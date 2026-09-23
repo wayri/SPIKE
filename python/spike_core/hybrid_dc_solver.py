@@ -32,6 +32,7 @@ from .hybrid_mesh import HybridMesh, build_hybrid_mesh, nearest_mesh_node
 from .pi_path_dc import stamp_pi_path_interfaces
 from .result_face_projection import (
     TOPOLOGY_VISUALIZATION_KINDS,
+    bind_result_faces,
     physical_result_edges,
     project_result_faces,
 )
@@ -568,23 +569,28 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
             status="validated",
         ))
 
+    face_bindings = bind_result_faces(active_cells, physical_edges)
     scalar_voltage = project_result_faces(active_cells, physical_edges,
-        lambda edge: (float(voltage[edge["a"]]) + float(voltage[edge["b"]])) / 2.0
+        lambda edge: (float(voltage[edge["a"]]) + float(voltage[edge["b"]])) / 2.0,
+        bindings=face_bindings,
     )
     scalar_drop = project_result_faces(active_cells, physical_edges,
-        lambda edge: (node_drop(edge["a"]) + node_drop(edge["b"])) / 2.0
+        lambda edge: (node_drop(edge["a"]) + node_drop(edge["b"])) / 2.0,
+        bindings=face_bindings,
     )
     current_density = project_result_faces(active_cells, physical_edges,
-        lambda edge: edge["current_density_a_mm2"] if edge["current_density_supported"] else None
+        lambda edge: edge["current_density_a_mm2"] if edge["current_density_supported"] else None,
+        bindings=face_bindings,
     )
-    current_field = project_result_faces(active_cells, physical_edges, lambda edge: abs(edge["current_a"]))
+    current_field = project_result_faces(active_cells, physical_edges, lambda edge: abs(edge["current_a"]), bindings=face_bindings)
     operating_point_impedance = project_result_faces(active_cells, physical_edges,
         lambda edge: abs(
             (float(voltage[edge["a"]]) + float(voltage[edge["b"]]))
             / (2.0 * float(edge["current_a"]))
-        ) if abs(float(edge["current_a"])) > 1e-15 else None
+        ) if abs(float(edge["current_a"])) > 1e-15 else None,
+        bindings=face_bindings,
     )
-    power_loss = project_result_faces(active_cells, physical_edges, lambda edge: edge["power_loss_w"])
+    power_loss = project_result_faces(active_cells, physical_edges, lambda edge: edge["power_loss_w"], bindings=face_bindings)
     via_source_ids = {str(edge["source_id"]) for edge in via_edges}
     via_cells = [cell for cell in active_cells if str(cell.get("source_id", "")) in via_source_ids]
     via_stress = project_result_faces(
