@@ -26,6 +26,18 @@ output. HTML may tab by net; print/PDF must include all nets in a linear documen
 Decimation and display interpolation must be labeled and never change solver
 samples. See [engineering reports](ENGINEERING_REPORTS.md).
 
+## Implementation checkpoint (2026-09-24)
+
+The results panel now exposes a scoped DC review using original returned
+voltage, drop, copper-density and via-density samples, including limit states,
+geometry identity and approximate-model labeling. A PDN review is tied to the
+exact source analysis ID and rejects failed sources, mismatched nets/sweeps
+and incomplete candidates. HTML report admission excludes partial values and
+plots from failed or blocked solves while retaining their diagnostics. Focused
+fixtures verify these presentation guards. These changes close the UI
+admission portion of the P0/P1 rows; they do not close physical board
+correlation, source/load terminal measurement, passivity or convergence gates.
+
 The first PI release is still **blocked** by the six native workflow gates in
 [PI release qualification](PI_RELEASE_QUALIFICATION.md), including real-board
 AC/transient and coupled solver evidence. Reference coverage does not relax any

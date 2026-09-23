@@ -35,6 +35,25 @@ The Results viewer and engineering report share `app/src/resultAnalytics.ts`. It
 
 The via table preserves the highest sample for each via element when a via produces multiple solver branches.
 
+## DC source to board review
+
+Open a completed DC result in the PI Results viewer and select a net and copper
+layer. The DC review shows the solver's declared maximum source voltage and the
+lowest voltage, largest drop, largest current density, and largest via density
+among original returned samples in that scope. Each extreme retains its element,
+net, layer, and source object identifier where the result supplied one. The
+drop and density screens compare these scoped samples with the current setup
+limits; changing a limit after a run changes the screen, not the solved values.
+An unset, invalid, or absent value is shown as unavailable rather than passed.
+
+The solver bundle does not currently return a distinct source terminal identity
+and voltage at every load terminal. A lowest board sample may be near a load,
+but is not a load measurement. This view therefore makes no source-to-load
+voltage guarantee. Complete that review with mapped load terminals, persisted
+terminal identities, and mesh-convergence evidence. Failed and `solved=false`
+results cannot populate this review or the engineering analytics; their raw
+diagnostics remain available elsewhere. Approximate DC status remains visible.
+
 ## Copper-fusing screen
 
 SPIKE uses the short-duration Onderdonk copper equation in the form published by NASA:

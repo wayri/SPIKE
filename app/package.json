@@ -64,6 +64,7 @@
     "test:harness-pi-panel": "node scripts/test-harness-pi-panel-render.mjs",
     "test:tetra-mesh-panel": "node scripts/test-tetra-mesh-panel.mjs",
     "test:report-runtime": "node scripts/test-engineering-report-runtime.mjs",
+    "test:pi-review-admission": "node scripts/test-dc-review.mjs && node scripts/test-pi-pdn-review.mjs && node scripts/test-report-admission.mjs",
     "test:via-stress-map": "node scripts/test-via-stress-map.mjs",
     "test:assembly-si-batch": "node scripts/test-assembly-si-batch.mjs",
     "test:thermal-ui": "node scripts/test-thermal-workflow.mjs && node scripts/test-thermal-assembly.mjs && node scripts/test-thermal-hardware.mjs",

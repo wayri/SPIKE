@@ -6,6 +6,9 @@ import {
   PdnCandidateRequest, PdnReview, ResultVisualization, ResultViewMode, SolverResultBundle, ViaModel, resultModeAvailable,
 } from "./analysisResults";
 import { buildResultEngineeringAnalytics } from "./resultAnalytics";
+import { resultSolvedForPresentation } from "./resultAdmission";
+import { buildDcReview } from "./dcReview";
+import PiPdnReview from "./PiPdnReview";
 import { viaStressMapSvg } from "./viaStressMap";
 import { resultDatumLayers, resultLayerMatchesSelection } from "./resultLayerSelection";
 import { numericExtent } from "./numericRange";
@@ -35,7 +38,9 @@ type Props = {
   parasiticsAvailable: boolean;
   riskAvailable: boolean;
   pdnReview: PdnReview | null;
+  pdnReviewSourceId: string | null;
   densityLimitAMm2: number | null;
+  dropLimitMv?: number | null;
   onVisualization: (value: ResultVisualization) => void;
   onConfigure: () => void;
   onRunParasitics: (viaModel: ViaModel) => void;
@@ -48,9 +53,11 @@ type Props = {
 };
 
 export default function ResultVisualizationPanel({
-  domain, board, selectedNet, result, sourceResult, visualization, workerAvailable, parasiticsAvailable, riskAvailable, pdnReview, densityLimitAMm2,
+  domain, board, selectedNet, result: rawResult, sourceResult: rawSourceResult, visualization, workerAvailable, parasiticsAvailable, riskAvailable, pdnReview, pdnReviewSourceId, densityLimitAMm2, dropLimitMv,
   onVisualization, onConfigure, onRunParasitics, onRunRisk, onRunPdn, onExportAnimation, onClose, onDetach, onTracePlots,
 }: Props) {
+  const result = rawResult?.status === "preview" || resultSolvedForPresentation(rawResult) ? rawResult : null;
+  const sourceResult = resultSolvedForPresentation(rawSourceResult) ? rawSourceResult : null;
   const [pdnTarget, setPdnTarget] = useState("0.05");
   const [candidateCuf, setCandidateCuf] = useState("100");
   const [candidateEsrMohm, setCandidateEsrMohm] = useState("10");
@@ -194,18 +201,21 @@ export default function ResultVisualizationPanel({
       return `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`;
     }).join(" ");
   })();
-  const resultLabel = !result ? "No solver result loaded"
+  const resultLabel = !result ? rawResult ? `${rawResult.mode.toUpperCase()} / ${rawResult.status} / ${rawResult.model_status}` : "No solver result loaded"
     : result.status === "preview" ? `${result.mode.toUpperCase()} mesh preview / not solved`
       : `${result.mode.toUpperCase()} / ${result.model_status}`;
   const frameCount = sourceResult?.time_series.frames.length ?? 0;
   const activeTime = sourceResult?.time_series.frames[visualization.animationFrame]?.time_s;
   const transientSummary = sourceResult?.summary ?? {};
-  const engineeringAnalytics = buildResultEngineeringAnalytics(result, densityLimitAMm2, {
+  const engineeringAnalytics = buildResultEngineeringAnalytics(result?.status === "preview" ? null : result, densityLimitAMm2, {
     ambientTemperatureC: visualization.fusingAmbientC,
     faultDurationS: visualization.fusingDurationS,
   });
+  const dcReview = domain === "pi" ? buildDcReview(result, selected || null, visualization.visibleResultLayers, dropLimitMv ?? null, densityLimitAMm2) : null;
   const vectorMode = ["current", "current_density", "electric_field", "magnetic_field"].includes(visualization.mode);
   const analyticsValue = (value: number | null, unit = "") => value === null ? "-" : `${value.toPrecision(6)}${unit ? ` ${unit}` : ""}`;
+  const dcSampleIdentity = (sample: { element_id?: string; source_id?: string; source_kind?: string; net?: string; layer?: string } | null) =>
+    sample ? `${sample.element_id || "sample"} / ${sample.net || "net unknown"} / ${sample.layer || "layer unknown"}${sample.source_id ? ` / geometry ${sample.source_kind || "object"} ${sample.source_id}` : " / geometry identity unavailable"}` : "No scoped sample returned";
   const reportedVias = engineeringAnalytics.stressedVias.some(via => via.status !== "ok")
     ? engineeringAnalytics.stressedVias.filter(via => via.status !== "ok").slice(0, 16)
     : engineeringAnalytics.stressedVias.slice(0, 8);
@@ -310,6 +320,20 @@ export default function ResultVisualizationPanel({
           <strong>{activeCount ?? 0} {visualization.mode === "impedance" && domain === "si" ? "network records" : "samples"}</strong>
           <span>{visualization.mode === "geometry" ? "Native design geometry" : visualization.mode === "impedance" && impedanceAvailable ? domain === "pi" ? "Spatial V/I from solved DC output" : "Extracted R/L/C/G and frequency sweep" : resultModeAvailable(result, visualization.mode) ? "Rendered from solver output" : "No compatible field dataset in the current result"}</span>
         </section>
+        {rawResult && !result && <section className="result-workflow-state" role="alert"><AlertTriangle size={14} /><div><b>Result unavailable for review</b><span>{rawResult.status} / {rawResult.model_status}. Partial samples are diagnostic only and are hidden from engineering analytics.</span></div></section>}
+        {dcReview && <section className="result-engineering-analytics" aria-label="DC source to board review">
+          <header><div><b>DC SOURCE TO BOARD REVIEW</b><span>{selected || "All nets"} / {visualization.visibleResultLayers.length ? visualization.visibleResultLayers.join(", ") : "all layers"} / {result?.model_status} / {result?.analysis_id}</span></div></header>
+          <dl className="probe-extrema">
+            <dt>Maximum declared source voltage</dt><dd>{analyticsValue(dcReview.sourceVoltageV, "V")} (source terminal identity is not returned)</dd>
+            <dt>Lowest returned board voltage</dt><dd>{analyticsValue(dcReview.lowestVoltage?.value ?? null, "V")}; {dcSampleIdentity(dcReview.lowestVoltage)}</dd>
+            <dt>Highest returned board drop</dt><dd>{analyticsValue(dcReview.highestDrop === null ? null : dcReview.highestDrop.value * 1000, "mV")}; {dcSampleIdentity(dcReview.highestDrop)}</dd>
+            <dt>Selected sample / current drop limit</dt><dd>{dcReview.drop.limit === null ? "No positive limit configured" : analyticsValue(dcReview.drop.limit * 1000, "mV")} / {dcReview.drop.state}</dd>
+            <dt>Highest copper density</dt><dd>{analyticsValue(dcReview.highestDensity?.value ?? null, "A/mm2")}; {dcSampleIdentity(dcReview.highestDensity)}</dd>
+            <dt>Selected sample / current density limit</dt><dd>{dcReview.density.limit === null ? "No positive limit configured" : analyticsValue(dcReview.density.limit, "A/mm2")} / {dcReview.density.state}</dd>
+            <dt>Highest via density</dt><dd>{analyticsValue(dcReview.highestViaDensity?.value ?? null, "A/mm2")}; {dcSampleIdentity(dcReview.highestViaDensity)}</dd>
+          </dl>
+          <p className="analytics-validity-note">These are original solver samples for the selected net and layers. The worst board sample is not identified as a load terminal. A source-to-load voltage budget requires returned terminal identities and values. {result?.model_status === "approximate" ? "This DC solve is approximate; check mesh convergence before engineering sign-off." : "Review model validity and mesh convergence before engineering sign-off."}</p>
+        </section>}
         {!result && <section className="result-workflow-state">
           <div>
             <b>{selected || "No analysis net selected"}</b>
@@ -397,7 +421,7 @@ export default function ResultVisualizationPanel({
             </>}
           </div>
         </section>}
-        {result && <section className="result-engineering-analytics">
+        {result && result.status !== "preview" && <section className="result-engineering-analytics">
           <header><div><b>ENGINEERING ANALYTICS</b><span>Solver extrema, probes, via stress, and copper-fusing screening</span></div><span className="approximate-badge">APPROXIMATE FUSING MODEL</span></header>
           <div className="analytics-summary-grid">
             <div><span>Minimum voltage</span><strong>{analyticsValue(engineeringAnalytics.fields.find(field => field.key === "voltage_v")?.minimum ?? null, "V")}</strong></div>
@@ -468,13 +492,7 @@ export default function ResultVisualizationPanel({
                 count: Math.max(1, Number(candidateCount) || 1),
                 ...(candidatePort ?? {}),
               })}><Activity size={14} /> Check target and candidate</button>
-              {pdnReview && <dl className={`pdn-review ${pdnReview.status}`}>
-                <dt>Target status</dt><dd>{pdnReview.status === "pass" ? "Pass" : `${pdnReview.violation_count} violating points`}</dd>
-                <dt>Worst impedance</dt><dd>{pdnReview.maximum_impedance_ohm.toPrecision(6)} ohm</dd>
-                <dt>Resonance peaks</dt><dd>{pdnReview.resonances.length}</dd>
-                <dt>Candidate result</dt><dd>{pdnReview.candidate_screening[0]?.status === "evaluated" && pdnReview.candidate_screening[0].worst_impedance_ohm !== undefined && pdnReview.candidate_screening[0].worst_impedance_improvement_percent !== undefined ? `${pdnReview.candidate_screening[0].worst_impedance_ohm.toPrecision(6)} ohm / ${pdnReview.candidate_screening[0].worst_impedance_improvement_percent.toFixed(2)}% improvement` : pdnReview.candidate_screening[0]?.issues?.[0]?.message ?? "No candidate"}</dd>
-                <dt>Placement model</dt><dd>{pdnReview.candidate_screening[0]?.placement_method?.replace(/_/g, " ") ?? "-"}</dd>
-              </dl>}
+              {pdnReview && <PiPdnReview source={sourceResult} review={pdnReview} selectedNet={selected ?? ""} reviewSourceId={pdnReviewSourceId} />}
               <small>{candidatePorts.length ? `${candidatePorts.length} reviewed probe placement port(s) were extracted. Choose one to use local and transfer impedance; the model remains ${selectedMultiport?.model_status ?? "approximate"}.` : "Mount R/L screen an explicit lumped connection path. Place probes at candidate capacitor pads, then run AC from PI Setup to extract reviewed local and transfer-impedance sweeps."}</small>
             </div>
             <button className="secondary-btn" onClick={onConfigure}><Grid3X3 size={14} /> Configure and regenerate mesh</button>

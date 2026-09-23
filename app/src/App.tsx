@@ -8,6 +8,7 @@ import BoardImportPanel from "./BoardImportPanel";
 import { analysisFailure } from "./analysisFailure";
 import { workspaceIssues } from "./workspaceIssues";
 import { createResultPackage, mergeProjectSnapshot, readResultPackage, retainOpaqueResultState, isSupportedSavedResult } from "./projectSnapshotState";
+import { resultSolvedForPresentation } from "./resultAdmission";
 import { hydrateProjectArtifacts, restoreBoardVisuals, serializeBoardVisuals } from "./projectPersistenceArtifacts";
 import { useBoardVisualImport } from "./useBoardVisualImport";
 import WorkflowSchematic from "./WorkflowSchematic";
@@ -642,7 +643,7 @@ const emiFarFieldFrequencies = (startHz: number, stopHz: number) => {
   if (!(startHz > 0) || !(stopHz > startHz)) return [startHz].filter(value => value > 0);
   return [startHz, Math.sqrt(startHz * stopHz), stopHz];
 };
-type ProjectSnapshot = { probes: BoardObject[]; probeFormulaRows: ProbeFormulaRow[]; probeReferenceIds: Record<string, string>; boardFile: string; frequency: string; solverId: string; formulation: string; solverSelections: Record<string, string>; piSetup: PiSetup; piTopology: TopologyModel; siTopology: TopologyModel; selectedSiSuite: SiProtocolSuite | null; siChannelResult: Record<string, unknown> | null; spiceWorkspace: SpiceWorkspace; emiSetup: EmiSetup; emiPreflight: EmiPreflight | null; emiScreening: EmiScreening | null; emiFieldResult: EmiFieldResult | null; thermalScenario: Record<string, unknown> | null; componentBonds: BondRecord[]; visibleLayers: Record<LayerName, boolean>; layerOpacity: Record<LayerName, number>; layerSeparation: number; showVias: boolean; showNetNames: boolean; showAxes: boolean; selected: BoardObject | null; selectionFilter: SelectionFilter; isolatedNet: string | null; modelAssignments: Record<string, string>; assemblyIr: AssemblyIr | null; assemblyDesigns: AssemblyDesigns | null; assemblyPackageShapes: AssemblyPackageShapesIndex | null; modelIndex: ModelIndex; showModels: boolean; showSmdModels: boolean; showThtModels: boolean; navigationInertia: boolean; viewMode: "2D" | "3D"; resultVisualization: ResultVisualization; analysisResult: SolverResultBundle | null; pdnReview: PdnReview | null; workspace?: WorkspaceState };
+type ProjectSnapshot = { probes: BoardObject[]; probeFormulaRows: ProbeFormulaRow[]; probeReferenceIds: Record<string, string>; boardFile: string; frequency: string; solverId: string; formulation: string; solverSelections: Record<string, string>; piSetup: PiSetup; piTopology: TopologyModel; siTopology: TopologyModel; selectedSiSuite: SiProtocolSuite | null; siChannelResult: Record<string, unknown> | null; spiceWorkspace: SpiceWorkspace; emiSetup: EmiSetup; emiPreflight: EmiPreflight | null; emiScreening: EmiScreening | null; emiFieldResult: EmiFieldResult | null; thermalScenario: Record<string, unknown> | null; componentBonds: BondRecord[]; visibleLayers: Record<LayerName, boolean>; layerOpacity: Record<LayerName, number>; layerSeparation: number; showVias: boolean; showNetNames: boolean; showAxes: boolean; selected: BoardObject | null; selectionFilter: SelectionFilter; isolatedNet: string | null; modelAssignments: Record<string, string>; assemblyIr: AssemblyIr | null; assemblyDesigns: AssemblyDesigns | null; assemblyPackageShapes: AssemblyPackageShapesIndex | null; modelIndex: ModelIndex; showModels: boolean; showSmdModels: boolean; showThtModels: boolean; navigationInertia: boolean; viewMode: "2D" | "3D"; resultVisualization: ResultVisualization; analysisResult: SolverResultBundle | null; pdnReview: PdnReview | null; pdnReviewSourceId: string | null; workspace?: WorkspaceState };
 
 function decodeBase64Buffer(value: string): ArrayBuffer {
   const binary = atob(value);
@@ -940,6 +941,7 @@ export default function App() {
   const [reportPreview, setReportPreview] = useState<{ fileName: string; html: string } | null>(null);
   const [resultDisplay, setResultDisplay] = useState<"all" | "none" | string>("none");
   const [pdnReview, setPdnReview] = useState<PdnReview | null>(null);
+  const [pdnReviewSourceId, setPdnReviewSourceId] = useState<string | null>(null);
   const [resultVisualization, setResultVisualization] = useState<ResultVisualization>(defaultResultVisualization);
   const [resultVisualizerOpen, setResultVisualizerOpen] = useState(false);
   const [tracePlotsOpen, setTracePlotsOpen] = useState(false);
@@ -1381,7 +1383,7 @@ export default function App() {
     setViewportRestore({ token: Date.now(), ...restored.viewports });
     return restored.viewMode === "2D" ? Boolean(restored.viewports.twoD) : Boolean(restored.viewports.threeD);
   };
-  const snapshot = (): ProjectSnapshot => ({ probes: structuredClone(probes), probeFormulaRows: structuredClone(probeFormulaRows), probeReferenceIds: { ...probeReferenceIds }, boardFile, frequency, solverId, formulation, solverSelections: { ...solverSelections }, piSetup: structuredClone(piSetup), piTopology: structuredClone(piTopology), siTopology: structuredClone(siTopology), selectedSiSuite: structuredClone(selectedSiSuite), siChannelResult: structuredClone(siChannelResult), spiceWorkspace: structuredClone(spiceWorkspace), emiSetup: structuredClone(emiSetup), emiPreflight: structuredClone(emiPreflight), emiScreening: structuredClone(emiScreening), emiFieldResult: structuredClone(emiFieldResult), thermalScenario: structuredClone(thermalScenario), componentBonds: structuredClone(componentBonds), visibleLayers: { ...visibleLayers }, layerOpacity: { ...layerOpacity }, layerSeparation, showVias, showNetNames, showAxes, selected, selectionFilter, isolatedNet, modelAssignments: { ...modelAssignments }, assemblyIr: structuredClone(assemblyIr), assemblyDesigns: structuredClone(assemblyDesigns), assemblyPackageShapes: structuredClone(assemblyPackageShapes), modelIndex: structuredClone(modelIndex), showModels, showSmdModels, showThtModels, navigationInertia, viewMode, resultVisualization: { ...resultVisualization }, analysisResult, pdnReview: structuredClone(pdnReview), workspace: workspaceState() });
+  const snapshot = (): ProjectSnapshot => ({ probes: structuredClone(probes), probeFormulaRows: structuredClone(probeFormulaRows), probeReferenceIds: { ...probeReferenceIds }, boardFile, frequency, solverId, formulation, solverSelections: { ...solverSelections }, piSetup: structuredClone(piSetup), piTopology: structuredClone(piTopology), siTopology: structuredClone(siTopology), selectedSiSuite: structuredClone(selectedSiSuite), siChannelResult: structuredClone(siChannelResult), spiceWorkspace: structuredClone(spiceWorkspace), emiSetup: structuredClone(emiSetup), emiPreflight: structuredClone(emiPreflight), emiScreening: structuredClone(emiScreening), emiFieldResult: structuredClone(emiFieldResult), thermalScenario: structuredClone(thermalScenario), componentBonds: structuredClone(componentBonds), visibleLayers: { ...visibleLayers }, layerOpacity: { ...layerOpacity }, layerSeparation, showVias, showNetNames, showAxes, selected, selectionFilter, isolatedNet, modelAssignments: { ...modelAssignments }, assemblyIr: structuredClone(assemblyIr), assemblyDesigns: structuredClone(assemblyDesigns), assemblyPackageShapes: structuredClone(assemblyPackageShapes), modelIndex: structuredClone(modelIndex), showModels, showSmdModels, showThtModels, navigationInertia, viewMode, resultVisualization: { ...resultVisualization }, analysisResult, pdnReview: structuredClone(pdnReview), pdnReviewSourceId, workspace: workspaceState() });
   const restoreSnapshot = (next: ProjectSnapshot) => {
     setProbes(next.probes ?? []); setProbeFormulaRows(next.probeFormulaRows ?? []); setSavedProbeReferenceIds(next.probeReferenceIds ?? {});
     setBoardFile(next.boardFile); setFrequency(next.frequency); setSolverId(next.solverId ?? "auto"); setFormulation(next.formulation ?? "auto"); setVisibleLayers(next.visibleLayers);
@@ -1406,7 +1408,7 @@ export default function App() {
     setLayerOpacity(next.layerOpacity ?? {});
     setLayerSeparation(next.layerSeparation ?? 0); setShowVias(next.showVias ?? true); setShowNetNames(next.showNetNames ?? false); setShowAxes(next.showAxes ?? true); setNavigationInertia(next.navigationInertia ?? false);
     setSelected(next.selected); setSelectionFilter(next.selectionFilter ?? "all"); setIsolatedNet(next.isolatedNet ?? null); setModelAssignments(next.modelAssignments ?? {}); setShowModels(next.showModels); setShowSmdModels(next.showSmdModels ?? true); setShowThtModels(next.showThtModels ?? true); setViewMode(next.viewMode);
-    setResultVisualization({ ...defaultResultVisualization(), ...(next.resultVisualization ?? {}) }); setAnalysisResult(next.analysisResult ?? null); setPdnReview(next.pdnReview ?? null);
+    setResultVisualization({ ...defaultResultVisualization(), ...(next.resultVisualization ?? {}) }); setAnalysisResult(next.analysisResult ?? null); setPdnReview(next.pdnReview ?? null); setPdnReviewSourceId(next.pdnReviewSourceId ?? null);
     restoreWorkspaceState(next.workspace);
   };
   const recordChange = () => { historyRef.current = [...historyRef.current.slice(-49), snapshot()]; redoRef.current = []; markProjectDirty(); };
@@ -1414,12 +1416,12 @@ export default function App() {
   const redo = () => { const next = redoRef.current.pop(); if (!next) { setStatus("Nothing to redo"); return; } historyRef.current.push(snapshot()); restoreSnapshot(next); markProjectDirty(); setStatus("Change redone"); };
   const download = (name: string, content: string, type = "application/json") => { const url = URL.createObjectURL(new Blob([content], { type })); const anchor = document.createElement("a"); anchor.href = url; anchor.download = name; document.body.appendChild(anchor); anchor.click(); anchor.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 1500); };
   const downloadBlob = (name: string, blob: Blob) => { const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = name; anchor.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000); };
-  const projectData = () => createProjectPackage(mergeProjectSnapshot(retainedProjectSnapshot.current, { board_visuals: null, harness: harnessDocument, project: { name: projectName }, design: { canonical_design: canonicalDesignIr, source_file: boardFile, source_format: boardFile.endsWith(".spike-design.json") ? "spike-normalized" : "kicad_pcb", source_board: boardSource, stackup: boardData?.stackup ?? [], technology: boardData?.technology ?? "rigid", regions: boardData?.regions ?? [], bend_lines: boardData?.bendLines ?? [], model_assignments: modelAssignments, component_bonds: componentBonds, topologies: { pi: piTopology, si: siTopology } }, assembly_ir: assemblyIr, assembly_designs: assemblyDesigns, assembly_package_shapes: assemblyPackageShapes, models: modelIndex, analysis: retainOpaqueResultState(retainedProjectSnapshot.current?.analysis, { mode: analysisMode, solver_id: solverId, formulation, solver_selections: solverSelections, power_nets: powerNets, pi_setup: piSetup, si: { suite: selectedSiSuite, latest_channel_result: siChannelResult }, limits, frequency, visible_layers: visibleLayers, layer_opacity: layerOpacity, layer_separation_mm: layerSeparation, show_vias: showVias, show_net_names: showNetNames, show_axes: showAxes, show_models: showModels, show_smd_models: showSmdModels, show_tht_models: showThtModels, navigation_inertia: navigationInertia, view_mode: viewMode, selection_filter: selectionFilter, isolated_net: isolatedNet, result_visualization: resultVisualization, result_display: resultDisplay, latest_result: analysisResult, result_history: resultRecords.map(record => ({ id: record.id, label: record.label, bundle: record.bundle })), pdn_review: pdnReview, selected_net_geometry: boardData && isolatedNet ? extractNetGeometry(boardData, isolatedNet) : null }, isSupportedSavedResult), spice: { workspace: spiceWorkspace }, emi: { setup: emiSetup, preflight: emiPreflight, screening: emiScreening, field_result: emiFieldResult }, thermal: { scenario: thermalScenario, component_bonds: componentBonds }, workspace: workspaceState(), probes, probe_table: { calculated_rows: probeFormulaRows, reference_ids: probeReferenceIds }, selection: selected }));
+  const projectData = () => createProjectPackage(mergeProjectSnapshot(retainedProjectSnapshot.current, { board_visuals: null, harness: harnessDocument, project: { name: projectName }, design: { canonical_design: canonicalDesignIr, source_file: boardFile, source_format: boardFile.endsWith(".spike-design.json") ? "spike-normalized" : "kicad_pcb", source_board: boardSource, stackup: boardData?.stackup ?? [], technology: boardData?.technology ?? "rigid", regions: boardData?.regions ?? [], bend_lines: boardData?.bendLines ?? [], model_assignments: modelAssignments, component_bonds: componentBonds, topologies: { pi: piTopology, si: siTopology } }, assembly_ir: assemblyIr, assembly_designs: assemblyDesigns, assembly_package_shapes: assemblyPackageShapes, models: modelIndex, analysis: retainOpaqueResultState(retainedProjectSnapshot.current?.analysis, { mode: analysisMode, solver_id: solverId, formulation, solver_selections: solverSelections, power_nets: powerNets, pi_setup: piSetup, si: { suite: selectedSiSuite, latest_channel_result: siChannelResult }, limits, frequency, visible_layers: visibleLayers, layer_opacity: layerOpacity, layer_separation_mm: layerSeparation, show_vias: showVias, show_net_names: showNetNames, show_axes: showAxes, show_models: showModels, show_smd_models: showSmdModels, show_tht_models: showThtModels, navigation_inertia: navigationInertia, view_mode: viewMode, selection_filter: selectionFilter, isolated_net: isolatedNet, result_visualization: resultVisualization, result_display: resultDisplay, latest_result: analysisResult, result_history: resultRecords.map(record => ({ id: record.id, label: record.label, bundle: record.bundle })), pdn_review: pdnReview, pdn_review_source_id: pdnReviewSourceId, selected_net_geometry: boardData && isolatedNet ? extractNetGeometry(boardData, isolatedNet) : null }, isSupportedSavedResult), spice: { workspace: spiceWorkspace }, emi: { setup: emiSetup, preflight: emiPreflight, screening: emiScreening, field_result: emiFieldResult }, thermal: { scenario: thermalScenario, component_bonds: componentBonds }, workspace: workspaceState(), probes, probe_table: { calculated_rows: probeFormulaRows, reference_ids: probeReferenceIds }, selection: selected }));
   const performNewProject = () => { setHarnessDocument(null);
     retainedProjectSnapshot.current = null;
     resetPreparedVisualBundle();
     setDeferredBoardVisual(null);
-    historyRef.current = []; redoRef.current = []; setProjectName("untitled.spike"); setProjectPath(null); setProjectManifestDigest(null); setActiveDesignId(null); setCanonicalDesignIr(null); setBoardFile("untitled.kicad_pcb"); setBoardSource(""); setBoardData(null); setSelected(null); setSolverSelections({}); setPiSetup(defaultPiSetup()); setPiTopology(emptyTopology("pi")); setSiTopology(emptyTopology("si")); setSelectedSiSuite(null); setSiChannelResult(null); setSpiceWorkspace(defaultSpiceWorkspace("pi")); setEmiSetup(defaultEmiSetup()); setEmiPreflight(null); setEmiScreening(null); setEmiFieldResult(null); setThermalScenario(null); setComponentBonds([]); setAssemblyIr(null); setAssemblyDesigns(null); setAssemblyPackageShapes(null); setModelIndex(normalizeModelIndex(null)); setBondValidation([]); setProbes([]); setProbeFormulaRows([]); setSavedProbeReferenceIds({}); setAnalysisResult(null); setPdnReview(null); setResultRecords([]); setResultDisplay("none"); setAnalysisSummary(null); setProjectManagerOpen(false); setProjectClean(); setStatus("New SPIKE project created");
+    historyRef.current = []; redoRef.current = []; setProjectName("untitled.spike"); setProjectPath(null); setProjectManifestDigest(null); setActiveDesignId(null); setCanonicalDesignIr(null); setBoardFile("untitled.kicad_pcb"); setBoardSource(""); setBoardData(null); setSelected(null); setSolverSelections({}); setPiSetup(defaultPiSetup()); setPiTopology(emptyTopology("pi")); setSiTopology(emptyTopology("si")); setSelectedSiSuite(null); setSiChannelResult(null); setSpiceWorkspace(defaultSpiceWorkspace("pi")); setEmiSetup(defaultEmiSetup()); setEmiPreflight(null); setEmiScreening(null); setEmiFieldResult(null); setThermalScenario(null); setComponentBonds([]); setAssemblyIr(null); setAssemblyDesigns(null); setAssemblyPackageShapes(null); setModelIndex(normalizeModelIndex(null)); setBondValidation([]); setProbes([]); setProbeFormulaRows([]); setSavedProbeReferenceIds({}); setAnalysisResult(null); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords([]); setResultDisplay("none"); setAnalysisSummary(null); setProjectManagerOpen(false); setProjectClean(); setStatus("New SPIKE project created");
   };
   const requestUnsavedAction = (actionLabel: string, action: () => void | Promise<void>) => {
     if (!projectDirtyRef.current) { void action(); return; }
@@ -1538,7 +1540,7 @@ export default function App() {
     const restoredDisplay = persistedDisplay === "none" || persistedDisplay === "all" || boundedRecords.some(record => record.id === persistedDisplay)
       ? persistedDisplay
       : boundedRecords[boundedRecords.length - 1]?.id ?? (loadedResult ? "all" : "none");
-    setResultVisualization({ ...defaultResultVisualization(), ...(analysis.result_visualization ?? {}) }); setAnalysisResult(loadedResult); setPdnReview(loadedPdnReview); setResultRecords(boundedRecords); setResultDisplay(restoredDisplay); setProbes(data.probes ?? []);
+    setResultVisualization({ ...defaultResultVisualization(), ...(analysis.result_visualization ?? {}) }); setAnalysisResult(loadedResult); setPdnReview(loadedPdnReview); setPdnReviewSourceId(typeof analysis.pdn_review_source_id === "string" ? analysis.pdn_review_source_id : null); setResultRecords(boundedRecords); setResultDisplay(restoredDisplay); setProbes(data.probes ?? []);
     const loadedProbeTable = normalizeProbeTableState(data.probe_table);
     setProbeFormulaRows(loadedProbeTable.calculatedRows); setSavedProbeReferenceIds(loadedProbeTable.referenceIds); setSelected(data.selection ?? null); setAnalysisSummary(null);
     if (!restoreWorkspaceState(data.workspace)) setCameraCommand(`fit-project-${Date.now()}`);
@@ -1861,7 +1863,8 @@ export default function App() {
         faultDurationS: resultVisualization.fusingDurationS,
       },
       modelAssignmentCount: Object.keys(modelAssignments).length,
-      pdnReview,
+      pdnReview: reportDomain === "pi" && result && resultSolvedForPresentation(result)
+        && pdnReviewSourceId === result.analysis_id ? pdnReview : null,
       emi: { setup: emiSetup, preflight: emiPreflight, screening: emiScreening, fieldResult: emiFieldResult },
       si: { channelResult: siChannelResult, suite: selectedSiSuite },
       thermal: { scenario: thermalScenario },
@@ -2140,7 +2143,7 @@ export default function App() {
       setIsolatedNet(null);
       setAnalysisSummary(null);
       setAnalysisResult(null);
-      setPdnReview(null);
+      setPdnReview(null); setPdnReviewSourceId(null);
       setResultRecords([]);
       setResultDisplay("none");
       setEmiSetup(defaultEmiSetup(Object.values(parsed.nets)));
@@ -2168,7 +2171,7 @@ export default function App() {
       if (!result) return;
       const record = resultRecord(result, resultRecords.length);
       setAnalysisResult(result);
-      setPdnReview(null);
+      setPdnReview(null); setPdnReviewSourceId(null);
       setResultRecords(current => boundedResultRecords([...current.filter(item => item.id !== record.id), record]));
       setResultDisplay(record.id);
       setResultVisualization(current => ({
@@ -2386,7 +2389,7 @@ export default function App() {
     [analysisResult, displayedResult, resultRecords.length, resultVisualization.animationFrame, frameFieldSelection],
   );
   const activePdnReview = resultVisualizerDomain === "pi" && activeAnalysisResult?.analysis_id
-    && activeAnalysisResult.analysis_id === analysisResult?.analysis_id ? pdnReview : null;
+    && activeAnalysisResult.analysis_id === analysisResult?.analysis_id && pdnReviewSourceId === analysisResult?.analysis_id ? pdnReview : null;
   const detachedProbeSnapshot = useMemo(() => buildDetachedProbeSnapshot(probes, activeAnalysisResult, probeFormulaRows, probeReferenceIds),
     [probes, activeAnalysisResult, probeFormulaRows, probeReferenceIds]);
   const detachedResultsSnapshot = useMemo(() => buildDetachedResultsSnapshot(activeAnalysisResult,
@@ -3148,7 +3151,7 @@ export default function App() {
       if (result) {
         const record = resultRecord(result, resultRecords.length);
         setAnalysisResult(result);
-        setPdnReview(null);
+        setPdnReview(null); setPdnReviewSourceId(null);
         setResultRecords(current => boundedResultRecords([...current.filter(item => item.id !== record.id), record]));
         setResultDisplay(record.id);
         if (mode === "broadband_hf") {
@@ -3188,7 +3191,9 @@ export default function App() {
     );
   }
   const runPdnReview = async (targetOhm: number, candidate: PdnCandidateRequest) => {
-    if (!analysisResult) { setStatus("Run an AC impedance extraction before PDN review"); return; }
+    if (!analysisResult || !resultSolvedForPresentation(analysisResult)) { setStatus("Run a completed AC impedance extraction before PDN review"); return; }
+    const sourceId = analysisResult.analysis_id;
+    setPdnReview(null); setPdnReviewSourceId(null);
     setAnalysisRunning(true);
     try {
       const response = await runLocalWorker({
@@ -3198,6 +3203,7 @@ export default function App() {
       const review = response.result as PdnReview | undefined;
       if (review?.contract === "spike/pdn-review/v1") {
         setPdnReview(review);
+        setPdnReviewSourceId(sourceId);
         setStatus(review.status === "pass" ? "PDN impedance target passed" : `${review.violation_count} PDN impedance points exceed the target`);
       } else {
         setStatus(response.error ?? "PDN review failed");
@@ -3253,7 +3259,7 @@ export default function App() {
       setProbes([]); setProbeFormulaRows([]); setSavedProbeReferenceIds({});
       setAnalysisSummary(null);
       setAnalysisResult(null);
-      setPdnReview(null);
+      setPdnReview(null); setPdnReviewSourceId(null);
       setResultRecords([]);
       setResultDisplay("none");
       setSelectedSiSuite(null);
@@ -4005,7 +4011,7 @@ export default function App() {
     {thermalOpen && <ThermalWizard initialScenario={thermalScenario} componentBonds={componentBonds} board={boardData} design={designForSolver()} workerAvailable={workerAvailable} onRequireAdmission={requireAssemblyAdmission} onClose={() => { setThermalOpen(false); setThermalPreview(null); }} onStatus={setStatus} onPreview={setThermalPreview} onScenario={scenario => { recordChange(); setThermalScenario(scenario); setThermalPreview(scenario); }} />}
     {tracePlotsOpen && <div className="modal-shade"><div style={{ width: "min(1400px, 94vw)", height: "88vh", background: "#101c25", overflow: "auto" }}><TraceResultsWorkbench result={activeAnalysisResult} domain={resultVisualizerDomain} targetNet={activePdnReview?.net} targetOhm={activePdnReview?.target_ohm}
       onClose={() => setTracePlotsOpen(false)} onDetach={() => void detachTool("trace-plots")} /></div></div>}
-    {resultVisualizerOpen && <ResultVisualizationPanel onTracePlots={() => setTracePlotsOpen(true)} onDetach={() => void detachTool("results")} domain={resultVisualizerDomain} board={boardData} selectedNet={selected?.net ?? piSetup.net ?? null} result={activeAnalysisResult} sourceResult={analysisResult} visualization={resultVisualization} workerAvailable={workerAvailable} parasiticsAvailable={solverSupports("partial_inductance", "frequency_dependent_impedance")} riskAvailable={solverSupports("coupled_line_extraction", "electric_field_coupling", "magnetic_field_coupling")} pdnReview={pdnReview} densityLimitAMm2={Number.isFinite(Number(limits.density)) && Number(limits.density) > 0 ? Number(limits.density) : null} onVisualization={setResultVisualization} onConfigure={() => { setResultVisualizerOpen(false); setDcRunOpen(true); }} onRunParasitics={runParasitics} onRunRisk={runSiRisk} onRunPdn={(target, candidate) => void runPdnReview(target, candidate)} onExportAnimation={() => void exportResultAnimation()} onClose={() => setResultVisualizerOpen(false)} />}
+    {resultVisualizerOpen && <ResultVisualizationPanel onTracePlots={() => setTracePlotsOpen(true)} onDetach={() => void detachTool("results")} domain={resultVisualizerDomain} board={boardData} selectedNet={selected?.net ?? piSetup.net ?? null} result={activeAnalysisResult} sourceResult={analysisResult} visualization={resultVisualization} workerAvailable={workerAvailable} parasiticsAvailable={solverSupports("partial_inductance", "frequency_dependent_impedance")} riskAvailable={solverSupports("coupled_line_extraction", "electric_field_coupling", "magnetic_field_coupling")} pdnReview={activePdnReview} pdnReviewSourceId={pdnReviewSourceId} dropLimitMv={Number.isFinite(Number(limits.drop)) && Number(limits.drop) > 0 ? Number(limits.drop) : null} densityLimitAMm2={Number.isFinite(Number(limits.density)) && Number(limits.density) > 0 ? Number(limits.density) : null} onVisualization={setResultVisualization} onConfigure={() => { setResultVisualizerOpen(false); setDcRunOpen(true); }} onRunParasitics={runParasitics} onRunRisk={runSiRisk} onRunPdn={(target, candidate) => void runPdnReview(target, candidate)} onExportAnimation={() => void exportResultAnimation()} onClose={() => setResultVisualizerOpen(false)} />}
     <div hidden={!sparameterOpen}><SParameterWorkbench assemblyDesigns={assemblyDesigns} canonicalDesign={canonicalDesignIr} suite={selectedSiSuite} initialResult={siChannelResult} onClose={() => setSparameterOpen(false)} onStatus={setStatus} onResult={result => { recordChange(); setSiChannelResult(result); }} /></div>
     </Suspense>
     {emiDashboardOpen && tab === "EMI" && !emiChamberOpen && <EmiDashboard preflight={emiPreflight} screening={emiScreening} fieldResult={emiFieldResult} onClose={() => setEmiDashboardOpen(false)} onScreen={() => void runEmiScreening()} onPrepare={() => void prepareEmiCase()} onSolverManager={() => void openExternalEngineCenter()} />}
@@ -4026,7 +4032,7 @@ export default function App() {
     {helpOpen && <Suspense fallback={<div className="modal-shade" role="status">Loading help…</div>}><HelpCenter context={tab} diagnosticCode={helpDiagnosticCode} onClose={() => { setHelpOpen(false); setHelpDiagnosticCode(undefined); }} /></Suspense>}
     {aboutOpen && <AboutDialog license={appSettings.license} onClose={() => setAboutOpen(false)} onOpenGuide={() => { setAboutOpen(false); setHelpOpen(true); }} onOpenValidation={() => { setAboutOpen(false); setBenchmarkOpen(true); }} />}
     {benchmarkOpen && <BenchmarkCenter onClose={() => setBenchmarkOpen(false)} onStatus={setStatus} />}
-    {spiceOpen && <SpiceWorkbench initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} />}
+    {spiceOpen && <SpiceWorkbench initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} />}
     {bondManagerOpen && <BondManager
       bonds={componentBonds}
       validation={bondValidation}

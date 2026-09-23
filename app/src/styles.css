@@ -983,6 +983,14 @@ select option:disabled { color: #647b85; }
 .pdn-screening .pdn-review { display: grid; grid-template-columns: minmax(110px, .8fr) 1.5fr; margin: 0; padding: 8px; border-left: 3px solid #e3a435; background: rgba(227,164,53,.06); }
 .pdn-screening .pdn-review.pass { border-left-color: #58d09b; background: rgba(88,208,155,.06); }
 .pdn-screening .pdn-review dt, .pdn-screening .pdn-review dd { margin: 0; padding: 3px 5px; }
+.pdn-review-detail { min-width: 0; padding: 12px; border: 1px solid #31515a; border-left: 3px solid #58cbbd; background: #12232b; color: #b5cbd0; }
+.pdn-review-detail h3, .pdn-review-detail h4 { margin: 0 0 8px; color: #d9e9eb; }
+.pdn-review-detail p { margin: 7px 0; color: #a7c0c6; }
+.pdn-review-detail dl { display: grid; grid-template-columns: minmax(120px, .8fr) minmax(0, 1.5fr); gap: 1px 10px; margin: 8px 0; }
+.pdn-review-detail dt, .pdn-review-detail dd { margin: 0; padding: 4px 0; border-bottom: 1px solid #27404a; overflow-wrap: anywhere; }
+.pdn-review-detail dt { color: #8ca8b0; }
+.pdn-review-detail ul { margin: 6px 0; padding-left: 18px; }
+.pdn-candidate { margin-top: 12px; padding: 10px; border: 1px solid #29454e; background: #0f1e25; }
 @media (max-width: 1100px) { .pdn-screening > div { grid-template-columns: repeat(2, minmax(90px, 1fr)); } }
 .risk-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-height: 210px; overflow: auto; margin-bottom: 10px; }.risk-columns > div { display: grid; align-content: start; gap: 4px; padding: 8px; background: #0d181e; }.risk-columns b { color: #dfa94d; font-size: 9px; text-transform: uppercase; }.risk-columns label { min-width: 0; display: flex; align-items: center; gap: 5px; color: #8ba1aa; font-size: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 900px) { .result-visualizer { top: 12px; right: 12px; bottom: 12px; width: calc(100vw - 24px); }.result-visualizer-body { grid-template-columns: 135px minmax(0,1fr); }.result-data-status { grid-template-columns: 1fr 80px; }.result-data-status span { grid-column: 1 / -1; padding-bottom: 8px; }.result-workflow-state { grid-template-columns: 1fr; }.result-workflow-state > p { grid-column: 1; } }

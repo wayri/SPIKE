@@ -48,6 +48,16 @@ candidate multiport data are validated and reverse transfer is explicit or
 reciprocity is explicitly declared. It does not promote an approximate PEEC
 or capacitance extraction.
 
+The desktop candidate review is a display of the returned `spike/pdn-review/v1`
+values. It shows the reviewed target, source worst impedance and violation count,
+candidate C/ESR/ESL/count and mounting values, placement model, assumptions,
+status, and before/after worst impedance. It requires the review to be bound to
+the active source analysis ID. Saved reviews without that binding must be rerun;
+the review envelope itself does not currently carry the source ID. The display
+rejects candidate rows with missing/nonfinite model or response values, source
+ID mismatch, or a frequency grid different from the source sweep. The original
+raw review remains available for diagnosis.
+
 ### Native PEEC candidate extraction
 
 `spike.peec_2_5d` can now emit `spike/pdn-multiport/v1` when an AC analysis
