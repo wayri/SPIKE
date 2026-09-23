@@ -75,7 +75,7 @@ definitions.push({ id: 48, name: "User.1", kind: "user" });
 const inventory = inventoryModule.buildLayerManagerInventory(definitions, stackup);
 assert.equal(inventory.physicalCount, 17, "the manager must use the canonical stackup physical count");
 assert.equal(inventory.copperCount, 6, "the manager must report copper-layer count independently of stack rows");
-assert.equal(inventory.drawableCount, 14, "drawable technical layers must be counted separately");
+assert.equal(inventory.drawableCount, 15, "board body and drawable technical layers must be counted separately");
 assert.deepEqual(inventory.entries.slice(0, 17).map(entry => entry.name), stackup.map(layer => layer.name), "physical source order must be preserved");
 
 const groupCounts = Object.fromEntries(inventoryModule.LAYER_INVENTORY_GROUP_ORDER.map(group => [
@@ -83,18 +83,19 @@ const groupCounts = Object.fromEntries(inventoryModule.LAYER_INVENTORY_GROUP_ORD
   inventory.entries.filter(entry => entry.group === group).length,
 ]));
 assert.equal(groupCounts.Copper, 6);
-assert.equal(groupCounts.Dielectric, 5);
+assert.equal(groupCounts.Dielectric, 6);
 assert.equal(groupCounts["Board finish"], 6);
 assert.equal(groupCounts.Mechanical, 1);
 assert.equal(groupCounts.User, 1);
 assert.ok(inventory.entries.find(entry => entry.name === "dielectric 1")?.description.includes("100 µm"));
 assert.equal(inventory.entries.find(entry => entry.name === "dielectric 1")?.drawable, false);
+assert.equal(inventory.entries.find(entry => entry.name === "Board body")?.drawable, true, "the substrate scene has an independent visibility control");
 assert.equal(inventory.entries.filter(entry => entry.name === "F.Cu").length, 1, "a physical drawable layer must not be duplicated");
 
 const fallback = inventoryModule.buildLayerManagerInventory(definitions, []);
 assert.equal(fallback.physicalCount, 0);
 assert.equal(fallback.copperCount, 6, "boards without stackup metadata must still report their copper-layer count");
-assert.equal(fallback.entries.length, definitions.length, "boards without stackup metadata must retain every drawable layer");
+assert.equal(fallback.entries.length, definitions.length + 1, "boards without stackup metadata retain every drawable layer and the board body");
 
 const modularSource = readFileSync(new URL("../public/demo/MODULAR-BUS-NIB.kicad_pcb", import.meta.url), "utf8");
 const modularBoard = parser.parseKicadBoard(modularSource);
@@ -116,4 +117,5 @@ const arbitraryCopper = ["TOP", "SIGNAL1", "BOTTOM"];
 assert.deepEqual(copperLayerSelectionModule.resolveBoardCopperLayers(arbitraryCopper, ["TOP", "BOTTOM"]), ["TOP", "BOTTOM"]);
 const arbitraryInventory = inventoryModule.buildLayerManagerInventory(arbitraryCopper.map((name, id) => ({name, id, kind: "signal"})), []);
 assert.equal(arbitraryInventory.copperCount, 3);
-assert.ok(arbitraryInventory.entries.every(entry => entry.group === "Copper"));
+assert.ok(arbitraryInventory.entries.filter(entry => entry.name !== "Board body").every(entry => entry.group === "Copper"));
+assert.ok(arbitraryInventory.drawableNames.includes("Board body"));

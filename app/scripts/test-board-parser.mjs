@@ -36,6 +36,7 @@ ${copperRows}
   )
   (setup (stackup
     (layer "F.Cu" (type "copper") (thickness 0.035))
+    (layer "F.Mask" (type "solder mask") (color "red") (thickness 0.01))
     (layer "dielectric 1" (type "core") (thickness 1.53) (epsilon_r 4.2))
     (layer "B.Cu" (type "copper") (thickness 0.035))
   ))
@@ -49,6 +50,7 @@ assert.deepEqual(parsed.layers, copperNames, "all copper layers must retain KiCa
 assert.equal(parsed.layerDefinitions.length, 35, "all enabled board layers must be retained");
 assert.equal(parsed.layerDefinitions.find(layer => layer.name === "In10.Cu")?.userName, "MEMORY_PWR");
 assert.equal(parsed.tracks[0].layer, "In30.Cu");
+assert.equal(parsed.stackup.find(layer => layer.name === "F.Mask")?.color, "red", "source finish color must survive import");
 assert.equal(
   parser.isCopperLayerDefinition({ id: 96, name: "POWER_CORE_32", kind: "power" }),
   true,

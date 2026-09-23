@@ -84,3 +84,5 @@
   .help-browser .help-code code { white-space: pre-wrap; }
   .help-browser figure { break-inside: avoid; }
 }
+
+.help-browser .help-image-button:focus-visible, .help-browser a[data-help-topic]:focus-visible { outline: 2px solid #e2b45e; outline-offset: 4px; }

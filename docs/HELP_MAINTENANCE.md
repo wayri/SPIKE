@@ -35,6 +35,27 @@ The external-engine image records an unavailable/gated runtime. Two additional o
 
 Reproducible completed-result captures for every PI/SI/EMI/Thermal/assembly workbench remain an explicit coverage gap. Do not replace that gap with simulated screenshots or inferred results. Add real captures together with fixture, version, inputs, operation/model status and result artifacts, then update the gallery and asset tests.
 
+## Picture walkthrough and recorded-result example
+
+The in-app **Follow the pictures: inspect a real board** article puts the four
+existing Marble browser captures into a numbered inspection sequence. They show
+an imported board, layer controls, net-name display, and an explicitly unsolved
+report. The captured ribbon differs from the current main-workspace ribbon;
+the images are historical interface evidence, not a pixel-exact guide to the
+current desktop build. **Feature coverage and missing evidence** links 16
+feature families to their instructions and states the missing runtime captures.
+Animated help demos are illustrations and never solver-result evidence.
+
+**Read a recorded DC result** interprets the local PI-only evaluation artifact
+`build/pi-ten-board-evaluation-20260924/ui/pic-real-dc-evidence.json` (SHA-256
+`d87bdd05b901075d7fea91d6a56a431c1c6de8f98310220a53a674688d66ac8b`).
+It records a completed but *approximate* PIC programmer solve with the stated
+1 V source and 0.1 A load. This is a separate evaluation result, not a capture
+or qualification of the current main desktop UI. The raw artifact is a local
+evaluation output and is not bundled with the offline help. If the artifact is
+promoted into release documentation, pin and redistribute its input, full
+result, solver version, warnings, and numerical review together.
+
 ## Navigation and local state
 
 Help links use help:ARTICLE_ID#SECTION and can be pasted into help search. They are internal documentation addresses, not operating-system protocol registrations. Diagnostic opens select the exact registered code; unknown codes remain unknown. Bookmarks and checklist progress are local preferences and never edit a project. Help traps focus and prevents project keyboard shortcuts while open. Ctrl+F focuses help search; Escape closes an enlarged image before closing help. Print styles isolate the current article.

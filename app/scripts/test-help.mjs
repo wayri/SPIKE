@@ -61,3 +61,6 @@ for (const file of ['marble-workspace-3d.png', 'marble-layout-layers.png', 'marb
   assert.ok(bytes.length > 100 && (png || jpeg), `Invalid or truncated help image: ${file}`);
 }
 console.log(`Help checks passed: ${controls.length} controls, ${reference.commands.length} CLI pages, ${reference.errors.length} diagnostics; search, links, safe Markdown, all reference documents and image assets.`);
+
+// Authored picture workflows and coverage must remain linked and source-faithful.
+await import("./test-help-workflows.mjs");

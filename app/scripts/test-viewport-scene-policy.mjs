@@ -293,7 +293,8 @@ try {
       assert.ok(tag && !tag.includes('opacity="0"'), `${transparent} zero opacity must preserve unrelated supplied ${preserved} plot`);
     }
   }
-  assert.doesNotMatch(allLayers, /data-net-label=/, "net labels are optional");
+  assert.doesNotMatch(allLayers, /data-net-label="(?:trace|zone)"/, "net labels are optional");
+  assert.match(allLayers, /data-net-label="pad"[^>]*><title>U1\.1: VCC<\/title>1<\/text>/, "pad numbers remain visible with net names off");
   assert.match(render({ showNetNames: true }), /data-net-label="trace"/, "net labels render on tracks");
   assert.match(render({ showNetNames: true }), /data-net-label="zone"/, "net labels render on zones");
   const allOff = Object.fromEntries(board.layerDefinitions.map(layer => [layer.name, false]));

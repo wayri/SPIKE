@@ -55,6 +55,8 @@ export type ParsedLayerDefinition = {
 export type ParsedStackupLayer = {
   name: string;
   type: string;
+  /** Optional finish color supplied by the source board stackup. */
+  color?: string;
   thickness?: number;
   material?: string;
   epsilonR?: number;
@@ -477,6 +479,7 @@ export function parseKicadBoard(source: string): ParsedBoard {
         stackup.push({
           name,
           type: stringAt(child(stackLayer, "type"), 1, "unknown"),
+          color: stringAt(child(stackLayer, "color"), 1) || undefined,
           thickness: thicknessNode ? numberAt(thicknessNode, 1) : undefined,
           material: stringAt(child(stackLayer, "material"), 1) || undefined,
           epsilonR: epsilonNode ? numberAt(epsilonNode, 1) : undefined,

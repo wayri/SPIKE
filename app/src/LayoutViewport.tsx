@@ -28,6 +28,63 @@ type LayoutPickFeature =
   | { kind: "track"; index: number }
   | { kind: "zone"; index: number };
 
+type LayoutFeatureLabel = { id: string; text: string; title: string; kind: string; x: number; y: number; angle: number; fontSize: number };
+
+/** Screen-space budget shared by pad numbers, pin nets, tracks and zones. */
+function layoutFeatureAnnotations(
+  board: ParsedBoard,
+  view: { minX: number; minY: number; maxX: number; maxY: number; unitsPerPixel: number },
+  visibleLayers: Record<string, boolean>, activeLayer: string, isolatedNet: string | null,
+  showNetNames: boolean, copperLabels: ReturnType<typeof copperNetLabels>,
+) {
+  const labels: LayoutFeatureLabel[] = [], pinOne: Point[] = [];
+  const unit = view.unitsPerPixel;
+  if (!(unit > 0) || !Number.isFinite(unit)) return { labels, pinOne };
+  const occupied = new Map<string, { x: number; y: number; w: number; h: number }[]>();
+  const cell = unit * 48;
+  const add = (label: LayoutFeatureLabel) => {
+    if (labels.length >= 600) return;
+    const width = label.fontSize * (label.text.length * 0.65 + 1), height = label.fontSize * 1.2;
+    const angle = label.angle * Math.PI / 180;
+    const w = Math.abs(Math.cos(angle)) * width + Math.abs(Math.sin(angle)) * height;
+    const h = Math.abs(Math.sin(angle)) * width + Math.abs(Math.cos(angle)) * height;
+    const x = label.x - w / 2, y = label.y - h / 2;
+    if (x < view.minX || y < view.minY || x + w > view.maxX || y + h > view.maxY) return;
+    const keys: string[] = [];
+    for (let ix = Math.floor(x / cell); ix <= Math.floor((x + w) / cell); ix++) {
+      for (let iy = Math.floor(y / cell); iy <= Math.floor((y + h) / cell); iy++) {
+        const key = `${ix}:${iy}`;
+        if ((occupied.get(key) ?? []).some(b => x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y)) return;
+        keys.push(key);
+      }
+    }
+    const box = { x, y, w, h };
+    for (const key of keys) { const entries = occupied.get(key); if (entries) entries.push(box); else occupied.set(key, [box]); }
+    labels.push(label);
+  };
+  // Linear scan, early viewport rejection, then constant-sized collision buckets.
+  // All visible pin-one markers are batched into one path, independent of text budget.
+  for (const pad of board.pads) {
+    const [x, y] = pad.at;
+    if (x < view.minX || y < view.minY || x > view.maxX || y > view.maxY || isolatedNet && pad.net !== isolatedNet) continue;
+    if (!resolveBoardCopperLayers(board.layers, pad.layers).some(layer => visibleLayers[layer] !== false && (activeLayer === "All" || layer === activeLayer))) continue;
+    if (pad.ref && /^(?:0*1|A0*1)$/i.test(pad.name.trim())) pinOne.push(pad.at);
+    if (!pad.name || labels.length >= 600) continue;
+    const long = Math.max(pad.width, pad.height), short = Math.min(pad.width, pad.height);
+    const fontFor = (text: string) => Math.min(unit * 11, short * 0.72, long / (text.length * 0.65 + 1));
+    let text = pad.name;
+    const combined = `${pad.name} \u00b7 ${pad.net ?? ""}`;
+    if (showNetNames && pad.net && pad.net.length <= 160 && fontFor(combined) >= unit * 8) text = combined;
+    const fontSize = fontFor(text);
+    if (fontSize < unit * 7) continue;
+    let angle = pad.rotation + (pad.height > pad.width ? 90 : 0);
+    angle = ((angle + 90) % 180 + 180) % 180 - 90;
+    add({ id: pad.id, kind: "pad", text, title: `${pad.ref ?? ""}.${pad.name}${pad.net ? `: ${pad.net}` : ""}`, x, y, angle, fontSize });
+  }
+  for (const label of copperLabels) add({ ...label, text: label.net, title: label.net });
+  return { labels, pinOne };
+}
+
 function scalarSamplesForMode(result: SolverResultBundle | null | undefined, mode: ResultViewMode): ScalarSample[] {
   if (!result) return [];
   if (mode === "voltage") return result.scalar_fields.voltage_v;
@@ -800,16 +857,24 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
   ] : boardCenter;
   const axisTicks = Array.from({ length: 6 }, (_, index) => index / 5);
 
-  const netNameLabels = useMemo(() => {
-    if (!showNetNames || resultsOnlyScene || activeCopperLayer === "Overview") return [];
+  const featureAnnotations = useMemo(() => {
+    if (resultsOnlyScene || activeCopperLayer === "Overview") return { labels: [], pinOne: [] };
     const visible = (item: { layer: string; net?: string }) => visibleLayers[item.layer] !== false
       && (activeCopperLayer === "All" || item.layer === activeCopperLayer) && (!isolatedNet || item.net === isolatedNet);
     const min = toBoard([view.x, view.y]), max = toBoard([view.x + view.width, view.y + view.height]);
-    return copperNetLabels(board.tracks.filter(visible), board.zones.filter(visible), {
-      minX: min[0], minY: min[1], maxX: max[0], maxY: max[1],
-      unitsPerPixel: Math.max(view.width / pixelSize.width, view.height / pixelSize.height),
-    });
+    const bounds = { minX: min[0], minY: min[1], maxX: max[0], maxY: max[1],
+      unitsPerPixel: Math.max(view.width / pixelSize.width, view.height / pixelSize.height) };
+    const copper = showNetNames ? copperNetLabels(board.tracks.filter(visible), board.zones.filter(visible), bounds) : [];
+    return layoutFeatureAnnotations(board, bounds, visibleLayers, activeCopperLayer, isolatedNet, showNetNames, copper);
   }, [board, showNetNames, resultsOnlyScene, activeCopperLayer, visibleLayers, isolatedNet, view, pixelSize, projectionKey]);
+
+  const pinOnePath = useMemo(() => {
+    const radius = Math.max(view.width / pixelSize.width, view.height / pixelSize.height) * 3;
+    return featureAnnotations.pinOne.map(point => {
+      const [x, y] = toLayout(point);
+      return `M${x - radius},${y}a${radius},${radius} 0 1,0 ${radius * 2},0a${radius},${radius} 0 1,0 ${-radius * 2},0`;
+    }).join(" ");
+  }, [featureAnnotations, view, pixelSize, projectionKey]);
 
   const compositeCopper = activeCopperLayer === "All" && availableCopperLayers.filter(layer => visibleLayers[layer] !== false).length > 1;
   const nativeLayersOverlay = useMemo(() => (!resultsOnlyScene && !isolatedNet && activeCopperLayer !== "Overview"
@@ -991,12 +1056,14 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       />;
       })}
       {nativeLayersOverlay}
-      {showNetNames && <g aria-label="Copper net names" pointerEvents="none" fill="#f3f8fa" stroke="#101820" strokeWidth={0.035} paintOrder="stroke" fontFamily="monospace" textAnchor="middle" dominantBaseline="central">
-        {netNameLabels.map(label => {
+      <g aria-label="Pad numbers and copper net names" pointerEvents="none" fill="#f3f8fa" stroke="#101820" strokeWidth={Math.max(view.width / pixelSize.width, view.height / pixelSize.height) * 1.8} paintOrder="stroke" fontFamily="monospace" textAnchor="middle" dominantBaseline="central">
+        {featureAnnotations.labels.map(label => {
           const [x, y] = toLayout([label.x, label.y]);
-          return <text key={`${label.kind}:${label.layer}:${label.id}`} data-net-label={label.kind} x={x} y={y} fontSize={label.fontSize} transform={`rotate(${label.angle} ${x} ${y})`}>{label.net}</text>;
+          return <text key={`${label.kind}:${label.id}`} data-net-label={label.kind} x={x} y={y} fontSize={label.fontSize} transform={`rotate(${label.angle} ${x} ${y})`}><title>{label.title}</title>{label.text}</text>;
         })}
-      </g>}
+      </g>
+      {pinOnePath && <path aria-label="Pin 1 and A1 markers" data-pin-one-count={featureAnnotations.pinOne.length} d={pinOnePath} fill="none" stroke="#ffdc74" strokeWidth={1.5} vectorEffect="non-scaling-stroke" pointerEvents="none" />}
+
       {!resultsOnlyScene && viasOnlyActive && <g aria-label="Vias only" pointerEvents="none">{availableCopperLayers.map(layer =>
         <path key={layer} d={nativeLayerGeometry[layer]?.vias ?? ""} fill="#c79c50" fillRule="evenodd" />)}</g>}
       {netHighlightOverlay}

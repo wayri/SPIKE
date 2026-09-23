@@ -100,6 +100,14 @@ export function buildLayerManagerInventory(
     };
   });
 
+  // The rendered dielectric body is a scene surface, separate from the
+  // physical dielectric rows. It must have its own visibility control so
+  // hiding mask or copper cannot accidentally hide the substrate.
+  entries.push({
+    key: "scene:Board body", name: "Board body", group: "Dielectric",
+    description: "FR-4 substrate and board outline", physical: false, drawable: true,
+  });
+
   definitions.forEach(definition => {
     if (representedDefinitions.has(definition.name)) return;
     entries.push({

@@ -16,6 +16,7 @@ import LayoutViewport from "./LayoutViewport";
 import type { Viewport2DState, Viewport3DCameraState, ViewportRestoreCommand } from "./workspaceState";
 import type { MeshCell, ResultVisualization, ScalarSample, SolverResultBundle } from "./analysisResults";
 import { layerCssColor, layerThreeColor } from "./layerPalette";
+import { stackupColor } from "./stackupVisual";
 import { thermalVolume, ThermalScenarioView, ThermalSceneVisibility } from "./thermalScene";
 import { numericExtent, numericMaximum } from "./numericRange";
 import { meshCellEdgeIndexes, meshCellFaceVertices } from "./meshTopology";
@@ -688,7 +689,7 @@ function prepareImportedScene(scene: THREE.Object3D, kind: "board" | "components
           object.receiveShadow = false;
         } else if (surface === "substrate") {
           sceneKind = "substrate";
-          entry.color.setHex(0x15382d);
+          entry.color.setHex(0x9b783f);
           entry.metalness = 0;
           entry.roughness = 0.82;
           entry.opacity = 1;
@@ -2209,7 +2210,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         bevelEnabled: false,
         curveSegments: 10,
       }),
-      material(0x184b40, { roughness: 0.48 }),
+      material(0x9b783f, { roughness: 0.82 }),
     );
     substrate.position.z = substrateBounds.bottom;
     substrate.receiveShadow = true;
@@ -2219,7 +2220,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     proceduralGroup.add(substrate);
     const boardEdges = new THREE.LineSegments(
       new THREE.EdgesGeometry(substrate.geometry, 24),
-      new THREE.LineBasicMaterial({ color: 0x4b756c, transparent: true, opacity: 0.75 }),
+      new THREE.LineBasicMaterial({ color: 0x65491f, transparent: true, opacity: 0.75 }),
     );
     boardEdges.position.copy(substrate.position);
     boardEdges.userData.layer = "Edge.Cuts";
@@ -2231,7 +2232,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         ? region.outline.slice(0, -1)
         : region.outline;
       if (points.length < 3) return;
-      const color = region.kind === "flex" ? 0xb4883c : region.kind === "stiffener" ? 0x617e91 : region.kind === "transition" ? 0x9a6942 : 0x3b6d62;
+      const color = region.kind === "flex" ? 0xb4883c : region.kind === "stiffener" ? 0x617e91 : region.kind === "transition" ? 0x9a6942 : 0x9b783f;
       const overlay = new THREE.Mesh(
         new THREE.ShapeGeometry(pathFromPoints(points.map(world)), 8),
         material(color, { roughness: 0.7, opacity: region.kind === "flex" ? 0.46 : 0.3 }),
@@ -2255,9 +2256,10 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     });
 
     for (const [layer, z] of [["B.Mask", -boardSurface - copperClearance * 2], ["F.Mask", boardSurface + copperClearance * 2]] as const) {
+      const finish = activeBoard.stackup.find(row => row.name === layer);
       const mask = new THREE.Mesh(
         new THREE.ShapeGeometry(boardShape, 10),
-        material(0x145a46, { roughness: 0.58, opacity: PROCEDURAL_SOLDERMASK_OPACITY }),
+        material(new THREE.Color(stackupColor(finish ?? { name: layer, type: "soldermask" })).getHex(), { roughness: 0.58, opacity: PROCEDURAL_SOLDERMASK_OPACITY }),
       );
       mask.position.z = z;
       mask.userData.surface = true;
@@ -2433,7 +2435,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false, side: THREE.DoubleSide }),
       );
       viaPick.position.set(position.x, position.y, startZ + copperClearance * 3);
-      viaPick.userData = { ...data, pickPriority: 5, basePositionZ: viaPick.position.z, pickingProxy: true, viaPick: true, viaPickLayer: startLayer };
+      viaPick.userData = { ...data, pickPriority: 5, basePositionZ: viaPick.position.z, pickingProxy: true, viaPick: true, viaPickLayer: startLayer, viaStartLayer: startLayer, viaEndLayer: endLayer };
       identifySceneObject(viaPick, "picking", startLayer, `${via.id}-pick`, activeBoard.layers);
       pickingGroup.add(viaPick);
       pickablesRef.current.push(viaPick);
@@ -2456,7 +2458,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     drawingsByLayer.forEach((positions, layer) => {
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-      const color = layer.endsWith("SilkS") ? 0xe8e2cf
+      const color = layer.endsWith("SilkS") ? new THREE.Color(stackupColor(activeBoard.stackup.find(row => row.name === layer) ?? { name: layer, type: "silkscreen" })).getHex()
         : layer.endsWith("Fab") ? 0x7196a6
           : layer.endsWith("CrtYd") ? 0xb269a7
             : layer === "Margin" ? 0xd4b958
@@ -3496,9 +3498,6 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     const group = proceduralGroupRef.current;
     if (!group) return;
     const copperLayers = activeBoard?.layers ?? [];
-    const viasOnlyActive = showVias
-      && Object.keys(visibleLayers).length > 0
-      && Object.values(visibleLayers).every(visible => !visible);
     const stackMidpoint = Math.max((copperLayers.length - 1) / 2, 0.5);
     const worldSpacing = layerSeparation * (210 / Math.max(activeBoard?.width ?? 210, activeBoard?.height ?? 210, 1));
     const offsetForLayer = (layer?: string) => {
@@ -3518,6 +3517,9 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     const presentation = boardSceneVisibility({
       is3D: viewMode === "3D", boardReady: fullModelState === "ready",
       componentsReady: componentModelState === "ready", split: splitSceneAvailable,
+      // Layer-addressable boards keep the same representation across toggles.
+      // A monolithic GLB cannot independently hide its copper or technical layers.
+      layerAddressable: copperLayers.length > 0,
       layerFiltered: layerFilterActive, exploded: layerSeparation > 0.001,
       isolated: Boolean(isolatedNet), analysisOnly: analysisOnlyScene, resultsOnly: resultsOnlyScene,
       showModels, categoryFiltered: categoryFilterActive, resultModelsVisible,
@@ -3588,23 +3590,24 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       // Copper toggles must never hide SMD/THT models placed on that side.
       const visibilityLayer = data.viaFaceLayer ?? data.layer;
       const faceVisible = layerObjectVisible(visibilityLayer, Boolean(data.model), visibleLayers);
-      const layerVisible = viasOnlyActive && data.via ? true : data.viaBarrel
+      const layerVisible = data.viaBarrel
         ? viaSpanVisible(data.viaStartLayer, data.viaEndLayer, copperLayers, visibleLayers)
         : faceVisible;
-      const surfaceVisible = !data.surface || viewMode === "3D";
+      const surfaceVisible = (!data.surface || viewMode === "3D")
+        && (!data.substrate || visibleLayers["Board body"] !== false);
       const missingModelFallback = Boolean(data.model && data.ref && missingModelSet.has(data.ref));
       const categoryVisible = data.mount === "tht" ? showThtModels : data.mount === "smd" ? showSmdModels : true;
       const modelVisible = !data.model || showModels && resultModelsVisible && categoryVisible && viewMode === "3D" && (proceduralModelsAllowed || missingModelFallback);
       const authoritativeFallbackVisible = !authoritativeView || Boolean(data.model && presentation.proceduralComponents);
       const viaVisible = !data.via || showVias;
-      const inspectingCopper = copperLayers.some(layer => visibleLayers[layer] === false) || layerSeparation > 0.001;
-      const substrateVisible = !data.substrate || !viasOnlyActive && !inspectingCopper;
+      // The substrate is independent of copper visibility. Inspection uses the
+      // explicit scene translucency/explode controls, not an unrelated layer eye.
       const isolatedVisible = !isolatedNet || Boolean(data.net && data.net === isolatedNet);
       const analyzed = Boolean(data.net && analysisNetSet.has(data.net));
       const analysisVisible = analysisOnlyScene
         ? analyzed || Boolean(data.model && resultModelsVisible)
         : !resultVisualization?.analysisOnly || analyzed || Boolean(data.substrate || data.surface);
-      object.visible = layerVisible && surfaceVisible && modelVisible && viaVisible && substrateVisible && isolatedVisible && analysisVisible && authoritativeFallbackVisible;
+      object.visible = layerVisible && surfaceVisible && modelVisible && viaVisible && isolatedVisible && analysisVisible && authoritativeFallbackVisible;
       if (data.layer && (!data.model || data.separationAnchor)) {
         data.basePositionZ ??= object.position.z;
         object.position.z = data.basePositionZ + offsetForLayer(data.layer);
@@ -3620,7 +3623,8 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         object.position.z = data.basePositionZ + segmentOffset;
         object.scale.y = data.baseScaleY;
       }
-      if (data.layer && !data.model && (object instanceof THREE.Mesh || object instanceof THREE.LineSegments)) {
+      const opacityLayer = data.substrate ? "Board body" : data.viaFaceLayer ?? data.layer;
+      if ((opacityLayer || data.substrate) && !data.model && (object instanceof THREE.Mesh || object instanceof THREE.LineSegments)) {
         const materials = Array.isArray(object.material) ? object.material : [object.material];
         materials.forEach((entry) => {
           const settings = entry.userData as { baseOpacity?: number; baseTransparent?: boolean; baseDepthWrite?: boolean };
@@ -3629,7 +3633,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
             settings.baseTransparent = entry.transparent;
             settings.baseDepthWrite = entry.depthWrite;
           }
-          const opacity = layerOpacity[data.layer!] ?? 1;
+          const opacity = opacityLayer ? layerOpacity[opacityLayer] ?? 1 : 1;
           const sceneOpacity = resultVisualization?.sceneMode === "translucent" ? resultVisualization.boardOpacity : 1;
           const analysisOpacity = sceneOpacity;
           const wasTransparent = entry.transparent;
@@ -3683,12 +3687,15 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         basePositionZ?: number;
         viaPick?: boolean;
         viaPickLayer?: string;
+        viaStartLayer?: string;
+        viaEndLayer?: string;
       };
       const componentProxy = data.type === "component" || Boolean(data.model);
       const categoryVisible = data.mount === "tht" ? showThtModels : data.mount === "smd" ? showSmdModels : true;
       const layerVisible = componentProxy
         ? showModels && categoryVisible && viewMode === "3D"
-        : viasOnlyActive && data.viaPick ? true : layerObjectVisible(data.viaPickLayer ?? data.layer, false, visibleLayers);
+        : data.viaPick ? showVias && viaSpanVisible(data.viaStartLayer, data.viaEndLayer, copperLayers, visibleLayers)
+          : layerObjectVisible(data.viaPickLayer ?? data.layer, false, visibleLayers);
       const pickMaterial = object.material as THREE.MeshBasicMaterial;
       const exactSelected = data.id === selectedId;
       const netHighlighted = Boolean(data.net && (data.net === selectedNet || data.net === isolatedNet));
@@ -3718,6 +3725,27 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       if (selected) {
         selectionBox.setFromObject(selected);
       }
+    }
+    // Compact observability of actual renderable objects, including parent gates.
+    // Counts describe render objects/batches, not source tracks or solver geometry.
+    if (hostRef.current) {
+      const counts: Record<string, { total: number; visible: number }> = {};
+      for (const root of [group, accurateGroupRef.current]) root?.traverse(object => {
+        if (!(object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points)) return;
+        const identity = String(object.userData.spikeSceneIdentity ?? object.name);
+        const kind = identity.startsWith("spike:") ? identity.split(":")[1] : "unclassified";
+        const layer = object.userData.viaFaceLayer ?? object.userData.layer ?? "global";
+        const key = `${kind}|${layer}`;
+        const count = counts[key] ??= { total: 0, visible: 0 };
+        count.total += 1;
+        let effective = true;
+        for (let ancestor: THREE.Object3D | null = object; ancestor; ancestor = ancestor.parent) {
+          if (!ancestor.visible) { effective = false; break; }
+        }
+        if (object instanceof THREE.InstancedMesh && object.count === 0) effective = false;
+        if (effective) count.visible += 1;
+      });
+      hostRef.current.dataset.sceneVisibility = JSON.stringify(counts);
     }
     hoverMaterialsRef.current = hoverMaterials;
     selectionMaterialsRef.current = selectionMaterials;

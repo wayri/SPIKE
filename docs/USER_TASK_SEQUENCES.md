@@ -160,3 +160,57 @@ shows the print dialog, export destination, or rendered external report.
 
 **Screenshot gap:** no shipped asset shows the status console, error envelope,
 or Help Center error-code search result.
+
+## Picture walkthrough and evidence coverage
+
+In the Help Center, open **Follow the pictures: inspect a real board** or paste
+`help:picture-guide` into help search. Each unchanged Marble capture now has a
+numbered sequence immediately beside its explanation: identify the board/runtime,
+separate layers, zoom for net names, and recognize an unsolved report. Select the
+image to enlarge it. These are the main workbench's existing browser captures;
+no private board or separate release-candidate screenshot was added.
+
+Open **Feature coverage and missing evidence** (`help:feature-coverage`) for
+links to instructions across 16 feature families. Its matrix distinguishes real
+captures, illustrative animations, written instructions, and missing runtime
+examples. Animated guides are explanatory drawings, not simulations. Historical
+Studio circuit/HDL recordings belong to the separate Studio application.
+
+| Feature family | Current evidence | Missing picture/result evidence |
+| --- | --- | --- |
+| Import / readiness | Marble browser workspace | Native import and diagnostics |
+| 2D navigation / layers | Marble layer and net-name captures | Every filter and layer state |
+| 3D / stackup / assembly | Procedural preview | Model assignment and assembly transforms |
+| DC PI | Verified recorded PIC values; separate evaluation | Current main-desktop solve and convergence |
+| AC / transient PI | Written instructions / animation | Current sweeps and waveforms |
+| Terminals / power tree | Illustrative placement and wiring | Exact anchors and model handoff |
+| Mesh | Illustrative refinement | Real preview and convergence comparison |
+| Results / probes | Illustrative guide; separate Studio capture | PCB fields and formula results |
+| Reports | Explicitly unsolved Marble report | Solved report/export/reopen sequence |
+| Projects / result packages | Written sequence | Native dialogs and restored state |
+| Signal integrity | Written sequence | SI, eye and protocol results |
+| EMI / thermal | Written sequence | Reproducible results |
+| Solvers / extensions | Gated external-engine capture | Installation, trust and adapter output |
+| Circuit / HDL Studio | Recorded signal/timing captures | Main-workbench solve evidence |
+| Settings / shortcuts / licensing | Written reference | Runtime activation and recovery |
+| Diagnostics | Canonical catalog | Error-to-recovery pictures |
+
+## Recorded DC interpretation example
+
+Open **Read a recorded DC result** (`help:recorded-pic-dc`). This example reads an
+actual, separate PI-only evaluation artifact; it is not a claim that the pictured
+main workbench ran the solve. `pic-real-dc-evidence.json`, generated
+`2026-09-23T21:06:18.944Z`, has SHA-256
+`d87bdd05b901075d7fea91d6a56a431c1c6de8f98310220a53a674688d66ac8b`.
+The record is `ten-board-pic-programmer-dc`, `completed` with model status
+`approximate`. Its 1 V source and 0.1 A load produced a recorded maximum drop of
+16.382762821 mV and copper loss of 1.638276282 mW, using 767 nodes and 787 edges.
+These are demonstration boundary conditions, not operating recommendations.
+
+Read the warnings with those values: 49 branches outside the driven component
+were excluded; rounded-rectangle pads were approximated; terminal package/contact
+resistance was absent; mesh convergence was requested before sign-off. A small
+linear residual does not establish physical validity. The help article includes
+the pinned board revision/hash. Raw evaluation inputs/results are not bundled
+with help, and no separate candidate screenshot is used as a main-UI picture.
+The historical Marble screenshots show Home / PI / HF-SI / EMI / Thermal tabs. The current workspace uses Home / PI / Mesh / Solve / Probes / Results / Reports / Settings. Follow command names and workflow prerequisites rather than relying on historical tab positions.
