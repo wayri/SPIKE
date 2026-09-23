@@ -43,6 +43,15 @@ def _metrics(result: AnalysisResult) -> Dict[str, float]:
     copper_loss = float(summary.get("total_copper_loss_w", 0) or 0)
     if isfinite(load_current) and isfinite(copper_loss) and load_current > 0 and copper_loss >= 0:
         values["effective_path_resistance_ohm"] = copper_loss / (load_current * load_current)
+    source_to_load = result.networks.get("source_to_load", {})
+    if isinstance(source_to_load, dict) and source_to_load.get("status") == "validated":
+        for path in source_to_load.get("paths", []):
+            if not isinstance(path, dict):
+                continue
+            source_id, load_id = path.get("source_id"), path.get("load_id")
+            drop = path.get("supply_drop_v")
+            if source_id and load_id and isinstance(drop, (int, float)) and isfinite(drop):
+                values[f"source_to_load_drop_v:{source_id}:{load_id}"] = float(drop)
     return values
 
 
@@ -202,6 +211,12 @@ def run_mesh_convergence(
             "edge_count": result.summary.get("edge_count", result.summary.get("filament_count")),
             "issues": [issue.__dict__ for issue in result.issues if issue.severity == "error"],
         })
+        if spec.mode == "dc" and spec.options.get("require_exact_terminal_geometry"):
+            path_metrics = [key for key in metrics if key.startswith("source_to_load_drop_v:")]
+            if len(path_metrics) != len(spec.loads):
+                converged = False
+                comparisons = []
+                break
         if result.status != "completed" or result.model_status not in {
             "approximate", "validated", "reference_validated"
         } or any(issue.severity == "error" for issue in result.issues):
@@ -221,6 +236,17 @@ def run_mesh_convergence(
                 )
                 for metric, threshold in thresholds.items()
             ]
+            if spec.mode == "dc":
+                path_metrics = sorted({
+                    key for record in (previous, current) for key in record["metrics"]
+                    if key.startswith("source_to_load_drop_v:")
+                })
+                required.extend(
+                    _comparison(metric, thresholds["max_load_voltage_drop_v"],
+                                previous, current, True,
+                                absolute_thresholds.get("max_load_voltage_drop_v"))
+                    for metric in path_metrics
+                )
             required.append(_refinement_comparison(previous, current))
             advisory = [
                 _comparison(

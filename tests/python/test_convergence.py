@@ -259,6 +259,54 @@ class MeshConvergenceTests(unittest.TestCase):
         self.assertEqual(voltage["status"], "unavailable")
         self.assertFalse(report["can_sign_off"])
 
+    def test_each_exact_source_to_load_path_must_converge(self):
+        from dataclasses import replace
+        from python.spike_core.contracts import AnalysisResult
+
+        exact = replace(self.spec, loads=[self.spec.loads[0], {**self.spec.loads[0], "id": "other"}],
+                        options={**self.spec.options, "require_exact_terminal_geometry": True})
+        calls = 0
+
+        def runner(_design, _spec):
+            nonlocal calls
+            calls += 1
+            # The maximum stays fixed, hiding an unstable second path.
+            second = (0.005, 0.007, 0.009)[calls - 1]
+            return AnalysisResult(status="completed", mode="dc", summary={
+                "max_load_voltage_drop_v": 0.01,
+                "total_copper_loss_w": 0.01,
+                "total_load_current_a": 2,
+                "p95_current_density_a_mm2": 2,
+                "node_count": calls * 100,
+                "edge_count": calls * 200,
+            }, networks={"source_to_load": {"status": "validated", "paths": [
+                {"source_id": "source", "load_id": "load-1", "supply_drop_v": 0.01},
+                {"source_id": "source", "load_id": "load-2", "supply_drop_v": second},
+            ]}})
+
+        report = run_mesh_convergence(self.design, exact, runner)
+        path = next(item for item in report["comparisons"]
+                    if item["metric"] == "source_to_load_drop_v:source:load-2")
+        self.assertEqual(path["status"], "failed")
+        self.assertFalse(report["can_sign_off"])
+
+    def test_exact_terminal_study_rejects_missing_path_evidence(self):
+        from dataclasses import replace
+        from python.spike_core.contracts import AnalysisResult
+
+        exact = replace(self.spec, options={**self.spec.options, "require_exact_terminal_geometry": True})
+
+        def runner(_design, _spec):
+            return AnalysisResult(status="completed", mode="dc", summary={
+                "max_load_voltage_drop_v": 0.01, "total_copper_loss_w": 0.01,
+                "total_load_current_a": 1, "p95_current_density_a_mm2": 2,
+                "node_count": 100, "edge_count": 200,
+            })
+
+        report = run_mesh_convergence(self.design, exact, runner)
+        self.assertFalse(report["can_sign_off"])
+        self.assertEqual(len(report["levels"]), 1)
+
     def test_completed_unsupported_result_cannot_sign_off(self):
         from python.spike_core.contracts import AnalysisResult
         calls = 0
