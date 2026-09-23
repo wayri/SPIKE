@@ -151,6 +151,8 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 |---|---|
 | `python/core/board_parser.py` | Current low-level KiCad S-expression parser |
 | `src/peec` | Native PEEC kernel code |
+| `src/peec/volume_inductance.*` | Isolated experimental finite rectangular-volume integration, not the legacy production extractor |
+| `python/spike_core/peec_magnetic_geometry.py` | Strict physical cross-section descriptors separate from equivalent DC area; not yet production-wired |
 | `src/thermal` | Native thermal kernel code |
 | `src/math` | Native mathematical utilities |
 | `CMakeLists.txt` | Native build configuration |

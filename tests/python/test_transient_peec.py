@@ -1,4 +1,5 @@
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
@@ -9,7 +10,7 @@ from python.spike_core.preflight import preflight_analysis
 from python.spike_core.solver_plugins import default_solver_registry
 from python.spike_core.transient_peec import (
     _admit_visual_records,
-    _project_passive_inductance,
+    _assess_passive_inductance,
     estimate_line_capacitance_per_m,
     solve_peec_rl_transient,
     transient_settings,
@@ -102,11 +103,43 @@ class TransientPeecTests(unittest.TestCase):
         self.assertTrue(result["can_solve"])
         self.assertNotIn("FREQUENCY_SWEEP_REQUIRED", {issue["code"] for issue in result["issues"]})
 
-    def test_nonpassive_inductance_is_projected_and_reported(self):
-        projected, metrics = _project_passive_inductance(np.asarray([[1.0, 2.0], [2.0, 1.0]]))
+    def test_nonpassive_inductance_is_reported_without_projection(self):
+        input_matrix = np.asarray([[1.0, 2.0], [2.0, 1.0]])
+        assessed, metrics = _assess_passive_inductance(input_matrix)
         self.assertEqual(metrics["negative_eigenmode_count"], 1)
-        self.assertGreater(metrics["frobenius_correction_ratio"], 0)
-        self.assertGreater(float(np.min(np.linalg.eigvalsh(projected))), 0)
+        self.assertFalse(metrics["projection_applied"])
+        self.assertEqual(metrics["frobenius_correction_ratio"], 0.0)
+        np.testing.assert_array_equal(assessed, input_matrix)
+        self.assertLess(float(np.min(np.linalg.eigvalsh(assessed))), 0)
+
+    def test_passive_singular_graph_link_is_unchanged(self):
+        input_matrix = np.diag([2e-9, 0.0])
+        assessed, metrics = _assess_passive_inductance(input_matrix)
+        self.assertEqual(metrics["negative_eigenmode_count"], 0)
+        self.assertFalse(metrics["projection_applied"])
+        np.testing.assert_array_equal(assessed, input_matrix)
+
+    def test_nonpassive_native_transient_fails_without_waveform(self):
+        def make_solver(mesh, _epsilon):
+            count = len(mesh.branches)
+            solver = SimpleNamespace(
+                compute_partial_inductance=lambda: np.diag([1e-9] * (count - 1) + [-1e-9]),
+                compute_resistance=lambda _frequency: np.eye(count),
+            )
+            return solver, SimpleNamespace(eps_r=4.2)
+
+        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.transient_peec._make_native_solver", side_effect=make_solver,
+        ):
+            result = solve_peec_rl_transient(self.design, self.spec())
+        self.assertEqual(result.status, "failed")
+        self.assertIn("TRANSIENT_INDUCTANCE_NONPASSIVE", {issue.code for issue in result.issues})
+        self.assertFalse(result.fields)
+        self.assertFalse(result.provenance["solved"])
+        self.assertEqual(result.provenance["inductance_units"], "H")
+        quality = result.provenance["numerical_quality"]["inductance_passivity"]
+        self.assertEqual(quality["negative_eigenmode_count"], 1)
+        self.assertFalse(quality["projection_applied"])
 
     def test_preflight_blocks_excessive_saved_frames(self):
         result = preflight_analysis(
@@ -216,8 +249,7 @@ class TransientPeecTests(unittest.TestCase):
         self.assertEqual(result.provenance["transient_memory_budget_bytes"], 2048 * 1024 * 1024)
         self.assertEqual(result.provenance["branch_admission"]["workload_class"], "dense")
 
-    @unittest.skipUnless(native_available(), "Native PEEC extension is not built")
-    def test_explicit_return_stackup_adds_distributed_capacitance(self):
+    def _explicit_return_case(self):
         design = DesignIR(
             name="two-layer RLC transient fixture",
             layers=[{"name": "F.Cu"}, {"name": "B.Cu"}],
@@ -247,7 +279,38 @@ class TransientPeecTests(unittest.TestCase):
             "layer": "B.Cu", "net": "GND", "current_a": -1.0, "terminal_role": "load_return",
             "pair_id": "pair-1", "profile": {"kind": "constant"},
         })
+        return design, spec
+
+    @unittest.skipUnless(native_available(), "Native PEEC extension is not built")
+    def test_real_native_two_layer_result_is_passive_or_fails_closed(self):
+        design, spec = self._explicit_return_case()
         result = default_solver_registry().run(design, spec)
+        if result.status == "failed":
+            self.assertIn("TRANSIENT_INDUCTANCE_NONPASSIVE", {issue.code for issue in result.issues})
+            self.assertFalse(result.fields)
+        else:
+            self.assertEqual(result.status, "completed")
+            quality = result.provenance["inductance_passivity"]
+            self.assertEqual(quality["negative_eigenmode_count"], 0)
+            self.assertFalse(quality["projection_applied"])
+
+    def test_explicit_return_stackup_adds_distributed_capacitance_with_passive_matrix(self):
+        design, spec = self._explicit_return_case()
+        # Isolate the stackup-capacitance behavior from the native inductance
+        # model, which currently fails the required passivity check for this
+        # two-layer geometry. The real native extraction is separately checked.
+        def passive_solver(mesh, _epsilon):
+            count = len(mesh.branches)
+            solver = SimpleNamespace(
+                compute_partial_inductance=lambda: np.eye(count) * 1e-9,
+                compute_resistance=lambda _frequency: np.eye(count) * 0.01,
+            )
+            return solver, SimpleNamespace(eps_r=4.2)
+
+        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.transient_peec._make_native_solver", side_effect=passive_solver,
+        ):
+            result = default_solver_registry().run(design, spec)
         self.assertEqual(result.status, "completed")
         self.assertGreater(result.summary["estimated_distributed_capacitance_f"], 0)
         self.assertGreater(result.summary["peak_capacitive_current_a"], 0)

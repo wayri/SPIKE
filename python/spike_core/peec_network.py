@@ -61,6 +61,12 @@ def solve_linear_system(
     rhs: np.ndarray,
     diagnostics: bool,
 ) -> Tuple[np.ndarray, Dict[str, Any]]:
+    matrix = np.asarray(matrix, dtype=complex)
+    rhs = np.asarray(rhs, dtype=complex)
+    if (matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1] or not matrix.size
+            or rhs.ndim not in (1, 2) or rhs.shape[0] != matrix.shape[0]
+            or not np.all(np.isfinite(matrix)) or not np.all(np.isfinite(rhs))):
+        raise ValueError("PEEC MNA requires a finite nonempty square matrix and compatible finite RHS")
     method = "dense_direct"
     rank = matrix.shape[0]
     try:
@@ -68,17 +74,24 @@ def solve_linear_system(
     except np.linalg.LinAlgError:
         solution, _, rank, _ = np.linalg.lstsq(matrix, rhs, rcond=1e-11)
         method = "rank_revealing_least_squares"
-        if rank < matrix.shape[0] - 1:
+        if rank < matrix.shape[0]:
             raise ValueError("PEEC MNA matrix is rank deficient")
-    relative_residual = float(
-        np.linalg.norm(matrix @ solution - rhs)
-        / max(np.linalg.norm(rhs), np.finfo(float).eps)
-    )
+    if not np.all(np.isfinite(solution)):
+        raise ValueError("PEEC MNA solution contains nonfinite values")
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        relative_residual = float(
+            np.linalg.norm(matrix @ solution - rhs)
+            / max(np.linalg.norm(rhs), np.finfo(float).eps)
+        )
+    if not np.isfinite(relative_residual) or relative_residual > 1e-7:
+        raise ValueError("PEEC MNA solution failed its relative residual check")
     condition_number = (
         float(np.linalg.cond(matrix))
         if diagnostics and matrix.shape[0] <= 400
         else None
     )
+    if condition_number is not None and not np.isfinite(condition_number):
+        raise ValueError("PEEC MNA condition estimate is nonfinite")
     return solution, {
         "method": method,
         "rank": int(rank),

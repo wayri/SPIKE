@@ -14,6 +14,7 @@ from python.spike_core.spice_workspace import SPICE_WORKSPACE_CONTRACT
 def extraction_result():
     return {
         "analysis_id": "peec-ac-1",
+        "status": "completed",
         "model_status": "approximate",
         "provenance": {"solver": "spike-peec-native/v0.4"},
         "networks": {"parasitics": [{
@@ -74,6 +75,29 @@ def design():
 
 
 class PeecSpiceExportTests(unittest.TestCase):
+    def test_import_rejects_failed_or_error_bearing_extraction(self):
+        mapping = {
+            "network_index": 0, "from_node": "VDD_SRC", "to_node": "VDD_LOAD",
+            "reference_node": "GND", "endpoint_reviewed": True,
+        }
+        failed = extraction_result()
+        failed["status"] = "failed"
+        failed["model_status"] = "failed"
+        with self.assertRaisesRegex(ValueError, "completed"):
+            import_peec_rlcg(failed, workspace(), [mapping])
+        completed_with_error = extraction_result()
+        completed_with_error["issues"] = [{"severity": "error", "code": "PEEC_BAD"}]
+        with self.assertRaisesRegex(ValueError, "errors"):
+            list_peec_spice_networks(completed_with_error)
+        failed_network = extraction_result()
+        failed_network["networks"]["parasitics"][0]["model_status"] = "failed"
+        with self.assertRaisesRegex(ValueError, "failed or unsupported"):
+            import_peec_rlcg(failed_network, workspace(), [mapping])
+        missing_status = extraction_result()
+        del missing_status["status"]
+        with self.assertRaisesRegex(ValueError, "completed"):
+            import_peec_rlcg(missing_status, workspace(), [mapping])
+
     def test_catalog_exposes_mesh_endpoints_without_inferring_circuit_nodes(self):
         catalog = list_peec_spice_networks(extraction_result())
         self.assertEqual(catalog["status"], "mapping_required")
@@ -88,6 +112,16 @@ class PeecSpiceExportTests(unittest.TestCase):
         mapping["to_node"] = "VDD_SRC"
         with self.assertRaisesRegex(ValueError, "distinct"):
             import_peec_rlcg(extraction_result(), workspace(), [mapping])
+
+    def test_import_requires_exact_integer_network_index(self):
+        for index in (0.5, True, "0"):
+            with self.subTest(network_index=index):
+                with self.assertRaisesRegex(ValueError, "integer network_index"):
+                    import_peec_rlcg(extraction_result(), workspace(), [{
+                        "network_index": index,
+                        "from_node": "VDD_SRC", "to_node": "VDD_LOAD",
+                        "reference_node": "GND", "endpoint_reviewed": True,
+                    }])
 
     def test_import_preserves_status_and_does_not_claim_frequency_fit(self):
         imported = import_peec_rlcg(extraction_result(), workspace(), [{

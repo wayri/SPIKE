@@ -74,7 +74,21 @@ target_link_libraries(spike_peec PUBLIC
     Eigen3::Eigen
     OpenMP::OpenMP_CXX
 )
-spike_enable_legacy_hpc(spike_peec)
+if(MSVC)
+    target_compile_options(spike_peec PRIVATE /fp:strict)
+else()
+    target_compile_options(spike_peec PRIVATE -fno-fast-math -ffp-contract=off)
+endif()
+
+# Finite-volume inductance verification kernel. Deliberately isolated from the
+# legacy PEEC model until barrel geometry and overlap-aware bases are qualified.
+add_library(spike_peec_volume STATIC src/peec/volume_inductance.cpp)
+target_include_directories(spike_peec_volume PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+if(MSVC)
+    target_compile_options(spike_peec_volume PRIVATE /W4 /WX /fp:strict)
+else()
+    target_compile_options(spike_peec_volume PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+endif()
 
 # Strict typed geometry admission only. Keep this target independent of Eigen,
 # OpenMP, PEEC solver APIs, and legacy fast-math/ISA flags.
@@ -240,6 +254,14 @@ if(BUILD_TESTING)
     target_link_libraries(test_peec PRIVATE spike_peec)
     
     add_test(NAME test_peec COMMAND test_peec)
+
+    add_executable(test_peec_admission tests/test_peec_admission.cpp)
+    target_link_libraries(test_peec_admission PRIVATE spike_peec)
+    add_test(NAME test_peec_admission COMMAND test_peec_admission)
+
+    add_executable(test_volume_inductance tests/test_volume_inductance.cpp)
+    target_link_libraries(test_volume_inductance PRIVATE spike_peec_volume Eigen3::Eigen)
+    add_test(NAME test_volume_inductance COMMAND test_volume_inductance)
 
     add_executable(test_via_transition_mesh_input
         tests/test_via_transition_mesh_input.cpp)

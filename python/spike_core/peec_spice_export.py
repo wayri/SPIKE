@@ -55,7 +55,20 @@ def _finite_nonnegative(value: Any, field: str) -> float:
 def _networks(result: Dict[str, Any]) -> List[Dict[str, Any]]:
     if not isinstance(result, dict):
         raise ValueError("The extraction result must be an object.")
-    networks = result.get("networks", {}).get("parasitics", [])
+    if result.get("status") != "completed":
+        raise ValueError("Only a completed PEEC extraction result can be imported.")
+    if str(result.get("model_status", "")).lower() in {"failed", "unsupported"}:
+        raise ValueError("A failed or unsupported PEEC extraction cannot be imported.")
+    issues = result.get("issues", [])
+    if not isinstance(issues, list) or any(
+        not isinstance(issue, dict) or str(issue.get("severity", "")).lower() == "error"
+        for issue in issues
+    ):
+        raise ValueError("A PEEC extraction with errors cannot be imported.")
+    network_data = result.get("networks")
+    if not isinstance(network_data, dict):
+        raise ValueError("The extraction result requires a networks object.")
+    networks = network_data.get("parasitics", [])
     if not isinstance(networks, list) or not networks:
         raise ValueError("The extraction result contains no PEEC RLCG networks.")
     if len(networks) > MAX_IMPORTED_NETWORKS:
@@ -126,10 +139,9 @@ def import_peec_rlcg(
     for mapping_position, mapping in enumerate(mapping_list):
         if not isinstance(mapping, dict):
             raise ValueError(f"Mapping {mapping_position} must be an object.")
-        try:
-            network_index = int(mapping.get("network_index"))
-        except (TypeError, ValueError) as exc:
-            raise ValueError(f"Mapping {mapping_position} requires an integer network_index.") from exc
+        network_index = mapping.get("network_index")
+        if type(network_index) is not int:
+            raise ValueError(f"Mapping {mapping_position} requires an integer network_index.")
         if network_index < 0 or network_index >= len(source_networks):
             raise ValueError(f"Mapping {mapping_position} references an unavailable RLCG network.")
         if network_index in seen_indices:
@@ -141,6 +153,8 @@ def import_peec_rlcg(
         network = source_networks[network_index]
         if network.get("contract") != "spike/rlgc-network/v1":
             raise ValueError(f"Network {network_index} does not use spike/rlgc-network/v1.")
+        if str(network.get("model_status", "")).lower() in {"failed", "unsupported"}:
+            raise ValueError(f"Network {network_index} is failed or unsupported.")
         start = _node(mapping.get("from_node"), f"mappings[{mapping_position}].from_node")
         stop = _node(mapping.get("to_node"), f"mappings[{mapping_position}].to_node")
         if start == stop:

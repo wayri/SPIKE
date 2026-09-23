@@ -8,7 +8,8 @@ SPIKE can execute a reviewed one-way hybrid analysis:
 2. `list_peec_spice_networks` exposes the extraction mesh endpoints and asks the
    user to map each selected network to explicit circuit nodes.
 3. `import_peec_rlcg` appends the selected equivalent R/L/C/G section to a
-   `spike/spice-workspace/v1` project only when `endpoint_reviewed=true`.
+   `spike/spice-workspace/v1` project only when the extraction has completed
+   without error issues and `endpoint_reviewed=true`.
 4. The SPICE workspace composes assigned component/subcircuit models and the
    reviewed parasitic sections into a deterministic self-contained netlist.
 5. `run_hybrid_cosimulation` runs that netlist through the process-isolated
@@ -37,6 +38,10 @@ copper model.
 This representation is suitable for traceable circuit studies whose required
 accuracy is compatible with the source extraction status. It is not a general
 wideband macromodel.
+
+Failed, unsupported, incomplete, or error-bearing extraction results cannot
+be catalogued or imported even when they retain partial network data. Rerun
+the extraction successfully before mapping its endpoints.
 
 ## Validity boundary
 

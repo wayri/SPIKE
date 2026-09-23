@@ -45,7 +45,7 @@ struct Point3D {
     return Point3D(x - other.x, y - other.y, z - other.z);
   }
 
-  double norm() const { return std::sqrt(x * x + y * y + z * z); }
+  double norm() const { return std::hypot(x, y, z); }
 };
 
 /**
@@ -57,11 +57,11 @@ struct Point3D {
 struct Filament {
   Point3D start;       ///< Start point (mm)
   Point3D end;         ///< End point (mm)
-  double width;        ///< Width (mm)
-  double thickness;    ///< Thickness (mm)
-  int node_p;          ///< Positive node index
-  int node_n;          ///< Negative node index
-  double conductivity; ///< Conductivity (S/m), e.g., 5.8e7 for copper
+  double width = 0;        ///< Width (mm)
+  double thickness = 0;    ///< Thickness (mm)
+  int node_p = 0;          ///< Positive node index
+  int node_n = 0;          ///< Negative node index
+  double conductivity = 0; ///< Conductivity (S/m), e.g., 5.8e7 for copper
 
   /// Get filament length
   double length() const { return (end - start).norm(); }
@@ -83,8 +83,8 @@ struct Filament {
 struct Patch {
   Point3D center; ///< Center point (mm)
   Point3D normal; ///< Normal vector (unit)
-  double area;    ///< Area (mm²)
-  int node;       ///< Node index
+  double area = 0;    ///< Area (mm²)
+  int node = 0;       ///< Node index
 };
 
 /**
@@ -162,9 +162,10 @@ public:
   Eigen::SparseMatrix<double> compute_capacitance();
 
   /**
-   * @brief Solve MNA system at a given frequency
+   * @brief Unsupported legacy entry point; throws std::logic_error.
    *
-   * [G + jωC + Γ/(jω)] · V = I
+   * Use the topology-aware branch-incidence MNA adapter. The former
+   * one-filament/one-node approximation was not a valid circuit assembly.
    *
    * @param frequency Frequency (Hz)
    * @param current_sources Current excitation vector

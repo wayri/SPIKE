@@ -53,12 +53,9 @@ class NativePeecFieldReductionProvider:
                 f"Parasitic {identifier} references extraction {source_result_id or 'missing'}, "
                 f"not {analysis_id}."
             )
-        try:
-            index = int(parasitic["source_network_index"])
-        except (KeyError, TypeError, ValueError) as exc:
-            raise ValueError(
-                f"Parasitic {identifier} requires an explicit source_network_index."
-            ) from exc
+        index = parasitic.get("source_network_index")
+        if type(index) is not int:
+            raise ValueError(f"Parasitic {identifier} requires an integer source_network_index.")
         if index < 0 or index >= len(networks):
             raise ValueError(f"Parasitic {identifier} references unavailable PEEC network {index}.")
         network = networks[index]
@@ -73,7 +70,17 @@ class NativePeecFieldReductionProvider:
             )
         source_nodes = parasitic.get("source_mesh_nodes")
         actual_nodes = [network.get("source_node"), network.get("sink_node")]
-        if isinstance(source_nodes, list) and len(source_nodes) == 2 and source_nodes != actual_nodes:
+        if any(type(node) is not int or node < 0 for node in actual_nodes):
+            raise ValueError(f"PEEC network {index} has invalid mesh endpoint IDs.")
+        if (
+            not isinstance(source_nodes, list)
+            or len(source_nodes) != 2
+            or any(type(node) is not int or node < 0 for node in source_nodes)
+        ):
+            raise ValueError(
+                f"Parasitic {identifier} requires two non-negative integer source_mesh_nodes."
+            )
+        if source_nodes != actual_nodes:
             raise ValueError(
                 f"Parasitic {identifier} PEEC endpoint identity changed from {source_nodes} "
                 f"to {actual_nodes}."

@@ -9,7 +9,7 @@ adding independently extracted net inductances would not.
 
 from __future__ import annotations
 
-from math import pi
+from math import isfinite, pi
 from typing import Any, Dict, List, Sequence, Tuple
 
 import numpy as np
@@ -179,9 +179,20 @@ def _series_component_impedance(
                 status="unsupported",
             ))
             continue
-        resistance = max(float(raw.get("resistance_ohm", raw.get("linearized_resistance_ohm", 0.0))), 0.0)
-        inductance = max(float(raw.get("inductance_h", 0.0)), 0.0)
-        capacitance = max(float(raw.get("capacitance_f", 0.0)), 0.0)
+        def nonnegative(key: str, value: Any) -> float:
+            if isinstance(value, bool):
+                raise ValueError(f"component_models[{index}].{key} must be finite and non-negative")
+            try:
+                number = float(value)
+            except (TypeError, ValueError, OverflowError) as exc:
+                raise ValueError(f"component_models[{index}].{key} must be finite and non-negative") from exc
+            if not isfinite(number) or number < 0.0:
+                raise ValueError(f"component_models[{index}].{key} must be finite and non-negative")
+            return number
+
+        resistance = nonnegative("resistance_ohm", raw.get("resistance_ohm", raw.get("linearized_resistance_ohm", 0.0)))
+        inductance = nonnegative("inductance_h", raw.get("inductance_h", 0.0))
+        capacitance = nonnegative("capacitance_f", raw.get("capacitance_f", 0.0))
         if str(raw.get("model_kind", "linear_rlc")).lower() not in {"linear_rlc", "passive", "linearized_operating_point"}:
             issues.append(ValidationIssue(
                 "SPIKE-BE-PI-W-0206", "warning",

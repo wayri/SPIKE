@@ -263,13 +263,18 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         branches=[mesh.branches[index] for index in physical_branch_indices],
         target_size_mm=mesh.target_size_mm,
     )
-    native_solver, config = _make_native_solver(physical_mesh, epsilon_r, spec)
-    raw_inductance = embed_physical_inductance(
-        _dense(native_solver.compute_partial_inductance()),
-        len(mesh.branches),
-        physical_branch_indices,
-    )
-    inductance, inductance_quality = assess_symmetric_positive_semidefinite(raw_inductance)
+    try:
+        native_solver, config = _make_native_solver(physical_mesh, epsilon_r, spec)
+        raw_inductance = embed_physical_inductance(
+            _dense(native_solver.compute_partial_inductance()),
+            len(mesh.branches), physical_branch_indices,
+        )
+        inductance, inductance_quality = assess_symmetric_positive_semidefinite(raw_inductance)
+    except (ValueError, RuntimeError, np.linalg.LinAlgError) as error:
+        return AnalysisResult(analysis_id=spec.analysis_id, mode=spec.mode,
+            status="failed", model_status="failed",
+            issues=issues + [ValidationIssue("PEEC_MATRIX_EXTRACTION_FAILED", "error", str(error))],
+            provenance={"solved": False, "failure_stage": "physical_inductance_admission"})
     topology_indices = [
         index for index in range(len(mesh.branches)) if index not in physical_branch_indices
     ]
@@ -310,6 +315,12 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
                 f"The physical partial-inductance matrix contains {inductance_quality['negative_eigenmode_count']} negative-energy mode(s); no passivity projection was applied.",
                 suggestion="Refine overlapping physical copper primitives or use a validated volume-integral PEEC extractor.",
             )],
+            provenance={
+                "solver": "spike-peec-native/v0.4", "solved": False,
+                "numerical_quality": {"inductance_passivity": inductance_quality},
+                "failure_stage": "physical_inductance_admission",
+                "inductance_units": "H",
+            },
         )
     branch_capacitance, branch_loss_tangent, capacitance_info = estimate_branch_capacitance(
         design, spec, mesh.branches
@@ -559,7 +570,7 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
                 status="violated",
             )
         )
-    if not ports and not loop_parasitics:
+    if any(issue.severity == "error" for issue in issues) or (not ports and not loop_parasitics):
         return AnalysisResult(
             analysis_id=spec.analysis_id,
             mode=spec.mode,

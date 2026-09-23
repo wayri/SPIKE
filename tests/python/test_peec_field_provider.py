@@ -77,6 +77,25 @@ class NativePeecFieldProviderTests(unittest.TestCase):
             provider(field_request(source_mesh_nodes=[10, 99]))
 
     @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    def test_requires_exact_reviewed_mesh_endpoint_identity(self, solve):
+        solve.return_value = extraction_result()
+        provider = NativePeecFieldReductionProvider(DesignIR(), spec())
+        for invalid in (None, [10], [10, 42.0], [True, 42], [-1, 42]):
+            with self.subTest(source_mesh_nodes=invalid):
+                with self.assertRaisesRegex(ValueError, "source_mesh_nodes"):
+                    provider(field_request(source_mesh_nodes=invalid))
+        for invalid_index in (0.5, True, "0"):
+            with self.subTest(source_network_index=invalid_index):
+                with self.assertRaisesRegex(ValueError, "integer source_network_index"):
+                    provider(field_request(source_network_index=invalid_index))
+        solve.return_value.networks["parasitics"][0]["sink_node"] = 99
+        with self.assertRaisesRegex(ValueError, "endpoint identity changed"):
+            provider(field_request())
+        solve.return_value.networks["parasitics"][0]["sink_node"] = True
+        with self.assertRaisesRegex(ValueError, "invalid mesh endpoint"):
+            provider(field_request(source_mesh_nodes=[10, 1]))
+
+    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
     def test_rejects_failed_extraction_and_missing_provenance(self, solve):
         provider = NativePeecFieldReductionProvider(DesignIR(), spec())
         solve.return_value = AnalysisResult(

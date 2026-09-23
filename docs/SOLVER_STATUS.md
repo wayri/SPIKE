@@ -83,6 +83,14 @@ comparison evidence and cannot independently promote a native SPIKE workflow.
 
 ### Native PEEC RLCG (`spike.peec_2_5d`)
 
+The [2026-09-24 correction record](PEEC_VOLUME_CORRECTION_20260924.md) documents
+reproduced real-board nonpassivity. A standalone rectangular-volume kernel is
+under verification, not a production replacement. Marble AC and MODULAR-BUS-NIB
+AC/DC convergence remain blocked; transient now rejects negative-energy modes
+instead of projecting the matrix. Do not infer readiness from preflight alone.
+The [PEEC safety policy](PEEC_SAFETY_POLICY.md) records native admission,
+capacitance, MNA, failed-result/export and reviewed-port checks plus local rollout.
+
 - State: experimental when `spike_peec_native` is packaged
 - Geometry: routed tracks, polygonal copper zones, SMD/THT pads, plated vias,
   and through-pad barrels in one connected hybrid mesh
@@ -813,7 +821,7 @@ explicit-netlist circuit adapter.
 
 ### Parallel SPIKES generic FEM runtime handoff
 
-`D:\workspace\SPIKES` is the separately developed native generic solver
+`D:\PROJECTS-DEV\SPIKES` is the separately developed native generic solver
 suite. Its current Milestone 0 process boundary now declares deterministic 1D
 diffusion and 2D triangular stationary/transient FEM verification workloads in
 addition to capability probing and self-tests. It also declares two explicitly

@@ -3,20 +3,40 @@
  * @brief PEEC partial-element extraction kernel
  * @version 0.1.6.0
  *
- * The matrix extraction routines are operational. The current frequency solve
- * remains an approximation until a topology-correct PEEC MNA assembly replaces
- * the one-filament/one-node mapping.
+ * Matrix extraction remains an explicitly approximate legacy model. The
+ * non-topological frequency-solve stub is disabled; use branch-incidence MNA.
  */
 
 #include "peec_solver.hpp"
 #include <algorithm>
+#include <limits>
 #include <omp.h>
 #include <stdexcept>
 
 namespace spike {
 namespace peec {
 
+namespace {
+bool positive_finite(double value) { return std::isfinite(value) && value > 0; }
+bool finite_point(const Point3D &point) {
+  return std::isfinite(point.x) && std::isfinite(point.y) && std::isfinite(point.z);
+}
+}
+
 PEECSolver::PEECSolver(const PEECConfig &config) : config_(config) {
+  if (!positive_finite(config.mu_0) || !positive_finite(config.eps_0) ||
+      !positive_finite(config.eps_r) ||
+      !positive_finite(config.eps_0 * config.eps_r) ||
+      !std::isfinite(config.sparse_threshold) || config.sparse_threshold < 0 ||
+      !std::isfinite(config.roughness_rms_um) || config.roughness_rms_um < 0 ||
+      config.num_threads < 0 || config.num_threads > 1024 ||
+      (config.solver_type != SolverType::DENSE_DIRECT &&
+       config.solver_type != SolverType::SPARSE_ITERATIVE)) {
+    throw std::invalid_argument("Invalid PEEC physical constants or numerical configuration.");
+  }
+  if (config.quad_order != 6 || !config.use_analytic_singular) {
+    throw std::invalid_argument("Legacy PEEC implements only order-6 mutual quadrature and analytic self terms.");
+  }
   // Set OpenMP thread count
   if (config_.num_threads > 0) {
     omp_set_num_threads(config_.num_threads);
@@ -26,15 +46,25 @@ PEECSolver::PEECSolver(const PEECConfig &config) : config_(config) {
 PEECSolver::~PEECSolver() { clear(); }
 
 void PEECSolver::add_filament(const Filament &fil) {
-  if (fil.length() <= 0.0 || fil.width <= 0.0 || fil.thickness <= 0.0 ||
-      fil.conductivity <= 0.0) {
+  if (!finite_point(fil.start) || !finite_point(fil.end) ||
+      !positive_finite(fil.length()) || !positive_finite(fil.width) ||
+      !positive_finite(fil.thickness) || !positive_finite(fil.conductivity) ||
+      !positive_finite(fil.area()) || !positive_finite(fil.resistance()) ||
+      fil.node_p < 0 || fil.node_n < 0) {
     throw std::invalid_argument(
         "PEEC filaments require positive length, width, thickness, and conductivity.");
   }
   filaments_.push_back(fil);
 }
 
-void PEECSolver::add_patch(const Patch &patch) { patches_.push_back(patch); }
+void PEECSolver::add_patch(const Patch &patch) {
+  if (!finite_point(patch.center) || !finite_point(patch.normal) ||
+      !positive_finite(patch.area) || patch.node < 0 ||
+      std::abs(patch.normal.norm() - 1.0) > 1e-10) {
+    throw std::invalid_argument("PEEC patches require finite geometry, positive area and a unit normal.");
+  }
+  patches_.push_back(patch);
+}
 
 Eigen::SparseMatrix<double> PEECSolver::compute_partial_inductance() {
   const size_t n = filaments_.size();
@@ -71,6 +101,13 @@ Eigen::SparseMatrix<double> PEECSolver::compute_partial_inductance() {
     }
   }
 
+  // Never throw through an OpenMP worker. Singular/overflowed interactions
+  // signal nonfinite values and are rejected after all workers have joined.
+  for (const auto &entry : triplets) {
+    if (!std::isfinite(entry.value())) {
+      throw std::runtime_error("PEEC_INDUCTANCE_GEOMETRY_UNSUPPORTED: singular or unrepresentable line interaction; finite-volume extraction required.");
+    }
+  }
   // Build sparse matrix from triplets
   L_p.setFromTriplets(triplets.begin(), triplets.end());
 
@@ -78,6 +115,10 @@ Eigen::SparseMatrix<double> PEECSolver::compute_partial_inductance() {
 }
 
 Eigen::SparseMatrix<double> PEECSolver::compute_resistance(double frequency) {
+  if (!std::isfinite(frequency) || frequency < 0 ||
+      !std::isfinite(2.0 * M_PI * frequency * config_.mu_0)) {
+    throw std::invalid_argument("PEEC resistance requires finite nonnegative frequency in range.");
+  }
   const size_t n = filaments_.size();
   Eigen::SparseMatrix<double> R(n, n);
   std::vector<Eigen::Triplet<double>> triplets;
@@ -98,6 +139,9 @@ Eigen::SparseMatrix<double> PEECSolver::compute_resistance(double frequency) {
     if (frequency > 0.0 && config_.enable_skin_effect) {
       double omega = 2.0 * M_PI * frequency;
       double delta = std::sqrt(2.0 / (omega * mu_0 * fil.conductivity));
+      if (!positive_finite(delta)) {
+        throw std::runtime_error("PEEC skin depth exceeds numerical range.");
+      }
       double w = fil.width * 1e-3;
       double t = fil.thickness * 1e-3;
       const double narrow = std::min(w, t);
@@ -118,6 +162,9 @@ Eigen::SparseMatrix<double> PEECSolver::compute_resistance(double frequency) {
             (2.0 * fil.conductivity * broad * delta);
         resistance_per_m = impedance_per_m.real();
       }
+      if (!positive_finite(resistance_per_m)) {
+        throw std::runtime_error("PEEC skin impedance exceeds numerical range.");
+      }
       r_val = std::max(r_dc, fil.length() * 1e-3 * resistance_per_m);
 
       if (config_.enable_hammerstad_roughness &&
@@ -130,6 +177,9 @@ Eigen::SparseMatrix<double> PEECSolver::compute_resistance(double frequency) {
       }
     }
     
+    if (!positive_finite(r_val)) {
+      throw std::runtime_error("PEEC resistance calculation exceeded numerical range.");
+    }
     triplets.emplace_back(static_cast<int>(i), static_cast<int>(i), r_val);
   }
   
@@ -169,8 +219,12 @@ Eigen::SparseMatrix<double> PEECSolver::compute_capacitance() {
   // capability-gated patch approximation; callers must validate panel shape,
   // convergence, and conductor grouping before treating it as sign-off data.
   P = (P + P.transpose()) * 0.5;
+  if (!P.allFinite()) {
+    throw std::runtime_error("Capacitance potential matrix contains nonfinite values.");
+  }
   Eigen::LDLT<Eigen::MatrixXd> factor(P);
-  if (factor.info() != Eigen::Success) {
+  if (factor.info() != Eigen::Success ||
+      (factor.vectorD().array() <= 0.0).any()) {
     throw std::runtime_error("Capacitance potential matrix factorization failed.");
   }
   Eigen::MatrixXd C_dense = factor.solve(Eigen::MatrixXd::Identity(n, n));
@@ -178,12 +232,17 @@ Eigen::SparseMatrix<double> PEECSolver::compute_capacitance() {
     throw std::runtime_error("Capacitance potential matrix solve failed.");
   }
   C_dense = (C_dense + C_dense.transpose()) * 0.5;
+  const double residual = (P * C_dense - Eigen::MatrixXd::Identity(n, n)).norm() /
+                          std::sqrt(static_cast<double>(n));
+  if (!std::isfinite(residual) || residual > 1e-10) {
+    throw std::runtime_error("Capacitance potential solve failed its residual check.");
+  }
 
   Eigen::SparseMatrix<double> C(n, n);
   std::vector<Eigen::Triplet<double>> triplets;
   for (int i = 0; i < C_dense.rows(); ++i) {
     for (int j = 0; j < C_dense.cols(); ++j) {
-      if (std::abs(C_dense(i, j)) > config_.sparse_threshold) {
+      if (C_dense(i, j) != 0.0) {
         triplets.emplace_back(i, j, C_dense(i, j));
       }
     }
@@ -195,60 +254,10 @@ Eigen::SparseMatrix<double> PEECSolver::compute_capacitance() {
 Eigen::VectorXcd
 PEECSolver::solve_frequency(double frequency,
                             const Eigen::VectorXcd &current_sources) {
-  if (frequency <= 0) {
-    throw std::invalid_argument("Frequency must be strictly positive for AC MNA.");
-  }
-
-  // 1. Build L, C, R matrices
-  Eigen::SparseMatrix<double> L_p = compute_partial_inductance();
-  Eigen::SparseMatrix<double> C = compute_capacitance();
-  Eigen::SparseMatrix<double> R = compute_resistance(frequency);
-
-  // 2. Compute Gamma = L^-1
-  // Convert sparse L_p to dense for inversion (stub for direct solving)
-  Eigen::MatrixXd L_dense = Eigen::MatrixXd(L_p);
-  Eigen::MatrixXd Gamma_dense;
-  
-  if (config_.solver_type == SolverType::DENSE_DIRECT || L_p.rows() < 5000) {
-    Gamma_dense = L_dense.inverse();
-  } else {
-    // In future: Use iterative approach or H-matrix to avoid full O(N^3)
-    Gamma_dense = L_dense.inverse(); 
-  }
-  
-  // 3. Assemble Y(w) = G + jwC + Gamma/(jw)
-  // Note: this is a simplified MNA mapped to the filament nodes.
-  // In a full PEEC solver, nodes map to filament ends and patches.
-  // For this stub, we assume N nodes = N filaments.
-  size_t n = filaments_.size();
-  Eigen::MatrixXcd Y(n, n);
-  double omega = 2.0 * M_PI * frequency;
-  std::complex<double> jw(0, omega);
-
-  for (size_t i = 0; i < n; ++i) {
-    for (size_t k = 0; k < n; ++k) {
-      double g_val = (i == k) ? (1.0 / R.coeff(i, i)) : 0.0;
-      double c_val = (i < C.rows() && k < C.cols()) ? C.coeff(i, k) : 0.0;
-      double gamma_val = Gamma_dense(i, k);
-      
-      Y(i, k) = g_val + jw * c_val + gamma_val / jw;
-    }
-  }
-
-  // 4. Solve Y * V = I
-  Eigen::VectorXcd V;
-  if (config_.solver_type == SolverType::DENSE_DIRECT || n < 2000) {
-     Eigen::PartialPivLU<Eigen::MatrixXcd> solver(Y);
-     V = solver.solve(current_sources);
-  } else {
-     // Use iterative BiCGSTAB for large systems
-     Eigen::SparseMatrix<std::complex<double>> Y_sparse = Y.sparseView(1e-10);
-     Eigen::BiCGSTAB<Eigen::SparseMatrix<std::complex<double>>> solver;
-     solver.compute(Y_sparse);
-     V = solver.solve(current_sources);
-  }
-
-  return V;
+  (void)frequency;
+  (void)current_sources;
+  throw std::logic_error(
+      "PEEC_LEGACY_FREQUENCY_SOLVE_UNSUPPORTED: use the topology-aware branch-incidence MNA adapter.");
 }
 
 void PEECSolver::clear() {
@@ -275,9 +284,6 @@ double PEECSolver::compute_mutual_inductance(const Filament &fil_i,
     const double w = fil_i.width * 1e-3;
     const double t = fil_i.thickness * 1e-3;
     const double gmd = w + t; // Geometric mean distance approximation
-
-    if (l < 1e-12)
-      return 0.0; // Degenerate filament
 
     double L_self = (mu_0 * l / (2.0 * M_PI)) *
                     (std::log(2.0 * l / gmd) + 0.5 + 0.2235 * (gmd / l));
@@ -312,9 +318,6 @@ double PEECSolver::compute_mutual_inductance(const Filament &fil_i,
   const double len_i = dl_i.norm();
   const double len_j = dl_j.norm();
 
-  if (len_i < 1e-12 || len_j < 1e-12)
-    return 0.0; // Degenerate filament
-
   // Normalize direction vectors
   dl_i.x /= len_i;
   dl_i.y /= len_i;
@@ -325,6 +328,7 @@ double PEECSolver::compute_mutual_inductance(const Filament &fil_i,
 
   // Dot product of direction vectors
   const double dl_dot = dl_i.x * dl_j.x + dl_i.y * dl_j.y + dl_i.z * dl_j.z;
+  if (dl_dot == 0.0) return 0.0;
 
   // Double integration using Gaussian quadrature
   double integral = 0.0;
@@ -349,9 +353,10 @@ double PEECSolver::compute_mutual_inductance(const Filament &fil_i,
       const Point3D dr = r_i - r_j;
       const double R = dr.norm() * 1e-3; // Convert mm to m
 
-      // Avoid singularity for very close points
-      if (R < 1e-9)
-        continue;
+      // The legacy line kernel has no admissible coincident-volume model.
+      // Do not silently erase singular contributions and report a false matrix.
+      if (R < 1e-9 || !std::isfinite(R))
+        return std::numeric_limits<double>::quiet_NaN();
 
       // Integrand: (dl_i · dl_j) / R
       const double integrand = dl_dot / R;

@@ -167,6 +167,31 @@ class CoupledLoopTests(unittest.TestCase):
         self.assertEqual(results[0]["component_models"], [])
         self.assertIn("SPIKE-BE-PI-E-0204", {issue.code for issue in issues})
 
+    def test_invalid_reviewed_component_values_reject_loop(self):
+        for value in (-0.1, float("nan"), float("inf"), True):
+            with self.subTest(resistance_ohm=value):
+                spec = AnalysisSpec(
+                    mode="ac",
+                    options={"loop_extractions": [{
+                        "forward": {
+                            "net": "VIN", "start": {"position_mm": [0.0, 0.0]},
+                            "end": {"position_mm": [10.0, 0.0]},
+                        },
+                        "return": {
+                            "net": "GND", "start": {"position_mm": [10.0, 1.0]},
+                            "end": {"position_mm": [0.0, 1.0]},
+                        },
+                        "component_models": [{"id": "Rbad", "reviewed": True, "resistance_ohm": value}],
+                    }]},
+                )
+                results, issues, _ = extract_loop_parasitics(
+                    self.mesh, spec, FakeResistanceSolver(),
+                    np.asarray([[10e-9, 4e-9], [4e-9, 10e-9]]), np.zeros(2), [1e3],
+                )
+                self.assertEqual(results, [])
+                self.assertIn("SPIKE-BE-PI-E-0201", {issue.code for issue in issues})
+                self.assertIn("finite and non-negative", issues[0].message)
+
     def test_capacitance_is_not_reused_for_a_different_return_net(self):
         spec = AnalysisSpec(
             mode="ac",
