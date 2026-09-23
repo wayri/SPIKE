@@ -89,6 +89,17 @@ if(MSVC)
 else()
     target_compile_options(spike_peec_volume PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
 endif()
+add_library(spike_peec_volume_matrix STATIC
+    src/peec/volume_matrix.cpp
+    src/peec/annular_inductance.cpp)
+target_include_directories(spike_peec_volume_matrix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_link_libraries(spike_peec_volume_matrix PUBLIC spike_peec_volume Eigen3::Eigen)
+set_target_properties(spike_peec_volume spike_peec_volume_matrix PROPERTIES POSITION_INDEPENDENT_CODE ON)
+if(MSVC)
+    target_compile_options(spike_peec_volume_matrix PRIVATE /W4 /WX /fp:strict)
+else()
+    target_compile_options(spike_peec_volume_matrix PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+endif()
 
 # Strict typed geometry admission only. Keep this target independent of Eigen,
 # OpenMP, PEEC solver APIs, and legacy fast-math/ISA flags.
@@ -218,12 +229,15 @@ endif()
 # Installation
 # ============================================================================
 
-install(TARGETS spike_peec spike_transition_handoff spike_geometry spike_thermal spike_math spikes_core spikes_c_api spikes_dashboard spikes_console spikes_osdi_worker spikes_appcontainer_launcher
+install(TARGETS spike_peec spike_peec_volume spike_peec_volume_matrix spike_transition_handoff spike_geometry spike_thermal spike_math spikes_core spikes_c_api spikes_dashboard spikes_console spikes_osdi_worker spikes_appcontainer_launcher
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
 )
 install(FILES
+    src/peec/volume_inductance.hpp
+    src/peec/annular_inductance.hpp
+    src/peec/volume_matrix.hpp
     src/peec/via_transition_mesh_input.hpp
     src/peec/reference_plane_antipad_mesh_input.hpp
     src/geometry/planar_topology.hpp
@@ -262,6 +276,14 @@ if(BUILD_TESTING)
     add_executable(test_volume_inductance tests/test_volume_inductance.cpp)
     target_link_libraries(test_volume_inductance PRIVATE spike_peec_volume Eigen3::Eigen)
     add_test(NAME test_volume_inductance COMMAND test_volume_inductance)
+
+    add_executable(test_volume_matrix tests/test_volume_matrix.cpp)
+    target_link_libraries(test_volume_matrix PRIVATE spike_peec_volume_matrix Eigen3::Eigen)
+    add_test(NAME test_volume_matrix COMMAND test_volume_matrix)
+
+    add_executable(test_annular_inductance tests/test_annular_inductance.cpp)
+    target_link_libraries(test_annular_inductance PRIVATE spike_peec_volume_matrix)
+    add_test(NAME test_annular_inductance COMMAND test_annular_inductance)
 
     add_executable(test_via_transition_mesh_input
         tests/test_via_transition_mesh_input.cpp)
@@ -385,6 +407,7 @@ if(BUILD_PYTHON_BINDINGS)
         spike_geometry
         spike_thermal
         spike_math
+        spike_peec_volume_matrix
     )
     
     # Set output directory

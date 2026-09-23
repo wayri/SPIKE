@@ -73,3 +73,20 @@ class PEECEnergyAdmissionTests(unittest.TestCase):
         self.assertFalse(quality['projection_applied'])
         np.testing.assert_array_equal(matrix, [[1e-9, 2e-9], [2e-9, 1e-9]])
         json.dumps(result.to_dict(), allow_nan=False)
+
+    def test_explicit_volume_request_fails_closed_when_backend_is_unavailable(self):
+        mesh = HybridMesh(nodes=[MeshNode(i, i, 0, 0, 'F.Cu', 'VCC') for i in range(2)],
+            branches=[MeshBranch('0', 'track', 0, 1, (0, 0, 0), (1, 0, 0),
+                .2, .035, 5.8e7, 'F.Cu', 'VCC', '0')])
+        solver = SimpleNamespace(compute_partial_inductance=lambda: np.eye(1))
+        spec = AnalysisSpec(mode='ac', options={'peec_volume_extraction': 'enabled'})
+        with patch('python.spike_core.peec_plugin.native', object()), patch(
+            'python.spike_core.peec_plugin.build_hybrid_mesh', return_value=mesh), patch(
+            'python.spike_core.peec_plugin._make_native_solver', return_value=(solver, None)), patch(
+            'python.spike_core.peec_plugin.extract_volume_matrices',
+            side_effect=ValueError('native finite-volume PEEC backend is unavailable')):
+            result = solve_peec_2_5d(DesignIR(), spec)
+        self.assertEqual(result.status, 'failed')
+        self.assertIn('PEEC_VOLUME_EXTRACTION_FAILED', {issue.code for issue in result.issues})
+        self.assertEqual(result.provenance['failure_stage'], 'volume_matrix_extraction')
+        self.assertEqual(result.provenance['volume_current_model'], 'uniform_volume_current')

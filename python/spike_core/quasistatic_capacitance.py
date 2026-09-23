@@ -13,11 +13,27 @@ from typing import Any, Dict, Iterable, List, Sequence, Tuple
 
 import numpy as np
 
-from .contracts import AnalysisSpec, DesignIR
+from .contracts import AnalysisSpec, DesignIR, ValidationIssue
 
 
 EPSILON_0_F_M = 8.8541878128e-12
 LIGHT_SPEED_M_S = 299_792_458.0
+
+
+def zone_pad_mesh_dependence_issue(branches: Sequence[Any],
+                                   physical_indices: Sequence[int],
+                                   volume_extraction: bool) -> ValidationIssue | None:
+    """Keep the current internal-edge C limitation explicit to AC consumers."""
+    if not volume_extraction or not any(
+        branches[index].kind in {"zone", "pad"} for index in physical_indices
+    ):
+        return None
+    return ValidationIssue(
+        "PEEC_ZONE_PAD_CAPACITANCE_MESH_DEPENDENT", "warning",
+        "Zone/pad capacitance currently sums microstrip estimates on internal mesh links; refinement can change the total without changing copper geometry.",
+        suggestion="Do not use this capacitance for bandwidth sign-off; compare mesh refinements and use a validated electrostatic extractor.",
+        status="approximate",
+    )
 
 
 def estimate_line_capacitance_per_m(

@@ -5,6 +5,7 @@
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/complex.h>
 #include <nanobind/stl/function.h>
+#include <nanobind/stl/array.h>
 
 // Eigen integration for nanobind is needed to pass matrices,
 // but for now we bind the interface without direct dense matrix return types
@@ -15,6 +16,7 @@
 
 #include "geometry/planar_topology.hpp"
 #include "peec/peec_solver.hpp"
+#include "peec/volume_matrix.hpp"
 #include "peec/reference_plane_antipad_mesh_input.hpp"
 #include "peec/generalized_reference_plane_mesh_input.hpp"
 #include "peec/via_transition_mesh_input.hpp"
@@ -25,6 +27,60 @@ using namespace nb::literals;
 
 NB_MODULE(spike_peec_native, m) {
     m.doc() = "SPIKE Simulation Engine C++ Backend bindings";
+
+    namespace volume = spike::peec::volume;
+    nb::class_<volume::RectangularVolume>(m, "VolumeRectangularBasis")
+        .def(nb::init<>())
+        .def_rw("center_m", &volume::RectangularVolume::center_m)
+        .def_rw("direction", &volume::RectangularVolume::direction)
+        .def_rw("width_axis", &volume::RectangularVolume::width_axis)
+        .def_rw("length_m", &volume::RectangularVolume::length_m)
+        .def_rw("width_m", &volume::RectangularVolume::width_m)
+        .def_rw("thickness_m", &volume::RectangularVolume::thickness_m);
+    nb::class_<volume::CoaxialAnnulusVolume>(m, "VolumeCoaxialAnnulusBasis")
+        .def(nb::init<>())
+        .def_rw("center_m", &volume::CoaxialAnnulusVolume::center_m)
+        .def_rw("direction", &volume::CoaxialAnnulusVolume::direction)
+        .def_rw("length_m", &volume::CoaxialAnnulusVolume::length_m)
+        .def_rw("inner_radius_m", &volume::CoaxialAnnulusVolume::inner_radius_m)
+        .def_rw("outer_radius_m", &volume::CoaxialAnnulusVolume::outer_radius_m);
+    nb::class_<volume::IntegrationOptions>(m, "VolumePairIntegrationOptions")
+        .def(nb::init<>())
+        .def_rw("relative_tolerance", &volume::IntegrationOptions::relative_tolerance)
+        .def_rw("absolute_tolerance_h", &volume::IntegrationOptions::absolute_tolerance_h)
+        .def_rw("max_potential_evaluations", &volume::IntegrationOptions::max_potential_evaluations)
+        .def_rw("max_cells", &volume::IntegrationOptions::max_cells)
+        .def_rw("permeability_h_per_m", &volume::IntegrationOptions::permeability_h_per_m);
+    nb::class_<volume::AnnularIntegrationOptions>(m, "VolumeAnnularIntegrationOptions")
+        .def(nb::init<>())
+        .def_rw("relative_tolerance", &volume::AnnularIntegrationOptions::relative_tolerance)
+        .def_rw("absolute_tolerance_h", &volume::AnnularIntegrationOptions::absolute_tolerance_h)
+        .def_rw("max_evaluations", &volume::AnnularIntegrationOptions::max_evaluations)
+        .def_rw("max_cells", &volume::AnnularIntegrationOptions::max_cells)
+        .def_rw("permeability_h_per_m", &volume::AnnularIntegrationOptions::permeability_h_per_m);
+    nb::class_<volume::MatrixIntegrationOptions>(m, "VolumeMatrixIntegrationOptions")
+        .def(nb::init<>())
+        .def_rw("pair", &volume::MatrixIntegrationOptions::pair)
+        .def_rw("annular_pair", &volume::MatrixIntegrationOptions::annular_pair)
+        .def_rw("maximum_matrix_pairs", &volume::MatrixIntegrationOptions::maximum_matrix_pairs)
+        .def_rw("maximum_total_potential_evaluations", &volume::MatrixIntegrationOptions::maximum_total_potential_evaluations);
+    nb::class_<volume::MatrixIntegrationResult>(m, "VolumeMatrixResult")
+        .def_ro("inductance_h", &volume::MatrixIntegrationResult::inductance_h)
+        .def_ro("estimated_error_h", &volume::MatrixIntegrationResult::estimated_error_h)
+        .def_ro("reciprocity_difference_h", &volume::MatrixIntegrationResult::reciprocity_difference_h)
+        .def_ro("potential_evaluations", &volume::MatrixIntegrationResult::potential_evaluations)
+        .def_ro("pair_count", &volume::MatrixIntegrationResult::pair_count)
+        .def_ro("converged", &volume::MatrixIntegrationResult::converged)
+        .def_ro("failure_code", &volume::MatrixIntegrationResult::failure_code)
+        .def_ro("failure_pair_i", &volume::MatrixIntegrationResult::failure_pair_i)
+        .def_ro("failure_pair_j", &volume::MatrixIntegrationResult::failure_pair_j);
+    nb::class_<volume::VolumeMatrixAssembler>(m, "VolumeMatrixAssembler")
+        .def(nb::init<volume::MatrixIntegrationOptions>(), nb::arg("options") = volume::MatrixIntegrationOptions())
+        .def("add_rectangular", &volume::VolumeMatrixAssembler::add_rectangular)
+        .def("add_coaxial_annulus", &volume::VolumeMatrixAssembler::add_coaxial_annulus)
+        .def("basis_count", &volume::VolumeMatrixAssembler::basis_count)
+        .def("clear", &volume::VolumeMatrixAssembler::clear)
+        .def("compute_inductance", &volume::VolumeMatrixAssembler::compute_inductance);
 
     nb::class_<spike::geometry::Point2>(m, "PlanarPoint2")
         .def(nb::init<>())

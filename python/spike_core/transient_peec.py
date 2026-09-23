@@ -21,7 +21,8 @@ from scipy.linalg import LinAlgWarning, lu_factor, lu_solve
 from .contracts import AnalysisResult, AnalysisSpec, DesignIR, ValidationIssue
 from .hybrid_mesh import HybridMesh, build_hybrid_mesh, nearest_mesh_node
 from .numerics import assess_symmetric_positive_semidefinite
-from .peec_plugin import _dense, _dielectric_epsilon, _make_native_solver, native_available
+from .peec_plugin import _dense, _dielectric_epsilon, _make_native_solver, native, native_available
+from .peec_volume_adapter import extract_volume_matrices
 from .quasistatic_capacitance import estimate_line_capacitance_per_m
 from .spatial_sampling import stratified_sample_records
 
@@ -779,14 +780,26 @@ def solve_peec_rl_transient(design: DesignIR, spec: AnalysisSpec) -> AnalysisRes
         design, spec, settings, physical_branches, branch_endpoints, node_metadata, node_count,
     )
 
+    volume_extraction = spec.options.get("peec_volume_extraction") == "enabled"
+    volume_quality: Dict[str, Any] | None = None
     try:
         active_mesh = HybridMesh(nodes=mesh.nodes, branches=physical_branches, target_size_mm=mesh.target_size_mm)
         solver, native_config = _make_native_solver(active_mesh, _dielectric_epsilon(design))
-        physical_inductance = _dense(solver.compute_partial_inductance())
+        if volume_extraction:
+            volume = extract_volume_matrices(native, design, physical_branches)
+            physical_inductance = _dense(volume.inductance_h)
+            physical_resistance = _dense(volume.dc_resistance_ohm)
+            volume_quality = dict(volume.quality)
+        else:
+            physical_inductance = _dense(solver.compute_partial_inductance())
+            physical_resistance = _dense(solver.compute_resistance(0.0))
         physical_inductance, passivity = _assess_passive_inductance(physical_inductance)
-        physical_resistance = _dense(solver.compute_resistance(0.0))
     except Exception as exc:
-        return _failed(spec, issues + [ValidationIssue("PEEC_MATRIX_EXTRACTION_FAILED", "error", f"Native PEEC matrix extraction failed: {exc}.")])
+        return _failed(spec, issues + [ValidationIssue(
+            "PEEC_VOLUME_EXTRACTION_FAILED" if volume_extraction else "PEEC_MATRIX_EXTRACTION_FAILED",
+            "error", f"Native PEEC matrix extraction failed: {exc}.",
+        )], provenance={"failure_stage": "volume_matrix_extraction" if volume_extraction else "matrix_extraction",
+                        "volume_current_model": "uniform_volume_current" if volume_extraction else "disabled"})
     if perf_counter() - solve_started > settings.max_solver_time_s:
         return _failed(spec, issues + [ValidationIssue(
             "TRANSIENT_SOLVER_TIME_LIMIT", "error",
@@ -1338,6 +1351,9 @@ def solve_peec_rl_transient(design: DesignIR, spec: AnalysisSpec) -> AnalysisRes
             "via_model": str(spec.mesh.get("via_model", "extracted")),
             "integration": "backward_euler",
             "inductance_passivity": passivity,
+            "volume_current_model": "uniform_volume_current" if volume_extraction else "disabled",
+            "volume_extraction_work": "bounded_adaptive_pair_integration" if volume_extraction else "disabled",
+            **({"volume_extraction": volume_quality} if volume_quality is not None else {}),
             "time_step_s": settings.time_step_s,
             "output_decimation": settings.output_decimation,
             "limits": [

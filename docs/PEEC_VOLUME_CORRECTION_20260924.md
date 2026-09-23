@@ -4,9 +4,63 @@
 
 ## Status
 
+### Continuation: local finite-volume integration
+
+The negative-energy Marble matrix has a physical, opt-in correction in the
+local CPython 3.11 runtime. Rectangular planar and circular-annular via bases
+use finite-volume self/mutual inductance; overlapping planar copper also uses
+a symmetric resistance bilinear form. The retained 1 mm, 45-basis Marble
+C383-net matrix is positive within roundoff (smallest eigenvalue
+`5.354853551935084e-12 H`); the previous filament matrix had five negative
+modes and smallest eigenvalue `-22.1443162 pH`. No eigenvalue projection,
+clipping, or relaxed passivity test was applied.
+
+An explicit routed `U37.18` to `R195.1` AC probe completes with
+`model_status=approximate`, 1,035 converged volume pairs, zero negative modes,
+and `0.0` passivity correction ratio. The original `U37.18` to `C383.1`
+terminal pair still correctly fails `PEEC_LOAD_DISCONNECTED`: the C383.1 pad
+is separated from the nearby copper fill by about 0.064 mm in the public
+Marble v1.4.4 board. The routed probe is a **different, connected path** and
+does not turn the original path into a solved case. Reproduce both with
+`scripts/run_public_board_volume_ac.py` and
+`--original-disconnected-ports` for the original pair.
+
+This is not yet qualified board AC accuracy or a deployable release. The
+0.5 mm, 120-basis mesh now completes with an 8,192-pair bounded runtime cap:
+7,260 pairs, 72,259,138 potential evaluations, no negative energy modes and
+no projection. However, the same routed path changes from 1.3422803 to
+1.2637065 nH (about 5.9%) and from 4.77887 to 5.25118 mOhm (about 9.9%)
+between 1 and 0.5 mm. Thus path quantities have **not** demonstrated mesh
+convergence. An intermediate 0.75 mm run returned 1.2252173 nH and
+4.37768 mOhm, so the three-point path sequence is nonmonotone. The 0.25 mm
+mesh has 431 physical bases/93,096 pairs and remains
+outside the admitted production work budget. The single-reference C/G model,
+skin/proximity loss, manufactured/independent
+board reference, package parity, and knowledgeable human numerical review
+remain open. See `scripts/marble_refinement_qualification.md` for current
+refinement evidence and
+[the mesh audit](validation/MARBLE_PEEC_MESH_AUDIT.md) for the demonstrated
+boundary-support, attachment-resistance and C-estimator defects. Only the
+CPython 3.11 local binary was installed; the
+rebuilt CPython 3.12 binary passed native tests but could not replace the
+in-use runtime file. Capability claims must stay `approximate` and the volume
+path opt-in until these gates close.
+
+The rebuilt CPython 3.12 extension also passed its two native volume tests
+and six focused Python adapter/runtime tests when loaded from its Release
+build path. The installed CPython 3.12 extension remained locked by another
+process, so those checks do **not** establish deployed 3.12 package parity.
+The local CPython 3.11 full default Python discovery passed 1,860 tests with
+two skips; focused post-audit adapter and capacitance-warning tests passed,
+and `scripts/check_architecture.py` passed. These checks do not override the
+demonstrated mesh nonconvergence or substitute for independent correlation.
+
+### Historical baseline and original isolated kernel
+
 The subsequent [safety policy and consumer audit](PEEC_SAFETY_POLICY.md) makes
 the findings permanent runtime and regression requirements. It closes additional
-unsafe admission/export paths, not the missing board-volume formulation.
+unsafe admission/export paths. The remainder of this record describes the
+state before the local finite-volume continuation above.
 
 **The real-board AC defect is not fixed yet. Do not synchronize a release claim
 or enable a production capability based on this increment.** The new native

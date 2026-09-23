@@ -178,6 +178,55 @@ class TransientPeecTests(unittest.TestCase):
         self.assertIn("PEEC_MATRIX_EXTRACTION_FAILED", {issue.code for issue in result.issues})
         self.assertIn("positive length", result.issues[-1].message)
 
+    def test_explicit_volume_request_fails_closed_without_fallback(self):
+        spec = self.spec()
+        spec.options["peec_volume_extraction"] = "enabled"
+        solver = SimpleNamespace(
+            compute_partial_inductance=lambda: self.fail("filament fallback must not run"),
+            compute_resistance=lambda _frequency: self.fail("filament fallback must not run"),
+        )
+        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.transient_peec._make_native_solver",
+            return_value=(solver, SimpleNamespace(eps_r=4.2)),
+        ), patch(
+            "python.spike_core.transient_peec.extract_volume_matrices",
+            side_effect=ValueError("volume integration did not converge"),
+        ):
+            result = solve_peec_rl_transient(self.design, spec)
+        self.assertEqual(result.status, "failed")
+        self.assertIn("PEEC_VOLUME_EXTRACTION_FAILED", {issue.code for issue in result.issues})
+        self.assertEqual(result.provenance["failure_stage"], "volume_matrix_extraction")
+        self.assertEqual(result.provenance["volume_current_model"], "uniform_volume_current")
+
+    def test_explicit_volume_request_drives_transient_matrices(self):
+        spec = self.spec()
+        spec.options["peec_volume_extraction"] = "enabled"
+        solver = SimpleNamespace(
+            compute_partial_inductance=lambda: self.fail("filament fallback must not run"),
+            compute_resistance=lambda _frequency: self.fail("filament fallback must not run"),
+        )
+
+        def volume_result(_native, _design, branches):
+            count = len(branches)
+            return SimpleNamespace(
+                inductance_h=np.eye(count) * 1e-9,
+                dc_resistance_ohm=np.eye(count) * 1e-3,
+                quality={"method": "uniform_volume_current", "pair_count": count * count},
+            )
+
+        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.transient_peec._make_native_solver",
+            return_value=(solver, SimpleNamespace(eps_r=4.2)),
+        ), patch(
+            "python.spike_core.transient_peec.extract_volume_matrices", side_effect=volume_result,
+        ):
+            result = solve_peec_rl_transient(self.design, spec)
+        self.assertEqual(result.status, "completed")
+        self.assertEqual(result.model_status, "approximate")
+        self.assertEqual(result.provenance["volume_current_model"], "uniform_volume_current")
+        self.assertEqual(result.provenance["volume_extraction_work"], "bounded_adaptive_pair_integration")
+        self.assertEqual(result.provenance["volume_extraction"]["method"], "uniform_volume_current")
+
     def test_stackup_line_capacitance_is_physical_and_finite(self):
         value = estimate_line_capacitance_per_m(1.0, 0.2, 4.2)
         self.assertGreater(value, 50e-12)

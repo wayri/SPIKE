@@ -84,8 +84,11 @@ comparison evidence and cannot independently promote a native SPIKE workflow.
 ### Native PEEC RLCG (`spike.peec_2_5d`)
 
 The [2026-09-24 correction record](PEEC_VOLUME_CORRECTION_20260924.md) documents
-reproduced real-board nonpassivity. A standalone rectangular-volume kernel is
-under verification, not a production replacement. Marble AC and MODULAR-BUS-NIB
+the original real-board nonpassivity and the opt-in local finite-volume
+rectangular/annular correction. A routed Marble 1 mm AC probe now passes the
+matrix energy gate without projection, but its C/G model is approximate,
+the original C383.1 terminal is physically disconnected, and mesh-refinement
+and deployment qualification remain open. MODULAR-BUS-NIB
 AC/DC convergence remain blocked; transient now rejects negative-energy modes
 instead of projecting the matrix. Do not infer readiness from preflight alone.
 The [PEEC safety policy](PEEC_SAFETY_POLICY.md) records native admission,

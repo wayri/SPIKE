@@ -11,6 +11,8 @@ from .contracts import AnalysisResult, AnalysisSpec, DesignIR, ValidationIssue
 from .hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS, HybridMesh, build_hybrid_mesh, nearest_mesh_node
 from .loop_parasitics import extract_loop_parasitics
 from .peec_matrices import TopologyResistanceSolver, embed_physical_inductance
+from .peec_native_factory import dielectric_epsilon as _dielectric_epsilon, make_native_solver
+from .peec_volume_adapter import VolumeResistanceOverlay, extract_volume_matrices
 from .peec_network import (
     dense as _dense,
     extract_pdn_multiport as _extract_pdn_multiport,
@@ -18,7 +20,7 @@ from .peec_network import (
     solve_shared_reference_port_matrix as _solve_shared_reference_port_matrix,
 )
 from .numerics import assess_symmetric_positive_semidefinite
-from .quasistatic_capacitance import estimate_branch_capacitance
+from .quasistatic_capacitance import estimate_branch_capacitance, zone_pad_mesh_dependence_issue
 
 try:
     from python import spike_peec_native as native
@@ -138,35 +140,7 @@ def _make_native_solver(
     epsilon_r: float,
     spec: AnalysisSpec | None = None,
 ) -> Any:
-    config = native.PEECConfig()
-    config.eps_r = epsilon_r
-    conductor = spec.options.get("conductor_models", {}) if spec is not None else {}
-    config.enable_skin_effect = bool(conductor.get("skin_effect", True))
-    roughness_model = str(conductor.get("surface_roughness_model", "none")).lower()
-    config.enable_hammerstad_roughness = roughness_model == "hammerstad"
-    config.roughness_rms_um = max(float(conductor.get("rms_roughness_um", 0.0)), 0.0)
-    solver = native.PEECSolver(config)
-    for branch in mesh.branches:
-        filament = native.Filament()
-        filament.start = native.Point3D(*branch.start_mm)
-        filament.end = native.Point3D(*branch.end_mm)
-        filament.width = branch.width_mm
-        filament.thickness = branch.thickness_mm
-        filament.node_p = branch.node_p
-        filament.node_n = branch.node_n
-        filament.conductivity = branch.conductivity_s_m
-        solver.add_filament(filament)
-    return solver, config
-
-
-def _dielectric_epsilon(design: DesignIR) -> float:
-    values = [
-        float(layer.get("epsilon_r", layer.get("epsilonR")))
-        for layer in design.stackup
-        if not str(layer.get("name", "")).endswith(".Cu")
-        and (layer.get("epsilon_r") is not None or layer.get("epsilonR") is not None)
-    ]
-    return sum(values) / len(values) if values else 4.2
+    return make_native_solver(native, mesh, epsilon_r, spec)
 
 
 def _local_shunt_matrices(
@@ -263,18 +237,32 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         branches=[mesh.branches[index] for index in physical_branch_indices],
         target_size_mm=mesh.target_size_mm,
     )
+    volume_extraction = spec.options.get("peec_volume_extraction") == "enabled"
+    volume_quality: Dict[str, Any] | None = None
     try:
         native_solver, config = _make_native_solver(physical_mesh, epsilon_r, spec)
-        raw_inductance = embed_physical_inductance(
-            _dense(native_solver.compute_partial_inductance()),
-            len(mesh.branches), physical_branch_indices,
-        )
+        if volume_extraction:
+            volume = extract_volume_matrices(native, design, physical_mesh.branches)
+            volume_quality = dict(volume.quality)
+            raw_inductance = embed_physical_inductance(
+                _dense(volume.inductance_h), len(mesh.branches), physical_branch_indices,
+            )
+        else:
+            volume = None
+            raw_inductance = embed_physical_inductance(
+                _dense(native_solver.compute_partial_inductance()),
+                len(mesh.branches), physical_branch_indices,
+            )
         inductance, inductance_quality = assess_symmetric_positive_semidefinite(raw_inductance)
     except (ValueError, RuntimeError, np.linalg.LinAlgError) as error:
         return AnalysisResult(analysis_id=spec.analysis_id, mode=spec.mode,
             status="failed", model_status="failed",
-            issues=issues + [ValidationIssue("PEEC_MATRIX_EXTRACTION_FAILED", "error", str(error))],
-            provenance={"solved": False, "failure_stage": "physical_inductance_admission"})
+            issues=issues + [ValidationIssue(
+                "PEEC_VOLUME_EXTRACTION_FAILED" if volume_extraction else "PEEC_MATRIX_EXTRACTION_FAILED",
+                "error", str(error),
+            )],
+            provenance={"solved": False, "failure_stage": "volume_matrix_extraction" if volume_extraction else "physical_inductance_admission",
+                        "volume_current_model": "uniform_volume_current" if volume_extraction else "disabled"})
     topology_indices = [
         index for index in range(len(mesh.branches)) if index not in physical_branch_indices
     ]
@@ -295,11 +283,15 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         )
         resistance_solver, _ = _make_native_solver(resistance_mesh, epsilon_r, spec)
     solver = TopologyResistanceSolver(resistance_solver, mesh, resistance_indices)
+    if volume_extraction:
+        solver = VolumeResistanceOverlay(
+            solver, physical_branch_indices, _dense(volume.dc_resistance_ohm)
+        )
     if topology_indices:
         issues.append(ValidationIssue(
             "PEEC_TOPOLOGY_FIELD_EXCLUDED",
             "warning",
-            f"Excluded {len(topology_indices)} graph-only link(s) from the unsupported filament L/C model while retaining their mesh resistance in the circuit solve.",
+            f"Excluded {len(topology_indices)} graph-only link(s) from magnetic/capacitive field bases while retaining their mesh resistance in the circuit solve.",
             suggestion="Review attachment geometry and DC resistance; graph links are not finite field filaments.",
             status="approximate",
         ))
@@ -335,7 +327,6 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
     capacitance_info.update({
         "field_branch_count": len(physical_branch_indices),
         "topology_constraint_branch_count_excluded": len(topology_indices),
-        "estimated_branch_count": len(physical_branch_indices),
         "total_capacitance_f": float(np.sum(branch_capacitance)),
     })
     frequencies = _frequencies(spec)
@@ -540,6 +531,10 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
             suggestion="Provide an explicit return conductor and fabrication dielectric/loss data; use a validated electrostatic solver for sign-off capacitance.",
             status="approximate",
         ))
+        mesh_c_issue = zone_pad_mesh_dependence_issue(
+            mesh.branches, physical_branch_indices, volume_extraction)
+        if mesh_c_issue is not None:
+            issues.append(mesh_c_issue)
     else:
         issues.append(ValidationIssue(
             "PEEC_CAPACITANCE_UNSUPPORTED",
@@ -785,11 +780,14 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
             "numerical_quality": {
                 "inductance_passivity": inductance_quality,
                 "capacitance": capacitance_info,
+                **({"volume_extraction": volume_quality} if volume_quality is not None else {}),
             },
+            "volume_current_model": "uniform_volume_current" if volume_extraction else "disabled",
+            "volume_extraction_work": "bounded_adaptive_pair_integration" if volume_extraction else "disabled",
             "limits": [
                 "quasi-static RLCG driving-point model",
-                "finite-volume planar copper",
-                "rectangular filament approximation",
+                ("uniform finite-volume planar and annular magnetic current bases"
+                 if volume_extraction else "rectangular filament magnetic approximation"),
                 "single-reference approximate capacitance and dielectric loss",
                 "PDN candidate matrices use the explicit source terminal as an ideal common reference",
                 "loop extraction requires explicit forward/return pad-to-pad paths and includes mutual partial inductance",
