@@ -14,6 +14,11 @@ result is **17/17 passed** for the synthetic board and
 `release_validated: false`. The board-derived DC and AC results remain
 `approximate` even when a benchmark check passes.
 
+The separate [PI kernel report](../examples/pi/reference_board/validation/pi-kernel-benchmarks.json)
+records **10/10 passed, zero skips** for analytical and bounded numerical
+references. The internal mixed-capability benchmark corpus is not relabeled
+as a public PI gate.
+
 | PI capability | Example / check | Present evidence | Release conclusion |
 | --- | --- | --- | --- |
 | KiCad import and board validation | Four-net reference board | Exact counts: 6 tracks, 2 vias, 12 pads, 2 filled zones, 8 components, 3 stackup rows | Fixture import passes; importer breadth needs a separate corpus. |

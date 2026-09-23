@@ -21,6 +21,7 @@ Run from a checkout with SPIKE's Python dependencies and native PEEC extension:
 ```sh
 python examples/pi/reference_board/generate_board.py
 python examples/pi/reference_board/run.py --output build/pi-reference-evidence.json --html-dir build/pi-reference-html
+python examples/pi/reference_board/run_kernel_benchmarks.py --output build/pi-kernel-benchmarks.json
 ```
 
 The deterministic board UUIDs and SHA-256 in the evidence detect accidental
@@ -30,6 +31,13 @@ mesh convergence, reviewed R1 series-path AC, board-derived PDN multiport,
 placed-C2 versus DNP-C3 capacitor sensitivity, an independent 17-frequency
 nodal loading reference, multi-net batch normalization, and JSON/HTML reports.
 The runner exits nonzero when any of its executable checks fails.
+The separate kernel runner selects exactly ten retained PI references from
+the internal benchmark implementations. It fails if any case fails or skips;
+its checked [output](validation/pi-kernel-benchmarks.json) records every
+measured value, oracle, error, and tolerance. These checks cover straight
+trace and plated-via resistance, zone refinement, hybrid connectivity, native
+self-inductance, hybrid PEEC, a capacitance limit, AC loss monotonicity,
+shared-reference multiport algebra, and independent capacitor loading.
 
 The closed-form VAUX DC oracle is `R = L/(sigma*w*t)` with `L=35 mm`,
 `w=0.8 mm`, `t=35 um`, and `sigma=5.8e7 S/m`. The 2% tolerance allows pad

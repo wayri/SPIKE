@@ -1,0 +1,115 @@
+{
+  "benchmarks": [
+    {
+      "detail": "R = length / (conductivity * width * thickness); segmentation must be invariant.",
+      "expected": 0.009852216748768475,
+      "measured": 0.009852216748768471,
+      "name": "straight_trace_dc_resistance",
+      "relative_error": 3.521488656232918e-16,
+      "status": "passed",
+      "tolerance": 1e-10,
+      "units": "ohm"
+    },
+    {
+      "detail": "The rectangular PEEC surrogate preserves the exact annular barrel area.",
+      "expected": 0.0010570927785201747,
+      "measured": 0.001057092778520175,
+      "name": "plated_via_dc_resistance",
+      "relative_error": 2.0512904723524461e-16,
+      "status": "passed",
+      "tolerance": 1e-10,
+      "units": "ohm"
+    },
+    {
+      "detail": "cells_mm=[2.0, 1.0, 0.5, 0.25]; relative_errors=[0.2, 0.1, 0.05, 0.025]",
+      "expected": 0.0004926108374384237,
+      "measured": 0.0004802955665024644,
+      "name": "square_zone_sheet_resistance_convergence",
+      "relative_error": 0.02499999999999741,
+      "status": "passed",
+      "tolerance": 0.03,
+      "units": "ohm/square"
+    },
+    {
+      "detail": "geometry_counts={'track': 2, 'zone': 1, 'via': 1, 'pad': 1}; nodes=45; branches=66",
+      "expected": null,
+      "measured": 0.008334805047974214,
+      "name": "hybrid_trace_zone_pad_via_connectivity",
+      "relative_error": null,
+      "status": "passed",
+      "tolerance": null,
+      "units": "ohm"
+    },
+    {
+      "detail": "Independent Python evaluation of the rectangular-conductor Rosa/Grover expression.",
+      "expected": 1.6664176609586414e-08,
+      "measured": 1.6664176609586414e-08,
+      "name": "native_straight_trace_self_inductance",
+      "relative_error": 0.0,
+      "status": "passed",
+      "tolerance": 1e-08,
+      "units": "henry"
+    },
+    {
+      "detail": "status=completed; geometry_counts={'track': 2, 'zone': 1, 'via': 1, 'pad': 1}; ports=1",
+      "expected": null,
+      "measured": 0.008334805358982234,
+      "name": "native_hybrid_peec_mna",
+      "relative_error": null,
+      "status": "passed",
+      "tolerance": null,
+      "units": "ohm"
+    },
+    {
+      "detail": "A wide microstrip must approach the independent parallel-plate electrostatic limit.",
+      "expected": 3.54167512512e-09,
+      "measured": 3.62119168295309e-09,
+      "name": "wide_microstrip_parallel_plate_capacitance_limit",
+      "relative_error": 0.022451680355745636,
+      "status": "passed",
+      "tolerance": 0.05,
+      "units": "farad/meter"
+    },
+    {
+      "detail": "frequency_sweep_resistance_ohm=[0.04926108376537413, 0.04926109055277545, 0.049263236877349764, 0.04993796913458232, 0.1300686768463349]",
+      "expected": 0.04926108376537413,
+      "measured": 0.1300686768463349,
+      "name": "native_ac_resistance_monotonicity",
+      "relative_error": null,
+      "status": "passed",
+      "tolerance": null,
+      "units": "ohm"
+    },
+    {
+      "detail": "Two-port closed-form Z=[[R1,R1],[R1,R1+R2]] with non-contiguous mesh node IDs; method=dense_direct; residual=0. This verifies MNA assembly and the multi-right-hand-side solve, not PCB field extraction.",
+      "expected": 0.0,
+      "measured": 0.0,
+      "name": "peec_shared_reference_multiport_resistor_matrix",
+      "relative_error": 0.0,
+      "status": "passed",
+      "tolerance": 1e-12,
+      "units": "relative_frobenius"
+    },
+    {
+      "detail": "Compared the multiport loading response against an independent passive two-node nodal re-solve at 17 frequencies; this validates the circuit reduction only, not PCB multiport extraction or placement accuracy.",
+      "expected": 0.0,
+      "measured": 6.856592385534563e-16,
+      "name": "pdn_two_port_capacitor_loading_circuit_reference",
+      "relative_error": 6.856592385534563e-16,
+      "status": "passed",
+      "tolerance": 1e-10,
+      "units": "relative"
+    }
+  ],
+  "contract": "spike/public-pi-kernel-benchmarks/v1",
+  "native_peec_sha256": "3e50846def9cc383a12f7482e8b0b02bb47645c6082e06c11d9067f1e0219829",
+  "release_validated": false,
+  "scope": "Numerical kernels and bounded analytical references; no measured-board correlation.",
+  "status": "passed",
+  "summary": {
+    "failed": 0,
+    "passed": 10,
+    "skipped": 0,
+    "total": 10
+  }
+}
