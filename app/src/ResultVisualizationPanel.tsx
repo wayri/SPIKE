@@ -8,6 +8,7 @@ import {
 import { buildResultEngineeringAnalytics } from "./resultAnalytics";
 import { resultSolvedForPresentation } from "./resultAdmission";
 import { buildDcReview } from "./dcReview";
+import { sourceLoadReview } from "./sourceLoadReview";
 import PiPdnReview from "./PiPdnReview";
 import { viaStressMapSvg } from "./viaStressMap";
 import { resultDatumLayers, resultLayerMatchesSelection } from "./resultLayerSelection";
@@ -212,6 +213,7 @@ export default function ResultVisualizationPanel({
     faultDurationS: visualization.fusingDurationS,
   });
   const dcReview = domain === "pi" ? buildDcReview(result, selected || null, visualization.visibleResultLayers, dropLimitMv ?? null, densityLimitAMm2) : null;
+  const terminalReview = domain === "pi" ? sourceLoadReview(result, selected || null, dropLimitMv ?? null) : null;
   const vectorMode = ["current", "current_density", "electric_field", "magnetic_field"].includes(visualization.mode);
   const analyticsValue = (value: number | null, unit = "") => value === null ? "-" : `${value.toPrecision(6)}${unit ? ` ${unit}` : ""}`;
   const dcSampleIdentity = (sample: { element_id?: string; source_id?: string; source_kind?: string; net?: string; layer?: string } | null) =>
@@ -324,7 +326,7 @@ export default function ResultVisualizationPanel({
         {dcReview && <section className="result-engineering-analytics" aria-label="DC source to board review">
           <header><div><b>DC SOURCE TO BOARD REVIEW</b><span>{selected || "All nets"} / {visualization.visibleResultLayers.length ? visualization.visibleResultLayers.join(", ") : "all layers"} / {result?.model_status} / {result?.analysis_id}</span></div></header>
           <dl className="probe-extrema">
-            <dt>Maximum declared source voltage</dt><dd>{analyticsValue(dcReview.sourceVoltageV, "V")} (source terminal identity is not returned)</dd>
+            <dt>Maximum declared source voltage</dt><dd>{analyticsValue(dcReview.sourceVoltageV, "V")}{terminalReview ? " (terminal paths below)" : " (source terminal identity is not returned)"}</dd>
             <dt>Lowest returned board voltage</dt><dd>{analyticsValue(dcReview.lowestVoltage?.value ?? null, "V")}; {dcSampleIdentity(dcReview.lowestVoltage)}</dd>
             <dt>Highest returned board drop</dt><dd>{analyticsValue(dcReview.highestDrop === null ? null : dcReview.highestDrop.value * 1000, "mV")}; {dcSampleIdentity(dcReview.highestDrop)}</dd>
             <dt>Selected sample / current drop limit</dt><dd>{dcReview.drop.limit === null ? "No positive limit configured" : analyticsValue(dcReview.drop.limit * 1000, "mV")} / {dcReview.drop.state}</dd>
@@ -332,7 +334,19 @@ export default function ResultVisualizationPanel({
             <dt>Selected sample / current density limit</dt><dd>{dcReview.density.limit === null ? "No positive limit configured" : analyticsValue(dcReview.density.limit, "A/mm2")} / {dcReview.density.state}</dd>
             <dt>Highest via density</dt><dd>{analyticsValue(dcReview.highestViaDensity?.value ?? null, "A/mm2")}; {dcSampleIdentity(dcReview.highestViaDensity)}</dd>
           </dl>
-          <p className="analytics-validity-note">These are original solver samples for the selected net and layers. The worst board sample is not identified as a load terminal. A source-to-load voltage budget requires returned terminal identities and values. {result?.model_status === "approximate" ? "This DC solve is approximate; check mesh convergence before engineering sign-off." : "Review model validity and mesh convergence before engineering sign-off."}</p>
+          {terminalReview && <div className="source-load-review" aria-label="Source to load terminal paths">
+            <h4>Source to load terminals · {terminalReview.status}</h4>
+            <p>Voltage reference: {terminalReview.voltageReference}. Source current balance: {terminalReview.sourceCurrentBalanceA === null ? "not returned" : analyticsValue(terminalReview.sourceCurrentBalanceA, "A")}.</p>
+            <table><thead><tr><th>Source → load</th><th>Source</th><th>Load</th><th>Supply drop</th><th>Loop drop</th><th>Load current</th><th>Limit</th></tr></thead>
+              <tbody>{terminalReview.paths.map((path, index) => <tr key={`${path.sourceId}-${path.loadId}-${index}`}>
+                <td>{path.sourceId} → {path.loadId}<small>{path.supplyNet}{path.returnNet ? ` / return ${path.returnNet}` : ""}</small></td>
+                <td>{analyticsValue(path.sourceVoltageV, "V")}</td><td>{analyticsValue(path.loadVoltageV, "V")}</td>
+                <td>{analyticsValue(path.supplyDropV * 1000, "mV")}</td>
+                <td>{path.loopDropV === null ? "No explicit return" : analyticsValue(path.loopDropV * 1000, "mV")}</td>
+                <td>{analyticsValue(path.loadCurrentA, "A")}</td><td>{path.limitState}</td>
+              </tr>)}</tbody></table>
+          </div>}
+          <p className="analytics-validity-note">These are original solver samples for the selected net and layers. {terminalReview ? "The terminal paths are separately anchored solver values; field extrema need not coincide with load pads." : "The worst board sample is not identified as a load terminal. A source-to-load voltage budget requires returned terminal identities and values."} {result?.model_status === "approximate" ? "This DC solve is approximate; check mesh convergence before engineering sign-off." : "Review model validity and mesh convergence before engineering sign-off."}</p>
         </section>}
         {!result && <section className="result-workflow-state">
           <div>

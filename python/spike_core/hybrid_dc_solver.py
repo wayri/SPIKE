@@ -22,6 +22,11 @@ from .dc_result_utils import (
     terminal_resistance,
     weighted_percentile_density,
 )
+from .dc_terminal_validation import (
+    build_source_to_load_evidence,
+    terminal_anchor_id,
+    terminal_copper_nodes,
+)
 from .hybrid_mesh import HybridMesh, build_hybrid_mesh, nearest_mesh_node
 from .pi_path_dc import stamp_pi_path_interfaces
 from .result_face_projection import (
@@ -98,36 +103,9 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
     load_nodes: Dict[int, float] = {}
     load_records: List[Dict[str, Any]] = []
     contact_count = 0
+    exact_terminals = bool(spec.options.get("require_exact_terminal_geometry", False))
 
     issues.extend(stamp_pi_path_interfaces(mesh, design, spec, node_positions, edges))
-
-    def terminal_copper_nodes(item: Dict[str, Any]) -> List[int]:
-        net = terminal_net(spec, item)
-        primary = nearest_mesh_node(mesh, item, net)
-        if primary is None:
-            return []
-        anchor = item.get("geometry_anchor")
-        anchor_id = str(anchor.get("id", "")) if isinstance(anchor, dict) else str(item.get("geometry_anchor_id", ""))
-        pad_kinds = {"pad", "pad_attachment", "pad_zone_attachment", "pad_barrel"}
-        source_ids = {
-            branch.source_id
-            for branch in mesh.branches
-            if (branch.node_p == primary or branch.node_n == primary)
-            and (branch.source_id == anchor_id if anchor_id else branch.kind in pad_kinds)
-        }
-        if not source_ids:
-            return [primary]
-        primary_layer = mesh.nodes[primary].layer
-        layer_scope = str(item.get("layer_scope", "single" if item.get("layer") else "connected_conductor"))
-        nodes = {
-            node_id
-            for branch in mesh.branches
-            if branch.source_id in source_ids
-            for node_id in (branch.node_p, branch.node_n)
-            if mesh.nodes[node_id].net == net
-            and (layer_scope != "single" or mesh.nodes[node_id].layer == primary_layer)
-        }
-        return sorted(nodes) or [primary]
 
     def attach_contact(copper_nodes: List[int], resistance: float, item_id: str, kind: str) -> List[int]:
         nonlocal contact_count
@@ -169,7 +147,7 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         return [floating]
 
     for index, source in enumerate(spec.sources):
-        coppers = terminal_copper_nodes(source)
+        coppers = terminal_copper_nodes(mesh, spec, source, exact_terminals)
         if not coppers:
             source_id = str(source.get("id", index + 1))
             issues.append(ValidationIssue("SPIKE-BE-PI-E-0001", "error", f"Source {source_id} could not snap to selected copper.", path=f"analysis.sources[{source_id}]", suggestion="Assign the source to an exact copper object on the analyzed net."))
@@ -181,6 +159,8 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
                 issues.append(ValidationIssue("SPIKE-BE-PI-E-0006", "error", "Two source boundaries assign different voltages to the same copper node.", path="analysis.sources", suggestion="Remove the duplicate source or place it on a distinct conductor domain."))
             source_nodes[terminal] = source_voltage
         source_records.append({
+            "id": str(source.get("id", index + 1)),
+            "geometry_anchor_id": terminal_anchor_id(source),
             "node": terminals[0],
             "boundary_nodes": terminals,
             "net": node_nets[terminals[0]],
@@ -190,7 +170,7 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         })
 
     for index, load in enumerate(spec.loads):
-        coppers = terminal_copper_nodes(load)
+        coppers = terminal_copper_nodes(mesh, spec, load, exact_terminals)
         if not coppers:
             load_id = str(load.get("id", index + 1))
             issues.append(ValidationIssue("SPIKE-BE-PI-E-0001", "error", f"Load {load_id} could not snap to selected copper.", path=f"analysis.loads[{load_id}]", suggestion="Assign the load to an exact copper object on the analyzed net."))
@@ -201,6 +181,8 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         for terminal in terminals:
             load_nodes[terminal] = load_nodes.get(terminal, 0.0) + current_per_node
         load_records.append({
+            "id": str(load.get("id", index + 1)),
+            "geometry_anchor_id": terminal_anchor_id(load),
             "node": terminals[0],
             "boundary_nodes": terminals,
             "net": node_nets[terminals[0]],
@@ -422,6 +404,23 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         })
     max_loop_drop = max((item["loop_drop_v"] for item in paired_loop_drops), default=max_supply_drop + max_return_rise)
     max_drop = max_loop_drop if explicit_return else max_supply_drop
+
+    terminal_evidence = build_source_to_load_evidence(
+        source_records, load_records, voltage, conductance, rhs, scaled_residual, explicit_return,
+    )
+    if exact_terminals and terminal_evidence["status"] != "validated":
+        return AnalysisResult(
+            analysis_id=spec.analysis_id,
+            mode="dc",
+            status="failed",
+            model_status="approximate",
+            issues=issues + [ValidationIssue(
+                "SPIKE-BE-PI-E-0007", "error",
+                "Exact source-to-load terminal validation failed: " + "; ".join(terminal_evidence["issues"] or ["a terminal lacks an exact geometry anchor"]),
+                path="analysis.terminals",
+                suggestion="Give every terminal a unique geometry anchor on its declared net and layer, and pair each load with one source.",
+            )],
+        )
     density_edges = [edge for edge in active_edges if edge["current_density_supported"]]
     max_density_edge = max(density_edges, key=lambda edge: edge["current_density_a_mm2"])
     p95_density = weighted_percentile_density(density_edges, 0.95)
@@ -735,6 +734,7 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
             "component_bridges": component_bridges,
         },
         networks={
+            "source_to_load": terminal_evidence,
             "return_path": {
                 "mode": return_mode,
                 "net": str(spec.return_path.get("net", "")),

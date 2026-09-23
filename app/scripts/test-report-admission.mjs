@@ -15,6 +15,9 @@ const result = { contract: "spike/v1", analysis_id: "failed-pi", status: "failed
   pdn_multiports: [], loop_parasitics: [], coupling_risks: [], component_stress: [], probes: [],
   time_series: { times_s: [0], frames: [{ time_s: 0, scalar_values: { voltage_drop_v: [.02] } }] },
   issues: [{ severity: "error", code: "PEEC_INDUCTANCE_NONPASSIVE", message: "Negative energy" }],
+  source_to_load: { status: "validated", voltage_reference: "source boundary", source_current_balance_a: 0,
+    paths: [{ source_id: "R19.3", load_id: "J20.2", supply_net: "VDD", source_voltage_v: 1,
+      load_voltage_v: .98, supply_drop_v: .02, load_current_a: 2 }] },
   provenance: { solved: false, failure_stage: "physical_inductance_admission", numerical_quality: { inductance_passivity: { negative_mode_count: 5 } } } };
 const board = { width: 2, height: 3, nets: { 1: "VDD" }, bounds: { minX: 0, minY: 0, maxX: 2, maxY: 3 }, layers: ["F.Cu"], stackup: [], outlineLoops: [],
   tracks: [], vias: [], pads: [], zones: [], components: [] };
@@ -34,6 +37,7 @@ assert.equal(failedEvidence.solver_provenance.failure_stage, "physical_inductanc
 assert.equal(failedEvidence.analytics.rows[0].maxDropV, null);
 assert.equal(failedEvidence.analytics.rows[0].conductorLossW, null);
 assert.equal(failedEvidence.analysis.pdn_review, null);
+assert.equal(failedEvidence.analysis.source_to_load, null);
 assert.deepEqual(failedGeometry.fields, {});
 assert.deepEqual(failedGeometry.datasets[0].fields, {});
 assert.deepEqual(failedGeometry.impedance, []);
@@ -54,4 +58,6 @@ const completedEvidence = scriptJson(completed, "evidence-data"), completedGeome
 assert.equal(completedEvidence.analytics.rows[0].maxDropV, .02);
 assert.equal(completedGeometry.fields.voltage_drop_v.length, 1);
 assert.equal(completedGeometry.impedance.length, 1);
+assert.equal(completedEvidence.analysis.source_to_load.paths[0].load_id, "J20.2");
+assert.match(completed, /Source-to-load terminal paths/);
 console.log("PI report admission: failed partial metrics/plots are hidden, diagnostics retained, completed control preserved.");

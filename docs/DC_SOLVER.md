@@ -18,6 +18,22 @@ finite-volume zone current spreading, and explicitly assigned package/contact
 resistance. It remains `approximate` until zone mesh convergence is established.
 Thermal conductivity changes and unassigned package values are not inferred.
 
+For a source-to-load terminal check, set `options.require_exact_terminal_geometry`
+to `true` and give every source and load a `geometry_anchor` with the imported
+copper object's `id`. The terminal's declared net and layer must match that
+object. Missing anchors, missing copper, and ambiguous source-to-load mappings
+fail the run. Coordinate-only terminals remain usable for exploratory DCIR,
+but their source-to-load evidence is marked `approximate`.
+
+`networks.source_to_load.terminal_voltages` contains the solved boundary voltage
+and current for each named source and load. `paths` names each source and load
+and reports their signed supply drop in volts. Explicit return paths also
+report source and load differential voltages and signed loop drop. The
+`source_current_balance_a` diagnostic checks current conservation across the
+specified terminals. A `validated` terminal mapping confirms the terminals
+and solved electrical values only; the board-level numerical model still
+requires mesh convergence and appropriate contact/package data for sign-off.
+
 ## Command-line run
 
 ```text

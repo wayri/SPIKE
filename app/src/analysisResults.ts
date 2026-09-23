@@ -240,6 +240,7 @@ export type SolverResultBundle = {
   mode: string;
   model_status: string;
   summary: Record<string, unknown>;
+  source_to_load?: unknown;
   scalar_fields: {
     voltage_v: ScalarSample[];
     voltage_drop_v: ScalarSample[];
@@ -467,6 +468,7 @@ export function normalizeSolverResult(raw: unknown): SolverResultBundle | null {
         vector_directions: directSeries.vector_directions,
       },
       component_stress: Array.isArray(result.component_stress) ? result.component_stress as ComponentStress[] : [],
+      source_to_load: directNetworks.source_to_load ?? result.source_to_load,
       parasitics: directParasitics,
       pdn_multiports: Array.isArray(result.pdn_multiports)
         ? result.pdn_multiports as PdnMultiportResult[]
@@ -569,6 +571,7 @@ export function normalizeSolverResult(raw: unknown): SolverResultBundle | null {
     component_stress: Array.isArray((result.networks as Record<string, unknown> | undefined)?.component_stress)
       ? (result.networks as Record<string, unknown>).component_stress as ComponentStress[]
       : [],
+    source_to_load: (result.networks as Record<string, unknown> | undefined)?.source_to_load ?? result.source_to_load,
     probes: Array.isArray(result.probes) ? result.probes as SolverResultBundle["probes"] : [],
     issues: Array.isArray(result.issues) ? result.issues as SolverResultBundle["issues"] : [],
     provenance: (result.provenance as Record<string, unknown>) ?? {},

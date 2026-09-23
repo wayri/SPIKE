@@ -46,13 +46,14 @@ drop and density screens compare these scoped samples with the current setup
 limits; changing a limit after a run changes the screen, not the solved values.
 An unset, invalid, or absent value is shown as unavailable rather than passed.
 
-The solver bundle does not currently return a distinct source terminal identity
-and voltage at every load terminal. A lowest board sample may be near a load,
-but is not a load measurement. This view therefore makes no source-to-load
-voltage guarantee. Complete that review with mapped load terminals, persisted
-terminal identities, and mesh-convergence evidence. Failed and `solved=false`
-results cannot populate this review or the engineering analytics; their raw
-diagnostics remain available elsewhere. Approximate DC status remains visible.
+When the solver returns `networks.source_to_load`, the viewer shows each
+anchored source/load pair, its terminal voltages, supply drop, optional explicit
+return-loop drop, load current, and configured drop-limit state. The terminal
+geometry status is separate from overall model status: an exact pad anchor does
+not establish mesh convergence. Older or unanchored results continue to show
+only original board samples; the lowest sample is not called a load measurement.
+Failed and `solved=false` results cannot populate either review; their raw
+diagnostics remain available elsewhere.
 
 ## Copper-fusing screen
 
