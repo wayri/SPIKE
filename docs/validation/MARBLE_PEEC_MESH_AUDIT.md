@@ -3,7 +3,8 @@
 # Marble finite-volume PEEC mesh audit
 
 Date: 2026-09-24. Status: diagnostic evidence, not production qualification.
-This audit changes no numerical implementation and performs no Git actions.
+The initial audit below changed no numerical implementation; later follow-up
+sections record experimental implementation and verification separately.
 
 ## Finding
 
@@ -192,3 +193,148 @@ causes the observed L drift; isolating that requires corrected geometry and
 controlled port/contact studies. There is no evidence here that native
 quadrature, PSD admission, or the overlap Gram resistance formula is itself
 responsible for the measured refinement drift.
+
+## 2026-09-24 conforming RT0 DC follow-up
+
+The experimental `scripts/probe_marble_rt0_dc.py` repeats the same board SHA,
+net, and U37.18-to-R195.1 terminal pair using the interior-rectangle partition
+and mixed RT0 DC discretization. The command accepts explicit mesh, partition,
+and unknown budgets; its output is `diagnostic_only`, does not enforce an OS
+memory limit, and does not construct a compatible PEEC inductance or
+capacitance matrix. The probe rejects requested h < 0.05 mm because the base
+builder would otherwise silently clamp it. Its output excludes the unbounded
+contact list.
+
+From the repository root, with the optional Shapely/SciPy environment and the
+pinned board at the path above, reproduce one row with:
+
+```powershell
+python scripts/probe_marble_rt0_dc.py --board build/marble-qualification/sources/Marble-v1.4.4/design/Marble.kicad_pcb --mesh-size-mm 0.25 --boundary-depth 6 --area-limit 0.02 --max-cells 100000 --max-unknowns 250000
+```
+
+The script verifies board SHA-256 before importing geometry. Replace only
+`--mesh-size-mm` for the other rows, not source/load identities or budgets.
+
+These runs used boundary depth 6, maximum omitted-area fraction 0.02, and
+up to 100,000 partition cells and 250,000 mixed unknowns. The earlier 1 mm run
+used a 20,000-cell partition budget; all listed accepted solves returned
+`model_status=experimental` and `production_qualified=false`.
+
+| Requested h, mm | Routed RT0 DC R, mOhm | Change vs. previous, relative to finer R | Connected triangles | Connected current unknowns | Result |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 1.0 | 5.005036809 | -- | 42,388 | 57,422 | Experimental solve |
+| 0.5 | 4.490019274 | 11.470% | 44,550 | 60,384 | Experimental solve |
+| 0.25 | 4.313441318 | 4.094% | 49,980 | 67,909 | Experimental solve |
+| 0.125 | 4.211180359 | 2.428% | 64,407 | 87,892 | Experimental solve |
+| 0.0625 | -- | -- | -- | -- | Admission refused: 307,521 mixed unknowns exceed 250,000 budget |
+
+For h=0.25 mm, relative linear residual was 3.64e-13, maximum triangle KCL
+error 1.84e-13 A, and energy mismatch 6.31e-14. Those checks validate the
+linear algebra for that admitted discrete problem, **not** physical accuracy.
+Neither of the last two consecutive mesh changes is <=2%, so the proposed
+port-R mesh gate fails. The 0.0625 mm run did not solve and cannot be used for
+an extrapolation. The 2% omitted-area admission is an area bound, not a port
+error bound; at h=0.25 mm, the F.Cu represented area misses 0.9152% and B.Cu
+misses 0.3966% of their respective copper unions.
+
+Two independent production-builder audits identify why more refinement alone
+is insufficient:
+
+1. At h=0.75 mm and depth 6, a 5.70e-7 mm2 B.Cu interior rectangle on
+   `zone-102:B.Cu:1` is corner-only connected at
+   `(235.3009,158.79395)` mm. The true zone has a diagonal full-copper
+   boundary there. The area gate passes while the positive-face topology gate
+   correctly rejects a disconnected retained island. A diagonal graph link
+   would fabricate copper; repair must use boundary-conforming cells or
+   topology-directed boundary refinement, and still fail if the budget is
+   exhausted.
+2. The builder represents each finite pad contact by one fixed rectangle.
+   In a 0.5 mm square manufactured pad, requested h of 0.25, 0.125, 0.0625,
+   and 0.03125 mm yielded maximum contact-triangle edges of 0.125, 0.125,
+   0.0883883, and 0.0883883 mm. The fixed physical footprint is appropriate,
+   but its discretization must subdivide while preserving total contact area
+   and terminal identity. A manufactured 2-by-1 unit sheet with fixed 0.5-unit
+   source/sink strips has exact R = 4/3 ohm; holding each contact unrefined
+   plateaued near 1.38094 ohm despite interior refinement. This is a contact
+   discretization error, not a KCL failure.
+
+AC remains blocked by a separate formulation gap: the live PEEC path constructs
+rectangle/annulus branch R/L, whereas experimental RT0 DC uses triangle-face
+currents, a non-diagonal resistance matrix, and distributed via contacts. The
+native affine-prism test currently admits no self-inductance at its bounded
+work budget; its test tolerance for a mutual case is 25%. A dense L for the
+57,422-current 1 mm RT0 component would be about 26.4 GB in real doubles
+before complex solve storage. Correct AC requires the same signed RT0 basis in
+R and an error-controlled sparse/matrix-free magnetic operator, plus separate
+quadrature, contact, mesh, and solver qualification. None of the DC results
+above should be reported as Marble AC accuracy.
+
+### Finite-contact subdivision follow-up
+
+The experimental conforming builder now subdivides each unchanged finite
+contact footprint at the effective mesh size, preserving one terminal ID and
+area-weighted RT0 injection/measurement. A production-builder regression
+checks footprint area, maximum subcell edge, normalized contact weights, and
+total-cell budget refusal. It also rejects requested conforming h below the
+base builder's 0.05 mm floor instead of silently labeling a clamped mesh as a
+refinement.
+
+On the pinned Marble pair, h=1, 0.5, and 0.25 mm had no contact subcells to
+add and retained the resistance values above. At h=0.125 mm, nine contact
+subcells were added across the reviewed net and R changed from
+4.211180359 to 4.210952454 mOhm. The h=0.25-to-0.125 change is still 2.434%
+relative to the finer result, above the proposed 2% gate. Thus the contact
+fix repairs a discretization invariant but does **not** close Marble port
+convergence. At h=0.125 mm, relative algebraic residual was 5.60e-13,
+maximum cell KCL error 1.46e-14 A, and relative energy mismatch 8.45e-15;
+these do not certify mesh accuracy. At h=0.0625 mm, the original mixed system already exceeded its
+250,000-unknown budget; the subdivided system cannot be assumed affordable.
+The isolated matrix-free RT0 trace-CG prototype fails closed on Marble at
+h=0.125 mm under both 2,000 and 10,000 Jacobi-preconditioned iterations;
+conditioning work is separate from geometry and AC qualification.
+
+### Concurrent legacy-mesh change is not yet an accepted baseline
+
+A 2026-09-24 rerun while `hybrid_mesh.py` had concurrent uncommitted edits
+preserved the 18/82/315 zone-basis counts but changed the out-of-copper
+violation counts to 4/12/23 and summed outside areas to
+0.045651497/0.045507083/0.006631754 mm2 at h=1/0.5/0.25 mm. This is an
+improvement relative to the independently audited baseline above but still
+violates the pre-native geometry admission rule. Consequently the exact-value
+optional Marble regression in `test_peec_volume_support.py` fails on this
+working tree at all three sizes. The mesher owner must reconcile the polygon
+geometry, test oracle, and committed documentation before these numbers replace
+the baseline. No native AC result is admitted from either mesh state.
+
+## Release checkpoint (2026-09-24)
+
+The conforming geometry/RT0 DC/finite-contact/unique-area-capacitance files
+are experimental source, not a release capability. The Marble production AC
+route remains blocked before native extraction. A local checkpoint preserves
+the implementation and this evidence; it does not waive numerical review.
+
+Focused Python 3.11 tests for conforming mesh/DC, finite contacts, iterative
+RT0, unique-area capacitance and the pinned-board diagnostic passed 49/49.
+The architecture check passed. A separate CP312 Release-native adapter run
+passed 7/7 when explicitly loading the newly built binary. That binary was
+not installed into the shared runtime because other Python processes held the
+old extension open. The optional Marble support test on concurrent legacy
+`hybrid_mesh.py` edits failed three exact baseline assertions (18 tests total);
+the out-of-copper admission itself still rejects. The complete project test
+suite was not run in a stable tree and is not claimed green.
+
+The bounded matrix-free RT0 DC trace-CG prototype is not a Marble solve:
+Jacobi exhausted 10,000 iterations at h=0.125 mm; an experimental symmetric
+multilevel variant remained at residual 0.002815 after 2,000 iterations.
+Local RT0 mass condition numbers across 70,896 assembled triangles ranged up
+to 2.01e7 (99th percentile 5.88e3), exposing severe hanging/skinny triangle
+conditioning. Both iterative attempts correctly refused a result.
+
+Resume order: reconcile the concurrent legacy-mesh polygon audit; repair
+positive-face boundary topology and RT0 triangle quality under explicit work
+budgets; demonstrate two consecutive <=2% Marble R refinements with fixed
+terminal footprints; implement error-controlled self/touching RT0 magnetic
+integrals and a shared-basis scalable R/L operator; then qualify L/AC against
+independent references. No passivity repair or expanded native work budget is
+a substitute for these gates. Knowledgeable human numerical review is required
+before release of any promoted field result.
