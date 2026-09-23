@@ -17,7 +17,7 @@ work plan (2026-09-05)](STABILIZATION_RELEASE_PLAN_20260905.md).
 | Check solver availability or validity | [Solver status](SOLVER_STATUS.md) | [Validation program](VALIDATION_PROGRAM.md), [release qualification](PI_RELEASE_QUALIFICATION.md) |
 | Understand solver mathematics and research provenance | [Solver handbook](SOLVER_HANDBOOK.md) | [Annotated references](SOLVER_REFERENCES.md), [recorded citation inventory](generated/solver-reference-inventory.json) |
 | Run SERDES and actuator reference checks | [SERDES reference](SERDES_REFERENCE_QUALIFICATION.md) | [Actuator map review](ACTUATOR_FORCE_MAP.md), [delivery and recent research](SERDES_ACTUATOR_DELIVERY.md) |
-| Configure PI | [PI path analysis](PI_PATH_ANALYSIS.md) | [DC solver](DC_SOLVER.md), [transient PI](TRANSIENT_PI.md), [PDN screening](PDN_SCREENING.md) |
+| Configure PI | [PI path analysis](PI_PATH_ANALYSIS.md) | [Reference coverage and acceptance](PI_REFERENCE_COVERAGE_20260924.md), [DC solver](DC_SOLVER.md), [transient PI](TRANSIENT_PI.md), [PDN screening](PDN_SCREENING.md) |
 | Configure SI/network analysis | [Signal-integrity workbench](SIGNAL_INTEGRITY_NETWORK_WORKBENCH.md) | [Bounded geometry channels](GEOMETRY_DERIVED_SI_CHANNEL.md), [S-parameter integration](SIGNAL_INTEGRITY_NETWORK_INTEGRATION.md) |
 | Inspect the circuit language/analysis boundary | [SPIKES language and linear analysis wave 3](SPIKES_LANGUAGE_ANALYSIS_WAVE3.md) | [Solver status](SOLVER_STATUS.md) |
 | Inspect nonlinear behavioral analysis | [SPIKES nonlinear language and analysis wave 4](SPIKES_LANGUAGE_ANALYSIS_WAVE4.md) | [Solver status](SOLVER_STATUS.md) |

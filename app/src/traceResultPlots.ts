@@ -14,6 +14,12 @@ const escape = (value: string) => value.replace(/[&<>"']/g, character => ({ "&":
 
 export function resultPlotFields(result: SolverResultBundle | null, domain: "pi" | "si"): ResultPlotField[] {
   if (!result) return [];
+  // Partial arrays on a failed solve are diagnostic evidence, not plot data.
+  // Leave the authoritative bundle (including failure provenance) untouched.
+  const rejected = /^(failed(?:_.*)?|blocked|error|cancelled|canceled|unsupported)$/i;
+  const admission = [result, result.summary, result.provenance] as (Record<string, unknown> | undefined)[];
+  if (rejected.test(result.status ?? "") || rejected.test(result.model_status ?? "")
+    || admission.some(record => record?.solved === false || Boolean(record?.failure_stage))) return [];
   const fields: ResultPlotField[] = [];
   const sourceIds = new Map((result.mesh ?? []).filter(cell => cell.source_id).map(cell => [JSON.stringify([cell.id, cell.net ?? "", cell.layer ?? ""]), cell.source_id!]));
   const identify = (sample: ScalarSample): ScalarSample => sample.source_id ? sample : { ...sample,

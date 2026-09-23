@@ -42,4 +42,11 @@ assert.equal(traceSnapshot.trace.result.scalar_fields.voltage_v.at(-1).value, 10
 assert.equal(traceSnapshot.trace.result.scalar_fields.voltage_v.at(0).source_id, "trace-0");
 assert.equal(traceSnapshot.trace.result.scalar_fields.voltage_v.at(-1).source_id, "trace-100004");
 assert.match(traceSnapshot.trace.notice, /100000 of 100005 field samples/);
+const failedTrace = snapshots.buildDetachedTraceSnapshot({ ...result,
+  summary: { solved: false, large_diagnostic: "x".repeat(100_000) },
+  provenance: { solved: false, failure_stage: "physical_inductance_admission", numerical_quality: { inductance_passivity: { negative_mode_count: 5 } } },
+}, "pi");
+assert.equal(failedTrace.trace.result.status, "completed", "do not rewrite source status in display transport");
+assert.deepEqual(failedTrace.trace.result.summary, { solved: false });
+assert.deepEqual(failedTrace.trace.result.provenance, { solved: false, failure_stage: "physical_inductance_admission" });
 console.log("results tool snapshots: opaque IDs, formulas, capability controls and analytics passed");

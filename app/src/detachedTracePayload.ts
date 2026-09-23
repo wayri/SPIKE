@@ -68,7 +68,14 @@ export function buildDetachedTracePayload(result: SolverResultBundle | null, dom
   const shownImpedance = MAX_DETACHED_IMPEDANCE_POINTS - impedanceRemaining;
   const bounded: SolverResultBundle = {
     ...result,
-    summary: {}, provenance: {},
+    // Keep the admission decision when stripping large result metadata. A
+    // detached plot must not resurrect partial fields from a rejected solve.
+    summary: result.summary?.solved === false ? { solved: false } : {},
+    provenance: {
+      ...(result.provenance?.solved === false ? { solved: false } : {}),
+      ...(typeof result.provenance?.failure_stage === "string"
+        ? { failure_stage: result.provenance.failure_stage.slice(0, 128) } : {}),
+    },
     scalar_fields: boundedScalars,
     vector_fields: boundedVectors,
     mesh: boundedMesh,

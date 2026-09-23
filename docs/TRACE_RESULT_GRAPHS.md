@@ -40,6 +40,12 @@ colors, exact hover samples and bounded rendering. The browser fixture at
 `app/scripts/trace-results-preview.html` contains clearly labeled synthetic
 rendering data; it is not an analysis of Marble or a solver qualification.
 
+Failed, blocked, cancelled, unsupported and failed-to-converge bundles do not
+provide trace plot fields, even when partial scalar or impedance arrays remain.
+An explicit `solved: false` or failure stage also suppresses plotting. The
+original status, partial evidence and numerical-quality provenance remain
+unchanged for diagnostics; successful approximate results retain that label.
+
 The visual comparison used the user's local wayriCAD documentation and
 `quick_pi_plugin/help-results.png` (Marble Net-(R161-Pad1)): geometry-matched
 field colors, clear units and source markers. No wayriCAD implementation code

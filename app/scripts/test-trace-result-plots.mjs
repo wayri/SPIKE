@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import ts from 'typescript';
+import { stripTypeScriptTypes } from 'node:module';
 const path = new URL('../src/traceResultPlots.ts', import.meta.url);
-const js = ts.transpileModule(readFileSync(path, 'utf8'), {compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText
+const js = stripTypeScriptTypes(readFileSync(path, 'utf8'))
   .replace(/from "(\.\/[^"\n]+)"/g, (_, name) => `from "${new URL(name + '.ts', path)}"`);
 const { buildTracePlot, resultTraceGroups, resultPlotFields, buildImpedancePlot } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
 const face = (id,net,layer,x,value) => ({x_mm:x+.5,y_mm:.5,z_mm:0,element_id:id,net,layer,value,vertices_mm:[[x,0,0],[x+1,0,0],[x+1,1,0],[x,1,0]]});
@@ -40,4 +40,21 @@ const networks=[{net:'SIG',impedance:[{frequency_hz:1e6,magnitude_ohm:50,phase_d
 const ac=buildImpedancePlot(networks,'SIG'); assert.deepEqual(ac.data[0].x,[1e3,1e6]);assert.equal(ac.layout.xaxis.type,'log');
 assert.equal(networks[0].impedance[0].frequency_hz,1e6,'sorting preserves solver source');
 assert.equal(resultPlotFields({...groupedResult,parasitics:networks},'si')[0].key,'impedance_sweep');
+const partial = {...groupedResult, status:'completed', model_status:'approximate', parasitics:networks};
+for (const failure of [
+  {status:'failed'}, {status:'blocked'}, {status:'failed_to_converge'},
+  {status:'cancelled'}, {model_status:'unsupported'}, {solved:false},
+  {summary:{solved:false}},
+  {provenance:{solved:false}},
+  {provenance:{failure_stage:'physical_inductance_admission', inductance_units:'H',
+    numerical_quality:{inductance_passivity:{negative_mode_count:5}}}},
+]) {
+  const rejected = {...partial, ...failure};
+  const preserved = JSON.stringify(rejected);
+  assert.deepEqual(resultPlotFields(rejected,'pi'),[], 'failed solve must suppress partial scalar fields');
+  assert.deepEqual(resultPlotFields(rejected,'si'),[], 'failed solve must suppress partial impedance');
+  assert.equal(JSON.stringify(rejected),preserved,'failure status, diagnostics and partial evidence remain intact');
+}
+assert.ok(resultPlotFields(partial,'pi').length > 0,'successful approximate fields remain available without promotion');
+assert.equal(partial.model_status,'approximate');
 console.log('Trace plots: net/layer/source ownership, exact hover, face continuity, bounded display, SI units and source immutability passed.');
