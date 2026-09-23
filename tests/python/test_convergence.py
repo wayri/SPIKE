@@ -4,6 +4,7 @@ import unittest
 from io import StringIO
 from pathlib import Path
 import contextlib
+import hashlib
 
 from python.spike_core.cli import EXIT_ANALYSIS, EXIT_OK, main
 from python.spike_core.contracts import AnalysisSpec, DesignIR
@@ -237,6 +238,27 @@ class MeshConvergenceTests(unittest.TestCase):
         self.assertEqual(density["status"], "unavailable")
         self.assertFalse(report["can_sign_off"])
 
+    def test_global_voltage_drop_does_not_replace_load_voltage_drop(self):
+        from python.spike_core.contracts import AnalysisResult
+        calls = 0
+
+        def runner(_design, _spec):
+            nonlocal calls
+            calls += 1
+            return AnalysisResult(status="completed", mode="dc", summary={
+                "max_voltage_drop_v": 0.01,
+                "total_copper_loss_w": 0.01,
+                "total_load_current_a": 1,
+                "p95_current_density_a_mm2": 2,
+                "node_count": calls * 100,
+                "edge_count": calls * 200,
+            })
+
+        report = run_mesh_convergence(self.design, self.spec, runner)
+        voltage = next(item for item in report["comparisons"] if item["metric"] == "max_load_voltage_drop_v")
+        self.assertEqual(voltage["status"], "unavailable")
+        self.assertFalse(report["can_sign_off"])
+
     def test_completed_unsupported_result_cannot_sign_off(self):
         from python.spike_core.contracts import AnalysisResult
         calls = 0
@@ -256,6 +278,37 @@ class MeshConvergenceTests(unittest.TestCase):
         report = run_mesh_convergence(self.design, self.spec, runner)
         self.assertEqual(len(report["levels"]), 1)
         self.assertFalse(report["can_sign_off"])
+
+    def test_pinned_board_recorded_levels_remain_failed(self):
+        from python.spike_core.contracts import AnalysisResult
+
+        root = Path(__file__).resolve().parents[2]
+        board = root / "app/public/demo/MODULAR-BUS-NIB.kicad_pcb"
+        evidence = json.loads((root / "docs/validation/modular-bus-nib-pinned-dc-convergence.json").read_text())
+        self.assertEqual(hashlib.sha256(board.read_bytes()).hexdigest(), evidence["board_sha256"])
+        levels = iter(evidence["levels"])
+
+        def replay(_design, _spec):
+            level = next(levels)
+            return AnalysisResult(
+                status=level["status"], model_status=level["model_status"], mode="dc",
+                summary={
+                    **level["metrics"],
+                    "node_count": level["node_count"],
+                    "edge_count": level["edge_count"],
+                    "total_load_current_a": 10.0,
+                },
+            )
+
+        report = run_mesh_convergence(
+            self.design, self.spec, replay,
+            levels=(2, 1, 0.5, 0.25), stop_when_converged=False,
+        )
+        self.assertEqual(report["comparison_history"], evidence["comparison_history"])
+        self.assertEqual(report["status"], "failed_to_converge")
+        self.assertFalse(report["can_sign_off"])
+        load_drop = next(item for item in report["comparisons"] if item["metric"] == "max_load_voltage_drop_v")
+        self.assertEqual(load_drop["status"], "failed")
 
 
 if __name__ == "__main__":

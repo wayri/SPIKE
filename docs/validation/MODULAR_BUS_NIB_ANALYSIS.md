@@ -4,7 +4,7 @@ Date: 2026-07-30
 
 ## Fixture
 
-- Source: `C:\Users\example\Documents\Github\TEST\MODULAR-BUS-NIB\MODULAR-BUS-NIB.kicad_pcb`
+- Source: `C:\Users\yawar\Documents\Github\TEST\MODULAR-BUS-NIB\MODULAR-BUS-NIB.kicad_pcb`
 - Application: 22-60 V input, selectable 12/5/3.3 V, 120 W buck converter
 - Parsed geometry: 46 nets, 404 tracks, 617 vias, 260 pads, 192 zone
   polygons, 92 component groups, and 17 stackup entries
@@ -41,6 +41,33 @@ preview cells, and 8,477 estimated unknowns at the 1.0 mm preview setting.
 
 The 0.125 mm result differs from the 0.25 mm result by 9.0%. The sequence is
 not converged to a sign-off threshold, so these values are `Approximate`.
+
+### Pinned board convergence rerun
+
+The repository copy at `app/public/demo/MODULAR-BUS-NIB.kicad_pcb` (SHA-256
+`37639b58aa75c11265ecf7867c2d358942b70c9e0011a10da99f524e767c2f07`)
+was imported and solved with the request's `/12Vout` terminals. The four-level
+study used a 4 GiB solver memory budget; the default 2 GiB budget rejected the
+fourth mesh at its 85,196-branch admission limit. The 4 GiB budget changes
+resource admission only. The repeatable command is
+`.venv/Scripts/python.exe -m scripts.verify_modular_bus_pi_convergence --output docs/validation/modular-bus-nib-pinned-dc-convergence.json`.
+
+| Target / zone cell | Nodes / branches | Maximum load drop | Copper loss | p95 current density |
+| --- | ---: | ---: | ---: | ---: |
+| 2.0 / 1.0 mm | 3,126 / 4,909 | 2.84367 mV | 27.66355 mW | 4.56305 A/mm2 |
+| 1.0 / 0.5 mm | 5,402 / 9,629 | 1.72457 mV | 15.42297 mW | 5.21345 A/mm2 |
+| 0.5 / 0.25 mm | 13,636 / 26,245 | 1.75181 mV | 14.50160 mW | 5.15988 A/mm2 |
+| 0.25 / 0.125 mm | 45,688 / 91,360 | 1.57518 mV | 14.94111 mW | 5.23818 A/mm2 |
+
+The finest pair changes maximum load drop by 10.08% against a 3% limit.
+Copper loss changes by 2.94% against a 5% limit, but rises after falling on
+the preceding meshes. The run is therefore `failed_to_converge` and cannot
+sign off. [Compact evidence](modular-bus-nib-pinned-dc-convergence.json) records
+the pinned input hashes and per-level metrics; the separate
+[2 GiB attempt](modular-bus-nib-pinned-dc-convergence-2gb.json) records the
+resource rejection. These terminal coordinates are not yet bound to exact pad
+IDs in the request, so a refinement-dependent terminal snap remains a possible
+cause of the voltage-drop jump and requires a controlled anchored rerun.
 
 The reported peak current density of 95.56 A/mm2 is at the idealized R19 source
 injection element. This is a terminal singularity/model artifact and must not be

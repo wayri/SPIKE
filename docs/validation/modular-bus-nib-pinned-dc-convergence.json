@@ -1,0 +1,401 @@
+{
+  "contract": "spike/real-board-pi-convergence-evidence/v1",
+  "board": "app/public/demo/MODULAR-BUS-NIB.kicad_pcb",
+  "board_sha256": "37639b58aa75c11265ecf7867c2d358942b70c9e0011a10da99f524e767c2f07",
+  "request": "docs/validation/modular-bus-nib-12vout-dcir-request.json",
+  "request_sha256": "5f133d60414a52fc592e012559491abba690782a00c69d340debbce34687bad8",
+  "analysis_mode": "dc",
+  "net_names": [
+    "/12Vout"
+  ],
+  "solver_memory_limit_gb": 4.0,
+  "status": "failed_to_converge",
+  "can_sign_off": false,
+  "levels": [
+    {
+      "index": 0,
+      "factor": 2.0,
+      "target_size_mm": 2.0,
+      "zone_cell_mm": 1.0,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "total_copper_loss_w": 0.027663551791421916,
+        "p95_current_density_a_mm2": 4.56304706010856,
+        "max_voltage_drop_v": 0.004450815881739345,
+        "max_current_density_a_mm2": 450.84211418070146,
+        "max_load_voltage_drop_v": 0.0028436706297177493,
+        "effective_path_resistance_ohm": 0.00027663551791421917
+      },
+      "node_count": 3126,
+      "edge_count": 4909,
+      "issues": []
+    },
+    {
+      "index": 1,
+      "factor": 1.0,
+      "target_size_mm": 1.0,
+      "zone_cell_mm": 0.5,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "total_copper_loss_w": 0.015422972459075517,
+        "p95_current_density_a_mm2": 5.213451876429076,
+        "max_voltage_drop_v": 0.002633266125531719,
+        "max_current_density_a_mm2": 297.5541583388856,
+        "max_load_voltage_drop_v": 0.0017245701685455472,
+        "effective_path_resistance_ohm": 0.00015422972459075518
+      },
+      "node_count": 5402,
+      "edge_count": 9629,
+      "issues": []
+    },
+    {
+      "index": 2,
+      "factor": 0.5,
+      "target_size_mm": 0.5,
+      "zone_cell_mm": 0.25,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "total_copper_loss_w": 0.014501602104681982,
+        "p95_current_density_a_mm2": 5.159881245091923,
+        "max_voltage_drop_v": 0.002681243272220968,
+        "max_current_density_a_mm2": 283.15724300540336,
+        "max_load_voltage_drop_v": 0.0017518115434660832,
+        "effective_path_resistance_ohm": 0.0001450160210468198
+      },
+      "node_count": 13636,
+      "edge_count": 26245,
+      "issues": []
+    },
+    {
+      "index": 3,
+      "factor": 0.25,
+      "target_size_mm": 0.25,
+      "zone_cell_mm": 0.125,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "total_copper_loss_w": 0.014941108482567194,
+        "p95_current_density_a_mm2": 5.238182319772022,
+        "max_voltage_drop_v": 0.001575180728249137,
+        "max_current_density_a_mm2": 161.94168307863754,
+        "max_load_voltage_drop_v": 0.001575180728249137,
+        "effective_path_resistance_ohm": 0.00014941108482567194
+      },
+      "node_count": 45688,
+      "edge_count": 91360,
+      "issues": []
+    }
+  ],
+  "comparison_history": [
+    {
+      "coarse_level_index": 0,
+      "fine_level_index": 1,
+      "signoff_eligible": false,
+      "comparisons": [
+        {
+          "metric": "max_load_voltage_drop_v",
+          "coarse_value": 0.0028436706297177493,
+          "fine_value": 0.0017245701685455472,
+          "relative_delta": 0.39354081639309935,
+          "absolute_delta": 0.001119100461172202,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "total_copper_loss_w",
+          "coarse_value": 0.027663551791421916,
+          "fine_value": 0.015422972459075517,
+          "relative_delta": 0.44248039530997724,
+          "absolute_delta": 0.012240579332346398,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "effective_path_resistance_ohm",
+          "coarse_value": 0.00027663551791421917,
+          "fine_value": 0.00015422972459075518,
+          "relative_delta": 0.44248039530997724,
+          "absolute_delta": 0.000122405793323464,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "p95_current_density_a_mm2",
+          "coarse_value": 4.56304706010856,
+          "fine_value": 5.213451876429076,
+          "relative_delta": 0.12475512035722618,
+          "absolute_delta": 0.650404816320516,
+          "tolerance": 0.1,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "resolved_mesh_growth",
+          "coarse_value": {
+            "node_count": 3126,
+            "edge_count": 4909
+          },
+          "fine_value": {
+            "node_count": 5402,
+            "edge_count": 9629
+          },
+          "required": true,
+          "status": "passed",
+          "meaning": "the finer solve must contain more resolved nodes or branches without losing either count"
+        },
+        {
+          "metric": "max_voltage_drop_v",
+          "coarse_value": 0.004450815881739345,
+          "fine_value": 0.002633266125531719,
+          "relative_delta": 0.40836327641963505,
+          "absolute_delta": 0.001817549756207626,
+          "tolerance": 0.25,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": false,
+          "status": "failed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        },
+        {
+          "metric": "max_current_density_a_mm2",
+          "coarse_value": 450.84211418070146,
+          "fine_value": 297.5541583388856,
+          "relative_delta": 0.3400036310280825,
+          "absolute_delta": 153.28795584181586,
+          "tolerance": 0.25,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": false,
+          "status": "failed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        }
+      ]
+    },
+    {
+      "coarse_level_index": 1,
+      "fine_level_index": 2,
+      "signoff_eligible": true,
+      "comparisons": [
+        {
+          "metric": "max_load_voltage_drop_v",
+          "coarse_value": 0.0017245701685455472,
+          "fine_value": 0.0017518115434660832,
+          "relative_delta": 0.015550402680094761,
+          "absolute_delta": 2.724137492053592e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "total_copper_loss_w",
+          "coarse_value": 0.015422972459075517,
+          "fine_value": 0.014501602104681982,
+          "relative_delta": 0.05974012835971591,
+          "absolute_delta": 0.0009213703543935348,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "effective_path_resistance_ohm",
+          "coarse_value": 0.00015422972459075518,
+          "fine_value": 0.0001450160210468198,
+          "relative_delta": 0.05974012835971606,
+          "absolute_delta": 9.213703543935371e-06,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "p95_current_density_a_mm2",
+          "coarse_value": 5.213451876429076,
+          "fine_value": 5.159881245091923,
+          "relative_delta": 0.010275462899994349,
+          "absolute_delta": 0.053570631337152896,
+          "tolerance": 0.1,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "resolved_mesh_growth",
+          "coarse_value": {
+            "node_count": 5402,
+            "edge_count": 9629
+          },
+          "fine_value": {
+            "node_count": 13636,
+            "edge_count": 26245
+          },
+          "required": true,
+          "status": "passed",
+          "meaning": "the finer solve must contain more resolved nodes or branches without losing either count"
+        },
+        {
+          "metric": "max_voltage_drop_v",
+          "coarse_value": 0.002633266125531719,
+          "fine_value": 0.002681243272220968,
+          "relative_delta": 0.017893619421376687,
+          "absolute_delta": 4.7977146689248684e-05,
+          "tolerance": 0.25,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        },
+        {
+          "metric": "max_current_density_a_mm2",
+          "coarse_value": 297.5541583388856,
+          "fine_value": 283.15724300540336,
+          "relative_delta": 0.04838418462660346,
+          "absolute_delta": 14.39691533348224,
+          "tolerance": 0.25,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        }
+      ]
+    },
+    {
+      "coarse_level_index": 2,
+      "fine_level_index": 3,
+      "signoff_eligible": true,
+      "comparisons": [
+        {
+          "metric": "max_load_voltage_drop_v",
+          "coarse_value": 0.0017518115434660832,
+          "fine_value": 0.001575180728249137,
+          "relative_delta": 0.10082752101716921,
+          "absolute_delta": 0.00017663081521694613,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "total_copper_loss_w",
+          "coarse_value": 0.014501602104681982,
+          "fine_value": 0.014941108482567194,
+          "relative_delta": 0.029415915050614475,
+          "absolute_delta": 0.00043950637788521194,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "effective_path_resistance_ohm",
+          "coarse_value": 0.0001450160210468198,
+          "fine_value": 0.00014941108482567194,
+          "relative_delta": 0.029415915050614534,
+          "absolute_delta": 4.395063778852128e-06,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "p95_current_density_a_mm2",
+          "coarse_value": 5.159881245091923,
+          "fine_value": 5.238182319772022,
+          "relative_delta": 0.014948138476307753,
+          "absolute_delta": 0.07830107468009917,
+          "tolerance": 0.1,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "resolved_mesh_growth",
+          "coarse_value": {
+            "node_count": 13636,
+            "edge_count": 26245
+          },
+          "fine_value": {
+            "node_count": 45688,
+            "edge_count": 91360
+          },
+          "required": true,
+          "status": "passed",
+          "meaning": "the finer solve must contain more resolved nodes or branches without losing either count"
+        },
+        {
+          "metric": "max_voltage_drop_v",
+          "coarse_value": 0.002681243272220968,
+          "fine_value": 0.001575180728249137,
+          "relative_delta": 0.4125185340066664,
+          "absolute_delta": 0.0011060625439718308,
+          "tolerance": 0.25,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": false,
+          "status": "failed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        },
+        {
+          "metric": "max_current_density_a_mm2",
+          "coarse_value": 283.15724300540336,
+          "fine_value": 161.94168307863754,
+          "relative_delta": 0.42808567649619583,
+          "absolute_delta": 121.21555992676582,
+          "tolerance": 0.25,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": false,
+          "status": "failed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        }
+      ]
+    }
+  ],
+  "thresholds": {
+    "max_load_voltage_drop_v": 0.03,
+    "total_copper_loss_w": 0.05,
+    "effective_path_resistance_ohm": 0.05,
+    "p95_current_density_a_mm2": 0.1
+  },
+  "limitations": [
+    "A passing mesh study establishes numerical stability for the selected geometry, terminals, loads, and solver settings only.",
+    "It does not validate material inputs, package models, manufacturing tolerances, or omitted physics."
+  ]
+}
