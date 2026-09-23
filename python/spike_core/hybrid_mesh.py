@@ -617,6 +617,32 @@ def _polygons_touch(
     )
 
 
+def _shared_polygon_face_length(
+    left: List[Point2D], right: List[Point2D], tolerance: float = 1e-7,
+) -> float:
+    """Return shared positive-length copper boundary in mm, excluding point contact.
+
+    Each collinear edge pair contributes its one-dimensional overlap. Polygon
+    vertices must describe simple non-overlapping fragments, as emitted by the
+    zone clipper. A shared face is the conductor cross-section width; a full
+    grid-cell width would invent copper on clipped boundary fragments.
+    """
+    total = 0.0
+    for start, end in _segments(left):
+        dx, dy = end[0] - start[0], end[1] - start[1]
+        length = hypot(dx, dy)
+        if length <= tolerance:
+            continue
+        for a, b in _segments(right):
+            if any(abs(dx * (p[1] - start[1]) - dy * (p[0] - start[0])) / length > tolerance for p in (a, b)):
+                continue
+            low, high = sorted(
+                ((p[0] - start[0]) * dx + (p[1] - start[1]) * dy) / length for p in (a, b)
+            )
+            total += max(0.0, min(length, high) - max(0.0, low))
+    return total
+
+
 def _distance_to_segment(point: Point2D, start: Point2D, end: Point2D) -> float:
     dx, dy = end[0] - start[0], end[1] - start[1]
     length_squared = dx * dx + dy * dy
@@ -1399,7 +1425,9 @@ class _Builder:
                 b,
                 (p.x_mm, p.y_mm, p.z_mm),
                 (n.x_mm, n.y_mm, n.z_mm),
-                max(width, 0.001),
+                # Clipped zone faces already have positive geometric width.
+                # A generic 1 um floor would create copper across tiny slivers.
+                max(width, 1e-12) if kind == "zone" else max(width, 0.001),
                 max(thickness, 0.001),
                 COPPER_CONDUCTIVITY_S_M,
                 layer,
@@ -1726,11 +1754,12 @@ class _Builder:
                 current_polygons = fragment_polygons[(column, row)]
                 for left_index, left_node in enumerate(current_nodes):
                     for right_index in range(left_index + 1, len(current_nodes)):
-                        if not _polygons_touch(
+                        face_width = _shared_polygon_face_length(
                             current_polygons[left_index],
                             current_polygons[right_index],
                             self.containment_tolerance,
-                        ):
+                        )
+                        if face_width <= 1e-7:
                             continue
                         left_point = self.mesh.nodes[left_node]
                         right_point = self.mesh.nodes[current_nodes[right_index]]
@@ -1744,7 +1773,7 @@ class _Builder:
                             "zone",
                             left_node,
                             current_nodes[right_index],
-                            cell,
+                            face_width,
                             thickness,
                             layer,
                             net,
@@ -1755,11 +1784,12 @@ class _Builder:
                     neighbor_polygons = fragment_polygons.get(neighbor_key, [])
                     for current_index, current in enumerate(current_nodes):
                         for neighbor_index, neighbor in enumerate(neighbor_nodes):
-                            if not _polygons_touch(
+                            face_width = _shared_polygon_face_length(
                                 current_polygons[current_index],
                                 neighbor_polygons[neighbor_index],
                                 self.containment_tolerance,
-                            ):
+                            )
+                            if face_width <= 1e-7:
                                 continue
                             current_point = self.mesh.nodes[current]
                             neighbor_point = self.mesh.nodes[neighbor]
@@ -1773,7 +1803,7 @@ class _Builder:
                                 "zone",
                                 current,
                                 neighbor,
-                                cell,
+                                face_width,
                                 thickness,
                                 layer,
                                 net,

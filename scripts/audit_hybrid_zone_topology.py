@@ -71,7 +71,7 @@ def audit(builder, names, solve=False, face_experiment=False):
         branches = by_zone[region["source_id"]]
         ratios, zero_faces, examples = [], 0, []
         for branch in branches:
-            face = shared_face_length(builder.zone_polygons[branch.node_p], builder.zone_polygons[branch.node_n])
+            face = shared_face_length(builder.zone_polygons[branch.node_p], builder.zone_polygons[branch.node_n], builder.containment_tolerance)
             zone_faces[branch.id] = face
             if face <= 1e-7:
                 zero_faces += 1
@@ -127,6 +127,7 @@ def audit(builder, names, solve=False, face_experiment=False):
             with patch("python.spike_core.hybrid_dc_solver.build_hybrid_mesh", return_value=graph):
                 result = solve_hybrid_dc(builder.design, spec)
             report["dc_experiments"].append({"label": label, "status": result.status,
+                "model_status": result.model_status,
                 "paths": result.networks.get("source_to_load", {}).get("paths", []),
                 "residual": result.summary.get("max_scaled_linear_residual"),
                 "copper_loss_w": result.summary.get("total_copper_loss_w"),
@@ -157,6 +158,12 @@ def main():
         reports.append({"factor": factor, **report})
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(reports, indent=2) + "\n")
+        # Each of these six retained filled polygons had one zone component
+        # before the contact/face repair. Reject loss of positive-area paths.
+        if len(report["zones"]) != 6 or any(zone["components"] != 1 for zone in report["zones"]):
+            raise AssertionError("Pinned board zone component count changed; inspect written topology evidence")
+        if any(zone["zero_shared_face_branches"] or zone["max_width_to_face_ratio"] > 1 + 1e-7 for zone in report["zones"]):
+            raise AssertionError("Zone branches exceed retained positive shared-face width")
         print(json.dumps({"factor": factor, "nodes": report["nodes"], "components": report["components"],
                           "zones": len(report["zones"])}), flush=True)
 
