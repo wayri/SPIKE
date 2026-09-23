@@ -89,6 +89,7 @@ def run(
                     ("partial_inductance_h", "resistance_start_ohm", "geometry_counts")},
         "volume_quality": ((analysis.get("provenance") or {}).get("numerical_quality") or {}).get(
             "volume_extraction"),
+        "zone_basis_support": (analysis.get("provenance") or {}).get("zone_basis_support"),
         "inductance_passivity": ((analysis.get("provenance") or {}).get("numerical_quality") or {}).get(
             "inductance_passivity"),
         "worker_error": response.get("error"),

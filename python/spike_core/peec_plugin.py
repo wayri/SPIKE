@@ -13,6 +13,7 @@ from .loop_parasitics import extract_loop_parasitics
 from .peec_matrices import TopologyResistanceSolver, embed_physical_inductance
 from .peec_native_factory import dielectric_epsilon as _dielectric_epsilon, make_native_solver
 from .peec_volume_adapter import VolumeResistanceOverlay, extract_volume_matrices
+from .peec_volume_support import ZoneBasisSupportError
 from .peec_network import (
     dense as _dense,
     extract_pdn_multiport as _extract_pdn_multiport,
@@ -255,14 +256,16 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
             )
         inductance, inductance_quality = assess_symmetric_positive_semidefinite(raw_inductance)
     except (ValueError, RuntimeError, np.linalg.LinAlgError) as error:
+        issue_code = error.code if isinstance(error, ZoneBasisSupportError) else (
+            "PEEC_VOLUME_EXTRACTION_FAILED" if volume_extraction else "PEEC_MATRIX_EXTRACTION_FAILED")
         return AnalysisResult(analysis_id=spec.analysis_id, mode=spec.mode,
             status="failed", model_status="failed",
             issues=issues + [ValidationIssue(
-                "PEEC_VOLUME_EXTRACTION_FAILED" if volume_extraction else "PEEC_MATRIX_EXTRACTION_FAILED",
-                "error", str(error),
+                issue_code, "error", str(error),
             )],
             provenance={"solved": False, "failure_stage": "volume_matrix_extraction" if volume_extraction else "physical_inductance_admission",
-                        "volume_current_model": "uniform_volume_current" if volume_extraction else "disabled"})
+                        "volume_current_model": "uniform_volume_current" if volume_extraction else "disabled",
+                        **({"zone_basis_support": error.report} if isinstance(error, ZoneBasisSupportError) else {})})
     topology_indices = [
         index for index in range(len(mesh.branches)) if index not in physical_branch_indices
     ]

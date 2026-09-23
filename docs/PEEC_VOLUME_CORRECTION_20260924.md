@@ -6,18 +6,24 @@
 
 ### Continuation: local finite-volume integration
 
-The negative-energy Marble matrix has a physical, opt-in correction in the
-local CPython 3.11 runtime. Rectangular planar and circular-annular via bases
+The negative-energy Marble line-filament matrix has an opt-in finite-volume
+alternative in the local CPython 3.11 runtime. Rectangular planar and circular-annular via bases
 use finite-volume self/mutual inductance; overlapping planar copper also uses
 a symmetric resistance bilinear form. The retained 1 mm, 45-basis Marble
-C383-net matrix is positive within roundoff (smallest eigenvalue
+C383-net **diagnostic** matrix is positive within roundoff (smallest eigenvalue
 `5.354853551935084e-12 H`); the previous filament matrix had five negative
 modes and smallest eigenvalue `-22.1443162 pH`. No eigenvalue projection,
-clipping, or relaxed passivity test was applied.
+clipping, or relaxed passivity test was applied. This energy result is not a
+valid board solve: the supplied zone current support extends outside filled
+copper.
 
-An explicit routed `U37.18` to `R195.1` AC probe completes with
+Before the geometry-support gate, an explicit routed `U37.18` to `R195.1` AC probe completed with
 `model_status=approximate`, 1,035 converged volume pairs, zero negative modes,
-and `0.0` passivity correction ratio. The original `U37.18` to `C383.1`
+and `0.0` passivity correction ratio. Those historical values are **not
+currently admitted**. The runtime now fails that 1 mm routed request before
+native quadrature with `PEEC_ZONE_BASIS_OUTSIDE_COPPER`: 7 of 18 zone bases
+cross the filled boundary (first outside area 0.182384376059 mm²), preserving
+all violating source IDs in structured evidence. The original `U37.18` to `C383.1`
 terminal pair still correctly fails `PEEC_LOAD_DISCONNECTED`: the C383.1 pad
 is separated from the nearby copper fill by about 0.064 mm in the public
 Marble v1.4.4 board. The routed probe is a **different, connected path** and
@@ -25,10 +31,11 @@ does not turn the original path into a solved case. Reproduce both with
 `scripts/run_public_board_volume_ac.py` and
 `--original-disconnected-ports` for the original pair.
 
-This is not yet qualified board AC accuracy or a deployable release. The
-0.5 mm, 120-basis mesh now completes with an 8,192-pair bounded runtime cap:
+This is not yet qualified board AC accuracy or a deployable release. Before
+the support gate, the 0.5 mm, 120-basis diagnostic completed with an 8,192-pair bounded runtime cap:
 7,260 pairs, 72,259,138 potential evaluations, no negative energy modes and
-no projection. However, the same routed path changes from 1.3422803 to
+no projection. It is now rejected because 19 of 82 zone bases cross the filled
+boundary. The earlier same-path quantities changed from 1.3422803 to
 1.2637065 nH (about 5.9%) and from 4.77887 to 5.25118 mOhm (about 9.9%)
 between 1 and 0.5 mm. Thus path quantities have **not** demonstrated mesh
 convergence. An intermediate 0.75 mm run returned 1.2252173 nH and
@@ -45,6 +52,16 @@ CPython 3.11 local binary was installed; the
 rebuilt CPython 3.12 binary passed native tests but could not replace the
 in-use runtime file. Capability claims must stay `approximate` and the volume
 path opt-in until these gates close.
+
+The local capacitance estimate no longer sums pad/zone internal mesh links.
+For simple source-filled zones and undrilled rectangular pads with unambiguous
+ownership, it uses one projected source area and the approximate
+`epsilon_0 * epsilon_r * area / separation` surrogate. Holes, duplicate
+owners, nonfinite geometry and ambiguous same-net overlap fail the whole
+estimate closed. On the Marble C383 net at 1, 0.75, 0.5 and 0.25 mm, the
+result is consistently `0 pF` with `status=unsupported`, **not** a physical
+zero-capacitance prediction or broadband qualification. A field-based
+multiconductor electrostatic extraction remains required.
 
 The rebuilt CPython 3.12 extension also passed its two native volume tests
 and six focused Python adapter/runtime tests when loaded from its Release

@@ -84,11 +84,17 @@ comparison evidence and cannot independently promote a native SPIKE workflow.
 ### Native PEEC RLCG (`spike.peec_2_5d`)
 
 The [2026-09-24 correction record](PEEC_VOLUME_CORRECTION_20260924.md) documents
-the original real-board nonpassivity and the opt-in local finite-volume
-rectangular/annular correction. A routed Marble 1 mm AC probe now passes the
-matrix energy gate without projection, but its C/G model is approximate,
-the original C383.1 terminal is physically disconnected, and mesh-refinement
-and deployment qualification remain open. MODULAR-BUS-NIB
+the original real-board nonpassivity and a local finite-volume
+rectangular/annular implementation. Earlier routed Marble matrices passed the
+energy gate without projection, but an independent support audit found current
+bases outside filled copper. The current opt-in runtime fails that Marble AC
+request with `PEEC_ZONE_BASIS_OUTSIDE_COPPER` before native integration;
+historical positive-energy matrices are not qualified board results. The
+original C383.1 terminal is physically disconnected. Geometry, contact,
+capacitance, mesh-refinement and deployment gates remain open. The revised
+zone/pad C estimator avoids internal-link double counting for a narrow simple
+geometry subset, but returns `unsupported`/0 F for ambiguous Marble copper;
+this is not a measured or field-derived capacitance. MODULAR-BUS-NIB
 AC/DC convergence remain blocked; transient now rejects negative-energy modes
 instead of projecting the matrix. Do not infer readiness from preflight alone.
 The [PEEC safety policy](PEEC_SAFETY_POLICY.md) records native admission,

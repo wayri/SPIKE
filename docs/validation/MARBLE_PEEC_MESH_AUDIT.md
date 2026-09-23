@@ -65,6 +65,14 @@ attachment loss explain a large part of this reversal, but are not a full
 decomposition of geometry/current redistribution effects. The 0.25 mm check
 is DC-only; it does not claim a completed native L extraction.
 
+An additional controlled perturbation in
+`scripts/probe_marble_contact_loss.py` scaled **all** graph-attachment
+resistances to 1% of their extracted values, leaving the physical overlap
+matrix unchanged. The routed DC values at 1, 0.75, 0.5 and 0.25 mm became
+3.822225, 3.804859, 4.136519 and 3.970494 mOhm, respectively. They remain
+nonmonotone, so simply making graph links nearly ideal is not a valid cure.
+The perturbation is diagnostic only; it is not a new contact formulation.
+
 ### Definite geometry-support defect
 
 `hybrid_mesh.py`, `_Builder.zones`, clips display/control cells and checks
@@ -164,6 +172,19 @@ since been removed; older evidence still carries the misleading count.
    Use <=2% tessellation sensitivity for the bounded C surrogate without
    promoting its physical accuracy. A trusted independent reference and
    knowledgeable numerical review remain required before release claims.
+
+An independent affine-potential patch audit also blocks promotion of a
+cell-centred shared-face rectangular prototype. For a left cell
+`[0,1] x [0,2]` and two right cells `[1,2] x [0,1]`,
+`[1,2] x [1,2]`, the exact potential `V=y` has zero flux through each
+vertical common face. The prototype's normal-distance two-point rule uses
+cell-centre potentials 1, 0.5 and 1.5 and instead gives opposite nonzero
+face currents (`+/-0.5 sigma*t` in unit-width coordinates). Their net KCL
+cancels, so conservation alone would miss the inconsistency. Require each
+face's affine-potential flux to match to roundoff under hanging refinement
+and rotation before using that prototype for DC/AC qualification. A
+nonoverlapping copper-union RT0 face-current discretization with explicit
+finite pad/via contact coupling is a candidate, not yet an implemented cure.
 
 Confidence: high for out-of-copper support, capacitance mesh dependence and
 DC/topology sensitivity, all directly reproduced. Moderate for how much each

@@ -12,6 +12,7 @@ from python.spike_core.contracts import AnalysisSpec, DesignIR, ValidationIssue
 from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
 from python.spike_core.peec_plugin import solve_peec_2_5d, native_available
 from python.spike_core.peec_network import solve_linear_system
+from python.spike_core.peec_volume_support import ZoneBasisSupportError
 
 
 class PEECEnergyAdmissionTests(unittest.TestCase):
@@ -90,3 +91,23 @@ class PEECEnergyAdmissionTests(unittest.TestCase):
         self.assertIn('PEEC_VOLUME_EXTRACTION_FAILED', {issue.code for issue in result.issues})
         self.assertEqual(result.provenance['failure_stage'], 'volume_matrix_extraction')
         self.assertEqual(result.provenance['volume_current_model'], 'uniform_volume_current')
+
+    def test_zone_support_failure_preserves_structured_ownership(self):
+        mesh = HybridMesh(nodes=[MeshNode(i, i, 0, 0, 'F.Cu', 'VCC') for i in range(2)],
+            branches=[MeshBranch('zone-branch', 'zone', 0, 1, (0, 0, 0), (1, 0, 0),
+                .2, .035, 5.8e7, 'F.Cu', 'VCC', 'zone-source')])
+        solver = SimpleNamespace(compute_partial_inductance=lambda: np.eye(1))
+        report = {'violating_basis_count': 1, 'violations': [
+            {'branch_id': 'zone-branch', 'source_id': 'zone-source',
+             'outside_area_mm2': 0.01}]}
+        failure = ZoneBasisSupportError('PEEC_ZONE_BASIS_OUTSIDE_COPPER',
+                                        'zone-branch crosses source fill', report)
+        spec = AnalysisSpec(mode='ac', options={'peec_volume_extraction': 'enabled'})
+        with patch('python.spike_core.peec_plugin.native', object()), patch(
+            'python.spike_core.peec_plugin.build_hybrid_mesh', return_value=mesh), patch(
+            'python.spike_core.peec_plugin._make_native_solver', return_value=(solver, None)), patch(
+            'python.spike_core.peec_plugin.extract_volume_matrices', side_effect=failure):
+            result = solve_peec_2_5d(DesignIR(), spec)
+        self.assertEqual(result.status, 'failed')
+        self.assertIn('PEEC_ZONE_BASIS_OUTSIDE_COPPER', {issue.code for issue in result.issues})
+        self.assertEqual(result.provenance['zone_basis_support'], report)

@@ -14,6 +14,7 @@ from .contracts import DesignIR
 from .hybrid_mesh import MeshBranch
 from .peec_magnetic_geometry import describe_magnetic_cross_section
 from .peec_volume_resistance import assemble_overlap_resistance
+from .peec_volume_support import admit_zone_basis_support
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,7 @@ def extract_volume_matrices(
         raise ValueError("native finite-volume PEEC backend is unavailable")
     if not branches:
         raise ValueError("finite-volume PEEC requires physical copper branches")
+    support = admit_zone_basis_support(design, branches)
     if options is None:
         options = native.VolumeMatrixIntegrationOptions()
         # Directed rectangular integrals split the pair budget evenly. Marble
@@ -104,6 +106,8 @@ def extract_volume_matrices(
         "rectangular_absolute_tolerance_h": float(options.pair.absolute_tolerance_h),
         "rectangular_relative_tolerance": float(options.pair.relative_tolerance),
         "maximum_estimated_pair_error_h": float(np.max(errors)),
+        "zone_basis_outside_area_sum_mm2": float(support["outside_area_sum_mm2"]),
+        "zone_basis_outside_area_tolerance_mm2": float(support["outside_area_tolerance_mm2"]),
         **resistance_quality,
     }
     if not all(isfinite(float(value)) for value in quality.values()

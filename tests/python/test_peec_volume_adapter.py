@@ -42,7 +42,7 @@ class VolumeAdapterTests(unittest.TestCase):
         self.assertIsNone(zone_pad_mesh_dependence_issue(branches, [0, 1], False))
         self.assertIsNone(zone_pad_mesh_dependence_issue(branches, [0], True))
         issue = zone_pad_mesh_dependence_issue(branches, [0, 1], True)
-        self.assertEqual(issue.code, "PEEC_ZONE_PAD_CAPACITANCE_MESH_DEPENDENT")
+        self.assertEqual(issue.code, "PEEC_ZONE_PAD_CAPACITANCE_AREA_SURROGATE")
 
     def test_unavailable_backend_fails_closed(self):
         with self.assertRaisesRegex(ValueError, "unavailable"):

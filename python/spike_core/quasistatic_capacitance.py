@@ -8,8 +8,8 @@ counted and reported instead of receiving a fabricated capacitance.
 
 from __future__ import annotations
 
-from math import hypot, log, pi, sqrt
-from typing import Any, Dict, Iterable, List, Sequence, Tuple
+from math import cos, hypot, isfinite, log, pi, radians, sin, sqrt
+from typing import Any, Dict, List, Sequence, Tuple
 
 import numpy as np
 
@@ -23,15 +23,15 @@ LIGHT_SPEED_M_S = 299_792_458.0
 def zone_pad_mesh_dependence_issue(branches: Sequence[Any],
                                    physical_indices: Sequence[int],
                                    volume_extraction: bool) -> ValidationIssue | None:
-    """Keep the current internal-edge C limitation explicit to AC consumers."""
+    """Keep the unqualified area surrogate explicit to AC consumers."""
     if not volume_extraction or not any(
         branches[index].kind in {"zone", "pad"} for index in physical_indices
     ):
         return None
     return ValidationIssue(
-        "PEEC_ZONE_PAD_CAPACITANCE_MESH_DEPENDENT", "warning",
-        "Zone/pad capacitance currently sums microstrip estimates on internal mesh links; refinement can change the total without changing copper geometry.",
-        suggestion="Do not use this capacitance for bandwidth sign-off; compare mesh refinements and use a validated electrostatic extractor.",
+        "PEEC_ZONE_PAD_CAPACITANCE_AREA_SURROGATE", "warning",
+        "Zone/pad capacitance uses unique projected copper area and a parallel-plate surrogate; fringing and multiconductor coupling are omitted.",
+        suggestion="Do not use this capacitance for bandwidth sign-off; use a validated electrostatic extractor.",
         status="approximate",
     )
 
@@ -178,6 +178,175 @@ def _point_in_polygon(point: Tuple[float, float], polygon: Sequence[Tuple[float,
     return inside
 
 
+def _polygon_area(points: Sequence[Tuple[float, float]]) -> float:
+    return abs(sum(
+        a[0] * b[1] - b[0] * a[1]
+        for a, b in zip(points, (*points[1:], points[0]))
+    )) / 2.0 if len(points) >= 3 else 0.0
+
+
+def _pad_polygon(pad: Dict[str, Any]) -> List[Tuple[float, float]] | None:
+    """Return exact pad corners for the deliberately narrow admitted subset."""
+    if str(pad.get("shape", "")) != "rect" or pad.get("drill", 0):
+        return None
+    size = pad.get("size", [0.0, 0.0])
+    try:
+        width, height = (float(size), float(size)) if isinstance(size, (int, float)) else _xy(size)
+        cx, cy = _xy(pad.get("at", [0.0, 0.0]))
+        angle = radians(float(pad.get("rotation", 0.0)) % 360.0)
+    except (TypeError, ValueError, OverflowError, IndexError, KeyError):
+        return None
+    if not all(isfinite(value) for value in (width, height, cx, cy, angle)) or width <= 0 or height <= 0:
+        return None
+    ca, sa = cos(angle), sin(angle)
+    return [
+        (cx + ca * x - sa * y, cy + sa * x + ca * y)
+        for x, y in ((-width / 2, -height / 2), (width / 2, -height / 2),
+                     (width / 2, height / 2), (-width / 2, height / 2))
+    ]
+
+
+def _bbox(points: Sequence[Tuple[float, float]]) -> Tuple[float, float, float, float]:
+    xs, ys = [p[0] for p in points], [p[1] for p in points]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _bbox_overlaps(a: Sequence[Tuple[float, float]], b: Sequence[Tuple[float, float]]) -> bool:
+    ax0, ay0, ax1, ay1 = _bbox(a)
+    bx0, by0, bx1, by1 = _bbox(b)
+    return min(ax1, bx1) > max(ax0, bx0) and min(ay1, by1) > max(ay0, by0)
+
+
+def _orientation(a: Tuple[float, float], b: Tuple[float, float], c: Tuple[float, float]) -> float:
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+
+
+def _proper_intersection(a: Tuple[float, float], b: Tuple[float, float],
+                         c: Tuple[float, float], d: Tuple[float, float]) -> bool:
+    return (_orientation(a, b, c) * _orientation(a, b, d) < 0
+            and _orientation(c, d, a) * _orientation(c, d, b) < 0)
+
+
+def _on_segment(a: Tuple[float, float], b: Tuple[float, float], p: Tuple[float, float]) -> bool:
+    return (abs(_orientation(a, b, p)) <= 1e-12
+            and min(a[0], b[0]) <= p[0] <= max(a[0], b[0])
+            and min(a[1], b[1]) <= p[1] <= max(a[1], b[1]))
+
+
+def _segments_intersect(a: Tuple[float, float], b: Tuple[float, float],
+                        c: Tuple[float, float], d: Tuple[float, float]) -> bool:
+    return (_proper_intersection(a, b, c, d) or _on_segment(a, b, c)
+            or _on_segment(a, b, d) or _on_segment(c, d, a) or _on_segment(c, d, b))
+
+
+def _polygon_is_simple(points: Sequence[Tuple[float, float]]) -> bool:
+    edges = list(zip(points, (*points[1:], points[0])))
+    count = len(edges)
+    for i, (a, b) in enumerate(edges):
+        for j in range(i + 1, count):
+            if j == i + 1 or (i == 0 and j == count - 1):
+                continue
+            if _segments_intersect(a, b, *edges[j]):
+                return False
+    return True
+
+
+def _polygon_strictly_contains(container: Sequence[Tuple[float, float]],
+                               contained: Sequence[Tuple[float, float]]) -> bool:
+    if not all(_point_in_polygon(point, container) for point in contained):
+        return False
+    container_edges = list(zip(container, (*container[1:], container[0])))
+    contained_edges = list(zip(contained, (*contained[1:], contained[0])))
+    return not any(
+        _proper_intersection(a, b, c, d)
+        for a, b in container_edges for c, d in contained_edges
+    )
+
+
+def _planar_owner_areas(design: DesignIR) -> Tuple[Dict[Tuple[str, str], float], set[Tuple[str, str]], int]:
+    """Admit unique source copper area, failing closed on ambiguous unions.
+
+    Source-filled simple zone polygons and undrilled rectangular pads are the
+    only admitted shapes. A pad wholly inside a same-net filled zone is already
+    represented by that fill and is counted zero times. Any other overlapping
+    source bounding boxes are rejected rather than pretending their areas add.
+    """
+    areas: Dict[Tuple[str, str], float] = {}
+    polygons: Dict[Tuple[str, str], List[Tuple[float, float]]] = {}
+    ambiguous: set[Tuple[str, str]] = set()
+    for zone in design.zones:
+        owner, layer = str(zone.get("id", "")), str(zone.get("layer", ""))
+        key = (owner, layer)
+        try:
+            points = [_xy(value) for value in zone.get("points", zone.get("polygon", []))]
+        except (TypeError, ValueError, OverflowError, IndexError, KeyError):
+            ambiguous.add(key)
+            continue
+        if (key in polygons or key in ambiguous or not owner or not layer
+                or zone.get("holes") or zone.get("interiors")
+                or zone.get("filled_copper_state") not in (None, "source_filled")
+                or zone.get("source_fill_provenance_complete") is False
+                or len(points) < 3 or not all(isfinite(value) for point in points for value in point)
+                or not _polygon_is_simple(points) or not isfinite(_polygon_area(points))
+                or _polygon_area(points) <= 0):
+            ambiguous.add(key)
+            continue
+        polygons[key], areas[key] = points, _polygon_area(points)
+    for pad in design.pads:
+        owner = str(pad.get("id") or pad.get("component_pad") or "")
+        layers = [str(v) for v in pad.get("layers", []) if str(v).endswith(".Cu")]
+        if not layers and str(pad.get("layer", "")).endswith(".Cu"):
+            layers = [str(pad["layer"])]
+        polygon = _pad_polygon(pad)
+        for layer in layers:
+            key = (owner, layer)
+            if key in polygons or key in ambiguous or not owner or polygon is None:
+                ambiguous.add(key)
+            else:
+                polygons[key], areas[key] = polygon, _polygon_area(polygon)
+
+    # Only same-net/source-layer overlap is relevant. Owner ids are resolved
+    # back to their source records here to avoid inferring electrical unions.
+    net_by_key: Dict[Tuple[str, str], str] = {}
+    for item in (*design.zones, *design.pads):
+        owner = str(item.get("id") or item.get("component_pad") or "")
+        item_layers = [str(v) for v in item.get("layers", []) if str(v).endswith(".Cu")]
+        if not item_layers:
+            item_layers = [str(item.get("layer", ""))]
+        for layer in item_layers:
+            net_by_key[(owner, layer)] = str(item.get("net_name") or item.get("net") or "")
+    keys = list(polygons)
+    zone_keys = {(str(z.get("id", "")), str(z.get("layer", ""))) for z in design.zones}
+    for pos, key_a in enumerate(keys):
+        for key_b in keys[pos + 1:]:
+            if key_a[1] != key_b[1] or net_by_key.get(key_a) != net_by_key.get(key_b):
+                continue
+            if not _bbox_overlaps(polygons[key_a], polygons[key_b]):
+                continue
+            if key_a in zone_keys and _polygon_strictly_contains(polygons[key_a], polygons[key_b]):
+                areas[key_b] = 0.0
+            elif key_b in zone_keys and _polygon_strictly_contains(polygons[key_b], polygons[key_a]):
+                areas[key_a] = 0.0
+            else:
+                ambiguous.update((key_a, key_b))
+    # Filled zones may already contain same-net routed copper. Without a robust
+    # polygon union, even a possible overlap makes the zone area unsupported.
+    for track in design.tracks:
+        layer = str(track.get("layer", ""))
+        net = str(track.get("net_name") or track.get("net") or "")
+        start, end = _xy(track.get("start", [0, 0])), _xy(track.get("end", [0, 0]))
+        half = max(float(track.get("width", 0.0)), 0.0) / 2.0
+        track_box = [(min(start[0], end[0]) - half, min(start[1], end[1]) - half),
+                     (max(start[0], end[0]) + half, min(start[1], end[1]) - half),
+                     (max(start[0], end[0]) + half, max(start[1], end[1]) + half),
+                     (min(start[0], end[0]) - half, max(start[1], end[1]) + half)]
+        for key in zone_keys:
+            if key in polygons and key[1] == layer and net_by_key.get(key) == net \
+                    and _bbox_overlaps(polygons[key], track_box):
+                ambiguous.add(key)
+    return areas, ambiguous, len(polygons)
+
+
 def _reference_overlaps_branch(
     design: DesignIR,
     return_net: str,
@@ -261,6 +430,8 @@ def estimate_branch_capacitance(
     skipped_reference = 0
     skipped_reference_geometry = 0
     loss_known = 0
+    owner_areas, ambiguous_owners, source_geometry_count = _planar_owner_areas(design)
+    branch_reference: Dict[int, Tuple[str, float, float, float | None]] = {}
 
     for index, branch in enumerate(branches):
         kind = str(branch.kind)
@@ -302,7 +473,8 @@ def estimate_branch_capacitance(
             float(branch.width_mm), height_mm, epsilon_r
         ) * float(branch.length_mm) * 1e-3
         if kind.startswith("zone") or kind.startswith("pad"):
-            value *= 0.5
+            # Replaced below by a source-area value counted once per owner.
+            branch_reference[index] = (reference_layer, epsilon_r, height_mm, tan_delta)
         if not np.isfinite(value) or value <= 0:
             skipped_reference += 1
             continue
@@ -313,12 +485,60 @@ def estimate_branch_capacitance(
         estimated += 1
         reference_layers.add(reference_layer)
 
+    planar_groups: Dict[Tuple[str, str], List[int]] = {}
+    for index, branch in enumerate(branches):
+        if str(branch.kind).startswith(("zone", "pad")):
+            planar_groups.setdefault((str(branch.source_id), str(branch.layer)), []).append(index)
+    unsupported_planar = 0
+    admitted_planar = 0
+    for owner, indices in planar_groups.items():
+        old_estimated = sum(capacitance[index] > 0 for index in indices)
+        old_loss_known = sum(loss_tangent[index] > 0 for index in indices)
+        capacitance[indices] = 0.0
+        loss_tangent[indices] = 0.0
+        estimated -= old_estimated
+        loss_known -= old_loss_known
+        references = [branch_reference.get(index) for index in indices]
+        area_mm2 = owner_areas.get(owner)
+        if (owner in ambiguous_owners or area_mm2 is None or area_mm2 <= 0
+                or any(value is None for value in references)
+                or len({value[:3] for value in references if value is not None}) != 1):
+            unsupported_planar += 1
+            skipped_reference += len(indices)
+            continue
+        reference_layer, epsilon_r, height_mm, tan_delta = references[0]  # type: ignore[misc]
+        weights = np.asarray([max(float(branches[index].length_mm), 0.0) for index in indices])
+        if float(np.sum(weights)) <= 0:
+            unsupported_planar += 1
+            continue
+        owner_capacitance = EPSILON_0_F_M * epsilon_r * area_mm2 * 1e-3 / height_mm
+        shares = owner_capacitance * weights / float(np.sum(weights))
+        capacitance[indices] = shares
+        if tan_delta is not None:
+            loss_tangent[indices] = tan_delta
+            loss_known += len(indices)
+        estimated += len(indices)
+        reference_layers.add(reference_layer)
+        admitted_planar += 1
+
+    # A mixed result would silently retain track C while dropping an
+    # overlapping zone/pad owner, which is neither a union nor a bound. Fail
+    # the entire capacitance estimate closed when any requested planar owner
+    # cannot be uniquely counted.
+    if unsupported_planar:
+        capacitance[:] = 0.0
+        loss_tangent[:] = 0.0
+        estimated = 0
+        loss_known = 0
+
     total = float(np.sum(capacitance))
     weighted_loss = float(np.sum(capacitance * loss_tangent) / total) if total > 0 else 0.0
     return capacitance, loss_tangent, {
         "contract": "spike/distributed-capacitance/v1",
-        "model": "hammerstad_jensen_single_reference",
+        "model": "hammerstad_jensen_tracks_plus_unique_area_parallel_plate",
         "status": "approximate" if estimated else "unsupported",
+        "reason": ("Zone/pad copper union or reference geometry is ambiguous; capacitance was omitted."
+                   if unsupported_planar else ""),
         "reference_mode": "explicit_return_conductor" if return_net else "implicit_nearest_copper",
         "reference_net": return_net,
         "reference_layers": sorted(reference_layers),
@@ -330,8 +550,14 @@ def estimate_branch_capacitance(
         "loss_tangent_branch_coverage": loss_known / max(estimated, 1),
         "effective_loss_tangent": weighted_loss,
         "total_capacitance_f": total,
+        "planar_source_geometry_count": source_geometry_count,
+        "planar_source_count": len(planar_groups),
+        "admitted_planar_source_count": admitted_planar,
+        "unsupported_planar_source_count": unsupported_planar,
         "validity": [
             "single-reference quasi-static microstrip approximation",
+            "zone/pad capacitance uses each admitted source copper area once with no fringing correction",
+            "ambiguous or unsupported zone/pad source geometry and overlap are omitted",
             "zero conductor-thickness correction",
             "no via/antipad capacitance without a validated via field model",
             "not a multiconductor capacitance matrix",

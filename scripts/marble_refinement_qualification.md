@@ -8,6 +8,12 @@ not a measured correlation, a whole-board model, or certification of board
 impedance accuracy. The AC comparison uses explicit, connected U37.18/R195.1
 pad terminals. The solver remains experimental/approximate.
 
+**Historical pre-support-gate evidence:** the finite-volume current rectangles
+at these mesh levels were later found to extend outside filled zone copper.
+The current runtime rejects Marble before native integration with
+`PEEC_ZONE_BASIS_OUTSIDE_COPPER`; the completed AC numbers below are retained
+for defect diagnosis, not as currently admissible results.
+
 ## Reproduction identity
 
 - Board SHA-256: `3304ba37c2bd891849fc36b500cd940934aaf1f2013a95639c03564fb925c512`
@@ -18,7 +24,7 @@ pad terminals. The solver remains experimental/approximate.
 
 ## Results
 
-| Mesh | Physical bases | Matrix pairs | Routed AC result | Partial L | Starting R |
+| Mesh | Physical bases | Matrix pairs | Historical routed AC result | Partial L | Starting R |
 | --- | ---: | ---: | --- | ---: | ---: |
 | 1.0 mm | 45 | 1,035 | completed, approximate | 1.342280298 nH | 4.778865685 mOhm |
 | 0.75 mm | 64 | 2,080 | completed, approximate | 1.225217320 nH | 4.377684346 mOhm |
