@@ -1,6 +1,7 @@
 """Containment regressions for physical hybrid-mesh faces and result samples."""
 
-from math import cos, hypot, radians, sin
+import json
+from math import ceil, cos, hypot, radians, sin
 from pathlib import Path
 import unittest
 
@@ -9,6 +10,8 @@ from python.spike_core.hybrid_mesh import HybridMesh
 
 from python.spike_core.contracts import AnalysisSpec, DesignIR
 from python.spike_core.hybrid_mesh import (
+    _PolygonContainmentCache,
+    _clip_polygon_to_rect_fragments,
     _point_in_polygon,
     _clean_polygon,
     _normalize_filled_zone_polygon,
@@ -17,6 +20,7 @@ from python.spike_core.hybrid_mesh import (
     _polygon_is_simple,
     _point_in_capsule_local,
     _segment_inside_polygon,
+    _triangulate_polygon,
     build_hybrid_mesh,
 )
 from python.spike_core.solver_plugins import default_solver_registry
@@ -54,6 +58,108 @@ def _inside_track_union(point, tracks, tolerance=1e-7):
 
 
 class HybridMeshContainmentTests(unittest.TestCase):
+
+    def test_bounded_zone_containment_cache_preserves_concave_fragments(self):
+        polygon = [
+            (0, 0), (8, 0), (8, 8), (5, 8),
+            (5, 2), (3, 2), (3, 8), (0, 8),
+        ]
+        triangles = _triangulate_polygon(polygon)
+        bounds = [
+            (column * 2, row * 2, (column + 1) * 2, (row + 1) * 2)
+            for row in range(4)
+            for column in range(4)
+        ]
+        baseline = [
+            _clip_polygon_to_rect_fragments(polygon, triangles, *cell, 1e-6)
+            for cell in bounds
+        ]
+        cache = _PolygonContainmentCache(polygon, 1e-6, maximum_entries=3)
+        cached = [
+            _clip_polygon_to_rect_fragments(polygon, triangles, *cell, 1e-6, cache)
+            for cell in bounds
+        ]
+
+        self.assertEqual(cached, baseline)
+        self.assertLessEqual(len(cache.point_results), 3)
+        self.assertLessEqual(len(cache.segment_results), 3)
+        self.assertEqual(len(cache.point_results), 3)
+        self.assertEqual(len(cache.segment_results), 3)
+
+    def test_checked_in_filled_polygon_cache_preserves_exact_fragments(self):
+        fixture = Path(__file__).parents[2] / "docs/validation/modular-bus-nib-design.json"
+        raw = json.loads(fixture.read_text(encoding="utf-8"))
+        zone = max(
+            (
+                item for item in raw["zones"]
+                if item.get("net_name") == "/12Vout" and item.get("layer") == "F.Cu"
+            ),
+            key=lambda item: len(item["points"]),
+        )
+        polygon = _normalize_filled_zone_polygon([
+            (float(point[0]), float(point[1])) for point in zone["points"]
+        ])
+        triangles = _triangulate_polygon(polygon)
+        min_x, max_x = min(x for x, _ in polygon), max(x for x, _ in polygon)
+        min_y, max_y = min(y for _, y in polygon), max(y for _, y in polygon)
+        cell = 0.5
+        columns = ceil((max_x - min_x) / cell)
+        rows = ceil((max_y - min_y) / cell)
+        bounds = [
+            (
+                min_x + column * cell,
+                min_y + row * cell,
+                min(min_x + (column + 1) * cell, max_x),
+                min(min_y + (row + 1) * cell, max_y),
+            )
+            for row in range(rows)
+            for column in range(columns)
+        ]
+        baseline = [
+            _clip_polygon_to_rect_fragments(polygon, triangles, *item, 1e-4)
+            for item in bounds
+        ]
+        cache = _PolygonContainmentCache(polygon, 1e-4)
+        cached = [
+            _clip_polygon_to_rect_fragments(polygon, triangles, *item, 1e-4, cache)
+            for item in bounds
+        ]
+
+        self.assertEqual(cached, baseline)
+        self.assertGreater(sum(bool(item) for item in cached), 0)
+
+    def test_triangle_bounds_halo_preserves_near_cell_boundary_fragment(self):
+        tolerance = 1e-4
+        polygon = [
+            (-1, -1), (2, -1), (2, -0.6), (0, -0.6),
+            (0, 0.6), (2, 0.6), (2, 1), (-1, 1),
+        ]
+        triangles = _triangulate_polygon(polygon)
+        cell = (0.5 + tolerance / 2, -1.0, 1.5, 1.0)
+        triangle_bounds = [
+            (
+                min(x for x, _ in triangle),
+                min(y for _, y in triangle),
+                max(x for x, _ in triangle),
+                max(y for _, y in triangle),
+            )
+            for triangle in triangles
+        ]
+        baseline = _clip_polygon_to_rect_fragments(
+            polygon, triangles, *cell, tolerance
+        )
+        cache = _PolygonContainmentCache(polygon, tolerance)
+        cached = _clip_polygon_to_rect_fragments(
+            polygon,
+            triangles,
+            *cell,
+            tolerance,
+            cache,
+            triangle_bounds,
+        )
+
+        self.assertEqual(cached, baseline)
+        self.assertGreater(len(cached), 1)
 
     def test_drilled_pad_cells_are_annular_and_never_cross_the_hole(self):
         pad = {

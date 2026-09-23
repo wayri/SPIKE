@@ -7,7 +7,7 @@ import ctypes
 from math import atan2, ceil, cos, hypot, pi, radians, sin, sqrt
 import os
 import platform
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Callable, Dict, Iterable, List, Tuple
 
 from .contracts import AnalysisSpec, DesignIR, ValidationIssue
 from .dc_result_utils import stratified_sample_records
@@ -38,6 +38,10 @@ Point2D = Tuple[float, float]
 # much tighter than the cell-containment tolerance: it is only for recognising
 # a numerical jog introduced while tessellating an authoritative fill.
 ZONE_BOUNDARY_VALIDATION_TOLERANCE_MM = 1e-6
+# Per-zone containment memoization is transient while rasterizing one polygon.
+# The cap prevents pathological geometry from turning a speed optimization into
+# unbounded memory growth.
+MAX_ZONE_CONTAINMENT_CACHE_ENTRIES = 131_072
 
 
 def is_visualizable_physical_branch(branch: "MeshBranch") -> bool:
@@ -178,15 +182,30 @@ def _segment_inside_polygon(
 ) -> bool:
     """Return true only when every interval of a segment remains on copper."""
 
-    if not (
-        _point_in_polygon(start, polygon, tolerance)
-        and _point_in_polygon(end, polygon, tolerance)
-    ):
+    return _segment_inside_polygon_with_predicate(
+        start,
+        end,
+        _segments(polygon),
+        tolerance,
+        lambda point: _point_in_polygon(point, polygon, tolerance),
+    )
+
+
+def _segment_inside_polygon_with_predicate(
+    start: Point2D,
+    end: Point2D,
+    edges: Iterable[Tuple[Point2D, Point2D]],
+    tolerance: float,
+    point_inside: Callable[[Point2D], bool],
+) -> bool:
+    """Evaluate segment containment using reusable edges and point predicate."""
+
+    if not (point_inside(start) and point_inside(end)):
         return False
     dx, dy = end[0] - start[0], end[1] - start[1]
     denominator_scale = max(hypot(dx, dy), 1.0)
     parameters = [0.0, 1.0]
-    for a, b in _segments(polygon):
+    for a, b in edges:
         sx, sy = b[0] - a[0], b[1] - a[1]
         denominator = dx * sy - dy * sx
         ax, ay = a[0] - start[0], a[1] - start[1]
@@ -210,14 +229,55 @@ def _segment_inside_polygon(
             parameters.append(max(0.0, min(1.0, t)))
     ordered = sorted(set(round(value, 12) for value in parameters))
     return all(
-        _point_in_polygon(
-            (start[0] + dx * ((left + right) / 2), start[1] + dy * ((left + right) / 2)),
-            polygon,
-            tolerance,
-        )
+        point_inside((
+            start[0] + dx * ((left + right) / 2),
+            start[1] + dy * ((left + right) / 2),
+        ))
         for left, right in zip(ordered, ordered[1:])
         if right - left > 1e-12
     )
+
+
+class _PolygonContainmentCache:
+    """Bound repeated exact containment work for one immutable polygon."""
+
+    def __init__(
+        self,
+        polygon: List[Point2D],
+        tolerance: float,
+        maximum_entries: int = MAX_ZONE_CONTAINMENT_CACHE_ENTRIES,
+    ) -> None:
+        self.polygon = polygon
+        self.tolerance = tolerance
+        self.maximum_entries = max(1, int(maximum_entries))
+        self.edges = tuple(_segments(polygon))
+        self.point_results: Dict[Point2D, bool] = {}
+        self.segment_results: Dict[Tuple[Point2D, Point2D], bool] = {}
+
+    def point_inside(self, point: Point2D) -> bool:
+        cached = self.point_results.get(point)
+        if cached is not None:
+            return cached
+        result = _point_in_polygon(point, self.polygon, self.tolerance)
+        if len(self.point_results) < self.maximum_entries:
+            self.point_results[point] = result
+        return result
+
+    def segment_inside(self, start: Point2D, end: Point2D) -> bool:
+        key = (start, end) if start <= end else (end, start)
+        cached = self.segment_results.get(key)
+        if cached is not None:
+            return cached
+        result = _segment_inside_polygon_with_predicate(
+            start,
+            end,
+            self.edges,
+            self.tolerance,
+            self.point_inside,
+        )
+        if len(self.segment_results) < self.maximum_entries:
+            self.segment_results[key] = result
+        return result
 
 
 def _polygon_area(polygon: List[Point2D]) -> float:
@@ -439,6 +499,7 @@ def _polygon_is_contained_in(
     candidate: List[Point2D],
     source: List[Point2D],
     tolerance: float,
+    containment_cache: _PolygonContainmentCache | None = None,
 ) -> bool:
     """Return true only for a simple face wholly contained by source copper.
 
@@ -456,13 +517,24 @@ def _polygon_is_contained_in(
     if not triangles:
         return False
     for triangle in triangles:
-        if not _polygon_edges_inside(triangle, source, tolerance):
+        if containment_cache is None:
+            edges_inside = _polygon_edges_inside(triangle, source, tolerance)
+        else:
+            edges_inside = all(
+                containment_cache.segment_inside(start, end)
+                for start, end in _segments(triangle)
+            )
+        if not edges_inside:
             return False
         center = (
             sum(point[0] for point in triangle) / 3,
             sum(point[1] for point in triangle) / 3,
         )
-        if not _point_in_polygon(center, source, tolerance):
+        if not (
+            containment_cache.point_inside(center)
+            if containment_cache is not None
+            else _point_in_polygon(center, source, tolerance)
+        ):
             return False
     return True
 
@@ -488,22 +560,42 @@ def _clip_polygon_to_rect_fragments(
     x1: float,
     y1: float,
     tolerance: float,
+    containment_cache: _PolygonContainmentCache | None = None,
+    triangle_bounds: List[Tuple[float, float, float, float]] | None = None,
 ) -> List[List[Point2D]]:
     """Clip one cell while preserving disconnected concave copper fragments."""
 
     clipped = _clip_polygon_to_rect(polygon, x0, y0, x1, y1, tolerance)
     if len(clipped) < 3:
         return []
-    if _polygon_is_contained_in(clipped, polygon, tolerance):
+    if _polygon_is_contained_in(
+        clipped, polygon, tolerance, containment_cache
+    ):
         return [clipped]
 
     fragments: List[List[Point2D]] = []
-    for triangle in triangles:
+    for triangle_index, triangle in enumerate(triangles):
+        # A strict bounding-box rejection cannot remove a positive-area
+        # fragment. Touching boxes stay on the exact clipping path so cell
+        # order and boundary behavior remain unchanged.
+        if triangle_bounds is not None:
+            triangle_min_x, triangle_min_y, triangle_max_x, triangle_max_y = (
+                triangle_bounds[triangle_index]
+            )
+            if (
+                triangle_max_x < x0 - tolerance
+                or x1 + tolerance < triangle_min_x
+                or triangle_max_y < y0 - tolerance
+                or y1 + tolerance < triangle_min_y
+            ):
+                continue
         fragment = _clip_polygon_to_rect(triangle, x0, y0, x1, y1, tolerance)
         if (
             len(fragment) >= 3
             and _polygon_area(fragment) > 1e-12
-            and _polygon_is_contained_in(fragment, polygon, tolerance)
+            and _polygon_is_contained_in(
+                fragment, polygon, tolerance, containment_cache
+            )
         ):
             fragments.append(fragment)
     return fragments
@@ -1233,7 +1325,12 @@ class _Builder:
             ),
         )
 
-    def local_zone_node(self, region: Dict[str, Any], point: Point2D) -> int | None:
+    def local_zone_node(
+        self,
+        region: Dict[str, Any],
+        point: Point2D,
+        containment_cache: _PolygonContainmentCache | None = None,
+    ) -> int | None:
         """Find a nearby zone node without crossing a void or another island."""
 
         candidate = self.nearest_grid_node(
@@ -1248,12 +1345,18 @@ class _Builder:
         cell = float(region["cell_mm"])
         if distance > sqrt(2.0) * cell + self.node_tolerance:
             return None
-        if not _segment_inside_polygon(
-            point,
-            (node.x_mm, node.y_mm),
-            region["polygon"],
-            self.containment_tolerance,
-        ):
+        end = (node.x_mm, node.y_mm)
+        contained = (
+            containment_cache.segment_inside(point, end)
+            if containment_cache is not None
+            else _segment_inside_polygon(
+                point,
+                end,
+                region["polygon"],
+                self.containment_tolerance,
+            )
+        )
+        if not contained:
             return None
         return candidate
 
@@ -1556,6 +1659,19 @@ class _Builder:
             rows = max(1, int(ceil((max_y - min_y) / cell)))
             existing = list(self.nodes_by_layer_net.get((layer, net), []))
             triangles = _triangulate_polygon(polygon)
+            triangle_bounds = [
+                (
+                    min(x for x, _ in triangle),
+                    min(y for _, y in triangle),
+                    max(x for x, _ in triangle),
+                    max(y for _, y in triangle),
+                )
+                for triangle in triangles
+            ]
+            containment_cache = _PolygonContainmentCache(
+                polygon,
+                self.containment_tolerance,
+            )
             grid: Dict[Tuple[int, int], List[int]] = {}
             fragment_polygons: Dict[Tuple[int, int], List[List[Point2D]]] = {}
             z = self.layer_z.get(layer, 0.0)
@@ -1571,6 +1687,8 @@ class _Builder:
                         x1,
                         y1,
                         self.containment_tolerance,
+                        containment_cache,
+                        triangle_bounds,
                     )
                     for fragment_index, clipped in enumerate(fragments):
                         if _polygon_area(clipped) <= max(1e-12, cell * cell * 1e-10):
@@ -1616,11 +1734,9 @@ class _Builder:
                             continue
                         left_point = self.mesh.nodes[left_node]
                         right_point = self.mesh.nodes[current_nodes[right_index]]
-                        if not _segment_inside_polygon(
+                        if not containment_cache.segment_inside(
                             (left_point.x_mm, left_point.y_mm),
                             (right_point.x_mm, right_point.y_mm),
-                            polygon,
-                            self.containment_tolerance,
                         ):
                             continue
                         self.add_branch(
@@ -1647,11 +1763,9 @@ class _Builder:
                                 continue
                             current_point = self.mesh.nodes[current]
                             neighbor_point = self.mesh.nodes[neighbor]
-                            if not _segment_inside_polygon(
+                            if not containment_cache.segment_inside(
                                 (current_point.x_mm, current_point.y_mm),
                                 (neighbor_point.x_mm, neighbor_point.y_mm),
-                                polygon,
-                                self.containment_tolerance,
                             ):
                                 continue
                             self.add_branch(
@@ -1685,7 +1799,7 @@ class _Builder:
                 point = (node.x_mm, node.y_mm)
                 if not _point_in_polygon(point, polygon, self.containment_tolerance):
                     continue
-                nearest = self.local_zone_node(region, point)
+                nearest = self.local_zone_node(region, point, containment_cache)
                 if nearest is None:
                     self.warn_unresolved_zone_attachment(source_id)
                     continue
