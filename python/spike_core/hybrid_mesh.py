@@ -1828,6 +1828,12 @@ class _Builder:
 
     def pads(self) -> None:
         warned_shapes: set[str] = set()
+        # Zone coupling is owned by the evidence-gated pad_zone_attachment
+        # path below. A second full-pad-width link for each zone centroid
+        # inside the pad duplicates that contact and appears/disappears as
+        # the zone grid moves under refinement. Track/via nodes still use
+        # the generic attachment path.
+        zone_nodes = {node for region in self.zone_regions for node in region["nodes"]}
         for index, pad in enumerate(self.design.pads):
             net = _net(pad)
             if not net or (self.requested and net not in self.requested):
@@ -2166,6 +2172,8 @@ class _Builder:
                 if not pad_nodes:
                     continue
                 for node_id in existing:
+                    if node_id in zone_nodes:
+                        continue
                     node = self.mesh.nodes[node_id]
                     if node.layer != layer or node.net != net or not _point_in_pad((node.x_mm, node.y_mm), pad):
                         continue
