@@ -2385,6 +2385,8 @@ export default function App() {
     () => resultAtFrame(displayedResult ?? (resultRecords.length ? null : analysisResult), resultVisualization.animationFrame, frameFieldSelection),
     [analysisResult, displayedResult, resultRecords.length, resultVisualization.animationFrame, frameFieldSelection],
   );
+  const activePdnReview = resultVisualizerDomain === "pi" && activeAnalysisResult?.analysis_id
+    && activeAnalysisResult.analysis_id === analysisResult?.analysis_id ? pdnReview : null;
   const detachedProbeSnapshot = useMemo(() => buildDetachedProbeSnapshot(probes, activeAnalysisResult, probeFormulaRows, probeReferenceIds),
     [probes, activeAnalysisResult, probeFormulaRows, probeReferenceIds]);
   const detachedResultsSnapshot = useMemo(() => buildDetachedResultsSnapshot(activeAnalysisResult,
@@ -2436,7 +2438,7 @@ export default function App() {
   const detachTool = async (kind: ToolWindowKind) => {
     try {
       await openDetachedToolWindow(kind, kind === "probes" ? detachedProbeSnapshot : kind === "trace-plots"
-        ? buildDetachedTraceSnapshot(activeAnalysisResult, resultVisualizerDomain) : detachedResultsSnapshot,
+        ? buildDetachedTraceSnapshot(activeAnalysisResult, resultVisualizerDomain, activePdnReview) : detachedResultsSnapshot,
         action => detachedActionRef.current(action));
       setDetachedTools(current => ({ ...current, [kind]: true }));
       if (kind === "results") setResultVisualizerOpen(false);
@@ -2455,8 +2457,8 @@ export default function App() {
     if (detachedTools.results) void updateDetachedToolWindow("results", detachedResultsSnapshot).catch(error => setStatus(String(error)));
   }, [detachedTools.results, detachedResultsSnapshot]);
   useEffect(() => {
-    if (detachedTools["trace-plots"]) void updateDetachedToolWindow("trace-plots", buildDetachedTraceSnapshot(activeAnalysisResult, resultVisualizerDomain)).catch(error => setStatus(String(error)));
-  }, [detachedTools["trace-plots"], activeAnalysisResult, resultVisualizerDomain]);
+    if (detachedTools["trace-plots"]) void updateDetachedToolWindow("trace-plots", buildDetachedTraceSnapshot(activeAnalysisResult, resultVisualizerDomain, activePdnReview)).catch(error => setStatus(String(error)));
+  }, [detachedTools["trace-plots"], activeAnalysisResult, resultVisualizerDomain, activePdnReview]);
   useEffect(() => () => { void closeAllDetachedToolWindows(); }, []);
   const activeResultNets = useMemo(() => activeAnalysisResult ? [...new Set([
     ...Object.values(activeAnalysisResult.scalar_fields).flatMap(samples => samples.map(sample => sample.net).filter((net): net is string => Boolean(net))),
@@ -4001,7 +4003,7 @@ export default function App() {
     </div>}
     {tetraMeshOpen && <TetraMeshPanel onClose={() => setTetraMeshOpen(false)} onStatus={setStatus} />}
     {thermalOpen && <ThermalWizard initialScenario={thermalScenario} componentBonds={componentBonds} board={boardData} design={designForSolver()} workerAvailable={workerAvailable} onRequireAdmission={requireAssemblyAdmission} onClose={() => { setThermalOpen(false); setThermalPreview(null); }} onStatus={setStatus} onPreview={setThermalPreview} onScenario={scenario => { recordChange(); setThermalScenario(scenario); setThermalPreview(scenario); }} />}
-    {tracePlotsOpen && <div className="modal-shade"><div style={{ width: "min(1400px, 94vw)", height: "88vh", background: "#101c25", overflow: "auto" }}><TraceResultsWorkbench result={activeAnalysisResult} domain={resultVisualizerDomain}
+    {tracePlotsOpen && <div className="modal-shade"><div style={{ width: "min(1400px, 94vw)", height: "88vh", background: "#101c25", overflow: "auto" }}><TraceResultsWorkbench result={activeAnalysisResult} domain={resultVisualizerDomain} targetNet={activePdnReview?.net} targetOhm={activePdnReview?.target_ohm}
       onClose={() => setTracePlotsOpen(false)} onDetach={() => void detachTool("trace-plots")} /></div></div>}
     {resultVisualizerOpen && <ResultVisualizationPanel onTracePlots={() => setTracePlotsOpen(true)} onDetach={() => void detachTool("results")} domain={resultVisualizerDomain} board={boardData} selectedNet={selected?.net ?? piSetup.net ?? null} result={activeAnalysisResult} sourceResult={analysisResult} visualization={resultVisualization} workerAvailable={workerAvailable} parasiticsAvailable={solverSupports("partial_inductance", "frequency_dependent_impedance")} riskAvailable={solverSupports("coupled_line_extraction", "electric_field_coupling", "magnetic_field_coupling")} pdnReview={pdnReview} densityLimitAMm2={Number.isFinite(Number(limits.density)) && Number(limits.density) > 0 ? Number(limits.density) : null} onVisualization={setResultVisualization} onConfigure={() => { setResultVisualizerOpen(false); setDcRunOpen(true); }} onRunParasitics={runParasitics} onRunRisk={runSiRisk} onRunPdn={(target, candidate) => void runPdnReview(target, candidate)} onExportAnimation={() => void exportResultAnimation()} onClose={() => setResultVisualizerOpen(false)} />}
     <div hidden={!sparameterOpen}><SParameterWorkbench assemblyDesigns={assemblyDesigns} canonicalDesign={canonicalDesignIr} suite={selectedSiSuite} initialResult={siChannelResult} onClose={() => setSparameterOpen(false)} onStatus={setStatus} onResult={result => { recordChange(); setSiChannelResult(result); }} /></div>

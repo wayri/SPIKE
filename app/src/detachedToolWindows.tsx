@@ -260,7 +260,7 @@ export function DetachedToolContent({ snapshot, kind, onAction }: {
 }) {
   if (kind === "trace-plots") return <main className="detached-tool-root" data-detached-tool={kind}>
     <header className="detached-tool-header"><div><span className="detached-tool-eyebrow">SPIKE ENGINEERING RESULTS</span><h1>{snapshot?.title ?? "Trace graphs"}</h1><p>{snapshot?.trace?.notice ?? "Waiting for the workspace state..."}</p></div><button className="detached-tool-button detached-tool-button-primary" onClick={() => onAction({ type: "redock" })}>Return to workspace</button></header>
-    <section className="detached-tool-trace">{snapshot?.trace ? <Suspense fallback={<p className="detached-tool-empty">Loading trace graphs...</p>}><TraceResultsWorkbench result={snapshot.trace.result} domain={snapshot.trace.domain} /></Suspense> : <p className="detached-tool-empty">Waiting for the workspace state...</p>}</section>
+    <section className="detached-tool-trace">{snapshot?.trace ? <Suspense fallback={<p className="detached-tool-empty">Loading trace graphs...</p>}><TraceResultsWorkbench result={snapshot.trace.result} domain={snapshot.trace.domain} targetNet={snapshot.trace.targetNet} targetOhm={snapshot.trace.targetOhm} /></Suspense> : <p className="detached-tool-empty">Waiting for the workspace state...</p>}</section>
   </main>;
   const hasActions = Boolean(snapshot?.rowActions?.length || snapshot?.rows.some(row => row.actions?.length));
   return <main className="detached-tool-root" data-detached-tool={kind}>

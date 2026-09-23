@@ -38,6 +38,12 @@ assert.equal(resultTraceGroups(resultPlotFields(groupedResult,'pi')[0].samples).
 assert.deepEqual(resultPlotFields(groupedResult,'si'),[],'SI must not display PI-only quantities');
 const networks=[{net:'SIG',impedance:[{frequency_hz:1e6,magnitude_ohm:50,phase_deg:0},{frequency_hz:1e3,magnitude_ohm:49,phase_deg:1}]}];
 const ac=buildImpedancePlot(networks,'SIG'); assert.deepEqual(ac.data[0].x,[1e3,1e6]);assert.equal(ac.layout.xaxis.type,'log');
+const target=buildImpedancePlot(networks,'SIG',.05);
+assert.equal(target.shown,2,'target is a design threshold, not an extra solver sample');
+assert.deepEqual(target.data[1].x,[1e3,1e6]);
+assert.deepEqual(target.data[1].y,[.05,.05]);
+assert.equal(target.data[1].name,'PDN screening target');
+assert.equal(buildImpedancePlot(networks,'SIG',0).data.length,1,'invalid target is not displayed');
 assert.equal(networks[0].impedance[0].frequency_hz,1e6,'sorting preserves solver source');
 assert.equal(resultPlotFields({...groupedResult,parasitics:networks},'si')[0].key,'impedance_sweep');
 const partial = {...groupedResult, status:'completed', model_status:'approximate', parasitics:networks};

@@ -10,6 +10,8 @@ const MAX_VERTICES_PER_ITEM = 256;
 export type DetachedTracePayload = {
   domain: "pi" | "si";
   result: SolverResultBundle | null;
+  targetNet?: string;
+  targetOhm?: number;
   notice: string;
   shownSamples: number;
   totalSamples: number;
@@ -33,7 +35,7 @@ const mesh = (cell: MeshCell): MeshCell | null => {
   return vertices ? { ...cell, vertices_mm: vertices } : null;
 };
 
-export function buildDetachedTracePayload(result: SolverResultBundle | null, domain: "pi" | "si"): DetachedTracePayload {
+export function buildDetachedTracePayload(result: SolverResultBundle | null, domain: "pi" | "si", targetNet?: string, targetOhm?: number): DetachedTracePayload {
   if (!result) return { domain, result: null, notice: "No completed analysis result.", shownSamples: 0, totalSamples: 0 };
   const scalarEntries = Object.entries(result.scalar_fields) as Array<[keyof SolverResultBundle["scalar_fields"], ScalarSample[]]>;
   const vectorEntries = Object.entries(result.vector_fields) as Array<[keyof SolverResultBundle["vector_fields"], VectorSample[]]>;
@@ -88,14 +90,17 @@ export function buildDetachedTracePayload(result: SolverResultBundle | null, dom
   const notice = omitted || meshOmitted || shownImpedance < totalImpedance
     ? `Display-only payload: ${shownSamples} of ${totalSamples} field samples, ${boundedMesh.length} of ${result.mesh.length} mesh cells, and ${shownImpedance} of ${totalImpedance} impedance points. Export and saved results retain the authoritative full result.`
     : `Display-only payload contains all ${totalSamples} field samples, ${boundedMesh.length} mesh cells, and ${shownImpedance} impedance points.`;
-  return { domain, result: bounded, notice, shownSamples, totalSamples };
+  return { domain, result: bounded, notice, shownSamples, totalSamples,
+    ...(domain === "pi" && typeof targetNet === "string" && targetNet.length <= 256
+      && Number.isFinite(targetOhm) && Number(targetOhm) > 0
+      ? { targetNet, targetOhm } : {}) };
 }
 
 export function normalizeDetachedTracePayload(value: unknown): DetachedTracePayload | undefined {
   if (!value || typeof value !== "object") return undefined;
   const source = value as Partial<DetachedTracePayload>;
   if (source.domain !== "pi" && source.domain !== "si") return undefined;
-  const bounded = buildDetachedTracePayload(source.result ?? null, source.domain);
+  const bounded = buildDetachedTracePayload(source.result ?? null, source.domain, source.targetNet, source.targetOhm);
   if (typeof source.notice === "string") bounded.notice = source.notice.slice(0, 512);
   if (Number.isSafeInteger(source.totalSamples) && Number(source.totalSamples) >= bounded.shownSamples) bounded.totalSamples = Number(source.totalSamples);
   return bounded;

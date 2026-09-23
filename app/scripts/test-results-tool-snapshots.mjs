@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 
 const bundle = await build({ entryPoints: [fileURLToPath(new URL("../src/resultsToolSnapshots.ts", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node" });
 const snapshots = await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].contents).toString("base64")}`);
+const modelBundle = await build({ entryPoints: [fileURLToPath(new URL("../src/detachedToolWindowModel.ts", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node" });
+const model = await import(`data:text/javascript;base64,${Buffer.from(modelBundle.outputFiles[0].contents).toString("base64")}`);
 
 const result = {
   status: "completed", model_status: "validated", mode: "dc", summary: {}, analysis_id: "a", contract: "spike/v1",
@@ -49,4 +51,11 @@ const failedTrace = snapshots.buildDetachedTraceSnapshot({ ...result,
 assert.equal(failedTrace.trace.result.status, "completed", "do not rewrite source status in display transport");
 assert.deepEqual(failedTrace.trace.result.summary, { solved: false });
 assert.deepEqual(failedTrace.trace.result.provenance, { solved: false, failure_stage: "physical_inductance_admission" });
+const pdnTrace = snapshots.buildDetachedTraceSnapshot(result, "pi", { net: "VCC", target_ohm: .05 });
+assert.equal(pdnTrace.trace.targetNet, "VCC");
+assert.equal(pdnTrace.trace.targetOhm, .05);
+assert.equal(snapshots.buildDetachedTraceSnapshot(result, "si", { net: "VCC", target_ohm: .05 }).trace.targetOhm, undefined);
+const normalizedPdn = model.normalizeDetachedToolSnapshot(pdnTrace);
+assert.equal(normalizedPdn.trace.targetNet, "VCC", "the target net survives detached-window transport");
+assert.equal(normalizedPdn.trace.targetOhm, .05);
 console.log("results tool snapshots: opaque IDs, formulas, capability controls and analytics passed");

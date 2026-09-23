@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import { resultModeAvailable, type ResultViewMode, type ResultVisualization, type SolverResultBundle } from "./analysisResults";
+import { resultModeAvailable, type PdnReview, type ResultViewMode, type ResultVisualization, type SolverResultBundle } from "./analysisResults";
 import { DEFAULT_COPPER_FUSING_SETTINGS, buildResultEngineeringAnalytics } from "./resultAnalytics";
 import { buildProbeRows, evaluateProbeFormulas, type ProbeFormulaRow, type ProbeInput, type ProbeReferenceValues } from "./probeCalculations";
 import { encodeDetachedRowId, MAX_DETACHED_ROWS, type DetachedToolControl, type DetachedToolSnapshot } from "./detachedToolWindowModel";
@@ -125,8 +125,8 @@ export function buildDetachedResultsSnapshot(
   };
 }
 
-export function buildDetachedTraceSnapshot(result: SolverResultBundle | null, domain: "pi" | "si"): DetachedToolSnapshot {
-  const trace = buildDetachedTracePayload(result, domain);
+export function buildDetachedTraceSnapshot(result: SolverResultBundle | null, domain: "pi" | "si", pdnReview?: PdnReview | null): DetachedToolSnapshot {
+  const trace = buildDetachedTracePayload(result, domain, pdnReview?.net, pdnReview?.target_ohm);
   return {
     kind: "trace-plots", title: domain === "pi" ? "PI trace graphs" : "SI / HF trace graphs", revision: 0,
     status: trace.notice, columns: [], rows: [], trace, emptyMessage: "No trace result is available.",

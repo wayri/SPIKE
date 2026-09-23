@@ -135,15 +135,27 @@ export function buildTracePlot(samples: readonly ScalarSample[], options: {
   return { data, layout, shown: shown.length, total: filtered.length };
 }
 
-export function buildImpedancePlot(networks: ParasiticResult[], net: string): TracePlot {
+export function buildImpedancePlot(networks: ParasiticResult[], net: string, targetOhm?: number): TracePlot {
   let total = 0;
-  const data = networks.filter(network => network.net === net).map((network, index) => {
+  let minimumFrequency = Infinity;
+  let maximumFrequency = 0;
+  const data: Record<string, unknown>[] = networks.filter(network => network.net === net).map((network, index) => {
     const points = (network.impedance ?? []).filter(point => point.frequency_hz > 0 && Number.isFinite(point.frequency_hz) && Number.isFinite(point.magnitude_ohm)).sort((a, b) => a.frequency_hz - b.frequency_hz);
     total += points.length;
+    if (points.length) {
+      minimumFrequency = Math.min(minimumFrequency, points[0].frequency_hz);
+      maximumFrequency = Math.max(maximumFrequency, points[points.length - 1].frequency_hz);
+    }
     return { type: "scatter", mode: "lines+markers", name: escape(`${net} · ${index + 1}`), x: points.map(point => point.frequency_hz), y: points.map(point => point.magnitude_ohm),
       customdata: points.map(point => [point.resistance_ohm ?? null, point.reactance_ohm ?? null, point.phase_deg]),
       hovertemplate: "f=%{x:.6g} Hz<br>|Z|=%{y:.6g} ohm<br>R=%{customdata[0]:.6g} ohm<br>X=%{customdata[1]:.6g} ohm<br>Phase=%{customdata[2]:.6g} deg<extra></extra>" };
   });
+  if (Number.isFinite(targetOhm) && Number(targetOhm) > 0 && total) {
+    data.push({ type: "scatter", mode: "lines", name: "PDN screening target",
+      x: [minimumFrequency, maximumFrequency], y: [targetOhm!, targetOhm!],
+      line: { color: "#ffbf69", width: 2, dash: "dash" },
+      hovertemplate: "Target=%{y:.6g} ohm<extra></extra>" });
+  }
   return { data, shown: total, total, layout: { paper_bgcolor: "#14212b", plot_bgcolor: "#14212b", font: { color: "#dce8ee" }, margin: { l: 65, r: 25, t: 35, b: 60 },
     colorway: ["#49d4e8", "#ffbf69", "#81e6b2", "#c5a3ff"], xaxis: { type: "log", title: { text: "Frequency (Hz)" } }, yaxis: { title: { text: "Impedance magnitude (ohm)" } }, uirevision: net, hovermode: "closest" } };
 }

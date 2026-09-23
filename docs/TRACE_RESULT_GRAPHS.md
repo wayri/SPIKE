@@ -13,6 +13,9 @@ Only the active graph is mounted. The window can be detached for another screen.
   invent path distance or connect samples into an inferred electrical route.
 - Impedance sweeps use frequency in Hz and magnitude in ohms. A network sweep
   does not become a spatial field merely because the board is visible.
+  A completed PI PDN review supplies a dashed target line on its exact reviewed
+  net in both docked and detached graphs; changing the active analysis removes
+  that line. The target is a design limit, not another solver sample.
 
 Trace ownership uses returned source identifiers, or an exact mesh element to
 source mapping with matching net and layer. Where that mapping is absent, the
