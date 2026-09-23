@@ -101,6 +101,19 @@ else()
     target_compile_options(spike_peec_volume_matrix PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
 endif()
 
+# Isolated affine-prism verification kernel. It is not wired into the board
+# extractor until touching bases, contacts, and mixed annular terms are solved.
+add_library(spike_peec_affine_triangle STATIC
+    src/peec/affine_triangle_basis.cpp)
+target_include_directories(spike_peec_affine_triangle PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
+if(MSVC)
+    target_compile_options(spike_peec_affine_triangle PRIVATE /W4 /WX /fp:strict)
+else()
+    target_compile_options(spike_peec_affine_triangle PRIVATE
+        -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+endif()
+
 # Strict typed geometry admission only. Keep this target independent of Eigen,
 # OpenMP, PEEC solver APIs, and legacy fast-math/ISA flags.
 add_library(spike_transition_handoff STATIC
@@ -284,6 +297,10 @@ if(BUILD_TESTING)
     add_executable(test_annular_inductance tests/test_annular_inductance.cpp)
     target_link_libraries(test_annular_inductance PRIVATE spike_peec_volume_matrix)
     add_test(NAME test_annular_inductance COMMAND test_annular_inductance)
+
+    add_executable(test_affine_triangle_basis tests/test_affine_triangle_basis.cpp)
+    target_link_libraries(test_affine_triangle_basis PRIVATE spike_peec_affine_triangle)
+    add_test(NAME test_affine_triangle_basis COMMAND test_affine_triangle_basis)
 
     add_executable(test_via_transition_mesh_input
         tests/test_via_transition_mesh_input.cpp)

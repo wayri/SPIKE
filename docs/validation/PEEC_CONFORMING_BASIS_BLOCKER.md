@@ -6,6 +6,25 @@ Date: 2026-09-24. Diagnostic evidence; no corrected AC extraction or release
 qualification. The current branch geometry cannot express the conforming
 boundary/contact correction. `hybrid_mesh.py` is deliberately unchanged.
 
+## Isolated affine-prism verification kernel
+
+`src/peec/affine_triangle_basis.hpp/.cpp` now implements exact local affine
+current moments and same-prism resistance, plus a bounded mutual-inductance
+integral for **strictly separated** triangular prisms. It is deliberately not
+connected to the board extractor or Python binding. The manufactured shared-face
+unit-flux pair gives `0.0001642036124794745 ohm`, matching its analytic
+resistance. An independent six-dimensional reference also agrees with a
+separated mutual result (`5.55826e-10 H` versus `5.55794e-10 H`, reported
+estimate `1.61853e-11 H`). The estimate includes a floating-point roundoff
+indicator; it is not a certified interval bound.
+
+`test_affine_triangle_basis` is registered as an isolated CTest target. It
+passes strict MSVC and GCC builds. Touching/self prism inductance, overlapping
+supports, annular cross terms, composite basis assembly, terminal/via contact
+stamping, and board convergence are still unsupported. The current public
+Marble AC run remains ineligible under the copper-support gate; this kernel
+does not change that status.
+
 ## Reproduced geometry and contact evidence
 
 Run from the repository root with the qualification interpreter, NumPy and
