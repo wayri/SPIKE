@@ -48,6 +48,7 @@ import {
 } from "./viewportScenePolicy";
 import { KeyedResourcePool, partitionComponentProxies, takeWithinCostBudget, throughHoleComponentRefs } from "./viewportPerformance";
 import { buildProceduralComponentInstances, updateProceduralComponentInstances, type PlaceholderInstance } from "./proceduralComponentInstances";
+import { deriveComponentPlaceholder } from "./componentPlaceholder";
 import {
   buildBoundsSpatialIndex, nearbyPointCandidates, nearestPointSample, pointSpatialIndex,
   rayBoundsCandidates, type BoundsSpatialIndex, type SpatialBounds,
@@ -791,15 +792,15 @@ function padPath(pad: ParsedPad, scale: number): THREE.Shape {
   return shape;
 }
 
-function componentAppearance(component: ParsedComponent): { color: number; height: number; inset: number } {
+function componentAppearance(component: ParsedComponent): { color: number; inset: number } {
   const prefix = component.ref[0]?.toUpperCase();
-  if (prefix === "C") return { color: 0xb8a77d, height: 1.15, inset: 0.35 };
-  if (prefix === "R") return { color: 0x30383b, height: 1.0, inset: 0.35 };
-  if (prefix === "L") return { color: 0x252d30, height: 2.6, inset: 0.18 };
-  if (prefix === "J" || prefix === "P") return { color: 0x273d43, height: 4.2, inset: 0.12 };
-  if (prefix === "D") return { color: 0x343b3d, height: 1.3, inset: 0.28 };
-  if (prefix === "Q") return { color: 0x252b2e, height: 1.8, inset: 0.22 };
-  return { color: 0x242b2f, height: 2.1, inset: 0.2 };
+  if (prefix === "C") return { color: 0xb8a77d, inset: 0.35 };
+  if (prefix === "R") return { color: 0x30383b, inset: 0.35 };
+  if (prefix === "L") return { color: 0x252d30, inset: 0.18 };
+  if (prefix === "J" || prefix === "P") return { color: 0x273d43, inset: 0.12 };
+  if (prefix === "D") return { color: 0x343b3d, inset: 0.28 };
+  if (prefix === "Q") return { color: 0x252b2e, inset: 0.22 };
+  return { color: 0x242b2f, inset: 0.2 };
 }
 
 function boardThicknessMm(board: ParsedBoard): number {
@@ -2139,6 +2140,12 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     const boardSurface = boardThickness / 2;
     const copperClearance = Math.max(0.004 * scale, 0.012);
     const throughHoleRefs = throughHoleComponentRefs(activeBoard.pads);
+    const componentPads = new Map<string, ParsedPad[]>();
+    activeBoard.pads.forEach((pad) => {
+      if (!pad.ref) return;
+      const grouped = componentPads.get(pad.ref);
+      if (grouped) grouped.push(pad); else componentPads.set(pad.ref, [pad]);
+    });
     const boardFeatureCount = activeBoard.tracks.length + activeBoard.zones.length + activeBoard.pads.length + activeBoard.vias.length;
     const proceduralLod = boardFeatureCount > 40_000;
     // Reduce curve tessellation on dense boards, never omit electrical objects.
@@ -2472,36 +2479,43 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         model: true,
         mount,
       };
-      const position = world(component.at);
       const bottom = component.layer.startsWith("B.") || activeBoard.layers.length > 1 && component.layer === activeBoard.layers[activeBoard.layers.length - 1];
       const side: 1 | -1 = bottom ? -1 : 1;
       const appearance = componentAppearance(component);
-      const width = Math.max(component.width * scale * (1 - appearance.inset), 1e-6);
-      const height = Math.max(component.height * scale * (1 - appearance.inset), 1e-6);
-      const bodyHeight = Math.max(appearance.height * scale, 1e-6);
+      const dimensions = deriveComponentPlaceholder(component, componentPads.get(component.ref) ?? [], mount);
+      const inset = dimensions.planarSource === "body" || dimensions.planarSource === "courtyard" ? 0 : appearance.inset;
+      const width = Math.max(dimensions.widthMm * scale * (1 - inset), 1e-6);
+      const height = Math.max(dimensions.depthMm * scale * (1 - inset), 1e-6);
+      const bodyHeight = Math.max(dimensions.heightMm * scale, 1e-6);
+      const localAngle = -component.rotation * Math.PI / 180;
+      const offset = dimensions.centerOffsetMm;
+      const center = world([
+        component.at[0] + offset[0] * Math.cos(localAngle) - offset[1] * Math.sin(localAngle),
+        component.at[1] + offset[0] * Math.sin(localAngle) + offset[1] * Math.cos(localAngle),
+      ]);
       const bodyZ = bottom ? -boardSurface - bodyHeight / 2 : boardSurface + bodyHeight / 2;
       placeholderInstances.push({ id: component.id, ref: component.ref, layer: component.layer, mount, side, kind: "body", color: appearance.color,
-        position: new THREE.Vector3(position.x, position.y, bodyZ), rotationZ: component.rotation * Math.PI / 180, scale: new THREE.Vector3(width, height, bodyHeight) });
+        position: new THREE.Vector3(center.x, center.y, bodyZ), rotationZ: component.rotation * Math.PI / 180, scale: new THREE.Vector3(width, height, bodyHeight) });
       if (/^[CR]/i.test(component.ref)) {
         const capWidth = Math.max(width * 0.14, 1e-6);
         for (const capSide of [-1, 1]) {
           const offset = new THREE.Vector2(capSide * (width / 2 - capWidth / 2), 0).rotateAround(new THREE.Vector2(), component.rotation * Math.PI / 180);
           placeholderInstances.push({ id: component.id, ref: component.ref, layer: component.layer, mount, side, kind: "cap", color: 0xb7b8b4,
-            position: new THREE.Vector3(position.x + offset.x, position.y + offset.y, bodyZ), rotationZ: component.rotation * Math.PI / 180, scale: new THREE.Vector3(capWidth, height * 1.02, bodyHeight * 0.72) });
+            position: new THREE.Vector3(center.x + offset.x, center.y + offset.y, bodyZ), rotationZ: component.rotation * Math.PI / 180, scale: new THREE.Vector3(capWidth, height * 1.02, bodyHeight * 0.72) });
         }
       } else if (/^[UQ]/i.test(component.ref)) {
         const offset = new THREE.Vector2(-width * 0.3, height * 0.3).rotateAround(new THREE.Vector2(), component.rotation * Math.PI / 180);
         const radius = Math.min(width, height) * 0.055;
         placeholderInstances.push({ id: component.id, ref: component.ref, layer: component.layer, mount, side, kind: "marker", color: 0xc7c4b8,
-          position: new THREE.Vector3(position.x + offset.x, position.y + offset.y, bottom ? bodyZ - bodyHeight / 2 - 0.04 : bodyZ + bodyHeight / 2 + 0.04),
+          position: new THREE.Vector3(center.x + offset.x, center.y + offset.y, bottom ? bodyZ - bodyHeight / 2 - 0.04 : bodyZ + bodyHeight / 2 + 0.04),
           rotationZ: component.rotation * Math.PI / 180, scale: new THREE.Vector3(radius, radius, 0.05 * scale) });
       }
       {
         const componentPick = new THREE.Mesh(
-          new THREE.BoxGeometry(Math.max(component.width * scale, 1.2), Math.max(component.height * scale, 1.2), 3),
+          new THREE.BoxGeometry(Math.max(dimensions.widthMm * scale, 1.2), Math.max(dimensions.depthMm * scale, 1.2), Math.max(bodyHeight, 3)),
           new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, colorWrite: false }),
         );
-        componentPick.position.set(position.x, position.y, 0);
+        componentPick.position.set(center.x, center.y, 0);
         componentPick.position.z = (component.layer.startsWith("B.") || activeBoard.layers.length > 1 && component.layer === activeBoard.layers[activeBoard.layers.length - 1]) ? -boardSurface - 1 : boardSurface + 1;
         componentPick.rotation.z = component.rotation * Math.PI / 180;
         componentPick.userData = { ...data, pickPriority: 6, basePositionZ: componentPick.position.z, pickingProxy: true };

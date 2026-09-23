@@ -54,4 +54,18 @@ assert.equal(
   true,
   "semantic copper layers must not be capped by numeric ID",
 );
+
+const footprintMetadata = parser.parseKicadBoard(`(kicad_pcb
+  (version 20241229)
+  (layers (0 "F.Cu" signal) (31 "B.Cu" signal) (36 "B.SilkS" user) (37 "F.SilkS" user)
+    (44 "Edge.Cuts" user) (48 "B.Fab" user) (49 "F.Fab" user) (46 "B.CrtYd" user) (47 "F.CrtYd" user))
+  (footprint "Package_SO:TSSOP-8" (layer "F.Cu") (at 20 30 90)
+    (property "Reference" "U1")
+    (property "Value" "TEST_IC")
+    (fp_rect (start -2 -1.5) (end 2 1.5) (stroke (width 0.1) (type default)) (fill none) (layer "F.Fab"))
+    (fp_rect (start -2.4 -1.9) (end 2.4 1.9) (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd"))
+    (pad "1" smd rect (at -2.7 -1) (size 1.4 0.6) (layers "F.Cu" "F.Paste" "F.Mask"))
+    (pad "2" smd rect (at 2.7 1) (size 1.4 0.6) (layers "F.Cu" "F.Paste" "F.Mask"))))`);
+assert.deepEqual(footprintMetadata.components[0].bodyBounds, { minX: -2, minY: -1.5, maxX: 2, maxY: 1.5 });
+assert.deepEqual(footprintMetadata.components[0].courtyardBounds, { minX: -2.4, minY: -1.9, maxX: 2.4, maxY: 1.9 });
 console.log(`boardParser high-layer regression passed: ${parsed.layers.length} copper / ${parsed.layerDefinitions.length} total layers`);

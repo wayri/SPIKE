@@ -20,6 +20,7 @@
     "test:workspace-issues": "node scripts/test-workspace-issues.mjs",
     "test:solver-readiness": "node scripts/test-solver-readiness-label.mjs",
     "test:viewport": "node scripts/test-viewport-scene-policy.mjs",
+    "test:component-placeholders": "node scripts/test-component-placeholder.mjs",
     "test:viewport-focus": "node scripts/test-viewport-focus.mjs",
     "test:viewport-context": "node scripts/test-viewport-context.mjs",
     "test:navigator": "node scripts/test-scene-navigator.mjs",

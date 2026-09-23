@@ -33,6 +33,9 @@ export type ParsedComponent = {
   modelOffset: [number, number, number];
   modelScale: [number, number, number];
   modelRotation: [number, number, number];
+  bodyBounds?: { minX: number; minY: number; maxX: number; maxY: number };
+  courtyardBounds?: { minX: number; minY: number; maxX: number; maxY: number };
+  properties?: readonly { name?: unknown; values?: readonly unknown[] }[];
 };
 export type ParsedZone = { id: string; points: Point[]; holes?: Point[][]; layer: string; net?: string };
 export type ParsedDrawing = {
@@ -534,6 +537,8 @@ export function parseKicadBoard(source: string): ParsedBoard {
         || "";
       const componentPads: ParsedPad[] = [];
       const localPadPoints: Point[] = [];
+      const bodyPoints: Point[] = [];
+      const courtyardPoints: Point[] = [];
 
       children(item, "pad").forEach((padNode, index) => {
         const localAt = pointAt(padNode, "at") ?? [0, 0];
@@ -568,6 +573,9 @@ export function parseKicadBoard(source: string): ParsedBoard {
 
       for (const graphicType of ["fp_line", "fp_arc", "fp_circle", "fp_rect", "fp_poly"]) {
         children(item, graphicType).forEach((graphic, index) => {
+          const localDrawing = drawingFromNode(graphic, `${reference}:${graphicType}:${index}:local`, undefined, reference);
+          if (localDrawing?.layer.endsWith(".Fab")) bodyPoints.push(...localDrawing.points);
+          if (localDrawing?.layer.endsWith(".CrtYd")) courtyardPoints.push(...localDrawing.points);
           const drawing = drawingFromNode(graphic, `${reference}:${graphicType}:${index}`, transform, reference);
           if (drawing) drawings.push(drawing);
         });
@@ -593,6 +601,8 @@ export function parseKicadBoard(source: string): ParsedBoard {
         modelOffset: xyzAt(modelNode, "offset", [0, 0, 0]),
         modelScale: xyzAt(modelNode, "scale", [1, 1, 1]),
         modelRotation: xyzAt(modelNode, "rotate", [0, 0, 0]),
+        bodyBounds: bodyPoints.length ? boundsOf(bodyPoints) : undefined,
+        courtyardBounds: courtyardPoints.length ? boundsOf(courtyardPoints) : undefined,
       });
       layers.add(layer === "B.Cu" ? "B.Cu" : "F.Cu");
     }
