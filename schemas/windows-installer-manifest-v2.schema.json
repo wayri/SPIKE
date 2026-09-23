@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/windows-installer-manifest-v2.schema.json",
+  "title": "SPIKE Windows Installer Manifest v2",
+  "description": "Post-signing inventory for a non-qualified Windows production candidate.",
+  "type": "object",
+  "required": ["contract", "product", "version", "application_version", "channel", "release_state", "license_key_id", "production_qualified", "generated_at", "signing_policy", "files"],
+  "properties": {
+    "contract": {"const": "spike/windows-installer-manifest/v2"},
+    "product": {"const": "SPIKE"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "application_version": {"type": "string", "minLength": 1},
+    "channel": {"const": "production-candidate"},
+    "release_state": {"const": "production-candidate"},
+    "license_key_id": {"type": "string", "minLength": 1},
+    "production_qualified": {"const": false},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "signing_policy": {"$ref": "#/$defs/signing_policy"},
+    "files": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {"$ref": "#/$defs/artifact"},
+      "allOf": [
+        {"contains": {"properties": {"kind": {"const": "msi"}}, "required": ["kind"]}},
+        {"contains": {"properties": {"kind": {"const": "nsis"}}, "required": ["kind"]}}
+      ]
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "thumbprint": {"type": "string", "pattern": "^[0-9A-F]{40}$"},
+    "signing_policy": {
+      "type": "object",
+      "required": ["required", "expected_signer_thumbprint", "digest_algorithm", "timestamp_required", "timestamp_protocol"],
+      "properties": {
+        "required": {"const": true},
+        "expected_signer_thumbprint": {"$ref": "#/$defs/thumbprint"},
+        "digest_algorithm": {"const": "sha256"},
+        "timestamp_required": {"const": true},
+        "timestamp_protocol": {"const": "rfc3161"}
+      },
+      "additionalProperties": false
+    },
+    "authenticode": {
+      "type": "object",
+      "required": ["status", "file_digest_algorithm", "signer_thumbprint", "timestamp_protocol", "timestamp_authority_thumbprint"],
+      "properties": {
+        "status": {"const": "Valid"},
+        "file_digest_algorithm": {"const": "sha256"},
+        "signer_thumbprint": {"$ref": "#/$defs/thumbprint"},
+        "signer_subject": {"type": "string"},
+        "timestamp_protocol": {"const": "rfc3161"},
+        "timestamp_authority_thumbprint": {"$ref": "#/$defs/thumbprint"},
+        "timestamp_authority_subject": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "artifact": {
+      "type": "object",
+      "required": ["file", "kind", "size", "sha256", "authenticode"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1, "pattern": "^(?!.*[\\\\/:])(?!.*\\.\\.).+$"},
+        "kind": {"enum": ["msi", "nsis"]},
+        "size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "authenticode": {"$ref": "#/$defs/authenticode"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

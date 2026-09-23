@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/thermal-relief-observed-topology-v1.schema.json",
+  "title": "SPIKE controlled thermal-relief observed topology v1",
+  "description": "Bounded, digest-bound evidence for the controlled four-cardinal source-fill fixture only. It does not claim general KiCad spoke extraction, regenerated topology, refill, native overlay, mesh, physics, or solver readiness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "records", "accounting", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/thermal-relief-observed-topology/v1"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["design_contract", "design_sha256", "design_id", "connection_contract", "connection_sha256", "boundary_contact_contract", "boundary_contact_sha256"],
+      "properties": {
+        "design_contract": {"const": "spike/design-ir/v2"}, "design_sha256": {"$ref": "#/$defs/digest"}, "design_id": {"$ref": "#/$defs/id"},
+        "connection_contract": {"const": "spike/zone-pad-connection-evidence/v1"}, "connection_sha256": {"$ref": "#/$defs/digest"},
+        "boundary_contact_contract": {"const": "spike/thermal-relief-boundary-contact-evidence/v1"}, "boundary_contact_sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "records": {"type": "array", "maxItems": 65536, "items": {"$ref": "#/$defs/record"}},
+    "accounting": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "topology_record_count", "attachment_count", "all_controlled_candidates_accounted"],
+      "properties": {
+        "status": {"enum": ["complete", "no_candidates"]},
+        "topology_record_count": {"type": "integer", "minimum": 0, "maximum": 65536},
+        "attachment_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "all_controlled_candidates_accounted": {"const": true}
+      }
+    },
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_records", "maximum_attachments", "maximum_component_vertices", "maximum_cross_sections", "maximum_work_steps", "maximum_serialized_bytes", "actual_records", "actual_attachments", "actual_cross_sections", "actual_work_steps", "actual_serialized_bytes", "cancellation_supported"],
+      "properties": {
+        "maximum_records": {"const": 65536}, "maximum_attachments": {"const": 262144}, "maximum_component_vertices": {"const": 4096}, "maximum_cross_sections": {"const": 1048576}, "maximum_work_steps": {"const": 16777216}, "maximum_serialized_bytes": {"const": 67108864},
+        "actual_records": {"type": "integer", "minimum": 0, "maximum": 65536}, "actual_attachments": {"type": "integer", "minimum": 0, "maximum": 262144}, "actual_cross_sections": {"type": "integer", "minimum": 0, "maximum": 1048576}, "actual_work_steps": {"type": "integer", "minimum": 0, "maximum": 16777216}, "actual_serialized_bytes": {"type": "integer", "minimum": 1, "maximum": 67108864}, "cancellation_supported": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "controlled_fixture_observed_spoke_topology", "general_kicad_thermal_spoke_topology_extracted", "thermal_spoke_topology_regenerated", "parametric_zone_refill_performed", "native_geometric_overlay_verified", "mesh_ready", "field_convergence_performed", "physics_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "controlled_source_fill_observed_spoke_topology_only"}, "controlled_fixture_observed_spoke_topology": {"type": "boolean"},
+        "general_kicad_thermal_spoke_topology_extracted": {"const": false}, "thermal_spoke_topology_regenerated": {"const": false}, "parametric_zone_refill_performed": {"const": false}, "native_geometric_overlay_verified": {"const": false}, "mesh_ready": {"const": false}, "field_convergence_performed": {"const": false}, "physics_ready": {"const": false}, "solver_ready": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"accounting": {"properties": {"status": {"const": "complete"}}, "required": ["status"]}}, "required": ["accounting"]},
+      "then": {"properties": {"accounting": {"properties": {"topology_record_count": {"minimum": 1}, "attachment_count": {"minimum": 4}}}, "qualification": {"properties": {"controlled_fixture_observed_spoke_topology": {"const": true}}}}}
+    },
+    {
+      "if": {"properties": {"accounting": {"properties": {"status": {"const": "no_candidates"}}, "required": ["status"]}}, "required": ["accounting"]},
+      "then": {"properties": {"accounting": {"properties": {"topology_record_count": {"const": 0}, "attachment_count": {"const": 0}}}, "resources": {"properties": {"actual_records": {"const": 0}, "actual_attachments": {"const": 0}, "actual_cross_sections": {"const": 0}}}, "qualification": {"properties": {"controlled_fixture_observed_spoke_topology": {"const": false}}}}}
+    }
+  ],
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "point": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}], "minItems": 2, "maxItems": 2},
+    "crossSection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["offset_mm", "start_tangent_mm", "end_tangent_mm", "width_mm"],
+      "properties": {"offset_mm": {"type": "number", "minimum": 0}, "start_tangent_mm": {"type": "number"}, "end_tangent_mm": {"type": "number"}, "width_mm": {"type": "number", "exclusiveMinimum": 0}}
+    },
+    "attachment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["attachment_id", "zone_id", "filled_copper_id", "source_fill_component_sha256", "pad_edge_index", "boundary_start_fraction", "boundary_end_fraction", "boundary_center_mm", "outward_unit", "observed_normal_angle_deg", "configured_angle_delta_deg", "observed_boundary_width_mm", "width_delta_mm", "centerline_start_mm", "centerline_end_mm", "cross_sections", "topology_state"],
+      "properties": {
+        "attachment_id": {"$ref": "#/$defs/digest"}, "zone_id": {"$ref": "#/$defs/id"}, "filled_copper_id": {"$ref": "#/$defs/id"}, "source_fill_component_sha256": {"$ref": "#/$defs/digest"}, "pad_edge_index": {"type": "integer", "minimum": 0},
+        "boundary_start_fraction": {"type": "number", "minimum": 0, "maximum": 1}, "boundary_end_fraction": {"type": "number", "minimum": 0, "maximum": 1}, "boundary_center_mm": {"$ref": "#/$defs/point"}, "outward_unit": {"$ref": "#/$defs/point"},
+        "observed_normal_angle_deg": {"type": "number"}, "configured_angle_delta_deg": {"type": "number", "minimum": 0}, "observed_boundary_width_mm": {"type": "number", "exclusiveMinimum": 0}, "width_delta_mm": {"type": "number"}, "centerline_start_mm": {"$ref": "#/$defs/point"}, "centerline_end_mm": {"$ref": "#/$defs/point"},
+        "cross_sections": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/crossSection"}}, "topology_state": {"const": "fixture_conforming_spoke_shaped_attachment"}
+      }
+    },
+    "record": {
+      "type": "object", "additionalProperties": false,
+      "required": ["topology_id", "profile", "pad_id", "component_id", "source_zone_id", "layer_id", "net_id", "source_fill_group_id", "source_fill_group_sha256", "source_fill_component_count", "effective_gap_mm", "effective_width_mm", "configured_angle_deg", "attachment_count", "attachments", "observation"],
+      "properties": {
+        "topology_id": {"$ref": "#/$defs/digest"}, "profile": {"const": "four_cardinal_rectilinear_reservoir_v1"}, "pad_id": {"$ref": "#/$defs/id"}, "component_id": {"type": "string", "maxLength": 512}, "source_zone_id": {"$ref": "#/$defs/id"}, "layer_id": {"$ref": "#/$defs/id"}, "net_id": {"$ref": "#/$defs/id"}, "source_fill_group_id": {"$ref": "#/$defs/id"}, "source_fill_group_sha256": {"$ref": "#/$defs/digest"},
+        "source_fill_component_count": {"const": 4}, "effective_gap_mm": {"type": "number", "exclusiveMinimum": 0}, "effective_width_mm": {"type": "number", "exclusiveMinimum": 0}, "configured_angle_deg": {"type": "number"}, "attachment_count": {"const": 4}, "attachments": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/attachment"}}, "observation": {"const": "controlled_fixture_topology_matched"}
+      }
+    }
+  }
+}

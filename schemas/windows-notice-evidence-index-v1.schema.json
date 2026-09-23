@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/windows-notice-evidence-index-v1.schema.json",
+  "title": "SPIKE Windows Notice Evidence Index v1",
+  "description": "Bounded candidate notice evidence. It grants no completeness, approval, or redistribution claim.",
+  "type": "object",
+  "required": ["contract", "platform", "production_qualified", "inventory_sha256", "components", "summary"],
+  "properties": {
+    "contract": {"const": "spike/windows-notice-evidence-index/v1"},
+    "platform": {"const": "windows-x64"},
+    "production_qualified": {"const": false},
+    "inventory_sha256": {"$ref": "#/$defs/sha256"},
+    "components": {"type": "array", "items": {"$ref": "#/$defs/component"}},
+    "summary": {"$ref": "#/$defs/summary"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "candidate": {"type": "object", "required": ["source_locator", "relative_path", "sha256", "size", "source_kind", "evidence_path"], "properties": {"source_locator": {"type": "string", "pattern": "^(?:cargo-cache|build-wheel-dir|runtime-wheel-dir|npm-root)/(?!(?:.*(?:^|/)\\.\\.(?:/|$)))(?!.*[\\\\:]).+$"}, "relative_path": {"type": "string", "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$)).+$"}, "sha256": {"$ref": "#/$defs/sha256"}, "size": {"type": "integer", "minimum": 0, "maximum": 4194304}, "source_kind": {"enum": ["cargo-crate", "python-wheel", "npm-installed-tree-candidate-non-authoritative"]}, "evidence_path": {"type": "string", "pattern": "^windows-notice-evidence/[0-9a-f]{64}$"}}, "additionalProperties": false},
+    "component": {"type": "object", "required": ["purl", "identity_sha256", "ecosystem", "scope", "candidates", "missing"], "properties": {"purl": {"type": "string", "pattern": "^pkg:"}, "identity_sha256": {"$ref": "#/$defs/sha256"}, "ecosystem": {"enum": ["npm", "python", "rust"]}, "scope": {"enum": ["bundled", "build-only"]}, "candidates": {"type": "array", "items": {"$ref": "#/$defs/candidate"}}, "missing": {"type": "boolean"}}, "additionalProperties": false},
+    "summary": {"type": "object", "required": ["components", "candidates", "missing_components", "by_ecosystem_scope"], "properties": {"components": {"type": "integer", "minimum": 0}, "candidates": {"type": "integer", "minimum": 0}, "missing_components": {"type": "integer", "minimum": 0}, "by_ecosystem_scope": {"type": "object", "additionalProperties": {"type": "object", "required": ["components", "candidates", "missing_components"], "properties": {"components": {"type": "integer", "minimum": 0}, "candidates": {"type": "integer", "minimum": 0}, "missing_components": {"type": "integer", "minimum": 0}}, "additionalProperties": false}}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

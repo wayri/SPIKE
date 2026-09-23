@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SPIKE",
+  "version": "0.2.12",
+  "identifier": "org.spike.integrity",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [{
+      "label": "main",
+      "title": "SPIKE | Electronic Systems Integrity Workbench",
+      "width": 1440,
+      "height": 920,
+      "minWidth": 900,
+      "minHeight": 620,
+      "resizable": true,
+      "center": true,
+      "decorations": true,
+      "shadow": true,
+      "backgroundColor": "#101820",
+      "dragDropEnabled": true
+    }],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' blob: ipc: http://ipc.localhost; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "useLocalToolsDir": true,
+    "category": "DeveloperTool",
+    "icon": ["icons/icon.png", "icons/icon.ico"],
+    "licenseFile": "../../licenses/SPIKE-PREVIEW-NOTICE.md",
+    "shortDescription": "Electronic systems integrity analysis workbench",
+    "longDescription": "Offline-first electronic systems integrity workbench for PCB power integrity, signal integrity, thermal, and EMI workflows.",
+    "fileAssociations": [{
+      "ext": ["spike"],
+      "name": "SPIKE Project",
+      "description": "SPIKE project package",
+      "role": "Editor",
+      "mimeType": "application/x-spike-project"
+    }],
+    "resources": {
+      "../../dependencies.lock.json": "dependencies.lock.json",
+      "../../python/core": "python/core",
+      "../../python/spike_core": "python/spike_core",
+      "../../extensions": "extensions",
+      "../../LICENSE": "legal/LICENSE",
+      "../../LICENSING.md": "legal/LICENSING.md",
+      "../../THIRD_PARTY_NOTICES.md": "legal/THIRD_PARTY_NOTICES.md",
+      "../../licenses/SPIKE-PREVIEW-NOTICE.md": "legal/SPIKE-PREVIEW-NOTICE.md",
+      "../../licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md": "legal/SPIKE-COMMERCIAL-EULA-DRAFT.md",
+      "../../docs/ERROR_CODE_CATALOG.md": "docs/ERROR_CODE_CATALOG.md",
+      "../../TROUBLESHOOTING.md": "docs/TROUBLESHOOTING.md",
+      "resources/worker": "bundled",
+      "resources/README.md": "README.md"
+    },
+    "windows": {
+      "allowDowngrades": false,
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "both",
+        "languages": ["English"],
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "startMenuFolder": "SPIKE"
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "bundle": {
+    "licenseFile": "../../licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md",
+    "resources": {
+      "../../artifacts/windows/production-candidate/dependencies.lock.json.p7s": "dependencies.lock.json.p7s",
+      "../../config/windows-component-inventory.json": "release/windows-component-inventory.json",
+      "../../licenses/windows-component-approvals.json": "legal/windows-component-approvals.json",
+      "../../requirements-build-windows-x64.txt": "release/requirements-build-windows-x64.txt",
+      "../../requirements-runtime-windows-x64.txt": "release/requirements-runtime-windows-x64.txt",
+      "../../config/windows-signing-policy.json": "release/windows-signing-policy.json"
+    }
+  }
+}

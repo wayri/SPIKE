@@ -1,0 +1,31 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
+
+const require = createRequire(import.meta.url);
+const source = readFileSync(new URL("../src/TetraMeshPanel.tsx", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
+const uiModule = { exports: {} };
+new Function("require", "module", "exports", compiled)(name => {
+  if (name === "react") return { ...React, useEffect() {}, useRef: initial => ({ current: initial }), useState: initial => [typeof initial === "function" ? initial() : initial, () => {}] };
+  if (name === "./workerBridge") return { cancelLocalWorker() {}, cancelLocalWorkerCleanup() {}, openNativeTextFile() {}, runLocalWorker() {}, saveNativeTextFile() {} };
+  return require(name);
+}, uiModule, uiModule.exports);
+const html = renderToStaticMarkup(uiModule.exports.default({ onClose() {}, onStatus() {} }));
+assert.match(html, /EXPLICIT TETRAHEDRAL MESH/);
+assert.match(html, /spike\/gmsh-occ-mesh\/v1/);
+assert.match(html, /does not translate the active PCB/);
+assert.match(html, /does not attach this mesh|target solver’s separate compatibility/);
+assert.match(html, /pinned local CPython 3\.11 runtime/);
+assert.match(source, /disabled=\{busy\} value=\{text\}/);
+assert.match(source, /Unverified imported claim/);
+assert.match(source, /saveNativeTextFile\([\s\S]*?\.catch\(caught => setError/);
+assert.match(source, /method: "generate_tetrahedral_mesh"/);
+assert.match(source, /timeout_s: 180, memory_limit_mb: 2048/);
+assert.match(source, /counts\.vertices !== mesh\.vertices\.length/);
+assert.match(source, /64 MiB UI exchange limit/);
+assert.throws(() => uiModule.exports.parseTetraMeshRequest(JSON.stringify({ contract: "spike/gmsh-occ-mesh/v1", solids: [], mesh: {} })), /1–64 explicit solids/);
+console.log("Explicit tetrahedral mesh panel renders bounded development-only controls.");

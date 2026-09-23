@@ -1,0 +1,4 @@
+* Demonstration interconnect loss block, NOT a switching-converter model.
+.subckt series_loss INPUT OUTPUT GND
+Rloss INPUT OUTPUT 2
+.ends series_loss

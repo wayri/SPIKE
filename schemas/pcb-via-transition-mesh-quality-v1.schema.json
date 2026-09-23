@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-via-transition-mesh-quality-v1.schema.json",
+  "title": "SPIKE circular via-transition geometry quality and convergence evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "policy", "levels", "convergence", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/pcb-via-transition-mesh-quality/v1"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["geometry_contract", "geometry_sha256", "design_id", "via_id", "source_via_id"],
+      "properties": {
+        "geometry_contract": {"const": "spike/pcb-via-transition-geometry/v1"},
+        "geometry_sha256": {"$ref": "#/$defs/digest"}, "design_id": {"$ref": "#/$defs/id"},
+        "via_id": {"$ref": "#/$defs/id"}, "source_via_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["radial_levels", "maximum_terminal_relative_error", "maximum_terminal_relative_change", "maximum_terminal_normalized_radial_deviation", "review_minimum_triangle_angle_deg", "review_maximum_triangle_aspect_ratio", "maximum_terminal_radial_deviation_mm"],
+      "properties": {
+        "radial_levels": {"type": "array", "minItems": 4, "maxItems": 5, "uniqueItems": true, "items": {"type": "integer", "minimum": 8, "maximum": 128, "multipleOf": 4}},
+        "maximum_terminal_relative_error": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "maximum_terminal_relative_change": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "maximum_terminal_normalized_radial_deviation": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "review_minimum_triangle_angle_deg": {"type": "number", "exclusiveMinimum": 0, "maximum": 60},
+        "review_maximum_triangle_aspect_ratio": {"type": "number", "minimum": 1},
+        "maximum_terminal_radial_deviation_mm": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "levels": {"type": "array", "minItems": 4, "maxItems": 5, "items": {"$ref": "#/$defs/level"}},
+    "convergence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coarse_radial_segments", "fine_radial_segments", "counts_strictly_increase", "radial_deviation_strictly_decreases", "volumes_conservative_and_monotonic", "maximum_terminal_relative_error", "maximum_terminal_relative_change", "terminal_radial_deviation_mm", "terminal_normalized_radial_deviation", "all_levels_topology_validated", "all_levels_native_admitted", "passed"],
+      "properties": {
+        "coarse_radial_segments": {"type": "integer", "minimum": 8, "maximum": 128, "multipleOf": 4},
+        "fine_radial_segments": {"type": "integer", "minimum": 16, "maximum": 128, "multipleOf": 4},
+        "counts_strictly_increase": {"const": true}, "radial_deviation_strictly_decreases": {"const": true},
+        "volumes_conservative_and_monotonic": {"const": true},
+        "maximum_terminal_relative_error": {"type": "number", "minimum": 0, "maximum": 1},
+        "maximum_terminal_relative_change": {"type": "number", "minimum": 0, "maximum": 1},
+        "terminal_radial_deviation_mm": {"type": "number", "minimum": 0},
+        "terminal_normalized_radial_deviation": {"type": "number", "minimum": 0, "maximum": 1},
+        "all_levels_topology_validated": {"const": true}, "all_levels_native_admitted": {"const": true},
+        "passed": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "geometry_convergence_passed", "physics_convergence_performed", "capacitance_ready", "si_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "geometry_domain_convergence_evidence"},
+        "geometry_convergence_passed": {"const": true}, "physics_convergence_performed": {"const": false},
+        "capacitance_ready": {"const": false}, "si_ready": {"const": false}, "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "positive": {"type": "number", "exclusiveMinimum": 0},
+    "surfaceRole": {"enum": ["signal_outer_boundary", "signal_land_shoulder", "drill_void_boundary", "signal_lower_face", "signal_upper_face", "antipad_void_boundary", "local_patch_truncation", "lower_face", "upper_face"]},
+    "roleQuality": {
+      "type": "object", "additionalProperties": false,
+      "required": ["surface_role", "triangle_count", "surface_area_mm2"],
+      "properties": {"surface_role": {"$ref": "#/$defs/surfaceRole"}, "triangle_count": {"type": "integer", "minimum": 1}, "surface_area_mm2": {"$ref": "#/$defs/positive"}}
+    },
+    "domainQuality": {
+      "type": "object", "additionalProperties": false,
+      "required": ["triangle_count", "minimum_triangle_area_mm2", "minimum_triangle_angle_deg", "maximum_triangle_aspect_ratio", "minimum_edge_length_mm", "maximum_edge_length_mm", "reference_void_boundary_error_mm", "domain_id", "kind", "surface_area_mm2", "signed_volume_mm3", "exact_surface_area_mm2", "exact_volume_mm3", "relative_surface_area_error", "relative_volume_error", "surface_roles"],
+      "properties": {
+        "triangle_count": {"type": "integer", "minimum": 1}, "minimum_triangle_area_mm2": {"$ref": "#/$defs/positive"},
+        "minimum_triangle_angle_deg": {"type": "number", "exclusiveMinimum": 0, "maximum": 60},
+        "maximum_triangle_aspect_ratio": {"type": "number", "minimum": 1},
+        "minimum_edge_length_mm": {"$ref": "#/$defs/positive"}, "maximum_edge_length_mm": {"$ref": "#/$defs/positive"},
+        "reference_void_boundary_error_mm": {"type": "number", "minimum": 0},
+        "domain_id": {"$ref": "#/$defs/id"}, "kind": {"enum": ["signal_via_conductor", "reference_plane_local_patch"]},
+        "surface_area_mm2": {"$ref": "#/$defs/positive"}, "signed_volume_mm3": {"$ref": "#/$defs/positive"},
+        "exact_surface_area_mm2": {"$ref": "#/$defs/positive"}, "exact_volume_mm3": {"$ref": "#/$defs/positive"},
+        "relative_surface_area_error": {"type": "number", "minimum": 0}, "relative_volume_error": {"type": "number", "minimum": 0},
+        "surface_roles": {"type": "array", "minItems": 1, "maxItems": 9, "items": {"$ref": "#/$defs/roleQuality"}}
+      }
+    },
+    "level": {
+      "type": "object", "additionalProperties": false,
+      "required": ["radial_segments", "mesh_contract", "mesh_sha256", "native_handoff_contract", "native_handoff_sha256", "vertices", "triangles", "domain_count", "maximum_circle_radial_deviation_mm", "maximum_normalized_circle_radial_deviation", "minimum_reference_clearance_margin_mm", "coordinate_tolerance_mm", "topology_audit_passed", "native_admission_passed", "conditioning_warnings", "minimum_triangle_area_mm2", "minimum_triangle_angle_deg", "maximum_triangle_aspect_ratio", "minimum_edge_length_mm", "maximum_edge_length_mm", "maximum_reference_void_boundary_error_mm", "domains"],
+      "properties": {
+        "radial_segments": {"type": "integer", "minimum": 8, "maximum": 128, "multipleOf": 4},
+        "mesh_contract": {"const": "spike/pcb-via-transition-mesh/v1"}, "mesh_sha256": {"$ref": "#/$defs/digest"},
+        "native_handoff_contract": {"const": "spike/native-via-transition-handoff/v1"}, "native_handoff_sha256": {"$ref": "#/$defs/digest"},
+        "vertices": {"type": "integer", "minimum": 1, "maximum": 32768}, "triangles": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "domain_count": {"type": "integer", "minimum": 2, "maximum": 65},
+        "maximum_circle_radial_deviation_mm": {"type": "number", "minimum": 0},
+        "maximum_normalized_circle_radial_deviation": {"type": "number", "minimum": 0, "maximum": 1},
+        "minimum_reference_clearance_margin_mm": {"type": "number", "minimum": 0}, "coordinate_tolerance_mm": {"$ref": "#/$defs/positive"},
+        "topology_audit_passed": {"const": true}, "native_admission_passed": {"const": true},
+        "conditioning_warnings": {"type": "array", "maxItems": 2, "uniqueItems": true, "items": {"enum": ["minimum_triangle_angle_below_review_threshold", "maximum_triangle_aspect_ratio_above_review_threshold"]}},
+        "minimum_triangle_area_mm2": {"$ref": "#/$defs/positive"}, "minimum_triangle_angle_deg": {"type": "number", "exclusiveMinimum": 0, "maximum": 60},
+        "maximum_triangle_aspect_ratio": {"type": "number", "minimum": 1}, "minimum_edge_length_mm": {"$ref": "#/$defs/positive"},
+        "maximum_edge_length_mm": {"$ref": "#/$defs/positive"}, "maximum_reference_void_boundary_error_mm": {"type": "number", "minimum": 0},
+        "domains": {"type": "array", "minItems": 2, "maxItems": 65, "items": {"$ref": "#/$defs/domainQuality"}}
+      }
+    }
+  }
+}

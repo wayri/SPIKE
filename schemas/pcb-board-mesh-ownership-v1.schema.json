@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-board-mesh-ownership-v1.schema.json",
+  "title": "SPIKE bounded board-mesh copper ownership sidecar v1",
+  "description": "Deterministic, source-bound ownership accounting for the copper geometry supplied to a legacy SPIKE mesh preview. This sidecar does not establish complete-board coverage, native overlay verification, convergence, physics readiness, or solver readiness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "source_records", "accounting", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/pcb-board-mesh-ownership/v1"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mesh_contract", "mesh_sha256", "geometry_contract", "geometry_sha256", "design_id", "scope"],
+      "properties": {
+        "mesh_contract": {"const": "spike/mesh/v3"},
+        "mesh_sha256": {"$ref": "#/$defs/digest"},
+        "geometry_contract": {"const": "spike/v1"},
+        "geometry_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"},
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["all_nets", "requested_nets"],
+          "properties": {
+            "all_nets": {"type": "boolean"},
+            "requested_nets": {"type": "array", "maxItems": 512, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}
+          },
+          "allOf": [
+            {"if": {"properties": {"all_nets": {"const": true}}, "required": ["all_nets"]}, "then": {"properties": {"requested_nets": {"maxItems": 0}}}},
+            {"if": {"properties": {"all_nets": {"const": false}}, "required": ["all_nets"]}, "then": {"properties": {"requested_nets": {"minItems": 1}}}}
+          ]
+        }
+      }
+    },
+    "source_records": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 131072,
+      "items": {"$ref": "#/$defs/sourceRecord"}
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "supplied_geometry_audit", "supplied_source_count", "supplied_mesh_cell_count", "owned_source_count", "owned_mesh_cell_count", "intentionally_omitted_source_count", "intentionally_omitted_mesh_cell_count", "unsupported_source_count", "unsupported_mesh_cell_count", "all_source_records_accounted"],
+      "properties": {
+        "status": {"const": "passed"},
+        "supplied_geometry_audit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "checked_volumes", "by_source_kind", "tolerance_mm"],
+          "properties": {
+            "status": {"const": "passed"},
+            "checked_volumes": {"type": "integer", "minimum": 1, "maximum": 1048576},
+            "by_source_kind": {
+              "type": "object",
+              "propertyNames": {"$ref": "#/$defs/sourceKind"},
+              "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 1048576}
+            },
+            "tolerance_mm": {"type": "number", "minimum": 0, "maximum": 0.1}
+          }
+        },
+        "supplied_source_count": {"type": "integer", "minimum": 1, "maximum": 131072},
+        "supplied_mesh_cell_count": {"type": "integer", "minimum": 1, "maximum": 1048576},
+        "owned_source_count": {"type": "integer", "minimum": 0, "maximum": 131072},
+        "owned_mesh_cell_count": {"type": "integer", "minimum": 0, "maximum": 1048576},
+        "intentionally_omitted_source_count": {"type": "integer", "minimum": 0, "maximum": 131072},
+        "intentionally_omitted_mesh_cell_count": {"const": 0},
+        "unsupported_source_count": {"type": "integer", "minimum": 0, "maximum": 131072},
+        "unsupported_mesh_cell_count": {"const": 0},
+        "all_source_records_accounted": {"const": true}
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_source_records", "maximum_mesh_cells", "maximum_work_steps", "maximum_serialized_bytes", "actual_source_records", "actual_mesh_cells", "actual_work_steps", "actual_serialized_bytes", "cancellation_supported"],
+      "properties": {
+        "maximum_source_records": {"const": 131072},
+        "maximum_mesh_cells": {"const": 1048576},
+        "maximum_work_steps": {"const": 16777216},
+        "maximum_serialized_bytes": {"const": 67108864},
+        "actual_source_records": {"type": "integer", "minimum": 1, "maximum": 131072},
+        "actual_mesh_cells": {"type": "integer", "minimum": 1, "maximum": 1048576},
+        "actual_work_steps": {"type": "integer", "minimum": 1, "maximum": 16777216},
+        "actual_serialized_bytes": {"type": "integer", "minimum": 1, "maximum": 67108864},
+        "cancellation_supported": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "all_supplied_geometry_owned", "complete_board_copper_coverage", "native_geometric_overlay_verified", "field_convergence_performed", "physics_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "bounded_supplied_copper_ownership_only"},
+        "all_supplied_geometry_owned": {"const": true},
+        "complete_board_copper_coverage": {"const": false},
+        "native_geometric_overlay_verified": {"const": false},
+        "field_convergence_performed": {"const": false},
+        "physics_ready": {"const": false},
+        "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sourceKind": {"enum": ["track", "zone", "pad", "pad_barrel", "via"]},
+    "sourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_key", "source_kind", "source_id", "status", "mesh_cell_count", "mesh_cell_ids_sha256", "reason_code"],
+      "properties": {
+        "source_key": {"$ref": "#/$defs/id"},
+        "source_kind": {"$ref": "#/$defs/sourceKind"},
+        "source_id": {"$ref": "#/$defs/id"},
+        "status": {"enum": ["owned", "intentionally_omitted", "unsupported"]},
+        "mesh_cell_count": {"type": "integer", "minimum": 0, "maximum": 1048576},
+        "mesh_cell_ids_sha256": {"$ref": "#/$defs/digest"},
+        "reason_code": {"enum": ["owned_by_exact_volume_containment", "outside_requested_net_scope", "source_has_no_electrical_net", "non_electrical_unplated_hole", "unsupported_geometry", "admitted_source_emitted_no_volume"]}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "owned"}}, "required": ["status"]},
+          "then": {"properties": {"mesh_cell_count": {"type": "integer", "minimum": 1}, "reason_code": {"const": "owned_by_exact_volume_containment"}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "intentionally_omitted"}}, "required": ["status"]},
+          "then": {"properties": {"mesh_cell_count": {"const": 0}, "reason_code": {"enum": ["outside_requested_net_scope", "source_has_no_electrical_net", "non_electrical_unplated_hole"]}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "unsupported"}}, "required": ["status"]},
+          "then": {"properties": {"mesh_cell_count": {"const": 0}, "reason_code": {"enum": ["unsupported_geometry", "admitted_source_emitted_no_volume"]}}}
+        }
+      ]
+    }
+  }
+}

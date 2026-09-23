@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-multiregion-runnable-case-v1.schema.json",
+  "title": "SPIKE OpenFOAM Multi-region Runnable Case v1",
+  "type": "object",
+  "required": ["contract", "status", "solver", "job_id", "plan_digest", "request_digest", "regions", "region_kinds", "region_conductivity_w_mk", "view_factor_regions", "input_files", "field_export_path", "qualification", "manifest_digest"],
+  "properties": {
+    "contract": {"const": "spike/openfoam-multiregion-runnable-case/v1"},
+    "status": {"const": "runnable"}, "solver": {"const": "chtMultiRegionFoam"}, "job_id": {"type": "string"},
+    "plan_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "request_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "regions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "region_kinds": {"type": "object", "additionalProperties": {"enum": ["solid", "fluid"]}},
+    "region_conductivity_w_mk": {"type": "object", "additionalProperties": {"type": "number", "exclusiveMinimum": 0}},
+    "view_factor_regions": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "input_files": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}},
+    "field_export_path": {"const": "postProcessing/spike/fields.json"}, "qualification": {"type": "object"},
+    "manifest_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  },
+  "additionalProperties": false
+}

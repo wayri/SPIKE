@@ -1,0 +1,7 @@
+SPIKES public fixed-speed motor-armature electrical fixture
+VBUS bus 0 PULSE(0 24 0 1u 1u 50m 100m)
+RARM bus winding 0.5
+LARM winding emf 2m
+VBEMF emf 0 12
+.tran 20u 20m
+.end

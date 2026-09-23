@@ -1,0 +1,7 @@
+SPIKES public 50 MHz-class series-resonator fixture
+V1 in 0 AC 1
+RSRC in tank 5
+LRF tank out 100n
+CRF out 0 100p
+.ac dec 100 1meg 1g
+.end

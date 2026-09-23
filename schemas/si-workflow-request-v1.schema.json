@@ -1,0 +1,712 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/si-workflow-request-v1.schema.json",
+  "title": "SPIKE experimental source-to-receiver SI workflow",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "resonance_requests": {
+      "type": "array", "maxItems": 16,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["port", "model", "frequency_min_hz", "frequency_max_hz"],
+        "properties": {
+          "port": {"type": "integer", "minimum": 0, "maximum": 15},
+          "model": {"enum": ["series_rlc", "parallel_rlc"]},
+          "frequency_min_hz": {"type": "number", "exclusiveMinimum": 0},
+          "frequency_max_hz": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }
+    },
+    "contract": {
+      "const": "spike/si-workflow-request/v1"
+    },
+    "channel": {
+      "oneOf": [
+        {"$ref": "si-network-graph-v1.schema.json"},
+        {"$ref": "si-multiboard-channel-v1.schema.json"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "coupled": {
+              "type": "boolean",
+              "default": true
+            },
+            "length_m": {
+              "type": "number",
+              "default": 0.05,
+              "exclusiveMinimum": 0
+            },
+            "resistance_ohm_per_m": {
+              "type": "number",
+              "default": 5.0
+            },
+            "inductance_h_per_m": {
+              "type": "number",
+              "default": 2.5e-07,
+              "exclusiveMinimum": 0
+            },
+            "capacitance_f_per_m": {
+              "type": "number",
+              "default": 1e-10,
+              "exclusiveMinimum": 0
+            },
+            "loss_tangent": {
+              "type": "number",
+              "default": 0.015
+            },
+            "inductive_coupling": {
+              "type": "number",
+              "default": 0.08
+            },
+            "capacitive_coupling": {
+              "type": "number",
+              "default": 0.08
+            },
+            "frequency_stop_hz": {
+              "type": "number",
+              "default": 8000000000.0,
+              "exclusiveMinimum": 0
+            },
+            "frequency_points": {
+              "type": "integer",
+              "default": 1025,
+              "minimum": 3,
+              "maximum": 8193
+            },
+            "reference_impedance_ohm": {
+              "type": "number",
+              "default": 50.0,
+              "exclusiveMinimum": 0
+            },
+            "kind": {
+              "const": "rlgc"
+            }
+          },
+          "required": []
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "touchstone"
+            },
+            "name": {
+              "type": "string",
+              "pattern": "\\.s[0-9]+p$"
+            },
+            "text": {
+              "type": "string",
+              "maxLength": 32000000
+            }
+          },
+          "required": [
+            "kind",
+            "text"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "geometry"
+            },
+            "request": {
+              "$ref": "si-uniform-channel-request-v1.schema.json"
+            }
+          },
+          "required": [
+            "kind",
+            "request"
+          ]
+        }
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "resistance_ohm": {
+            "type": "number",
+            "default": 50.0,
+            "minimum": 1e-06,
+            "maximum": 1000000000000.0
+          },
+          "low_v": {
+            "type": "number",
+            "default": 0.0
+          },
+          "high_v": {
+            "type": "number",
+            "default": 1.8
+          },
+          "rise_time_s": {
+            "type": "number",
+            "default": 1e-10
+          },
+          "fall_time_s": {
+            "type": "number",
+            "default": 1e-10
+          },
+          "capacitance_f": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "package_r_ohm": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "package_l_h": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "package_c_f": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "pattern_shift_bits": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 126
+          },
+          "delay_s": {
+            "type": "number",
+            "default": 0.0
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15
+          },
+          "ibis": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 8000000
+              },
+              "name": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string",
+                "minLength": 1
+              },
+              "component": {
+                "type": "string"
+              },
+              "pin": {
+                "type": "string"
+              },
+              "corner": {
+                "enum": [
+                  "typ",
+                  "min",
+                  "max"
+                ]
+              },
+              "state": {
+                "enum": [
+                  "low",
+                  "high"
+                ]
+              },
+              "operating_voltage_v": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "text",
+              "model"
+            ]
+          }
+        },
+        "required": [
+          "port"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "receivers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cdr": {"$ref": "si-clock-recovery-v1.schema.json"},
+          "resistance_ohm": {
+            "type": "number",
+            "default": 1000000.0,
+            "minimum": 1e-06,
+            "maximum": 1000000000000.0
+          },
+          "capacitance_f": {
+            "type": "number",
+            "default": 2e-12,
+            "minimum": 0
+          },
+          "package_r_ohm": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "package_l_h": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "package_c_f": {
+            "type": "number",
+            "default": 0.0,
+            "minimum": 0
+          },
+          "vil_v": {
+            "type": "number",
+            "default": 0.63
+          },
+          "vih_v": {
+            "type": "number",
+            "default": 1.17
+          },
+          "input_noise_rms_v": {
+            "type": "number",
+            "default": 0.0
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15
+          },
+          "ibis": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "text": {
+                "type": "string",
+                "maxLength": 8000000
+              },
+              "name": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string",
+                "minLength": 1
+              },
+              "component": {
+                "type": "string"
+              },
+              "pin": {
+                "type": "string"
+              },
+              "corner": {
+                "enum": [
+                  "typ",
+                  "min",
+                  "max"
+                ]
+              },
+              "state": {
+                "enum": [
+                  "low",
+                  "high"
+                ]
+              },
+              "operating_voltage_v": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "text",
+              "model"
+            ]
+          }
+        },
+        "required": [
+          "port"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "passives": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15
+          },
+          "connection": {
+            "enum": [
+              "series",
+              "shunt"
+            ]
+          },
+          "model": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "resistance_ohm": {
+                    "type": "number",
+                    "default": 33.0
+                  },
+                  "tolerance_fraction": {
+                    "type": "number",
+                    "default": 0.01,
+                    "minimum": 0,
+                    "maximum": 0.99
+                  },
+                  "tcr_ppm_per_c": {
+                    "type": "number",
+                    "default": 100.0
+                  },
+                  "noise_index_db": {
+                    "type": "number",
+                    "default": -10.0
+                  },
+                  "inductance_h": {
+                    "type": "number",
+                    "default": 5e-10
+                  },
+                  "capacitance_f": {
+                    "type": "number",
+                    "default": 5e-14
+                  },
+                  "dc_voltage_v": {
+                    "type": "number",
+                    "default": 0.0
+                  },
+                  "temperature_c": {
+                    "type": "number",
+                    "default": 25.0
+                  },
+                  "kind": {
+                    "const": "resistor"
+                  },
+                  "grade": {
+                    "enum": [
+                      "thick_film",
+                      "thin_film",
+                      "metal_film",
+                      "wirewound"
+                    ]
+                  },
+                  "corner": {
+                    "enum": [
+                      "nominal",
+                      "min",
+                      "max"
+                    ]
+                  }
+                },
+                "required": []
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "capacitance_f": {
+                    "type": "number",
+                    "default": 1e-07
+                  },
+                  "tolerance_fraction": {
+                    "type": "number",
+                    "default": 0.1,
+                    "minimum": 0,
+                    "maximum": 0.99
+                  },
+                  "esr_ohm": {
+                    "type": "number",
+                    "default": 0.03
+                  },
+                  "esl_h": {
+                    "type": "number",
+                    "default": 5e-10
+                  },
+                  "leakage_ohm": {
+                    "type": "number",
+                    "default": 1000000000.0
+                  },
+                  "rated_voltage_v": {
+                    "type": "number",
+                    "default": 25.0
+                  },
+                  "dc_voltage_v": {
+                    "type": "number",
+                    "default": 0.0
+                  },
+                  "bias_factor": {
+                    "type": "number",
+                    "default": 1.0
+                  },
+                  "aging_percent_per_decade": {
+                    "type": "number",
+                    "default": 0.0
+                  },
+                  "age_hours": {
+                    "type": "number",
+                    "default": 1000.0
+                  },
+                  "temperature_c": {
+                    "type": "number",
+                    "default": 25.0
+                  },
+                  "temperature_factor": {
+                    "type": "number",
+                    "default": 1.0
+                  },
+                  "kind": {
+                    "const": "capacitor"
+                  },
+                  "grade": {
+                    "enum": [
+                      "C0G",
+                      "X7R",
+                      "X5R",
+                      "Y5V",
+                      "Z5U"
+                    ]
+                  },
+                  "corner": {
+                    "enum": [
+                      "nominal",
+                      "min",
+                      "max"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            ]
+          }
+        },
+        "required": [
+          "port"
+        ]
+      }
+    },
+    "edits": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "renormalize"
+              },
+              "reference_impedance_ohm": {
+                "type": "number",
+                "minimum": 0.01,
+                "maximum": 1000000.0
+              }
+            },
+            "required": [
+              "kind",
+              "reference_impedance_ohm"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "reorder"
+              },
+              "ports": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 15
+                },
+                "minItems": 2,
+                "maxItems": 16,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "kind",
+              "ports"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "port_extension"
+              },
+              "delay_s": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 0.001
+                },
+                "minItems": 2,
+                "maxItems": 16
+              }
+            },
+            "required": [
+              "kind",
+              "delay_s"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "kind": {
+                "const": "cascade"
+              },
+              "channel": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "coupled": {
+                        "type": "boolean",
+                        "default": true
+                      },
+                      "length_m": {
+                        "type": "number",
+                        "default": 0.05,
+                        "exclusiveMinimum": 0
+                      },
+                      "resistance_ohm_per_m": {
+                        "type": "number",
+                        "default": 5.0
+                      },
+                      "inductance_h_per_m": {
+                        "type": "number",
+                        "default": 2.5e-07,
+                        "exclusiveMinimum": 0
+                      },
+                      "capacitance_f_per_m": {
+                        "type": "number",
+                        "default": 1e-10,
+                        "exclusiveMinimum": 0
+                      },
+                      "loss_tangent": {
+                        "type": "number",
+                        "default": 0.015
+                      },
+                      "inductive_coupling": {
+                        "type": "number",
+                        "default": 0.08
+                      },
+                      "capacitive_coupling": {
+                        "type": "number",
+                        "default": 0.08
+                      },
+                      "frequency_stop_hz": {
+                        "type": "number",
+                        "default": 8000000000.0,
+                        "exclusiveMinimum": 0
+                      },
+                      "frequency_points": {
+                        "type": "integer",
+                        "default": 1025,
+                        "minimum": 3,
+                        "maximum": 8193
+                      },
+                      "reference_impedance_ohm": {
+                        "type": "number",
+                        "default": 50.0,
+                        "exclusiveMinimum": 0
+                      },
+                      "kind": {
+                        "const": "rlgc"
+                      }
+                    },
+                    "required": []
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "touchstone"
+                      },
+                      "name": {
+                        "type": "string",
+                        "pattern": "\\.s[0-9]+p$"
+                      },
+                      "text": {
+                        "type": "string",
+                        "maxLength": 32000000
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "text"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "channel"
+            ]
+          }
+        ]
+      }
+    },
+    "temperature_c": {
+      "type": "number",
+      "minimum": -273.14,
+      "maximum": 500
+    },
+    "bit_rate_hz": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 100000000000000.0
+    },
+    "bit_count": {
+      "type": "integer",
+      "minimum": 128,
+      "maximum": 2048
+    },
+    "run_time_domain": {
+      "type": "boolean"
+    },
+    "export_format": {
+      "enum": [
+        "RI",
+        "MA",
+        "DB"
+      ]
+    }
+  },
+  "required": [
+    "contract"
+  ]
+}

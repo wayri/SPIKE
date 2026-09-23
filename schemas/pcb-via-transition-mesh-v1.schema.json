@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-via-transition-mesh-v1.schema.json",
+  "title": "SPIKE conservative circular PCB via-transition surface mesh v1",
+  "type": "object",
+  "required": ["contract", "source", "center_mm", "tessellation", "vertices_mm", "triangles", "domains", "boundary_loops", "resources", "topology_audit", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/pcb-via-transition-mesh/v1"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["geometry_contract", "geometry_sha256", "design_id", "via_id", "source_via_id"],
+      "properties": {
+        "geometry_contract": {"const": "spike/pcb-via-transition-geometry/v1"},
+        "geometry_sha256": {"$ref": "#/$defs/digest"}, "design_id": {"$ref": "#/$defs/id"},
+        "via_id": {"$ref": "#/$defs/id"}, "source_via_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "center_mm": {"$ref": "#/$defs/point2"},
+    "tessellation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["radial_segments", "coordinate_tolerance_mm", "circle_approximation"],
+      "properties": {
+        "radial_segments": {"type": "integer", "minimum": 8, "maximum": 128, "multipleOf": 4},
+        "coordinate_tolerance_mm": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.000001},
+        "circle_approximation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["source_is_exact_circle", "outer_boundaries", "drill_and_antipad_void_boundaries", "max_radial_deviation_mm"],
+          "properties": {
+            "source_is_exact_circle": {"const": true}, "outer_boundaries": {"const": "inscribed"},
+            "drill_and_antipad_void_boundaries": {"const": "circumscribed"},
+            "max_radial_deviation_mm": {"type": "number", "minimum": 0}
+          }
+        }
+      }
+    },
+    "vertices_mm": {"type": "array", "minItems": 1, "maxItems": 32768, "items": {"$ref": "#/$defs/point3"}},
+    "triangles": {"type": "array", "minItems": 1, "maxItems": 65536, "items": {"$ref": "#/$defs/triangle"}},
+    "domains": {"type": "array", "minItems": 2, "maxItems": 65, "items": {"$ref": "#/$defs/domain"}},
+    "boundary_loops": {"type": "array", "maxItems": 0},
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_vertices", "max_triangles", "actual_vertices", "actual_triangles", "max_serialized_bytes"],
+      "properties": {
+        "max_vertices": {"const": 32768}, "max_triangles": {"const": 65536},
+        "actual_vertices": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "actual_triangles": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "max_serialized_bytes": {"const": 8388608}
+      }
+    },
+    "topology_audit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["zero_area_triangles", "duplicate_triangles", "nonmanifold_or_boundary_edges", "orientation_mismatches", "unused_vertices", "reference_void_violations", "closed_domains", "passed"],
+      "properties": {
+        "zero_area_triangles": {"const": 0}, "duplicate_triangles": {"const": 0},
+        "nonmanifold_or_boundary_edges": {"const": 0}, "orientation_mismatches": {"const": 0},
+        "unused_vertices": {"const": 0}, "reference_void_violations": {"const": 0},
+        "closed_domains": {"type": "integer", "minimum": 2, "maximum": 65}, "passed": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["geometry_state", "reference_plane_state", "refinement_state", "discrete_watertightness_checked", "native_handoff_ready", "capacitance_ready", "si_ready", "solver_ready"],
+      "properties": {
+        "geometry_state": {"const": "conservative_discrete_circular_approximation"},
+        "reference_plane_state": {"const": "source_contained_local_patch_not_full_plane"},
+        "refinement_state": {"const": "tessellation_not_convergence_proof"},
+        "discrete_watertightness_checked": {"const": true}, "native_handoff_ready": {"const": false},
+        "capacitance_ready": {"const": false}, "si_ready": {"const": false}, "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "point2": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}], "minItems": 2, "maxItems": 2},
+    "point3": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}], "minItems": 3, "maxItems": 3},
+    "ids": {"type": "array", "minItems": 1, "maxItems": 64, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "triangle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "domain_id", "vertex_indices", "surface_role", "source_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "domain_id": {"$ref": "#/$defs/id"},
+        "vertex_indices": {"type": "array", "prefixItems": [{"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 0}], "minItems": 3, "maxItems": 3},
+        "surface_role": {"enum": ["signal_outer_boundary", "signal_land_shoulder", "drill_void_boundary", "signal_lower_face", "signal_upper_face", "antipad_void_boundary", "local_patch_truncation", "lower_face", "upper_face"]},
+        "source_ids": {"$ref": "#/$defs/ids"}
+      }
+    },
+    "domain": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "net_id", "layer_ids", "source_ids", "triangle_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "kind": {"enum": ["signal_via_conductor", "reference_plane_local_patch"]},
+        "net_id": {"$ref": "#/$defs/id"}, "layer_ids": {"$ref": "#/$defs/ids"},
+        "source_ids": {"$ref": "#/$defs/ids"},
+        "triangle_ids": {"type": "array", "minItems": 1, "maxItems": 65536, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "antipad_radius_mm": {"type": "number", "exclusiveMinimum": 0},
+        "reference_zone_id": {"$ref": "#/$defs/id"},
+        "qualification": {"const": "source_contained_local_patch_not_full_plane"}
+      },
+      "allOf": [{"if": {"properties": {"kind": {"const": "reference_plane_local_patch"}}},
+                 "then": {"required": ["antipad_radius_mm", "reference_zone_id", "qualification"]}}]
+    }
+  },
+  "additionalProperties": false
+}

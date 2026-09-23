@@ -1,0 +1,4626 @@
+{
+  "contract": "spike/public-board-validation/v1",
+  "cases": 22,
+  "normalized_imports": 20,
+  "project_roundtrips": 15,
+  "source_files_verified": 720,
+  "source_files_changed": [],
+  "viewport_pixels_verified": false,
+  "solver_physics_qualified": false,
+  "records": [
+    {
+      "id": "constraints",
+      "path": "build/public-board-corpus/sources/constraints/demos/constraints/constraints.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "edbb888d918401098fe87af52d79df770b43203c4429b28810dc5f0cce4b8648",
+      "bytes": 37478,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 0,
+        "pads": 0,
+        "tracks": 0,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 0,
+        "nets": 0,
+        "layers": 24,
+        "models": 0
+      },
+      "geometry_rows": 0,
+      "package_bytes": 21545,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 0.081,
+      "import_completed": true,
+      "import_status": "completed_with_warnings",
+      "diagnostic_entry_counts": {
+        "STACKUP_MISSING": 1,
+        "NETS_MISSING": 1
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "No conductor geometry was imported."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "No conductor geometry was imported.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "No conductor geometry was imported.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "No conductor geometry was imported."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "No conductor geometry was imported.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {
+        "id": "constraints",
+        "status": "failed",
+        "error": "KiCad rejected the board"
+      },
+      "frontend": {
+        "id": "constraints",
+        "status": "parsed",
+        "counts": {
+          "components": 0,
+          "pads": 0,
+          "tracks": 0,
+          "vias": 0,
+          "zones": 0,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 181.287655,
+          "minY": 153.639499,
+          "maxX": 184.287655,
+          "maxY": 156.639499
+        },
+        "elapsed_ms": 8
+      }
+    },
+    {
+      "id": "ecc83",
+      "path": "build/public-board-corpus/sources/ecc83/demos/ecc83/ecc83-pp.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "0ab45f4f8c90ac877e3313a1888d875107f2be3fc2b2f40cfb7927873b35260c",
+      "bytes": 158878,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 15,
+        "pads": 33,
+        "tracks": 59,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 1,
+        "nets": 13,
+        "layers": 21,
+        "models": 11
+      },
+      "geometry_rows": 93,
+      "package_bytes": 149743,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 0.23,
+      "import_completed": true,
+      "import_status": "completed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 11,
+        "resolved": 1
+      },
+      "native_reference": {
+        "id": "ecc83",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 15,
+        "pads": 33,
+        "tracks": 59,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 1,
+        "nets": 13,
+        "copper_layers": 2,
+        "thickness_mm": 1.6,
+        "bounds_mm": [
+          121.2215,
+          90.1065,
+          173.4185,
+          136.5885
+        ],
+        "model_references": 11
+      },
+      "frontend": {
+        "id": "ecc83",
+        "status": "parsed",
+        "counts": {
+          "components": 15,
+          "pads": 33,
+          "tracks": 59,
+          "vias": 0,
+          "zones": 1,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 121.285,
+          "minY": 90.17,
+          "maxX": 173.355,
+          "maxY": 136.525
+        },
+        "elapsed_ms": 13
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": true
+      }
+    },
+    {
+      "id": "pic-programmer",
+      "path": "build/public-board-corpus/sources/pic-programmer/demos/pic_programmer/pic_programmer.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "1ca70b620506818eb0227e2863bbd573d1fec1672072dc43d0dbe8475e69c8fb",
+      "bytes": 643403,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 63,
+        "pads": 247,
+        "tracks": 370,
+        "arcs": 0,
+        "vias": 6,
+        "zones": 3,
+        "nets": 111,
+        "layers": 21,
+        "models": 56
+      },
+      "geometry_rows": 626,
+      "package_bytes": 656783,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 0.975,
+      "import_completed": true,
+      "import_status": "completed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 56,
+        "resolved": 56
+      },
+      "native_reference": {
+        "id": "pic-programmer",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 63,
+        "pads": 247,
+        "tracks": 370,
+        "arcs": 0,
+        "vias": 6,
+        "zones": 1,
+        "nets": 111,
+        "copper_layers": 2,
+        "thickness_mm": 1.6,
+        "bounds_mm": [
+          73.61,
+          40.59,
+          233.73,
+          139.75
+        ],
+        "model_references": 56
+      },
+      "frontend": {
+        "id": "pic-programmer",
+        "status": "parsed",
+        "counts": {
+          "components": 63,
+          "pads": 247,
+          "tracks": 370,
+          "vias": 6,
+          "zones": 3,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 73.66,
+          "minY": 40.64,
+          "maxX": 233.68,
+          "maxY": 139.7
+        },
+        "elapsed_ms": 35
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": true
+      }
+    },
+    {
+      "id": "interf-u",
+      "path": "build/public-board-corpus/sources/interf-u/demos/interf_u/interf_u.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "a740ce7fde77ab6af191e23ece21e57d36bb3c29325879248520dcd9ab47b57e",
+      "bytes": 622284,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 25,
+        "pads": 379,
+        "tracks": 731,
+        "arcs": 0,
+        "vias": 84,
+        "zones": 23,
+        "nets": 173,
+        "layers": 21,
+        "models": 23
+      },
+      "geometry_rows": 1217,
+      "package_bytes": 741004,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 1.045,
+      "import_completed": true,
+      "import_status": "completed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 23,
+        "resolved": 0
+      },
+      "native_reference": {
+        "id": "interf-u",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 25,
+        "pads": 379,
+        "tracks": 731,
+        "arcs": 0,
+        "vias": 84,
+        "zones": 1,
+        "nets": 173,
+        "copper_layers": 2,
+        "thickness_mm": 1.6002,
+        "bounds_mm": [
+          79.3115,
+          34.2265,
+          195.0085,
+          142.5575
+        ],
+        "model_references": 23
+      },
+      "frontend": {
+        "id": "interf-u",
+        "status": "parsed",
+        "counts": {
+          "components": 25,
+          "pads": 379,
+          "tracks": 731,
+          "vias": 84,
+          "zones": 23,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 79.375,
+          "minY": 34.29,
+          "maxX": 194.945,
+          "maxY": 142.494
+        },
+        "elapsed_ms": 30
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": true
+      }
+    },
+    {
+      "id": "microwave",
+      "path": "build/public-board-corpus/sources/microwave/demos/microwave/microwave.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "7f17191488b51f8782efc0a3b9ce7b5748a4e771ff0babb34ec0369ffcf43be5",
+      "bytes": 85718,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 1,
+        "pads": 8,
+        "tracks": 0,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 4,
+        "nets": 0,
+        "layers": 20,
+        "models": 0
+      },
+      "geometry_rows": 12,
+      "package_bytes": 75281,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 0.212,
+      "import_completed": true,
+      "import_status": "completed_with_warnings",
+      "diagnostic_entry_counts": {
+        "STACKUP_MISSING": 1,
+        "NETS_MISSING": 1
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "No net connectivity was imported.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {
+        "id": "microwave",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 4,
+        "pads": 8,
+        "tracks": 0,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 0,
+        "nets": 0,
+        "copper_layers": 2,
+        "thickness_mm": 1.6,
+        "bounds_mm": [
+          59.5376,
+          81.1276,
+          351.9424,
+          202.0824
+        ],
+        "model_references": 0
+      },
+      "frontend": {
+        "id": "microwave",
+        "status": "parsed",
+        "counts": {
+          "components": 4,
+          "pads": 8,
+          "tracks": 0,
+          "vias": 0,
+          "zones": 0,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 59.69,
+          "minY": 81.28,
+          "maxX": 351.79,
+          "maxY": 201.93
+        },
+        "elapsed_ms": 7
+      },
+      "native_count_comparison": {
+        "components": false,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": true
+      }
+    },
+    {
+      "id": "stickhub",
+      "path": "build/public-board-corpus/sources/stickhub/demos/stickhub/StickHub.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "cee5a90f8803791cc55498d2576ed1f3416060d37701a02d4ec2937073c76051",
+      "bytes": 1063630,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 94,
+        "pads": 278,
+        "tracks": 2553,
+        "arcs": 0,
+        "vias": 87,
+        "zones": 11,
+        "nets": 47,
+        "layers": 21,
+        "models": 86
+      },
+      "geometry_rows": 2929,
+      "package_bytes": 1118767,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 1.954,
+      "import_completed": true,
+      "import_status": "completed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 86,
+        "resolved": 9
+      },
+      "native_reference": {
+        "id": "stickhub",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 94,
+        "pads": 278,
+        "tracks": 1113,
+        "arcs": 180,
+        "vias": 87,
+        "zones": 5,
+        "nets": 47,
+        "copper_layers": 2,
+        "thickness_mm": 1.6,
+        "bounds_mm": [
+          141.7,
+          79.95,
+          158.3,
+          120.05
+        ],
+        "model_references": 93
+      },
+      "frontend": {
+        "id": "stickhub",
+        "status": "parsed",
+        "counts": {
+          "components": 94,
+          "pads": 278,
+          "tracks": 2557,
+          "vias": 87,
+          "zones": 11,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 141.75,
+          "minY": 79.99999999999709,
+          "maxX": 158.25000000000185,
+          "maxY": 120
+        },
+        "elapsed_ms": 51
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": false
+      }
+    },
+    {
+      "id": "cm5-minima",
+      "path": "build/public-board-corpus/sources/cm5-minima/demos/cm5_minima/CM5_MINIMA_3.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "123e209e6245cbcc344c1c70b425dcb44a12cd0a2d05f00a39d3f2e7ff307ffa",
+      "bytes": 3382011,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 112,
+        "pads": 633,
+        "tracks": 3484,
+        "arcs": 0,
+        "vias": 444,
+        "zones": 31,
+        "nets": 220,
+        "layers": 38,
+        "models": 72
+      },
+      "geometry_rows": 4592,
+      "package_bytes": 3911845,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 6.113,
+      "import_completed": true,
+      "import_status": "completed_with_warnings",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 72,
+        "resolved": 9
+      },
+      "native_reference": {
+        "id": "cm5-minima",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 112,
+        "pads": 633,
+        "tracks": 1884,
+        "arcs": 200,
+        "vias": 444,
+        "zones": 14,
+        "nets": 220,
+        "copper_layers": 6,
+        "thickness_mm": 1.5296,
+        "bounds_mm": [
+          75.025001,
+          20.225001,
+          136.275001,
+          84.475001
+        ],
+        "model_references": 77
+      },
+      "frontend": {
+        "id": "cm5-minima",
+        "status": "parsed",
+        "counts": {
+          "components": 112,
+          "pads": 633,
+          "tracks": 4361,
+          "vias": 444,
+          "zones": 32,
+          "copper_layers": 7
+        },
+        "bounds": {
+          "minX": 75.05313324114893,
+          "minY": 20.250004948256162,
+          "maxX": 136.24988415459782,
+          "maxY": 84.44998328976241
+        },
+        "elapsed_ms": 194
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": false
+      }
+    },
+    {
+      "id": "video",
+      "path": "build/public-board-corpus/sources/video/demos/video/video.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "f620675158ddd5c61e5ce9e15f4c92b230ae1df1cbcec6c502b8ce266e4007ea",
+      "bytes": 5787523,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 189,
+        "pads": 2118,
+        "tracks": 7932,
+        "arcs": 0,
+        "vias": 808,
+        "zones": 8,
+        "nets": 588,
+        "layers": 25,
+        "models": 175
+      },
+      "geometry_rows": 10866,
+      "package_bytes": 6536167,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 11.267,
+      "import_completed": true,
+      "import_status": "completed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 175,
+        "resolved": 4
+      },
+      "native_reference": {
+        "id": "video",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 189,
+        "pads": 2118,
+        "tracks": 7932,
+        "arcs": 0,
+        "vias": 808,
+        "zones": 2,
+        "nets": 588,
+        "copper_layers": 4,
+        "thickness_mm": 1.600198,
+        "bounds_mm": [
+          53.4924,
+          56.4134,
+          365.7346,
+          163.2966
+        ],
+        "model_references": 175
+      },
+      "frontend": {
+        "id": "video",
+        "status": "parsed",
+        "counts": {
+          "components": 189,
+          "pads": 2118,
+          "tracks": 7932,
+          "vias": 808,
+          "zones": 8,
+          "copper_layers": 4
+        },
+        "bounds": {
+          "minX": 53.594,
+          "minY": 56.515,
+          "maxX": 365.633,
+          "maxY": 163.195
+        },
+        "elapsed_ms": 271
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": true
+      }
+    },
+    {
+      "id": "tiny-tapeout",
+      "path": "build/public-board-corpus/sources/tiny-tapeout/demos/tiny_tapeout/tinytapeout-demo.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "0d26bf9b6d561e32cf610d428541d6433e60b45e1838f34f73467e25b9144814",
+      "bytes": 4541774,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 173,
+        "pads": 757,
+        "tracks": 2143,
+        "arcs": 0,
+        "vias": 405,
+        "zones": 129,
+        "nets": 114,
+        "layers": 34,
+        "models": 130
+      },
+      "geometry_rows": 3434,
+      "package_bytes": 4482743,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 9.008,
+      "import_completed": true,
+      "import_status": "completed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 130,
+        "resolved": 4
+      },
+      "native_reference": {
+        "id": "tiny-tapeout",
+        "status": "failed",
+        "error": "Command '['C:\\\\Program Files\\\\KiCad\\\\10.0\\\\bin\\\\python.exe', 'C:\\\\Users\\\\yawar\\\\Documents\\\\agws\\\\KiCAD_plugins\\\\SPIKE\\\\scripts\\\\public_board_native_oracle.py', 'build/public-board-corpus/manifest.json', 'build\\\\public-board-corpus\\\\tiny-tapeout-native.json', 'tiny-tapeout']' timed out after 90 seconds"
+      },
+      "frontend": {
+        "id": "tiny-tapeout",
+        "status": "parsed",
+        "counts": {
+          "components": 309,
+          "pads": 757,
+          "tracks": 2143,
+          "vias": 405,
+          "zones": 104,
+          "copper_layers": 4
+        },
+        "bounds": {
+          "minX": 56.5,
+          "minY": 53.5,
+          "maxX": 161,
+          "maxY": 134.5
+        },
+        "elapsed_ms": 203
+      }
+    },
+    {
+      "id": "vme-wren",
+      "path": "build/public-board-corpus/sources/vme-wren/demos/vme-wren/vme-wren.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "1c76ac238b04babc238d2d50585858988fb3f6c4f8d0fbacc738cfe4862fff5b",
+      "bytes": 69638531,
+      "status": "failed",
+      "stage": "roundtrip",
+      "counts": {
+        "components": 1508,
+        "pads": 6883,
+        "tracks": 39194,
+        "arcs": 0,
+        "vias": 4374,
+        "zones": 138,
+        "nets": 1800,
+        "layers": 50,
+        "models": 1480
+      },
+      "error": "{\"ok\": false, \"error\": \"Package control-plane JSON member exceeds the configured limit: design/design-ir.json\", \"type\": \"ProjectPackageError\", \"error_code\": \"SPIKE-BE-PACKAGE-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-PACKAGE-E-0001\", \"origin\": \"BE\", \"domain\": \"PACKAGE\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Project package invalid\", \"message\": \"Package control-plane JSON member exceeds the configured limit: design/design-ir.json\", \"recoverable\": true, \"retryable\": false, \"user_action\": \"Open a verified backup or re-import the source design.\", \"docs_anchor\": \"help:error-codes#spike-be-package-e-0001\", \"timestamp_utc\": \"2026-09-05T17:14:34.215Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 69.347,
+      "import_completed": true,
+      "import_status": "completed_with_warnings",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 1480,
+        "resolved": 1312
+      },
+      "native_reference": {
+        "id": "vme-wren",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 1508,
+        "pads": 6883,
+        "tracks": 24858,
+        "arcs": 1792,
+        "vias": 4374,
+        "zones": 128,
+        "nets": 1800,
+        "copper_layers": 12,
+        "thickness_mm": 1.896,
+        "bounds_mm": [
+          70.912175,
+          82.246095,
+          231.090025,
+          315.761115
+        ],
+        "model_references": 1480
+      },
+      "frontend": {
+        "id": "vme-wren",
+        "status": "parsed",
+        "counts": {
+          "components": 1508,
+          "pads": 6883,
+          "tracks": 46897,
+          "vias": 4374,
+          "zones": 143,
+          "copper_layers": 12
+        },
+        "bounds": {
+          "minX": 70.937175,
+          "minY": 82.271095,
+          "maxX": 231.065015,
+          "maxY": 315.736105
+        },
+        "elapsed_ms": 3438
+      },
+      "native_count_comparison": {
+        "components": true,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": true
+      }
+    },
+    {
+      "id": "jetson-thor",
+      "path": "build/public-board-corpus/sources/jetson-thor/demos/jetson-agx-thor-baseboard/jetson-agx-thor-baseboard.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "e61179b68ac151376f5552f91a8acc2aed46f0cc4cd9c771049490735cdbf3f8",
+      "bytes": 84806775,
+      "status": "failed",
+      "stage": "roundtrip",
+      "counts": {
+        "components": 1124,
+        "pads": 4862,
+        "tracks": 38363,
+        "arcs": 0,
+        "vias": 3235,
+        "zones": 120,
+        "nets": 1387,
+        "layers": 46,
+        "models": 1006
+      },
+      "error": "{\"ok\": false, \"error\": \"Package control-plane JSON member exceeds the configured limit: extensions/index.json\", \"type\": \"ProjectPackageError\", \"error_code\": \"SPIKE-BE-PACKAGE-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-PACKAGE-E-0001\", \"origin\": \"BE\", \"domain\": \"PACKAGE\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Project package invalid\", \"message\": \"Package control-plane JSON member exceeds the configured limit: extensions/index.json\", \"recoverable\": true, \"retryable\": false, \"user_action\": \"Open a verified backup or re-import the source design.\", \"docs_anchor\": \"help:error-codes#spike-be-package-e-0001\", \"timestamp_utc\": \"2026-09-05T17:15:39.396Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 63.913,
+      "import_completed": true,
+      "import_status": "completed_with_warnings",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": true,
+          "reasons": []
+        },
+        "si": {
+          "ready": true,
+          "reasons": []
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": true,
+          "reasons": []
+        }
+      },
+      "model_resolution": {
+        "declared": 1006,
+        "resolved": 0
+      },
+      "native_reference": {
+        "id": "jetson-thor",
+        "status": "read",
+        "reader": "10.0.5",
+        "components": 1125,
+        "pads": 4862,
+        "tracks": 19835,
+        "arcs": 2316,
+        "vias": 3235,
+        "zones": 125,
+        "nets": 1387,
+        "copper_layers": 10,
+        "thickness_mm": 1.711,
+        "bounds_mm": [
+          59.880532,
+          53.66,
+          239.980532,
+          153.76
+        ],
+        "model_references": 1011
+      },
+      "frontend": {
+        "id": "jetson-thor",
+        "status": "parsed",
+        "counts": {
+          "components": 1125,
+          "pads": 4862,
+          "tracks": 48731,
+          "vias": 3235,
+          "zones": 148,
+          "copper_layers": 10
+        },
+        "bounds": {
+          "minX": 59.930532,
+          "minY": 53.71,
+          "maxX": 239.930532,
+          "maxY": 153.71
+        },
+        "elapsed_ms": 4934
+      },
+      "native_count_comparison": {
+        "components": false,
+        "pads": true,
+        "vias": true,
+        "track_segments_including_8_per_arc": true,
+        "model_references": false
+      }
+    },
+    {
+      "id": "olimex-a64",
+      "path": "build/public-board-corpus/sources/olimex-a64/HARDWARE/A64-OLinuXino/1. Latest hardware revision/A64-OLinuXino hardware revision H/A64-OlinuXino_Rev_H.kicad_pcb",
+      "format": "kicad_pcb",
+      "sha256": "3acf7af7d39d54ba87343845d78851b0245a6290841cb463c42c7e41696404f4",
+      "bytes": 5621693,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 459,
+        "pads": 2913,
+        "tracks": 17062,
+        "arcs": 0,
+        "vias": 1130,
+        "zones": 437,
+        "nets": 447,
+        "layers": 24,
+        "models": 374
+      },
+      "geometry_rows": 21542,
+      "package_bytes": 6610686,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 14.965,
+      "import_completed": true,
+      "import_status": "completed_with_warnings",
+      "diagnostic_entry_counts": {
+        "STACKUP_MISSING": 1
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": true,
+          "reasons": []
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": true,
+          "reasons": []
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 374,
+        "resolved": 0
+      },
+      "native_reference": {
+        "id": "olimex-a64",
+        "status": "failed",
+        "error": "Command '['C:\\\\Program Files\\\\KiCad\\\\10.0\\\\bin\\\\python.exe', 'C:\\\\Users\\\\yawar\\\\Documents\\\\agws\\\\KiCAD_plugins\\\\SPIKE\\\\scripts\\\\public_board_native_oracle.py', 'build/public-board-corpus/manifest.json', 'build\\\\public-board-corpus\\\\olimex-a64-native.json', 'olimex-a64']' timed out after 90 seconds"
+      },
+      "frontend": {
+        "id": "olimex-a64",
+        "status": "parsed",
+        "counts": {
+          "components": 459,
+          "pads": 2913,
+          "tracks": 17062,
+          "vias": 1130,
+          "zones": 482,
+          "copper_layers": 6
+        },
+        "bounds": {
+          "minX": 100,
+          "minY": 37.5,
+          "maxX": 190,
+          "maxY": 100
+        },
+        "elapsed_ms": 384
+      }
+    },
+    {
+      "id": "beaglebone-black",
+      "path": "build/public-board-corpus/sources/beaglebone-black/examples/beagleboneblack",
+      "format": "odb++",
+      "sha256": "93674c65931758d279e5d4b690d58cf602250c5398205103c56b9a95abe9c561",
+      "bytes": 10402115,
+      "status": "failed",
+      "stage": "roundtrip",
+      "counts": {
+        "components": 413,
+        "pads": 7611,
+        "tracks": 33647,
+        "arcs": 48,
+        "vias": 0,
+        "zones": 971,
+        "nets": 334,
+        "layers": 21,
+        "models": 0
+      },
+      "error": "{\"ok\": false, \"error\": \"Package control-plane JSON member exceeds the configured limit: design/design-ir.json\", \"type\": \"ProjectPackageError\", \"error_code\": \"SPIKE-BE-PACKAGE-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-PACKAGE-E-0001\", \"origin\": \"BE\", \"domain\": \"PACKAGE\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Project package invalid\", \"message\": \"Package control-plane JSON member exceeds the configured limit: design/design-ir.json\", \"recoverable\": true, \"retryable\": false, \"user_action\": \"Open a verified backup or re-import the source design.\", \"docs_anchor\": \"help:error-codes#spike-be-package-e-0001\", \"timestamp_utc\": \"2026-09-05T18:10:29.629Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 82.882,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_CONNECTIVITY_MISSING": 200,
+        "ODB_DRILL_SPAN_MISSING": 200,
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 247,
+        "ODB_DRILL_UNSUPPORTED": 7,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 187,
+        "ODB_VIA_SPAN_UNRESOLVED": 860,
+        "ODB_VIA_UNRESOLVED": 3,
+        "ODB_DRILL_OWNER_UNRESOLVED": 991
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "beaglebone-black",
+        "status": "parsed",
+        "counts": {
+          "components": 413,
+          "pads": 7611,
+          "tracks": 34031,
+          "vias": 0,
+          "zones": 971,
+          "copper_layers": 6
+        },
+        "bounds": {
+          "minX": 0,
+          "minY": -3.552713678800501e-15,
+          "maxX": 86.36,
+          "maxY": 54.61
+        },
+        "elapsed_ms": 1317
+      },
+      "source_inventory": {
+        "components": 413,
+        "feature_records": {
+          "steps/stp/layers/bottom/features": {
+            "L": 6474,
+            "A": 18,
+            "P": 1640,
+            "S": 338
+          },
+          "steps/stp/layers/comp_+_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/stp/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/stp/layers/drill/features": {
+            "L": 7,
+            "A": 0,
+            "P": 991,
+            "S": 0
+          },
+          "steps/stp/layers/fab/features": {
+            "L": 30332,
+            "A": 34,
+            "P": 0,
+            "S": 0
+          },
+          "steps/stp/layers/fab_drc/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 4
+          },
+          "steps/stp/layers/height_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 6
+          },
+          "steps/stp/layers/lyr2_gnd/features": {
+            "L": 4489,
+            "A": 18,
+            "P": 998,
+            "S": 6
+          },
+          "steps/stp/layers/lyr3/features": {
+            "L": 5727,
+            "A": 18,
+            "P": 998,
+            "S": 181
+          },
+          "steps/stp/layers/lyr4/features": {
+            "L": 5355,
+            "A": 18,
+            "P": 998,
+            "S": 121
+          },
+          "steps/stp/layers/lyr5_pwr/features": {
+            "L": 4460,
+            "A": 18,
+            "P": 998,
+            "S": 26
+          },
+          "steps/stp/layers/outline/features": {
+            "L": 10,
+            "A": 8,
+            "P": 0,
+            "S": 0
+          },
+          "steps/stp/layers/smb/features": {
+            "L": 4358,
+            "A": 18,
+            "P": 780,
+            "S": 4
+          },
+          "steps/stp/layers/smt/features": {
+            "L": 4357,
+            "A": 18,
+            "P": 1069,
+            "S": 68
+          },
+          "steps/stp/layers/spb/features": {
+            "L": 4363,
+            "A": 18,
+            "P": 644,
+            "S": 4
+          },
+          "steps/stp/layers/spt/features": {
+            "L": 4362,
+            "A": 18,
+            "P": 992,
+            "S": 13
+          },
+          "steps/stp/layers/ssb/features": {
+            "L": 20798,
+            "A": 32,
+            "P": 0,
+            "S": 6
+          },
+          "steps/stp/layers/ssb+1/features": {
+            "L": 14459,
+            "A": 15,
+            "P": 0,
+            "S": 2
+          },
+          "steps/stp/layers/sst/features": {
+            "L": 11651,
+            "A": 63,
+            "P": 0,
+            "S": 10
+          },
+          "steps/stp/layers/sst+1/features": {
+            "L": 6913,
+            "A": 21,
+            "P": 5,
+            "S": 6
+          },
+          "steps/stp/layers/top/features": {
+            "L": 7142,
+            "A": 18,
+            "P": 1993,
+            "S": 472
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "merit-badge",
+      "path": "build/public-board-corpus/sources/merit-badge/Production/ODB++/rfsr_electronicsmeritbadgekit-pcb_v1.0.0.zip",
+      "format": "odb++",
+      "sha256": "78a288980dfe0e9442e0676840e9e76a1fe4bae4e1785d9b8f69eb064709829e",
+      "bytes": 194907,
+      "status": "failed",
+      "stage": "import",
+      "error": "{\"ok\": false, \"error\": \"Extension exited with code 1: ValueError: Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/eda/data. Re-export with gzip or uncompressed members.\\nTraceback (most recent call last):\\r\\n  File \\\"C:\\\\Users\\\\yawar\\\\Documents\\\\agws\\\\KiCAD_plugins\\\\SPIKE\\\\extensions\\\\odb-import\\\\extension.py\\\", line 29, in <module>\\r\\n    if __name__ == \\\"__main__\\\": main()\\r\\n                               ^^^^^^\\r\\n  File \\\"C:\\\\Users\\\\yawar\\\\Documents\\\\agws\\\\KiCAD_plugins\\\\SPIKE\\\\exte...[TRUNCATED]\", \"type\": \"RuntimeError\", \"error_code\": \"SPIKE-BE-IMPORT-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-IMPORT-E-0001\", \"origin\": \"BE\", \"domain\": \"IMPORT\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Design import failed\", \"message\": \"Extension exited with code 1: ValueError: Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/eda/data. Re-export with gzip or uncompressed members.\\nTraceback (most recent call last):\\r\\n  File \\\"C:\\\\Users\\\\yawar\\\\Documents\\\\agws\\\\KiCAD_plugins\\\\SPIKE\\\\extensions\\\\odb-import\\\\extension.py\\\", line 29, in <module>\\r\\n    if __name__ == \\\"__main__\\\": main()\\r\\n                               ^^^^^^\\r\\n  File \\\"C:\\\\Users\\\\yawar\\\\Documents\\\\agws\\\\KiCAD_plugins\\\\SPIKE\\\\exte...[TRUNCATED]\", \"recoverable\": true, \"retryable\": true, \"user_action\": \"Review the source path, format hint, and importer diagnostics, then retry.\", \"docs_anchor\": \"help:error-codes#spike-be-import-e-0001\", \"timestamp_utc\": \"2026-09-05T17:17:25.372Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 1.174,
+      "import_completed": false,
+      "import_status": "failed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {},
+      "model_resolution": {},
+      "native_reference": {},
+      "frontend": {
+        "id": "merit-badge",
+        "status": "unavailable",
+        "reason": "No normalized snapshot was produced"
+      },
+      "source_inventory": {
+        "components": 0,
+        "feature_records": {},
+        "unreadable_members": [
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottom/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottom/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottom/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottom/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomassembly/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomassembly/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomassembly/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomassembly/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottommask/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottommask/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottommask/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottommask/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottompaste/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottompaste/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottompaste/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottompaste/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomsilk/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomsilk/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomsilk/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/bottomsilk/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_bot/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_bot/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_bot/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_bot/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_top/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_top/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_top/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/comp_+_top/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/fr-4/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/fr-4/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/fr-4/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/fr-4/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/rout/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/rout/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist1/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist1/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist1/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/solderresist1/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/through_drill/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/through_drill/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/through_drill/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/through_drill/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/top/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/top/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/top/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/top/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topassembly/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topassembly/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topassembly/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topassembly/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topdimensions/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topdimensions/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topdimensions/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topdimensions/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topmask/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topmask/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topmask/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topmask/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/toppaste/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/toppaste/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/toppaste/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/toppaste/features. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topsilk/components.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topsilk/components. Re-export with gzip or uncompressed members."
+          },
+          {
+            "name": "rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topsilk/features.Z",
+            "error": "Unix compress (.Z) encoding is not supported for source member: rfsr_electronicsmeritbadgekit-pcb/steps/pcb/layers/topsilk/features. Re-export with gzip or uncompressed members."
+          }
+        ]
+      }
+    },
+    {
+      "id": "odb-simple",
+      "path": "build/public-board-corpus/sources/odb-simple/samples/test-odb.tgz",
+      "format": "odb++",
+      "sha256": "b5c10264dcb196ca406b8295a392c7a2c08a7789706789c5447acf59cec4a3e1",
+      "bytes": 5124,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 2,
+        "pads": 0,
+        "tracks": 1,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 0,
+        "nets": 3,
+        "layers": 18,
+        "models": 0
+      },
+      "geometry_rows": 1,
+      "package_bytes": 40509,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 1.458,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 4,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 4,
+        "ODB_PROFILE_UNSUPPORTED": 1
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "odb-simple",
+        "status": "parsed",
+        "counts": {
+          "components": 2,
+          "pads": 0,
+          "tracks": 1,
+          "vias": 0,
+          "zones": 0,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 0,
+          "minY": 0,
+          "maxX": 1,
+          "maxY": 1
+        },
+        "elapsed_ms": 2
+      },
+      "source_inventory": {
+        "components": 2,
+        "feature_records": {
+          "odb/steps/pcb/layers/user.comments/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 4,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/b.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/f.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/f.cu/features": {
+            "L": 1,
+            "A": 0,
+            "P": 4,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/b.silkscreen/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/f.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 4,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/f.courtyard/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/f.silkscreen/features": {
+            "L": 41,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/edge.cuts/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/b.courtyard/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/b.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "odb/steps/pcb/layers/user.drawings/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "odb-kitchen-sink",
+      "path": "build/public-board-corpus/sources/odb-kitchen-sink/samples/odb-kitchen-sink",
+      "format": "odb++",
+      "sha256": "ae1934e400b630b2d768de6eede07ac87c944d70b4bb7c3612a2c51deef69054",
+      "bytes": 282846,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 3,
+        "pads": 8,
+        "tracks": 4,
+        "arcs": 0,
+        "vias": 3,
+        "zones": 3,
+        "nets": 1,
+        "layers": 37,
+        "models": 0
+      },
+      "geometry_rows": 18,
+      "package_bytes": 802701,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 2.465,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 2,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 3,
+        "ODB_DRILL_OWNER_UNRESOLVED": 4
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "odb-kitchen-sink",
+        "status": "parsed",
+        "counts": {
+          "components": 3,
+          "pads": 8,
+          "tracks": 4,
+          "vias": 3,
+          "zones": 3,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 35.65,
+          "minY": -170.7,
+          "maxX": 258.75,
+          "maxY": -29.4
+        },
+        "elapsed_ms": 15
+      },
+      "source_inventory": {
+        "components": 3,
+        "feature_records": {
+          "steps/pcb/layers/b.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.courtyard/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.cu/features": {
+            "L": 4,
+            "A": 0,
+            "P": 7,
+            "S": 3
+          },
+          "steps/pcb/layers/b.fab/features": {
+            "L": 31,
+            "A": 1,
+            "P": 4,
+            "S": 0
+          },
+          "steps/pcb/layers/b.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 6,
+            "S": 0
+          },
+          "steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 1,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.silkscreen/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/capping_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 7,
+            "S": 0
+          },
+          "steps/pcb/layers/edge.cuts/features": {
+            "L": 13,
+            "A": 0,
+            "P": 2,
+            "S": 0
+          },
+          "steps/pcb/layers/f.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.courtyard/features": {
+            "L": 4,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 9,
+            "S": 0
+          },
+          "steps/pcb/layers/f.fab/features": {
+            "L": 31,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 7,
+            "S": 0
+          },
+          "steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 2,
+            "S": 0
+          },
+          "steps/pcb/layers/f.silkscreen/features": {
+            "L": 273,
+            "A": 0,
+            "P": 5,
+            "S": 0
+          },
+          "steps/pcb/layers/filling_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/plugging_front/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "steps/pcb/layers/tenting_back/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "steps/pcb/layers/tenting_front/features": {
+            "L": 0,
+            "A": 0,
+            "P": 2,
+            "S": 0
+          },
+          "steps/pcb/layers/user.1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.4/features": {
+            "L": 2,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.5/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.6/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.7/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.8/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.9/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.comments/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.drawings/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "odb-rigidflex",
+      "path": "build/public-board-corpus/sources/odb-rigidflex/samples/designodb_rigidflex.tgz",
+      "format": "odb++",
+      "sha256": "e67cbbdf95044b0a961fea956ef0e292121755b5de413e95a3265269eb24ee78",
+      "bytes": 11653177,
+      "status": "failed",
+      "stage": "import",
+      "error": "{\"ok\": false, \"error\": \"Extension result exceeds the 268435456-byte limit.\", \"type\": \"RuntimeError\", \"error_code\": \"SPIKE-BE-IMPORT-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-IMPORT-E-0001\", \"origin\": \"BE\", \"domain\": \"IMPORT\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Design import failed\", \"message\": \"Extension result exceeds the 268435456-byte limit.\", \"recoverable\": true, \"retryable\": true, \"user_action\": \"Review the source path, format hint, and importer diagnostics, then retry.\", \"docs_anchor\": \"help:error-codes#spike-be-import-e-0001\", \"timestamp_utc\": \"2026-09-05T17:19:21.063Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 106.58,
+      "import_completed": false,
+      "import_status": "failed",
+      "diagnostic_entry_counts": {},
+      "solver_readiness": {},
+      "model_resolution": {},
+      "native_reference": {},
+      "frontend": {
+        "id": "odb-rigidflex",
+        "status": "unavailable",
+        "reason": "No normalized snapshot was produced"
+      },
+      "source_inventory": {
+        "components": 692,
+        "feature_records": {
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/assemb/features": {
+            "L": 44299,
+            "A": 37,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/assemt/features": {
+            "L": 369433,
+            "A": 114,
+            "P": 1,
+            "S": 1
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/bend_area/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/comp_+_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/coverbottom/features": {
+            "L": 0,
+            "A": 0,
+            "P": 34,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/covertop/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_13/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_15/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_17/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_19/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_5/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_7/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/dielectric_9/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_1_10/features": {
+            "L": 0,
+            "A": 0,
+            "P": 5,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_1_2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 3185,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_2_3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 2399,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_3_8/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1305,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_5_6/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_8_9/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1239,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/d_9_10/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1261,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/fab_drc/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 9
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/flex_5/features": {
+            "L": 3760,
+            "A": 54,
+            "P": 1307,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/flex_6/features": {
+            "L": 4959,
+            "A": 554,
+            "P": 1341,
+            "S": 260
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/flex_area/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/odb_board_outline/features": {
+            "L": 117,
+            "A": 118,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/plane_4/features": {
+            "L": 2000,
+            "A": 0,
+            "P": 1307,
+            "S": 4
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/polyimide_base_11/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/rigid_area/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/rout/features": {
+            "L": 1,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_10/features": {
+            "L": 2968,
+            "A": 0,
+            "P": 1438,
+            "S": 35
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_1/features": {
+            "L": 5514,
+            "A": 0,
+            "P": 5438,
+            "S": 547
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_2/features": {
+            "L": 7978,
+            "A": 0,
+            "P": 6424,
+            "S": 1605
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_3/features": {
+            "L": 6279,
+            "A": 0,
+            "P": 3713,
+            "S": 1581
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_7/features": {
+            "L": 2892,
+            "A": 0,
+            "P": 1307,
+            "S": 138
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_8/features": {
+            "L": 4479,
+            "A": 0,
+            "P": 2546,
+            "S": 519
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/signal_9/features": {
+            "L": 3804,
+            "A": 0,
+            "P": 2559,
+            "S": 287
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/soldermask_bottom/features": {
+            "L": 42,
+            "A": 62,
+            "P": 204,
+            "S": 5
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/soldermask_top/features": {
+            "L": 6862,
+            "A": 19,
+            "P": 2267,
+            "S": 31
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/spb/features": {
+            "L": 3017,
+            "A": 0,
+            "P": 145,
+            "S": 0
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/spt/features": {
+            "L": 2727,
+            "A": 0,
+            "P": 2118,
+            "S": 61
+          },
+          "designodb_rigidflex/steps/cellular_flip-phone/layers/stiffener/features": {
+            "L": 4,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "designodb_rigidflex/symbols/sc_join0201w_hd/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/sc_join0201w_hd_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/sc_join0201w_hd_sm_50um/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/sc_join0201_hd/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/sc_join0201_hd_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/sc_join0201_hd_sm_50um/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.300x0.330/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.440x0.560wide/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.440x0.560/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.500x0.800_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special0.510x0.560/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.540x0.660wide/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.540x0.660/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.560x0.680/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special0.584x0.900x2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special0.770x0.840/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.000x1.000/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.100x1.100/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.120x1.120/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.150x1.650/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.250x1.750/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.270x1.770/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.500x2.600x2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special1.800x1.800x4/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 4
+          },
+          "designodb_rigidflex/symbols/special1.900x2.000/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.900x2.000_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.900x2.500/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special1.900x2.500_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.100x3.100/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.100x3.100_b/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.100x3.100_b_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.100x3.100_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.100x3.500/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.100x3.500_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special2.25x3.50/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special5.2mm_outer_dia_2.8mm_inner_trim_4.2mm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special5.2mm_outer_dia_trim_4.2mm_cl/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special5.800x2.200_pb/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special5.800x2.350/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special5.900x2.450_sm_50um/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special5.920x2.470_radius0.18/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.300x0.330/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.440x0.560wide/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.440x0.560/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.510x0.560/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.540x0.660wide/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.540x0.660/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.670x0.950_nt2520/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.770x0.840/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_0.770x1.050_nt2520/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_1.150x1.650/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_1.250x1.750/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_1.900x2.000/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_1.900x2.000_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_1.900x2.500/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_1.900x2.500_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_5.200_outer_dia_2.800_inner_trim_4.200/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_5.200_outer_dia_2.800_inner_trim_4.200_cutout/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_5.200_outer_dia_2.800_inner_trim_4.200_cutout_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_5.200_outer_dia_2.800_inner_trim_4.200_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_alona_domekey_outer_b/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_alona_domekey_outer_c/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_alona_domekey_outer_sm_b/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_alona_domekey_outer_sm_c/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101134/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101134_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101141_sp/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 4
+          },
+          "designodb_rigidflex/symbols/special_byx101149/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101149_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101149_sm_50um/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101151_p6/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101151_p6_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101151_p7/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101151_p7_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101155/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_byx101155_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101155_sp/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 4
+          },
+          "designodb_rigidflex/symbols/special_byx101208_c/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101208_c_sm50/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101208_c_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101517/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_byx101517_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_byx101517_sp/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 4
+          },
+          "designodb_rigidflex/symbols/special_byx101517_sp_b/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 4
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_1_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_2_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_3_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_4/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_4_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_5/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_3mm_paris_5_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_4mm_sidecut/features": {
+            "L": 1,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_4mm_sidecut_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_5mm_sidecut/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domekey_5mm_sidecut_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_domekey_lena_shaved/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domkey_4.800_justine/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_domkey_4.800_justine_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_ellen_mic_paste/features": {
+            "L": 2,
+            "A": 0,
+            "P": 0,
+            "S": 3
+          },
+          "designodb_rigidflex/symbols/special_join0201w_hd/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_join0201w_hd_sm_50um/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_join0402_hdwide/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_join0402_hd_sm_wide/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_join_0603/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_mulan_domkey_outer_s2921_soldermask_050/features": {
+            "L": 0,
+            "A": 0,
+            "P": 2,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_samantha_domekey_outer/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_samantha_domekey_outer_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_sania_speaker_cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_sania_speaker_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_shinobu_domekey_outer/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_shinobu_domekey_outer_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_3000sm/features": {
+            "L": 5,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_3000/features": {
+            "L": 5,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_4237sm/features": {
+            "L": 5,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_4237/features": {
+            "L": 5,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_b/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 2
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_sm/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_sofia_domekey_outer_sm_b/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 1
+          },
+          "designodb_rigidflex/symbols/special_spark_gap_0.457x0.229/features": {
+            "L": 0,
+            "A": 0,
+            "P": 3,
+            "S": 1
+          }
+        },
+        "unreadable_members": []
+      }
+    },
+    {
+      "id": "ecc83-odb",
+      "path": "build/public-board-corpus/generated/ecc83.zip",
+      "format": "odb++",
+      "sha256": "ccc9d3b420bd08eb5a3e4542a31abaa917d3d6f0caafa452822a31f9ad96c1bb",
+      "bytes": 55519,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 15,
+        "pads": 66,
+        "tracks": 59,
+        "arcs": 0,
+        "vias": 0,
+        "zones": 1,
+        "nets": 13,
+        "layers": 23,
+        "models": 0
+      },
+      "geometry_rows": 126,
+      "package_bytes": 758233,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 1.706,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_DRILL_OWNER_UNRESOLVED": 33
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "ecc83-odb",
+        "status": "parsed",
+        "counts": {
+          "components": 15,
+          "pads": 66,
+          "tracks": 59,
+          "vias": 0,
+          "zones": 1,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 121.285,
+          "minY": -136.525,
+          "maxX": 173.355,
+          "maxY": -90.17
+        },
+        "elapsed_ms": 17
+      },
+      "source_inventory": {
+        "components": 15,
+        "feature_records": {
+          "steps/pcb/layers/b.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.courtyard/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.fab/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 33,
+            "S": 0
+          },
+          "steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.silkscreen/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/bottom_cu/features": {
+            "L": 59,
+            "A": 0,
+            "P": 33,
+            "S": 1
+          },
+          "steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_plated_top_cu-bottom_cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 33,
+            "S": 0
+          },
+          "steps/pcb/layers/edge.cuts/features": {
+            "L": 4,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.courtyard/features": {
+            "L": 36,
+            "A": 0,
+            "P": 6,
+            "S": 0
+          },
+          "steps/pcb/layers/f.fab/features": {
+            "L": 1115,
+            "A": 0,
+            "P": 2,
+            "S": 0
+          },
+          "steps/pcb/layers/f.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 33,
+            "S": 0
+          },
+          "steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.silkscreen/features": {
+            "L": 560,
+            "A": 0,
+            "P": 2,
+            "S": 0
+          },
+          "steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/top_cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 33,
+            "S": 0
+          },
+          "steps/pcb/layers/user.comments/features": {
+            "L": 0,
+            "A": 0,
+            "P": 4,
+            "S": 0
+          },
+          "steps/pcb/layers/user.drawings/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "stickhub-odb",
+      "path": "build/public-board-corpus/generated/stickhub.zip",
+      "format": "odb++",
+      "sha256": "e33a8ef848764943216465721dececed0a74f7df494c87ff842caee82898d0ce",
+      "bytes": 222599,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 90,
+        "pads": 0,
+        "tracks": 1113,
+        "arcs": 0,
+        "vias": 87,
+        "zones": 13,
+        "nets": 47,
+        "layers": 25,
+        "models": 0
+      },
+      "geometry_rows": 1213,
+      "package_bytes": 3860626,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 8.324,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 451,
+        "ODB_DRILL_UNSUPPORTED": 1,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 455
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "stickhub-odb",
+        "status": "parsed",
+        "counts": {
+          "components": 90,
+          "pads": 0,
+          "tracks": 1113,
+          "vias": 87,
+          "zones": 13,
+          "copper_layers": 2
+        },
+        "bounds": {
+          "minX": 141.75,
+          "minY": -120,
+          "maxX": 158.25,
+          "maxY": -80
+        },
+        "elapsed_ms": 76
+      },
+      "source_inventory": {
+        "components": 90,
+        "feature_records": {
+          "steps/pcb/layers/b.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.courtyard/features": {
+            "L": 224,
+            "A": 192,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.cu/features": {
+            "L": 423,
+            "A": 98,
+            "P": 242,
+            "S": 8
+          },
+          "steps/pcb/layers/b.fab/features": {
+            "L": 2810,
+            "A": 0,
+            "P": 1,
+            "S": 1
+          },
+          "steps/pcb/layers/b.mask/features": {
+            "L": 21,
+            "A": 4,
+            "P": 161,
+            "S": 6
+          },
+          "steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 152,
+            "S": 0
+          },
+          "steps/pcb/layers/b.silkscreen/features": {
+            "L": 1679,
+            "A": 4,
+            "P": 0,
+            "S": 147
+          },
+          "steps/pcb/layers/comp_+_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_non-plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 87,
+            "S": 0
+          },
+          "steps/pcb/layers/edge.cuts/features": {
+            "L": 12,
+            "A": 8,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.courtyard/features": {
+            "L": 144,
+            "A": 112,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.cu/features": {
+            "L": 690,
+            "A": 82,
+            "P": 203,
+            "S": 5
+          },
+          "steps/pcb/layers/f.fab/features": {
+            "L": 2643,
+            "A": 28,
+            "P": 7,
+            "S": 0
+          },
+          "steps/pcb/layers/f.mask/features": {
+            "L": 465,
+            "A": 0,
+            "P": 117,
+            "S": 9
+          },
+          "steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 112,
+            "S": 0
+          },
+          "steps/pcb/layers/f.silkscreen/features": {
+            "L": 614,
+            "A": 0,
+            "P": 0,
+            "S": 63
+          },
+          "steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.comments/features": {
+            "L": 247,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.drawings/features": {
+            "L": 2,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "cm5-minima-odb",
+      "path": "build/public-board-corpus/generated/cm5-minima.zip",
+      "format": "odb++",
+      "sha256": "7f31a7508edfa815a339c0e0f6d795fedc71e0818be76f2c09959642518853cd",
+      "bytes": 857699,
+      "status": "imported",
+      "stage": "complete",
+      "counts": {
+        "components": 84,
+        "pads": 572,
+        "tracks": 1884,
+        "arcs": 45,
+        "vias": 444,
+        "zones": 31,
+        "nets": 220,
+        "layers": 42,
+        "models": 0
+      },
+      "geometry_rows": 2976,
+      "package_bytes": 14476819,
+      "package_roundtrip": "passed",
+      "source_text_roundtrip": true,
+      "elapsed_seconds": 25.76,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 320,
+        "ODB_DRILL_UNSUPPORTED": 12,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 389,
+        "ODB_DRILL_OWNER_UNRESOLVED": 26
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "cm5-minima-odb",
+        "status": "parsed",
+        "counts": {
+          "components": 84,
+          "pads": 572,
+          "tracks": 2244,
+          "vias": 444,
+          "zones": 31,
+          "copper_layers": 6
+        },
+        "bounds": {
+          "minX": 75.047719,
+          "minY": -84.451605,
+          "maxX": 136.252316,
+          "maxY": -20.247865
+        },
+        "elapsed_ms": 367
+      },
+      "source_inventory": {
+        "components": 84,
+        "feature_records": {
+          "steps/pcb/layers/b.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.courtyard/features": {
+            "L": 48,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.cu/features": {
+            "L": 783,
+            "A": 108,
+            "P": 738,
+            "S": 8
+          },
+          "steps/pcb/layers/b.fab/features": {
+            "L": 610,
+            "A": 0,
+            "P": 3,
+            "S": 0
+          },
+          "steps/pcb/layers/b.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 308,
+            "S": 0
+          },
+          "steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 269,
+            "S": 0
+          },
+          "steps/pcb/layers/b.silkscreen/features": {
+            "L": 1630,
+            "A": 8,
+            "P": 1,
+            "S": 31
+          },
+          "steps/pcb/layers/comp_+_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_4/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_5/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_non-plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 14,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 468,
+            "S": 0
+          },
+          "steps/pcb/layers/edge.cuts/features": {
+            "L": 16,
+            "A": 14,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.courtyard/features": {
+            "L": 192,
+            "A": 0,
+            "P": 13,
+            "S": 0
+          },
+          "steps/pcb/layers/f.cu/features": {
+            "L": 926,
+            "A": 92,
+            "P": 791,
+            "S": 15
+          },
+          "steps/pcb/layers/f.fab/features": {
+            "L": 3107,
+            "A": 0,
+            "P": 9,
+            "S": 0
+          },
+          "steps/pcb/layers/f.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 361,
+            "S": 0
+          },
+          "steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 320,
+            "S": 0
+          },
+          "steps/pcb/layers/f.silkscreen/features": {
+            "L": 4974,
+            "A": 2,
+            "P": 14,
+            "S": 72
+          },
+          "steps/pcb/layers/in1.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 468,
+            "S": 1
+          },
+          "steps/pcb/layers/in2.cu/features": {
+            "L": 139,
+            "A": 0,
+            "P": 468,
+            "S": 2
+          },
+          "steps/pcb/layers/in3.cu/features": {
+            "L": 36,
+            "A": 0,
+            "P": 468,
+            "S": 4
+          },
+          "steps/pcb/layers/in4.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 468,
+            "S": 1
+          },
+          "steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.2/features": {
+            "L": 4,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.4/features": {
+            "L": 0,
+            "A": 0,
+            "P": 4,
+            "S": 0
+          },
+          "steps/pcb/layers/user.5/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.6/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.7/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.8/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.9/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.comments/features": {
+            "L": 0,
+            "A": 0,
+            "P": 16,
+            "S": 0
+          },
+          "steps/pcb/layers/user.drawings/features": {
+            "L": 9982,
+            "A": 0,
+            "P": 2,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco1/features": {
+            "L": 5,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco2/features": {
+            "L": 6,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "video-odb",
+      "path": "build/public-board-corpus/generated/video.zip",
+      "format": "odb++",
+      "sha256": "6c25e48ad88e5dd3cfc1ef1e53870a993cc0d6be0b5b533109b66f1a3a8b76c0",
+      "bytes": 1238915,
+      "status": "failed",
+      "stage": "roundtrip",
+      "counts": {
+        "components": 189,
+        "pads": 3791,
+        "tracks": 7946,
+        "arcs": 0,
+        "vias": 808,
+        "zones": 8,
+        "nets": 588,
+        "layers": 28,
+        "models": 0
+      },
+      "error": "{\"ok\": false, \"error\": \"Package control-plane JSON member exceeds the configured limit: extensions/index.json\", \"type\": \"ProjectPackageError\", \"error_code\": \"SPIKE-BE-PACKAGE-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-PACKAGE-E-0001\", \"origin\": \"BE\", \"domain\": \"PACKAGE\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Project package invalid\", \"message\": \"Package control-plane JSON member exceeds the configured limit: extensions/index.json\", \"recoverable\": true, \"retryable\": false, \"user_action\": \"Open a verified backup or re-import the source design.\", \"docs_anchor\": \"help:error-codes#spike-be-package-e-0001\", \"timestamp_utc\": \"2026-09-05T18:09:05.842Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 40.223,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_CONNECTIVITY_MISSING": 28,
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 1063,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 1063,
+        "ODB_DRILL_OWNER_UNRESOLVED": 912
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "video-odb",
+        "status": "parsed",
+        "counts": {
+          "components": 189,
+          "pads": 3791,
+          "tracks": 7946,
+          "vias": 808,
+          "zones": 8,
+          "copper_layers": 4
+        },
+        "bounds": {
+          "minX": 53.594,
+          "minY": -163.195,
+          "maxX": 365.633,
+          "maxY": -56.515
+        },
+        "elapsed_ms": 1523
+      },
+      "source_inventory": {
+        "components": 189,
+        "feature_records": {
+          "steps/pcb/layers/b.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.courtyard/features": {
+            "L": 412,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.cu/features": {
+            "L": 3653,
+            "A": 0,
+            "P": 2043,
+            "S": 0
+          },
+          "steps/pcb/layers/b.fab/features": {
+            "L": 8032,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1235,
+            "S": 0
+          },
+          "steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 261,
+            "S": 0
+          },
+          "steps/pcb/layers/b.silkscreen/features": {
+            "L": 3815,
+            "A": 0,
+            "P": 0,
+            "S": 3
+          },
+          "steps/pcb/layers/comp_+_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_plated_top_copper-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1720,
+            "S": 0
+          },
+          "steps/pcb/layers/edge.cuts/features": {
+            "L": 22,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.adhesive/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.courtyard/features": {
+            "L": 444,
+            "A": 0,
+            "P": 1,
+            "S": 0
+          },
+          "steps/pcb/layers/f.fab/features": {
+            "L": 5517,
+            "A": 11,
+            "P": 6,
+            "S": 0
+          },
+          "steps/pcb/layers/f.mask/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1795,
+            "S": 0
+          },
+          "steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 819,
+            "S": 0
+          },
+          "steps/pcb/layers/f.silkscreen/features": {
+            "L": 3618,
+            "A": 10,
+            "P": 6,
+            "S": 9
+          },
+          "steps/pcb/layers/in1.cu/features": {
+            "L": 69,
+            "A": 0,
+            "P": 1720,
+            "S": 4
+          },
+          "steps/pcb/layers/in2.cu/features": {
+            "L": 539,
+            "A": 0,
+            "P": 1720,
+            "S": 4
+          },
+          "steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/top_copper/features": {
+            "L": 3685,
+            "A": 0,
+            "P": 2603,
+            "S": 0
+          },
+          "steps/pcb/layers/user.comments/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.drawings/features": {
+            "L": 251,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/user.eco2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    },
+    {
+      "id": "olimex-a64-odb",
+      "path": "build/public-board-corpus/generated/olimex-a64.zip",
+      "format": "odb++",
+      "sha256": "e78d81674f3248c6c6969560dae68e7e8ae5d636db1475816552098e6af52833",
+      "bytes": 2158926,
+      "status": "failed",
+      "stage": "roundtrip",
+      "counts": {
+        "components": 452,
+        "pads": 2710,
+        "tracks": 17005,
+        "arcs": 0,
+        "vias": 1130,
+        "zones": 419,
+        "nets": 447,
+        "layers": 33,
+        "models": 0
+      },
+      "error": "{\"ok\": false, \"error\": \"Package control-plane JSON member exceeds the configured limit: design/design-ir.json\", \"type\": \"ProjectPackageError\", \"error_code\": \"SPIKE-BE-PACKAGE-E-0001\", \"error_detail\": {\"contract\": \"spike/error/v1\", \"code\": \"SPIKE-BE-PACKAGE-E-0001\", \"origin\": \"BE\", \"domain\": \"PACKAGE\", \"classification\": \"E\", \"sequence\": 1, \"title\": \"Project package invalid\", \"message\": \"Package control-plane JSON member exceeds the configured limit: design/design-ir.json\", \"recoverable\": true, \"retryable\": false, \"user_action\": \"Open a verified backup or re-import the source design.\", \"docs_anchor\": \"help:error-codes#spike-be-package-e-0001\", \"timestamp_utc\": \"2026-09-05T17:24:33.240Z\", \"context\": {}, \"operation_id\": \"public-corpus\"}}",
+      "elapsed_seconds": 76.144,
+      "import_completed": true,
+      "import_status": "completed_with_errors",
+      "diagnostic_entry_counts": {
+        "ODB_CONNECTIVITY_MISSING": 12,
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1,
+        "ODB_FEATURE_UNSUPPORTED": 63,
+        "ODB_DRILL_UNSUPPORTED": 13,
+        "ODB_FEATURE_REFERENCE_UNRESOLVED": 1271,
+        "ODB_DRILL_OWNER_UNRESOLVED": 125
+      },
+      "solver_readiness": {
+        "pi_dc": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "pi_ac": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "si": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        },
+        "thermal": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving."
+          ]
+        },
+        "emi": {
+          "ready": false,
+          "reasons": [
+            "Conductor geometry import is incomplete.",
+            "Retained conductor geometry is not qualified for solver meshing.",
+            "ODB++ copper requires explicit layer thickness before solving.",
+            "Stackup or dielectric material data is incomplete."
+          ]
+        }
+      },
+      "model_resolution": {
+        "declared": 0,
+        "resolved": 0
+      },
+      "native_reference": {},
+      "frontend": {
+        "id": "olimex-a64-odb",
+        "status": "parsed",
+        "counts": {
+          "components": 452,
+          "pads": 2710,
+          "tracks": 17005,
+          "vias": 1130,
+          "zones": 419,
+          "copper_layers": 6
+        },
+        "bounds": {
+          "minX": 100,
+          "minY": -100,
+          "maxX": 190,
+          "maxY": -37.5
+        },
+        "elapsed_ms": 1111
+      },
+      "source_inventory": {
+        "components": 452,
+        "feature_records": {
+          "steps/pcb/layers/b.adhes/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.crtyd/features": {
+            "L": 12,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.cu/features": {
+            "L": 4562,
+            "A": 0,
+            "P": 1844,
+            "S": 121
+          },
+          "steps/pcb/layers/b.fab/features": {
+            "L": 24901,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/b.mask/features": {
+            "L": 1102,
+            "A": 0,
+            "P": 711,
+            "S": 29
+          },
+          "steps/pcb/layers/b.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 575,
+            "S": 0
+          },
+          "steps/pcb/layers/b.silks/features": {
+            "L": 11397,
+            "A": 79,
+            "P": 11,
+            "S": 0
+          },
+          "steps/pcb/layers/cmts.user/features": {
+            "L": 680,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/comp_+_bot/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/comp_+_top/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_1/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_2/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_3/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_4/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/dielectric_5/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_non-plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 17,
+            "S": 0
+          },
+          "steps/pcb/layers/drill_plated_f.cu-b.cu/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1251,
+            "S": 0
+          },
+          "steps/pcb/layers/dwgs.user/features": {
+            "L": 2492,
+            "A": 13,
+            "P": 10,
+            "S": 0
+          },
+          "steps/pcb/layers/eco1.user/features": {
+            "L": 27,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/eco2.user/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/edge.cuts/features": {
+            "L": 4,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.adhes/features": {
+            "L": 16,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.crtyd/features": {
+            "L": 4,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          },
+          "steps/pcb/layers/f.cu/features": {
+            "L": 5619,
+            "A": 0,
+            "P": 2642,
+            "S": 128
+          },
+          "steps/pcb/layers/f.fab/features": {
+            "L": 25711,
+            "A": 0,
+            "P": 6,
+            "S": 0
+          },
+          "steps/pcb/layers/f.mask/features": {
+            "L": 1130,
+            "A": 0,
+            "P": 1516,
+            "S": 30
+          },
+          "steps/pcb/layers/f.paste/features": {
+            "L": 0,
+            "A": 0,
+            "P": 1353,
+            "S": 0
+          },
+          "steps/pcb/layers/f.silks/features": {
+            "L": 10955,
+            "A": 48,
+            "P": 27,
+            "S": 0
+          },
+          "steps/pcb/layers/in1.cu/features": {
+            "L": 466,
+            "A": 0,
+            "P": 1251,
+            "S": 7
+          },
+          "steps/pcb/layers/in2.cu/features": {
+            "L": 3054,
+            "A": 0,
+            "P": 1251,
+            "S": 57
+          },
+          "steps/pcb/layers/in3.cu/features": {
+            "L": 2758,
+            "A": 0,
+            "P": 1251,
+            "S": 67
+          },
+          "steps/pcb/layers/in4.cu/features": {
+            "L": 609,
+            "A": 0,
+            "P": 1251,
+            "S": 39
+          },
+          "steps/pcb/layers/margin/features": {
+            "L": 0,
+            "A": 0,
+            "P": 0,
+            "S": 0
+          }
+        },
+        "unreadable_members": []
+      },
+      "component_records_match_source": true
+    }
+  ]
+}

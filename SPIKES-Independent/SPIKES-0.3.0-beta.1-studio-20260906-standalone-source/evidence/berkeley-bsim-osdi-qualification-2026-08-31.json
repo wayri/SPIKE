@@ -1,0 +1,59 @@
+{
+  "contract": "spikes/osdi-compact-model-qualification/v1",
+  "status": "passed",
+  "scope": "official_source_compile_and_native_callback_execution",
+  "compiler": {
+    "name": "OpenVAF-reloaded",
+    "version": "20260616-3-g0e83f1ed",
+    "abi": "OSDI 0.4",
+    "sha256": "5ad1c62f8effe61cd613a14995d1ec22ade97361ac29d25c1c22f0239435a655",
+    "options": ["-O", "3", "--target_cpu", "generic"]
+  },
+  "models": [
+    {
+      "family": "BSIM-BULK",
+      "version": "107.2.1",
+      "release_date": "2025-02-11",
+      "module": "bsimbulk",
+      "source_url": "https://www.bsim.berkeley.edu/wp-content/uploads/BSIMBULK/BSIM-BULK107.2.1_02112025.tar.gz",
+      "archive_sha256": "dd9c033797fb9dfe7e69e9ddbbda186c5f4c24d31fe58fe150d6a8f59d52a416",
+      "source_sha256": "4db89e3997e9eec1fd5949cf2751f415a483d37b61cdd37aabd1febfc5cb7fb8",
+      "artifact": "bsimbulk-107.2.1-windows-x64.osdi",
+      "artifact_sha256": "c78b891580105fa402431b2e0b50c0320a07092102d28abf771a6760a000ce03",
+      "artifact_bytes": 600064,
+      "license": "Educational Community License 2.0",
+      "callbacks_executed": ["setup_model", "setup_instance", "access", "dc_residual", "dc_jacobian", "reactive_residual", "noise", "noise_parameters"],
+      "correlated_noise_fixture": {"parameter": "TNOIMOD", "value": 1, "observed_source_name": "corl"}
+    },
+    {
+      "family": "BSIM-CMG",
+      "version": "112.1.0",
+      "release_date": "2026-04-28",
+      "module": "bsimcmg_va",
+      "source_url": "https://www.bsim.berkeley.edu/wp-content/uploads/BSIMCMG/BSIM-CMG_112.1.0_04282026.tar.gz",
+      "archive_sha256": "9c70a7c9fcfafe66fb1582655bbfd36714b90ecba137a9dd83c76b3a0bd9e50a",
+      "source_sha256": "adde661d1b0473d22a7eeab9e68a223c140c4417dd31253ee2499896f581f578",
+      "artifact": "bsimcmg-112.1.0-windows-x64.osdi",
+      "artifact_sha256": "f85a3177eabebc123927d7443235305e55c656c5c8329f88970c7fe12bd3fad3",
+      "artifact_bytes": 877056,
+      "license": "Educational Community License 2.0",
+      "callbacks_executed": ["setup_model", "setup_instance", "access", "dc_residual", "dc_jacobian", "reactive_residual", "noise", "noise_parameters"],
+      "correlated_noise_fixture": {"parameter": "TNOIMOD", "value": 1, "observed_source_name": "corl"}
+    }
+  ],
+  "verification": {
+    "native_test": "build-spikes-wave5-ninja/test_spikes_core.exe",
+    "result": "passed",
+    "parameter_types": ["real", "integer"],
+    "case_insensitive_alias_lookup": true,
+    "reference_node_sentinel": true,
+    "simulator_parameters": {"gmin": 1e-12, "minr": 0.001},
+    "veriloga_log_callback_installed": true
+  },
+  "limitations": [
+    "This qualifies compiler provenance and SPIKES OSDI callback execution, not a foundry process card or fabricated-device accuracy.",
+    "No vendor GaN/SiC/IGBT/thyristor model is redistributed or called production-qualified by this evidence.",
+    "Noise-source callbacks and BSIM correlated-noise decomposition execute, but a full native output-referred AC noise solve remains a separate gate.",
+    "The native transient OSDI route is currently fixed-step backward Euler; generalized multistep history remains open."
+  ]
+}

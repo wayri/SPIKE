@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/wave1-packaged-acceptance-v1.schema.json",
+  "title": "SPIKE Wave 1 Packaged Assembly Acceptance v1",
+  "description": "Machine-readable composition of automated and reviewed Wave 1 packaged assembly acceptance evidence.",
+  "type": "object",
+  "required": ["contract", "generated_at", "status", "automated", "human", "candidate", "worker", "fixture", "runtime", "qualification"],
+  "properties": {
+    "contract": { "const": "spike/wave1-packaged-acceptance/v1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["passed", "failed", "pending_human"] },
+    "automated": { "$ref": "#/$defs/automated" },
+    "human": { "$ref": "#/$defs/human" },
+    "candidate": { "type": "object" },
+    "worker": { "type": "object" },
+    "fixture": { "type": "object" },
+    "runtime": {
+      "type": "object",
+      "required": ["generated_at", "source_snapshot_digest", "packaged_snapshot_digest"],
+      "properties": {
+        "generated_at": {},
+        "source_snapshot_digest": {},
+        "packaged_snapshot_digest": {}
+      },
+      "additionalProperties": false
+    },
+    "qualification": {
+      "type": "object",
+      "required": ["assembly_foundation", "physics", "solver_ready"],
+      "properties": {
+        "assembly_foundation": { "enum": ["packaged_acceptance", "contract_tested"] },
+        "physics": { "const": "not_qualified" },
+        "solver_ready": { "const": false }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "summary": {
+      "type": "object",
+      "required": ["total", "passed", "failed"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "check": {
+      "type": "object",
+      "required": ["id", "status", "detail", "evidence"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["passed", "failed"] },
+        "detail": { "type": "string" },
+        "evidence": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "automated": {
+      "type": "object",
+      "required": ["status", "summary", "checks"],
+      "properties": {
+        "status": { "enum": ["passed", "failed"] },
+        "summary": { "$ref": "#/$defs/summary" },
+        "checks": { "type": "array", "items": { "$ref": "#/$defs/check" } }
+      },
+      "additionalProperties": false
+    },
+    "human": {
+      "type": "object",
+      "required": ["status", "summary", "checks"],
+      "properties": {
+        "status": { "enum": ["passed", "failed", "pending"] },
+        "summary": { "$ref": "#/$defs/summary" },
+        "checks": { "type": "array", "items": { "$ref": "#/$defs/check" } },
+        "evidence": { "type": ["string", "null"] },
+        "reviewer": {},
+        "reviewed_at": {},
+        "environment": {},
+        "installer_sha256": {},
+        "before_manifest_payload_sha256": {},
+        "after_manifest_payload_sha256": {}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

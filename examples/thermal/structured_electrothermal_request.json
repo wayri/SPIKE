@@ -1,0 +1,24 @@
+{
+  "contract": "spike/structured-electrothermal-dc/v1",
+  "circuit": {
+    "contract": "spike/native-mna-request/v1", "request_id": "heated-resistor", "ground_node": "0",
+    "analysis": {"mode": "operating_point"},
+    "elements": [
+      {"id": "V", "type": "voltage_source", "positive_node": "hot", "negative_node": "0", "dc_value": 12.0},
+      {"id": "R", "type": "resistor", "positive_node": "hot", "negative_node": "0", "resistance_ohm": 4.0}
+    ]
+  },
+  "thermal": {
+    "contract": "spike/structured-solid-thermal-request/v1",
+    "grid": {"shape": [1, 1, 1], "spacing_m": 1.0},
+    "materials": [{"id": "solid", "thermal_conductivity_w_mk": 0.16666666666666666}],
+    "material_ids": ["solid"], "heat_generation_w_m3": 0.0,
+    "boundaries": {
+      "x_min": {"type": "temperature", "temperature_k": 300.0},
+      "x_max": {"type": "adiabatic"}, "y_min": {"type": "adiabatic"},
+      "y_max": {"type": "adiabatic"}, "z_min": {"type": "adiabatic"}, "z_max": {"type": "adiabatic"}
+    },
+    "study": {"type": "steady"}
+  },
+  "bindings": [{"element_id": "R", "cells": [0], "weights": [1.0], "reference_temperature_k": 300.0, "temperature_coefficient_per_k": 0.004}]
+}

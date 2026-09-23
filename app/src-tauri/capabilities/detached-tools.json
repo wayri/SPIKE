@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "detached-tools",
+  "description": "Detached results and probe windows can exchange bounded UI state with the main workspace only.",
+  "windows": ["spike-tool-results", "spike-tool-probes", "spike-tool-trace-plots"],
+  "permissions": ["core:event:default"]
+}

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=SPIKES Studio
+Comment=Circuit simulation and interactive instruments
+Exec=AppRun
+Icon=spikes-studio
+Categories=Education;Science;Electronics;
+Terminal=false

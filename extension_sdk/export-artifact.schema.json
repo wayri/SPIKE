@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/extension-export-artifact-v1.json",
+  "title": "SPIKE desktop export artifact v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "file_name",
+    "media_type",
+    "encoding",
+    "data",
+    "sha256"
+  ],
+  "properties": {
+    "file_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^[^/\\\\:\\u0000-\\u001f]+\\.(step|stp|zip|json|FCStd|fcstd|brep)$"
+    },
+    "media_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "encoding": {
+      "enum": [
+        "base64",
+        "utf-8"
+      ]
+    },
+    "data": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 89478488
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"SPIKES generic trusted sampled controller",
+  "type":"object",
+  "required":["contract","language","step_s","state_count","pins","source"],
+  "properties":{
+    "contract":{"const":"spikes/generic-controller/v1"},
+    "language":{"enum":["C","C++"]},
+    "step_s":{"type":"number","minimum":1e-12,"maximum":1},
+    "state_count":{"type":"integer","minimum":1,"maximum":64},
+    "source":{"type":"string","maxLength":262144},
+    "pins":{"type":"array","minItems":2,"maxItems":64,"items":{"type":"object","required":["name","mode","node","reference","source","vdd"],"properties":{
+      "name":{"type":"string","pattern":"^[A-Za-z][A-Za-z0-9_]{0,31}$"},
+      "mode":{"enum":["AI","DI","AO","DO"]},"node":{"type":"string"},"reference":{"type":"string"},"source":{"type":"string"},"vdd":{"type":"number","exclusiveMinimum":0,"maximum":1000}
+    }}}
+  },
+  "description":"Loading does not compile, trust or attach code. Runtime validates pin uniqueness, bindings and timestep compatibility. MCU firmware binaries and Verilog coupling are unsupported."
+}

@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/ecad-mcad-mechanical-v1.schema.json",
+  "title": "SPIKE FreeCAD Mechanical Envelope Exchange v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "schema_version",
+    "units",
+    "coordinate_system",
+    "generator",
+    "generated_at",
+    "source_document",
+    "objects"
+  ],
+  "properties": {
+    "contract": { "const": "spike/ecad-mcad-mechanical/v1" },
+    "schema_version": { "const": 1 },
+    "units": { "const": "mm" },
+    "coordinate_system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handedness", "up_axis", "origin"],
+      "properties": {
+        "handedness": { "const": "right" },
+        "up_axis": { "const": "Z" },
+        "origin": { "$ref": "#/$defs/point3" }
+      }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/nonEmptyString" },
+        "freecad_version": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "generated_at": { "$ref": "#/$defs/nonEmptyString" },
+    "source_document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "label"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "label": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/mechanicalObject" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "number": {
+      "type": "number",
+      "minimum": -1000000,
+      "maximum": 1000000
+    },
+    "positiveNumber": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000000
+    },
+    "point3": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/number" },
+        { "$ref": "#/$defs/number" },
+        { "$ref": "#/$defs/number" }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "box": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "origin", "size"],
+      "properties": {
+        "type": { "const": "box" },
+        "origin": { "$ref": "#/$defs/point3" },
+        "size": {
+          "type": "array",
+          "prefixItems": [
+            { "$ref": "#/$defs/positiveNumber" },
+            { "$ref": "#/$defs/positiveNumber" },
+            { "$ref": "#/$defs/positiveNumber" }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "maxProperties": 64,
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      }
+    },
+    "mechanicalObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "role", "representation", "primitive", "source"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "role": { "enum": ["component_envelope", "keepout"] },
+        "representation": { "const": "axis_aligned_bounding_box" },
+        "primitive": { "$ref": "#/$defs/box" },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["freecad_name", "freecad_type_id"],
+          "properties": {
+            "freecad_name": { "$ref": "#/$defs/nonEmptyString" },
+            "freecad_type_id": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        },
+        "metadata": { "$ref": "#/$defs/metadata" }
+      }
+    }
+  }
+}
+

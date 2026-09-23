@@ -1,0 +1,56 @@
+{
+  "contract": "spike/openfoam-multiregion-synthetic-summary/v1",
+  "record_usage": "human-readable evidence summary; not directly importable as a validation record",
+  "status": "candidate",
+  "production_qualified": false,
+  "solver": {
+    "name": "OpenFOAM",
+    "version": "v2606",
+    "application": "chtMultiRegionFoam",
+    "platform": "WSL2/Linux x64"
+  },
+  "fixture": {
+    "kind": "synthetic_board_air_slab",
+    "regions": ["board", "air"],
+    "gravity_m_s2": [0.0, 0.0, 0.0],
+    "source_power_w": 0.1,
+    "ambient_temperature_k": 298.15,
+    "note": "Deterministic translator/runtime fixture; not a representative PCB, cabinet, or measured correlation."
+  },
+  "mesh_convergence": {
+    "levels": [
+      {"id": "m1", "divisions": 1, "board_cells": 1, "max_board_temperature_k": 301.8679469},
+      {"id": "m2", "divisions": 2, "board_cells": 8, "max_board_temperature_k": 301.8595283},
+      {"id": "m4", "divisions": 4, "board_cells": 64, "max_board_temperature_k": 301.8554325}
+    ],
+    "finest_relative_delta": 0.000013
+  },
+  "time_convergence": {
+    "levels": [
+      {"id": "dt1", "delta_t_s": 1.0, "max_board_temperature_k": 301.8518583},
+      {"id": "dt05", "delta_t_s": 0.5, "max_board_temperature_k": 301.8569673},
+      {"id": "dt025", "delta_t_s": 0.25, "max_board_temperature_k": 301.8595283}
+    ],
+    "finest_relative_delta": 0.000017
+  },
+  "energy_balance": {
+    "input_energy_j": 1.0,
+    "boundary_energy_j": 0.013442375588046,
+    "stored_energy_change_j": 0.9850851795975392,
+    "residual_j": 0.001472444814414886,
+    "relative_residual": 0.001472445,
+    "wall_flux_samples": 40
+  },
+  "fields": {
+    "temperature": {"unit": "K", "regions": ["board", "air"]},
+    "heat_flux": {"unit": "W/m2", "regions": ["board", "air"]},
+    "velocity": {"unit": "m/s", "regions": ["air"]},
+    "pressure": {"unit": "Pa", "regions": ["air"]}
+  },
+  "qualification_boundary": [
+    "No PCB/enclosure/heatsink/fan/potting/radiation/vacuum representative run",
+    "No electro-thermal field-coupled iteration evidence",
+    "No independent-solver or measured correlation",
+    "No exact signed Windows/Linux package identity"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-polymesh-request-v1.schema.json",
+  "title": "SPIKE OpenFOAM polyMesh Materialization Request v1",
+  "type": "object",
+  "required": ["contract", "region_id", "mesh", "mesh_evidence", "boundary_patches"],
+  "properties": {
+    "contract": {"const": "spike/openfoam-polymesh-request/v1"},
+    "region_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+    "mesh": {"type": "object", "required": ["contract"], "properties": {"contract": {"const": "spike/solver-mesh/v1"}}},
+    "mesh_evidence": {
+      "type": "object", "required": ["id", "contract", "sha256", "qualified"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1}, "contract": {"const": "spike/solver-mesh/v1"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "qualified": {"const": true}
+      }, "additionalProperties": false
+    },
+    "boundary_patches": {
+      "type": "array", "minItems": 1, "maxItems": 4096,
+      "items": {
+        "type": "object", "required": ["name", "type", "faces"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+          "type": {"enum": ["wall", "patch", "symmetryPlane", "empty", "mappedWall"]},
+          "groups": {
+            "type": "array", "maxItems": 16, "uniqueItems": true,
+            "items": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"}
+          },
+          "faces": {"type": "array", "minItems": 1, "items": {"type": "array", "minItems": 3, "maxItems": 4, "items": {"type": "integer", "minimum": 0}}},
+          "neighbour_region": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+          "neighbour_patch": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+          "interface_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"}
+        }, "additionalProperties": false,
+        "allOf": [{"if": {"properties": {"type": {"const": "mappedWall"}}}, "then": {"required": ["neighbour_region", "neighbour_patch", "interface_id"]}}]
+      }
+    },
+    "cell_zones": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "required": ["name", "cell_ids"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+          "cell_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/thermal-field-result-v1.schema.json",
+  "title": "SPIKE Thermal Field Result v1",
+  "type": "object",
+  "required": ["contract", "job_id", "plan_digest", "status", "model_status", "summary", "fields", "component_temperatures_k", "resource_usage", "issues", "qualification", "provenance"],
+  "properties": {
+    "contract": {"const": "spike/thermal-field-result/v1"}, "job_id": {"type": "string"}, "plan_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "status": {"enum": ["completed", "blocked", "failed", "cancelled"]}, "model_status": {"enum": ["validated", "reference_validated", "experimental", "approximate", "solver_dependent", "unsupported", "failed"]},
+    "summary": {"type": "object"}, "fields": {"type": "object"}, "component_temperatures_k": {"type": "object"}, "resource_usage": {"type": "object"},
+    "issues": {"type": "array", "items": {"type": "object"}}, "qualification": {"type": "object"}, "provenance": {"type": "object"}, "electrothermal": {"type": "object"}
+  }, "additionalProperties": false
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "spike-wx-desktop",
+  "version-string": "0.2.5",
+  "description": "Parallel native wxWidgets and VTK client for SPIKE",
+  "dependencies": [
+    "nlohmann-json",
+    {
+      "name": "vtk",
+      "default-features": false
+    },
+    {
+      "name": "wxwidgets",
+      "default-features": false,
+      "features": ["webview"]
+    }
+  ],
+  "builtin-baseline": "6283825b81bb60f952af1d0703638df1de611243"
+}

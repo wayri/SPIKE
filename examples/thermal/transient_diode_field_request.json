@@ -1,0 +1,83 @@
+{
+  "contract": "spike/transient-diode-field/v1",
+  "thermal": {
+    "contract": "spike/structured-solid-thermal-request/v1",
+    "grid": {
+      "shape": [
+        1,
+        1,
+        1
+      ],
+      "spacing_m": 1.0
+    },
+    "materials": [
+      {
+        "id": "solid",
+        "thermal_conductivity_w_mk": 0.05,
+        "density_kg_m3": 2.0,
+        "specific_heat_j_kgk": 1.0
+      }
+    ],
+    "material_ids": [
+      "solid"
+    ],
+    "heat_generation_w_m3": 0.0,
+    "boundaries": {
+      "x_min": {
+        "type": "temperature",
+        "temperature_k": 300.0
+      },
+      "x_max": {
+        "type": "adiabatic"
+      },
+      "y_min": {
+        "type": "adiabatic"
+      },
+      "y_max": {
+        "type": "adiabatic"
+      },
+      "z_min": {
+        "type": "adiabatic"
+      },
+      "z_max": {
+        "type": "adiabatic"
+      }
+    },
+    "study": {
+      "type": "transient",
+      "initial_temperature_k": 300.0,
+      "time_step_s": 1.25,
+      "steps": 8,
+      "output_stride": 1
+    }
+  },
+  "devices": [
+    {
+      "id": "D1",
+      "model": {
+        "saturation_current_a": 1e-12,
+        "ideality_factor": 1.0,
+        "series_resistance_ohm": 0.02,
+        "reference_temperature_k": 300.0,
+        "bandgap_ev": 1.11,
+        "saturation_temperature_exponent": 3.0
+      },
+      "cells": [
+        0
+      ],
+      "weights": [
+        1.0
+      ],
+      "current_a": [
+        0.1,
+        0.2,
+        0.5,
+        0.5,
+        0.2,
+        0.0,
+        0.1,
+        0.0
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+SPDX-License-Identifier: CC0-1.0
+
+SPIKES Public Application Benchmark Corpus
+
+To the extent possible under law, the contributors who associated CC0 with
+these first-party circuit decks have waived all copyright and related or
+neighboring rights to the decks. The CC0 1.0 Universal legal code is available
+at https://creativecommons.org/publicdomain/zero/1.0/legalcode .
+
+This dedication applies only to the generated `.cir` files in this directory.
+It does not relicense SPIKES, another simulator, or any third-party model.

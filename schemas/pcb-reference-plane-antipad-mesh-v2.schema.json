@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-reference-plane-antipad-mesh-v2.schema.json",
+  "title": "SPIKE generalized reference-plane antipad mesh v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "radial_segments", "tessellation", "vertices_mm", "triangles", "domains", "boundary_loops", "resources", "qualification", "topology_audit"],
+  "properties": {
+    "contract": {"const": "spike/pcb-reference-plane-antipad-mesh/v2"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["geometry_contract", "geometry_sha256", "design_id", "via_id", "source_via_id"],
+      "properties": {
+        "geometry_contract": {"enum": ["spike/pcb-reference-plane-antipad-geometry/v2", "spike/pcb-reference-plane-antipad-geometry/v3"]},
+        "geometry_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"}, "via_id": {"$ref": "#/$defs/id"},
+        "source_via_id": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "radial_segments": {"type": "integer", "minimum": 8, "maximum": 128, "multipleOf": 4},
+    "tessellation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coordinate_grid_mm", "coordinate_tolerance_mm", "source_boundary", "maximum_source_curve_deviation_mm", "antipad_boundary", "planar_method"],
+      "properties": {
+        "coordinate_grid_mm": {"const": 0.000001},
+        "coordinate_tolerance_mm": {"const": 1e-9},
+        "source_boundary": {"enum": ["exact_straight_segments", "certified_bounded_flattened_segments"]},
+        "maximum_source_curve_deviation_mm": {"type": "number", "minimum": 0, "maximum": 0.001},
+        "antipad_boundary": {"const": "exact_grid_circumscribed"},
+        "planar_method": {"const": "exact_fixed_grid_constrained_delaunay_no_steiner"}
+      }
+    },
+    "vertices_mm": {"type": "array", "minItems": 1, "maxItems": 32768, "items": {"$ref": "#/$defs/point3"}},
+    "triangles": {"type": "array", "minItems": 1, "maxItems": 65536, "items": {"$ref": "#/$defs/triangle"}},
+    "domains": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/domain"}},
+    "boundary_loops": {"type": "array", "minItems": 4, "maxItems": 16384, "items": {"$ref": "#/$defs/loop"}},
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_vertices", "max_triangles", "max_planar_vertices_per_region", "max_planar_triangles_per_region", "maximum_work_steps", "actual_work_steps", "cancellation_poll_interval", "actual_vertices", "actual_triangles", "max_serialized_bytes"],
+      "properties": {
+        "max_vertices": {"const": 32768}, "max_triangles": {"const": 65536},
+        "max_planar_vertices_per_region": {"const": 4096},
+        "max_planar_triangles_per_region": {"const": 8192},
+        "maximum_work_steps": {"type": "integer", "minimum": 1, "maximum": 16777216},
+        "actual_work_steps": {"type": "integer", "minimum": 1, "maximum": 16777216},
+        "cancellation_poll_interval": {"const": 1024},
+        "actual_vertices": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "actual_triangles": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "max_serialized_bytes": {"const": 8388608}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "mesh_topology_admitted", "conservative_antipad_void_proven", "conservative_source_copper_envelope_proven", "native_handoff_ready", "mesh_quality_performed", "physics_convergence_performed", "capacitance_ready", "si_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "generalized_reference_plane_geometry_mesh_only"},
+        "mesh_topology_admitted": {"const": true},
+        "conservative_antipad_void_proven": {"const": true},
+        "conservative_source_copper_envelope_proven": {"type": "boolean"},
+        "native_handoff_ready": {"const": false}, "mesh_quality_performed": {"const": false},
+        "physics_convergence_performed": {"const": false}, "capacitance_ready": {"const": false},
+        "si_ready": {"const": false}, "solver_ready": {"const": false}
+      }
+    },
+    "topology_audit": {"$ref": "#/$defs/audit"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "point3": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}, {"type": "number"}], "minItems": 3, "maxItems": 3},
+    "sources": {"type": "array", "minItems": 1, "maxItems": 8, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "triangle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "domain_id", "vertex_indices", "surface_role", "source_ids"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "domain_id": {"$ref": "#/$defs/id"},
+        "vertex_indices": {"type": "array", "prefixItems": [{"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 0}, {"type": "integer", "minimum": 0}], "minItems": 3, "maxItems": 3},
+        "surface_role": {"enum": ["reference_zone_upper_face", "reference_zone_lower_face", "reference_zone_outer_boundary", "source_cutout_boundary", "antipad_void_boundary"]},
+        "source_ids": {"$ref": "#/$defs/sources"}
+      }
+    },
+    "domain": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "kind", "net_id", "layer_ids", "source_ids", "triangle_ids", "reference_zone_id", "source_zone_sha256", "resolved_region_sha256", "antipad_radius_mm", "exact_discrete_area_mm2", "exact_discrete_volume_mm3", "source_cutout_count", "antipad_radial_inflation_grid_units"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "kind": {"const": "generalized_reference_plane"},
+        "net_id": {"$ref": "#/$defs/id"},
+        "layer_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"$ref": "#/$defs/id"}},
+        "source_ids": {"$ref": "#/$defs/sources"},
+        "triangle_ids": {"type": "array", "minItems": 1, "maxItems": 65536, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "reference_zone_id": {"$ref": "#/$defs/id"},
+        "source_zone_sha256": {"$ref": "#/$defs/digest"},
+        "resolved_region_sha256": {"$ref": "#/$defs/digest"},
+        "source_boundary_sha256": {"$ref": "#/$defs/digest"},
+        "flattened_boundary_sha256": {"$ref": "#/$defs/digest"},
+        "antipad_radius_mm": {"type": "number", "exclusiveMinimum": 0},
+        "exact_discrete_area_mm2": {"type": "number", "exclusiveMinimum": 0},
+        "exact_discrete_volume_mm3": {"type": "number", "exclusiveMinimum": 0},
+        "source_cutout_count": {"type": "integer", "minimum": 0, "maximum": 128},
+        "antipad_radial_inflation_grid_units": {"type": "integer", "minimum": 0, "maximum": 32}
+      }
+    },
+    "loop": {
+      "type": "object", "additionalProperties": false,
+      "required": ["loop_id", "domain_id", "role", "surface", "z_mm", "vertex_indices", "source_ids"],
+      "properties": {
+        "loop_id": {"$ref": "#/$defs/id"}, "domain_id": {"$ref": "#/$defs/id"},
+        "role": {"enum": ["source_outer", "source_cutout", "antipad_hole"]},
+        "surface": {"enum": ["lower", "upper"]}, "z_mm": {"type": "number"},
+        "vertex_indices": {"type": "array", "minItems": 3, "maxItems": 4096, "uniqueItems": true, "items": {"type": "integer", "minimum": 0}},
+        "source_ids": {"$ref": "#/$defs/sources"}
+      }
+    },
+    "audit": {
+      "type": "object", "additionalProperties": false,
+      "required": ["zero_area_triangles", "duplicate_triangles", "nonmanifold_or_boundary_edges", "orientation_mismatches", "unused_vertices", "reference_void_violations", "closed_domains", "passed"],
+      "properties": {
+        "zero_area_triangles": {"const": 0}, "duplicate_triangles": {"const": 0},
+        "nonmanifold_or_boundary_edges": {"const": 0}, "orientation_mismatches": {"const": 0},
+        "unused_vertices": {"const": 0}, "reference_void_violations": {"const": 0},
+        "closed_domains": {"type": "integer", "minimum": 1, "maximum": 64},
+        "passed": {"const": true}
+      }
+    }
+  }
+}

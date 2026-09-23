@@ -1,0 +1,61 @@
+{
+  "contract": "spike/openfoam-vacuum-radiation-runtime-evidence/v1",
+  "recorded_at": "2026-09-05",
+  "runtime": {
+    "distribution": "OpenFOAM",
+    "version": "2606",
+    "build": "_481094f-20260618",
+    "transport": "WSL Ubuntu",
+    "application": "chtMultiRegionFoam"
+  },
+  "case": {
+    "fixture_contract": "spike/openfoam-solid-vacuum-fixture/v1",
+    "topology": "one solid region; zero fluid regions",
+    "cells": 8,
+    "end_time_s": 2.0,
+    "delta_t_s": 0.25,
+    "heat_input_w": 0.1,
+    "surface_emissivity": 0.85,
+    "initial_temperature_k": 298.15,
+    "radiation_background_temperature_k": 298.15,
+    "convection_coefficient_w_m2k": 0.0,
+    "request_digest": "4fc46b11b9d691688b3cde09382ef9c6dd7df3ce9b1a05822af3cc22b01c6648",
+    "runnable_manifest_digest": "e69c75e1f7d7b3af292577623605676b08e0c7806eb350425905ab1bab83bfe0"
+  },
+  "execution": {
+    "status": "completed",
+    "commands": [
+      "checkMesh -allRegions -allTopology -allGeometry",
+      "chtMultiRegionFoam",
+      "postProcess -region board -func writeCellCentres -latestTime",
+      "postProcess -region board -func writeCellVolumes -latestTime",
+      "postProcess -region board -func gradT -latestTime"
+    ],
+    "resource_boundary": "Windows Job containment with 64-process WSL proxy allowance; Linux prlimit owns solver address-space, CPU-time, and file-size limits",
+    "field_export_sha256": "39f852bce1a9fc2f21d4a4b885562f71be684a39b84c558774afbe72dc76e8ed",
+    "field_export_bytes": 2073
+  },
+  "result": {
+    "solid_samples": 8,
+    "fluid_samples": 0,
+    "minimum_temperature_k": 298.8965379,
+    "maximum_temperature_k": 298.8965379,
+    "temperature_field_imported": true,
+    "heat_flux_field_imported": true,
+    "velocity_field_imported": false,
+    "pressure_field_imported": false
+  },
+  "qualification": {
+    "candidate_runtime_evidence": true,
+    "production_qualified": false,
+    "limitations": [
+      "Synthetic homogeneous eight-cell solid only",
+      "No PCB copper/dielectric/package/contact geometry",
+      "No enclosure-to-enclosure view-factor execution",
+      "No mesh or time convergence for this vacuum fixture",
+      "No energy-conservation calculation for this vacuum fixture",
+      "No independent-solver or measured vacuum-chamber correlation",
+      "No exact Windows and Linux packaged-runtime qualification"
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/windows-notice-review-packet-v1.schema.json",
+  "title": "SPIKE Windows Notice Review Packet v1",
+  "description": "Deterministic review queue derived from the Windows component inventory and review overlay. It is not a notice bundle and grants no approval or redistribution right.",
+  "type": "object",
+  "required": ["contract", "platform", "production_qualified", "inventory_sha256", "approvals_sha256", "components", "summary"],
+  "properties": {
+    "contract": {"const": "spike/windows-notice-review-packet/v1"},
+    "platform": {"const": "windows-x64"},
+    "production_qualified": {"const": false},
+    "inventory_sha256": {"$ref": "#/$defs/sha256"},
+    "approvals_sha256": {"$ref": "#/$defs/sha256"},
+    "components": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/component"}},
+    "summary": {"$ref": "#/$defs/summary"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "purl": {"type": "string", "pattern": "^pkg:[a-z0-9.+-]+/[^@?#\\s]+@[^?#\\s]+(?:\\?[^#\\s]+)?(?:#[^\\s]+)?$"},
+    "component": {
+      "type": "object",
+      "required": ["purl", "identity_sha256", "scope", "ecosystem", "name", "version", "declared_license", "proposed_notice_marker", "review_status", "needs_notice_text", "needs_legal_review"],
+      "properties": {
+        "purl": {"$ref": "#/$defs/purl"},
+        "identity_sha256": {"$ref": "#/$defs/sha256"},
+        "scope": {"enum": ["bundled", "build-only"]},
+        "ecosystem": {"enum": ["python", "npm", "rust"]},
+        "name": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "declared_license": {"type": "string", "minLength": 1, "maxLength": 160},
+        "proposed_notice_marker": {"type": "string", "pattern": "^NOTICE-REVIEW-[0-9a-f]{64}$"},
+        "review_status": {"enum": ["pending_review", "requires_manual_verification"]},
+        "needs_notice_text": {"const": true},
+        "needs_legal_review": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": ["components", "bundled_components", "build_only_components", "pending_review_components", "manual_verification_components", "needs_notice_text_components", "needs_legal_review_components", "invalid_spdx_declarations", "unresolved_spdx_declarations"],
+      "properties": {
+        "components": {"type": "integer", "minimum": 1},
+        "bundled_components": {"type": "integer", "minimum": 0},
+        "build_only_components": {"type": "integer", "minimum": 0},
+        "pending_review_components": {"type": "integer", "minimum": 0},
+        "manual_verification_components": {"type": "integer", "minimum": 0},
+        "needs_notice_text_components": {"type": "integer", "minimum": 0},
+        "needs_legal_review_components": {"type": "integer", "minimum": 0},
+        "invalid_spdx_declarations": {"type": "integer", "minimum": 0},
+        "unresolved_spdx_declarations": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/wave1-clean-machine-harness-v1.schema.json",
+  "title": "SPIKE Wave 1 Clean Machine Harness v1",
+  "type": "object",
+  "required": ["contract", "run_id", "provider", "eligible_for_human_review", "inputs_sha256", "installer_sha256", "before_manifest_payload_sha256", "after_manifest_payload_sha256", "environment", "mechanics", "artifacts"],
+  "properties": {
+    "contract": {"const": "spike/wave1-clean-machine-harness/v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "provider": {"enum": ["windows-sandbox", "hyperv-vm", "external-clean-vm", "physical-clean-machine", "not-isolated"]},
+    "eligible_for_human_review": {"type": "boolean"},
+    "inputs_sha256": {"$ref": "#/$defs/sha256"},
+    "installer_sha256": {"$ref": "#/$defs/sha256"},
+    "before_manifest_payload_sha256": {"$ref": "#/$defs/sha256"},
+    "after_manifest_payload_sha256": {"$ref": "#/$defs/sha256"},
+    "environment": {"type": "object"},
+    "mechanics": {"type": "object"},
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$))[^/]+$"},
+          "sha256": {"$ref": "#/$defs/sha256"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}},
+  "additionalProperties": false
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/solver-plugin-job-v1.schema.json",
+  "title": "SPIKE Process Solver Job v1",
+  "description": "Authenticated process-solver job manifest. Paths are job-relative; a host must verify containment and digests before launch.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "request_id", "solver", "analysis", "inputs", "output", "resource_budget"],
+  "properties": {
+    "contract": {"const": "spike/solver-plugin-job/v1"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "solver": {"type": "object", "additionalProperties": false, "required": ["id", "version"], "properties": {"id": {"type": "string", "pattern": "^[a-z0-9._-]+$"}, "version": {"type": "string", "minLength": 1}}},
+    "analysis": {"type": "object", "additionalProperties": true, "required": ["mode"], "properties": {"mode": {"type": "string", "minLength": 1}}},
+    "inputs": {"type": "object", "additionalProperties": false, "required": ["geometry", "meshes"], "properties": {"geometry": {"$ref": "#/$defs/artifact"}, "meshes": {"type": "array", "maxItems": 64, "items": {"allOf": [{"$ref": "#/$defs/artifact"}, {"properties": {"contract": {"const": "spike/solver-mesh/v1"}}}]}}}},
+    "output": {"type": "object", "additionalProperties": false, "required": ["result_contract", "path"], "properties": {"result_contract": {"const": "spike/solver-plugin-result/v1"}, "path": {"$ref": "#/$defs/safePath"}}},
+    "resource_budget": {"type": "object", "additionalProperties": false, "required": ["max_wall_time_s", "max_result_bytes"], "properties": {"max_wall_time_s": {"type": "integer", "minimum": 1, "maximum": 86400}, "max_result_bytes": {"type": "integer", "minimum": 1024, "maximum": 1073741824}}}
+  },
+  "$defs": {
+    "safePath": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"},
+    "artifact": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "contract"], "properties": {"path": {"$ref": "#/$defs/safePath"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "contract": {"type": "string", "minLength": 1}}}
+  }
+}

@@ -1,0 +1,18 @@
+.board-import-panel { position: fixed; right: 20px; bottom: 42px; z-index: 1200; width: min(430px, calc(100vw - 32px)); max-height: 75vh; overflow: auto; padding: 18px; background: #142329; color: #e8f2f3; border: 1px solid #42636d; border-radius: 10px; box-shadow: 0 12px 44px #0008; font-size: 13px; }
+.board-import-panel header, .board-import-panel footer, .board-import-progress-caption { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.board-import-panel header div { display: grid; gap: 5px; min-width: 0; }
+.board-import-panel header strong { overflow-wrap: anywhere; }
+.board-import-panel small, .board-import-progress-caption, .board-import-help { color: #a7bdc4; }
+.board-import-panel progress { width: 100%; height: 10px; accent-color: #3dd6bf; }
+.board-import-progress-caption { font-size: 11px; margin-top: 5px; }
+.board-import-panel section { border-top: 1px solid #36515b; margin-top: 15px; padding-top: 8px; }
+.board-import-panel p { line-height: 1.5; }
+.board-import-panel h3 { font-size: 14px; margin: 8px 0; }
+.board-import-problem { display: grid; gap: 6px; padding: 12px 0; border-bottom: 1px solid #36515b; overflow-wrap: anywhere; }
+.board-import-problem button { justify-self: start; }
+.board-import-panel button, .board-import-status { border: 1px solid #4b707b; border-radius: 5px; background: #233e48; color: #efffff; padding: 7px 10px; cursor: pointer; }
+.board-import-panel button:focus-visible { outline: 2px solid #54e4cf; outline-offset: 2px; }
+.board-import-panel button:disabled { opacity: .5; cursor: wait; }
+.board-import-panel footer { margin-top: 16px; justify-content: flex-end; flex-wrap: wrap; }
+.board-import-warning { color: #ffd894; overflow-wrap: anywhere; }
+.board-import-status { position: fixed; right: 20px; bottom: 42px; z-index: 1000; max-width: 70vw; }

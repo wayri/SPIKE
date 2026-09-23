@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/windows-component-approvals-v1.schema.json",
+  "title": "SPIKE Windows Component Approvals v1",
+  "description": "Human review overlay keyed to an immutable component inventory. It does not alter component identity.",
+  "type": "object",
+  "required": ["contract", "platform", "inventory_sha256", "notices_sha256", "approvals"],
+  "properties": {
+    "contract": {"const": "spike/windows-component-approvals/v1"},
+    "platform": {"const": "windows-x64"},
+    "inventory_sha256": {"$ref": "#/$defs/sha256"},
+    "notices_sha256": {"$ref": "#/$defs/sha256"},
+    "approvals": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/approval"}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "purl": {"type": "string", "pattern": "^pkg:[a-z0-9.+-]+/[^@?#\\s]+@[^?#\\s]+(?:\\?[^#\\s]+)?(?:#[^\\s]+)?$"},
+    "relative_file": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$))(?:[^/]+/)*[^/]+$"},
+    "notice": {
+      "type": "object",
+      "required": ["status", "file", "sha256", "marker"],
+      "properties": {
+        "status": {"enum": ["included", "not-required"]},
+        "file": {"$ref": "#/$defs/relative_file"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "marker": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "review": {
+      "type": "object",
+      "required": ["ticket", "reviewer", "reviewed_at"],
+      "properties": {
+        "ticket": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
+        "reviewer": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
+        "reviewed_at": {"type": "string", "format": "date-time"}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["file", "sha256"],
+      "properties": {
+        "file": {"$ref": "#/$defs/relative_file"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "reciprocal_obligations": {
+      "type": "object",
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"const": "satisfied"},
+        "evidence": {"$ref": "#/$defs/evidence"}
+      },
+      "additionalProperties": false
+    },
+    "approval": {
+      "type": "object",
+      "required": ["purl", "identity_sha256", "disposition"],
+      "properties": {
+        "purl": {"$ref": "#/$defs/purl"},
+        "identity_sha256": {"$ref": "#/$defs/sha256"},
+        "disposition": {"enum": ["pending_review", "approved", "excluded"]},
+        "approved_license_expression": {"type": "string", "minLength": 1, "maxLength": 160, "pattern": "^\\S(?:.*\\S)?$"},
+        "compliance_approved": {"type": "boolean"},
+        "redistribution_approved": {"type": "boolean"},
+        "notice": {"$ref": "#/$defs/notice"},
+        "review": {"$ref": "#/$defs/review"},
+        "license_resolution_evidence": {"$ref": "#/$defs/evidence"},
+        "reciprocal_obligations": {"$ref": "#/$defs/reciprocal_obligations"}
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {"if": {"properties": {"disposition": {"const": "approved"}}, "required": ["disposition"]}, "then": {"required": ["approved_license_expression", "compliance_approved", "redistribution_approved", "notice", "review"], "properties": {"compliance_approved": {"const": true}, "redistribution_approved": {"const": true}}}}
+      ]
+    }
+  },
+  "additionalProperties": false
+}

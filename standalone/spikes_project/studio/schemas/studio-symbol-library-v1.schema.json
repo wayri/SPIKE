@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spikes.local/schemas/studio-symbol-library-v1.schema.json",
+  "title": "SPIKES Studio symbol library",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "library_id", "version", "license", "symbols"],
+  "properties": {
+    "contract": {"const": "spikes/studio-symbol-library/v1"},
+    "library_id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+    "version": {"type": "string", "minLength": 1, "maxLength": 64},
+    "license": {"type": "string", "minLength": 1, "maxLength": 128},
+    "symbols": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {"$ref": "#/$defs/symbol"}
+    }
+  },
+  "$defs": {
+    "point": {
+      "type": "array",
+      "prefixItems": [{"type": "number"}, {"type": "number"}],
+      "items": false
+    },
+    "terminal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "at", "leg_endpoint", "direction", "connection_indicator"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "name": {"type": "string", "minLength": 1, "maxLength": 32},
+        "at": {"$ref": "#/$defs/point"},
+        "leg_endpoint": {"$ref": "#/$defs/point"},
+        "direction": {"enum": ["north", "east", "south", "west"]},
+        "connection_indicator": {"const": true}
+      }
+    },
+    "primitive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["line", "polyline", "polygon", "circle", "arc"]},
+        "points": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/point"}},
+        "center": {"$ref": "#/$defs/point"},
+        "radius": {"type": "number", "exclusiveMinimum": 0},
+        "start_deg": {"type": "number"},
+        "sweep_deg": {"type": "number"},
+        "fill": {"type": "boolean", "default": false}
+      }
+    },
+    "symbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "family", "standard", "conformance", "grid", "body_keepout", "label_keepouts", "terminals", "primitives"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9_.-]+$"},
+        "name": {"type": "string", "minLength": 1, "maxLength": 128},
+        "family": {"type": "string", "minLength": 1, "maxLength": 64},
+        "standard": {"enum": ["IEC 60617", "IEEE/ANSI 315", "common-convention"]},
+        "conformance": {"enum": ["conformant", "derived", "unverified"]},
+        "source_note": {"type": "string", "maxLength": 512},
+        "grid": {"type": "number", "exclusiveMinimum": 0},
+        "body_keepout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {"min": {"$ref": "#/$defs/point"}, "max": {"$ref": "#/$defs/point"}}
+        },
+        "label_keepouts": {"type": "array", "items": {"type": "object"}},
+        "terminals": {"type": "array", "minItems": 1, "maxItems": 256, "items": {"$ref": "#/$defs/terminal"}},
+        "primitives": {"type": "array", "minItems": 1, "maxItems": 512, "items": {"$ref": "#/$defs/primitive"}}
+      }
+    }
+  }
+}

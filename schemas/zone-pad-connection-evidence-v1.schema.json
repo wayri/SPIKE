@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/zone-pad-connection-evidence-v1.schema.json",
+  "title": "SPIKE source-filled zone-to-pad connection evidence v1",
+  "description": "Digest-bound, bounded evidence that retained pad, footprint, and zone connection policy was resolved against source-filled copper. The contract records observed source geometry only; it does not regenerate thermal spokes or establish physics or solver readiness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "records", "accounting", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/zone-pad-connection-evidence/v1"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_contract", "design_sha256", "design_id"],
+      "properties": {
+        "design_contract": {"const": "spike/design-ir/v2"},
+        "design_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 262144,
+      "items": {"$ref": "#/$defs/record"}
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "candidate_record_count", "contact_record_count", "no_contact_record_count", "unsupported_record_count", "all_candidate_connections_accounted"],
+      "properties": {
+        "status": {"enum": ["complete", "unsupported"]},
+        "candidate_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "contact_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "no_contact_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "unsupported_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "all_candidate_connections_accounted": {"const": true}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"unsupported_record_count": {"const": 0}}, "required": ["unsupported_record_count"]},
+          "then": {"properties": {"status": {"const": "complete"}}}
+        },
+        {
+          "if": {"properties": {"unsupported_record_count": {"minimum": 1}}, "required": ["unsupported_record_count"]},
+          "then": {"properties": {"status": {"const": "unsupported"}}}
+        }
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_pads", "maximum_source_filled_zones", "maximum_records", "maximum_work_steps", "maximum_serialized_bytes", "actual_pads", "actual_source_filled_zones", "actual_records", "actual_work_steps", "actual_serialized_bytes", "cancellation_supported"],
+      "properties": {
+        "maximum_pads": {"const": 65536},
+        "maximum_source_filled_zones": {"const": 65536},
+        "maximum_records": {"const": 262144},
+        "maximum_work_steps": {"const": 16777216},
+        "maximum_serialized_bytes": {"const": 134217728},
+        "actual_pads": {"type": "integer", "minimum": 0, "maximum": 65536},
+        "actual_source_filled_zones": {"type": "integer", "minimum": 0, "maximum": 65536},
+        "actual_records": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "actual_work_steps": {"type": "integer", "minimum": 0, "maximum": 16777216},
+        "actual_serialized_bytes": {"type": "integer", "minimum": 1, "maximum": 134217728},
+        "cancellation_supported": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "source_filled_copper_evidence_complete", "thermal_spoke_topology_regenerated", "parametric_zone_refill_performed", "native_geometric_overlay_verified", "field_convergence_performed", "physics_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "source_filled_connection_evidence_only"},
+        "source_filled_copper_evidence_complete": {"type": "boolean"},
+        "thermal_spoke_topology_regenerated": {"const": false},
+        "parametric_zone_refill_performed": {"const": false},
+        "native_geometric_overlay_verified": {"const": false},
+        "field_convergence_performed": {"const": false},
+        "physics_ready": {"const": false},
+        "solver_ready": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "accounting": {
+            "properties": {"status": {"const": "complete"}},
+            "required": ["status"]
+          }
+        },
+        "required": ["accounting"]
+      },
+      "then": {
+        "properties": {
+          "qualification": {
+            "properties": {"source_filled_copper_evidence_complete": {"const": true}}
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "accounting": {
+            "properties": {"status": {"const": "unsupported"}},
+            "required": ["status"]
+          }
+        },
+        "required": ["accounting"]
+      },
+      "then": {
+        "properties": {
+          "qualification": {
+            "properties": {"source_filled_copper_evidence_complete": {"const": false}}
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "optionalId": {"type": "string", "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "overrideMode": {"enum": ["inherit", "none", "thermal", "solid", "tht_thermal"]},
+    "zoneMode": {"enum": ["none", "thermal", "solid", "tht_thermal"]},
+    "resolvedMode": {"enum": ["none", "thermal", "solid"]},
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "pad_id", "component_id", "pad_kind", "zone_id", "source_zone_id", "filled_copper_id", "zone_geometry_state", "layer_id", "net_id", "pad_layer_mode", "pad_mode", "footprint_mode", "zone_mode", "resolved_by", "resolved_mode", "through_hole_expansion", "filled_copper_geometry_sha256", "observation", "reason_code", "topology_state"],
+      "properties": {
+        "record_id": {"$ref": "#/$defs/id"},
+        "pad_id": {"$ref": "#/$defs/id"},
+        "component_id": {"$ref": "#/$defs/optionalId"},
+        "pad_kind": {"enum": ["smd", "thru_hole", "connect"]},
+        "zone_id": {"$ref": "#/$defs/id"},
+        "source_zone_id": {"$ref": "#/$defs/id"},
+        "filled_copper_id": {"$ref": "#/$defs/id"},
+        "zone_geometry_state": {"const": "source_filled"},
+        "layer_id": {"$ref": "#/$defs/id"},
+        "net_id": {"$ref": "#/$defs/id"},
+        "pad_layer_mode": {"$ref": "#/$defs/overrideMode"},
+        "pad_mode": {"$ref": "#/$defs/overrideMode"},
+        "footprint_mode": {"$ref": "#/$defs/overrideMode"},
+        "zone_mode": {"$ref": "#/$defs/zoneMode"},
+        "resolved_by": {"enum": ["pad_layer_override", "pad_override", "footprint_override", "zone_default"]},
+        "resolved_mode": {"$ref": "#/$defs/resolvedMode"},
+        "through_hole_expansion": {"enum": ["not_applicable", "expanded_on_canonical_copper_layer"]},
+        "filled_copper_geometry_sha256": {"$ref": "#/$defs/digest"},
+        "observation": {"enum": ["source_filled_copper_contact", "no_source_filled_copper_contact", "unsupported"]},
+        "reason_code": {"enum": ["filled_polygon_intersection_observed", "filled_polygon_disjoint_observed", "pad_geometry_unsupported", "exact_intersection_indeterminate"]},
+        "topology_state": {"const": "not_regenerated"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"pad_kind": {"const": "thru_hole"}}, "required": ["pad_kind"]},
+          "then": {"properties": {"through_hole_expansion": {"const": "expanded_on_canonical_copper_layer"}}},
+          "else": {"properties": {"through_hole_expansion": {"const": "not_applicable"}}}
+        },
+        {
+          "if": {"properties": {"pad_layer_mode": {"enum": ["none", "thermal", "solid", "tht_thermal"]}}, "required": ["pad_layer_mode"]},
+          "then": {"properties": {"resolved_by": {"const": "pad_layer_override"}}},
+          "else": {
+            "if": {"properties": {"pad_mode": {"enum": ["none", "thermal", "solid", "tht_thermal"]}}, "required": ["pad_mode"]},
+            "then": {"properties": {"resolved_by": {"const": "pad_override"}}},
+            "else": {
+              "if": {"properties": {"footprint_mode": {"enum": ["none", "thermal", "solid", "tht_thermal"]}}, "required": ["footprint_mode"]},
+              "then": {"properties": {"resolved_by": {"const": "footprint_override"}}},
+              "else": {"properties": {"resolved_by": {"const": "zone_default"}}}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"observation": {"const": "source_filled_copper_contact"}}, "required": ["observation"]},
+          "then": {"properties": {"reason_code": {"const": "filled_polygon_intersection_observed"}}}
+        },
+        {
+          "if": {"properties": {"observation": {"const": "no_source_filled_copper_contact"}}, "required": ["observation"]},
+          "then": {"properties": {"reason_code": {"const": "filled_polygon_disjoint_observed"}}}
+        },
+        {
+          "if": {"properties": {"observation": {"const": "unsupported"}}, "required": ["observation"]},
+          "then": {"properties": {"reason_code": {"enum": ["pad_geometry_unsupported", "exact_intersection_indeterminate"]}}}
+        }
+      ]
+    }
+  }
+}

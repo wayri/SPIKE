@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pdn-optimization-v1.schema.json",
+  "title": "SPIKE Solver-Independent PDN Capacitor-Bank Optimization v1",
+  "description": "Strict request/result envelope for auditable PDN capacitor-bank recommendation. Schema validity does not promote source solver validity or establish a globally optimal physical placement.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/request" },
+    { "$ref": "#/$defs/result" }
+  ],
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "modelStatus": {
+      "enum": ["validated", "approximate", "experimental", "unvalidated", "unsupported", "failed"]
+    },
+    "frequencyPoint": {
+      "type": "object",
+      "required": ["frequency_hz", "target_impedance_ohm"],
+      "properties": {
+        "frequency_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "target_impedance_ohm": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "terminal": {
+      "type": "object",
+      "required": ["object_id", "object_type", "net"],
+      "properties": {
+        "object_id": { "$ref": "#/$defs/identifier" },
+        "object_type": { "enum": ["pad", "via", "copper_zone", "trace", "connector_pin"] },
+        "net": { "$ref": "#/$defs/identifier" },
+        "board_id": { "$ref": "#/$defs/identifier" },
+        "layer_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "mountingModel": {
+      "type": "object",
+      "required": ["resistance_ohm", "inductance_h"],
+      "properties": {
+        "resistance_ohm": { "type": "number", "minimum": 0 },
+        "inductance_h": { "type": "number", "minimum": 0 },
+        "source": { "enum": ["vendor", "extracted", "measured", "user"] }
+      },
+      "additionalProperties": false
+    },
+    "candidatePort": {
+      "type": "object",
+      "required": ["id", "board_id", "positive_terminal", "negative_terminal", "mounting"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "board_id": { "$ref": "#/$defs/identifier" },
+        "positive_terminal": { "$ref": "#/$defs/terminal" },
+        "negative_terminal": { "$ref": "#/$defs/terminal" },
+        "mounting": { "$ref": "#/$defs/mountingModel" },
+        "enabled": { "type": "boolean", "default": true },
+        "notes": { "type": "string", "maxLength": 2048 }
+      },
+      "additionalProperties": false
+    },
+    "capacitor": {
+      "type": "object",
+      "required": [
+        "id", "capacitance_f", "esr_ohm", "esl_h", "mounting", "min_count",
+        "max_count", "unit_cost", "voltage_rating_v", "ripple_current_rating_a"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "manufacturer_part_number": { "type": "string", "maxLength": 256 },
+        "capacitance_f": { "type": "number", "exclusiveMinimum": 0 },
+        "esr_ohm": { "type": "number", "minimum": 0 },
+        "esl_h": { "type": "number", "minimum": 0 },
+        "mounting": { "$ref": "#/$defs/mountingModel" },
+        "min_count": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "max_count": { "type": "integer", "minimum": 0, "maximum": 100000 },
+        "unit_cost": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$", "default": "USD" },
+        "voltage_rating_v": { "type": "number", "exclusiveMinimum": 0 },
+        "ripple_current_rating_a": { "type": "number", "minimum": 0 },
+        "temperature_rating_c": { "type": "number" },
+        "source": { "enum": ["vendor", "measured", "user"] }
+      },
+      "additionalProperties": false
+    },
+    "sourceNetwork": {
+      "type": "object",
+      "required": ["result_id", "result_contract", "model_status", "observation_port_id", "frequency_hz"],
+      "properties": {
+        "result_id": { "$ref": "#/$defs/identifier" },
+        "result_contract": { "$ref": "#/$defs/identifier" },
+        "model_status": { "$ref": "#/$defs/modelStatus" },
+        "observation_port_id": { "$ref": "#/$defs/identifier" },
+        "frequency_hz": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 100000,
+          "uniqueItems": true,
+          "items": { "type": "number", "exclusiveMinimum": 0 }
+        },
+        "provenance_uri": { "type": "string", "maxLength": 2048 }
+      },
+      "additionalProperties": false
+    },
+    "objectives": {
+      "type": "object",
+      "required": ["target_impedance", "target_violation_weight", "count_weight", "cost_weight"],
+      "properties": {
+        "target_impedance": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 100000,
+          "items": { "$ref": "#/$defs/frequencyPoint" }
+        },
+        "target_violation_weight": { "type": "number", "minimum": 0 },
+        "count_weight": { "type": "number", "minimum": 0 },
+        "cost_weight": { "type": "number", "minimum": 0 },
+        "max_total_count": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "max_total_cost": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": [
+        "contract", "record_type", "optimization_id", "source_network", "candidate_ports",
+        "capacitor_library", "objectives"
+      ],
+      "properties": {
+        "contract": { "const": "spike/pdn-optimization/v1" },
+        "record_type": { "const": "request" },
+        "optimization_id": { "$ref": "#/$defs/identifier" },
+        "source_network": { "$ref": "#/$defs/sourceNetwork" },
+        "candidate_ports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": { "$ref": "#/$defs/candidatePort" }
+        },
+        "capacitor_library": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": { "$ref": "#/$defs/capacitor" }
+        },
+        "objectives": { "$ref": "#/$defs/objectives" },
+        "search_limit": { "type": "integer", "minimum": 1, "maximum": 10000000, "default": 100000 },
+        "notes": { "type": "string", "maxLength": 4096 }
+      },
+      "additionalProperties": false
+    },
+    "bankAssignment": {
+      "type": "object",
+      "required": ["candidate_port_id", "capacitor_id", "count"],
+      "properties": {
+        "candidate_port_id": { "$ref": "#/$defs/identifier" },
+        "port_id": { "$ref": "#/$defs/identifier" },
+        "capacitor_id": { "$ref": "#/$defs/identifier" },
+        "count": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "location": { "type": "object" },
+        "capacitance_f": { "type": "number", "exclusiveMinimum": 0 },
+        "esr_ohm": { "type": "number", "minimum": 0 },
+        "esl_h": { "type": "number", "minimum": 0 },
+        "mounting_resistance_ohm": { "type": "number", "minimum": 0 },
+        "mounting_inductance_h": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "recommendation": {
+      "type": "object",
+      "required": ["rank", "assignments", "target_violation_score", "total_count", "total_cost", "model_status"],
+      "properties": {
+        "rank": { "type": "integer", "minimum": 1 },
+        "assignments": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/bankAssignment" } },
+        "target_violation_score": { "type": "number", "minimum": 0 },
+        "total_count": { "type": "integer", "minimum": 0 },
+        "total_cost": { "type": "number", "minimum": 0 },
+        "model_status": { "$ref": "#/$defs/modelStatus" },
+        "id": { "$ref": "#/$defs/identifier" },
+        "passes_target": { "type": "boolean" },
+        "worst_impedance_ohm": { "type": "number", "minimum": 0 },
+        "worst_frequency_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "worst_target_ratio": { "type": "number", "minimum": 0 },
+        "target_excess_integral_log_decades": { "type": "number", "minimum": 0 },
+        "violation_count": { "type": "integer", "minimum": 0 },
+        "response": { "type": "array", "items": { "type": "object" } },
+        "issues": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": false
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "contract", "record_type", "optimization_id", "source_network", "source_model_status",
+        "search_scope", "claim", "recommendations"
+      ],
+      "properties": {
+        "contract": { "const": "spike/pdn-optimization/v1" },
+        "record_type": { "const": "result" },
+        "optimization_id": { "$ref": "#/$defs/identifier" },
+        "source_network": { "$ref": "#/$defs/sourceNetwork" },
+        "source_model_status": { "$ref": "#/$defs/modelStatus" },
+        "status": { "enum": ["completed", "no_feasible_configuration"] },
+        "search_scope": { "enum": ["bounded", "heuristic", "exhaustive"] },
+        "search_status": { "enum": ["bounded", "exhaustive"] },
+        "claim": { "enum": ["recommendation", "global_optimum"] },
+        "optimality": { "enum": ["recommendation_only", "optimal_within_explicit_search_domain"] },
+        "model_status": { "$ref": "#/$defs/modelStatus" },
+        "source_result_id": { "type": ["string", "null"] },
+        "net": { "type": "string" },
+        "target_ohm": { "type": "number", "exclusiveMinimum": 0 },
+        "frequency_start_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "frequency_stop_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "point_count": { "type": "integer", "minimum": 2 },
+        "baseline": { "type": "object" },
+        "search": { "type": "object" },
+        "constraints": { "type": "object" },
+        "recommendations": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/recommendation" }
+        },
+        "best_recommendation_id": { "type": ["string", "null"] },
+        "evaluated_configurations": { "type": "integer", "minimum": 0 },
+        "search_limit": { "type": "integer", "minimum": 1 },
+        "issues": { "type": "array", "items": { "type": "object" } },
+        "validity": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "search_scope": { "const": "exhaustive" } }, "required": ["search_scope"] },
+          "then": {},
+          "else": { "properties": { "claim": { "const": "recommendation" } } }
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

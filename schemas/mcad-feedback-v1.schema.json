@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/mcad-feedback-v1.schema.json",
+  "description": "Millimetres; right-handed Z-up; parent-local row-major proper rigid transforms. Runtime validation additionally enforces identities, graph topology, finite numbers, geometry closure, SHA-256 assets and bounded total input.",
+  "type": "object",
+  "properties": {
+    "contract": {
+      "const": "spike/mcad-feedback/v1"
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "assembly_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "\\S"
+    },
+    "baseline_assembly_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "baseline_designs_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "\\S"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "\\S"
+          },
+          "transform": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 16,
+            "maxItems": 16
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "transform"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 130
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "object_a_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "\\S"
+          },
+          "object_b_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "\\S"
+          },
+          "distance_mm": {
+            "type": "number",
+            "minimum": 0
+          },
+          "overlap_volume_mm3": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "object_a_id",
+          "object_b_id",
+          "distance_mm",
+          "overlap_volume_mm3"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "contract",
+    "session_id",
+    "project_id",
+    "assembly_id",
+    "baseline_assembly_sha256",
+    "baseline_designs_sha256",
+    "objects",
+    "measurements"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/model-index-v1.schema.json",
+  "title": "SPIKE Model Index v1",
+  "type": "object",
+  "required": ["contract", "models"],
+  "properties": {
+    "contract": { "const": "spike/model-index/v1" },
+    "models": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/modelReference" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "modelReference": {
+      "type": "object",
+      "required": ["id", "source_id", "name", "extensions", "model_type", "uri", "digest", "transform"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^\\S(?:.*\\S)?$" },
+        "source_id": { "type": "string" },
+        "name": { "type": "string" },
+        "extensions": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$" }
+        },
+        "model_type": { "enum": ["step", "gltf", "glb"] },
+        "uri": {
+          "type": "string",
+          "pattern": "^package:models/artifacts/[A-Za-z0-9][A-Za-z0-9._+-]*$"
+        },
+        "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "transform": {
+          "type": "array",
+          "description": "Empty for identity, otherwise a row-major 4x4 homogeneous transform in canonical millimetres applied inside the owning AssemblyIR part frame.",
+          "items": { "type": "number" },
+          "oneOf": [
+            { "maxItems": 0 },
+            { "minItems": 16, "maxItems": 16 }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "model_type": { "const": "step" } } },
+          "then": { "properties": { "uri": { "pattern": "\\.(?:step|stp)$" } } }
+        },
+        {
+          "if": { "properties": { "model_type": { "const": "gltf" } } },
+          "then": { "properties": { "uri": { "pattern": "\\.gltf$" } } }
+        },
+        {
+          "if": { "properties": { "model_type": { "const": "glb" } } },
+          "then": { "properties": { "uri": { "pattern": "\\.glb$" } } }
+        }
+      ],
+      "additionalProperties": true
+    }
+  }
+}

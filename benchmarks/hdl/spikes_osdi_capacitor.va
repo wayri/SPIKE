@@ -1,0 +1,9 @@
+// SPDX-License-Identifier: CC0-1.0
+`include "disciplines.vams"
+
+module spikes_osdi_capacitor(p, n);
+    inout p, n;
+    electrical p, n;
+    parameter real capacitance = 1.0e-6 from (0.0:inf);
+    analog I(p, n) <+ capacitance * ddt(V(p, n));
+endmodule

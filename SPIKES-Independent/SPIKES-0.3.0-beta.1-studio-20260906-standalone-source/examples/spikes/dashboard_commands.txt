@@ -1,0 +1,11 @@
+status
+kp-a
+step 25
+checkpoint
+kp-a
+step 5
+restore
+attach VLOAD voltage RETload 20
+step 5
+history HEALTH 5
+quit

@@ -1,0 +1,45 @@
+{
+  "manifest": "spike/dependencies/v1",
+  "policy": "offline-first",
+  "signature": {
+    "required": true,
+    "format": "cms-detached-sha256",
+    "sidecar": "dependencies.lock.json.p7s",
+    "verification": "The release signer certificate is supplied out of band and pinned by thumbprint."
+  },
+  "runtime": {
+    "worker": "bundled/spike-worker/spike-worker.exe",
+    "python": "embedded in the verified worker artifact"
+  },
+  "dependencies": [
+    {"id": "frontend", "version": "bundled", "required": true, "source": "Tauri resources"},
+    {"id": "worker", "version": "bundled", "required": true, "source": "SPIKE signed release artifact"},
+    {"id": "python-runtime", "version": "pinned-per-release", "required": true, "source": "embedded in the verified PyInstaller onedir worker artifact"},
+    {"id": "pyarrow", "version": "25.0.1", "required": true, "source": "Apache Arrow CPython wheel embedded in the verified worker artifact"},
+    {"id": "numba", "version": "0.66.0", "required": false, "source": "approved SPIKE accelerator bundle"},
+    {"id": "petsc-mumps", "version": "externally-provisioned-pinned-per-platform", "required": false, "source": "administrator-provided PETSc build with MUMPS; signed dependency manifest and functional readiness probe required; never downloaded by SPIKE"},
+    {"id": "cupy-cuda", "version": "externally-provisioned-not-release-qualified", "required": false, "source": "administrator-provided CuPy and compatible NVIDIA CUDA worker runtime; no bundled artifact or automatic download; hardware qualification required before release bundling"},
+    {"id": "sparselizard-native", "version": "e536ff15905556400909b47c4ff3df405e288b44", "required": false, "source": "official sparseLizard source compiled as a native Windows UCRT64 GPL process"},
+    {"id": "msmpi", "version": "10.1.12498.52", "required": false, "source": "official Microsoft MPI redistributable for the native sparseLizard runtime"},
+    {"id": "ngspice", "version": "46", "required": false, "source": "official ngspice Windows x64 archive"},
+    {"id": "peec-2.5d", "version": "0.4.0-approximate", "required": true, "source": "SPIKE native solver bundle; validation limits apply"},
+    {"id": "surface-mom", "version": "unselected", "required": false, "source": "license-reviewed optional solver bundle"},
+    {"id": "fullwave-3d", "version": "unselected", "required": false, "source": "license-reviewed optional solver bundle"},
+    {"id": "openems", "version": "0.0.36", "required": false, "source": "official openEMS Windows release and CPython 3.11 wheels"},
+    {"id": "openfoam", "version": "2606", "required": false, "source": "official signed OpenCFD Ubuntu 24.04 package; installed externally and never by the application"},
+    {"id": "flotherm-connector", "version": "customer-supplied", "required": false, "source": "customer-licensed Siemens installation; never bundled or downloaded by SPIKE"},
+    {"id": "freecad", "version": "1.1.3", "required": false, "source": "official FreeCAD per-user installation"},
+    {"id": "blender", "version": "optional-pinned", "required": false, "source": "optional converter bundle"}
+  ],
+  "verified_artifacts": [
+    {"id": "openems-windows-x64", "version": "0.0.36", "sha256": "e0d62b1176c0897ad18876b45667de877d7d3b58b37c0be95545f9b988896059"},
+    {"id": "openems-cp311-wheel", "version": "0.0.36", "sha256": "730cf5e02889832599ee14b7747bd10e8e3ceaf1cad175e0f3ce1ade12e4b029"},
+    {"id": "csxcad-cp311-wheel", "version": "0.6.3", "sha256": "fad34f17fd09a7e6c0568cd8470cda8f113956aadc255fd6cabc1e347e297c41"},
+    {"id": "numpy-openems-cp311-wheel", "version": "1.26.4", "sha256": "cd25bcecc4974d09257ffcd1f098ee778f7834c3ad767fe5db785be9a4aa9cb2"},
+    {"id": "h5py-openems-cp311-wheel", "version": "3.11.0", "sha256": "083e0329ae534a264940d6513f47f5ada617da536d8dccbafc3026aefc33c90e"},
+    {"id": "ngspice-windows-x64", "version": "46", "sha256": "7ed713cd8d401db724ffe99087c3122bf05a9cfa99de02c6eeed44ee44785a33"},
+    {"id": "numba-cp314-wheel", "version": "0.66.0", "sha256": "bd57790acd20f6a468e0ad333ef6b82355e309a92310fb7dff80e919f01a21a9"},
+    {"id": "llvmlite-cp314-wheel", "version": "0.48.0", "sha256": "966dcab0a598e2bd8fb5f2cc082cf7b07bae564fc485a3a8692393caf986facf"},
+    {"id": "msmpi-runtime-installer", "version": "10.1.12498.52", "sha256": "47443829114d8d8670f77af98939fe876d33eceb35d0ce4e0e85efeec4d87213"}
+  ]
+}

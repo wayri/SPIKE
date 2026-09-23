@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/multiboard-analysis-plan-v1.schema.json",
+  "title": "SPIKE Multi-board Analysis Plan v1",
+  "type": "object",
+  "required": ["contract", "request_contract", "domain", "mode", "state", "can_plan", "independent_jobs_admissible", "can_execute_coupled", "coupled_physics", "execution_strategy", "board_limit", "copper_layer_limit_per_board", "board_dimension_limit_mm", "component_limit_per_board", "net_limit_per_board", "selected_board_ids", "omitted_harness_ids", "graph", "graph_digest", "issues", "meaning", "plan_digest"],
+  "properties": {
+    "contract": { "const": "spike/multiboard-analysis-plan/v1" },
+    "request_contract": { "const": "spike/multiboard-analysis-request/v1" },
+    "domain": { "enum": ["pi", "si"] },
+    "mode": { "enum": ["independent_board_batch", "coupled_harness_network"] },
+    "state": { "enum": ["admitted", "blocked"] },
+    "can_plan": { "type": "boolean" },
+    "independent_jobs_admissible": { "type": "boolean" },
+    "can_execute_coupled": { "const": false },
+    "coupled_physics": { "type": "boolean" },
+    "execution_strategy": { "enum": ["single_board_dispatch_required", "none"] },
+    "board_limit": { "const": 30 },
+    "copper_layer_limit_per_board": { "const": 32 },
+    "board_dimension_limit_mm": { "const": 1000.0 },
+    "component_limit_per_board": { "const": 20000 },
+    "net_limit_per_board": { "const": 100000 },
+    "selected_board_ids": { "type": "array", "minItems": 1, "maxItems": 30, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "omitted_harness_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "graph": {
+      "type": "object",
+      "required": ["assembly_id", "domain", "boards", "harnesses", "connector_mappings"],
+      "properties": {
+        "assembly_id": { "type": "string", "minLength": 1 },
+        "domain": { "enum": ["pi", "si"] },
+        "boards": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "type": "object" } },
+        "harnesses": { "type": "array", "items": { "type": "object" } },
+        "connector_mappings": { "type": "array", "items": { "type": "object" } }
+      },
+      "additionalProperties": false
+    },
+    "graph_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "issues": { "type": "array", "items": { "type": "object" } },
+    "meaning": { "type": "string", "minLength": 1 },
+    "plan_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

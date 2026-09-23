@@ -1,0 +1,1381 @@
+{
+  "errors": [
+    {
+      "code": "SPIKE-BE-APP-C-9999",
+      "title": "Unexpected backend failure",
+      "message": "The backend encountered an unexpected failure.",
+      "action": "Preserve the diagnostic record and restart the affected worker.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "APP",
+      "classification": "C"
+    },
+    {
+      "code": "SPIKE-BE-EXT-E-0001",
+      "title": "External engine launch failed",
+      "message": "A configured external engine could not be started or completed.",
+      "action": "Review engine discovery and process diagnostics before retrying.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "EXT",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-EXT-S-0001",
+      "title": "External engine trust failure",
+      "message": "The external engine or adapter failed integrity or trust verification.",
+      "action": "Do not execute the engine; restore a trusted signed installation.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "EXT",
+      "classification": "S"
+    },
+    {
+      "code": "SPIKE-BE-IMPORT-E-0001",
+      "title": "Design import failed",
+      "message": "The source design could not be converted into the canonical import contract.",
+      "action": "Review the source path, format hint, and importer diagnostics, then retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "IMPORT",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-IMPORT-E-0002",
+      "title": "MCAD assembly import failed",
+      "message": "The STEP or glTF artifact could not be safely attached to the SPIKE project.",
+      "action": "Save the project, verify the MCAD file and embedded resources, then retry the import.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "IMPORT",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-IMPORT-W-0001",
+      "title": "Import quality warning",
+      "message": "The design imported with incomplete or ambiguous source data.",
+      "action": "Review the import-quality report before configuring an analysis.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "IMPORT",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-IPC-E-0001",
+      "title": "Invalid worker request",
+      "message": "The backend received a request that does not satisfy the worker contract.",
+      "action": "Correct the request payload and retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "IPC",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-IPC-E-0002",
+      "title": "Unknown worker method",
+      "message": "The requested worker method is not supported by this backend version.",
+      "action": "Verify frontend and backend versions and use a supported method.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "IPC",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0001",
+      "title": "Conductor mesh escaped source geometry",
+      "message": "A field-solver conductor volume is outside its canonical track, zone, pad, or via owner.",
+      "action": "Inspect the identified source geometry and mesh settings; do not solve until ownership validation passes.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0002",
+      "title": "Pad drill consumes copper land",
+      "message": "A drilled pad has no positive annular copper region because its drill is as large as or larger than the pad land.",
+      "action": "Correct the pad or drill dimensions in the source design and re-import before meshing.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0003",
+      "title": "Via transition geometry is unsupported",
+      "message": "A via type, span, land, plating, or explicit antipad cannot enter the exact circular transition contract.",
+      "action": "Provide supported circular source geometry and explicit reference-plane antipads, then rebuild the transition.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0004",
+      "title": "Via transition discrete topology is invalid",
+      "message": "A circular transition mesh failed provenance, resource, orientation, manifold, or reference-void validation.",
+      "action": "Inspect the source-bound transition and use a supported bounded radial tessellation before solver handoff.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0005",
+      "title": "Native via transition handoff was rejected",
+      "message": "A source-bound via transition failed the strict native geometry admission boundary.",
+      "action": "Rebuild and validate the transition geometry and mesh before native handoff.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0006",
+      "title": "Via transition mesh quality gate failed",
+      "message": "A native-admitted transition failed exact geometry quality or bounded domain-convergence policy.",
+      "action": "Inspect the per-level geometry errors and conditioning warnings, then refine or repair the source transition.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0007",
+      "title": "Reference plane antipad geometry is unsupported",
+      "message": "A complete source reference zone or explicit antipad failed the bounded exact geometry contract.",
+      "action": "Repair the source zone or antipad ownership and use an admitted bounded topology before meshing.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0008",
+      "title": "Reference plane antipad mesh is invalid",
+      "message": "A complete source-zone mesh failed constrained-boundary, antipad-void, resource, or closed-topology validation.",
+      "action": "Inspect the source-bound plane and rebuild it with an admitted deterministic tessellation policy.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0009",
+      "title": "Native reference plane antipad handoff was rejected",
+      "message": "A complete source-bound reference-plane antipad mesh failed the strict native geometry admission boundary.",
+      "action": "Rebuild and validate the complete reference-plane geometry and mesh before native handoff.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0010",
+      "title": "Reference plane antipad mesh quality gate failed",
+      "message": "A native-admitted complete reference-plane mesh failed exact discrete-geometry quality or bounded domain-convergence policy.",
+      "action": "Inspect per-level geometry discrepancies, clearance, and conditioning, then refine or repair the source plane.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0011",
+      "title": "General reference plane topology is invalid",
+      "message": "A concave source plane, source cutout, or explicit antipad failed exact-grid topology, separation, identity, or resource admission.",
+      "action": "Repair touching, crossing, nested, off-grid, or unsupported curved source boundaries before meshing.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0012",
+      "title": "Bounded curve plane topology is invalid",
+      "message": "A DesignIR line or circular-arc boundary failed deterministic flattening, grid, curve-envelope separation, topology, identity, or resource admission.",
+      "action": "Repair the source curve or increase physical separation; fixed production geometry limits are not silently relaxed.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0013",
+      "title": "General reference plane mesh is invalid",
+      "message": "A generalized exact-grid plane mesh failed constraint, cutout, antipad, extrusion, cancellation, resource, or closed-topology admission.",
+      "action": "Repair the source constraints or use an admitted bounded tessellation and resource policy before native handoff.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0014",
+      "title": "Native generalized plane handoff was rejected",
+      "message": "A generalized source-bound plane mesh failed native digest, loop, surface-role, ownership, resource, or closed-orientation admission.",
+      "action": "Regenerate the generalized mesh and repair incomplete loops or provenance before native handoff.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0015",
+      "title": "Generalized plane mesh quality gate failed",
+      "message": "A generalized native-admitted plane failed deterministic antipad geometry convergence, conditioning, cancellation, or resource policy.",
+      "action": "Inspect the refinement series and repair source constraints or conditioning before field qualification.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0016",
+      "title": "Custom pad resolved geometry is unsupported",
+      "message": "A custom pad lacks an admitted resolved boundary/drill combination or failed contained mesh generation.",
+      "action": "Use an admitted filled boundary with no drill or one centered contained plated circle/oval drill.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0017",
+      "title": "Board mesh ownership accounting failed",
+      "message": "A supplied conductor volume escaped its canonical owner, source accounting was incomplete, or the ownership resource/cancellation contract was not satisfied.",
+      "action": "Inspect the source, net scope, omitted/unsupported records, and resource limits; do not hand the mesh to a solver until the ownership sidecar passes.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0018",
+      "title": "Zone-pad connection evidence failed",
+      "message": "Retained pad, footprint, or zone policy could not be resolved against digest-bound source-filled copper evidence.",
+      "action": "Repair the retained connection policy or source-filled geometry; do not infer or regenerate thermal spokes.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0019",
+      "title": "Thermal boundary-contact evidence failed",
+      "message": "A retained thermal-policy candidate could not be observed on a bounded polygonal pad boundary or failed digest, provenance, cancellation, or resource admission.",
+      "action": "Repair source-filled component provenance or pad geometry; do not label boundary intervals as thermal spokes.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-E-0020",
+      "title": "Observed thermal topology failed",
+      "message": "A controlled source-filled attachment profile failed component, width, gap, reservoir, angle, digest, cancellation, or resource admission.",
+      "action": "Repair the controlled fixture geometry or retained thermal parameters; do not treat observed topology as refill provenance.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-MESH-P-0001",
+      "title": "Mesh resource budget exceeded",
+      "message": "The requested mesh exceeds the configured time or memory budget.",
+      "action": "Increase the approved budget or use a coarser validated mesh policy.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "P"
+    },
+    {
+      "code": "SPIKE-BE-MESH-W-0001",
+      "title": "Mesh validity warning",
+      "message": "The generated mesh contains a condition that may limit result validity.",
+      "action": "Inspect the mesh diagnostics and refine the affected geometry or settings.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-MESH-W-0002",
+      "title": "Copper polygon is unusable",
+      "message": "An imported copper polygon is invalid, self-intersecting, empty, or cannot be triangulated.",
+      "action": "Repair or refill the identified copper zone in the source design, re-import it, and inspect the mesh preview.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-MESH-W-0003",
+      "title": "Pad geometry approximated",
+      "message": "A pad shape is represented by extracted bounding dimensions instead of its exact polygon.",
+      "action": "Inspect the identified pad in the mesh preview and use a polygon-preserving import path when exact geometry is required.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "MESH",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-MESH-W-0004",
+      "title": "Copper geometry skipped",
+      "message": "A copper primitive has invalid or unusable dimensions and was excluded from the mesh.",
+      "action": "Inspect the identified copper object, repair its dimensions in the source design, and re-import before solving.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "MESH",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PACKAGE-E-0001",
+      "title": "Project package invalid",
+      "message": "The project package is corrupt, incomplete, or incompatible.",
+      "action": "Open a verified backup or re-import the source design.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "PACKAGE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PACKAGE-E-0002",
+      "title": "Project package write failed",
+      "message": "The project could not be written as a verified SPIKE package.",
+      "action": "Choose a writable destination, verify available space, and retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PACKAGE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0001",
+      "title": "Terminal is not mapped to copper",
+      "message": "A source or load terminal could not be mapped to the selected connected conductor geometry.",
+      "action": "Select a pad, via, zone, or exact coordinate on the analyzed net and assign that object as the terminal anchor.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0002",
+      "title": "PI formulation is unsupported",
+      "message": "The selected PI solver does not support the requested analysis mode or formulation.",
+      "action": "Select a compatible DC, AC, transient, or circuit formulation and validate the setup again.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0003",
+      "title": "PI terminals are incomplete",
+      "message": "The PI request does not contain the source and load terminals required by the selected formulation.",
+      "action": "Assign at least one source and one load to exact copper objects, then validate the setup again.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0004",
+      "title": "Analyzed copper geometry is empty",
+      "message": "No usable connected copper geometry matched the managed nets in the PI request.",
+      "action": "Review the managed nets, import diagnostics, layer visibility, and mesh preview before retrying.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0005",
+      "title": "Load is disconnected from its source",
+      "message": "At least one load terminal is not electrically reachable from any configured source terminal.",
+      "action": "Correct terminal anchors or add the missing series-component and cross-net path definitions.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0006",
+      "title": "Source boundary conflict",
+      "message": "Two source definitions assign different voltages to the same connected conductor node.",
+      "action": "Remove the duplicate source or separate the conflicting source boundaries onto distinct conductor domains.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0100",
+      "title": "PDN candidate invalid",
+      "message": "A decoupling candidate has invalid, unreviewed, or incompatible electrical placement data.",
+      "action": "Review the candidate values, endpoint mapping, frequency grid, and extraction provenance.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0102",
+      "title": "PDN candidate port extraction failed",
+      "message": "PDN candidate ports could not be extracted or mapped from terminals to the mesh.",
+      "action": "Review explicit source, observation, and candidate terminals, then correct their mesh mapping and retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-I-0001",
+      "title": "Explicit return path solved",
+      "message": "The PI solve includes explicit supply and return conductors in the paired current loop.",
+      "action": "No action is required.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "PI",
+      "classification": "I"
+    },
+    {
+      "code": "SPIKE-BE-PI-P-0103",
+      "title": "PDN candidate port limit exceeded",
+      "message": "The requested PDN candidate ports exceed the configured extraction resource limit.",
+      "action": "Reduce the candidate count, run bounded batches, or raise the approved limit up to the hard maximum.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "P"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0001",
+      "title": "Floating copper excluded",
+      "message": "Copper outside the source-driven connected component was excluded from this result.",
+      "action": "Inspect the excluded geometry and add missing connectivity or terminals when it belongs to the intended current path.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0002",
+      "title": "Voltage-drop limit exceeded",
+      "message": "The solved voltage drop exceeds the configured design limit.",
+      "action": "Inspect the highlighted path, conductor geometry, contacts, and load definition before changing the limit.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0003",
+      "title": "Current-density limit exceeded",
+      "message": "The solved conductor current density exceeds the configured design limit.",
+      "action": "Inspect the identified conductor or via, then increase copper cross-section or reduce current where required.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0004",
+      "title": "Copper discretization requires convergence review",
+      "message": "The result uses a discretized copper representation that has not passed the configured mesh-convergence policy.",
+      "action": "Run the convergence study and review coarse-to-fine result agreement before engineering sign-off.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0005",
+      "title": "Ideal terminal package model used",
+      "message": "One or more source or load terminals use an ideal zero-resistance package or contact model.",
+      "action": "Assign measured or reviewed package and contact resistance models to the affected terminals.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0006",
+      "title": "Isolated secondary simplified",
+      "message": "An isolated secondary is represented as a local DC boundary without transformer magnetic behavior.",
+      "action": "Assign a coupled transformer or circuit model when leakage, saturation, loss, or regulation must be included.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-PI-W-0101",
+      "title": "PDN multiport approximation",
+      "message": "PDN multiport extraction uses a shared ideal reference; return-path and differential PCB physics are not validated.",
+      "action": "Use the result for screening only; obtain an independently validated power/return extraction for return-path or differential analysis.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "PI",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-REPORT-E-0001",
+      "title": "Report generation failed",
+      "message": "The engineering report could not be generated.",
+      "action": "Review the report diagnostics and retry with a writable destination.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "REPORT",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-E-0001",
+      "title": "License claims invalid",
+      "message": "Required entitlement claims are missing, inconsistent, or unsupported.",
+      "action": "Correct the issuer claims and issue a new signed entitlement.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-E-0002",
+      "title": "License product mismatch",
+      "message": "The entitlement targets a different product or incompatible major version.",
+      "action": "Use an entitlement issued for this SPIKE product major version.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-E-0003",
+      "title": "License validity period rejected",
+      "message": "The entitlement is not yet valid or has expired.",
+      "action": "Renew the entitlement or correct the trusted system clock before activating again.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-E-0004",
+      "title": "License storage failed",
+      "message": "The desktop host could not read, stage, replace, or remove the local entitlement.",
+      "action": "Check per-user application-data permissions and available disk space, then retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-E-0005",
+      "title": "License not installed",
+      "message": "No signed entitlement is installed for the current machine and user.",
+      "action": "Activate a signed temporary, timed, perpetual, or developer entitlement.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-E-0006",
+      "title": "Licensed capability required",
+      "message": "The installed entitlement does not grant the requested protected operation.",
+      "action": "Install an entitlement containing the required capability or continue in viewer mode.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-S-0001",
+      "title": "License issuer trust unavailable",
+      "message": "The desktop build has no usable pinned license issuer key.",
+      "action": "Install an official SPIKE build containing the expected issuer public key.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "S"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-S-0002",
+      "title": "License envelope invalid",
+      "message": "The entitlement envelope is malformed, unsupported, or exceeds its safety limit.",
+      "action": "Obtain a fresh entitlement from an authorized SPIKE issuer.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "S"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-S-0003",
+      "title": "License signature invalid",
+      "message": "The entitlement signature does not verify against the pinned issuer key.",
+      "action": "Do not use the entitlement; obtain a fresh signed entitlement from an authorized issuer.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "S"
+    },
+    {
+      "code": "SPIKE-BE-SECURITY-S-0004",
+      "title": "License device binding mismatch",
+      "message": "The entitlement is bound to a different machine or operating-system user.",
+      "action": "Deactivate the previous seat or issue a new entitlement for this device-user binding.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SECURITY",
+      "classification": "S"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-E-0001",
+      "title": "Solver unavailable",
+      "message": "No installed solver satisfies the requested capability and validity policy.",
+      "action": "Select or install an eligible solver and validate the setup again.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SOLVER",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-E-0002",
+      "title": "Solver failed to converge",
+      "message": "The solver did not converge within its declared numerical limits.",
+      "action": "Review conditioning and mesh diagnostics before changing solver limits.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SOLVER",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-E-0003",
+      "title": "Solver execution cancelled",
+      "message": "The active solver or co-simulation was cancelled before it completed.",
+      "action": "Review any partial diagnostics, then run the analysis again when ready.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SOLVER",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-I-0001",
+      "title": "Solver progress",
+      "message": "The solver reported a progress update.",
+      "action": "No action is required.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SOLVER",
+      "classification": "I"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-P-0004",
+      "title": "Solver time budget exceeded",
+      "message": "The active solver or co-simulation exceeded its configured wall-time budget.",
+      "action": "Increase the approved time budget or reduce the validated model complexity.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SOLVER",
+      "classification": "P"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-P-0005",
+      "title": "Interactive result data decimated",
+      "message": "Interactive geometry or result records were reduced to remain within the configured display budget.",
+      "action": "Increase the approved result-detail budget for full export, or keep decimation enabled for responsive inspection.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SOLVER",
+      "classification": "P"
+    },
+    {
+      "code": "SPIKE-BE-SOLVER-W-0005",
+      "title": "Linear residual is elevated",
+      "message": "The solved linear system has a scaled residual above the preferred engineering threshold.",
+      "action": "Review disconnected geometry, resistance ratios, terminal placement, and mesh convergence before using the result.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SOLVER",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0001",
+      "title": "SPICE workspace contract invalid",
+      "message": "The SPICE workspace does not satisfy the supported contract.",
+      "action": "Correct the workspace contract and validate it again.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0010",
+      "title": "SPICE model invalid",
+      "message": "A SPICE model definition is incomplete or invalid.",
+      "action": "Correct the model definition and validate the workspace again.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0020",
+      "title": "SPICE assignment invalid",
+      "message": "A component or pin assignment is incomplete or inconsistent.",
+      "action": "Map every required model pin to an explicit design anchor.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0030",
+      "title": "SPICE parasitic mapping invalid",
+      "message": "A parasitic element has invalid terminals, units, or provenance.",
+      "action": "Review terminal mapping, units, and extraction provenance.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0041",
+      "title": "Field/circuit coupling request invalid",
+      "message": "The closed-loop field/circuit request, circuit stage, or convergence controls are invalid.",
+      "action": "Review the circuit workspace, coupling controls, and explicit terminal mappings.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0042",
+      "title": "Field reduction response invalid",
+      "message": "The field adapter returned an invalid result or attempted to change reviewed coupling topology.",
+      "action": "Inspect the field adapter diagnostics and preserve the reviewed parasitic IDs and endpoints.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0043",
+      "title": "PEEC field mapping invalid",
+      "message": "The native PEEC result could not be mapped to the reviewed circuit parasitics.",
+      "action": "Re-extract the PEEC network and review its explicit circuit endpoint mapping before rerunning co-simulation.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-E-0054",
+      "title": "Owned SPICE bridge execution failed",
+      "message": "The structured workspace passed admission but the release-owned circuit engine bridge failed.",
+      "action": "Inspect the owned-engine status, workspace validation, and bounded execution diagnostics.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-P-0040",
+      "title": "SPICE transient budget exceeded",
+      "message": "The transient setup exceeds its configured point, time, or memory budget.",
+      "action": "Adjust duration, step size, outputs, or the approved resource budget.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "P"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-S-0001",
+      "title": "Unsafe SPICE content blocked",
+      "message": "The SPICE workspace contains content prohibited by the execution policy.",
+      "action": "Remove the prohibited directive or import a reviewed immutable model.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "SPICE",
+      "classification": "S"
+    },
+    {
+      "code": "SPIKE-BE-SPICE-W-0031",
+      "title": "SPICE parasitic model unvalidated",
+      "message": "A parasitic model is outside its validated use or frequency range.",
+      "action": "Use a validated extraction or explicitly limit the requested analysis.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "SPICE",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-FE-APP-C-9999",
+      "title": "Unexpected frontend failure",
+      "message": "The application encountered an unexpected frontend failure.",
+      "action": "Preserve the diagnostic record and restart SPIKE.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "APP",
+      "classification": "C"
+    },
+    {
+      "code": "SPIKE-FE-APP-E-0001",
+      "title": "Frontend operation failed",
+      "message": "The requested frontend operation could not be completed.",
+      "action": "Review the operation details, correct the input, and retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "APP",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-FE-APP-I-0001",
+      "title": "Operation status",
+      "message": "The requested frontend operation reported a status update.",
+      "action": "No action is required.",
+      "recoverable": true,
+      "retryable": false,
+      "domain": "APP",
+      "classification": "I"
+    },
+    {
+      "code": "SPIKE-FE-APP-W-0001",
+      "title": "Frontend operation warning",
+      "message": "The frontend completed an operation with a condition that requires review.",
+      "action": "Review the associated object and suggested recovery before continuing.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "APP",
+      "classification": "W"
+    },
+    {
+      "code": "SPIKE-FE-IPC-E-0001",
+      "title": "Worker unavailable",
+      "message": "The frontend could not communicate with the local analysis worker.",
+      "action": "Restart the worker or the application, then retry the operation.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "IPC",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-FE-IPC-E-0002",
+      "title": "Malformed worker response",
+      "message": "The worker returned a response that does not satisfy its contract.",
+      "action": "Preserve the diagnostic record and verify component versions.",
+      "recoverable": false,
+      "retryable": false,
+      "domain": "IPC",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-FE-PROJECT-E-0001",
+      "title": "Project open failed",
+      "message": "The selected project could not be opened by the frontend.",
+      "action": "Check the project path and package integrity, then retry.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PROJECT",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-FE-SECURITY-E-0001",
+      "title": "Desktop license service unavailable",
+      "message": "The licensing operation requires the native SPIKE desktop host.",
+      "action": "Open the installed SPIKE desktop application and retry the licensing operation.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SECURITY",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-FE-SPICE-E-0001",
+      "title": "SPICE assistant input invalid",
+      "message": "The SPICE model assistant contains invalid or incomplete input.",
+      "action": "Correct the highlighted model, pin, or analysis fields and validate again.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "SPICE",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-FE-VIEW-P-0001",
+      "title": "Viewport performance degraded",
+      "message": "The viewport exceeded its configured frame-time budget.",
+      "action": "Reduce visible detail or select a lower rendering quality preset.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "VIEW",
+      "classification": "P"
+    }
+  ],
+  "commands": [
+    {
+      "command": "spike",
+      "summary": "SPIKE local-first PI/SI automation CLI",
+      "usage": "usage: spike [-h] [--version] [--output OUTPUT] [--output-format {json,text}]\n             [--compact] [--quiet] [--fail-on-warning]\n             {capabilities,capability-ledger,project-inspect,project-migrate,solvers,extensions,accelerators,external-engines,solver-manager,sparselizard-runtime-status,sparselizard-validation-status,solver-recommend,solver-register,solver-unregister,solver-tune,dependencies,benchmark,pi-release-qualification,openems-benchmark,environment-list,environment-materialize,environment-validate,import,import-design,validate,inspect,extract-net,analyze-dc,dc,setup-dc,analyze-ac,ac,setup-ac,analyze-transient,transient,setup-transient,preflight,mesh-preview,converge,run,emi-preflight,emi-screen,openems-prepare,openems-run,sparselizard-prepare,sparselizard-run,report,compare,pdn-review,pdn-optimize,external-pi-import,peec-spice-import,hybrid-run,native-mna-validate,native-mna-run,native-workspace-compile,native-workspace-run,field-circuit-validate,field-circuit-run,converter-study,thermal-estimate,sparam-inspect,touchstone,sparam-renormalize,si-geometry-channel,si-workflow,harness-pi}\n             ...\n\nSPIKE local-first PI/SI automation CLI\n\npositional arguments:\n  {capabilities,capability-ledger,project-inspect,project-migrate,solvers,extensions,accelerators,external-engines,solver-manager,sparselizard-runtime-status,sparselizard-validation-status,solver-recommend,solver-register,solver-unregister,solver-tune,dependencies,benchmark,pi-release-qualification,openems-benchmark,environment-list,environment-materialize,environment-validate,import,import-design,validate,inspect,extract-net,analyze-dc,dc,setup-dc,analyze-ac,ac,setup-ac,analyze-transient,transient,setup-transient,preflight,mesh-preview,converge,run,emi-preflight,emi-screen,openems-prepare,openems-run,sparselizard-prepare,sparselizard-run,report,compare,pdn-review,pdn-optimize,external-pi-import,peec-spice-import,hybrid-run,native-mna-validate,native-mna-run,native-workspace-compile,native-workspace-run,field-circuit-validate,field-circuit-run,converter-study,thermal-estimate,sparam-inspect,touchstone,sparam-renormalize,si-geometry-channel,si-workflow,harness-pi}\n    capabilities        Show worker and analysis capabilities\n    capability-ledger   Show native ownership, validation, and release gates\n                        for every workflow\n    project-inspect     Inspect a SPIKE v3 package or supported legacy project\n                        without extracting it\n    project-migrate     Migrate a legacy SPIKE JSON project into a secure v3\n                        package\n    solvers             List solver plugins and validity limits\n    extensions          List installed extension modules\n    accelerators        List optional numerical acceleration backends and\n                        selection policy\n    external-engines    List optional external engineering engines and adapter\n                        readiness\n    solver-manager      Show workload recommendations, registrations, tuning,\n                        and execution gates\n    sparselizard-runtime-status\n                        Verify the integrity-bound native sparseLizard runtime\n                        without enabling PCB solver capabilities\n    sparselizard-validation-status\n                        Evaluate signed-runtime, PETSc/MUMPS, convergence, and\n                        PCB fixture release gates\n    solver-recommend    Recommend the best currently runnable solver for a\n                        workload\n    solver-register     Register an explicit local external-engine path\n                        without installing it\n    solver-unregister   Forget an external-engine registration without\n                        deleting its files\n    solver-tune         Save allowlisted, range-checked solver tuning values\n    dependencies        Verify the bundled dependency lock\n    benchmark           Run analytical, convergence, and native solver\n                        benchmarks\n    pi-release-qualification\n                        Fail closed unless the packaged runtime and all stable\n                        PI workflow gates pass\n    openems-benchmark   Run the real openEMS simple-patch reference and mesh-\n                        convergence gate\n    environment-list    List built-in cross-domain environment profiles\n    environment-materialize\n                        Materialize a built-in preset or a user-owned\n                        environment profile\n    environment-validate\n                        Validate environment input readiness for one or more\n                        solver domains\n    import (import-design)\n                        Normalize an EDA design into DesignIR\n    validate            Validate a design or SPIKE project\n    inspect             Inspect normalized design content\n    extract-net         Export complete geometry for one net\n    analyze-dc (dc)     Build and run a DC PI request\n    setup-dc            Build a reproducible DC PI request without running it\n    analyze-ac (ac)     Build and run a hybrid PEEC R/L/C/G request\n    setup-ac            Build a reproducible AC PEEC request without running\n                        it\n    analyze-transient (transient)\n                        Run a geometry-derived quasi-static PEEC RLC transient\n    setup-transient     Build a reproducible quasi-static PEEC RLC transient\n                        request without running it\n    preflight           Validate an analysis request and generate its pre-\n                        solve mesh\n    mesh-preview        Generate a pre-solve mesh from an analysis request\n    converge            Run coarse-to-fine PI mesh convergence from an\n                        analysis request\n    run                 Execute an analysis request, batch manifest, or SPIKE\n                        project\n    emi-preflight       Validate a versioned EMI setup without running field\n                        physics\n    emi-screen          Rank EMI review nets from supplied pre-pass metrics\n    openems-prepare     Prepare an inspectable openEMS case from an analysis\n                        request\n    openems-run         Build or execute a prepared SPIKE openEMS case\n    sparselizard-prepare\n                        Prepare a reviewed differential-port PI multiport case\n                        for sparseLizard\n    sparselizard-run    Execute a prepared case through an exact spike-\n                        sparselizard-adapter executable\n    report              Generate a report from an AnalysisResult JSON file\n    compare             Compare two AnalysisResult files\n    pdn-review          Check an AC result against a PDN target and screen\n                        lumped decoupling candidates\n    pdn-optimize        Search explicit capacitor ports and a finite component\n                        library using a PDN multiport result\n    external-pi-import  Validate and normalize an external PI multiport result\n                        for PDN analysis\n    peec-spice-import   Import reviewed PEEC RLCG networks into a visual SPICE\n                        workspace\n    hybrid-run          Run reviewed PEEC RLCG plus explicit component models\n                        through ngspice\n    native-mna-validate\n                        Validate a versioned native linear MNA circuit request\n                        without solving it\n    native-mna-run      Run a versioned native linear MNA DC, AC, or transient\n                        circuit request\n    native-workspace-compile\n                        Compile a reviewed visual SPICE workspace into the\n                        native linear MNA contract\n    native-workspace-run\n                        Compile and run a reviewed visual SPICE workspace with\n                        the native linear MNA engine\n    field-circuit-validate\n                        Fail-closed validation for a reviewed DesignIR, SPICE\n                        workspace, and PEEC field-circuit package\n    field-circuit-run   Run a reviewed field-circuit co-simulation through the\n                        native PEEC reduction provider\n    converter-study     Run a reviewed PWM converter study through ngspice,\n                        optional PEEC, analytics, and thermal handoff\n    thermal-estimate    Run the explicit first-order compact thermal RC\n                        estimator\n    sparam-inspect (touchstone)\n                        Inspect Touchstone data, network traces, and validity\n                        checks\n    sparam-renormalize  Convert a Touchstone network to a new real reference\n                        impedance\n    si-geometry-channel\n                        Run the bounded straight DesignIR v2 geometry-to-\n                        RLGC/S/TDR/TDT/NRZ-eye channel\n    si-workflow         Run an experimental source/receiver/passive loaded SI\n                        study\n    harness-pi          Run explicit-pin lumped DC harness PI (experimental)\n\noptions:\n  -h, --help            show this help message and exit\n  --version             show program's version number and exit\n  --output OUTPUT, -o OUTPUT\n                        Write the command result to a file\n  --output-format {json,text}\n  --compact             Emit compact JSON\n  --quiet               Do not write the result to stdout\n  --fail-on-warning     Return exit code 4 when warnings exist\n"
+    },
+    {
+      "command": "spike capabilities",
+      "summary": "Show worker and analysis capabilities",
+      "usage": "usage: spike capabilities [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike capability-ledger",
+      "summary": "Show native ownership, validation, and release gates for every workflow",
+      "usage": "usage: spike capability-ledger [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike project-inspect",
+      "summary": "Inspect a SPIKE v3 package or supported legacy project without extracting it",
+      "usage": "usage: spike project-inspect [-h] project\n\npositional arguments:\n  project\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike project-migrate",
+      "summary": "Migrate a legacy SPIKE JSON project into a secure v3 package",
+      "usage": "usage: spike project-migrate [-h] project destination\n\npositional arguments:\n  project\n  destination\n\noptions:\n  -h, --help   show this help message and exit\n"
+    },
+    {
+      "command": "spike solvers",
+      "summary": "List solver plugins and validity limits",
+      "usage": "usage: spike solvers [-h] [--available]\n\noptions:\n  -h, --help   show this help message and exit\n  --available\n"
+    },
+    {
+      "command": "spike extensions",
+      "summary": "List installed extension modules",
+      "usage": "usage: spike extensions [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike accelerators",
+      "summary": "List optional numerical acceleration backends and selection policy",
+      "usage": "usage: spike accelerators [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike external-engines",
+      "summary": "List optional external engineering engines and adapter readiness",
+      "usage": "usage: spike external-engines [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike solver-manager",
+      "summary": "Show workload recommendations, registrations, tuning, and execution gates",
+      "usage": "usage: spike solver-manager [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike sparselizard-runtime-status",
+      "summary": "Verify the integrity-bound native sparseLizard runtime without enabling PCB solver capabilities",
+      "usage": "usage: spike sparselizard-runtime-status [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike sparselizard-validation-status",
+      "summary": "Evaluate signed-runtime, PETSc/MUMPS, convergence, and PCB fixture release gates",
+      "usage": "usage: spike sparselizard-validation-status [-h]\n                                            [--evidence-root EVIDENCE_ROOT]\n\noptions:\n  -h, --help            show this help message and exit\n  --evidence-root EVIDENCE_ROOT\n                        Directory containing spike/sparselizard-validation-\n                        evidence/v1 fixture results\n"
+    },
+    {
+      "command": "spike solver-recommend",
+      "summary": "Recommend the best currently runnable solver for a workload",
+      "usage": "usage: spike solver-recommend [-h]\n                              {dc_pi,quasistatic_ac_pi,geometry_transient,circuit_cosimulation,fullwave_comparison,thermal_airflow,emi_radiation}\n\npositional arguments:\n  {dc_pi,quasistatic_ac_pi,geometry_transient,circuit_cosimulation,fullwave_comparison,thermal_airflow,emi_radiation}\n\noptions:\n  -h, --help            show this help message and exit\n"
+    },
+    {
+      "command": "spike solver-register",
+      "summary": "Register an explicit local external-engine path without installing it",
+      "usage": "usage: spike solver-register [-h] engine path\n\npositional arguments:\n  engine\n  path\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike solver-unregister",
+      "summary": "Forget an external-engine registration without deleting its files",
+      "usage": "usage: spike solver-unregister [-h] engine\n\npositional arguments:\n  engine\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike solver-tune",
+      "summary": "Save allowlisted, range-checked solver tuning values",
+      "usage": "usage: spike solver-tune [-h] target KEY=VALUE [KEY=VALUE ...]\n\npositional arguments:\n  target\n  KEY=VALUE\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike dependencies",
+      "summary": "Verify the bundled dependency lock",
+      "usage": "usage: spike dependencies [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike benchmark",
+      "summary": "Run analytical, convergence, and native solver benchmarks",
+      "usage": "usage: spike benchmark [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike pi-release-qualification",
+      "summary": "Fail closed unless the packaged runtime and all stable PI workflow gates pass",
+      "usage": "usage: spike pi-release-qualification [-h] [--runtime-report RUNTIME_REPORT]\n                                      [--benchmark-report BENCHMARK_REPORT]\n\noptions:\n  -h, --help            show this help message and exit\n  --runtime-report RUNTIME_REPORT\n                        Passing spike/release-runtime-qualification/v1 report\n  --benchmark-report BENCHMARK_REPORT\n                        Existing benchmark report; omit to run the native\n                        corpus now\n"
+    },
+    {
+      "command": "spike openems-benchmark",
+      "summary": "Run the real openEMS simple-patch reference and mesh-convergence gate",
+      "usage": "usage: spike openems-benchmark [-h]\n                               [--mesh-resolution-mm MESH_RESOLUTION_MM [MESH_RESOLUTION_MM ...]]\n                               [--case-root CASE_ROOT]\n                               [--max-timesteps MAX_TIMESTEPS]\n                               [--timeout-seconds TIMEOUT_SECONDS]\n\noptions:\n  -h, --help            show this help message and exit\n  --mesh-resolution-mm MESH_RESOLUTION_MM [MESH_RESOLUTION_MM ...]\n                        One or more mesh resolutions; three are required for\n                        convergence\n  --case-root CASE_ROOT\n  --max-timesteps MAX_TIMESTEPS\n  --timeout-seconds TIMEOUT_SECONDS\n"
+    },
+    {
+      "command": "spike environment-list",
+      "summary": "List built-in cross-domain environment profiles",
+      "usage": "usage: spike environment-list [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike environment-materialize",
+      "summary": "Materialize a built-in preset or a user-owned environment profile",
+      "usage": "usage: spike environment-materialize [-h] {preset,user} ...\n\npositional arguments:\n  {preset,user}\n    preset       Copy a built-in profile with optional overrides\n    user         Create a user-owned profile from explicit physical inputs\n\noptions:\n  -h, --help     show this help message and exit\n"
+    },
+    {
+      "command": "spike environment-materialize preset",
+      "summary": "Copy a built-in profile with optional overrides",
+      "usage": "usage: spike environment-materialize preset [-h] [--overrides OVERRIDES]\n                                            profile_id\n\npositional arguments:\n  profile_id\n\noptions:\n  -h, --help            show this help message and exit\n  --overrides OVERRIDES\n                        JSON object recursively applied to the preset\n"
+    },
+    {
+      "command": "spike environment-materialize user",
+      "summary": "Create a user-owned profile from explicit physical inputs",
+      "usage": "usage: spike environment-materialize user [-h] --name NAME\n                                          [--physical PHYSICAL]\n                                          [--source-title SOURCE_TITLE]\n                                          [--source-locator SOURCE_LOCATOR]\n                                          profile_id\n\npositional arguments:\n  profile_id\n\noptions:\n  -h, --help            show this help message and exit\n  --name NAME\n  --physical PHYSICAL   JSON object containing explicit physical inputs\n  --source-title SOURCE_TITLE\n  --source-locator SOURCE_LOCATOR\n"
+    },
+    {
+      "command": "spike environment-validate",
+      "summary": "Validate environment input readiness for one or more solver domains",
+      "usage": "usage: spike environment-validate [-h] [--domain {pi,si,thermal,emi}] profile\n\npositional arguments:\n  profile               spike/environment-profile/v1 JSON\n\noptions:\n  -h, --help            show this help message and exit\n  --domain {pi,si,thermal,emi}\n                        Requested solver domain; repeat as needed (defaults to\n                        all domains)\n"
+    },
+    {
+      "command": "spike import",
+      "summary": "Normalize an EDA design into DesignIR",
+      "usage": "usage: spike import [-h] [--format FORMAT] [--step STEP] [--report] design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help       show this help message and exit\n  --format FORMAT  Explicit importer format (for example odb++)\n  --step STEP      Select a board step in a multi-step ODB++ job\n  --report         Return typed DesignIR and import quality report\n"
+    },
+    {
+      "command": "spike import-design",
+      "summary": "spike import-design",
+      "usage": "usage: spike import [-h] [--format FORMAT] [--step STEP] [--report] design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help       show this help message and exit\n  --format FORMAT  Explicit importer format (for example odb++)\n  --step STEP      Select a board step in a multi-step ODB++ job\n  --report         Return typed DesignIR and import quality report\n"
+    },
+    {
+      "command": "spike validate",
+      "summary": "Validate a design or SPIKE project",
+      "usage": "usage: spike validate [-h] design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike inspect",
+      "summary": "Inspect normalized design content",
+      "usage": "usage: spike inspect [-h]\n                     [--section {summary,nets,layers,components,stackup,regions,bends,issues,all}]\n                     design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --section {summary,nets,layers,components,stackup,regions,bends,issues,all}\n"
+    },
+    {
+      "command": "spike extract-net",
+      "summary": "Export complete geometry for one net",
+      "usage": "usage: spike extract-net [-h] --net NET design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help  show this help message and exit\n  --net NET\n"
+    },
+    {
+      "command": "spike analyze-dc",
+      "summary": "Build and run a DC PI request",
+      "usage": "usage: spike analyze-dc [-h] --net NET --source\n                        X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]] --load\n                        X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        [--return-net RETURN_NET]\n                        [--return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]]\n                        [--return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]]\n                        [--return-mode {explicit,isolated_secondary}]\n                        [--domain-id DOMAIN_ID] [--solver SOLVER]\n                        [--formulation FORMULATION]\n                        [--analysis-id ANALYSIS_ID]\n                        [--max-drop-mv MAX_DROP_MV]\n                        [--max-density MAX_DENSITY]\n                        [--mesh-size-mm MESH_SIZE_MM]\n                        [--zone-cell-mm ZONE_CELL_MM]\n                        [--max-zone-cells MAX_ZONE_CELLS]\n                        [--max-conductors MAX_CONDUCTORS]\n                        [--memory-limit-gb MEMORY_LIMIT_GB]\n                        [--via-model {extracted,plated_cylinder}]\n                        [--via-plating-mm VIA_PLATING_MM]\n                        [--board-thickness-mm BOARD_THICKNESS_MM]\n                        [--save-request SAVE_REQUEST]\n                        design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET             Net name; repeat for multi-net networks\n  --source X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]]\n  --load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n  --return-net RETURN_NET\n                        Explicit return or local ground net\n  --return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]\n                        Source-side return/reference terminal\n  --return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        Load-side return terminal; one per --load\n  --return-mode {explicit,isolated_secondary}\n  --domain-id DOMAIN_ID\n                        Power/isolation domain identifier\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --max-drop-mv MAX_DROP_MV\n  --max-density MAX_DENSITY\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --board-thickness-mm BOARD_THICKNESS_MM\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n"
+    },
+    {
+      "command": "spike dc",
+      "summary": "spike dc",
+      "usage": "usage: spike analyze-dc [-h] --net NET --source\n                        X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]] --load\n                        X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        [--return-net RETURN_NET]\n                        [--return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]]\n                        [--return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]]\n                        [--return-mode {explicit,isolated_secondary}]\n                        [--domain-id DOMAIN_ID] [--solver SOLVER]\n                        [--formulation FORMULATION]\n                        [--analysis-id ANALYSIS_ID]\n                        [--max-drop-mv MAX_DROP_MV]\n                        [--max-density MAX_DENSITY]\n                        [--mesh-size-mm MESH_SIZE_MM]\n                        [--zone-cell-mm ZONE_CELL_MM]\n                        [--max-zone-cells MAX_ZONE_CELLS]\n                        [--max-conductors MAX_CONDUCTORS]\n                        [--memory-limit-gb MEMORY_LIMIT_GB]\n                        [--via-model {extracted,plated_cylinder}]\n                        [--via-plating-mm VIA_PLATING_MM]\n                        [--board-thickness-mm BOARD_THICKNESS_MM]\n                        [--save-request SAVE_REQUEST]\n                        design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET             Net name; repeat for multi-net networks\n  --source X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]]\n  --load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n  --return-net RETURN_NET\n                        Explicit return or local ground net\n  --return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]\n                        Source-side return/reference terminal\n  --return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        Load-side return terminal; one per --load\n  --return-mode {explicit,isolated_secondary}\n  --domain-id DOMAIN_ID\n                        Power/isolation domain identifier\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --max-drop-mv MAX_DROP_MV\n  --max-density MAX_DENSITY\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --board-thickness-mm BOARD_THICKNESS_MM\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n"
+    },
+    {
+      "command": "spike setup-dc",
+      "summary": "Build a reproducible DC PI request without running it",
+      "usage": "usage: spike setup-dc [-h] --net NET --source\n                      X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]] --load\n                      X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                      [--return-net RETURN_NET]\n                      [--return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]]\n                      [--return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]]\n                      [--return-mode {explicit,isolated_secondary}]\n                      [--domain-id DOMAIN_ID] [--solver SOLVER]\n                      [--formulation FORMULATION] [--analysis-id ANALYSIS_ID]\n                      [--max-drop-mv MAX_DROP_MV] [--max-density MAX_DENSITY]\n                      [--mesh-size-mm MESH_SIZE_MM]\n                      [--zone-cell-mm ZONE_CELL_MM]\n                      [--max-zone-cells MAX_ZONE_CELLS]\n                      [--max-conductors MAX_CONDUCTORS]\n                      [--memory-limit-gb MEMORY_LIMIT_GB]\n                      [--via-model {extracted,plated_cylinder}]\n                      [--via-plating-mm VIA_PLATING_MM]\n                      [--board-thickness-mm BOARD_THICKNESS_MM]\n                      [--save-request SAVE_REQUEST]\n                      design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET             Net name; repeat for multi-net networks\n  --source X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]]\n  --load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n  --return-net RETURN_NET\n                        Explicit return or local ground net\n  --return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]\n                        Source-side return/reference terminal\n  --return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        Load-side return terminal; one per --load\n  --return-mode {explicit,isolated_secondary}\n  --domain-id DOMAIN_ID\n                        Power/isolation domain identifier\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --max-drop-mv MAX_DROP_MV\n  --max-density MAX_DENSITY\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --board-thickness-mm BOARD_THICKNESS_MM\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n"
+    },
+    {
+      "command": "spike analyze-ac",
+      "summary": "Build and run a hybrid PEEC R/L/C/G request",
+      "usage": "usage: spike analyze-ac [-h] --net NET --start-hz START_HZ --stop-hz STOP_HZ\n                        [--points POINTS] [--source X,Y,LAYER[,NAME]]\n                        [--load X,Y,LAYER[,NAME]]\n                        [--mesh-size-mm MESH_SIZE_MM]\n                        [--zone-cell-mm ZONE_CELL_MM]\n                        [--max-zone-cells MAX_ZONE_CELLS]\n                        [--max-conductors MAX_CONDUCTORS]\n                        [--memory-limit-gb MEMORY_LIMIT_GB]\n                        [--via-model {extracted,plated_cylinder}]\n                        [--via-plating-mm VIA_PLATING_MM]\n                        [--max-preview-cells MAX_PREVIEW_CELLS]\n                        [--skin-effect | --no-skin-effect]\n                        [--return-net RETURN_NET]\n                        [--capacitance-model {auto,stackup_shunt,none}]\n                        [--roughness-model {none,hammerstad}]\n                        [--roughness-um ROUGHNESS_UM] [--solver SOLVER]\n                        [--formulation FORMULATION]\n                        [--analysis-id ANALYSIS_ID]\n                        [--save-request SAVE_REQUEST]\n                        design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  --source X,Y,LAYER[,NAME]\n  --load X,Y,LAYER[,NAME]\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --max-preview-cells MAX_PREVIEW_CELLS\n  --skin-effect, --no-skin-effect\n  --return-net RETURN_NET\n                        Explicit return/reference conductor for capacitance\n                        extraction\n  --capacitance-model {auto,stackup_shunt,none}\n  --roughness-model {none,hammerstad}\n  --roughness-um ROUGHNESS_UM\n                        RMS copper roughness in micrometres\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n"
+    },
+    {
+      "command": "spike ac",
+      "summary": "spike ac",
+      "usage": "usage: spike analyze-ac [-h] --net NET --start-hz START_HZ --stop-hz STOP_HZ\n                        [--points POINTS] [--source X,Y,LAYER[,NAME]]\n                        [--load X,Y,LAYER[,NAME]]\n                        [--mesh-size-mm MESH_SIZE_MM]\n                        [--zone-cell-mm ZONE_CELL_MM]\n                        [--max-zone-cells MAX_ZONE_CELLS]\n                        [--max-conductors MAX_CONDUCTORS]\n                        [--memory-limit-gb MEMORY_LIMIT_GB]\n                        [--via-model {extracted,plated_cylinder}]\n                        [--via-plating-mm VIA_PLATING_MM]\n                        [--max-preview-cells MAX_PREVIEW_CELLS]\n                        [--skin-effect | --no-skin-effect]\n                        [--return-net RETURN_NET]\n                        [--capacitance-model {auto,stackup_shunt,none}]\n                        [--roughness-model {none,hammerstad}]\n                        [--roughness-um ROUGHNESS_UM] [--solver SOLVER]\n                        [--formulation FORMULATION]\n                        [--analysis-id ANALYSIS_ID]\n                        [--save-request SAVE_REQUEST]\n                        design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  --source X,Y,LAYER[,NAME]\n  --load X,Y,LAYER[,NAME]\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --max-preview-cells MAX_PREVIEW_CELLS\n  --skin-effect, --no-skin-effect\n  --return-net RETURN_NET\n                        Explicit return/reference conductor for capacitance\n                        extraction\n  --capacitance-model {auto,stackup_shunt,none}\n  --roughness-model {none,hammerstad}\n  --roughness-um ROUGHNESS_UM\n                        RMS copper roughness in micrometres\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n"
+    },
+    {
+      "command": "spike setup-ac",
+      "summary": "Build a reproducible AC PEEC request without running it",
+      "usage": "usage: spike setup-ac [-h] --net NET --start-hz START_HZ --stop-hz STOP_HZ\n                      [--points POINTS] [--source X,Y,LAYER[,NAME]]\n                      [--load X,Y,LAYER[,NAME]] [--mesh-size-mm MESH_SIZE_MM]\n                      [--zone-cell-mm ZONE_CELL_MM]\n                      [--max-zone-cells MAX_ZONE_CELLS]\n                      [--max-conductors MAX_CONDUCTORS]\n                      [--memory-limit-gb MEMORY_LIMIT_GB]\n                      [--via-model {extracted,plated_cylinder}]\n                      [--via-plating-mm VIA_PLATING_MM]\n                      [--max-preview-cells MAX_PREVIEW_CELLS]\n                      [--skin-effect | --no-skin-effect]\n                      [--return-net RETURN_NET]\n                      [--capacitance-model {auto,stackup_shunt,none}]\n                      [--roughness-model {none,hammerstad}]\n                      [--roughness-um ROUGHNESS_UM] [--solver SOLVER]\n                      [--formulation FORMULATION] [--analysis-id ANALYSIS_ID]\n                      [--save-request SAVE_REQUEST]\n                      design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  --source X,Y,LAYER[,NAME]\n  --load X,Y,LAYER[,NAME]\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --max-preview-cells MAX_PREVIEW_CELLS\n  --skin-effect, --no-skin-effect\n  --return-net RETURN_NET\n                        Explicit return/reference conductor for capacitance\n                        extraction\n  --capacitance-model {auto,stackup_shunt,none}\n  --roughness-model {none,hammerstad}\n  --roughness-um ROUGHNESS_UM\n                        RMS copper roughness in micrometres\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n"
+    },
+    {
+      "command": "spike analyze-transient",
+      "summary": "Run a geometry-derived quasi-static PEEC RLC transient",
+      "usage": "usage: spike analyze-transient [-h] --net NET --source\n                               X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]] --load\n                               X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                               [--return-net RETURN_NET]\n                               [--return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]]\n                               [--return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]]\n                               [--return-mode {explicit,isolated_secondary}]\n                               [--domain-id DOMAIN_ID] [--solver SOLVER]\n                               [--formulation FORMULATION]\n                               [--analysis-id ANALYSIS_ID]\n                               [--max-drop-mv MAX_DROP_MV]\n                               [--max-density MAX_DENSITY]\n                               [--mesh-size-mm MESH_SIZE_MM]\n                               [--zone-cell-mm ZONE_CELL_MM]\n                               [--max-zone-cells MAX_ZONE_CELLS]\n                               [--max-conductors MAX_CONDUCTORS]\n                               [--memory-limit-gb MEMORY_LIMIT_GB]\n                               [--via-model {extracted,plated_cylinder}]\n                               [--via-plating-mm VIA_PLATING_MM]\n                               [--board-thickness-mm BOARD_THICKNESS_MM]\n                               [--save-request SAVE_REQUEST] --stop-time-s\n                               STOP_TIME_S [--time-step-s TIME_STEP_S]\n                               [--output-decimation OUTPUT_DECIMATION]\n                               [--output-decimation-mode {auto,manual}]\n                               [--playback-fps PLAYBACK_FPS]\n                               [--initial-condition {operating_point,zero}]\n                               [--source-waveform PROFILE]\n                               [--load-waveform PROFILE]\n                               [--max-internal-steps MAX_INTERNAL_STEPS]\n                               [--max-output-frames MAX_OUTPUT_FRAMES]\n                               [--max-transient-branches MAX_TRANSIENT_BRANCHES]\n                               [--max-solver-time-s MAX_SOLVER_TIME_S]\n                               [--memory-budget-mb MEMORY_BUDGET_MB]\n                               [--capacitance-model {auto,stackup_shunt,none}]\n                               [--visual-sample-limit VISUAL_SAMPLE_LIMIT]\n                               design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET             Net name; repeat for multi-net networks\n  --source X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]]\n  --load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n  --return-net RETURN_NET\n                        Explicit return or local ground net\n  --return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]\n                        Source-side return/reference terminal\n  --return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        Load-side return terminal; one per --load\n  --return-mode {explicit,isolated_secondary}\n  --domain-id DOMAIN_ID\n                        Power/isolation domain identifier\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --max-drop-mv MAX_DROP_MV\n  --max-density MAX_DENSITY\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --board-thickness-mm BOARD_THICKNESS_MM\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n  --stop-time-s STOP_TIME_S\n                        Transient stop time in seconds\n  --time-step-s TIME_STEP_S\n                        Backward-Euler integration step; omit for excitation-\n                        based automatic selection\n  --output-decimation OUTPUT_DECIMATION\n                        Save one result frame every N integration steps\n  --output-decimation-mode {auto,manual}\n                        Allow SPIKE to increase decimation to meet\n                        frame/memory limits\n  --playback-fps PLAYBACK_FPS\n                        Preferred desktop/report playback rate\n  --initial-condition {operating_point,zero}\n  --source-waveform PROFILE\n                        Source waveform; one value broadcasts or repeat per\n                        --source\n  --load-waveform PROFILE\n                        Load waveform; one value broadcasts or repeat per\n                        --load\n  --max-internal-steps MAX_INTERNAL_STEPS\n  --max-output-frames MAX_OUTPUT_FRAMES\n  --max-transient-branches MAX_TRANSIENT_BRANCHES\n                        Optional transient branch cap within the RAM-derived\n                        dense-workspace capacity\n  --max-solver-time-s MAX_SOLVER_TIME_S\n                        Wall-time limit for matrix extraction and integration\n  --memory-budget-mb MEMORY_BUDGET_MB\n                        Transient dense-workspace and saved-frame budget\n  --capacitance-model {auto,stackup_shunt,none}\n  --visual-sample-limit VISUAL_SAMPLE_LIMIT\n                        Maximum node/branch samples stored per frame\n"
+    },
+    {
+      "command": "spike transient",
+      "summary": "spike transient",
+      "usage": "usage: spike analyze-transient [-h] --net NET --source\n                               X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]] --load\n                               X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                               [--return-net RETURN_NET]\n                               [--return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]]\n                               [--return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]]\n                               [--return-mode {explicit,isolated_secondary}]\n                               [--domain-id DOMAIN_ID] [--solver SOLVER]\n                               [--formulation FORMULATION]\n                               [--analysis-id ANALYSIS_ID]\n                               [--max-drop-mv MAX_DROP_MV]\n                               [--max-density MAX_DENSITY]\n                               [--mesh-size-mm MESH_SIZE_MM]\n                               [--zone-cell-mm ZONE_CELL_MM]\n                               [--max-zone-cells MAX_ZONE_CELLS]\n                               [--max-conductors MAX_CONDUCTORS]\n                               [--memory-limit-gb MEMORY_LIMIT_GB]\n                               [--via-model {extracted,plated_cylinder}]\n                               [--via-plating-mm VIA_PLATING_MM]\n                               [--board-thickness-mm BOARD_THICKNESS_MM]\n                               [--save-request SAVE_REQUEST] --stop-time-s\n                               STOP_TIME_S [--time-step-s TIME_STEP_S]\n                               [--output-decimation OUTPUT_DECIMATION]\n                               [--output-decimation-mode {auto,manual}]\n                               [--playback-fps PLAYBACK_FPS]\n                               [--initial-condition {operating_point,zero}]\n                               [--source-waveform PROFILE]\n                               [--load-waveform PROFILE]\n                               [--max-internal-steps MAX_INTERNAL_STEPS]\n                               [--max-output-frames MAX_OUTPUT_FRAMES]\n                               [--max-transient-branches MAX_TRANSIENT_BRANCHES]\n                               [--max-solver-time-s MAX_SOLVER_TIME_S]\n                               [--memory-budget-mb MEMORY_BUDGET_MB]\n                               [--capacitance-model {auto,stackup_shunt,none}]\n                               [--visual-sample-limit VISUAL_SAMPLE_LIMIT]\n                               design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET             Net name; repeat for multi-net networks\n  --source X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]]\n  --load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n  --return-net RETURN_NET\n                        Explicit return or local ground net\n  --return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]\n                        Source-side return/reference terminal\n  --return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        Load-side return terminal; one per --load\n  --return-mode {explicit,isolated_secondary}\n  --domain-id DOMAIN_ID\n                        Power/isolation domain identifier\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --max-drop-mv MAX_DROP_MV\n  --max-density MAX_DENSITY\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --board-thickness-mm BOARD_THICKNESS_MM\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n  --stop-time-s STOP_TIME_S\n                        Transient stop time in seconds\n  --time-step-s TIME_STEP_S\n                        Backward-Euler integration step; omit for excitation-\n                        based automatic selection\n  --output-decimation OUTPUT_DECIMATION\n                        Save one result frame every N integration steps\n  --output-decimation-mode {auto,manual}\n                        Allow SPIKE to increase decimation to meet\n                        frame/memory limits\n  --playback-fps PLAYBACK_FPS\n                        Preferred desktop/report playback rate\n  --initial-condition {operating_point,zero}\n  --source-waveform PROFILE\n                        Source waveform; one value broadcasts or repeat per\n                        --source\n  --load-waveform PROFILE\n                        Load waveform; one value broadcasts or repeat per\n                        --load\n  --max-internal-steps MAX_INTERNAL_STEPS\n  --max-output-frames MAX_OUTPUT_FRAMES\n  --max-transient-branches MAX_TRANSIENT_BRANCHES\n                        Optional transient branch cap within the RAM-derived\n                        dense-workspace capacity\n  --max-solver-time-s MAX_SOLVER_TIME_S\n                        Wall-time limit for matrix extraction and integration\n  --memory-budget-mb MEMORY_BUDGET_MB\n                        Transient dense-workspace and saved-frame budget\n  --capacitance-model {auto,stackup_shunt,none}\n  --visual-sample-limit VISUAL_SAMPLE_LIMIT\n                        Maximum node/branch samples stored per frame\n"
+    },
+    {
+      "command": "spike setup-transient",
+      "summary": "Build a reproducible quasi-static PEEC RLC transient request without running it",
+      "usage": "usage: spike setup-transient [-h] --net NET --source\n                             X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]] --load\n                             X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                             [--return-net RETURN_NET]\n                             [--return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]]\n                             [--return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]]\n                             [--return-mode {explicit,isolated_secondary}]\n                             [--domain-id DOMAIN_ID] [--solver SOLVER]\n                             [--formulation FORMULATION]\n                             [--analysis-id ANALYSIS_ID]\n                             [--max-drop-mv MAX_DROP_MV]\n                             [--max-density MAX_DENSITY]\n                             [--mesh-size-mm MESH_SIZE_MM]\n                             [--zone-cell-mm ZONE_CELL_MM]\n                             [--max-zone-cells MAX_ZONE_CELLS]\n                             [--max-conductors MAX_CONDUCTORS]\n                             [--memory-limit-gb MEMORY_LIMIT_GB]\n                             [--via-model {extracted,plated_cylinder}]\n                             [--via-plating-mm VIA_PLATING_MM]\n                             [--board-thickness-mm BOARD_THICKNESS_MM]\n                             [--save-request SAVE_REQUEST] --stop-time-s\n                             STOP_TIME_S [--time-step-s TIME_STEP_S]\n                             [--output-decimation OUTPUT_DECIMATION]\n                             [--output-decimation-mode {auto,manual}]\n                             [--playback-fps PLAYBACK_FPS]\n                             [--initial-condition {operating_point,zero}]\n                             [--source-waveform PROFILE]\n                             [--load-waveform PROFILE]\n                             [--max-internal-steps MAX_INTERNAL_STEPS]\n                             [--max-output-frames MAX_OUTPUT_FRAMES]\n                             [--max-transient-branches MAX_TRANSIENT_BRANCHES]\n                             [--max-solver-time-s MAX_SOLVER_TIME_S]\n                             [--memory-budget-mb MEMORY_BUDGET_MB]\n                             [--capacitance-model {auto,stackup_shunt,none}]\n                             [--visual-sample-limit VISUAL_SAMPLE_LIMIT]\n                             design\n\npositional arguments:\n  design\n\noptions:\n  -h, --help            show this help message and exit\n  --net NET             Net name; repeat for multi-net networks\n  --source X,Y,LAYER,V[,CONTACT_R[,PACKAGE_R]]\n  --load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n  --return-net RETURN_NET\n                        Explicit return or local ground net\n  --return-source X,Y,LAYER,0[,CONTACT_R[,PACKAGE_R]]\n                        Source-side return/reference terminal\n  --return-load X,Y,LAYER,A[,CONTACT_R[,PACKAGE_R]]\n                        Load-side return terminal; one per --load\n  --return-mode {explicit,isolated_secondary}\n  --domain-id DOMAIN_ID\n                        Power/isolation domain identifier\n  --solver SOLVER\n  --formulation FORMULATION\n  --analysis-id ANALYSIS_ID\n  --max-drop-mv MAX_DROP_MV\n  --max-density MAX_DENSITY\n  --mesh-size-mm MESH_SIZE_MM\n  --zone-cell-mm ZONE_CELL_MM\n  --max-zone-cells MAX_ZONE_CELLS\n  --max-conductors MAX_CONDUCTORS\n                        Optional branch cap within the RAM-admitted solver\n                        capacity\n  --memory-limit-gb MEMORY_LIMIT_GB\n                        Solver workspace limit in GB; minimum 2 GB\n  --via-model {extracted,plated_cylinder}\n  --via-plating-mm VIA_PLATING_MM\n  --board-thickness-mm BOARD_THICKNESS_MM\n  --save-request SAVE_REQUEST\n                        Save the normalized request\n  --stop-time-s STOP_TIME_S\n                        Transient stop time in seconds\n  --time-step-s TIME_STEP_S\n                        Backward-Euler integration step; omit for excitation-\n                        based automatic selection\n  --output-decimation OUTPUT_DECIMATION\n                        Save one result frame every N integration steps\n  --output-decimation-mode {auto,manual}\n                        Allow SPIKE to increase decimation to meet\n                        frame/memory limits\n  --playback-fps PLAYBACK_FPS\n                        Preferred desktop/report playback rate\n  --initial-condition {operating_point,zero}\n  --source-waveform PROFILE\n                        Source waveform; one value broadcasts or repeat per\n                        --source\n  --load-waveform PROFILE\n                        Load waveform; one value broadcasts or repeat per\n                        --load\n  --max-internal-steps MAX_INTERNAL_STEPS\n  --max-output-frames MAX_OUTPUT_FRAMES\n  --max-transient-branches MAX_TRANSIENT_BRANCHES\n                        Optional transient branch cap within the RAM-derived\n                        dense-workspace capacity\n  --max-solver-time-s MAX_SOLVER_TIME_S\n                        Wall-time limit for matrix extraction and integration\n  --memory-budget-mb MEMORY_BUDGET_MB\n                        Transient dense-workspace and saved-frame budget\n  --capacitance-model {auto,stackup_shunt,none}\n  --visual-sample-limit VISUAL_SAMPLE_LIMIT\n                        Maximum node/branch samples stored per frame\n"
+    },
+    {
+      "command": "spike preflight",
+      "summary": "Validate an analysis request and generate its pre-solve mesh",
+      "usage": "usage: spike preflight [-h] [--include-cells] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help       show this help message and exit\n  --include-cells  Include full mesh cell geometry in terminal/JSON output\n"
+    },
+    {
+      "command": "spike mesh-preview",
+      "summary": "Generate a pre-solve mesh from an analysis request",
+      "usage": "usage: spike mesh-preview [-h] [--dimension {surface_2_5d,volume_3d}]\n                          [--target-size-mm TARGET_SIZE_MM]\n                          request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help            show this help message and exit\n  --dimension {surface_2_5d,volume_3d}\n                        Override the request mesh representation.\n  --target-size-mm TARGET_SIZE_MM\n                        Override the request target mesh size.\n"
+    },
+    {
+      "command": "spike converge",
+      "summary": "Run coarse-to-fine PI mesh convergence from an analysis request",
+      "usage": "usage: spike converge [-h] [--levels LEVELS [LEVELS ...]]\n                      [--metric-tolerance-percent METRIC_TOLERANCE_PERCENT]\n                      [--density-tolerance-percent DENSITY_TOLERANCE_PERCENT]\n                      request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help            show this help message and exit\n  --levels LEVELS [LEVELS ...]\n                        Strictly decreasing mesh scale factors\n  --metric-tolerance-percent METRIC_TOLERANCE_PERCENT\n                        Override all non-density metric tolerances\n  --density-tolerance-percent DENSITY_TOLERANCE_PERCENT\n                        Override peak current-density tolerance\n"
+    },
+    {
+      "command": "spike run",
+      "summary": "Execute an analysis request, batch manifest, or SPIKE project",
+      "usage": "usage: spike run [-h] [--continue-on-error] input\n\npositional arguments:\n  input\n\noptions:\n  -h, --help           show this help message and exit\n  --continue-on-error\n"
+    },
+    {
+      "command": "spike emi-preflight",
+      "summary": "Validate a versioned EMI setup without running field physics",
+      "usage": "usage: spike emi-preflight [-h] design setup\n\npositional arguments:\n  design      DesignIR, KiCad board, or SPIKE project\n  setup       spike/emi-setup/v1 JSON\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike emi-screen",
+      "summary": "Rank EMI review nets from supplied pre-pass metrics",
+      "usage": "usage: spike emi-screen [-h] design setup\n\npositional arguments:\n  design      DesignIR, KiCad board, or SPIKE project\n  setup       spike/emi-setup/v1 JSON\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike openems-prepare",
+      "summary": "Prepare an inspectable openEMS case from an analysis request",
+      "usage": "usage: spike openems-prepare [-h] [--case-dir CASE_DIR]\n                             [--mesh-resolution-mm MESH_RESOLUTION_MM]\n                             [--max-solver-time-s MAX_SOLVER_TIME_S]\n                             request\n\npositional arguments:\n  request               spike/analysis-request/v1 JSON with selected nets and\n                        optional explicit ports\n\noptions:\n  -h, --help            show this help message and exit\n  --case-dir CASE_DIR   New output directory; defaults to the local SPIKE job\n                        store\n  --mesh-resolution-mm MESH_RESOLUTION_MM\n  --max-solver-time-s MAX_SOLVER_TIME_S\n"
+    },
+    {
+      "command": "spike openems-run",
+      "summary": "Build or execute a prepared SPIKE openEMS case",
+      "usage": "usage: spike openems-run [-h] [--setup-only]\n                         [--timeout-seconds TIMEOUT_SECONDS]\n                         case_dir\n\npositional arguments:\n  case_dir\n\noptions:\n  -h, --help            show this help message and exit\n  --setup-only          Generate the CSXCAD XML without running FDTD\n  --timeout-seconds TIMEOUT_SECONDS\n"
+    },
+    {
+      "command": "spike sparselizard-prepare",
+      "summary": "Prepare a reviewed differential-port PI multiport case for sparseLizard",
+      "usage": "usage: spike sparselizard-prepare [-h] --case-dir CASE_DIR request\n\npositional arguments:\n  request              spike/analysis-request/v1 JSON with options.ports\n\noptions:\n  -h, --help           show this help message and exit\n  --case-dir CASE_DIR\n"
+    },
+    {
+      "command": "spike sparselizard-run",
+      "summary": "Execute a prepared case through an exact spike-sparselizard-adapter executable",
+      "usage": "usage: spike sparselizard-run [-h] [--adapter ADAPTER]\n                              [--timeout-seconds TIMEOUT_SECONDS]\n                              [--memory-limit-mb MEMORY_LIMIT_MB]\n                              case_dir\n\npositional arguments:\n  case_dir\n\noptions:\n  -h, --help            show this help message and exit\n  --adapter ADAPTER     Explicit local adapter; otherwise use registration or\n                        PATH\n  --timeout-seconds TIMEOUT_SECONDS\n  --memory-limit-mb MEMORY_LIMIT_MB\n"
+    },
+    {
+      "command": "spike report",
+      "summary": "Generate a report from an AnalysisResult JSON file",
+      "usage": "usage: spike report [-h] [--report-format {html,pdf,csv,json}] --report-output\n                    REPORT_OUTPUT\n                    result\n\npositional arguments:\n  result\n\noptions:\n  -h, --help            show this help message and exit\n  --report-format {html,pdf,csv,json}\n  --report-output REPORT_OUTPUT\n"
+    },
+    {
+      "command": "spike compare",
+      "summary": "Compare two AnalysisResult files",
+      "usage": "usage: spike compare [-h] [--tolerance-percent TOLERANCE_PERCENT]\n                     baseline candidate\n\npositional arguments:\n  baseline\n  candidate\n\noptions:\n  -h, --help            show this help message and exit\n  --tolerance-percent TOLERANCE_PERCENT\n"
+    },
+    {
+      "command": "spike pdn-review",
+      "summary": "Check an AC result against a PDN target and screen lumped decoupling candidates",
+      "usage": "usage: spike pdn-review [-h] --target-ohm TARGET_OHM [--net NET]\n                        [--candidate ID,C_F,ESR_OHM,ESL_H[,COUNT]]\n                        [--candidate-file CANDIDATE_FILE]\n                        result\n\npositional arguments:\n  result\n\noptions:\n  -h, --help            show this help message and exit\n  --target-ohm TARGET_OHM\n  --net NET\n  --candidate ID,C_F,ESR_OHM,ESL_H[,COUNT]\n                        Lumped shunt capacitor candidate; repeat as needed\n  --candidate-file CANDIDATE_FILE\n                        JSON candidate, candidate array, or object containing\n                        a candidates array; repeat as needed\n"
+    },
+    {
+      "command": "spike pdn-optimize",
+      "summary": "Search explicit capacitor ports and a finite component library using a PDN multiport result",
+      "usage": "usage: spike pdn-optimize [-h] --target-ohm TARGET_OHM [--net NET] --library\n                          LIBRARY [--constraints CONSTRAINTS]\n                          result\n\npositional arguments:\n  result\n\noptions:\n  -h, --help            show this help message and exit\n  --target-ohm TARGET_OHM\n  --net NET\n  --library LIBRARY     PDN optimization request or capacitor-library JSON\n  --constraints CONSTRAINTS\n                        Optional JSON object overriding optimization\n                        constraints\n"
+    },
+    {
+      "command": "spike external-pi-import",
+      "summary": "Validate and normalize an external PI multiport result for PDN analysis",
+      "usage": "usage: spike external-pi-import [-h] [--engine-id ENGINE_ID]\n                                [--frequency-grid FREQUENCY_GRID]\n                                result\n\npositional arguments:\n  result\n\noptions:\n  -h, --help            show this help message and exit\n  --engine-id ENGINE_ID\n  --frequency-grid FREQUENCY_GRID\n                        Optional JSON frequency array or object with\n                        frequency_hz\n"
+    },
+    {
+      "command": "spike peec-spice-import",
+      "summary": "Import reviewed PEEC RLCG networks into a visual SPICE workspace",
+      "usage": "usage: spike peec-spice-import [-h] extraction_result workspace mappings\n\npositional arguments:\n  extraction_result\n  workspace\n  mappings           JSON array of reviewed network-to-circuit-node mappings\n\noptions:\n  -h, --help         show this help message and exit\n"
+    },
+    {
+      "command": "spike hybrid-run",
+      "summary": "Run reviewed PEEC RLCG plus explicit component models through ngspice",
+      "usage": "usage: spike hybrid-run [-h] [--timeout-seconds TIMEOUT_SECONDS]\n                        design extraction_result workspace mappings\n\npositional arguments:\n  design\n  extraction_result\n  workspace\n  mappings\n\noptions:\n  -h, --help            show this help message and exit\n  --timeout-seconds TIMEOUT_SECONDS\n"
+    },
+    {
+      "command": "spike native-mna-validate",
+      "summary": "Validate a versioned native linear MNA circuit request without solving it",
+      "usage": "usage: spike native-mna-validate [-h] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike native-mna-run",
+      "summary": "Run a versioned native linear MNA DC, AC, or transient circuit request",
+      "usage": "usage: spike native-mna-run [-h] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike native-workspace-compile",
+      "summary": "Compile a reviewed visual SPICE workspace into the native linear MNA contract",
+      "usage": "usage: spike native-workspace-compile [-h] design workspace\n\npositional arguments:\n  design\n  workspace\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike native-workspace-run",
+      "summary": "Compile and run a reviewed visual SPICE workspace with the native linear MNA engine",
+      "usage": "usage: spike native-workspace-run [-h] design workspace\n\npositional arguments:\n  design\n  workspace\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike field-circuit-validate",
+      "summary": "Fail-closed validation for a reviewed DesignIR, SPICE workspace, and PEEC field-circuit package",
+      "usage": "usage: spike field-circuit-validate [-h] package\n\npositional arguments:\n  package     spike/field-circuit-cosimulation-package/v1 JSON input\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike field-circuit-run",
+      "summary": "Run a reviewed field-circuit co-simulation through the native PEEC reduction provider",
+      "usage": "usage: spike field-circuit-run [-h] package\n\npositional arguments:\n  package     spike/field-circuit-cosimulation-package/v1 JSON input\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike converter-study",
+      "summary": "Run a reviewed PWM converter study through ngspice, optional PEEC, analytics, and thermal handoff",
+      "usage": "usage: spike converter-study [-h] [--extraction-result EXTRACTION_RESULT]\n                             [--timeout-seconds TIMEOUT_SECONDS]\n                             design study\n\npositional arguments:\n  design\n  study                 spike/converter-study/v1 JSON\n\noptions:\n  -h, --help            show this help message and exit\n  --extraction-result EXTRACTION_RESULT\n                        Optional PEEC result required when the study declares\n                        peec mappings\n  --timeout-seconds TIMEOUT_SECONDS\n"
+    },
+    {
+      "command": "spike thermal-estimate",
+      "summary": "Run the explicit first-order compact thermal RC estimator",
+      "usage": "usage: spike thermal-estimate [-h] scenario\n\npositional arguments:\n  scenario    ThermalScenario JSON or an object containing a scenario field\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike sparam-inspect",
+      "summary": "Inspect Touchstone data, network traces, and validity checks",
+      "usage": "usage: spike sparam-inspect [-h] [--trace-limit TRACE_LIMIT] network\n\npositional arguments:\n  network\n\noptions:\n  -h, --help            show this help message and exit\n  --trace-limit TRACE_LIMIT\n                        Maximum serialized points per S-parameter trace\n"
+    },
+    {
+      "command": "spike touchstone",
+      "summary": "spike touchstone",
+      "usage": "usage: spike sparam-inspect [-h] [--trace-limit TRACE_LIMIT] network\n\npositional arguments:\n  network\n\noptions:\n  -h, --help            show this help message and exit\n  --trace-limit TRACE_LIMIT\n                        Maximum serialized points per S-parameter trace\n"
+    },
+    {
+      "command": "spike sparam-renormalize",
+      "summary": "Convert a Touchstone network to a new real reference impedance",
+      "usage": "usage: spike sparam-renormalize [-h] --to-ohms TO_OHMS --touchstone-output\n                                TOUCHSTONE_OUTPUT [--format {RI,MA,DB}]\n                                network\n\npositional arguments:\n  network\n\noptions:\n  -h, --help            show this help message and exit\n  --to-ohms TO_OHMS\n  --touchstone-output TOUCHSTONE_OUTPUT\n  --format {RI,MA,DB}\n"
+    },
+    {
+      "command": "spike si-geometry-channel",
+      "summary": "Run the bounded straight DesignIR v2 geometry-to-RLGC/S/TDR/TDT/NRZ-eye channel",
+      "usage": "usage: spike si-geometry-channel [-h] design request\n\npositional arguments:\n  design      DesignIR v2 JSON or object containing design_ir\n  request     spike/si-uniform-channel-request/v1 JSON\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike si-workflow",
+      "summary": "Run an experimental source/receiver/passive loaded SI study",
+      "usage": "usage: spike si-workflow [-h] [--design DESIGN]\n                         [--touchstone-output TOUCHSTONE_OUTPUT]\n                         request\n\npositional arguments:\n  request               SI workflow request JSON\n\noptions:\n  -h, --help            show this help message and exit\n  --design DESIGN       Optional canonical DesignIR v2 JSON for geometry\n                        extraction\n  --touchstone-output TOUCHSTONE_OUTPUT\n                        Export the edited channel (without endpoint loading)\n"
+    },
+    {
+      "command": "spike harness-pi",
+      "summary": "Run explicit-pin lumped DC harness PI (experimental)",
+      "usage": "usage: spike harness-pi [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  spike/harness-pi-request/v1 JSON\n"
+    },
+    {
+      "command": "spikes",
+      "summary": "Strict CLI for the experimental SPIKES linear RLC circuit kernel.",
+      "usage": "usage: spikes [-h] [--version]\n              {loop-gain,transient-fra,fra,library-inspect,check,compile,run,native-run,ac,transfer,fourier,temp-sweep,monte-carlo,corner-sweep,library,benchmark,capabilities,qualification}\n              ...\n\nStrict CLI for the experimental SPIKES linear RLC circuit kernel.\n\npositional arguments:\n  {loop-gain,transient-fra,fra,library-inspect,check,compile,run,native-run,ac,transfer,fourier,temp-sweep,monte-carlo,corner-sweep,library,benchmark,capabilities,qualification}\n    loop-gain           Linear voltage-injection return ratio for an\n                        explicitly chosen unilateral loop fixture.\n    transient-fra       Native sine-injection transfer measurement on a\n                        switching-capable deck.\n    fra                 Explicit linear frequency-response analysis (not\n                        switching loop gain).\n    library-inspect     Check a mixed-library manifest and payload hashes\n                        without executing code.\n    check               Parse and validate a supported SPICE netlist.\n    compile             Emit the normalized project and native request\n                        template.\n    run                 Run .op, a linear single-source .dc sweep, or a\n                        bounded .tran.\n    native-run          Run .op, .dc, or .tran through an explicitly selected\n                        owned SPIKES library.\n    ac                  Run a bounded linear complex AC sweep with an explicit\n                        source.\n    transfer            Run AC and reduce one output probe to a transfer\n                        function.\n    fourier             Reduce a completed uniform transient result over\n                        integral cycles.\n    temp-sweep          Run explicit linear R/L/C temperature-coefficient\n                        cases.\n    monte-carlo         Run deterministic seeded relative-value samples.\n    corner-sweep        Run every bounded low/high Cartesian relative-value\n                        corner.\n    library             Search, inspect, validate, or elaborate built-in\n                        archetypes.\n    benchmark           Run accuracy-gated analytical DC micro-benchmarks.\n    capabilities        Run representative parser probes; not a parity or\n                        numerical qualification claim.\n    qualification       Run native analytical, switching, interaction, and\n                        soft-real-time gates.\n\noptions:\n  -h, --help            show this help message and exit\n  --version             show program's version number and exit\n"
+    },
+    {
+      "command": "spikes loop-gain",
+      "summary": "Linear voltage-injection return ratio for an explicitly chosen unilateral loop fixture.",
+      "usage": "usage: spikes loop-gain [-h] --injection INJECTION [--assume-unilateral]\n                        [--start-hz START_HZ] [--stop-hz STOP_HZ]\n                        [--points POINTS] [-o OUTPUT]\n                        netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --injection INJECTION\n  --assume-unilateral\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes transient-fra",
+      "summary": "Native sine-injection transfer measurement on a switching-capable deck.",
+      "usage": "usage: spikes transient-fra [-h] --library LIBRARY --source SOURCE\n                            --output-probe OUTPUT_PROBE --frequency-hz\n                            FREQUENCY_HZ [--amplitude AMPLITUDE]\n                            [--max-step-s MAX_STEP_S] [-o OUTPUT]\n                            netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --library LIBRARY\n  --source SOURCE\n  --output-probe OUTPUT_PROBE\n  --frequency-hz FREQUENCY_HZ\n  --amplitude AMPLITUDE\n  --max-step-s MAX_STEP_S\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes fra",
+      "summary": "Explicit linear frequency-response analysis (not switching loop gain).",
+      "usage": "usage: spikes fra [-h] --source SOURCE --output-probe OUTPUT_PROBE\n                  [--start-hz START_HZ] [--stop-hz STOP_HZ] [--points POINTS]\n                  [-o OUTPUT]\n                  netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --source SOURCE\n  --output-probe OUTPUT_PROBE\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes library-inspect",
+      "summary": "Check a mixed-library manifest and payload hashes without executing code.",
+      "usage": "usage: spikes library-inspect [-h] [-o OUTPUT] manifest\n\npositional arguments:\n  manifest\n\noptions:\n  -h, --help            show this help message and exit\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes check",
+      "summary": "Parse and validate a supported SPICE netlist.",
+      "usage": "usage: spikes check [-h] [--probe EXPR] [-o OUTPUT] netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --probe EXPR          Add V(node), V(node,node), I(element), or P(element);\n                        repeatable.\n  -o OUTPUT, --output OUTPUT\n                        Write JSON to this file instead of stdout.\n"
+    },
+    {
+      "command": "spikes compile",
+      "summary": "Emit the normalized project and native request template.",
+      "usage": "usage: spikes compile [-h] [--probe EXPR] [-o OUTPUT] netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --probe EXPR          Add V(node), V(node,node), I(element), or P(element);\n                        repeatable.\n  -o OUTPUT, --output OUTPUT\n                        Write JSON to this file instead of stdout.\n"
+    },
+    {
+      "command": "spikes run",
+      "summary": "Run .op, a linear single-source .dc sweep, or a bounded .tran.",
+      "usage": "usage: spikes run [-h] [--probe EXPR] [-o OUTPUT] netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --probe EXPR          Add V(node), V(node,node), I(element), or P(element);\n                        repeatable.\n  -o OUTPUT, --output OUTPUT\n                        Write JSON to this file instead of stdout.\n"
+    },
+    {
+      "command": "spikes native-run",
+      "summary": "Run .op, .dc, or .tran through an explicitly selected owned SPIKES library.",
+      "usage": "usage: spikes native-run [-h] --library LIBRARY [--method {trap,be,bdf2}]\n                         [--probe EXPR] [-o OUTPUT]\n                         netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --library LIBRARY\n  --method {trap,be,bdf2}\n                        Transient integration: event-aware hybrid trapezoidal\n                        (trap, default), backward Euler (be), or variable-step\n                        BDF2 (bdf2).\n  --probe EXPR\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes ac",
+      "summary": "Run a bounded linear complex AC sweep with an explicit source.",
+      "usage": "usage: spikes ac [-h] --source SOURCE --start-hz START_HZ --stop-hz STOP_HZ\n                 [--points POINTS] [--scale {linear,log}]\n                 [--magnitude MAGNITUDE] [--phase-deg PHASE_DEG]\n                 [--probe EXPR] [-o OUTPUT]\n                 netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --source SOURCE       Independent voltage or current source ID.\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  --scale {linear,log}\n  --magnitude MAGNITUDE\n  --phase-deg PHASE_DEG\n  --probe EXPR          Add a complex V(...), I(...), or P(...) series;\n                        repeatable.\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes transfer",
+      "summary": "Run AC and reduce one output probe to a transfer function.",
+      "usage": "usage: spikes transfer [-h] --source SOURCE --start-hz START_HZ --stop-hz\n                       STOP_HZ [--points POINTS] [--scale {linear,log}]\n                       [--magnitude MAGNITUDE] [--phase-deg PHASE_DEG]\n                       --output-probe EXPR [-o OUTPUT]\n                       netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --source SOURCE       Independent voltage or current source ID.\n  --start-hz START_HZ\n  --stop-hz STOP_HZ\n  --points POINTS\n  --scale {linear,log}\n  --magnitude MAGNITUDE\n  --phase-deg PHASE_DEG\n  --output-probe EXPR   Output V(...) or I(...) divided by the source phasor.\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes fourier",
+      "summary": "Reduce a completed uniform transient result over integral cycles.",
+      "usage": "usage: spikes fourier [-h] --probe EXPR --fundamental-hz FUNDAMENTAL_HZ\n                      [--harmonics HARMONICS] [-o OUTPUT]\n                      result\n\npositional arguments:\n  result                JSON output from `spikes run` transient analysis.\n\noptions:\n  -h, --help            show this help message and exit\n  --probe EXPR\n  --fundamental-hz FUNDAMENTAL_HZ\n  --harmonics HARMONICS\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes temp-sweep",
+      "summary": "Run explicit linear R/L/C temperature-coefficient cases.",
+      "usage": "usage: spikes temp-sweep [-h] --start-c START_C --stop-c STOP_C --step-c\n                         STEP_C [--reference-c REFERENCE_C] --tempco\n                         ELEMENT=TC1 [--tempco2 ELEMENT=TC2] [--probe EXPR]\n                         [-o OUTPUT]\n                         netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --start-c START_C\n  --stop-c STOP_C\n  --step-c STEP_C\n  --reference-c REFERENCE_C\n  --tempco ELEMENT=TC1\n  --tempco2 ELEMENT=TC2\n  --probe EXPR\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes monte-carlo",
+      "summary": "Run deterministic seeded relative-value samples.",
+      "usage": "usage: spikes monte-carlo [-h] --vary ELEMENT=TOLERANCE --samples SAMPLES\n                          --seed SEED\n                          [--distribution {uniform,normal_3sigma_clipped}]\n                          [--probe EXPR] [-o OUTPUT]\n                          netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --vary ELEMENT=TOLERANCE\n  --samples SAMPLES\n  --seed SEED\n  --distribution {uniform,normal_3sigma_clipped}\n  --probe EXPR\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes corner-sweep",
+      "summary": "Run every bounded low/high Cartesian relative-value corner.",
+      "usage": "usage: spikes corner-sweep [-h] --vary ELEMENT=TOLERANCE [--probe EXPR]\n                           [-o OUTPUT]\n                           netlist\n\npositional arguments:\n  netlist\n\noptions:\n  -h, --help            show this help message and exit\n  --vary ELEMENT=TOLERANCE\n  --probe EXPR\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes library",
+      "summary": "Search, inspect, validate, or elaborate built-in archetypes.",
+      "usage": "usage: spikes library [-h] {search,inspect,validate,elaborate} ...\n\npositional arguments:\n  {search,inspect,validate,elaborate}\n    search              Search archetype metadata.\n    inspect             Inspect one fully qualified archetype ID.\n    validate            Validate every runnable built-in elaboration.\n    elaborate           Elaborate one runnable archetype to native elements.\n\noptions:\n  -h, --help            show this help message and exit\n"
+    },
+    {
+      "command": "spikes library search",
+      "summary": "Search archetype metadata.",
+      "usage": "usage: spikes library search [-h] [--status {all,runnable,unavailable}]\n                             [-o OUTPUT]\n                             [query]\n\npositional arguments:\n  query\n\noptions:\n  -h, --help            show this help message and exit\n  --status {all,runnable,unavailable}\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes library inspect",
+      "summary": "Inspect one fully qualified archetype ID.",
+      "usage": "usage: spikes library inspect [-h] [-o OUTPUT] archetype_id\n\npositional arguments:\n  archetype_id\n\noptions:\n  -h, --help            show this help message and exit\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes library validate",
+      "summary": "Validate every runnable built-in elaboration.",
+      "usage": "usage: spikes library validate [-h] [-o OUTPUT]\n\noptions:\n  -h, --help            show this help message and exit\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes library elaborate",
+      "summary": "Elaborate one runnable archetype to native elements.",
+      "usage": "usage: spikes library elaborate [-h] --instance INSTANCE --pin PIN=NODE\n                                [--preset PRESET] [--param NAME=VALUE]\n                                [-o OUTPUT]\n                                archetype_id\n\npositional arguments:\n  archetype_id\n\noptions:\n  -h, --help            show this help message and exit\n  --instance INSTANCE\n  --pin PIN=NODE\n  --preset PRESET\n  --param NAME=VALUE\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes benchmark",
+      "summary": "Run accuracy-gated analytical DC micro-benchmarks.",
+      "usage": "usage: spikes benchmark [-h] [--warmups WARMUPS] [--repetitions REPETITIONS]\n                        [--timeout TIMEOUT] [--external-id EXTERNAL_ID]\n                        [-o OUTPUT] [--external-command ...]\n\noptions:\n  -h, --help            show this help message and exit\n  --warmups WARMUPS\n  --repetitions REPETITIONS\n  --timeout TIMEOUT\n  --external-id EXTERNAL_ID\n  -o OUTPUT, --output OUTPUT\n  --external-command ...\n                        External JSON wrapper argv; place this option last. No\n                        shell is used.\n"
+    },
+    {
+      "command": "spikes capabilities",
+      "summary": "Run representative parser probes; not a parity or numerical qualification claim.",
+      "usage": "usage: spikes capabilities [-h] [-o OUTPUT]\n\noptions:\n  -h, --help            show this help message and exit\n  -o OUTPUT, --output OUTPUT\n"
+    },
+    {
+      "command": "spikes qualification",
+      "summary": "Run native analytical, switching, interaction, and soft-real-time gates.",
+      "usage": "usage: spikes qualification [-h] --library LIBRARY [--repetitions REPETITIONS]\n                            [--wall-steps WALL_STEPS] [-o OUTPUT]\n\noptions:\n  -h, --help            show this help message and exit\n  --library LIBRARY\n  --repetitions REPETITIONS\n  --wall-steps WALL_STEPS\n  -o OUTPUT, --output OUTPUT\n"
+    }
+  ]
+}

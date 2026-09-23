@@ -1,0 +1,7 @@
+.title Tutorial 01 - DC operating point
+* Expected V(out) = 6 V, load current = 6 mA.
+V1 in 0 12
+R1 in out 1k
+R2 out 0 1k
+.op
+.end

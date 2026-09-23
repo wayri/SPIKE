@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/designir-layout-handoff-v1.schema.json",
+  "title": "SPIKE DesignIR Layout Handoff v1 — Supported Planar Subset",
+  "description": "Strict normalized autorouter handoff to the private SPIKES planar geometry compiler. This contract does not perform or claim Boolean meshing, conforming 3-D volume generation, port construction, physics execution, or product EM readiness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "consumer_kind", "lineage", "frame", "materials", "layers",
+    "nets", "tracks", "arcs", "zones", "pads", "vias",
+    "changed_entity_ids", "claims", "identity"
+  ],
+  "properties": {
+    "contract": { "const": "spike/designir-layout-handoff/v1-supported-planar-subset" },
+    "consumer_kind": { "const": "autorouter" },
+    "lineage": { "$ref": "#/$defs/lineage" },
+    "frame": { "$ref": "#/$defs/frame" },
+    "materials": {
+      "type": "array", "minItems": 1, "maxItems": 16384,
+      "items": { "$ref": "#/$defs/material" }
+    },
+    "layers": {
+      "type": "array", "minItems": 1, "maxItems": 256,
+      "items": { "$ref": "#/$defs/layer" }
+    },
+    "nets": {
+      "type": "array", "maxItems": 1000000,
+      "items": { "$ref": "#/$defs/net" }
+    },
+    "tracks": {
+      "type": "array", "maxItems": 8000000,
+      "items": { "$ref": "#/$defs/track" }
+    },
+    "arcs": {
+      "type": "array", "maxItems": 8000000,
+      "items": { "$ref": "#/$defs/arc" }
+    },
+    "zones": {
+      "type": "array", "maxItems": 8000000,
+      "items": { "$ref": "#/$defs/zone" }
+    },
+    "pads": {
+      "type": "array", "maxItems": 8000000,
+      "items": { "$ref": "#/$defs/pad" }
+    },
+    "vias": {
+      "type": "array", "maxItems": 8000000,
+      "items": { "$ref": "#/$defs/via" }
+    },
+    "changed_entity_ids": {
+      "type": "array", "maxItems": 4096, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "claims": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "supported_planar_subset", "solid_boolean_meshing_performed",
+        "conforming_volume_mesh_generated", "product_em_ready"
+      ],
+      "properties": {
+        "supported_planar_subset": { "const": true },
+        "solid_boolean_meshing_performed": { "const": false },
+        "conforming_volume_mesh_generated": { "const": false },
+        "product_em_ready": { "const": false }
+      }
+    },
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["canonical_bytes", "canonical_sha256"],
+      "properties": {
+        "canonical_bytes": { "type": "integer", "minimum": 1, "maximum": 1073741824 },
+        "canonical_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "positive": { "type": "number", "exclusiveMinimum": 0 },
+    "nonnegative": { "type": "number", "minimum": 0 },
+    "point": {
+      "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "minItems": 2, "maxItems": 2
+    },
+    "ring": {
+      "type": "array", "minItems": 3, "maxItems": 64000000,
+      "items": { "$ref": "#/$defs/point" }
+    },
+    "idArray": {
+      "type": "array", "minItems": 1, "maxItems": 256, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "lineage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_sha256", "candidate_sha256"],
+      "properties": {
+        "source_sha256": { "$ref": "#/$defs/sha256" },
+        "candidate_sha256": { "$ref": "#/$defs/sha256" },
+        "parent_candidate_sha256": { "$ref": "#/$defs/sha256" },
+        "baseline_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "frame": {
+      "type": "object", "additionalProperties": false,
+      "required": ["frame_id", "parent_frame_id", "units", "rotation", "translation_mm"],
+      "properties": {
+        "frame_id": { "$ref": "#/$defs/id" },
+        "parent_frame_id": { "const": "" },
+        "units": { "const": "mm" },
+        "rotation": {
+          "type": "array", "minItems": 9, "maxItems": 9,
+          "items": { "type": "number" }
+        },
+        "translation_mm": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": { "type": "number" }
+        }
+      }
+    },
+    "material": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "material_class"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" },
+        "material_class": { "type": "string", "maxLength": 128 },
+        "electrical_conductivity_s_per_m": { "$ref": "#/$defs/positive" },
+        "relative_permittivity": { "$ref": "#/$defs/positive" },
+        "loss_tangent": { "type": "number", "minimum": 0, "maximum": 1 },
+        "thermal_conductivity_w_per_mk": { "$ref": "#/$defs/positive" },
+        "density_kg_per_m3": { "$ref": "#/$defs/positive" },
+        "heat_capacity_j_per_kgk": { "$ref": "#/$defs/positive" }
+      }
+    },
+    "layer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "kind", "order", "z_bottom_mm", "z_top_mm", "material_id"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["conductor", "dielectric"] },
+        "order": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "z_bottom_mm": { "type": "number" },
+        "z_top_mm": { "type": "number" },
+        "material_id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "net": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id"],
+      "properties": { "public_id": { "$ref": "#/$defs/id" } }
+    },
+    "track": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "net_id", "layer_id", "start_mm", "end_mm", "width_mm"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" }, "net_id": { "$ref": "#/$defs/id" },
+        "layer_id": { "$ref": "#/$defs/id" }, "start_mm": { "$ref": "#/$defs/point" },
+        "end_mm": { "$ref": "#/$defs/point" }, "width_mm": { "$ref": "#/$defs/positive" }
+      }
+    },
+    "arc": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "net_id", "layer_id", "start_mm", "mid_mm", "end_mm", "width_mm"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" }, "net_id": { "$ref": "#/$defs/id" },
+        "layer_id": { "$ref": "#/$defs/id" }, "start_mm": { "$ref": "#/$defs/point" },
+        "mid_mm": { "$ref": "#/$defs/point" }, "end_mm": { "$ref": "#/$defs/point" },
+        "width_mm": { "$ref": "#/$defs/positive" }
+      }
+    },
+    "zone": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "net_id", "layer_ids", "outer_mm", "holes_mm", "fill_provenance"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" }, "net_id": { "$ref": "#/$defs/id" },
+        "layer_ids": { "$ref": "#/$defs/idArray" }, "outer_mm": { "$ref": "#/$defs/ring" },
+        "holes_mm": { "type": "array", "maxItems": 1000000, "items": { "$ref": "#/$defs/ring" } },
+        "fill_provenance": {
+          "type": "object", "additionalProperties": false,
+          "required": ["state", "complete", "representation", "group_id", "group_sha256", "component_ordinal", "component_count", "component_sha256"],
+          "properties": {
+            "state": { "const": "source_filled" }, "complete": { "const": true },
+            "representation": { "const": "flat_polygon_path" },
+            "group_id": { "$ref": "#/$defs/id" }, "group_sha256": { "$ref": "#/$defs/sha256" },
+            "component_ordinal": { "type": "integer", "minimum": 1, "maximum": 65536 },
+            "component_count": { "type": "integer", "minimum": 1, "maximum": 65536 },
+            "component_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        }
+      }
+    },
+    "pad": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "net_id", "component_id", "layer_ids", "center_mm", "size_x_mm", "size_y_mm", "shape"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" }, "net_id": { "$ref": "#/$defs/id" },
+        "component_id": { "const": "" }, "layer_ids": { "$ref": "#/$defs/idArray" },
+        "center_mm": { "$ref": "#/$defs/point" }, "size_x_mm": { "$ref": "#/$defs/positive" },
+        "size_y_mm": { "$ref": "#/$defs/positive" }, "shape": { "enum": ["rectangle", "circle"] }
+      }
+    },
+    "via": {
+      "type": "object", "additionalProperties": false,
+      "required": ["public_id", "net_id", "center_mm", "diameter_mm", "drill_mm", "start_layer_id", "end_layer_id", "plating_mm", "via_type"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/id" }, "net_id": { "$ref": "#/$defs/id" },
+        "center_mm": { "$ref": "#/$defs/point" }, "diameter_mm": { "$ref": "#/$defs/positive" },
+        "drill_mm": { "$ref": "#/$defs/positive" }, "start_layer_id": { "$ref": "#/$defs/id" },
+        "end_layer_id": { "$ref": "#/$defs/id" }, "plating_mm": { "$ref": "#/$defs/positive" },
+        "via_type": { "enum": ["through", "blind", "buried"] }
+      }
+    }
+  }
+}

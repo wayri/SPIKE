@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: CC0-1.0
+`include "constants.vams"
+`include "disciplines.vams"
+
+module spikes_osdi_noise(p, n);
+    inout p, n;
+    electrical p, n;
+    parameter real resistance = 1000.0 from (0.0:inf);
+    parameter real flicker_coefficient = 1.0e-18 from [0.0:inf);
+    analog begin
+        I(p, n) <+ V(p, n) / resistance;
+        I(p, n) <+ white_noise(4.0 * `P_K * $temperature / resistance,
+                                "thermal");
+        I(p, n) <+ flicker_noise(flicker_coefficient, 1.0, "flicker");
+    end
+endmodule

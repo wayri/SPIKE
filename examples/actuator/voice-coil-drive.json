@@ -1,0 +1,17 @@
+{
+  "contract": "spike/voice-coil-drive/v1",
+  "resistance_ohm": 6.0,
+  "inductance_h": 0.012,
+  "force_constant_n_per_a": 3.0,
+  "mass_kg": 0.08,
+  "damping_n_s_per_m": 1.2,
+  "spring_n_per_m": 180.0,
+  "spring_equilibrium_position_m": 0.0,
+  "voltage_v": 2.0,
+  "initial_current_a": 0.0,
+  "initial_position_m": 0.0,
+  "initial_velocity_m_per_s": 0.0,
+  "duration_s": 0.05,
+  "time_step_s": 0.0001,
+  "provenance": "Original MIT SigHarmonic voice-coil example"
+}

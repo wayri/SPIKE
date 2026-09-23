@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-07",
+  "status": "source_integration_tested",
+  "companion_version": "0.2.0",
+  "runtime": "Installed FreeCAD 1.1.3, Windows, headless Part kernel",
+  "checks": {
+    "python_tests_passed": 61,
+    "native_host_tests_passed": 35,
+    "native_host_tests_ignored": 1,
+    "typescript": "passed",
+    "vite_production_build": "passed_with_large_chunk_warnings",
+    "generated_help": "passed",
+    "architecture": "passed",
+    "workbench_zip_integrity": "passed"
+  },
+  "real_kernel_evidence": [
+    "board-outline and embedded STEP import",
+    "15 mm gap in retained demo",
+    "10 mm separation and 80 mm3 overlap test fixtures",
+    "nested rigid placements",
+    "FCStd save/reopen",
+    "SPIKE feedback apply",
+    "unsupported geometry and hierarchy edit rejection"
+  ],
+  "limitations": [
+    "Native GUI interaction not manually qualified",
+    "No new frozen worker or native installer built",
+    "Thermal and other numerical simulation not implemented by this companion increment",
+    "Harness route exchange and structural synchronization remain planned"
+  ],
+  "source_sha256": {
+    "python/spike_core/mcad_session_contract.py": "cffa5b59fd981deb71dd2a44ac3baf5f26adee401468da31d94bb88eab80c59b",
+    "python/spike_core/service_mcad_collaboration.py": "d9e016686fbae291aa072065b03f14e7abb536a733da25c15207fe43f4e18e6a",
+    "python/spike_core/service_project_assembly.py": "f2933cae542979ca361f846a9c616ccc0f4a9cec668c70d58326daf915ae0679",
+    "python/spike_core/service_project_mcad_placement.py": "0df71bd9e9596e5bbd39e4bd5b79efeafec2a42806fe8f18e4cb544213d00e7b",
+    "app/src/FreecadCollaboration.tsx": "878ba609ca041d748e7496840025c30ba706d983947a5e5441aef7ca6e5271f8",
+    "app/src/AssemblyStructureEditor.tsx": "879c2c624d6078ad32c6268d652350e4a003a8493bedd7d57551e61e52dd1c36",
+    "app/src/workerBridge.ts": "c1881d0c71b1d69c0ff986a0915e8f12a9f69a6256b6010c839c854e4a119061",
+    "app/src-tauri/src/lib.rs": "02add937fd5dc2696e2ec353fb2ee0caef1defe0f5811a232ec7432e9d8d661d",
+    "app/src-tauri/src/entitlement.rs": "4218d386a5e6d2f3bdca7867740bb9cb7a6f52179ebc84d3dc86fd37a3a8377a",
+    "app/src-tauri/src/project_trust_binding.rs": "89b8e069166270558b0c5c50b8a910d035ba734408fa59a324bb8854a225dfe4",
+    "integrations/freecad/SPIKEWorkbench/spike_freecad/collaboration.py": "e52d19c3e19bbabcd80f02caa21ecea7a90efe28dd8caa7d98cd32a657105412",
+    "integrations/freecad/SPIKEWorkbench/spike_freecad/collaboration_commands.py": "c2fa6dfe4fe50222143b76812bdaf4b86cd4b667d082f42feb206ff04c867614",
+    "integrations/freecad/SPIKEWorkbench/spike_freecad/session_contract.py": "cffa5b59fd981deb71dd2a44ac3baf5f26adee401468da31d94bb88eab80c59b",
+    "tests/python/test_mcad_collaboration.py": "bc7cb72202ff6d80a51d1ad197a7a2c18672ee6aeb6b0a9f11209f82702d5f7f",
+    "schemas/mcad-session-v1.schema.json": "8ce33f849c595e43b34b3f6360cb6528935a8baf056e974aab48af5c5e37a59f",
+    "schemas/mcad-feedback-v1.schema.json": "1294bc5f130e2899a788871b6a214579c0a44c4ab7c17568e67a5831b17234ed"
+  },
+  "workbench_zip": {
+    "path": "artifacts/freecad/SPIKEWorkbench-0.2.0.zip",
+    "sha256": "659c3790e03065c488101e5933e5f21c8815b585fc5230ec10d99e1ce73a254b"
+  }
+}

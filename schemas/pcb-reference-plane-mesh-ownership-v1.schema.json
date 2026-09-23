@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-reference-plane-mesh-ownership-v1.schema.json",
+  "title": "SPIKE admitted reference-plane mesh ownership overlay v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "source", "domains", "summary", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/pcb-reference-plane-mesh-ownership/v1"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mesh_contract", "mesh_sha256", "geometry_contract", "geometry_sha256", "design_id", "via_id", "source_via_id"],
+      "properties": {
+        "mesh_contract": {"const": "spike/pcb-reference-plane-antipad-mesh/v2"},
+        "mesh_sha256": {"$ref": "#/$defs/digest"},
+        "geometry_contract": {"enum": ["spike/pcb-reference-plane-antipad-geometry/v2", "spike/pcb-reference-plane-antipad-geometry/v3"]},
+        "geometry_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"}, "via_id": {"$ref": "#/$defs/id"},
+        "source_via_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "domains": {
+      "type": "array", "minItems": 1, "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["domain_id", "reference_zone_id", "source_zone_id", "net_id", "layer_id", "source_zone_sha256", "resolved_region_sha256", "triangle_count", "vertex_reference_count", "boundary_loop_count", "source_cutout_count", "antipad_count", "xy_containment_checked", "z_containment_checked", "provenance_checked"],
+        "properties": {
+          "domain_id": {"$ref": "#/$defs/id"}, "reference_zone_id": {"$ref": "#/$defs/id"},
+          "source_zone_id": {"$ref": "#/$defs/id"}, "net_id": {"$ref": "#/$defs/id"},
+          "layer_id": {"$ref": "#/$defs/id"}, "source_zone_sha256": {"$ref": "#/$defs/digest"},
+          "resolved_region_sha256": {"$ref": "#/$defs/digest"},
+          "triangle_count": {"type": "integer", "minimum": 1, "maximum": 65536},
+          "vertex_reference_count": {"type": "integer", "minimum": 3, "maximum": 196608},
+          "boundary_loop_count": {"type": "integer", "minimum": 4, "maximum": 16384},
+          "source_cutout_count": {"type": "integer", "minimum": 0, "maximum": 128},
+          "antipad_count": {"const": 1}, "xy_containment_checked": {"const": true},
+          "z_containment_checked": {"const": true}, "provenance_checked": {"const": true}
+        }
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "checked_domains", "checked_triangles", "checked_vertex_references", "checked_boundary_loops", "duplicate_owner_count", "orphan_triangle_count"],
+      "properties": {
+        "status": {"const": "passed"}, "checked_domains": {"type": "integer", "minimum": 1, "maximum": 64},
+        "checked_triangles": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "checked_vertex_references": {"type": "integer", "minimum": 3, "maximum": 196608},
+        "checked_boundary_loops": {"type": "integer", "minimum": 4, "maximum": 16384},
+        "duplicate_owner_count": {"const": 0}, "orphan_triangle_count": {"const": 0}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "all_supplied_domains_owned", "complete_board_copper_coverage", "source_curve_copper_envelope_proven", "native_geometric_overlay_verified", "physics_convergence_performed", "solver_ready"],
+      "properties": {
+        "state": {"const": "admitted_source_region_ownership_overlay_only"},
+        "all_supplied_domains_owned": {"const": true},
+        "complete_board_copper_coverage": {"const": false},
+        "source_curve_copper_envelope_proven": {"type": "boolean"},
+        "native_geometric_overlay_verified": {"const": false},
+        "physics_convergence_performed": {"const": false}, "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

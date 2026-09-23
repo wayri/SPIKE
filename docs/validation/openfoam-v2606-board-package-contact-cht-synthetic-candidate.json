@@ -1,0 +1,93 @@
+{
+  "contract": "spike/openfoam-board-package-contact-cht-runtime-evidence/v1",
+  "recorded_at": "2026-09-05",
+  "runtime": {
+    "distribution": "OpenFOAM",
+    "version": "2606",
+    "build": "_481094f-20260618",
+    "transport": "WSL Ubuntu",
+    "application": "chtMultiRegionFoam"
+  },
+  "fixture": {
+    "contract": "spike/openfoam-board-package-air-contact-fixture/v1",
+    "topology": "FR-4 board -> explicit TIM/contact -> silicon package -> air",
+    "footprint_mm": [10.0, 10.0],
+    "board_thickness_mm": 1.6,
+    "package_thickness_mm": 1.0,
+    "air_height_mm": 10.0,
+    "heat_input_w": 0.1,
+    "contact_resistance_k_per_w": 0.2,
+    "contact_area_mm2": 100.0,
+    "contact_layer_thickness_m": 0.00002,
+    "contact_layer_conductivity_w_mk": 1.0,
+    "initial_temperature_k": 298.15,
+    "end_time_s": 10.0
+  },
+  "reference_execution": {
+    "spatial_divisions": 2,
+    "delta_t_s": 0.5,
+    "outer_correctors": 10,
+    "frozen_flow": true,
+    "request_digest": "d6b0024f887e26629bcec431c4b40c2cda500b2cdce8e4ffcd36866266277068",
+    "runnable_manifest_digest": "2edd84e9e64e1464af05fee64a8d32b063226947ba11d62dced6bcf27f5ce452",
+    "field_export_sha256": "3da4fb080c749f0fff8bf0262b5c5cf59a4f9cf916781f865f0700706846bdc5",
+    "field_export_bytes": 6260,
+    "status": "completed",
+    "duration_s": 16.906,
+    "total_samples": 24,
+    "fluid_samples": 8,
+    "minimum_temperature_k": 298.2691711,
+    "maximum_temperature_k": 301.0892269,
+    "temperature_imported": true,
+    "heat_flux_imported": true,
+    "velocity_imported": true,
+    "pressure_imported": true
+  },
+  "mesh_convergence": {
+    "metric": "maximum_temperature_k",
+    "common_delta_t_s": 0.03125,
+    "relative_tolerance": 0.002,
+    "levels": [
+      {"spatial_divisions": 1, "cells": 3, "maximum_temperature_k": 301.3252974, "manifest_digest": "93b82fec6ce78ac5d96ff4c8d3cabb4ecf3c8c07eb0084579de3ecc75cc94a45"},
+      {"spatial_divisions": 2, "cells": 24, "maximum_temperature_k": 301.0943943, "manifest_digest": "baeeadd5b981c02977e25b24a12f560337c4fb2b3171e0b0b4d4fb5cb55fc10d"},
+      {"spatial_divisions": 3, "cells": 81, "maximum_temperature_k": 301.0444468, "manifest_digest": "1beaa8cf2b77d5887dc51464e3127326022da2622c49c490ed16e1eaeffd4e08"}
+    ],
+    "successive_relative_changes": [0.0007668794383796157, 0.0001659140387105569],
+    "passed": true
+  },
+  "time_convergence": {
+    "metric": "maximum_temperature_k",
+    "spatial_divisions": 2,
+    "relative_tolerance": 0.002,
+    "levels": [
+      {"delta_t_s": 1.0, "maximum_temperature_k": 301.083352, "manifest_digest": "da56ff03bb9b178bdeb60baacca5fa4d36cca2f027219af385854a06d4e6af52"},
+      {"delta_t_s": 0.5, "maximum_temperature_k": 301.0892269, "manifest_digest": "2edd84e9e64e1464af05fee64a8d32b063226947ba11d62dced6bcf27f5ce452"},
+      {"delta_t_s": 0.25, "maximum_temperature_k": 301.0920303, "manifest_digest": "a9bb7e4c0cf5ce7e637556a68968ede90b3dc8cba122c28376bbf2b289fb82bd"}
+    ],
+    "successive_relative_changes": [0.000019512156115730958, 0.000009310774506899801],
+    "passed": true
+  },
+  "energy_conservation": {
+    "input_energy_j": 1.0,
+    "stored_energy_change_j": 0.9877116799476084,
+    "stored_energy_by_region_j": {"air": 0.0005822799426000286, "board": 0.5078319397200006, "package": 0.47929746028500775},
+    "integrated_external_boundary_energy_j": 0.0117224075077075,
+    "relative_residual": 0.0005659125446840774,
+    "relative_tolerance": 0.01,
+    "wall_flux_artifact_sha256": "a855e45b7f80f820235888ee536b45e5d90e9377da0dafaa4fbf04752e79c61d",
+    "passed": true,
+    "note": "Input, stored energy and independently integrated external wall-flux history close without inferring the boundary term."
+  },
+  "qualification": {
+    "candidate_runtime_evidence": true,
+    "candidate_conservation_mesh_time_gates_passed": true,
+    "production_qualified": false,
+    "limitations": [
+      "Synthetic homogeneous FR-4 and silicon blocks rather than geometry-derived PCB copper, dielectric, die, package and bond topology",
+      "Zero-gravity fan-free fixture uses frozen flow and does not validate buoyancy, a fan curve, airflow or pressure-drop accuracy",
+      "No enclosure, heatsink, potting or radiation in this fixture",
+      "No independent-solver or measured correlation",
+      "No exact Windows and Linux packaged-runtime qualification"
+    ]
+  }
+}

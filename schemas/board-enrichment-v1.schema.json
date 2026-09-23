@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://spike.local/schemas/board-enrichment-v1.schema.json",
+  "title": "Explicit board enrichment in millimeters", "type": "object", "additionalProperties": false, "required": ["contract"],
+  "properties": {
+    "contract": {"const": "spike/board-enrichment/v1"}, "extensions": {"type": "object"},
+    "stackup": {"type": "array", "items": {"type": "object", "required": ["name", "type", "thickness_mm"], "properties": {
+      "name": {"type": "string", "minLength": 1}, "type": {"enum": ["copper", "signal", "conductor", "dielectric", "soldermask", "silkscreen"]},
+      "thickness_mm": {"type": "number", "exclusiveMinimum": 0}, "material": {"type": "string"},
+      "epsilon_r": {"type": "number", "minimum": 1}, "loss_tangent": {"type": "number", "minimum": 0}, "properties": {"type": "object"}
+    }}},
+    "components": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["reference"], "properties": {
+      "reference": {"type": "string", "minLength": 1}, "properties": {"type": "object"},
+      "models": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "transform"], "properties": {
+        "path": {"type": "string", "minLength": 1}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "transform": {"type": "array", "minItems": 16, "maxItems": 16, "items": {"type": "number"}}
+      }}}
+    }}}
+  }
+}

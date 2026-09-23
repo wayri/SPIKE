@@ -1,0 +1,14 @@
+.title Native E G F H dependent-source qualification example
+Eamp eout 0 in 0 3
+Gsink gout 0 in 0 1m
+Fcopy 0 fout Vsense -2
+Htrans hout 0 Vsense -1000
+Vsense in 0 2
+Rin in 0 1000
+Re eout 0 1000
+Rg gout 0 1000
+Rf fout 0 1000
+Rh hout 0 1000
+.op
+* Expected eout=6 V, gout=-2 V, fout=4 V, hout=2 V.
+.end

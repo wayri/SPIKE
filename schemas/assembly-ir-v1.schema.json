@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/assembly-ir-v1.schema.json",
+  "title": "SPIKE AssemblyIR v1",
+  "type": "object",
+  "required": ["contract", "assembly_id", "name", "frame", "boards", "harnesses", "connector_mappings", "rigid_flex_links", "parts", "extensions", "metadata"],
+  "properties": {
+    "contract": { "const": "spike/assembly-ir/v1" },
+    "assembly_id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "frame": { "$ref": "design-ir-v2.schema.json#/$defs/frame" },
+    "boards": {
+      "type": "array", "maxItems": 30,
+      "items": {
+        "allOf": [{ "$ref": "design-ir-v2.schema.json#/$defs/entity" }, {
+          "type": "object", "required": ["design_id", "frame"],
+          "properties": { "design_id": { "type": "string", "minLength": 1 }, "frame": { "$ref": "design-ir-v2.schema.json#/$defs/frame" } }
+        }]
+      }
+    },
+    "harnesses": {
+      "type": "array",
+      "items": {
+        "allOf": [{ "$ref": "design-ir-v2.schema.json#/$defs/entity" }, {
+          "type": "object", "required": ["endpoint_a", "endpoint_b", "length_mm", "conductor_material_id", "pin_map"],
+          "properties": { "endpoint_a": { "type": "string", "minLength": 1 }, "endpoint_b": { "type": "string", "minLength": 1 }, "length_mm": { "type": "number", "minimum": 0 }, "conductor_material_id": { "type": "string" }, "gauge_awg": { "type": ["number", "null"] }, "pin_map": { "type": "object", "additionalProperties": { "type": "string" } } }
+        }]
+      }
+    },
+    "connector_mappings": { "type": "array", "items": { "$ref": "design-ir-v2.schema.json#/$defs/entity" } },
+    "rigid_flex_links": { "type": "array", "items": { "$ref": "design-ir-v2.schema.json#/$defs/entity" } },
+    "parts": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/assembly_part" } },
+    "materials": { "type": "array", "items": { "$ref": "design-ir-v2.schema.json#/$defs/entity" } },
+    "thermal_contacts": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/thermal_contact" } },
+    "electrical_bonds": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/electrical_bond" } },
+    "extensions": { "$ref": "design-ir-v2.schema.json#/$defs/extensions" },
+    "metadata": { "type": "object" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "assembly_part": {
+      "allOf": [
+        { "$ref": "design-ir-v2.schema.json#/$defs/entity" },
+        {
+          "type": "object",
+          "required": ["part_type", "model_id", "frame", "material_id"],
+          "properties": {
+            "part_type": { "type": "string", "minLength": 1 },
+            "model_id": { "type": "string", "minLength": 1 },
+            "frame": { "$ref": "design-ir-v2.schema.json#/$defs/frame" },
+            "material_id": { "type": "string" },
+            "placement_policy": {
+              "oneOf": [
+                { "$ref": "assembly-placement-policy-v1.schema.json" },
+                { "type": "null" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "thermal_contact": {
+      "allOf": [
+        { "$ref": "design-ir-v2.schema.json#/$defs/entity" },
+        {
+          "type": "object",
+          "required": ["endpoint_a", "endpoint_b", "contact_type", "material_id", "contact_area_mm2", "thermal_resistance_k_per_w"],
+          "properties": {
+            "endpoint_a": { "type": "string", "minLength": 1 },
+            "endpoint_b": { "type": "string", "minLength": 1 },
+            "contact_type": { "type": "string", "minLength": 1 },
+            "material_id": { "type": "string" },
+            "contact_area_mm2": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+            "thermal_resistance_k_per_w": { "type": ["number", "null"], "minimum": 0 }
+          }
+        }
+      ]
+    },
+    "electrical_bond": {
+      "allOf": [
+        { "$ref": "design-ir-v2.schema.json#/$defs/entity" },
+        {
+          "type": "object",
+          "required": ["endpoint_a", "endpoint_b", "bond_type", "electrical_material_id", "thermal_material_id", "contact_area_mm2", "thickness_mm", "electrical_resistance_ohm"],
+          "properties": {
+            "endpoint_a": { "type": "string", "minLength": 1 },
+            "endpoint_b": { "type": "string", "minLength": 1 },
+            "bond_type": { "type": "string", "minLength": 1 },
+            "electrical_material_id": { "type": "string" },
+            "thermal_material_id": { "type": "string" },
+            "contact_area_mm2": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+            "thickness_mm": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+            "electrical_resistance_ohm": { "type": ["number", "null"], "minimum": 0 }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "contract": "spike/extension/v1", "api_version": 1,
+  "id": "spike.odb-import", "name": "ODB++ Design Import", "version": "0.1.0",
+  "provider": "SPIKE", "description": "Import ODB++ board jobs with geometry, connectivity, vendor properties and auditable coverage.",
+  "execution": "process", "runtime": "python", "entrypoint": "extension.py", "state": "experimental", "bundled": true,
+  "permissions": ["filesystem.workspace"],
+  "limits": {"timeout_seconds": 300, "max_result_bytes": 268435456},
+  "contributes": {
+    "importers": [{"id": "odb-design", "name": "ODB++ Design", "source_formats": ["odb++", "odb", "odbpp"],
+      "extensions": [".odb", ".odb++", ".zip", ".tgz", ".tar", ".tar.gz"], "accepts_directories": true, "output_contract": "spike/v1",
+      "input_schema": {"type": "object", "properties": {"step": {"type": "string"}}, "additionalProperties": false}}],
+    "schemas": [{"id": "odb-enrichment-schema", "name": "Board enrichment", "output_contract": "spike/board-enrichment/v1"}]
+  }
+}

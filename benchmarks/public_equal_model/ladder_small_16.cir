@@ -1,0 +1,22 @@
+SPIKES public small 16-section unit-resistor ladder
+* SPDX-License-Identifier: CC0-1.0
+* First-party deterministic sparse-MNA scale fixture
+IIN 0 n15 1
+R0 n0 0 1
+R1 n1 n0 1
+R2 n2 n1 1
+R3 n3 n2 1
+R4 n4 n3 1
+R5 n5 n4 1
+R6 n6 n5 1
+R7 n7 n6 1
+R8 n8 n7 1
+R9 n9 n8 1
+R10 n10 n9 1
+R11 n11 n10 1
+R12 n12 n11 1
+R13 n13 n12 1
+R14 n14 n13 1
+R15 n15 n14 1
+.op
+.end

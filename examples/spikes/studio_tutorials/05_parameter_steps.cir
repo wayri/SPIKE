@@ -1,0 +1,8 @@
+.title Tutorial 05 - Parameter sweep overlays
+.param resistance=1k
+.step param resistance list 1k 2k 4k
+V1 in 0 1
+R1 in out {resistance}
+C1 out 0 1u
+.tran 20u 5m uic
+.end

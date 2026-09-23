@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pi-workflow-qualification-evidence-v1.schema.json",
+  "title": "SPIKE PI workflow qualification evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "evidence_id", "workflow_id", "native_owner", "qualification_profile_id",
+    "qualification_level", "status", "generated_at", "candidate", "summary", "cases",
+    "applicability", "limitations"
+  ],
+  "properties": {
+    "contract": {"const": "spike/pi-workflow-qualification-evidence/v1"},
+    "evidence_id": {"type": "string", "pattern": "^[a-z][a-z0-9._-]{1,127}$"},
+    "workflow_id": {"type": "string", "pattern": "^[a-z][a-z0-9._-]{1,127}$"},
+    "native_owner": {"type": "string", "pattern": "^spike\\.native\\.[a-z0-9._-]+$"},
+    "qualification_profile_id": {"type": "string", "pattern": "^[a-z][a-z0-9._-]{1,127}$"},
+    "qualification_level": {"enum": ["reference_validated", "validated"]},
+    "status": {"const": "passed"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "candidate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["solver_id", "solver_version", "worker_version", "worker_executable_sha256", "worker_manifest_sha256", "runtime_snapshot_digest"],
+      "properties": {
+        "solver_id": {"type": "string", "pattern": "^spike\\.native\\."},
+        "solver_version": {"type": "string", "minLength": 1, "maxLength": 128},
+        "worker_version": {"type": "string", "minLength": 1, "maxLength": 128},
+        "worker_executable_sha256": {"$ref": "#/$defs/sha256"},
+        "worker_manifest_sha256": {"$ref": "#/$defs/sha256"},
+        "runtime_snapshot_digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["total", "passed", "failed", "skipped"],
+      "properties": {
+        "total": {"type": "integer", "minimum": 1},
+        "passed": {"type": "integer", "minimum": 1},
+        "failed": {"const": 0},
+        "skipped": {"const": 0}
+      }
+    },
+    "cases": {
+      "type": "array", "minItems": 1, "maxItems": 10000,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["case_id", "classes", "status", "input", "candidate_result", "reference", "metrics", "convergence"],
+        "properties": {
+          "case_id": {"type": "string", "pattern": "^[a-z][a-z0-9._-]{1,127}$"},
+          "classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 128}},
+          "status": {"const": "passed"},
+          "input": {"$ref": "#/$defs/digestRecord"},
+          "candidate_result": {"$ref": "#/$defs/digestRecord"},
+          "reference": {
+            "type": "object", "additionalProperties": true,
+            "required": ["kind", "engine_id", "engine_version", "input_sha256", "result_sha256"],
+            "properties": {
+              "kind": {"enum": ["analytical", "independent_solver", "measurement"]},
+              "engine_id": {"type": "string", "minLength": 1, "maxLength": 256},
+              "engine_version": {"type": "string", "minLength": 1, "maxLength": 128},
+              "input_sha256": {"$ref": "#/$defs/sha256"},
+              "result_sha256": {"$ref": "#/$defs/sha256"}
+            }
+          },
+          "metrics": {"type": "array", "minItems": 1, "maxItems": 10000, "items": {"type": "object"}},
+          "convergence": {"type": "object"}
+        }
+      }
+    },
+    "applicability": {"type": "object"},
+    "limitations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 1024}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "digestRecord": {
+      "type": "object", "additionalProperties": false,
+      "required": ["contract", "sha256"],
+      "properties": {
+        "contract": {"type": "string", "minLength": 1, "maxLength": 256},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

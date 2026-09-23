@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/native-reference-plane-antipad-handoff-v2.schema.json",
+  "title": "SPIKE generalized native reference-plane handoff v2",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "source", "native_validation", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/native-reference-plane-antipad-handoff/v2"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mesh_contract", "mesh_sha256", "geometry_contract", "geometry_sha256", "design_id", "via_id", "source_via_id"],
+      "properties": {
+        "mesh_contract": {"const": "spike/pcb-reference-plane-antipad-mesh/v2"},
+        "mesh_sha256": {"$ref": "#/$defs/digest"},
+        "geometry_contract": {"enum": ["spike/pcb-reference-plane-antipad-geometry/v2", "spike/pcb-reference-plane-antipad-geometry/v3"]},
+        "geometry_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"}, "via_id": {"$ref": "#/$defs/id"},
+        "source_via_id": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    },
+    "native_validation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "finite_vertices_checked", "compact_indices_checked", "closed_domains_checked", "domain_ownership_checked", "provenance_checked", "complete_loop_coverage_checked", "complete_surface_roles_checked", "source_curve_claim_checked", "solver_entry_points_exposed", "vertex_count", "triangle_count", "domain_count", "loop_count"],
+      "properties": {
+        "status": {"const": "passed"}, "finite_vertices_checked": {"const": true},
+        "compact_indices_checked": {"const": true}, "closed_domains_checked": {"const": true},
+        "domain_ownership_checked": {"const": true}, "provenance_checked": {"const": true},
+        "complete_loop_coverage_checked": {"const": true},
+        "complete_surface_roles_checked": {"const": true},
+        "source_curve_claim_checked": {"const": true},
+        "solver_entry_points_exposed": {"const": false},
+        "vertex_count": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "triangle_count": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "domain_count": {"type": "integer", "minimum": 1, "maximum": 64},
+        "loop_count": {"type": "integer", "minimum": 4, "maximum": 16384}
+      }
+    },
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_vertices", "max_triangles", "actual_vertices", "actual_triangles", "actual_loops", "maximum_work_steps", "actual_work_steps", "max_serialized_bytes"],
+      "properties": {
+        "max_vertices": {"const": 32768}, "max_triangles": {"const": 65536},
+        "actual_vertices": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "actual_triangles": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "actual_loops": {"type": "integer", "minimum": 4, "maximum": 16384},
+        "maximum_work_steps": {"type": "integer", "minimum": 1, "maximum": 16777216},
+        "actual_work_steps": {"type": "integer", "minimum": 1, "maximum": 16777216},
+        "max_serialized_bytes": {"const": 8388608}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "native_validation_passed", "mesh_quality_performed", "physics_convergence_performed", "capacitance_ready", "si_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "generalized_reference_plane_native_geometry_only"},
+        "native_validation_passed": {"const": true}, "mesh_quality_performed": {"const": false},
+        "physics_convergence_performed": {"const": false}, "capacitance_ready": {"const": false},
+        "si_ready": {"const": false}, "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

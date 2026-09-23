@@ -1,0 +1,7 @@
+SPIKES owned-kernel PWM switch example
+Vs in 0 10
+Vgate gate 0 PULSE(0 5 100u 100u 100u 200u 500u)
+Smain in out gate 0 1 1meg 2.5 100m
+Rload out 0 10
+.tran 70u 2.5m
+.end

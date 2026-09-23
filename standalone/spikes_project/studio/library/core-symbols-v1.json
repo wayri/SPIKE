@@ -1,0 +1,82 @@
+{
+  "contract": "spikes/studio-symbol-library/v1",
+  "library_id": "spikes.core.symbols",
+  "version": "0.1.0",
+  "license": "MIT; independently drawn geometry",
+  "symbols": [
+    {
+      "id": "resistor.iec",
+      "name": "Resistor, IEC rectangular body",
+      "family": "resistor",
+      "standard": "IEC 60617",
+      "conformance": "unverified",
+      "source_note": "Independent conventional geometry; requires licensed IEC conformance review before a conformant claim.",
+      "grid": 10,
+      "body_keepout": {"min": [-25, -10], "max": [25, 10]},
+      "label_keepouts": [{"role": "reference", "min": [-25, -30], "max": [25, -15]}, {"role": "value", "min": [-25, 15], "max": [25, 30]}],
+      "terminals": [{"id": "1", "name": "1", "at": [-40, 0], "leg_endpoint": [-25, 0], "direction": "west", "connection_indicator": true}, {"id": "2", "name": "2", "at": [40, 0], "leg_endpoint": [25, 0], "direction": "east", "connection_indicator": true}],
+      "primitives": [{"kind": "line", "points": [[-40, 0], [-25, 0]]}, {"kind": "polygon", "points": [[-25, -10], [25, -10], [25, 10], [-25, 10], [-25, -10]]}, {"kind": "line", "points": [[25, 0], [40, 0]]}]
+    },
+    {
+      "id": "resistor.ieee",
+      "name": "Resistor, ANSI zig-zag body",
+      "family": "resistor",
+      "standard": "IEEE/ANSI 315",
+      "conformance": "unverified",
+      "source_note": "Independent conventional geometry on a modular grid; IEEE 315 is inactive-reserved and requires licensed review.",
+      "grid": 10,
+      "body_keepout": {"min": [-25, -10], "max": [25, 10]},
+      "label_keepouts": [{"role": "reference", "min": [-25, -30], "max": [25, -15]}, {"role": "value", "min": [-25, 15], "max": [25, 30]}],
+      "terminals": [{"id": "1", "name": "1", "at": [-40, 0], "leg_endpoint": [-25, 0], "direction": "west", "connection_indicator": true}, {"id": "2", "name": "2", "at": [40, 0], "leg_endpoint": [25, 0], "direction": "east", "connection_indicator": true}],
+      "primitives": [{"kind": "polyline", "points": [[-40, 0], [-25, 0], [-20, -10], [-10, 10], [0, -10], [10, 10], [20, -10], [25, 0], [40, 0]]}]
+    },
+    {
+      "id": "capacitor.unpolarized",
+      "name": "Capacitor, unpolarized",
+      "family": "capacitor",
+      "standard": "common-convention",
+      "conformance": "derived",
+      "grid": 10,
+      "body_keepout": {"min": [-6, -20], "max": [6, 20]},
+      "label_keepouts": [{"role": "reference", "min": [12, -25], "max": [55, -10]}, {"role": "value", "min": [12, 10], "max": [55, 25]}],
+      "terminals": [{"id": "1", "name": "1", "at": [-40, 0], "leg_endpoint": [-6, 0], "direction": "west", "connection_indicator": true}, {"id": "2", "name": "2", "at": [40, 0], "leg_endpoint": [6, 0], "direction": "east", "connection_indicator": true}],
+      "primitives": [{"kind": "line", "points": [[-40, 0], [-6, 0]]}, {"kind": "line", "points": [[-6, -20], [-6, 20]]}, {"kind": "line", "points": [[6, -20], [6, 20]]}, {"kind": "line", "points": [[6, 0], [40, 0]]}]
+    },
+    {
+      "id": "inductor.air_core",
+      "name": "Inductor, air core",
+      "family": "inductor",
+      "standard": "common-convention",
+      "conformance": "derived",
+      "grid": 10,
+      "body_keepout": {"min": [-25, -12], "max": [35, 12]},
+      "label_keepouts": [{"role": "reference", "min": [-25, -35], "max": [35, -20]}, {"role": "value", "min": [-25, 20], "max": [35, 35]}],
+      "terminals": [{"id": "1", "name": "1", "at": [-40, 0], "leg_endpoint": [-25, 0], "direction": "west", "connection_indicator": true}, {"id": "2", "name": "2", "at": [40, 0], "leg_endpoint": [35, 0], "direction": "east", "connection_indicator": true}],
+      "primitives": [{"kind": "line", "points": [[-40, 0], [-25, 0]]}, {"kind": "arc", "center": [-15, 0], "radius": 10, "start_deg": 180, "sweep_deg": 180}, {"kind": "arc", "center": [5, 0], "radius": 10, "start_deg": 180, "sweep_deg": 180}, {"kind": "arc", "center": [25, 0], "radius": 10, "start_deg": 180, "sweep_deg": 180}, {"kind": "line", "points": [[35, 0], [40, 0]]}]
+    },
+    {
+      "id": "diode.pn",
+      "name": "PN junction diode",
+      "family": "diode",
+      "standard": "common-convention",
+      "conformance": "derived",
+      "grid": 10,
+      "body_keepout": {"min": [-15, -20], "max": [15, 20]},
+      "label_keepouts": [{"role": "reference", "min": [-15, -40], "max": [15, -25]}, {"role": "value", "min": [-15, 25], "max": [15, 40]}],
+      "terminals": [{"id": "a", "name": "A", "at": [-40, 0], "leg_endpoint": [-15, 0], "direction": "west", "connection_indicator": true}, {"id": "k", "name": "K", "at": [40, 0], "leg_endpoint": [15, 0], "direction": "east", "connection_indicator": true}],
+      "primitives": [{"kind": "line", "points": [[-40, 0], [-15, 0]]}, {"kind": "polygon", "points": [[-15, -20], [-15, 20], [15, 0], [-15, -20]]}, {"kind": "line", "points": [[15, -20], [15, 20]]}, {"kind": "line", "points": [[15, 0], [40, 0]]}]
+    },
+    {
+      "id": "ground.signal",
+      "name": "Signal reference ground",
+      "family": "ground",
+      "standard": "common-convention",
+      "conformance": "derived",
+      "grid": 10,
+      "body_keepout": {"min": [-20, 0], "max": [20, 16]},
+      "label_keepouts": [],
+      "terminals": [{"id": "0", "name": "0", "at": [0, -30], "leg_endpoint": [0, 0], "direction": "north", "connection_indicator": true}],
+      "primitives": [{"kind": "line", "points": [[0, -30], [0, 0]]}, {"kind": "line", "points": [[-20, 0], [20, 0]]}, {"kind": "line", "points": [[-13, 8], [13, 8]]}, {"kind": "line", "points": [[-6, 16], [6, 16]]}]
+    }
+  ]
+}

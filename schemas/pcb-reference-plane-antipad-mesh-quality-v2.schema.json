@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-reference-plane-antipad-mesh-quality-v2.schema.json",
+  "title": "SPIKE generalized reference-plane mesh quality v2",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "source", "policy", "levels", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/pcb-reference-plane-antipad-mesh-quality/v2"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mesh_contract", "geometry_contract", "geometry_sha256", "design_id", "via_id"],
+      "properties": {
+        "mesh_contract": {"const": "spike/pcb-reference-plane-antipad-mesh/v2"},
+        "geometry_contract": {"enum": ["spike/pcb-reference-plane-antipad-geometry/v2", "spike/pcb-reference-plane-antipad-geometry/v3"]},
+        "geometry_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"}, "via_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["radial_levels", "maximum_terminal_relative_area_error", "require_monotonic_conservative_area_error", "triangle_quality_metric", "source_curve_error_included"],
+      "properties": {
+        "radial_levels": {"const": [8, 16, 32, 64]},
+        "maximum_terminal_relative_area_error": {"const": 0.0015},
+        "require_monotonic_conservative_area_error": {"const": true},
+        "triangle_quality_metric": {"const": "two_sqrt3_area_over_sum_edge_squared"},
+        "source_curve_error_included": {"const": false}
+      }
+    },
+    "levels": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"$ref": "#/$defs/level"}},
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["maximum_work_steps_per_level", "actual_total_work_steps", "cancellation_supported"],
+      "properties": {
+        "maximum_work_steps_per_level": {"const": 16777216},
+        "actual_total_work_steps": {"type": "integer", "minimum": 1, "maximum": 67108864},
+        "cancellation_supported": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "native_admission_all_levels", "geometry_convergence_passed", "mesh_quality_characterized", "source_curve_convergence_performed", "field_convergence_performed", "physics_convergence_performed", "capacitance_ready", "si_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "generalized_plane_geometry_convergence_only"},
+        "native_admission_all_levels": {"const": true},
+        "geometry_convergence_passed": {"const": true},
+        "mesh_quality_characterized": {"const": true},
+        "source_curve_convergence_performed": {"const": false},
+        "field_convergence_performed": {"const": false},
+        "physics_convergence_performed": {"const": false},
+        "capacitance_ready": {"const": false}, "si_ready": {"const": false},
+        "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "region": {
+      "type": "object", "additionalProperties": false,
+      "required": ["domain_id", "analytic_area_mm2", "discrete_area_mm2", "conservative_area_deficit_mm2", "relative_area_error", "analytic_volume_mm3", "discrete_volume_mm3", "source_cutout_count", "antipad_radial_inflation_grid_units"],
+      "properties": {
+        "domain_id": {"$ref": "#/$defs/id"},
+        "analytic_area_mm2": {"type": "number", "exclusiveMinimum": 0},
+        "discrete_area_mm2": {"type": "number", "exclusiveMinimum": 0},
+        "conservative_area_deficit_mm2": {"type": "number", "minimum": 0},
+        "relative_area_error": {"type": "number", "minimum": 0},
+        "analytic_volume_mm3": {"type": "number", "exclusiveMinimum": 0},
+        "discrete_volume_mm3": {"type": "number", "exclusiveMinimum": 0},
+        "source_cutout_count": {"type": "integer", "minimum": 0, "maximum": 128},
+        "antipad_radial_inflation_grid_units": {"type": "integer", "minimum": 0, "maximum": 32}
+      }
+    },
+    "level": {
+      "type": "object", "additionalProperties": false,
+      "required": ["radial_segments", "mesh_sha256", "native_handoff_sha256", "vertex_count", "triangle_count", "boundary_loop_count", "work_steps", "minimum_upper_face_triangle_quality", "regions", "native_admission_passed"],
+      "properties": {
+        "radial_segments": {"enum": [8, 16, 32, 64]},
+        "mesh_sha256": {"$ref": "#/$defs/digest"},
+        "native_handoff_sha256": {"$ref": "#/$defs/digest"},
+        "vertex_count": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "triangle_count": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "boundary_loop_count": {"type": "integer", "minimum": 4, "maximum": 16384},
+        "work_steps": {"type": "integer", "minimum": 1, "maximum": 16777216},
+        "minimum_upper_face_triangle_quality": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+        "regions": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/region"}},
+        "native_admission_passed": {"const": true}
+      }
+    }
+  }
+}

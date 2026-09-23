@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/assembly-placement-policy-v1.schema.json",
+  "title": "SPIKE Assembly Placement Policy v1",
+  "type": "object",
+  "required": ["contract", "translation_snap_mm", "rotation_snap_deg"],
+  "properties": {
+    "contract": { "const": "spike/assembly-placement-policy/v1" },
+    "translation_snap_mm": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+    "rotation_snap_deg": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 180 }
+  },
+  "additionalProperties": false
+}

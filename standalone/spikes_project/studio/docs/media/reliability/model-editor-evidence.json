@@ -1,0 +1,13 @@
+{
+  "all_passed": true,
+  "checks": {
+    "dropdown binds PULSE source": true,
+    "reopened dialog restores model type": true,
+    "reopened dialog restores waveform parameters": true,
+    "model source survives save/load": true,
+    "native PULSE run produces recorded data": true,
+    "native input reaches entered low/high values": true,
+    "diode parameters bind to private executable model": true
+  },
+  "native_library": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll"
+}

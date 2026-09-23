@@ -1,0 +1,54 @@
+{
+  "contract": "spike/openems-reference-validation/v1",
+  "status": "passed",
+  "validation_scope": "openems_adapter.simple_patch_antenna",
+  "reference": "https://docs.openems.de/python/openEMS/Tutorials/Simple_Patch_Antenna.html",
+  "engine": {
+    "name": "openEMS",
+    "version": "0.0.36",
+    "archive_sha256": "e0d62b1176c0897ad18876b45667de877d7d3b58b37c0be95545f9b988896059"
+  },
+  "adapter_version": "1.1.0",
+  "runtime": {
+    "python": "3.11.9",
+    "CSXCAD": "0.6.3",
+    "numpy": "1.26.4",
+    "platform": "Windows x86_64"
+  },
+  "runs": [
+    {
+      "mesh_resolution_mm": 5.0,
+      "resonance_hz": 2200000000.0,
+      "minimum_s11_linear": 0.142871886343006,
+      "maximum_directivity_linear": 4.733224708750144,
+      "duration_s": 34.33,
+      "result_sha256": "b3467903298725a6c1888647980757318b847a7b9e52d17109e950feb1af79ac"
+    },
+    {
+      "mesh_resolution_mm": 4.0,
+      "resonance_hz": 2280000000.0,
+      "minimum_s11_linear": 0.17906739777624228,
+      "maximum_directivity_linear": 4.766251285219487,
+      "duration_s": 84.64,
+      "result_sha256": "4f035b36f526688001097a4345b73ad9d426654df953a559fd27f5c4fbdea3c7"
+    },
+    {
+      "mesh_resolution_mm": 3.0,
+      "resonance_hz": 2320000000.0,
+      "minimum_s11_linear": 0.1285181990981539,
+      "maximum_directivity_linear": 4.888551355579755,
+      "duration_s": 60.08,
+      "result_sha256": "fb69362297059b233fe3e0dcbe1da5c0b6c7c195df79d3f6b676d8310e18337d"
+    }
+  ],
+  "convergence": {
+    "finest_pair_resonance_relative_change": 0.017241379310344827,
+    "finest_pair_directivity_relative_change": 0.025017650724007544,
+    "maximum_resonance_relative_change": 0.03,
+    "maximum_directivity_relative_change": 0.1
+  },
+  "limitations": [
+    "Validation applies only to the SPIKE openEMS adapter and the recorded simple-patch fixture.",
+    "Arbitrary PCB geometry, cables, enclosures, immunity, emissions limits, and regulatory compliance are not validated by this evidence."
+  ]
+}

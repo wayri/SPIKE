@@ -1,0 +1,1693 @@
+{
+  "contract": "spikes/standalone-source-manifest/v1",
+  "product": "SPIKES standalone engine and Studio source project",
+  "version": "0.3.0-beta.1-studio-20260906",
+  "channel": "engineering_preview_source",
+  "files": [
+    {
+      "path": "benchmarks/public_application/converter_pwm_lc.cir",
+      "size": 157,
+      "sha256": "9bb1413f4a8bbaa7d10fc2af51626278bd9047275b5a8f54527f00812299ad24"
+    },
+    {
+      "path": "benchmarks/public_application/LICENSE.txt",
+      "size": 524,
+      "sha256": "58afe5dfc447bb5b086fbfe82eedc2186f0d11698b32380f67d532462430a4bc"
+    },
+    {
+      "path": "benchmarks/public_application/motor_fixed_speed_armature.cir",
+      "size": 175,
+      "sha256": "ffc4be27219d975df1b3d12a5ad2b8824e96cf5d04b9684b5a3236b6611f824c"
+    },
+    {
+      "path": "benchmarks/public_application/PROVENANCE.md",
+      "size": 862,
+      "sha256": "6c0f02b5219d5bf01b59cc5a1066d141aaaacd6567ed5886d6a08c53e8603aa2"
+    },
+    {
+      "path": "benchmarks/public_application/rf_series_resonator.cir",
+      "size": 138,
+      "sha256": "652f64398aaedf685c64075b583b5528c652d76bbe3b66204d0a10d3d69ddcf6"
+    },
+    {
+      "path": "benchmarks/public_equal_model/ladder_large_2000.cir",
+      "size": 36831,
+      "sha256": "ea186b9a6dcd500272ff9aed30ae1d727ea482276e25c99460b7ea2d4793a21a"
+    },
+    {
+      "path": "benchmarks/public_equal_model/ladder_medium_500.cir",
+      "size": 8331,
+      "sha256": "79f496826f96023d6066cc89b027bd7c38017e2372d2cf2ca7c0ca3dd2bab72b"
+    },
+    {
+      "path": "benchmarks/public_equal_model/ladder_small_16.cir",
+      "size": 353,
+      "sha256": "011d12c098f0d52cc02287c9a5c24688a91741a0cfcd4b7a7c61d485cec372eb"
+    },
+    {
+      "path": "benchmarks/public_equal_model/LICENSE.txt",
+      "size": 581,
+      "sha256": "a248af0df4f513ae46dc8381192221e0f6d0919b794594c96ae562ae168c7edc"
+    },
+    {
+      "path": "benchmarks/public_equal_model/PROVENANCE.md",
+      "size": 1107,
+      "sha256": "404d5a59a4f90c7651ae6b406c662e613ea60e041c4ddf523770e2cdd5711493"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "size": 6153,
+      "sha256": "7cc86a28d67645e4d4f45fc734b03c299600d5382263db326b2447ddafdffdd4"
+    },
+    {
+      "path": "docs/BERKELEY_BSIM_OSDI_QUALIFICATION.md",
+      "size": 1416,
+      "sha256": "c39a2baeb6f854afc3796e6ad03df18a25bdd50bb84882257ce99eb51a5effa7"
+    },
+    {
+      "path": "docs/PHYSICAL_HIL_CERTIFICATION.md",
+      "size": 1587,
+      "sha256": "bfaf69738f6a5c5c64da10f7a0a97a0914273919712e3cc522dbc569b8d06f6e"
+    },
+    {
+      "path": "docs/SOLVER_STATUS.md",
+      "size": 56723,
+      "sha256": "d844f6572bb55e634f2da30b6a7b4b324037497964087ece0d377717a82ad09f"
+    },
+    {
+      "path": "docs/SPIKES_0_2_0_ENGINEERING_PREVIEW.md",
+      "size": 1917,
+      "sha256": "a4eac7cbc29376e00c41397e0cc20979f876543b6e8fc45dd93f7cc27a80d477"
+    },
+    {
+      "path": "docs/SPIKES_0_3_0_ALPHA4_ENGINEERING_PREVIEW.md",
+      "size": 2435,
+      "sha256": "0a0bace9185489a7de3c68f71d37aad93377d53408aefbcaf35b0482bf164963"
+    },
+    {
+      "path": "docs/SPIKES_C_ABI.md",
+      "size": 10142,
+      "sha256": "cd4c142e122cec713eadaa61bda399a6ef02eff560d4390cb11ba9e33658f1b6"
+    },
+    {
+      "path": "docs/SPIKES_CLI.md",
+      "size": 14878,
+      "sha256": "9509fe875051a627644710c225c25994d01aa5ff3d589a013155afef6c14ec3d"
+    },
+    {
+      "path": "docs/SPIKES_COMPETITIVE_GATES.md",
+      "size": 5540,
+      "sha256": "2e236195ac94cf19a0ef81aa133c56ce568f4c1b6398d6b1bfe9cfe6bdc137f3"
+    },
+    {
+      "path": "docs/SPIKES_COMPILED_BLOCKS.md",
+      "size": 2116,
+      "sha256": "4d5f6a91292aa632fd41a138847140c811830cb8c55c7614d56f3e24068bdd42"
+    },
+    {
+      "path": "docs/SPIKES_CONSOLE_DASHBOARD.md",
+      "size": 4348,
+      "sha256": "8a94659591428f4e907175e56445db050fff36b88423659c1072fbf6b4154bac"
+    },
+    {
+      "path": "docs/SPIKES_HDL_FRONTEND.md",
+      "size": 5977,
+      "sha256": "965b0932c6a39397283fb7345f83589bbe07a0656c5f3dca8a40b0e338150eb9"
+    },
+    {
+      "path": "docs/SPIKES_LANGUAGE_ANALYSIS_WAVE3.md",
+      "size": 3499,
+      "sha256": "8c4c08e96a86066bac9371d3e38cae6a7c718fbcccb7f6efc94f38ed7a28fd48"
+    },
+    {
+      "path": "docs/SPIKES_LANGUAGE_ANALYSIS_WAVE4.md",
+      "size": 3521,
+      "sha256": "bb36ecba824cb45dfed86c9556da48a7598ae9b28a3d6715fe48d5282a632062"
+    },
+    {
+      "path": "docs/SPIKES_LANGUAGE_ANALYSIS_WAVE5.md",
+      "size": 4111,
+      "sha256": "ae8396bc57e269d2f31689576e3e07ee7199dbd871bfdf34410b7fada438a039"
+    },
+    {
+      "path": "docs/SPIKES_LANGUAGE_ANALYSIS_WAVE6.md",
+      "size": 2484,
+      "sha256": "a9b6beba1f1a7ca018d2c49d0f883d55df6ce1fd53956db4ed6943a091a5118e"
+    },
+    {
+      "path": "docs/SPIKES_MODEL_LIBRARY.md",
+      "size": 1372,
+      "sha256": "ac0785e5729c26846c942b80970a2debda261d23e26ffe0cecef94dd54d6c1d2"
+    },
+    {
+      "path": "docs/SPIKES_NATIVE_SWITCHING_KERNEL.md",
+      "size": 2718,
+      "sha256": "9ea844589ad1a42ac8bee3eb7345bb27bf3b45e62d3c3a96aa67cdb1dd6034a3"
+    },
+    {
+      "path": "docs/SPIKES_PUBLIC_EQUAL_MODEL_BENCHMARKS.md",
+      "size": 3687,
+      "sha256": "a06d9b02ad56c9899993de3c68ca6fa25d5053684240f42c6e12435f51764412"
+    },
+    {
+      "path": "docs/SPIKES_QUALIFICATION.md",
+      "size": 3400,
+      "sha256": "4a31f6c8060bf08a85d088a3b50f98757aa34874b59fdd77d30a2de3305009d3"
+    },
+    {
+      "path": "docs/SPIKES_STREAMING_RESULTS.md",
+      "size": 3627,
+      "sha256": "743e961bffd0582675c0527196ada113fee6fdffc6372c4e63b7832fec858ad8"
+    },
+    {
+      "path": "docs/SPIKES_WAVE1_BENCHMARKS.md",
+      "size": 2212,
+      "sha256": "c19e15f6b0f477f18a639443cb0e064fa623745212d8ad3616119aa732fe1f33"
+    },
+    {
+      "path": "docs/validation/spikes-ngspice-competitive-gate.json",
+      "size": 2974,
+      "sha256": "a8d8e2addbb16fe9c692ee3e04589fe8c819ca984d1e6b0835239c5fea7b3fcb"
+    },
+    {
+      "path": "engine/src/spikes/appcontainer_launcher.cpp",
+      "size": 7670,
+      "sha256": "4af8c1f961843dfaf813b51475dcc4a237814d24835468f467acbe1b71adbbb1"
+    },
+    {
+      "path": "engine/src/spikes/c_api.cpp",
+      "size": 49546,
+      "sha256": "a9848d1c113a47ac2ffcba8a1f211bd2c852367cffcee7ba11fc2866d81f04f5"
+    },
+    {
+      "path": "engine/src/spikes/c_api.h",
+      "size": 18332,
+      "sha256": "0d7290131b1c61f269d0d92b96b3158b7fa34399c6ccc1f93e66937382c67615"
+    },
+    {
+      "path": "engine/src/spikes/console_dashboard.cpp",
+      "size": 32596,
+      "sha256": "ca9ae4f3974b3263df3d866b24a62beb6413b36794a76c846748e8bdb37982bc"
+    },
+    {
+      "path": "engine/src/spikes/console_dashboard.hpp",
+      "size": 3791,
+      "sha256": "3a8ccf846d9110dd49596dd3b4312a5e2c1b70a52114b9e785ccb1d0cc909ac6"
+    },
+    {
+      "path": "engine/src/spikes/console_main.cpp",
+      "size": 3046,
+      "sha256": "e24d414ba3f503f30b48cfe6bf9a4868027408b479114d246af31e8a2edb5a2b"
+    },
+    {
+      "path": "engine/src/spikes/dc_solver.cpp",
+      "size": 102207,
+      "sha256": "0398e03895657e27255dee2040c9cb260188b59f09e7a868ef585cd0f55f2574"
+    },
+    {
+      "path": "engine/src/spikes/dc_solver.hpp",
+      "size": 16232,
+      "sha256": "eb6ee4edae9678fa550ff518e00a40323a4373e0f1d61e2ccbd0af79e9d5a1aa"
+    },
+    {
+      "path": "engine/src/spikes/osdi_device.cpp",
+      "size": 37359,
+      "sha256": "cff9bef2a6345f429926614cc24a70ecd48d976469513f8d15b7854c83df0fb8"
+    },
+    {
+      "path": "engine/src/spikes/osdi_device.hpp",
+      "size": 4787,
+      "sha256": "de96c206efc0a350a364b84f3e13cf84d1d3e849c842a450d3d98e0d45644ebf"
+    },
+    {
+      "path": "engine/src/spikes/osdi_worker_main.cpp",
+      "size": 3306,
+      "sha256": "d27bb5d5e9e17c0cdccce9c07d3cdb617d8916cdb414083d0ff5620ec70909ec"
+    },
+    {
+      "path": "engine/src/spikes/transient_session.cpp",
+      "size": 12316,
+      "sha256": "214f4d4d2b902d382fde17251ffbef01a69de828cd3c121f4a88fbbace1dec7a"
+    },
+    {
+      "path": "engine/src/spikes/transient_session.hpp",
+      "size": 2718,
+      "sha256": "18319caaf886fc659a90e26d48ed8898864ad1ca9c9258a2cd31fab0fc850100"
+    },
+    {
+      "path": "engine/src/spikes/transient_solver.cpp",
+      "size": 96697,
+      "sha256": "b0c7374a38532af5d38b3690e30b9a4bcf446fe2fee2d1f53e86ca7b28dc2707"
+    },
+    {
+      "path": "engine/src/spikes/transient_solver.hpp",
+      "size": 6433,
+      "sha256": "16f9c2cab94c2b70ec497501b9748194497b95b284a30c09af66298cd9ff066f"
+    },
+    {
+      "path": "evidence/berkeley-bsim-osdi-qualification-2026-08-31.json",
+      "size": 3155,
+      "sha256": "4d700478b2811491a0e67ec8403c84bca7684dd669684d6617fb3ea2989dcd4f"
+    },
+    {
+      "path": "evidence/spikes-competitive-converter-rf-motor-2026-08-31.json",
+      "size": 32305,
+      "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+    },
+    {
+      "path": "evidence/spikes-parity-check-report-0.3.0-alpha.4-2026-08-31.json",
+      "size": 20791,
+      "sha256": "ee9381add2aa413f4982a487ca35f7257869e8ee7b3ea76fc2e0b8cf66720589"
+    },
+    {
+      "path": "evidence/spikes-physical-hil-gate-2026-08-31.json",
+      "size": 2351,
+      "sha256": "07592d68d2f1f6e7f9cf25286278b69d03dcc534908b472b541defbf541ba47b"
+    },
+    {
+      "path": "evidence/spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+      "size": 62975,
+      "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+    },
+    {
+      "path": "examples/spikes/dashboard_commands.txt",
+      "size": 112,
+      "sha256": "9d2b226d9cab1f66331d265386dd2a9e79bb9ce5db60c769daabc481e1365a7a"
+    },
+    {
+      "path": "examples/spikes/dc_sweep.cir",
+      "size": 103,
+      "sha256": "59b935e9eba2fafdd830b3ad5b8ccfe0e0572b8cd38bc45b8392deeeebdde517"
+    },
+    {
+      "path": "examples/spikes/electrothermal_dashboard.spkc",
+      "size": 324,
+      "sha256": "599a49149caf176a21c38f478675c05a52d1f10af44f943f7c27aa2a2f9948e1"
+    },
+    {
+      "path": "examples/spikes/hil_evidence_template.json",
+      "size": 391,
+      "sha256": "1aa42f062afdba750f6b0ff9307525a8b2da50dddb0c4c61fd1d27697f5cae84"
+    },
+    {
+      "path": "examples/spikes/native_pwm_switch.cir",
+      "size": 170,
+      "sha256": "a42aaae664e00c3840f48d6bac8e72d6e2d05d34a48f64365bf654012186507e"
+    },
+    {
+      "path": "examples/spikes/rc_lowpass.cir",
+      "size": 87,
+      "sha256": "45d12b6ec399fae497665ad29afc91c425436df28ae3ee6687323bd8b0a5359a"
+    },
+    {
+      "path": "examples/spikes/rc_transient.cir",
+      "size": 77,
+      "sha256": "7f8441db464bf5fb8de4259370b2aac6ec8cb7824a4d36adb834425a227fc32b"
+    },
+    {
+      "path": "examples/spikes/voltage_divider.cir",
+      "size": 101,
+      "sha256": "bfb0fbdc592e32ae487f6f010d6191415931f162606852cc9e4ba65f533455f2"
+    },
+    {
+      "path": "LICENSE",
+      "size": 1684,
+      "sha256": "5623bd08aac1170983126d8023b723dce05b69a4e038a35c3141871a432d0982"
+    },
+    {
+      "path": "licenses/MIT.txt",
+      "size": 1085,
+      "sha256": "504f4235362234edab6987c8a7a8aa0b57026c092e18f49040a99b0d1b81b5a2"
+    },
+    {
+      "path": "licenses/README.md",
+      "size": 829,
+      "sha256": "458457bcdd3dac6192dca7caa7000914a799bf546a35f0ed638a6b8f6f8c480f"
+    },
+    {
+      "path": "licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md",
+      "size": 9319,
+      "sha256": "4af284e777ccd234206b9005e3c65f246ce7e29f4d90976446fd00292848b332"
+    },
+    {
+      "path": "licenses/SPIKE-PREVIEW-NOTICE.md",
+      "size": 1126,
+      "sha256": "abc0940565b935878aa16e72e492ecb0c405db33d45b72a2865dd9f6869ea021"
+    },
+    {
+      "path": "licenses/windows-component-approvals.json",
+      "size": 93655,
+      "sha256": "a0a66a3d4aaf4afb9ec4b2d5ee8e30e86a40721a9b822d3e19b05fca3e7dca03"
+    },
+    {
+      "path": "models/bsimbulk-107.2.1-windows-x64.osdi",
+      "size": 600064,
+      "sha256": "c78b891580105fa402431b2e0b50c0320a07092102d28abf771a6760a000ce03"
+    },
+    {
+      "path": "models/bsimcmg-112.1.0-windows-x64.osdi",
+      "size": 877056,
+      "sha256": "f85a3177eabebc123927d7443235305e55c656c5c8329f88970c7fe12bd3fad3"
+    },
+    {
+      "path": "models/fixtures/hdl-qualification-wave5-capacitor.osdi",
+      "size": 14848,
+      "sha256": "c31ac668a6352b6a1b99cd12732734ee904cfb9d0a4b6b4a98025fe29882d1b6"
+    },
+    {
+      "path": "models/fixtures/hdl-qualification-wave5-noise.osdi",
+      "size": 15360,
+      "sha256": "4952533c490f3e7e648d3f9b2ff7d6d29fd9d7572aa00c327b73321c20dc9e00"
+    },
+    {
+      "path": "models/fixtures/spikes_linear_resistor.osdi",
+      "size": 12800,
+      "sha256": "7899f08ace3354124c4da0bd0dfe0e94585246c90ccc4445c8bc26b543457c84"
+    },
+    {
+      "path": "models/legal/bsimbulk-107.2.1/LICENSE.txt",
+      "size": 525,
+      "sha256": "4d202b27df0df53f021ad2ba5cb2d0e7e62a9025e6a9786952c67be7111edea8"
+    },
+    {
+      "path": "models/legal/bsimbulk-107.2.1/NOTICE.txt",
+      "size": 244,
+      "sha256": "54d07588c4a6986b1fdc9fc42d868fffd5b91641a71814508b058a6194e6ab83"
+    },
+    {
+      "path": "models/legal/bsimcmg-112.1.0/LICENSE.txt",
+      "size": 525,
+      "sha256": "4d202b27df0df53f021ad2ba5cb2d0e7e62a9025e6a9786952c67be7111edea8"
+    },
+    {
+      "path": "models/legal/bsimcmg-112.1.0/NOTICE.txt",
+      "size": 219,
+      "sha256": "c699eed1e04ff629348a5a6747405afacef35bfb5dab36ea834d31c2ca74209c"
+    },
+    {
+      "path": "pyproject.toml",
+      "size": 1418,
+      "sha256": "41e678112b696e7fa8139fae0073de08b0d1e09c0ea60f6f1e392c8fa269f5ab"
+    },
+    {
+      "path": "python/__init__.py",
+      "size": 340,
+      "sha256": "a4cc3ac0c01f8d8278a097a49d39620d1d4660967ce13f1821a194d41b5272f0"
+    },
+    {
+      "path": "python/spike_core/__init__.py",
+      "size": 369,
+      "sha256": "18ef90d50b65fd8ce9dd2c7e49589c2b2ae71b1dcf0c1b5479a93f0e017f15ab"
+    },
+    {
+      "path": "python/spike_core/acceleration.py",
+      "size": 17091,
+      "sha256": "ab160f6edd2b1b230599dac666a9c309a848a4b8c79af2fdc91d07eb2ca0d74d"
+    },
+    {
+      "path": "python/spike_core/contracts.py",
+      "size": 3784,
+      "sha256": "a3e04fe2bc8e663d84549898f7a067841d3abbf131b1e820ed1246e791c2bc40"
+    },
+    {
+      "path": "python/spike_core/native_mna.py",
+      "size": 37291,
+      "sha256": "d534d530599b09b36b131e05fb4768c45f8669d4b39fc41cc4a102200d5236ec"
+    },
+    {
+      "path": "python/spike_core/ngspice_plugin.py",
+      "size": 14993,
+      "sha256": "77457e59f758a7796c49b56eca961ba795d530c00830796076e119bfe55a471d"
+    },
+    {
+      "path": "python/spike_core/runtime_locations.py",
+      "size": 672,
+      "sha256": "b4a12ebc52c918589c59ebd0df15b269ff8e3b19cadc32e8233c3d27010e28d0"
+    },
+    {
+      "path": "python/spike_core/solver_plugins.py",
+      "size": 1782,
+      "sha256": "61935830a184c44a76aef840df49305e938c17d0061d8bdeb53011cbfc9c048b"
+    },
+    {
+      "path": "python/spike_core/sparselizard_process.py",
+      "size": 14035,
+      "sha256": "4a7e2ca2844c5fdd83df946c44bf50040a739e55cc3b40a057e6ae84973337e0"
+    },
+    {
+      "path": "python/spike_core/spice_netlist_safety.py",
+      "size": 1369,
+      "sha256": "4c201a7c797131ff39071d053af7f6b9a43f7609a78e8a5d90653c33121c0cee"
+    },
+    {
+      "path": "python/spikes/__init__.py",
+      "size": 17385,
+      "sha256": "8572208d38387bd1d4372cf78c0796023294fbe24cecb2fe167e61929242f8ec"
+    },
+    {
+      "path": "python/spikes/__main__.py",
+      "size": 150,
+      "sha256": "7a307c8da47bcb53b2b369f866785136d86c8e567eb460cf4910419f9d952039"
+    },
+    {
+      "path": "python/spikes/advanced_analyses.py",
+      "size": 15554,
+      "sha256": "ecfb994c424896fcdd36ff0183b66eb08f49b54c720949e9d3c71ea5ea291fef"
+    },
+    {
+      "path": "python/spikes/analyses.py",
+      "size": 18415,
+      "sha256": "7745e69b02ca45d9910791b514a3b2a2d88ec6fe4c27c83cc807fc539b86ebcb"
+    },
+    {
+      "path": "python/spikes/behavioral.py",
+      "size": 23163,
+      "sha256": "02da9a6cc8721b0a141b2e7f11087d41bd78f9ae32e6d2b992b8c9d28f6b8496"
+    },
+    {
+      "path": "python/spikes/benchmark.py",
+      "size": 16296,
+      "sha256": "c7039466896b5be74f041324a2be30e2290db0d6c9b7cb4471a10c275a101377"
+    },
+    {
+      "path": "python/spikes/benchmark_cli.py",
+      "size": 2823,
+      "sha256": "b87827b8e7679c05060b904177f613a67437e3dbdbff3d41b2f800154af1db20"
+    },
+    {
+      "path": "python/spikes/cli.py",
+      "size": 20413,
+      "sha256": "099ccd8f9bc68ea01448f3120de4e38f7a35f60b40aa4d6624e822c75f04d295"
+    },
+    {
+      "path": "python/spikes/competitive_benchmark.py",
+      "size": 24929,
+      "sha256": "f4a8f0df30baf0dd637d7fb1e0fa8a32b6dd6306daf33cfae446c7bc46ef5c27"
+    },
+    {
+      "path": "python/spikes/competitive_gate.py",
+      "size": 3689,
+      "sha256": "16d3d52acd9b44e52f2539742794530fd3d8a752c6f4df5e5b6006bcf5ba0a56"
+    },
+    {
+      "path": "python/spikes/compiled_blocks.py",
+      "size": 21969,
+      "sha256": "d0fe83a27ebed3a29ea2f63c94f43868a46ef6e81c2a9bcd86170463f97aac18"
+    },
+    {
+      "path": "python/spikes/contracts.py",
+      "size": 45328,
+      "sha256": "6b9efceaf96eb53b134ed6787f57ec77200260cb455f91533f43a703562d6329"
+    },
+    {
+      "path": "python/spikes/converter_qualification.py",
+      "size": 19504,
+      "sha256": "3e27a282e39b878f19087bcde69311eecf33b77b4eafd9c1c2f2b3f051fcab23"
+    },
+    {
+      "path": "python/spikes/device_contracts.py",
+      "size": 16022,
+      "sha256": "19882dee39d0bc344c61ebc2b5e50d8db054751fd58ac3d7bd79fbf01ab9ebeb"
+    },
+    {
+      "path": "python/spikes/device_extensions.py",
+      "size": 9191,
+      "sha256": "f993d86ad1d233b207f60f978088e928079cc5acb31ed03cd881386fca39552e"
+    },
+    {
+      "path": "python/spikes/digital.py",
+      "size": 13014,
+      "sha256": "9c679a26eada06609cd1d3128d004d9845cd8025f1b1f7d7db63e61c4855357f"
+    },
+    {
+      "path": "python/spikes/dynamic_devices.py",
+      "size": 16007,
+      "sha256": "0c906ae0ed839dcca2c634109c54ce22d58e573ed092a6098dbedf061f8c52ce"
+    },
+    {
+      "path": "python/spikes/first_release.py",
+      "size": 9690,
+      "sha256": "762c663fa56f4742881b0268409ae05412a0a2294aa53a07f3fdf19248a4bbdb"
+    },
+    {
+      "path": "python/spikes/hdl_frontend.py",
+      "size": 25509,
+      "sha256": "9f6e81c7f284eeb3d61356ec83014c9b07571825328443a324ca5655549e8dab"
+    },
+    {
+      "path": "python/spikes/hil_certification.py",
+      "size": 8541,
+      "sha256": "1985aa4a20fe2247ef05cc384e6f0b61924f1f29c71d9a0b2c180f23ea48bbc8"
+    },
+    {
+      "path": "python/spikes/instrument_contracts.py",
+      "size": 17884,
+      "sha256": "bfaa336412aa577c95af3c416df955ee8212b0ea6e0174e73da570df452d3058"
+    },
+    {
+      "path": "python/spikes/instrument_session.py",
+      "size": 9382,
+      "sha256": "22ca8e988969d6aabbe2efa585f9a168bb2a808508ff93a32bbe79a9cca560f7"
+    },
+    {
+      "path": "python/spikes/instruments.py",
+      "size": 14814,
+      "sha256": "3c0d73a8c62acea073ef72dde1e3bd74943ea8ff32af602abcad18f8bc651dce"
+    },
+    {
+      "path": "python/spikes/library.py",
+      "size": 27719,
+      "sha256": "4b70231f6f529242944ef5a55061c15c4a5669609dab3d6f2bf50946b037cad7"
+    },
+    {
+      "path": "python/spikes/library_contracts.py",
+      "size": 8329,
+      "sha256": "e31473e34d843a1b8f21d9ed0880d244b622df2ed8f85881c946f45d3172a72c"
+    },
+    {
+      "path": "python/spikes/model_builder.py",
+      "size": 20222,
+      "sha256": "897cb9a7c7d5610d27f40aca511a2490c0757ef8d79c75ca4b76b155837c8058"
+    },
+    {
+      "path": "python/spikes/model_builder_contracts.py",
+      "size": 21370,
+      "sha256": "eabe32a4d6fd07935a0c7b25978fe2d8622ed8749836437f6d8cfee3552746ec"
+    },
+    {
+      "path": "python/spikes/model_library.py",
+      "size": 12045,
+      "sha256": "667e210ca9309c50924d0b4b3d8fe36ba7b63ec628b2cf3d3efd268fcf54be0e"
+    },
+    {
+      "path": "python/spikes/native_abi.py",
+      "size": 77984,
+      "sha256": "31cfe2fbad883c4e6a3b9fadc9a9dce34858ad818d56cd4a463c78ffa274621a"
+    },
+    {
+      "path": "python/spikes/native_runner.py",
+      "size": 13442,
+      "sha256": "96897f712f7136165c880fbfed03983b43911e20e8eb233281c6ca5f1aab0676"
+    },
+    {
+      "path": "python/spikes/netlist.py",
+      "size": 82140,
+      "sha256": "bb11966afb2d4758322772ae87276fc1360ccc75e40a5d32789f6a8d27ce9373"
+    },
+    {
+      "path": "python/spikes/nonlinear_analyses.py",
+      "size": 54495,
+      "sha256": "43c908b5a26a1dd169ea72c7953fba4349f42ef2940cec2fae624c49523c1b6d"
+    },
+    {
+      "path": "python/spikes/nonlinear_deck.py",
+      "size": 12823,
+      "sha256": "9cef73b4b8f34148921eb251fd6c9693bc743b18de8ce14161a3a8cb71e1658e"
+    },
+    {
+      "path": "python/spikes/osdi_native_worker.py",
+      "size": 12043,
+      "sha256": "5a60eb31719019737177cc063c5a033b9af3c92f86b35bc3b02918fbf114f819"
+    },
+    {
+      "path": "python/spikes/osdi_runtime.py",
+      "size": 21929,
+      "sha256": "bb91913859350e959f550b73ec29849953073d2a91d4dc2ebaeb3aee5cec76e1"
+    },
+    {
+      "path": "python/spikes/parity_report.py",
+      "size": 8515,
+      "sha256": "98103aebb393e3915ab9176b2089aaea75dec66657984a9f4069741a6dd2f876"
+    },
+    {
+      "path": "python/spikes/public_benchmark.py",
+      "size": 29341,
+      "sha256": "358e03d82316b180c6baccc2fa027d2e02e8dfe33a730bf0884730710786700c"
+    },
+    {
+      "path": "python/spikes/public_corpus.py",
+      "size": 18449,
+      "sha256": "4c3782673c544114bda8d2a193be74ed38bb490f251f9e8042a2df12ee6bfc4a"
+    },
+    {
+      "path": "python/spikes/qualification.py",
+      "size": 37626,
+      "sha256": "8dd86d16546f1a54fb6e702d82b9d5104e910a68c17e071e23582721cf0c26a2"
+    },
+    {
+      "path": "python/spikes/release_bundle.py",
+      "size": 10787,
+      "sha256": "21266234ae27ea3537a0c72ddadc5f54c31a0e7360e915a3d27730a1d801445a"
+    },
+    {
+      "path": "python/spikes/release_verifier.py",
+      "size": 11523,
+      "sha256": "ad9a285eeb8fa0d402bab470db15b534a4efe87d979f704593afa18b660a2617"
+    },
+    {
+      "path": "python/spikes/runner.py",
+      "size": 22146,
+      "sha256": "6890452a955656b8401a5658f465b7200334d3887321928793877b3d016fce9f"
+    },
+    {
+      "path": "python/spikes/session.py",
+      "size": 22726,
+      "sha256": "f3cf1902541244f852f6a883f6d723b0f611df718fff0aaa839db5588c4cea2b"
+    },
+    {
+      "path": "python/spikes/session_contracts.py",
+      "size": 15637,
+      "sha256": "6bdd47c42591b17fceda51ed391985d60c6223cb389ad03d84501b0c8480e80c"
+    },
+    {
+      "path": "python/spikes/static_compact_devices.py",
+      "size": 13805,
+      "sha256": "b7aafbae48185de07e9f5637076792e05b8a1278380ab6a728e3d2b5d1710464"
+    },
+    {
+      "path": "python/spikes/streaming.py",
+      "size": 8446,
+      "sha256": "8265e159d74f74a34f7c50ea348b020f17ad8298fdbaa9af62f1c256822418dc"
+    },
+    {
+      "path": "python/spikes/streaming_contracts.py",
+      "size": 9735,
+      "sha256": "d13149932f93dea355702888e942e136e8a6a6f15da5fdb0a5ec6cca92d73a46"
+    },
+    {
+      "path": "python/spikes/sweeps.py",
+      "size": 13495,
+      "sha256": "1d00fd9c2d2cf38773a98b05e11dbddd07cad92b809d9d7205920ffaf3b86c28"
+    },
+    {
+      "path": "python/spikes/version.py",
+      "size": 136,
+      "sha256": "960190697aada033cbff06a8f6f832d83ae83daec393ba518b507c48129ff172"
+    },
+    {
+      "path": "python/spikes/wave1_benchmark.py",
+      "size": 18350,
+      "sha256": "e139b7c2738e665f2baed55f0f558281d663146034fabfcb668f642512afda97"
+    },
+    {
+      "path": "python/spikes/waveform_store.py",
+      "size": 14996,
+      "sha256": "fbb2b2d1f8078096b2cea28dfaaeb848c4c6dafcac7398c82bad58a3f9df82ea"
+    },
+    {
+      "path": "README.md",
+      "size": 3633,
+      "sha256": "e8c2bf182418285551dd943f71300917c6ddb8c3997492e4ba9ae9ceb1634f5d"
+    },
+    {
+      "path": "RELEASE_NOTES.md",
+      "size": 27962,
+      "sha256": "5c27735761e6aa31371c90c05ba24fb00d3c75db0a0c84d19555fa2cb7e1d4f8"
+    },
+    {
+      "path": "scripts/build_spikes_studio_package.py",
+      "size": 5335,
+      "sha256": "dd34f40a95c93c517e1f32be9eca0fa1b0bf61273447c078d463396925a6c6aa"
+    },
+    {
+      "path": "scripts/studio_packaging/AppRun",
+      "size": 104,
+      "sha256": "dbe440133ded1fa5eb6c3a8cc3785bc027b5b5b4fc18f3a7b65783411b08b8a6"
+    },
+    {
+      "path": "scripts/studio_packaging/CMakeLists.txt",
+      "size": 923,
+      "sha256": "14d39fec3f758272bc3db82c866ee489630127648c22c6f24328cbd5718fd058"
+    },
+    {
+      "path": "scripts/studio_packaging/entry.py",
+      "size": 958,
+      "sha256": "017a5f548245560f29de330bdc483c88c185c149e1b707e6f4151969a972bcf1"
+    },
+    {
+      "path": "scripts/studio_packaging/render_icon.py",
+      "size": 804,
+      "sha256": "648b997b7cd6e2900be52058ad8da1443afc2908a28adddf75f3238678779793"
+    },
+    {
+      "path": "scripts/studio_packaging/spikes-studio.desktop",
+      "size": 195,
+      "sha256": "621262d4ce21022be1eab656b9a56c5c1022587bdd6639d4d74132b6d46f9f84"
+    },
+    {
+      "path": "scripts/studio_packaging/spikes-studio.ico",
+      "size": 28536,
+      "sha256": "877e33b22488adcf4981e41756b4c45702f325c65c1385c8143b1baf4cacd9a9"
+    },
+    {
+      "path": "scripts/studio_packaging/spikes-studio.png",
+      "size": 16667,
+      "sha256": "f5fb437e1ae4249c185c4c76cd10eef7ea2521aa30504bbee935c7ec778e971a"
+    },
+    {
+      "path": "scripts/studio_packaging/spikes-studio.svg",
+      "size": 377,
+      "sha256": "58e60efda399bc5505f7e8beb655216941429ec06a9c4d4f360983da0277ffe1"
+    },
+    {
+      "path": "scripts/studio_packaging/studio.spec",
+      "size": 890,
+      "sha256": "417c93ce91a6032e54d2f50f1b4569564c050d5869c66c5a00e54e31618c6843"
+    },
+    {
+      "path": "scripts/studio_packaging/windows.iss",
+      "size": 1202,
+      "sha256": "bd9da0454bc13254809476f0034c3eb27015bb8446dc0515b7d76cddde76298f"
+    },
+    {
+      "path": "studio/docs/COMPONENT_LIBRARY.md",
+      "size": 15325,
+      "sha256": "1e56773ad002ccca706a32b99bf700564d87ff0db8128190bdf7851715268b36"
+    },
+    {
+      "path": "studio/docs/GUI_ARCHITECTURE.md",
+      "size": 5634,
+      "sha256": "88b241fa70d48e0261fdccdbd880d28de6374b343c00b950b2ce2e15193c2224"
+    },
+    {
+      "path": "studio/docs/GUI_PRODUCT_PLAN.md",
+      "size": 19670,
+      "sha256": "b8a434c4378ec63d48e7ffdf99064de7e74edb7083cf7457760584d8b55a6b94"
+    },
+    {
+      "path": "studio/docs/media/01-recorded-plots.png",
+      "size": 76582,
+      "sha256": "b1c4c4ab087c81c7630ac8cce74fe5606e27fd917ba46401eb680bf3a69a724e"
+    },
+    {
+      "path": "studio/docs/media/02-differential-probe.png",
+      "size": 31888,
+      "sha256": "4a3c72914299b5573d7ac2e76370325f366a9890726a2d59403aea2142bd3004"
+    },
+    {
+      "path": "studio/docs/media/03-limits-editor.png",
+      "size": 11718,
+      "sha256": "67f58d165d2c3981231e822b2f6c0115e36d9a2e8a2ea224fcb449dd8e0356c4"
+    },
+    {
+      "path": "studio/docs/media/04-model-editor.png",
+      "size": 11757,
+      "sha256": "1ea32b0c82a8bf2d17cc024c9fd34491413bb7a54198d308b7caaa3c25c007dc"
+    },
+    {
+      "path": "studio/docs/media/05-real-synthesis.png",
+      "size": 43733,
+      "sha256": "02a7a69160c56cbb05fd6299d91aa2b2b552710abf0755110aa3f728f8dc1442"
+    },
+    {
+      "path": "studio/docs/media/06-real-vcd-timing.png",
+      "size": 57424,
+      "sha256": "b33512c3a0f98588241c9db1bdf174cbe1dec054ed5336c2fc17dd13d6859c22"
+    },
+    {
+      "path": "studio/docs/media/07-symbol-designer.png",
+      "size": 67906,
+      "sha256": "8f503d68bd6f71d9760b4e4473757fcad7d2265cb93bdbec04bd11248fabec73"
+    },
+    {
+      "path": "studio/docs/media/08-cpp-analysis.png",
+      "size": 49790,
+      "sha256": "21dd6398d611ee1e20f0fc738844b05c41965d561bb9f3d6afa80b04becac7a3"
+    },
+    {
+      "path": "studio/docs/media/counter.vcd",
+      "size": 620,
+      "sha256": "0a38d5a74dbeb01c6d2920927e4234b66a0941d9dc84b6534c4a519e05f0790c"
+    },
+    {
+      "path": "studio/docs/media/cpp-analysis-report.json",
+      "size": 433,
+      "sha256": "75e3827b105921c90b818c06a1cfcf6bfb59b3896268609fc51721692ac8199b"
+    },
+    {
+      "path": "studio/docs/media/digital-simulation-report.json",
+      "size": 3592,
+      "sha256": "9af371c8922a0f508a1c5a174d444f41c376759a2304cde45d4a984988324b6c"
+    },
+    {
+      "path": "studio/docs/media/evidence.json",
+      "size": 1842,
+      "sha256": "04ec15652eea442ef8510e17092acc16bba844acde84346bedce790aee468d34"
+    },
+    {
+      "path": "studio/docs/media/rc-project.spksch",
+      "size": 1593,
+      "sha256": "4662e2eedd66aaa00c12c834766b2a54366800b2d9d59c5447ddff24a8169fc8"
+    },
+    {
+      "path": "studio/docs/media/rc-run.json",
+      "size": 143468,
+      "sha256": "3ad07be459e88971fd82bbbd4539367ba80afd5a3f7afe8b0f56b7bbf68b9e02"
+    },
+    {
+      "path": "studio/docs/media/rc-run.spkdata",
+      "size": 32305,
+      "sha256": "bbcf1690655a12abc473bb46c7baa7886f4e7563c35c64e8ef0c15293442c2e2"
+    },
+    {
+      "path": "studio/docs/media/recorded-rc-response.svg",
+      "size": 53073,
+      "sha256": "e149fb6e9d74c771d459d7349928022ec23ed2f4978666fcb301cb2bf8ba99f0"
+    },
+    {
+      "path": "studio/docs/media/reliability/01-batch-probes.png",
+      "size": 74201,
+      "sha256": "f371571852fc32fea826f2d9decc17862e528f974dcb2bdd3c951b845ac6359d"
+    },
+    {
+      "path": "studio/docs/media/reliability/02-continuous-paused.png",
+      "size": 79992,
+      "sha256": "dd9fa7c2620fc6f8c4f72b97ae476b5a713b4d39eed025b2ce39775a4324987f"
+    },
+    {
+      "path": "studio/docs/media/reliability/03-live-control.png",
+      "size": 79765,
+      "sha256": "717f47fa71771eff9a85b77f1fc14c2b3e9bcceeb80bf9dc963e5fba1ad36f9e"
+    },
+    {
+      "path": "studio/docs/media/reliability/catalog-alert.png",
+      "size": 41384,
+      "sha256": "479185815f5c933ce0be9e54289d568ab2e74998ada4f1f93e75eb072426cdc3"
+    },
+    {
+      "path": "studio/docs/media/reliability/catalog-bench.png",
+      "size": 69014,
+      "sha256": "db7a692070a29a4c52023ddfc9e60ffe32be2dbfaf394b7831408b29d8327e83"
+    },
+    {
+      "path": "studio/docs/media/reliability/catalog-controller.png",
+      "size": 71712,
+      "sha256": "9da9174914ecbfa8f744c98bbc0621d3f6e2d140f5268fde11381ebebb8547b1"
+    },
+    {
+      "path": "studio/docs/media/reliability/directive-canvas.png",
+      "size": 43453,
+      "sha256": "cb343fcf7c5ed6b95d793b5939a00cc52793d1f3679265cd286b2e34f5ba51b4"
+    },
+    {
+      "path": "studio/docs/media/reliability/directive-editor.png",
+      "size": 8145,
+      "sha256": "076c3470ca7fc914ea62a5511bb1560ac968b49d258fc156a3628b13a79afc49"
+    },
+    {
+      "path": "studio/docs/media/reliability/directive-manager.png",
+      "size": 48261,
+      "sha256": "ce79783532bc7199144d1504caa26db586780af21ee47d3d3bd072418718cf84"
+    },
+    {
+      "path": "studio/docs/media/reliability/evidence.json",
+      "size": 1312,
+      "sha256": "8f16aeabfd44282467ceab6a48125bd0833e08c6ee2e6ec75f937816f3ab04d7"
+    },
+    {
+      "path": "studio/docs/media/reliability/frequency-bode.png",
+      "size": 93826,
+      "sha256": "b0448af5fe61e94c881a9655ff95108808b07cf0f39fcaf5a4bda1165838bb66"
+    },
+    {
+      "path": "studio/docs/media/reliability/frequency-pole-zero.png",
+      "size": 71991,
+      "sha256": "5ea49b402c74bb6cb04d15ec33bfd43404723daa7cf088899b3cfc06a021e6a9"
+    },
+    {
+      "path": "studio/docs/media/reliability/frequency-smith.png",
+      "size": 113134,
+      "sha256": "7fde1c2f43914831321dbdb5121abc2b1866ca557f0a0f2c3431a27e4b94f983"
+    },
+    {
+      "path": "studio/docs/media/reliability/library-browser-pinned-light.png",
+      "size": 97962,
+      "sha256": "b8c6bcbe093e535ca8e080bad3cf4fa9b7e911b77bcf9a7e418918a89ec88a52"
+    },
+    {
+      "path": "studio/docs/media/reliability/library-browser-pinned.png",
+      "size": 100501,
+      "sha256": "de918349a10b7ee50acc38e7eb5db1cf2900cae531700268cdfd2a8f627ef851"
+    },
+    {
+      "path": "studio/docs/media/reliability/library-browser-preview.png",
+      "size": 101510,
+      "sha256": "23ca2363bc1110dea818e955ac794a60aeae3721caeb45809dbeaca7f4fbac8a"
+    },
+    {
+      "path": "studio/docs/media/reliability/model-editor-evidence.json",
+      "size": 554,
+      "sha256": "d53960de5d3321583338935f98e7e9b84b3d015891297b51a4e2c91ba2c1efc8"
+    },
+    {
+      "path": "studio/docs/media/reliability/performance-after.json",
+      "size": 33558,
+      "sha256": "a313a7608fec79b69e2f32f68899a50a51fa2f98c59160308e5affd3fd4c530f"
+    },
+    {
+      "path": "studio/docs/media/reliability/performance-before.json",
+      "size": 33559,
+      "sha256": "5b558a84c39c4956762ea7e58307add0a727b80be7ad0e421b82f05af9b9af28"
+    },
+    {
+      "path": "studio/docs/media/reliability/property-diode.png",
+      "size": 28008,
+      "sha256": "66e575b049140eb6f89458168db92d28b6fb76e0161162e80a3ec7db6ef39e4f"
+    },
+    {
+      "path": "studio/docs/media/reliability/property-source.png",
+      "size": 25631,
+      "sha256": "73817d74d9eb09ad1f23a9923f4c4fe2dbe556fbb9b060104f6548c68d490b92"
+    },
+    {
+      "path": "studio/docs/media/reliability/simulation-manager.png",
+      "size": 62029,
+      "sha256": "854ebf4bda649694ab15e2d8d4348b0da1e007fb25188fe5d53acec51a17a902"
+    },
+    {
+      "path": "studio/docs/media/reliability/thermal-board.png",
+      "size": 26946,
+      "sha256": "1157650e6690eee724ecbf61158c5b421c128b566cb243a445c253a3ad838545"
+    },
+    {
+      "path": "studio/docs/media/reliability/upgrade-dark.png",
+      "size": 65662,
+      "sha256": "026c54ecedcb71ac8fdf25aba57f637eebeae92125bd23e16b07e53f064ee4c4"
+    },
+    {
+      "path": "studio/docs/media/reliability/upgrade-light.png",
+      "size": 64451,
+      "sha256": "9d3d33af57a82f88a1a7675b8d3a33cec404005c17bbbf68ea60613f11bcea51"
+    },
+    {
+      "path": "studio/docs/media/reliability/upgrade-power-tree.png",
+      "size": 60281,
+      "sha256": "6a4945d0e41ee3bf0ead698930e97e652c369b29ea33cbf97955f91c095aaef1"
+    },
+    {
+      "path": "studio/docs/media/reliability/upgrade-properties.png",
+      "size": 21430,
+      "sha256": "96f41e885d5df9e811f614d5de946bd3e02e62973dadea1ff5808764f468a64c"
+    },
+    {
+      "path": "studio/docs/media/reliability/workspace-cursors.png",
+      "size": 22898,
+      "sha256": "5c1bb0847f7f9b4bf1d9321449e47140f4b3039493ea2f124dc039a3ff62ac5d"
+    },
+    {
+      "path": "studio/docs/media/reliability/workspace-phasor.png",
+      "size": 41268,
+      "sha256": "e00127470eaf1e07825e173d8779e2ecca9e3259bd3f438a0ccb4a78682c6c99"
+    },
+    {
+      "path": "studio/docs/media/reliability/workspace-split.png",
+      "size": 101944,
+      "sha256": "e32b911744e16d71c8acdfca78f6f938efa9ee428fd0d67ed7420558a1b18459"
+    },
+    {
+      "path": "studio/docs/media/synthesis-report.json",
+      "size": 18955,
+      "sha256": "cf66e017d661303b0c6faae65c89ba99268431a51246ab89f94c326a1f0e5d6f"
+    },
+    {
+      "path": "studio/docs/media/workbench-walkthrough.gif",
+      "size": 215902,
+      "sha256": "ca249f5e660f3e44b1ef5768b9a8075e9dc3ce0677a4629437f8a48a1f656f10"
+    },
+    {
+      "path": "studio/docs/WORKBENCH_GUIDE.md",
+      "size": 39490,
+      "sha256": "ec4497820049aee935b0ec0cad027f53d3e23945cfd77105a4e80dab67c283c2"
+    },
+    {
+      "path": "studio/library/core-symbols-v1.json",
+      "size": 5557,
+      "sha256": "2fd65747c5aa91fd784c0df0a717bfe2a2935ae944848a3986285f269340741b"
+    },
+    {
+      "path": "studio/library/generic-components-v1.json",
+      "size": 4298288,
+      "sha256": "c6c6300135d2019cc97b7d11f5d915dfbec164a7ce7caf806aa4cf8fec468209"
+    },
+    {
+      "path": "studio/library/ripple-analytics.json",
+      "size": 302,
+      "sha256": "bc5b210964d59e51358b31d7a9f230d9207298c34cdab8228f2b2c1af025206f"
+    },
+    {
+      "path": "studio/library/series-loss.cir",
+      "size": 150,
+      "sha256": "0249d1dc6edbd81fbddb3880e2f28959901d283c898050bb6773633f9fcd83db"
+    },
+    {
+      "path": "studio/library/spikes-studio.ico",
+      "size": 28536,
+      "sha256": "877e33b22488adcf4981e41756b4c45702f325c65c1385c8143b1baf4cacd9a9"
+    },
+    {
+      "path": "studio/library/spikes-studio.png",
+      "size": 16667,
+      "sha256": "f5fb437e1ae4249c185c4c76cd10eef7ea2521aa30504bbee935c7ec778e971a"
+    },
+    {
+      "path": "studio/library/spikes-studio.svg",
+      "size": 377,
+      "sha256": "58e60efda399bc5505f7e8beb655216941429ec06a9c4d4f360983da0277ffe1"
+    },
+    {
+      "path": "studio/native/CMakeLists.txt",
+      "size": 718,
+      "sha256": "7d2a7dcd1b7c443e9420aa741ea4d2749b5025e17e493e1dbcb805d326afd987"
+    },
+    {
+      "path": "studio/python/spikes_studio/__init__.py",
+      "size": 715,
+      "sha256": "fc1d3061c628f43eea7e4155b163386d0d99e4fe31e7770f33227fa7a7d3edcc"
+    },
+    {
+      "path": "studio/python/spikes_studio/analytics.py",
+      "size": 4630,
+      "sha256": "d289305230c8c7634fd5f935bdca9d04a8afb8a6a1e7722193add9056c38f915"
+    },
+    {
+      "path": "studio/python/spikes_studio/analytics_panel.py",
+      "size": 6841,
+      "sha256": "c77f5dc23e8963bad7cb45d1284f49cf5a025f4fdc7aa0648436630101f5b18f"
+    },
+    {
+      "path": "studio/python/spikes_studio/component_catalog.py",
+      "size": 19772,
+      "sha256": "9417c7754649c8d2765d43b9c160d94d690e3cfbe591ff06515880b34bdf5dd7"
+    },
+    {
+      "path": "studio/python/spikes_studio/component_panel.py",
+      "size": 23352,
+      "sha256": "083d2092069ae511db21daac72f31e031ae8b6665a276ff78bdb34924e28f98a"
+    },
+    {
+      "path": "studio/python/spikes_studio/controller_block.py",
+      "size": 11307,
+      "sha256": "403507ff8f5d703366351010670c57de35d4eb0e8ec2def7cb18fcc7b1c1a5f9"
+    },
+    {
+      "path": "studio/python/spikes_studio/controller_panel.py",
+      "size": 4008,
+      "sha256": "85241f16e6f4d94867e9dbd6bf3c013f50dcc5b9e7b4f1d98631fd5f77abc060"
+    },
+    {
+      "path": "studio/python/spikes_studio/desktop.py",
+      "size": 110539,
+      "sha256": "612c3fb1712a4233066d16e44d32b6ac582f4bd7867a5fd1636163f673bfc5c4"
+    },
+    {
+      "path": "studio/python/spikes_studio/directive_manager.py",
+      "size": 10402,
+      "sha256": "b50e9db497d77a35b6f199d3dc3e4f60e284dd98db4444a0de2221f329456c40"
+    },
+    {
+      "path": "studio/python/spikes_studio/directives.py",
+      "size": 5366,
+      "sha256": "408d9503951951cac38a46dd6b424e51d7fe73b1d4f5c36830920d8137e84ecc"
+    },
+    {
+      "path": "studio/python/spikes_studio/document.py",
+      "size": 15874,
+      "sha256": "08081316a13cb73112dbec10e17a712f2efff775c64877ceb2411355c597bb90"
+    },
+    {
+      "path": "studio/python/spikes_studio/frequency.py",
+      "size": 13898,
+      "sha256": "ba21387316f1557934c076a80acec6276dd6f5bb5a28de3f9ce94ea1d24c90d1"
+    },
+    {
+      "path": "studio/python/spikes_studio/frequency_panel.py",
+      "size": 10238,
+      "sha256": "4d5983d9b7660d1e29d38d3ecc0ac73dacfc5cae6fe2ad342a4bc43fecd3eaa4"
+    },
+    {
+      "path": "studio/python/spikes_studio/ide.py",
+      "size": 7732,
+      "sha256": "51a940f5e294e8ca668121955e5fea176ac8d567fc574fd119c8918e110e3c35"
+    },
+    {
+      "path": "studio/python/spikes_studio/interchange.py",
+      "size": 3558,
+      "sha256": "592512cbb4dcd20f92ecb030c86651bc847fbf0533991b2023c592680cf1366b"
+    },
+    {
+      "path": "studio/python/spikes_studio/library_browser.py",
+      "size": 6790,
+      "sha256": "105c8fabb1633eef354073ef1538563d35324e81f36e56a2271cc865880a6402"
+    },
+    {
+      "path": "studio/python/spikes_studio/local_ai.py",
+      "size": 8549,
+      "sha256": "4218ebcc52c4858630a65be5d67f8c1424e3f91ca918b2260ba3dee0ab0e2d28"
+    },
+    {
+      "path": "studio/python/spikes_studio/model_import.py",
+      "size": 11668,
+      "sha256": "03c58a1e88b30c427580757a66c232cb629108beb78b6e40bf3350759c13ad0c"
+    },
+    {
+      "path": "studio/python/spikes_studio/package_smoke.py",
+      "size": 2776,
+      "sha256": "e241dd8240adac034dac20d425e95783332f33582605e9b1a0f98afd81b6fe8e"
+    },
+    {
+      "path": "studio/python/spikes_studio/part_alerts.py",
+      "size": 1611,
+      "sha256": "0793946ecaa06bf2231a3a4baafd3ab26b7facb48176a157b5ba7b90e79e3c58"
+    },
+    {
+      "path": "studio/python/spikes_studio/part_properties.py",
+      "size": 10566,
+      "sha256": "18055366eb4bf9aa6712595073374a452bb8a629a4ee34b41f46541c4ce8ec81"
+    },
+    {
+      "path": "studio/python/spikes_studio/plot_panes.py",
+      "size": 4363,
+      "sha256": "d4ff072156883de7c11688fb695793dad02a2bd9101dbc7003c317d9e16d84d9"
+    },
+    {
+      "path": "studio/python/spikes_studio/plot_workspace.py",
+      "size": 6010,
+      "sha256": "242e8dfed0b4a0427bb6be6f62b22e9708f3860da0302904b821e4fd52d1f4c3"
+    },
+    {
+      "path": "studio/python/spikes_studio/plotting.py",
+      "size": 649,
+      "sha256": "86aa17b58f413a04ef4e2217c1c68d2a37516431a573835fd2567f4aff4c9cba"
+    },
+    {
+      "path": "studio/python/spikes_studio/power_panel.py",
+      "size": 12686,
+      "sha256": "fa2d5a140fc51298fb9b275024af24e6226b6861b344fc54cc7daeb0ff322226"
+    },
+    {
+      "path": "studio/python/spikes_studio/power_tree.py",
+      "size": 7765,
+      "sha256": "350b4f80ce6c194fc08b7db3e78fd69c732430c36436facf7cb07e1d9e33a3ee"
+    },
+    {
+      "path": "studio/python/spikes_studio/resources.py",
+      "size": 275,
+      "sha256": "9479bfc46f4e8e711b600b182241f5e11493fa841dabfa2ce64948a5eb4b448e"
+    },
+    {
+      "path": "studio/python/spikes_studio/result_file.py",
+      "size": 3214,
+      "sha256": "243927743380d93e40295bf1996718defc24a6944643424a8342989aa97da6c0"
+    },
+    {
+      "path": "studio/python/spikes_studio/run_control.py",
+      "size": 12842,
+      "sha256": "a8419c5f92a30a1793e1ac60286ed470b00014403ad93533bf78145b95b11d14"
+    },
+    {
+      "path": "studio/python/spikes_studio/signal_math.py",
+      "size": 12289,
+      "sha256": "0b6860bd8fa79a75d46a1f709a33cce21a1ca4b94e16c48ea03d8fd14a00de2a"
+    },
+    {
+      "path": "studio/python/spikes_studio/simulation_manager.py",
+      "size": 15255,
+      "sha256": "4e316ff2d4734f8e1195e88460c07284e0de4a27f9e15bb115c20afb8e0cc9c9"
+    },
+    {
+      "path": "studio/python/spikes_studio/simulation_setup.py",
+      "size": 8921,
+      "sha256": "d43297faaf41b8d850c85c772c7cade38d30dc9a35c7bab8887ba86cc7813876"
+    },
+    {
+      "path": "studio/python/spikes_studio/symbol_validation.py",
+      "size": 1719,
+      "sha256": "b1672ff464360130d743c1f1efc7ed98c059de88647c0b9211cc03856603b3d3"
+    },
+    {
+      "path": "studio/python/spikes_studio/themes.py",
+      "size": 7544,
+      "sha256": "29ec0d73077d224f9b6b485ffea31da40539dbd1f94ea6dc674b0864ea306f3f"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_browser_evidence.py",
+      "size": 11155,
+      "sha256": "c141754fa4619c01ec8f87ee1e9c3bf101952201528f8293c3f13fd595b6c3dd"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_catalog_evidence.py",
+      "size": 4827,
+      "sha256": "c30ec8532df1c5a12e3b4ab3ee31b1f8970efe5499aceeb02578400d1cb452c5"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_directive_evidence.py",
+      "size": 5875,
+      "sha256": "34551fdae5257c1a09992424f583868fb78bd239fb8d03072ed318a61d15ea15"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_evidence.py",
+      "size": 7225,
+      "sha256": "d0a639dd6359f6fa8151a39f41b941e768a5c14da21a240f01b8fa0373450fa5"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_frequency_evidence.py",
+      "size": 3913,
+      "sha256": "4a2d185f133f31b2753e5179d1f9d55d5124969fe53bc9908120e3ed9cdd0e66"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_model_evidence.py",
+      "size": 4338,
+      "sha256": "0076a19eae71f2dc910ee6365a674810f35e4e598925cb5d217da58caae714b5"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_regression.py",
+      "size": 6808,
+      "sha256": "df7548cb62d84dacf7956a5894f1fb84da293bb74c8200a4cf0e77fc895356a8"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_setup_evidence.py",
+      "size": 6102,
+      "sha256": "bb086c5310e65f63170a7cae49e68ea990db551e1baf248f2b2ff79efab600f7"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_upgrade_evidence.py",
+      "size": 5973,
+      "sha256": "655b2d76852d47c4fad1ed150e379e7fbbcfe717b6d37715ee2eadb83f716bd8"
+    },
+    {
+      "path": "studio/python/spikes_studio/ui_workspace_evidence.py",
+      "size": 7478,
+      "sha256": "40784f2a4a32a0b8de109231e616bccf8ac6427eb3e381d67bef62ab9b228c01"
+    },
+    {
+      "path": "studio/python/spikes_studio/vendor_intake.py",
+      "size": 2188,
+      "sha256": "ca452a4904f86bfa72e65adb9be4365b9843fe20f1ed044166fadcf5cdf4acda"
+    },
+    {
+      "path": "studio/python/spikes_studio/workspace_dialogs.py",
+      "size": 7887,
+      "sha256": "05f2c51f621312b7c4828ae0667f7ce1a5cf6b3815b8e5fe32986134021d5e0d"
+    },
+    {
+      "path": "studio/schemas/analytics-extension-v1.schema.json",
+      "size": 971,
+      "sha256": "d1735dcc3b6c34ac4a99f7ea8d6d447abfa25a1a0b5c5f3fb1bb74abf0a1411e"
+    },
+    {
+      "path": "studio/schemas/component-catalog-v1.schema.json",
+      "size": 900,
+      "sha256": "590fc79f7f506bed0da14c794ccc7082f0661dc037a242491bbeafd16dcc6510"
+    },
+    {
+      "path": "studio/schemas/generic-controller-v1.schema.json",
+      "size": 1124,
+      "sha256": "3009ba625f2864d2fb0773a994b753cf7b522d862d18b54cefbb00409819ae75"
+    },
+    {
+      "path": "studio/schemas/run-profile-v1.schema.json",
+      "size": 1145,
+      "sha256": "8059dad35d68f2133788e4c4f41e0e33647566ff8d2bac2c1cb1c6b99259ad8b"
+    },
+    {
+      "path": "studio/schemas/spikes-schematic-v1.schema.json",
+      "size": 3605,
+      "sha256": "a637f0408b986967dcca5fefd99a539fe3e73a7b60098c5e9da7327779e31df4"
+    },
+    {
+      "path": "studio/schemas/studio-ai-model-draft-v1.schema.json",
+      "size": 1962,
+      "sha256": "2024a11f75159ff72f25cf492a48e94116cf8ff68a9b3a182977b3025d0d2af0"
+    },
+    {
+      "path": "studio/schemas/studio-deployment-model-v1.schema.json",
+      "size": 2891,
+      "sha256": "393aa41dabb7ad6aec5e5929ea39876c0a8d78866589ffa87b3340fdeed24cb7"
+    },
+    {
+      "path": "studio/schemas/studio-part-v1.schema.json",
+      "size": 1909,
+      "sha256": "8bbbb7e14871959a2f6d1ef1bad8e979617930539e3493b893e057dbca67d70d"
+    },
+    {
+      "path": "studio/schemas/studio-project-v1.schema.json",
+      "size": 1115,
+      "sha256": "d52f41aea470ef4e2e2c3f22b98ea2170315265ab6d65a61b5ffec0cb00a99f4"
+    },
+    {
+      "path": "studio/schemas/studio-symbol-library-v1.schema.json",
+      "size": 3247,
+      "sha256": "61c1bd50fcf45fb6064bc9ed90bf4d60cc513f39aedb74bcdab9b716adb03675"
+    },
+    {
+      "path": "studio/schemas/thermal-setup-v1.schema.json",
+      "size": 2462,
+      "sha256": "3d582dc07194186201e8b56e35a34d938ee78ec68d8d8beba38ffd42f6dcd015"
+    },
+    {
+      "path": "tests/native/test_spikes_c_api.cpp",
+      "size": 8253,
+      "sha256": "5524e4c546b4982e98627eb65f56dd81a8bb6a0207d0d45a49d30382eb6fc39e"
+    },
+    {
+      "path": "tests/native/test_spikes_console_dashboard.cpp",
+      "size": 3473,
+      "sha256": "71b25763a80b91b1e02f1a42b585248e4855630686f65f5ed3371ff453419151"
+    },
+    {
+      "path": "tests/native/test_spikes_dc.cpp",
+      "size": 27245,
+      "sha256": "dc9714de666adebd271fd13bd19735c9b618383d69a98097f5d7084131af3ee3"
+    },
+    {
+      "path": "tests/native/test_spikes_transient.cpp",
+      "size": 26955,
+      "sha256": "6103bedf976c233d5fa0060d37734d8b8712b674341e3158777255b814597051"
+    },
+    {
+      "path": "tests/native/test_spikes_transient_c_api.cpp",
+      "size": 8665,
+      "sha256": "1de199886f8526363422fe0495147c341492435fb32212fc8c0825f928c9c9e9"
+    },
+    {
+      "path": "tests/native/test_spikes_transient_session.cpp",
+      "size": 6096,
+      "sha256": "5446e440714ed016c2578a175cb26dbe8e67c29e50c51c87df544bf21af62f44"
+    },
+    {
+      "path": "tests/native/test_spikes_transient_session_c_api.cpp",
+      "size": 6663,
+      "sha256": "7c9f88168ad4129c441296d62ece71540f448671ef3bd758241f71fb37fe143d"
+    },
+    {
+      "path": "tests/python/test_component_catalog.py",
+      "size": 8759,
+      "sha256": "4e24e5f860c7b7703200955dbee87466e35db8f83241d2072d509c1594a5c8cd"
+    },
+    {
+      "path": "tests/python/test_directives.py",
+      "size": 7325,
+      "sha256": "38794c824a88d161b2887a6e4359b00cd0ba446850132db1b2ad8ff05eb61b39"
+    },
+    {
+      "path": "tests/python/test_frequency.py",
+      "size": 5046,
+      "sha256": "bd4d33e3e18b5ea68cfa815ec9d47db8f423927b62b115a5b9455622758f3e28"
+    },
+    {
+      "path": "tests/python/test_library_browser.py",
+      "size": 4403,
+      "sha256": "6d74225c85adb67d782c2c489a5a7979470711dec1a41dbb8e1ab2de9f00eaf1"
+    },
+    {
+      "path": "tests/python/test_local_ai.py",
+      "size": 2935,
+      "sha256": "0d604184119dedde6b46c6935d93643032d1e5817a58f52a852fceedb1df7504"
+    },
+    {
+      "path": "tests/python/test_model_import.py",
+      "size": 2911,
+      "sha256": "4ff3bbc2625ff9eb1a874dfbd08f58084bf32cc57231ad58cf9622bc8da584dc"
+    },
+    {
+      "path": "tests/python/test_part_properties.py",
+      "size": 4549,
+      "sha256": "abf4021ec375336b3da08954fbe7d9e3ec767eb7a2217f9ac4eb6fd561f20db6"
+    },
+    {
+      "path": "tests/python/test_plot_workspace.py",
+      "size": 5004,
+      "sha256": "619841f6a52b7ff59f0a10b2580e6e7318c4231c62e35b8f80433010dcdd1965"
+    },
+    {
+      "path": "tests/python/test_simulation_setup.py",
+      "size": 4794,
+      "sha256": "9e07ca1a58e49c1a4901163366198651894e4dc209a1ee5e7b569f52ed4d98b0"
+    },
+    {
+      "path": "tests/python/test_spikes_analyses.py",
+      "size": 6908,
+      "sha256": "4b8bea8cf968cd7f18f834ccd057da50fbeff0309c2cac31c335811635e13f45"
+    },
+    {
+      "path": "tests/python/test_spikes_archetype_library.py",
+      "size": 10741,
+      "sha256": "dcd127e71f77f271ba9b3f6e7a24141bccecb8ef572227312f9eb1f5f0e3e6e8"
+    },
+    {
+      "path": "tests/python/test_spikes_benchmark.py",
+      "size": 4542,
+      "sha256": "8df15209698a389f4ecb7d93c22a3c1d7d29b3875f34bf393525bb2bd2736f3e"
+    },
+    {
+      "path": "tests/python/test_spikes_cli_slice.py",
+      "size": 9105,
+      "sha256": "9859ee1fbc90a1a759da485f92362bd3784e6a496228e64a07cf9a5b00671371"
+    },
+    {
+      "path": "tests/python/test_spikes_competitive_benchmark.py",
+      "size": 3736,
+      "sha256": "ed8951a17c02ee523262b27d8a31d82e1c6c65f2d85da44329aea850566aa415"
+    },
+    {
+      "path": "tests/python/test_spikes_competitive_gate.py",
+      "size": 1337,
+      "sha256": "757e44845d58959bc2b79628271752a725fe7e91ed7c0b74771273afeba2a882"
+    },
+    {
+      "path": "tests/python/test_spikes_compiled_blocks.py",
+      "size": 6340,
+      "sha256": "b8771c39508d53c87cd411755849e1018ffc30d05af86bfa2aaabf43e52d6f6f"
+    },
+    {
+      "path": "tests/python/test_spikes_converter_qualification.py",
+      "size": 3927,
+      "sha256": "efd5a374371b501667c445f464ecb8c1c43b1df4395a6805822c2aff71c1b8ef"
+    },
+    {
+      "path": "tests/python/test_spikes_device_extensions.py",
+      "size": 8951,
+      "sha256": "a168cad375388cc65d7673e25266bccba89395285fbbc1cf1ec16e0cc2fb33bc"
+    },
+    {
+      "path": "tests/python/test_spikes_digital.py",
+      "size": 3721,
+      "sha256": "26c0e263a7837e388c0d31f60ff371c9a8713d58fbd868a6824594eb7a472c4e"
+    },
+    {
+      "path": "tests/python/test_spikes_dynamic_devices.py",
+      "size": 8099,
+      "sha256": "c277a861dce2c1958a21ed2f6eafc1b2f5c08b98af7f44729a7c6cab8c9b09e8"
+    },
+    {
+      "path": "tests/python/test_spikes_first_release.py",
+      "size": 2928,
+      "sha256": "ba476d98f884a3daa63df0068022acc289d5d6f43a22212f9b77b73e8875bd14"
+    },
+    {
+      "path": "tests/python/test_spikes_hdl_frontend.py",
+      "size": 4352,
+      "sha256": "a9a67d0963bbd3272691edd3597281c3e98699752358085ecfd37cb1fd140dc9"
+    },
+    {
+      "path": "tests/python/test_spikes_hil_certification.py",
+      "size": 1226,
+      "sha256": "2b174856407c6b1b8fd625c85e8a72b14be9fad7e4c4d74527c9c6390bacd96a"
+    },
+    {
+      "path": "tests/python/test_spikes_imports.py",
+      "size": 930,
+      "sha256": "9ab4d15684737c6ee91b24f9c146a343475819cabadc67ff8cb898df6913735c"
+    },
+    {
+      "path": "tests/python/test_spikes_instrument_session.py",
+      "size": 1850,
+      "sha256": "27fd821269e76cefc9ac86b36fc8d00fdac7604e0d8ab673acc4b5f07754c2e2"
+    },
+    {
+      "path": "tests/python/test_spikes_instruments.py",
+      "size": 8170,
+      "sha256": "67658630e64683041063f0268465b1a4040998f66294fdc42d0d98ecf22ca934"
+    },
+    {
+      "path": "tests/python/test_spikes_language_analysis_wave3.py",
+      "size": 5122,
+      "sha256": "6e7c11ca04c4250f66e2b9de054f2a677681b9bba50dcd47267190ab5a54e716"
+    },
+    {
+      "path": "tests/python/test_spikes_language_analysis_wave4.py",
+      "size": 11198,
+      "sha256": "0afd6bcdb8c8b3dcd097dbc0a0defd623a3a2008a52af12bcee53397f97743a1"
+    },
+    {
+      "path": "tests/python/test_spikes_language_analysis_wave5.py",
+      "size": 5470,
+      "sha256": "8e4253b1049bc582df1b2aad040f20b64c0b5d3b6356aa55db4544d619da6cbf"
+    },
+    {
+      "path": "tests/python/test_spikes_language_analysis_wave6.py",
+      "size": 2693,
+      "sha256": "205917b990fec777526a83c306e235cdc3a6e87fa1d06549e3c15dac029ff81b"
+    },
+    {
+      "path": "tests/python/test_spikes_language_wave1.py",
+      "size": 6407,
+      "sha256": "2b7c2e93838e39260e7b22e554fa54ddd13c35b547e610c8b2f817a87dd9bcbd"
+    },
+    {
+      "path": "tests/python/test_spikes_model_builder.py",
+      "size": 8848,
+      "sha256": "1963dd03dfaba0e3f6960ce1c90632f66d94014a25c190c01788d1b25a1df8a5"
+    },
+    {
+      "path": "tests/python/test_spikes_model_library.py",
+      "size": 3634,
+      "sha256": "32dbf31ba0cfd7a8c21f264f90aa6c63802153a57c6502908b54c27ea267826a"
+    },
+    {
+      "path": "tests/python/test_spikes_native_abi.py",
+      "size": 30227,
+      "sha256": "1be36a0ed55c783c788b51f3ede4b5fae9c2c9509b4ca48bcc3b57b98dd6cfcc"
+    },
+    {
+      "path": "tests/python/test_spikes_native_cli.py",
+      "size": 10092,
+      "sha256": "47d580a535f737e1aeeea1a691c5f20d3fe1724a8055f33c996e49e706760691"
+    },
+    {
+      "path": "tests/python/test_spikes_osdi_runtime.py",
+      "size": 7855,
+      "sha256": "b6c1eef62d70470224fc77f454378b716d8bf73c1f4d8d55e769d5bb4772c54d"
+    },
+    {
+      "path": "tests/python/test_spikes_parity_report.py",
+      "size": 1652,
+      "sha256": "0a6cc3eba06452bd078e2682c55b9d784520f713f46941074e579eea6c6af19d"
+    },
+    {
+      "path": "tests/python/test_spikes_public_benchmark.py",
+      "size": 7339,
+      "sha256": "4c1a48165e0f167d78ff0017aab36a593c09bf8e8cfddf1a71a44415356a297c"
+    },
+    {
+      "path": "tests/python/test_spikes_qualification.py",
+      "size": 3523,
+      "sha256": "0110d734b073192563e05e773fff217c6ffd4ef4f85b13f1fc4f36375efde7bc"
+    },
+    {
+      "path": "tests/python/test_spikes_release_bundle.py",
+      "size": 2108,
+      "sha256": "255dccd12f56652cdfc965aa5b40d46bf099f345622a1d6da6d023419a6fa842"
+    },
+    {
+      "path": "tests/python/test_spikes_session_capture.py",
+      "size": 2467,
+      "sha256": "b4aa2a993d19fe1ef89296cf33e4317ed830fb9757d79f29fe64891768f3d84c"
+    },
+    {
+      "path": "tests/python/test_spikes_sessions.py",
+      "size": 7922,
+      "sha256": "10f82be1a406cc86f7320c64cc10c29efbc6ed6e5a1100616b23f435c8271daf"
+    },
+    {
+      "path": "tests/python/test_spikes_spice3_wave7.py",
+      "size": 5265,
+      "sha256": "f0d674d1f9e7c144f199dc96573242dabeddab924c5c20f05b695182eb16f1b0"
+    },
+    {
+      "path": "tests/python/test_spikes_static_compact_devices.py",
+      "size": 6409,
+      "sha256": "51697a2e24b7afb38da9acac84755f2930f6602e297be07e48fd79213129bb0d"
+    },
+    {
+      "path": "tests/python/test_spikes_step_measure.py",
+      "size": 6532,
+      "sha256": "91d4441f0939e8ae677ae2c977f9c7005ebaa11250ea16d7ed1eb9b7e406eb9c"
+    },
+    {
+      "path": "tests/python/test_spikes_streaming.py",
+      "size": 6097,
+      "sha256": "afbfca86340aa89817e317136b0e7caf34800c956f595cfb0b1d62a847e51ce0"
+    },
+    {
+      "path": "tests/python/test_spikes_subcircuits.py",
+      "size": 6579,
+      "sha256": "055e23ba0bb48e5c310745c0339fbdc2476939361d1ac2ef3aee65ddd7f2a831"
+    },
+    {
+      "path": "tests/python/test_spikes_sweeps.py",
+      "size": 4981,
+      "sha256": "74e8273dcf085e9fba6a4c1f0ad3a540aef07cb83a47676984c2fb81fc9049b2"
+    },
+    {
+      "path": "tests/python/test_spikes_transient_slice.py",
+      "size": 6117,
+      "sha256": "ee79d2d8b867fd62b418aca9cc6d0aece3b7df9455c511eb721364d9058e5cba"
+    },
+    {
+      "path": "tests/python/test_spikes_vendored_hdl_toolchains.py",
+      "size": 4568,
+      "sha256": "fdfe1de68b019ef9110b67db015f94cb70237afe7805f13f4844fac6c5a4015a"
+    },
+    {
+      "path": "tests/python/test_spikes_wave1_benchmark.py",
+      "size": 3578,
+      "sha256": "167130f6dca378ff663b141d4651325f0c8197ca4c7be5dabee4ad7b43ff84f8"
+    },
+    {
+      "path": "tests/python/test_spikes_windows_job_sandbox.py",
+      "size": 1149,
+      "sha256": "43bc30fab414a9955d50a2a9b23315ac43cbdfc2aa085056bbea09ff1828e027"
+    },
+    {
+      "path": "tests/python/test_standalone_version.py",
+      "size": 575,
+      "sha256": "f6da981a0e2fb0772b8d5fdd6b95bf0fc0530b945af3f0e2fc0bf1edbc33368f"
+    },
+    {
+      "path": "tests/python/test_studio_contracts.py",
+      "size": 1030,
+      "sha256": "a178c26a4c9082020e6de358145c1468fd2dbb33c42008547f15f7e3cd185c5a"
+    },
+    {
+      "path": "tests/python/test_studio_lifecycle.py",
+      "size": 5051,
+      "sha256": "f6d937e71d5dda0eb271351284ef0adbf82c32a4e6d955ff3339310340d754e3"
+    },
+    {
+      "path": "tests/python/test_studio_workbench.py",
+      "size": 5403,
+      "sha256": "f33c8b594014dfbc07a8db91255d6c62a242941ffd5781ca9deb44c737b81ea8"
+    },
+    {
+      "path": "tests/python/test_symbol_library.py",
+      "size": 1464,
+      "sha256": "78971daa52eacdf4d9cc86c7ec9739db4e3456459188927cc8c80ae120a3d5d7"
+    },
+    {
+      "path": "tests/python/test_workbench_upgrade.py",
+      "size": 6924,
+      "sha256": "4b3ca22c46179ef9f1c98069e82a46101da12007089e4a9106865c4bb129ed81"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "size": 2063,
+      "sha256": "964c8e4e9d255936fb1ea78b710c0e80db7e819652b40ddeef9d0568ae573df5"
+    },
+    {
+      "path": "vcpkg.json",
+      "size": 346,
+      "sha256": "d1638c89438c36a33678dd5dcd671da80769f111e1ddb2c1909e927949ee10dc"
+    }
+  ],
+  "claims": {
+    "standalone_source_project": true,
+    "engine_and_console_buildable": true,
+    "studio_gui_implemented": false,
+    "studio_wxpython_workbench_runnable": true,
+    "studio_cpp_vtk_gui_implemented": false,
+    "complete_spice3_parity": false,
+    "physical_hil_certified": false,
+    "production_signed": false
+  }
+}

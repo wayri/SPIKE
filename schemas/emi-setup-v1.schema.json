@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/emi-setup-v1.schema.json",
+  "title": "SPIKE EMI Setup v1",
+  "type": "object",
+  "required": [
+    "contract",
+    "selected_nets",
+    "return_nets",
+    "requested_analyses",
+    "frequency",
+    "environment",
+    "mesh",
+    "max_solver_time_s",
+    "excitation",
+    "net_metrics"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/emi-setup/v1"
+    },
+    "selected_nets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "return_nets": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "requested_analyses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "conducted_screening",
+          "near_field",
+          "far_field"
+        ]
+      }
+    },
+    "frequency": {
+      "type": "object",
+      "required": [
+        "start_hz",
+        "stop_hz",
+        "points"
+      ],
+      "properties": {
+        "start_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "stop_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "points": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 100000
+        }
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "free_space",
+            "bench_ground_plane",
+            "shielded_enclosure"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "mesh": {
+      "type": "object",
+      "required": [
+        "resolution_mm",
+        "padding_cells"
+      ],
+      "properties": {
+        "resolution_mm": {
+          "type": "number",
+          "minimum": 0.0001,
+          "maximum": 100
+        },
+        "padding_cells": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 40
+        }
+      },
+      "additionalProperties": false
+    },
+    "max_solver_time_s": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 604800
+    },
+    "excitation": {
+      "type": "object",
+      "required": [
+        "mode",
+        "ports"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "prepass_results",
+            "explicit_ports",
+            "spice"
+          ]
+        },
+        "ports": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "start",
+              "stop",
+              "direction",
+              "impedance_ohm",
+              "excite"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "start": {
+                "$ref": "#/$defs/point3d"
+              },
+              "stop": {
+                "$ref": "#/$defs/point3d"
+              },
+              "direction": {
+                "enum": [
+                  "x",
+                  "y",
+                  "z"
+                ]
+              },
+              "impedance_ohm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "excite": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "net_metrics": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "required": [
+          "net",
+          "source",
+          "dv_dt_v_per_s",
+          "di_dt_a_per_s",
+          "peak_current_a",
+          "loop_area_mm2",
+          "return_discontinuities"
+        ],
+        "properties": {
+          "net": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dv_dt_v_per_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "di_dt_a_per_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "peak_current_a": {
+            "type": "number",
+            "minimum": 0
+          },
+          "loop_area_mm2": {
+            "type": "number",
+            "minimum": 0
+          },
+          "return_discontinuities": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "viewport": {
+      "type": "object",
+      "properties": {
+        "translucent_board": {
+          "type": "boolean"
+        },
+        "analysis_nets_only": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "chamber": {
+      "type": "object",
+      "description": "Virtual chamber fixture preview. Only distance_m is used as the NF2FF observation radius; fixture geometry is not solver geometry.",
+      "properties": {
+        "distance_m": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "table_height_m": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 1.5
+        },
+        "antenna_height_m": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "azimuth_deg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 360
+        },
+        "orientation": {
+          "enum": [
+            "flat",
+            "upright",
+            "side"
+          ]
+        },
+        "polarization": {
+          "enum": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        "floor": {
+          "enum": [
+            "absorber",
+            "ground_plane"
+          ]
+        },
+        "cutaway": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "point3d": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "additionalProperties": false
+}

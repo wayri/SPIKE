@@ -1,0 +1,11 @@
+SPIKES electrothermal console dashboard example
+Vbus bus 0 0
+RETload bus 0 tj 10 3.9m 300.15 5 100m 200 600
+.tran 1m 1 bdf2
+.probe VBUS node bus 20
+.probe ILOAD current RETload 2
+.probe PLOAD power RETload 20
+.probe TEMP temperature tj 300.15 450
+.probe HEALTH health RETload 20 2 20 tj 300.15 450
+.control a Vbus 0 12
+.end

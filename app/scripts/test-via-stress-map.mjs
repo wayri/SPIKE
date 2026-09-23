@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import ts from 'typescript';
+const source = readFileSync(new URL('../src/viaStressMap.ts', import.meta.url), 'utf8');
+const mod = { exports: {} };
+new Function('exports', ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText)(mod.exports);
+const { viaStressMapSvg } = mod.exports;
+assert.match(viaStressMapSvg([]), /No finite/);
+const svg = viaStressMapSvg([{ x_mm: 10, y_mm: 20, value: 2, element_id: '<script>' }, { x_mm: 10, y_mm: 20, value: -5 }, { x_mm: 20, y_mm: 30, value: 3 }, { x_mm: NaN, y_mm: 0, value: 100 }]);
+assert.match(svg, /3 samples; 2 peak-preserving/);
+assert.match(svg, /5.00000 A\/mm2/);
+assert.match(svg, /cx="470" cy="470"/);
+assert.ok(!svg.includes('<script>'));
+assert.match(viaStressMapSvg([{ x_mm: 0, y_mm: 0, value: 1, element_id: '<script>' }]), /&lt;script&gt;/);
+console.log('Via stress map: peak binning, finite admission, coordinate orientation and escaping passed.');

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/analysis-spec-v1.schema.json",
+  "title": "SPIKE AnalysisSpec v1",
+  "type": "object",
+  "required": ["contract", "mode", "net_names", "sources", "loads", "return_path", "probes", "mesh", "limits", "options"],
+  "properties": {
+    "contract": { "const": "spike/v1" },
+    "analysis_id": { "type": "string" },
+    "mode": { "type": "string" },
+    "solver_id": { "type": "string" },
+    "formulation": { "type": "string" },
+    "required_capabilities": { "type": "array", "items": { "type": "string" } },
+    "net_names": { "type": "array", "items": { "type": "string" } },
+    "sources": { "type": "array", "items": { "type": "object" } },
+    "loads": { "type": "array", "items": { "type": "object" } },
+    "return_path": { "type": "object" },
+    "probes": { "type": "array", "items": { "type": "object" } },
+    "frequency_start_hz": { "type": ["number", "null"], "minimum": 0 },
+    "frequency_stop_hz": { "type": ["number", "null"], "minimum": 0 },
+    "frequency_points": { "type": "integer", "minimum": 1 },
+    "transient": { "type": "object" },
+    "mesh": { "type": "object" },
+    "limits": { "type": "object" },
+    "options": { "type": "object" }
+  },
+  "additionalProperties": true
+}

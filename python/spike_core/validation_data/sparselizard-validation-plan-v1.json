@@ -1,0 +1,45 @@
+{
+  "contract": "spike/sparselizard-validation-plan/v1",
+  "engine_id": "external.sparselizard",
+  "fixtures": [
+    {
+      "id": "pcb-dc-copper-bar-v1",
+      "physics": "dc_conduction",
+      "description": "Rectangular copper bar with analytical resistance L/(sigma*w*t).",
+      "minimum_convergence_levels": 3,
+      "metrics": [{"name": "resistance_ohm", "expected": 0.009852216748768473, "relative_tolerance": 0.02}]
+    },
+    {
+      "id": "pcb-ac-rlcg-two-conductor-v1",
+      "physics": "ac_rlcg",
+      "description": "Two-conductor PCB transmission fixture with analytical/correlated RLCG sweep.",
+      "minimum_convergence_levels": 3,
+      "metrics": [
+        {"name": "resistance_1mhz_ohm", "expected": 0.0108, "relative_tolerance": 0.05},
+        {"name": "loop_inductance_h", "expected": 0.000000016, "relative_tolerance": 0.08},
+        {"name": "capacitance_f", "expected": 0.0000000062, "relative_tolerance": 0.08}
+      ]
+    },
+    {
+      "id": "pcb-thermal-slab-v1",
+      "physics": "thermal",
+      "description": "One-dimensional PCB slab conduction fixture with analytical delta-T QL/(kA).",
+      "minimum_convergence_levels": 3,
+      "metrics": [{"name": "temperature_rise_k", "expected": 10.0, "relative_tolerance": 0.03}]
+    },
+    {
+      "id": "pcb-electrostatic-parallel-plate-v1",
+      "physics": "field",
+      "description": "Finite parallel-plate fixture compared with epsilon*A/d in its documented guard-band region.",
+      "minimum_convergence_levels": 3,
+      "metrics": [{"name": "capacitance_f", "expected": 0.00000000035416675125, "relative_tolerance": 0.05}]
+    },
+    {
+      "id": "pcb-harmonic-loop-field-v1",
+      "physics": "field",
+      "description": "Current loop on-axis magnetic field compared with the Biot-Savart closed form.",
+      "minimum_convergence_levels": 3,
+      "metrics": [{"name": "magnetic_flux_density_t", "expected": 0.00006283185307179586, "relative_tolerance": 0.08}]
+    }
+  ]
+}

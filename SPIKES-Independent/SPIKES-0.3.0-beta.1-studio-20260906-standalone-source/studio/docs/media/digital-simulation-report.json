@@ -1,0 +1,161 @@
+{
+  "tool": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\tools\\hdl\\oss-cad-suite\\oss-cad-suite\\bin\\iverilog.exe",
+  "argv": [
+    "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\tools\\hdl\\oss-cad-suite\\oss-cad-suite\\bin\\iverilog.exe",
+    "-g2012",
+    "-Wall",
+    "-s",
+    "top",
+    "-o",
+    "design.vvp",
+    "design.v"
+  ],
+  "exit_code": 0,
+  "output": "VCD info: dumpfile wave.vcd opened for output.\r\ndesign.v:6: $finish called at 100000 (1ps)\r\n",
+  "mode": "simulate",
+  "vcd_source": "$date\n\tSat Sep 05 17:46:23 2026\n$end\n$version\n\tIcarus Verilog\n$end\n$timescale\n\t1ps\n$end\n$scope module top $end\n$var reg 1 ! clk $end\n$var reg 4 \" count [3:0] $end\n$upscope $end\n$enddefinitions $end\n$comment Show the parameter values. $end\n$dumpall\n$end\n#0\n$dumpvars\nb0 \"\n0!\n$end\n#5000\nb1 \"\n1!\n#10000\n0!\n#15000\nb10 \"\n1!\n#20000\n0!\n#25000\nb11 \"\n1!\n#30000\n0!\n#35000\nb100 \"\n1!\n#40000\n0!\n#45000\nb101 \"\n1!\n#50000\n0!\n#55000\nb110 \"\n1!\n#60000\n0!\n#65000\nb111 \"\n1!\n#70000\n0!\n#75000\nb1000 \"\n1!\n#80000\n0!\n#85000\nb1001 \"\n1!\n#90000\n0!\n#95000\nb1010 \"\n1!\n#100000\n0!\n",
+  "timing": {
+    "timescale_s": 1e-12,
+    "end_time_s": 1e-07,
+    "signals": {
+      "top.clk": {
+        "width": 1,
+        "transitions": [
+          [
+            0.0,
+            "0"
+          ],
+          [
+            5e-09,
+            "1"
+          ],
+          [
+            1e-08,
+            "0"
+          ],
+          [
+            1.5e-08,
+            "1"
+          ],
+          [
+            2e-08,
+            "0"
+          ],
+          [
+            2.5e-08,
+            "1"
+          ],
+          [
+            3e-08,
+            "0"
+          ],
+          [
+            3.5e-08,
+            "1"
+          ],
+          [
+            4e-08,
+            "0"
+          ],
+          [
+            4.5e-08,
+            "1"
+          ],
+          [
+            5e-08,
+            "0"
+          ],
+          [
+            5.4999999999999996e-08,
+            "1"
+          ],
+          [
+            6e-08,
+            "0"
+          ],
+          [
+            6.5e-08,
+            "1"
+          ],
+          [
+            7e-08,
+            "0"
+          ],
+          [
+            7.5e-08,
+            "1"
+          ],
+          [
+            8e-08,
+            "0"
+          ],
+          [
+            8.5e-08,
+            "1"
+          ],
+          [
+            9e-08,
+            "0"
+          ],
+          [
+            9.5e-08,
+            "1"
+          ],
+          [
+            1e-07,
+            "0"
+          ]
+        ]
+      },
+      "top.count": {
+        "width": 4,
+        "transitions": [
+          [
+            0.0,
+            "0"
+          ],
+          [
+            5e-09,
+            "1"
+          ],
+          [
+            1.5e-08,
+            "10"
+          ],
+          [
+            2.5e-08,
+            "11"
+          ],
+          [
+            3.5e-08,
+            "100"
+          ],
+          [
+            4.5e-08,
+            "101"
+          ],
+          [
+            5.4999999999999996e-08,
+            "110"
+          ],
+          [
+            6.5e-08,
+            "111"
+          ],
+          [
+            7.5e-08,
+            "1000"
+          ],
+          [
+            8.5e-08,
+            "1001"
+          ],
+          [
+            9.5e-08,
+            "1010"
+          ]
+        ]
+      }
+    }
+  }
+}

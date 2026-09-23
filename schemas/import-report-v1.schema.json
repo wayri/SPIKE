@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/import-report-v1.schema.json",
+  "title": "SPIKE ImportReport v1",
+  "type": "object",
+  "required": ["contract", "importer_id", "source_format", "source_sha256", "source_size_bytes", "status", "coverage", "inferred", "unsupported", "geometry_errors", "object_map", "layer_order", "model_resolution", "solver_readiness", "diagnostics"],
+  "properties": {
+    "contract": { "const": "spike/import-report/v1" },
+    "importer_id": { "type": "string", "minLength": 1 },
+    "source_format": { "type": "string", "minLength": 1 },
+    "source_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "source_size_bytes": { "type": "integer", "minimum": 0 },
+    "status": { "enum": ["completed", "completed_with_warnings", "completed_with_errors", "failed"] },
+    "coverage": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "inferred": { "type": "array", "items": { "type": "object" } },
+    "unsupported": { "type": "array", "items": { "type": "object" } },
+    "geometry_errors": { "type": "array", "items": { "type": "object" } },
+    "object_map": { "type": "object", "additionalProperties": { "type": "string" } },
+    "layer_order": { "type": "array", "items": { "type": "string" } },
+    "model_resolution": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+    "solver_readiness": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["ready", "reasons"],
+        "properties": {
+          "ready": { "type": "boolean" },
+          "reasons": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "diagnostics": { "type": "array", "items": { "type": "object" } }
+  },
+  "additionalProperties": false
+}

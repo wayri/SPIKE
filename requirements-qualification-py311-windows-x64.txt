@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 SigHarmonic
+# Supplemental local CPython 3.11 qualification dependencies, not a runtime lock.
+# Versions match the existing Windows runtime/build ledger; cp311 wheel hash
+# verified against https://pypi.org/pypi/pyarrow/25.0.1/json on 2026-09-20.
+# nanobind 3.0.0 is yanked for incorrect Python 3.9 compatibility metadata;
+# this developer environment is explicitly Python 3.11, never Python 3.9.
+pyarrow==25.0.1 --hash=sha256:62cd0d785b8aa6675ee355f9fc02252a340f4441257c42674937826fd7594325
+nanobind==3.0.0 --hash=sha256:3808620334b1e7e647d71feb1bf525496216b48ee2a8cd4c4a31ae1f1cbb1c6f

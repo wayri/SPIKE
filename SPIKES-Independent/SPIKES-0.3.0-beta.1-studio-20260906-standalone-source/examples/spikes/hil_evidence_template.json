@@ -1,0 +1,13 @@
+{
+  "contract": "spikes/physical-hil-evidence/v1",
+  "execution_mode": "not_executed",
+  "synthetic": true,
+  "target": {},
+  "host": {},
+  "calibration": {},
+  "raw_trace": {},
+  "timing": {},
+  "fault_tests": [],
+  "attestation": {},
+  "note": "Replace every placeholder with evidence from an authorized physical target run. This template is intentionally unable to pass certification."
+}

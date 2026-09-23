@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/si-channel-result-v1.schema.json",
+  "title": "SPIKE bounded geometry-derived SI channel result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "status", "model_status", "production_qualified",
+    "compliance_status", "extraction", "network", "time_domain",
+    "eye", "crosstalk", "differential", "resource_admission", "provenance", "release_gate"
+  ],
+  "properties": {
+    "contract": {"const": "spike/si-channel-result/v1"},
+    "status": {"const": "completed"},
+    "model_status": {"const": "experimental"},
+    "production_qualified": {"const": false},
+    "compliance_status": {"const": "not_evaluated"},
+    "extraction": {"type": "object"},
+    "network": {"type": "object"},
+    "time_domain": {"type": "object"},
+    "eye": {"type": ["object", "null"]},
+    "crosstalk": {"type": ["object", "null"]},
+    "differential": {"type": ["object", "null"]},
+    "resource_admission": {
+      "type": "object",
+      "required": [
+        "frequency_points", "time_domain_samples", "eye_waveform_samples",
+        "estimated_numeric_bytes", "hard_limits", "cooperative_cancellation_supported"
+      ],
+      "properties": {
+        "frequency_points": {"type": "integer", "minimum": 3, "maximum": 32769},
+        "time_domain_samples": {"type": "integer", "minimum": 5, "maximum": 65537},
+        "eye_waveform_samples": {"type": "integer", "minimum": 0, "maximum": 1048576},
+        "estimated_numeric_bytes": {"type": "integer", "minimum": 0},
+        "hard_limits": {"type": "object"},
+        "cooperative_cancellation_supported": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "provenance": {"type": "object"},
+    "release_gate": {
+      "type": "object",
+      "required": ["state", "required_before_promotion"],
+      "properties": {
+        "state": {"const": "experimental_bounded_geometry"},
+        "required_before_promotion": {
+          "type": "array", "minItems": 1, "items": {"type": "string"}
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

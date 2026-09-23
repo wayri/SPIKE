@@ -1,0 +1,13 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "type":"object",
+  "required":["contract","version","records","counts","archetype_count","notice"],
+  "properties":{
+    "contract":{"const":"spikes/component-catalog/v1"},"version":{"type":"string"},
+    "archetype_count":{"type":"integer","minimum":1},"counts":{"type":"object"},"notice":{"type":"string"},
+    "records":{"type":"array","items":{"type":"object","required":["id","category","family","name","parameters","status","fidelity","limitations","qualification"],"properties":{
+      "id":{"type":"string"},"category":{"type":"string"},"family":{"type":"string"},"name":{"type":"string"},"parameters":{"type":"object"},
+      "status":{"enum":["native_subcircuit","equation_bench_only"]},"fidelity":{"const":"generic_reduced_order"},"qualification":{"const":"unqualified_presets"},"limitations":{"type":"string"}
+    }}}
+  }
+}

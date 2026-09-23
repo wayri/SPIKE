@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-turbulence-model-v1.schema.json",
+  "$comment": "SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+  "title": "Explicit experimental kOmegaSST parameters",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "initial_k_m2_s2", "inlet_k_m2_s2", "initial_omega_per_s", "inlet_omega_per_s", "turbulent_prandtl"],
+  "properties": {
+    "type": {"const": "kOmegaSST"},
+    "initial_k_m2_s2": {"type": "number", "minimum": 1e-12, "maximum": 1e8},
+    "inlet_k_m2_s2": {"type": "number", "minimum": 1e-12, "maximum": 1e8},
+    "initial_omega_per_s": {"type": "number", "minimum": 1e-12, "maximum": 1e8},
+    "inlet_omega_per_s": {"type": "number", "minimum": 1e-12, "maximum": 1e8},
+    "turbulent_prandtl": {"type": "number", "minimum": 0.1, "maximum": 10}
+  }
+}

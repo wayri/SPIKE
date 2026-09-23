@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/multiboard-coupled-reduced-network-bind-result-v1.schema.json",
+  "title": "SPIKE multi-board coupled reduced-network bind result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "status", "domain", "plan_contract", "plan_digest", "model_status", "production_qualified", "board_port_networks", "connector_bindings", "reference_nodes", "circuit_fragment", "coupling", "release_gate", "result_digest"],
+  "properties": {
+    "contract": {"const": "spike/multiboard-coupled-reduced-network-bind-result/v1"},
+    "status": {"const": "bound"},
+    "domain": {"enum": ["pi", "si"]},
+    "plan_contract": {"const": "spike/multiboard-analysis-plan/v1"},
+    "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "model_status": {"const": "explicit_reduced_network_orchestration_only"},
+    "production_qualified": {"const": false},
+    "board_port_networks": {"type": "array", "minItems": 1, "maxItems": 30},
+    "connector_bindings": {"type": "array", "minItems": 1},
+    "reference_nodes": {"type": "array", "minItems": 1},
+    "circuit_fragment": {"type": "object"},
+    "coupling": {"type": "object"},
+    "release_gate": {"type": "object"},
+    "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

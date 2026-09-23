@@ -1,0 +1,6 @@
+.title Tutorial 09 - DC transfer sweep
+V1 in 0 0
+R1 in out 1k
+R2 out 0 1k
+.dc V1 0 12 1
+.end

@@ -1,0 +1,43 @@
+.emi-chamber-workspace { position: absolute; inset: 0; z-index: 22; display: flex; flex-direction: column; min-width: 0; background: #0c1722; color: #dbe6ee; }
+.emi-chamber-nav { display: flex; align-items: center; gap: 6px; padding: 8px; background: #152532; border-bottom: 1px solid #354957; flex-wrap: wrap; }
+.emi-chamber-nav > span { flex: 1; }
+.emi-chamber-workspace button { border: 1px solid #486071; border-radius: 4px; padding: 7px 10px; color: #dbe6ee; background: #1c3242; font-size: 11px; cursor: pointer; }
+.emi-chamber-workspace button.active { color: #8ae4dc; border-color: #62ada9; background: #204449; }
+.emi-chamber-workspace button:disabled { opacity: .45; cursor: default; }
+.canvas-area:has(.emi-chamber-workspace) { grid-template-rows: minmax(0, 1fr); }
+.canvas-area:has(.emi-chamber-workspace) > :not(.board-canvas) { display: none; }
+.board-canvas:has(.emi-chamber-workspace) > .viewport-hud-top, .board-canvas:has(.emi-chamber-workspace) > .viewport-hud-bottom { display: none; }
+.emi-chamber-content { flex: 1; display: flex; min-height: 0; min-width: 0; overflow: hidden; }
+.emi-chamber-scene { flex: 1; position: relative; min-height: 180px; min-width: 0; overflow: hidden; }
+.emi-chamber-canvas { position: absolute; inset: 0; }
+.emi-chamber-canvas canvas { display: block; }
+.emi-chamber-title { position: absolute; top: 16px; left: 18px; display: grid; gap: 6px; pointer-events: none; padding: 10px; background: #0c1722c9; border-radius: 5px; }
+.emi-chamber-title b { font-size: 11px; letter-spacing: 1.4px; }
+.emi-chamber-title span { color: #85d4d9; font: 12px ui-monospace, monospace; }
+.emi-chamber-title small { color: #9fadb9; font-size: 10px; }
+.emi-chamber-view { position: absolute; right: 12px; top: 14px; display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: min(680px, calc(100% - 28px)); }
+.emi-chamber-caption { position: absolute; left: 12px; bottom: 12px; right: 12px; padding: 9px; background: #0c1722dc; font-size: 12px; pointer-events: none; }
+.emi-chamber-caption small { display: block; color: #aabcca; margin-top: 4px; font-size: 10px; }
+.emi-chamber-controls { display: flex; flex-shrink: 0; max-height: 125px; overflow: auto; gap: 9px; padding: 10px; align-items: end; flex-wrap: wrap; background: #152532; border-top: 1px solid #354957; }
+.emi-chamber-workspace label { display: grid; gap: 5px; font-size: 10px; color: #afc2d1; }
+.emi-chamber-workspace select, .emi-chamber-workspace input[type=number] { background: #10202d; border: 1px solid #4b6172; color: #e1e9ef; border-radius: 3px; height: 29px; padding: 4px; font-size: 11px; }
+.emi-chamber-workspace input[type=number] { width: 65px; }
+.emi-chamber-workspace input[type=range] { width: 100px; }
+.emi-chamber-controls .emi-chamber-check { display: flex; align-items: center; height: 29px; }
+.emi-chamber-results { flex: 1; min-width: 0; overflow: auto; border-left: 1px solid #465b6a; container-type: inline-size; }
+.emi-chamber-content.split .emi-chamber-results { flex: 0 0 48%; min-width: 280px; }
+.emi-dashboard-embedded { height: 100%; min-height: 0; }
+.emi-dashboard-embedded .emi-dashboard { position: relative; inset: auto; height: 100%; z-index: auto; border: 0; box-shadow: none; grid-template-rows: auto auto minmax(0, 1fr) auto; }
+.emi-dashboard-embedded .emi-dashboard > header { min-height: 40px; }
+.emi-dashboard-embedded .emi-dashboard > header small { display: none; }
+.emi-dashboard-embedded .emi-dashboard-body { grid-template-columns: 1fr; }
+.emi-dashboard-embedded .emi-dashboard-body > section { grid-column: 1; border-right: 0; border-bottom: 1px solid #304654; }
+.emi-dashboard-embedded .emi-field-review { order: -1; }
+.emi-dashboard-embedded .emi-dashboard > footer { flex-wrap: wrap; }
+.emi-dashboard-embedded .emi-dashboard > footer p { flex-basis: 100%; white-space: normal; }
+.emi-spectrum svg, .emi-angular-map svg { width: 100%; background: #0b171d; }
+.emi-spectrum text, .emi-angular-map text { fill: #a3bac8; font: 10px sans-serif; }
+.emi-spectrum table { width: 100%; border-collapse: collapse; font: 10px ui-monospace, monospace; }
+.emi-spectrum td, .emi-spectrum th { padding: 6px; border-bottom: 1px solid #2a404d; text-align: right; }
+@container (max-width: 500px) { .emi-dashboard-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .emi-polar-result { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .emi-chamber-content.split { flex-direction: column; overflow: auto; } .emi-chamber-content.split .emi-chamber-scene { min-height: 300px; } .emi-chamber-content.split .emi-chamber-results { flex: 1 0 350px; } .emi-chamber-view { top: 105px; } }

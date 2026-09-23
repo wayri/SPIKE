@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/analysis-index-v1.schema.json",
+  "title": "SPIKE analysis index v1",
+  "type": "object",
+  "required": ["contract", "runs"],
+  "properties": {
+    "contract": {"const": "spike/analysis-index/v1"},
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "spec"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "design_id": {"type": "string"},
+          "spec": {"type": "object"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

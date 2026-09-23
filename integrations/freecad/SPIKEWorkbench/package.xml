@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
+  <name>SPIKEWorkbench</name>
+  <description>SPIKE assembly collaboration, placement feedback, solid clearances and ECAD/MCAD geometry exchange.</description>
+  <version>0.2.0</version>
+  <date>2026-09-07</date>
+  <maintainer email="">SPIKE contributors</maintainer>
+  <license file="LICENSE">MIT</license>
+  <icon>Resources/icons/SPIKEWorkbench.svg</icon>
+  <freecadmin>0.21</freecadmin>
+  <content>
+    <workbench>
+      <classname>SPIKEWorkbench</classname>
+      <subdirectory>./</subdirectory>
+    </workbench>
+  </content>
+</package>

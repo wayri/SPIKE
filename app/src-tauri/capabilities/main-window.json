@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-window",
+  "description": "The main SPIKE workspace may create and communicate with presentation-only detached tool windows.",
+  "windows": ["main"],
+  "permissions": [
+    "core:event:default",
+    "core:app:allow-version",
+    "core:webview:allow-create-webview-window",
+    "core:webview:allow-get-all-webviews",
+    "core:window:allow-show",
+    "core:window:allow-set-focus",
+    "core:window:allow-close"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-multiregion-case-v1.schema.json",
+  "title": "SPIKE OpenFOAM Multi-region Prepared Case v1",
+  "type": "object",
+  "required": ["contract", "adapter_contract", "adapter_version", "status", "solver", "assembly_mesh_evidence", "materials", "regions", "interfaces", "environment", "heat_sources", "fans", "heatsinks", "numerics", "requested_physics", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/openfoam-multiregion-case/v1"},
+    "adapter_contract": {"const": "spike/openfoam-multiregion-adapter/v1"},
+    "adapter_version": {"type": "string"},
+    "status": {"const": "prepared_not_runnable"},
+    "solver": {"type": "object"},
+    "assembly_mesh_evidence": {"type": "object"},
+    "materials": {"type": "array"}, "regions": {"type": "array"}, "interfaces": {"type": "array"},
+    "environment": {"type": "object"}, "heat_sources": {"type": "array"}, "fans": {"type": "array"}, "heatsinks": {"type": "array"},
+    "numerics": {"type": "object", "required": ["transient", "end_time_s", "delta_t_s", "write_interval_steps", "validation_interval_steps", "outer_correctors"]},
+    "requested_physics": {"type": "object"}, "qualification": {"type": "object"},
+    "request_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "files": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+  },
+  "additionalProperties": false
+}

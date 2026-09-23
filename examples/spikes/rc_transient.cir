@@ -1,0 +1,6 @@
+RC transient reference
+V1 in 0 1
+R1 in out 1k
+C1 out 0 1u
+.tran 100u 1m
+.end

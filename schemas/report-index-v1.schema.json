@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/report-index-v1.schema.json",
+  "title": "SPIKE report index v1",
+  "type": "object",
+  "required": ["contract", "reports"],
+  "properties": {
+    "contract": {"const": "spike/report-index/v1"},
+    "reports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "format", "sha256", "size_bytes"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "format": {"enum": ["html", "pdf"]},
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "size_bytes": {"type": "integer", "minimum": 0},
+          "analysis_id": {"type": "string"},
+          "created_at": {"type": "string"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

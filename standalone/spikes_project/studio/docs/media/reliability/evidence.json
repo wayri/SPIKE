@@ -1,0 +1,28 @@
+{
+  "contract": "spikes/studio-workflow-regressions/v1",
+  "checks": {
+    "refresh retains unapplied circuit text": true,
+    "source apply preserves component identity": true,
+    "property dialog applies persisted values": true,
+    "canvas drag commits one move": true,
+    "menu undo restores dragged position": true,
+    "menu redo restores move": true,
+    "Save clears document dirty state": true,
+    "menu Run obtains native result": true,
+    "Run uses unapplied edited 3k resistor": true,
+    "saved differential probe is plotted after Run": true,
+    "voltage and power have separate unit axes": true,
+    "measurement cursor preserves zoom": true,
+    "Pause freezes actual native samples": true,
+    "live source button changes native input": true,
+    "live source event has simulation timestamp": true,
+    "continuous window contains actual accepted timesteps": true,
+    "Stop releases continuous worker": true,
+    "Stop terminates batch worker": true,
+    "oversized batch is rejected nonmodally": true,
+    "oversized source remains editable for rolling mode": true
+  },
+  "all_passed": true,
+  "native_library": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
+  "no_synthetic_display_data": true
+}

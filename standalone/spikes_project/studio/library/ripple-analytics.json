@@ -1,0 +1,10 @@
+{
+  "contract": "spikes/analytics-extension/v1",
+  "id": "example.ripple",
+  "name": "Ripple and AC component",
+  "measurements": [
+    {"name": "Peak-to-peak", "expression": "pp(x)"},
+    {"name": "RMS", "expression": "rms(x)"}
+  ],
+  "traces": [{"name": "AC component", "expression": "x-mean(x)"}]
+}

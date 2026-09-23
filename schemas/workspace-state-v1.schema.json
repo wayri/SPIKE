@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/workspace-state-v1.schema.json",
+  "title": "SPIKE Workspace State v1",
+  "type": "object",
+  "required": ["contract", "viewMode", "docks", "viewports"],
+  "properties": {
+    "contract": { "const": "spike/workspace-state/v1" },
+    "viewMode": { "enum": ["2D", "3D"] },
+    "docks": {
+      "type": "object",
+      "required": ["leftOpen", "rightOpen", "bottomOpen", "sidePanelsPinned", "bottomPinned", "leftWidthPx", "rightWidthPx", "bottomHeightPx", "activeBottomDock"],
+      "properties": {
+        "leftOpen": { "type": "boolean" },
+        "rightOpen": { "type": "boolean" },
+        "bottomOpen": { "type": "boolean" },
+        "sidePanelsPinned": { "type": "boolean" },
+        "bottomPinned": { "type": "boolean" },
+        "leftWidthPx": { "type": "number", "minimum": 180, "maximum": 520 },
+        "rightWidthPx": { "type": "number", "minimum": 210, "maximum": 620 },
+        "bottomHeightPx": { "type": "number", "minimum": 72, "maximum": 440 },
+        "activeBottomDock": { "enum": ["Issues", "Probe table", "Power tree", "Console"] }
+      },
+      "additionalProperties": false
+    },
+    "viewports": {
+      "type": "object",
+      "properties": {
+        "threeD": {
+          "type": "object",
+          "required": ["contract", "position", "target", "up"],
+          "properties": {
+            "contract": { "const": "spike/viewport-camera/v1" },
+            "position": { "$ref": "#/$defs/vector3" },
+            "target": { "$ref": "#/$defs/vector3" },
+            "up": { "$ref": "#/$defs/vector3" }
+          },
+          "additionalProperties": false
+        },
+        "twoD": {
+          "type": "object",
+          "required": ["contract", "x", "y", "width", "height"],
+          "properties": {
+            "contract": { "const": "spike/layout-view/v1" },
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1000000000 },
+            "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1000000000 }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "vector3": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    }
+  },
+  "additionalProperties": false
+}

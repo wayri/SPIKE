@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: CC0-1.0
+`include "disciplines.vams"
+
+module spikes_linear_resistor(p, n);
+    inout p, n;
+    electrical p, n;
+    parameter real resistance = 1000.0 from (0.0:inf);
+    analog I(p, n) <+ V(p, n) / resistance;
+endmodule
+

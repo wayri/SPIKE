@@ -1,0 +1,7 @@
+SPIKES public ideal PWM converter output-filter fixture
+VSW sw 0 PULSE(0 24 0 10n 10n 3.98u 10u)
+L1 sw out 47u
+C1 out 0 100u
+RLOAD out 0 5
+.tran 50n 2m
+.end

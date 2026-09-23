@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spikes.local/schemas/studio-project-v1.schema.json",
+  "title": "SPIKES Studio project",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "project_id", "title", "documents", "libraries", "simulation_profiles", "dashboards"],
+  "properties": {
+    "contract": {"const": "spikes/studio-project/v1"},
+    "project_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "title": {"type": "string", "minLength": 1, "maxLength": 256},
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "path"],
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"enum": ["schematic", "subcircuit", "dashboard", "script", "model", "plot_layout"]},
+          "path": {"type": "string"}
+        }
+      }
+    },
+    "libraries": {"type": "array", "items": {"type": "string"}},
+    "simulation_profiles": {"type": "array", "items": {"type": "object"}},
+    "dashboards": {"type": "array", "items": {"type": "object"}}
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spikes.local/schemas/studio-deployment-model-v1.schema.json",
+  "title": "SPIKES deployable behavioral model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "model_id", "revision", "target", "interface", "state", "time", "numerics", "provenance", "qualification"],
+  "properties": {
+    "contract": {"const": "spikes/deployment-model/v1"},
+    "model_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,127}$"},
+    "revision": {"type": "string", "minLength": 1},
+    "target": {"enum": ["sil", "pil", "hil", "observer", "control_plant", "library_block"]},
+    "interface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["abi", "inputs", "outputs"],
+      "properties": {
+        "abi": {"enum": ["spikes_c_abi_v1", "fmi_3_cs", "fmi_3_me"]},
+        "inputs": {"type": "array", "items": {"$ref": "#/$defs/port"}},
+        "outputs": {"type": "array", "items": {"$ref": "#/$defs/port"}}
+      }
+    },
+    "state": {"type": "array", "items": {"$ref": "#/$defs/port"}},
+    "time": {
+      "type": "object",
+      "required": ["mode", "nominal_step_seconds"],
+      "properties": {
+        "mode": {"enum": ["continuous", "fixed_step", "variable_step"]},
+        "nominal_step_seconds": {"type": "number", "exclusiveMinimum": 0},
+        "deadline_seconds": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "numerics": {
+      "type": "object",
+      "required": ["validity_envelope", "determinism"],
+      "properties": {
+        "validity_envelope": {"type": "object"},
+        "determinism": {"enum": ["bitwise", "bounded_numeric", "unspecified"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["project_sha256", "engine_sha256", "model_index_sha256"],
+      "properties": {
+        "project_sha256": {"$ref": "#/$defs/hash"},
+        "engine_sha256": {"$ref": "#/$defs/hash"},
+        "model_index_sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "required": ["state", "evidence"],
+      "properties": {
+        "state": {"enum": ["unreviewed", "simulation_only", "sil_qualified", "pil_qualified", "hil_qualified"]},
+        "evidence": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "port": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "quantity", "unit", "direction"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "quantity": {"type": "string", "minLength": 1},
+        "unit": {"type": "string"},
+        "direction": {"enum": ["input", "output", "state"]},
+        "minimum": {"type": "number"},
+        "maximum": {"type": "number"}
+      }
+    }
+  }
+}

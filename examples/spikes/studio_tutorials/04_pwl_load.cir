@@ -1,0 +1,8 @@
+.title Tutorial 04 - Dynamic load profile
+* Ideal current load draws 0.1 to 0.5 A. Source resistance causes bus droop.
+V1 supply 0 12
+Rsource supply bus 1
+Cbus bus 0 100u
+Iload bus 0 PWL(0 0.1 1m 0.1 1.1m 0.5 3m 0.5 3.1m 0.1 5m 0.1)
+.tran 10u 5m
+.end

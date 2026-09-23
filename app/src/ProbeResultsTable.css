@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: MIT */
+.probe-table { min-width: 0; color: #cbd8dc; font-size: 11px; }
+.probe-table header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 9px; background: #15252e; border: 1px solid #314852; }
+.probe-table h3, .probe-table p { margin: 0; } .probe-table h3 { font-size: 12px; } .probe-table p { color: #9eb4be; }
+.probe-table-actions { display: flex; gap: 6px; } .probe-table button, .probe-table input { border: 1px solid #344b55; background: #0d181f; color: #cbd8dc; min-height: 28px; padding: 3px 6px; }
+.probe-table button:focus-visible, .probe-table input:focus-visible, .probe-table-scroll:focus-visible { outline: 2px solid #d2aa58; outline-offset: 1px; }
+.probe-table button:disabled { opacity: .5; } .probe-table-scroll { max-width: 100%; overflow-x: auto; border: 1px solid #314852; border-top: 0; }
+.probe-table table { width: 100%; min-width: 1100px; border-collapse: collapse; table-layout: fixed; } .probe-table caption { text-align: left; padding: 5px 8px; color: #91b9c5; }
+.probe-table th, .probe-table td { border-top: 1px solid #273c45; padding: 5px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.probe-table thead th { color: #9eb4be; font-weight: 500; } .probe-table tbody th { width: 150px; } .probe-table th input { display: block; width: 100%; }
+.probe-table small, .probe-table th span { display: block; color: #91a4ac; margin-top: 2px; } .probe-table code { color: #e2bd6b; }
+.probe-status { display: inline-block; border: 1px solid #58717b; border-radius: 9px; padding: 1px 5px; } .probe-status-mapped { border-color: #4f8b68; color: #92d3a8; }
+.probe-formula-row td, .probe-formula-row th { background: #13252b; } .probe-formula-error td, .probe-formula-error th { background: #2b1b1b; }
+.probe-formula-error [role="alert"] { color: #ffaca6; } .probe-table label { color: #9eb4be; } .probe-table label input { display: block; width: 100%; margin-top: 2px; }
+.probe-formula-value { font-size: 14px; color: #d8edf2; } .probe-table-empty { padding: 10px; color: #9eb4be; }
+
+.probe-results-overlay { display: flex; flex-direction: column; max-height: min(65vh, 650px); overflow: hidden; }
+.probe-results-overlay .probe-table { display: flex; flex-direction: column; min-height: 0; }
+.probe-results-overlay .probe-table-scroll { overflow: auto; min-height: 0; }
+.probe-window-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 5px 8px; background: #15252e; }
+.probe-window-actions button { color: #d6e9ef; background: #203843; border: 1px solid #58717b; padding: 5px 10px; cursor: pointer; }

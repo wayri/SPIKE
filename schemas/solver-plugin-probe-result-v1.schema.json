@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/solver-plugin-probe-result-v1.schema.json",
+  "title": "SPIKE Process Solver Runtime Probe Result v1",
+  "description": "Runtime/adapter probe evidence only. A passed probe does not grant workflow qualification or compliance status.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "status", "runtime", "adapter"],
+  "properties": {
+    "contract": {"const": "spike/solver-plugin-probe-result/v1"},
+    "status": {"enum": ["passed", "failed"]},
+    "runtime": {"type": "object", "additionalProperties": false, "required": ["name", "version"], "properties": {"name": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}, "executable_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
+    "adapter": {"type": "object", "additionalProperties": false, "required": ["version"], "properties": {"version": {"type": "string", "minLength": 1}, "protocol": {"const": "spike/solver-plugin/v1"}}},
+    "reason": {"type": "string", "maxLength": 4096}
+  }
+}

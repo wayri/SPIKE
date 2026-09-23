@@ -1,0 +1,32 @@
+{
+    "name": "SPIKE - SI/PI/Thermal Analysis",
+    "description": "Signal, Power, and Integrity Knowledge Engine - Professional multiphysics PCB analysis suite with PEEC/FEM solvers",
+    "description_full": "SPIKE (Signal, Power, and Integrity Knowledge Engine) is a world-class SI/PI/Thermal multiphysics analysis suite for PCB design. Features include:\n\n• DC IR-drop analysis with current density mapping\n• AC impedance analysis for PDN optimization\n• PEEC-based parasitic extraction\n• Thermal FEM analysis with reliability prediction\n• Graph-based PDN analysis\n• Professional wxPython Ribbon UI\n• HPC-grade C++ solvers with OpenMP parallelization\n\nVersion 0.1.6.0 provides plugin infrastructure. Full analysis features coming in v0.1.7.0+",
+    "identifier": "com.spike.si_pi_thermal",
+    "type": "plugin",
+    "author": {
+        "name": "SPIKE Development Team",
+        "contact": {
+            "web": "https://github.com/yourusername/SPIKE"
+        }
+    },
+    "maintainer": {
+        "name": "SPIKE Development Team",
+        "contact": {
+            "web": "https://github.com/yourusername/SPIKE"
+        }
+    },
+    "license": "MIT",
+    "resources": {
+        "homepage": "https://github.com/yourusername/SPIKE"
+    },
+    "versions": [
+        {
+            "version": "0.1.6.0",
+            "status": "stable",
+            "kicad_version": "10.0",
+            "download_url": "",
+            "install_size": 2097152
+        }
+    ]
+}

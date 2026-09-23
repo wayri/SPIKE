@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/layout-scoring-process-job-v1.schema.json",
+  "title": "SPIKE Layout Scoring Process Job v1",
+  "description": "Strict fixed-process envelope for preparing or scoring one autorouter, autoplacer, or joint DesignIR candidate. The process does not route, place, mesh, or solve physics.",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "action", "request", "candidate", "registry"],
+      "properties": {
+        "contract": { "const": "spike/layout-scoring-process-job/v1" },
+        "action": { "const": "prepare" },
+        "request": { "$ref": "layout-evaluation-v1.schema.json#/$defs/request" },
+        "candidate": { "$ref": "design-ir-v2.schema.json" },
+        "registry": { "$ref": "layout-metric-registry-v1.schema.json" },
+        "baseline": { "$ref": "design-ir-v2.schema.json" },
+        "parent": { "$ref": "design-ir-v2.schema.json" },
+        "batch_size": { "type": "integer", "minimum": 1, "maximum": 65536 },
+        "incremental": { "type": "boolean" },
+        "change_kind": { "enum": ["placement", "routing", "stackup", "geometry", "material", "boundary_condition"] }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "action", "request", "native_results"],
+      "properties": {
+        "contract": { "const": "spike/layout-scoring-process-job/v1" },
+        "action": { "const": "score" },
+        "request": { "$ref": "layout-evaluation-v1.schema.json#/$defs/request" },
+        "native_results": {
+          "type": "object",
+          "maxProperties": 4096,
+          "propertyNames": { "pattern": "^layout\\.[0-9a-f]{32}$" },
+          "additionalProperties": { "type": "object" }
+        },
+        "external_results": {
+          "type": "object",
+          "maxProperties": 4096,
+          "additionalProperties": { "type": "object" }
+        }
+      }
+    }
+  ]
+}

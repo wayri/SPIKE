@@ -1,0 +1,15 @@
+.terminal-table-scroll { min-width: 0; max-width: 100%; overflow-x: auto; border: 1px solid #314852; }
+.terminal-table { width: 100%; min-width: 780px; border-collapse: collapse; table-layout: fixed; color: #cbd8dc; font-size: 10px; }
+.terminal-table caption { text-align: left; padding: 8px; color: #91b9c5; background: #15252e; }
+.terminal-table th { text-align: left; color: #9eb4be; font-weight: 500; padding: 7px 5px; white-space: nowrap; }
+.terminal-table td { padding: 4px; border-top: 1px solid #273c45; background: #101c23; vertical-align: top; }
+.terminal-table th:nth-child(4) { width: 150px; }
+.terminal-table th:last-child { width: 155px; }
+.terminal-table input, .terminal-table select, .terminal-table button { width: 100%; min-width: 0; height: 29px; border: 1px solid #344b55; background: #0d181f; color: #cbd8dc; padding: 0 5px; font-size: 10px; }
+.terminal-table input:focus-visible, .terminal-table select:focus-visible, .terminal-table button:focus-visible { outline: 2px solid #d2aa58; outline-offset: -2px; }
+.terminal-table-actions { display: flex; gap: 4px; }
+.terminal-table-actions button:last-child { width: 26px; flex-shrink: 0; }
+.terminal-table button:hover { background: #263942; }
+.terminal-table-detail > td { padding: 8px; background: #15252e; }
+.terminal-table-detail .terminal-pad-picker { max-width: 720px; }
+.terminal-table-empty { padding: 8px; color: #9eb4be; }

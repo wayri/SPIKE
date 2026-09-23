@@ -1,0 +1,31 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"SPIKES .spksch schematic",
+  "type":"object",
+  "required":["contract","id","title","revision","source","components","probes","expressions","metadata"],
+  "properties":{
+    "contract":{"const":"spikes/schematic/v1"},
+    "id":{"type":"string"},"title":{"type":"string"},"revision":{"type":"integer","minimum":0},
+    "source":{"type":"string","description":"Authoritative SPICE electrical source; layout and source edits are explicit transactions."},
+    "components":{"type":"array","items":{"type":"object","required":["id","ref","kind","nodes","value","x","y","limits","parameters","model_source","evidence"],"properties":{"id":{"type":"string"},"ref":{"type":"string"},"nodes":{"type":"array","items":{"type":"string"}},"value":{"type":"string"},"x":{"type":"number"},"y":{"type":"number"},"temperature_k":{"type":"number","exclusiveMinimum":0},"limits":{"type":"object","additionalProperties":{"type":"number","exclusiveMinimum":0}},"model_source":{"type":"string"},"evidence":{"type":"string"}}}},
+    "probes":{"type":"array","items":{"type":"object","required":["id","expression","anchor","descriptor"]}},
+    "expressions":{"type":"array","items":{"type":"string"}},"metadata":{"type":"object"},
+    "instruments":{"type":"array","maxItems":64,"items":{"type":"object","required":["id","anchor","expression","kind","source","format","x","y","frequency_hz"],"properties":{"id":{"type":"string"},"anchor":{"type":"string"},"expression":{"type":"string","minLength":1,"maxLength":8192},"kind":{"enum":["Readout","Mini plot"]},"source":{"enum":["Selected run","AC frequency"]},"format":{"enum":["Engineering","Rectangular complex","Polar / degrees"]},"x":{"type":"number"},"y":{"type":"number"},"frequency_hz":{"type":"number","exclusiveMinimum":0}}}},
+    "thermal_setup":{"$ref":"thermal-setup-v1.schema.json"},
+    "run_profile":{"$ref":"run-profile-v1.schema.json"},
+    "controller_setup":{"anyOf":[{"type":"null"},{"$ref":"generic-controller-v1.schema.json"}]},
+    "plot_layout":{"type":"object","required":["mode","panes","heights"],"properties":{"mode":{"enum":["units","traces","custom"]},"panes":{"type":"object","additionalProperties":{"type":"integer","minimum":1,"maximum":16}},"heights":{"type":"object","additionalProperties":{"type":"number","minimum":0.25,"maximum":8}}}},
+    "power_tree":{"type":"object","required":["contract","stages"],"properties":{"contract":{"const":"spikes/power-tree/v1"},"stages":{"type":"array","maxItems":256,"items":{"type":"object","required":["id","name","kind","parent","voltage_v","current_a","max_current_a","efficiency","quiescent_a","limit_a","model"]}}}},
+    "analytics_extensions":{"type":"array","maxItems":32,"items":{"$ref":"analytics-extension-v1.schema.json"}},
+    "directives":{"type":"array","maxItems":2000,"items":{
+      "type":"object","required":["id","text","enabled","line","end_line","group","title","visible","x","y"],
+      "properties":{
+        "id":{"type":"string"},"text":{"type":"string"},"enabled":{"type":"boolean"},
+        "line":{"type":"integer","minimum":2},"end_line":{"type":"integer","minimum":2},
+        "group":{"type":"string","minLength":1,"maxLength":128},"title":{"type":"string","maxLength":128},
+        "visible":{"type":"boolean"},"x":{"type":"number","minimum":-1000000,"maximum":1000000},"y":{"type":"number","minimum":-1000000,"maximum":1000000}
+      },
+      "description":"Top-level source-backed annotations. Source determines text/state/line spans; project metadata determines grouping and placement."
+    }}
+  }
+}

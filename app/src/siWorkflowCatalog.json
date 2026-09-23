@@ -1,0 +1,164 @@
+{
+  "defaults": {
+    "contract": "spike/si-workflow-request/v1",
+    "channel": {
+      "kind": "rlgc",
+      "coupled": true,
+      "length_m": 0.05,
+      "resistance_ohm_per_m": 5.0,
+      "inductance_h_per_m": 2.5e-07,
+      "capacitance_f_per_m": 1e-10,
+      "loss_tangent": 0.015,
+      "inductive_coupling": 0.08,
+      "capacitive_coupling": 0.08,
+      "frequency_stop_hz": 8000000000.0,
+      "frequency_points": 1025,
+      "reference_impedance_ohm": 50.0
+    },
+    "sources": [
+      {
+        "port": 0,
+        "resistance_ohm": 50.0,
+        "low_v": 0.0,
+        "high_v": 1.8,
+        "rise_time_s": 1e-10,
+        "fall_time_s": 1e-10,
+        "capacitance_f": 0.0,
+        "package_r_ohm": 0.0,
+        "package_l_h": 0.0,
+        "package_c_f": 0.0,
+        "pattern_shift_bits": 0,
+        "delay_s": 0.0
+      }
+    ],
+    "receivers": [
+      {
+        "port": 2,
+        "resistance_ohm": 1000000.0,
+        "capacitance_f": 2e-12,
+        "package_r_ohm": 0.0,
+        "package_l_h": 0.0,
+        "package_c_f": 0.0,
+        "vil_v": 0.63,
+        "vih_v": 1.17,
+        "input_noise_rms_v": 0.0
+      }
+    ],
+    "passives": [],
+    "edits": [],
+    "bit_rate_hz": 1000000000.0,
+    "bit_count": 256,
+    "temperature_c": 25.0,
+    "run_time_domain": true,
+    "export_format": "RI"
+  },
+  "capacitor_grades": {
+    "C0G": {
+      "temperature_min_c": -55,
+      "temperature_max_c": 125,
+      "temperature_low_fraction": -0.003,
+      "temperature_high_fraction": 0.003
+    },
+    "X7R": {
+      "temperature_min_c": -55,
+      "temperature_max_c": 125,
+      "temperature_low_fraction": -0.15,
+      "temperature_high_fraction": 0.15
+    },
+    "X5R": {
+      "temperature_min_c": -55,
+      "temperature_max_c": 85,
+      "temperature_low_fraction": -0.15,
+      "temperature_high_fraction": 0.15
+    },
+    "Y5V": {
+      "temperature_min_c": -30,
+      "temperature_max_c": 85,
+      "temperature_low_fraction": -0.82,
+      "temperature_high_fraction": 0.22
+    },
+    "Z5U": {
+      "temperature_min_c": 10,
+      "temperature_max_c": 85,
+      "temperature_low_fraction": -0.56,
+      "temperature_high_fraction": 0.22
+    }
+  },
+  "resistor_grades": {
+    "thick_film": {
+      "tolerance_fraction": 0.01,
+      "tcr_ppm_per_c": 100.0,
+      "noise_index_db": -10.0
+    },
+    "thin_film": {
+      "tolerance_fraction": 0.001,
+      "tcr_ppm_per_c": 25.0,
+      "noise_index_db": -30.0
+    },
+    "metal_film": {
+      "tolerance_fraction": 0.01,
+      "tcr_ppm_per_c": 50.0,
+      "noise_index_db": -25.0
+    },
+    "wirewound": {
+      "tolerance_fraction": 0.01,
+      "tcr_ppm_per_c": 20.0,
+      "noise_index_db": -40.0
+    }
+  },
+  "resistor": {
+    "kind": "resistor",
+    "grade": "thick_film",
+    "resistance_ohm": 33.0,
+    "tolerance_fraction": 0.01,
+    "tcr_ppm_per_c": 100.0,
+    "noise_index_db": -10.0,
+    "inductance_h": 5e-10,
+    "capacitance_f": 5e-14,
+    "dc_voltage_v": 0.0,
+    "temperature_c": 25.0,
+    "corner": "nominal"
+  },
+  "capacitor": {
+    "kind": "capacitor",
+    "grade": "X7R",
+    "capacitance_f": 1e-07,
+    "tolerance_fraction": 0.1,
+    "esr_ohm": 0.03,
+    "esl_h": 5e-10,
+    "leakage_ohm": 1000000000.0,
+    "rated_voltage_v": 25.0,
+    "dc_voltage_v": 0.0,
+    "bias_factor": 1.0,
+    "aging_percent_per_decade": 0.0,
+    "age_hours": 1000.0,
+    "temperature_c": 25.0,
+    "temperature_factor": 1.0,
+    "corner": "nominal"
+  },
+  "source": {
+    "resistance_ohm": 50.0,
+    "low_v": 0.0,
+    "high_v": 1.8,
+    "rise_time_s": 1e-10,
+    "fall_time_s": 1e-10,
+    "capacitance_f": 0.0,
+    "package_r_ohm": 0.0,
+    "package_l_h": 0.0,
+    "package_c_f": 0.0,
+    "pattern_shift_bits": 0,
+    "delay_s": 0.0
+  },
+  "receiver": {
+    "resistance_ohm": 1000000.0,
+    "capacitance_f": 2e-12,
+    "package_r_ohm": 0.0,
+    "package_l_h": 0.0,
+    "package_c_f": 0.0,
+    "vil_v": 0.63,
+    "vih_v": 1.17,
+    "input_noise_rms_v": 0.0
+  },
+  "model_status": "experimental",
+  "production_qualified": false
+}

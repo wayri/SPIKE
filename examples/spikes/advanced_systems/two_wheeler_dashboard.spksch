@@ -1,0 +1,554 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "bd97819f84674bc3b1228b1daf3ea177",
+  "title": "Two-wheeler averaged armature",
+  "source": ".title Two-wheeler averaged armature; mechanical state and back-EMF in C controller\nVdrive motor_in 0 0\nRarm motor_in arm 0.08\nLarm arm emf 500u\nVback emf sense 0\nRsense sense 0 1m\nVspeed omega 0 0\nVcurrent current 0 0\nVthrottle throttle 0 0\nVbrake brake 0 0\nVtemperature controller_temp 0 25\nVbus bus 0 72\n.tran 1m 10 uic\n.end\n",
+  "components": [
+    {
+      "id": "a674fabc6ee043a08cacb2e9cc378fd0",
+      "ref": "VDRIVE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "motor_in",
+        "0"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "3cf74cd85a814dbbb8cd97ea4881fc58",
+      "ref": "RARM",
+      "kind": "resistor",
+      "value": "0.08",
+      "nodes": [
+        "motor_in",
+        "arm"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "fd18193d576142a68b507156678dbdef",
+      "ref": "LARM",
+      "kind": "inductor",
+      "value": "0.0005",
+      "nodes": [
+        "arm",
+        "emf"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "40acc485b482415ea0e3a1b6f9a3c4f1",
+      "ref": "VBACK",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "emf",
+        "sense"
+      ],
+      "x": 740,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "1ab66aaf15584660996d475599989377",
+      "ref": "RSENSE",
+      "kind": "resistor",
+      "value": "0.001",
+      "nodes": [
+        "sense",
+        "0"
+      ],
+      "x": 140,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "e71a81e81fa24b0b837abf53e61aa546",
+      "ref": "VSPEED",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "omega",
+        "0"
+      ],
+      "x": 340,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "939673b73d0248d787209a1136e0fc55",
+      "ref": "VCURRENT",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "current",
+        "0"
+      ],
+      "x": 540,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "18beb366edbb4b8eae03785cdd775eef",
+      "ref": "VTHROTTLE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "throttle",
+        "0"
+      ],
+      "x": 740,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "0355e5e323284ead94d75ded2fb9657f",
+      "ref": "VBRAKE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "brake",
+        "0"
+      ],
+      "x": 140,
+      "y": 500,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "03fc18ec9ee546bf977034ad573db204",
+      "ref": "VTEMPERATURE",
+      "kind": "voltage_source",
+      "value": "25",
+      "nodes": [
+        "controller_temp",
+        "0"
+      ],
+      "x": 340,
+      "y": 500,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "5356b2dc6c784c24a3238556caac70ed",
+      "ref": "VBUS",
+      "kind": "voltage_source",
+      "value": "72",
+      "nodes": [
+        "bus",
+        "0"
+      ],
+      "x": 540,
+      "y": 500,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    }
+  ],
+  "probes": [],
+  "expressions": [],
+  "metadata": {
+    "example_limitations": "Averaged DC equivalent, hypothetical parameters; no three-phase PWM, vendor switches, battery chemistry, HIL or safety certification. Temperature and bus are controller estimates."
+  },
+  "revision": 0,
+  "wires": [],
+  "model_policy": {
+    "schematic": {
+      "tier": "source",
+      "enforce": false
+    },
+    "subsheets": {},
+    "components": {}
+  },
+  "simulation_sequences": [],
+  "annotations": [],
+  "dashboard": {
+    "version": 1,
+    "widgets": [
+      {
+        "id": "80f80fefcd174acfa18d49c22f752907",
+        "kind": "Source control",
+        "title": "Throttle",
+        "expression": "",
+        "x": 0,
+        "y": 0,
+        "width": 300,
+        "height": 190,
+        "minimum": 0,
+        "maximum": 1,
+        "source": "VTHROTTLE"
+      },
+      {
+        "id": "4fb48ef87fb4473194430be402131701",
+        "kind": "Source control",
+        "title": "Regen brake",
+        "expression": "",
+        "x": 320,
+        "y": 0,
+        "width": 300,
+        "height": 190,
+        "minimum": 0,
+        "maximum": 1,
+        "source": "VBRAKE"
+      },
+      {
+        "id": "114b340a475f45f09562bc549d0b0068",
+        "kind": "Meter",
+        "title": "Motor current [A]",
+        "expression": "V(current)",
+        "x": 640,
+        "y": 0,
+        "width": 300,
+        "height": 190,
+        "minimum": -150,
+        "maximum": 150,
+        "source": ""
+      },
+      {
+        "id": "627f012718704a9b995e3a41f145b696",
+        "kind": "Meter",
+        "title": "Motor speed [rad/s]",
+        "expression": "V(omega)",
+        "x": 0,
+        "y": 210,
+        "width": 300,
+        "height": 190,
+        "minimum": 0,
+        "maximum": 650,
+        "source": ""
+      },
+      {
+        "id": "898e0b81e6674f1ca83db99641bb972a",
+        "kind": "Meter",
+        "title": "Controller temperature estimate [degC]",
+        "expression": "V(controller_temp)",
+        "x": 320,
+        "y": 210,
+        "width": 300,
+        "height": 190,
+        "minimum": 0,
+        "maximum": 110,
+        "source": ""
+      },
+      {
+        "id": "814d7c509552420dbab430957305bad2",
+        "kind": "Meter",
+        "title": "Bus voltage estimate [V]",
+        "expression": "V(bus)",
+        "x": 640,
+        "y": 210,
+        "width": 300,
+        "height": 190,
+        "minimum": 60,
+        "maximum": 80,
+        "source": ""
+      },
+      {
+        "id": "e3ef3143d23240d1bf7f25d83c8cc322",
+        "kind": "Scope",
+        "title": "Armature current [A]",
+        "expression": "V(current)",
+        "x": 0,
+        "y": 420,
+        "width": 300,
+        "height": 190,
+        "minimum": -150,
+        "maximum": 150,
+        "source": ""
+      },
+      {
+        "id": "e3565cf1ec0f4d799662a6dd4a003715",
+        "kind": "Scope",
+        "title": "Closed-loop speed [rad/s]",
+        "expression": "V(omega)",
+        "x": 320,
+        "y": 420,
+        "width": 300,
+        "height": 190,
+        "minimum": 0,
+        "maximum": 650,
+        "source": ""
+      }
+    ]
+  },
+  "thermal_setup": {
+    "contract": "spikes/thermal-setup/v1",
+    "solver_binding": "not_coupled",
+    "board": {
+      "length_mm": 100.0,
+      "width_mm": 80.0,
+      "thickness_mm": 1.6,
+      "material": "FR4 (assumption)",
+      "orientation": "horizontal",
+      "layers": [
+        {
+          "name": "L1",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L2",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L3",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L4",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        }
+      ]
+    },
+    "enclosure": {
+      "type": "open_air",
+      "material": "Unspecified",
+      "length_mm": 150.0,
+      "width_mm": 120.0,
+      "height_mm": 50.0,
+      "wall_mm": 2.0,
+      "vent_area_mm2": 0.0
+    },
+    "environment": {
+      "ambient_c": 25.0,
+      "airflow": "natural",
+      "air_speed_m_s": 0.0,
+      "direction": "parallel_to_board",
+      "convection_w_m2k": null,
+      "altitude_m": 0.0
+    },
+    "notes": "Initial authoring assumptions; replace with actual board/environment data."
+  },
+  "run_profile": {
+    "contract": "spikes/run-profile/v1",
+    "name": "Default",
+    "execution": "batch",
+    "analysis": "from_netlist",
+    "time_step": "10u",
+    "stop_time": "5m",
+    "uic": true,
+    "method": "hybrid_trapezoidal",
+    "capture_samples": 20000,
+    "speed_ratio": 1.0,
+    "electrical_temperature_c": null
+  },
+  "plot_layout": {
+    "mode": "units",
+    "panes": {},
+    "heights": {}
+  },
+  "instruments": [],
+  "controller_setup": {
+    "contract": "spikes/generic-controller/v1",
+    "language": "C",
+    "step_s": 0.001,
+    "state_count": 3,
+    "pins": [
+      {
+        "name": "current",
+        "mode": "AI",
+        "node": "sense",
+        "reference": "0",
+        "source": "",
+        "vdd": 3.3
+      },
+      {
+        "name": "speed",
+        "mode": "AI",
+        "node": "omega",
+        "reference": "0",
+        "source": "",
+        "vdd": 3.3
+      },
+      {
+        "name": "throttle",
+        "mode": "AI",
+        "node": "throttle",
+        "reference": "0",
+        "source": "",
+        "vdd": 3.3
+      },
+      {
+        "name": "brake",
+        "mode": "AI",
+        "node": "brake",
+        "reference": "0",
+        "source": "",
+        "vdd": 3.3
+      },
+      {
+        "name": "drive",
+        "mode": "AO",
+        "node": "",
+        "reference": "0",
+        "source": "VDRIVE",
+        "vdd": 1000
+      },
+      {
+        "name": "temperature",
+        "mode": "AO",
+        "node": "",
+        "reference": "0",
+        "source": "VTEMPERATURE",
+        "vdd": 1000
+      },
+      {
+        "name": "bus",
+        "mode": "AO",
+        "node": "",
+        "reference": "0",
+        "source": "VBUS",
+        "vdd": 1000
+      },
+      {
+        "name": "backemf",
+        "mode": "AO",
+        "node": "",
+        "reference": "0",
+        "source": "VBACK",
+        "vdd": 1000
+      },
+      {
+        "name": "omega",
+        "mode": "AO",
+        "node": "",
+        "reference": "0",
+        "source": "VSPEED",
+        "vdd": 1000
+      },
+      {
+        "name": "measured",
+        "mode": "AO",
+        "node": "",
+        "reference": "0",
+        "source": "VCURRENT",
+        "vdd": 1000
+      }
+    ],
+    "source": "/* Educational averaged DC-equivalent drive. Not firmware or a safety controller.\n * inputs: current[A], omega[rad/s], throttle[0..1], brake[0..1]\n * outputs: average voltage[V], temperature estimate[degC], bus estimate[V]\n * state: PI integral, thermal rise, motor speed. Fixed hypothetical 72 V battery.\n */\n#include <math.h>\nstatic double clip(double x,double lo,double hi) { return fmax(lo,fmin(hi,x)); }\nvoid control_step(double time_s,double step_s,const double *inputs,\n                  double *outputs,double *state) {\n    (void)time_s;\n    /* 12-bit signed +/-150 A ADC, no modeled conversion latency. */\n    double measured=inputs[0]/0.001;\n    double current=round(clip(measured,-150,150)/300*4095)*300/4095;\n    state[2]+=step_s*(0.12*measured-0.02*state[2])/0.30;\n    double speed=state[2], throttle=clip(inputs[2],0,1), brake=clip(inputs[3],0,1);\n    double target=brake>0.01 ? -60*brake*clip(speed/30,0,1) : 100*throttle;\n    /* Illustrative thermal foldback; not a rated protection system. */\n    target*=clip((110-(25+state[1]))/20,0,1);\n    double error=target-current;\n    double bus=clip(72-0.03*current,60,80);\n    double unconstrained=0.12*speed+0.4*error+state[0];\n    outputs[0]=clip(unconstrained,-bus,bus);\n    state[0]+=step_s*(40*error+20*(outputs[0]-unconstrained));\n    /* Lumped conduction-only controller loss, Rtheta=1 K/W, Cth=100 J/K. */\n    state[1]+=step_s*(current*current*0.015-state[1])/100;\n    outputs[1]=25+state[1];outputs[2]=bus;\n    outputs[3]=0.12*speed;outputs[4]=speed;outputs[5]=measured;\n}\n"
+  },
+  "power_tree": {
+    "contract": "spikes/power-tree/v1",
+    "stages": []
+  },
+  "analytics_extensions": [],
+  "directives": [
+    {
+      "id": "354b50233dd84fa5ab8a884065af91d6",
+      "group": "Simulation",
+      "title": "",
+      "visible": true,
+      "x": 100.0,
+      "y": 420.0,
+      "text": ".tran 1m 10 uic",
+      "enabled": true,
+      "line": 13,
+      "end_line": 13
+    }
+  ]
+}

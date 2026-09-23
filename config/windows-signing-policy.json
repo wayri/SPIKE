@@ -1,0 +1,13 @@
+{
+  "schema": "spike/windows-signing-policy/v1",
+  "digest_algorithm": "sha256",
+  "timestamp_protocol": "rfc3161",
+  "allowed_timestamp_hosts": [
+    "timestamp.digicert.com",
+    "timestamp.sectigo.com"
+  ],
+  "allowed_certificate_store_scopes": [
+    "CurrentUser",
+    "LocalMachine"
+  ]
+}

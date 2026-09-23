@@ -1,0 +1,70 @@
+{
+  "contract": "spikes/physical-hil-gate/v1",
+  "status": "blocked",
+  "certification_eligible": false,
+  "requirements": {
+    "period_ns": 100000,
+    "maximum_response_latency_ns": 80000,
+    "maximum_absolute_jitter_ns": 5000,
+    "minimum_cycles": 100000,
+    "minimum_duration_s": 60.0,
+    "required_fault_tests": [
+      "watchdog_timeout",
+      "transport_disconnect",
+      "stale_input",
+      "output_safe_state",
+      "emergency_stop"
+    ]
+  },
+  "checks": [
+    {
+      "check": "contract",
+      "status": "passed",
+      "detail": "expected spikes/physical-hil-evidence/v1"
+    },
+    {
+      "check": "physical_execution",
+      "status": "blocked",
+      "detail": "requires an explicitly non-synthetic physical_closed_loop run"
+    },
+    {
+      "check": "target_identity",
+      "status": "blocked",
+      "detail": "manufacturer/model/serial/firmware/fixture identity must be complete and hash-bound"
+    },
+    {
+      "check": "host_identity",
+      "status": "blocked",
+      "detail": "host and exact solver artifact identity are required"
+    },
+    {
+      "check": "calibration",
+      "status": "blocked",
+      "detail": "a present, in-root, digest-matched calibration certificate is required"
+    },
+    {
+      "check": "raw_trace",
+      "status": "blocked",
+      "detail": "raw host/target timestamps and physical I/O sequence data must be retained and digest-bound"
+    },
+    {
+      "check": "hard_realtime_timing",
+      "status": "blocked",
+      "detail": "period, duration, cycle count, zero misses, p99.999 response, jitter and cross-clock error must meet the declared limits"
+    },
+    {
+      "check": "fault_injection",
+      "status": "blocked",
+      "detail": "every required fault must be physically injected, traced and observed in a safe state"
+    },
+    {
+      "check": "independent_attestation",
+      "status": "blocked",
+      "detail": "a separately verified signed manifest is required; an embedded self-assertion is insufficient"
+    }
+  ],
+  "limitations": [
+    "Software tests, simulated loopback, and self-authored timing summaries cannot satisfy this physical gate.",
+    "A passing result is qualification evidence for the named host/target/firmware/fixture only, not universal product certification."
+  ]
+}

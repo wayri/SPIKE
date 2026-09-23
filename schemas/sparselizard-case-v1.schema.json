@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/sparselizard-case-v1.schema.json",
+  "title": "SPIKE sparseLizard Process Case v1",
+  "type": "object",
+  "required": ["contract", "adapter_contract", "engine_id", "analysis", "design", "geometry", "ports", "frequencies_hz", "output", "provenance"],
+  "properties": {
+    "contract": { "const": "spike/sparselizard-case/v1" },
+    "adapter_contract": { "const": "spike/sparselizard-adapter/v1" },
+    "engine_id": { "const": "external.sparselizard" },
+    "analysis": {
+      "type": "object",
+      "required": ["analysis_id", "mode", "net_names", "required_capabilities"],
+      "properties": {
+        "analysis_id": { "type": "string" },
+        "mode": { "type": "string", "minLength": 1 },
+        "net_names": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "required_capabilities": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    },
+    "design": {
+      "type": "object",
+      "required": ["design_id", "name"],
+      "properties": {
+        "design_id": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "const": "geometry.json" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "ports": {
+      "type": "array", "minItems": 2, "maxItems": 64,
+      "items": { "$ref": "#/$defs/port" }
+    },
+    "frequencies_hz": {
+      "type": "array", "minItems": 2, "maxItems": 100000,
+      "items": { "type": "number", "exclusiveMinimum": 0 }
+    },
+    "output": {
+      "type": "object", "required": ["contract", "path"],
+      "properties": { "contract": { "const": "spike/pi-multiport-result/v1" }, "path": { "const": "result.json" } },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object", "required": ["geometry_digest", "request_digest"],
+      "properties": {
+        "geometry_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "request_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "terminal": {
+      "type": "object", "required": ["object_id", "object_type", "net"],
+      "properties": {
+        "object_id": { "type": "string", "minLength": 1 },
+        "object_type": { "enum": ["pad", "via", "zone", "trace", "connector_pin"] },
+        "net": { "type": "string", "minLength": 1 },
+        "layers": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "port": {
+      "type": "object", "required": ["id", "role", "endpoint_reviewed", "positive_terminal", "negative_terminal", "location"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "role": { "enum": ["observation", "candidate"] },
+        "endpoint_reviewed": { "const": true },
+        "positive_terminal": { "$ref": "#/$defs/terminal" },
+        "negative_terminal": { "$ref": "#/$defs/terminal" },
+        "location": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

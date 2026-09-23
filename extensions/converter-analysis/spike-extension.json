@@ -1,0 +1,31 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.converter-analysis",
+  "name": "PWM Converter Analysis",
+  "version": "1.0.0",
+  "provider": "SPIKE",
+  "description": "Build and review staged PWM converter studies using ngspice, reviewed PEEC parasitics, analytics, and thermal loss handoff.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "experimental",
+  "license": "MIT",
+  "bundled": true,
+  "permissions": ["design.read", "selection.read"],
+  "limits": { "timeout_seconds": 30, "max_result_bytes": 1048576 },
+  "contributes": {
+    "applications": [{
+      "id": "converter-study-assistant",
+      "name": "Converter Study Assistant",
+      "description": "Inspect converter-study readiness and create the versioned setup envelope.",
+      "category": "Power conversion",
+      "output_contract": "spike/extension-result/v1"
+    }],
+    "validators": [{
+      "id": "converter-design-readiness",
+      "name": "Converter design readiness",
+      "description": "Report normalized geometry and component-model readiness for a converter study."
+    }]
+  }
+}

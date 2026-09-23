@@ -1,0 +1,16 @@
+{
+  "contract": "spike/extension/v1", "api_version": 1,
+  "id": "spike.harness", "name": "Harness Engineering", "version": "0.1.0", "provider": "SPIKE",
+  "description": "Create, import, validate and compile portable harness connection models.",
+  "execution": "process", "runtime": "python", "entrypoint": "extension.py", "state": "experimental", "bundled": true,
+  "permissions": ["filesystem.workspace", "harness.read"],
+  "contributes": {
+    "importers": [{"id": "harness-import", "name": "Import harness JSON / connection CSV / TSV", "output_contract": "spike/harness/v1",
+      "input_schema": {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}, "column_map": {"type": "object"}, "delimiter": {"enum": [",", ";", "\t", "|"]}}}}],
+    "harness_engines": [{"id": "harness-compile", "name": "Compile harness circuit", "output_contract": "spike/harness-circuit/v1"},
+      {"id": "harness-bind", "name": "Bind to assembly harness pin map", "output_contract": "spike/multiboard-harness-compile-result/v1", "input_schema": {"type": "object", "required": ["multiboard_request"], "properties": {"multiboard_request": {"type": "object"}}}}],
+    "validators": [{"id": "harness-validate", "name": "Check harness connectivity", "output_contract": "spike/harness-analysis/v1"}],
+    "exporters": [{"id": "harness-export", "name": "Export portable harness JSON", "output_contract": "spike/harness/v1"}],
+    "schemas": [{"id": "harness-schema", "name": "Harness schema v1", "output_contract": "spike/harness/v1"}]
+  }
+}

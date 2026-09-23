@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/wave1-clean-machine-harness-v2.schema.json",
+  "title": "SPIKE Wave 1 Clean Machine Harness v2",
+  "description": "Mechanics and review inputs only. A supplied environment attestation is not cryptographic proof that a machine is clean or isolated.",
+  "type": "object",
+  "required": ["contract", "run_id", "provider", "eligible_for_human_review", "inputs_sha256", "installer_sha256", "before_manifest_payload_sha256", "after_manifest_payload_sha256", "environment", "mechanics", "environment_attestation", "artifacts"],
+  "properties": {
+    "contract": {"const": "spike/wave1-clean-machine-harness/v2"},
+    "run_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "provider": {"enum": ["windows-sandbox", "hyperv-vm", "external-clean-vm", "physical-clean-machine", "not-isolated"]},
+    "eligible_for_human_review": {"type": "boolean"},
+    "inputs_sha256": {"$ref": "#/$defs/sha256"},
+    "installer_sha256": {"$ref": "#/$defs/sha256"},
+    "before_manifest_payload_sha256": {"$ref": "#/$defs/sha256"},
+    "after_manifest_payload_sha256": {"$ref": "#/$defs/sha256"},
+    "environment": {
+      "type": "object", "required": ["provider", "os", "gpu", "webview2_version", "display_scale_percent", "process_path_entries", "pre_install_spike_residue"],
+      "properties": {
+        "provider": {"enum": ["windows-sandbox", "hyperv-vm", "external-clean-vm", "physical-clean-machine", "not-isolated"]},
+        "os": {"type": "object", "minProperties": 1},
+        "gpu": {"type": "array", "minItems": 1, "items": {"type": "object", "minProperties": 1}},
+        "webview2_version": {"type": ["string", "null"]},
+        "display_scale_percent": {"type": "number", "minimum": 50, "maximum": 500},
+        "process_path_entries": {"type": "integer", "minimum": 1},
+        "pre_install_spike_residue": {"type": "object", "required": ["uninstall_products", "install_paths", "file_association"], "properties": {"uninstall_products": {"type": "array"}, "install_paths": {"type": "array"}, "file_association": {"type": "object", "minProperties": 1}}, "additionalProperties": false}
+      }, "additionalProperties": false
+    },
+    "mechanics": {"type": "object", "required": ["staged_hashes_verified", "installer_started", "installer_exit_code", "installed_product", "spike_association", "launched_process_id", "after_project_supplied"], "properties": {"staged_hashes_verified": {"const": true}, "installer_started": {"type": "boolean"}, "installer_exit_code": {"type": ["integer", "null"]}, "installed_product": {"type": "array"}, "spike_association": {"type": "object", "minProperties": 1}, "launched_process_id": {"type": ["integer", "null"]}, "after_project_supplied": {"type": "boolean"}}, "additionalProperties": false},
+    "environment_attestation": {"$ref": "#/$defs/environmentAttestation"},
+    "artifacts": {"type": "array", "minItems": 1, "maxItems": 100, "items": {"$ref": "#/$defs/artifact"}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+    "artifact": {"type": "object", "required": ["path", "sha256"], "properties": {"path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$))[^/]+$"}, "sha256": {"$ref": "#/$defs/sha256"}}, "additionalProperties": false},
+    "environmentAttestation": {
+      "type": "object", "required": ["status", "cryptographically_verified", "eligible_for_human_review", "note"],
+      "properties": {
+        "status": {"enum": ["unattested", "supplied_for_human_review"]},
+        "cryptographically_verified": {"const": false},
+        "eligible_for_human_review": {"type": "boolean"},
+        "note": {"type": "string", "minLength": 1, "maxLength": 512},
+        "contract": {"const": "spike/wave1-environment-attestation/v1"},
+        "provider": {"enum": ["windows-sandbox", "hyperv-vm", "external-clean-vm", "physical-clean-machine", "not-isolated"]},
+        "run_id": {"type": "string", "minLength": 1, "maxLength": 128},
+        "inputs_sha256": {"$ref": "#/$defs/sha256"},
+        "attestor": {"type": "string", "minLength": 1, "maxLength": 256},
+        "issued_at": {"type": "string", "format": "date-time", "minLength": 20, "maxLength": 64},
+        "environment_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "isolation_claim": {"type": "string", "minLength": 1, "maxLength": 1024},
+        "artifact": {"$ref": "#/$defs/artifact"}
+      }, "additionalProperties": false
+    }
+  }, "additionalProperties": false
+}

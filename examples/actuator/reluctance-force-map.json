@@ -1,0 +1,11 @@
+{
+  "contract": "spike/actuator-force-map/v1",
+  "kind": "reluctance",
+  "position_m": [0, 0.001, 0.002, 0.003, 0.004],
+  "force_n": [0.02, 0.02, 0.02, 0.02, 0.02],
+  "coenergy_j": [0.02, 0.02002, 0.02004, 0.02006, 0.02008],
+  "fixed_excitation": {"current_a": 2},
+  "relative_tolerance": 0.000001,
+  "absolute_force_tolerance_n": 0.000000000001,
+  "provenance": "Original ideal linear L(x)=0.01+0.01*x H; W'=L*I^2/2. Not a geometry extraction or measurement. SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic"
+}

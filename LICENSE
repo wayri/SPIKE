@@ -1,0 +1,34 @@
+SPIKE REPOSITORY LICENSING NOTICE
+Version 0.1 - 20 August 2026
+
+IMPORTANT: This repository does not currently have one blanket license.
+
+1. A file or directory containing its own license or SPDX identifier is governed
+   by that license. Those terms take precedence for that material.
+
+2. Existing material previously distributed under the MIT License remains
+   available under that grant. Nothing in this notice revokes or narrows a
+   valid earlier grant. The MIT text is recorded in licenses/MIT.txt.
+
+3. External engines, libraries, examples, models, and assets retain their own
+   copyright and license terms. They are not relicensed by SPIKE. See
+   THIRD_PARTY_NOTICES.md and the license files shipped with each component.
+
+4. Commercial SPIKE binary distributions and proprietary modules may be
+   offered under the SPIKE Commercial End User License Agreement. The current
+   legal-review draft is licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md. It does not
+   replace an open-source license that applies to a component.
+
+5. For material that has no applicable open-source license, no permission is
+   granted by this notice beyond rights required by law. Such material is all
+   rights reserved, but only to the extent that the applicable SPIKE licensor
+   owns or is authorized to license it.
+
+6. Contributor and asset provenance cannot be established from this workspace
+   because its Git history is unavailable. A commercial release must not rely
+   on this notice as proof of ownership. The release gate in LICENSING.md must
+   be completed first.
+
+This notice is not legal advice and is not a substitute for review by qualified
+intellectual-property and commercial counsel.
+

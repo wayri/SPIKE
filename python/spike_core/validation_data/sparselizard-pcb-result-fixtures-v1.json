@@ -1,0 +1,98 @@
+{
+  "contract": "spike/sparselizard-pcb-result-fixtures/v1",
+  "engine_id": "external.sparselizard",
+  "purpose": "Deterministic adapter-result contract fixtures; no sparseLizard runtime is required.",
+  "fixtures": [
+    {
+      "id": "ac-rlcg-reviewed-two-port",
+      "expected": {"accepted": true, "normalized_contract": "spike/pdn-multiport/v1"},
+      "result": {
+        "contract": "spike/pi-multiport-result/v1",
+        "engine_id": "external.sparselizard",
+        "status": "completed",
+        "model_status": "validated",
+        "analysis_id": "sl-fixture",
+        "net": "VCC",
+        "z_parameters": [
+          {"frequency_hz": 1000.0, "resistance_ohm": [[0.2, 0.05], [0.05, 0.3]], "reactance_ohm": [[0.0, 0.006283185307179586], [0.006283185307179586, 0.012566370614359173]]},
+          {"frequency_hz": 10000.0, "resistance_ohm": [[0.25, 0.06], [0.06, 0.35]], "reactance_ohm": [[0.0, 0.06283185307179587], [0.06283185307179587, 0.12566370614359174]]}
+        ],
+        "rlcg_network": {"contract": "spike/rlgc-network/v1", "resistance_ohm": 0.2, "inductance_h": 0.000001, "capacitance_f": 0.000000001, "conductance_s": 0.000001},
+        "quality": {"passivity_tolerance_ohm": 0.000000001, "reciprocity_tolerance": 0.000000001},
+        "convergence": {"passed": true, "levels": [{"cells": 100}, {"cells": 400}]},
+        "provenance": {"solver_version": "sparseLizard-fixture", "adapter_version": "fixture-v1", "validation_evidence": "analytical reviewed two-port"}
+      }
+    },
+    {
+      "id": "dc-conduction-result",
+      "expected": {"accepted": false, "error": "Expected spike/pi-multiport-result/v1."},
+      "result": {
+        "contract": "spike/analysis-result/v1",
+        "status": "completed",
+        "model_status": "validated",
+        "mode": "dc",
+        "summary": {"max_voltage_drop_v": 0.02},
+        "fields": {"edge_results": [{"id": "trace-1", "current_a": 1.0, "voltage_drop_v": 0.02}]}
+      }
+    },
+    {
+      "id": "thermal-result",
+      "expected": {"accepted": false, "error": "Expected spike/pi-multiport-result/v1."},
+      "result": {
+        "contract": "spike/thermal-result/v1",
+        "status": "completed",
+        "model_status": "validated",
+        "summary": {"max_steady_temperature_c": 72.0},
+        "sources": [{"id": "U1", "power_w": 2.0, "steady_temperature_c": 72.0}]
+      }
+    },
+    {
+      "id": "field-output-result",
+      "expected": {"accepted": false, "error": "Expected spike/pi-multiport-result/v1."},
+      "result": {
+        "contract": "spike/analysis-result/v1",
+        "status": "completed",
+        "model_status": "validated",
+        "fields": {"visualization": {"scalar_fields": {"voltage_v": [{"x_mm": 0.0, "y_mm": 0.0, "value": 5.0}]}, "vector_fields": {"current_density": [{"x_mm": 0.0, "y_mm": 0.0, "dx": 1.0, "dy": 0.0, "value": 1.0}]}}}
+      }
+    },
+    {
+      "id": "claimed-validated-without-evidence",
+      "expected": {"accepted": false, "error": "validation_evidence"},
+      "result": {
+        "contract": "spike/pi-multiport-result/v1",
+        "engine_id": "external.sparselizard",
+        "status": "completed",
+        "model_status": "validated",
+        "analysis_id": "sl-fixture",
+        "net": "VCC",
+        "z_parameters": [
+          {"frequency_hz": 1000.0, "resistance_ohm": [[0.2, 0.05], [0.05, 0.3]], "reactance_ohm": [[0.0, 0.0], [0.0, 0.0]]},
+          {"frequency_hz": 10000.0, "resistance_ohm": [[0.2, 0.05], [0.05, 0.3]], "reactance_ohm": [[0.0, 0.0], [0.0, 0.0]]}
+        ],
+        "quality": {"passivity_tolerance_ohm": 0.000000001, "reciprocity_tolerance": 0.000000001},
+        "convergence": {"passed": true, "levels": [{"cells": 100}, {"cells": 400}]},
+        "provenance": {"solver_version": "sparseLizard-fixture", "adapter_version": "fixture-v1"}
+      }
+    },
+    {
+      "id": "unvalidated-pi-result",
+      "expected": {"accepted": false, "error": "unvalidated"},
+      "result": {
+        "contract": "spike/pi-multiport-result/v1",
+        "engine_id": "external.sparselizard",
+        "status": "completed",
+        "model_status": "unvalidated",
+        "analysis_id": "sl-fixture",
+        "net": "VCC",
+        "z_parameters": [
+          {"frequency_hz": 1000.0, "resistance_ohm": [[0.2, 0.05], [0.05, 0.3]], "reactance_ohm": [[0.0, 0.0], [0.0, 0.0]]},
+          {"frequency_hz": 10000.0, "resistance_ohm": [[0.2, 0.05], [0.05, 0.3]], "reactance_ohm": [[0.0, 0.0], [0.0, 0.0]]}
+        ],
+        "quality": {"passivity_tolerance_ohm": 0.000000001, "reciprocity_tolerance": 0.000000001},
+        "convergence": {"passed": true, "levels": [{"cells": 100}, {"cells": 400}]},
+        "provenance": {"solver_version": "sparseLizard-fixture", "adapter_version": "fixture-v1"}
+      }
+    }
+  ]
+}

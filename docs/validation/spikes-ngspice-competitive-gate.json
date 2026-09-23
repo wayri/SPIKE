@@ -1,0 +1,78 @@
+{
+  "contract": "spikes/competitive-release-gate/v1",
+  "candidate": "SPIKES",
+  "reference": "ngspice",
+  "evaluated_on": "2026-08-30",
+  "status": "blocked",
+  "claim_eligible": false,
+  "summary": {
+    "required_gates": 10,
+    "passed_gates": 0,
+    "blocked_gates": 10
+  },
+  "gates": [
+    {"id": "compatibility.spice_language_models", "status": "blocked"},
+    {
+      "id": "analysis.complete_modes",
+      "status": "blocked",
+      "implemented_evidence": [
+        "owned C++ operating-point execution",
+        "owned C++ independent-operating-point DC sweeps",
+        "owned C++ bounded transient execution"
+      ]
+    },
+    {"id": "devices.qualified_breadth", "status": "blocked"},
+    {"id": "extensions.compiled_models", "status": "blocked"},
+    {
+      "id": "switching.converter_accuracy_convergence",
+      "status": "blocked",
+      "implemented_evidence": [
+        "native PULSE/PWL sources",
+        "exact source breakpoint solves",
+        "event-aware hybrid trapezoidal/backward-Euler integration",
+        "bounded exact-matrix LU factorization reuse with diagnostics",
+        "bidirectional analytic-Jacobian voltage-controlled switch"
+      ]
+    },
+    {
+      "id": "performance.public_corpora",
+      "status": "blocked",
+      "implemented_evidence": [
+        "compressed sparse MNA stamping",
+        "reusable symbolic sparsity analysis",
+        "sparse LU and sparse QR",
+        "ILUT-preconditioned GMRES",
+        "configurable native linear-solver ABI with thread diagnostics",
+        "same-deck cold-process accuracy and timing checks against installed ngspice and LTspice"
+      ],
+      "blocking_scope": [
+        "current competitive corpus contains only three small DC operating-point cases",
+        "no medium, large, AC, transient, switching, memory, or thread-scaling comparison corpus",
+        "current report explicitly marks the performance claim ineligible"
+      ]
+    },
+    {"id": "robustness.adversarial_corpus", "status": "blocked"},
+    {
+      "id": "embedding.continuous_hil",
+      "status": "blocked",
+      "implemented_evidence": [
+        "stable additive C ABI",
+        "explicit ctypes bridge",
+        "persistent transient sessions",
+        "interactive source updates and bounded lockstep stepping",
+        "checkpoint and bit-exact restore",
+        "packaged JSON-line worker session API",
+        "desktop resident-worker routing preserves session identity across commands",
+        "soft-real-time functional qualification"
+      ],
+      "blocking_scope": [
+        "no deterministic WCET qualification",
+        "no physical I/O latency or jitter qualification",
+        "no HIL hardware exercised"
+      ]
+    },
+    {"id": "library.qualified_redistributable_models", "status": "blocked"},
+    {"id": "platform.cross_platform_reproducibility", "status": "blocked"}
+  ],
+  "policy": "No superiority claim is permitted until every required gate passes with reproducible evidence."
+}

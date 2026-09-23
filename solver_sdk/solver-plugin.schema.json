@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/solver-plugin-v1.json",
+  "title": "SPIKE Solver Plugin Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "api_version",
+    "id",
+    "name",
+    "version",
+    "provider",
+    "analyses",
+    "formulations",
+    "capabilities",
+    "execution",
+    "state",
+    "model_status",
+    "validation",
+    "license"
+  ],
+  "properties": {
+    "contract": { "const": "spike/solver-plugin/v1" },
+    "api_version": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9._-]+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "provider": { "type": "string", "minLength": 1 },
+    "analyses": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "formulations": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+    "capabilities": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "geometry_contracts": {
+      "type": "array",
+      "items": { "enum": ["spike/v1", "spike/net-geometry/v1", "spike/solver-geometry/v1"] },
+      "default": ["spike/v1", "spike/net-geometry/v1", "spike/solver-geometry/v1"]
+    },
+    "result_contract": { "const": "spike/v1", "default": "spike/v1" },
+    "execution": { "enum": ["builtin", "process"] },
+    "entrypoint": { "type": "string", "default": "" },
+    "state": { "enum": ["available", "experimental", "integration_pending", "unavailable"] },
+    "model_status": { "enum": ["validated", "approximate", "solver_dependent", "unsupported"] },
+    "validation": { "type": "string", "minLength": 1 },
+    "license": { "type": "string", "minLength": 1 },
+    "bundled": { "type": "boolean", "default": false },
+    "priority": { "type": "integer", "default": 0 },
+    "limits": { "type": "object", "default": {} },
+    "runtime_probe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "argv", "timeout_s", "result_contract"],
+      "properties": {
+        "contract": { "const": "spike/solver-plugin-probe/v1" },
+        "argv": { "type": "array", "minItems": 1, "maxItems": 16, "items": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^[^\\u0000\\r\\n]+$" } },
+        "timeout_s": { "type": "integer", "minimum": 1, "maximum": 60 },
+        "result_contract": { "const": "spike/solver-plugin-probe-result/v1" }
+      }
+    },
+    "interchange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["job_contract", "mesh_contracts", "artifact_result_contract"],
+      "properties": {
+        "job_contract": { "const": "spike/solver-plugin-job/v1" },
+        "mesh_contracts": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["spike/solver-mesh/v1", "spike/dc-fem-conductor-volumes/v1", "spike/solver-geometry/v1"] } },
+        "artifact_result_contract": { "const": "spike/solver-plugin-result/v1" }
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime_probe_required", "adapter_validation_required", "workflow_validation_required"],
+      "properties": {
+        "runtime_probe_required": { "type": "boolean" },
+        "adapter_validation_required": { "type": "boolean" },
+        "workflow_validation_required": { "type": "boolean" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "execution": { "const": "process" } }, "required": ["execution"] },
+      "then": { "required": ["entrypoint", "runtime_probe", "interchange", "qualification"] }
+    }
+  ]
+}

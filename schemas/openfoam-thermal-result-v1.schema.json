@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-thermal-result-v1.schema.json",
+  "title": "SPIKE OpenFOAM Thermal Result v1",
+  "type": "object",
+  "required": ["contract", "adapter_contract", "status", "model_status", "summary", "issues", "provenance", "fields"],
+  "properties": {
+    "contract": {"const": "spike/openfoam-thermal-result/v1"},
+    "adapter_contract": {"const": "spike/openfoam-adapter/v1"},
+    "status": {"const": "completed"},
+    "model_status": {"const": "experimental"},
+    "summary": {"type": "object"},
+    "issues": {"type": "array", "items": {"type": "object"}},
+    "provenance": {"type": "object", "required": ["scenario_digest", "case_file_digest"], "properties": {"scenario_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "case_file_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}, "additionalProperties": true},
+    "fields": {"type": "object", "required": ["temperature_k", "velocity_m_s", "pressure_pa"], "additionalProperties": false, "properties": {"temperature_k": {"$ref": "#/$defs/scalarFieldK"}, "velocity_m_s": {"$ref": "#/$defs/vectorField"}, "pressure_pa": {"$ref": "#/$defs/scalarFieldPa"}}}
+  },
+  "$defs": {
+    "point": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}},
+    "scalarFieldK": {"type": "object", "required": ["unit", "samples"], "properties": {"unit": {"const": "K"}, "samples": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["point_m", "value"], "properties": {"point_m": {"$ref": "#/$defs/point"}, "value": {"type": "number"}}, "additionalProperties": true}}}, "additionalProperties": false},
+    "scalarFieldPa": {"type": "object", "required": ["unit", "samples"], "properties": {"unit": {"const": "Pa"}, "samples": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["point_m", "value"], "properties": {"point_m": {"$ref": "#/$defs/point"}, "value": {"type": "number"}}, "additionalProperties": true}}}, "additionalProperties": false},
+    "vectorField": {"type": "object", "required": ["unit", "samples"], "properties": {"unit": {"const": "m/s"}, "samples": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["point_m", "value"], "properties": {"point_m": {"$ref": "#/$defs/point"}, "value": {"$ref": "#/$defs/point"}}, "additionalProperties": true}}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

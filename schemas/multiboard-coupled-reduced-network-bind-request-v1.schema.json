@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/multiboard-coupled-reduced-network-bind-request-v1.schema.json",
+  "title": "SPIKE multi-board coupled reduced-network bind request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "multiboard_request", "board_port_networks", "connector_bindings", "reference_nodes", "conductor_models", "return_paths"],
+  "properties": {
+    "contract": {"const": "spike/multiboard-coupled-reduced-network-bind-request/v1"},
+    "multiboard_request": {"$ref": "multiboard-analysis-request-v1.schema.json"},
+    "board_port_networks": {"type": "array", "minItems": 1, "maxItems": 30, "items": {"type": "object"}},
+    "connector_bindings": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "reference_nodes": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "conductor_models": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "return_paths": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "shield_paths": {"type": "array", "items": {"type": "object"}},
+    "mutual_terms": {"type": "array", "items": {"type": "object"}}
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.example.net-inventory",
+  "name": "Net Inventory",
+  "version": "1.0.0",
+  "provider": "SPIKE SDK",
+  "description": "Example general-purpose extension that summarizes normalized design nets.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "available",
+  "license": "MIT",
+  "bundled": true,
+  "permissions": ["design.read"],
+  "limits": {
+    "timeout_seconds": 30,
+    "max_result_bytes": 1048576
+  },
+  "contributes": {
+    "applications": [
+      {
+        "id": "net-inventory-app",
+        "name": "Net Inventory",
+        "description": "Inspect net and conductor counts for any normalized board.",
+        "category": "Design utilities",
+        "output_contract": "spike/extension-result/v1"
+      }
+    ],
+    "commands": [
+      {
+        "id": "summarize-nets",
+        "name": "Summarize nets",
+        "description": "Return a machine-readable net inventory."
+      }
+    ],
+    "reports": [
+      {
+        "id": "net-inventory-report",
+        "name": "Net inventory report",
+        "description": "Generate structured net inventory report data."
+      }
+    ]
+  }
+}

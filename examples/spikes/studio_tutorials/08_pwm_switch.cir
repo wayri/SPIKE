@@ -1,0 +1,8 @@
+.title Tutorial 08 - Smooth controlled switching
+Vs in 0 10
+Vgate gate 0 PULSE(0 5 100u 10u 10u 200u 500u)
+Smain in out gate 0 1 1meg 2.5 100m
+Rload out 0 10
+.tran 10u 2m
+* Owned smooth-switch extension, not a vendor MOSFET loss model.
+.end

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-multiregion-request-v1.schema.json",
+  "title": "SPIKE OpenFOAM Multi-region Request v1",
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "required": ["id", "sha256", "contract", "qualified"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "contract": {"type": "string", "minLength": 1},
+        "qualified": {"const": true}
+      },
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "required": ["contract", "mesh_evidence", "materials", "regions", "interfaces", "heat_sources", "environment", "fans", "heatsinks"],
+  "properties": {
+    "contract": {"const": "spike/openfoam-multiregion-request/v1"},
+    "mesh_evidence": {"$ref": "#/$defs/evidence"},
+    "materials": {"type": "array", "minItems": 1, "maxItems": 256, "items": {"type": "object", "properties":{"density_model":{"$ref":"openfoam-density-model-v1.schema.json"}}}},
+    "regions": {"type": "array", "minItems": 1, "maxItems": 128, "items": {"type": "object"}},
+    "interfaces": {"type": "array", "maxItems": 2048, "items": {"type": "object"}},
+    "heat_sources": {"type": "array", "maxItems": 10000, "items": {"type": "object"}},
+    "environment": {"type": "object", "properties": {
+      "dpdt_enabled": {"type": "boolean", "default": true, "description": "false explicitly selects constant-density zero-gravity no-dpdt thermal model; not pressure-work qualification"},
+      "turbulence_model": {"$ref": "openfoam-turbulence-model-v1.schema.json"},
+      "pressure_outlets": {"type": "array", "maxItems": 256, "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["fluid_region_id", "boundary_patch", "static_pressure_pa", "backflow_temperature_k"],
+        "properties": {
+          "fluid_region_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+          "boundary_patch": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+          "static_pressure_pa": {"type": "number", "exclusiveMinimum": 0},
+          "backflow_temperature_k": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }}
+    }},
+    "fans": {"type": "array", "maxItems": 64, "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "fluid_region_id", "flow_rate_m3_s", "boundary_evidence"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+        "fluid_region_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+        "boundary_patch": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+        "flow_rate_m3_s": {"type": "number", "exclusiveMinimum": 0},
+        "inlet_temperature_k": {"type": "number", "exclusiveMinimum": 0},
+        "boundary_evidence": {"$ref": "#/$defs/evidence"}
+      }
+    }},
+    "heatsinks": {"type": "array", "maxItems": 256, "items": {"type": "object"}},
+    "numerics": {
+      "type": "object",
+      "properties": {
+        "end_time_s": {"type": "number", "exclusiveMinimum": 0},
+        "delta_t_s": {"type": "number", "exclusiveMinimum": 0},
+        "write_interval_steps": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "validation_interval_steps": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "outer_correctors": {"type": "integer", "minimum": 1, "maximum": 50}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

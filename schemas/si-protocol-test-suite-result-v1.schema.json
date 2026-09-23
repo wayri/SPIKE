@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/si-protocol-test-suite-result-v1.schema.json",
+  "title": "SPIKE SI protocol test-suite result v1",
+  "type": "object",
+  "required": ["contract", "status", "model_status", "production_qualified", "compliance_status", "suite", "lanes", "summary", "resource_admission", "release_gate"],
+  "properties": {
+    "contract": {"const": "spike/si-protocol-test-suite-result/v1"},
+    "status": {"const": "completed"},
+    "model_status": {"const": "experimental"},
+    "production_qualified": {"const": false},
+    "compliance_status": {"const": "not_evaluated"},
+    "suite": {"type": "object"},
+    "lanes": {"type": "array", "minItems": 1, "maxItems": 32},
+    "summary": {"type": "object"},
+    "resource_admission": {"type": "object"},
+    "release_gate": {"type": "object"}
+  }
+}

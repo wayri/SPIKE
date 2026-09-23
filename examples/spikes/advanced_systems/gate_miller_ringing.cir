@@ -1,0 +1,10 @@
+.title Linear gate-loop resonance and drain-to-gate capacitive injection
+Vgate command 0 PULSE(0 12 100n 10n 10n 400n 1u)
+Rdriver command gate_lead 2
+Lpackage gate_lead gate 20n
+Cgs gate 0 2n
+Cgd gate drain 100p
+Vdrain drain 0 PULSE(72 0 200n 5n 5n 400n 1u)
+Rleak gate 0 1G
+.tran 1n 3u uic
+.end

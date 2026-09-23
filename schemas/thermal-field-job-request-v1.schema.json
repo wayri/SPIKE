@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/thermal-field-job-request-v1.schema.json",
+  "title": "SPIKE Thermal Field Job Request v1",
+  "type": "object",
+  "required": ["contract", "scenario", "solver_selection"],
+  "properties": {
+    "contract": {"const": "spike/thermal-field-job-request/v1"},
+    "job_id": {"type": "string", "maxLength": 160},
+    "scenario": {"type": "object"},
+    "solver_selection": {"type": "object", "required": ["solver_id"], "properties": {"solver_id": {"type": "string", "minLength": 1, "maxLength": 160}}, "additionalProperties": false},
+    "requested_physics": {"type": "array", "maxItems": 20, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 80}},
+    "geometry": {"type": "object"},
+    "resource_budget": {"type": "object"},
+    "cancellation_enabled": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}

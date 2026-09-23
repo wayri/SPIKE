@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spikes-simulator"
+version = "0.3.0b1"
+description = "SPIKES circuit-simulation engine, CLI, model tools, and Studio contracts"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+]
+
+[project.optional-dependencies]
+studio = ["matplotlib>=3.8", "wxPython>=4.2", "Pillow>=10"]
+
+[project.scripts]
+spikes = "python.spikes.cli:main"
+spikes-model-import = "spikes_studio.model_import:main"
+spikes-studio = "spikes_studio.desktop:main"
+
+[tool.setuptools]
+packages = ["python", "python.spikes", "python.spike_core", "spikes_studio"]
+
+[tool.setuptools.package-dir]
+spikes_studio = "studio/python/spikes_studio"
+
+[tool.setuptools.data-files]
+"share/spikes/studio/docs" = ["studio/docs/WORKBENCH_GUIDE.md", "studio/docs/COMPONENT_LIBRARY.md"]
+"share/spikes/studio/docs/media" = ["studio/docs/media/*.png", "studio/docs/media/*.gif", "studio/docs/media/*.json", "studio/docs/media/*.svg", "studio/docs/media/*.spksch", "studio/docs/media/*.spkdata", "studio/docs/media/*.vcd"]
+"share/spikes/studio/docs/media/reliability" = ["studio/docs/media/reliability/*"]
+"share/spikes/studio/schemas" = ["studio/schemas/*.json"]
+"share/spikes/studio/library" = ["studio/library/*.json", "studio/library/*.cir", "studio/library/*.svg", "studio/library/*.png", "studio/library/*.ico"]

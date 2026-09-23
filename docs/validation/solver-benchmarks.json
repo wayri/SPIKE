@@ -1,0 +1,116 @@
+{
+  "contract": "spike/solver-benchmark-report/v1",
+  "status": "passed",
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "benchmarks": [
+    {
+      "name": "straight_trace_dc_resistance",
+      "status": "passed",
+      "measured": 0.009852216748768471,
+      "expected": 0.009852216748768475,
+      "relative_error": 3.521488656232918e-16,
+      "tolerance": 1e-10,
+      "units": "ohm",
+      "detail": "R = length / (conductivity * width * thickness); segmentation must be invariant."
+    },
+    {
+      "name": "plated_via_dc_resistance",
+      "status": "passed",
+      "measured": 0.001057092778520175,
+      "expected": 0.0010570927785201747,
+      "relative_error": 2.0512904723524461e-16,
+      "tolerance": 1e-10,
+      "units": "ohm",
+      "detail": "The rectangular PEEC surrogate preserves the exact annular barrel area."
+    },
+    {
+      "name": "square_zone_sheet_resistance_convergence",
+      "status": "passed",
+      "measured": 0.00048029556650245475,
+      "expected": 0.0004926108374384237,
+      "relative_error": 0.025000000000016998,
+      "tolerance": 0.03,
+      "units": "ohm/square",
+      "detail": "cells_mm=[2.0, 1.0, 0.5, 0.25]; relative_errors=[0.2, 0.1, 0.05, 0.025]"
+    },
+    {
+      "name": "hybrid_trace_zone_pad_via_connectivity",
+      "status": "passed",
+      "measured": 0.008550303398992834,
+      "expected": null,
+      "relative_error": null,
+      "tolerance": null,
+      "units": "ohm",
+      "detail": "geometry_counts={'track': 2, 'zone': 1, 'via': 1, 'pad': 1}; nodes=45; branches=70"
+    },
+    {
+      "name": "native_straight_trace_self_inductance",
+      "status": "passed",
+      "measured": 1.6664176609586414e-08,
+      "expected": 1.6664176609586414e-08,
+      "relative_error": 0.0,
+      "tolerance": 1e-08,
+      "units": "henry",
+      "detail": "Independent Python evaluation of the rectangular-conductor Rosa/Grover expression."
+    },
+    {
+      "name": "native_hybrid_peec_mna",
+      "status": "passed",
+      "measured": 0.008550304535625525,
+      "expected": null,
+      "relative_error": null,
+      "tolerance": null,
+      "units": "ohm",
+      "detail": "status=completed; geometry_counts={'track': 2, 'zone': 1, 'via': 1, 'pad': 1}; ports=1"
+    },
+    {
+      "name": "wide_microstrip_parallel_plate_capacitance_limit",
+      "status": "passed",
+      "measured": 3.62119168295309e-09,
+      "expected": 3.54167512512e-09,
+      "relative_error": 0.022451680355745636,
+      "tolerance": 0.05,
+      "units": "farad/meter",
+      "detail": "A wide microstrip must approach the independent parallel-plate electrostatic limit."
+    },
+    {
+      "name": "native_ac_resistance_monotonicity",
+      "status": "passed",
+      "measured": 0.13006867684633483,
+      "expected": 0.049261083765374095,
+      "relative_error": null,
+      "tolerance": null,
+      "units": "ohm",
+      "detail": "frequency_sweep_resistance_ohm=[0.049261083765374095, 0.04926109055277549, 0.049263236877349764, 0.049937969134582344, 0.13006867684633483]"
+    },
+    {
+      "name": "peec_shared_reference_multiport_resistor_matrix",
+      "status": "passed",
+      "measured": 0.0,
+      "expected": 0.0,
+      "relative_error": 0.0,
+      "tolerance": 1e-12,
+      "units": "relative_frobenius",
+      "detail": "Two-port closed-form Z=[[R1,R1],[R1,R1+R2]] with non-contiguous mesh node IDs; method=dense_direct; residual=0. This verifies MNA assembly and the multi-right-hand-side solve, not PCB field extraction."
+    },
+    {
+      "name": "pdn_two_port_capacitor_loading_circuit_reference",
+      "status": "passed",
+      "measured": 6.856592385534563e-16,
+      "expected": 0.0,
+      "relative_error": 6.856592385534563e-16,
+      "tolerance": 1e-10,
+      "units": "relative",
+      "detail": "Compared the multiport loading response against an independent passive two-node nodal re-solve at 17 frequencies; this validates the circuit reduction only, not PCB multiport extraction or placement accuracy."
+    }
+  ],
+  "limitations": [
+    "These fixtures validate extraction, units, topology, convergence, passivity metadata, AC-loss monotonicity, one capacitance asymptote, a closed-form shared-reference multiport matrix, and the PDN two-port loading circuit identity; they do not replace arbitrary-geometry electrostatic or full-wave validation.",
+    "Measured fixture and trusted-tool correlation remain required before sign-off claims."
+  ]
+}

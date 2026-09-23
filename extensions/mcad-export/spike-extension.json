@@ -1,0 +1,13 @@
+{
+  "contract": "spike/extension/v1", "api_version": 1,
+  "id": "spike.mcad", "name": "MCAD Collaboration", "version": "0.1.0", "provider": "SPIKE",
+  "description": "Export named STEP assemblies and a STEP/FreeCAD/BREP collaboration bundle with material and source metadata. Requires the optional FreeCAD runtime. Preview reports omitted geometry before export.",
+  "execution": "process", "runtime": "python", "entrypoint": "extension.py", "state": "experimental", "bundled": true,
+  "permissions": ["design.read", "project.read", "harness.read"],
+  "limits": {"timeout_seconds": 360, "max_result_bytes": 268435456},
+  "contributes": {
+    "commands": [{"id": "mcad-plan", "name": "Preview mechanical assembly", "description": "Review named bodies and geometry omissions before export.", "output_contract": "spike/mcad-assembly/v1", "input_schema": {"type": "object", "properties": {"assembly": {"type": "object"}, "objects": {"type": "array"}, "materials": {"type": "array"}, "board_rings": {"type": "array"}, "wire_radius_mm": {"type": "object"}, "route_frames": {"type": "object"}}}}],
+    "exporters": [{"id": "mcad-export", "name": "Export STEP and collaboration bundle", "description": "STEP, FCStd, individual BREP solids and JSON metadata; named solids are reimport-checked.", "output_contract": "spike/mcad-export/v1", "input_schema": {"type": "object", "properties": {"assembly": {"type": "object"}, "allow_partial": {"type": "boolean"}, "objects": {"type": "array"}, "materials": {"type": "array"}, "board_rings": {"type": "array"}, "wire_radius_mm": {"type": "object"}, "route_frames": {"type": "object"}}}}],
+    "schemas": [{"id": "mcad-schema", "name": "Mechanical assembly schema", "output_contract": "spike/mcad-assembly/v1"}]
+  }
+}

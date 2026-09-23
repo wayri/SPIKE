@@ -1,0 +1,19 @@
+{
+  "contract": "spike/structured-solid-thermal-request/v1",
+  "grid": {"shape": [8, 1, 1], "spacing_m": [0.001, 0.01, 0.01]},
+  "materials": [
+    {"id": "aluminum", "thermal_conductivity_w_mk": [205.0, 205.0, 205.0], "density_kg_m3": 2700.0, "specific_heat_j_kgk": 900.0}
+  ],
+  "material_ids": ["aluminum", "aluminum", "aluminum", "aluminum", "aluminum", "aluminum", "aluminum", "aluminum"],
+  "heat_generation_w_m3": 100000.0,
+  "boundaries": {
+    "x_min": {"type": "temperature", "temperature_k": 300.0},
+    "x_max": {"type": "convection", "ambient_temperature_k": 300.0, "heat_transfer_coefficient_w_m2k": 15.0},
+    "y_min": {"type": "adiabatic"},
+    "y_max": {"type": "adiabatic"},
+    "z_min": {"type": "radiation", "ambient_temperature_k": 300.0, "emissivity": 0.8},
+    "z_max": {"type": "adiabatic"}
+  },
+  "study": {"type": "steady"},
+  "solver": {"radiation_tolerance_k": 1e-8, "radiation_max_iterations": 50}
+}

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pi-multiport-result-v1.schema.json",
+  "title": "SPIKE External PI Multiport Result v1",
+  "type": "object",
+  "required": [
+    "contract", "engine_id", "status", "model_status", "analysis_id", "net",
+    "ports", "z_parameters", "quality", "convergence", "provenance"
+  ],
+  "properties": {
+    "contract": { "const": "spike/pi-multiport-result/v1" },
+    "engine_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "status": { "const": "completed" },
+    "model_status": {
+      "enum": ["validated", "reference_validated", "approximate", "experimental", "unvalidated"]
+    },
+    "analysis_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "source_result_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "net": { "type": "string", "minLength": 1, "maxLength": 512 },
+    "reference": { "type": "object" },
+    "reciprocal": { "type": "boolean" },
+    "ports": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 64,
+      "items": { "$ref": "#/$defs/port" }
+    },
+    "z_parameters": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 100000,
+      "items": { "$ref": "#/$defs/matrixPoint" }
+    },
+    "quality": {
+      "type": "object",
+      "properties": {
+        "passivity_tolerance_ohm": { "type": "number", "exclusiveMinimum": 0 },
+        "reciprocity_tolerance": { "type": "number", "exclusiveMinimum": 0 },
+        "maximum_relative_residual": { "type": "number", "minimum": 0 },
+        "maximum_condition_number": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "convergence": {
+      "type": "object",
+      "required": ["passed", "levels"],
+      "properties": {
+        "passed": { "const": true },
+        "levels": { "type": "array", "minItems": 2, "items": { "type": "object" } }
+      },
+      "additionalProperties": true
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["solver_version", "adapter_version", "geometry_digest", "request_digest"],
+      "properties": {
+        "solver_version": { "type": "string", "minLength": 1 },
+        "adapter_version": { "type": "string", "minLength": 1 },
+        "geometry_digest": { "type": "string", "minLength": 16 },
+        "request_digest": { "type": "string", "minLength": 16 },
+        "validation_evidence": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    },
+    "validity": { "type": "object" }
+  },
+  "$defs": {
+    "terminal": {
+      "type": "object",
+      "required": ["object_id", "object_type", "net"],
+      "properties": {
+        "object_id": { "type": "string", "minLength": 1 },
+        "object_type": { "enum": ["pad", "via", "zone", "trace", "connector_pin"] },
+        "net": { "type": "string", "minLength": 1 },
+        "board_id": { "type": "string" },
+        "layers": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "port": {
+      "type": "object",
+      "required": ["id", "role", "endpoint_reviewed", "positive_terminal", "negative_terminal"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "role": { "enum": ["observation", "candidate"] },
+        "endpoint_reviewed": { "const": true },
+        "positive_terminal": { "$ref": "#/$defs/terminal" },
+        "negative_terminal": { "$ref": "#/$defs/terminal" },
+        "location": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "matrixPoint": {
+      "type": "object",
+      "required": ["frequency_hz", "resistance_ohm", "reactance_ohm"],
+      "properties": {
+        "frequency_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "resistance_ohm": { "type": "array", "minItems": 2, "items": { "type": "array", "items": { "type": "number" } } },
+        "reactance_ohm": { "type": "array", "minItems": 2, "items": { "type": "array", "items": { "type": "number" } } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

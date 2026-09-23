@@ -1,0 +1,9 @@
+.title Native NMOS constant terminal-charge switching example - use BE or BDF2
+Vbus bus 0 12
+Rload bus drain 100
+Vcommand command 0 PULSE(0 5 1u 100n 100n 4u 10u)
+Rgate command gate 20
+M1 drain gate 0 0 mm W=10u L=1u
+.model mm NMOS(LEVEL=1 VTO=1 KP=1m CGS=1n CGD=200p CDS=100p)
+.tran 10n 20u
+.end

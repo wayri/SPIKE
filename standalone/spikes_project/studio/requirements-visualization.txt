@@ -1,0 +1,9 @@
+# Verified development visualization stack (Python 3.11, Windows x64).
+# Runtime/native dependency and redistribution audit is still required per release.
+# Do not install Qt backend extras.
+wxPython==4.3.1
+matplotlib==3.11.1
+numpy==2.4.6
+plotly==6.9.0
+narwhals==2.26.0
+packaging==26.3

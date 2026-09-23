@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spikes.local/schemas/studio-ai-model-draft-v1.schema.json",
+  "title": "SPIKES Studio AI-assisted model draft",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["contract", "part", "evidence", "symbol", "model", "qualification", "execution", "validation_plan"],
+  "properties": {
+    "contract": {"const": "spikes/studio-ai-model-draft/v1"},
+    "provider": {"enum": ["lm_studio", "ollama"]},
+    "provider_model": {"type": "string", "minLength": 1},
+    "part": {
+      "type": "object",
+      "required": ["name", "family", "pins"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "family": {"type": "string", "minLength": 1},
+        "pins": {"type": "array", "minItems": 1, "maxItems": 512}
+      }
+    },
+    "evidence": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "symbol": {
+      "type": "object",
+      "required": ["terminals", "body_keepout"],
+      "properties": {
+        "terminals": {"type": "array", "minItems": 1},
+        "body_keepout": {"type": "object"}
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": ["backend", "source"],
+      "properties": {
+        "backend": {"enum": ["spice_compact", "spice_behavioral", "verilog_a", "c_block"]},
+        "source": {"type": "string"},
+        "validity_envelope": {"type": "object"}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "required": ["state", "human_review_required"],
+      "properties": {
+        "state": {"const": "unreviewed"},
+        "human_review_required": {"const": true}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "required": ["allowed", "generated_source_is_inert"],
+      "properties": {
+        "allowed": {"const": false},
+        "generated_source_is_inert": {"const": true}
+      }
+    },
+    "validation_plan": {"type": "array", "minItems": 1}
+  }
+}

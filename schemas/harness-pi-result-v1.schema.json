@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-pi-result-v1.schema.json",
+  "title": "Bounded experimental harness DC PI result",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "status", "model_status", "production_qualified", "request_digest", "harness_digest", "native_result", "limitations"],
+  "properties": {
+    "contract": {"const": "spike/harness-pi-result/v1"},
+    "status": {"enum": ["completed", "failed", "blocked"]},
+    "model_status": {"const": "experimental"}, "production_qualified": {"const": false},
+    "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "harness_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "native_result": {"type": "object", "description": "Original spike/native-mna-result/v1, retaining diagnostics and failure details."},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "node_voltages_v": {"type": "object", "additionalProperties": {"type": "number"}},
+    "connections": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "id", "element_id", "positive_node", "negative_node", "voltage_v", "current_a", "power_w"],
+      "properties": {"kind": {"enum": ["contact", "terminal"]}, "id": {"type": "string"}, "element_id": {"type": "string"},
+        "positive_node": {"type": "string"}, "negative_node": {"type": "string"}, "voltage_v": {"type": "number"}, "current_a": {"type": "number"}, "power_w": {"type": "number"}}
+    }},
+    "wires": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false, "required": ["wire_id", "resistance_ohm", "current_a", "loss_w"],
+      "properties": {"wire_id": {"type": "string"}, "resistance_ohm": {"type": "number", "exclusiveMinimum": 0}, "current_a": {"type": "number"}, "loss_w": {"type": "number"}}
+    }},
+    "total_wire_loss_w": {"type": "number"}, "total_contact_loss_w": {"type": "number"}
+  },
+  "allOf": [{"if": {"properties": {"status": {"const": "completed"}}}, "then": {
+    "required": ["node_voltages_v", "connections", "wires", "total_wire_loss_w", "total_contact_loss_w"]
+  }}]
+}

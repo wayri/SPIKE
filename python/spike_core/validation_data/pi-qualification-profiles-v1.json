@@ -1,0 +1,18 @@
+{
+  "contract": "spike/pi-qualification-profiles/v1",
+  "profiles": [
+    {
+      "profile_id": "native-linear-mna-reference-v1",
+      "workflow_id": "circuit.spice_compatible_mna",
+      "native_owner": "spike.native.mna",
+      "qualification_level": "reference_validated",
+      "required_case_classes": [
+        "analytical", "independent_solver", "measurement", "dc", "ac", "transient",
+        "dependent_source", "dense_sparse_parity", "timestep_convergence"
+      ],
+      "required_reference_engines": ["external.ngspice"],
+      "minimum_convergence_levels": 3,
+      "prohibited_claims": ["nonlinear_devices", "adaptive_integration", "general_spice_compatibility"]
+    }
+  ]
+}

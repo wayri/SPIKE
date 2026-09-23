@@ -1,0 +1,8 @@
+.title Native bounded GaN five-terminal example - use BE or BDF2
+Vbus bus 0 48
+Rload bus drain 100
+Vgate gate 0 PULSE(0 4 1u 100n 100n 4u 10u)
+Z1 drain gate 0 0 tj gm
+.model gm SPK_GAN(GATE_SOURCE_CAPACITANCE_F=1n GATE_DRAIN_CAPACITANCE_F=100p THERMAL_CAPACITANCE_J_PER_K=.01)
+.tran 10n 20u
+.end

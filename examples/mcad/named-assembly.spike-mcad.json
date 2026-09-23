@@ -1,0 +1,231 @@
+{
+  "contract": "spike/mcad-assembly/v1",
+  "id": "fixture",
+  "name": "ECAD MCAD exchange",
+  "units": "mm",
+  "materials": [
+    {
+      "id": "fr4",
+      "name": "FR-4",
+      "properties": {
+        "relative_permittivity": 4.2,
+        "vendor": {
+          "grade": "test"
+        }
+      }
+    },
+    {
+      "id": "metal",
+      "name": "Copper",
+      "properties": {
+        "density_kg_per_m3": 8960
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "board",
+      "name": "Main board",
+      "kind": "assembly",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        12.0,
+        0.0,
+        1.0,
+        0.0,
+        23.0,
+        0.0,
+        0.0,
+        1.0,
+        5.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "substrate",
+      "name": "Core",
+      "kind": "dielectric",
+      "parent_id": "board",
+      "material_id": "fr4",
+      "geometry": {
+        "type": "extrusion",
+        "height_mm": 1.6,
+        "rings": [
+          {
+            "role": "outer",
+            "start_mm": [
+              0,
+              0
+            ],
+            "segments": [
+              {
+                "kind": "line",
+                "end_mm": [
+                  20,
+                  0
+                ]
+              },
+              {
+                "kind": "line",
+                "end_mm": [
+                  20,
+                  10
+                ]
+              },
+              {
+                "kind": "line",
+                "end_mm": [
+                  0,
+                  10
+                ]
+              },
+              {
+                "kind": "line",
+                "end_mm": [
+                  0,
+                  0
+                ]
+              }
+            ]
+          },
+          {
+            "role": "cutout",
+            "start_mm": [
+              1,
+              1
+            ],
+            "segments": [
+              {
+                "kind": "line",
+                "end_mm": [
+                  2,
+                  1
+                ]
+              },
+              {
+                "kind": "line",
+                "end_mm": [
+                  2,
+                  2
+                ]
+              },
+              {
+                "kind": "line",
+                "end_mm": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "kind": "line",
+                "end_mm": [
+                  1,
+                  1
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "cells",
+      "name": "Cells",
+      "kind": "assembly",
+      "parent_id": "board",
+      "transform": [
+        0.0,
+        -1.0,
+        0.0,
+        4.0,
+        1.0,
+        0.0,
+        0.0,
+        3.0,
+        0.0,
+        0.0,
+        1.0,
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "cell:1",
+      "name": "Repeated cell",
+      "kind": "cell",
+      "parent_id": "cells",
+      "material_id": "metal",
+      "geometry": {
+        "type": "box",
+        "size_mm": [
+          1,
+          2,
+          3
+        ]
+      },
+      "properties": {
+        "reference": "U1",
+        "vendor_properties": [
+          {
+            "name": "x",
+            "value": 1
+          },
+          {
+            "name": "x",
+            "value": 2
+          }
+        ]
+      }
+    },
+    {
+      "id": "cell:2",
+      "name": "Repeated cell",
+      "kind": "cell",
+      "parent_id": "board",
+      "geometry": {
+        "type": "cylinder",
+        "radius_mm": 0.5,
+        "height_mm": 3
+      }
+    },
+    {
+      "id": "wire:1",
+      "name": "Harness wire",
+      "kind": "harness",
+      "material_id": "metal",
+      "geometry": {
+        "type": "route",
+        "radius_mm": 0.25,
+        "points_mm": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            4,
+            0,
+            0
+          ],
+          [
+            4,
+            3,
+            2
+          ]
+        ]
+      },
+      "properties": {
+        "net": "VCC",
+        "connection": "J1.01 -> J2.02"
+      }
+    }
+  ]
+}

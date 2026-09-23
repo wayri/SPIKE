@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/multiboard-si-independent-batch-result-v1.schema.json",
+  "title": "SPIKE independent multi-board SI batch result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "status", "model_status", "production_qualified", "plan_contract", "plan_digest", "execution_strategy", "coupling", "jobs", "resource_admission", "release_gate", "result_digest"],
+  "properties": {
+    "contract": {"const": "spike/multiboard-si-independent-batch-result/v1"},
+    "status": {"const": "completed"},
+    "model_status": {"const": "experimental"},
+    "production_qualified": {"const": false},
+    "plan_contract": {"const": "spike/multiboard-analysis-plan/v1"},
+    "plan_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "execution_strategy": {"const": "sequential_independent_board_jobs"},
+    "coupling": {"type": "object"},
+    "jobs": {"type": "array", "minItems": 1, "maxItems": 30},
+    "resource_admission": {"type": "object"},
+    "release_gate": {"type": "object"},
+    "result_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

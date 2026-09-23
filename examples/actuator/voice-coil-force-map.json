@@ -1,0 +1,12 @@
+{
+  "contract": "spike/actuator-force-map/v1",
+  "kind": "permanent_magnet",
+  "position_m": [0, 0.001, 0.002, 0.003, 0.004],
+  "force_n": [0.2, 0.2, 0.2, 0.2, 0.2],
+  "coenergy_j": [0, 0.0002, 0.0004, 0.0006, 0.0008],
+  "fixed_excitation": {"current_a": 2},
+  "moving_mass_kg": 0.01,
+  "relative_tolerance": 0.000001,
+  "absolute_force_tolerance_n": 0.000000000001,
+  "provenance": "Original ideal uniform B=0.5T, active wire length=0.2m, Lorentz force B*l*I. No fringing/cogging model or hardware measurement. SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic"
+}

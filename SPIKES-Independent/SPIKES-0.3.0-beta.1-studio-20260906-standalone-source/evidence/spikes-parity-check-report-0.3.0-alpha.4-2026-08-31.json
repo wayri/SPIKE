@@ -1,0 +1,555 @@
+{
+  "contract": "spikes/parity-check-report/v1",
+  "status": "blocked",
+  "claim_eligible": false,
+  "summary": {
+    "required_gates": 10,
+    "passed_gates": 0,
+    "blocked_gates": 10
+  },
+  "inputs": [
+    {
+      "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+      "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+    },
+    {
+      "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+      "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+    }
+  ],
+  "competitive_gate": {
+    "contract": "spikes/competitive-release-gate/v1",
+    "candidate": "SPIKES",
+    "reference": "ngspice and LTspice",
+    "evaluated_at_epoch_s": 1788176509.828705,
+    "status": "blocked",
+    "claim_eligible": false,
+    "summary": {
+      "required_gates": 10,
+      "passed_gates": 0,
+      "blocked_gates": 10
+    },
+    "gates": [
+      {
+        "id": "compatibility.spice_language_models",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "shared_subset.three_engine_accuracy",
+            "passed": true,
+            "detail": "Owned SPIKES, ngspice, and LTspice must agree on the shared subset."
+          },
+          {
+            "id": "corpus.spice3_language",
+            "passed": false,
+            "detail": "Required evidence class 'spice3_language' is absent."
+          },
+          {
+            "id": "corpus.hierarchy",
+            "passed": false,
+            "detail": "Required evidence class 'hierarchy' is absent."
+          },
+          {
+            "id": "corpus.behavioral_sources",
+            "passed": false,
+            "detail": "Required evidence class 'behavioral_sources' is absent."
+          },
+          {
+            "id": "corpus.model_cards",
+            "passed": false,
+            "detail": "Required evidence class 'model_cards' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.spice3_language",
+          "corpus.hierarchy",
+          "corpus.behavioral_sources",
+          "corpus.model_cards"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "analysis.complete_modes",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "corpus.operating_point",
+            "passed": true,
+            "detail": "Required evidence class 'operating_point' is present."
+          },
+          {
+            "id": "corpus.dc",
+            "passed": true,
+            "detail": "Required evidence class 'dc' is present."
+          },
+          {
+            "id": "corpus.ac",
+            "passed": false,
+            "detail": "Required evidence class 'ac' is absent."
+          },
+          {
+            "id": "corpus.transient",
+            "passed": true,
+            "detail": "Required evidence class 'transient' is present."
+          },
+          {
+            "id": "corpus.noise",
+            "passed": false,
+            "detail": "Required evidence class 'noise' is absent."
+          },
+          {
+            "id": "corpus.pole_zero",
+            "passed": false,
+            "detail": "Required evidence class 'pole_zero' is absent."
+          },
+          {
+            "id": "corpus.distortion",
+            "passed": false,
+            "detail": "Required evidence class 'distortion' is absent."
+          },
+          {
+            "id": "corpus.sensitivity",
+            "passed": false,
+            "detail": "Required evidence class 'sensitivity' is absent."
+          },
+          {
+            "id": "corpus.temperature",
+            "passed": false,
+            "detail": "Required evidence class 'temperature' is absent."
+          },
+          {
+            "id": "corpus.statistical",
+            "passed": false,
+            "detail": "Required evidence class 'statistical' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.ac",
+          "corpus.noise",
+          "corpus.pole_zero",
+          "corpus.distortion",
+          "corpus.sensitivity",
+          "corpus.temperature",
+          "corpus.statistical"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "devices.qualified_breadth",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "corpus.diode_bjt_jfet_mos",
+            "passed": false,
+            "detail": "Required evidence class 'diode_bjt_jfet_mos' is absent."
+          },
+          {
+            "id": "corpus.wbg",
+            "passed": false,
+            "detail": "Required evidence class 'wbg' is absent."
+          },
+          {
+            "id": "corpus.transmission_lines",
+            "passed": false,
+            "detail": "Required evidence class 'transmission_lines' is absent."
+          },
+          {
+            "id": "corpus.magnetics",
+            "passed": false,
+            "detail": "Required evidence class 'magnetics' is absent."
+          },
+          {
+            "id": "corpus.mixed_signal",
+            "passed": false,
+            "detail": "Required evidence class 'mixed_signal' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.diode_bjt_jfet_mos",
+          "corpus.wbg",
+          "corpus.transmission_lines",
+          "corpus.magnetics",
+          "corpus.mixed_signal"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "extensions.compiled_models",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "corpus.compiled_models",
+            "passed": false,
+            "detail": "Required evidence class 'compiled_models' is absent."
+          },
+          {
+            "id": "corpus.verilog_a_osdi",
+            "passed": false,
+            "detail": "Required evidence class 'verilog_a_osdi' is absent."
+          },
+          {
+            "id": "corpus.xspice_code_models",
+            "passed": false,
+            "detail": "Required evidence class 'xspice_code_models' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.compiled_models",
+          "corpus.verilog_a_osdi",
+          "corpus.xspice_code_models"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "switching.converter_accuracy_convergence",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "qualification.switching_cases",
+            "passed": true,
+            "detail": "The internal native switching qualification cases must pass."
+          },
+          {
+            "id": "corpus.switching_ccm",
+            "passed": false,
+            "detail": "Required evidence class 'switching_ccm' is absent."
+          },
+          {
+            "id": "corpus.switching_dcm",
+            "passed": false,
+            "detail": "Required evidence class 'switching_dcm' is absent."
+          },
+          {
+            "id": "corpus.hard_switching",
+            "passed": false,
+            "detail": "Required evidence class 'hard_switching' is absent."
+          },
+          {
+            "id": "corpus.soft_switching",
+            "passed": false,
+            "detail": "Required evidence class 'soft_switching' is absent."
+          },
+          {
+            "id": "corpus.regenerative",
+            "passed": false,
+            "detail": "Required evidence class 'regenerative' is absent."
+          },
+          {
+            "id": "corpus.saturation",
+            "passed": false,
+            "detail": "Required evidence class 'saturation' is absent."
+          },
+          {
+            "id": "corpus.electrothermal",
+            "passed": false,
+            "detail": "Required evidence class 'electrothermal' is absent."
+          },
+          {
+            "id": "corpus.protection",
+            "passed": false,
+            "detail": "Required evidence class 'protection' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.switching_ccm",
+          "corpus.switching_dcm",
+          "corpus.hard_switching",
+          "corpus.soft_switching",
+          "corpus.regenerative",
+          "corpus.saturation",
+          "corpus.electrothermal",
+          "corpus.protection"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "performance.public_corpora",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "benchmark.comparable_timing",
+            "passed": true,
+            "detail": "All engines must use a comparable timing and output scope."
+          },
+          {
+            "id": "benchmark.performance_claim_eligible",
+            "passed": false,
+            "detail": "The benchmark policy must explicitly qualify the performance claim."
+          },
+          {
+            "id": "corpus.small",
+            "passed": true,
+            "detail": "Required evidence class 'small' is present."
+          },
+          {
+            "id": "corpus.medium",
+            "passed": false,
+            "detail": "Required evidence class 'medium' is absent."
+          },
+          {
+            "id": "corpus.large",
+            "passed": false,
+            "detail": "Required evidence class 'large' is absent."
+          },
+          {
+            "id": "corpus.cold_warm",
+            "passed": false,
+            "detail": "Required evidence class 'cold_warm' is absent."
+          },
+          {
+            "id": "corpus.peak_memory",
+            "passed": false,
+            "detail": "Required evidence class 'peak_memory' is absent."
+          },
+          {
+            "id": "corpus.thread_scaling",
+            "passed": false,
+            "detail": "Required evidence class 'thread_scaling' is absent."
+          },
+          {
+            "id": "corpus.public_corpus",
+            "passed": false,
+            "detail": "Required evidence class 'public_corpus' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "benchmark.performance_claim_eligible",
+          "corpus.medium",
+          "corpus.large",
+          "corpus.cold_warm",
+          "corpus.peak_memory",
+          "corpus.thread_scaling",
+          "corpus.public_corpus"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "robustness.adversarial_corpus",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "corpus.adversarial",
+            "passed": false,
+            "detail": "Required evidence class 'adversarial' is absent."
+          },
+          {
+            "id": "corpus.industry_derived",
+            "passed": false,
+            "detail": "Required evidence class 'industry_derived' is absent."
+          },
+          {
+            "id": "corpus.restart",
+            "passed": false,
+            "detail": "Required evidence class 'restart' is absent."
+          },
+          {
+            "id": "corpus.convergence",
+            "passed": false,
+            "detail": "Required evidence class 'convergence' is absent."
+          },
+          {
+            "id": "corpus.silent_corruption_audit",
+            "passed": false,
+            "detail": "Required evidence class 'silent_corruption_audit' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.adversarial",
+          "corpus.industry_derived",
+          "corpus.restart",
+          "corpus.convergence",
+          "corpus.silent_corruption_audit"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "embedding.continuous_hil",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "qualification.interactive_replay",
+            "passed": true,
+            "detail": "Persistent lockstep checkpoint/restore must be qualified."
+          },
+          {
+            "id": "qualification.hard_realtime",
+            "passed": false,
+            "detail": "Deterministic hard-real-time behavior must be independently qualified."
+          },
+          {
+            "id": "qualification.hil",
+            "passed": false,
+            "detail": "Physical I/O latency, jitter, fault injection, and HIL hardware must pass."
+          },
+          {
+            "id": "corpus.physical_io_latency",
+            "passed": false,
+            "detail": "Required evidence class 'physical_io_latency' is absent."
+          },
+          {
+            "id": "corpus.hil_hardware",
+            "passed": false,
+            "detail": "Required evidence class 'hil_hardware' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "qualification.hard_realtime",
+          "qualification.hil",
+          "corpus.physical_io_latency",
+          "corpus.hil_hardware"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "library.qualified_redistributable_models",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "corpus.qualified_redistributable_models",
+            "passed": false,
+            "detail": "Required evidence class 'qualified_redistributable_models' is absent."
+          },
+          {
+            "id": "corpus.model_licenses",
+            "passed": false,
+            "detail": "Required evidence class 'model_licenses' is absent."
+          },
+          {
+            "id": "corpus.model_provenance",
+            "passed": false,
+            "detail": "Required evidence class 'model_provenance' is absent."
+          },
+          {
+            "id": "corpus.per_model_numerical_qualification",
+            "passed": false,
+            "detail": "Required evidence class 'per_model_numerical_qualification' is absent."
+          }
+        ],
+        "blocking_checks": [
+          "corpus.qualified_redistributable_models",
+          "corpus.model_licenses",
+          "corpus.model_provenance",
+          "corpus.per_model_numerical_qualification"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      },
+      {
+        "id": "platform.cross_platform_reproducibility",
+        "status": "blocked",
+        "checks": [
+          {
+            "id": "platform.windows",
+            "passed": true,
+            "detail": "A reproducible windows build and numerical-agreement artifact is required."
+          },
+          {
+            "id": "platform.linux",
+            "passed": false,
+            "detail": "A reproducible linux build and numerical-agreement artifact is required."
+          },
+          {
+            "id": "platform.darwin",
+            "passed": false,
+            "detail": "A reproducible darwin build and numerical-agreement artifact is required."
+          }
+        ],
+        "blocking_checks": [
+          "platform.linux",
+          "platform.darwin"
+        ],
+        "evidence_checked": [
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
+          },
+          {
+            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
+          }
+        ]
+      }
+    ]
+  },
+  "policy": "Whole-product parity is permitted only when all ten gates pass."
+}

@@ -1,0 +1,15 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://spike.local/schemas/openfoam-density-model-v1.schema.json",
+  "$comment":"SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+  "type":"object","additionalProperties":false,
+  "required":["type","rho0_kg_m3","T0_k","beta_per_k","temperature_min_k","temperature_max_k"],
+  "properties":{
+    "type":{"const":"Boussinesq"},
+    "rho0_kg_m3":{"type":"number","exclusiveMinimum":0,"exclusiveMaximum":1000000000},
+    "T0_k":{"type":"number","exclusiveMinimum":0,"exclusiveMaximum":1000000000},
+    "beta_per_k":{"type":"number","exclusiveMinimum":0,"exclusiveMaximum":1000000000},
+    "temperature_min_k":{"type":"number","exclusiveMinimum":0,"exclusiveMaximum":1000000000},
+    "temperature_max_k":{"type":"number","exclusiveMinimum":0,"exclusiveMaximum":1000000000}
+  }
+}

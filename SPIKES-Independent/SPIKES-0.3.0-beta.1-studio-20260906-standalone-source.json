@@ -1,0 +1,22 @@
+{
+  "contract": "spikes/standalone-source-manifest/v1",
+  "version": "0.3.0-beta.1-studio-20260906",
+  "package": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\SPIKES-Independent\\SPIKES-0.3.0-beta.1-studio-20260906-standalone-source",
+  "manifest_sha256": "cdf23ee4ee905e005bf131261eca1a2bdae0f01f6ca58b8dee3d99b1ef909d14",
+  "archive": {
+    "path": "SPIKES-0.3.0-beta.1-studio-20260906-standalone-source.zip",
+    "size": 3715517,
+    "sha256": "fa0d1ca47b64671048ef989e652450585e9076b9660b2bd3b042c271f3ba7583"
+  },
+  "file_count": 335,
+  "claims": {
+    "standalone_source_project": true,
+    "engine_and_console_buildable": true,
+    "studio_gui_implemented": false,
+    "studio_wxpython_workbench_runnable": true,
+    "studio_cpp_vtk_gui_implemented": false,
+    "complete_spice3_parity": false,
+    "physical_hil_certified": false,
+    "production_signed": false
+  }
+}

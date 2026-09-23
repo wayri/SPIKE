@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/native-via-transition-handoff-v1.schema.json",
+  "title": "SPIKE native via-transition geometry handoff evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "native_validation", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/native-via-transition-handoff/v1"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mesh_contract", "mesh_sha256", "geometry_contract", "geometry_sha256", "design_id", "via_id", "source_via_id"],
+      "properties": {
+        "mesh_contract": {"const": "spike/pcb-via-transition-mesh/v1"},
+        "mesh_sha256": {"$ref": "#/$defs/digest"},
+        "geometry_contract": {"const": "spike/pcb-via-transition-geometry/v1"},
+        "geometry_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"}, "via_id": {"$ref": "#/$defs/id"},
+        "source_via_id": {"$ref": "#/$defs/id"}
+      }
+    },
+    "native_validation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "finite_vertices_checked", "compact_indices_checked", "closed_domains_checked", "domain_ownership_checked", "provenance_checked", "solver_entry_points_exposed", "vertex_count", "triangle_count", "domain_count"],
+      "properties": {
+        "status": {"const": "passed"}, "finite_vertices_checked": {"const": true},
+        "compact_indices_checked": {"const": true}, "closed_domains_checked": {"const": true},
+        "domain_ownership_checked": {"const": true}, "provenance_checked": {"const": true},
+        "solver_entry_points_exposed": {"const": false},
+        "vertex_count": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "triangle_count": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "domain_count": {"type": "integer", "minimum": 2, "maximum": 65}
+      }
+    },
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_vertices", "max_triangles", "actual_vertices", "actual_triangles", "max_serialized_bytes"],
+      "properties": {
+        "max_vertices": {"const": 32768}, "max_triangles": {"const": 65536},
+        "actual_vertices": {"type": "integer", "minimum": 1, "maximum": 32768},
+        "actual_triangles": {"type": "integer", "minimum": 1, "maximum": 65536},
+        "max_serialized_bytes": {"const": 8388608}
+      }
+    },
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "native_validation_passed", "capacitance_ready", "si_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "geometry_handoff_only"}, "native_validation_passed": {"const": true},
+        "capacitance_ready": {"const": false}, "si_ready": {"const": false}, "solver_ready": {"const": false}
+      }
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

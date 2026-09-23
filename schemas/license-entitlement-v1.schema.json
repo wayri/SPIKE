@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.spike.app/license-entitlement-v1.schema.json",
+  "title": "SPIKE Signed License Entitlement v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "key_id", "payload_base64url", "signature_base64url"],
+  "properties": {
+    "schema": {"const": "spike/license-entitlement/v1"},
+    "key_id": {"type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$"},
+    "payload_base64url": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"},
+    "signature_base64url": {"type": "string", "pattern": "^[A-Za-z0-9_-]+$"}
+  },
+  "$defs": {
+    "signedPayload": {
+      "description": "UTF-8 JSON bytes represented by payload_base64url and signed exactly as stored. Producers emit keys in lexicographic order and no insignificant whitespace.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema", "license_id", "activation_id", "subject_id", "subject_name",
+        "tier", "license_type", "capabilities", "product", "product_major", "issued_at",
+        "not_before", "expires_at", "device_public_key_sha256", "revocation_epoch", "offline"
+      ],
+      "properties": {
+        "schema": {"const": "spike/license-claims/v1"},
+        "license_id": {"type": "string", "format": "uuid"},
+        "activation_id": {"type": "string", "format": "uuid"},
+        "subject_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "subject_name": {"type": "string", "minLength": 1, "maxLength": 256},
+        "tier": {"enum": ["evaluation", "professional", "enterprise", "developer"]},
+        "license_type": {"enum": ["temporary", "timed", "perpetual", "developer"]},
+        "capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 256,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9]*(\\.[a-z0-9][a-z0-9_-]*)+$"}
+        },
+        "product": {"const": "SPIKE"},
+        "product_major": {"type": "integer", "minimum": 0, "maximum": 65535},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "not_before": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": ["string", "null"], "format": "date-time"},
+        "refresh_after": {"type": ["string", "null"], "format": "date-time"},
+        "device_public_key_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "revocation_epoch": {"type": "integer", "minimum": 0},
+        "organization_id": {"type": ["string", "null"], "maxLength": 256},
+        "offline": {"type": "boolean", "default": false}
+      }
+    }
+  }
+}

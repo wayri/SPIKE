@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/thermal-solver-qualification-evidence-v1.schema.json",
+  "title": "SPIKE Thermal Solver Qualification Evidence v1",
+  "type": "object",
+  "required": ["contract", "evidence_id", "solver", "platforms", "capabilities", "fixtures"],
+  "properties": {
+    "contract": {"const": "spike/thermal-solver-qualification-evidence/v1"},
+    "evidence_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "solver": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 160},
+        "version": {"type": "string", "minLength": 1, "maxLength": 80}
+      },
+      "additionalProperties": false
+    },
+    "platforms": {
+      "type": "array", "minItems": 2, "uniqueItems": true,
+      "items": {"enum": ["windows-x64", "linux-x64"]}
+    },
+    "capabilities": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 80}
+    },
+    "fixtures": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "gate", "status", "fixture_sha256", "result_sha256", "reference_type", "reference_id", "tolerance", "observed"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 200},
+          "gate": {"type": "string", "minLength": 1, "maxLength": 100},
+          "status": {"const": "passed"},
+          "fixture_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "result_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "reference_type": {"enum": ["analytic", "independent_solver", "measured"]},
+          "reference_id": {"type": "string", "minLength": 1, "maxLength": 500},
+          "tolerance": {"type": "number", "minimum": 0},
+          "observed": {"type": "number", "minimum": 0}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pdn-candidate-set-v1.schema.json",
+  "title": "SPIKE PDN Candidate Set v1",
+  "type": "object",
+  "required": ["contract", "candidates"],
+  "properties": {
+    "contract": { "const": "spike/pdn-candidate-set/v1" },
+    "candidates": {
+      "type": "array",
+      "maxItems": 4096,
+      "items": { "$ref": "#/$defs/candidate" }
+    }
+  },
+  "$defs": {
+    "impedancePoint": {
+      "type": "object",
+      "required": ["frequency_hz"],
+      "properties": {
+        "frequency_hz": { "type": "number", "exclusiveMinimum": 0 },
+        "resistance_ohm": { "type": "number" },
+        "reactance_ohm": { "type": "number" },
+        "magnitude_ohm": { "type": "number", "minimum": 0 },
+        "phase_deg": { "type": "number" }
+      },
+      "oneOf": [
+        { "required": ["resistance_ohm", "reactance_ohm"] },
+        { "required": ["magnitude_ohm", "phase_deg"] }
+      ],
+      "additionalProperties": false
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["id", "capacitance_f"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "capacitance_f": { "type": "number", "exclusiveMinimum": 0 },
+        "esr_ohm": { "type": "number", "minimum": 0, "default": 0 },
+        "esl_h": { "type": "number", "minimum": 0, "default": 0 },
+        "count": { "type": "integer", "minimum": 1, "default": 1 },
+        "mounting_resistance_ohm": { "type": "number", "minimum": 0, "default": 0 },
+        "mounting_inductance_h": { "type": "number", "minimum": 0, "default": 0 },
+        "location": {
+          "type": "object",
+          "properties": {
+            "board_id": { "type": "string", "maxLength": 256 },
+            "component_ref": { "type": "string", "maxLength": 128 },
+            "pad_id": { "type": "string", "maxLength": 256 },
+            "x_mm": { "type": "number" },
+            "y_mm": { "type": "number" },
+            "layer": { "type": "string", "maxLength": 128 }
+          },
+          "additionalProperties": false
+        },
+        "spreading_impedance": { "type": "array", "items": { "$ref": "#/$defs/impedancePoint" } },
+        "local_impedance": { "type": "array", "items": { "$ref": "#/$defs/impedancePoint" } },
+        "transfer_impedance": { "type": "array", "items": { "$ref": "#/$defs/impedancePoint" } },
+        "reverse_transfer_impedance": { "type": "array", "items": { "$ref": "#/$defs/impedancePoint" } },
+        "source_result_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "endpoint_reviewed": { "type": "boolean" },
+        "reciprocal": { "type": "boolean" },
+        "model_status": { "enum": ["validated", "approximate", "unsupported", "failed"] }
+      },
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              { "required": ["local_impedance"] },
+              { "required": ["transfer_impedance"] },
+              { "required": ["reverse_transfer_impedance"] }
+            ]
+          },
+          "then": {
+            "required": ["local_impedance", "transfer_impedance", "source_result_id", "endpoint_reviewed", "model_status"],
+            "properties": { "endpoint_reviewed": { "const": true } }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

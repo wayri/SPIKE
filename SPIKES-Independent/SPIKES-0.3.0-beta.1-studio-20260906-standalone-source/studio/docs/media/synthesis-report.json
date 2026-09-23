@@ -1,0 +1,95 @@
+{
+  "tool": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\tools\\hdl\\oss-cad-suite\\oss-cad-suite\\bin\\yosys.exe",
+  "argv": [
+    "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\tools\\hdl\\oss-cad-suite\\oss-cad-suite\\bin\\yosys.exe",
+    "-p",
+    "read_verilog design.v; hierarchy -check -top top; synth -top top; stat; write_json netlist.json"
+  ],
+  "exit_code": 0,
+  "output": "\n /----------------------------------------------------------------------------\\\n |  yosys -- Yosys Open SYnthesis Suite                                       |\n |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |\n |  Distributed under an ISC-like license, type \"license\" to see terms        |\n \\----------------------------------------------------------------------------/\n Yosys 0.68+136 (git sha1 c30457480-dirty, Release, GNU /usr/bin/x86_64-w64-mingw32-g++ 15.2.1)\n\n-- Running command `read_verilog design.v; hierarchy -check -top top; synth -top top; stat; write_json netlist.json' --\n\n1. Executing Verilog-2005 frontend: design.v\nParsing Verilog input from `design.v' to AST representation.\nGenerating RTLIL representation for module `\\top'.\nSuccessfully finished Verilog frontend.\n\n2. Executing HIERARCHY pass (managing design hierarchy).\n\n2.1. Analyzing design hierarchy..\nTop module:  \\top\n\n2.2. Analyzing design hierarchy..\nTop module:  \\top\nRemoved 0 unused modules.\n\n3. Executing SYNTH pass.\n\n3.1. Executing HIERARCHY pass (managing design hierarchy).\n\n3.1.1. Analyzing design hierarchy..\nTop module:  \\top\n\n3.1.2. Analyzing design hierarchy..\nTop module:  \\top\nRemoved 0 unused modules.\n\n3.2. Executing PROC pass (convert processes to netlists).\n\n3.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).\nCleaned up 0 empty switches.\n\n3.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).\nRemoved a total of 0 dead cases.\n\n3.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).\nRemoved 0 redundant assignments.\nPromoted 0 assignments to connections.\n\n3.2.4. Executing PROC_INIT pass (extract init attributes).\n\n3.2.5. Executing PROC_ARST pass (detect async resets in processes).\n\n3.2.6. Executing PROC_ROM pass (convert switches to ROMs).\nConverted 0 switches.\n\n3.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).\n\n3.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).\n\n3.2.9. Executing PROC_DFF pass (convert process syncs to FFs).\n\n3.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).\n\n3.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).\nCleaned up 0 empty switches.\n\n3.2.12. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.3. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.4. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\nRemoved 0 unused cells and 1 unused wires.\n<suppressed ~1 debug messages>\n\n3.5. Executing CHECK pass (checking for obvious problems).\nChecking module top...\nFound and reported 0 problems.\n\n3.6. Executing OPT pass (performing simple optimizations).\n\n3.6.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.6.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).\nRunning muxtree optimizer on module \\top..\n  Creating internal representation of mux trees.\n  No muxes found in this module.\nRemoved 0 multiplexer ports.\n\n3.6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).\n  Optimizing cells in module \\top.\nPerformed a total of 0 changes.\n\n3.6.5. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.6.6. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.6.7. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.6.8. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.6.9. Finished fast OPT passes. (There is nothing left to do.)\n\n3.7. Executing FSM pass (extract and optimize FSM).\n\n3.7.1. Executing FSM_DETECT pass (finding FSMs in design).\n\n3.7.2. Executing FSM_EXTRACT pass (extracting FSM from design).\n\n3.7.3. Executing FSM_OPT pass (simple optimizations of FSMs).\n\n3.7.4. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.7.5. Executing FSM_OPT pass (simple optimizations of FSMs).\n\n3.7.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).\n\n3.7.7. Executing FSM_INFO pass (dumping all available information on FSM cells).\n\n3.7.8. Executing FSM_MAP pass (mapping FSMs to basic logic).\n\n3.8. Executing OPT pass (performing simple optimizations).\n\n3.8.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.8.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).\nRunning muxtree optimizer on module \\top..\n  Creating internal representation of mux trees.\n  No muxes found in this module.\nRemoved 0 multiplexer ports.\n\n3.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).\n  Optimizing cells in module \\top.\nPerformed a total of 0 changes.\n\n3.8.5. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.8.6. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.8.7. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.8.8. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.8.9. Finished fast OPT passes. (There is nothing left to do.)\n\n3.9. Executing WREDUCE pass (reducing word size of cells).\n\n3.10. Executing PEEPOPT pass (run peephole optimizers).\n\n3.11. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.12. Executing ALUMACC pass (create $alu and $macc cells).\nExtracting $alu and $macc cells in module top:\n  created 0 $alu and 0 $macc cells.\n\n3.13. Executing SHARE pass (SAT-based resource sharing).\n\n3.14. Executing OPT pass (performing simple optimizations).\n\n3.14.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.14.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.14.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).\nRunning muxtree optimizer on module \\top..\n  Creating internal representation of mux trees.\n  No muxes found in this module.\nRemoved 0 multiplexer ports.\n\n3.14.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).\n  Optimizing cells in module \\top.\nPerformed a total of 0 changes.\n\n3.14.5. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.14.6. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.14.7. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.14.8. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.14.9. Finished fast OPT passes. (There is nothing left to do.)\n\n3.15. Executing MEMORY pass.\n\n3.15.1. Executing OPT_MEM pass (optimize memories).\nPerformed a total of 0 transformations.\n\n3.15.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).\nPerformed a total of 0 transformations.\n\n3.15.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).\n\n3.15.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).\n\n3.15.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).\n\n3.15.6. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.15.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).\n\n3.15.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).\nPerformed a total of 0 transformations.\n\n3.15.9. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.15.10. Executing MEMORY_COLLECT pass (generating $mem cells).\n\n3.16. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.17. Executing OPT pass (performing simple optimizations).\n\n3.17.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.17.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.17.3. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.17.4. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.17.5. Finished fast OPT passes.\n\n3.18. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).\n\n3.19. Executing OPT pass (performing simple optimizations).\n\n3.19.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.19.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.19.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).\nRunning muxtree optimizer on module \\top..\n  Creating internal representation of mux trees.\n  No muxes found in this module.\nRemoved 0 multiplexer ports.\n\n3.19.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).\n  Optimizing cells in module \\top.\nPerformed a total of 0 changes.\n\n3.19.5. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.19.6. Executing OPT_SHARE pass.\n\n3.19.7. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.19.8. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.19.9. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.19.10. Finished fast OPT passes. (There is nothing left to do.)\n\n3.20. Executing TECHMAP pass (map to technology primitives).\n\n3.20.1. Executing Verilog-2005 frontend: C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\tools\\hdl\\oss-cad-suite\\oss-cad-suite\\bin\\../share/yosys/techmap.v\nParsing Verilog input from `C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\tools\\hdl\\oss-cad-suite\\oss-cad-suite\\bin\\../share/yosys/techmap.v' to AST representation.\nGenerating RTLIL representation for module `\\_90_simplemap_bool_ops'.\nGenerating RTLIL representation for module `\\_90_simplemap_reduce_ops'.\nGenerating RTLIL representation for module `\\_90_simplemap_logic_ops'.\nGenerating RTLIL representation for module `\\_90_simplemap_compare_ops'.\nGenerating RTLIL representation for module `\\_90_simplemap_various'.\nGenerating RTLIL representation for module `\\_90_simplemap_registers'.\nGenerating RTLIL representation for module `\\_90_shift_ops_shr_shl_sshl_sshr'.\nGenerating RTLIL representation for module `\\_90_shift_shiftx'.\nGenerating RTLIL representation for module `\\_90_fa'.\nGenerating RTLIL representation for module `\\_90_lcu_brent_kung'.\nGenerating RTLIL representation for module `\\_90_alu'.\nGenerating RTLIL representation for module `\\_90_macc'.\nGenerating RTLIL representation for module `\\_90_alumacc'.\nGenerating RTLIL representation for module `$__div_mod_u'.\nGenerating RTLIL representation for module `$__div_mod_trunc'.\nGenerating RTLIL representation for module `\\_90_div'.\nGenerating RTLIL representation for module `\\_90_mod'.\nGenerating RTLIL representation for module `$__div_mod_floor'.\nGenerating RTLIL representation for module `\\_90_divfloor'.\nGenerating RTLIL representation for module `\\_90_modfloor'.\nGenerating RTLIL representation for module `\\_90_pow'.\nGenerating RTLIL representation for module `\\_90_demux'.\nGenerating RTLIL representation for module `\\_90_lut'.\nGenerating RTLIL representation for module `$connect'.\nGenerating RTLIL representation for module `$input_port'.\nSuccessfully finished Verilog frontend.\n\n3.20.2. Continuing TECHMAP pass.\nUsing extmapper simplemap for cells of type $and.\nNo more expansions possible.\n<suppressed ~78 debug messages>\n\n3.21. Executing OPT pass (performing simple optimizations).\n\n3.21.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.21.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.21.3. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.21.4. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\n\n3.21.5. Finished fast OPT passes.\n\n3.22. Executing ABC pass (technology mapping using ABC).\n\n3.22.1. Extracting gate netlist of module `\\top' to `<abc-temp-dir>/input.blif'..\n\n3.22.1.1. Executed ABC.\nExtracted 1 gates and 3 wires to a netlist network with 2 inputs and 1 outputs.\nRunning ABC script: <abc-temp-dir>/abc.script\nABC: ======== ABC command line \"source <abc-temp-dir>/abc.script\"\nABC: + read_blif <abc-temp-dir>/input.blif \nABC: + read_library <abc-temp-dir>/stdcells.genlib \nABC: + strash \nABC: + &get -n \nABC: + &fraig -x \nABC: + &put \nABC: + scorr \nABC: Warning: The network is combinational (run \"fraig\" or \"fraig_sweep\").\nABC: + dc2 \nABC: + dretime \nABC: + strash \nABC: + &get -n \nABC: + &dch -f \nABC: + &nf \nABC: + &put \nABC: + write_blif <abc-temp-dir>/output.blif \n\n3.22.1.2. Re-integrating ABC results.\nABC RESULTS:               AND cells:        1\nABC RESULTS:        internal signals:        0\nABC RESULTS:           input signals:        2\nABC RESULTS:          output signals:        1\nRemoving temp directory.\nRemoving global temp directory.\n\n3.23. Executing OPT pass (performing simple optimizations).\n\n3.23.1. Executing OPT_EXPR pass (perform const folding).\nOptimizing module top.\n\n3.23.2. Executing OPT_MERGE pass (detect identical cells).\nFinding identical cells in module `\\top'.\nComputing hashes of 1 cells of `\\top'.\nFinding duplicate cells in `\\top'.\nRemoved a total of 0 cells.\n\n3.23.3. Executing OPT_DFF pass (perform DFF optimizations).\n\n3.23.4. Executing OPT_CLEAN pass (remove unused cells and wires).\nFinding unused cells or wires in module \\top..\nRemoved 0 unused cells and 3 unused wires.\n<suppressed ~1 debug messages>\n\n3.23.5. Finished fast OPT passes.\n\n3.24. Executing HIERARCHY pass (managing design hierarchy).\nAttribute `top' found on module `top'. Setting top module to top.\n\n3.24.1. Analyzing design hierarchy..\nTop module:  \\top\n\n3.24.2. Analyzing design hierarchy..\nTop module:  \\top\nRemoved 0 unused modules.\n\n3.25. Printing statistics.\n\n=== top ===\n\n        +----------Local Count, excluding submodules.\n        | \n        3 wires\n        3 wire bits\n        3 public wires\n        3 public wire bits\n        3 ports\n        3 port bits\n        1 cells\n        1   $_AND_\n\n3.26. Executing CHECK pass (checking for obvious problems).\nChecking module top...\nFound and reported 0 problems.\n\n4. Printing statistics.\n\n=== top ===\n\n        +----------Local Count, excluding submodules.\n        | \n        3 wires\n        3 wire bits\n        3 public wires\n        3 public wire bits\n        3 ports\n        3 port bits\n        1 cells\n        1   $_AND_\n\n5. Executing JSON backend.\n\nEnd of script. Logfile hash: bdc99d07f9\nYosys 0.68+136 (git sha1 c30457480-dirty, Release, GNU /usr/bin/x86_64-w64-mingw32-g++ 15.2.1)\nTime spent: 2% 13x opt_expr (0 sec), 2% 13x opt_clean (0 sec), ...\n",
+  "mode": "synthesize",
+  "netlist": {
+    "creator": "Yosys 0.68+136 (git sha1 c30457480-dirty, Release, GNU /usr/bin/x86_64-w64-mingw32-g++ 15.2.1)",
+    "modules": {
+      "top": {
+        "attributes": {
+          "top": "00000000000000000000000000000001",
+          "src": "design.v:1.1-3.10"
+        },
+        "ports": {
+          "a": {
+            "direction": "input",
+            "bits": [
+              2
+            ]
+          },
+          "b": {
+            "direction": "input",
+            "bits": [
+              3
+            ]
+          },
+          "y": {
+            "direction": "output",
+            "bits": [
+              4
+            ]
+          }
+        },
+        "cells": {
+          "$abc$74$auto$blifparse.cc:397:parse_blif$75": {
+            "hide_name": 1,
+            "type": "$_AND_",
+            "parameters": {},
+            "attributes": {},
+            "port_directions": {
+              "A": "input",
+              "B": "input",
+              "Y": "output"
+            },
+            "connections": {
+              "A": [
+                2
+              ],
+              "B": [
+                3
+              ],
+              "Y": [
+                4
+              ]
+            }
+          }
+        },
+        "netnames": {
+          "a": {
+            "hide_name": 0,
+            "bits": [
+              2
+            ],
+            "attributes": {
+              "src": "design.v:1.18-1.19"
+            }
+          },
+          "b": {
+            "hide_name": 0,
+            "bits": [
+              3
+            ],
+            "attributes": {
+              "src": "design.v:1.27-1.28"
+            }
+          },
+          "y": {
+            "hide_name": 0,
+            "bits": [
+              4
+            ],
+            "attributes": {
+              "src": "design.v:1.37-1.38"
+            }
+          }
+        }
+      }
+    }
+  }
+}

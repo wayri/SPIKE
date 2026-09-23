@@ -1,0 +1,21 @@
+.workflow-schematic { margin: 12px 0; border: 1px solid #47636f; background: #14252d; color: #cadce1; font-size: 12px; }
+.workflow-schematic > summary { padding: 12px; cursor: pointer; font-weight: 600; }
+.workflow-schematic > summary > span { display: block; margin: 5px 0 0 15px; font-size: 10px; color: #94b0ba; font-weight: normal; }
+.workflow-schematic-controls { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; gap: 8px; }
+.workflow-schematic-controls button { color: #d4ece5; background: #26473f; border: 1px solid #64877d; padding: 6px 10px; cursor: pointer; }
+.workflow-schematic-sheet { overflow: auto; max-height: 290px; background: #f6f5ed; background-image: radial-gradient(#c9d1c6 .8px, transparent .8px); background-size: 20px 20px; }
+.workflow-schematic.expanded .workflow-schematic-sheet { max-height: 65vh; }
+.workflow-schematic.expanded { position: fixed; inset: 35px; z-index: 90; overflow: auto; margin: 0; padding: 10px; box-shadow: 0 20px 80px #000b; }
+.workflow-schematic.expanded .workflow-schematic-sheet { min-height: 45vh; }
+.workflow-schematic.expanded .workflow-schematic-sheet svg { width: 100%; height: auto; }
+.workflow-schematic-sheet svg { display: block; }
+.workflow-schematic-sheet path { fill: none; stroke: #447660; stroke-width: 1.5; }
+.workflow-schematic-sheet .scope path { stroke-dasharray: 5 4; }
+.workflow-schematic-sheet text { fill: #294b3f; font: 12px ui-monospace, monospace; }
+.workflow-schematic-sheet .wire-label { font-size: 9px; paint-order: stroke; stroke: #f6f5ed; stroke-width: 4px; }
+.workflow-symbol rect { fill: #f6f5ed; stroke: #447660; stroke-width: 1.5; }
+.workflow-symbol circle { fill: #447660; }
+.workflow-symbol .detail { font-size: 10px; fill: #526b61; }
+.workflow-symbol.editable { cursor: pointer; }
+.workflow-symbol.editable:hover rect, .workflow-symbol:focus-visible rect { fill: #dceae1; stroke: #2474a7; stroke-width: 2; }
+.workflow-schematic > p, .workflow-schematic > details { margin: 12px; font-size: 11px; line-height: 1.5; }

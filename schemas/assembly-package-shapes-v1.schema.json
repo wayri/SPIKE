@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/assembly-package-shapes-v1.schema.json",
+  "title": "SPIKE Assembly Package Shapes v1",
+  "type": "object",
+  "required": ["contract", "assembly_id", "shapes", "constraints", "thermal_contact_bindings", "electrical_bond_bindings", "extensions", "metadata"],
+  "properties": {
+    "contract": { "const": "spike/assembly-package-shapes/v1" },
+    "assembly_id": { "$ref": "#/$defs/id" },
+    "shapes": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/shape" } },
+    "constraints": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/constraint" } },
+    "thermal_contact_bindings": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/binding" } },
+    "electrical_bond_bindings": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/binding" } },
+    "extensions": { "type": "object", "propertyNames": { "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$" } },
+    "metadata": { "type": "object" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^\\S(?:.*\\S)?$" },
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "reference": {
+      "type": "object",
+      "required": ["ref_kind", "part_id", "shape_id", "topology_id", "topology_kind"],
+      "properties": {
+        "ref_kind": { "const": "package_shape_topology" },
+        "part_id": { "$ref": "#/$defs/id" },
+        "shape_id": { "$ref": "#/$defs/id" },
+        "topology_id": { "$ref": "#/$defs/id" },
+        "topology_kind": { "enum": ["solid", "shell", "face", "edge", "axis", "vertex"] }
+      },
+      "additionalProperties": false
+    },
+    "entity": {
+      "type": "object",
+      "required": ["topology_id", "kind", "native_persistent_id", "fingerprint_sha256", "support"],
+      "properties": {
+        "topology_id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["solid", "shell", "face", "edge", "axis", "vertex"] },
+        "native_persistent_id": { "$ref": "#/$defs/id" },
+        "fingerprint_sha256": { "$ref": "#/$defs/digest" },
+        "support": {
+          "type": "object",
+          "required": ["surface_kind", "curve_kind", "axis_topology_id"],
+          "properties": {
+            "surface_kind": { "type": ["string", "null"], "enum": ["plane", "cylinder", "cone", "sphere", "torus", "nurbs", "other", null] },
+            "curve_kind": { "type": ["string", "null"], "enum": ["line", "circle", "ellipse", "bspline", "other", null] },
+            "axis_topology_id": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] }
+          },
+          "additionalProperties": false
+        },
+        "geometry": { "$ref": "#/$defs/selectorGeometry" }
+      },
+      "additionalProperties": false
+    },
+    "vector3": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "selectorGeometry": {
+      "type": "object",
+      "required": ["contract", "coordinate_space", "representation", "origin_mm", "direction", "radius_mm"],
+      "properties": {
+        "contract": { "const": "spike/package-shape-selector-geometry/v1" },
+        "coordinate_space": { "const": "shape_local_mm" },
+        "representation": { "enum": ["unsupported", "point", "line", "circle", "plane", "axis"] },
+        "origin_mm": { "anyOf": [{ "$ref": "#/$defs/vector3" }, { "type": "null" }] },
+        "direction": { "anyOf": [{ "$ref": "#/$defs/vector3" }, { "type": "null" }] },
+        "radius_mm": { "type": ["number", "null"], "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "selectorPreview": {
+      "type": "object",
+      "required": ["contract", "artifact_uri", "artifact_sha256", "source_sha256", "topology_artifact_sha256", "selector_inventory_sha256", "freecad_version", "linear_deflection_mm", "face_count", "edge_count", "axis_count", "visual_only", "solver_ready"],
+      "properties": {
+        "contract": { "const": "spike/package-shape-selector-preview/v1" },
+        "artifact_uri": { "type": "string", "pattern": "^package:geometry/package-shapes/[A-Za-z0-9][A-Za-z0-9._+-]*\\.spkselect\\.glb$" },
+        "artifact_sha256": { "$ref": "#/$defs/digest" },
+        "source_sha256": { "$ref": "#/$defs/digest" },
+        "topology_artifact_sha256": { "$ref": "#/$defs/digest" },
+        "selector_inventory_sha256": { "$ref": "#/$defs/digest" },
+        "freecad_version": { "$ref": "#/$defs/id" },
+        "linear_deflection_mm": { "type": "number", "exclusiveMinimum": 0 },
+        "face_count": { "type": "integer", "minimum": 0, "maximum": 20000 },
+        "edge_count": { "type": "integer", "minimum": 0, "maximum": 20000 },
+        "axis_count": { "type": "integer", "minimum": 0, "maximum": 20000 },
+        "visual_only": { "const": true },
+        "solver_ready": { "const": false }
+      },
+      "additionalProperties": false
+    },
+    "shape": {
+      "type": "object",
+      "required": ["shape_id", "part_id", "source_model_id", "source_artifact_uri", "source_sha256", "topology_artifact_uri", "topology_artifact_sha256", "kernel", "extraction", "entities", "extensions"],
+      "properties": {
+        "shape_id": { "$ref": "#/$defs/id" },
+        "part_id": { "$ref": "#/$defs/id" },
+        "source_model_id": { "$ref": "#/$defs/id" },
+        "source_artifact_uri": { "type": "string", "pattern": "^package:models/artifacts/[A-Za-z0-9][A-Za-z0-9._+-]*\\.(?:step|stp)$" },
+        "source_sha256": { "$ref": "#/$defs/digest" },
+        "topology_artifact_uri": { "type": "string", "pattern": "^package:geometry/package-shapes/[A-Za-z0-9][A-Za-z0-9._+-]*\\.spkshape$" },
+        "topology_artifact_sha256": { "$ref": "#/$defs/digest" },
+        "kernel": {
+          "type": "object",
+          "required": ["id", "contract", "version"],
+          "properties": { "id": { "$ref": "#/$defs/id" }, "contract": { "const": "spike/package-shape-kernel/v1" }, "version": { "$ref": "#/$defs/id" } },
+          "additionalProperties": false
+        },
+        "extraction": {
+          "type": "object",
+          "required": ["status", "source_format", "source_model_transform_sha256", "topology_ready", "solver_ready"],
+          "properties": {
+            "status": { "const": "complete" }, "source_format": { "const": "step" },
+            "source_model_transform_sha256": { "$ref": "#/$defs/digest" },
+            "topology_ready": { "const": true }, "solver_ready": { "const": false }
+          },
+          "additionalProperties": false
+        },
+        "entities": { "type": "array", "minItems": 1, "maxItems": 200000, "items": { "$ref": "#/$defs/entity" } },
+        "selector_preview": { "$ref": "#/$defs/selectorPreview" },
+        "extensions": { "type": "object", "propertyNames": { "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$" } }
+      },
+      "additionalProperties": false
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["constraint_id", "kind", "references", "value_mm", "value_deg", "status"],
+      "properties": {
+        "constraint_id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["face", "edge", "axis", "concentric", "coincident", "distance", "angle"] },
+        "references": { "type": "array", "minItems": 1, "maxItems": 2, "items": { "$ref": "#/$defs/reference" } },
+        "value_mm": { "type": ["number", "null"], "minimum": 0 }, "value_deg": { "type": ["number", "null"], "minimum": 0, "maximum": 180 },
+        "status": { "const": "defined" }
+      },
+      "additionalProperties": false
+    },
+    "binding": {
+      "type": "object",
+      "required": ["assembly_entity_id", "endpoint_a", "endpoint_b"],
+      "properties": {
+        "assembly_entity_id": { "$ref": "#/$defs/id" },
+        "endpoint_a": { "$ref": "#/$defs/reference" },
+        "endpoint_b": { "$ref": "#/$defs/reference" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

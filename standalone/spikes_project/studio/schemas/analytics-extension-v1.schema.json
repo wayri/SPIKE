@@ -1,0 +1,13 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"SPIKES safe analytics expression extension","type":"object","additionalProperties":false,
+  "required":["contract","id","name","measurements","traces"],
+  "properties":{
+    "contract":{"const":"spikes/analytics-extension/v1"},
+    "id":{"type":"string","minLength":1,"maxLength":128},"name":{"type":"string","minLength":1,"maxLength":128},
+    "measurements":{"type":"array","maxItems":32,"items":{"$ref":"#/$defs/recipe"}},
+    "traces":{"type":"array","maxItems":32,"items":{"$ref":"#/$defs/recipe"}}
+  },
+  "$defs":{"recipe":{"type":"object","additionalProperties":false,"required":["name","expression"],"properties":{"name":{"type":"string","minLength":1,"maxLength":128},"expression":{"type":"string","minLength":1,"maxLength":8191}}}},
+  "description":"Declarations only. Runtime uses the bounded SignalMath interpreter; no code entrypoints. Measurements must return finite real scalars."
+}

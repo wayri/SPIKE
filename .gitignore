@@ -1,0 +1,69 @@
+# Build artifacts
+build/
+/build-*/
+dist/
+app/node_modules/
+app/dist/
+app/public/demo/models/
+.tmp/
+/%USERPROFILE%/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python virtual environments
+venv/
+env/
+.venv/
+aether_env/
+runtime/downloads/
+runtime/external/
+runtime/envs/
+
+# Compiled binaries
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.o
+*.obj
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation builds
+docs/_build/
+
+# Generated toolchains and local runtime output
+app/src-tauri/target/
+app/src-tauri/resources/worker/spike-worker/
+app/.tmp/
+artifacts/
+tools/hdl/oss-cad-suite/

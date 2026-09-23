@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/ecad-mcad-geometry-v1.schema.json",
+  "title": "SPIKE ECAD/MCAD Geometry Exchange v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "schema_version",
+    "units",
+    "coordinate_system",
+    "design",
+    "objects"
+  ],
+  "properties": {
+    "contract": { "const": "spike/ecad-mcad-geometry/v1" },
+    "schema_version": { "const": 1 },
+    "units": { "const": "mm" },
+    "coordinate_system": { "$ref": "#/$defs/coordinateSystem" },
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "revision": { "type": "string", "maxLength": 4096 }
+      }
+    },
+    "generator": { "$ref": "#/$defs/generator" },
+    "metadata": { "$ref": "#/$defs/metadata" },
+    "objects": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/geometryObject" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "number": {
+      "type": "number",
+      "minimum": -1000000,
+      "maximum": 1000000
+    },
+    "positiveNumber": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000000
+    },
+    "point2": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/number" },
+        { "$ref": "#/$defs/number" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "point3": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/number" },
+        { "$ref": "#/$defs/number" },
+        { "$ref": "#/$defs/number" }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "coordinateSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handedness", "up_axis", "origin"],
+      "properties": {
+        "handedness": { "const": "right" },
+        "up_axis": { "const": "Z" },
+        "origin": { "$ref": "#/$defs/point3" }
+      }
+    },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "version": { "$ref": "#/$defs/nonEmptyString" },
+        "freecad_version": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "maxProperties": 64,
+      "additionalProperties": {
+        "type": ["string", "number", "integer", "boolean", "null"]
+      }
+    },
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "color": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "number", "minimum": 0, "maximum": 1 }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "box": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "origin", "size"],
+      "properties": {
+        "type": { "const": "box" },
+        "origin": { "$ref": "#/$defs/point3" },
+        "size": {
+          "type": "array",
+          "prefixItems": [
+            { "$ref": "#/$defs/positiveNumber" },
+            { "$ref": "#/$defs/positiveNumber" },
+            { "$ref": "#/$defs/positiveNumber" }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "cylinder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "center", "radius", "height"],
+      "properties": {
+        "type": { "const": "cylinder" },
+        "center": { "$ref": "#/$defs/point3" },
+        "radius": { "$ref": "#/$defs/positiveNumber" },
+        "height": { "$ref": "#/$defs/positiveNumber" },
+        "axis": { "$ref": "#/$defs/point3" }
+      }
+    },
+    "polygonPrism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "points", "z", "height"],
+      "properties": {
+        "type": { "const": "polygon_prism" },
+        "points": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 100000,
+          "items": { "$ref": "#/$defs/point2" }
+        },
+        "z": { "$ref": "#/$defs/number" },
+        "height": { "$ref": "#/$defs/positiveNumber" }
+      }
+    },
+    "geometryObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "role", "primitive"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "name": { "$ref": "#/$defs/nonEmptyString" },
+        "role": {
+          "enum": [
+            "board",
+            "copper",
+            "component_envelope",
+            "keepout",
+            "mounting_hole",
+            "mechanical",
+            "air_volume",
+            "reference"
+          ]
+        },
+        "primitive": {
+          "oneOf": [
+            { "$ref": "#/$defs/box" },
+            { "$ref": "#/$defs/cylinder" },
+            { "$ref": "#/$defs/polygonPrism" }
+          ]
+        },
+        "visual": { "$ref": "#/$defs/visual" },
+        "metadata": { "$ref": "#/$defs/metadata" }
+      }
+    }
+  }
+}
+

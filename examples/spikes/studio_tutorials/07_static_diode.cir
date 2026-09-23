@@ -1,0 +1,8 @@
+.title Tutorial 07 - Static diode model
+V1 in 0 1
+R1 in out 1k
+D1 out 0 DEMO
+.model DEMO D(IS=1p N=1)
+* Static Shockley behavior; no reverse recovery or self heating claimed.
+.op
+.end

@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/thermal-relief-boundary-contact-evidence-v1.schema.json",
+  "title": "SPIKE thermal-relief pad boundary-contact evidence v1",
+  "description": "Digest-bound, bounded evidence of observed source-filled copper contact at thermal pad boundaries. This contract neither extracts or regenerates spoke topology nor claims mesh, physics, or solver readiness.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "records", "accounting", "resources", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/thermal-relief-boundary-contact-evidence/v1"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_contract", "design_sha256", "design_id", "connection_contract", "connection_sha256"],
+      "properties": {
+        "design_contract": {"const": "spike/design-ir/v2"},
+        "design_sha256": {"$ref": "#/$defs/digest"},
+        "design_id": {"$ref": "#/$defs/id"},
+        "connection_contract": {"const": "spike/zone-pad-connection-evidence/v1"},
+        "connection_sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 262144,
+      "items": {"$ref": "#/$defs/record"}
+    },
+    "accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "record_count", "extracted_record_count", "no_contact_record_count", "unsupported_record_count", "all_thermal_candidates_accounted"],
+      "properties": {
+        "status": {"enum": ["complete", "unsupported"]},
+        "record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "extracted_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "no_contact_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "unsupported_record_count": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "all_thermal_candidates_accounted": {"const": true}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"unsupported_record_count": {"const": 0}}, "required": ["unsupported_record_count"]},
+          "then": {"properties": {"status": {"const": "complete"}}}
+        },
+        {
+          "if": {"properties": {"unsupported_record_count": {"minimum": 1}}, "required": ["unsupported_record_count"]},
+          "then": {"properties": {"status": {"const": "unsupported"}}}
+        }
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maximum_records", "maximum_intervals", "maximum_work_steps", "maximum_serialized_bytes", "actual_records", "actual_intervals", "actual_work_steps", "actual_serialized_bytes", "cancellation_supported"],
+      "properties": {
+        "maximum_records": {"const": 262144},
+        "maximum_intervals": {"const": 1048576},
+        "maximum_work_steps": {"const": 16777216},
+        "maximum_serialized_bytes": {"const": 67108864},
+        "actual_records": {"type": "integer", "minimum": 0, "maximum": 262144},
+        "actual_intervals": {"type": "integer", "minimum": 0, "maximum": 1048576},
+        "actual_work_steps": {"type": "integer", "minimum": 0, "maximum": 16777216},
+        "actual_serialized_bytes": {"type": "integer", "minimum": 1, "maximum": 67108864},
+        "cancellation_supported": {"const": true}
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "boundary_contact_evidence_complete", "thermal_spoke_topology_extracted", "thermal_spoke_topology_regenerated", "parametric_zone_refill_performed", "mesh_ready", "field_convergence_performed", "physics_ready", "solver_ready"],
+      "properties": {
+        "state": {"const": "source_filled_pad_boundary_contact_only"},
+        "boundary_contact_evidence_complete": {"type": "boolean"},
+        "thermal_spoke_topology_extracted": {"const": false},
+        "thermal_spoke_topology_regenerated": {"const": false},
+        "parametric_zone_refill_performed": {"const": false},
+        "mesh_ready": {"const": false},
+        "field_convergence_performed": {"const": false},
+        "physics_ready": {"const": false},
+        "solver_ready": {"const": false}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"accounting": {"properties": {"status": {"const": "complete"}}, "required": ["status"]}}, "required": ["accounting"]},
+      "then": {"properties": {"qualification": {"properties": {"boundary_contact_evidence_complete": {"const": true}}}}}
+    },
+    {
+      "if": {"properties": {"accounting": {"properties": {"status": {"const": "unsupported"}}, "required": ["status"]}}, "required": ["accounting"]},
+      "then": {"properties": {"qualification": {"properties": {"boundary_contact_evidence_complete": {"const": false}}}}}
+    }
+  ],
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "point": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}], "minItems": 2, "maxItems": 2},
+    "boundaryInterval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["edge_index", "start_fraction", "end_fraction", "start_mm", "end_mm", "length_mm"],
+      "properties": {
+        "edge_index": {"type": "integer", "minimum": 0},
+        "start_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "end_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+        "start_mm": {"$ref": "#/$defs/point"},
+        "end_mm": {"$ref": "#/$defs/point"},
+        "length_mm": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "connection_evidence_id", "pad_id", "zone_id", "filled_copper_id", "layer_id", "net_id", "resolved_mode", "source_fill_group_id", "source_fill_group_sha256", "source_fill_component_sha256", "observation", "reason_code", "boundary_contact_kind", "boundary_intervals"],
+      "properties": {
+        "record_id": {"$ref": "#/$defs/id"},
+        "connection_evidence_id": {"$ref": "#/$defs/id"},
+        "pad_id": {"$ref": "#/$defs/id"},
+        "zone_id": {"$ref": "#/$defs/id"},
+        "filled_copper_id": {"$ref": "#/$defs/id"},
+        "layer_id": {"$ref": "#/$defs/id"},
+        "net_id": {"$ref": "#/$defs/id"},
+        "resolved_mode": {"const": "thermal"},
+        "source_fill_group_id": {"$ref": "#/$defs/id"},
+        "source_fill_group_sha256": {"$ref": "#/$defs/digest"},
+        "source_fill_component_sha256": {"$ref": "#/$defs/digest"},
+        "observation": {"enum": ["boundary_contact_extracted", "no_source_filled_contact", "unsupported"]},
+        "reason_code": {"enum": ["polygonal_pad_boundary_observed", "source_filled_disjoint", "source_fill_provenance_incomplete", "pad_boundary_unsupported", "interior_contact_without_boundary_crossing"]},
+        "boundary_contact_kind": {"enum": ["none", "partial", "full", "unsupported"]},
+        "boundary_intervals": {"type": "array", "maxItems": 1048576, "items": {"$ref": "#/$defs/boundaryInterval"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"observation": {"const": "boundary_contact_extracted"}}, "required": ["observation"]},
+          "then": {"properties": {"reason_code": {"const": "polygonal_pad_boundary_observed"}, "boundary_contact_kind": {"enum": ["partial", "full"]}, "boundary_intervals": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"observation": {"const": "no_source_filled_contact"}}, "required": ["observation"]},
+          "then": {"properties": {"reason_code": {"enum": ["source_filled_disjoint", "interior_contact_without_boundary_crossing"]}, "boundary_contact_kind": {"const": "none"}, "boundary_intervals": {"maxItems": 0}}}
+        },
+        {
+          "if": {"properties": {"observation": {"const": "unsupported"}}, "required": ["observation"]},
+          "then": {"properties": {"reason_code": {"enum": ["source_fill_provenance_incomplete", "pad_boundary_unsupported"]}, "boundary_contact_kind": {"const": "unsupported"}, "boundary_intervals": {"maxItems": 0}}}
+        }
+      ]
+    }
+  }
+}

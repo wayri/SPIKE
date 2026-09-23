@@ -1,0 +1,8 @@
+# Development license root pinned for this checkout. Release engineering must
+# override SPIKE_LICENSE_PUBLIC_KEY_B64URL (and SPIKE_LICENSE_KEY_ID if needed)
+# with the production issuer key when building signed production artifacts.
+# The matching private key is NOT in source control; it lives in
+# %USERPROFILE%\.spike-license\ on the issuing machine.
+[env]
+SPIKE_LICENSE_PUBLIC_KEY_B64URL = "yka23m8hOVS4-AVLMNtMrlpKUMmL0THT7qW5_V3HjtE"
+SPIKE_LICENSE_KEY_ID = "spike-license-root-v1"

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/windows-release-provenance-v1.schema.json",
+  "title": "SPIKE Windows Release Provenance v1",
+  "description": "Offline digest binding for a Windows production candidate. This record never claims production qualification.",
+  "type": "object",
+  "required": ["contract", "product", "version", "application_version", "channel", "release_state", "production_qualified", "installer_manifest", "installers", "inputs", "worker_manifest", "sbom", "notices"],
+  "properties": {
+    "contract": {"const": "spike/windows-release-provenance/v1"},
+    "product": {"const": "SPIKE"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "application_version": {"type": "string", "minLength": 1, "pattern": "^\\S+$"},
+    "channel": {"const": "production-candidate"},
+    "release_state": {"const": "production-candidate"},
+    "production_qualified": {"const": false},
+    "installers": {
+      "type": "object",
+      "required": ["msi", "nsis"],
+      "properties": {
+        "msi": {"$ref": "#/$defs/msi_artifact"},
+        "nsis": {"$ref": "#/$defs/nsis_artifact"}
+      },
+      "additionalProperties": false
+    },
+    "installer_manifest": {"$ref": "#/$defs/digest_file"},
+    "inputs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source_input"}},
+    "worker_manifest": {"$ref": "#/$defs/digest_file"},
+    "sbom": {"$ref": "#/$defs/digest_file"},
+    "notices": {"$ref": "#/$defs/digest_file"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "relative_file": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$))(?:[^/]+/)*[^/]+$"},
+    "digest_file": {
+      "type": "object",
+      "required": ["file", "sha256"],
+      "properties": {
+        "file": {"$ref": "#/$defs/relative_file"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "source_input": {
+      "type": "object",
+      "required": ["id", "file", "sha256"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "file": {"$ref": "#/$defs/relative_file"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "msi_artifact": {
+      "type": "object",
+      "required": ["identity", "file", "sha256"],
+      "properties": {
+        "identity": {"const": "windows-msi"},
+        "file": {"type": "string", "pattern": "^[^\\\\/:]+\\.msi$"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    },
+    "nsis_artifact": {
+      "type": "object",
+      "required": ["identity", "file", "sha256"],
+      "properties": {
+        "identity": {"const": "windows-nsis"},
+        "file": {"type": "string", "pattern": "^[^\\\\/:]+\\.exe$"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

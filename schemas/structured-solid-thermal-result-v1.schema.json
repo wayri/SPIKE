@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/structured-solid-thermal-result-v1.schema.json",
+  "title": "SPIKE bounded structured solid thermal result v1",
+  "type": "object",
+  "required": ["contract", "status", "model_status", "temperature_k", "frames", "issues", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/structured-solid-thermal-result/v1"},
+    "status": {"enum": ["completed", "blocked", "cancelled"]},
+    "model_status": {"type": "string"},
+    "shape": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 1}},
+    "spacing_m": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number", "exclusiveMinimum": 0}},
+    "cell_order": {"const": "x-fast"},
+    "temperature_k": {"type": "array", "maxItems": 262144, "items": {"type": "number", "minimum": 0}},
+    "frames": {"type": "array", "maxItems": 10000, "items": {"type": "object"}},
+    "summary": {"type": "object"},
+    "energy": {"type": "object"},
+    "issues": {"type": "array", "maxItems": 64, "items": {"type": "object"}},
+    "qualification": {"type": "object", "required": ["state", "production_qualified"], "properties": {"state": {"type": "string"}, "production_qualified": {"const": false}, "limitations": {"type": "array", "items": {"type": "string"}}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

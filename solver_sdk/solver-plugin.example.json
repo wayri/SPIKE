@@ -1,0 +1,41 @@
+{
+  "contract": "spike/solver-plugin/v1",
+  "api_version": 1,
+  "id": "example.surface_solver",
+  "name": "Example Surface Solver",
+  "version": "0.1.0",
+  "provider": "Example Provider",
+  "analyses": ["ac", "s_parameters"],
+  "formulations": ["surface_mom"],
+  "capabilities": ["complex_fields", "s_parameters"],
+  "geometry_contracts": ["spike/solver-geometry/v1"],
+  "result_contract": "spike/v1",
+  "execution": "process",
+  "entrypoint": "bin/example-solver.exe",
+  "state": "experimental",
+  "model_status": "approximate",
+  "validation": "Fixture review required before release.",
+  "license": "LicenseRef-Proprietary; redistribution in a separate signed bundle.",
+  "bundled": false,
+  "priority": 20,
+  "limits": {
+    "timeout_s": 1800,
+    "max_result_bytes": 268435456
+  },
+  "runtime_probe": {
+    "contract": "spike/solver-plugin-probe/v1",
+    "argv": ["--spike-probe"],
+    "timeout_s": 15,
+    "result_contract": "spike/solver-plugin-probe-result/v1"
+  },
+  "interchange": {
+    "job_contract": "spike/solver-plugin-job/v1",
+    "mesh_contracts": ["spike/solver-mesh/v1"],
+    "artifact_result_contract": "spike/solver-plugin-result/v1"
+  },
+  "qualification": {
+    "runtime_probe_required": true,
+    "adapter_validation_required": true,
+    "workflow_validation_required": true
+  }
+}

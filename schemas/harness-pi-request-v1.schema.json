@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-pi-request-v1.schema.json",
+  "title": "Explicit harness DC PI operating point",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "harness", "ground", "terminals"],
+  "properties": {
+    "contract": {"const": "spike/harness-pi-request/v1"},
+    "harness": {"type": "object", "description": "Validated independently against spike/harness/v1."},
+    "ground": {"$ref": "#/$defs/endpoint"},
+    "terminals": {"type": "array", "minItems": 1, "maxItems": 4096, "items": {
+      "type": "object", "additionalProperties": false, "required": ["id", "type", "positive", "negative", "value"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "type": {"enum": ["voltage_source", "current_load"]},
+        "positive": {"$ref": "#/$defs/endpoint"}, "negative": {"$ref": "#/$defs/endpoint"},
+        "value": {"type": "number", "minimum": 0, "description": "Volts for voltage_source, amperes drawn positive to negative for current_load."}}
+    }},
+    "contacts": {"type": "array", "maxItems": 4096, "items": {
+      "type": "object", "additionalProperties": false, "required": ["id", "from", "to", "resistance_ohm"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "from": {"$ref": "#/$defs/endpoint"}, "to": {"$ref": "#/$defs/endpoint"}, "resistance_ohm": {"type": "number", "minimum": 1e-12, "maximum": 1e12}}
+    }},
+    "resource_limits": {"type": "object", "additionalProperties": false, "properties": {
+      "maximum_elements": {"type": "integer", "minimum": 1, "maximum": 4096},
+      "maximum_nodes": {"type": "integer", "minimum": 2, "maximum": 1024}
+    }}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\u0000-\\u001f]+$"},
+    "endpoint": {"oneOf": [
+      {"type": "object", "additionalProperties": false, "required": ["connector", "pin"], "properties": {"connector": {"$ref": "#/$defs/id"}, "pin": {"$ref": "#/$defs/id"}}},
+      {"type": "object", "additionalProperties": false, "required": ["splice"], "properties": {"splice": {"$ref": "#/$defs/id"}}}
+    ]}
+  }
+}

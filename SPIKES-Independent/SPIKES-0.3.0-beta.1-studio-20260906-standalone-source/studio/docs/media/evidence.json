@@ -1,0 +1,52 @@
+{
+  "contract": "spikes/studio-ui-evidence/v1",
+  "solver_provenance": {
+    "solver": "SPIKES owned C++ kernel",
+    "implementation": "strict_fp_dense_mna",
+    "integration": "hybrid_trapezoidal",
+    "owned_cpp_transient": true,
+    "library": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
+    "source_sha256": "1f6620174e016117f1e0c1d2b97e05cf5fe8e04e794b0c0afc1b78015fbff4c6"
+  },
+  "sample_count": 501,
+  "rc_max_error_v": 4.917615182199221e-05,
+  "property_apply_undo_redo": true,
+  "canvas_differential_clicks": true,
+  "real_synthesis_exit": 0,
+  "real_digital_simulation_exit": 0,
+  "real_cpp_analysis_exit": 0,
+  "captures": [
+    {
+      "file": "01-recorded-plots.png",
+      "sha256": "b1c4c4ab087c81c7630ac8cce74fe5606e27fd917ba46401eb680bf3a69a724e"
+    },
+    {
+      "file": "02-differential-probe.png",
+      "sha256": "4a3c72914299b5573d7ac2e76370325f366a9890726a2d59403aea2142bd3004"
+    },
+    {
+      "file": "03-limits-editor.png",
+      "sha256": "67f58d165d2c3981231e822b2f6c0115e36d9a2e8a2ea224fcb449dd8e0356c4"
+    },
+    {
+      "file": "04-model-editor.png",
+      "sha256": "1ea32b0c82a8bf2d17cc024c9fd34491413bb7a54198d308b7caaa3c25c007dc"
+    },
+    {
+      "file": "05-real-synthesis.png",
+      "sha256": "02a7a69160c56cbb05fd6299d91aa2b2b552710abf0755110aa3f728f8dc1442"
+    },
+    {
+      "file": "06-real-vcd-timing.png",
+      "sha256": "b33512c3a0f98588241c9db1bdf174cbe1dec054ed5336c2fc17dd13d6859c22"
+    },
+    {
+      "file": "08-cpp-analysis.png",
+      "sha256": "21dd6398d611ee1e20f0fc738844b05c41965d561bb9f3d6afa80b04becac7a3"
+    },
+    {
+      "file": "07-symbol-designer.png",
+      "sha256": "8f503d68bd6f71d9760b4e4473757fcad7d2265cb93bdbec04bd11248fabec73"
+    }
+  ]
+}

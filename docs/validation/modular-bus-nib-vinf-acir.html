@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><title>SPIKE Analysis Report</title>
+<style>body{font:14px Arial;color:#243038;margin:40px}h1{color:#9a6416}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccd5d9;padding:8px;text-align:left}pre{background:#f3f5f6;padding:16px;overflow:auto}</style></head>
+<body><h1>SPIKE Analysis Report</h1><table>
+<tr><th>Status</th><td>completed</td></tr>
+<tr><th>Model status</th><td>approximate</td></tr>
+<tr><th>Mode</th><td>ac</td></tr>
+<tr><th>Maximum voltage drop</th><td>0 mV</td></tr>
+<tr><th>Maximum current density</th><td>0 A/mm^2</td></tr>
+</table><h2>Issues</h2><table><tr><th>Severity</th><th>Code</th><th>Message</th></tr><tr><td>warning</td><td>PEEC_RL_EXTRACTION_EXPERIMENTAL</td><td>Hybrid trace, pad, zone, and via RL extraction is operational. Capacitance and dielectric-loss matrices are not yet included.</td></tr><tr><td>warning</td><td>VIA_PLATING_ASSUMPTION</td><td>Via barrels without fabrication plating data use 0.025 mm plating.</td></tr></table>
+<h2>Frequency-dependent impedance</h2><table><tr><th>Net</th><th>Frequency (Hz)</th><th>R (ohm)</th><th>X (ohm)</th><th>|Z| (ohm)</th><th>Phase (deg)</th></tr><tr><td>/Vin_f</td><td>1000</td><td>9.20935683e-05</td><td>1.32738406e-05</td><td>9.30452587e-05</td><td>8.2018</td></tr><tr><td>/Vin_f</td><td>3627.77</td><td>0.000100799633</td><td>4.04467965e-05</td><td>0.000108611737</td><td>21.8636</td></tr><tr><td>/Vin_f</td><td>13160.7</td><td>0.00012133547</td><td>0.00011970092</td><td>0.000170442384</td><td>44.6115</td></tr><tr><td>/Vin_f</td><td>47744.2</td><td>0.000155543722</td><td>0.000448093342</td><td>0.00047432214</td><td>70.8569</td></tr><tr><td>/Vin_f</td><td>173205</td><td>0.000211129651</td><td>0.0016663477</td><td>0.00167966973</td><td>82.779</td></tr><tr><td>/Vin_f</td><td>628349</td><td>0.000557675516</td><td>0.00616884674</td><td>0.00619400291</td><td>84.8344</td></tr><tr><td>/Vin_f</td><td>2.27951e+06</td><td>0.00224645607</td><td>0.0236241913</td><td>0.0237307602</td><td>84.568</td></tr><tr><td>/Vin_f</td><td>8.26954e+06</td><td>0.00919064956</td><td>0.0917832773</td><td>0.092242279</td><td>84.2818</td></tr><tr><td>/Vin_f</td><td>3e+07</td><td>0.0270003461</td><td>0.350288504</td><td>0.351327561</td><td>85.5923</td></tr></table><h2>Provenance</h2><pre>{
+  &quot;solver&quot;: &quot;spike-peec-native/v0.3&quot;,
+  &quot;formulation&quot;: &quot;topology_correct_peec_rl_2_5d&quot;,
+  &quot;native&quot;: true,
+  &quot;epsilon_r&quot;: 4.1571428571428575,
+  &quot;mesh_target_mm&quot;: 2.0,
+  &quot;geometry_counts&quot;: {
+    &quot;track&quot;: 4,
+    &quot;zone&quot;: 5,
+    &quot;via&quot;: 42,
+    &quot;pad&quot;: 6
+  },
+  &quot;limits&quot;: [
+    &quot;quasi-static RL only&quot;,
+    &quot;finite-volume planar copper&quot;,
+    &quot;rectangular filament approximation&quot;,
+    &quot;no capacitance or dielectric loss&quot;
+  ],
+  &quot;solver_plugin&quot;: &quot;spike.peec_2_5d&quot;,
+  &quot;solver_plugin_version&quot;: &quot;0.3.0&quot;,
+  &quot;solver_formulation&quot;: &quot;peec_2_5d&quot;,
+  &quot;geometry_contract&quot;: &quot;spike/solver-geometry/v1&quot;
+}</pre></body></html>

@@ -1,0 +1,10 @@
+.title Explicit voltage-injection fixture in a unilateral feedback loop
+Vreference reference 0 0
+Eerror error 0 reference feedback 1
+Eamplifier gain 0 error 0 10
+Rdominant gain out 1000
+Cdominant out 0 1u
+Vinject feedback out 0
+.op
+* T(s)=10/(1+.001*s); Vinject positive is forward, negative is return.
+.end

@@ -1,0 +1,11 @@
+.title Tutorial 06 - Two instances and hierarchy ports
+.subckt DIVIDER IN OUT REF
+Rtop IN OUT 1k
+Rbottom OUT REF 1k
+.ends DIVIDER
+V1 in 0 12
+XFIRST in mid 0 DIVIDER
+XSECOND mid out 0 DIVIDER
+* Loaded divider cascade: mid = 4.8 V; out = 2.4 V.
+.op
+.end

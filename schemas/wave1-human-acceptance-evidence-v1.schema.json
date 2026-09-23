@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/wave1-human-acceptance-evidence-v1.schema.json",
+  "title": "SPIKE Wave 1 Human Acceptance Evidence v1",
+  "description": "Reviewed clean-machine evidence used by Wave 1 packaged assembly acceptance.",
+  "type": "object",
+  "required": ["contract", "reviewer", "reviewed_at", "environment", "installer_sha256", "before_manifest_payload_sha256", "after_manifest_payload_sha256", "checks"],
+  "properties": {
+    "contract": { "const": "spike/wave1-human-acceptance-evidence/v1" },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "reviewed_at": { "type": "string", "format": "date-time" },
+    "environment": {
+      "type": "object",
+      "required": ["os", "gpu", "webview2_version", "display_scale_percent"],
+      "properties": {
+        "os": {},
+        "gpu": {},
+        "webview2_version": { "type": "string", "minLength": 1 },
+        "display_scale_percent": { "type": "number", "minimum": 50, "maximum": 500 }
+      }
+    },
+    "installer_sha256": { "$ref": "#/$defs/sha256" },
+    "before_manifest_payload_sha256": { "$ref": "#/$defs/sha256" },
+    "after_manifest_payload_sha256": { "$ref": "#/$defs/sha256" },
+    "checks": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": { "$ref": "#/$defs/check" },
+      "allOf": [
+        { "contains": { "properties": { "id": { "const": "install_launch" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "file_association" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "assembly_hierarchy" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "pixel_views" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "placement_persistence" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "reparent_world_pose" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "topology_snap" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "structure_persistence" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "operation_cancellation" } }, "required": ["id"] } },
+        { "contains": { "properties": { "id": { "const": "upgrade_uninstall" } }, "required": ["id"] } }
+      ]
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "artifact": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      },
+      "additionalProperties": false
+    },
+    "check": {
+      "type": "object",
+      "required": ["id", "status", "artifacts"],
+      "properties": {
+        "id": { "enum": ["install_launch", "file_association", "assembly_hierarchy", "pixel_views", "placement_persistence", "reparent_world_pose", "topology_snap", "structure_persistence", "operation_cancellation", "upgrade_uninstall"] },
+        "status": { "enum": ["passed", "failed"] },
+        "detail": { "type": "string" },
+        "artifacts": { "type": "array", "minItems": 1, "maxItems": 50, "items": { "$ref": "#/$defs/artifact" } }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

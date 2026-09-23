@@ -1,0 +1,10 @@
+numpy>=1.26.0
+scipy>=1.11.0
+pyvista>=0.43.0
+wxPython>=4.2.0
+nanobind>=2.0.0
+matplotlib>=3.8.0
+mplcursors>=0.5.2
+reportlab>=4.0.0
+pyarrow==25.0.1
+jsonschema==4.25.1

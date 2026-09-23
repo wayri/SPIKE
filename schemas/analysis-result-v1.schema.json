@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/analysis-result-v1.schema.json",
+  "title": "SPIKE AnalysisResult v1",
+  "type": "object",
+  "required": ["contract", "analysis_id", "status", "mode", "model_status", "summary", "fields", "networks", "probes", "issues", "provenance"],
+  "properties": {
+    "contract": { "const": "spike/v1" },
+    "analysis_id": { "type": "string" },
+    "status": { "type": "string" },
+    "mode": { "type": "string" },
+    "model_status": { "type": "string" },
+    "summary": { "type": "object" },
+    "fields": { "type": "object" },
+    "networks": { "type": "object" },
+    "probes": { "type": "array", "items": { "type": "object" } },
+    "issues": { "type": "array", "items": { "type": "object" } },
+    "provenance": { "type": "object" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,6 @@
+.title SPIKES voltage-divider operating point
+V1 in 0 DC 12V
+R1 in out 2kOhm
+R2 out 0 1kOhm
+.op
+.end

@@ -1,0 +1,7 @@
+.title Tutorial 02 - RC startup and linked probes
+* tau = 1 ms; V(out) approaches 5 V. At 5 ms, about 4.966 V.
+V1 in 0 5
+R1 in out 1k
+C1 out 0 1u
+.tran 10u 5m uic
+.end

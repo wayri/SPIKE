@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/actuator-force-map-v1.schema.json",
+  "$comment": "SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+  "title": "Fixed-excitation actuator force/coenergy map review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "kind", "position_m", "force_n", "coenergy_j", "fixed_excitation", "provenance", "relative_tolerance", "absolute_force_tolerance_n"],
+  "properties": {
+    "contract": {"const": "spike/actuator-force-map/v1"},
+    "kind": {"enum": ["reluctance", "permanent_magnet", "electrostatic"]},
+    "position_m": {"$ref": "#/$defs/samples"},
+    "force_n": {"$ref": "#/$defs/samples"},
+    "coenergy_j": {"$ref": "#/$defs/samples"},
+    "fixed_excitation": {"type": "object"},
+    "provenance": {"type": "string", "minLength": 1, "maxLength": 2048, "pattern": "\\S"},
+    "relative_tolerance": {"type": "number", "minimum": 0, "maximum": 0.1},
+    "absolute_force_tolerance_n": {"type": "number", "minimum": 0},
+    "moving_mass_kg": {"type": "number", "minimum": 1e-12}
+  },
+  "if": {"properties": {"kind": {"const": "electrostatic"}}},
+  "then": {"properties": {"fixed_excitation": {"type": "object", "additionalProperties": false, "required": ["voltage_v"], "properties": {"voltage_v": {"type": "number"}}}}},
+  "else": {"properties": {"fixed_excitation": {"type": "object", "additionalProperties": false, "required": ["current_a"], "properties": {"current_a": {"type": "number"}}}}},
+  "$defs": {"samples": {"type": "array", "minItems": 5, "maxItems": 4097, "items": {"type": "number"}}}
+}

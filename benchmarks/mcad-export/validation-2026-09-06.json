@@ -1,0 +1,46 @@
+{
+  "contract": "spike/mcad-export-qualification/v1",
+  "date": "2026-09-06",
+  "status": "engineering_preview",
+  "python_regression_tests": 53,
+  "packaging_tests": 4,
+  "native_host_tests": 31,
+  "typescript": "passed",
+  "help_checks": "passed",
+  "architecture": "passed",
+  "isolated_extension_export": "passed",
+  "source_release_probe": "passed",
+  "installed_desktop_export_manually_tested": false,
+  "frozen_worker_rebuilt": false,
+  "freecad_version": "1.1.3",
+  "fixture": {
+    "objects": 6,
+    "solid_objects": 4,
+    "nested_parent_volume_bounds": "passed",
+    "material_property_retention": "passed"
+  },
+  "public_ecc83": "partial dielectric STEP export verified; components, copper, drills and unspecified process thickness explicitly reported",
+  "sample_bundle": {
+    "path": "build/mcad-export-validation/verified-named-assembly.zip",
+    "sha256": "fcad6a88e0957002fa66006cc3a4e2d6dcfba36eb6ee0c9cc88d38c11fa2dadf"
+  },
+  "source_hashes": {
+    "python/spike_core/mcad_export.py": "31eb6e8e026b283ff784a5ff138e319e966ba810da670c78381aba2f7846e8e3",
+    "python/spike_core/mcad_export_contract.py": "f5815ca7d32598795e490234500191e11e466f9695197434a27249edfada13e0",
+    "python/spike_core/mcad_export_design.py": "43d4dac8fc18d765af924aeac4ae717b61384475904d2be6ae7a4cdf018e7c6f",
+    "python/spike_core/freecad_assembly_export.py": "8be8a8db79313145323d811a3660b6ca7eb2d81e450cc253bb10df6420c9fc9d",
+    "schemas/mcad-assembly-v1.schema.json": "26e8188fe4a7efd8fa0444caaf9f89f9c5fbee330dd466fd31c56db5c8666c71",
+    "extensions/mcad-export/spike-extension.json": "876e5e5dc8551522baa92bc0f9545ab5e697a1fa701a198fc62dccdee19d347a",
+    "extensions/mcad-export/extension.py": "b5b3988be49243eedd8c35781c433a96f454bf3e95718e35c340638808eb039c",
+    "tests/python/test_mcad_export.py": "02996b0b6b2c6268dc43219f7bb74d4e33d296f2210b226976d6adb68b0982b1",
+    "examples/mcad/named-assembly.spike-mcad.json": "a9f59bf5ae249c640ae583669e24948fe3f1e4c8f13755f8bf65c52ea2bc8cfe",
+    "app/src/ExtensionArtifacts.tsx": "c0c4e87d9cb9d118f11887e106d5399f119d21ee11b13ae046b01f826b687539",
+    "app/src-tauri/src/extension_artifacts.rs": "28500ab5cd0bf8f65a9e69c3c620f38668969c6418c2164ae07878d03d66b5b2"
+  },
+  "limitations": [
+    "Automatic board projection exports dielectric bodies only and does not subtract pad/via drills.",
+    "Explicit named geometry is required for full component/cell/copper/insulation fidelity.",
+    "Harness routes are round-jointed envelopes, not manufactured cable bend/twist/shield models.",
+    "No receiving-vendor CAD or solver-physics qualification."
+  ]
+}

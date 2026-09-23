@@ -1,0 +1,411 @@
+{
+  "contract": "spikes/manufacturer-intake/v1",
+  "manufacturer": "ti",
+  "url": "https://www.ti.com/lit/zip/SNOM268",
+  "final_url": "https://www.ti.com/lit/mo/snom268c/snom268c.zip?ts=1788844610180&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FLM358",
+  "retrieved_utc": "2026-09-08T16:04:19.124782+00:00",
+  "sha256": "d3b7b2089c35518ab9f0f05290cf7856297e2680a40b0a731640923203a6dcc2",
+  "bytes": 23655,
+  "entries": [
+    {
+      "name": "library/",
+      "bytes": 0,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "library/lmx58_lm2904.olb",
+      "bytes": 27136,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/",
+      "bytes": 0,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/",
+      "bytes": 0,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/",
+      "bytes": 0,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/Install_TIPSpice.json",
+      "bytes": 40,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.1OP",
+      "bytes": 2119,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.cir",
+      "bytes": 687,
+      "status": "not_model_text",
+      "reason": "No .model or .subckt declarations found"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.json",
+      "bytes": 5533,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.mif",
+      "bytes": 1504,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.mrk",
+      "bytes": 423,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.out.1",
+      "bytes": 1377,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient/transient.prb",
+      "bytes": 1196,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904-PSpiceFiles/SCHEMATIC1/transient.sim",
+      "bytes": 1847,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904.dsn",
+      "bytes": 23552,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904.lib",
+      "bytes": 12026,
+      "status": "inventoried_not_executed",
+      "review": {
+        "contract": "spikes/vendor-model-review/v1",
+        "filename": "lmx58_lm2904.lib",
+        "content_sha256": "467a3e573420d1f5a21fab57b76be0e13073e854f609a73459a191958e314726",
+        "models": [
+          {
+            "name": "BB_SW",
+            "type": "VSWITCH",
+            "line": 36
+          },
+          {
+            "name": "ESD_SW",
+            "type": "VSWITCH",
+            "line": 37
+          },
+          {
+            "name": "OL_SW",
+            "type": "VSWITCH",
+            "line": 38
+          },
+          {
+            "name": "OR_SW",
+            "type": "VSWITCH",
+            "line": 39
+          },
+          {
+            "name": "R_NOISELESS",
+            "type": "RES",
+            "line": 40
+          },
+          {
+            "name": "S_VSWITCH_1",
+            "type": "VSWITCH",
+            "line": 219
+          },
+          {
+            "name": "S_VSWITCH_2",
+            "type": "VSWITCH",
+            "line": 220
+          },
+          {
+            "name": "S_VSWITCH_3",
+            "type": "VSWITCH",
+            "line": 221
+          },
+          {
+            "name": "S_VSWITCH_4",
+            "type": "VSWITCH",
+            "line": 222
+          },
+          {
+            "name": "S_VSWITCH_5",
+            "type": "VSWITCH",
+            "line": 223
+          },
+          {
+            "name": "DVNF",
+            "type": "D",
+            "line": 270
+          },
+          {
+            "name": "DVN",
+            "type": "D",
+            "line": 295
+          }
+        ],
+        "subcircuits": [
+          {
+            "name": "LMX58_LM2904",
+            "declared_header": "IN+ IN- VCC VEE OUT",
+            "pins": [
+              "IN+",
+              "IN-",
+              "VCC",
+              "VEE",
+              "OUT"
+            ],
+            "line": 33
+          },
+          {
+            "name": "PHASEREV_0",
+            "declared_header": "VCC VEE VIN+ VIN- VOUT+ VOUT- MID",
+            "pins": [
+              "VCC",
+              "VEE",
+              "VIN+",
+              "VIN-",
+              "VOUT+",
+              "VOUT-",
+              "MID"
+            ],
+            "line": 227
+          },
+          {
+            "name": "CRS_DIST_0",
+            "declared_header": "VIMON MID OUT",
+            "pins": [
+              "VIMON",
+              "MID",
+              "OUT"
+            ],
+            "line": 234
+          },
+          {
+            "name": "VCCS_LIM_ZO_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 246
+          },
+          {
+            "name": "VCCS_LIM_2_EN_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT- EN MID",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-",
+              "EN",
+              "MID"
+            ],
+            "line": 255
+          },
+          {
+            "name": "FEMT_0",
+            "declared_header": "1 2",
+            "pins": [
+              "1",
+              "2"
+            ],
+            "line": 264
+          },
+          {
+            "name": "VNSE_0",
+            "declared_header": "1 2",
+            "pins": [
+              "1",
+              "2"
+            ],
+            "line": 289
+          },
+          {
+            "name": "VCCS_LIM_1_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 314
+          },
+          {
+            "name": "VCCS_LIMIT_IQ_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 323
+          },
+          {
+            "name": "CLAMP_AMP_LO_0",
+            "declared_header": "VC+ VC- VIN COM VO+ VO-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "VIN",
+              "COM",
+              "VO+",
+              "VO-"
+            ],
+            "line": 330
+          },
+          {
+            "name": "CLAMP_AMP_HI_0",
+            "declared_header": "VC+ VC- VIN COM VO+ VO-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "VIN",
+              "COM",
+              "VO+",
+              "VO-"
+            ],
+            "line": 338
+          },
+          {
+            "name": "VCCS_LIM_GR_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 346
+          },
+          {
+            "name": "VCCS_LIM_4_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 355
+          },
+          {
+            "name": "VCCS_LIM_CLAW+_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 364
+          },
+          {
+            "name": "VCCS_LIM_CLAW-_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 378
+          },
+          {
+            "name": "VCCS_LIM_3_0",
+            "declared_header": "VC+ VC- IOUT+ IOUT-",
+            "pins": [
+              "VC+",
+              "VC-",
+              "IOUT+",
+              "IOUT-"
+            ],
+            "line": 398
+          },
+          {
+            "name": "OL_SENSE_0",
+            "declared_header": "COM SW+ OLN OLP",
+            "pins": [
+              "COM",
+              "SW+",
+              "OLN",
+              "OLP"
+            ],
+            "line": 407
+          },
+          {
+            "name": "VCCS_EXT_LIM_0",
+            "declared_header": "VIN+ VIN- IOUT- IOUT+ VP+ VP-",
+            "pins": [
+              "VIN+",
+              "VIN-",
+              "IOUT-",
+              "IOUT+",
+              "VP+",
+              "VP-"
+            ],
+            "line": 413
+          }
+        ],
+        "dependencies_not_loaded": [],
+        "inventory": {
+          "element_prefix_counts": {
+            "C": 31,
+            "D": 4,
+            "E": 11,
+            "G": 36,
+            "H": 3,
+            "I": 7,
+            "R": 96,
+            "S": 5,
+            "V": 13,
+            "X": 20
+          },
+          "features_requiring_review": [
+            "TABLE",
+            "VSWITCH",
+            "behavioral VALUE",
+            "noise parameters",
+            "parameters"
+          ],
+          "unresolved_subcircuits": []
+        },
+        "execution": "not_approved",
+        "compatibility": "not_qualified",
+        "redistribution": "not_reviewed; local user-supplied model only",
+        "datasheet_fit": "not_performed",
+        "next_steps": [
+          "Verify model pin order against the exact package datasheet.",
+          "Review dependencies, manufacturer provenance and license.",
+          "Run DC, AC, transient and limit tests before execution approval."
+        ]
+      }
+    },
+    {
+      "name": "lmx58_lm2904.libsig",
+      "bytes": 813,
+      "status": "retained_in_archive_only"
+    },
+    {
+      "name": "lmx58_lm2904.opj",
+      "bytes": 2987,
+      "status": "retained_in_archive_only"
+    }
+  ],
+  "execution": "not_performed",
+  "qualification": "not_qualified",
+  "redistribution": "requires_license_review"
+}

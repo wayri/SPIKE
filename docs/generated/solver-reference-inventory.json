@@ -1,0 +1,1519 @@
+{
+  "contract": "spike/recorded-reference-inventory/v1",
+  "scope_roots": [
+    "docs",
+    "src",
+    "python/spike_core",
+    "python/spikes",
+    "tests/python",
+    "benchmarks"
+  ],
+  "files_scanned": 813,
+  "scope": "Recorded links and DOIs only; not proof of reading, adoption, accuracy or license permission. Includes non-paper links.",
+  "excluded": [
+    "private repositories",
+    "build/runtime/downloads",
+    "generated files",
+    "docs/SOLVER_HANDBOOK.md",
+    "docs/SOLVER_REFERENCES.md"
+  ],
+  "references": [
+    {
+      "url": "http://timestamp.digicert.com",
+      "occurrences": [
+        {
+          "file": "tests/python/test_windows_signing_contract.py",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "url": "https://aces-society.org/search.php?no=1&type=2&vol=41",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_ACTUATOR_DELIVERY.md",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2212/fluid_2solveFluid_8H.html",
+      "occurrences": [
+        {
+          "file": "python/spike_core/openfoam_flow_diagnostics.py",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2306/basicThermo_8C_source.html",
+      "occurrences": [
+        {
+          "file": "docs/FAN_CHT_QUALIFICATION.md",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2412/classFoam_1_1pressureInletOutletVelocityFvPatchVectorField.html",
+      "occurrences": [
+        {
+          "file": "docs/OPENFOAM_FAN_BOUNDARIES.md",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2506/classFoam_1_1functionObjects_1_1fieldValues_1_1volFieldValue.html",
+      "occurrences": [
+        {
+          "file": "python/spike_core/openfoam_flow_diagnostics.py",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2506/classFoam_1_1prghPressureFvPatchScalarField.html",
+      "occurrences": [
+        {
+          "file": "docs/OPENFOAM_FAN_BOUNDARIES.md",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2512/heatTransfer_2chtMultiRegionFoam_2fluid_2EEqn_8H_source.html",
+      "occurrences": [
+        {
+          "file": "docs/FAN_CHT_QUALIFICATION.md",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2606/classFoam_1_1functionObjects_1_1fieldValues_1_1surfaceFieldValue.html",
+      "occurrences": [
+        {
+          "file": "python/spike_core/openfoam_flow_diagnostics.py",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "url": "https://api.openfoam.com/2606/classFoam_1_1inletOutletFvPatchField.html",
+      "occurrences": [
+        {
+          "file": "docs/OPENFOAM_FAN_BOUNDARIES.md",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "url": "https://article.murata.com/en-us/article/basics-of-capacitors-2",
+      "occurrences": [
+        {
+          "file": "docs/SI_WORKFLOW.md",
+          "line": 188
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1702.01771",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 209
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2507.18491",
+      "occurrences": [
+        {
+          "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "url": "https://bempp.com/handbook/api/function_spaces.html",
+      "occurrences": [
+        {
+          "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
+          "line": 80
+        },
+        {
+          "file": "python/spike_core/mom_surface_basis.py",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "url": "https://blog.freecad.org/2025/09/16/getting-started-with-fem/",
+      "occurrences": [
+        {
+          "file": "docs/FREECAD_ASSEMBLY_THERMAL_EXTENSION_PLAN.md",
+          "line": 168
+        }
+      ]
+    },
+    {
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "occurrences": [
+        {
+          "file": "docs/MEASURED_SI_CAMBRIDGE.md",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "occurrences": [
+        {
+          "file": "tests/python/test_spikes_public_benchmark.py",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "url": "https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html#_custom_pad_options",
+      "occurrences": [
+        {
+          "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+          "line": 716
+        }
+      ]
+    },
+    {
+      "url": "https://devblogs.microsoft.com/directx/gpus-in-the-task-manager/",
+      "occurrences": [
+        {
+          "file": "docs/RESOURCE_MONITOR_AND_ACCELERATION.md",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://digitalcommons.usu.edu/all_datasets/126/",
+      "occurrences": [
+        {
+          "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "url": "https://doc.cgal.org/latest/Triangulation_2/classCGAL_1_1Constrained__Delaunay__triangulation__2.html",
+      "occurrences": [
+        {
+          "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+          "line": 724
+        }
+      ]
+    },
+    {
+      "url": "https://doc.cgal.org/latest/Triangulation_2/index.html",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 107
+        },
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.models.particle.inertial_focusing/inertial_focusing.html",
+      "occurrences": [
+        {
+          "file": "docs/BOUNDED_CHT_AND_RADIATION.md",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "url": "https://doc.openfoam.com/2212/tools/processing/models/thermophysical/equation-of-state/rtm/Boussinesq/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/openfoam_buoyancy.py",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "url": "https://doc.openfoam.com/2306/tools/processing/boundary-conditions/rtm/derived/inlet/flowRateInletVelocity/",
+      "occurrences": [
+        {
+          "file": "docs/OPENFOAM_FAN_BOUNDARIES.md",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "url": "https://doc.openfoam.com/2306/tools/processing/solvers/rtm/heat-transfer/chtMultiRegionFoam/",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_FIELD_JOB_CONTRACT.md",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "url": "https://doc.openfoam.com/2606/tools/processing/boundary-conditions/rtm/derived/thermal/alphatWallFunction/",
+      "occurrences": [
+        {
+          "file": "docs/SST_RUNTIME_INCREMENT.md",
+          "line": 20
+        },
+        {
+          "file": "python/spike_core/openfoam_turbulence.py",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "url": "https://doc.openfoam.com/2606/tools/processing/models/turbulence/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/openfoam_turbulence.py",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "url": "https://doc.openfoam.com/2606/tools/processing/models/turbulence/ras/linear-evm/rtm/kOmegaSST/",
+      "occurrences": [
+        {
+          "file": "docs/SST_RUNTIME_INCREMENT.md",
+          "line": 10
+        },
+        {
+          "file": "python/spike_core/openfoam_turbulence.py",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "url": "https://docs.amd.com/r/en-US/xapp1392-pcb-chan-design-guidelines/Via-Impedance-Optimization",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 116
+        }
+      ]
+    },
+    {
+      "url": "https://docs.cupy.dev/en/stable/reference/generated/cupyx.scipy.sparse.linalg.spsolve.html",
+      "occurrences": [
+        {
+          "file": "docs/ACCELERATION_ARCHITECTURE.md",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "url": "https://docs.kicad.org/8.0/en/pcbnew/pcbnew.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+          "line": 718
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engines.py",
+          "line": 293
+        },
+        {
+          "file": "tests/python/test_external_engines.py",
+          "line": 123
+        },
+        {
+          "file": "tests/python/test_external_engines.py",
+          "line": 283
+        },
+        {
+          "file": "tests/python/test_external_engines.py",
+          "line": 365
+        },
+        {
+          "file": "tests/python/test_openems_geometry_admission.py",
+          "line": 110
+        },
+        {
+          "file": "tests/python/test_openems_geometry_admission.py",
+          "line": 134
+        },
+        {
+          "file": "tests/python/test_pcb_entity_ports.py",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/python/CSXCAD/CSXCAD.html",
+      "occurrences": [
+        {
+          "file": "python/spike_core/openems_assembly_geometry.py",
+          "line": 123
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/python/openEMS/Tutorials/Simple_Patch_Antenna.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/OPENEMS_REFERENCE_VALIDATION.md",
+          "line": 22
+        },
+        {
+          "file": "python/spike_core/openems_benchmarks.py",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/python/openEMS/openEMS.html",
+      "occurrences": [
+        {
+          "file": "docs/EXTERNAL_SOLVER_PLUGIN_GUIDE.md",
+          "line": 176
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/python/openEMS/ports.html",
+      "occurrences": [
+        {
+          "file": "docs/EXTERNAL_SOLVER_PLUGIN_GUIDE.md",
+          "line": 177
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.mejo.2025.106612",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_ACTUATOR_DELIVERY.md",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.mejo.2025.106641",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_ACTUATOR_DELIVERY.md",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1049/pel2.12667",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1109/ACCESS.2022.3147034",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1109/SPI.2007.4512227",
+      "occurrences": [
+        {
+          "file": "docs/AC_CONDUCTOR_MODEL_PLAN.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1109/TCPMT.2023.3284551",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1109/TMTT.1965.1125964",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 213
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1109/TMTT.2017.2695192",
+      "occurrences": [
+        {
+          "file": "docs/AC_CONDUCTOR_MODEL_PLAN.md",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1234/example",
+      "occurrences": [
+        {
+          "file": "tests/python/test_solver_reference_index.py",
+          "line": 9
+        },
+        {
+          "file": "tests/python/test_solver_reference_index.py",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.17863/CAM.65674",
+      "occurrences": [
+        {
+          "file": "docs/MEASURED_SI_CAMBRIDGE.md",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.2514/3.8890",
+      "occurrences": [
+        {
+          "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
+          "line": 25
+        },
+        {
+          "file": "python/spike_core/cfd_reference_correlation.py",
+          "line": 34
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.26078/cad3-j806",
+      "occurrences": [
+        {
+          "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.6028/NBS.TN.688",
+      "occurrences": [
+        {
+          "file": "docs/NBS_YAGI_COMPARISON.md",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "url": "https://evil.example",
+      "occurrences": [
+        {
+          "file": "tests/python/test_windows_signing_contract.py",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "url": "https://example.invalid/component",
+      "occurrences": [
+        {
+          "file": "tests/python/test_windows_release_provenance.py",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "url": "https://example.invalid/model.bin",
+      "occurrences": [
+        {
+          "file": "tests/python/test_project_package_v3.py",
+          "line": 890
+        }
+      ]
+    },
+    {
+      "url": "https://example.org/a(b)",
+      "occurrences": [
+        {
+          "file": "tests/python/test_solver_reference_index.py",
+          "line": 13
+        },
+        {
+          "file": "tests/python/test_solver_reference_index.py",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "url": "https://example.org/reference.cir",
+      "occurrences": [
+        {
+          "file": "tests/python/test_spikes_public_benchmark.py",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "url": "https://example.test/fixture",
+      "occurrences": [
+        {
+          "file": "tests/python/test_board_corpus_benchmark.py",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "url": "https://freecad.github.io/API/d7/d75/classApp_1_1GeoFeature.html",
+      "occurrences": [
+        {
+          "file": "docs/MULTIBOARD_HARNESS_ASSEMBLIES.md",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/BerkeleyLab/Marble",
+      "occurrences": [
+        {
+          "file": "docs/CERN_MARBLE_EVALUATION_20260920.md",
+          "line": 27
+        },
+        {
+          "file": "docs/HARNESS_PI.md",
+          "line": 70
+        },
+        {
+          "file": "docs/MARBLE_CLI_QUALIFICATION_PLAN.md",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/BerkeleyLab/Marble.git",
+      "occurrences": [
+        {
+          "file": "docs/MARBLE_CLI_QUALIFICATION_PLAN.md",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/ElmerCSC/elmerfem",
+      "occurrences": [
+        {
+          "file": "docs/EXTERNAL_SOLVER_PLUGIN_GUIDE.md",
+          "line": 178
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/ElmerCSC/elmerfem/blob/devel/fem/src/modules/HeatSolve.F90",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_FIELD_JOB_CONTRACT.md",
+          "line": 93
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/ElmerCSC/elmerfem/releases/tag/release-26.2",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_FIELD_JOB_CONTRACT.md",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/Assembly_Workbench.md",
+      "occurrences": [
+        {
+          "file": "docs/FREECAD_ASSEMBLY_THERMAL_EXTENSION_PLAN.md",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/TopoShape_API.md",
+      "occurrences": [
+        {
+          "file": "docs/FREECAD_COLLABORATION.md",
+          "line": 110
+        },
+        {
+          "file": "docs/MULTIBOARD_HARNESS_ASSEMBLIES.md",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/FreeCAD/FreeCAD/blob/main/src/Mod/Import/App/AppImportPy.cpp",
+      "occurrences": [
+        {
+          "file": "docs/MCAD_EXPORT.md",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/FreeCAD/FreeCAD/blob/main/src/Mod/Part/App/TopoShapePyImp.cpp",
+      "occurrences": [
+        {
+          "file": "docs/FREECAD_COLLABORATION.md",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/Huaqiu-Electronics/ecad-viewer",
+      "occurrences": [
+        {
+          "file": "docs/VISUALIZATION_ARCHITECTURE.md",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/NanoComp/harminv",
+      "occurrences": [
+        {
+          "file": "python/spike_core/si_ringdown.py",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/Nubis-Communications/SignalIntegrity",
+      "occurrences": [
+        {
+          "file": "docs/SIGNAL_INTEGRITY_NETWORK_INTEGRATION.md",
+          "line": 62
+        },
+        {
+          "file": "docs/SIGNAL_INTEGRITY_NETWORK_WORKBENCH.md",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/Nubis-Communications/SignalIntegrity/blob/master/LICENSE.txt",
+      "occurrences": [
+        {
+          "file": "docs/SIGNAL_INTEGRITY_NETWORK_WORKBENCH.md",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/OLIMEX/MOD-OLED-128x64",
+      "occurrences": [
+        {
+          "file": "docs/STABILIZATION_RELEASE_PLAN_20260905.md",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/Open-Cascade-SAS/OCCT/wiki/xde",
+      "occurrences": [
+        {
+          "file": "docs/MCAD_EXPORT.md",
+          "line": 132
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/buganini/Kikakuka",
+      "occurrences": [
+        {
+          "file": "docs/HARNESS_PI.md",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/krishna-swaroop/KiCAD-Prism",
+      "occurrences": [
+        {
+          "file": "docs/VISUALIZATION_ARCHITECTURE.md",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/rust-lang/crates.io-index",
+      "occurrences": [
+        {
+          "file": "tests/python/test_windows_release_provenance.py",
+          "line": 403
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/LICENSE",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/scripts/synthetic_corpus/common.py",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/L1_parsing/test_L1_018_corpus_sexpr_passthrough.py",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/L1_parsing/test_L1_020_pcb_projection_corpus.py",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/L1_parsing/test_L1_023_rust_corpus_performance_memory.py",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 127
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/corpus/README.md",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/corpus/kicad.archive.toml",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/performance/sexpr_corpus_cases.toml",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/blob/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d/tests/support_scripts/performance_provenance.py",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wavenumber-eng/kicad_monkey/tree/bc6796c1b8ce55bfbcb8b1771f3ecbc70658d34d",
+      "occurrences": [
+        {
+          "file": "docs/KICAD_MONKEY_BENCHMARK_PLAN.md",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "url": "https://gitlab.com/ohwr/project/wr-switch-hw",
+      "occurrences": [
+        {
+          "file": "docs/CERN_MARBLE_EVALUATION_20260920.md",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "url": "https://gmsh.info/doc/texinfo/gmsh.html",
+      "occurrences": [
+        {
+          "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "url": "https://ibis.org/ver8.0/ver8_0.pdf",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 221
+        }
+      ]
+    },
+    {
+      "url": "https://ibis.org/~ibisorg/ver7.2/ver7_2.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SI_WORKFLOW.md",
+          "line": 182
+        }
+      ]
+    },
+    {
+      "url": "https://ieee802.org/3/ap/public/jan05/brink_01_0105.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_REFERENCE_QUALIFICATION.md",
+          "line": 66
+        }
+      ]
+    },
+    {
+      "url": "https://json-schema.org/draft/2020-12/schema",
+      "occurrences": [
+        {
+          "file": "python/spike_core/public_release_readiness.py",
+          "line": 68
+        },
+        {
+          "file": "tests/python/test_dc_fem_geometry_schema.py",
+          "line": 70
+        },
+        {
+          "file": "tests/python/test_environment_profiles.py",
+          "line": 141
+        },
+        {
+          "file": "tests/python/test_errors.py",
+          "line": 193
+        },
+        {
+          "file": "tests/python/test_pdn_optimization_schema.py",
+          "line": 18
+        },
+        {
+          "file": "tests/python/test_schema_catalog.py",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetformattedcounterarrayw",
+      "occurrences": [
+        {
+          "file": "docs/RESOURCE_MONITOR_AND_ACCELERATION.md",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "url": "https://meep.readthedocs.io/en/master/Python_User_Interface/#near-to-far-field-spectra",
+      "occurrences": [
+        {
+          "file": "docs/BOUNDED_CHT_AND_RADIATION.md",
+          "line": 60
+        },
+        {
+          "file": "python/spike_core/huygens_far_field.py",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://ngspice.sourceforge.io/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 273
+        }
+      ]
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/19900004089/downloads/19900004089.pdf",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/20240015387/downloads/Magnet_Systems_Analysis_FINAL.pdf",
+      "occurrences": [
+        {
+          "file": "docs/RESULT_VISUALIZATION_AND_LIMITS.md",
+          "line": 46
+        }
+      ]
+    },
+    {
+      "url": "https://odbplusplus.com/design/odb-design-format-specification/",
+      "occurrences": [
+        {
+          "file": "docs/ODB_AND_HARNESS_EXTENSIONS.md",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "url": "https://pcisig.com/specification-overview/pci-express-base",
+      "occurrences": [
+        {
+          "file": "docs/SI_SPICE_EMI_RF_ENGINE_GATES.md",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "url": "https://people.eecs.berkeley.edu/~jrs/papers/cdtj1.pdf",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "url": "https://people.eecs.berkeley.edu/~jrs/papers/robust-predicates.pdf",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "url": "https://people.eecs.berkeley.edu/~jrs/papers/robustr.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+          "line": 722
+        }
+      ]
+    },
+    {
+      "url": "https://people.eecs.berkeley.edu/~jrs/papers/segments.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+          "line": 727
+        },
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 151
+        }
+      ]
+    },
+    {
+      "url": "https://plm.sw.siemens.com/en-US/simcenter/fluids-thermal-simulation/flotherm/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "url": "https://pypi.org/project/kicad-monkey/",
+      "occurrences": [
+        {
+          "file": "docs/VISUALIZATION_ARCHITECTURE.md",
+          "line": 17
+        }
+      ]
+    },
+    {
+      "url": "https://scdn.rohde-schwarz.com/ur/pws/dl_downloads/dl_common_library/dl_manuals/dl_user_manual/ES-K1_Manual_en_08.pdf",
+      "occurrences": [
+        {
+          "file": "docs/emi-chamber-workflow.md",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "url": "https://spike.local/schemas/dc-fem-conductor-volumes-v1.schema.json",
+      "occurrences": [
+        {
+          "file": "tests/python/test_dc_fem_geometry_schema.py",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "url": "https://spike.local/schemas/pdn-optimization-v1.schema.json",
+      "occurrences": [
+        {
+          "file": "tests/python/test_pdn_optimization_schema.py",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "url": "https://standards.ieee.org/ieee/370/6165/",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 217
+        },
+        {
+          "file": "docs/VALIDATION_PROGRAM.md",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "url": "https://timestamp.digicert.com",
+      "occurrences": [
+        {
+          "file": "tests/python/test_windows_signing_contract.py",
+          "line": 56
+        }
+      ]
+    },
+    {
+      "url": "https://timestamp.digicert.com/path",
+      "occurrences": [
+        {
+          "file": "tests/python/test_windows_signing_contract.py",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/Backstep_validation/cf.exp.dat",
+      "occurrences": [
+        {
+          "file": "python/spike_core/cfd_reference_correlation.py",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/backstep_val.html",
+      "occurrences": [
+        {
+          "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "url": "https://training.plm.automation.siemens.com/ilt/iltdescription.cfm?pID=298990-US_____EDA__2510___1199",
+      "occurrences": [
+        {
+          "file": "docs/SI_EXPANSION_20260907.md",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "url": "https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=7607",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 207
+        }
+      ]
+    },
+    {
+      "url": "https://user:pass@example.invalid/run",
+      "occurrences": [
+        {
+          "file": "tests/python/test_errors.py",
+          "line": 137
+        }
+      ]
+    },
+    {
+      "url": "https://vesa.org/displayport-developer/compliance/",
+      "occurrences": [
+        {
+          "file": "docs/SI_SPICE_EMI_RF_ENGINE_GATES.md",
+          "line": 105
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.101/www/s2019/handouts/L02_4.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SI_NETWORK_GRAPH_INCREMENT_20260907.md",
+          "line": 32
+        },
+        {
+          "file": "python/spike_core/si_resonance.py",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "url": "https://white-rabbit-collaboration-website.web.cern.ch/wr-technology/",
+      "occurrences": [
+        {
+          "file": "docs/CERN_MARBLE_EVALUATION_20260920.md",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "url": "https://www.asme.org/codes-standards/find-codes-standards/standard-for-verification-and-validation-in-computational-fluid-dynamics-and-heat-transfer/2009",
+      "occurrences": [
+        {
+          "file": "docs/VALIDATION_PROGRAM.md",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "url": "https://www.elmerfem.org/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 174
+        }
+      ]
+    },
+    {
+      "url": "https://www.fastfieldsolvers.com/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 238
+        },
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "url": "https://www.grc.nasa.gov/WWW/wind/valid/tutorial/consistency.html",
+      "occurrences": [
+        {
+          "file": "docs/BOUNDED_CHT_AND_RADIATION.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://www.harwin.com/resources/product-datasheets",
+      "occurrences": [
+        {
+          "file": "docs/HARNESS_PI.md",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://www.hdmi.org/resource/testing",
+      "occurrences": [
+        {
+          "file": "docs/SI_SPICE_EMI_RF_ENGINE_GATES.md",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "url": "https://www.hdmi.org/spec/index",
+      "occurrences": [
+        {
+          "file": "docs/SI_SPICE_EMI_RF_ENGINE_GATES.md",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "url": "https://www.ibis.org/specs/",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "url": "https://www.ibis.org/touchstone_ver2.1/touchstone_ver2_1.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SI_WORKFLOW.md",
+          "line": 184
+        }
+      ]
+    },
+    {
+      "url": "https://www.ieee802.org/3/ad_hoc/COM/public/index.html",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_ACTUATOR_DELIVERY.md",
+          "line": 70
+        },
+        {
+          "file": "docs/SERDES_REFERENCE_QUALIFICATION.md",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "url": "https://www.ieee802.org/3/an/",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_ACTUATOR_DELIVERY.md",
+          "line": 72
+        }
+      ]
+    },
+    {
+      "url": "https://www.ipc.org/TOC/IPC-2152.pdf",
+      "occurrences": [
+        {
+          "file": "docs/VALIDATION_PROGRAM.md",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://www.ipc.org/TOC/IPC-2228_TOC.pdf",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "url": "https://www.ipc.org/ipc-design-standards",
+      "occurrences": [
+        {
+          "file": "docs/VALIDATION_PROGRAM.md",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "url": "https://www.ipc.org/ipc-document-revision-table",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 38
+        },
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "url": "https://www.ipc.org/test-methods",
+      "occurrences": [
+        {
+          "file": "docs/VALIDATION_PROGRAM.md",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "url": "https://www.ipc2581.com/ipc-2581-revc-test-cases/",
+      "occurrences": [
+        {
+          "file": "docs/TEST_FIXTURES.md",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "url": "https://www.kicad.org/discover/3dviewer/",
+      "occurrences": [
+        {
+          "file": "docs/VISUALIZATION_ARCHITECTURE.md",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "url": "https://www.kicad.org/sponsors/become-a-sponsor/",
+      "occurrences": [
+        {
+          "file": "docs/BUSINESS_PLAN.md",
+          "line": 143
+        }
+      ]
+    },
+    {
+      "url": "https://www.murata.com/en-global/support/faqs/capacitor/ceramiccapacitor/char/0017",
+      "occurrences": [
+        {
+          "file": "docs/SI_WORKFLOW.md",
+          "line": 190
+        }
+      ]
+    },
+    {
+      "url": "https://www.nature.com/articles/s41467-025-66232-7",
+      "occurrences": [
+        {
+          "file": "docs/SERDES_ACTUATOR_DELIVERY.md",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/publications/comments-conversions-between-s-z-y-h-abcd-and-t-parameters-which-are-valid-complex",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 215
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/publications/finite-element-method-solution-uncertainty-asymptotic-solution-and-new-approach",
+      "occurrences": [
+        {
+          "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
+          "line": 119
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/publications/statistical-study-de-embedding-applied-eye-diagram-analysis",
+      "occurrences": [
+        {
+          "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+          "line": 219
+        }
+      ]
+    },
+    {
+      "url": "https://www.openfoam.com/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 259
+        }
+      ]
+    },
+    {
+      "url": "https://www.openfoam.com/download/openfoam-installation-on-linux",
+      "occurrences": [
+        {
+          "file": "docs/EXTERNAL_SOLVER_DEPLOYMENT.md",
+          "line": 167
+        }
+      ]
+    },
+    {
+      "url": "https://www.openfoam.com/download/release-history",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_FIELD_JOB_CONTRACT.md",
+          "line": 101
+        }
+      ]
+    },
+    {
+      "url": "https://www.openfoam.com/news/main-news/openfoam-v2606/pre-processing",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_FIELD_JOB_CONTRACT.md",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "url": "https://www.raspberrypi.com/documentation/microcontrollers/microcontroller-chips.html",
+      "occurrences": [
+        {
+          "file": "docs/STABILIZATION_RELEASE_PLAN_20260905.md",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-us/products/pcb/hyperlynx/signal-integrity/",
+      "occurrences": [
+        {
+          "file": "docs/SI_EXPANSION_20260907.md",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "url": "https://www.sparselizard.org/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/external_engine_discovery.py",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "url": "https://www.sparselizard.org/DOCUMENTATION.pdf",
+      "occurrences": [
+        {
+          "file": "docs/EXTERNAL_SOLVER_PLUGIN_GUIDE.md",
+          "line": 179
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/docs/49562/49562.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SI_WORKFLOW.md",
+          "line": 192
+        }
+      ]
+    },
+    {
+      "url": "https://zenodo.org/records/17909944",
+      "occurrences": [
+        {
+          "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
+          "line": 60
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+.si-flow { padding: 14px 20px; overflow: auto; min-height: 440px; max-height: 78vh; color: var(--text-primary, #dce6f4); }
+.si-flow .si-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
+.si-flow button, .si-file { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #52647a; border-radius: 5px; background: #203247; color: #edf4fc; padding: 8px 12px; cursor: pointer; font-size: 12px; }
+.si-flow button:disabled { opacity: .5; cursor: default; }
+.si-flow .primary-btn, .si-steps button.active { background: #075985; border-color: #38bdf8; }
+.si-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.si-flow .si-note { border-left: 3px solid #eab308; background: #2b3040; padding: 10px 14px; margin: 10px 0; font-size: 12px; line-height: 1.65; }
+.si-flow fieldset { border: 1px solid #475569; border-radius: 6px; margin: 12px 0; padding: 14px; min-width: 0; }
+.si-flow fieldset.si-stage { border: 0; padding: 0; }
+.si-flow legend { padding: 0 8px; color: #7dd3fc; }
+.si-flow h3 { margin: 12px 0; font-size: 16px; }
+.si-flow p { line-height: 1.65; font-size: 12px; max-width: 1100px; }
+.si-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 12px 0; }
+.si-flow label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+.si-flow input:not([type=checkbox]):not([type=file]), .si-flow select, .si-flow textarea { box-sizing: border-box; width: 100%; min-width: 100px; background: #111d2e; color: #f1f5f9; border: 1px solid #62748a; border-radius: 4px; padding: 8px; font: inherit; }
+.si-flow input[type=checkbox] { align-self: flex-start; }
+.si-flow .si-file { position: relative; display: inline-flex; flex-direction: row; overflow: hidden; }
+.si-file input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.si-endpoint-table-wrap { overflow-x: auto; border: 1px solid #475569; border-radius: 6px; margin: 10px 0; }
+.si-endpoint-table { border-collapse: collapse; min-width: 900px; width: 100%; font-size: 12px; }
+.si-endpoint-table th, .si-endpoint-table td { border-bottom: 1px solid #334155; padding: 7px; text-align: left; vertical-align: middle; }
+.si-endpoint-table thead th { background: #1d2d40; color: #bae6fd; font-weight: 600; white-space: nowrap; }
+.si-endpoint-table tbody tr:last-child th, .si-endpoint-table tbody tr:last-child td { border-bottom: 0; }
+.si-endpoint-table tbody tr:hover { background: #17263a; }
+.si-endpoint-table input { min-width: 94px; padding: 6px !important; }
+.si-endpoint-table button { padding: 5px 7px; }
+.si-endpoint-ibis { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: #facc15; }
+.si-endpoint-hint { margin-top: 6px !important; color: #94a3b8; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.si-json { height: 430px; font-family: monospace !important; }
+.si-flow pre { white-space: pre-wrap; word-break: break-word; background: #101a29; padding: 12px; max-height: 400px; overflow: auto; font-size: 11px; }
+.si-flow details { margin: 14px 0; }
+.si-flow summary { cursor: pointer; padding: 8px 0; }
+.si-plot { border: 1px solid #334155; background: #101c2c; padding: 8px 12px; margin: 14px 0; border-radius: 6px; }
+.si-plot h4 { margin: 6px 0; font-size: 13px; color: #e2e8f0; }
+.si-plot-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.si-flow .si-plot-heading button { padding: 5px 9px; }
+.si-plot svg { width: 100%; max-height: 320px; display: block; }
+.si-plot svg text { fill: #cbd5e1; font-size: 10px; }
+.si-plot small { color: #94a3b8; display: block; font-size: 10px; }
+.si-plot-shade { position: fixed; z-index: var(--z-modal, 200); inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(3, 8, 11, .78); }
+.si-plot-window { box-sizing: border-box; width: min(1100px, calc(100vw - 36px)); height: min(720px, calc(100vh - 36px)); min-width: min(540px, calc(100vw - 36px)); min-height: 360px; resize: both; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr); border: 1px solid #64748b; border-radius: 7px; color: #e2e8f0; background: #101c2c; box-shadow: 0 24px 80px rgba(0, 0, 0, .7); }
+.si-plot-window > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid #334155; background: #17263a; }
+.si-plot-window > header h3 { margin: 0; font-size: 14px; }
+.si-flow .si-plot-window > header button { padding: 6px 10px; }
+.si-plot-window-body { min-height: 0; overflow: auto; padding: 10px 14px; }
+.si-plot-window-body svg { width: 100%; height: calc(100% - 28px); min-height: 280px; display: block; }
+.si-plot-window-body svg text { fill: #cbd5e1; font-size: 10px; }
+.si-plot-window-body small { color: #94a3b8; display: block; padding-top: 5px; font-size: 10px; }
+@media (max-width: 620px), (max-height: 440px) {
+  .si-plot-shade { padding: 0; }
+  .si-plot-window { width: 100vw; height: 100vh; min-width: 0; min-height: 0; resize: none; border: 0; border-radius: 0; }
+}
+.si-metrics { display: flex; flex-wrap: wrap; gap: 18px; margin: 14px 0; }
+.si-metrics div { display: flex; flex-direction: column; gap: 6px; }
+.si-metrics span { color: #94a3b8; font-size: 11px; }
+.si-flow :focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }

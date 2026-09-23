@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/openfoam-thermal-case-v1.schema.json",
+  "title": "SPIKE OpenFOAM Thermal Case v1",
+  "type": "object",
+  "required": ["contract", "adapter_contract", "adapter_version", "scenario", "mode", "result_path", "model_status", "validation_status", "sources", "files"],
+  "properties": {
+    "contract": {"const": "spike/openfoam-thermal-case/v1"},
+    "adapter_contract": {"const": "spike/openfoam-adapter/v1"},
+    "adapter_version": {"type": "string", "minLength": 1},
+    "scenario": {"type": "object", "required": ["id", "name", "digest"], "properties": {"id": {"type": "string"}, "name": {"type": "string"}, "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}, "additionalProperties": false},
+    "mode": {"enum": ["steady_state_natural_convection", "steady_state_forced_convection"]},
+    "result_path": {"const": "postProcessing/spike/thermal-result.json"},
+    "model_status": {"const": "experimental"},
+    "validation_status": {"const": "not_externally_validated"},
+    "sources": {"type": "array", "items": {"type": "object", "required": ["id", "cell_set", "power_w"], "properties": {"id": {"type": "string"}, "cell_set": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"}, "power_w": {"type": "number", "minimum": 0}}, "additionalProperties": false}},
+    "files": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+  },
+  "additionalProperties": false
+}

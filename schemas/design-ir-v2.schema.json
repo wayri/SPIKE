@@ -1,0 +1,500 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/design-ir-v2.schema.json",
+  "title": "SPIKE DesignIR v2",
+  "type": "object",
+  "required": ["contract", "design_id", "name", "source", "frame", "materials", "layers", "nets", "tracks", "arcs", "zones", "pads", "vias", "castellations", "pins", "components", "component_bonds", "connectors", "regions", "bends", "models", "constraints", "variants", "simulation_models", "issues", "vendor_extensions", "metadata"],
+  "properties": {
+    "contract": { "const": "spike/design-ir/v2" },
+    "design_id": { "$ref": "#/$defs/id" },
+    "name": { "type": "string", "minLength": 1 },
+    "source": { "$ref": "#/$defs/sourceIdentity" },
+    "frame": { "$ref": "#/$defs/frame" },
+    "materials": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "layers": { "type": "array", "maxItems": 256, "items": { "$ref": "#/$defs/layer" } },
+    "nets": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "tracks": { "type": "array", "items": { "$ref": "#/$defs/track" } },
+    "arcs": { "type": "array", "items": { "$ref": "#/$defs/arc" } },
+    "zones": { "type": "array", "items": { "$ref": "#/$defs/zone" } },
+    "pads": { "type": "array", "items": { "$ref": "#/$defs/pad" } },
+    "vias": { "type": "array", "items": { "$ref": "#/$defs/via" } },
+    "drills": { "type": "array", "items": { "$ref": "#/$defs/drill" } },
+    "castellations": { "type": "array", "items": { "$ref": "#/$defs/castellation" } },
+    "pins": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "components": { "type": "array", "items": { "$ref": "#/$defs/component" } },
+    "component_bonds": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "connectors": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "regions": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "bends": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "models": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "constraints": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "variants": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "simulation_models": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "retained_padstack_occurrence_groups": { "type": "array", "items": { "$ref": "#/$defs/retainedPadstackOccurrenceGroup" } },
+    "retained_nonregular_padstack_geometry": { "$ref": "#/$defs/retainedNonregularPadstackGeometry" },
+    "retained_standard_contour_land_geometry": { "$ref": "#/$defs/retainedStandardContourLandGeometry" },
+    "issues": { "type": "array", "items": { "$ref": "design-ir-v1.schema.json#/$defs/validationIssue" } },
+    "vendor_extensions": { "$ref": "#/$defs/extensions" },
+    "metadata": { "type": "object" }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "point": { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }], "minItems": 2, "maxItems": 2 },
+    "zoneConnectionMode": { "enum": ["none", "thermal", "solid", "tht_thermal", "unknown"] },
+    "zoneConnectionOverride": { "enum": ["inherit", "none", "thermal", "solid", "tht_thermal", "unknown"] },
+    "optionalNonnegativeMm": { "type": ["number", "null"], "minimum": 0 },
+    "extensions": { "type": "object", "propertyNames": { "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._/-]*$" } },
+    "sourceIdentity": {
+      "type": "object",
+      "required": ["source_format", "source_digest", "native_id", "artifact_path"],
+      "properties": {
+        "source_format": { "type": "string", "minLength": 1 },
+        "source_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "native_id": { "type": "string" },
+        "artifact_path": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "frame": {
+      "type": "object",
+      "required": ["frame_id", "parent_frame_id", "units", "handedness", "transform"],
+      "properties": {
+        "frame_id": { "$ref": "#/$defs/id" },
+        "parent_frame_id": { "type": "string" },
+        "units": { "const": "mm" },
+        "handedness": { "const": "right" },
+        "transform": { "type": "array", "minItems": 16, "maxItems": 16, "items": { "type": "number" }, "description": "Row-major 4x4 homogeneous transform from this right-handed millimetre frame into parent_frame_id." }
+      },
+      "additionalProperties": false
+    },
+    "entity": {
+      "type": "object",
+      "required": ["id", "source_id", "name", "extensions"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "source_id": { "type": "string" },
+        "name": { "type": "string" },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": true
+    },
+    "layer": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object",
+        "required": ["layer_type", "order", "z_mm", "material_id", "region_ids"],
+        "properties": {
+          "layer_type": { "type": "string" }, "order": { "type": "integer", "minimum": 0 },
+          "z_mm": { "type": "number" }, "thickness_mm": { "type": ["number", "null"], "minimum": 0 },
+          "material_id": { "type": "string" }, "region_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }
+        }
+      }]
+    },
+    "track": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object", "required": ["net_id", "layer_id", "start_mm", "end_mm", "width_mm"],
+        "properties": { "net_id": { "$ref": "#/$defs/id" }, "layer_id": { "$ref": "#/$defs/id" }, "start_mm": { "$ref": "#/$defs/point" }, "end_mm": { "$ref": "#/$defs/point" }, "width_mm": { "type": "number", "exclusiveMinimum": 0 }, "path": { "$ref": "#/$defs/trackPath" } }
+      }]
+    },
+    "trackPath": {
+      "type": "object",
+      "required": ["path_id", "step_index", "step_count", "end_cap", "join_style"],
+      "properties": {
+        "path_id": { "$ref": "#/$defs/id" },
+        "step_index": { "type": "integer", "minimum": 0 },
+        "step_count": { "type": "integer", "minimum": 1 },
+        "end_cap": { "const": "round" },
+        "join_style": { "const": "round" }
+      },
+      "additionalProperties": false
+    },
+    "arc": {
+      "allOf": [{ "$ref": "#/$defs/track" }, {
+        "type": "object", "required": ["mid_mm"], "properties": { "mid_mm": { "$ref": "#/$defs/point" } }
+      }]
+    },
+    "zone": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object", "required": ["net_id", "layer_ids", "outlines_mm", "holes_mm", "source_zone_id", "filled_copper_id", "source_zone_outline_id", "source_zone_outline_sha256", "source_zone_outline_paths_mm", "source_zone_outline_path_count", "source_zone_outline_vertex_count", "source_zone_outline_representation", "source_zone_outline_provenance_complete", "parametric_refill_eligible", "source_fill_group_id", "source_fill_group_sha256", "source_fill_component_ordinal", "source_fill_component_count", "source_fill_component_sha256", "source_fill_representation", "source_fill_provenance_complete", "thermal_topology_eligible", "zone_kind", "filled_copper_state", "zone_connection_default", "zone_connection_declared", "clearance_mm", "thermal_gap_mm", "thermal_spoke_width_mm", "fill_mode", "thermal_settings_valid"],
+        "properties": {
+          "net_id": { "$ref": "#/$defs/id" },
+          "layer_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" } },
+          "outlines_mm": { "type": "array" }, "holes_mm": { "type": "array" },
+          "boundary_rings": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/zoneBoundaryRing" } },
+          "fill_style_id": { "$ref": "#/$defs/id" }, "fill_property": { "const": "FILL" },
+          "source_zone_id": { "type": "string", "maxLength": 256 },
+          "filled_copper_id": { "type": "string", "maxLength": 512 },
+          "source_zone_outline_id": { "type": "string", "maxLength": 512 },
+          "source_zone_outline_sha256": { "type": "string", "pattern": "^$|^[0-9a-f]{64}$" },
+          "source_zone_outline_paths_mm": { "type": "array", "maxItems": 256, "items": { "type": "array", "minItems": 3, "maxItems": 65536, "items": { "$ref": "#/$defs/point" } } },
+          "source_zone_outline_path_count": { "type": "integer", "minimum": 0, "maximum": 256 },
+          "source_zone_outline_vertex_count": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+          "source_zone_outline_representation": { "enum": ["none", "flat_polygon_paths", "unknown"] },
+          "source_zone_outline_provenance_complete": { "type": "boolean" },
+          "parametric_refill_eligible": { "const": false },
+          "source_fill_group_id": { "type": "string", "maxLength": 512 },
+          "source_fill_group_sha256": { "type": "string", "pattern": "^$|^[0-9a-f]{64}$" },
+          "source_fill_component_ordinal": { "type": "integer", "minimum": 0, "maximum": 65536 },
+          "source_fill_component_count": { "type": "integer", "minimum": 0, "maximum": 65536 },
+          "source_fill_component_sha256": { "type": "string", "pattern": "^$|^[0-9a-f]{64}$" },
+          "source_fill_representation": { "enum": ["none", "flat_polygon_path", "unknown"] },
+          "source_fill_provenance_complete": { "type": "boolean" },
+          "thermal_topology_eligible": { "const": false },
+          "zone_kind": { "enum": ["copper", "keepout", "unknown"] },
+          "filled_copper_state": { "enum": ["source_filled", "outline_fallback", "none", "unknown"] },
+          "zone_connection_default": { "$ref": "#/$defs/zoneConnectionMode" },
+          "zone_connection_declared": { "type": "boolean" },
+          "clearance_mm": { "$ref": "#/$defs/optionalNonnegativeMm" },
+          "thermal_gap_mm": { "$ref": "#/$defs/optionalNonnegativeMm" },
+          "thermal_spoke_width_mm": { "$ref": "#/$defs/optionalNonnegativeMm" },
+          "fill_mode": { "enum": ["solid", "hatched", "unknown"] },
+          "thermal_settings_valid": { "type": "boolean" }
+        },
+        "allOf": [{
+          "if": { "properties": { "source_zone_outline_provenance_complete": { "const": true } }, "required": ["source_zone_outline_provenance_complete"] },
+          "then": { "properties": {
+            "source_zone_outline_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+            "source_zone_outline_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "source_zone_outline_paths_mm": { "type": "array", "minItems": 1, "maxItems": 256 },
+            "source_zone_outline_path_count": { "type": "integer", "minimum": 1, "maximum": 256 },
+            "source_zone_outline_vertex_count": { "type": "integer", "minimum": 3, "maximum": 1048576 },
+            "source_zone_outline_representation": { "const": "flat_polygon_paths" }
+          } },
+          "else": { "properties": {
+            "source_zone_outline_id": { "const": "" }, "source_zone_outline_sha256": { "const": "" },
+            "source_zone_outline_paths_mm": { "maxItems": 0 }, "source_zone_outline_path_count": { "const": 0 },
+            "source_zone_outline_vertex_count": { "const": 0 }, "source_zone_outline_representation": { "const": "none" }
+          } }
+        }, {
+          "if": { "properties": { "source_fill_provenance_complete": { "const": true } }, "required": ["source_fill_provenance_complete"] },
+          "then": { "properties": {
+            "filled_copper_state": { "const": "source_filled" },
+            "source_fill_group_id": { "type": "string", "minLength": 1, "maxLength": 512 },
+            "source_fill_group_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "source_fill_component_ordinal": { "type": "integer", "minimum": 1, "maximum": 65536 },
+            "source_fill_component_count": { "type": "integer", "minimum": 1, "maximum": 65536 },
+            "source_fill_component_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+            "source_fill_representation": { "const": "flat_polygon_path" }
+          } },
+          "else": { "properties": {
+            "source_fill_group_id": { "const": "" },
+            "source_fill_group_sha256": { "const": "" },
+            "source_fill_component_ordinal": { "const": 0 },
+            "source_fill_component_count": { "const": 0 },
+            "source_fill_component_sha256": { "const": "" },
+            "source_fill_representation": { "const": "none" }
+          } }
+        }]
+      }]
+    },
+    "zoneBoundaryRing": {
+      "type": "object", "required": ["role", "start_mm", "segments"],
+      "properties": {
+        "role": { "enum": ["outer", "cutout"] }, "start_mm": { "$ref": "#/$defs/point" },
+        "segments": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/zoneBoundarySegment" } }
+      },
+      "additionalProperties": false
+    },
+    "zoneBoundarySegment": {
+      "oneOf": [
+        {
+          "type": "object", "required": ["kind", "end_mm"],
+          "properties": { "kind": { "const": "line" }, "end_mm": { "$ref": "#/$defs/point" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["kind", "end_mm", "center_mm", "clockwise"],
+          "properties": {
+            "kind": { "const": "arc" }, "end_mm": { "$ref": "#/$defs/point" },
+            "center_mm": { "$ref": "#/$defs/point" }, "clockwise": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "pad": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object", "required": ["net_id", "component_id", "pin_id", "layer_ids", "center_mm", "size_mm", "shape", "drill_size_mm", "drill_shape", "plated", "pad_kind", "zone_connection_override", "zone_connection_declared", "zone_connection_layer_overrides", "thermal_gap_override_mm", "thermal_spoke_width_override_mm", "thermal_spoke_angle_deg", "thermal_settings_valid"],
+        "properties": { "net_id": { "$ref": "#/$defs/id" }, "component_id": { "type": "string" }, "pin_id": { "type": "string" }, "layer_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }, "center_mm": { "$ref": "#/$defs/point" }, "size_mm": { "$ref": "#/$defs/point" }, "shape": { "type": "string" }, "drill_size_mm": { "$ref": "#/$defs/point" }, "drill_shape": { "enum": ["none", "circle", "oval", "slot", "custom"] }, "plated": { "type": "boolean" }, "land_profiles": { "type": "array", "items": { "$ref": "#/$defs/landProfile" } }, "custom_geometry": { "$ref": "#/$defs/customPadGeometry" }, "pad_kind": { "enum": ["smd", "thru_hole", "np_thru_hole", "connect", "unknown"] }, "zone_connection_override": { "$ref": "#/$defs/zoneConnectionOverride" }, "zone_connection_declared": { "type": "boolean" }, "zone_connection_layer_overrides": { "type": "object", "propertyNames": { "minLength": 1 }, "additionalProperties": { "$ref": "#/$defs/zoneConnectionMode" } }, "thermal_gap_override_mm": { "$ref": "#/$defs/optionalNonnegativeMm" }, "thermal_spoke_width_override_mm": { "$ref": "#/$defs/optionalNonnegativeMm" }, "thermal_spoke_angle_deg": { "type": ["number", "null"], "minimum": 0, "exclusiveMaximum": 360 }, "thermal_settings_valid": { "type": "boolean" } }
+      }]
+    },
+    "customPadGeometry": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["status", "coordinate_space", "mirror_x", "positive_filled_polygon"],
+          "properties": {
+            "status": { "const": "supported" }, "coordinate_space": { "const": "pad_local_mm" },
+            "mirror_x": { "type": "boolean" },
+            "positive_filled_polygon": { "type": "array", "minItems": 3, "maxItems": 4096, "items": { "$ref": "#/$defs/point" } },
+            "curve_approximation": {
+              "type": "object", "additionalProperties": false,
+              "required": ["method", "maximum_sagitta_mm", "source_circle_count", "flattened_segment_count", "conservative_source_containment"],
+              "properties": {
+                "method": { "const": "inscribed_equal_angle_v1" },
+                "maximum_sagitta_mm": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.001 },
+                "source_circle_count": { "type": "integer", "minimum": 1, "maximum": 16 },
+                "flattened_segment_count": { "type": "integer", "minimum": 12, "maximum": 4096 },
+                "conservative_source_containment": { "const": true }
+              }
+            },
+            "stroke_approximation": {
+              "type": "object", "additionalProperties": false,
+              "required": ["method", "source_primitive_kind", "source_width_mm", "source_vertex_count", "source_geometry_sha256", "maximum_radial_error_mm", "quantization_grid_mm", "flattened_segment_count", "round_join", "closed_path_no_caps", "conservative_source_containment"],
+              "properties": {
+                "method": { "const": "inscribed_round_offset_v1" },
+                "source_primitive_kind": { "const": "gr_poly" },
+                "source_width_mm": { "type": "number", "exclusiveMinimum": 0, "maximum": 2000 },
+                "source_vertex_count": { "type": "integer", "minimum": 3, "maximum": 128 },
+                "source_geometry_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+                "maximum_radial_error_mm": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.001 },
+                "quantization_grid_mm": { "const": 1e-8 },
+                "flattened_segment_count": { "type": "integer", "minimum": 1, "maximum": 4096 },
+                "round_join": { "const": true },
+                "closed_path_no_caps": { "const": true },
+                "conservative_source_containment": { "const": true }
+              }
+            }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["status", "reason"],
+          "properties": { "status": { "const": "unsupported" }, "reason": { "type": "string", "minLength": 1, "maxLength": 128 } }
+        }
+      ]
+    },
+    "via": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object", "required": ["net_id", "center_mm", "diameter_mm", "drill_mm", "start_layer_id", "end_layer_id", "via_type"],
+        "properties": { "net_id": { "$ref": "#/$defs/id" }, "center_mm": { "$ref": "#/$defs/point" }, "diameter_mm": { "type": "number", "exclusiveMinimum": 0 }, "drill_mm": { "type": "number", "minimum": 0 }, "start_layer_id": { "$ref": "#/$defs/id" }, "end_layer_id": { "$ref": "#/$defs/id" }, "plating_mm": { "type": ["number", "null"], "minimum": 0 }, "via_type": { "enum": ["through", "blind", "buried", "microvia", "custom"] }, "land_profiles": { "type": "array", "items": { "$ref": "#/$defs/landProfile" } } }
+      }]
+    },
+    "landProfile": {
+      "type": "object",
+      "required": ["layer_id", "use", "shape", "size_mm", "offset_mm", "source_primitive_id"],
+      "properties": {
+        "layer_id": { "$ref": "#/$defs/id" }, "use": { "const": "regular" },
+        "shape": { "enum": ["circle", "rect"] }, "size_mm": { "$ref": "#/$defs/point" },
+        "offset_mm": { "$ref": "#/$defs/point" }, "source_primitive_id": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "retainedPadstackOccurrenceGroup": {
+      "type": "object",
+      "required": ["id", "kind", "status", "reason", "padstack_ref", "net_id", "at_mm", "expected_regular_layer_ids", "observed_layer_ids", "occurrence_count", "occurrences"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "kind": { "const": "incomplete_padstack_occurrence_group" },
+        "status": { "const": "retained_unresolved" }, "reason": { "const": "missing_required_regular_layers" },
+        "padstack_ref": { "$ref": "#/$defs/id" }, "net_id": { "$ref": "#/$defs/id" }, "at_mm": { "$ref": "#/$defs/point" },
+        "expected_regular_layer_ids": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "observed_layer_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "occurrence_count": { "type": "integer", "minimum": 1 },
+        "occurrences": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/retainedPadOccurrence" } }
+      },
+      "additionalProperties": false
+    },
+    "retainedPadOccurrence": {
+      "type": "object",
+      "required": ["source_index", "source_id", "layer_id", "pad_usage", "at_mm", "shape", "pin"],
+      "properties": {
+        "source_index": { "type": "integer", "minimum": 0 }, "source_id": { "$ref": "#/$defs/id" },
+        "layer_id": { "$ref": "#/$defs/id" }, "pad_usage": { "type": "string", "maxLength": 64 },
+        "at_mm": { "$ref": "#/$defs/point" }, "shape": { "$ref": "#/$defs/retainedPadShape" },
+        "pin": { "anyOf": [{ "$ref": "#/$defs/retainedPadPin" }, { "type": "null" }] }
+      },
+      "additionalProperties": false
+    },
+    "retainedPadShape": {
+      "type": "object", "required": ["kind", "size_mm", "source_primitive_id"],
+      "properties": { "kind": { "enum": ["circle", "rect"] }, "size_mm": { "$ref": "#/$defs/point" }, "source_primitive_id": { "type": "string", "maxLength": 256 } },
+      "additionalProperties": false
+    },
+    "retainedPadPin": {
+      "type": "object", "required": ["component_id", "pin"],
+      "properties": { "component_id": { "$ref": "#/$defs/id" }, "pin": { "$ref": "#/$defs/id" } },
+      "additionalProperties": false
+    },
+    "retainedNonregularPadstackGeometry": {
+      "type": "object",
+      "required": ["contract", "user_primitives", "occurrences"],
+      "properties": {
+        "contract": { "const": "spike/retained-padstack-geometry/v1" },
+        "user_primitives": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/retainedUserPrimitive" } },
+        "occurrences": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/retainedNonregularPadstackOccurrence" } }
+      },
+      "additionalProperties": false
+    },
+    "retainedUserPrimitive": {
+      "type": "object",
+      "required": ["id", "kind", "source_index", "source_units", "contours"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "kind": { "const": "user_special" },
+        "source_index": { "type": "integer", "minimum": 0 },
+        "source_units": { "type": "string", "minLength": 1 },
+        "contours": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/retainedPrimitiveContour" } }
+      },
+      "additionalProperties": false
+    },
+    "retainedPrimitiveContour": {
+      "type": "object", "required": ["boundary_rings"],
+      "properties": { "boundary_rings": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/retainedPrimitiveRing" } } },
+      "additionalProperties": false
+    },
+    "retainedPrimitiveRing": {
+      "type": "object", "required": ["role", "start_mm", "segments", "fill_style_id"],
+      "properties": {
+        "role": { "enum": ["outer", "cutout"] }, "start_mm": { "$ref": "#/$defs/point" },
+        "segments": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/retainedPrimitiveSegment" } },
+        "fill_style_id": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "retainedPrimitiveSegment": {
+      "oneOf": [
+        {
+          "type": "object", "required": ["kind", "end_mm"],
+          "properties": { "kind": { "const": "line" }, "end_mm": { "$ref": "#/$defs/point" } },
+          "additionalProperties": false
+        },
+        {
+          "type": "object", "required": ["kind", "end_mm", "center_mm", "clockwise"],
+          "properties": {
+            "kind": { "const": "arc" }, "end_mm": { "$ref": "#/$defs/point" },
+            "center_mm": { "$ref": "#/$defs/point" }, "clockwise": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "retainedOccurrenceTransform": {
+      "type": "object", "required": ["rotation_deg", "mirror"],
+      "properties": { "rotation_deg": { "type": "number" }, "mirror": { "type": "boolean" } },
+      "additionalProperties": false
+    },
+    "retainedNonregularPadstackOccurrence": {
+      "type": "object",
+      "required": ["source_index", "source_id", "kind", "status", "reason", "padstack_ref", "layer_id", "layer_polarity", "raw_net_ref", "resolved_net_id", "occurrence_pad_usage", "matched_profile_use", "at_mm", "xform", "primitive_ref"],
+      "properties": {
+        "source_index": { "type": "integer", "minimum": 0 }, "source_id": { "$ref": "#/$defs/id" },
+        "kind": { "const": "retained_padstack_nonregular_occurrence" }, "status": { "const": "retained_unresolved" },
+        "reason": { "const": "negative_plane_user_primitive_semantics_pending" },
+        "padstack_ref": { "$ref": "#/$defs/id" }, "layer_id": { "$ref": "#/$defs/id" },
+        "layer_polarity": { "const": "negative" }, "raw_net_ref": { "$ref": "#/$defs/id" },
+        "resolved_net_id": { "$ref": "#/$defs/id" }, "occurrence_pad_usage": { "const": "via" },
+        "matched_profile_use": { "const": "thermal" }, "at_mm": { "$ref": "#/$defs/point" },
+        "xform": { "$ref": "#/$defs/retainedOccurrenceTransform" }, "primitive_ref": { "$ref": "#/$defs/id" }
+      },
+      "additionalProperties": false
+    },
+    "retainedStandardContourLandGeometry": {
+      "type": "object",
+      "required": ["contract", "semantic_state", "projection", "definitions", "padstacks", "occurrences"],
+      "properties": {
+        "contract": { "const": "spike/retained-standard-contour-land-geometry/v2" },
+        "semantic_state": { "const": "unapplied_normative_semantics_missing", "description": "Empirical source-retention state; not an IPC-2581 conformance assertion." },
+        "projection": { "const": "forbidden" },
+        "definitions": { "type": "array", "minItems": 1, "maxItems": 100000, "items": { "$ref": "#/$defs/retainedStandardContourLandDefinition" } },
+        "padstacks": { "type": "array", "minItems": 1, "maxItems": 100000, "items": { "$ref": "#/$defs/retainedStandardContourLandPadstack" } },
+        "occurrences": { "type": "array", "minItems": 1, "maxItems": 100000, "items": { "$ref": "#/$defs/retainedStandardContourLandOccurrence" } }
+      },
+      "additionalProperties": false
+    },
+    "retainedStandardContourLandXform": {
+      "type": "object", "required": ["rotation_deg", "mirror", "raw_attributes"],
+      "properties": {
+        "rotation_deg": { "type": "number" }, "mirror": { "type": "boolean" },
+        "raw_attributes": { "$ref": "#/$defs/stringMap" },
+        "x_offset_mm": { "type": ["number", "null"] }, "y_offset_mm": { "type": ["number", "null"] },
+        "face_up": { "type": ["boolean", "null"] }, "scale": { "type": ["number", "null"] }
+      }, "additionalProperties": false
+    },
+    "retainedStandardContourLandLocation": {
+      "type": "object", "required": ["at_mm", "raw_attributes"],
+      "properties": { "at_mm": { "$ref": "#/$defs/point" }, "raw_attributes": { "$ref": "#/$defs/stringMap" } },
+      "additionalProperties": false
+    },
+    "retainedStandardContourLandDefinition": {
+      "type": "object", "required": ["id", "kind", "status", "reason", "source_index", "source_units", "raw_entry_attributes", "contour", "fill_descriptor"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "kind": { "const": "standard_contour_land_definition" },
+        "status": { "const": "retained_unresolved" }, "reason": { "const": "contour_land_layer_transform_semantics_pending" },
+        "source_index": { "type": "integer", "minimum": 0 }, "source_units": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "raw_entry_attributes": { "$ref": "#/$defs/stringMap" }, "contour": { "$ref": "#/$defs/retainedStandardContourLandContour" },
+        "fill_descriptor": { "$ref": "#/$defs/retainedStandardContourLandFill" }
+      }, "additionalProperties": false
+    },
+    "retainedStandardContourLandContour": {
+      "type": "object", "required": ["kind", "points_mm", "fill_style_ref", "raw_poly_begin_attributes", "raw_poly_step_attributes", "raw_fill_ref_attributes"],
+      "properties": {
+        "kind": { "const": "closed_line_ring" }, "points_mm": { "type": "array", "minItems": 4, "maxItems": 4096, "items": { "$ref": "#/$defs/point" } },
+        "fill_style_ref": { "$ref": "#/$defs/id" }, "raw_poly_begin_attributes": { "$ref": "#/$defs/stringMap" },
+        "raw_poly_step_attributes": { "type": "array", "maxItems": 4096, "items": { "$ref": "#/$defs/stringMap" } },
+        "raw_fill_ref_attributes": { "$ref": "#/$defs/stringMap" }
+      }, "additionalProperties": false
+    },
+    "retainedStandardContourLandFill": {
+      "type": "object", "required": ["id", "source_units", "declared_fill_property", "raw_attributes"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "source_units": { "type": "string", "minLength": 1, "maxLength": 64 }, "declared_fill_property": { "type": "string", "minLength": 1, "maxLength": 64 }, "raw_attributes": { "$ref": "#/$defs/stringMap" } },
+      "additionalProperties": false
+    },
+    "retainedStandardContourLandPadstack": {
+      "type": "object", "required": ["name", "source_index", "raw_attributes", "declared_regular_layer_id", "raw_declared_regular_layer_ref", "raw_profile_attributes", "profile_location", "profile_xform", "primitive_ref", "raw_primitive_ref_attributes"],
+      "properties": {
+        "name": { "$ref": "#/$defs/id" }, "source_index": { "type": "integer", "minimum": 0 }, "raw_attributes": { "$ref": "#/$defs/stringMap" },
+        "declared_regular_layer_id": { "$ref": "#/$defs/id" }, "raw_declared_regular_layer_ref": { "$ref": "#/$defs/id" }, "raw_profile_attributes": { "$ref": "#/$defs/stringMap" },
+        "profile_location": { "$ref": "#/$defs/retainedStandardContourLandLocation" }, "profile_xform": { "$ref": "#/$defs/retainedStandardContourLandXform" },
+        "primitive_ref": { "$ref": "#/$defs/id" }, "raw_primitive_ref_attributes": { "$ref": "#/$defs/stringMap" }
+      }, "additionalProperties": false
+    },
+    "retainedStandardContourLandPinProvenance": {
+      "type": "object", "required": ["raw_component_ref", "resolved_component_id", "component_layer_id", "pin", "raw_attributes"],
+      "properties": { "raw_component_ref": { "$ref": "#/$defs/id" }, "resolved_component_id": { "$ref": "#/$defs/id" }, "component_layer_id": { "$ref": "#/$defs/id" }, "pin": { "$ref": "#/$defs/id" }, "raw_attributes": { "$ref": "#/$defs/stringMap" } },
+      "additionalProperties": false
+    },
+    "retainedStandardContourLandOccurrence": {
+      "type": "object", "required": ["source_index", "source_id", "kind", "status", "reason", "padstack_ref", "primitive_ref", "declared_regular_layer_id", "observed_layer_id", "declared_layer_matches_observed", "raw_observed_layer_ref", "observed_layer_polarity", "raw_net_ref", "resolved_net_id", "pin_provenance", "at_mm", "xform", "raw_primitive_ref_attributes", "raw_pad_attributes", "raw_set_attributes", "raw_layer_feature_attributes"],
+      "properties": {
+        "source_index": { "type": "integer", "minimum": 0 }, "source_id": { "$ref": "#/$defs/id" }, "kind": { "const": "standard_contour_land_occurrence" }, "status": { "const": "retained_unresolved" }, "reason": { "const": "contour_land_layer_transform_semantics_pending" },
+        "padstack_ref": { "$ref": "#/$defs/id" }, "primitive_ref": { "$ref": "#/$defs/id" }, "declared_regular_layer_id": { "$ref": "#/$defs/id" }, "observed_layer_id": { "$ref": "#/$defs/id" }, "declared_layer_matches_observed": { "type": "boolean" }, "raw_observed_layer_ref": { "$ref": "#/$defs/id" }, "observed_layer_polarity": { "const": "positive" }, "raw_net_ref": { "$ref": "#/$defs/id" }, "resolved_net_id": { "$ref": "#/$defs/id" }, "pin_provenance": { "$ref": "#/$defs/retainedStandardContourLandPinProvenance" }, "at_mm": { "$ref": "#/$defs/point" }, "xform": { "$ref": "#/$defs/retainedStandardContourLandXform" }, "raw_primitive_ref_attributes": { "$ref": "#/$defs/stringMap" }, "raw_pad_attributes": { "$ref": "#/$defs/stringMap" }, "raw_set_attributes": { "$ref": "#/$defs/stringMap" }, "raw_layer_feature_attributes": { "$ref": "#/$defs/stringMap" }
+      }, "additionalProperties": false
+    },
+    "stringMap": { "type": "object", "maxProperties": 64, "additionalProperties": { "type": "string", "maxLength": 4096 }, "propertyNames": { "minLength": 1, "maxLength": 128 } },
+    "drill": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object",
+        "required": ["source_layer_id", "center_mm", "shape", "diameter_mm", "size_mm", "rotation_deg", "plating_status", "plated", "plus_tolerance_mm", "minus_tolerance_mm", "net_id", "component_id", "geometry_ref", "span_layer_ids", "span_provenance", "owner_kind", "owner_id", "owner_match"],
+        "properties": {
+          "source_layer_id": { "type": "string" }, "center_mm": { "$ref": "#/$defs/point" },
+          "shape": { "enum": ["circle", "slot", "polygon", "custom"] },
+          "diameter_mm": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+          "size_mm": { "anyOf": [{ "$ref": "#/$defs/point" }, { "type": "null" }] },
+          "rotation_deg": { "type": ["number", "null"] },
+          "plating_status": { "enum": ["plated", "unplated", "via", "unknown"] },
+          "plated": { "type": ["boolean", "null"] },
+          "plus_tolerance_mm": { "type": ["number", "null"], "minimum": 0 },
+          "minus_tolerance_mm": { "type": ["number", "null"], "minimum": 0 },
+          "net_id": { "type": "string" }, "component_id": { "type": "string" },
+          "geometry_ref": { "type": "string" },
+          "span_layer_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+          "span_provenance": { "enum": ["explicit", "matched_owner", "unresolved"] },
+          "owner_kind": { "enum": ["via", "pad", "none", "unresolved"] },
+          "owner_id": { "type": "string" },
+          "owner_match": { "enum": ["exact_source", "geometric", "none"] }
+        }
+      }]
+    },
+    "castellation": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object", "required": ["net_id", "via_id", "boundary_region_id", "retained_fraction"],
+        "properties": { "net_id": { "$ref": "#/$defs/id" }, "via_id": { "$ref": "#/$defs/id" }, "boundary_region_id": { "$ref": "#/$defs/id" }, "retained_fraction": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 } }
+      }]
+    },
+    "component": {
+      "allOf": [{ "$ref": "#/$defs/entity" }, {
+        "type": "object", "required": ["reference", "value", "footprint", "side", "position_mm", "rotation_deg", "pin_ids", "model_ids", "zone_connection_override", "zone_connection_declared", "thermal_gap_override_mm", "thermal_spoke_width_override_mm", "thermal_settings_valid"],
+        "properties": { "reference": { "type": "string" }, "value": { "type": "string" }, "footprint": { "type": "string" }, "side": { "enum": ["top", "bottom", "embedded", "assembly"] }, "position_mm": { "$ref": "#/$defs/point" }, "rotation_deg": { "type": "number" }, "pin_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }, "model_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } }, "zone_connection_override": { "$ref": "#/$defs/zoneConnectionOverride" }, "zone_connection_declared": { "type": "boolean" }, "thermal_gap_override_mm": { "$ref": "#/$defs/optionalNonnegativeMm" }, "thermal_spoke_width_override_mm": { "$ref": "#/$defs/optionalNonnegativeMm" }, "thermal_settings_valid": { "type": "boolean" } }
+      }]
+    }
+  },
+  "additionalProperties": false
+}

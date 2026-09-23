@@ -1,0 +1,347 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/environment-profile-v1.schema.json",
+  "title": "SPIKE Cross-Domain Environment Profile v1",
+  "description": "Solver-neutral physical environment inputs. Schema validity does not imply qualification, compliance, or certification.",
+  "type": "object",
+  "required": [
+    "contract",
+    "profile_id",
+    "name",
+    "revision",
+    "environment_class",
+    "description",
+    "physical",
+    "validity",
+    "provenance"
+  ],
+  "properties": {
+    "contract": { "const": "spike/environment-profile/v1" },
+    "profile_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "revision": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "environment_class": {
+      "enum": [
+        "standard_lab_ambient_air",
+        "sealed_potted",
+        "automotive",
+        "marine",
+        "aerospace_altitude",
+        "vacuum_space",
+        "user_defined"
+      ]
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "physical": { "$ref": "#/$defs/physical" },
+    "validity": { "$ref": "#/$defs/validity" },
+    "provenance": { "$ref": "#/$defs/provenance" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nullableNumber": {
+      "type": ["number", "null"]
+    },
+    "nullableNonNegative": {
+      "type": ["number", "null"],
+      "minimum": 0
+    },
+    "nullablePositive": {
+      "type": ["number", "null"],
+      "exclusiveMinimum": 0
+    },
+    "nullableFraction": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "vector3": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "nullableVector3": {
+      "oneOf": [
+        { "$ref": "#/$defs/vector3" },
+        { "type": "null" }
+      ]
+    },
+    "nullableRange": {
+      "oneOf": [
+        {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "number" }
+        },
+        { "type": "null" }
+      ]
+    },
+    "physical": {
+      "type": "object",
+      "required": [
+        "thermal",
+        "atmosphere",
+        "flow",
+        "fluid",
+        "convection",
+        "enclosure",
+        "encapsulation",
+        "electromagnetic",
+        "electrical",
+        "exposure"
+      ],
+      "properties": {
+        "thermal": {
+          "type": "object",
+          "required": [
+            "ambient_temperature_k",
+            "initial_temperature_k",
+            "radiation_enabled",
+            "radiative_sink_temperature_k",
+            "external_radiative_flux_w_m2",
+            "default_surface_emissivity"
+          ],
+          "properties": {
+            "ambient_temperature_k": { "$ref": "#/$defs/nullablePositive" },
+            "initial_temperature_k": { "$ref": "#/$defs/nullablePositive" },
+            "radiation_enabled": { "type": "boolean" },
+            "radiative_sink_temperature_k": { "$ref": "#/$defs/nullablePositive" },
+            "external_radiative_flux_w_m2": { "$ref": "#/$defs/nullableNumber" },
+            "default_surface_emissivity": { "$ref": "#/$defs/nullableFraction" }
+          },
+          "additionalProperties": false
+        },
+        "atmosphere": {
+          "type": "object",
+          "required": ["medium", "pressure_pa", "relative_humidity", "altitude_m", "gravity_m_s2"],
+          "properties": {
+            "medium": { "enum": ["air", "vacuum", "gas", "liquid", "user_defined"] },
+            "pressure_pa": { "$ref": "#/$defs/nullablePositive" },
+            "relative_humidity": { "$ref": "#/$defs/nullableFraction" },
+            "altitude_m": { "$ref": "#/$defs/nullableNumber" },
+            "gravity_m_s2": { "$ref": "#/$defs/nullableVector3" }
+          },
+          "additionalProperties": false
+        },
+        "flow": {
+          "type": "object",
+          "required": ["regime", "velocity_m_s", "mass_flow_rate_kg_s", "turbulence_intensity", "characteristic_length_m"],
+          "properties": {
+            "regime": { "enum": ["still", "forced", "sealed", "vacuum", "solver_resolved", "user_defined"] },
+            "velocity_m_s": { "$ref": "#/$defs/nullableVector3" },
+            "mass_flow_rate_kg_s": { "$ref": "#/$defs/nullableNonNegative" },
+            "turbulence_intensity": { "$ref": "#/$defs/nullableFraction" },
+            "characteristic_length_m": { "$ref": "#/$defs/nullablePositive" }
+          },
+          "additionalProperties": false
+        },
+        "fluid": {
+          "type": "object",
+          "required": [
+            "name",
+            "density_kg_m3",
+            "dynamic_viscosity_pa_s",
+            "specific_heat_capacity_j_kg_k",
+            "thermal_conductivity_w_m_k",
+            "volumetric_thermal_expansion_per_k"
+          ],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "density_kg_m3": { "$ref": "#/$defs/nullableNonNegative" },
+            "dynamic_viscosity_pa_s": { "$ref": "#/$defs/nullableNonNegative" },
+            "specific_heat_capacity_j_kg_k": { "$ref": "#/$defs/nullableNonNegative" },
+            "thermal_conductivity_w_m_k": { "$ref": "#/$defs/nullableNonNegative" },
+            "volumetric_thermal_expansion_per_k": { "$ref": "#/$defs/nullableNonNegative" }
+          },
+          "additionalProperties": false
+        },
+        "convection": {
+          "type": "object",
+          "required": ["model", "heat_transfer_coefficient_w_m2_k"],
+          "properties": {
+            "model": { "enum": ["natural", "forced", "specified_coefficient", "solver_resolved", "disabled", "user_defined"] },
+            "heat_transfer_coefficient_w_m2_k": { "$ref": "#/$defs/nullableNonNegative" }
+          },
+          "additionalProperties": false
+        },
+        "enclosure": {
+          "type": "object",
+          "required": ["kind", "wall_temperature_k", "internal_volume_m3"],
+          "properties": {
+            "kind": { "enum": ["open", "sealed", "vented", "free_space", "user_defined"] },
+            "wall_temperature_k": { "$ref": "#/$defs/nullablePositive" },
+            "internal_volume_m3": { "$ref": "#/$defs/nullablePositive" }
+          },
+          "additionalProperties": false
+        },
+        "encapsulation": {
+          "type": "object",
+          "required": [
+            "enabled",
+            "material_name",
+            "coverage_fraction",
+            "thickness_m",
+            "thermal_conductivity_w_m_k",
+            "density_kg_m3",
+            "specific_heat_capacity_j_kg_k",
+            "relative_permittivity",
+            "loss_tangent"
+          ],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "material_name": { "type": ["string", "null"] },
+            "coverage_fraction": { "$ref": "#/$defs/nullableFraction" },
+            "thickness_m": { "$ref": "#/$defs/nullablePositive" },
+            "thermal_conductivity_w_m_k": { "$ref": "#/$defs/nullablePositive" },
+            "density_kg_m3": { "$ref": "#/$defs/nullablePositive" },
+            "specific_heat_capacity_j_kg_k": { "$ref": "#/$defs/nullablePositive" },
+            "relative_permittivity": { "$ref": "#/$defs/nullablePositive" },
+            "loss_tangent": { "$ref": "#/$defs/nullableNonNegative" }
+          },
+          "additionalProperties": false
+        },
+        "electromagnetic": {
+          "type": "object",
+          "required": [
+            "background_material",
+            "relative_permittivity",
+            "relative_permeability",
+            "electrical_conductivity_s_m",
+            "loss_tangent",
+            "valid_frequency_min_hz",
+            "valid_frequency_max_hz"
+          ],
+          "properties": {
+            "background_material": { "type": "string", "minLength": 1 },
+            "relative_permittivity": { "$ref": "#/$defs/nullablePositive" },
+            "relative_permeability": { "$ref": "#/$defs/nullablePositive" },
+            "electrical_conductivity_s_m": { "$ref": "#/$defs/nullableNonNegative" },
+            "loss_tangent": { "$ref": "#/$defs/nullableNonNegative" },
+            "valid_frequency_min_hz": { "$ref": "#/$defs/nullableNonNegative" },
+            "valid_frequency_max_hz": { "$ref": "#/$defs/nullablePositive" }
+          },
+          "additionalProperties": false
+        },
+        "electrical": {
+          "type": "object",
+          "required": ["conductor_reference_temperature_k", "copper_temperature_coefficient_per_k"],
+          "properties": {
+            "conductor_reference_temperature_k": { "$ref": "#/$defs/nullablePositive" },
+            "copper_temperature_coefficient_per_k": { "$ref": "#/$defs/nullableNonNegative" }
+          },
+          "additionalProperties": false
+        },
+        "exposure": {
+          "type": "object",
+          "required": [
+            "salinity_mass_fraction",
+            "surface_contamination_conductance_s",
+            "solar_flux_w_m2",
+            "ionizing_dose_rate_gy_s",
+            "atomic_oxygen_flux_m2_s",
+            "vibration_rms_acceleration_m_s2",
+            "shock_peak_acceleration_m_s2"
+          ],
+          "properties": {
+            "salinity_mass_fraction": { "$ref": "#/$defs/nullableFraction" },
+            "surface_contamination_conductance_s": { "$ref": "#/$defs/nullableNonNegative" },
+            "solar_flux_w_m2": { "$ref": "#/$defs/nullableNonNegative" },
+            "ionizing_dose_rate_gy_s": { "$ref": "#/$defs/nullableNonNegative" },
+            "atomic_oxygen_flux_m2_s": { "$ref": "#/$defs/nullableNonNegative" },
+            "vibration_rms_acceleration_m_s2": { "$ref": "#/$defs/nullableNonNegative" },
+            "shock_peak_acceleration_m_s2": { "$ref": "#/$defs/nullableNonNegative" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "validity": {
+      "type": "object",
+      "required": [
+        "input_status",
+        "applicable_domains",
+        "temperature_range_k",
+        "pressure_range_pa",
+        "frequency_range_hz",
+        "assumptions",
+        "known_limitations",
+        "required_overrides",
+        "certification_claimed",
+        "certification_basis"
+      ],
+      "properties": {
+        "input_status": { "enum": ["draft", "template", "user_confirmed", "measured", "imported"] },
+        "applicable_domains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["pi", "si", "thermal", "emi"] }
+        },
+        "temperature_range_k": { "$ref": "#/$defs/nullableRange" },
+        "pressure_range_pa": { "$ref": "#/$defs/nullableRange" },
+        "frequency_range_hz": { "$ref": "#/$defs/nullableRange" },
+        "assumptions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "known_limitations": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "required_overrides": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^/" } },
+        "certification_claimed": { "const": false },
+        "certification_basis": { "type": "array", "maxItems": 0 }
+      },
+      "additionalProperties": false
+    },
+    "provenanceSource": {
+      "type": "object",
+      "required": ["id", "kind", "title", "publisher", "locator", "revision_or_date", "scope"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["engineering_seed", "user_supplied", "measured", "datasheet", "standard", "imported"] },
+        "title": { "type": "string", "minLength": 1 },
+        "publisher": { "type": "string" },
+        "locator": { "type": "string" },
+        "revision_or_date": { "type": "string" },
+        "scope": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["origin", "profile_revision", "generated_by", "generated_at", "sources", "parameter_sources", "transformations"],
+      "properties": {
+        "origin": { "enum": ["spike_builtin", "user", "measured", "imported"] },
+        "profile_revision": { "type": "string", "minLength": 1 },
+        "generated_by": { "type": "string", "minLength": 1 },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/provenanceSource" }
+        },
+        "parameter_sources": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^/" },
+          "additionalProperties": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          }
+        },
+        "transformations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "paths"],
+            "properties": {
+              "kind": { "type": "string", "minLength": 1 },
+              "paths": { "type": "array", "items": { "type": "string", "pattern": "^/" } }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

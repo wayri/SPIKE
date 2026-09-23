@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/spice-workspace-v1.schema.json",
+  "title": "SPIKE SPICE Workspace v1",
+  "type": "object",
+  "required": ["contract", "name", "domain", "ground_node", "models", "assignments", "parasitics", "analysis"],
+  "properties": {
+    "contract": { "const": "spike/spice-workspace/v1" },
+    "name": { "type": "string", "maxLength": 256 },
+    "domain": { "enum": ["pi", "si"] },
+    "ground_node": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "models": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "kind", "pins", "origin"],
+        "properties": {
+          "id": { "$ref": "#/$defs/identifier" },
+          "name": { "type": "string", "maxLength": 256 },
+          "kind": { "enum": ["primitive", "subcircuit"] },
+          "primitive": { "enum": ["resistor", "capacitor", "inductor", "voltage_source", "current_source", "diode"] },
+          "subcircuit_name": { "$ref": "#/$defs/identifier" },
+          "pins": { "type": "array", "minItems": 1, "maxItems": 512, "uniqueItems": true, "items": { "$ref": "#/$defs/pin" } },
+          "value": { "type": "string", "maxLength": 4096 },
+          "device_model": { "type": "string", "maxLength": 128 },
+          "source": { "type": "string", "maxLength": 2097152 },
+          "origin": { "enum": ["built_in", "project", "imported"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "assignments": {
+      "type": "array",
+      "maxItems": 8192,
+      "items": {
+        "type": "object",
+        "required": ["id", "component_ref", "model_id", "enabled", "pin_bindings"],
+        "properties": {
+          "id": { "$ref": "#/$defs/identifier" },
+          "component_ref": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "model_id": { "$ref": "#/$defs/identifier" },
+          "enabled": { "type": "boolean" },
+          "pin_bindings": {
+            "type": "array",
+            "maxItems": 512,
+            "items": {
+              "type": "object",
+              "required": ["model_pin", "pad_id", "board_net", "circuit_node"],
+              "properties": {
+                "model_pin": { "$ref": "#/$defs/pin" },
+                "pad_id": { "type": "string", "maxLength": 256 },
+                "board_net": { "type": "string", "maxLength": 512 },
+                "circuit_node": { "type": "string", "minLength": 1, "maxLength": 128 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "ratings": { "type": "object" },
+          "vectors": { "type": "object" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "parasitics": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "required": ["id", "enabled", "net", "from_node", "to_node", "reference_node", "resistance_ohm", "inductance_h", "capacitance_f", "conductance_s", "source_result_id", "model_status", "endpoint_reviewed"],
+        "properties": {
+          "id": { "$ref": "#/$defs/identifier" },
+          "enabled": { "type": "boolean" },
+          "net": { "type": "string", "maxLength": 512 },
+          "from_node": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "to_node": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "reference_node": { "type": "string", "maxLength": 128 },
+          "resistance_ohm": { "type": "number", "minimum": 0 },
+          "inductance_h": { "type": "number", "minimum": 0 },
+          "capacitance_f": { "type": "number", "minimum": 0 },
+          "conductance_s": { "type": "number", "minimum": 0 },
+          "source_result_id": { "type": "string", "maxLength": 256 },
+          "model_status": { "type": "string", "maxLength": 64 },
+          "endpoint_reviewed": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "analysis": {
+      "oneOf": [
+        { "type": "object", "required": ["mode"], "properties": { "mode": { "const": "operating_point" } }, "additionalProperties": false },
+        { "type": "object", "required": ["mode", "start_hz", "stop_hz", "points_per_decade"], "properties": { "mode": { "const": "ac" }, "start_hz": { "type": "number", "exclusiveMinimum": 0 }, "stop_hz": { "type": "number", "exclusiveMinimum": 0 }, "points_per_decade": { "type": "integer", "minimum": 1, "maximum": 10000 } }, "additionalProperties": false },
+        { "type": "object", "required": ["mode", "time_step_s", "stop_time_s"], "properties": { "mode": { "const": "transient" }, "time_step_s": { "type": "number", "exclusiveMinimum": 0 }, "stop_time_s": { "type": "number", "exclusiveMinimum": 0 } }, "additionalProperties": false }
+      ]
+    }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.:+-]{0,127}$" },
+    "pin": { "type": "string", "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.:+-]{0,127}$" }
+  },
+  "additionalProperties": false
+}

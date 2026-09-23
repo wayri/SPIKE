@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/windows-release-sbom-v1.schema.json",
+  "title": "SPIKE Windows Release SBOM v1",
+  "description": "Offline, deterministic component inventory for a Windows production candidate. It is not a production qualification record.",
+  "type": "object",
+  "required": ["contract", "product", "version", "application_version", "channel", "release_state", "production_qualified", "components"],
+  "properties": {
+    "contract": {"const": "spike/windows-release-sbom/v1"},
+    "product": {"const": "SPIKE"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "application_version": {"type": "string", "minLength": 1, "pattern": "^\\S+$"},
+    "channel": {"const": "production-candidate"},
+    "release_state": {"const": "production-candidate"},
+    "production_qualified": {"const": false},
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/component"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "relative_file": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*[\\\\:])(?!.*(?:^|/)\\.\\.(?:/|$))(?:[^/]+/)*[^/]+$"},
+    "component": {
+      "type": "object",
+      "required": ["id", "purl", "name", "version", "ecosystem", "license", "scope", "integrity", "notice"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"},
+        "purl": {"type": "string", "pattern": "^pkg:[a-z0-9.+-]+/[^@?#\\s]+@[^?#\\s]+(?:\\?[^#\\s]+)?(?:#[^\\s]+)?$"},
+        "name": {"type": "string", "minLength": 1, "pattern": "^\\S(?:.*\\S)?$"},
+        "version": {"type": "string", "minLength": 1, "pattern": "^\\S+$"},
+        "ecosystem": {"enum": ["python", "npm", "rust", "windows", "native", "embedded", "external"]},
+        "license": {"type": "string", "minLength": 1, "pattern": "^[A-Za-z0-9.+() -]+$"},
+        "scope": {"enum": ["bundled", "build-only", "external-not-distributed"]},
+        "integrity": {
+          "type": "object",
+          "required": ["algorithm", "value"],
+          "properties": {
+            "algorithm": {"enum": ["sha256", "sha512-sri", "cargo-sha256", "installed-record-sha256"]},
+            "value": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {"if": {"properties": {"algorithm": {"enum": ["sha256", "cargo-sha256", "installed-record-sha256"]}}}, "then": {"properties": {"value": {"$ref": "#/$defs/sha256"}}}},
+            {"if": {"properties": {"algorithm": {"const": "sha512-sri"}}}, "then": {"properties": {"value": {"pattern": "^sha512-[A-Za-z0-9+/]+={0,2}$"}}}}
+          ]
+        },
+        "notice": {
+          "type": "object",
+          "required": ["status", "file", "sha256"],
+          "properties": {
+            "status": {"enum": ["included", "not-required"]},
+            "file": {"$ref": "#/$defs/relative_file"},
+            "sha256": {"$ref": "#/$defs/sha256"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

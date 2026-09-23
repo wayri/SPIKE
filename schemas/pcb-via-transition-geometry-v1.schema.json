@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-via-transition-geometry-v1.schema.json",
+  "title": "SPIKE circular PCB via-transition geometry v1",
+  "type": "object",
+  "required": ["contract", "design_id", "via_id", "source_via_id", "net_id", "via_type", "span", "center_mm", "drill_diameter_mm", "plating_mm", "interfaces", "barrel_segments", "lands", "antipads", "refinement_sizes_mm", "topology_audit", "qualification"],
+  "properties": {
+    "contract": {"const": "spike/pcb-via-transition-geometry/v1"},
+    "design_id": {"$ref": "#/$defs/id"}, "via_id": {"$ref": "#/$defs/id"}, "source_via_id": {"type": "string", "maxLength": 256}, "net_id": {"$ref": "#/$defs/id"},
+    "via_type": {"enum": ["through", "blind", "buried", "microvia"]},
+    "span": {"type": "object", "required": ["start_layer_id", "end_layer_id", "start_copper_index", "end_copper_index", "ordered_layer_ids"], "properties": {"start_layer_id": {"$ref": "#/$defs/id"}, "end_layer_id": {"$ref": "#/$defs/id"}, "start_copper_index": {"type": "integer", "minimum": 0}, "end_copper_index": {"type": "integer", "minimum": 1}, "ordered_layer_ids": {"type": "array", "minItems": 2, "maxItems": 32, "items": {"$ref": "#/$defs/id"}}}, "additionalProperties": false},
+    "center_mm": {"$ref": "#/$defs/point"}, "drill_diameter_mm": {"type": "number", "exclusiveMinimum": 0}, "plating_mm": {"type": "number", "exclusiveMinimum": 0},
+    "interfaces": {"type": "array", "minItems": 2, "maxItems": 32, "items": {"$ref": "#/$defs/interface"}},
+    "barrel_segments": {"type": "array", "minItems": 1, "maxItems": 31, "items": {"$ref": "#/$defs/barrel"}},
+    "lands": {"type": "array", "minItems": 2, "maxItems": 32, "items": {"$ref": "#/$defs/land"}},
+    "antipads": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/antipad"}},
+    "refinement_sizes_mm": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "number", "exclusiveMinimum": 0}},
+    "topology_audit": {"type": "object", "required": ["analytic_csg_profile_validated", "duplicate_analytic_surface_ids", "discrete_watertightness_checked", "explicit_reference_plane_voids"], "properties": {"analytic_csg_profile_validated": {"const": true}, "duplicate_analytic_surface_ids": {"const": 0}, "discrete_watertightness_checked": {"const": false}, "explicit_reference_plane_voids": {"type": "integer", "minimum": 1, "maximum": 64}}, "additionalProperties": false},
+    "qualification": {"type": "object", "required": ["geometry_state", "refinement_state", "native_handoff_ready", "capacitance_ready", "si_ready", "solver_ready"], "properties": {"geometry_state": {"const": "admitted_exact_circular"}, "refinement_state": {"const": "refinement_not_convergence_proof"}, "native_handoff_ready": {"const": false}, "capacitance_ready": {"const": false}, "si_ready": {"const": false}, "solver_ready": {"const": false}}, "additionalProperties": false}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 256}, "point": {"type": "array", "prefixItems": [{"type": "number"}, {"type": "number"}], "minItems": 2, "maxItems": 2},
+    "interface": {"type": "object", "required": ["layer_id", "z_mm", "inner_radius_mm", "outer_radius_mm"], "properties": {"layer_id": {"$ref": "#/$defs/id"}, "z_mm": {"type": "number"}, "inner_radius_mm": {"type": "number", "exclusiveMinimum": 0}, "outer_radius_mm": {"type": "number", "exclusiveMinimum": 0}}, "additionalProperties": false},
+    "barrel": {"type": "object", "required": ["id", "from_layer_id", "to_layer_id", "z_min_mm", "z_max_mm", "inner_radius_mm", "outer_radius_mm", "source_via_id", "net_id"], "properties": {"id": {"$ref": "#/$defs/id"}, "from_layer_id": {"$ref": "#/$defs/id"}, "to_layer_id": {"$ref": "#/$defs/id"}, "z_min_mm": {"type": "number"}, "z_max_mm": {"type": "number"}, "inner_radius_mm": {"type": "number", "exclusiveMinimum": 0}, "outer_radius_mm": {"type": "number", "exclusiveMinimum": 0}, "source_via_id": {"$ref": "#/$defs/id"}, "net_id": {"$ref": "#/$defs/id"}}, "additionalProperties": false},
+    "land": {"type": "object", "required": ["id", "layer_id", "outer_diameter_mm", "inner_diameter_mm", "source_profile_id", "z_min_mm", "z_max_mm", "source_via_id", "net_id"], "properties": {"id": {"$ref": "#/$defs/id"}, "layer_id": {"$ref": "#/$defs/id"}, "outer_diameter_mm": {"type": "number", "exclusiveMinimum": 0}, "inner_diameter_mm": {"type": "number", "exclusiveMinimum": 0}, "source_profile_id": {"type": "string", "maxLength": 256}, "z_min_mm": {"type": "number"}, "z_max_mm": {"type": "number"}, "source_via_id": {"$ref": "#/$defs/id"}, "net_id": {"$ref": "#/$defs/id"}}, "additionalProperties": false},
+    "antipad": {"type": "object", "required": ["layer_id", "diameter_mm", "reference_net_id", "reference_zone_id", "reference_patch_outer_diameter_mm", "source_id", "clearance_mm"], "properties": {"layer_id": {"$ref": "#/$defs/id"}, "diameter_mm": {"type": "number", "exclusiveMinimum": 0}, "reference_net_id": {"$ref": "#/$defs/id"}, "reference_zone_id": {"$ref": "#/$defs/id"}, "reference_patch_outer_diameter_mm": {"type": "number", "exclusiveMinimum": 0}, "source_id": {"$ref": "#/$defs/id"}, "clearance_mm": {"type": "number", "exclusiveMinimum": 0}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

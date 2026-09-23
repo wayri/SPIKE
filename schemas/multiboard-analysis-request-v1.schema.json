@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/multiboard-analysis-request-v1.schema.json",
+  "title": "SPIKE Multi-board Analysis Request v1",
+  "type": "object",
+  "required": ["contract", "domain", "mode", "assembly", "designs"],
+  "properties": {
+    "contract": { "const": "spike/multiboard-analysis-request/v1" },
+    "domain": { "enum": ["pi", "si"] },
+    "mode": { "enum": ["independent_board_batch", "coupled_harness_network"] },
+    "assembly": { "$ref": "assembly-ir-v1.schema.json" },
+    "designs": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 20,
+      "additionalProperties": {
+        "anyOf": [
+          { "$ref": "design-ir-v2.schema.json" },
+          { "type": "object" }
+        ]
+      }
+    },
+    "selected_board_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 30,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "additionalProperties": false
+}

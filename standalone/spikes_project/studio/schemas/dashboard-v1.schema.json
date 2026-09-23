@@ -1,0 +1,19 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"SPIKES dashboard layout",
+  "type":"object","required":["version","widgets"],
+  "properties":{
+    "version":{"const":1},
+    "widgets":{"type":"array","maxItems":200,"items":{
+      "type":"object","required":["id","kind","title","expression","source","x","y","width","height","minimum","maximum"],
+      "properties":{
+        "id":{"type":"string","minLength":1},
+        "kind":{"enum":["Meter","Scope","Indicator","Source control"]},
+        "title":{"type":"string","maxLength":2048},"expression":{"type":"string","maxLength":2048},"source":{"type":"string","maxLength":2048},
+        "x":{"type":"number","minimum":0,"maximum":20000},"y":{"type":"number","minimum":0,"maximum":20000},
+        "width":{"type":"number","minimum":180,"maximum":2000},"height":{"type":"number","minimum":120,"maximum":2000},
+        "minimum":{"type":"number"},"maximum":{"type":"number"}
+      }
+    }}
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"SPIKES project thermal assumptions","type":"object",
+  "required":["contract","solver_binding","board","enclosure","environment","notes"],
+  "properties":{
+    "contract":{"const":"spikes/thermal-setup/v1"},"solver_binding":{"const":"not_coupled"},
+    "board":{"type":"object","required":["length_mm","width_mm","thickness_mm","material","orientation","layers"],"properties":{
+      "length_mm":{"$ref":"#/$defs/dimension"},"width_mm":{"$ref":"#/$defs/dimension"},"thickness_mm":{"$ref":"#/$defs/dimension"},
+      "material":{"$ref":"#/$defs/text"},"orientation":{"enum":["horizontal","vertical"]},
+      "layers":{"type":"array","minItems":1,"maxItems":64,"items":{"type":"object","required":["name","copper_um","coverage_pct"],"properties":{
+        "name":{"type":"string","minLength":1},"copper_um":{"type":"number","exclusiveMinimum":0,"maximum":10000},"coverage_pct":{"type":"number","minimum":0,"maximum":100}
+      }}}
+    }},
+    "enclosure":{"type":"object","required":["type","material","length_mm","width_mm","height_mm","wall_mm","vent_area_mm2"],"properties":{
+      "type":{"enum":["open_air","ventilated","sealed"]},"material":{"$ref":"#/$defs/text"},
+      "length_mm":{"$ref":"#/$defs/dimension"},"width_mm":{"$ref":"#/$defs/dimension"},"height_mm":{"$ref":"#/$defs/dimension"},"wall_mm":{"$ref":"#/$defs/dimension"},
+      "vent_area_mm2":{"type":"number","minimum":0,"maximum":10000000000}
+    }},
+    "environment":{"type":"object","required":["ambient_c","airflow","air_speed_m_s","direction","convection_w_m2k","altitude_m"],"properties":{
+      "ambient_c":{"type":"number","exclusiveMinimum":-273.15,"maximum":2000},"airflow":{"enum":["still","natural","forced"]},
+      "air_speed_m_s":{"type":"number","minimum":0,"maximum":1000},"direction":{"enum":["parallel_to_board","normal_to_board","unspecified"]},
+      "convection_w_m2k":{"type":["number","null"],"exclusiveMinimum":0,"maximum":1000000},"altitude_m":{"type":"number","minimum":-500,"maximum":100000}
+    }},
+    "notes":{"$ref":"#/$defs/text"}
+  },
+  "$defs":{"dimension":{"type":"number","exclusiveMinimum":0,"maximum":100000},"text":{"type":"string","maxLength":8192}},
+  "description":"Authoring assumptions only. Runtime checks layer-name uniqueness, copper versus board thickness, enclosure interior and airflow consistency. No geometry-based temperature or convection prediction is implied."
+}

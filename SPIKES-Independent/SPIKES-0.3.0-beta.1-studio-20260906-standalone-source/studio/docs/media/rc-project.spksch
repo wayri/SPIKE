@@ -1,0 +1,73 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "ad7424807c774aa0a9872e13ee6f2531",
+  "title": "SPIKES RC startup",
+  "source": "SPIKES RC startup\nV1 in 0 1\nR1 in out 1k\nC1 out 0 1u\n.tran 10u 5m uic\n.end\n",
+  "components": [
+    {
+      "id": "87293989ba4540e598a3165a645f0238",
+      "ref": "V1",
+      "kind": "voltage_source",
+      "value": "1",
+      "nodes": [
+        "in",
+        "0"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {}
+    },
+    {
+      "id": "8c848585df0349e9a0c38cbbb37cd709",
+      "ref": "R1",
+      "kind": "resistor",
+      "value": "1000",
+      "nodes": [
+        "in",
+        "out"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {}
+    },
+    {
+      "id": "bb09139e17ec4ee89ec0b400dc1309a8",
+      "ref": "C1",
+      "kind": "capacitor",
+      "value": "1e-06",
+      "nodes": [
+        "out",
+        "0"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {}
+    }
+  ],
+  "probes": [],
+  "expressions": [
+    "v(out)",
+    "v(in,out)",
+    "v(in,out)*i(R1)"
+  ],
+  "metadata": {},
+  "revision": 3
+}

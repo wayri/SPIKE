@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/layout-metric-registry-v1.schema.json",
+  "title": "SPIKE Layout Metric Registry v1",
+  "description": "Strict, evidence-backed evaluator capabilities used to reject unsupported autorouter and autoplacer requirements before any evaluation job is launched.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "registry_id", "registry_version", "producer", "metrics"],
+  "properties": {
+    "contract": { "const": "spike/layout-metric-registry/v1" },
+    "registry_id": { "$ref": "#/$defs/identifier" },
+    "registry_version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:[-+][0-9A-Za-z.-]+)?$", "maxLength": 64 },
+    "producer": { "$ref": "#/$defs/producer" },
+    "metrics": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": { "$ref": "#/$defs/metric" }
+    }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[a-z][a-z0-9._-]{1,127}$" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "relativePath": { "type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?![A-Za-z]:)(?![/\\\\])(?!.*(?:^|[/\\\\])\\.\\.(?:[/\\\\]|$)).+$" },
+    "dimensionExponent": {
+      "oneOf": [
+        { "type": "integer", "minimum": -1024, "maximum": 1024 },
+        {
+          "type": "array",
+          "prefixItems": [
+            { "type": "integer", "minimum": -1024, "maximum": 1024 },
+            { "type": "integer", "minimum": 1, "maximum": 1024 }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        }
+      ]
+    },
+    "dimension": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/dimensionExponent" },
+        { "$ref": "#/$defs/dimensionExponent" },
+        { "$ref": "#/$defs/dimensionExponent" },
+        { "$ref": "#/$defs/dimensionExponent" },
+        { "$ref": "#/$defs/dimensionExponent" },
+        { "$ref": "#/$defs/dimensionExponent" },
+        { "$ref": "#/$defs/dimensionExponent" }
+      ],
+      "minItems": 7,
+      "maxItems": 7
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "version"],
+      "properties": {
+        "implementation": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "version": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes", "contract"],
+      "properties": {
+        "path": { "$ref": "#/$defs/relativePath" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 1073741824 },
+        "contract": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "artifact"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "enum": ["validation_report", "benchmark", "conformance_suite", "manufactured_solution", "third_party_certification"] },
+        "artifact": { "$ref": "#/$defs/artifact" },
+        "claim": { "type": "string", "minLength": 1, "maxLength": 512 }
+      }
+    },
+    "batch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supported", "max_candidates"],
+      "properties": {
+        "supported": { "type": "boolean" },
+        "max_candidates": { "type": "integer", "minimum": 1, "maximum": 65536 }
+      },
+      "allOf": [
+        { "if": { "properties": { "supported": { "const": false } } }, "then": { "properties": { "max_candidates": { "const": 1 } } } },
+        { "if": { "properties": { "supported": { "const": true } } }, "then": { "properties": { "max_candidates": { "minimum": 2 } } } }
+      ]
+    },
+    "incremental": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supported", "change_kinds"],
+      "properties": {
+        "supported": { "type": "boolean" },
+        "change_kinds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["placement", "routing", "stackup", "geometry", "material", "boundary_condition"] }
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "supported": { "const": false } } }, "then": { "properties": { "change_kinds": { "maxItems": 0 } } } },
+        { "if": { "properties": { "supported": { "const": true } } }, "then": { "properties": { "change_kinds": { "minItems": 1 } } } }
+      ]
+    },
+    "metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "dimension", "evaluator", "supported_consumers", "supported_kinds", "supported_relations", "validation_state", "evidence", "batch", "incremental"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "dimension": { "$ref": "#/$defs/dimension" },
+        "evaluator": { "enum": ["cad_drc", "native_solver", "custom"] },
+        "result_key": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,127}$" },
+        "supported_consumers": { "type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": { "enum": ["autorouter", "autoplacer", "joint"] } },
+        "supported_kinds": { "type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": { "enum": ["hard_constraint", "soft_constraint", "objective"] } },
+        "supported_relations": { "type": "array", "minItems": 1, "maxItems": 6, "uniqueItems": true, "items": { "enum": ["le", "ge", "between", "target", "minimize", "maximize"] } },
+        "validation_state": { "enum": ["qualified", "validated", "reference_validated", "verification_only", "cad_drc", "experimental", "approximate", "unvalidated"] },
+        "evidence": { "type": "array", "minItems": 1, "maxItems": 64, "items": { "$ref": "#/$defs/evidence" } },
+        "batch": { "$ref": "#/$defs/batch" },
+        "incremental": { "$ref": "#/$defs/incremental" }
+      },
+      "allOf": [
+        { "if": { "properties": { "evaluator": { "const": "native_solver" } } }, "then": { "required": ["result_key"] }, "else": { "not": { "required": ["result_key"] } } },
+        { "if": { "properties": { "validation_state": { "const": "cad_drc" } } }, "then": { "properties": { "evaluator": { "const": "cad_drc" } } } }
+      ]
+    }
+  }
+}

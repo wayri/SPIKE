@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/dc-fem-conductor-volumes-v1.schema.json",
+  "title": "SPIKE DC FEM Conductor Volumes v1",
+  "description": "Bounded conductor-volume handoff for DC field solvers. This is geometry exchange only; it does not claim numerical validation or solver convergence.",
+  "type": "object",
+  "required": [
+    "contract",
+    "units",
+    "coordinate_system",
+    "volumes",
+    "material_regions",
+    "terminal_boundary_faces",
+    "ownership_audit",
+    "quality",
+    "resource_admission",
+    "source_mesh_contract",
+    "counts"
+  ],
+  "properties": {
+    "contract": { "const": "spike/dc-fem-conductor-volumes/v1" },
+    "units": { "const": "mm" },
+    "coordinate_system": { "$ref": "#/$defs/coordinateSystem" },
+    "volumes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10000000,
+      "items": { "$ref": "#/$defs/conductorVolume" }
+    },
+    "material_regions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": { "$ref": "#/$defs/materialRegion" }
+    },
+    "terminal_boundary_faces": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4096,
+      "items": { "$ref": "#/$defs/terminalBoundaryFace" },
+      "allOf": [
+        { "contains": { "type": "object", "properties": { "role": { "const": "source" } }, "required": ["role"] } },
+        { "contains": { "type": "object", "properties": { "role": { "const": "load" } }, "required": ["role"] } }
+      ]
+    },
+    "ownership_audit": { "$ref": "#/$defs/ownershipAudit" },
+    "quality": { "$ref": "#/$defs/quality" },
+    "resource_admission": { "$ref": "#/$defs/resourceAdmission" },
+    "source_mesh_contract": { "const": "spike/mesh/v3" },
+    "counts": { "$ref": "#/$defs/counts" }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "point2": {
+      "type": "array",
+      "minItems": 2,
+      "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "items": false
+    },
+    "point3": {
+      "type": "array",
+      "minItems": 3,
+      "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }],
+      "items": false
+    },
+    "coordinateSystem": {
+      "type": "object",
+      "required": ["plane", "normal"],
+      "properties": {
+        "plane": { "const": "XY" },
+        "normal": { "const": "+Z" }
+      },
+      "additionalProperties": false
+    },
+    "conductorVolume": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "source_kind",
+        "source_id",
+        "layer",
+        "net",
+        "vertices_mm",
+        "topology",
+        "material",
+        "material_region_id"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "kind": { "const": "volume" },
+        "source_kind": { "$ref": "#/$defs/identifier" },
+        "source_id": { "$ref": "#/$defs/identifier" },
+        "layer": { "$ref": "#/$defs/identifier" },
+        "net": { "$ref": "#/$defs/identifier" },
+        "vertices_mm": {
+          "type": "array",
+          "minItems": 6,
+          "items": { "$ref": "#/$defs/point3" }
+        },
+        "role": { "type": "string" },
+        "topology": { "$ref": "#/$defs/identifier" },
+        "material": { "const": "copper" },
+        "material_region_id": { "$ref": "#/$defs/identifier" }
+      },
+      "additionalProperties": true
+    },
+    "materialRegion": {
+      "type": "object",
+      "required": ["id", "material", "layer", "conductivity_s_m", "cell_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "material": { "const": "copper" },
+        "layer": { "$ref": "#/$defs/identifier" },
+        "conductivity_s_m": { "type": "number", "exclusiveMinimum": 0 },
+        "cell_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/identifier" },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "terminalBoundaryFace": {
+      "type": "object",
+      "required": ["id", "role", "cell_id", "source_id", "net", "layer", "vertices_mm", "position_mm"],
+      "properties": {
+        "id": { "$ref": "#/$defs/identifier" },
+        "role": { "enum": ["source", "load"] },
+        "cell_id": { "$ref": "#/$defs/identifier" },
+        "source_id": { "$ref": "#/$defs/identifier" },
+        "net": { "$ref": "#/$defs/identifier" },
+        "layer": { "$ref": "#/$defs/identifier" },
+        "vertices_mm": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/point3" }
+        },
+        "position_mm": { "$ref": "#/$defs/point2" }
+      },
+      "additionalProperties": false
+    },
+    "ownershipAudit": {
+      "type": "object",
+      "required": ["status", "checked_volumes", "by_source_kind", "tolerance_mm"],
+      "properties": {
+        "status": { "const": "passed" },
+        "checked_volumes": { "type": "integer", "minimum": 1 },
+        "by_source_kind": {
+          "type": "object",
+          "propertyNames": { "enum": ["track", "zone", "pad", "pad_barrel", "via"] },
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "tolerance_mm": { "type": "number", "minimum": 0, "maximum": 0.1 }
+      },
+      "additionalProperties": false
+    },
+    "quality": {
+      "type": "object",
+      "required": ["zero_length_edges", "minimum_edge_mm", "maximum_edge_mm", "maximum_aspect_ratio", "mean_aspect_ratio"],
+      "properties": {
+        "zero_length_edges": { "type": "integer", "minimum": 0 },
+        "minimum_edge_mm": { "type": "number", "minimum": 0 },
+        "maximum_edge_mm": { "type": "number", "minimum": 0 },
+        "maximum_aspect_ratio": { "type": "number", "minimum": 0 },
+        "mean_aspect_ratio": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "resourceAdmission": {
+      "type": "object",
+      "required": [
+        "requested_cells",
+        "admitted_cells",
+        "capacity_cells",
+        "memory_budget_bytes",
+        "estimated_resident_bytes_per_cell",
+        "physical_memory_bytes",
+        "limited_by_memory",
+        "meaning"
+      ],
+      "properties": {
+        "requested_cells": { "type": "integer", "minimum": 1 },
+        "admitted_cells": { "type": "integer", "minimum": 1 },
+        "capacity_cells": { "type": "integer", "minimum": 1 },
+        "memory_budget_bytes": { "type": "integer", "minimum": 1 },
+        "estimated_resident_bytes_per_cell": { "type": "integer", "minimum": 1 },
+        "physical_memory_bytes": { "type": ["integer", "null"], "minimum": 1 },
+        "limited_by_memory": { "type": "boolean" },
+        "meaning": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": ["volumes", "material_regions", "terminal_boundary_faces"],
+      "properties": {
+        "volumes": { "type": "integer", "minimum": 1 },
+        "material_regions": { "type": "integer", "minimum": 1 },
+        "terminal_boundary_faces": { "type": "integer", "minimum": 2 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

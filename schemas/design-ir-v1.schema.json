@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/design-ir-v1.schema.json",
+  "title": "SPIKE DesignIR v1",
+  "type": "object",
+  "required": [
+    "contract",
+    "design_id",
+    "name",
+    "source_format",
+    "units",
+    "layers",
+    "nets",
+    "tracks",
+    "vias",
+    "pads",
+    "zones",
+    "components",
+    "stackup",
+    "issues",
+    "metadata"
+  ],
+  "properties": {
+    "contract": { "const": "spike/v1" },
+    "design_id": { "type": "string" },
+    "name": { "type": "string" },
+    "source_format": { "type": "string" },
+    "source_path": { "type": "string" },
+    "units": { "const": "mm" },
+    "layers": { "type": "array", "items": { "type": "object" } },
+    "nets": { "type": "array", "items": { "type": "object" } },
+    "tracks": { "type": "array", "items": { "type": "object" } },
+    "vias": { "type": "array", "items": { "type": "object" } },
+    "pads": { "type": "array", "items": { "type": "object" } },
+    "zones": { "type": "array", "items": { "type": "object" } },
+    "components": { "type": "array", "items": { "type": "object" } },
+    "connectors": { "type": "array", "items": { "type": "object" } },
+    "stackup": { "type": "array", "items": { "type": "object" } },
+    "technology": { "enum": ["rigid", "flex", "rigid-flex", "unknown"] },
+    "regions": { "type": "array", "items": { "type": "object" } },
+    "bends": { "type": "array", "items": { "type": "object" } },
+    "issues": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/validationIssue" }
+    },
+    "metadata": { "type": "object" }
+  },
+  "$defs": {
+    "validationIssue": {
+      "type": "object",
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "severity": { "enum": ["info", "warning", "error"] },
+        "message": { "type": "string" },
+        "path": { "type": "string" },
+        "suggestion": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

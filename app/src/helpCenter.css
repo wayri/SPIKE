@@ -1,0 +1,86 @@
+.help-browser { width: min(1380px, calc(100vw - 28px)); height: calc(100vh - 28px); max-height: calc(100vh - 28px); border-radius: 12px; grid-template-rows: 64px minmax(0, 1fr) 38px; font-family: inherit; }
+.help-browser > header { padding: 12px 20px; }
+.help-browser header b { font-size: 16px; letter-spacing: .1px; }
+.help-browser header small { font-size: 11px; color: #a4bac3; }
+.help-browser button, .help-browser select, .help-browser summary { cursor: pointer; }
+.help-browser button:disabled { opacity: .35; cursor: default; }
+.help-browser :focus-visible { outline: 2px solid #efbe66; outline-offset: 3px; }
+.help-browser button { color: #c9d9df; }
+.help-browser .help-layout { grid-template-columns: 300px minmax(0, 1fr); }
+.help-browser .help-sidebar { display: grid; grid-template-rows: 60px 35px 32px minmax(0, 1fr); }
+.help-browser .help-search { margin: 12px; border-radius: 6px; }
+.help-browser .help-search input { font-size: 12px; height: 34px; }
+.help-browser .help-sidebar > select { margin: 0 12px; min-width: 0; padding: 4px 8px; background: #192c35; color: #d5e4e9; border: 1px solid #39525d; border-radius: 5px; }
+.help-result-count { padding: 8px 15px; color: #9db3bd; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.help-browser .help-sidebar nav { padding: 0 8px 14px; }
+.help-browser .help-sidebar nav button { min-height: 54px; padding: 9px 10px; border-radius: 3px; display: grid; gap: 4px; }
+.help-browser .help-sidebar nav button span { font-size: 12px; overflow-wrap: anywhere; }
+.help-browser .help-sidebar nav button small { color: #8ca8b3; font-size: 9px; text-transform: uppercase; letter-spacing: .8px; }
+.help-browser .help-sidebar nav button em { color: #9bb0ba; font-size: 10px; font-style: normal; line-height: 1.45; max-height: 44px; overflow: hidden; }
+.help-reading { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: #13232c; }
+.help-toolbar { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border-bottom: 1px solid #2e4651; flex-shrink: 0; }
+.help-toolbar span { flex: 1; color: #95adb7; font-size: 11px; }
+.help-toolbar button, .help-header-actions button, .help-related button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #39535e; border-radius: 5px; background: #1b303a; min-height: 30px; padding: 4px 9px; font-size: 11px; }
+.help-browser article { flex: 1; min-height: 0; overflow: auto; padding: 28px clamp(22px, 4vw, 62px) 50px; scrollbar-width: thin; }
+.help-browser article h1 { font-size: 30px; font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; }
+.help-browser article h2 { font-size: 20px; margin-top: 30px; scroll-margin-top: 20px; }
+.help-browser article h3 { font-size: 15px; color: #e0eaf0; scroll-margin-top: 20px; }
+.help-browser article p, .help-browser article li, .help-paragraph, .help-browser blockquote { color: #b9cbd3; font-size: 13px; line-height: 1.8; }
+.help-paragraph { margin: 12px 0; overflow-wrap: anywhere; }
+.help-browser article strong { color: #f1d391; }
+.help-browser article a { color: #8fdbdc; text-decoration: underline; text-underline-offset: 3px; }
+.help-browser article code, .help-browser article kbd { font-size: 11px; overflow-wrap: anywhere; }
+.help-browser .help-lead { font-size: 20px; color: #e3c88b; }
+.help-eyebrow { color: #83b7bd; text-transform: uppercase; font-size: 10px; letter-spacing: 1.6px; margin-bottom: 12px; }
+.help-stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 24px 0; }
+.help-stats span { flex: 1; min-width: 120px; display: grid; gap: 8px; padding: 16px; border: 1px solid #36515d; border-radius: 8px; background: #192f39; color: #a8bdc6; font-size: 12px; }
+.help-stats b { color: #f0c777; font-size: 21px; }
+.help-browser .help-checklist { padding: 4px 20px 20px; border: 1px solid #36515d; border-radius: 8px; }
+.help-checklist label { display: flex; align-items: center; gap: 10px; margin: 12px 0; color: #d1e0e6; font-size: 13px; }
+.help-checklist input { width: 16px; height: 16px; accent-color: #ddac59; }
+.help-checklist small { color: #8cafbb; }
+.help-toc, .help-control { border: 1px solid #34505d; border-radius: 6px; margin: 16px 0; padding: 14px; }
+.help-toc summary, .help-control summary { font-size: 12px; color: #a8cbd5; }
+.help-toc button { display: block; border: 0; background: transparent; text-align: left; padding: 6px 0; font-size: 12px; }
+.help-control h3 { margin: 0 0 10px; }
+.help-tag { color: #86c7ca; font-size: 10px; text-transform: uppercase; letter-spacing: .6px; }
+.help-local-search { display: grid; gap: 7px; color: #adc5d0; font-size: 12px; }
+.help-local-search input { padding: 10px; color: #e0eaf0; background: #0d1b22; border: 1px solid #426473; }
+.help-code { position: relative; margin: 16px 0; border: 1px solid #36515e; border-radius: 6px; background: #0b171e; }
+.help-code > button { position: sticky; top: 0; float: right; margin: 6px; padding: 4px 8px; background: #213943; border: 1px solid #42616e; border-radius: 4px; }
+.help-code pre { clear: both; overflow: auto; padding: 0 18px 18px; max-height: 650px; }
+.help-browser .help-code code { border: 0; background: transparent; padding: 0; line-height: 1.65; white-space: pre; }
+.help-table-wrap { overflow-x: auto; margin: 18px 0; }
+.help-browser table { border-collapse: collapse; width: 100%; font-size: 12px; color: #b6cbd4; }
+.help-browser th, .help-browser td { text-align: left; vertical-align: top; padding: 10px; border: 1px solid #36515e; line-height: 1.7; min-width: 110px; }
+.help-browser th { background: #203842; color: #dfebef; }
+.help-browser blockquote { border-left: 3px solid #ccab66; padding: 8px 16px; background: #26312d; }
+.help-browser figure img { cursor: zoom-in; max-height: 520px; }
+.help-image-button { width: 100%; padding: 0; border: 0; background: transparent; }
+.help-browser figcaption { font-size: 11px; line-height: 1.6; }
+.help-related { border-top: 1px solid #36515d; margin-top: 40px; padding-top: 10px; }
+.help-related button { margin: 0 6px 6px 0; }
+.help-notice { padding: 10px 20px; color: #f0cf8d; background: #34301f; font-size: 12px; }
+.help-empty { padding: 10px; color: #aabfc9; font-size: 12px; line-height: 1.6; }
+.help-browser > footer { font-size: 10px; padding: 8px 18px; }
+.help-lightbox { position: absolute; inset: 0; z-index: 2; background: #050e16f5; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 14px; }
+.help-lightbox button { align-self: flex-end; padding: 10px; background: #263d48; border: 1px solid #557681; border-radius: 6px; display: flex; align-items: center; gap: 6px; }
+.help-lightbox img { max-width: 100%; max-height: calc(100% - 100px); object-fit: contain; }
+.help-lightbox p { color: #cedfe7; }
+.help-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (max-width: 850px) { .help-browser .help-layout { grid-template-columns: 220px minmax(0, 1fr); } .help-header-actions > button:first-child { display: none; } .help-toolbar { padding: 8px; flex-wrap: wrap; } .help-toolbar span { display: none; } .help-browser article { padding: 20px; } }
+@media (max-width: 560px) { .help-browser { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; } .help-browser .help-layout { grid-template-columns: 155px minmax(0, 1fr); } .help-browser article { padding: 14px; } .help-browser article h1 { font-size: 23px; } .help-browser > footer small { display: none; } }
+@media (prefers-reduced-motion: reduce) { .help-browser *, .help-browser *::before, .help-browser *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+@media print {
+  body * { visibility: hidden; }
+  .help-browser, .help-browser article, .help-browser article * { visibility: visible; }
+  .help-shade { position: absolute !important; inset: 0 !important; display: block !important; background: white !important; }
+  .help-browser { position: static; width: 100%; height: auto; max-height: none; display: block; border: 0; box-shadow: none; background: white; color: black; }
+  .help-browser > header, .help-browser > footer, .help-sidebar, .help-toolbar, .help-toc, .help-related, .help-notice, .help-code > button, .help-lightbox { display: none !important; }
+  .help-browser .help-layout, .help-reading { display: block; background: white; }
+  .help-browser article { overflow: visible; padding: 0; }
+  .help-browser article * { color: black !important; background: white !important; }
+  .help-code pre { max-height: none; white-space: pre-wrap; overflow: visible; }
+  .help-browser .help-code code { white-space: pre-wrap; }
+  .help-browser figure { break-inside: avoid; }
+}

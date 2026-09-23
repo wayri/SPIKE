@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spikes.local/schemas/studio-part-v1.schema.json",
+  "title": "SPIKES Studio part",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract", "part_id", "display_name", "category", "family", "technology",
+    "symbol", "instance_prefix", "pins", "optional_pins", "requires_pin_mapping",
+    "model", "simulation", "qualification"
+  ],
+  "properties": {
+    "contract": {"const": "spikes/studio-part/v1"},
+    "part_id": {"type": "string", "pattern": "^[a-z][a-z0-9_.-]*\\.spice:[a-z0-9_.-]+@[1-9][0-9]*$"},
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 128},
+    "category": {"type": "string", "minLength": 1},
+    "family": {"type": "string", "minLength": 1},
+    "technology": {"enum": ["unspecified", "gan", "sic", "diamond"]},
+    "symbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["library_id", "auto_generated", "editable"],
+      "properties": {
+        "library_id": {"type": "string", "minLength": 1},
+        "auto_generated": {"type": "boolean"},
+        "editable": {"type": "boolean"}
+      }
+    },
+    "instance_prefix": {"type": "string", "minLength": 1, "maxLength": 4},
+    "pins": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "electrical_type"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "name": {"type": "string", "minLength": 1},
+          "electrical_type": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "optional_pins": {"type": "array", "items": {"type": "string"}},
+    "requires_pin_mapping": {"type": "boolean"},
+    "model": {"type": "object"},
+    "simulation": {"type": "object"},
+    "qualification": {"type": "object"}
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "contract": "spike/gmsh-occ-mesh/v1",
+  "solids": [
+    {
+      "id": "board",
+      "material_id": "fr4",
+      "priority": 0,
+      "shape": {
+        "kind": "polygon_prism",
+        "outer_mm": [
+          [
+            0,
+            0
+          ],
+          [
+            4,
+            0
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            3.5,
+            2
+          ],
+          [
+            3.5,
+            3
+          ],
+          [
+            0,
+            3
+          ]
+        ],
+        "holes_mm": [
+          [
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ]
+        ],
+        "z_min_mm": 0,
+        "z_max_mm": 1
+      }
+    },
+    {
+      "id": "via",
+      "material_id": "copper",
+      "priority": 1,
+      "shape": {
+        "kind": "tube",
+        "center_mm": [
+          3,
+          1
+        ],
+        "outer_radius_mm": 0.3,
+        "inner_radius_mm": 0.2,
+        "z_min_mm": 0,
+        "z_max_mm": 1.035
+      }
+    },
+    {
+      "id": "drill_air",
+      "material_id": "air",
+      "priority": 2,
+      "shape": {
+        "kind": "tube",
+        "center_mm": [
+          3,
+          1
+        ],
+        "outer_radius_mm": 0.2,
+        "inner_radius_mm": 0,
+        "z_min_mm": 0,
+        "z_max_mm": 1.035
+      }
+    },
+    {
+      "id": "trace_top",
+      "material_id": "copper",
+      "priority": 1,
+      "shape": {
+        "kind": "polygon_prism",
+        "outer_mm": [
+          [
+            2.5,
+            0.7
+          ],
+          [
+            3.4,
+            0.7
+          ],
+          [
+            3.4,
+            1.3
+          ],
+          [
+            2.5,
+            1.3
+          ]
+        ],
+        "holes_mm": [],
+        "z_min_mm": 1,
+        "z_max_mm": 1.035
+      }
+    }
+  ],
+  "mesh": {
+    "min_size_mm": 0.1,
+    "max_size_mm": 0.6,
+    "max_cells": 30000,
+    "max_vertices": 12000
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/actuator-motion-v1.schema.json",
+  "$comment": "SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+  "title": "Fixed-excitation one-degree-of-freedom actuator motion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "force_map", "mass_kg", "damping_n_s_per_m", "spring_n_per_m", "spring_equilibrium_position_m", "initial_position_m", "initial_velocity_m_per_s", "duration_s", "time_step_s"],
+  "properties": {
+    "contract": {"const": "spike/actuator-motion/v1"},
+    "force_map": {"$ref": "actuator-force-map-v1.schema.json"},
+    "mass_kg": {"type": "number", "minimum": 1e-12},
+    "damping_n_s_per_m": {"type": "number", "minimum": 0},
+    "spring_n_per_m": {"type": "number", "minimum": 0},
+    "spring_equilibrium_position_m": {"type": "number"},
+    "initial_position_m": {"type": "number"},
+    "initial_velocity_m_per_s": {"type": "number"},
+    "duration_s": {"type": "number", "minimum": 1e-15},
+    "time_step_s": {"type": "number", "minimum": 1e-15}
+  }
+}

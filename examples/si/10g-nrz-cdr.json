@@ -1,0 +1,19 @@
+{
+  "contract": "spike/si-workflow-request/v1",
+  "channel": {
+    "kind": "rlgc", "coupled": false, "length_m": 0.01,
+    "resistance_ohm_per_m": 0, "inductance_h_per_m": 2.5e-7,
+    "capacitance_f_per_m": 1e-10, "loss_tangent": 0,
+    "frequency_points": 1025, "frequency_stop_hz": 160000000000,
+    "reference_impedance_ohm": 50
+  },
+  "sources": [{"port": 0, "low_v": 0, "high_v": 1,
+               "rise_time_s": 2e-11, "fall_time_s": 2e-11}],
+  "receivers": [{"port": 1, "resistance_ohm": 50, "capacitance_f": 0,
+                 "vil_v": 0.15, "vih_v": 0.35,
+                 "cdr": {"kind": "transition_pi", "threshold_v": 0.25,
+                         "normalization_v": 0.5, "initial_phase_ui": 0.6}}],
+  "bit_rate_hz": 10312500000,
+  "bit_count": 1024,
+  "run_time_domain": true
+}

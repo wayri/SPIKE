@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/geometry-index-v1.schema.json",
+  "title": "SPIKE Geometry Index v1",
+  "type": "object",
+  "required": ["contract", "tables"],
+  "properties": {
+    "contract": { "const": "spike/geometry-index/v1" },
+    "tables": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "required": ["path", "encoding", "sha256"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^geometry/[A-Za-z0-9][A-Za-z0-9._+-]*\\.arrow$" },
+          "encoding": { "const": "arrow-ipc" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "schema": { "enum": ["spike/copper-geometry-arrow/v1", "spike/copper-geometry-arrow/v2", "spike/copper-geometry-arrow/v3", "spike/copper-geometry-arrow/v4"] },
+          "rows": { "type": "integer", "minimum": 0, "maximum": 10000000 },
+          "design_id": { "type": "string", "minLength": 1 },
+          "design_ir_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        },
+        "allOf": [
+          {
+            "if": { "required": ["schema"] },
+            "then": { "required": ["rows", "design_id", "design_ir_sha256"] }
+          }
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/si-workflow-result-v1.schema.json",
+  "title": "SPIKE experimental loaded SI workflow result",
+  "type": "object",
+  "required": ["contract", "status", "model_status", "production_qualified", "compliance_status", "request", "request_sha256", "network", "loaded_transfers", "time_domain", "touchstone", "noise", "limitations"],
+  "properties": {
+    "contract": {"const": "spike/si-workflow-result/v1"},
+    "status": {"enum": ["completed", "partial"]},
+    "model_status": {"const": "experimental"},
+    "production_qualified": {"const": false},
+    "compliance_status": {"const": "not_evaluated"},
+    "request": {"$ref": "si-workflow-request-v1.schema.json"},
+    "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "network": {"type": "object"},
+    "loaded_transfers": {"type": "array"},
+    "time_domain": {"type": "object", "required": ["status"], "properties": {"status": {"enum": ["completed", "blocked", "not_requested"]}}},
+    "touchstone": {"type": "object", "required": ["name", "text", "error"], "properties": {"name": {"type": "string"}, "text": {"type": ["string", "null"]}, "error": {"type": ["string", "null"]}}},
+    "noise": {"type": "object"},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}

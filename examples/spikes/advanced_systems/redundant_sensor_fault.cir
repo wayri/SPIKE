@@ -1,0 +1,16 @@
+.title Educational dual-channel sensor discrepancy and watchdog filtering
+VsensorA raw_a 0 PWL(0 0 10m 0 11m 2.5 50m 2.5)
+VsensorB raw_b 0 PWL(0 0 10m 0 11m 2.5 30m 2.5 31m 5 50m 5)
+Ra raw_a a 1k
+Ca a 0 1u
+Rb raw_b b 1k
+Cb b 0 1u
+Rfiltera a filtered_a 10k
+Cfiltera filtered_a 0 1u
+Rfilterb b filtered_b 10k
+Cfilterb filtered_b 0 1u
+Vwatchdog heartbeat 0 PULSE(0 3.3 0 1u 1u 5m 10m)
+Rwatchdog heartbeat watchdog 10k
+Cwatchdog watchdog 0 1u
+.tran 10u 50m uic
+.end

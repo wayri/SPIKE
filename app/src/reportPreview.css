@@ -1,0 +1,13 @@
+.report-preview-toolbar::after {
+  content: "Interactive HTML · sequential all-net print";
+  color: #82939a;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 820px) {
+  .report-preview-toolbar::after {
+    display: none;
+  }
+}

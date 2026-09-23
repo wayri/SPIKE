@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/spike-project-package-v3.schema.json",
+  "title": "SPIKE Project Package v3 Manifest",
+  "type": "object",
+  "required": ["format", "contract", "profile", "package_id", "created_at", "application", "compatibility", "schemas", "audit_identity", "members", "manifest_payload_sha256"],
+  "properties": {
+    "format": { "const": "spike-project-package/v3" },
+    "contract": { "const": "spike/project-package/v3" },
+    "profile": { "enum": ["portable_project", "design_exchange", "result_bundle"] },
+    "package_id": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "application": { "type": "object", "required": ["name", "version"], "properties": { "name": { "const": "SPIKE" }, "version": { "type": "string" } }, "additionalProperties": false },
+    "compatibility": { "type": "object" },
+    "schemas": {
+      "type": "object",
+      "required": ["design_ir", "assembly_ir", "assembly_placement_policy", "assembly_package_shapes", "model_index", "geometry_index", "workspace"],
+      "properties": {
+        "design_ir": { "const": "spike/design-ir/v2" },
+        "assembly_ir": { "const": "spike/assembly-ir/v1" },
+        "assembly_placement_policy": { "const": "spike/assembly-placement-policy/v1" },
+        "assembly_package_shapes": { "const": "spike/assembly-package-shapes/v1" },
+        "model_index": { "const": "spike/model-index/v1" },
+        "geometry_index": { "const": "spike/geometry-index/v1" },
+        "workspace": { "const": "spike/workspace-state/v1" }
+      },
+      "additionalProperties": true
+    },
+    "audit_identity": { "type": "object" },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["path", "sha256", "size", "media_type", "role"],
+        "properties": { "path": { "type": "string", "pattern": "^[A-Za-z0-9].*$" }, "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }, "size": { "type": "integer", "minimum": 0 }, "media_type": { "type": "string" }, "role": { "type": "string" } },
+        "additionalProperties": false
+      }
+    },
+    "manifest_payload_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "signature": {
+      "type": "object",
+      "required": ["contract", "algorithm", "key_id", "signed_payload_sha256", "signature_base64url"],
+      "properties": {
+        "contract": { "const": "spike/manifest-signature/v1" },
+        "algorithm": { "const": "ed25519" },
+        "key_id": { "type": "string", "minLength": 1 },
+        "signed_payload_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "signature_base64url": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

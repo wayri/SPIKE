@@ -1,0 +1,9 @@
+.title Native NPN diffusion-charge example - use BE or BDF2
+Vbus bus 0 5
+Rload bus collector 1k
+Vcommand command 0 PULSE(0 1 1u 100n 100n 4u 10u)
+Rbase command base 10k
+Q1 collector base 0 qm
+.model qm NPN(IS=1f BF=99 BR=1 NF=1 CBE=20p CBC=5p TF=10n TR=100n)
+.tran 10n 20u
+.end

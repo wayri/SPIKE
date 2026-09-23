@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-v1.schema.json",
+  "title": "SPIKE Harness v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "id", "name", "connectors", "wires"],
+  "properties": {
+    "contract": {"const": "spike/harness/v1"},
+    "id": {"$ref": "#/$defs/id"}, "name": {"$ref": "#/$defs/id"},
+    "connectors": {"type": "array", "maxItems": 100000, "items": {"$ref": "#/$defs/connector"}},
+    "wires": {"type": "array", "maxItems": 100000, "items": {"$ref": "#/$defs/wire"}},
+    "splices": {"type": "array", "maxItems": 100000, "items": {"type": "object", "required": ["id"], "additionalProperties": false, "properties": {
+      "id": {"$ref": "#/$defs/id"}, "part_number": {"type": "string"}, "properties": {"type": "object"}, "extensions": {"type": "object"}
+    }}},
+    "cables": {"type": "array", "maxItems": 100000, "items": {"type": "object", "required": ["id", "wire_ids"], "additionalProperties": false, "properties": {
+      "id": {"$ref": "#/$defs/id"}, "wire_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+      "twisted": {"type": "boolean"}, "twist_pitch_mm": {"type": "number", "exclusiveMinimum": 0},
+      "shield": {"type": "object", "additionalProperties": false, "properties": {"type": {"type": "string"}, "terminations": {"type": "array", "items": {"$ref": "#/$defs/endpoint"}}, "properties": {"type": "object"}}},
+      "properties": {"type": "object"}, "extensions": {"type": "object"}
+    }}},
+    "routes": {"type": "array", "maxItems": 100000, "items": {"type": "object", "required": ["id", "points_mm"], "additionalProperties": false, "properties": {
+      "id": {"$ref": "#/$defs/id"}, "frame_id": {"type": "string"},
+      "points_mm": {"type": "array", "minItems": 2, "maxItems": 100000, "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}}},
+      "properties": {"type": "object"}, "extensions": {"type": "object"}
+    }}},
+    "properties": {"type": "object"}, "extensions": {"type": "object"}, "provenance": {"type": "object"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^[^\\u0000-\\u001f]+$"},
+    "endpoint": {"oneOf": [
+      {"type": "object", "required": ["connector", "pin"], "additionalProperties": false, "properties": {"connector": {"$ref": "#/$defs/id"}, "pin": {"$ref": "#/$defs/id"}}},
+      {"type": "object", "required": ["splice"], "additionalProperties": false, "properties": {"splice": {"$ref": "#/$defs/id"}}}
+    ]},
+    "connector": {"type": "object", "required": ["id", "pins"], "additionalProperties": false, "properties": {
+      "id": {"$ref": "#/$defs/id"}, "name": {"type": "string"}, "part_number": {"type": "string"},
+      "board_binding": {"type": "object", "required": ["board_id", "connector_id"], "additionalProperties": false, "properties": {"board_id": {"$ref": "#/$defs/id"}, "connector_id": {"$ref": "#/$defs/id"}}},
+      "pins": {"type": "array", "minItems": 1, "maxItems": 100000, "items": {"type": "object", "required": ["id"], "additionalProperties": false, "properties": {
+        "id": {"$ref": "#/$defs/id"}, "net": {"type": "string"}, "required": {"type": "boolean"}, "max_connections": {"type": "integer", "minimum": 1},
+        "terminal_part_number": {"type": "string"}, "properties": {"type": "object"}, "extensions": {"type": "object"}
+      }}}, "properties": {"type": "object"}, "extensions": {"type": "object"}
+    }},
+    "wire": {"type": "object", "required": ["id", "from", "to"], "additionalProperties": false, "properties": {
+      "id": {"$ref": "#/$defs/id"}, "from": {"$ref": "#/$defs/endpoint"}, "to": {"$ref": "#/$defs/endpoint"},
+      "net": {"type": "string"}, "color": {"type": "string"}, "part_number": {"type": "string"},
+      "length_mm": {"type": "number", "exclusiveMinimum": 0}, "area_mm2": {"type": "number", "exclusiveMinimum": 0}, "route_id": {"$ref": "#/$defs/id"},
+      "material": {"type": "object", "additionalProperties": false, "properties": {
+        "name": {"type": "string"}, "resistivity_ohm_m": {"type": "number", "exclusiveMinimum": 0}, "reference_temperature_c": {"type": "number"}, "properties": {"type": "object"}
+      }},
+      "electrical": {"type": "object", "additionalProperties": false, "properties": {
+        "resistance_ohm": {"type": "number", "exclusiveMinimum": 0}, "inductance_h": {"type": "number", "minimum": 0},
+        "capacitance_to_reference_f": {"type": "number", "minimum": 0}, "conductance_to_reference_s": {"type": "number", "minimum": 0},
+        "reference": {"$ref": "#/$defs/endpoint"}, "provenance": {"type": "object"}, "extensions": {"type": "object"}
+      }}, "properties": {"type": "object"}, "extensions": {"type": "object"}
+    }}
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "contract": "spike/laminar-channel-cht/v1",
+  "geometry": {
+    "length_m": 0.1,
+    "fluid_height_m": 0.01,
+    "width_m": 0.02,
+    "lower_wall_thickness_m": 0.002,
+    "upper_wall_thickness_m": 0.002
+  },
+  "grid": {
+    "nx": 8,
+    "fluid_cells": 8,
+    "lower_wall_cells": 2,
+    "upper_wall_cells": 2
+  },
+  "fluid": {
+    "density_kg_m3": 1.2,
+    "dynamic_viscosity_pa_s": 1.8e-05,
+    "specific_heat_j_kgk": 1005.0,
+    "conductivity_w_mk": 0.026
+  },
+  "walls": {
+    "lower_conductivity_w_mk": 2.0,
+    "upper_conductivity_w_mk": 3.0,
+    "lower_heat_w_m3": 10000.0,
+    "upper_heat_w_m3": 0.0
+  },
+  "drive": {
+    "pressure_gradient_pa_m": 0.1,
+    "inlet_temperature_k": 300.0
+  },
+  "boundaries": {
+    "lower": {
+      "type": "adiabatic"
+    },
+    "upper": {
+      "type": "adiabatic"
+    }
+  }
+}

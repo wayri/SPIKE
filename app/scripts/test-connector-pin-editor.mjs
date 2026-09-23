@@ -1,0 +1,51 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+
+const root = new URL("../", import.meta.url);
+const source = readFileSync(new URL("src/connectorPresets.ts", root), "utf8");
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
+const module = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
+
+assert.deepEqual({ ...module.parsePinMappings("01=A\n02,B\n# comment") }, { "01": "A", "02": "B" });
+assert.equal(module.formatPinMappings({ "01": "A", "02": "B" }), "01=A\n02=B");
+assert.throws(() => module.parsePinMappings("1=A\n2=A"), /duplicate destination/);
+assert.throws(() => module.parsePinMappings("broken"), /expected source=destination/);
+assert.deepEqual(Object.entries(module.parsePinMappings("__proto__=safe\nconstructor=also-safe")), [["__proto__", "safe"], ["constructor", "also-safe"]]);
+assert.throws(() => module.parsePinMappings("x".repeat(1_000_001)), /exceeds 1 MB/);
+const retainedPin = { id: "1", net: "VCC", required: true, max_connections: 2, extensions: { vendor: "kept" } };
+assert.deepEqual(module.mergeConnectorPins([retainedPin], ["1", "2"]), [retainedPin, { id: "2" }]);
+const retainedWire = { id: "wire-vcc", from: { connector: "J1", pin: "1" }, to: { connector: "J2", pin: "A" }, electrical: { resistance_ohm: 0.2, inductance_h: 1e-7 }, properties: { vendor: "kept" } };
+const collision = { id: "J1-2-J2-B", from: { connector: "J3", pin: "1" }, to: { connector: "J4", pin: "1" } };
+const reconciled = module.reconcilePairWires([retainedWire, collision], "J1", "J2", { "1": "A", "2": "B" });
+assert.equal(reconciled.find(wire => wire.id === "wire-vcc").electrical.inductance_h, 1e-7);
+assert.equal(reconciled.find(wire => wire.id === "wire-vcc").properties.vendor, "kept");
+assert.ok(reconciled.some(wire => wire.id === "J1-2-J2-B-2"), "new wire IDs must avoid collisions");
+for (const family of ["berg_header", "jumper", "d_sub", "xt_power", "datamate", "gecko", "micro_d", "power", "signal"])
+  assert.ok(module.CONNECTOR_PRESETS.some(item => item.family === family), `missing ${family} preset`);
+assert.ok(module.CONNECTOR_PRESETS.every(item => /estimate|Unspecified/i.test(item.note)), "presets must identify estimates or remain unspecified");
+
+const harnessEditor = readFileSync(new URL("src/HarnessDocumentEditor.tsx", root), "utf8");
+const harnessPiPanel = readFileSync(new URL("src/HarnessPiPanel.tsx", root), "utf8");
+const assemblyEditor = readFileSync(new URL("src/AssemblyStructureEditor.tsx", root), "utf8");
+const simulationWorkspace = readFileSync(new URL("src/SimulationWorkspace.tsx", root), "utf8");
+const appSource = readFileSync(new URL("src/App.tsx", root), "utf8");
+assert.ok(harnessEditor.includes("Connector-to-connector pin matching"));
+assert.ok(harnessEditor.includes("manufacturer-guaranteed"));
+assert.ok(harnessEditor.includes("Explicit DC R"));
+assert.ok(harnessEditor.includes("HarnessPiPanel"));
+assert.ok(harnessPiPanel.includes('method: "run_harness_pi"'));
+assert.ok(harnessPiPanel.includes('cancelLocalWorker(requestId.current)'));
+assert.ok(harnessPiPanel.includes("results below are stale"));
+assert.ok(harnessPiPanel.includes("not a PCB/board field solve"));
+assert.ok(harnessPiPanel.includes('JSON.stringify(["connector"'));
+assert.ok(harnessPiPanel.includes("Saved Harness PI setup is malformed"));
+assert.ok(harnessPiPanel.includes('"unavailable"'));
+assert.ok(assemblyEditor.includes("Bulk / text pin mapping"));
+assert.ok(assemblyEditor.includes("AssemblyPinMapEditor"));
+assert.ok(assemblyEditor.includes("Open Harness PI editor"));
+assert.ok(simulationWorkspace.includes("Harness PI"));
+assert.ok(appSource.includes("harnessEditorOpen"));
+assert.ok(appSource.includes('aria-labelledby="harness-editor-title"'));
+assert.ok(appSource.includes("setHarnessDocument(next)"), "direct editor must mutate the one project harness document");
+console.log("Connector presets and GUI/text pin mapping checks passed.");

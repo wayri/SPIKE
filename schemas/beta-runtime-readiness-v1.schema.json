@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/beta-runtime-readiness-v1.schema.json",
+  "title": "SPIKE beta runtime readiness report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "product", "version", "engine_product", "engine_version", "status", "release_tier", "production_qualified", "components", "errors", "limitations"],
+  "properties": {
+    "contract": {"const": "spike/beta-runtime-readiness/v1"},
+    "product": {"const": "SPIKE"},
+    "version": {"type": "string", "minLength": 1, "maxLength": 64},
+    "engine_product": {"const": "SPIKES"},
+    "engine_version": {"const": "0.3.0-beta.1"},
+    "status": {"enum": ["passed", "failed"]},
+    "release_tier": {"const": "bounded_beta_candidate"},
+    "production_qualified": {"const": false},
+    "components": {"type": "object", "additionalProperties": {"type": "object"}},
+    "errors": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 4096}},
+    "limitations": {"type": "array", "maxItems": 64, "items": {"type": "string", "maxLength": 4096}}
+  }
+}

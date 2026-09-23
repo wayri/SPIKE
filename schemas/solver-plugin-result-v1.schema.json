@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/solver-plugin-result-v1.schema.json",
+  "title": "SPIKE Process Solver Result v1",
+  "description": "Bounded result-artifact envelope. A completed process result must still be normalized and qualification-gated by the owning workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "request_id", "solver", "status", "model_status", "artifacts", "provenance", "issues"],
+  "properties": {
+    "contract": {"const": "spike/solver-plugin-result/v1"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "solver": {"type": "object", "additionalProperties": false, "required": ["id", "version"], "properties": {"id": {"type": "string", "pattern": "^[a-z0-9._-]+$"}, "version": {"type": "string", "minLength": 1}}},
+    "status": {"enum": ["completed", "blocked", "failed"]},
+    "model_status": {"enum": ["validated", "reference_validated", "approximate", "solver_dependent", "unsupported", "unvalidated"]},
+    "artifacts": {"type": "array", "maxItems": 256, "items": {"type": "object", "additionalProperties": false, "required": ["kind", "path", "sha256", "bytes", "contract"], "properties": {"kind": {"type": "string", "minLength": 1}, "path": {"$ref": "#/$defs/safePath"}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "bytes": {"type": "integer", "minimum": 0, "maximum": 1073741824}, "contract": {"type": "string", "minLength": 1}}}},
+    "provenance": {"type": "object", "additionalProperties": false, "required": ["adapter_version", "runtime_probe"], "properties": {"adapter_version": {"type": "string", "minLength": 1}, "runtime_probe": {"enum": ["passed", "failed", "not_run"]}, "qualification": {"type": "string"}}},
+    "issues": {"type": "array", "maxItems": 1024, "items": {"type": "object", "additionalProperties": false, "required": ["code", "severity", "message"], "properties": {"code": {"type": "string", "minLength": 1}, "severity": {"enum": ["info", "warning", "error"]}, "message": {"type": "string", "minLength": 1}}}}
+  },
+  "$defs": {"safePath": {"type": "string", "minLength": 1, "maxLength": 1024, "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"}}
+}
