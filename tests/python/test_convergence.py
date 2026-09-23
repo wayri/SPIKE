@@ -63,10 +63,13 @@ class MeshConvergenceTests(unittest.TestCase):
                 status="completed",
                 mode="dc",
                 summary={
+                    "max_load_voltage_drop_v": target,
                     "max_voltage_drop_v": target,
                     "total_copper_loss_w": target,
                     "total_load_current_a": 1,
                     "max_current_density_a_mm2": target,
+                    "node_count": int(100 / target),
+                    "edge_count": int(200 / target),
                 },
             )
 
@@ -82,11 +85,14 @@ class MeshConvergenceTests(unittest.TestCase):
                 status="completed",
                 mode="dc",
                 summary={
+                    "max_load_voltage_drop_v": 0.01,
                     "max_voltage_drop_v": 0.01,
                     "total_copper_loss_w": 0.01,
                     "total_load_current_a": 1,
                     "p95_current_density_a_mm2": 2.0,
                     "max_current_density_a_mm2": 10.0 / target,
+                    "node_count": int(100 / target),
+                    "edge_count": int(200 / target),
                 },
             )
 
@@ -112,11 +118,14 @@ class MeshConvergenceTests(unittest.TestCase):
                 status="completed",
                 mode="dc",
                 summary={
+                    "max_load_voltage_drop_v": stable,
                     "max_voltage_drop_v": stable,
                     "total_copper_loss_w": stable,
                     "total_load_current_a": 1,
                     "p95_current_density_a_mm2": stable,
                     "max_current_density_a_mm2": stable,
+                    "node_count": int(100 / target),
+                    "edge_count": int(200 / target),
                 },
             )
 
@@ -133,6 +142,7 @@ class MeshConvergenceTests(unittest.TestCase):
 
     def test_near_zero_voltage_drop_can_pass_a_bounded_absolute_tolerance(self):
         values = iter((20e-6, 30e-6, 40e-6))
+        counts = iter((100, 200, 400))
 
         def runner(_design, _spec):
             value = next(values)
@@ -147,6 +157,8 @@ class MeshConvergenceTests(unittest.TestCase):
                     "total_load_current_a": 1,
                     "p95_current_density_a_mm2": 2.0,
                     "max_current_density_a_mm2": 2.0,
+                    "node_count": (count := next(counts)),
+                    "edge_count": count * 2,
                 },
             )
 
@@ -155,6 +167,95 @@ class MeshConvergenceTests(unittest.TestCase):
         self.assertEqual(report["status"], "passed")
         self.assertEqual(voltage["pass_basis"], "absolute")
         self.assertLessEqual(voltage["absolute_delta"], voltage["absolute_tolerance"])
+
+    def test_unchanged_solved_network_cannot_sign_off(self):
+        from python.spike_core.contracts import AnalysisResult
+
+        def runner(_design, _spec):
+            return AnalysisResult(status="completed", mode="dc", summary={
+                "max_voltage_drop_v": 0.01,
+                "max_load_voltage_drop_v": 0.01,
+                "total_copper_loss_w": 0.01,
+                "total_load_current_a": 1,
+                "p95_current_density_a_mm2": 2,
+                "node_count": 100,
+                "edge_count": 200,
+            })
+
+        report = run_mesh_convergence(self.design, self.spec, runner)
+        self.assertEqual(report["status"], "failed_to_converge")
+        growth = next(item for item in report["comparisons"] if item["metric"] == "resolved_mesh_growth")
+        self.assertEqual(growth["status"], "failed")
+
+    def test_failed_later_level_revokes_earlier_convergence(self):
+        from python.spike_core.contracts import AnalysisResult
+        calls = 0
+
+        def runner(_design, _spec):
+            nonlocal calls
+            calls += 1
+            if calls == 4:
+                return AnalysisResult(status="failed", mode="dc", summary={})
+            return AnalysisResult(status="completed", mode="dc", summary={
+                "max_voltage_drop_v": 0.01,
+                "max_load_voltage_drop_v": 0.01,
+                "total_copper_loss_w": 0.01,
+                "total_load_current_a": 1,
+                "p95_current_density_a_mm2": 2,
+                "node_count": calls * 100,
+                "edge_count": calls * 200,
+            })
+
+        report = run_mesh_convergence(
+            self.design, self.spec, runner,
+            levels=[2, 1, 0.5, 0.25], stop_when_converged=False,
+        )
+        self.assertEqual(report["status"], "failed_to_converge")
+        self.assertFalse(report["can_sign_off"])
+        self.assertEqual(len(report["comparison_history"]), 2)
+        self.assertEqual(report["levels"][-1]["status"], "failed")
+
+    def test_missing_required_density_is_unavailable_for_signoff(self):
+        from python.spike_core.contracts import AnalysisResult
+        calls = 0
+
+        def runner(_design, _spec):
+            nonlocal calls
+            calls += 1
+            return AnalysisResult(status="completed", mode="dc", summary={
+                "max_load_voltage_drop_v": 0.01,
+                "max_voltage_drop_v": 0.01,
+                "total_copper_loss_w": 0.01,
+                "total_load_current_a": 1,
+                "max_current_density_a_mm2": 2,
+                "node_count": calls * 100,
+                "edge_count": calls * 200,
+            })
+
+        report = run_mesh_convergence(self.design, self.spec, runner)
+        density = next(item for item in report["comparisons"] if item["metric"] == "p95_current_density_a_mm2")
+        self.assertEqual(density["status"], "unavailable")
+        self.assertFalse(report["can_sign_off"])
+
+    def test_completed_unsupported_result_cannot_sign_off(self):
+        from python.spike_core.contracts import AnalysisResult
+        calls = 0
+
+        def runner(_design, _spec):
+            nonlocal calls
+            calls += 1
+            return AnalysisResult(status="completed", model_status="unsupported", mode="dc", summary={
+                "max_load_voltage_drop_v": 0.01,
+                "total_copper_loss_w": 0.01,
+                "total_load_current_a": 1,
+                "p95_current_density_a_mm2": 2,
+                "node_count": calls * 100,
+                "edge_count": calls * 200,
+            })
+
+        report = run_mesh_convergence(self.design, self.spec, runner)
+        self.assertEqual(len(report["levels"]), 1)
+        self.assertFalse(report["can_sign_off"])
 
 
 if __name__ == "__main__":

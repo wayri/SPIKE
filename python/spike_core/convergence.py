@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from math import isfinite
 from typing import Any, Callable, Dict, Iterable, List
 
 from .contracts import AnalysisResult, AnalysisSpec, DesignIR, ValidationIssue
@@ -36,18 +37,12 @@ def _metrics(result: AnalysisResult) -> Dict[str, float]:
     values: Dict[str, float] = {}
     for key in set(DC_METRICS) | set(DC_ADVISORY_METRICS) | set(AC_METRICS):
         value = summary.get(key)
-        if isinstance(value, (int, float)):
+        if isinstance(value, (int, float)) and isfinite(value):
             values[key] = float(value)
     load_current = float(summary.get("total_load_current_a", 0) or 0)
     copper_loss = float(summary.get("total_copper_loss_w", 0) or 0)
-    if load_current > 0 and copper_loss >= 0:
+    if isfinite(load_current) and isfinite(copper_loss) and load_current > 0 and copper_loss >= 0:
         values["effective_path_resistance_ohm"] = copper_loss / (load_current * load_current)
-    # Older solver plugins only publish the raw peak. Keep them compatible while
-    # native solvers migrate to the robust, volume-weighted hotspot metric.
-    if "p95_current_density_a_mm2" not in values and "max_current_density_a_mm2" in values:
-        values["p95_current_density_a_mm2"] = values["max_current_density_a_mm2"]
-    if "max_load_voltage_drop_v" not in values and "max_voltage_drop_v" in values:
-        values["max_load_voltage_drop_v"] = values["max_voltage_drop_v"]
     return values
 
 
@@ -109,6 +104,29 @@ def _level_spec(spec: AnalysisSpec, factor: float, index: int) -> AnalysisSpec:
     )
 
 
+def _refinement_comparison(previous: Dict[str, Any], current: Dict[str, Any]) -> Dict[str, Any]:
+    """Check that changing the requested cell size refined the solved network."""
+    counts = ("node_count", "edge_count")
+    before = {key: previous.get(key) for key in counts}
+    after = {key: current.get(key) for key in counts}
+    available = all(
+        isinstance(before[key], int) and isinstance(after[key], int)
+        and before[key] > 0 and after[key] > 0
+        for key in counts
+    )
+    passed = available and all(after[key] >= before[key] for key in counts) and any(
+        after[key] > before[key] for key in counts
+    )
+    return {
+        "metric": "resolved_mesh_growth",
+        "coarse_value": before,
+        "fine_value": after,
+        "required": True,
+        "status": "passed" if passed else "failed" if available else "unavailable",
+        "meaning": "the finer solve must contain more resolved nodes or branches without losing either count",
+    }
+
+
 def run_mesh_convergence(
     design: DesignIR,
     spec: AnalysisSpec,
@@ -165,6 +183,7 @@ def run_mesh_convergence(
     level_records: List[Dict[str, Any]] = []
     final_result: AnalysisResult | None = None
     comparisons: List[Dict[str, Any]] = []
+    comparison_history: List[Dict[str, Any]] = []
     converged = False
     for index, factor in enumerate(factors):
         level_spec = _level_spec(spec, factor, index)
@@ -183,9 +202,13 @@ def run_mesh_convergence(
             "edge_count": result.summary.get("edge_count", result.summary.get("filament_count")),
             "issues": [issue.__dict__ for issue in result.issues if issue.severity == "error"],
         })
-        if result.status != "completed":
+        if result.status != "completed" or result.model_status not in {
+            "approximate", "validated", "reference_validated"
+        } or any(issue.severity == "error" for issue in result.issues):
+            converged = False
+            comparisons = []
             break
-        if len(level_records) >= minimum_levels:
+        if len(level_records) >= 2:
             previous, current = level_records[-2], level_records[-1]
             required = [
                 _comparison(
@@ -198,6 +221,7 @@ def run_mesh_convergence(
                 )
                 for metric, threshold in thresholds.items()
             ]
+            required.append(_refinement_comparison(previous, current))
             advisory = [
                 _comparison(
                     metric,
@@ -210,7 +234,15 @@ def run_mesh_convergence(
                 for metric, threshold in advisory_thresholds.items()
             ]
             comparisons = required + advisory
-            converged = all(item["status"] == "passed" for item in required)
+            comparison_history.append({
+                "coarse_level_index": previous["index"],
+                "fine_level_index": current["index"],
+                "signoff_eligible": len(level_records) >= minimum_levels,
+                "comparisons": comparisons,
+            })
+            converged = len(level_records) >= minimum_levels and all(
+                item["status"] == "passed" for item in required
+            )
             if converged and stop_when_converged:
                 break
 
@@ -241,16 +273,13 @@ def run_mesh_convergence(
         suggestion="" if converged else "Inspect the per-metric deltas and the fine-grid solver issues.",
         status="validated" if converged else "failed_to_converge",
     )
-    stale_codes = {"HYBRID_COPPER_DISCRETIZATION_APPROXIMATE", "COPPER_DISCRETIZATION_APPROXIMATE"}
-    if converged:
-        final_result.issues = [issue for issue in final_result.issues if issue.code not in stale_codes]
     final_result.issues.append(convergence_issue)
     final_result.summary = {
         **final_result.summary,
         "mesh_convergence_status": "passed" if converged else "failed_to_converge",
         "mesh_convergence_levels": len(level_records),
         "mesh_convergence_max_relative_delta": max(
-            (float(item["relative_delta"]) for item in comparisons if item["required"] and item["relative_delta"] is not None),
+            (float(item["relative_delta"]) for item in comparisons if item["required"] and item.get("relative_delta") is not None),
             default=None,
         ),
         "mesh_convergence_peak_density_advisory": peak_comparison["status"] if peak_comparison else "unavailable",
@@ -268,6 +297,7 @@ def run_mesh_convergence(
             "minimum_levels": minimum_levels,
             "adaptive_stop": bool(stop_when_converged),
             "comparisons": comparisons,
+            "comparison_history": comparison_history,
         },
     }
     return {
@@ -277,6 +307,7 @@ def run_mesh_convergence(
         "mode": spec.mode,
         "levels": level_records,
         "comparisons": comparisons,
+        "comparison_history": comparison_history,
         "thresholds": thresholds,
         "advisory_thresholds": advisory_thresholds,
         "absolute_thresholds": absolute_thresholds,
