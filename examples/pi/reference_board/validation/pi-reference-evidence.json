@@ -1,0 +1,277 @@
+{
+  "analysis_status": "approximate",
+  "board": "examples/pi/reference_board/spike-pi-reference.kicad_pcb",
+  "board_license": "MIT",
+  "board_sha256": "50c716920c4989a1b7b89c1d3c15b1822b9586f42370e99150fffc0052a83d64",
+  "checks": [
+    {
+      "evidence": {
+        "counts": {
+          "components": 8,
+          "nets": 4,
+          "pads": 12,
+          "stackup": 3,
+          "tracks": 6,
+          "vias": 2,
+          "zones": 2
+        },
+        "valid": true
+      },
+      "name": "kicad_import_and_design",
+      "scope": "Original synthetic KiCad file; exact object census and importer validation.",
+      "status": "passed",
+      "verification_level": "structural"
+    },
+    {
+      "evidence": {
+        "branch_count": 26,
+        "can_solve": true,
+        "cell_count": 38,
+        "preview_contract": "spike/mesh/v3"
+      },
+      "name": "preflight_and_hybrid_mesh",
+      "scope": "Trace, pad, filled zone, and plated-via geometry is admitted to the PI mesh.",
+      "status": "passed",
+      "verification_level": "structural"
+    },
+    {
+      "evidence": {
+        "ac_samples": 0,
+        "error_codes": [],
+        "geometry_counts": {
+          "contact": 0,
+          "pad": 3,
+          "track": 2,
+          "via": 0,
+          "zone": 0
+        },
+        "model_status": "approximate",
+        "status": "completed"
+      },
+      "name": "vin_dc",
+      "scope": "Board-derived result; an approximate model, not measured accuracy evidence.",
+      "status": "passed",
+      "verification_level": "execution_and_invariants"
+    },
+    {
+      "evidence": {
+        "ac_samples": 0,
+        "error_codes": [],
+        "geometry_counts": {
+          "contact": 0,
+          "pad": 4,
+          "track": 3,
+          "via": 2,
+          "zone": 1
+        },
+        "model_status": "approximate",
+        "status": "completed"
+      },
+      "name": "vload_dc",
+      "scope": "Board-derived result; an approximate model, not measured accuracy evidence.",
+      "status": "passed",
+      "verification_level": "execution_and_invariants"
+    },
+    {
+      "evidence": {
+        "ac_samples": 0,
+        "error_codes": [],
+        "geometry_counts": {
+          "contact": 0,
+          "pad": 2,
+          "track": 1,
+          "via": 0,
+          "zone": 0
+        },
+        "model_status": "approximate",
+        "status": "completed"
+      },
+      "name": "vaux_dc",
+      "scope": "Board-derived result; an approximate model, not measured accuracy evidence.",
+      "status": "passed",
+      "verification_level": "execution_and_invariants"
+    },
+    {
+      "evidence": {
+        "ac_samples": 3,
+        "error_codes": [],
+        "geometry_counts": {
+          "pad": 3,
+          "track": 2,
+          "via": 0,
+          "zone": 0
+        },
+        "model_status": "approximate",
+        "status": "completed"
+      },
+      "name": "vin_ac",
+      "scope": "Board-derived result; an approximate model, not measured accuracy evidence.",
+      "status": "passed",
+      "verification_level": "execution_and_invariants"
+    },
+    {
+      "evidence": {
+        "ac_samples": 3,
+        "error_codes": [],
+        "geometry_counts": {
+          "pad": 4,
+          "track": 3,
+          "via": 2,
+          "zone": 1
+        },
+        "model_status": "approximate",
+        "status": "completed"
+      },
+      "name": "vload_ac",
+      "scope": "Board-derived result; an approximate model, not measured accuracy evidence.",
+      "status": "passed",
+      "verification_level": "execution_and_invariants"
+    },
+    {
+      "evidence": {
+        "ac_samples": 3,
+        "error_codes": [],
+        "geometry_counts": {
+          "pad": 2,
+          "track": 1,
+          "via": 0,
+          "zone": 0
+        },
+        "model_status": "approximate",
+        "status": "completed"
+      },
+      "name": "vaux_ac",
+      "scope": "Board-derived result; an approximate model, not measured accuracy evidence.",
+      "status": "passed",
+      "verification_level": "execution_and_invariants"
+    },
+    {
+      "evidence": {
+        "computed_ohm": 0.02156623782415934,
+        "expected_ohm": 0.02155172413793104,
+        "relative_error": 0.0006734350409931476,
+        "tolerance": 0.02
+      },
+      "name": "vaux_dc_closed_form",
+      "scope": "R=L/(sigma*w*t) for a 35 mm x 0.8 mm x 35 um straight copper trace; pads add contact geometry.",
+      "status": "passed",
+      "verification_level": "analytical_reference"
+    },
+    {
+      "evidence": {
+        "copper_loss_w": 0.000215662378244027,
+        "current_times_load_drop_w": 0.0002156623782415934,
+        "relative_error": 1.1284305664139936e-11,
+        "tolerance": 0.01
+      },
+      "name": "dc_power_balance",
+      "scope": "Passive single-net DC path with one 0.1 A load.",
+      "status": "passed",
+      "verification_level": "conservation"
+    },
+    {
+      "evidence": {
+        "level_count": 3,
+        "status": "passed"
+      },
+      "name": "vaux_dc_convergence",
+      "scope": "Three ordered refinement levels under the solver's unchanged required tolerances.",
+      "status": "passed",
+      "verification_level": "mesh_refinement"
+    },
+    {
+      "evidence": {
+        "level_count": 3,
+        "status": "passed"
+      },
+      "name": "vload_dc_convergence",
+      "scope": "Three ordered refinement levels under the solver's unchanged required tolerances.",
+      "status": "passed",
+      "verification_level": "mesh_refinement"
+    },
+    {
+      "evidence": {
+        "compile": "ready",
+        "relative_residual_max": 3.9189341560131046e-14,
+        "run": "completed",
+        "series_resistance_ohm": [
+          0.1
+        ],
+        "validation": true
+      },
+      "name": "reviewed_series_path_ac",
+      "scope": "Actual board-derived PEEC rail networks joined only at explicit R1 pads; no spatial circuit field is inferred.",
+      "status": "passed",
+      "verification_level": "reviewed_circuit_and_residual"
+    },
+    {
+      "evidence": {
+        "port_ids": [
+          "load",
+          "C2-placed",
+          "C3-dnp"
+        ]
+      },
+      "name": "pdn_board_multiport",
+      "scope": "One observation port and two reviewed capacitor sites on the synthetic VLOAD rail.",
+      "status": "passed",
+      "verification_level": "board_extraction_invariants"
+    },
+    {
+      "evidence": {
+        "search_status": "exhaustive",
+        "source_model_status": "approximate",
+        "target_ohm": 0.05,
+        "worst_target_ratios": {
+          "C2-placed": 0.26623117674065594,
+          "C3-dnp": 0.24493488847911823
+        }
+      },
+      "name": "placed_vs_dnp_cap_sensitivity",
+      "scope": "Equal nominal 47 uF/8 mOhm/0.6 nH parts at C2 (placed) and C3 (DNP); ranking is model sensitivity, not an operating-board optimum.",
+      "status": "passed",
+      "verification_level": "bounded_sensitivity"
+    },
+    {
+      "evidence": {
+        "relative_error": 6.856592385534563e-16,
+        "tolerance": 1e-10
+      },
+      "name": "pdn_loading_independent_nodal_reference",
+      "scope": "17-frequency two-node nodal re-solve validates capacitor loading algebra, not PCB extraction accuracy.",
+      "status": "passed",
+      "verification_level": "analytical_reference"
+    },
+    {
+      "evidence": {
+        "job_count": 3,
+        "modes": [
+          "dc",
+          "dc",
+          "ac"
+        ],
+        "status": "completed"
+      },
+      "name": "multinet_batch_and_portable_report",
+      "scope": "Repeated independent net requests compiled into a versioned PI-only batch report.",
+      "status": "passed",
+      "verification_level": "result_contract"
+    }
+  ],
+  "contract": "spike/pi-reference-evidence/v1",
+  "copyright": "Yawar Badri",
+  "limits": [
+    "Synthetic board and nominal copper/FR4/capacitor parameters; no measured hardware correlation.",
+    "AC quasi-static PEEC results are approximate and retain their result-level validity limits.",
+    "Placed-versus-DNP capacitor comparison assumes equal nominal parts and ideal common return reference.",
+    "This example does not resolve Marble or MODULAR-BUS-NIB AC passivity and convergence failures.",
+    "A knowledgeable human must review numerical models before release promotion."
+  ],
+  "native_peec_sha256": "3e50846def9cc383a12f7482e8b0b02bb47645c6082e06c11d9067f1e0219829",
+  "release_validated": false,
+  "solver_ids": [
+    "spike-hybrid-dc/v4",
+    "spike-peec-native/v0.4"
+  ],
+  "status": "passed"
+}

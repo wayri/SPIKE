@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8"><title>SPIKE PI Batch Report</title>
+<style>body{font:14px Arial;color:#243038;margin:40px}h1{color:#9a6416}table{border-collapse:collapse;width:100%;margin:12px 0 28px}th,td{border:1px solid #ccd5d9;padding:7px;text-align:left;vertical-align:top}th{background:#e8eef0}pre{background:#f3f5f6;padding:16px;overflow:auto}</style></head>
+<body><h1>SPIKE Power Integrity Batch Report</h1>
+<p>Numerical and validity states are reproduced per job. Incomplete jobs remain visible and are not promoted.</p>
+<h2>Batch Summary</h2><pre>{
+  &quot;requested&quot;: 3,
+  &quot;completed&quot;: 3,
+  &quot;blocked&quot;: 0,
+  &quot;failed&quot;: 0,
+  &quot;cancelled&quot;: 0,
+  &quot;not_run&quot;: 0,
+  &quot;dc_jobs&quot;: 2,
+  &quot;ac_jobs&quot;: 1,
+  &quot;total_power_loss_w&quot;: 0.0002896991407171693,
+  &quot;issue_count&quot;: 11
+}</pre>
+<h2>Analysis Jobs</h2><table><tr><th>Job</th><th>Mode</th><th>Nets</th><th>Status</th><th>Model</th><th>Solver</th><th>impedance_max_ohm</th><th>impedance_min_ohm</th><th>max_current_density_a_mm2</th><th>max_voltage_drop_v</th><th>total_copper_loss_w</th></tr><tr><td>vin_dc</td><td>dc</td><td>VIN</td><td>completed</td><td>approximate</td><td>spike-hybrid-dc/v4</td><td></td><td></td><td>2.857142857141114</td><td>0.000741818993342247</td><td>7.403676247314226e-05</td></tr><tr><td>vaux_dc</td><td>dc</td><td>VAUX</td><td>completed</td><td>approximate</td><td>spike-hybrid-dc/v4</td><td></td><td></td><td>3.5714285714831053</td><td>0.0021580751510145157</td><td>0.000215662378244027</td></tr><tr><td>vload_ac</td><td>ac</td><td>VLOAD</td><td>completed</td><td>approximate</td><td>spike-peec-native/v0.4</td><td>0.012045687588600798</td><td>0.009126754240853109</td><td></td><td></td><td></td></tr></table>
+<h2>Issues</h2><table><tr><th>Job</th><th>Severity</th><th>Code</th><th>Message</th></tr><tr><td>vin_dc</td><td>warning</td><td>SPIKE-BE-PI-W-0004</td><td>Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.</td></tr><tr><td>vin_dc</td><td>warning</td><td>SPIKE-BE-PI-W-0004</td><td>Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.</td></tr><tr><td>vin_dc</td><td>warning</td><td>SPIKE-BE-PI-W-0005</td><td>No terminal package/contact resistance was assigned.</td></tr><tr><td>vaux_dc</td><td>warning</td><td>SPIKE-BE-PI-W-0004</td><td>Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.</td></tr><tr><td>vaux_dc</td><td>warning</td><td>SPIKE-BE-PI-W-0004</td><td>Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.</td></tr><tr><td>vaux_dc</td><td>warning</td><td>SPIKE-BE-PI-W-0005</td><td>No terminal package/contact resistance was assigned.</td></tr><tr><td>vload_ac</td><td>warning</td><td>PEEC_TOPOLOGY_FIELD_EXCLUDED</td><td>Excluded 13 graph-only link(s) from the unsupported filament L/C model while retaining their mesh resistance in the circuit solve.</td></tr><tr><td>vload_ac</td><td>warning</td><td>SPIKE-BE-PI-W-0101</td><td>PDN candidate ports use the explicit source terminal as an ideal common reference; return-path impedance and multiconductor capacitance are not included.</td></tr><tr><td>vload_ac</td><td>warning</td><td>PEEC_RLCG_EXTRACTION_EXPERIMENTAL</td><td>R and partial L are extracted from the hybrid conductor mesh. C and dielectric G use a bounded single-reference stackup estimate and are not a multiconductor electrostatic field solve.</td></tr><tr><td>vload_ac</td><td>warning</td><td>PEEC_CAPACITANCE_APPROXIMATE</td><td>Estimated 1.48829 pF across 13 planar mesh branches; 2 via/barrel branches were excluded.</td></tr><tr><td>vload_ac</td><td>warning</td><td>VIA_PLATING_ASSUMPTION</td><td>Via barrels without fabrication plating data use 0.025 mm plating.</td></tr></table>
+<h2>Provenance</h2><pre>{
+  &quot;source_contract&quot;: &quot;spike/analysis-batch-result/v1&quot;,
+  &quot;source_status&quot;: &quot;completed&quot;,
+  &quot;aggregation&quot;: &quot;spike.pi_batch_report&quot;,
+  &quot;aggregation_version&quot;: 1
+}</pre></body></html>

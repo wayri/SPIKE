@@ -142,7 +142,10 @@ def validate_pi_path(path: Dict[str, Any], design: DesignIR, mode: str = "dc") -
         if _net(input_pad) != _text(before.get("net")) or _net(output_pad) != _text(after.get("net")):
             issues.append(_issue("PI_PATH_TRANSITION_NET_MISMATCH", "Transition pads do not terminate on the declared adjacent nets.", path_key))
         reference = _text(transition.get("component_ref"))
-        if reference and (_text(input_pad.get("ref")) != reference or _text(output_pad.get("ref")) != reference):
+        # DesignIR fixtures use ``ref``; KiCad import records the owner as ``component``.
+        input_ref = _text(input_pad.get("ref") or input_pad.get("component"))
+        output_ref = _text(output_pad.get("ref") or output_pad.get("component"))
+        if reference and (input_ref != reference or output_ref != reference):
             issues.append(_issue("PI_PATH_TRANSITION_COMPONENT_MISMATCH", "Both transition pads must belong to the declared series component.", path_key))
         model = transition.get("model") if isinstance(transition.get("model"), dict) else {}
         primitive = _text(model.get("primitive") or model.get("type")).lower()
