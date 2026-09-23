@@ -69,6 +69,19 @@ resource rejection. These terminal coordinates are not yet bound to exact pad
 IDs in the request, so a refinement-dependent terminal snap remains a possible
 cause of the voltage-drop jump and requires a controlled anchored rerun.
 
+An exact-pad anchored diagnostic completed the first three levels before its
+fourth level was stopped for a terminal-model repair. Its source-to-load checks
+identified the intended R19.3 and J14/J20/J15.2 pads and balanced 10 A, but
+the maximum load drop still moved 2.844 to 3.194 to 1.754 mV while copper
+loss moved 27.664 to 22.122 to 16.284 mW. The old pad boundary included
+zone-side endpoints of pad-to-zone links, so `validated` terminal identities
+did not establish a physically bounded contact. A separate mesh check also
+found that the unanchored request placed all three J loads on single zone
+nodes at the 0.5 factor. The
+[incomplete anchored checkpoint](modular-bus-nib-pinned-dc-convergence-anchored-pre-repair-incomplete.json)
+is diagnostic only and cannot sign off. Physical pad-boundary and pad-to-zone
+topology repairs require a new four-level study.
+
 The reported peak current density of 95.56 A/mm2 is at the idealized R19 source
 injection element. This is a terminal singularity/model artifact and must not be
 reported as a physical board hotspot until contact area and package geometry are
