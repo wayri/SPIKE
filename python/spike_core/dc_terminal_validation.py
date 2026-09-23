@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from math import isfinite
 from typing import Any, Dict, List
 
 import numpy as np
@@ -18,12 +19,20 @@ def terminal_anchor_id(item: Dict[str, Any]) -> str:
     return str(anchor.get("id", "")) if isinstance(anchor, dict) else str(item.get("geometry_anchor_id", ""))
 
 
-def terminal_copper_nodes(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, Any], exact: bool) -> List[int]:
+def terminal_copper_weights(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, Any], exact: bool) -> Dict[int, float]:
+    """Map a pad contact to its physical area, excluding topology attachments.
+
+    For uniform normal current density, I_i = I A_i/A. A distributed contact
+    with lumped resistance R has conductance G_i = A_i/(R A) in siemens.
+    Subdividing a cell therefore preserves current and contact conductance.
+    These weights also define the power-conjugate terminal voltage sum(w_i V_i).
+    Pad cell areas are in mm^2; their normalized ratios are dimensionless.
+    """
     net = terminal_net(spec, item)
     anchor = item.get("geometry_anchor")
     anchor_id = terminal_anchor_id(item)
     if exact and not anchor_id:
-        return []
+        return {}
     if anchor_id:
         layer = str(item.get("layer", ""))
         anchor_type = str(anchor.get("type", "")) if isinstance(anchor, dict) else ""
@@ -34,7 +43,7 @@ def terminal_copper_nodes(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, 
             "zone": {"zone", "zone_attachment"},
         }.get(anchor_type)
         if exact and anchor_type and allowed_kinds is None:
-            return []
+            return {}
         matching = [
             branch for branch in mesh.branches
             if branch.source_id == anchor_id
@@ -43,10 +52,10 @@ def terminal_copper_nodes(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, 
             and (allowed_kinds is None or branch.kind in allowed_kinds)
         ]
         if not matching:
-            return []
+            return {}
     primary = nearest_mesh_node(mesh, item, net)
     if primary is None:
-        return []
+        return {}
     pad_kinds = {"pad", "pad_attachment", "pad_zone_attachment", "pad_barrel"}
     source_ids = {
         branch.source_id
@@ -55,9 +64,43 @@ def terminal_copper_nodes(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, 
         and (branch.source_id == anchor_id if anchor_id else branch.kind in pad_kinds)
     }
     if not source_ids:
-        return [primary]
+        return {primary: 1.0}
     primary_layer = mesh.nodes[primary].layer
     layer_scope = str(item.get("layer_scope", "single" if item.get("layer") else "connected_conductor"))
+    pad_cells = [
+        cell for cell in mesh.cells
+        if exact and anchor_type == "pad"
+        and cell.get("source_kind") == "pad" and cell.get("source_id") in source_ids
+        and cell.get("net") == net
+        and (layer_scope != "single" or cell.get("layer") == primary_layer)
+    ]
+    if exact and anchor_id and anchor_type == "pad" and not pad_cells:
+        return {}
+    if pad_cells:
+        areas: Dict[int, float] = {}
+        for cell in pad_cells:
+            node_id = cell.get("node_id")
+            # Missing ownership cannot be repaired by including attachment ends:
+            # those can be zone nodes outside the physical pad surface.
+            if not isinstance(node_id, int) or not 0 <= node_id < len(mesh.nodes):
+                return {}
+            node = mesh.nodes[node_id]
+            if node.net != cell.get("net") or node.layer != cell.get("layer"):
+                return {}
+            try:
+                vertices = cell["vertices_mm"]
+                origin = vertices[0]
+                xy = [(float(point[0]) - float(origin[0]), float(point[1]) - float(origin[1])) for point in vertices]
+                if len(xy) < 3 or not all(isfinite(value) for point in xy for value in point):
+                    return {}
+                area = abs(sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(xy, xy[1:] + xy[:1]))) / 2
+            except (KeyError, TypeError, ValueError, IndexError, OverflowError):
+                return {}
+            if not isfinite(area) or area <= 0:
+                return {}
+            areas[node_id] = areas.get(node_id, 0.0) + area
+        total_area = sum(areas.values())
+        return {node: area / total_area for node, area in sorted(areas.items())} if isfinite(total_area) and total_area > 0 else {}
     nodes = {
         node_id
         for branch in mesh.branches
@@ -66,7 +109,18 @@ def terminal_copper_nodes(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, 
         if mesh.nodes[node_id].net == net
         and (layer_scope != "single" or mesh.nodes[node_id].layer == primary_layer)
     }
-    return sorted(nodes) or [primary]
+    nodes = sorted(nodes) or [primary]
+    return {node: 1.0 / len(nodes) for node in nodes}
+
+
+def terminal_copper_nodes(mesh: HybridMesh, spec: AnalysisSpec, item: Dict[str, Any], exact: bool) -> List[int]:
+    return list(terminal_copper_weights(mesh, spec, item, exact))
+
+
+def terminal_boundary_voltage(record: Dict[str, Any], voltage: np.ndarray) -> float:
+    nodes = record.get("boundary_nodes", [record["node"]])
+    weights = record.get("boundary_weights", [1.0 / len(nodes)] * len(nodes))
+    return float(sum(float(voltage[node]) * weight for node, weight in zip(nodes, weights)))
 
 
 def build_source_to_load_evidence(
@@ -80,8 +134,7 @@ def build_source_to_load_evidence(
 ) -> Dict[str, Any]:
     """Return signed terminal voltages, path drops, and KCL diagnostics."""
     def boundary_voltage(record: Dict[str, Any]) -> float:
-        nodes = record.get("boundary_nodes", [record["node"]])
-        return float(sum(float(voltage[node]) for node in nodes) / max(len(nodes), 1))
+        return terminal_boundary_voltage(record, voltage)
 
     supply_records = [item for item in source_records if item["role"] != "source_return"]
     return_records = [item for item in source_records if item["role"] == "source_return"]

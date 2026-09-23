@@ -25,7 +25,8 @@ from .dc_result_utils import (
 from .dc_terminal_validation import (
     build_source_to_load_evidence,
     terminal_anchor_id,
-    terminal_copper_nodes,
+    terminal_copper_weights,
+    terminal_boundary_voltage,
 )
 from .hybrid_mesh import HybridMesh, build_hybrid_mesh, nearest_mesh_node
 from .pi_path_dc import stamp_pi_path_interfaces
@@ -107,19 +108,19 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
 
     issues.extend(stamp_pi_path_interfaces(mesh, design, spec, node_positions, edges))
 
-    def attach_contact(copper_nodes: List[int], resistance: float, item_id: str, kind: str) -> List[int]:
+    def attach_contact(copper_weights: Dict[int, float], resistance: float, item_id: str, kind: str) -> Dict[int, float]:
         nonlocal contact_count
         if resistance <= 0:
-            return copper_nodes
-        copper_node = copper_nodes[0]
+            return copper_weights
+        copper_node = next(iter(copper_weights))
         x, y, layer = node_positions[copper_node]
         floating = len(node_positions)
         node_positions.append((x, y, layer))
         node_nets.append(node_nets[copper_node])
-        # N equal branches of N*R preserve the requested equivalent contact
-        # resistance while distributing current across the terminal pad area.
-        branch_resistance = resistance * len(copper_nodes)
-        for index, copper_node in enumerate(copper_nodes):
+        # Parallel conductances sum to 1/R under cell subdivision; surface
+        # fractions, not the count of mesh and attachment nodes, set the measure.
+        for index, (copper_node, weight) in enumerate(copper_weights.items()):
+            branch_resistance = resistance / weight
             cx, cy, copper_layer = node_positions[copper_node]
             a, b = (floating, copper_node) if kind == "source" else (copper_node, floating)
             edges.append({
@@ -144,10 +145,10 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
                 "current_density_supported": False,
             })
             contact_count += 1
-        return [floating]
+        return {floating: 1.0}
 
     for index, source in enumerate(spec.sources):
-        coppers = terminal_copper_nodes(mesh, spec, source, exact_terminals)
+        coppers = terminal_copper_weights(mesh, spec, source, exact_terminals)
         if not coppers:
             source_id = str(source.get("id", index + 1))
             issues.append(ValidationIssue("SPIKE-BE-PI-E-0001", "error", f"Source {source_id} could not snap to selected copper.", path=f"analysis.sources[{source_id}]", suggestion="Assign the source to an exact copper object on the analyzed net."))
@@ -161,31 +162,32 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         source_records.append({
             "id": str(source.get("id", index + 1)),
             "geometry_anchor_id": terminal_anchor_id(source),
-            "node": terminals[0],
-            "boundary_nodes": terminals,
-            "net": node_nets[terminals[0]],
+            "node": next(iter(terminals)),
+            "boundary_nodes": list(terminals),
+            "boundary_weights": list(terminals.values()),
+            "net": node_nets[next(iter(terminals))],
             "voltage_v": source_voltage,
             "role": str(source.get("terminal_role", "source_positive")),
             "domain_id": str(source.get("domain_id", "default")),
         })
 
     for index, load in enumerate(spec.loads):
-        coppers = terminal_copper_nodes(mesh, spec, load, exact_terminals)
+        coppers = terminal_copper_weights(mesh, spec, load, exact_terminals)
         if not coppers:
             load_id = str(load.get("id", index + 1))
             issues.append(ValidationIssue("SPIKE-BE-PI-E-0001", "error", f"Load {load_id} could not snap to selected copper.", path=f"analysis.loads[{load_id}]", suggestion="Assign the load to an exact copper object on the analyzed net."))
             continue
         terminals = attach_contact(coppers, terminal_resistance(load, spec), str(load.get("id", index + 1)), "load")
         load_current = float(load.get("current_a", load.get("current", 0)))
-        current_per_node = load_current / len(terminals)
-        for terminal in terminals:
-            load_nodes[terminal] = load_nodes.get(terminal, 0.0) + current_per_node
+        for terminal, weight in terminals.items():
+            load_nodes[terminal] = load_nodes.get(terminal, 0.0) + load_current * weight
         load_records.append({
             "id": str(load.get("id", index + 1)),
             "geometry_anchor_id": terminal_anchor_id(load),
-            "node": terminals[0],
-            "boundary_nodes": terminals,
-            "net": node_nets[terminals[0]],
+            "node": next(iter(terminals)),
+            "boundary_nodes": list(terminals),
+            "boundary_weights": list(terminals.values()),
+            "net": node_nets[next(iter(terminals))],
             "current_a": load_current,
             "role": str(load.get("terminal_role", "load_positive")),
             "pair_id": str(load.get("pair_id", load.get("id", index + 1))),
@@ -364,12 +366,12 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         return abs(reference - float(voltage[node]))
 
     def boundary_voltage(record: Dict[str, Any]) -> float:
-        nodes = record.get("boundary_nodes", [record["node"]])
-        return float(sum(float(voltage[node]) for node in nodes) / max(len(nodes), 1))
+        return terminal_boundary_voltage(record, voltage)
 
     def boundary_drop(record: Dict[str, Any]) -> float:
         nodes = record.get("boundary_nodes", [record["node"]])
-        return float(sum(node_drop(node) for node in nodes) / max(len(nodes), 1))
+        weights = record.get("boundary_weights", [1.0 / len(nodes)] * len(nodes))
+        return float(sum(node_drop(node) * weight for node, weight in zip(nodes, weights)))
 
     supply_nets = {item["net"] for item in supply_records}
     return_nets = {item["net"] for item in return_records}
@@ -429,7 +431,7 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
     total_copper_loss = sum(
         edge["power_loss_w"]
         for edge in active_edges
-        if edge.get("kind") != "series_component"
+        if edge.get("kind") not in {"series_component", "contact"}
     )
     net_power_loss_w: dict[str, float] = {}
     layer_power_loss_w: dict[str, float] = {}

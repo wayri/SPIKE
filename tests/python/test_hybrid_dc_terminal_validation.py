@@ -5,9 +5,12 @@ from __future__ import annotations
 import json
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, DesignIR
 from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
+from python.spike_core.dc_terminal_validation import terminal_copper_weights
+from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
 from python.spike_core.kicad_importer import import_kicad_design
 
 
@@ -37,6 +40,104 @@ def _line_spec() -> AnalysisSpec:
 
 
 class HybridDCTerminalValidationTests(unittest.TestCase):
+    @staticmethod
+    def _parallel_contact_mesh(split: bool) -> HybridMesh:
+        # Two parallel copper paths partitioned in the same 1:3 area ratio.
+        # R_i = 0.5 / w_i ohm, so subdivision preserves 0.5 ohm in parallel.
+        weights = [0.25, 0.75] if split else [1.0]
+        mesh = HybridMesh(nodes=[MeshNode(0, 0, 0, 0, "F.Cu", "VCC")])
+        mesh.branches.append(MeshBranch(
+            "source-node", "via", 0, 0, (0, 0, 0), (0, 0, 0),
+            1, 1, 1000, "F.Cu", "VCC", "source-anchor",
+        ))
+        for index, weight in enumerate(weights, 1):
+            mesh.nodes.append(MeshNode(index, index, 0, 0, "F.Cu", "VCC"))
+            mesh.branches.append(MeshBranch(
+                f"copper-{index}", "track", 0, index, (0, 0, 0), (index, 0, 0),
+                index * weight / 0.5, 1, 1000, "F.Cu", "VCC", "copper",
+            ))
+            mesh.cells.append({
+                "id": f"pad-cell-{index}", "kind": "surface",
+                "source_kind": "pad", "source_id": "load-pad", "node_id": index,
+                "layer": "F.Cu", "net": "VCC",
+                "vertices_mm": [[index, 0, 0], [index + weight, 0, 0],
+                                [index + weight, 1, 0], [index, 1, 0]],
+            })
+        mesh.branches.append(MeshBranch(
+            "pad-link", "pad", 1, len(weights), (1, 0, 0), (len(weights), 0, 0),
+            1, 1, 1000, "F.Cu", "VCC", "load-pad",
+        ))
+        return mesh
+
+    def test_pad_area_subdivision_preserves_current_contact_drop_and_energy(self) -> None:
+        for resistance in (0.0, 0.1):
+            for split in (False, True):
+                with self.subTest(contact_resistance=resistance, split=split):
+                    spec = AnalysisSpec(
+                        mode="dc", net_names=["VCC"],
+                        sources=[{"position_mm": [0, 0], "layer": "F.Cu", "voltage_v": 5,
+                                  "geometry_anchor": {"type": "via", "id": "source-anchor"}}],
+                        loads=[{"position_mm": [1, 0], "layer": "F.Cu", "current_a": 1,
+                                "geometry_anchor": {"type": "pad", "id": "load-pad"},
+                                "contact_resistance_ohm": resistance}],
+                        options={"require_exact_terminal_geometry": True},
+                    )
+                    with patch("python.spike_core.hybrid_dc_solver.build_hybrid_mesh",
+                               return_value=self._parallel_contact_mesh(split)):
+                        result = solve_hybrid_dc(DesignIR(), spec)
+                    self.assertEqual(result.status, "completed")
+                    self.assertAlmostEqual(result.summary["max_load_voltage_drop_v"], 0.5 + resistance, places=10)
+                    self.assertAlmostEqual(result.summary["geometry_power_loss_w"]["track"], 0.5, places=10)
+                    self.assertAlmostEqual(result.summary["total_copper_loss_w"], 0.5, places=10)
+                    self.assertAlmostEqual(result.summary["total_network_loss_w"], 0.5 + resistance, places=10)
+                    self.assertAlmostEqual(result.networks["source_to_load"]["source_current_balance_a"], 0, places=10)
+
+    def test_pad_boundary_excludes_zone_attachment_and_requires_cell_ownership(self) -> None:
+        mesh = self._parallel_contact_mesh(True)
+        mesh.nodes.append(MeshNode(3, 4, 0, 0, "F.Cu", "VCC"))
+        mesh.branches.append(MeshBranch(
+            "zone-link", "pad_zone_attachment", 2, 3, (2, 0, 0), (4, 0, 0),
+            1, 1, 1000, "F.Cu", "VCC", "load-pad",
+        ))
+        terminal = {"position_mm": [1, 0], "layer": "F.Cu",
+                    "geometry_anchor": {"type": "pad", "id": "load-pad"}}
+        spec = AnalysisSpec(net_names=["VCC"])
+        self.assertEqual(terminal_copper_weights(mesh, spec, terminal, True), {1: 0.25, 2: 0.75})
+        self.assertEqual(terminal_copper_weights(mesh, spec, terminal, False), {1: 1/3, 2: 1/3, 3: 1/3})
+        del mesh.cells[0]["node_id"]
+        self.assertEqual(terminal_copper_weights(mesh, spec, terminal, True), {})
+        for vertices in ([], [[0, 0]], [[0, 0], [1, 0], [float("nan"), 1]],
+                         [[0, 0], [1, 0], [float("inf"), 1]], [[0, 0], [1, 0], [2, 0]]):
+            with self.subTest(vertices=vertices):
+                mesh.cells[0]["node_id"] = 1
+                mesh.cells[0]["vertices_mm"] = vertices
+                self.assertEqual(terminal_copper_weights(mesh, spec, terminal, True), {})
+        mesh.cells.clear()
+        self.assertEqual(terminal_copper_weights(mesh, spec, terminal, True), {})
+
+    def test_area_weighted_voltage_is_power_conjugate_to_injected_current(self) -> None:
+        mesh = self._parallel_contact_mesh(True)
+        # Both path resistances are now 1 ohm, joined by another 1 ohm pad link.
+        # With sinks 1/4 A and 3/4 A, KCL gives drops 5/12 V and 7/12 V.
+        # The power-conjugate terminal drop is (1/4*5 + 3/4*7)/12 = 13/24 V.
+        for index, branch in enumerate(mesh.branches[1:3], 1):
+            branch.width_mm = index
+        spec = AnalysisSpec(
+            mode="dc", net_names=["VCC"],
+            sources=[{"position_mm": [0, 0], "layer": "F.Cu", "voltage_v": 5,
+                      "geometry_anchor": {"type": "via", "id": "source-anchor"}}],
+            loads=[{"position_mm": [1, 0], "layer": "F.Cu", "current_a": 1,
+                    "geometry_anchor": {"type": "pad", "id": "load-pad"}}],
+            options={"require_exact_terminal_geometry": True},
+        )
+        with patch("python.spike_core.hybrid_dc_solver.build_hybrid_mesh", return_value=mesh):
+            result = solve_hybrid_dc(DesignIR(), spec)
+        expected = 13 / 24
+        self.assertEqual(result.status, "completed")
+        self.assertAlmostEqual(result.summary["max_load_voltage_drop_v"], expected, places=10)
+        self.assertAlmostEqual(result.summary["total_network_loss_w"], expected, places=10)
+        self.assertAlmostEqual(result.networks["source_to_load"]["paths"][0]["supply_drop_v"], expected, places=10)
+
     def test_exact_terminals_report_signed_solved_drop_and_current_balance(self) -> None:
         result = solve_hybrid_dc(_line_design(), _line_spec())
         self.assertEqual(result.status, "completed")
