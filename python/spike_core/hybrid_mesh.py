@@ -1951,7 +1951,8 @@ class _Builder:
                         if local is None:
                             continue
                         point = _pad_local_to_world(pad, *local)
-                        grid[(side, radial)] = self.node(point, layer, net)
+                        node_id = self.node(point, layer, net)
+                        grid[(side, radial)] = node_id
                         corners = [_pad_local_to_world(pad, x, y) for x, y in local_corners]
                         self.add_cell(
                             f"{source_id}:{layer}:annulus:{radial}:{side}",
@@ -1960,6 +1961,7 @@ class _Builder:
                             layer,
                             net,
                             [(x, y, z) for x, y in corners],
+                            metadata={"node_id": node_id},
                         )
                     if grid:
                         side_count = max(side for side, _ in grid) + 1
@@ -2037,7 +2039,8 @@ class _Builder:
                                         continue
                                     point = _pad_local_to_world(pad, *local)
                                     key = (column, row)
-                                    custom_grid.setdefault(key, []).append(self.zone_node(point, layer, net))
+                                    node_id = self.zone_node(point, layer, net)
+                                    custom_grid.setdefault(key, []).append(node_id)
                                     fragment_polygons.setdefault(key, []).append(clipped_local)
                                     corners = [_pad_local_to_world(pad, x, y) for x, y in clipped_local]
                                     self.add_cell(
@@ -2047,6 +2050,7 @@ class _Builder:
                                         layer,
                                         net,
                                         [(x, y, z) for x, y in corners],
+                                        metadata={"node_id": node_id},
                                     )
                         for (column, row), current_nodes in custom_grid.items():
                             current_polygons = fragment_polygons[(column, row)]
@@ -2126,11 +2130,13 @@ class _Builder:
                                 if local is None:
                                     continue
                                 point = _pad_local_to_world(pad, *local)
-                                grid[(column, row)] = self.node(point, layer, net)
+                                node_id = self.node(point, layer, net)
+                                grid[(column, row)] = node_id
                                 corners = [_pad_local_to_world(pad, x, y) for x, y in clipped_local]
                                 self.add_cell(
                                     f"{source_id}:{layer}:cell:{column}:{row}", "pad", source_id,
                                     layer, net, [(x, y, z) for x, y in corners],
+                                    metadata={"node_id": node_id},
                                 )
                         for (column, row), current in grid.items():
                             for neighbor_key, branch_width in (

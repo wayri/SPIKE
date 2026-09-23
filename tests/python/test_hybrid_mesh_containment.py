@@ -59,6 +59,79 @@ def _inside_track_union(point, tracks, tolerance=1e-7):
 
 class HybridMeshContainmentTests(unittest.TestCase):
 
+    def test_physical_pad_cells_expose_valid_owning_node_metadata(self):
+        pads = [
+            {
+                "id": "rect-pad", "at": [0, 0], "size": [2, 1.5],
+                "shape": "rect", "layers": ["F.Cu"], "net_name": "VCC",
+            },
+            {
+                "id": "annular-pad", "at": [5, 0], "size": [2, 2],
+                "shape": "circle", "drill": 0.8, "drill_size": [0.8, 0.8],
+                "layers": ["F.Cu", "B.Cu"], "net_name": "VCC",
+            },
+            {
+                "id": "custom-pad", "at": [10, 0], "size": [3, 3],
+                "shape": "custom", "layers": ["F.Cu"], "net_name": "VCC",
+                "custom_geometry": {
+                    "status": "supported",
+                    "coordinate_space": "pad_local_mm",
+                    "mirror_x": False,
+                    "positive_filled_polygon": [
+                        [-1.5, -1.5], [1.5, -1.5], [1.5, 1.5],
+                        [0.5, 1.5], [0.5, 0.0], [-0.5, 0.0],
+                        [-0.5, 1.5], [-1.5, 1.5],
+                    ],
+                },
+            },
+        ]
+        mesh = build_hybrid_mesh(
+            DesignIR(
+                layers=[{"name": "F.Cu"}, {"name": "B.Cu"}],
+                nets=[{"id": 1, "name": "VCC"}],
+                pads=pads,
+            ),
+            AnalysisSpec(
+                mode="dc",
+                net_names=["VCC"],
+                mesh={"target_size_mm": 0.5},
+            ),
+        )
+
+        pad_cells = [cell for cell in mesh.cells if cell["source_kind"] == "pad"]
+        self.assertEqual({cell["source_id"] for cell in pad_cells}, {
+            "rect-pad", "annular-pad", "custom-pad",
+        })
+        for cell in pad_cells:
+            node_id = cell.get("node_id")
+            self.assertIs(type(node_id), int)
+            self.assertGreaterEqual(node_id, 0)
+            self.assertLess(node_id, len(mesh.nodes))
+            node = mesh.nodes[node_id]
+            self.assertEqual(node.net, cell["net"])
+            self.assertEqual(node.layer, cell["layer"])
+            self.assertTrue(any(
+                branch.source_id == cell["source_id"]
+                and node_id in (branch.node_p, branch.node_n)
+                for branch in mesh.branches
+            ))
+
+        barrel_cells = [
+            cell for cell in mesh.cells if cell["source_kind"] == "pad_barrel"
+        ]
+        self.assertGreater(len(barrel_cells), 0)
+        self.assertTrue(all("node_id" not in cell for cell in barrel_cells))
+        preview = mesh.to_preview(max_cells=len(mesh.cells))
+        preview_pad_cells = {
+            cell["id"]: cell for cell in preview["cells"]
+            if cell["source_kind"] == "pad"
+        }
+        self.assertEqual(len(preview_pad_cells), len(pad_cells))
+        self.assertTrue(all(
+            preview_pad_cells[cell["id"]]["node_id"] == cell["node_id"]
+            for cell in pad_cells
+        ))
+
     def test_bounded_zone_containment_cache_preserves_concave_fragments(self):
         polygon = [
             (0, 0), (8, 0), (8, 8), (5, 8),
