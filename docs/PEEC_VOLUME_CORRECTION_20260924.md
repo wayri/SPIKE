@@ -58,7 +58,9 @@ For simple source-filled zones and undrilled rectangular pads with unambiguous
 ownership, it uses one projected source area and the approximate
 `epsilon_0 * epsilon_r * area / separation` surrogate. Holes, duplicate
 owners, nonfinite geometry and ambiguous same-net overlap fail the whole
-estimate closed. On the Marble C383 net at 1, 0.75, 0.5 and 0.25 mm, the
+estimate closed. With an explicit return net, one filled return zone must
+cover the entire source polygon; a covered branch midpoint is insufficient.
+On the Marble C383 net at 1, 0.75, 0.5 and 0.25 mm, the
 result is consistently `0 pF` with `status=unsupported`, **not** a physical
 zero-capacitance prediction or broadband qualification. A field-based
 multiconductor electrostatic extraction remains required.

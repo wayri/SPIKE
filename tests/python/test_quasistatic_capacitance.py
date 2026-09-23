@@ -45,6 +45,19 @@ class QuasistaticCapacitanceTests(unittest.TestCase):
                 self.assertEqual(float(values.sum()), 0.0)
                 self.assertEqual(quality["status"], "unsupported")
 
+        # A branch midpoint under return copper does not justify assigning
+        # the entire 2 x 2 mm source area to a smaller return-plane patch.
+        partial = deepcopy(design)
+        partial.zones[1]["points"] = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
+        midpoint_covered_branch = MeshBranch("signal-link", "zone", 0, 1,
+            (0.25, 0.5, 0), (0.75, 0.5, 0), 0.25, 0.035, 5.8e7,
+            "F.Cu", "VCC", "signal")
+        values, _, quality = estimate_branch_capacitance(
+            partial, spec, [midpoint_covered_branch])
+        self.assertEqual(float(values.sum()), 0.0)
+        self.assertEqual(quality["status"], "unsupported")
+        self.assertGreater(quality["skipped_reference_geometry_branch_count"], 0)
+
     def test_fixed_zone_area_is_invariant_to_internal_link_refinement(self):
         design = DesignIR(
             layers=[{"name": "F.Cu"}, {"name": "B.Cu"}],

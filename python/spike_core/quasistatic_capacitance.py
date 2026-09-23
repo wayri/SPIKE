@@ -263,7 +263,9 @@ def _polygon_strictly_contains(container: Sequence[Tuple[float, float]],
     )
 
 
-def _planar_owner_areas(design: DesignIR) -> Tuple[Dict[Tuple[str, str], float], set[Tuple[str, str]], int]:
+def _planar_owner_areas(design: DesignIR) -> Tuple[Dict[Tuple[str, str], float],
+                                               Dict[Tuple[str, str], List[Tuple[float, float]]],
+                                               set[Tuple[str, str]], int]:
     """Admit unique source copper area, failing closed on ambiguous unions.
 
     Source-filled simple zone polygons and undrilled rectangular pads are the
@@ -344,7 +346,28 @@ def _planar_owner_areas(design: DesignIR) -> Tuple[Dict[Tuple[str, str], float],
             if key in polygons and key[1] == layer and net_by_key.get(key) == net \
                     and _bbox_overlaps(polygons[key], track_box):
                 ambiguous.add(key)
-    return areas, ambiguous, len(polygons)
+    return areas, polygons, ambiguous, len(polygons)
+
+
+def _reference_covers_planar_owner(design: DesignIR, owner_polygon: Sequence[Tuple[float, float]],
+                                   return_net: str, reference_layer: str) -> bool:
+    """Admit an explicit parallel-plate area only under one full return zone."""
+    for zone in design.zones:
+        if (str(zone.get("net_name") or zone.get("net") or "") != return_net
+                or str(zone.get("layer", "")) != reference_layer or zone.get("holes")
+                or zone.get("interiors")
+                or zone.get("filled_copper_state") not in (None, "source_filled")
+                or zone.get("source_fill_provenance_complete") is False):
+            continue
+        try:
+            points = [_xy(value) for value in zone.get("points", zone.get("polygon", []))]
+        except (TypeError, ValueError, OverflowError, IndexError, KeyError):
+            continue
+        if (len(points) >= 3 and all(isfinite(value) for point in points for value in point)
+                and _polygon_is_simple(points)
+                and _polygon_strictly_contains(points, owner_polygon)):
+            return True
+    return False
 
 
 def _reference_overlaps_branch(
@@ -430,7 +453,7 @@ def estimate_branch_capacitance(
     skipped_reference = 0
     skipped_reference_geometry = 0
     loss_known = 0
-    owner_areas, ambiguous_owners, source_geometry_count = _planar_owner_areas(design)
+    owner_areas, owner_polygons, ambiguous_owners, source_geometry_count = _planar_owner_areas(design)
     branch_reference: Dict[int, Tuple[str, float, float, float | None]] = {}
 
     for index, branch in enumerate(branches):
@@ -507,6 +530,11 @@ def estimate_branch_capacitance(
             skipped_reference += len(indices)
             continue
         reference_layer, epsilon_r, height_mm, tan_delta = references[0]  # type: ignore[misc]
+        if return_net and not _reference_covers_planar_owner(
+                design, owner_polygons[owner], return_net, reference_layer):
+            unsupported_planar += 1
+            skipped_reference_geometry += len(indices)
+            continue
         weights = np.asarray([max(float(branches[index].length_mm), 0.0) for index in indices])
         if float(np.sum(weights)) <= 0:
             unsupported_planar += 1
@@ -557,6 +585,7 @@ def estimate_branch_capacitance(
         "validity": [
             "single-reference quasi-static microstrip approximation",
             "zone/pad capacitance uses each admitted source copper area once with no fringing correction",
+            "explicit planar return requires one source-filled zone covering the entire source polygon",
             "ambiguous or unsupported zone/pad source geometry and overlap are omitted",
             "zero conductor-thickness correction",
             "no via/antipad capacitance without a validated via field model",
