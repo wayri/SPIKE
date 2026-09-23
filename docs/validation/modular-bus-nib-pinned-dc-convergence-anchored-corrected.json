@@ -1,0 +1,982 @@
+{
+  "contract": "spike/real-board-pi-convergence-evidence/v1",
+  "board": "app/public/demo/MODULAR-BUS-NIB.kicad_pcb",
+  "board_sha256": "37639b58aa75c11265ecf7867c2d358942b70c9e0011a10da99f524e767c2f07",
+  "request": "docs/validation/modular-bus-nib-12vout-dcir-request.json",
+  "request_sha256": "5f133d60414a52fc592e012559491abba690782a00c69d340debbce34687bad8",
+  "analysis_mode": "dc",
+  "net_names": [
+    "/12Vout"
+  ],
+  "terminal_mode": "exact_pad_anchors",
+  "terminal_pad_ids": {
+    "R19.3": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+    "J14.2": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+    "J20.2": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+    "J15.2": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22"
+  },
+  "solver_memory_limit_gb": 4.0,
+  "solver_revision": "856594203ff111c95a4f18c7f9b59efcdd9bcf15",
+  "solver_source_sha256": {
+    "convergence.py": "4d02b667893a025e694cc2db82426601ef39a4b008631dec3949949f09752ca8",
+    "dc_terminal_validation.py": "6d31a35ae94c754df77aa07159b15f0637081fb28fa39140ef102855ffaad2a2",
+    "hybrid_dc_solver.py": "27c45f4647b1c652c1da1d5f2bae34391d9a8ebc57550ef0b6a3002ab84e4a7c",
+    "hybrid_mesh.py": "c3f0bb06b8558719917b5c3d9a4a0a7cd1d74ff34808ed7538d8cc6649232ad7"
+  },
+  "status": "failed_to_converge",
+  "can_sign_off": false,
+  "levels": [
+    {
+      "index": 0,
+      "factor": 2.0,
+      "target_size_mm": 2.0,
+      "zone_cell_mm": 1.0,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "max_load_voltage_drop_v": 0.003934739196614766,
+        "max_current_density_a_mm2": 495.00246096670026,
+        "max_voltage_drop_v": 0.0056100729213408584,
+        "p95_current_density_a_mm2": 6.2866651829942555,
+        "total_copper_loss_w": 0.037900986298794466,
+        "effective_path_resistance_ohm": 0.00037900986298794464,
+        "source_to_load_drop_v:cli-source-1:cli-load-1": 0.0036778297015782613,
+        "source_to_load_drop_v:cli-source-1:cli-load-2": 0.003757726991365118,
+        "source_to_load_drop_v:cli-source-1:cli-load-3": 0.003934739196614245
+      },
+      "node_count": 3126,
+      "edge_count": 4530,
+      "issues": []
+    },
+    {
+      "index": 1,
+      "factor": 1.0,
+      "target_size_mm": 1.0,
+      "zone_cell_mm": 0.5,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "max_load_voltage_drop_v": 0.0038474356825670708,
+        "max_current_density_a_mm2": 493.65828509018934,
+        "max_voltage_drop_v": 0.005523109066110976,
+        "p95_current_density_a_mm2": 6.857942069721901,
+        "total_copper_loss_w": 0.03749938577173617,
+        "effective_path_resistance_ohm": 0.0003749938577173617,
+        "source_to_load_drop_v:cli-source-1:cli-load-1": 0.0036906375669154556,
+        "source_to_load_drop_v:cli-source-1:cli-load-2": 0.0037117424823929213,
+        "source_to_load_drop_v:cli-source-1:cli-load-3": 0.0038474356825659584
+      },
+      "node_count": 5402,
+      "edge_count": 8949,
+      "issues": []
+    },
+    {
+      "index": 2,
+      "factor": 0.5,
+      "target_size_mm": 0.5,
+      "zone_cell_mm": 0.25,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "max_load_voltage_drop_v": 0.003921918355505706,
+        "max_current_density_a_mm2": 492.07724887715665,
+        "max_voltage_drop_v": 0.005595683550225772,
+        "p95_current_density_a_mm2": 6.279978740195701,
+        "total_copper_loss_w": 0.03703239262420543,
+        "effective_path_resistance_ohm": 0.0003703239262420543,
+        "source_to_load_drop_v:cli-source-1:cli-load-1": 0.003717621241879243,
+        "source_to_load_drop_v:cli-source-1:cli-load-2": 0.0034701781890937866,
+        "source_to_load_drop_v:cli-source-1:cli-load-3": 0.003921918355503706
+      },
+      "node_count": 13636,
+      "edge_count": 25033,
+      "issues": []
+    },
+    {
+      "index": 3,
+      "factor": 0.25,
+      "target_size_mm": 0.25,
+      "zone_cell_mm": 0.125,
+      "status": "completed",
+      "model_status": "approximate",
+      "metrics": {
+        "max_load_voltage_drop_v": 0.004170609684034969,
+        "max_current_density_a_mm2": 508.7993050500104,
+        "max_voltage_drop_v": 0.005977584236124045,
+        "p95_current_density_a_mm2": 6.1673619819941905,
+        "total_copper_loss_w": 0.03903251930032635,
+        "effective_path_resistance_ohm": 0.0003903251930032635,
+        "source_to_load_drop_v:cli-source-1:cli-load-1": 0.00380787720801834,
+        "source_to_load_drop_v:cli-source-1:cli-load-2": 0.004170609684033266,
+        "source_to_load_drop_v:cli-source-1:cli-load-3": 0.003731268881082883
+      },
+      "node_count": 45688,
+      "edge_count": 88268,
+      "issues": []
+    }
+  ],
+  "level_diagnostics": [
+    {
+      "analysis_id": "analysis-convergence-1",
+      "status": "completed",
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 12.0,
+            "current_a": 9.999999999679858
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.996322170298422,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.996242273008635,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.996065260803386,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.996322170298422,
+            "supply_drop_v": 0.0036778297015782613,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.996242273008635,
+            "supply_drop_v": 0.003757726991365118,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.996065260803386,
+            "supply_drop_v": 0.003934739196614245,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": -3.2014213502407074e-10,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 8.060411375324921e-17,
+      "mesh_build_time_s": 7.6181441999506205,
+      "linear_solve_time_s": 0.0072522999253124,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.003934739196614766,
+        "total_copper_loss_w": 0.037900986298794466,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.2866651829942555,
+        "node_count": 3126,
+        "edge_count": 4530
+      },
+      "errors": []
+    },
+    {
+      "analysis_id": "analysis-convergence-2",
+      "status": "completed",
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 12.0,
+            "current_a": 10.000000001316948
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.996309362433085,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.996288257517607,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.996152564317434,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.996309362433085,
+            "supply_drop_v": 0.0036906375669154556,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.996288257517607,
+            "supply_drop_v": 0.0037117424823929213,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.996152564317434,
+            "supply_drop_v": 0.0038474356825659584,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": 1.3169483281672e-09,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 6.1287203105955e-17,
+      "mesh_build_time_s": 8.416568799992092,
+      "linear_solve_time_s": 0.01217440003529191,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.0038474356825670708,
+        "total_copper_loss_w": 0.03749938577173617,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.857942069721901,
+        "node_count": 5402,
+        "edge_count": 8949
+      },
+      "errors": []
+    },
+    {
+      "analysis_id": "analysis-convergence-3",
+      "status": "completed",
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 11.999999999999998,
+            "current_a": 10.000000002859451
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.996282378758119,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.996529821810904,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.996078081644495,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.996282378758119,
+            "supply_drop_v": 0.003717621241879243,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.996529821810904,
+            "supply_drop_v": 0.0034701781890937866,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.996078081644495,
+            "supply_drop_v": 0.003921918355503706,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": 2.8594513423740864e-09,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 1.7864194901873626e-16,
+      "mesh_build_time_s": 11.09432759997435,
+      "linear_solve_time_s": 0.029955900041386485,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.003921918355505706,
+        "total_copper_loss_w": 0.03703239262420543,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.279978740195701,
+        "node_count": 13636,
+        "edge_count": 25033
+      },
+      "errors": []
+    },
+    {
+      "analysis_id": "analysis-convergence-4",
+      "status": "completed",
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 11.999999999999998,
+            "current_a": 10.00000007195922
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.99619212279198,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.995829390315965,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.996268731118915,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.99619212279198,
+            "supply_drop_v": 0.00380787720801834,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.995829390315965,
+            "supply_drop_v": 0.004170609684033266,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.996268731118915,
+            "supply_drop_v": 0.003731268881082883,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": 7.195922080427408e-08,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 8.320474631548971e-17,
+      "mesh_build_time_s": 20.13559790002182,
+      "linear_solve_time_s": 0.11134289996698499,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.004170609684034969,
+        "total_copper_loss_w": 0.03903251930032635,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.1673619819941905,
+        "node_count": 45688,
+        "edge_count": 88268
+      },
+      "errors": []
+    }
+  ],
+  "comparison_history": [
+    {
+      "coarse_level_index": 0,
+      "fine_level_index": 1,
+      "signoff_eligible": false,
+      "comparisons": [
+        {
+          "metric": "max_load_voltage_drop_v",
+          "coarse_value": 0.003934739196614766,
+          "fine_value": 0.0038474356825670708,
+          "relative_delta": 0.02218787820112859,
+          "absolute_delta": 8.730351404769498e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "total_copper_loss_w",
+          "coarse_value": 0.037900986298794466,
+          "fine_value": 0.03749938577173617,
+          "relative_delta": 0.010596044226718941,
+          "absolute_delta": 0.0004016005270582948,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "effective_path_resistance_ohm",
+          "coarse_value": 0.00037900986298794464,
+          "fine_value": 0.0003749938577173617,
+          "relative_delta": 0.010596044226718896,
+          "absolute_delta": 4.016005270582931e-06,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "p95_current_density_a_mm2",
+          "coarse_value": 6.2866651829942555,
+          "fine_value": 6.857942069721901,
+          "relative_delta": 0.08330150370471287,
+          "absolute_delta": 0.5712768867276452,
+          "tolerance": 0.1,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-1",
+          "coarse_value": 0.0036778297015782613,
+          "fine_value": 0.0036906375669154556,
+          "relative_delta": 0.0034703665979043444,
+          "absolute_delta": 1.2807865337194357e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-2",
+          "coarse_value": 0.003757726991365118,
+          "fine_value": 0.0037117424823929213,
+          "relative_delta": 0.01223732034761026,
+          "absolute_delta": 4.5984508972196636e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-3",
+          "coarse_value": 0.003934739196614245,
+          "fine_value": 0.0038474356825659584,
+          "relative_delta": 0.02218787820128197,
+          "absolute_delta": 8.730351404828696e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "resolved_mesh_growth",
+          "coarse_value": {
+            "node_count": 3126,
+            "edge_count": 4530
+          },
+          "fine_value": {
+            "node_count": 5402,
+            "edge_count": 8949
+          },
+          "required": true,
+          "status": "passed",
+          "meaning": "the finer solve must contain more resolved nodes or branches without losing either count"
+        },
+        {
+          "metric": "max_voltage_drop_v",
+          "coarse_value": 0.0056100729213408584,
+          "fine_value": 0.005523109066110976,
+          "relative_delta": 0.01550137697837575,
+          "absolute_delta": 8.696385522988237e-05,
+          "tolerance": 0.25,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        },
+        {
+          "metric": "max_current_density_a_mm2",
+          "coarse_value": 495.00246096670026,
+          "fine_value": 493.65828509018934,
+          "relative_delta": 0.0027154933207520805,
+          "absolute_delta": 1.344175876510917,
+          "tolerance": 0.25,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        }
+      ]
+    },
+    {
+      "coarse_level_index": 1,
+      "fine_level_index": 2,
+      "signoff_eligible": true,
+      "comparisons": [
+        {
+          "metric": "max_load_voltage_drop_v",
+          "coarse_value": 0.0038474356825670708,
+          "fine_value": 0.003921918355505706,
+          "relative_delta": 0.018991387934956538,
+          "absolute_delta": 7.448267293863565e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "total_copper_loss_w",
+          "coarse_value": 0.03749938577173617,
+          "fine_value": 0.03703239262420543,
+          "relative_delta": 0.012453354579549485,
+          "absolute_delta": 0.00046699314753074345,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "effective_path_resistance_ohm",
+          "coarse_value": 0.0003749938577173617,
+          "fine_value": 0.0003703239262420543,
+          "relative_delta": 0.012453354579549467,
+          "absolute_delta": 4.669931475307428e-06,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "p95_current_density_a_mm2",
+          "coarse_value": 6.857942069721901,
+          "fine_value": 6.279978740195701,
+          "relative_delta": 0.08427649630899214,
+          "absolute_delta": 0.5779633295261997,
+          "tolerance": 0.1,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-1",
+          "coarse_value": 0.0036906375669154556,
+          "fine_value": 0.003717621241879243,
+          "relative_delta": 0.007258317404638931,
+          "absolute_delta": 2.6983674963787507e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-2",
+          "coarse_value": 0.0037117424823929213,
+          "fine_value": 0.0034701781890937866,
+          "relative_delta": 0.06508110259400342,
+          "absolute_delta": 0.00024156429329913465,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-3",
+          "coarse_value": 0.0038474356825659584,
+          "fine_value": 0.003921918355503706,
+          "relative_delta": 0.018991387934739867,
+          "absolute_delta": 7.448267293774791e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "resolved_mesh_growth",
+          "coarse_value": {
+            "node_count": 5402,
+            "edge_count": 8949
+          },
+          "fine_value": {
+            "node_count": 13636,
+            "edge_count": 25033
+          },
+          "required": true,
+          "status": "passed",
+          "meaning": "the finer solve must contain more resolved nodes or branches without losing either count"
+        },
+        {
+          "metric": "max_voltage_drop_v",
+          "coarse_value": 0.005523109066110976,
+          "fine_value": 0.005595683550225772,
+          "relative_delta": 0.012969726301242952,
+          "absolute_delta": 7.257448411479572e-05,
+          "tolerance": 0.25,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        },
+        {
+          "metric": "max_current_density_a_mm2",
+          "coarse_value": 493.65828509018934,
+          "fine_value": 492.07724887715665,
+          "relative_delta": 0.0032026935651324894,
+          "absolute_delta": 1.5810362130326894,
+          "tolerance": 0.25,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        }
+      ]
+    },
+    {
+      "coarse_level_index": 2,
+      "fine_level_index": 3,
+      "signoff_eligible": true,
+      "comparisons": [
+        {
+          "metric": "max_load_voltage_drop_v",
+          "coarse_value": 0.003921918355505706,
+          "fine_value": 0.004170609684034969,
+          "relative_delta": 0.059629490019468656,
+          "absolute_delta": 0.0002486913285292625,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "total_copper_loss_w",
+          "coarse_value": 0.03703239262420543,
+          "fine_value": 0.03903251930032635,
+          "relative_delta": 0.05124257188554565,
+          "absolute_delta": 0.002000126676120921,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "effective_path_resistance_ohm",
+          "coarse_value": 0.0003703239262420543,
+          "fine_value": 0.0003903251930032635,
+          "relative_delta": 0.05124257188554567,
+          "absolute_delta": 2.000126676120922e-05,
+          "tolerance": 0.05,
+          "absolute_tolerance": null,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "p95_current_density_a_mm2",
+          "coarse_value": 6.279978740195701,
+          "fine_value": 6.1673619819941905,
+          "relative_delta": 0.017932665516953817,
+          "absolute_delta": 0.11261675820151051,
+          "tolerance": 0.1,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-1",
+          "coarse_value": 0.003717621241879243,
+          "fine_value": 0.00380787720801834,
+          "relative_delta": 0.023702436084084462,
+          "absolute_delta": 9.02559661390967e-05,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": true,
+          "status": "passed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-2",
+          "coarse_value": 0.0034701781890937866,
+          "fine_value": 0.004170609684033266,
+          "relative_delta": 0.1679446287244301,
+          "absolute_delta": 0.0007004314949394796,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "source_to_load_drop_v:cli-source-1:cli-load-3",
+          "coarse_value": 0.003921918355503706,
+          "fine_value": 0.003731268881082883,
+          "relative_delta": 0.04861128079152411,
+          "absolute_delta": 0.00019064947442082314,
+          "tolerance": 0.03,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "none",
+          "required": true,
+          "status": "failed",
+          "meaning": "required numerical stability metric"
+        },
+        {
+          "metric": "resolved_mesh_growth",
+          "coarse_value": {
+            "node_count": 13636,
+            "edge_count": 25033
+          },
+          "fine_value": {
+            "node_count": 45688,
+            "edge_count": 88268
+          },
+          "required": true,
+          "status": "passed",
+          "meaning": "the finer solve must contain more resolved nodes or branches without losing either count"
+        },
+        {
+          "metric": "max_voltage_drop_v",
+          "coarse_value": 0.005595683550225772,
+          "fine_value": 0.005977584236124045,
+          "relative_delta": 0.06388880036024441,
+          "absolute_delta": 0.0003819006858982732,
+          "tolerance": 0.25,
+          "absolute_tolerance": 5e-05,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        },
+        {
+          "metric": "max_current_density_a_mm2",
+          "coarse_value": 492.07724887715665,
+          "fine_value": 508.7993050500104,
+          "relative_delta": 0.03286572133035857,
+          "absolute_delta": 16.72205617285374,
+          "tolerance": 0.25,
+          "absolute_tolerance": null,
+          "pass_basis": "relative",
+          "required": false,
+          "status": "passed",
+          "meaning": "mesh-sensitive hotspot monitor; reported but not used alone to block sign-off"
+        }
+      ]
+    }
+  ],
+  "thresholds": {
+    "max_load_voltage_drop_v": 0.03,
+    "total_copper_loss_w": 0.05,
+    "effective_path_resistance_ohm": 0.05,
+    "p95_current_density_a_mm2": 0.1
+  },
+  "limitations": [
+    "A passing mesh study establishes numerical stability for the selected geometry, terminals, loads, and solver settings only.",
+    "It does not validate material inputs, package models, manufacturing tolerances, or omitted physics."
+  ]
+}

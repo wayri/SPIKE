@@ -82,6 +82,19 @@ nodes at the 0.5 factor. The
 is diagnostic only and cannot sign off. Physical pad-boundary and pad-to-zone
 topology repairs require a new four-level study.
 
+The corrected exact-pad four-level study at solver revision `8565942` completed
+with the pinned board and 4 GiB budget. All four source-to-load networks passed
+their terminal and current-balance checks, but the finest pair still failed
+numerical convergence. From target/zone cells 0.5/0.25 to 0.25/0.125 mm,
+maximum load drop rose 3.92192 to 4.17061 mV (5.96% versus 3% allowed), and
+copper loss rose 37.03239 to 39.03252 mW (5.12% versus 5% allowed). Individual
+J20 and J15 path drops changed 16.79% and 4.86%, respectively, versus 3%
+allowed. The J14 path passed at 2.37%. The
+[corrected study evidence](modular-bus-nib-pinned-dc-convergence-anchored-corrected.json)
+records every level, input and solver hashes, exact pad IDs, per-load paths, and
+comparisons; its `can_sign_off` value is false. Pad-to-zone coupling remains
+under review before another qualification run.
+
 The reported peak current density of 95.56 A/mm2 is at the idealized R19 source
 injection element. This is a terminal singularity/model artifact and must not be
 reported as a physical board hotspot until contact area and package geometry are
