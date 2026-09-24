@@ -1,0 +1,112 @@
+{
+  "factor": 0.125,
+  "solver_memory_limit_gb": 12.0,
+  "status": "failed",
+  "model_status": "approximate",
+  "issues": [
+    {
+      "code": "SPIKE-BE-PI-E-0007",
+      "severity": "error",
+      "message": "Exact source-to-load terminal validation failed: The terminal current balance or linear residual exceeds tolerance.",
+      "path": "analysis.terminals",
+      "suggestion": "Give every terminal a unique geometry anchor on its declared net and layer, and pair each load with one source.",
+      "status": "open"
+    }
+  ],
+  "summary": {},
+  "provenance": {
+    "solver_plugin": "spike.routed_dc",
+    "solver_plugin_version": "2.0.0",
+    "solver_formulation": "resistive_network",
+    "geometry_contract": "spike/solver-geometry/v1"
+  },
+  "terminal_evidence": {
+    "status": "approximate",
+    "terminal_voltages": [
+      {
+        "id": "cli-source-1",
+        "kind": "source",
+        "role": "source_positive",
+        "domain_id": "default",
+        "net": "/12Vout",
+        "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+        "voltage_v": 11.999999999999998,
+        "current_a": 10.000000214513875
+      },
+      {
+        "id": "cli-load-1",
+        "kind": "load",
+        "role": "load_positive",
+        "domain_id": "default",
+        "net": "/12Vout",
+        "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+        "voltage_v": 11.998983775867533,
+        "pair_id": "cli-load-1",
+        "current_a": 3.333333333
+      },
+      {
+        "id": "cli-load-2",
+        "kind": "load",
+        "role": "load_positive",
+        "domain_id": "default",
+        "net": "/12Vout",
+        "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+        "voltage_v": 11.998942379624019,
+        "pair_id": "cli-load-2",
+        "current_a": 3.333333333
+      },
+      {
+        "id": "cli-load-3",
+        "kind": "load",
+        "role": "load_positive",
+        "domain_id": "default",
+        "net": "/12Vout",
+        "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+        "voltage_v": 11.998785875220396,
+        "pair_id": "cli-load-3",
+        "current_a": 3.333333334
+      }
+    ],
+    "paths": [
+      {
+        "load_id": "cli-load-1",
+        "source_id": "cli-source-1",
+        "pair_id": "cli-load-1",
+        "domain_id": "default",
+        "supply_net": "/12Vout",
+        "source_voltage_v": 11.999999999999998,
+        "load_voltage_v": 11.998983775867533,
+        "supply_drop_v": 0.001016224132465382,
+        "load_current_a": 3.333333333
+      },
+      {
+        "load_id": "cli-load-2",
+        "source_id": "cli-source-1",
+        "pair_id": "cli-load-2",
+        "domain_id": "default",
+        "supply_net": "/12Vout",
+        "source_voltage_v": 11.999999999999998,
+        "load_voltage_v": 11.998942379624019,
+        "supply_drop_v": 0.0010576203759793401,
+        "load_current_a": 3.333333333
+      },
+      {
+        "load_id": "cli-load-3",
+        "source_id": "cli-source-1",
+        "pair_id": "cli-load-3",
+        "domain_id": "default",
+        "supply_net": "/12Vout",
+        "source_voltage_v": 11.999999999999998,
+        "load_voltage_v": 11.998785875220396,
+        "supply_drop_v": 0.0012141247796026988,
+        "load_current_a": 3.333333334
+      }
+    ],
+    "issues": [
+      "The terminal current balance or linear residual exceeds tolerance."
+    ],
+    "source_current_balance_a": 2.1451387510751374e-07,
+    "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+  },
+  "observed_scaled_residual": 6.571404758304087e-17
+}

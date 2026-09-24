@@ -1,0 +1,23 @@
+{
+  "factor": 0.125,
+  "solver_memory_limit_gb": 4.0,
+  "status": "failed",
+  "model_status": "failed",
+  "issues": [
+    {
+      "code": "HYBRID_MESH_MEMORY_LIMIT",
+      "severity": "error",
+      "message": "Hybrid mesh exceeded the RAM-admitted 170393 branch capacity.",
+      "path": "",
+      "suggestion": "Increase the solver memory limit only when system RAM permits, coarsen the mesh, or isolate fewer nets.",
+      "status": "failed"
+    }
+  ],
+  "summary": {},
+  "provenance": {
+    "solver_plugin": "spike.routed_dc",
+    "solver_plugin_version": "2.0.0",
+    "solver_formulation": "resistive_network",
+    "geometry_contract": "spike/solver-geometry/v1"
+  }
+}

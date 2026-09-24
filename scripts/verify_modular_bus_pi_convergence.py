@@ -29,6 +29,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, help="Write compact JSON evidence to this path")
     parser.add_argument("--exact-terminals", action="store_true", help="Bind source and loads to their named board pads")
+    parser.add_argument("--owned-shared-faces", action="store_true", help="Use opt-in pad-owned shared-face copper coupling")
+    parser.add_argument("--include-fifth-level", action="store_true", help="Also solve the 0.125/0.0625 mm refinement level")
+    parser.add_argument("--solver-memory-gb", type=float, default=4.0, help="Per-run solver admission budget in GiB (default: 4)")
     arguments = parser.parse_args()
     request = json.loads(REQUEST.read_text(encoding="utf-8"))
     solver_revision = subprocess.run(
@@ -39,15 +42,19 @@ def main() -> int:
         name: sha256(ROOT / "python/spike_core" / name)
         for name in (
             "convergence.py", "dc_terminal_validation.py",
-            "hybrid_dc_solver.py", "hybrid_mesh.py",
+            "hybrid_dc_solver.py", "hybrid_mesh.py", "hybrid_owned_copper.py",
         )
     }
     design = _design_from_kicad(str(BOARD))
     spec = AnalysisSpec(**request["spec"])
     # This run's fourth level exceeds the default 2 GiB sparse-branch admission.
-    # This host has 32 GiB physical RAM; a 4 GiB run budget admits that level without
-    # changing the board, terminal, material, or numerical tolerances.
-    spec = replace(spec, mesh={**spec.mesh, "solver_memory_limit_gb": 4.0})
+    # The configured per-run budget changes resource admission only, not
+    # board, terminal, material, or numerical tolerances.
+    if arguments.solver_memory_gb <= 0:
+        parser.error("--solver-memory-gb must be positive")
+    spec = replace(spec, mesh={**spec.mesh, "solver_memory_limit_gb": arguments.solver_memory_gb})
+    if arguments.owned_shared_faces:
+        spec = replace(spec, mesh={**spec.mesh, "pad_zone_coupling": "owned_shared_faces"})
     terminal_pad_ids: dict[str, str] = {}
     if arguments.exact_terminals:
         terminal_names = ("R19.3", "J14.2", "J20.2", "J15.2")
@@ -73,6 +80,7 @@ def main() -> int:
         )
     level_diagnostics: list[dict] = []
     registry = default_solver_registry()
+    levels = (2.0, 1.0, 0.5, 0.25, 0.125) if arguments.include_fifth_level else (2.0, 1.0, 0.5, 0.25)
     progress_path = (
         arguments.output.with_name(arguments.output.stem + ".progress.json")
         if arguments.output else None
@@ -83,6 +91,9 @@ def main() -> int:
         level_diagnostics.append({
             "analysis_id": run_spec.analysis_id,
             "status": result.status,
+            "model_status": result.model_status,
+            "summary": result.summary,
+            "provenance": result.provenance,
             "source_to_load": result.networks.get("source_to_load"),
             "max_scaled_linear_residual": result.summary.get("max_scaled_linear_residual"),
             "mesh_build_time_s": result.summary.get("mesh_build_time_s"),
@@ -96,7 +107,7 @@ def main() -> int:
                     "node_count", "edge_count",
                 )
             },
-            "errors": [issue.__dict__ for issue in result.issues if issue.severity == "error"],
+            "issues": [issue.__dict__ for issue in result.issues],
         })
         if progress_path:
             progress_path.parent.mkdir(parents=True, exist_ok=True)
@@ -105,7 +116,9 @@ def main() -> int:
                 "board_sha256": sha256(BOARD),
                 "request_sha256": sha256(REQUEST),
                 "terminal_mode": "exact_pad_anchors" if arguments.exact_terminals else "coordinate_snap",
+                "pad_zone_coupling": spec.mesh.get("pad_zone_coupling", "legacy"),
                 "solver_memory_limit_gb": spec.mesh["solver_memory_limit_gb"],
+                "requested_factors": levels,
                 "solver_revision": solver_revision,
                 "solver_source_sha256": solver_source_sha256,
                 "completed_levels": level_diagnostics,
@@ -117,7 +130,7 @@ def main() -> int:
 
     report = run_mesh_convergence(
         design, spec, runner,
-        levels=(2.0, 1.0, 0.5, 0.25),
+        levels=levels,
         minimum_levels=3,
         stop_when_converged=False,
     )
@@ -130,8 +143,10 @@ def main() -> int:
         "analysis_mode": spec.mode,
         "net_names": spec.net_names,
         "terminal_mode": "exact_pad_anchors" if arguments.exact_terminals else "coordinate_snap",
+        "pad_zone_coupling": spec.mesh.get("pad_zone_coupling", "legacy"),
         "terminal_pad_ids": terminal_pad_ids,
         "solver_memory_limit_gb": spec.mesh["solver_memory_limit_gb"],
+        "requested_factors": levels,
         "solver_revision": solver_revision,
         "solver_source_sha256": solver_source_sha256,
         "status": report["status"],

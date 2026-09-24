@@ -95,6 +95,30 @@ records every level, input and solver hashes, exact pad IDs, per-load paths, and
 comparisons; its `can_sign_off` value is false. Pad-to-zone coupling remains
 under review before another qualification run.
 
+An opt-in pad-owned shared-face study at solver revision `c0963b9` improved the
+four-level trend, but its saved result predates the strict per-load gate. The
+finest pair changed maximum load drop by 2.19% and copper loss by 2.87%; J14
+and J20 source-to-load drops changed 3.18% and 3.34%, above the required 3%
+relative limit. The old 50 uV absolute allowance marked those paths passed,
+so its `can_sign_off: true` field is **not** a current qualification decision.
+The [four-level diagnostic](modular-bus-nib-pinned-dc-convergence-owned-faces.json)
+is retained without modification. The strict gate was introduced at `69c440d`.
+
+The strict fifth-level attempt kept the same pad anchors, mesh refinement, and
+numerical thresholds. At 4 GiB, the 0.125/0.0625 mm mesh exceeded the
+RAM-admitted 170,393-branch capacity; the
+[isolated admission result](modular-bus-nib-owned-faces-level5-4gb-admission.json)
+records `HYBRID_MESH_MEMORY_LIMIT`. A 12 GiB run admitted the fifth mesh, but
+exact-terminal validation failed: source current imbalance was 0.2145 uA
+against a 0.1 uA limit at 10 A load, while the scaled linear residual was
+6.57e-17. The [12 GiB failed study](modular-bus-nib-pinned-dc-convergence-owned-faces-five-level-12gb.json)
+and [terminal diagnostic](modular-bus-nib-owned-faces-level5-12gb-terminal-diagnostic.json)
+preserve this result. Independent [five-level topology evidence](modular-bus-nib-owned-faces-topology-audit-five-level-12gb.json)
+found six retained zones and area-balance error no larger than 3.19e-12 mm2,
+but the finest graph had one isolated node (components of 170,523 and 1), so
+connectivity and fifth-level source-to-load convergence remain open. The 12 GiB
+budget changes resource admission only, on a host with 31.5 GiB physical RAM.
+
 The reported peak current density of 95.56 A/mm2 is at the idealized R19 source
 injection element. This is a terminal singularity/model artifact and must not be
 reported as a physical board hotspot until contact area and package geometry are

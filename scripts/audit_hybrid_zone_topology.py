@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 from collections import Counter, defaultdict
 from dataclasses import replace
 import json
 from math import hypot
 from pathlib import Path
 import sys
+import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -108,6 +110,7 @@ def audit(builder, names, solve=False, face_experiment=False):
     report = {"mesh": builder.spec.mesh, "nodes": len(mesh.nodes), "branches": dict(Counter(b.kind for b in mesh.branches)),
             "components": len(sizes), "largest_component_sizes": sizes[:10], "zones": zones,
             "terminal_zone_attachments": contacts, "issues": [issue.__dict__ for issue in mesh.issues]}
+    report["branch_admission"] = {key: value for key, value in mesh.branch_admission.items() if key != "owned_copper"}
     if "owned_copper" in mesh.branch_admission:
         report["owned_copper"] = mesh.branch_admission["owned_copper"]
     if solve:
@@ -156,20 +159,34 @@ def main():
     parser.add_argument("--solve", action="store_true", help="Run an in-memory J14 attachment removal experiment")
     parser.add_argument("--face-experiment", action="store_true", help="Also replace full zone widths by actual shared faces; diagnostic only")
     parser.add_argument("--owned-shared-faces", action="store_true", help="Opt in to pad-owned copper partition qualification")
+    parser.add_argument("--solver-memory-gb", type=float, default=4.0, help="Per-run mesh admission budget in GiB (default: 4)")
     args = parser.parse_args()
     design = _design_from_kicad(str(ROOT / "app/public/demo/MODULAR-BUS-NIB.kicad_pcb"))
     request = json.loads((ROOT / "docs/validation/modular-bus-nib-12vout-dcir-request.json").read_text())
     spec = AnalysisSpec(**request["spec"])
-    spec = replace(spec, mesh={**spec.mesh, "solver_memory_limit_gb": 4.0})
+    if args.solver_memory_gb <= 0:
+        parser.error("--solver-memory-gb must be positive")
+    spec = replace(spec, mesh={**spec.mesh, "solver_memory_limit_gb": args.solver_memory_gb})
     if args.owned_shared_faces:
         spec = replace(spec,mesh={**spec.mesh,"pad_zone_coupling":"owned_shared_faces"})
     names = {pad["component_pad"]: pad for pad in design.pads if pad.get("component_pad") in {"R19.3", "J14.2", "J20.2", "J15.2"}}
+    source_identity = {
+        "board_sha256": hashlib.sha256((ROOT / "app/public/demo/MODULAR-BUS-NIB.kicad_pcb").read_bytes()).hexdigest(),
+        "request_sha256": hashlib.sha256((ROOT / "docs/validation/modular-bus-nib-12vout-dcir-request.json").read_bytes()).hexdigest(),
+        "solver_revision": subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, check=True, capture_output=True, text=True).stdout.strip(),
+        "solver_source_sha256": {
+            name: hashlib.sha256((ROOT / "python/spike_core" / name).read_bytes()).hexdigest()
+            for name in ("hybrid_mesh.py", "hybrid_owned_copper.py")
+        },
+    }
     reports = []
     for index, factor in enumerate(args.factors):
         report = audit(AuditBuilder(design, _level_spec(spec, factor, index)), names, solve=args.solve, face_experiment=args.face_experiment)
-        reports.append({"factor": factor, **report})
+        reports.append({"factor": factor, **source_identity, **report})
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(reports, indent=2) + "\n")
+        temporary = args.output.with_name(args.output.name + ".tmp")
+        temporary.write_text(json.dumps(reports, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+        temporary.replace(args.output)
         # Each of these six retained filled polygons had one zone component
         # before the contact/face repair. Reject loss of positive-area paths.
         if len(report["zones"]) != 6 or (not args.owned_shared_faces and any(zone["components"] != 1 for zone in report["zones"])):
