@@ -1215,6 +1215,8 @@ class _Builder:
     def __init__(self, design: DesignIR, spec: AnalysisSpec):
         self.design = design
         self.spec = spec
+        self.owned_shared_faces = spec.mesh.get("pad_zone_coupling") == "owned_shared_faces"
+        self.owned_face_nodes: Dict[int, Tuple[int,int]] = {}
         self.target = max(float(spec.mesh.get("target_size_mm", 1.0)), 0.05)
         self.zone_target = max(float(spec.mesh.get("zone_cell_mm", self.target)), 0.05)
         self.feature_aware = bool(spec.mesh.get("feature_aware", True))
@@ -1259,6 +1261,7 @@ class _Builder:
             zone.get("filled_copper_state") == "source_filled" for zone in self.design.zones
         )
         self.zone_pad_attachment_evidence: Dict[Tuple[str, str, str], str] = {}
+        self.zone_pad_declared_none: set[Tuple[str,str,str]] = set()
         if self.zone_pad_evidence_required:
             self._prepare_zone_pad_connection_evidence()
 
@@ -1277,6 +1280,10 @@ class _Builder:
                 for item in report["records"]
                 if item["observation"] == "source_filled_copper_contact"
                 and item["resolved_mode"] in {"thermal", "solid"}
+            }
+            self.zone_pad_declared_none = {
+                (pad_sources[item["pad_id"]], zone_sources[item["zone_id"]], layer_names[item["layer_id"]])
+                for item in report["records"] if item["resolved_mode"] == "none"
             }
         except (TypeError, ValueError, KeyError) as error:
             self.mesh.issues.append(ValidationIssue(
@@ -1301,6 +1308,12 @@ class _Builder:
             )
             self.nodes_by_layer_net.setdefault((layer, net), []).append(index)
         return self.node_map[key]
+
+    def cell_center(self, polygon: List[Point2D]) -> Point2D | None:
+        if self.owned_shared_faces:
+            from .hybrid_owned_copper import centroid
+            return centroid(polygon)
+        return _interior_polygon_point(polygon)
 
     def zone_node(self, point: Point2D, layer: str, net: str) -> int:
         """Create a zone node without merging across a narrow copper void.
@@ -1427,7 +1440,7 @@ class _Builder:
                 (n.x_mm, n.y_mm, n.z_mm),
                 # Clipped zone faces already have positive geometric width.
                 # A generic 1 um floor would create copper across tiny slivers.
-                max(width, 1e-12) if kind == "zone" else max(width, 0.001),
+                max(width, 1e-12) if kind == "zone" or (self.owned_shared_faces and kind == "pad_zone_attachment") else max(width, 0.001),
                 max(thickness, 0.001),
                 COPPER_CONDUCTIVITY_S_M,
                 layer,
@@ -1656,6 +1669,7 @@ class _Builder:
             if not net or not layer.endswith(".Cu") or (self.requested and net not in self.requested):
                 continue
             source_id = str(zone.get("id", f"zone-{index + 1}"))
+            prior_face_nodes = set(self.owned_face_nodes)
             # Preserve the filled-zone perimeter supplied by the importer.
             # The mesher may simplify only numerical duplicates, never a
             # shallow clearance or curved boundary feature.
@@ -1718,10 +1732,13 @@ class _Builder:
                         containment_cache,
                         triangle_bounds,
                     )
+                    if self.owned_shared_faces:
+                        from .hybrid_owned_copper import subtract
+                        fragments = subtract(self, fragments, layer, net)
                     for fragment_index, clipped in enumerate(fragments):
                         if _polygon_area(clipped) <= max(1e-12, cell * cell * 1e-10):
                             continue
-                        center = _interior_polygon_point(clipped)
+                        center = self.cell_center(clipped)
                         if center is None:
                             continue
                         key = (column, row)
@@ -1736,6 +1753,10 @@ class _Builder:
                             [(x, y, z) for x, y in clipped],
                         )
             if not grid:
+                if self.owned_shared_faces:
+                    from .hybrid_owned_copper import fail
+                    fail(self, f"Owned route does not admit a zone fully absorbed by pad/drill masks: {source_id}")
+                    return
                 interior_point = _interior_polygon_point(polygon)
                 if interior_point is None:
                     self.mesh.issues.append(ValidationIssue(
@@ -1767,6 +1788,11 @@ class _Builder:
                             (left_point.x_mm, left_point.y_mm),
                             (right_point.x_mm, right_point.y_mm),
                         ):
+                            if self.owned_shared_faces:
+                                from .hybrid_owned_copper import bent_zone_link
+                                bent_zone_link(self,f"{source_id}:fragment-link:{column}:{row}:{left_index}:{right_index}",
+                                    left_node,current_nodes[right_index],face_width,thickness,layer,net,source_id,
+                                    current_polygons[left_index],current_polygons[right_index])
                             continue
                         self.add_branch(
                             f"{source_id}:fragment-link:{column}:{row}:{left_index}:{right_index}",
@@ -1797,6 +1823,11 @@ class _Builder:
                                 (current_point.x_mm, current_point.y_mm),
                                 (neighbor_point.x_mm, neighbor_point.y_mm),
                             ):
+                                if self.owned_shared_faces:
+                                    from .hybrid_owned_copper import bent_zone_link
+                                    bent_zone_link(self,f"{source_id}:link:{column}:{row}:{current_index}:{neighbor_key[0]}:{neighbor_key[1]}:{neighbor_index}",
+                                        current,neighbor,face_width,thickness,layer,net,source_id,
+                                        current_polygons[current_index],neighbor_polygons[neighbor_index])
                                 continue
                             self.add_branch(
                                 f"{source_id}:link:{column}:{row}:{current_index}:{neighbor_key[0]}:{neighbor_key[1]}:{neighbor_index}",
@@ -1814,15 +1845,18 @@ class _Builder:
                 "net": net,
                 "layer": layer,
                 "polygon": polygon,
-                "nodes": zone_nodes,
+                "nodes": zone_nodes + sorted(set(self.owned_face_nodes)-prior_face_nodes),
                 "grid": grid,
                 "min_x": min_x,
                 "min_y": min_y,
                 "cell_mm": cell,
                 "source_id": source_id,
+                "cell_polygons": {node: fragment_polygons[key][i] for key, nodes in grid.items() for i,node in enumerate(nodes)},
             }
             self.zone_regions.append(region)
             for node_id in existing:
+                if self.owned_shared_faces and node_id in self.owned_pad_nodes:
+                    continue
                 node = self.mesh.nodes[node_id]
                 if node.layer != layer or node.net != net:
                     continue
@@ -1889,7 +1923,7 @@ class _Builder:
                         status="unsupported",
                     ))
                     continue
-            elif shape not in {"rect", "circle", "oval"} and shape not in warned_shapes:
+            elif shape not in ({"rect", "circle", "oval", "roundrect"} if self.owned_shared_faces else {"rect", "circle", "oval"}) and shape not in warned_shapes:
                 warned_shapes.add(shape)
                 self.mesh.issues.append(ValidationIssue(
                     "SPIKE-BE-MESH-W-0003",
@@ -1940,6 +1974,9 @@ class _Builder:
                     continue
             if shape == "custom":
                 local_boundary = custom_boundary
+            elif shape == "roundrect" and self.owned_shared_faces:
+                from .quasistatic_copper_area import _source_polygon
+                local_boundary = [_pad_world_to_local(pad, p) for p in _source_polygon("pad", pad)]
             elif shape in {"circle", "oval"}:
                 side_count = max(24, min(96, int(ceil(pi * max(width, height) / max(self.target, 0.01)))))
                 local_boundary = [
@@ -1983,7 +2020,7 @@ class _Builder:
                 z = self.layer_z.get(layer, 0.0)
                 if drilled:
                     for local_corners, (radial, side) in zip(annular_cells, annular_indices):
-                        local = _interior_polygon_point(local_corners)
+                        local = self.cell_center(local_corners)
                         if local is None:
                             continue
                         point = _pad_local_to_world(pad, *local)
@@ -2158,11 +2195,11 @@ class _Builder:
                                 y0 = -height / 2 + row * dy
                                 clipped_local = _clip_polygon_to_rect(
                                     local_boundary, x0, y0, x0 + dx, y0 + dy,
-                                    self.containment_tolerance,
+                                    1e-10 if self.owned_shared_faces else self.containment_tolerance,
                                 )
                                 if len(clipped_local) < 3 or _polygon_area(clipped_local) <= 1e-12:
                                     continue
-                                local = _interior_polygon_point(clipped_local)
+                                local = self.cell_center(clipped_local)
                                 if local is None:
                                     continue
                                 point = _pad_local_to_world(pad, *local)
@@ -2206,6 +2243,8 @@ class _Builder:
                         continue
                     node = self.mesh.nodes[node_id]
                     if node.layer != layer or node.net != net or not _point_in_pad((node.x_mm, node.y_mm), pad):
+                        continue
+                    if self.owned_shared_faces and not _point_in_polygon(_pad_world_to_local(pad, (node.x_mm,node.y_mm)), local_boundary, self.containment_tolerance):
                         continue
                     nearest = min(
                         pad_nodes,
@@ -2380,6 +2419,45 @@ class _Builder:
             self.mesh.geometry_counts["pad"] += 1
 
     def build(self) -> HybridMesh:
+        if self.owned_shared_faces:
+            from .hybrid_owned_copper import couple, fail, prepare
+            if self.spec.mode != "dc":
+                fail(self, "Owned pad-zone coupling is admitted for DC qualification only")
+                return self.mesh
+            if any(i.severity == "error" for i in self.mesh.issues):
+                self.mesh.branches.clear()
+                return self.mesh
+            if any(zone.get("filled_copper_state") != "source_filled" or zone.get("holes") or zone.get("source_fill_provenance_complete") is False for zone in self.design.zones if not self.requested or _net(zone) in self.requested):
+                fail(self, "Owned coupling requires retained source-filled zone polygons")
+                return self.mesh
+            for pad in self.design.pads:
+                if self.requested and _net(pad) not in self.requested:
+                    continue
+                shape = str(pad.get("shape", "rect")).lower()
+                if shape not in {"rect", "circle", "oval", "roundrect"} or pad.get("chamfer") or (_pad_has_drill(pad) and shape == "roundrect"):
+                    fail(self, f"Owned pad-zone coupling does not admit pad shape {shape}")
+                    return self.mesh
+                offset = pad.get("drill_offset",pad.get("drill_offset_mm",(0,0))) or (0,0)
+                if _pad_has_drill(pad) and (any(abs(float(v))>1e-12 for v in offset) or pad.get("drill_shape") not in {None,"","none","circle","oval"}):
+                    fail(self, "Owned pad-zone coupling requires a centered circular/oval pad drill")
+                    return self.mesh
+            try:
+                self.tracks()
+                self.vias()
+                self.pads()
+                if any(i.severity == "error" for i in self.mesh.issues):
+                    self.mesh.branches.clear()
+                    return self.mesh
+                if not prepare(self):
+                    return self.mesh
+                self.zones()
+                if any(i.severity == "error" for i in self.mesh.issues):
+                    self.mesh.branches.clear()
+                    return self.mesh
+                couple(self)
+            except ValueError as error:
+                fail(self, str(error))
+            return self.mesh
         self.tracks()
         self.vias()
         self.zones()

@@ -71,7 +71,10 @@ def audit(builder, names, solve=False, face_experiment=False):
         branches = by_zone[region["source_id"]]
         ratios, zero_faces, examples = [], 0, []
         for branch in branches:
-            face = shared_face_length(builder.zone_polygons[branch.node_p], builder.zone_polygons[branch.node_n], builder.containment_tolerance)
+            p,n=branch.node_p,branch.node_n
+            if p in builder.owned_face_nodes:p,n=builder.owned_face_nodes[p]
+            elif n in builder.owned_face_nodes:p,n=builder.owned_face_nodes[n]
+            face = shared_face_length(builder.zone_polygons[p], builder.zone_polygons[n], builder.containment_tolerance)
             zone_faces[branch.id] = face
             if face <= 1e-7:
                 zero_faces += 1
@@ -105,6 +108,8 @@ def audit(builder, names, solve=False, face_experiment=False):
     report = {"mesh": builder.spec.mesh, "nodes": len(mesh.nodes), "branches": dict(Counter(b.kind for b in mesh.branches)),
             "components": len(sizes), "largest_component_sizes": sizes[:10], "zones": zones,
             "terminal_zone_attachments": contacts, "issues": [issue.__dict__ for issue in mesh.issues]}
+    if "owned_copper" in mesh.branch_admission:
+        report["owned_copper"] = mesh.branch_admission["owned_copper"]
     if solve:
         from unittest.mock import patch
         from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
@@ -131,6 +136,10 @@ def audit(builder, names, solve=False, face_experiment=False):
                 "paths": result.networks.get("source_to_load", {}).get("paths", []),
                 "residual": result.summary.get("max_scaled_linear_residual"),
                 "copper_loss_w": result.summary.get("total_copper_loss_w"),
+                "total_load_current_a": result.summary.get("total_load_current_a"),
+                "source_current_balance_a": result.networks.get("source_to_load",{}).get("source_current_balance_a"),
+                "p95_current_density_a_mm2": result.summary.get("p95_current_density_a_mm2"),
+                "load_power_deficit_w": sum(p.get("load_current_a",0)*p.get("supply_drop_v",0) for p in result.networks.get("source_to_load",{}).get("paths",[])),
                 "baseline_overwidth_zone_loss_w": sum(edge["power_loss_w"] for edge in result.fields.get("branch_results", [])
                     if edge["id"] in zone_faces and edge["width_mm"] > 3 * zone_faces[edge["id"]]),
                 "baseline_zero_face_zone_loss_w": sum(edge["power_loss_w"] for edge in result.fields.get("branch_results", [])
@@ -146,11 +155,14 @@ def main():
     parser.add_argument("--factors", type=float, nargs="+", default=[2, 1, .5])
     parser.add_argument("--solve", action="store_true", help="Run an in-memory J14 attachment removal experiment")
     parser.add_argument("--face-experiment", action="store_true", help="Also replace full zone widths by actual shared faces; diagnostic only")
+    parser.add_argument("--owned-shared-faces", action="store_true", help="Opt in to pad-owned copper partition qualification")
     args = parser.parse_args()
     design = _design_from_kicad(str(ROOT / "app/public/demo/MODULAR-BUS-NIB.kicad_pcb"))
     request = json.loads((ROOT / "docs/validation/modular-bus-nib-12vout-dcir-request.json").read_text())
     spec = AnalysisSpec(**request["spec"])
     spec = replace(spec, mesh={**spec.mesh, "solver_memory_limit_gb": 4.0})
+    if args.owned_shared_faces:
+        spec = replace(spec,mesh={**spec.mesh,"pad_zone_coupling":"owned_shared_faces"})
     names = {pad["component_pad"]: pad for pad in design.pads if pad.get("component_pad") in {"R19.3", "J14.2", "J20.2", "J15.2"}}
     reports = []
     for index, factor in enumerate(args.factors):
@@ -160,7 +172,7 @@ def main():
         args.output.write_text(json.dumps(reports, indent=2) + "\n")
         # Each of these six retained filled polygons had one zone component
         # before the contact/face repair. Reject loss of positive-area paths.
-        if len(report["zones"]) != 6 or any(zone["components"] != 1 for zone in report["zones"]):
+        if len(report["zones"]) != 6 or (not args.owned_shared_faces and any(zone["components"] != 1 for zone in report["zones"])):
             raise AssertionError("Pinned board zone component count changed; inspect written topology evidence")
         if any(zone["zero_shared_face_branches"] or zone["max_width_to_face_ratio"] > 1 + 1e-7 for zone in report["zones"]):
             raise AssertionError("Zone branches exceed retained positive shared-face width")
