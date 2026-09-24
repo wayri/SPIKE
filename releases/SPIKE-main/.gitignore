@@ -1,0 +1,4 @@
+/app/
+/cargo-target/
+/artifacts/
+/tauri-build.log
