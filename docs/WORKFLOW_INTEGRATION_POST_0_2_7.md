@@ -22,6 +22,14 @@ The canonical PI setup is unchanged and continues to save in the native project.
 PI setup and SPICE workspace edits now explicitly activate unsaved-project
 protection; this does not create expensive full-board undo snapshots per keypress.
 
+The desktop close handler also needs the main window's Tauri `allow-destroy`
+permission: Tauri's `onCloseRequested` callback calls `destroy()` after an
+unblocked close. Without that permission, the title-bar close button and the
+save/discard continuation leave the window open. The permission is scoped to
+the main window; a failed programmatic close now reports an error and resets
+the close guard so the user can retry. This source correction needs a rebuilt
+desktop package for native acceptance.
+
 ## Owned SPIKES circuit integration
 
 The SPICE model assistant's Validate & run page now offers the release-owned

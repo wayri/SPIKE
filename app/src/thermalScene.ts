@@ -1,4 +1,5 @@
 export type ThermalPoint3 = [number, number, number];
+import type { ThermalBoundary } from "./thermalBoundaries";
 export type ThermalCoordinateFrame = "domain_local" | "board_local" | "board_absolute";
 
 export type ThermalFan = {
@@ -62,6 +63,9 @@ export type ThermalScenarioView = {
     material_id?: string;
     surface_finish_id?: string;
     power_w?: number;
+    theta_top_c_per_w?: number;
+    theta_bottom_c_per_w?: number;
+    thermal_capacitance_j_per_c?: number;
     region?: string;
     position?: ThermalPoint3;
     coordinate_frame?: ThermalCoordinateFrame;
@@ -93,6 +97,7 @@ export type ThermalScenarioView = {
     thickness_mm?: number;
     material_id?: string;
   }>;
+  thermal_boundaries?: ThermalBoundary[];
   material_library?: Array<Record<string, unknown>>;
   surface_finish_library?: Array<Record<string, unknown>>;
   thermal_screening?: Array<Record<string, unknown>>;

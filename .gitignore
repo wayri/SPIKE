@@ -4,8 +4,14 @@ build/
 dist/
 app/node_modules/
 app/dist/
+/app/src-tauri/target/
+/app/src-tauri/resources/worker/
+/app/.report-preview/
+/artifacts/
+/wx_desktop/artifacts/
 app/public/demo/models/
 .tmp/
+.local/
 /%USERPROFILE%/
 *.egg-info/
 __pycache__/
@@ -60,10 +66,3 @@ htmlcov/
 
 # Documentation builds
 docs/_build/
-
-# Generated toolchains and local runtime output
-app/src-tauri/target/
-app/src-tauri/resources/worker/spike-worker/
-app/.tmp/
-artifacts/
-tools/hdl/oss-cad-suite/

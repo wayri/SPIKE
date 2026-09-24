@@ -1,0 +1,21 @@
+* SPIKES generic behavioral power models, engineering preview.
+* Not manufacturer-qualified. No avalanche, SOA or temperature prediction.
+* State voltages are dimensionless proxies, NOT physical stored charge.
+.subckt SPK_IGBT C G E params: VTH=4 VSPAN=2 VCE=1 RON=.1 ROFF=1G TAU=1u CGE=1n CGC=100p
+Bdrive drive E V={limit((V(G,E)-VTH)/VSPAN,0,1)}
+Rtail drive state 1
+Ctail state E {TAU}
+Bchannel C E I={limit(V(state,E),0,1)*max(V(C,E)-VCE,0)/RON+V(C,E)/ROFF}
+Cgate G E {CGE}
+Cmiller G C {CGC}
+.ends SPK_IGBT
+
+* SCR: smooth regenerative conductance with holding-current threshold.
+* Gate must remain asserted long enough to latch; commutation needs time TAU.
+.subckt SPK_SCR A G K params: VGT=1 VON=.8 RON=.1 IH=.05 IW=.005 TAU=1u ROFF=1G RG=100
+Btarget target K V={max(limit(V(G,K)/VGT,0,1),.5*(1+tanh((V(state,K)*max(V(A,K)-VON,0)/RON-IH)/IW)))}
+Rstate target state 1
+Cstate state K {TAU}
+Bchannel A K I={limit(V(state,K),0,1)*max(V(A,K)-VON,0)/RON+V(A,K)/ROFF}
+Rgate G K {RG}
+.ends SPK_SCR

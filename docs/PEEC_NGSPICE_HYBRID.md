@@ -50,6 +50,13 @@ field/circuit solve. Device currents do not currently cause the field solver to
 re-extract a state-dependent geometry model. The combined result cannot have a
 stronger model status than its weakest extraction or circuit input.
 
+The experimental native PEEC field-reduction provider requires each reviewed
+network's R/L/C/G value to be explicitly available before it returns a completed
+circuit update. A missing value or a parameter marked `unsupported` fails the
+update; it is not converted to zero. An explicitly computed numeric zero remains
+valid. In particular, a completed PEEC extraction with unsupported capacitance
+cannot supply a complete RLCG parasitic to that provider.
+
 A production closed-loop workflow still requires:
 
 - a multiconductor electrostatic C/G matrix including pads, vias, antipads,

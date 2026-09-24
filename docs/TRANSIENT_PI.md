@@ -86,20 +86,20 @@ extraction/integration exceeds the wall-time limit.
 
 Overlapping line filaments from traces, pads, zones, and via transitions can
 make the approximate native partial-inductance matrix non-passive. Before time
-integration, SPIKE eigendecomposes the symmetric matrix and applies the nearest
-positive matrix in the Frobenius norm. Results record the negative eigenmode
-count, original eigenvalue range, eigenvalue floor, and correction ratio.
+integration, SPIKE assesses the symmetric matrix with the same scale-aware
+energy check as AC. Negative modes beyond that check's tolerance fail with
+`TRANSIENT_INDUCTANCE_NONPASSIVE`. No nearest-positive projection or artificial
+eigenvalue floor is applied. Valid zero-energy topology modes remain zero.
 
-- Any correction is reported as `TRANSIENT_INDUCTANCE_PASSIVITY_PROJECTED`.
-- Corrections above 5% are explicitly described as large and qualitative.
-- Corrections above 50% fail with `TRANSIENT_INDUCTANCE_NONPASSIVE`.
+- The legacy correction-ratio result field remains zero for compatibility.
 - Non-finite states, states above the numerical safety bound, and scaled linear
   residuals above `1e-7` fail rather than producing result fields.
 
-Passivity projection makes the exploratory R-L integration stable; it does not
-validate the underlying filament discretization. Quantitative use still
-requires geometry cleanup, mesh-convergence comparison, and independent
-analytical or measured fixtures with a small correction ratio.
+Previously projected runs can now fail explicitly. The two-layer native
+regression exposes five negative-energy modes with no waveform output.
+Quantitative use requires consistent finite-volume geometry and current bases,
+mesh convergence, and independent analytical/measured correlation. See the
+[finite-volume correction record](PEEC_VOLUME_CORRECTION_20260924.md).
 
 ## Result Contract
 
@@ -113,7 +113,7 @@ The solver emits `spike/v1` with:
 - Peak voltage drop, overshoot, current density, current, copper loss, and
   branch `L di/dt` summary values.
 - Integration, mesh, model-limit, and solver provenance.
-- Matrix passivity correction and maximum scaled linear residual.
+- Matrix passivity assessment and maximum scaled linear residual.
 - Stackup capacitance provenance, reference layers, skipped branches, and
   displacement-current peaks when that model is active.
 - Estimated dense workspace, peak worker memory, actual dense-array bytes,

@@ -29,8 +29,7 @@ type FrontendCode =
   | "SPIKE-FE-IPC-E-0002"
   | "SPIKE-FE-VIEW-P-0001"
   | "SPIKE-FE-PROJECT-E-0001"
-  | "SPIKE-FE-SPICE-E-0001"
-  | "SPIKE-FE-SECURITY-E-0001";
+  | "SPIKE-FE-SPICE-E-0001";
 
 const frontendCatalog: Record<FrontendCode, { title: string; action: string; recoverable: boolean; retryable: boolean }> = {
   "SPIKE-FE-APP-E-0001": { title: "Frontend operation failed", action: "Review the operation details, correct the input, and retry.", recoverable: true, retryable: true },
@@ -40,7 +39,6 @@ const frontendCatalog: Record<FrontendCode, { title: string; action: string; rec
   "SPIKE-FE-VIEW-P-0001": { title: "Viewport performance degraded", action: "Reduce visible detail or select a lower rendering quality preset.", recoverable: true, retryable: true },
   "SPIKE-FE-PROJECT-E-0001": { title: "Project open failed", action: "Check the project path and package integrity, then retry.", recoverable: true, retryable: true },
   "SPIKE-FE-SPICE-E-0001": { title: "SPICE assistant input invalid", action: "Correct the highlighted model, pin, or analysis fields and validate again.", recoverable: true, retryable: true },
-  "SPIKE-FE-SECURITY-E-0001": { title: "Desktop license service unavailable", action: "Open the installed SPIKE desktop application and retry the licensing operation.", recoverable: true, retryable: true },
 };
 
 const codePattern = /^SPIKE-(FE|BE)-([A-Z]+)-(I|W|P|E|C|S)-([0-9]{4})$/;

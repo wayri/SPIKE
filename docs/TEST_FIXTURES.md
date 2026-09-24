@@ -5,13 +5,13 @@ The e-brake driver board is a useful real-world KiCad regression fixture. It con
 Board under test:
 
 ```text
-C:\Users\example\Documents\Projects-kicad\Exercise-machine-ebrake-driver - Copy\Exercise-machine-ebrake-driver\ebrake1_rel1\ebrake1.kicad_pcb
+C:\Users\yawar\Documents\Projects-kicad\Exercise-machine-ebrake-driver - Copy\Exercise-machine-ebrake-driver\ebrake1_rel1\ebrake1.kicad_pcb
 ```
 
 Run the parser and normalized-design regression with:
 
 ```powershell
-$env:SPIKE_FIXTURE_BOARD = 'C:\Users\example\Documents\Projects-kicad\Exercise-machine-ebrake-driver - Copy\Exercise-machine-ebrake-driver\ebrake1_rel1\ebrake1.kicad_pcb'
+$env:SPIKE_FIXTURE_BOARD = 'C:\Users\yawar\Documents\Projects-kicad\Exercise-machine-ebrake-driver - Copy\Exercise-machine-ebrake-driver\ebrake1_rel1\ebrake1.kicad_pcb'
 python -m unittest tests.python.test_kicad_fixture -v
 ```
 

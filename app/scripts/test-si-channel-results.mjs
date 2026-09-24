@@ -24,4 +24,8 @@ const normalizedPam4 = module.normalizeSiChannelResult(pam4);
 assert.equal(normalizedPam4.pam4EyeHeights.length, 3);
 assert.equal(normalizedPam4.pam4BerProxies[2].points[1].y, 1e-6);
 assert.match(module.buildSiChannelHtmlReport(pam4), /PAM4 eye height/);
+const panel = readFileSync(new URL("../src/SiChannelResultPanel.tsx", import.meta.url), "utf8");
+assert.match(panel, /const displayed = showAll \? available : selected \? available\.filter/, "trace selector must control the plotted series");
+assert.match(panel, /defaultShowAll \/>/, "NEXT and FEXT are shown together for direct comparison");
+assert.match(panel, /No matched NEXT\/FEXT samples were returned/, "absent crosstalk stays explicit");
 console.log("SI channel native result assertions passed");

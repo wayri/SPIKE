@@ -16,6 +16,7 @@ import { resultDatumLayers, resultLayerIsVisible, resultLayerWithVisibleData } f
 import type { Viewport2DState, ViewportRestoreCommand } from "./workspaceState";
 import { buildBoundsSpatialIndex, pointBoundsCandidates, type BoundsSpatialIndex, type SpatialBounds } from "./viewportSpatialIndex";
 import { finiteFocusBounds, focusViewBox, type FocusBounds2D } from "./viewportFocus";
+import { buildContourGrid, connectedContourSampleGroups, contourGridTriangleSamples, matchViaStressSamples, sampleFaceSupport, viaStressAnnulusPath } from "./contourField";
 
 import { copperNetLabels } from "./viewportPerformance";
 
@@ -946,9 +947,41 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     });
   }, [activeCopperLayer, resultModeKey, analysisResult, board, visibleLayers, resultAnalysisOnly, analysisNetsKey, projectionKey]);
 
-  const displayResultSamples = useMemo(() => resultVisualization?.fieldStyle === "smooth"
-    ? smoothDisplaySamples(resultSamples, resultFaceTriangleIndices) : resultSamples,
-    [resultSamples, resultVisualization?.fieldStyle]);
+  const displayResultSamples = useMemo(() => {
+    if (resultModeKey === "via_stress") return [];
+    if (resultVisualization?.fieldStyle !== "smooth") return resultSamples.filter(sample => sample.source_kind !== "via");
+    const domains = connectedContourSampleGroups(resultSamples);
+    const planarSamples = new Set(domains.flat());
+    const reconstructed: ScalarSample[] = [];
+    let remainingGridVertices = 24_000;
+    domains.forEach(samples => {
+      if (samples.length < 3) {
+        reconstructed.push(...samples);
+        return;
+      }
+      if (remainingGridVertices < 64) {
+        reconstructed.push(...samples);
+        return;
+      }
+      const template = samples[0];
+      const vertexBudget = Math.min(remainingGridVertices,
+        Math.max(64, Math.floor(24_000 * samples.length / Math.max(planarSamples.size, 1))));
+      remainingGridVertices -= vertexBudget;
+      const grid = buildContourGrid(samples, {
+        maximumSourceSamples: 4_000,
+        maximumGridVertices: vertexBudget,
+        supportsPoint: sampleFaceSupport(samples),
+      });
+      if (grid) reconstructed.push(...contourGridTriangleSamples(grid, template));
+      else reconstructed.push(...smoothDisplaySamples(samples, resultFaceTriangleIndices));
+    });
+    // Preserve non-via samples whose faces cannot be projected onto the board.
+    // Vertical via barrel faces use source via geometry below, never squares.
+    reconstructed.push(...resultSamples.filter(sample => !planarSamples.has(sample)
+      && sample.source_kind !== "via")
+      .map(sample => ({ ...sample, vertices_mm: undefined })));
+    return reconstructed;
+  }, [resultSamples, resultVisualization?.fieldStyle, resultModeKey]);
   const resultSvgBatches = useMemo(() => buildScalarSvgBatches(displayResultSamples, {
     minimum: resultMinimum,
     maximum: resultMaximum,
@@ -957,11 +990,30 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     smooth: false,
     project: point => toLayout(point),
   }), [displayResultSamples, resultMinimum, resultMaximum, resultCellSize, resultVisualization?.fieldStyle, projectionKey]);
-  const resultFieldOverlay = useMemo(() => <g className={`result-field-overlay style-${resultVisualization?.fieldStyle ?? "cells"}`} pointerEvents="none" shapeRendering="crispEdges">
-    {resultSvgBatches.map(batch => <path key={`result-bucket-${batch.bucket}`} d={batch.path} fill={batch.color}
-      fillOpacity="1" stroke="none"
-      data-sample-count={batch.sampleCount} />)}
-  </g>, [resultSvgBatches, resultVisualization?.fieldStyle]);
+  const viaStressGlyphs = useMemo(() => matchViaStressSamples(
+    resultModeKey === "via_stress" ? resultSamples : resultSamples.filter(sample => sample.source_kind === "via"),
+    board.vias,
+  ), [resultModeKey, resultSamples, board.vias]);
+  const resultFieldOverlay = useMemo(() => {
+    if (resultModeKey === "via_stress") return <g className="result-field-overlay style-via-footprints" pointerEvents="none">
+      {viaStressGlyphs.map(({ via, value, sampleCount }) => {
+        const path = viaStressAnnulusPath(via, point => toLayout(point));
+        return <path key={`via-stress-${via.id}`} d={path} fill={resultColor(value)} fillRule="evenodd"
+          data-sample-count={sampleCount} data-via-id={via.id} />;
+      })}
+    </g>;
+    return <g className={`result-field-overlay style-${resultVisualization?.fieldStyle ?? "cells"}`} pointerEvents="none"
+      shapeRendering={resultVisualization?.fieldStyle === "smooth" ? "geometricPrecision" : "crispEdges"}>
+      {resultSvgBatches.map(batch => <path key={`result-bucket-${batch.bucket}`} d={batch.path} fill={batch.color}
+        fillOpacity="1" stroke="none"
+        data-sample-count={batch.sampleCount} />)}
+      {viaStressGlyphs.map(({ via, value, sampleCount }) => {
+        const path = viaStressAnnulusPath(via, point => toLayout(point));
+        return <path key={`result-via-${via.id}`} d={path} fill={resultColor(value)} fillRule="evenodd"
+          data-sample-count={sampleCount} data-via-id={via.id} />;
+      })}
+    </g>;
+  }, [resultModeKey, viaStressGlyphs, resultSvgBatches, resultVisualization?.fieldStyle, resultMinimum, resultMaximum, projectionKey]);
 
   const resultVectorsOverlay = useMemo(() => (!resultVisualization?.showVectors ? null : resultVectors.map((sample, index) => {
     const point = toLayout([sample.x_mm, sample.y_mm]);
@@ -1215,6 +1267,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         const featureCount = layerZones.length + layerTracks.length + layerPads.length + layerVias.length;
         const overviewResultSamples = displayResultSamples.filter(sample => sampleMatchesLayer(sample.layer, layer));
         const overviewResultVectors = resultVectors.filter(sample => sampleMatchesLayer(sample.layer, layer));
+        const overviewViaStress = viaStressGlyphs.filter(({ via }) => layersContainCopper(via.layers ?? [], layer));
         const overviewId = layer.replace(/[^a-z0-9_-]/gi, "-");
         return <button key={layer} onClick={() => setActiveCopperLayer(layer)} title={`${layer}: drag to pan, wheel to zoom, double-click to fit`}>
           <span>{layer}</span>
@@ -1271,8 +1324,12 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
                 return <g key={via.id}><circle cx={point[0]} cy={point[1]} r={via.size / 2} fill={via.id === selectedId ? "#ffc04f" : netColor} /><circle cx={point[0]} cy={point[1]} r={via.drill / 2} fill="#0b141a" /></g>;
               })}
               </g>}
-              <g pointerEvents="none" shapeRendering="crispEdges">
-                {buildScalarSvgBatches(overviewResultSamples, { minimum: resultMinimum, maximum: resultMaximum,
+              <g pointerEvents="none" shapeRendering={resultVisualization?.fieldStyle === "smooth" ? "geometricPrecision" : "crispEdges"}>
+                {resultModeKey === "via_stress" ? overviewViaStress.map(({ via, value, sampleCount }) => {
+                  const path = viaStressAnnulusPath(via, point => toLayout(point));
+                  return <path key={`overview-via-stress-${layer}-${via.id}`} d={path} fill={resultColor(value)} fillRule="evenodd"
+                    data-sample-count={sampleCount} data-via-id={via.id} />;
+                }) : buildScalarSvgBatches(overviewResultSamples, { minimum: resultMinimum, maximum: resultMaximum,
                   cellSize: resultCellSize, colorBuckets: 128, smooth: false, project: point => toLayout(point) }).map(batch =>
                   <path key={`overview-result-${layer}-${batch.bucket}`} d={batch.path} fill={batch.color} stroke="none" />)}
               </g>

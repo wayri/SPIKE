@@ -171,7 +171,7 @@ assert.notEqual(
   viewportSceneIdentity("mask", "F.Mask", "surface"),
   viewportSceneIdentity("copper-zone", "F.Cu", "surface"),
 );
-assert.ok(PROCEDURAL_SOLDERMASK_OPACITY <= 0.25, "procedural mask must preserve visible copper context");
+assert.ok(PROCEDURAL_SOLDERMASK_OPACITY >= 0.5 && PROCEDURAL_SOLDERMASK_OPACITY <= 0.7, "procedural mask color should read clearly while retaining copper context");
 
 const closeClip = adaptivePerspectiveClip({ radius: 40, cameraDistance: 18 });
 assert.ok(closeClip.near > 0 && closeClip.near < 1, "close board views need a conservative near plane");

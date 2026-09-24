@@ -96,7 +96,7 @@ class WindowsSigningContractTests(unittest.TestCase):
         self.assertIn("../../requirements-runtime-windows-x64.txt", resources)
         self.assertEqual(
             config["bundle"]["licenseFile"],
-            "../../licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md",
+            "../../LICENSE",
         )
 
     def test_dependency_cms_helper_is_detached_sha256_and_fails_closed(self) -> None:

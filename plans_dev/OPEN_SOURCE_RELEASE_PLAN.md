@@ -107,7 +107,7 @@ withheld circuit/transient implementations.
 | `kicad_plugin/metadata.json` declares MIT and a placeholder repository URL | If this integration ships, correct metadata against its verified license boundary and real public repository |
 
 There are multiple things currently called SPIKES: the in-tree circuit engine
-and standalone copies, and `D:\workspace\SPIKES`, a separately developed
+and standalone copies, and `D:\PROJECTS-DEV\SPIKES`, a separately developed
 native multiphysics project. The latter's LICENSE is currently proprietary;
 SPIKE's status document treats its PCB adapter as discovery/verification-only.
 Do not copy either whole project or substitute it for working PI solvers based
@@ -181,7 +181,7 @@ from copyleft or redistribution obligations.
 Planned location after the internal freeze:
 
 ```text
-D:\workspace\open-source-release-output\
+D:\PROJECTS-DEV\open-source-release-output\
   internal-release-control\       private plan, exclusion rules, provenance map
   spike\                          independent public Git repository
   spike-solvers\                  independent public Git repository

@@ -20,7 +20,7 @@ def default_thermal():
 
 
 def default_profile():
-    return {'contract':'spikes/run-profile/v1','name':'Default','execution':'batch','analysis':'from_netlist',
+    return {'contract':'spikes/run-profile/v1','name':'Default','backend':'native','execution':'batch','analysis':'from_netlist',
             'time_step':'10u','stop_time':'5m','uic':True,'method':'hybrid_trapezoidal',
             'capture_samples':20000,'speed_ratio':1.,'electrical_temperature_c':None}
 
@@ -68,6 +68,7 @@ def validate_profile(profile):
     from python.spikes.netlist import parse_spice_number
     if profile.get('contract')!='spikes/run-profile/v1':raise ValueError('Unsupported run profile')
     if not isinstance(profile['name'],str) or not profile['name'].strip() or len(profile['name'])>128:raise ValueError('Profile name must be 1..128 characters')
+    choice(profile.get('backend','native'),('native','ngspice'),'solver backend')
     choice(profile['execution'],('batch','continuous'),'execution mode')
     choice(profile['analysis'],('from_netlist','transient','operating_point'),'analysis')
     choice(profile['method'],('hybrid_trapezoidal','backward_euler','bdf2'),'integration method')
@@ -79,6 +80,7 @@ def validate_profile(profile):
     finite(profile['speed_ratio'],'Simulated seconds / wall second',0,1e6,True)
     if profile['electrical_temperature_c'] is not None:finite(profile['electrical_temperature_c'],'Electrical .TEMP [°C]',-273.15,2000,True)
     if profile['execution']=='continuous' and profile['analysis']=='operating_point':raise ValueError('Continuous mode requires transient analysis')
+    if profile.get('backend','native')=='ngspice' and profile['execution']!='batch':raise ValueError('ngspice compatibility runs are batch only; native continuous state cannot be substituted')
 
 
 def effective_source(source,profile):

@@ -8,7 +8,7 @@
     "tests/python",
     "benchmarks"
   ],
-  "files_scanned": 813,
+  "files_scanned": 827,
   "scope": "Recorded links and DOIs only; not proof of reading, adoption, accuracy or license permission. Includes non-paper links.",
   "excluded": [
     "private repositories",
@@ -18,6 +18,15 @@
     "docs/SOLVER_REFERENCES.md"
   ],
   "references": [
+    {
+      "url": "http://127.0.0.1:5187/fixtures/engineering-report-tabs-preview.html",
+      "occurrences": [
+        {
+          "file": "docs/ENGINEERING_REPORTS.md",
+          "line": 35
+        }
+      ]
+    },
     {
       "url": "http://timestamp.digicert.com",
       "occurrences": [
@@ -123,6 +132,15 @@
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
           "line": 209
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2310.12087",
+      "occurrences": [
+        {
+          "file": "docs/PEEC_VOLUME_CORRECTION_20260924.md",
+          "line": 146
         }
       ]
     },
@@ -396,6 +414,19 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1007/s001900000116",
+      "occurrences": [
+        {
+          "file": "docs/PEEC_VOLUME_CORRECTION_20260924.md",
+          "line": 142
+        },
+        {
+          "file": "src/peec/volume_inductance.cpp",
+          "line": 16
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1016/j.mejo.2025.106612",
       "occurrences": [
         {
@@ -464,6 +495,19 @@
         {
           "file": "docs/AC_CONDUCTOR_MODEL_PLAN.md",
           "line": 40
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1147/rd.165.0470",
+      "occurrences": [
+        {
+          "file": "docs/PEEC_VOLUME_CORRECTION_20260924.md",
+          "line": 141
+        },
+        {
+          "file": "src/peec/volume_inductance.cpp",
+          "line": 15
         }
       ]
     },
@@ -983,7 +1027,7 @@
       "occurrences": [
         {
           "file": "docs/RESULT_VISUALIZATION_AND_LIMITS.md",
-          "line": 46
+          "line": 52
         }
       ]
     },
@@ -1051,6 +1095,15 @@
         {
           "file": "python/spike_core/external_engine_discovery.py",
           "line": 129
+        }
+      ]
+    },
+    {
+      "url": "https://plotly.com/javascript/plotlyjs-function-reference/",
+      "occurrences": [
+        {
+          "file": "docs/TRACE_RESULT_GRAPHS.md",
+          "line": 33
         }
       ]
     },
@@ -1377,6 +1430,15 @@
         {
           "file": "docs/BUSINESS_PLAN.md",
           "line": 143
+        }
+      ]
+    },
+    {
+      "url": "https://www.mdpi.com/2673-4117/7/6/261",
+      "occurrences": [
+        {
+          "file": "docs/PEEC_VOLUME_CORRECTION_20260924.md",
+          "line": 149
         }
       ]
     },

@@ -1413,6 +1413,22 @@ class KicadParser:
             }
             if source_id:
                 pad.update({'id': source_id, 'uuid': source_id})
+            # Preserve authoritative rounded/chamfered pad parameters. Missing
+            # or malformed values must not become an invented square outline.
+            for token in ('roundrect_rratio', 'chamfer_ratio'):
+                shape_parameter = self._get_node(node, token)
+                if shape_parameter is not None:
+                    try:
+                        value = float(shape_parameter[1])
+                        if not math.isfinite(value) or not 0 <= value <= 1:
+                            raise ValueError('invalid shape ratio')
+                        pad[token] = value
+                    except (IndexError, TypeError, ValueError):
+                        pad[token] = None
+                        self.diagnostics.append(f"Pad {source_id or full_name} has invalid {token}.")
+            chamfer = self._get_node(node, 'chamfer')
+            if chamfer is not None:
+                pad['chamfer'] = [str(value) for value in chamfer[1:]]
             if str(shape).lower() == 'custom':
                 custom_geometry = self._parse_custom_pad_geometry(
                     node, mirrored, size, drill_shape != "none", ptype,

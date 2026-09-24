@@ -105,7 +105,7 @@ class Wave1PackagedAcceptanceTests(unittest.TestCase):
             return {"file": path.name, "kind": kind, "size": path.stat().st_size, "sha256": _sha256(path), "authenticode": {"status": "Valid", "file_digest_algorithm": "sha256", "signer_thumbprint": signer, "timestamp_protocol": "rfc3161", "timestamp_authority_thumbprint": authority}}
         return self.write_json(root, "signed-installers.json", {
             "contract": "spike/windows-installer-manifest/v2", "product": "SPIKE", "version": "0.2.0", "application_version": "0.2.0-alpha.1",
-            "channel": "production-candidate", "release_state": "production-candidate", "license_key_id": "production-test", "production_qualified": False, "generated_at": "2026-08-27T00:00:00Z",
+            "channel": "production-candidate", "release_state": "production-candidate", "production_qualified": False, "generated_at": "2026-08-27T00:00:00Z",
             "signing_policy": {"required": True, "expected_signer_thumbprint": signer, "digest_algorithm": "sha256", "timestamp_required": True, "timestamp_protocol": "rfc3161"},
             "files": [artifact(msi, "msi"), artifact(nsis, "nsis")],
         })

@@ -141,7 +141,7 @@ After installation, verify Eigen3 is accessible:
 
 ```powershell
 # Create build directory
-cd C:\Users\example\Documents\agws\KiCAD_plugins\SPIKE
+cd C:\Users\yawar\Documents\agws\KiCAD_plugins\SPIKE
 mkdir build
 cd build
 
@@ -197,7 +197,7 @@ Once Eigen3 is installed:
 
 1. **Build SPIKE C++ Kernel**
    ```powershell
-   cd C:\Users\example\Documents\agws\KiCAD_plugins\SPIKE
+   cd C:\Users\yawar\Documents\agws\KiCAD_plugins\SPIKE
    mkdir build
    cd build
    cmake ..

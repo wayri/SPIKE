@@ -1,7 +1,5 @@
 export type AppLanguage = "en" | "de" | "es" | "fr" | "ja" | "zh-CN";
 export type UnitSystem = "si" | "engineering" | "imperial";
-export type UserType = "viewer" | "engineer" | "administrator" | "developer";
-export type LicenseTier = "evaluation" | "professional" | "enterprise" | "developer";
 
 export type AppSettings = {
   language: AppLanguage;
@@ -21,27 +19,8 @@ export type AppSettings = {
   restoreWorkspace: boolean;
   autosaveMinutes: 0 | 1 | 5 | 10 | 30;
   telemetry: "off" | "crash-only";
-  profile: { displayName: string; initials: string; userType: UserType };
-  license: {
-    tier: LicenseTier;
-    status: "active" | "expired" | "invalid" | "unlicensed";
-    licensee: string;
-    source: "signed-license" | "none";
-    expiresAt: string | null;
-    capabilities: string[];
-    licenseId?: string | null;
-    licenseType?: "temporary" | "timed" | "perpetual" | "developer" | null;
-    deviceBinding?: string;
-    errorCode?: string | null;
-    message?: string | null;
-  };
+  profile: { displayName: string; initials: string };
 };
-
-export const ALL_CAPABILITIES = [
-  "project.read", "project.write", "design.import", "pi.dc", "pi.ac", "pi.transient",
-  "spice.execute", "solver.extensions", "thermal.prepare", "report.export", "step.export",
-  "validation.run", "administration.settings",
-];
 
 export const DEFAULT_SETTINGS: AppSettings = {
   language: "en",
@@ -61,19 +40,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   restoreWorkspace: true,
   autosaveMinutes: 5,
   telemetry: "off",
-  profile: { displayName: "SPIKE User", initials: "USR", userType: "viewer" },
-  license: {
-    tier: "evaluation",
-    status: "unlicensed",
-    licensee: "Unlicensed user",
-    source: "none",
-    expiresAt: null,
-    capabilities: ["project.read"],
-    licenseId: null,
-    licenseType: null,
-    errorCode: "SPIKE-BE-SECURITY-E-0005",
-    message: "No license is installed",
-  },
+  profile: { displayName: "SPIKE User", initials: "USR" },
 };
 
 const STORAGE_KEY = "spike.application.settings.v1";
@@ -90,12 +57,17 @@ export function loadAppSettings(): AppSettings {
           ? legacyLimitMb / 1024
           : DEFAULT_SETTINGS.solverMemoryLimitGb,
     );
+    const known = Object.fromEntries(Object.keys(DEFAULT_SETTINGS)
+      .filter(key => key in saved)
+      .map(key => [key, saved[key as keyof AppSettings]])) as Partial<AppSettings>;
     return {
       ...DEFAULT_SETTINGS,
-      ...saved,
+      ...known,
       solverMemoryLimitGb,
-      profile: { ...DEFAULT_SETTINGS.profile, ...(saved.profile ?? {}) },
-      license: DEFAULT_SETTINGS.license,
+      profile: {
+        displayName: typeof saved.profile?.displayName === "string" ? saved.profile.displayName : DEFAULT_SETTINGS.profile.displayName,
+        initials: typeof saved.profile?.initials === "string" ? saved.profile.initials : DEFAULT_SETTINGS.profile.initials,
+      },
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -103,9 +75,8 @@ export function loadAppSettings(): AppSettings {
 }
 
 export function saveAppSettings(settings: AppSettings): void {
-  const persisted = { ...settings, license: undefined };
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
   } catch {
     // Hardened WebViews may deny persistent storage; runtime settings remain usable.
   }
@@ -126,12 +97,4 @@ const TRANSLATIONS: Record<AppLanguage, Record<string, string>> = {
 
 export function translate(language: AppLanguage, key: string): string {
   return TRANSLATIONS[language][key] ?? TRANSLATIONS.en[key] ?? key;
-}
-
-export function hasCapability(settings: AppSettings, capability: string): boolean {
-  return settings.license.status === "active" && (
-    settings.license.tier === "developer"
-    || settings.license.licenseType === "developer"
-    || settings.license.capabilities.includes(capability)
-  );
 }

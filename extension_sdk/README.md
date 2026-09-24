@@ -3,7 +3,8 @@
 SPIKE extensions are local process modules described by
 `spike/extension/v1`. They can contribute applications, commands, analyses,
 importers, exporters, reports, schema-driven panels, and validators. A solver
-that consumes `DesignIR` should continue to use the stricter solver SDK.
+that consumes `DesignIR` can use a declared analysis contribution. Existing
+solver plugins may continue using the solver SDK.
 
 ## Package layout
 
@@ -51,6 +52,22 @@ panels return structured data or a schema-driven view description. This keeps
 extensions portable between desktop, CLI, and future cloud workers.
 
 See `../extensions/net-inventory` for a complete Python example.
+
+## External analysis round trip
+
+Declare an `analyses` contribution with `output_contract: "spike/v1"` and both
+`design.read` and `results.write` permissions. The host passes a normalized
+`spike/v1` DesignIR in `context.design` and a SHA-256 binding in
+`context.design_binding`. Return a completed `spike/v1` AnalysisResult as
+`data.analysis_result` inside the extension result envelope. Its provenance
+must include the input `design_id`, `design_digest_sha256`, and solver identity.
+The host checks those fields and admits finite, bounded visualization samples
+before adding the result to the normal result viewer, history, and reports.
+
+The dependency-free [Python helper](python/spike_extension_sdk.py) constructs
+the bound result and writes the envelope atomically. See the
+[analysis integration guide](../docs/EXTENSION_ANALYSIS_API.md) for the exact
+request, field names and units, scripting workflow, and an adapter example.
 
 ## Design and harness extensions
 

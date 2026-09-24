@@ -36,5 +36,10 @@ assert.match(source, /event\.key === "Escape"/);
 assert.match(source, /event\.key !== "Tab"/);
 assert.match(source, /expandButton\.current\?\.focus\(\)/);
 assert.match(source, /aria-label={`Close expanded \$\{title\}`}/);
+assert.match(source, /className="si-parameter-options"/, "trace menu uses an in-panel list instead of an unbounded native popup");
+assert.match(source, /setSelected\(key\)/, "choosing an S-parameter changes the plotted trace");
+assert.match(source, /parameterPicker\.current\?\.removeAttribute\("open"\)/, "selection and Escape dismiss the trace menu");
+const css = readFileSync(new URL("../src/siWorkflow.css", import.meta.url), "utf8");
+assert.match(css, /\.si-parameter-options\s*\{[^}]*max-height:[^;]+;[^}]*overflow-y: auto/s, "trace menu height is bounded and scrollable");
 
 console.log("SI workflow plot cursor and expanded-window assertions passed");

@@ -20,6 +20,13 @@ class StudioContractTests(unittest.TestCase):
         self.assertTrue({"sil", "pil", "hil", "observer", "control_plant"}.issubset(targets))
         self.assertIn("provenance", schema["required"])
 
+    def test_run_profile_schema_keeps_legacy_native_and_explicit_compatibility(self) -> None:
+        schema = json.loads((ROOT / "studio/schemas/run-profile-v1.schema.json").read_text(encoding="utf-8"))
+        self.assertNotIn("backend", schema["required"])
+        self.assertEqual(schema["properties"]["backend"]["default"], "native")
+        self.assertEqual(schema["properties"]["backend"]["enum"], ["native", "ngspice"])
+        self.assertEqual(schema["allOf"][0]["then"]["properties"]["execution"]["const"], "batch")
+
 
 if __name__ == "__main__":
     unittest.main()

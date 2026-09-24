@@ -56,7 +56,8 @@ capacitors are open in DC, inductors impose zero DC voltage, explicit shunt
 conductance becomes resistance. A current source is not treated as a conductive
 return. Floating circuits, unknown pins, duplicate IDs and unresolved resistances
 fail. Bounds: 8 MiB request, 1024 nodes, 4096 elements, with tighter user limits.
-Cancellation discards outputs. The desktop route requires the PI DC entitlement.
+Cancellation discards outputs. The desktop route requires a compatible local
+worker and solver.
 
 ## Validation and limitations
 

@@ -1,11 +1,67 @@
 # SPIKE Thermal Workflow
 
-SPIKE uses an intent-first thermal workflow. The user defines the enclosure or
-bounding volume, board heat sources, air channels, openings, fan placement, and
-ambient conditions. The local worker validates that scenario and translates it
-into a solver case. OpenFOAM dictionaries remain an implementation detail.
+SPIKE's Thermal tab has a built-in component thermal path and an optional CFD
+path. The built-in path runs steady-state or transient lumped RC calculations in
+the local worker without OpenFOAM. It reports approximate temperatures keyed by
+part reference, not a spatial PCB temperature field. See
+[Component thermal calculations](COMPONENT_THERMAL.md) for equations, limits,
+worker contract, and numerical checks.
 
-## Guided flow
+In the GUI, sync board parts or import a BOM CSV/TSV. Match reference,
+dissipation W, top resistance K/W, and bottom resistance K/W columns in the
+preview before applying. For ODB++ imports, named component properties with
+those same quantities can be read directly. Unmatched references, duplicate
+assignments, invalid units, and missing values are flagged; no property is
+inferred from package geometry. Enter positive heat capacity J/K for each
+selected part in transient mode, then choose **Run steady state** or
+**Run transient**. The board-level fallback is used when no powered part is
+selected. Review the reference-linked temperature table and transient samples
+inside the Thermal setup panel.
+
+**Object and surface heat transfer** adds a boundary to any enabled part,
+board, heatsink, enclosure, or mechanical object. Choose the whole object, an
+X/Y/Z face, or enter a named CAD surface with its measured exposed area.
+Conduction uses an explicit K/W resistance to the ambient
+sink or another included object. Convection uses an exposed area in mm² and a
+coefficient in W/m²K; radiation uses exposed area, emissivity, and a fixed
+surroundings temperature. Fluid/sink temperatures can override the scenario
+ambient. The GUI suggests an area from object dimensions, but the user must
+review the actually exposed area. Each object remains one lumped temperature
+node; a face label does not solve its spatial gradient. Top/bottom ambient
+paths and added boundaries conduct heat in parallel, so avoid entering the
+same physical path twice. Transient runs require heat capacity for every
+included object. Completed runs list steady boundary heat flows, positive
+outward from each object.
+
+In transient mode, set duration and time step in **Component transient
+controls**. The local RC solve needs no OpenFOAM installation. The time step
+also controls the returned sample interval; refine it to assess time accuracy.
+Saved setups retain the board fallback power and heat capacity. BOM and ODB++
+power cells may specify W or mW explicitly; a cell unit takes precedence over
+the column/property unit. Unterminated quoted BOM records are rejected with a
+parse message.
+Syncing board parts preserves entered values and existing references, then fills
+available table rows up to 256. For larger boards, import a BOM for the desired
+references or remove unused rows before syncing again.
+
+Top and bottom resistances each represent a complete path from the modeled
+component node to ambient. A datasheet junction-to-case resistance alone does
+not supply the board/contact/convection portions. The built-in result remains
+approximate and requires knowledgeable review before release. Material labels,
+CAD faces, fans and thermal links do not automatically create a conduction,
+convection or radiation path for this lumped run. The built-in radiation term
+uses prescribed emissivity and fixed surroundings; it does not solve view
+factors or enclosure exchanges.
+
+The optional OpenFOAM workflow captures enclosure or bounding volume, board
+heat sources, air channels, openings, fan placement, and ambient conditions.
+The local worker validates that scenario and translates it into a solver case.
+OpenFOAM dictionaries remain an implementation detail.
+The current OpenFOAM adapter does not translate the object/surface boundaries
+above. While any are enabled, the GUI blocks its screen, preflight, prepare,
+and run actions so those conditions cannot be silently omitted.
+
+## Optional OpenFOAM guided flow
 
 1. Open **Thermal setup** from the ribbon.
 2. In **Setup**, define the bounding volume, environment, medium, enclosure,

@@ -1,18 +1,12 @@
-import { CheckCircle2, Copy, Download, FolderOpen, Gauge, Globe2, KeyRound, MonitorCog, Ruler, ShieldCheck, SlidersHorizontal, Trash2, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Gauge, Globe2, MonitorCog, Ruler, ShieldCheck, SlidersHorizontal, UserRound, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AppSettings, LANGUAGE_NAMES } from "./appSettings";
-import { activateNativeLicense, deactivateNativeLicense, exportNativeLicense, readDeviceLicenseRequest } from "./licenseBridge";
-import { openNativeTextFile, saveNativeTextFile } from "./workerBridge";
 
-type SettingsTab = "General" | "Units" | "Interface" | "Language" | "Account & license" | "Privacy";
+type SettingsTab = "General" | "Units" | "Interface" | "Language" | "Profile" | "Privacy";
 
-export default function UniversalSettingsModal({ settings, onSave, onClose, onLicenseChanged }: { settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void; onLicenseChanged?: (license: AppSettings["license"]) => void }) {
+export default function UniversalSettingsModal({ settings, onSave, onClose }: { settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void }) {
   const [draft, setDraft] = useState<AppSettings>(() => structuredClone(settings));
   const [tab, setTab] = useState<SettingsTab>("General");
-  const [licenseEnvelope, setLicenseEnvelope] = useState("");
-  const [licenseBusy, setLicenseBusy] = useState(false);
-  const [licenseNotice, setLicenseNotice] = useState("");
-  const licenseFileRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const key = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     window.addEventListener("keydown", key);
@@ -21,99 +15,11 @@ export default function UniversalSettingsModal({ settings, onSave, onClose, onLi
   const update = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => setDraft(current => ({ ...current, [key]: value }));
   const tabs: { id: SettingsTab; icon: typeof Gauge }[] = [
     { id: "General", icon: SlidersHorizontal }, { id: "Units", icon: Ruler }, { id: "Interface", icon: MonitorCog },
-    { id: "Language", icon: Globe2 }, { id: "Account & license", icon: KeyRound }, { id: "Privacy", icon: ShieldCheck },
+    { id: "Language", icon: Globe2 }, { id: "Profile", icon: UserRound }, { id: "Privacy", icon: ShieldCheck },
   ];
-  const applyLicense = async () => {
-    setLicenseBusy(true);
-    setLicenseNotice("");
-    try {
-      const license = await activateNativeLicense(licenseEnvelope.trim());
-      setDraft(current => ({ ...current, license }));
-      onLicenseChanged?.(license);
-      setLicenseEnvelope("");
-      setLicenseNotice("Signed license verified and activated for this machine and user.");
-    } catch (error) {
-      setLicenseNotice(String(error));
-    } finally { setLicenseBusy(false); }
-  };
-  const removeLicense = async () => {
-    setLicenseBusy(true);
-    try {
-      const license = await deactivateNativeLicense();
-      setDraft(current => ({ ...current, license }));
-      onLicenseChanged?.(license);
-      setLicenseNotice("License removed. SPIKE is now read-only.");
-    } catch (error) { setLicenseNotice(String(error)); }
-    finally { setLicenseBusy(false); }
-  };
-  const copyDeviceRequest = async () => {
-    try {
-      const request = await readDeviceLicenseRequest();
-      await navigator.clipboard.writeText(JSON.stringify(request, null, 2));
-      setLicenseNotice("Device/user binding request copied.");
-    } catch (error) { setLicenseNotice(String(error)); }
-  };
-  const applyLicenseContents = async (contents: string) => {
-    setLicenseBusy(true);
-    setLicenseNotice("");
-    try {
-      const license = await activateNativeLicense(contents.trim());
-      setDraft(current => ({ ...current, license }));
-      onLicenseChanged?.(license);
-      setLicenseEnvelope("");
-      setLicenseNotice(license.status === "active"
-        ? "Signed license verified and activated from file for this machine and user."
-        : (license.message ?? "License file did not activate."));
-    } catch (error) {
-      setLicenseNotice(String(error));
-    } finally { setLicenseBusy(false); }
-  };
-  const loadLicenseFile = async () => {
-    setLicenseBusy(true);
-    setLicenseNotice("");
-    try {
-      const file = await openNativeTextFile("license");
-      if (!file) {
-        // No native host (browser preview) or cancelled: fall back to the
-        // in-page file input so a portable license can still be loaded.
-        setLicenseBusy(false);
-        licenseFileRef.current?.click();
-        return;
-      }
-      await applyLicenseContents(file.contents);
-    } catch (error) {
-      setLicenseNotice(String(error));
-      setLicenseBusy(false);
-      licenseFileRef.current?.click();
-    }
-  };
-  const importLicenseFromInput = async (input: HTMLInputElement | null) => {
-    const file = input?.files?.[0];
-    if (!file) return;
-    try {
-      const contents = await file.text();
-      await applyLicenseContents(contents);
-    } catch (error) {
-      setLicenseNotice(String(error));
-    } finally {
-      if (input) input.value = "";
-      setLicenseBusy(false);
-    }
-  };
-  const saveLicenseFile = async () => {
-    setLicenseBusy(true);
-    setLicenseNotice("");
-    try {
-      const contents = await exportNativeLicense();
-      const path = await saveNativeTextFile("spike-license.spike-license.json", contents, "license");
-      setLicenseNotice(path ? `License backup saved: ${path}` : "License backup save cancelled.");
-    } catch (error) {
-      setLicenseNotice(String(error));
-    } finally { setLicenseBusy(false); }
-  };
   return <div className="modal-shade settings-shade" role="dialog" aria-modal="true" aria-label="SPIKE settings">
     <section className="universal-settings">
-      <header><div><b>Settings</b><span>Application, units, interface, language, account, and security</span></div><button className="canvas-icon" onClick={onClose} aria-label="Close settings"><X size={16} /></button></header>
+      <header><div><b>Settings</b><span>Application, units, interface, language, profile, and privacy</span></div><button className="canvas-icon" onClick={onClose} aria-label="Close settings"><X size={16} /></button></header>
       <div className="settings-layout">
         <nav>{tabs.map(item => <button key={item.id} className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}><item.icon size={15} />{item.id}</button>)}</nav>
         <main>
@@ -143,19 +49,9 @@ export default function UniversalSettingsModal({ settings, onSave, onClose, onLi
             <Setting label="Application language"><select value={draft.language} onChange={event => update("language", event.target.value as AppSettings["language"])}>{Object.entries(LANGUAGE_NAMES).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select></Setting>
             <p className="settings-note">The localization framework is active for global application commands. Engineering identifiers, net names, units, and solver messages remain unmodified.</p>
           </SettingsSection>}
-          {tab === "Account & license" && <SettingsSection title="Signed entitlement">
-            <div className="license-card"><CheckCircle2 size={20} /><div><b>{draft.license.tier.toUpperCase()} · {draft.license.status}</b><span>{draft.license.licensee}</span></div></div>
+          {tab === "Profile" && <SettingsSection title="Display profile">
             <Setting label="Display name"><input value={draft.profile.displayName} onChange={event => update("profile", { ...draft.profile, displayName: event.target.value })} /></Setting>
-            <Setting label="User type"><b>{draft.profile.userType}</b></Setting>
-            <Setting label="License source"><b>{draft.license.source}</b></Setting>
-            <Setting label="License type"><b>{draft.license.licenseType ?? "none"}</b></Setting>
-            <Setting label="Expires"><b>{draft.license.expiresAt ?? "not applicable"}</b></Setting>
-            <Setting label="Capabilities"><b>{draft.license.tier === "developer" || draft.license.licenseType === "developer" ? "All implemented capabilities" : draft.license.capabilities.length}</b></Setting>
-            <label className="license-input"><span>Paste signed license entitlement</span><textarea value={licenseEnvelope} onChange={event => setLicenseEnvelope(event.target.value)} spellCheck={false} placeholder="{ &quot;schema&quot;: &quot;spike/license-entitlement/v1&quot;, ... }" /></label>
-            <div className="license-actions"><button className="secondary-btn" onClick={copyDeviceRequest} disabled={licenseBusy}><Copy size={14} /> Copy device request</button><button className="secondary-btn" onClick={loadLicenseFile} disabled={licenseBusy}><FolderOpen size={14} /> Load license file</button><button className="secondary-btn" onClick={saveLicenseFile} disabled={licenseBusy || draft.license.status === "unlicensed"}><Download size={14} /> Save license file</button><button className="secondary-btn danger" onClick={removeLicense} disabled={licenseBusy || draft.license.status === "unlicensed"}><Trash2 size={14} /> Deactivate</button><button className="run-btn" onClick={applyLicense} disabled={licenseBusy || !licenseEnvelope.trim()}>Activate license</button></div>
-            <input ref={licenseFileRef} type="file" accept=".license,.json,.txt" style={{ display: "none" }} onChange={event => void importLicenseFromInput(event.target)} />
-            {licenseNotice && <p className="settings-note">{licenseNotice}</p>}
-            <p className="settings-note">Entitlements are Ed25519-signed and verified by the native host. Temporary and timed keys expire automatically. Developer keys grant full capabilities only when issued for this machine/user binding. Browser storage is never an authorization boundary.</p>
+            <p className="settings-note">The display name appears in this local workspace and is saved with interface preferences.</p>
           </SettingsSection>}
           {tab === "Privacy" && <SettingsSection title="Privacy and diagnostics">
             <Setting label="Telemetry"><select value={draft.telemetry} onChange={event => update("telemetry", event.target.value as AppSettings["telemetry"])}><option value="off">Off</option><option value="crash-only">Local crash reports only</option></select></Setting>

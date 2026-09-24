@@ -12,6 +12,7 @@ or temperature changes back into the extraction.
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 from typing import Any, Dict, List
 
 from .contracts import AnalysisSpec, DesignIR
@@ -98,6 +99,18 @@ class NativePeecFieldReductionProvider:
         if result.status != "completed":
             messages = "; ".join(issue.message for issue in result.issues)
             raise RuntimeError(f"Native PEEC extraction did not complete: {messages or result.status}.")
+        unsupported_capacitance = [
+            issue for issue in result.issues
+            if issue.status == "unsupported"
+            and (issue.code.startswith("PEEC_CAPACITANCE_")
+                 or issue.code.startswith("PEEC_ZONE_PAD_CAPACITANCE_"))
+        ]
+        if unsupported_capacitance:
+            codes = ", ".join(issue.code for issue in unsupported_capacitance)
+            raise RuntimeError(
+                f"Native PEEC capacitance is unsupported ({codes}); "
+                "the field/circuit provider cannot publish an RLCG update."
+            )
         networks = result.networks.get("parasitics", [])
         if not isinstance(networks, list) or not networks:
             raise RuntimeError("Native PEEC extraction returned no RLCG networks.")
@@ -109,9 +122,31 @@ class NativePeecFieldReductionProvider:
             identifier = str(parasitic.get("id", "")).strip()
             network = self._mapped_network(networks, parasitic, result.analysis_id)
             update = {"id": identifier}
+            availability = network.get("parameter_availability", {})
             for parameter in _PARAMETERS:
                 value = network.get(parameter)
-                update[parameter] = 0.0 if value is None else float(value)
+                parameter_status = (
+                    availability.get(parameter.split("_", 1)[0])
+                    if isinstance(availability, dict) else None
+                )
+                if value is None or parameter_status == "unsupported":
+                    raise ValueError(
+                        f"PEEC network {parasitic['source_network_index']} {parameter} is "
+                        "missing or unsupported; a complete circuit parasitic cannot be formed."
+                    )
+                try:
+                    number = float(value)
+                except (TypeError, ValueError) as exc:
+                    raise ValueError(
+                        f"PEEC network {parasitic['source_network_index']} "
+                        f"{parameter} is invalid."
+                    ) from exc
+                if isinstance(value, bool) or not math.isfinite(number) or number < 0:
+                    raise ValueError(
+                        f"PEEC network {parasitic['source_network_index']} "
+                        f"{parameter} must be finite and non-negative."
+                    )
+                update[parameter] = number
             updates.append(update)
 
         return {

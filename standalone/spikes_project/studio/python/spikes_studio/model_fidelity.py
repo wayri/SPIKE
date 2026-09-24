@@ -108,3 +108,25 @@ def preflight(document, analysis=None):
     report['effective_source_sha256']=hashlib.sha256(source.encode()).hexdigest()
     document['resolved_models'] = report
     return report
+
+
+def preflight_compatibility(document):
+    """Review an explicit ngspice run without pretending its models are native.
+
+    The process adapter only accepts self-contained netlists. Model-tier or
+    parasitic selections that need native rewriting are rejected rather than
+    silently ignored on the compatibility backend.
+    """
+    from python.spike_core.spice_netlist_safety import validate_netlist
+    report=resolve(document,'spice')
+    errors=list(report['errors'])
+    for row in report['components']:
+        if row['selection']['tier']!='source':errors.append(f"{row['ref']}: ngspice uses source models only")
+        if row['selection'].get('parasitic_values'):errors.append(f"{row['ref']}: selected parasitics are not lowered for ngspice")
+    if errors:raise ValueError('Compatibility model preflight failed:\n'+'\n'.join(errors))
+    validate_netlist(document['source'])
+    report.update(backend='ngspice',model_status='solver_dependent',
+                  effective_source=document['source'],
+                  effective_source_sha256=hashlib.sha256(document['source'].encode()).hexdigest())
+    document['resolved_models']=report
+    return report

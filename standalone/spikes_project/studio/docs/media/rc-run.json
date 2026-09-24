@@ -5081,7 +5081,7 @@
     "implementation": "strict_fp_dense_mna",
     "integration": "hybrid_trapezoidal",
     "owned_cpp_transient": true,
-    "library": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
+    "library": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
     "source_sha256": "1f6620174e016117f1e0c1d2b97e05cf5fe8e04e794b0c0afc1b78015fbff4c6"
   }
 }

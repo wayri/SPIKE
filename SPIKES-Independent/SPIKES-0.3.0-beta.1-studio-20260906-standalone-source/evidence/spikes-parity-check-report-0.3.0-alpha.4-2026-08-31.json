@@ -9,11 +9,11 @@
   },
   "inputs": [
     {
-      "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+      "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
       "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
     },
     {
-      "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+      "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
       "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
     }
   ],
@@ -68,11 +68,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -143,11 +143,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -191,11 +191,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -227,11 +227,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -298,11 +298,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -368,11 +368,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -416,11 +416,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -463,11 +463,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -505,11 +505,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]
@@ -540,11 +540,11 @@
         ],
         "evidence_checked": [
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-competitive-converter-rf-motor-2026-08-31.json",
             "sha256": "205de1bbbb41ac990610baa189095e3ac2000f3a9f2fee5e5f718c85440b58ba"
           },
           {
-            "artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
+            "artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\artifacts\\spikes-qualification-report-0.3.0-alpha.4-2026-08-31.json",
             "sha256": "52398d27ce3eb7ba5975dc8893e062043a396e4a6266fba49aa7f796319f3ae8"
           }
         ]

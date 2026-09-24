@@ -6,6 +6,7 @@ No GUI objects or callbacks are accessed from either worker.
 from collections import deque
 import math
 import multiprocessing as mp
+import re
 import threading
 import time
 
@@ -42,11 +43,64 @@ def native_batch(source, library, method='hybrid_trapezoidal'):
             'measurements':{'by_step':[{'parameters':r['provenance']['step_parameters'],'measurements':r.get('measurements',{})} for r in results]}}
 
 
+def ngspice_batch(source):
+    """Run only the explicitly selected, process-isolated compatibility backend.
+
+    Raw vectors and backend issues remain in the result. Only real, complete,
+    strictly time-ordered voltage vectors enter the native plot contract;
+    currents, power and thermal quantities are never inferred from them.
+    """
+    from python.spike_core.contracts import AnalysisSpec, DesignIR
+    from python.spike_core.ngspice_plugin import NgspicePlugin
+    from python.spike_core.spice_netlist_safety import validate_netlist
+    import hashlib
+
+    validate_netlist(source)
+    source_hash=hashlib.sha256(source.encode('utf-8')).hexdigest()
+    result=NgspicePlugin().run(
+        DesignIR(design_id='spikes-compatibility-run',name='Explicit SPIKES compatibility run'),
+        AnalysisSpec(analysis_id='spikes-compatibility-run',mode='spice',solver_id='spike.ngspice',
+                     options={'spice_netlist':source,'timeout_seconds':120}),
+    ).to_dict()
+    provenance=result.setdefault('provenance',{})
+    provenance.update(requested_backend='ngspice',source_sha256=source_hash,
+                      backend_substitution=False,model_qualification='solver-dependent; not manufacturer-qualified')
+    result['data']={'summary':result.get('summary',{}),
+                    'notice':'Only complete real transient voltage vectors are mapped to plots; raw vectors remain in fields.waveforms.'}
+    if result.get('status')!='completed':return result
+    if result.get('summary',{}).get('parse_status')!='complete':
+        result['status']='failed'
+        result.setdefault('issues',[]).append({
+            'code':'NGSPICE_WAVEFORM_INCOMPLETE','severity':'error','status':'unsupported',
+            'message':'The compatibility backend did not return a complete raw waveform; no partial plot was accepted.',
+        })
+        return result
+    vectors=result.get('fields',{}).get('waveforms',{})
+    times=vectors.get('time')
+    if not isinstance(times,list) or not 2<=len(times)<=250000 or any(
+        type(t) not in (int,float) or not math.isfinite(t) for t in times
+    ) or any(right<=left for left,right in zip(times,times[1:])):
+        return result
+    voltages={}
+    for name,values in vectors.items():
+        match=re.fullmatch(r'v\(([^()]+)\)',name,re.IGNORECASE)
+        if not match or not isinstance(values,list) or len(values)!=len(times):continue
+        if any(type(v) not in (int,float) or not math.isfinite(v) for v in values):continue
+        voltages[match.group(1)]=values
+    if voltages:
+        result['data']={'time_s':times,'node_voltage_v':voltages,
+                        'element_current_a':{},'element_power_w':{}}
+        provenance['plot_projection']='complete real voltage vectors only; no inferred currents or power'
+    return result
+
+
 def _batch_worker(connection, source, library,method,kind,settings):
     try:
         if kind=='frequency':
             from .frequency import analyze
             connection.send(('result',analyze(source,settings)));return
+        if kind=='ngspice':
+            connection.send(('result',ngspice_batch(source)));return
         result=native_batch(source,library,method)
         connection.send(('result',result))
     except Exception as exc:
@@ -58,6 +112,7 @@ def _batch_worker(connection, source, library,method,kind,settings):
 class BatchRun:
     """Run the unchanged fast batch path in a cancellable child process."""
     def __init__(self, source, library,*,method='hybrid_trapezoidal',kind='circuit',settings=None):
+        if kind not in ('circuit','frequency','ngspice'):raise ValueError('Unknown batch backend')
         context = mp.get_context('spawn')
         self.connection, child = context.Pipe(duplex=False)
         self.kind=kind

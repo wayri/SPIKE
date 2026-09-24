@@ -46,6 +46,9 @@ class Document:
         from .simulation_setup import default_thermal,default_profile
         self.data.setdefault('thermal_setup',default_thermal())
         self.data.setdefault('run_profile',default_profile())
+        # v1 projects predate explicit backend selection. Their historical
+        # execution was native, so migration must never select ngspice.
+        self.data['run_profile'].setdefault('backend','native')
         from .plot_panes import default_layout
         self.data.setdefault('plot_layout',default_layout())
         self.data.setdefault('instruments',[])

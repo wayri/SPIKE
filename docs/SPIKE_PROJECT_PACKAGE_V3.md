@@ -180,8 +180,8 @@ Release builds configure the public-key registry at compile time with either:
 - `SPIKE_PACKAGE_KEY_ID` and `SPIKE_PACKAGE_PUBLIC_KEY_B64URL` for a single
   pinned key.
 
-These package-signing keys are independent of entitlement issuer keys. Private
-signing keys are not stored in the repository or desktop application.
+Private package-signing keys are not stored in the repository or desktop
+application.
 
 The machine-readable manifest schema is
 [`../schemas/spike-project-package-v3.schema.json`](../schemas/spike-project-package-v3.schema.json).

@@ -42,6 +42,7 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `python/spikes/` | Standalone hierarchical RCLVI CLI, native ABI bridge, sessions, virtual instruments, digital events, device extensions, and model-builder contracts | See `docs/SPIKES_CLI.md` |
 | `python/spikes/streaming*.py` | Bounded rolling samples and trigger-driven continuous event capture | See `docs/SPIKES_STREAMING_RESULTS.md` |
 | `python/spikes/waveform_store.py` | Lossless chunked waveform compression, hard byte limits, and torn-tail recovery | See `docs/SPIKES_STREAMING_RESULTS.md` |
+| `standalone/spikes_project/studio/python/spikes_studio/` | Qt-free wxPython Studio engineering preview, explicit native/ngspice batch routing, data-only library store | See `standalone/spikes_project/studio/docs/QT_FREE_WORKBENCH_IMPLEMENTATION.md` and ADR 0021; not the separate C++ wxWidgets board client |
 | `app/src/appSettings.ts` | Persisted UI preferences | Storage failure must be nonfatal |
 | `app/src/ProjectManager.tsx` | Project/recent-project workflow | Presentation layer only |
 | `app/src/UniversalSettingsModal.tsx` | Settings UI | Uses typed application settings |
@@ -65,6 +66,8 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `app/src/ResultVisualizationPanel.tsx` | Result controls | Capability-gates unavailable fields |
 | `app/src/gifExport.ts` | Visualization animation export | Must decimate and bound memory |
 | `app/src/thermalScene.ts` | Thermal scene entities | Solver input visualization only |
+| `app/src/ThermalBoundaryEditor.tsx`, `app/src/thermalBoundaries.ts` | Explicit object/face conduction, convection, and radiation setup | Persisted lumped-network boundaries; no inferred spatial field |
+| `app/src/ThermalInputImport.tsx`, `app/src/thermalBomParsing.ts` | BOM CSV/TSV and ODB++ property mapping to reference-linked thermal inputs | Preview and explicit application; no inferred heat path |
 
 ## Engineering workbenches and reports
 
@@ -109,6 +112,9 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `python/spike_core/layers.py` | Physical copper-layer ordering and helpers |
 | `python/spike_core/models.py` | 3D model discovery and KiCad scene export |
 | `python/spike_core/extensions.py` | General extension discovery and isolation |
+| `python/spike_core/extension_analysis_results.py` | External analysis result and board-binding admission |
+| `python/spike_core/automation.py` | Python scripting facade over versioned worker operations |
+| `python/spike_core/script_runtime.py`, `script_child.py` | In-app Python execution, output capture, cancellation boundary, and result admission |
 | `python/spike_core/dependencies.py` | Runtime dependency status and lock verification |
 | `python/spike_core/capabilities.py` | Implemented capability reporting |
 | `python/spike_core/external_engines.py` | External-engine discovery, preflight, private jobs, isolated execution, quotas, and result import |
@@ -143,6 +149,7 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `numerics.py` | Shared numerical safeguards | Tests define supported behavior |
 | `pdn.py` | PDN target review, explicit mounting-path screening, and two-port candidate loading | `docs/PDN_SCREENING.md` |
 | `thermal.py` | Compact thermal scenario/model | `docs/THERMAL_WORKFLOW.md` |
+| `component_thermal.py`, `thermal_network.py` | Built-in bounded component steady/transient RC solver and worker adapter | `docs/COMPONENT_THERMAL.md`; approximate, no spatial field |
 | `openfoam.py` | OpenFOAM case adapter | `docs/EXTERNAL_ENGINE_INTEROPERABILITY.md` |
 
 ## Source parsers and native kernels
@@ -182,11 +189,8 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `docs/adr` | Architecture decision records |
 | `schemas` | JSON wire-contract envelopes |
 | `docs/ENGINEERING_GOVERNANCE.md` | Review and release policy |
-| `LICENSE` and `LICENSING.md` | Repository license boundary, entitlement classes, and commercial release gate |
-| `licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md` | Legal-review draft for compiled commercial distributions and proprietary modules |
+| `LICENSE` and `LICENSING.md` | Repository license boundary and contributor provenance policy |
 | `THIRD_PARTY_NOTICES.md` | Release-blocking external software and asset provenance register |
-| `docs/LICENSE_ENGINE_ARCHITECTURE.md` | Native signed-entitlement, activation, secure-storage, and capability-enforcement design |
-| `schemas/license-entitlement-v1.schema.json` | Versioned signed license envelope and claims contract |
 
 ## Documentation ownership
 

@@ -16,8 +16,13 @@ export type EmiCameraView = "isometric" | "top" | "bottom";
 /** Camera positions use Z-up to match the physical chamber coordinate system. */
 export function emiCameraPose(target: THREE.Vector3, span: number, view: EmiCameraView) {
   const distance = Math.max(span, .01);
-  if (view === "top") return { position: target.clone().add(new THREE.Vector3(0, 0, distance)), up: new THREE.Vector3(0, 1, 0) };
-  if (view === "bottom") return { position: target.clone().add(new THREE.Vector3(0, 0, -distance)), up: new THREE.Vector3(0, 1, 0) };
+  // OrbitControls caches the camera's up-axis when it is constructed. Keep that
+  // axis Z-up for every preset; swapping to Y-up for the pole views makes the
+  // next drag use a different basis and reverses/rolls the chamber unexpectedly.
+  // A slight Y offset avoids the look-at singularity while remaining visually
+  // indistinguishable from an orthogonal top or bottom view.
+  if (view === "top") return { position: target.clone().add(new THREE.Vector3(0, -.025, 1).normalize().multiplyScalar(distance)), up: new THREE.Vector3(0, 0, 1) };
+  if (view === "bottom") return { position: target.clone().add(new THREE.Vector3(0, .025, -1).normalize().multiplyScalar(distance)), up: new THREE.Vector3(0, 0, 1) };
   return { position: target.clone().add(new THREE.Vector3(-distance * .65, -distance, distance * .65)), up: new THREE.Vector3(0, 0, 1) };
 }
 

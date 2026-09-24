@@ -28,7 +28,7 @@ packages = ["python", "python.spikes", "python.spike_core", "spikes_studio"]
 spikes_studio = "studio/python/spikes_studio"
 
 [tool.setuptools.data-files]
-"share/spikes/studio/docs" = ["studio/docs/WORKBENCH_GUIDE.md", "studio/docs/COMPONENT_LIBRARY.md"]
+"share/spikes/studio/docs" = ["studio/docs/WORKBENCH_GUIDE.md", "studio/docs/COMPONENT_LIBRARY.md", "studio/docs/LIBRARY_PACKAGE.md", "studio/docs/QT_FREE_WORKBENCH_IMPLEMENTATION.md"]
 "share/spikes/studio/docs/media" = ["studio/docs/media/*.png", "studio/docs/media/*.gif", "studio/docs/media/*.json", "studio/docs/media/*.svg", "studio/docs/media/*.spksch", "studio/docs/media/*.spkdata", "studio/docs/media/*.vcd"]
 "share/spikes/studio/docs/media/reliability" = ["studio/docs/media/reliability/*"]
 "share/spikes/studio/schemas" = ["studio/schemas/*.json"]

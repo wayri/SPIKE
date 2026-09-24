@@ -63,4 +63,12 @@ MutualResult separated_mutual(const TrianglePrism& first,
                              const TrianglePrism& second,
                              const MutualOptions& options = {});
 
+// Experimental all-pair extension, including self, touching and overlapping
+// supports. Integrable singular cells use analytic finite potential envelopes,
+// never a sampled singularity or softening length. Adaptive subdivision is
+// convergent in exact arithmetic; practical tolerances can exhaust the caps.
+// Admission covers integration only, not mesh, contact or physical validity.
+MutualResult mutual(const TrianglePrism& first, const TrianglePrism& second,
+                    const MutualOptions& options = {});
+
 } // namespace spike::peec::affine

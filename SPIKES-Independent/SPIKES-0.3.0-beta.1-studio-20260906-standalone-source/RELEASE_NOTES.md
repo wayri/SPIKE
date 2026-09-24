@@ -312,7 +312,7 @@ installer and installed-image evidence is recorded separately after verification
 **Status:** unsigned engineering preview; installed for the current Windows user
 
 - Built MSI and NSIS installers from the current tree and installed the NSIS
-  current-user package at `C:\Users\example\AppData\Local\Programs\SPIKE`.
+  current-user package at `C:\Users\yawar\AppData\Local\Programs\SPIKE`.
 - Packaged-worker verification passes all 1,084 declared file hashes, 15/15
   native benchmarks, and 8/8 source/package runtime-parity checks. The installed
   desktop executable exactly matches the release executable.
@@ -481,7 +481,7 @@ This release establishes the foundational architecture and operational protocols
 ### 1. Initialize Python Environment
 
 ```powershell
-cd C:\Users\example\Documents\agws\KiCAD_plugins\SPIKE
+cd C:\Users\yawar\Documents\agws\KiCAD_plugins\SPIKE
 python infra/aether_boot.py --init
 ```
 
@@ -599,7 +599,7 @@ All C++ solver methods throw `std::runtime_error("Not yet implemented")`. This i
 
 ## 🔗 Additional Resources
 
-- **Project Root:** `C:\Users\example\Documents\agws\KiCAD_plugins\SPIKE`
+- **Project Root:** `C:\Users\yawar\Documents\agws\KiCAD_plugins\SPIKE`
 - **Session Tracker:** `ccd_tracker.json`
 - **Architecture Docs:** `ARCHITECTURE.md`
 - **Development Guide:** `DEVELOPMENT.md`

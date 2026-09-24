@@ -195,9 +195,9 @@ export function viewportRenderProfile(objectCount: number, devicePixelRatio: num
   };
 }
 
-// The procedural mask is only a context layer; it has no pad openings. Keeping
-// it faint prevents that approximation from visually replacing copper below it.
-export const PROCEDURAL_SOLDERMASK_OPACITY = 0.22;
+// The procedural mask has no pad openings, so retain some copper visibility
+// while making its imported color legible as a board surface.
+export const PROCEDURAL_SOLDERMASK_OPACITY = 0.62;
 
 export type SubstrateZBounds = { bottom: number; top: number; depth: number };
 

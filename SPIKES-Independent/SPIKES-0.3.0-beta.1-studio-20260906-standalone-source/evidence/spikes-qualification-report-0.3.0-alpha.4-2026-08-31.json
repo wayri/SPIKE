@@ -1709,7 +1709,7 @@
     "release": "10",
     "system": "Windows"
   },
-  "library": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-wave5-ninja\\spikes_c_api.dll",
+  "library": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-wave5-ninja\\spikes_c_api.dll",
   "library_sha256": "1c75e4740451b08fb324267ce8bdd98a0d25693d013dc2bc0583ab68a3f22314",
   "limitations": [
     "Timings apply only to this host, library, workload, and timing scope.",

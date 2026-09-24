@@ -459,7 +459,8 @@ electrical `.TEMP` directive. Invalid geometry, inconsistent airflow and nonfini
 values are rejected without changing the document.
 
 The manager has one editable project run profile, with `.spkrun` import/export
-for reusable profiles. Choose batch or continuous execution, analysis from the
+for reusable profiles. Choose the owned C++ `native` backend or explicit
+`ngspice` compatibility backend, batch or continuous execution, analysis from the
 netlist or an explicit transient/operating-point override, integration method,
 continuous capture size and best-effort simulation/wall-time ratio. Timestep,
 stop and UIC override only apply when Transient is selected; continuous execution
@@ -468,7 +469,20 @@ override. Applying a profile saves settings but does not rewrite the circuit tex
 The main toolbar's Batch/Continuous commands choose that execution mode using the
 saved profile; **Run profile** first applies the manager's current fields.
 
-Run, pause/resume (continuous only), and stop operate the real native runner.
+The ngspice selection runs a self-contained deck in the existing isolated
+process adapter. It never silently substitutes for the owned solver. External
+`.include`/`.lib` files and executable control directives are rejected; selected
+model-tier or parasitic rewrites that cannot be honored are blocked. ngspice
+continuous pause/step/control is unavailable. Completed real transient voltage
+vectors can be plotted; currents, power and temperature are not inferred from
+backend vectors, and unprojected vectors remain in the result for inspection.
+The run record preserves the requested backend and source hash. Older profiles
+retain their original native behavior when opened.
+The self-closing development GUI check for this flow is
+`python scripts/verify_workbench_stage_a.py --backend-only` from the integration
+checkout, using the pinned Python 3.11 Studio dependencies and native library.
+
+Run and stop operate the selected backend. Pause/resume is native continuous only.
 This is not a parallel queue or hard-real-time scheduler. The last 50 run records
 retain status, timing, sample count, source hash and copies of the profile and
 thermal assumptions. Later project edits cannot change those recorded copies.

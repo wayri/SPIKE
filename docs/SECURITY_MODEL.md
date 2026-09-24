@@ -133,7 +133,8 @@ Node.js and npm are build-time tools only. A released desktop installer contains
 - Build-time package keys are supplied through
   `SPIKE_PACKAGE_TRUSTED_KEYS_JSON`, or the single-key
   `SPIKE_PACKAGE_KEY_ID` and `SPIKE_PACKAGE_PUBLIC_KEY_B64URL` pair.
-- Package-signing keys and entitlement issuer keys are separate trust roots.
+- Package-signing keys are separate from application runtime configuration and
+  are never stored in the repository.
   Private signing keys must remain in an isolated release-signing service.
 - Unsigned projects remain explicitly unsigned and must never be described as
   verified. A future organization policy may require signatures for all opens.

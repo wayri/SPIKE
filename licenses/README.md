@@ -1,15 +1,11 @@
 # SPIKE License Documents
 
-This directory separates three different legal concerns:
+This directory retains the repository's existing open-source grant and
+dependency-redistribution review records:
 
 1. `MIT.txt` records the MIT grant that applies to material previously released
    under that license. Existing grants are not revoked.
-2. `SPIKE-PREVIEW-NOTICE.md` is the notice shown by development installers. It
-   does not grant a blanket source-code license.
-3. `SPIKE-COMMERCIAL-EULA-DRAFT.md` is a commercial binary-license draft. It is
-   not ready for acceptance or sale until qualified counsel completes the
-   licensor identity, address, jurisdiction, venue, warranty, support, privacy,
-   and other bracketed terms.
+2. `windows-component-approvals.json` records component redistribution review.
 
 The repository-wide authority is `../LICENSE`; the commercialization and
 provenance gate is `../LICENSING.md`. Third-party software and assets remain

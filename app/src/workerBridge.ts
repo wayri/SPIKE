@@ -77,6 +77,7 @@ const HEAVY_METHODS = new Set([
   "run_si_protocol_test_suite",
   "run_spice_workspace_native_mna",
   "run_owned_spice_workspace",
+  "run_python_script",
   "run_sparselizard_case",
   "run_thermal_case",
 ]);
@@ -132,7 +133,10 @@ export async function subscribeDesktopCloseRequested(
 export async function closeDesktopWindow(): Promise<void> {
   if (!isDesktopShell()) return;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  await getCurrentWindow().close();
+  // Called only after the main workspace's save/discard close decision.
+  // A second close request would re-enter the listener and hide permission
+  // failures inside Tauri's asynchronous event callback.
+  await getCurrentWindow().destroy();
 }
 
 export async function runLocalWorker(request: Record<string, unknown>): Promise<WorkerResponse> {
@@ -270,12 +274,12 @@ export async function cancelLocalWorkerCleanup(operationId: string): Promise<boo
   }
 }
 
-export async function openNativeTextFile(kind: "board" | "project" | "report" | "result" | "netlist" | "license"): Promise<NativeTextFile | null> {
+export async function openNativeTextFile(kind: "board" | "project" | "report" | "result" | "netlist" | "license" | "script"): Promise<NativeTextFile | null> {
   if (!isDesktopShell()) return null;
   return invoke<NativeTextFile | null>("open_text_file", { kind });
 }
 
-export async function saveNativeTextFile(suggestedName: string, contents: string, kind: "project" | "report" | "step" | "netlist" | "result" | "license"): Promise<string | null> {
+export async function saveNativeTextFile(suggestedName: string, contents: string, kind: "project" | "report" | "step" | "netlist" | "result" | "license" | "script"): Promise<string | null> {
   if (!isDesktopShell()) return null;
   return invoke<string | null>("save_text_file", { suggestedName, contents, kind });
 }

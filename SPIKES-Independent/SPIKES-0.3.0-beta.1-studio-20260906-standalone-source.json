@@ -1,7 +1,7 @@
 {
   "contract": "spikes/standalone-source-manifest/v1",
   "version": "0.3.0-beta.1-studio-20260906",
-  "package": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\SPIKES-Independent\\SPIKES-0.3.0-beta.1-studio-20260906-standalone-source",
+  "package": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\SPIKES-Independent\\SPIKES-0.3.0-beta.1-studio-20260906-standalone-source",
   "manifest_sha256": "cdf23ee4ee905e005bf131261eca1a2bdae0f01f6ca58b8dee3d99b1ef909d14",
   "archive": {
     "path": "SPIKES-0.3.0-beta.1-studio-20260906-standalone-source.zip",

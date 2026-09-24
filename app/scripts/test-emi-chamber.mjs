@@ -22,9 +22,12 @@ const cameraTarget = new THREE.Vector3(2, -1, .8);
 const iso = emiCameraPose(cameraTarget, 4, "isometric");
 [-.6, -5, 3.4].forEach((value, index) => close(iso.position.toArray()[index], value)); assert.deepEqual(iso.up.toArray(), [0, 0, 1]);
 const top = emiCameraPose(cameraTarget, 4, "top");
- [2, -1, 4.8].forEach((value, index) => close(top.position.toArray()[index], value)); assert.deepEqual(top.up.toArray(), [0, 1, 0]);
+assert.ok(top.position.y < cameraTarget.y); close(top.position.distanceTo(cameraTarget), 4); assert.ok(top.position.z > cameraTarget.z); assert.deepEqual(top.up.toArray(), [0, 0, 1]);
 const bottom = emiCameraPose(cameraTarget, 4, "bottom");
- [2, -1, -3.2].forEach((value, index) => close(bottom.position.toArray()[index], value)); assert.deepEqual(bottom.up.toArray(), [0, 1, 0]);
+assert.ok(bottom.position.y > cameraTarget.y); close(bottom.position.distanceTo(cameraTarget), 4); assert.ok(bottom.position.z < cameraTarget.z); assert.deepEqual(bottom.up.toArray(), [0, 0, 1]);
+// Presets must not mutate the up-axis cached by OrbitControls. Switching from a
+// pole view back to orbit is the regression that previously mirrored dragging.
+for (const pose of [iso, top, bottom]) assert.deepEqual(pose.up.toArray(), [0, 0, 1]);
 assert.equal(emiCameraCommandView("view-top-123"), "top");
 assert.equal(emiCameraCommandView("view-bottom-123"), "bottom");
 assert.equal(emiCameraCommandView("view-iso-123"), "isometric");

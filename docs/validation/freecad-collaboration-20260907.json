@@ -37,7 +37,6 @@
     "app/src/AssemblyStructureEditor.tsx": "879c2c624d6078ad32c6268d652350e4a003a8493bedd7d57551e61e52dd1c36",
     "app/src/workerBridge.ts": "c1881d0c71b1d69c0ff986a0915e8f12a9f69a6256b6010c839c854e4a119061",
     "app/src-tauri/src/lib.rs": "02add937fd5dc2696e2ec353fb2ee0caef1defe0f5811a232ec7432e9d8d661d",
-    "app/src-tauri/src/entitlement.rs": "4218d386a5e6d2f3bdca7867740bb9cb7a6f52179ebc84d3dc86fd37a3a8377a",
     "app/src-tauri/src/project_trust_binding.rs": "89b8e069166270558b0c5c50b8a910d035ba734408fa59a324bb8854a225dfe4",
     "integrations/freecad/SPIKEWorkbench/spike_freecad/collaboration.py": "e52d19c3e19bbabcd80f02caa21ecea7a90efe28dd8caa7d98cd32a657105412",
     "integrations/freecad/SPIKEWorkbench/spike_freecad/collaboration_commands.py": "c2fa6dfe4fe50222143b76812bdaf4b86cd4b667d082f42feb206ff04c867614",

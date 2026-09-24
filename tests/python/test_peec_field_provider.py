@@ -68,6 +68,65 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         self.assertFalse(result["diagnostics"]["circuit_state_feedback"])
 
     @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    def test_rejects_completed_extraction_with_unsupported_capacitance(self, solve):
+        solve.return_value = extraction_result()
+        network = solve.return_value.networks["parasitics"][0]
+        network["capacitance_f"] = None
+        network["parameter_availability"] = {"capacitance": "unsupported"}
+
+        provider = NativePeecFieldReductionProvider(DesignIR(), spec())
+        with self.assertRaisesRegex(ValueError, "capacitance_f.*unsupported"):
+            provider(field_request())
+
+    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    def test_rejects_nonphysical_rlcg_values(self, solve):
+        provider = NativePeecFieldReductionProvider(DesignIR(), spec())
+        for value in (-1.0, float("nan"), float("inf"), True):
+            with self.subTest(value=value):
+                solve.return_value = extraction_result()
+                solve.return_value.networks["parasitics"][0]["resistance_ohm"] = value
+                with self.assertRaisesRegex(ValueError, "resistance_ohm.*finite"):
+                    provider(field_request())
+
+    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    def test_preserves_explicit_numeric_zero(self, solve):
+        solve.return_value = extraction_result()
+        network = solve.return_value.networks["parasitics"][0]
+        network["capacitance_f"] = 0.0
+        network["conductance_s"] = 0.0
+
+        result = NativePeecFieldReductionProvider(DesignIR(), spec())(field_request())
+        self.assertEqual(result["parasitics"][0]["capacitance_f"], 0.0)
+        self.assertEqual(result["parasitics"][0]["conductance_s"], 0.0)
+
+    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    def test_rejects_missing_or_unsupported_rlcg_values(self, solve):
+        provider = NativePeecFieldReductionProvider(DesignIR(), spec())
+        for parameter in (
+            "resistance_ohm", "inductance_h", "capacitance_f", "conductance_s"
+        ):
+            with self.subTest(parameter=parameter):
+                solve.return_value = extraction_result()
+                solve.return_value.networks["parasitics"][0].pop(parameter)
+                with self.assertRaisesRegex(ValueError, parameter):
+                    provider(field_request())
+
+        solve.return_value = extraction_result()
+        network = solve.return_value.networks["parasitics"][0]
+        network["capacitance_f"] = 0.0
+        network["parameter_availability"] = {"capacitance": "unsupported"}
+        with self.assertRaisesRegex(ValueError, "capacitance_f.*unsupported"):
+            provider(field_request())
+
+        solve.return_value = extraction_result()
+        solve.return_value.issues.append(ValidationIssue(
+            "PEEC_CAPACITANCE_UNSUPPORTED", "warning", "No valid reference conductor",
+            status="unsupported",
+        ))
+        with self.assertRaisesRegex(RuntimeError, "PEEC_CAPACITANCE_UNSUPPORTED"):
+            provider(field_request())
+
+    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
     def test_rejects_result_net_or_endpoint_identity_changes(self, solve):
         solve.return_value = extraction_result()
         provider = NativePeecFieldReductionProvider(DesignIR(), spec())

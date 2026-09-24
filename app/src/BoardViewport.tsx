@@ -8,7 +8,7 @@ import { ViewHelper } from "three/examples/jsm/helpers/ViewHelper.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { VRMLLoader } from "three/examples/jsm/loaders/VRMLLoader.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { ParsedBoard, ParsedComponent, ParsedPad, Point } from "./boardParser";
+import { ParsedBoard, ParsedComponent, ParsedPad, ParsedVia, Point } from "./boardParser";
 import { resolveBoardCopperLayers } from "./copperLayerSelection";
 import { buildContourGrid } from "./contourField";
 import { sharedVertexValues, resultSampleForHit, resultHitOccluded } from "./resultSurfaceInterpolation";
@@ -319,6 +319,39 @@ function viewportScalarSamples(result: SolverResultBundle, mode: string): Scalar
       : piImpedanceSamples(result.scalar_fields.voltage_v, result.scalar_fields.current_a);
   }
   return [];
+}
+
+function resultHeightDisplayRange(values: readonly number[]): { minimum: number; maximum: number } {
+  const finite = values.filter(Number.isFinite).sort((left, right) => left - right);
+  if (!finite.length) return { minimum: 0, maximum: 1 };
+  const minimum = finite[0];
+  // A lone mesh hot spot must remain visible in color and in the probe readout,
+  // but must not turn an otherwise planar PCB result into a screen-sized needle.
+  // Height is a display aid, so use a robust ceiling once enough samples exist.
+  const maximumIndex = finite.length < 20 ? finite.length - 1 : Math.floor((finite.length - 1) * 0.98);
+  return { minimum, maximum: Math.max(finite[maximumIndex], minimum + Number.EPSILON) };
+}
+
+function resultHeightRatio(value: number, range: { minimum: number; maximum: number }): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(1, (value - range.minimum) / Math.max(range.maximum - range.minimum, Number.EPSILON)));
+}
+
+function resultHeightAmplitude(
+  boardSpan: number,
+  cellSize: number,
+  boardThickness: number,
+  waveHeightScale: number,
+): number {
+  const requested = Math.max(cellSize * 1.8, boardThickness * 0.7, 0.35) * Math.max(waveHeightScale, 0.1);
+  return Math.max(0.35, Math.min(requested, Math.max(boardSpan * 0.035, 0.35)));
+}
+
+function resultSampleMatchesVia(sample: ScalarSample, via: ParsedVia): boolean {
+  if (sample.source_id === via.id || sample.element_id === via.id || sample.element_id?.startsWith(`${via.id}:`)) return true;
+  if (sample.net && via.net && sample.net !== via.net) return false;
+  const tolerance = Math.max(via.size / 2 + 0.08, 0.12);
+  return Math.hypot(sample.x_mm - via.at[0], sample.y_mm - via.at[1]) <= tolerance;
 }
 
 function engineeringValue(value: number | null | undefined, unit: string, scale = 1, resolution?: number) {
@@ -3964,6 +3997,114 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       const extent = numericExtent(values);
       const minimum = Number.isFinite(savedRanges?.[fieldKey]?.minimum) ? Number(savedRanges?.[fieldKey]?.minimum) : extent.minimum;
       const maximum = Number.isFinite(savedRanges?.[fieldKey]?.maximum) ? Number(savedRanges?.[fieldKey]?.maximum) : extent.maximum;
+      const heightRange = resultHeightDisplayRange(values);
+      if (mode === "via_stress") {
+        const samplesByVia = new Map<ParsedVia, ScalarSample[]>();
+        scalarSamples.forEach(sample => {
+          const direct = activeBoard.vias.find(via => sample.source_id === via.id
+            || sample.element_id === via.id || sample.element_id?.startsWith(`${via.id}:`));
+          const via = direct ?? activeBoard.vias
+            .filter(candidate => resultSampleMatchesVia(sample, candidate))
+            .sort((left, right) => Math.hypot(sample.x_mm - left.at[0], sample.y_mm - left.at[1])
+              - Math.hypot(sample.x_mm - right.at[0], sample.y_mm - right.at[1]))[0];
+          if (!via) return;
+          const assigned = samplesByVia.get(via) ?? [];
+          assigned.push(sample);
+          samplesByVia.set(via, assigned);
+        });
+        const viaSamples: ScalarSample[] = [];
+        const viaPositions: number[] = [];
+        const viaColors: number[] = [];
+        const viaTriangleSamples: number[] = [];
+        const appendTriangle = (sampleIndex: number, color: THREE.Color, ...vertices: THREE.Vector3[]) => {
+          vertices.forEach(vertex => {
+            viaPositions.push(vertex.x, vertex.y, vertex.z);
+            viaColors.push(color.r, color.g, color.b);
+          });
+          viaTriangleSamples.push(sampleIndex);
+        };
+        samplesByVia.forEach((samples, via) => {
+          const representative = samples.reduce((peak, sample) => Math.abs(sample.value) > Math.abs(peak.value) ? sample : peak);
+          const sampleIndex = viaSamples.push(representative) - 1;
+          const ratio = maximum > minimum
+            ? Math.max(0, Math.min(1, (representative.value - minimum) / (maximum - minimum))) : 0.5;
+          const color = new THREE.Color().setHSL((1 - ratio) * 0.62, 0.92, 0.54);
+          const span = resolveBoardCopperLayers(copperLayers, via.layers);
+          if (!span.length) return;
+          const startLayer = span[0];
+          const endLayer = span[span.length - 1];
+          const startZ = displayLayerZ(startLayer);
+          const endZ = displayLayerZ(endLayer);
+          const center = new THREE.Vector2((via.at[0] - centerX) * scale, (centerY - via.at[1]) * scale);
+          const outerRadius = Math.max(via.size * scale / 2, 1e-5);
+          const innerRadius = Math.min(Math.max(via.drill * scale / 2, 1e-5), outerRadius * 0.98);
+          // Sit just outside the procedural drill wall so the result color is
+          // stable instead of z-fighting with the copper model while orbiting.
+          const barrelRadius = Math.min(innerRadius + Math.max(scale * 0.006, innerRadius * 0.015), outerRadius * 0.98);
+          const outerBarrelRadius = outerRadius * 1.002;
+          const segments = 28;
+          for (let segment = 0; segment < segments; segment += 1) {
+            const angleA = segment / segments * Math.PI * 2;
+            const angleB = (segment + 1) / segments * Math.PI * 2;
+            const point = (radius: number, angle: number, z: number) => new THREE.Vector3(
+              center.x + Math.cos(angle) * radius,
+              center.y + Math.sin(angle) * radius,
+              z,
+            );
+            const outerAStart = point(outerRadius, angleA, startZ);
+            const outerBStart = point(outerRadius, angleB, startZ);
+            const innerAStart = point(innerRadius, angleA, startZ);
+            const innerBStart = point(innerRadius, angleB, startZ);
+            appendTriangle(sampleIndex, color, outerAStart, outerBStart, innerBStart);
+            appendTriangle(sampleIndex, color, outerAStart, innerBStart, innerAStart);
+            if (Math.abs(endZ - startZ) > 1e-6) {
+              const outerAEnd = point(outerRadius, angleA, endZ);
+              const outerBEnd = point(outerRadius, angleB, endZ);
+              const innerAEnd = point(innerRadius, angleA, endZ);
+              const innerBEnd = point(innerRadius, angleB, endZ);
+              appendTriangle(sampleIndex, color, outerAEnd, innerBEnd, outerBEnd);
+              appendTriangle(sampleIndex, color, outerAEnd, innerAEnd, innerBEnd);
+              appendTriangle(sampleIndex, color,
+                point(barrelRadius, angleA, startZ), point(barrelRadius, angleB, startZ), point(barrelRadius, angleB, endZ));
+              appendTriangle(sampleIndex, color,
+                point(barrelRadius, angleA, startZ), point(barrelRadius, angleB, endZ), point(barrelRadius, angleA, endZ));
+              appendTriangle(sampleIndex, color,
+                point(outerBarrelRadius, angleA, startZ), point(outerBarrelRadius, angleB, endZ), point(outerBarrelRadius, angleB, startZ));
+              appendTriangle(sampleIndex, color,
+                point(outerBarrelRadius, angleA, startZ), point(outerBarrelRadius, angleA, endZ), point(outerBarrelRadius, angleB, endZ));
+            }
+          }
+        });
+        if (viaPositions.length) {
+          const geometry = new THREE.BufferGeometry();
+          geometry.setAttribute("position", new THREE.Float32BufferAttribute(viaPositions, 3));
+          geometry.setAttribute("color", new THREE.Float32BufferAttribute(viaColors, 3));
+          const field = viewportResultField(mode);
+          const surface = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+            vertexColors: true, side: THREE.DoubleSide, depthTest: true, depthWrite: true,
+            polygonOffset: true, polygonOffsetFactor: -1,
+          }));
+          surface.name = "via-stress-conductor-surface";
+          surface.renderOrder = 115;
+          surface.userData = {
+            contourSamples: viaSamples,
+            triangleSamples: viaTriangleSamples,
+            contourLabel: `${field.label} (peak returned sample per via)`,
+            contourUnit: field.unit,
+            resultPrimitive: "via_geometry",
+            physicalGeometry: true,
+            displayAggregation: "maximum_absolute_returned_sample_per_via",
+          };
+          group.add(surface);
+          resultSurfacePickablesRef.current.push(surface);
+        }
+        if (hostRef.current) hostRef.current.dataset.resultViaGeometry = [
+          `source-samples=${scalarSamples.length}`,
+          `matched-vias=${samplesByVia.size}`,
+          `unmatched-samples=${scalarSamples.length - [...samplesByVia.values()].reduce((total, samples) => total + samples.length, 0)}`,
+        ].join(";");
+      }
+      const geometryScalarSamples = mode === "via_stress" ? [] : scalarSamples;
       const triangleIndices = new Map<ScalarSample, number[]>();
       const trianglesFor = (sample: ScalarSample) => {
         const cached = triangleIndices.get(sample);
@@ -3972,7 +4113,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         triangleIndices.set(sample, triangles);
         return triangles;
       };
-      const triangulatableSamples = scalarSamples.filter(sample => (sample.vertices_mm?.length ?? 0) >= 3
+      const triangulatableSamples = geometryScalarSamples.filter(sample => (sample.vertices_mm?.length ?? 0) >= 3
         && trianglesFor(sample).length > 0);
       const thinnedExactSamples = spatiallyThinSamples(
         triangulatableSamples,
@@ -4000,12 +4141,11 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       const fallbackSamples = spatiallyThinSamples(
         // Preserve admitted samples with unusable face topology as truthful
         // centre markers instead of dropping them from both render paths.
-        scalarSamples.filter(sample => !renderedExactSet.has(sample)),
+        geometryScalarSamples.filter(sample => !renderedExactSet.has(sample)),
         6000,
       );
-      const estimatedCellMm = Math.sqrt(Math.max(activeBoard.width * activeBoard.height / Math.max(scalarSamples.length, 1), 0.0025));
+      const estimatedCellMm = Math.sqrt(Math.max(activeBoard.width * activeBoard.height / Math.max(geometryScalarSamples.length, 1), 0.0025));
       const cellSize = THREE.MathUtils.clamp(estimatedCellMm * scale * 1.08, 0.18, 3.2);
-      const cellDepth = viewMode === "2D" ? 0.04 : THREE.MathUtils.clamp(cellSize * 0.16, 0.06, 0.42);
       const heightPlot = viewMode === "3D" && resultVisualization.plotStyle === "height";
       const contourPlot = viewMode === "3D" && resultVisualization.plotStyle === "contour";
       if (exactSamples.length) {
@@ -4015,10 +4155,11 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         const surfaceValues: number[] = [];
         const smoothValues = resultVisualization.fieldStyle === "smooth" || contourPlot
           ? sharedVertexValues(triangulatableSamples) : null;
-        const amplitude = THREE.MathUtils.clamp(
-          Math.max(activeBoard.width, activeBoard.height) * scale * 0.11 * resultVisualization.waveHeightScale,
-          1.2,
-          42,
+        const amplitude = resultHeightAmplitude(
+          Math.max(activeBoard.width, activeBoard.height) * scale,
+          cellSize,
+          boardThickness,
+          resultVisualization.waveHeightScale,
         );
         exactSamples.forEach((sample, sampleIndex) => {
           const vertices = sample.vertices_mm!;
@@ -4048,7 +4189,8 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
               const vertexRatio = maximum > minimum ? THREE.MathUtils.clamp((value - minimum) / (maximum - minimum), 0, 1) : ratio;
               const color = new THREE.Color().setHSL((1 - vertexRatio) * 0.62, 0.92, 0.54);
               const outward = sample.layer === copperLayers[copperLayers.length - 1] && copperLayers.length > 1 ? -1 : 1;
-              const plotHeight = outward * ((heightPlot || contourPlot ? vertexRatio * amplitude : 0) + 0.015);
+              const heightRatio = resultHeightRatio(value, heightRange);
+              const plotHeight = outward * ((heightPlot || contourPlot ? heightRatio * amplitude : 0) + 0.015);
               const zRatio = maximumZ > minimumZ ? (vertex[2] - minimumZ) / (maximumZ - minimumZ) : 0;
               const z = selectedResultLayers.length && selectedSpan.length
                 ? selectedSpan.length === 1 ? selectedFirstZ : selectedFirstZ + (selectedLastZ - selectedFirstZ) * zRatio
@@ -4126,10 +4268,11 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         });
         const groups = [...grouped.entries()].sort((left, right) => right[1].length - left[1].length).slice(0, 24);
         const perGroupLimit = Math.max(360, Math.floor(15000 / Math.max(groups.length, 1)));
-        const amplitude = THREE.MathUtils.clamp(
-          Math.max(activeBoard.width, activeBoard.height) * scale * 0.11 * resultVisualization.waveHeightScale,
-          1.2,
-          42,
+        const amplitude = resultHeightAmplitude(
+          Math.max(activeBoard.width, activeBoard.height) * scale,
+          cellSize,
+          boardThickness,
+          resultVisualization.waveHeightScale,
         );
         groups.forEach(([key, samples]) => {
           const contour = buildContourGrid(samples, { levels: 11, maximumGridVertices: perGroupLimit });
@@ -4145,7 +4288,8 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
             const ratio = maximum > minimum ? THREE.MathUtils.clamp((vertex.value - minimum) / (maximum - minimum), 0, 1) : 0.5;
             positions[index * 3] = (vertex.xMm - centerX) * scale;
             positions[index * 3 + 1] = (centerY - vertex.yMm) * scale;
-            positions[index * 3 + 2] = baseZ + (contourPlot ? outward * ratio * amplitude : 0);
+            positions[index * 3 + 2] = baseZ
+              + (contourPlot ? outward * resultHeightRatio(vertex.value, heightRange) * amplitude : 0);
             const color = new THREE.Color().setHSL((1 - ratio) * 0.62, 0.92, 0.54);
             colors[index * 3] = color.r;
             colors[index * 3 + 1] = color.g;
@@ -4202,7 +4346,9 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
             const linePositions = new Float32Array(supportedContours.length * 6);
             supportedContours.forEach((segment, index) => {
               const ratio = maximum > minimum ? THREE.MathUtils.clamp((segment.level - minimum) / (maximum - minimum), 0, 1) : 0.5;
-              const z = baseZ + (contourPlot ? outward * ratio * amplitude : 0) + 0.035;
+              const z = baseZ
+                + (contourPlot ? outward * resultHeightRatio(segment.level, heightRange) * amplitude : 0)
+                + outward * 0.035;
               linePositions.set([
                 (segment.start[0] - centerX) * scale,
                 (centerY - segment.start[1]) * scale,
@@ -4225,10 +4371,10 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       }
       const markerSamples = fallbackSamples.filter(sample => !surfacedSamples.has(sample));
       if (markerSamples.length) {
-        const smoothField = resultVisualization.fieldStyle === "smooth" && !heightPlot;
-        const geometry = smoothField
-          ? new THREE.CircleGeometry(cellSize * 1.18, 20)
-          : new THREE.BoxGeometry(cellSize, cellSize, 1);
+        // Samples without solver-authored faces remain explicit glyphs. Keep
+        // them flush with the conductor plane; extruded boxes imply unsupported
+        // volume/height and appear as detached dots when the camera orbits.
+        const geometry = new THREE.CircleGeometry(1, 16);
         const markers = new THREE.InstancedMesh(
           geometry,
           new THREE.MeshBasicMaterial({
@@ -4244,13 +4390,24 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         const orientation = new THREE.Quaternion();
         const objectScale = new THREE.Vector3(1, 1, 1);
         markerSamples.forEach((sample, index) => {
-          const ratio = maximum > minimum ? (sample.value - minimum) / (maximum - minimum) : 0.5;
-          const samplePosition = position(sample);
-          const height = heightPlot
-            ? cellDepth + ratio * cellSize * 6 * resultVisualization.waveHeightScale
-            : cellDepth;
-          samplePosition.z += smoothField ? 0.08 : height * 0.5 + 0.04;
-          objectScale.set(1, 1, smoothField ? 1 : height);
+          const ratio = maximum > minimum
+            ? Math.max(0, Math.min(1, (sample.value - minimum) / (maximum - minimum))) : 0.5;
+          const displayLayers = displayedDatumLayers(sample.layer);
+          const displayLayer = displayLayers[Math.floor((displayLayers.length - 1) / 2)];
+          const fallbackLayer = displayLayer ?? resultDatumLayers(sample.layer, copperLayers)[0];
+          const outward = fallbackLayer === copperLayers[copperLayers.length - 1] && copperLayers.length > 1 ? -1 : 1;
+          const samplePosition = new THREE.Vector3(
+            (sample.x_mm - centerX) * scale,
+            (centerY - sample.y_mm) * scale,
+            fallbackLayer ? displayLayerZ(fallbackLayer) + outward * 0.02
+              : sample.z_mm === undefined ? displayLayerZ(sample.layer) + outward * 0.02 : sample.z_mm * scale,
+          );
+          const radius = THREE.MathUtils.clamp(
+            (Number.isFinite(sample.width_mm) ? Number(sample.width_mm) * scale / 2 : cellSize * 0.42),
+            0.05,
+            Math.max(cellSize * 0.62, 0.08),
+          );
+          objectScale.set(radius, radius, 1);
           matrix.compose(samplePosition, orientation, objectScale);
           markers.setMatrixAt(index, matrix);
           markers.setColorAt(index, new THREE.Color().setHSL((1 - ratio) * 0.62, 0.92, 0.54));

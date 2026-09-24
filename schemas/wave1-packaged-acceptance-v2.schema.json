@@ -13,7 +13,7 @@
     "human": {"$ref": "#/$defs/human"},
     "candidate": {
       "type": "object",
-      "required": ["contract", "manifest", "manifest_sha256", "generated_at", "version", "application_version", "channel", "release_state", "license_key_id", "production_qualified", "signing_policy", "artifacts"],
+      "required": ["contract", "manifest", "manifest_sha256", "generated_at", "version", "application_version", "channel", "release_state", "production_qualified", "signing_policy", "artifacts"],
       "properties": {
         "contract": {"const": "spike/windows-installer-manifest/v2"},
         "manifest": {"type": "string", "minLength": 1},
@@ -23,7 +23,6 @@
         "application_version": {"type": "string", "minLength": 1},
         "channel": {"const": "production-candidate"},
         "release_state": {"const": "production-candidate"},
-        "license_key_id": {"type": "string", "minLength": 1},
         "production_qualified": {"const": false},
         "signing_policy": {"$ref": "#/$defs/signing_policy"},
         "artifacts": {

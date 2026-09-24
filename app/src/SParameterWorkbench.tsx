@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle2, Download, Play, Upload, X } from "lucide-r
 import { checkNetwork, parseTouchstone, TouchstoneData, trace } from "./sparameters";
 import { numericExtent } from "./numericRange";
 import type { AssemblyDesigns } from "./mcadAssembly";
-import { runSiProtocolTestSuite, runSiUniformChannel } from "./workerBridge";
+import { cancelLocalWorker, isDesktopShell, runSiProtocolTestSuite, runSiUniformChannel } from "./workerBridge";
 import SiChannelResultPanel from "./SiChannelResultPanel";
 import SiWorkflowWorkbench from "./SiWorkflowWorkbench";
 import type { SiProtocolSuite } from "./siProtocolSuites";
@@ -17,6 +17,9 @@ type Props = {
   suite?: SiProtocolSuite | null;
   selectedProfile?: SiChannelProfile | null;
   initialResult?: Record<string, unknown> | null;
+  initialView?: "workflow" | "geometry";
+  initialFocus?: "channel" | "crosstalk" | "eye" | "pam4" | "impedance" | "ports";
+  intentToken?: number;
   onResult?: (result: Record<string, unknown>) => void;
 };
 
@@ -116,8 +119,11 @@ const downloadJson = (name: string, value: unknown) => {
   URL.revokeObjectURL(anchor.href);
 };
 
-export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, onClose, onStatus, suite, selectedProfile, initialResult, onResult }: Props) {
-  const [workflowView, setWorkflowView] = useState(true);
+export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, onClose, onStatus, suite, selectedProfile, initialResult, initialView, initialFocus = "channel", intentToken, onResult }: Props) {
+  const [workflowView, setWorkflowView] = useState(() => initialView ? initialView === "workflow" : !suite && !selectedProfile && initialResult?.contract !== "spike/si-channel-result/v1");
+  useEffect(() => { if ((suite || selectedProfile) && !initialView) setWorkflowView(false); }, [suite?.id, selectedProfile?.id, initialView]);
+  useEffect(() => { if (initialView && intentToken) setWorkflowView(initialView === "workflow"); }, [initialView, intentToken]);
+  const desktop = isDesktopShell();
   const input = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<TouchstoneData | null>(null);
   const [error, setError] = useState("");
@@ -165,16 +171,18 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     setSignalNet(signal?.id ?? "");
     const preset = suitePreset(suite, selectedProfile);
     setVictimNet("");
-    setSignaling(preset.signaling);
+    setSignaling(initialFocus === "crosstalk" ? "single_ended" : preset.signaling);
     setDifferentialMateNet(suggestedDifferentialMate(signal, designNets));
     setReferenceNet(ground?.id ?? "");
     setReferenceLayer(copperLayers.find(layer => !/f\.cu|top/i.test(layer.name))?.id ?? copperLayers[0]?.id ?? "");
     setFrequencyStopHz(String(preset.frequencyStopHz)); setBitRateHz(String(preset.bitRateHz));
-    setModulation(suite?.encoding === "PAM4" ? "PAM4" : "NRZ");
-    setSiResult(initialResult?.contract === "spike/si-channel-result/v1" ? initialResult : null);
+    setModulation(initialFocus === "pam4" || (initialFocus !== "eye" && suite?.encoding === "PAM4") ? "PAM4" : "NRZ");
     setSuiteResult(null);
     setSiError("");
-  }, [activeDesign?.design_id, suite?.id, selectedProfile?.id, initialResult]);
+  }, [activeDesign?.design_id, suite?.id, selectedProfile?.id, initialFocus]);
+  useEffect(() => {
+    setSiResult(initialResult?.contract === "spike/si-channel-result/v1" ? initialResult : null);
+  }, [initialResult]);
 
   const runGeometryChannel = async () => {
     if (!activeDesign) return;
@@ -186,6 +194,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     if (!Number.isFinite(stop) || stop <= 0) { setSiError("Frequency stop must be positive and finite."); return; }
     if (!Number.isInteger(count) || count < 3 || count > 32769) { setSiError("Frequency points must be an integer from 3 through 32769."); return; }
     if (!signalNet || !referenceNet || !referenceLayer) { setSiError("Select a signal net, reference net, and reference copper layer."); return; }
+    if (initialFocus === "crosstalk" && !victimNet) { setSiError("Choose a separate victim net to calculate NEXT and FEXT."); return; }
     if (signalNet === referenceNet || (victimNet && [signalNet, referenceNet].includes(victimNet)) || (differentialMateNet && [signalNet, referenceNet, victimNet].includes(differentialMateNet))) { setSiError("Aggressor, differential mate, optional victim, and reference nets must be distinct."); return; }
     if (signaling === "differential" && !differentialMateNet) { setSiError("Differential signaling requires an explicitly selected P/N mate."); return; }
     const coupledMate = signaling === "differential" ? differentialMateNet : victimNet;
@@ -242,33 +251,38 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     setSiBusy(true);
     setSiError("");
     onStatus(`Running bounded experimental ${signaling === "differential" ? "differential" : "single-ended"} aggressor ${signalNet}${differentialMateNet ? ` / mate ${differentialMateNet}` : ""}${victimNet ? ` with separate victim ${victimNet}` : ""}`);
-    const response = suite
-      ? await runSiProtocolTestSuite(activeDesign, {
-        contract: "spike/si-protocol-test-suite-request/v1",
-        suite,
-        lanes: [{ lane_id: String(request.channel_id), channel_request: request }],
-      })
-      : await runSiUniformChannel(activeDesign, request);
-    setSiBusy(false);
-    if (!response.ok || !response.result) {
-      const message = response.error ?? "The SI worker returned no result.";
+    try {
+      const response = suite
+        ? await runSiProtocolTestSuite(activeDesign, {
+          contract: "spike/si-protocol-test-suite-request/v1",
+          suite,
+          lanes: [{ lane_id: String(request.channel_id), channel_request: request }],
+        })
+        : await runSiUniformChannel(activeDesign, request);
+      if (!response.ok || !response.result) {
+        const message = response.error ?? "The SI worker returned no result.";
+        setSiError(message);
+        onStatus(`Experimental SI channel failed: ${message}`);
+        return;
+      }
+      const channelResult = suite
+        ? (response.result.lanes as { channel_result?: Record<string, unknown> }[] | undefined)?.[0]?.channel_result
+        : response.result;
+      if (!channelResult || channelResult.contract !== "spike/si-channel-result/v1") {
+        setSiError("The SI worker returned no geometry-derived channel result.");
+        return;
+      }
+      setSuiteResult(suite ? response.result : null);
+      setSiResult(channelResult);
+      onResult?.(channelResult);
+      onStatus(suite
+        ? `${suite.name} experimental test matrix completed; blocked tests and compliance limits remain explicit.`
+        : "Experimental geometry-derived S/TDR/TDT channel run completed; signoff and compliance remain false.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
       setSiError(message);
       onStatus(`Experimental SI channel failed: ${message}`);
-      return;
-    }
-    const channelResult = suite
-      ? (response.result.lanes as { channel_result?: Record<string, unknown> }[] | undefined)?.[0]?.channel_result
-      : response.result;
-    if (!channelResult || channelResult.contract !== "spike/si-channel-result/v1") {
-      setSiError("The SI worker returned no geometry-derived channel result.");
-      return;
-    }
-    setSuiteResult(suite ? response.result : null);
-    setSiResult(channelResult);
-    onResult?.(channelResult);
-    onStatus(suite
-      ? `${suite.name} experimental test matrix completed; blocked tests and compliance limits remain explicit.`
-      : "Experimental geometry-derived S/TDR/TDT channel run completed; signoff and compliance remain false.");
+    } finally { setSiBusy(false); }
   };
 
   const load = async (file?: File) => {
@@ -310,16 +324,17 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   return <div className="modal-backdrop"><section className="modal sparam-workbench" role="dialog" aria-modal="true" aria-label="S-parameter workbench">
     <header><div><span className="eyebrow">HF / SI NETWORK ANALYSIS</span><h2>S-parameter workbench</h2></div><button className="icon-btn" onClick={onClose} title="Close"><X size={17} /></button></header>
     <div className="sparam-commandbar"><button className={workflowView ? "primary-btn" : "secondary-btn"} onClick={() => setWorkflowView(true)}>Source-to-receiver workflow</button><button className={!workflowView ? "primary-btn" : "secondary-btn"} onClick={() => setWorkflowView(false)}>Geometry / protocol / network inspection</button></div>
-    <div hidden={!workflowView}><SiWorkflowWorkbench design={activeDesign} initialResult={initialResult} onResult={onResult} onStatus={onStatus} /></div>
+    <div hidden={!workflowView}><SiWorkflowWorkbench design={activeDesign} initialResult={initialResult} initialStep={initialFocus === "ports" ? "endpoints" : "channel"} intentToken={intentToken} onResult={onResult} onStatus={onStatus} /></div>
     {!workflowView && <>
-    <div className="sparam-commandbar"><b>{suite ? `${suite.name} preset · ` : ""}Geometry-derived channel — experimental, not signoff/compliance qualified</b></div>
+    {!desktop && <p className="si-note">Geometry and protocol execution requires the SPIKE desktop app. Browser preview supports configuration and network inspection.</p>}
+    <div className="sparam-commandbar"><b>{initialFocus === "crosstalk" ? "NEXT / FEXT · select an aggressor and separate victim net" : initialFocus === "pam4" ? "PAM4 channel and eye" : initialFocus === "eye" ? "NRZ channel and eye" : initialFocus === "impedance" ? "Channel impedance and TDR" : suite ? `${suite.name} preset · geometry channel` : "Geometry-derived channel"} · experimental, not signoff/compliance qualified</b></div>
     {!activeDesign ? <div className="sparam-error"><AlertTriangle size={16} /> Blocked: this project has no canonical active DesignIR v2 record. Save or reopen a canonical project design before running geometry-derived SI.</div> : <>
       <div className="sparam-body">
         <aside>
           <h3>Canonical geometry</h3>
           <label className="setup-sublabel">Signal net<select className="select-control" value={signalNet} onChange={event => { const next = event.target.value; setSignalNet(next); setDifferentialMateNet(suggestedDifferentialMate(designNets.find(net => net.id === next), designNets)); }}><option value="">Select signal</option>{designNets.map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>{suite ? `${suite.name} candidates are prioritized; review the exact board net before running.` : "Select the exact board route to analyze."}</small></label>
-          <label className="setup-sublabel">Signaling<select className="select-control" value={signaling} onChange={event => setSignaling(event.target.value as "single_ended" | "differential")}><option value="single_ended">Single-ended aggressor</option><option value="differential">Differential aggressor pair</option></select></label>
-          {signaling === "differential" ? <label className="setup-sublabel">Differential mate<select className="select-control" value={differentialMateNet} onChange={event => setDifferentialMateNet(event.target.value)}><option value="">Select mate (P/N)</option>{designNets.filter(net => net.id !== signalNet).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Explicit P/N mate for the bounded four-port and mixed-mode transform.</small></label> : <label className="setup-sublabel">Victim net (optional)<select className="select-control" value={victimNet} onChange={event => setVictimNet(event.target.value)}><option value="">No separate victim</option>{designNets.filter(net => ![signalNet, referenceNet].includes(net.id)).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Separate coupled-line victim for NEXT/FEXT.</small></label>}
+          <label className="setup-sublabel">Signaling<select className="select-control" value={signaling} disabled={initialFocus === "crosstalk"} onChange={event => setSignaling(event.target.value as "single_ended" | "differential")}><option value="single_ended">Single-ended aggressor</option><option value="differential">Differential aggressor pair</option></select></label>
+          {signaling === "differential" ? <label className="setup-sublabel">Differential mate<select className="select-control" value={differentialMateNet} onChange={event => setDifferentialMateNet(event.target.value)}><option value="">Select mate (P/N)</option>{designNets.filter(net => net.id !== signalNet).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Explicit P/N mate for the bounded four-port and mixed-mode transform.</small></label> : <label className="setup-sublabel">{initialFocus === "crosstalk" ? "Victim net (required)" : "Victim net (optional)"}<select className="select-control" value={victimNet} onChange={event => setVictimNet(event.target.value)}><option value="">No separate victim</option>{designNets.filter(net => ![signalNet, referenceNet].includes(net.id)).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Select the separate coupled-line victim for NEXT/FEXT.</small></label>}
           {(signaling === "differential" || victimNet) && <><label className="setup-sublabel">Separation variation tolerance (mm)<input value={separationToleranceMm} onChange={event => setSeparationToleranceMm(event.target.value)} inputMode="decimal" /></label><label className="setup-sublabel">Path skew tolerance (mm)<input value={skewToleranceMm} onChange={event => setSkewToleranceMm(event.target.value)} inputMode="decimal" /><small>Fail-closed bounds for the piecewise paired-route approximation.</small></label></>}
           <label className="setup-sublabel">Reference net<select className="select-control" value={referenceNet} onChange={event => setReferenceNet(event.target.value)}><option value="">Select reference</option>{designNets.map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select></label>
           <label className="setup-sublabel">Reference layer<select className="select-control" value={referenceLayer} onChange={event => setReferenceLayer(event.target.value)}><option value="">Select copper layer</option>{copperLayers.map(layer => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label>
@@ -339,7 +354,9 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
             <label><span>CTLE zero / pole (Hz)</span><input value={`${ctleZeroHz}, ${ctlePoleHz}`} onChange={event => { const [zero = "", pole = ""] = event.target.value.split(","); setCtleZeroHz(zero.trim()); setCtlePoleHz(pole.trim()); }} /></label>
             <label><span>Normalized voltage noise RMS</span><input value={voltageNoise} onChange={event => setVoltageNoise(event.target.value)} inputMode="decimal" /></label>
           </div>}
-          <button className="primary-btn" disabled={siBusy} onClick={() => void runGeometryChannel()}><Play size={15} /> {siBusy ? "Running heavy SI worker..." : "Run experimental SI channel"}</button>
+          {siBusy
+            ? <button className="primary-btn" onClick={() => { void cancelLocalWorker().catch(error => setSiError(error instanceof Error ? error.message : String(error))); }}><X size={15} />Stop SI channel</button>
+            : <button className="primary-btn" disabled={!desktop} onClick={() => void runGeometryChannel()}><Play size={15} />{initialFocus === "crosstalk" ? "Run NEXT / FEXT" : initialFocus === "pam4" ? "Run PAM4 channel" : "Run experimental SI channel"}</button>}
           {siError && <div className="sparam-error"><AlertTriangle size={16} /> {siError}</div>}
           {suiteResult && <div className="sparam-summary"><div><span>SUITE</span><b>{String(record(suiteResult.suite).family ?? suite?.family ?? "SI")}</b></div><div><span>COMPLETED TESTS</span><b>{String(record(suiteResult.summary).completed_tests ?? 0)}</b></div><div><span>BLOCKED TESTS</span><b>{String(record(suiteResult.summary).blocked_tests ?? 0)}</b></div><div><span>COMPLIANCE</span><b>{String(suiteResult.compliance_status ?? "not_evaluated")}</b></div></div>}
           {summary && <>

@@ -93,10 +93,13 @@ class SequencePanel(wx.Panel):
         owner=self.owner;job=self.queue.pop(0);self.current=job
         try:
             owner.run_snapshot=deepcopy(self.snapshot);owner.run_snapshot.update(source=job['source'],document_source=self.snapshot['source'],run_profile=job['profile'])
-            from .model_fidelity import preflight
-            preflight(owner.run_snapshot)
-            owner.active_run=BatchRun(owner.run_snapshot['source'],owner.library,method=job['profile']['method'])
-            owner.active_record_id=owner.run_history.start(owner.run_snapshot,owner.library)
+            backend=job['profile'].get('backend','native')
+            from .model_fidelity import preflight,preflight_compatibility
+            if backend=='ngspice':preflight_compatibility(owner.run_snapshot)
+            else:preflight(owner.run_snapshot)
+            owner.active_run=BatchRun(owner.run_snapshot['source'],owner.library,method=job['profile']['method'],
+                                      kind='ngspice' if backend=='ngspice' else 'circuit')
+            owner.active_record_id=owner.run_history.start(owner.run_snapshot,owner.library if backend=='native' else 'explicit ngspice process adapter')
             owner.job_running=True;owner.manager.refresh_runs();owner.update_run_controls()
             self.status.SetLabel('Running '+job['profile']['name']+f' · {len(self.queue)} remaining')
         except Exception:

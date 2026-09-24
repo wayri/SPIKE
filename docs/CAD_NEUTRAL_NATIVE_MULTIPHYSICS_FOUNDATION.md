@@ -868,10 +868,10 @@ flowchart LR
 Adapters must use explicit paths, time and memory budgets, cancellation,
 allowlisted invocation, result-size limits, and provenance recording. A
 detected executable, library, or catalog entry is not evidence that a PCB
-workflow is runnable or validated. Licensing remains an explicit commercial
-gate. See [EXTERNAL_ENGINE_INTEROPERABILITY.md](EXTERNAL_ENGINE_INTEROPERABILITY.md),
-[EXTERNAL_SOLVER_DEPLOYMENT.md](EXTERNAL_SOLVER_DEPLOYMENT.md), and
-[LICENSING_AND_USERS.md](LICENSING_AND_USERS.md).
+workflow is runnable or validated. See
+[EXTERNAL_ENGINE_INTEROPERABILITY.md](EXTERNAL_ENGINE_INTEROPERABILITY.md),
+[EXTERNAL_SOLVER_DEPLOYMENT.md](EXTERNAL_SOLVER_DEPLOYMENT.md), and the
+[repository provenance policy](../LICENSING.md).
 
 ## Language and deployment policy
 

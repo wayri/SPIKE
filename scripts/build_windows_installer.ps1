@@ -51,9 +51,6 @@ function Invoke-Checked {
 
 if ($isProduction) {
     $required = @(
-        "SPIKE_COMMERCIAL_EULA_APPROVED",
-        "SPIKE_LICENSE_PUBLIC_KEY_B64URL",
-        "SPIKE_LICENSE_KEY_ID",
         "SPIKE_WINDOWS_SIGNING_THUMBPRINT",
         "SPIKE_WINDOWS_SIGNING_STORE_SCOPE",
         "SPIKE_WINDOWS_TIMESTAMP_URL",
@@ -65,12 +62,6 @@ if ($isProduction) {
         if ([string]::IsNullOrWhiteSpace($value)) {
             throw "Production packaging is blocked: $name is not configured."
         }
-    }
-    if ($env:SPIKE_COMMERCIAL_EULA_APPROVED -ne "1") {
-        throw "Production packaging is blocked until the commercial EULA is legally approved."
-    }
-    if (Select-String -LiteralPath (Join-Path $root "licenses\SPIKE-COMMERCIAL-EULA-DRAFT.md") -SimpleMatch "[LEGAL ENTITY NAME]" -Quiet) {
-        throw "Production packaging is blocked: the commercial EULA still contains legal placeholders."
     }
     $signingPolicyPath = Join-Path $root "config\windows-signing-policy.json"
     $signingPolicy = Get-Content -LiteralPath $signingPolicyPath -Raw | ConvertFrom-Json
@@ -88,7 +79,6 @@ if ($isProduction) {
     $timestampUri = Assert-SpikeTimestampUri $env:SPIKE_WINDOWS_TIMESTAMP_URL @($signingPolicy.allowed_timestamp_hosts)
     $signToolPath = Resolve-SpikeSignTool $env:SPIKE_SIGNTOOL_PATH
     $signingCertificate = Get-SpikeSigningCertificate $signingThumbprint $storeScope
-    $licenseKeyId = [string]$env:SPIKE_LICENSE_KEY_ID
     $buildWheelhouse = [System.IO.Path]::GetFullPath([string]$env:SPIKE_WINDOWS_BUILD_WHEELHOUSE)
     $runtimeWheelhouse = [System.IO.Path]::GetFullPath([string]$env:SPIKE_WINDOWS_RUNTIME_WHEELHOUSE)
     if (-not (Test-Path -LiteralPath $buildWheelhouse -PathType Container) -or
@@ -110,20 +100,6 @@ if ($isProduction) {
         $cmsMetadata.signer_thumbprint -ne $signingThumbprint) {
         throw "Production packaging is blocked: dependency CMS verification did not match the release signer."
     }
-} else {
-    $previewKeyPath = Join-Path $root "config\license-preview-public.json"
-    if (-not (Test-Path -LiteralPath $previewKeyPath)) {
-        throw "Preview packaging is blocked: the public preview issuer configuration is missing."
-    }
-    $previewKey = Get-Content -LiteralPath $previewKeyPath -Raw | ConvertFrom-Json
-    if ($previewKey.schema -ne "spike/license-public-key/v1" -or
-        [string]::IsNullOrWhiteSpace($previewKey.key_id) -or
-        [string]::IsNullOrWhiteSpace($previewKey.public_key_base64url)) {
-        throw "Preview packaging is blocked: the public preview issuer configuration is invalid."
-    }
-    $env:SPIKE_LICENSE_KEY_ID = [string]$previewKey.key_id
-    $env:SPIKE_LICENSE_PUBLIC_KEY_B64URL = [string]$previewKey.public_key_base64url
-    $licenseKeyId = [string]$previewKey.key_id
 }
 
 if (-not $SkipTests) {
@@ -232,7 +208,6 @@ if ($isProduction) {
         application_version = $applicationVersion
         channel = "production-candidate"
         release_state = "production-candidate"
-        license_key_id = $licenseKeyId
         generated_at = [DateTimeOffset]::UtcNow.ToString("o")
         production_qualified = $false
         signing_policy = [ordered]@{
@@ -252,7 +227,6 @@ if ($isProduction) {
         version = $version
         application_version = $applicationVersion
         channel = "engineering-preview"
-        license_key_id = $licenseKeyId
         generated_at = [DateTimeOffset]::UtcNow.ToString("o")
         production_qualified = $false
         files = $manifestItems

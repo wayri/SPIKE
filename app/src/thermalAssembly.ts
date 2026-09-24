@@ -34,6 +34,7 @@ export type ThermalElement = {
   coordinate_frame: ThermalCoordinateFrame;
   dimensions_mm: { x: number; y: number; z: number };
   power_w: number;
+  thermal_capacitance_j_per_c?: number;
   emissivity: number;
   theta_top_c_per_w?: number;
   theta_bottom_c_per_w?: number;
@@ -134,7 +135,7 @@ export function normalizeThermalElements(value: unknown): ThermalElement[] {
       position: (row.position ?? [0, 0, 0]) as ThermalPoint3,
       coordinate_frame: row.coordinate_frame ?? (row.kind === "pcb_component" || row.kind === "board" ? "board_local" : "domain_local"),
       dimensions_mm: { x: Number(row.dimensions_mm?.x) || 1, y: Number(row.dimensions_mm?.y) || 1, z: Number(row.dimensions_mm?.z) || 1 },
-      power_w: Number(row.power_w) || 0, emissivity: Number.isFinite(Number(row.emissivity)) ? Number(row.emissivity) : 0.8,
+      power_w: Number(row.power_w) || 0, thermal_capacitance_j_per_c: numericOptional(row.thermal_capacitance_j_per_c), emissivity: Number.isFinite(Number(row.emissivity)) ? Number(row.emissivity) : 0.8,
       theta_top_c_per_w: numericOptional(row.theta_top_c_per_w), theta_bottom_c_per_w: numericOptional(row.theta_bottom_c_per_w),
       theta_jc_c_per_w: numericOptional(row.theta_jc_c_per_w), max_junction_c: numericOptional(row.max_junction_c),
       max_case_c: numericOptional(row.max_case_c), initial_temperature_c: numericOptional(row.initial_temperature_c),

@@ -41,7 +41,6 @@ convergence remain separate fields.
 | `SOLVER` | [Solver availability](../TROUBLESHOOTING.md#solver-is-unavailable), [execution/convergence](../TROUBLESHOOTING.md#solver-fails-to-converge-or-exceeds-a-budget) | Request, solver descriptor, residual/convergence detail, limits |
 | `PI` | [PI candidate and loop extraction](../TROUBLESHOOTING.md#pi-candidate-and-loop-extraction-fails) | Endpoint/return mapping, candidates, frequency grid, provenance |
 | `SPICE` | [SPICE recovery](../TROUBLESHOOTING.md#spice-workspace-or-model-is-rejected) | Workspace/model identity, anchor mappings, resource limits |
-| `SECURITY` | [License and entitlement recovery](../TROUBLESHOOTING.md#license-activation-or-capability-is-rejected) | Redacted code, entitlement ID, product version, device-request digest |
 | `EXT` | [External engines](../TROUBLESHOOTING.md#external-engine-cannot-run) | Registration, trusted runtime identity, process diagnostics |
 | `REPORT` | [Report recovery](../TROUBLESHOOTING.md#report-generation-or-export-fails) | Result/provenance identity, preview state, approved destination |
 
@@ -90,7 +89,6 @@ issued entry.
 | `SPIKE-FE-VIEW-P-0001` | Viewport performance degraded | Reduce visible detail or use a lower rendering quality preset. |
 | `SPIKE-FE-PROJECT-E-0001` | Project open failed | Check package path and integrity, then retry. |
 | `SPIKE-FE-SPICE-E-0001` | SPICE assistant input invalid | Correct highlighted model, pin, or analysis fields. |
-| `SPIKE-FE-SECURITY-E-0001` | Desktop license service unavailable | Open the installed SPIKE desktop application and retry. |
 
 ## Backend Codes
 
@@ -177,16 +175,6 @@ issued entry.
 | `SPIKE-BE-SPICE-E-0056` | Owned circuit worker wall-time limit exceeded | Reduce the workload or request a larger admitted timeout; the supervisor terminated the complete admitted OS container. |
 | `SPIKE-BE-EXT-E-0001` | External engine launch failed | Review discovery and process diagnostics before retrying. |
 | `SPIKE-BE-EXT-S-0001` | External engine trust failure | Do not execute; restore a trusted signed installation. |
-| `SPIKE-BE-SECURITY-S-0001` | License issuer trust unavailable | Install an official build containing the expected issuer public key. |
-| `SPIKE-BE-SECURITY-S-0002` | License envelope invalid | Obtain a fresh entitlement from an authorized issuer. |
-| `SPIKE-BE-SECURITY-S-0003` | License signature invalid | Reject the entitlement and obtain a fresh signed copy. |
-| `SPIKE-BE-SECURITY-S-0004` | License device binding mismatch | Deactivate the previous seat or issue for this machine and user. |
-| `SPIKE-BE-SECURITY-E-0001` | License claims invalid | Correct issuer claims and issue a new signed entitlement. |
-| `SPIKE-BE-SECURITY-E-0002` | License product mismatch | Use an entitlement for this SPIKE product major version. |
-| `SPIKE-BE-SECURITY-E-0003` | License validity period rejected | Renew the entitlement or correct the trusted system clock. |
-| `SPIKE-BE-SECURITY-E-0004` | License storage failed | Check per-user app-data permissions and disk space. |
-| `SPIKE-BE-SECURITY-E-0005` | License not installed | Activate a signed entitlement or remain in viewer mode. |
-| `SPIKE-BE-SECURITY-E-0006` | Licensed capability required | Install an entitlement granting the requested capability. |
 | `SPIKE-BE-PACKAGE-E-0001` | Project package invalid | Open a verified backup or re-import the source design. |
 | `SPIKE-BE-PACKAGE-E-0002` | Project package write failed | Choose a writable destination, verify available space, and retry. |
 | `SPIKE-BE-PACKAGE-S-0001` | Package signature contract or algorithm unsupported | Open the package with a compatible SPIKE release or have an authorized signer issue a supported Ed25519 envelope. |

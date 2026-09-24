@@ -12,7 +12,6 @@ use std::time::{Duration, Instant};
 use sysinfo::{get_current_pid, Pid, ProcessRefreshKind, ProcessesToUpdate, System};
 use tauri::Manager;
 
-mod entitlement;
 mod gpu_metrics;
 mod extension_artifacts;
 mod package_trust;
@@ -180,6 +179,7 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "run_field_circuit_cosimulation"
             | "run_multiboard_si_independent_batch"
             | "run_openems_case"
+            | "run_python_script"
             | "run_pi_path_native_mna"
             | "run_harness_pi"
             | "generate_tetrahedral_mesh"
@@ -190,6 +190,7 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "run_spice_workspace_native_mna"
             | "run_owned_spice_workspace"
             | "run_sparselizard_case"
+            | "run_component_thermal"
             | "run_thermal_case"
     )
 }
@@ -564,7 +565,7 @@ fn dialog_for_kind(kind: &str, save: bool) -> rfd::FileDialog {
         ("step", _) => dialog.add_filter("STEP model", &["step", "stp"]),
         ("netlist", _) => dialog.add_filter("SPICE netlist", &["cir", "sp", "spice", "net"]),
         ("result", _) => dialog.add_filter("SPIKE result bundle", &["spike-results.json", "json"]),
-        ("license", _) => dialog.add_filter("SPIKE license", &["license", "spike-license.json", "json", "txt"]),
+        ("script", _) => dialog.add_filter("Python script", &["py"]),
         _ => dialog.add_filter("Text file", &["txt", "json"]),
     }
 }
@@ -1275,7 +1276,6 @@ async fn run_worker(
     state: tauri::State<'_, WorkerExecutionState>,
     resident: tauri::State<'_, ResidentWorkerState>,
 ) -> Result<serde_json::Value, String> {
-    require_worker_capability(&app, &request)?;
     let guard = claim_heavy_worker(state.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
     let resident_state = resident.0.clone();
@@ -1301,7 +1301,6 @@ async fn run_project_worker(
     workers: tauri::State<'_, WorkerExecutionState>,
     trust: tauri::State<'_, project_trust_binding::ProjectManifestState>,
 ) -> Result<serde_json::Value, String> {
-    require_worker_capability(&app, &request)?;
     let method = worker_method(&request).to_string();
     let requested_paths = project_worker_paths(&request)?;
     let all_approved = {
@@ -1336,53 +1335,6 @@ async fn run_project_worker(
         &method, &project_path, &response, &trust,
     )?;
     Ok(response)
-}
-
-fn require_worker_capability(
-    app: &tauri::AppHandle,
-    request: &serde_json::Value,
-) -> Result<(), String> {
-    let capability = entitlement::capability_for_worker(request);
-    if capability == "project.read" {
-        return Ok(());
-    }
-    let license = entitlement::status(app);
-    if license.permits(capability) {
-        Ok(())
-    } else {
-        Err(format!(
-            "SPIKE-BE-SECURITY-E-0006: a valid license with capability '{capability}' is required ({})",
-            license.message.as_deref().unwrap_or("license unavailable")
-        ))
-    }
-}
-
-#[tauri::command]
-fn license_status(app: tauri::AppHandle) -> entitlement::LicenseSummary {
-    entitlement::status(&app)
-}
-
-#[tauri::command]
-fn license_device_request() -> entitlement::DeviceBindingSummary {
-    entitlement::device_request()
-}
-
-#[tauri::command]
-fn license_activate(
-    app: tauri::AppHandle,
-    entitlement_json: String,
-) -> Result<entitlement::LicenseSummary, String> {
-    entitlement::activate(&app, &entitlement_json)
-}
-
-#[tauri::command]
-fn license_deactivate(app: tauri::AppHandle) -> Result<entitlement::LicenseSummary, String> {
-    entitlement::deactivate(&app)
-}
-
-#[tauri::command]
-fn license_file_export(app: tauri::AppHandle) -> Result<String, String> {
-    entitlement::export(&app)
 }
 
 #[tauri::command]
@@ -1423,11 +1375,6 @@ pub fn run() {
             save_text_file,
             save_extension_artifact,
             write_approved_text_file,
-            license_status,
-            license_device_request,
-            license_activate,
-            license_deactivate,
-            license_file_export,
             verify_project_manifest_signature
         ])
         .run(tauri::generate_context!())
@@ -1519,6 +1466,7 @@ mod tests {
         assert!(is_heavy_worker_method("prepare_sparselizard_case"));
         assert!(is_heavy_worker_method("run_sparselizard_case"));
         assert!(is_heavy_worker_method("run_converter_study"));
+        assert!(is_heavy_worker_method("run_component_thermal"));
         assert!(is_heavy_worker_method("run_field_circuit_cosimulation"));
         assert!(is_heavy_worker_method("run_multiboard_si_independent_batch"));
         assert!(is_heavy_worker_method("run_pi_path_native_mna"));
@@ -1699,8 +1647,6 @@ mod tests {
             assert!(project_trust_binding::is_targeted_project_read(method));
             assert!(is_heavy_worker_method(method));
         }
-        assert_eq!(entitlement::capability_for_worker(&json!({"method": "apply_mcad_feedback"})), "project.write");
-
         let lossless_resave = json!({
             "method": "write_project_package",
             "params": {

@@ -20,6 +20,7 @@ from spikes_studio.workbench_layout import PRESETS
 
 
 def main():
+    backend_only='--backend-only' in sys.argv
     preferences=tempfile.TemporaryDirectory(prefix='spikes-gui-test-')
     os.environ['LOCALAPPDATA']=preferences.name
     app=wx.App(False);app.SetAssertMode(wx.APP_ASSERT_EXCEPTION)
@@ -39,7 +40,8 @@ def main():
         nonlocal finished
         if finished:return
         finished=True
-        write_json(out/'checks.json',dict(passed=error is None,checks=checks,error=error,scope='Stage A development checks; not release qualification'))
+        report_name='checks-backend.json' if backend_only else 'checks.json'
+        write_json(out/report_name,dict(passed=error is None,checks=checks,error=error,scope='Stage A development checks; not release qualification'))
         frame.timer.Stop();frame.autosave_timer.Stop()
         if frame.active_run:frame.active_run.stop()
         if error is None and '--visual-review' in sys.argv:
@@ -89,8 +91,24 @@ def main():
                 voltage=frame.math.evaluate('v(out)').values
                 assert 0.98<float(voltage[-1])<1.01
                 checks['owned C++ RC transient acquired and checked']=True
-                frame.commands.execute('view.offline_report')
-                frame.offline_report.refresh_snapshot();state='offline report'
+                if backend_only:
+                    profile=deepcopy(frame.doc.data['run_profile']);profile['backend']='ngspice'
+                    frame.doc.update_setup('run_profile',profile);frame.manager.reflect_document()
+                    assert frame.manager.fields['backend'][0].GetStringSelection()=='ngspice'
+                    checks['manager displays explicitly selected ngspice backend']=True
+                    frame.run();state='ngspice run'
+                else:
+                    frame.commands.execute('view.offline_report')
+                    frame.offline_report.refresh_snapshot();state='offline report'
+            elif state=='ngspice run' and not frame.job_running:
+                assert frame.result is not None and frame.result['status']=='completed'
+                assert frame.result['provenance']['requested_backend']=='ngspice'
+                assert frame.result['provenance']['backend_substitution'] is False
+                assert not frame.result['data']['element_current_a']
+                assert not frame.result['data']['element_power_w']
+                assert frame.math is not None and 0.98<float(frame.math.evaluate('v(out)').values[-1])<1.01
+                checks['explicit ngspice RC acquired without native fallback or inferred power']=True
+                finish();return
             elif state=='offline report' and frame.offline_report.report is not None:
                 panel=frame.offline_report
                 if panel.web is None:raise RuntimeError('Embedded WebView unavailable')
@@ -108,7 +126,7 @@ def main():
             finish(traceback.format_exc())
     wx.CallLater(500,advance);app.MainLoop()
     import json
-    result=json.loads((out/'checks.json').read_text(encoding='utf-8'))
+    result=json.loads((out/('checks-backend.json' if backend_only else 'checks.json')).read_text(encoding='utf-8'))
     print(result)
     return int(not result['passed'])
 

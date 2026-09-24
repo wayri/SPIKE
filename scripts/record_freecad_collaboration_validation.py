@@ -10,7 +10,7 @@ root = Path(__file__).resolve().parents[1]
 sources = ["python/spike_core/mcad_session_contract.py", "python/spike_core/service_mcad_collaboration.py",
            "python/spike_core/service_project_assembly.py", "python/spike_core/service_project_mcad_placement.py",
            "app/src/FreecadCollaboration.tsx", "app/src/AssemblyStructureEditor.tsx", "app/src/workerBridge.ts",
-           "app/src-tauri/src/lib.rs", "app/src-tauri/src/entitlement.rs", "app/src-tauri/src/project_trust_binding.rs",
+           "app/src-tauri/src/lib.rs", "app/src-tauri/src/project_trust_binding.rs",
            "integrations/freecad/SPIKEWorkbench/spike_freecad/collaboration.py",
            "integrations/freecad/SPIKEWorkbench/spike_freecad/collaboration_commands.py",
            "integrations/freecad/SPIKEWorkbench/spike_freecad/session_contract.py",

@@ -5,15 +5,15 @@
 SPIKE keeps solver samples and display interpolation separate:
 
 - `Raw cells` displays the solver-owned scalar sample locations.
-- `Smooth field` is a derived visual interpolation. It does not add samples, change extrema, or alter report values.
-- `3D contour` builds an elevated, layer-aware display surface with quantized color bands and marching isolines. Surfaces are split by net and copper layer, and unsupported grid vertices remain empty so the renderer does not intentionally bridge large conductor voids.
+- `Smooth field` is the default for a new viewport. It is a derived visual interpolation. It does not add samples, change extrema, or alter report values. `Raw cells` remains available for inspecting the solver's discrete output; a saved project keeps its chosen style.
+- `3D contour` builds an elevated, layer-aware display surface with quantized color bands and marching isolines. Surfaces are split by net and copper layer, and unsupported grid vertices remain empty so the renderer does not intentionally bridge large conductor voids. Display height is bounded by board size and a robust range, while the legend and cursor retain the returned extrema.
 - Direction arrows use solver-owned vector fields. The arrow visibility and scale controls affect display only.
 - Layer overview cards use the same scalar range as the active viewport so colors remain comparable across layers.
 - Layer visibility, selected result scope, isolated nets, and analysis-net filtering apply before scalar or vector overlays are rendered.
 
 Reports and analytics always calculate statistics from the normalized solver result bundle, never from rendered or decimated screen objects.
 
-Live smooth fields reconstruct values on supplied face geometry. Shared vertex values are averaged only within edge-connected faces of the same net, layer, and physical position; touching corners alone do not join conductors. The 2D view subdivides these faces into bounded colored triangles without Gaussian blur. The 3D view interpolates vertex colors and contour heights on the same topology. Raw cells retain their original face values.
+Live smooth fields reconstruct values on supplied face geometry. Shared vertex values are averaged only within edge-connected faces of the same net, layer, and physical position; touching corners alone do not join conductors. The 2D view uses bounded interpolated triangles clipped to each connected solver-face component without Gaussian blur. The 3D view interpolates vertex colors and contour heights on the same topology. Raw cells retain their original face values.
 
 When face topology is absent, a bounded, deterministic subset supports a local weighted affine fit. Coordinates are normalized around the query, a 3-by-3 normal system is solved, and ill-conditioned neighborhoods fall back to inverse-distance weighting. Exact sample coordinates preserve their values; reconstructed values are clamped to the contributing range. Net/layer grouping, distance limits, and conductor masks restrict support. This independently authored display reconstruction reproduces an affine field inside its supported sample range, but is not a converged field solve and cannot recover missing geometry. Tests use independently constructed constant/affine/degenerate fixtures and do not establish solver accuracy.
 
@@ -21,7 +21,9 @@ Cursor readouts identify original solver samples. Exact faces map the ray-hit tr
 
 Surface subdivision has a hard 100,000-item output budget including fallback points. Large or invalid faces and vertical faces with no 2D area use bounded glyph fallbacks. Geometry may be thinned for interactive display; full solver data remains authoritative. The HTML report has a separate bounded presentation renderer. Report 2D uses top-left board coordinates; report 3D applies board-Y-to-world-Y inversion, including rotated pad and component corners.
 
-Vertical via/barrel faces have zero projected area in a 2D layout. SPIKE therefore renders their solver-owned centre as a bounded display glyph instead of emitting an invisible filled path. Admitted scalar records whose face topology cannot be triangulated use the same fallback in 2D and 3D; this preserves the sample without pretending that an invalid polygon is an exact surface.
+Vertical via/barrel faces have zero projected area in a 2D layout. Via-stress display matches returned barrel samples to their board via and colors its annular footprint, using the peak returned sample for that via. This is a display projection rather than a solved annular variation. Unmatched or untriangulatable scalar records use bounded, flat fallback glyphs; they do not imply a solved volume or plot height.
+
+The 2026-09-24 viewport correction was checked against a recorded `/12Vout` result with 9,614 scalar faces and 3,040 via-barrel faces across 76 vias. The 2D geometry check matched all barrel faces to annuli; an oblique 3D visual check showed continuous hollow via shapes without detached blocks. The frontend production build, result workbench, result performance, viewport and layer-selection tests, TypeScript check, and architecture check passed. These display checks do not establish mesh convergence or validate the numerical current-density values. Numerical code still requires knowledgeable human review before release.
 
 ## Reported analytics
 

@@ -64,45 +64,6 @@ Tauri resources, then the source tree for development. Python can be selected
 with `SPIKE_PYTHON`. Release packaging must include a tested runtime instead of
 depending silently on an arbitrary system Python.
 
-## Licensing during development
-
-Debug builds (`tauri dev`, `cargo test`) run with a clearly displayed
-development unlock: every capability is enabled locally without a signed
-license, and signed licenses still take precedence when installed. The unlock
-is compiled out of release binaries; production packaging cannot re-enable it.
-
-To verify the signed-license path itself:
-
-1. The checkout pins a development issuer root through
-   `app/src-tauri/.cargo/config.toml` (`spike-license-root-v1`) and, as a
-   compile-time fallback, through `DEV_PUBLIC_KEY_B64URL` in
-   `app/src-tauri/src/entitlement.rs`. Cargo only honors `[env]` in
-   `.cargo/config.toml` when the working directory can discover it, so npm/tauri
-   builds that launch cargo from a different CWD would otherwise compile with no
-   key at all; the constant guarantees release builds always embed the dev
-   issuer key. Release engineering must override by exporting
-   `SPIKE_LICENSE_PUBLIC_KEY_B64URL` (and `SPIKE_LICENSE_KEY_ID`) when building
-   production artifacts. The matching private key is not in source control; it
-   lives outside the repository (for example `%USERPROFILE%\.spike-license\`).
-   Note: `scripts/build_windows_installer.ps1` in the Preview channel sets the
-   engineering-preview issuer key, which verifies only preview-signed licenses;
-   pass the dev intercept explicitly (or build directly with `npm run tauri
-   build`) to keep developer-signed entitlements active.
-2. Issue an entitlement for your machine+user. The host computes its device
-   binding from `MachineGuid`, `USERDOMAIN`, and `USERNAME`; read it back from
-   the app (`license_device_request`) or replicate the digest.
-3. Sign claims with the issuer tool and activate either by placing the file at
-   `%LOCALAPPDATA%\org.spike.integrity\license-entitlement-v1.json` or through
-   the settings UI:
-
-```powershell
-tools\license-issuer\target\release\spike-license-issuer.exe init <key-file>
-tools\license-issuer\target\release\spike-license-issuer.exe issue <key-file> <claims-json> <entitlement-json>
-```
-
-Developer-tier entitlements grant every listed capability, require an expiry,
-and remain revocable through the revocation epoch.
-
 ## Required checks
 
 Run these before merging a cross-cutting change:

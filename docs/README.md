@@ -25,8 +25,6 @@ work plan (2026-09-05)](STABILIZATION_RELEASE_PLAN_20260905.md).
 | Configure EMI work | [EMI workflow](EMI_WORKFLOW.md) | [Engine gates](SI_SPICE_EMI_RF_ENGINE_GATES.md) |
 | Configure loaded SI and model handling | [SI workflow](SI_WORKFLOW.md) | [Solver status](SOLVER_STATUS.md) |
 | Use an optional external engine | [External-engine interoperability](EXTERNAL_ENGINE_INTEROPERABILITY.md) | [Deployment](EXTERNAL_SOLVER_DEPLOYMENT.md), engine-specific adapter documents |
-| Activate or diagnose a license | [Licensing and users](LICENSING_AND_USERS.md) | [License-engine architecture](LICENSE_ENGINE_ARCHITECTURE.md), [error catalog](ERROR_CODE_CATALOG.md) |
-| Issue an internal preview entitlement | [License issuance](LICENSE_ISSUANCE.md) | [Entitlement schema](../schemas/license-entitlement-v1.schema.json), [licensing policy](../LICENSING.md) |
 | Build a Windows preview installer | [Windows installer](WINDOWS_INSTALLER.md) | [Licensing policy](../LICENSING.md), [release qualification](PI_RELEASE_QUALIFICATION.md) |
 | Qualify the packaged Wave 1 assembly | [Wave 1 packaged acceptance](WAVE_1_PACKAGED_ASSEMBLY_ACCEPTANCE.md) | [Project package v3](SPIKE_PROJECT_PACKAGE_V3.md), [Windows installer](WINDOWS_INSTALLER.md) |
 
@@ -66,7 +64,6 @@ Read these in order for a new checkout:
 | Errors and recovery | [Error handling](ERROR_HANDLING.md) |
 | Persistence | [Project format](PROJECT_FORMAT.md) |
 | Security | [Security model](SECURITY_MODEL.md) |
-| License enforcement | [License-engine architecture](LICENSE_ENGINE_ARCHITECTURE.md) |
 | Accepted cross-cutting decisions | [Architecture decision records](adr/) |
 
 When these documents disagree, executable contracts and tests identify current

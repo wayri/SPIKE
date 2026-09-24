@@ -14,20 +14,12 @@ the installers to `artifacts/windows/installer`; and writes a SHA-256 manifest.
 The NSIS installer supports per-user or per-machine installation and registers
 the `.spike` project association.
 
-Windows Installer requires a numeric product version, so the current MSI/NSIS
-package uses `0.2.1`. The `spike/windows-installer-manifest/v1` manifest records
-the separate `application_version` of `0.2.0-alpha.2`. This does not promote the
-physics or release qualification state.
+The current MSI/NSIS preview package and application version are `0.2.13`.
+The SHA-256 installer manifest records the package and application versions.
+This does not promote the physics or release qualification state.
 
-Preview installers display `licenses/SPIKE-PREVIEW-NOTICE.md` and include the
-repository notice, licensing policy, third-party notices, commercial EULA
-draft, troubleshooting guide, and error-code catalog. They are not approved for
-sale or production engineering reliance.
-
-Preview packages pin the public key in `config/license-preview-public.json`.
-The corresponding private key is external to the repository and bundle. A
-preview without a pinned public key is rejected by the packaging script because
-it could never activate a signed entitlement.
+Preview installers are unsigned and include troubleshooting and error-code
+references. They are not approved for production engineering reliance.
 
 ## r10 package checkpoint
 
@@ -161,7 +153,7 @@ Extraction at `artifacts/windows/installer-smoke-20260827-r18/PFiles/SPIKE` has 
 
 The current tree is released as application `0.2.0-alpha.2`, numeric Windows
 package `0.2.1`, and installed for the current user at
-`C:\Users\example\AppData\Local\Programs\SPIKE`.
+`C:\Users\yawar\AppData\Local\Programs\SPIKE`.
 
 - `SPIKE_0.2.1_x64_en-US.msi`: 123,897,127 bytes, SHA-256
   `0d49e667175c28530f4344f1c3d321bac611257f5e9c3c55d4cd59e21a039822`
@@ -194,7 +186,7 @@ or physics qualification.
 
 The current working tree was rebuilt without `-SkipWorker` and deployed to the
 current Windows user at
-`C:\Users\example\AppData\Local\Programs\SPIKE`. The generated preview manifest
+`C:\Users\yawar\AppData\Local\Programs\SPIKE`. The generated preview manifest
 timestamp is `2026-08-28T01:58:00.9517649+05:30`:
 
 - MSI: 123,827,116 bytes, SHA-256
@@ -221,10 +213,10 @@ physics-qualification gate.
 ## Production gate
 
 `-Channel Production` intentionally fails while any release gate is incomplete.
-It requires a legally approved EULA, a pinned entitlement issuer, Windows code
-signing configuration, complete provenance/SBOM/notice evidence, production
-qualification, and an explicit Authenticode implementation. Removing that fail
-closed behavior is not a valid release procedure.
+It requires Windows code-signing configuration, complete provenance/SBOM/notice
+evidence, production qualification, and an explicit Authenticode
+implementation. Removing that fail-closed behavior is not a valid release
+procedure.
 
 ### Signed production candidates
 
@@ -249,11 +241,6 @@ thumbprint, and RFC 3161 timestamp-authority thumbprint. A report can therefore
 not transfer a successful review to a rebuilt installer with the same version.
 The resulting `spike/wave1-packaged-acceptance/v2` report still states
 `physics: not_qualified` and `solver_ready: false`.
-
-The development issuer private key must remain outside the repository,
-installer, logs, and CI artifacts. Production binaries contain only approved
-public verification keys. See [License issuance](LICENSE_ISSUANCE.md) for the
-isolated issuer workflow.
 
 The Windows Authenticode private key follows the same boundary: it is accessed
 through an approved certificate store/HSM or signing service. PFX files,
@@ -333,9 +320,6 @@ physics.
 
 ## Security notes
 
-- A signed local entitlement is bound to one machine and operating-system user.
-- Strict one-seat assignment, revocation, and lost-device recovery require the
-  licensing service; an offline file cannot enforce issuer-side uniqueness.
 - Windows production builds must be Authenticode signed and timestamped. The
   preview manifest records the current signature status for every artifact.
 - Tauri uses WebView2 on Windows. The preview uses the download bootstrapper if

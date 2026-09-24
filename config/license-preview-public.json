@@ -1,7 +1,0 @@
-{
-  "schema": "spike/license-public-key/v1",
-  "key_id": "spike-license-root-v1",
-  "public_key_base64url": "LHX5exfxr9D695OSjNoLA5PlqUtFzsQ7J8OZIyQk7rY",
-  "channel": "engineering-preview",
-  "private_key_policy": "The corresponding private key must remain outside the repository, installer, logs, and CI artifacts."
-}

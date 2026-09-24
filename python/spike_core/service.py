@@ -37,6 +37,7 @@ from .errors import error_envelope
 from .convergence import run_mesh_convergence
 from .geometry import extract_net_geometry
 from .extensions import ExtensionRegistry, default_extension_roots
+from .script_runtime import run_python_script
 from .si_protocol_suites import (
     SiProtocolSuiteError,
     plan_si_protocol_analysis,
@@ -388,6 +389,17 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
             )
             return {"ok": True, "result": result}
         except (ValueError, PermissionError, RuntimeError, OSError, json.JSONDecodeError) as exc:
+            return {"ok": False, "error": str(exc), "type": type(exc).__name__}
+    if method == "trust_extension":
+        try:
+            return {"ok": True, "result": _extension_registry.trust(str(params.get("extension_id", "")))}
+        except ValueError as exc:
+            return {"ok": False, "error": str(exc), "type": type(exc).__name__}
+    if method == "run_python_script":
+        try:
+            trusted = [item["id"] for item in _extension_registry.catalog() if item["trusted"]]
+            return {"ok": True, "result": run_python_script({**params, "_trusted_extension_ids": trusted})}
+        except (ValueError, TypeError, OSError) as exc:
             return {"ok": False, "error": str(exc), "type": type(exc).__name__}
     if method == "dependencies":
         return {"ok": True, "result": {"runtime": dependency_status(), "lockfile": verify_lockfile()}}

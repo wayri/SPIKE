@@ -192,7 +192,7 @@ Studio circuit/HDL recordings belong to the separate Studio application.
 | EMI / thermal | Written sequence | Reproducible results |
 | Solvers / extensions | Gated external-engine capture | Installation, trust and adapter output |
 | Circuit / HDL Studio | Recorded signal/timing captures | Main-workbench solve evidence |
-| Settings / shortcuts / licensing | Written reference | Runtime activation and recovery |
+| Settings / shortcuts | Written reference | Settings controls |
 | Diagnostics | Canonical catalog | Error-to-recovery pictures |
 
 ## Recorded DC interpretation example
@@ -213,4 +213,4 @@ resistance was absent; mesh convergence was requested before sign-off. A small
 linear residual does not establish physical validity. The help article includes
 the pinned board revision/hash. Raw evaluation inputs/results are not bundled
 with help, and no separate candidate screenshot is used as a main-UI picture.
-The historical Marble screenshots show Home / PI / HF-SI / EMI / Thermal tabs. The current workspace uses Home / PI / Mesh / Solve / Probes / Results / Reports / Settings. Follow command names and workflow prerequisites rather than relying on historical tab positions.
+The historical Marble screenshots show Home / PI / HF-SI / EMI / Thermal tabs. The current workspace places Mesh and Solve directly after Home, followed by PI, HF / SI, EMI, Thermal, Probes, Results, Reports, and Settings. Follow command names and workflow prerequisites rather than relying on historical tab positions.

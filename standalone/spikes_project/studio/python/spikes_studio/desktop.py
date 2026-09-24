@@ -1415,10 +1415,12 @@ class Studio(wx.Frame):
     def run(self):
         if not self.prepare_run():return
         from .run_control import BatchRun
-        self.active_run=BatchRun(self.run_snapshot['source'],self.library,method=self.run_snapshot['run_profile']['method'])
-        self.active_record_id=self.run_history.start(self.run_snapshot,self.library)
+        backend=self.run_snapshot['run_profile'].get('backend','native')
+        self.active_run=BatchRun(self.run_snapshot['source'],self.library,method=self.run_snapshot['run_profile']['method'],
+                                 kind='ngspice' if backend=='ngspice' else 'circuit')
+        self.active_record_id=self.run_history.start(self.run_snapshot,self.library if backend=='native' else 'explicit ngspice process adapter')
         self.manager.refresh_runs()
-        self.job_running=True;self.SetStatusText('Running native batch worker — Stop cancels; Pause is available in Continuous mode')
+        self.job_running=True;self.SetStatusText(f'Running {backend} batch worker — Stop cancels; Pause is available in native Continuous mode')
         self.update_run_controls()
 
     def start_frequency(self,settings):
@@ -1441,11 +1443,14 @@ class Studio(wx.Frame):
         snapshot['document_source']=snapshot['source']
         snapshot['run_profile']['execution']='continuous' if interactive else 'batch'
         snapshot['source']=effective_source(snapshot['source'],snapshot['run_profile'])
-        from .model_fidelity import preflight
-        preflight(snapshot)
-        from python.spikes.netlist import parse_netlist
-        parse_netlist(snapshot['source'],native_extensions=True,transient_capture='rolling' if interactive else 'full')
-        if not self.library:
+        backend=snapshot['run_profile'].get('backend','native')
+        from .model_fidelity import preflight,preflight_compatibility
+        if backend=='ngspice':preflight_compatibility(snapshot)
+        else:
+            preflight(snapshot)
+            from python.spikes.netlist import parse_netlist
+            parse_netlist(snapshot['source'],native_extensions=True,transient_capture='rolling' if interactive else 'full')
+        if backend=='native' and not self.library:
             path=self.choose_path("Select SPIKES native engine","Native library|*.dll;*.so;*.dylib")
             if not path:return False
             self.library=str(path)

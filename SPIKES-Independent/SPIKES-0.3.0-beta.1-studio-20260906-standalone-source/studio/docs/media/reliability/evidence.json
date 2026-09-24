@@ -23,6 +23,6 @@
     "oversized source remains editable for rolling mode": true
   },
   "all_passed": true,
-  "native_library": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
+  "native_library": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
   "no_synthetic_display_data": true
 }

@@ -65,6 +65,7 @@ import AboutDialog from "./AboutDialog";
 import { APP_VERSION } from "./appVersion";
 import ProjectManager, { RecentProject } from "./ProjectManager";
 import SpiceWorkbench from "./SpiceWorkbench";
+import PythonWorkspace from "./PythonWorkspace";
 import { defaultSpiceWorkspace, normalizeSpiceWorkspace, SpiceWorkspace } from "./spiceWorkspace";
 import UniversalSettingsModal from "./UniversalSettingsModal";
 import UniversalSearch, { UniversalSearchItem } from "./UniversalSearch";
@@ -82,7 +83,6 @@ import {
   normalizeEmiFieldResult, normalizeEmiSetup,
 } from "./EmiWorkbench";
 import { AppSettings, loadAppSettings, saveAppSettings, translate } from "./appSettings";
-import { readNativeLicense } from "./licenseBridge";
 import { createProjectPackage, parseProjectPackage, projectFileName } from "./projectPackage";
 import { DockTabId, normalizeWorkspaceState, Viewport2DState, Viewport3DCameraState, ViewportRestoreCommand, WorkspaceState } from "./workspaceState";
 import BondManager, { BondRecord, BondValidationResult } from "./BondManager";
@@ -90,16 +90,20 @@ import { bondsForSolver, inferComponentBonds, validateComponentBonds } from "./c
 import {
   defaultResultVisualization, normalizeSolverResult, PdnCandidateRequest, PdnReview, resultAtFrame, resultModeAvailable, ResultViewMode, ResultVisualization, SolverResultBundle, ViaModel,
 } from "./analysisResults";
+import { extensionAnalysisResult } from "./extensionAnalysisResult";
 import { availableViewportResultModes, resultHasExtractedNetworks, viewportContextLabel } from "./viewportContext";
 import { asThermalScenario, defaultThermalSceneVisibility, ThermalFan, ThermalHeatsink, ThermalSceneVisibility } from "./thermalScene";
 import { thermalFieldResultPreview } from "./thermalResultFields";
 import ThermalAssemblyEditor from "./ThermalAssemblyEditor";
+import ThermalBoundaryEditor from "./ThermalBoundaryEditor";
+import ThermalInputImport from "./ThermalInputImport";
 import ThermalHardwareEditor from "./ThermalHardwareEditor";
 import { normalizeThermalFans, normalizeThermalHeatsinks } from "./thermalHardware";
 import { normalizeThermalElements, normalizeThermalLinks, screenThermalElements, thermalAssemblyIssues, thermalMaterials, thermalSurfaceFinishes, ThermalElement, ThermalLink } from "./thermalAssembly";
+import { nativeThermalInputs, normalizeThermalBoundaries, type ThermalBoundary } from "./thermalBoundaries";
 import { numericExtent, numericMaximum, numericMinimum } from "./numericRange";
 import TransientWaveformEditor from "./TransientWaveformEditor";
-import TerminalTable from "./TerminalTable";
+import PiSiTerminalEditor from "./PiSiTerminalEditor";
 import {
   formatEngineering, parsePwlPoints, parseSpiceNumber, TransientWaveformKind, tryParseSpiceNumber,
 } from "./transientWaveform";
@@ -119,7 +123,7 @@ const SParameterWorkbench = lazy(() => import("./SParameterWorkbench"));
 const ExternalEngineCenter = lazy(() => import("./ExternalEngineCenter"));
 const SiProtocolSuiteWorkbench = lazy(() => import("./SiProtocolSuiteWorkbench"));
 
-type RibbonTab = "Home" | "PI" | "HF / SI" | "Mesh" | "Solve" | "EMI" | "Thermal" | "Probes" | "Results" | "Reports" | "Settings";
+type RibbonTab = "Home" | "Mesh" | "Solve" | "PI" | "HF / SI" | "EMI" | "Thermal" | "Probes" | "Results" | "Reports" | "Settings";
 type DockTab = DockTabId;
 type ActivityLevel = "info" | "success" | "warning" | "error";
 type ActivityEntry = {
@@ -325,8 +329,8 @@ const recordOperationTiming = (kind: OperationKind, seconds: number, meshCells: 
   } catch { /* Timing history is optional. */ }
 };
 const tabs: { name: RibbonTab; icon: typeof Activity }[] = [
-  { name: "Home", icon: FolderOpen }, { name: "PI", icon: BatteryCharging }, { name: "HF / SI", icon: AudioWaveform },
-  { name: "Mesh", icon: Grid3X3 }, { name: "Solve", icon: Play },
+  { name: "Home", icon: FolderOpen }, { name: "Mesh", icon: Grid3X3 }, { name: "Solve", icon: Play },
+  { name: "PI", icon: BatteryCharging }, { name: "HF / SI", icon: AudioWaveform },
   { name: "EMI", icon: SatelliteDish }, { name: "Thermal", icon: ThermometerSun }, { name: "Probes", icon: Crosshair },
   { name: "Results", icon: ChartArea }, { name: "Reports", icon: FileChartColumn }, { name: "Settings", icon: Settings2 }
 ];
@@ -851,6 +855,29 @@ function resultRecord(bundle: SolverResultBundle, fallbackIndex = 0): ResultReco
   return { id: bundle.analysis_id || `${bundle.mode}:${label}`, label, bundle };
 }
 
+/** Give results.read extensions useful evidence without sending unbounded field data. */
+function extensionResultsContext(result: SolverResultBundle | null): Record<string, unknown> | null {
+  if (!result) return null;
+  const contract = "spike/results-context/v1";
+  if (JSON.stringify(result).length <= 250_000) return { contract, complete: true, result };
+  const primitiveMetadata = (value: Record<string, unknown>) => Object.fromEntries(Object.entries(value)
+    .filter(([, item]) => ["string", "number", "boolean"].includes(typeof item))
+    .slice(0, 64).map(([key, item]) => [key, typeof item === "string" ? item.slice(0, 512) : item]));
+  const preview = {
+    contract, complete: false, analysis_id: result.analysis_id, status: result.status, mode: result.mode,
+    model_status: result.model_status, summary: primitiveMetadata(result.summary ?? {}), provenance: primitiveMetadata(result.provenance ?? {}),
+    field_counts: Object.fromEntries(Object.entries(result.scalar_fields).map(([key, samples]) => [key, samples.length])),
+    scalar_fields: Object.fromEntries(Object.entries(result.scalar_fields).map(([key, samples]) => [key, samples.slice(0, 64)])),
+    mesh_count: result.mesh.length, mesh: result.mesh.slice(0, 32),
+    parasitic_count: result.parasitics.length, parasitics: result.parasitics.slice(0, 32),
+    issues: result.issues.slice(0, 32),
+  };
+  if (JSON.stringify(preview).length <= 250_000) return preview;
+  return { contract, complete: false, analysis_id: result.analysis_id, status: result.status, mode: result.mode,
+    model_status: result.model_status, summary: primitiveMetadata(result.summary ?? {}), provenance: primitiveMetadata(result.provenance ?? {}),
+    field_counts: preview.field_counts, mesh_count: result.mesh.length, parasitic_count: result.parasitics.length };
+}
+
 function boundedResultRecords(records: ResultRecord[]) {
   return [...new Map(records.map(record => [record.id, record])).values()];
 }
@@ -906,6 +933,7 @@ export default function App() {
   const [thermalOpen, setThermalOpen] = useState(false);
   const [dcRunOpen, setDcRunOpen] = useState(false);
   const [sparameterOpen, setSparameterOpen] = useState(false);
+  const [siWorkbenchIntent, setSiWorkbenchIntent] = useState<{ view: "workflow" | "geometry"; focus: "channel" | "crosstalk" | "eye" | "pam4" | "impedance" | "ports"; token: number }>({ view: "workflow", focus: "channel", token: 0 });
   const [frequency, setFrequency] = useState("10 MHz");
   const [analysisMode, setAnalysisMode] = useState("DC IR Drop");
   const [solverId, setSolverId] = useState("auto");
@@ -1032,6 +1060,7 @@ export default function App() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [benchmarkOpen, setBenchmarkOpen] = useState(false);
   const [spiceOpen, setSpiceOpen] = useState(false);
+  const [pythonOpen, setPythonOpen] = useState(false);
   const [spiceWorkspace, setSpiceWorkspace] = useState<SpiceWorkspace>(() => defaultSpiceWorkspace("pi"));
   const [projectPath, setProjectPath] = useState<string | null>(null);
   const [projectManifestDigest, setProjectManifestDigest] = useState<string | null>(null);
@@ -1046,25 +1075,10 @@ export default function App() {
     catch { return []; }
   });
   const [appSettings, setAppSettings] = useState<AppSettings>(loadAppSettings);
-  useEffect(() => {
-    let active = true;
-    readNativeLicense().then(license => {
-      if (!active) return;
-      setAppSettings(current => ({
-        ...current,
-        license,
-        profile: {
-          ...current.profile,
-          displayName: license.status === "active" ? license.licensee : current.profile.displayName,
-          initials: license.status === "active" ? license.licensee.split(/\s+/).map(part => part[0]).join("").slice(0, 3).toUpperCase() || "USR" : "USR",
-          userType: license.tier === "developer" ? "developer" : license.status === "active" ? "engineer" : "viewer",
-        },
-      }));
-    }).catch(error => setStatus(String(error)));
-    return () => { active = false; };
-  }, []);
   const [extensionsOpen, setExtensionsOpen] = useState(false);
   const [extensionCatalog, setExtensionCatalog] = useState<ExtensionCatalogEntry[]>(fallbackExtensionCatalog);
+  const [extensionTrusting, setExtensionTrusting] = useState<string | null>(null);
+  const [extensionTrustError, setExtensionTrustError] = useState("");
   const [harnessDocument, setHarnessDocument] = useState<Record<string, any> | null>(null);
   const [extensionResult, setExtensionResult] = useState<Record<string, unknown> | null>(null);
   const [siProtocolSuitesOpen, setSiProtocolSuitesOpen] = useState(false);
@@ -1285,7 +1299,7 @@ export default function App() {
       if (!panel) return;
       const rect = panel.getBoundingClientRect();
       panel.style.left = `${Math.max(4, Math.min(window.innerWidth - rect.width - 4, event.clientX - offsetX))}px`;
-      panel.style.top = `${Math.max(4, Math.min(window.innerHeight - 42, event.clientY - offsetY))}px`;
+      panel.style.top = `${Math.max(4, Math.min(Math.max(4, window.innerHeight - rect.height - 4), event.clientY - offsetY))}px`;
     };
     const onPointerUp = (event: PointerEvent) => {
       if (!panel) return;
@@ -1762,7 +1776,12 @@ export default function App() {
     setUnsavedPrompt(null);
     if (pending.closeWindow) {
       allowWindowCloseRef.current = true;
-      await closeDesktopWindow();
+      try {
+        await closeDesktopWindow();
+      } catch (error) {
+        allowWindowCloseRef.current = false;
+        setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}`);
+      }
       return;
     }
     await pending.action?.();
@@ -2188,6 +2207,13 @@ export default function App() {
       }));
       setResultVisualizerDomain(result.mode === "si" ? "si" : "pi");
       setResultVisualizerOpen(result.status !== "preview");
+      if (result.status !== "preview") {
+        // A published solver result is terminal for the UI run lifecycle. The
+        // dialog clock also stops itself, but clearing here prevents a queued
+        // timer tick from leaving the workspace in a stale Running state.
+        setAnalysisRunning(false);
+        setOperationDisplay(null);
+      }
     };
     const onBatchResults = (event: Event) => {
       const bundles = ((event as CustomEvent<unknown[]>).detail ?? []).map(normalizeSolverResult).filter((item): item is SolverResultBundle => Boolean(item));
@@ -2198,6 +2224,8 @@ export default function App() {
         return boundedResultRecords([...current.filter(record => !ids.has(record.id)), ...records]);
       });
       setResultDisplay("all");
+      setAnalysisRunning(false);
+      setOperationDisplay(null);
     };
     window.addEventListener("spike-analysis-result", onResult);
     window.addEventListener("spike-analysis-batch-complete", onBatchResults);
@@ -2689,6 +2717,12 @@ export default function App() {
     setTab(next);
     setStatus(`${next} workspace selected for ${domain === "pi" ? "power" : "signal"} integrity`);
   };
+  const openSiWorkbench = (view: "workflow" | "geometry" = "geometry", focus: "channel" | "crosstalk" | "eye" | "pam4" | "impedance" | "ports" = "channel", preserveSuite = false) => {
+    setSimulationDomain("si");
+    if (!preserveSuite) setSelectedSiSuite(null);
+    setSiWorkbenchIntent(current => ({ view, focus, token: current.token + 1 }));
+    setSparameterOpen(true);
+  };
   const addProbe = (object: BoardObject | null) => {
     if (!object) { setStatus("Select a board object before placing a probe"); return; }
     const track = boardData?.tracks.find(item => item.id === object.id);
@@ -2722,10 +2756,23 @@ export default function App() {
     const extensions = response.result?.extensions;
     if (response.ok && Array.isArray(extensions)) setExtensionCatalog(extensions as ExtensionCatalogEntry[]);
   };
+  const trustExtension = async (extensionId: string) => {
+    setExtensionTrusting(extensionId); setExtensionTrustError("");
+    try {
+      const response = await runLocalWorker({ method: "trust_extension", params: { extension_id: extensionId } });
+      if (!response.ok) throw new Error(response.error ?? "Extension trust request failed.");
+      await openExtensionManager();
+      setStatus(`Trusted ${extensionId} for this session`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Extension trust request failed.";
+      setExtensionTrustError(message); setStatus(message);
+    } finally { setExtensionTrusting(null); }
+  };
   const invokeExtension = async (extensionId: string, contributionId: string, parameters: Record<string, any> = {}) => {
     try {
     const extension = extensionCatalog.find(item => item.id === extensionId);
-    const contribution = Object.values(extension?.contributes ?? {}).flat().find(item => item.id === contributionId);
+    const contributionEntry = Object.entries(extension?.contributes ?? {}).flatMap(([point, entries]) => entries.map(item => ({ point, item }))).find(entry => entry.item.id === contributionId);
+    const contribution = contributionEntry?.item;
     if (extension?.contributes.importers?.some(item => item.id === contributionId) && contribution?.output_contract === "spike/v1") {
       const file = await selectNativeImportFile("board", Boolean(parameters.directory));
       if (!file) { setStatus("CAD import cancelled"); return; }
@@ -2742,20 +2789,35 @@ export default function App() {
       if (!file) { setStatus("Harness import cancelled"); return; }
       parameters = { ...parameters, path: file.path };
     }
-    const design = designForSolver();
+    const design = designForExchange();
+    if (contributionEntry?.point === "analyses" && !design) throw new Error("Import a board before running an extension analysis.");
+    const extensionDesign = design;
     const permissions = extensionCatalog.find(extension => extension.id === extensionId)?.permissions ?? [];
+    const selectedResult = resultRecords.find(record => record.id === resultDisplay)?.bundle ?? analysisResult;
     const context = {
-      ...(permissions.includes("design.read") && design ? { design } : {}),
+      ...(permissions.includes("design.read") && extensionDesign ? { design: extensionDesign } : {}),
       ...(permissions.includes("project.read") ? { project: { name: projectName, ...(extensionId === "spike.mcad" && boardSource && !boardFile.endsWith(".spike-design.json") ? { source_board: boardSource, source_format: "kicad" } : {}) } } : {}),
       ...(permissions.includes("selection.read") ? { selection: selected } : {}),
       ...(permissions.includes("harness.read") && harnessDocument ? { harness: harnessDocument } : {}),
+      ...(permissions.includes("results.read") ? { results: extensionResultsContext(selectedResult) } : {}),
       parameters,
     };
     const response = await runLocalWorker({ method: "invoke_extension", params: { extension_id: extensionId, contribution_id: contributionId, context } });
     if (!response.ok) { setStatus(response.error ?? "Extension execution failed"); return; }
-    setExtensionResult(response.result ?? null);
     const title = String(response.result?.title ?? contributionId);
     const data = response.result?.data as Record<string, unknown> | undefined;
+    if (contributionEntry?.point === "analyses" && contribution?.output_contract === "spike/v1") {
+      const result = extensionAnalysisResult(contributionEntry.point, contribution.output_contract, data);
+      if (!result) throw new Error("Extension analysis returned no admitted, design-bound SPIKE result.");
+      setExtensionResult(response.result ?? null);
+      recordChange();
+      window.dispatchEvent(new CustomEvent("spike-analysis-result", { detail: result }));
+      setExtensionsOpen(false);
+      setDock("Console");
+      setStatus(`${title} completed: ${result.status} · ${result.model_status}`);
+      return;
+    }
+    setExtensionResult(response.result ?? null);
     if (contributionId === "harness-import" && data?.contract === "spike/harness/v1") { recordChange(); setHarnessDocument(data); }
     if (contributionId === "harness-export" && typeof data?.text === "string") {
       if (desktopShell) await saveNativeTextFile("harness.spike-harness.json", data.text, "result");
@@ -2805,6 +2867,16 @@ export default function App() {
     bends: boardData.bendLines ?? [],
     component_bonds: bondsForSolver(componentBonds),
   } : null;
+  const designForExchange = () => {
+    const design = designForSolver();
+    return design ? {
+      ...design,
+      design_id: String((design as Record<string, unknown>).design_id ?? activeDesignId ?? boardFile),
+      units: "mm",
+      issues: Array.isArray((design as Record<string, unknown>).issues) ? (design as Record<string, unknown>).issues : [],
+      metadata: (design as Record<string, unknown>).metadata ?? {},
+    } : null;
+  };
   const requireAssemblyAdmission = async (workload: AssemblyWorkload): Promise<AssemblyAnalysisScope | null> => {
     requireSupportedAssemblyPhysics(assemblyIr, workload, activeDesignId);
     const scope = assemblyAnalysisScope(assemblyIr, activeDesignId, projectManifestDigest);
@@ -3451,23 +3523,23 @@ export default function App() {
       case "PI":
         return <><ToolGroup label="POWER ANALYSES" priority="primary"><Tool icon={Gauge} label="DC drop" active={analysisMode === "DC IR Drop" && analysisSetupWorkflow === "single"} onClick={() => openAnalysisSetup("DC IR Drop")} /><Tool icon={Route} label="Series path" active={analysisMode === "DC IR Drop" && analysisSetupWorkflow === "path"} onClick={() => openAnalysisSetup("DC IR Drop", "path")} /><Tool icon={Network} label="Bulk nets" active={analysisMode === "Bulk Net Analysis" && analysisSetupWorkflow !== "batch"} onClick={() => openAnalysisSetup("Bulk Net Analysis")} /><Tool icon={Waves} label="AC sweep" active={analysisMode === "AC Impedance Sweep"} onClick={() => openAnalysisSetup("AC Impedance Sweep")} /><Tool icon={Activity} label="Transient" active={analysisMode === "Transient PI"} onClick={() => openAnalysisSetup("Transient PI")} /><Tool icon={Table2} label="Batch nets" active={analysisSetupWorkflow === "batch"} onClick={() => openAnalysisSetup("Bulk Net Analysis", "batch")} /></ToolGroup><ToolGroup label="SOURCES AND LOADS" priority="secondary"><Tool icon={ListTree} label="Net manager" active={netManagerOpen} onClick={() => setNetManagerOpen(true)} /><Tool icon={SlidersHorizontal} label="Terminals" onClick={() => openAnalysisSetup()} /><Tool icon={Network} label="Power paths" active={topologyEditor === "pi"} onClick={() => { setDock("Power tree"); setTopologyEditor("pi"); }} /><Tool icon={Microchip} label="SPICE models" active={spiceOpen} onClick={() => setSpiceOpen(true)} /><Tool icon={RadioTower} label="Probes" onClick={openProbeTable} /></ToolGroup><ToolGroup label="CHECK AND RUN" priority="tertiary"><Tool icon={ShieldAlert} label="Validate" onClick={validateDesign} /><Tool icon={Play} label={analysisRunning ? "Running..." : "Run PI"} onClick={runAnalysis} /><Tool icon={BarChart3} label="PI results" onClick={() => { setResultVisualizerDomain("pi"); setResultVisualizerOpen(true); }} /></ToolGroup><ToolGroup label="OUTPUT" priority="quaternary"><Tool icon={FileOutput} label="PI report" onClick={generateReport} /><Tool icon={Save} label="Save results" onClick={exportReport} /><Tool icon={FolderOpen} label="Load results" onClick={loadResults} /></ToolGroup></>;
       case "HF / SI":
-        return <><ToolGroup label="PROTOCOL WORKSPACES" priority="primary"><Tool icon={Boxes} label="Protocol suites" active={siProtocolSuitesOpen} onClick={() => setSiProtocolSuitesOpen(true)} /><Tool icon={Network} label="Channel tree" active={topologyEditor === "si"} onClick={() => setTopologyEditor("si")} /><Tool icon={Waves} label="Impedance" onClick={() => { setResultVisualizerDomain("si"); setResultVisualizerOpen(true); }} /><Tool icon={Activity} label="Coupling risk" onClick={() => { setResultVisualizerDomain("si"); setResultVisualizerOpen(true); }} /></ToolGroup><ToolGroup label="SIGNAL ANALYSES" priority="secondary"><Tool icon={Waves} label="S-parameters" onClick={() => setSparameterOpen(true)} /><Tool icon={Waves} label="NEXT / FEXT" onClick={() => { setResultVisualizerDomain("si"); setResultVisualizerOpen(true); }} /><Tool icon={BarChart3} label="Eye diagram" onClick={() => setStatus("Eye diagrams require a validated channel extraction and source/receiver models")} /><Tool icon={Gauge} label="PAM4" onClick={() => setStatus("PAM4 analysis remains capability-gated until the eye engine passes validation fixtures")} /></ToolGroup><ToolGroup label="CHANNEL MODEL" priority="tertiary"><Tool icon={Layers3} label="Stackup" onClick={() => setStackupOpen(true)} /><Tool icon={Layers3} label="Layer view" onClick={() => setLayersOpen(true)} /><Tool icon={RadioTower} label="Ports" onClick={openProbeTable} /></ToolGroup><ToolGroup label="INTERCHANGE" priority="quaternary"><Tool icon={Upload} label="Touchstone" onClick={() => setSparameterOpen(true)} /><Tool icon={Puzzle} label="Suite builder" onClick={() => setSiProtocolSuitesOpen(true)} /><Tool icon={CircuitBoard} label="External engines" onClick={() => void openExternalEngineCenter()} /></ToolGroup></>;
+        return <><ToolGroup label="PROTOCOL WORKSPACES" priority="primary"><Tool icon={Boxes} label="Protocol suites" active={siProtocolSuitesOpen} onClick={() => setSiProtocolSuitesOpen(true)} /><Tool icon={Network} label="Channel tree" active={topologyEditor === "si"} onClick={() => setTopologyEditor("si")} /><Tool icon={Waves} label="Impedance" onClick={() => openSiWorkbench("geometry", "impedance")} /><Tool icon={Activity} label="Coupling risk" onClick={() => openSiWorkbench("geometry", "crosstalk")} /></ToolGroup><ToolGroup label="SIGNAL ANALYSES" priority="secondary"><Tool icon={Waves} label="S-parameters" onClick={() => openSiWorkbench("geometry", "channel")} /><Tool icon={Waves} label="NEXT / FEXT" onClick={() => openSiWorkbench("geometry", "crosstalk")} /><Tool icon={BarChart3} label="Eye diagram" onClick={() => openSiWorkbench("geometry", "eye")} /><Tool icon={Gauge} label="PAM4" onClick={() => openSiWorkbench("geometry", "pam4")} /></ToolGroup><ToolGroup label="CHANNEL MODEL" priority="tertiary"><Tool icon={Layers3} label="Stackup" onClick={() => setStackupOpen(true)} /><Tool icon={Layers3} label="Layer view" onClick={() => setLayersOpen(true)} /><Tool icon={RadioTower} label="Ports" onClick={() => openSiWorkbench("workflow", "ports")} /></ToolGroup><ToolGroup label="INTERCHANGE" priority="quaternary"><Tool icon={Upload} label="Touchstone" onClick={() => openSiWorkbench("workflow", "channel")} /><Tool icon={Puzzle} label="Suite builder" onClick={() => setSiProtocolSuitesOpen(true)} /><Tool icon={CircuitBoard} label="External engines" onClick={() => void openExternalEngineCenter()} /></ToolGroup></>;
       case "Mesh":
-        return <><ToolGroup label="SHARED DOMAIN" priority="primary"><Tool icon={BatteryCharging} label="PI mesh" active={simulationDomain === "pi"} onClick={() => setSimulationDomain("pi")} /><Tool icon={AudioWaveform} label="SI mesh" active={simulationDomain === "si"} onClick={() => setSimulationDomain("si")} /></ToolGroup><ToolGroup label="MESH INPUTS" priority="secondary"><Tool icon={Grid3X3} label="Mesh settings" onClick={() => simulationDomain === "pi" ? openAnalysisSetup() : setSparameterOpen(true)} /><Tool icon={Layers3} label="Stackup" onClick={() => setStackupOpen(true)} /><Tool icon={ListTree} label="Nets" onClick={() => simulationDomain === "pi" ? setNetManagerOpen(true) : setSparameterOpen(true)} /></ToolGroup><ToolGroup label="NEXT" priority="tertiary"><Tool icon={Play} label="Solve workspace" onClick={() => openSharedWorkspace("Solve", simulationDomain)} /></ToolGroup></>;
+        return <><ToolGroup label="SHARED DOMAIN" priority="primary"><Tool icon={BatteryCharging} label="PI mesh" active={simulationDomain === "pi"} onClick={() => setSimulationDomain("pi")} /><Tool icon={AudioWaveform} label="SI mesh" active={simulationDomain === "si"} onClick={() => setSimulationDomain("si")} /></ToolGroup><ToolGroup label="MESH INPUTS" priority="secondary"><Tool icon={Grid3X3} label="Mesh settings" onClick={() => simulationDomain === "pi" ? openAnalysisSetup() : openSiWorkbench("geometry", "channel")} /><Tool icon={Layers3} label="Stackup" onClick={() => setStackupOpen(true)} /><Tool icon={ListTree} label="Nets" onClick={() => simulationDomain === "pi" ? setNetManagerOpen(true) : openSiWorkbench("geometry", "channel")} /></ToolGroup><ToolGroup label="NEXT" priority="tertiary"><Tool icon={Play} label="Solve workspace" onClick={() => openSharedWorkspace("Solve", simulationDomain)} /></ToolGroup></>;
       case "Solve":
-        return <><ToolGroup label="SHARED DOMAIN" priority="primary"><Tool icon={BatteryCharging} label="PI solve" active={simulationDomain === "pi"} onClick={() => setSimulationDomain("pi")} /><Tool icon={AudioWaveform} label="SI solve" active={simulationDomain === "si"} onClick={() => setSimulationDomain("si")} /></ToolGroup><ToolGroup label="EXECUTION" priority="secondary"><Tool icon={SlidersHorizontal} label="Review setup" onClick={() => simulationDomain === "pi" ? openAnalysisSetup() : setSparameterOpen(true)} /><Tool icon={Play} label={universalRunning ? "Running..." : "Run controls"} onClick={() => simulationDomain === "pi" ? runAnalysis() : setSparameterOpen(true)} /><Tool icon={X} label={activeWorkerOperation?.cancelling ? "Stopping..." : "Stop"} disabled={!universalRunning || activeWorkerOperation?.cancelling} onClick={() => void cancelActiveAnalysis()} /></ToolGroup><ToolGroup label="REVIEW" priority="tertiary"><Tool icon={BarChart3} label="Results" onClick={() => { setResultVisualizerDomain(simulationDomain); setResultVisualizerOpen(true); }} /><Tool icon={Activity} label="Console" onClick={() => setDock("Console")} /></ToolGroup></>;
+        return <><ToolGroup label="SHARED DOMAIN" priority="primary"><Tool icon={BatteryCharging} label="PI solve" active={simulationDomain === "pi"} onClick={() => setSimulationDomain("pi")} /><Tool icon={AudioWaveform} label="SI solve" active={simulationDomain === "si"} onClick={() => setSimulationDomain("si")} /></ToolGroup><ToolGroup label="EXECUTION" priority="secondary"><Tool icon={SlidersHorizontal} label="Review setup" onClick={() => simulationDomain === "pi" ? openAnalysisSetup() : openSiWorkbench("geometry", "channel")} /><Tool icon={Play} label={simulationDomain === "si" ? "Run SI channel" : universalRunning ? "Running..." : "Run controls"} onClick={() => simulationDomain === "pi" ? runAnalysis() : openSiWorkbench("geometry", "channel")} /><Tool icon={X} label={activeWorkerOperation?.cancelling ? "Stopping..." : "Stop"} disabled={!universalRunning || activeWorkerOperation?.cancelling} onClick={() => void cancelActiveAnalysis()} /></ToolGroup><ToolGroup label="REVIEW" priority="tertiary"><Tool icon={BarChart3} label="Results" onClick={() => { if (simulationDomain === "si") openSiWorkbench(siChannelResult?.contract === "spike/si-workflow-result/v1" ? "workflow" : "geometry", "channel"); else { setResultVisualizerDomain("pi"); setResultVisualizerOpen(true); } }} /><Tool icon={Activity} label="Console" onClick={() => setDock("Console")} /></ToolGroup></>;
       case "EMI":
         return <><ToolGroup label="SCREENING" priority="primary"><Tool icon={Network} label="Net domain" active={rightOpen && emiSection === "domain"} onClick={() => { setRightOpen(true); setEmiSection("domain"); setSelectionFilter("net"); setStatus("Select candidate and return nets in the EMI setup dock"); }} /><Tool icon={ShieldAlert} label="Preflight" active={Boolean(emiPreflight && !emiPreflight.counts.errors)} onClick={() => { setRightOpen(true); setEmiSection("prepass"); void validateEmi(); }} /><Tool icon={Gauge} label={emiBusy ? "Screening" : "Risk screen"} active={Boolean(emiScreening?.screening)} disabled={emiBusy} onClick={() => { setRightOpen(true); setEmiSection("prepass"); void runEmiScreening(); }} /></ToolGroup><ToolGroup label="EXCITATION" priority="secondary"><Tool icon={RadioTower} label="Ports" active={rightOpen && emiSection === "excitation"} onClick={() => { setRightOpen(true); setEmiSection("excitation"); setStatus("Configure explicit conductor-to-conductor ports in the EMI setup dock"); }} /><Tool icon={Cable} label="Bonds" active={bondManagerOpen} onClick={() => setBondManagerOpen(true)} /><Tool icon={Activity} label="PI transient" onClick={() => openAnalysisSetup("Transient PI")} /><Tool icon={CircuitBoard} label="SPICE" onClick={() => setSpiceOpen(true)} /></ToolGroup><ToolGroup label="FULL-WAVE" priority="tertiary"><Tool icon={Layers3} label="Domain mesh" active={rightOpen && emiSection === "solver"} onClick={() => { setRightOpen(true); setEmiSection("solver"); setStatus("Configure frequency, boundary, and mesh controls in the EMI setup dock"); }} /><Tool icon={CircuitBoard} label="Prepare case" active={Boolean(externalCase?.caseDir)} disabled={emiBusy || !boardData} onClick={() => { setRightOpen(true); setEmiSection("solver"); void prepareEmiCase(); }} /><Tool icon={Play} label="Run solver" disabled={emiBusy || !emiPreflight?.can_run || !externalCase?.canRun} onClick={() => void runExternalEngine("external.openems", false)} /><Tool icon={SlidersHorizontal} label="Solver manager" onClick={() => void openExternalEngineCenter()} /></ToolGroup><ToolGroup label="REVIEW" priority="quaternary"><Tool icon={BarChart3} label="Dashboard" active={emiDashboardOpen} disabled={!emiPreflight && !emiScreening && !emiFieldResult} onClick={() => setEmiDashboardOpen(true)} /><Tool icon={Waves} label="Near field" disabled onClick={() => setStatus("Near-field visualization requires a completed compatible field result")} /><Tool icon={RadioTower} label="Far field" active={Boolean(emiFieldResult?.far_field)} disabled={!emiFieldResult?.far_field} onClick={() => { setEmiDashboardOpen(true); setStatus("Showing the completed openEMS NF2FF radiation result"); }} /><Tool icon={FileOutput} label="EMI report" onClick={generateReport} /></ToolGroup></>;
       case "Thermal":
-        return <><ToolGroup label="SIMULATION DOMAIN" priority="primary"><Tool icon={Thermometer} label="Bounding volume" onClick={() => setThermalOpen(true)} /><Tool icon={Layers3} label="Board stack" onClick={() => setStackupOpen(true)} /><Tool icon={Activity} label="Heat sources" onClick={() => setThermalOpen(true)} /><Tool icon={Cable} label="Bonds" active={bondManagerOpen} onClick={() => setBondManagerOpen(true)} /></ToolGroup><ToolGroup label="AIRFLOW" priority="secondary"><Tool icon={Wind} label="Flow channels" onClick={() => setThermalOpen(true)} /><Tool icon={Fan} label="Fan placement" onClick={() => setThermalOpen(true)} /><Tool icon={Gauge} label="Ambient" onClick={() => setThermalOpen(true)} /></ToolGroup><ToolGroup label="OPENFOAM" priority="tertiary"><Tool icon={SlidersHorizontal} label="Scenario" onClick={() => setThermalOpen(true)} /><Tool icon={Play} label="Prepare case" onClick={() => setThermalOpen(true)} /><Tool icon={Activity} label="Solver console" onClick={() => setDock("Console")} /></ToolGroup><ToolGroup label="THERMAL RESULTS" priority="quaternary"><Tool icon={BarChart3} label="Temperature" onClick={() => setStatus("Temperature fields appear after a completed OpenFOAM run")} /><Tool icon={FileOutput} label="Report" onClick={generateReport} /></ToolGroup></>;
+        return <><ToolGroup label="SIMULATION DOMAIN" priority="primary"><Tool icon={Thermometer} label="Bounding volume" onClick={() => setThermalOpen(true)} /><Tool icon={Layers3} label="Board stack" onClick={() => setStackupOpen(true)} /><Tool icon={Activity} label="Heat sources" onClick={() => setThermalOpen(true)} /><Tool icon={Cable} label="Bonds" active={bondManagerOpen} onClick={() => setBondManagerOpen(true)} /></ToolGroup><ToolGroup label="AIRFLOW" priority="secondary"><Tool icon={Wind} label="Flow channels" onClick={() => setThermalOpen(true)} /><Tool icon={Fan} label="Fan placement" onClick={() => setThermalOpen(true)} /><Tool icon={Gauge} label="Ambient" onClick={() => setThermalOpen(true)} /></ToolGroup><ToolGroup label="OPTIONAL CFD" priority="tertiary"><Tool icon={SlidersHorizontal} label="Scenario" onClick={() => setThermalOpen(true)} /><Tool icon={Play} label="Prepare case" onClick={() => setThermalOpen(true)} /><Tool icon={Activity} label="Solver console" onClick={() => setDock("Console")} /></ToolGroup><ToolGroup label="THERMAL RESULTS" priority="quaternary"><Tool icon={BarChart3} label="Temperature" onClick={() => setThermalOpen(true)} /><Tool icon={FileOutput} label="Report" onClick={generateReport} /></ToolGroup></>;
       case "Probes":
         return <><ToolGroup label="PROBE TOOLS" priority="primary"><Tool icon={ScanSearch} label="Hover probe" active={probeMode === "hover"} onClick={() => setProbeMode(current => { const next = current === "hover" ? "off" : "hover"; setStatus(next === "hover" ? "Hover probe active: move across the board for live measurements" : "Hover probe disabled"); return next; })} /><Tool icon={RadioTower} label="Place probe" onClick={() => addProbe(selected)} /><Tool icon={Table2} label="Probe table" active={dock === "Probe table"} onClick={openProbeTable} /><Tool icon={Copy} label="Duplicate" onClick={() => selected ? addProbe({ ...selected, id: `${selected.id}-copy`, name: `${selected.name} copy` }) : setStatus("Select a probe location before duplicating")} /></ToolGroup><ToolGroup label="MEASUREMENTS" priority="secondary"><Tool icon={Gauge} label="Voltage" onClick={() => { setProbeKind("voltage"); setStatus("Voltage probe measurement selected"); }} /><Tool icon={Activity} label="Current" onClick={() => { setProbeKind("current"); setStatus("Current-density probe measurement selected"); }} /><Tool icon={Waves} label="Impedance" onClick={() => { setProbeKind("impedance"); setStatus("Impedance hover requires an AC or parasitic result"); }} /></ToolGroup><ToolGroup label="COMPARE AND EXPORT" priority="tertiary"><Tool icon={BarChart3} label="Compare" onClick={openProbeTable} /><Tool icon={Layers3} label="Cross-layer" onClick={() => setLayersOpen(true)} /><Tool icon={FileOutput} label="Export CSV" onClick={exportProbeCsv} /></ToolGroup></>;
       case "Results":
         return <><ToolGroup label="RESULT VIEWS" priority="primary"><Tool icon={ShieldAlert} label="Issues" active={dock === "Issues"} onClick={() => setDock("Issues")} /><Tool icon={Table2} label="Probe table" active={dock === "Probe table"} onClick={openProbeTable} /><Tool icon={Network} label="Power tree" active={dock === "Power tree"} onClick={() => setDock("Power tree")} /><Tool icon={Activity} label="Console" active={dock === "Console"} onClick={() => setDock("Console")} /></ToolGroup><ToolGroup label="VISUALIZATION" priority="secondary"><Tool icon={Eye} label="Fields" active={resultVisualizerOpen} onClick={() => setResultVisualizerOpen(true)} /><Tool icon={BarChart3} label="Voltage / current" onClick={() => setResultVisualizerOpen(true)} /><Tool icon={Layers3} label="Mesh" onClick={() => setResultVisualizerOpen(true)} /><Tool icon={RadioTower} label="Probe overlay" onClick={openProbeTable} /></ToolGroup><ToolGroup label="REVISION REVIEW" priority="tertiary"><Tool icon={Copy} label="Compare" onClick={() => comparisonInputRef.current?.click()} /><Tool icon={ShieldAlert} label="Limits" onClick={() => setRightOpen(true)} /><Tool icon={FileOutput} label="Report" onClick={generateReport} /></ToolGroup></>;
       case "Reports":
-        return <><ToolGroup label="REPORT" priority="primary"><Tool icon={BookOpen} label="Preview" onClick={generateReport} /><Tool icon={FileOutput} label="Print / PDF" onClick={() => { generateReport(); setStatus("Report preview ready; choose Print for printer or PDF output"); }} /><Tool icon={BarChart3} label="Analytics" onClick={generateReport} /></ToolGroup><ToolGroup label="DATA EXPORT" priority="secondary"><Tool icon={Table2} label="Probe CSV" onClick={exportProbeCsv} /><Tool icon={Waves} label="Touchstone" onClick={() => setSparameterOpen(true)} /><Tool icon={CircuitBoard} label="SPICE" onClick={() => setSpiceOpen(true)} /></ToolGroup><ToolGroup label="CAD AND PACKAGE" priority="tertiary"><Tool icon={CircuitBoard} label="STEP" onClick={() => void exportStep()} /><Tool icon={Save} label="Save results" onClick={exportReport} /><Tool icon={FolderOpen} label="Load results" onClick={loadResults} /><Tool icon={Copy} label="Save instance" onClick={saveInstance} /></ToolGroup></>;
+        return <><ToolGroup label="REPORT" priority="primary"><Tool icon={BookOpen} label="Preview" onClick={generateReport} /><Tool icon={FileOutput} label="Print / PDF" onClick={() => { generateReport(); setStatus("Report preview ready; choose Print for printer or PDF output"); }} /><Tool icon={BarChart3} label="Analytics" onClick={generateReport} /></ToolGroup><ToolGroup label="DATA EXPORT" priority="secondary"><Tool icon={Table2} label="Probe CSV" onClick={exportProbeCsv} /><Tool icon={Waves} label="Touchstone" onClick={() => openSiWorkbench("workflow", "channel")} /><Tool icon={CircuitBoard} label="SPICE" onClick={() => setSpiceOpen(true)} /></ToolGroup><ToolGroup label="CAD AND PACKAGE" priority="tertiary"><Tool icon={CircuitBoard} label="STEP" onClick={() => void exportStep()} /><Tool icon={Save} label="Save results" onClick={exportReport} /><Tool icon={FolderOpen} label="Load results" onClick={loadResults} /><Tool icon={Copy} label="Save instance" onClick={saveInstance} /></ToolGroup></>;
       case "Settings":
-        return <><ToolGroup label="APPLICATION" priority="primary"><Tool icon={Settings2} label="Settings" onClick={() => setPreferencesOpen(true)} /><Tool icon={Network} label="Extensions" onClick={() => void openExtensionManager()} /><Tool icon={CircuitBoard} label="External engines" onClick={() => void openExternalEngineCenter()} /><Tool icon={SlidersHorizontal} label="Dependencies" onClick={() => void checkDependencies()} /><Tool icon={Gauge} label="Verification" onClick={() => setBenchmarkOpen(true)} /></ToolGroup><ToolGroup label="DESIGN LIBRARIES" priority="secondary"><Tool icon={Layers3} label="Stackup" onClick={() => setStackupOpen(true)} /><Tool icon={BookOpen} label="3D library" onClick={() => setModelLibraryOpen(true)} /><Tool icon={Eye} label="Models" active={showModels} onClick={() => setShowModels(!showModels)} /></ToolGroup><ToolGroup label="INTERFACE" priority="tertiary"><Tool icon={Keyboard} label="Shortcuts" onClick={() => setShortcutsOpen(true)} /><Tool icon={Activity} label="Resources" onClick={() => setResourceOpen(true)} /><Tool icon={BookOpen} label="User guide" onClick={() => setHelpOpen(true)} /></ToolGroup></>;
+        return <><ToolGroup label="APPLICATION" priority="primary"><Tool icon={Settings2} label="Settings" onClick={() => setPreferencesOpen(true)} /><Tool icon={SquareTerminal} label="Python" active={pythonOpen} onClick={() => setPythonOpen(true)} /><Tool icon={Network} label="Extensions" onClick={() => void openExtensionManager()} /><Tool icon={CircuitBoard} label="External engines" onClick={() => void openExternalEngineCenter()} /><Tool icon={SlidersHorizontal} label="Dependencies" onClick={() => void checkDependencies()} /><Tool icon={Gauge} label="Verification" onClick={() => setBenchmarkOpen(true)} /></ToolGroup><ToolGroup label="DESIGN LIBRARIES" priority="secondary"><Tool icon={Layers3} label="Stackup" onClick={() => setStackupOpen(true)} /><Tool icon={BookOpen} label="3D library" onClick={() => setModelLibraryOpen(true)} /><Tool icon={Eye} label="Models" active={showModels} onClick={() => setShowModels(!showModels)} /></ToolGroup><ToolGroup label="INTERFACE" priority="tertiary"><Tool icon={Keyboard} label="Shortcuts" onClick={() => setShortcutsOpen(true)} /><Tool icon={Activity} label="Resources" onClick={() => setResourceOpen(true)} /><Tool icon={BookOpen} label="User guide" onClick={() => setHelpOpen(true)} /></ToolGroup></>;
     }
   })();
 
@@ -3498,7 +3570,7 @@ export default function App() {
     { id: "manager:layers", label: "Layer manager", category: "View", description: "Control layer visibility, opacity, models, vias, and separation", icon: Layers2, disabled: !boardData, run: () => setLayersOpen(true) },
     { id: "manager:models", label: "3D model library", category: "Design", description: "Browse and assign local STEP, WRL, and glTF models", keywords: "component package", icon: LibraryBig, disabled: !boardData, run: () => setModelLibraryOpen(true) },
     { id: "analysis:spice", label: "SPICE model assistant", category: "Simulation", description: "Assign models, pins, ratings, and explicit circuit netlists", keywords: "ngspice circuit", icon: CircuitBoard, run: () => setSpiceOpen(true) },
-    { id: "analysis:sparameter", label: "S-parameter workbench", category: "HF / SI", description: "Inspect or import Touchstone network data", keywords: "touchstone port", icon: Waves, run: () => { setTab("HF / SI"); setSparameterOpen(true); } },
+    { id: "analysis:sparameter", label: "S-parameter workbench", category: "HF / SI", description: "Run a geometry channel or inspect Touchstone data", keywords: "touchstone port", icon: Waves, run: () => { setTab("HF / SI"); openSiWorkbench("geometry", "channel"); } },
     { id: "analysis:emi", label: "EMI test setup", category: "EMI", description: "Configure domains, ports, preflight, full-wave case, and dashboard", keywords: "openems far field lisn", icon: SatelliteDish, run: () => { setTab("EMI"); setRightOpen(true); setEmiSection("domain"); } },
     { id: "analysis:thermal", label: "Thermal and airflow setup", category: "Thermal", description: "Configure environment, volume, heat sources, fans, and flow channels", keywords: "openfoam temperature", icon: ThermometerSun, run: () => { setTab("Thermal"); setThermalOpen(true); } },
     { id: "results:viewer", label: "Analysis result viewer", category: "Results", description: "Review voltage, current, density, mesh, loss, probes, and impedance", icon: ChartArea, run: () => { setTab("Results"); setResultVisualizerOpen(true); } },
@@ -3510,7 +3582,8 @@ export default function App() {
     { id: "view:navigator", label: leftOpen ? "Hide design navigator" : "Show design navigator", category: "View", icon: PanelLeft, run: () => setLeftOpen(current => !current) },
     { id: "view:analysis", label: rightOpen ? "Hide analysis setup" : "Show analysis setup", category: "View", icon: PanelRight, run: () => setRightOpen(current => !current) },
     { id: "view:console", label: "Open application console", category: "View", description: "Show commands, warnings, errors, and operation status", icon: SquareTerminal, run: () => { setBottomOpen(true); setDock("Console"); } },
-    { id: "settings:general", label: "Application settings", category: "Settings", description: "Configure interface, units, language, rendering, resources, and license", keywords: "preferences ram memory locale", icon: Settings2, run: () => setPreferencesOpen(true) },
+    { id: "settings:general", label: "Application settings", category: "Settings", description: "Configure interface, units, language, rendering, and resources", keywords: "preferences ram memory locale", icon: Settings2, run: () => setPreferencesOpen(true) },
+    { id: "tools:python", label: "Python workspace", category: "Tools", description: "Edit and run Python scripts in the desktop worker", keywords: "script automation ide", icon: SquareTerminal, run: () => setPythonOpen(true) },
     { id: "settings:shortcuts", label: "Keyboard shortcuts", category: "Settings", description: "Review and customize viewport and application bindings", icon: Keyboard, run: () => setShortcutsOpen(true) },
     { id: "settings:resources", label: "Resource monitor", category: "Settings", description: "Inspect CPU, memory, rendering, and capacity information", icon: MemoryStick, run: () => setResourceOpen(true) },
     { id: "settings:engines", label: "Solver manager", category: "Settings", description: "Detect, register, configure, and tune internal or external engines", keywords: "openems openfoam sparselizard elmer ngspice", icon: ServerCog, run: () => void openExternalEngineCenter() },
@@ -3555,8 +3628,14 @@ export default function App() {
         ? { level: "warning", title: `${modelLoadStatus.missingCount} unresolved 3D model assignment${modelLoadStatus.missingCount === 1 ? "" : "s"}`, detail: `${modelLoadStatus.missingRefs.slice(0, 4).join(", ")}${modelLoadStatus.missingRefs.length > 4 ? ` and ${modelLoadStatus.missingRefs.length - 4} more` : ""}` }
         : null;
 
+  const siWorkspace = tab === "HF / SI" || ((tab === "Mesh" || tab === "Solve") && simulationDomain === "si");
+  useEffect(() => {
+    if (tab === "HF / SI") setSimulationDomain("si");
+    if (tab === "PI") setSimulationDomain("pi");
+  }, [tab]);
+
   return <div className={`app-shell ${bottomOpen ? "bottom-open" : "bottom-closed"} ${appSettings.ribbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} style={shellStyle}>
-    <header className="topbar"><div className="brand-mark"><img src="/spike-mark.svg" alt="SPIKE" /><div><b>SPIKE</b><small>ELECTRONIC SYSTEMS INTEGRITY WORKBENCH</small></div></div><button className="project-path" onClick={() => setProjectManagerOpen(true)} title="Open project manager"><span>Project</span><b>{projectName}</b><ChevronDown size={15} /></button><div className="top-actions"><button className={`icon-btn universal-search-trigger ${globalSearchOpen ? "active" : ""}`} title="Universal search (Ctrl+K)" aria-label="Open universal search" aria-keyshortcuts="Control+K Meta+K" aria-expanded={globalSearchOpen} onClick={() => { setMenu(null); setGlobalSearchOpen(true); }}><Search size={17} /><span>Search</span><kbd>Ctrl K</kbd></button><div className="notification-center"><button className={`icon-btn ${modelNotice ? "has-notification" : ""}`} title="Notifications" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen(current => !current)}><Bell size={17} />{modelNotice && <span className={`notification-count ${modelNotice.level}`}>1</span>}</button>{notificationsOpen && <div className="notification-popover"><div><b>NOTIFICATIONS</b><button onClick={() => setNotificationsOpen(false)} title="Close notifications"><X size={13} /></button></div>{modelNotice ? <article className={modelNotice.level}><Bell size={14} /><span><b>{modelNotice.title}</b><small>{modelNotice.detail}</small>{modelLoadStatus.metrics && <em>{modelLoadStatus.metrics}</em>}</span></article> : <p>No active notifications.</p>}</div>}</div><button className="icon-btn" title="Help and user guide" onClick={() => setHelpOpen(true)}><CircleHelp size={17} /></button><button className="avatar" title={`${appSettings.profile.displayName} · ${appSettings.license.tier}`} onClick={() => setPreferencesOpen(true)}>{appSettings.profile.initials}</button></div></header>
+    <header className="topbar"><div className="brand-mark"><img src="/spike-mark.svg" alt="SPIKE" /><div><b>SPIKE</b><small>ELECTRONIC SYSTEMS INTEGRITY WORKBENCH</small></div></div><button className="project-path" onClick={() => setProjectManagerOpen(true)} title="Open project manager"><span>Project</span><b>{projectName}</b><ChevronDown size={15} /></button><div className="top-actions"><button className={`icon-btn universal-search-trigger ${globalSearchOpen ? "active" : ""}`} title="Universal search (Ctrl+K)" aria-label="Open universal search" aria-keyshortcuts="Control+K Meta+K" aria-expanded={globalSearchOpen} onClick={() => { setMenu(null); setGlobalSearchOpen(true); }}><Search size={17} /><span>Search</span><kbd>Ctrl K</kbd></button><div className="notification-center"><button className={`icon-btn ${modelNotice ? "has-notification" : ""}`} title="Notifications" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen(current => !current)}><Bell size={17} />{modelNotice && <span className={`notification-count ${modelNotice.level}`}>1</span>}</button>{notificationsOpen && <div className="notification-popover"><div><b>NOTIFICATIONS</b><button onClick={() => setNotificationsOpen(false)} title="Close notifications"><X size={13} /></button></div>{modelNotice ? <article className={modelNotice.level}><Bell size={14} /><span><b>{modelNotice.title}</b><small>{modelNotice.detail}</small>{modelLoadStatus.metrics && <em>{modelLoadStatus.metrics}</em>}</span></article> : <p>No active notifications.</p>}</div>}</div><button className="icon-btn" title="Help and user guide" onClick={() => setHelpOpen(true)}><CircleHelp size={17} /></button><button className="avatar" title={appSettings.profile.displayName} onClick={() => setPreferencesOpen(true)}>{appSettings.profile.initials}</button></div></header>
     <nav className="menu-bar" aria-label="Application menu">
       <MenuButton label={tr("File")} open={menu === "File"} onClick={() => setMenu(menu === "File" ? null : "File")}>
         <MenuItem icon={FilePlus} label="New project" shortcut="Ctrl+N" onClick={() => { newProject(); setMenu(null); }} />
@@ -3605,6 +3684,7 @@ export default function App() {
         <MenuItem icon={Settings2} label="Project and application settings" onClick={() => { setPreferencesOpen(true); setMenu(null); }} />
       </MenuButton>
       <MenuButton label="Tools" open={menu === "Tools"} onClick={() => setMenu(menu === "Tools" ? null : "Tools")}>
+        <MenuItem icon={SquareTerminal} label="Python workspace" onClick={() => { setPythonOpen(true); setMenu(null); }} />
         <MenuItem icon={Gauge} label="Solver verification" onClick={() => { setBenchmarkOpen(true); setMenu(null); }} />
         <MenuItem icon={ShieldAlert} label="Dependency status" onClick={() => { void checkDependencies(); setMenu(null); }} />
         <MenuItem icon={CircuitBoard} label="Extension manager" onClick={() => { void openExtensionManager(); setMenu(null); }} />
@@ -3654,7 +3734,6 @@ export default function App() {
     </>
     {universalRunning && <>
       <div className="global-progress" role="progressbar" aria-label={operationDisplay?.label ?? status} aria-valuetext={operationDisplay ? `${formatRunDuration(operationDisplay.elapsedSeconds)} elapsed${operationDisplay.estimateSeconds ? `, estimated ${formatRunDuration(operationDisplay.estimateSeconds)}` : ""}` : undefined}><span /></div>
-      <button className="global-stop" onClick={() => void cancelActiveAnalysis()} title="Cancel the active mesh or solver operation"><X size={13} /> Stop</button>
     </>}
 
     <main className={`workspace ${leftOpen ? "left-open" : "left-closed"} ${rightOpen ? "right-open" : "right-closed"}`}>
@@ -3742,7 +3821,7 @@ export default function App() {
           </div>}
           {!activeAnalysisResult && boardData && tab === "HF / SI" && <div className="viewport-context-group" aria-label="SI extraction commands">
             {(selected?.net || piSetup.net) && <button className="extract" onClick={() => runParasitics(resultVisualization.viaModel)} disabled={analysisRunning} title="Extract the selected net's R/L/C/G and Z(f)"><Cpu size={14} /> Extract RLC</button>}
-            <button onClick={() => setSparameterOpen(true)} title="Open S-parameter and Touchstone workflows"><Waves size={14} /> S-parameters</button>
+            <button onClick={() => openSiWorkbench("geometry", "channel")} title="Open S-parameter and Touchstone workflows"><Waves size={14} /> S-parameters</button>
             <button onClick={() => setStackupOpen(true)} title="Inspect dielectric and conductor stackup inputs"><Layers3 size={14} /> Stackup</button>
           </div>}
           {!activeAnalysisResult && boardData && tab === "Thermal" && <div className="viewport-context-group" aria-label="Thermal setup commands">
@@ -3788,17 +3867,17 @@ export default function App() {
         </div>
         {(tab === "Mesh" || tab === "Solve") && <SimulationWorkspace
           tab={tab} domain={simulationDomain}
-          analysisMode={simulationDomain === "pi" ? analysisMode : "Loaded SI workflow"}
+          analysisMode={simulationDomain === "pi" ? analysisMode : "SI channel analysis"}
           net={simulationDomain === "pi" ? piSetup.net : selected?.net ?? ""}
-          meshSummary={simulationDomain === "pi" ? `${piSetup.meshTargetMm || "-"} mm target` : "Configured in loaded SI workflow"}
+          meshSummary={simulationDomain === "pi" ? `${piSetup.meshTargetMm || "-"} mm target` : "Configured in SI channel setup"}
           solverName={solverCatalog.find(item => item.id === solverId)?.name ?? (solverId === "auto" ? "Automatic eligible solver" : solverId)}
           running={universalRunning} hasBoard={Boolean(boardData)} canExtract={Boolean(selected?.net || piSetup.net)}
           onDomain={setSimulationDomain}
-          onConfigure={() => simulationDomain === "pi" ? openAnalysisSetup() : setSparameterOpen(true)}
-          onNets={() => simulationDomain === "pi" ? setNetManagerOpen(true) : setSparameterOpen(true)}
+          onConfigure={() => simulationDomain === "pi" ? openAnalysisSetup() : openSiWorkbench("geometry", "channel")}
+          onNets={() => simulationDomain === "pi" ? setNetManagerOpen(true) : openSiWorkbench("geometry", "channel")}
           onStackup={() => setStackupOpen(true)}
-          onExtract={() => simulationDomain === "pi" ? runParasitics(resultVisualization.viaModel) : setSparameterOpen(true)}
-          onRun={() => simulationDomain === "pi" ? runAnalysis() : setSparameterOpen(true)}
+          onExtract={() => simulationDomain === "pi" ? runParasitics(resultVisualization.viaModel) : openSiWorkbench("geometry", "channel")}
+          onRun={() => simulationDomain === "pi" ? runAnalysis() : openSiWorkbench("geometry", "channel")}
           onStop={() => void cancelActiveAnalysis()}
           onHarness={() => setHarnessEditorOpen(true)}
           onTetraMesh={() => setTetraMeshOpen(true)}
@@ -3931,21 +4010,23 @@ export default function App() {
           </div>}
           <div className="viewport-hud-bottom">
             <div className="viewport-legend"><span><i className="legend-copper" /> Copper</span><span><i className="legend-current" /> Selected net</span><span><i className="legend-hot" /> Issue hotspot</span></div>
-            <button className="resolve-setup-button" onClick={resolveSimulationSetup} title="Resolve net, terminals, return path, solver selection, and mesh defaults"><ShieldAlert size={14} /> <span>Resolve setup</span></button>
+            {siWorkspace ? <button className="resolve-setup-button" onClick={() => openSiWorkbench("geometry", "channel")} title="Configure SI channel geometry and run settings"><SlidersHorizontal size={14} /> <span>Configure SI</span></button> : <button className="resolve-setup-button" onClick={resolveSimulationSetup} title="Resolve net, terminals, return path, solver selection, and mesh defaults"><ShieldAlert size={14} /> <span>Resolve setup</span></button>}
           </div>
         </div>
-        <div className="results-strip"><div><span className="eyebrow">ACTIVE ANALYSIS</span><b>{analysisMode}</b></div><div className="metric"><span>MAX DROP</span><strong>{analysisSummary ? analysisSummary.maxDropMv.toFixed(2) : "—"}</strong><small>mV</small></div><div className="metric"><span>MAX CURRENT DENSITY</span><strong>{analysisSummary ? analysisSummary.maxDensity.toFixed(2) : "—"}</strong><small>A/mm²</small></div><div className="metric"><span>MODEL STATUS</span><strong className="amber">{analysisSummary?.modelStatus ?? (analysisMode === "AC Impedance Sweep" ? "Unsupported" : "Approximate")}</strong></div><button className={`run-btn ${analysisRunning ? "stop" : ""}`} onClick={analysisRunning ? () => void cancelActiveAnalysis() : runAnalysis}>{analysisRunning ? <X size={15} /> : <Play size={15} fill="currentColor" />} {analysisRunning && operationDisplay ? `Stop · ${formatRunDuration(operationDisplay.elapsedSeconds)}` : analysisRunning ? "Stop" : analysisMode === "AC Impedance Sweep" ? "Configure AC" : analysisMode === "Transient PI" ? "Run transient" : "Run DC"}</button></div>
+        {siWorkspace ? <div className="results-strip"><div><span className="eyebrow">ACTIVE ANALYSIS</span><b>Signal integrity</b></div><div className="metric"><span>SI RESULT</span><strong>{siChannelResult ? String(siChannelResult.status ?? "saved") : "Not run"}</strong></div><div className="metric"><span>MODEL STATUS</span><strong className="amber">Experimental</strong></div><button className="plain-btn" onClick={() => openSiWorkbench(siChannelResult?.contract === "spike/si-workflow-result/v1" ? "workflow" : "geometry", "channel")}><LayoutDashboard size={15} /> SI results</button><button className="run-btn" onClick={() => openSiWorkbench("geometry", "channel")}><Play size={15} /> Configure and run SI</button></div> : <div className="results-strip"><div><span className="eyebrow">ACTIVE ANALYSIS</span><b>{analysisMode}</b></div><div className="metric"><span>MAX DROP</span><strong>{analysisSummary ? analysisSummary.maxDropMv.toFixed(2) : "—"}</strong><small>mV</small></div><div className="metric"><span>MAX CURRENT DENSITY</span><strong>{analysisSummary ? analysisSummary.maxDensity.toFixed(2) : "—"}</strong><small>A/mm²</small></div><div className="metric"><span>MODEL STATUS</span><strong className="amber">{analysisSummary?.modelStatus ?? (analysisMode === "AC Impedance Sweep" ? "Unsupported" : "Approximate")}</strong></div>{activeAnalysisResult && <button className="plain-btn" onClick={() => { if (detachedTools.results) void detachTool("results"); else setResultVisualizerOpen(true); }} title={detachedTools.results ? "Bring the detached results manager to the front" : "Open the floating results manager"}><LayoutDashboard size={15} /> Results manager</button>}<button className={`run-btn ${analysisRunning ? "stop" : ""}`} onClick={analysisRunning ? () => void cancelActiveAnalysis() : runAnalysis}>{analysisRunning ? <X size={15} /> : <Play size={15} fill="currentColor" />} {analysisRunning && operationDisplay ? `Stop · ${formatRunDuration(operationDisplay.elapsedSeconds)}` : analysisRunning ? "Stop" : analysisMode === "AC Impedance Sweep" ? "Configure AC" : analysisMode === "Transient PI" ? "Run transient" : "Run DC"}</button></div>}
       </section>
 
       <aside className={rightOpen ? "side-panel right" : "side-panel right collapsed"}>
         <div className="panel-heading">
-          <span>{tab === "EMI" ? "EMI TEST SETUP" : selected || selectedHarness || selectedBoardInstance ? "SELECTION INSPECTOR" : "ANALYSIS SETUP"}</span>
+          <span>{tab === "EMI" ? "EMI TEST SETUP" : siWorkspace ? "SI SETUP" : selected || selectedHarness || selectedBoardInstance ? "SELECTION INSPECTOR" : "ANALYSIS SETUP"}</span>
           <button onClick={() => setRightOpen(!rightOpen)} className="collapse-btn" title={rightOpen ? "Collapse analysis setup" : "Expand analysis setup"} aria-label={rightOpen ? "Collapse analysis setup" : "Expand analysis setup"}>{rightOpen ? <PanelRight size={15} /> : <PanelLeft size={17} />}</button>
         </div>
         {rightOpen && (tab === "EMI"
           ? <EmiSetupPanel board={boardData} selected={selected} setup={emiSetup} setSetup={setEmiSetup} preflight={emiPreflight} screening={emiScreening} section={emiSection} setSection={setEmiSection} busy={emiBusy || externalEngineBusy} canExecutePreparedCase={Boolean(externalCase?.canRun)} onValidate={() => void validateEmi()} onScreen={() => void runEmiScreening()} onPrepare={() => void prepareEmiCase()} onRun={() => void runExternalEngine("external.openems", false)} onDashboard={() => setEmiDashboardOpen(true)} onSolverManager={() => void openExternalEngineCenter()} onStatus={setStatus} />
+          : siWorkspace
+            ? <div className="inspector shared-mesh-inspector"><div className="setup-block"><label>SIGNAL CHANNEL</label><b>Experimental SI analysis</b><small>Configure an explicit channel and reference. Geometry-derived NEXT/FEXT needs a separate victim net; loaded studies use assigned channel ports.</small><button className="secondary-btn" onClick={() => openSiWorkbench("geometry", "channel")}>S-parameters and eye</button><button className="secondary-btn" onClick={() => openSiWorkbench("geometry", "crosstalk")}>NEXT / FEXT setup</button><button className="secondary-btn" onClick={() => openSiWorkbench("workflow", "ports")}>Source / receiver ports</button><button className="secondary-btn" onClick={() => openSiWorkbench("workflow", "channel")}>Loaded channel workflow</button>{siChannelResult && <small>Latest SI result: {String(siChannelResult.status ?? "saved")}. Open SI results to review limitations and traces.</small>}</div></div>
           : tab === "Mesh" && !selected
-            ? <div className="inspector shared-mesh-inspector"><div className="setup-block"><label>MESH WORKSPACE</label><b>{simulationDomain === "pi" ? `${piSetup.meshTargetMm} mm target` : "Loaded SI channel setup"}</b><small>Solver selection and execution are available in the Solve tab.</small><button className="secondary-btn" onClick={() => simulationDomain === "pi" ? openAnalysisSetup() : setSparameterOpen(true)}>Open mesh controls</button></div></div>
+            ? <div className="inspector shared-mesh-inspector"><div className="setup-block"><label>MESH WORKSPACE</label><b>{simulationDomain === "pi" ? `${piSetup.meshTargetMm} mm target` : "Loaded SI channel setup"}</b><small>Solver selection and execution are available in the Solve tab.</small><button className="secondary-btn" onClick={() => simulationDomain === "pi" ? openAnalysisSetup() : openSiWorkbench("geometry", "channel")}>Open mesh controls</button></div></div>
           : selected
             ? <Inspector board={boardData} object={selected} selectionFilter={selectionFilter} isolated={Boolean(isolatedNet)} assignedModel={selected.ref ? modelAssignments[selected.ref] : undefined} onClear={() => setSelected(null)} onProbe={() => addProbe(selected)} onModelLibrary={() => setModelLibraryOpen(true)} onIsolate={() => { recordChange(); setIsolatedNet(isolatedNet ? null : selected.net ?? null); setStatus(isolatedNet ? "Complete board restored" : `${selected.net} isolated for PI/SI extraction`); }} />
             : selectedHarness
@@ -3988,6 +4069,7 @@ export default function App() {
       {boardImport.progress && boardImport.open && <BoardImportPanel progress={boardImport.progress} onHide={boardImport.dismiss} onCancel={() => void boardImport.cancel()} onLocate={source => void boardImport.locate(source)} onRetry={() => void boardImport.retry()} />}
       {boardImport.progress && !boardImport.open && <button className="board-import-status" onClick={boardImport.show}>{boardImport.progress.busy ? `Import ${boardImport.progress.percent}% · ${boardImport.progress.label}` : "Import details"}</button>}
       <button className={`status-current ${analysisRunning ? "busy" : activityLevel(status)}`} onClick={() => { setDock("Console"); setBottomOpen(true); }} title="Open activity console"><Activity size={12} /><span className="status-message" aria-live="polite">{analysisRunning && operationDisplay ? `${operationDisplay.label} · ${formatRunDuration(operationDisplay.elapsedSeconds)} elapsed${operationDisplay.estimateSeconds ? ` · estimate ~${formatRunDuration(operationDisplay.estimateSeconds)}` : ""}` : analysisRunning ? `Working: ${status}` : status}</span></button>
+      {universalRunning && <button className="statusbar-stop" onClick={() => void cancelActiveAnalysis()} disabled={activeWorkerOperation?.cancelling} title="Cancel the active mesh or solver operation"><X size={12} /> {activeWorkerOperation?.cancelling ? "Stopping…" : "Stop"}</button>}
       <ResourceMonitor open={resourceOpen} setOpen={setResourceOpen} resources={processResources} render={renderTelemetry} board={boardData} />
       <button className="status-export" onClick={generateReport} title="Generate engineering report"><FileOutput size={12} /><span>Report</span></button>
       <span className="status-version">v{APP_VERSION}</span>
@@ -4014,7 +4096,7 @@ export default function App() {
     {tracePlotsOpen && <div className="modal-shade"><div style={{ width: "min(1400px, 94vw)", height: "88vh", background: "#101c25", overflow: "auto" }}><TraceResultsWorkbench result={activeAnalysisResult} domain={resultVisualizerDomain} targetNet={activePdnReview?.net} targetOhm={activePdnReview?.target_ohm}
       onClose={() => setTracePlotsOpen(false)} onDetach={() => void detachTool("trace-plots")} /></div></div>}
     {resultVisualizerOpen && <ResultVisualizationPanel onTracePlots={() => setTracePlotsOpen(true)} onDetach={() => void detachTool("results")} domain={resultVisualizerDomain} board={boardData} selectedNet={selected?.net ?? piSetup.net ?? null} result={activeAnalysisResult} sourceResult={analysisResult} visualization={resultVisualization} workerAvailable={workerAvailable} parasiticsAvailable={solverSupports("partial_inductance", "frequency_dependent_impedance")} riskAvailable={solverSupports("coupled_line_extraction", "electric_field_coupling", "magnetic_field_coupling")} pdnReview={activePdnReview} pdnReviewSourceId={pdnReviewSourceId} dropLimitMv={Number.isFinite(Number(limits.drop)) && Number(limits.drop) > 0 ? Number(limits.drop) : null} densityLimitAMm2={Number.isFinite(Number(limits.density)) && Number(limits.density) > 0 ? Number(limits.density) : null} onVisualization={setResultVisualization} onConfigure={() => { setResultVisualizerOpen(false); setDcRunOpen(true); }} onRunParasitics={runParasitics} onRunRisk={runSiRisk} onRunPdn={(target, candidate) => void runPdnReview(target, candidate)} onExportAnimation={() => void exportResultAnimation()} onClose={() => setResultVisualizerOpen(false)} />}
-    <div hidden={!sparameterOpen}><SParameterWorkbench assemblyDesigns={assemblyDesigns} canonicalDesign={canonicalDesignIr} suite={selectedSiSuite} initialResult={siChannelResult} onClose={() => setSparameterOpen(false)} onStatus={setStatus} onResult={result => { recordChange(); setSiChannelResult(result); }} /></div>
+    <div hidden={!sparameterOpen}><SParameterWorkbench assemblyDesigns={assemblyDesigns} canonicalDesign={canonicalDesignIr} suite={selectedSiSuite} initialResult={siChannelResult} initialView={siWorkbenchIntent.view} initialFocus={siWorkbenchIntent.focus} intentToken={siWorkbenchIntent.token} onClose={() => setSparameterOpen(false)} onStatus={setStatus} onResult={result => { recordChange(); setSiChannelResult(result); }} /></div>
     </Suspense>
     {emiDashboardOpen && tab === "EMI" && !emiChamberOpen && <EmiDashboard preflight={emiPreflight} screening={emiScreening} fieldResult={emiFieldResult} onClose={() => setEmiDashboardOpen(false)} onScreen={() => void runEmiScreening()} onPrepare={() => void prepareEmiCase()} onSolverManager={() => void openExternalEngineCenter()} />}
     {reportPreview && <ReportPreview fileName={reportPreview.fileName} html={reportPreview.html} onExport={exportPreparedReport} onClose={() => setReportPreview(null)} />}
@@ -4030,11 +4112,12 @@ export default function App() {
     <input ref={comparisonInputRef} className="hidden-input" type="file" accept=".spike.json,.json" onChange={loadComparisonBaseline} />
     {revisionComparison && <RevisionComparisonDialog comparison={revisionComparison} onClose={() => setRevisionComparison(null)} />}
     {projectManagerOpen && <ProjectManager projectName={projectName} projectPath={projectPath} boardFile={boardFile} counts={{ layers: boardData?.layers.length ?? 0, nets: Object.keys(boardData?.nets ?? {}).length, components: boardData?.components.length ?? 0, results: resultRecords.length + (analysisResult ? 1 : 0) }} recent={recentProjects} onNew={newProject} onOpen={() => { setProjectManagerOpen(false); void openProject(); }} onSave={() => { setProjectManagerOpen(false); void saveProject(); }} onSaveAs={() => { setProjectManagerOpen(false); void saveProject(projectFileName(projectName), true); }} onClose={() => setProjectManagerOpen(false)} />}
-    {preferencesOpen && <UniversalSettingsModal settings={appSettings} onClose={() => setPreferencesOpen(false)} onLicenseChanged={license => setAppSettings(current => ({ ...current, license }))} onSave={next => { setAppSettings(next); saveAppSettings(next); setNavigationInertia(next.navigationInertia); setPreferencesOpen(false); setStatus("Application settings saved locally"); }} />}
+    {preferencesOpen && <UniversalSettingsModal settings={appSettings} onClose={() => setPreferencesOpen(false)} onSave={next => { setAppSettings(next); saveAppSettings(next); setNavigationInertia(next.navigationInertia); setPreferencesOpen(false); setStatus("Application settings saved locally"); }} />}
     {helpOpen && <Suspense fallback={<div className="modal-shade" role="status">Loading help…</div>}><HelpCenter context={tab} diagnosticCode={helpDiagnosticCode} onClose={() => { setHelpOpen(false); setHelpDiagnosticCode(undefined); }} /></Suspense>}
-    {aboutOpen && <AboutDialog license={appSettings.license} onClose={() => setAboutOpen(false)} onOpenGuide={() => { setAboutOpen(false); setHelpOpen(true); }} onOpenValidation={() => { setAboutOpen(false); setBenchmarkOpen(true); }} />}
+    {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} onOpenGuide={() => { setAboutOpen(false); setHelpOpen(true); }} onOpenValidation={() => { setAboutOpen(false); setBenchmarkOpen(true); }} />}
     {benchmarkOpen && <BenchmarkCenter onClose={() => setBenchmarkOpen(false)} onStatus={setStatus} />}
     {spiceOpen && <SpiceWorkbench initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} />}
+    {pythonOpen && <PythonWorkspace design={designForExchange()} results={extensionResultsContext(activeAnalysisResult)} onClose={() => setPythonOpen(false)} onStatus={setStatus} />}
     {bondManagerOpen && <BondManager
       bonds={componentBonds}
       validation={bondValidation}
@@ -4076,13 +4159,13 @@ export default function App() {
       onHoverBond={bond => previewViewportTarget(bond ? { kind: "object", id: bond.padId, type: "pad", net: bond.net, ref: bond.reference, layer: bond.connectedLayers[0], position: bond.position, label: `${bond.reference}.${bond.pad} bond` } : null)}
       onClose={() => { previewViewportTarget(null); setBondManagerOpen(false); }}
     />}
-    {extensionsOpen && <ExtensionManager extensions={extensionCatalog} result={extensionResult} harness={harnessDocument} onHarnessChange={value => { recordChange(); setHarnessDocument(value); }} onClose={() => setExtensionsOpen(false)} onRefresh={() => void openExtensionManager()} onRun={(extensionId, contributionId, parameters) => void invokeExtension(extensionId, contributionId, parameters)} />}
+    {extensionsOpen && <ExtensionManager extensions={extensionCatalog} result={extensionResult} harness={harnessDocument} trustBusy={extensionTrusting} trustError={extensionTrustError} onTrust={extensionId => void trustExtension(extensionId)} onHarnessChange={value => { recordChange(); setHarnessDocument(value); }} onClose={() => setExtensionsOpen(false)} onRefresh={() => void openExtensionManager()} onRun={(extensionId, contributionId, parameters) => void invokeExtension(extensionId, contributionId, parameters)} />}
     {siProtocolSuitesOpen && <Suspense fallback={null}><SiProtocolSuiteWorkbench
       extensionSuites={extensionProtocolSuites}
       onClose={() => setSiProtocolSuitesOpen(false)}
       onStatus={setStatus}
       onOpenTopology={() => { setSiProtocolSuitesOpen(false); setTopologyEditor("si"); }}
-      onOpenNetwork={suite => { setSelectedSiSuite(suite); setSiProtocolSuitesOpen(false); setSparameterOpen(true); }}
+      onOpenNetwork={suite => { setSelectedSiSuite(suite); setSiProtocolSuitesOpen(false); openSiWorkbench("geometry", "channel", true); }}
       onOpenExtensions={() => { setSiProtocolSuitesOpen(false); void openExtensionManager(); }}
     /></Suspense>}
     {externalEnginesOpen && <Suspense fallback={<div className="modal-backdrop"><div className="modal-loading">Loading external-engine catalog...</div></div>}><ExternalEngineCenter engines={externalEngineCatalog} accelerators={accelerationCatalog} manager={solverManager} solverSelections={solverSelections} selectedNets={externalNetSelection} designAvailable={Boolean(boardData)} caseState={externalCase} busy={externalEngineBusy} onClose={() => setExternalEnginesOpen(false)} onRefresh={() => void refreshExternalEngines()} onPrepare={engineId => void prepareExternalEngine(engineId)} onRun={(engineId, setupOnly) => void runExternalEngine(engineId, setupOnly)} onRegister={(engineId, path) => void registerExternalSolver(engineId, path)} onUnregister={engineId => void unregisterExternalSolver(engineId)} onTune={(targetId, values) => void tuneManagedSolver(targetId, values)} onSelectSolver={(workloadId, selectedSolverId) => void selectManagedSolver(workloadId, selectedSolverId)} /></Suspense>}
@@ -4474,11 +4557,13 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
   const initial = asThermalScenario(initialScenario);
   const [volume, setVolume] = useState({ x: String(initial?.bounding_volume_mm?.x ?? 160), y: String(initial?.bounding_volume_mm?.y ?? 100), z: String(initial?.bounding_volume_mm?.z ?? 60) });
   const [ambient, setAmbient] = useState(String(initial?.ambient_temperature_c ?? 25));
-  const [power, setPower] = useState(String(initial?.heat_sources?.[0]?.power_w ?? 8));
+  const [power, setPower] = useState(String(initialScenario?.board_fallback_power_w ?? initial?.heat_sources?.[0]?.power_w ?? 8));
   const [thermalElements, setThermalElements] = useState<ThermalElement[]>(() => normalizeThermalElements(initial?.thermal_elements));
   const [thermalLinks, setThermalLinks] = useState<ThermalLink[]>(() => normalizeThermalLinks(initial?.thermal_links));
-  const [theta, setTheta] = useState("12.5");
-  const [thermalCapacitance, setThermalCapacitance] = useState("20");
+  const [thermalBoundaries, setThermalBoundaries] = useState<ThermalBoundary[]>(() => normalizeThermalBoundaries(initial?.thermal_boundaries));
+  const [boardTopRth, setBoardTopRth] = useState(String(initial?.heat_sources?.[0]?.theta_top_c_per_w ?? 25));
+  const [boardBottomRth, setBoardBottomRth] = useState(String(initial?.heat_sources?.[0]?.theta_bottom_c_per_w ?? 25));
+  const [thermalCapacitance, setThermalCapacitance] = useState(String(initial?.heat_sources?.[0]?.thermal_capacitance_j_per_c ?? 20));
   const [mode, setMode] = useState<"steady_state" | "transient">((initialScenario?.mode as "steady_state" | "transient") ?? "steady_state");
   const [environment, setEnvironment] = useState(String(initialScenario?.application_environment ?? "industrial"));
   const [medium, setMedium] = useState<"air" | "vacuum" | "potting">((initial?.medium as "air" | "vacuum" | "potting") ?? "air");
@@ -4499,16 +4584,28 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
   const [preparedCase, setPreparedCase] = useState<{ status?: string; can_run?: boolean; case_dir?: string; message?: string; issues?: { severity: string; message: string }[] } | null>(null);
   const [runResult, setRunResult] = useState<{ status?: string; message?: string; result_contract?: string; result?: unknown } | null>(null);
   const [estimate, setEstimate] = useState<{ status: string; model_status: string; summary: { total_power_w: number; max_steady_temperature_c: number }; sources: { id: string; temperature_rise_c: number; steady_temperature_c: number; time_constant_s?: number }[]; issues: { severity: string; message: string }[] } | null>(null);
-  const [busy, setBusy] = useState<"preflight" | "prepare" | "run" | "estimate" | null>(null);
+  type ComponentThermalResult = { contract: string; status: string; model_status: string; nodes: { id: string; component_ref: string; power_w: number; temperature_c: number; steady_temperature_c: number; heat_flow_top_w: number; heat_flow_bottom_w: number }[]; surfaces?: (ThermalBoundary & { heat_flow_w: number })[]; transient: { time_s: number; temperatures_c: Record<string, number> }[]; summary: { total_power_w?: number; max_temperature_c?: number; steady_energy_balance_error_w?: number }; issues: { severity: string; message: string }[] };
+  const [nativeResult, setNativeResult] = useState<ComponentThermalResult | null>(() => (initialScenario?.component_result as ComponentThermalResult | undefined) ?? null);
+  const [nativeResultInputKey, setNativeResultInputKey] = useState(String(initialScenario?.component_result_input_key ?? ""));
+  const [nativeError, setNativeError] = useState("");
+  const [busy, setBusy] = useState<"preflight" | "prepare" | "run" | "estimate" | "native" | null>(null);
   const advancedPhysics = medium !== "air" || enclosure !== "open" || radiation || fans.some(fan => fan.enabled) || heatsinks.some(heatsink => heatsink.enabled);
   const assemblyIssues = useMemo(() => thermalAssemblyIssues(thermalElements, thermalLinks), [thermalElements, thermalLinks]);
   const thermalScreening = useMemo(() => screenThermalElements(thermalElements, Number(ambient)), [ambient, thermalElements]);
+  const boardFallback = { component_ref: "BOARD", power_w: Number(power), resistance_top_c_per_w: Number(boardTopRth), resistance_bottom_c_per_w: Number(boardBottomRth), thermal_capacitance_j_per_c: Number(thermalCapacitance) };
+  const nativeInputs = nativeThermalInputs(thermalElements, thermalBoundaries, boardFallback);
+  const activeBoundaries = thermalBoundaries.filter(boundary => boundary.enabled);
+  const nativeInputKey = JSON.stringify({ mode, ambient: Number(ambient), endTime: Number(endTime), writeInterval: Number(writeInterval), components: nativeInputs.components, surfaces: activeBoundaries });
+  const boardBoundaryElement: ThermalElement = { id: "thermal-board-fallback", reference: "BOARD", name: "Board fallback", kind: "board", material_id: "", surface_finish_id: "as-modeled", enabled: true, coordinate_frame: "board_local", position: [0, 0, 0], dimensions_mm: { x: Number(board?.width) || Number(volume.x) || 1, y: Number(board?.height) || Number(volume.y) || 1, z: board ? Math.max(board.stackup.reduce((sum, layer) => sum + (Number(layer.thickness) || 0), 0), 0.1) : 1.6 }, power_w: Number(power), emissivity: 0.8 };
+  const boundaryEditorElements = thermalElements.some(element => element.reference === "BOARD") ? thermalElements : [boardBoundaryElement, ...thermalElements];
+  const boardConductance = 1 / Number(boardTopRth) + 1 / Number(boardBottomRth);
+  const boardEquivalentRth = Number.isFinite(boardConductance) && boardConductance > 0 ? 1 / boardConductance : 0;
   const scenario = useMemo(() => {
     const forcedAir = medium === "air" && convection === "forced";
     const totalFanFlow = fans.filter(fan => fan.enabled).reduce((sum, fan) => sum + Math.max(0, fan.flow_rate_m3_s), 0);
     return {
       contract: "spike/thermal/v1",
-      solver: { engine: "external.openfoam", case_status: preparedCase?.status ?? "unconfigured", validation_status: validation?.valid ? "passed" : validation ? "blocked" : "not_checked" },
+      solver: { engine: "spike.lumped_thermal_network", model_status: "approximate", case_status: preparedCase?.status ?? "unconfigured", validation_status: validation?.valid ? "passed" : validation ? "blocked" : "not_checked" },
       mode,
       application_environment: environment,
       medium,
@@ -4516,12 +4613,15 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
       convection: medium === "vacuum" ? "none" : convection,
       bounding_volume_mm: { x: Number(volume.x), y: Number(volume.y), z: Number(volume.z) },
       ambient_temperature_c: Number(ambient),
+      board_fallback_power_w: Number(power),
       gravity: "-Z",
       heat_sources: [{
         id: "board-total",
         source_type: "board",
-        power_w: Number(power),
-        theta_ja_c_per_w: Number(theta),
+        power_w: nativeInputs.boardPowerUsed ? Number(power) : 0,
+        theta_ja_c_per_w: boardEquivalentRth,
+        theta_top_c_per_w: Number(boardTopRth),
+        theta_bottom_c_per_w: Number(boardBottomRth),
         thermal_capacitance_j_per_c: Number(thermalCapacitance),
         region: "board",
         coordinate_frame: "board_local",
@@ -4530,6 +4630,7 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
       }, ...thermalElements.filter(element => element.enabled && element.power_w > 0).map(element => ({ id: `source-${element.id}`, element_id: element.id, reference: element.reference, name: element.name, source_type: element.kind, power_w: element.power_w, material_id: element.material_id, surface_finish_id: element.surface_finish_id, region: element.reference, coordinate_frame: element.coordinate_frame, position: [element.position[0], element.position[1], element.position[2] + element.dimensions_mm.z / 2], dimensions_mm: element.dimensions_mm }))],
       thermal_elements: thermalElements,
       thermal_links: thermalLinks,
+      thermal_boundaries: thermalBoundaries,
       material_library: thermalMaterials,
       surface_finish_library: thermalSurfaceFinishes,
       thermal_screening: thermalScreening,
@@ -4549,10 +4650,13 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
       run: { end_time_s: Number(endTime), write_interval_s: Number(writeInterval), max_iterations: Number(maxIterations), residual_target: Number(residualTarget) },
       options: { radiation, turbulence: forcedAir ? "auto" : "laminar" },
       field_result: fieldResult ?? undefined,
+      component_result: nativeResultInputKey === nativeInputKey ? nativeResult ?? undefined : undefined,
+      component_result_input_key: nativeResultInputKey === nativeInputKey ? nativeInputKey : undefined,
     };
-  }, [ambient, assemblyIssues, board, boundaryLayers, componentBonds, convection, endTime, enclosure, environment, fans, fieldResult, heatsinks, maxCells, maxIterations, medium, meshSize, mode, power, preparedCase?.status, radiation, residualTarget, thermalCapacitance, thermalElements, thermalLinks, thermalScreening, theta, validation, volume.x, volume.y, volume.z, writeInterval]);
+  }, [ambient, assemblyIssues, board, boardBottomRth, boardEquivalentRth, boardTopRth, boundaryLayers, componentBonds, convection, endTime, enclosure, environment, fans, fieldResult, heatsinks, maxCells, maxIterations, medium, meshSize, mode, nativeInputKey, nativeInputs.boardPowerUsed, nativeResult, nativeResultInputKey, power, preparedCase?.status, radiation, residualTarget, thermalBoundaries, thermalCapacitance, thermalElements, thermalLinks, thermalScreening, validation, volume.x, volume.y, volume.z, writeInterval]);
   useEffect(() => onPreview(scenario), [onPreview, scenario]);
   const preflightCase = async () => {
+    if (activeBoundaries.length) { onStatus("Explicit object/surface boundaries are supported by the SPIKE object solver only; disable them before optional OpenFOAM preflight."); return null; }
     onScenario(scenario);
     setPreparedCase(null); setRunResult(null); setBusy("preflight");
     try {
@@ -4575,6 +4679,7 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
     }
   };
   const prepareCase = async () => {
+    if (activeBoundaries.length) { onStatus("Disable explicit object/surface boundaries before preparing an OpenFOAM case; that adapter does not consume them."); return; }
     const preflight = validation?.valid ? validation : await preflightCase();
     if (!preflight?.valid) return;
     if (!design) return;
@@ -4594,6 +4699,7 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
     }
   };
   const runCase = async () => {
+    if (activeBoundaries.length) { onStatus("OpenFOAM cannot run this setup with explicit object/surface boundaries because they are not translated into that case."); return; }
     if (!preparedCase?.can_run || !preparedCase.case_dir) { onStatus("Prepare a runnable OpenFOAM case before execution"); return; }
     setBusy("run");
     try {
@@ -4616,6 +4722,7 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
     }
   };
   const compactEstimate = async () => {
+    if (activeBoundaries.length) { onStatus("The compact independent screen ignores surface boundaries. Run the SPIKE object solver instead or disable those boundaries."); return; }
     onScenario(scenario); setBusy("estimate");
     try {
       const assemblyScope = await onRequireAdmission("thermal");
@@ -4629,31 +4736,65 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, workerA
       setBusy(null);
     }
   };
+  const runNativeThermal = async () => {
+    setBusy("native");
+    setNativeResult(null);
+    setNativeError("");
+    try {
+      if (!workerAvailable) throw new Error("The SPIKE desktop worker is required for a thermal run.");
+      const components = nativeInputs.components;
+      const invalidCapacity = mode === "transient" ? components.find(component => !(Number(component.thermal_capacitance_j_per_c) > 0)) : undefined;
+      if (invalidCapacity) throw new Error(`${invalidCapacity.component_ref}: enter positive heat capacity J/K for transient analysis.`);
+      const invalidPath = components.find(component => [component.resistance_top_c_per_w, component.resistance_bottom_c_per_w].some(value => value !== undefined && !(Number(value) > 0)));
+      if (invalidPath) throw new Error(`${invalidPath.component_ref}: entered top/bottom paths must be positive K/W. Leave unused paths blank.`);
+      const assemblyScope = await onRequireAdmission("thermal");
+      const response = await runLocalWorker({ method: "run_component_thermal", params: { scenario: { mode, ambient_temperature_c: Number(ambient), run: { end_time_s: Number(endTime), write_interval_s: Number(writeInterval) } }, components, surfaces: thermalBoundaries, assembly_scope: assemblyScope } });
+      const next = response.result as ComponentThermalResult | undefined;
+      if (!response.ok || !next) throw new Error(response.error ?? "SPIKE thermal worker returned no result.");
+      setNativeResult(next);
+      setNativeResultInputKey(nativeInputKey);
+      onScenario({ ...scenario, component_result: next, component_result_input_key: nativeInputKey });
+      onStatus(next.status === "completed" ? `SPIKE ${mode === "transient" ? "transient" : "steady-state"} thermal run completed; approximate object network result` : next.issues?.[0]?.message ?? "Thermal run was blocked.");
+    } catch (error) { const message = error instanceof Error ? error.message : "SPIKE thermal run failed."; setNativeError(message); onStatus(message); }
+    finally { setBusy(null); }
+  };
   const cancelRun = async () => {
     const cancelled = await cancelLocalWorker();
     onStatus(cancelled ? "OpenFOAM cancellation requested" : "No cancellable OpenFOAM operation is active");
   };
   return <div className="modal-shade thermal-setup-shade"><div className="floating-panel thermal-wizard">
-    <div className="floating-heading"><div><b>THERMAL SETUP</b><small>OpenFOAM case workflow</small></div><button onClick={onClose}><X size={15} /></button></div>
-    <p className="wizard-intro">Build an inspectable local CFD case. SPIKE stores all setup inputs, but only the worker can confirm runtime availability, case integrity, execution, and imported fields.</p>
-    <div className="thermal-workflow"><div className={!validation ? "active" : ""}><b>1. Setup</b><span>Editing</span></div><div className={validation ? "active" : ""}><b>2. Preflight</b><span>{validation?.valid ? "Passed" : validation ? "Blocked" : "Not checked"}</span></div><div className={preparedCase ? "active" : ""}><b>3. Case</b><span>{preparedCase?.can_run ? "Prepared" : preparedCase?.status ?? "Not prepared"}</span></div><div className={runResult ? "active" : ""}><b>4. Run</b><span>{runResult?.status ?? "Not run"}</span></div></div>
+    <div className="floating-heading"><div><b>THERMAL SETUP</b><small>SPIKE steady-state and transient component solver</small></div><button onClick={onClose}><X size={15} /></button></div>
+    <p className="wizard-intro">Run a local lumped thermal model using object power, conduction paths, convection, and radiation. Results are approximate object temperatures; selected faces share their object's temperature rather than forming a spatial field.</p>
+    <div className="thermal-workflow"><div className="active"><b>1. Inputs</b><span>Part W, K/W and transient J/K</span></div><div className={nativeResult ? "active" : ""}><b>2. SPIKE run</b><span>{nativeResult?.status ?? "Not run"}</span></div><div className={nativeResult?.status === "completed" ? "active" : ""}><b>3. Review</b><span>{nativeResult?.model_status ?? "Approximate model"}</span></div></div>
     <WorkflowSchematic title="Thermal network schematic" diagram={thermalSchematic(scenario)} />
     <div className="wizard-section"><label>SIMULATION SPACE</label><div className="wizard-fields"><div><span>Width</span><input value={volume.x} onChange={e => setVolume({ ...volume, x: e.target.value })} /><small>mm</small></div><div><span>Depth</span><input value={volume.y} onChange={e => setVolume({ ...volume, y: e.target.value })} /><small>mm</small></div><div><span>Height</span><input value={volume.z} onChange={e => setVolume({ ...volume, z: e.target.value })} /><small>mm</small></div></div></div>
     <div className="wizard-section"><label>ENVIRONMENT</label><div className="wizard-fields"><div><span>Application</span><select value={environment} onChange={e => setEnvironment(e.target.value)}><option value="domestic">Domestic</option><option value="industrial">Industrial</option><option value="marine">Marine</option><option value="aerospace">Aerospace</option><option value="custom">Custom</option></select></div><div><span>Medium</span><select value={medium} onChange={e => { const value = e.target.value as typeof medium; setMedium(value); if (value === "vacuum") setConvection("none"); }}><option value="air">Air</option><option value="vacuum">Vacuum</option><option value="potting">Potted block</option></select></div><div><span>Enclosure</span><select value={enclosure} onChange={e => setEnclosure(e.target.value as typeof enclosure)}><option value="open">Open volume</option><option value="sealed">Sealed enclosure</option><option value="vented_cabinet">Directional cabinet</option></select></div><div><span>Analysis</span><select value={mode} onChange={e => setMode(e.target.value as typeof mode)}><option value="steady_state">Steady state</option><option value="transient">Transient</option></select></div></div></div>
-    <div className="wizard-section"><label>BOARD HEAT</label><div className="wizard-row"><span>Total board dissipation</span><input value={power} onChange={e => setPower(e.target.value)} /><small>W</small></div><div className="wizard-row"><span>Ambient temperature</span><input value={ambient} onChange={e => setAmbient(e.target.value)} /><small>deg C</small></div><div className="wizard-row"><span>Thermal resistance to ambient</span><input value={theta} onChange={e => setTheta(e.target.value)} /><small>deg C/W</small></div><div className="wizard-row"><span>Thermal capacitance</span><input value={thermalCapacitance} onChange={e => setThermalCapacitance(e.target.value)} /><small>J/deg C</small></div></div>
+    <div className="wizard-section"><label>BOARD HEAT FALLBACK</label><p className="thermal-table-note">These BOARD values are used when no powered or cooldown part rows are selected. Part values from the table take precedence, so board power is not added twice.</p><div className="wizard-row"><span>Board dissipation</span><input type="number" min="0" value={power} onChange={e => setPower(e.target.value)} /><small>W</small></div><div className="wizard-row"><span>Ambient temperature</span><input type="number" min="-273.15" value={ambient} onChange={e => setAmbient(e.target.value)} /><small>°C</small></div><div className="wizard-row"><span>Top path to ambient</span><input type="number" min="0" value={boardTopRth} onChange={e => setBoardTopRth(e.target.value)} /><small>K/W</small></div><div className="wizard-row"><span>Bottom path to ambient</span><input type="number" min="0" value={boardBottomRth} onChange={e => setBoardBottomRth(e.target.value)} /><small>K/W</small></div><div className="wizard-row"><span>Board heat capacity (transient)</span><input type="number" min="0" value={thermalCapacitance} onChange={e => setThermalCapacitance(e.target.value)} /><small>J/K</small></div></div>
+    <ThermalInputImport board={board} elements={thermalElements} onElements={setThermalElements} />
+    {mode === "transient" && <div className="wizard-section"><label>COMPONENT TRANSIENT CONTROLS</label><div className="wizard-fields"><div><span>Duration</span><input aria-label="Component transient duration" type="number" min="0.001" step="1" value={endTime} onChange={e => setEndTime(e.target.value)} /><small>s</small></div><div><span>Time step / sample interval</span><input aria-label="Component transient time step" type="number" min="0.001" step="0.1" value={writeInterval} onChange={e => setWriteInterval(e.target.value)} /><small>s</small></div></div><p className="thermal-table-note">The local RC solver uses this time step. Reduce it to check time convergence; duration divided by time step must not exceed 10,000, with at most 100,000 component samples.</p></div>}
     <ThermalAssemblyEditor board={board} ambientC={Number(ambient)} elements={thermalElements} links={thermalLinks} onElements={setThermalElements} onLinks={setThermalLinks} />
+    <ThermalBoundaryEditor elements={boundaryEditorElements} boundaries={thermalBoundaries} onBoundaries={setThermalBoundaries} />
+    <p className="thermal-table-note">The SPIKE object run uses selected object power, heat capacity, top/bottom paths and the explicit conduction, convection or radiation boundaries below. Assembly contacts, material geometry and fans do not automatically create a heat path.</p>
+    <div className="wizard-section thermal-native-run"><label>SPIKE OBJECT THERMAL SOLVER</label><p>Top/bottom resistances and added surface paths are additive. Conduction needs a complete resistance to its target; convection needs an exposed area and heat-transfer coefficient; radiation needs an exposed area and emissivity. Transient runs need heat capacity for every included object. Geometry, materials, fans and contacts do not automatically create these paths.</p><div className="thermal-native-actions"><button className="run-btn" disabled={busy !== null || !workerAvailable} onClick={() => void runNativeThermal()}><Play size={15} /> {busy === "native" ? "Running SPIKE thermal" : `Run ${mode === "transient" ? "transient" : "steady state"}`}</button><button className="secondary-btn" disabled={busy !== null} onClick={() => onScenario(scenario)}>Save setup</button></div>{!workerAvailable && <small>The desktop worker is unavailable. Reopen SPIKE to run the thermal model.</small>}</div>
+    {nativeError && <div className="thermal-validation invalid" role="alert"><b>SPIKE thermal run blocked</b><span>{nativeError}</span></div>}
+    {nativeResult && nativeResultInputKey !== nativeInputKey && <div className="thermal-validation invalid"><b>Inputs changed</b><span>Rerun SPIKE thermal to update the component temperatures.</span></div>}
+    {nativeResult && nativeResultInputKey === nativeInputKey && <div className={`thermal-validation ${nativeResult.status === "completed" ? "valid" : "invalid"}`}><b>SPIKE {mode === "transient" ? "transient" : "steady-state"} · {nativeResult.status} · {nativeResult.model_status}</b>{nativeResult.status === "completed" && <><span>{nativeResult.nodes.length} nodes · {nativeResult.summary.total_power_w?.toFixed(3)} W · maximum {nativeResult.summary.max_temperature_c?.toFixed(2)} °C</span><div className="thermal-native-results"><table><thead><tr><th>Reference</th><th>Power W</th><th>Final °C</th><th>Steady °C</th><th>Top heat W*</th><th>Bottom heat W*</th></tr></thead><tbody>{nativeResult.nodes.map(node => <tr key={node.id}><td>{node.component_ref}</td><td>{node.power_w.toFixed(3)}</td><td>{node.temperature_c.toFixed(2)}</td><td>{node.steady_temperature_c.toFixed(2)}</td><td>{node.heat_flow_top_w.toFixed(3)}</td><td>{node.heat_flow_bottom_w.toFixed(3)}</td></tr>)}</tbody></table></div><small>* Branch heat flows are steady-state values, including when the selected run is transient.</small>{nativeResult.transient.length > 0 && <details><summary>Transient samples ({nativeResult.transient.length})</summary><div className="thermal-native-results"><table><thead><tr><th>Time s</th>{nativeResult.nodes.map(node => <th key={node.id}>{node.component_ref} °C</th>)}</tr></thead><tbody>{(nativeResult.transient.length <= 100 ? nativeResult.transient : [...nativeResult.transient.slice(0, 50), ...nativeResult.transient.slice(-50)]).map(frame => <tr key={frame.time_s}><td>{frame.time_s.toFixed(3)}</td>{nativeResult.nodes.map(node => <td key={node.id}>{frame.temperatures_c[node.id]?.toFixed(2) ?? "—"}</td>)}</tr>)}</tbody></table></div>{nativeResult.transient.length > 100 && <small>Showing the first and last 50 samples. Increase the saved interval to reduce output size.</small>}</details>}</>}{nativeResult.issues.map((issue, index) => <small key={index}>{issue.severity}: {issue.message}</small>)}</div>}
+    {nativeResult?.status === "completed" && nativeResultInputKey === nativeInputKey && Boolean(nativeResult.surfaces?.length) && <div className="wizard-section"><label>SURFACE HEAT FLOWS · STEADY STATE</label><div className="thermal-native-results"><table><thead><tr><th>Object</th><th>Surface</th><th>Mechanism</th><th>Target</th><th>Flow W</th></tr></thead><tbody>{nativeResult.surfaces!.map(surface => <tr key={surface.id}><td>{surface.object_ref}</td><td>{surface.surface}</td><td>{surface.kind}</td><td>{surface.kind === "conduction" ? surface.target_ref || "ambient" : "environment"}</td><td>{surface.heat_flow_w.toFixed(4)}</td></tr>)}</tbody></table></div><small>Positive flow leaves the object. A negative value means heat enters it. Interobject conduction appears once here and with the opposite sign at the target.</small></div>}
     {assemblyIssues.length > 0 && <div className="thermal-validation invalid"><b>Thermal assembly needs attention</b>{assemblyIssues.slice(0, 8).map(issue => <small key={issue}>{issue}</small>)}</div>}
-    {thermalScreening.some(item => item.status === "critical" || item.status === "warning") && <div className="thermal-validation invalid"><b>Potential thermal limit violations</b>{thermalScreening.filter(item => item.status === "critical" || item.status === "warning").map(item => <small key={item.element_id}>{item.reference}: {item.estimated_junction_c?.toFixed(1)} deg C estimated, {item.margin_c?.toFixed(1)} deg C margin ({item.status})</small>)}<small>Screening uses entered resistance paths; final status requires the field solver.</small></div>}
+    {thermalScreening.some(item => item.status === "critical" || item.status === "warning") && <div className="thermal-validation invalid"><b>Potential thermal limit violations</b>{thermalScreening.filter(item => item.status === "critical" || item.status === "warning").map(item => <small key={item.element_id}>{item.reference}: {item.estimated_junction_c?.toFixed(1)} deg C estimated, {item.margin_c?.toFixed(1)} deg C margin ({item.status})</small>)}<small>This legacy screen uses only top/bottom resistance estimates and ignores added surface boundaries. Review the completed lumped result; a qualified field claim requires separate validation.</small></div>}
+    <details className="thermal-optional-cfd"><summary>Optional OpenFOAM CFD and airflow workflow</summary>
+    {activeBoundaries.length > 0 && <p className="capability-warning">Explicit object and surface boundaries are calculated by the SPIKE object solver above. This OpenFOAM adapter and the older compact screen do not translate them; disable the boundaries to use those separate workflows.</p>}
     <div className="wizard-section"><label>AIRFLOW AND RADIATION</label><div className="wizard-fields"><div><span>Convection</span><select value={medium === "vacuum" ? "none" : convection} disabled={medium === "vacuum"} onChange={e => setConvection(e.target.value as typeof convection)}><option value="none">None</option><option value="natural">Natural</option><option value="forced">Forced / fan</option></select></div><div><span>Radiation</span><button className={`wizard-choice ${radiation ? "selected" : ""}`} onClick={() => setRadiation(!radiation)}>{radiation ? "Enabled" : "Disabled"}</button></div></div></div>
     <ThermalHardwareEditor fans={fans} heatsinks={heatsinks} elements={thermalElements} onFans={setFans} onHeatsinks={setHeatsinks} />
     {advancedPhysics && <p className="capability-warning thermal-hardware-warning"><AlertTriangle size={14} /> Hardware geometry and operating inputs are stored and previewed. Multi-region CHT remains unavailable until its validated solver adapter is installed.</p>}
-    <div className="wizard-section"><label>OPENFOAM CASE CONTROLS</label><div className="wizard-fields thermal-case-grid"><div><span>Base cell size</span><input type="number" min="0.01" step="0.1" value={meshSize} onChange={e => setMeshSize(e.target.value)} /><small>mm</small></div><div><span>Boundary layers</span><input type="number" min="0" step="1" value={boundaryLayers} onChange={e => setBoundaryLayers(e.target.value)} /></div><div><span>Cell ceiling</span><input type="number" min="1" step="1000" value={maxCells} onChange={e => setMaxCells(e.target.value)} /></div><div><span>End time</span><input type="number" min="0.001" step="1" disabled={mode !== "transient"} value={endTime} onChange={e => setEndTime(e.target.value)} /><small>s</small></div><div><span>Write interval</span><input type="number" min="0.001" step="0.1" disabled={mode !== "transient"} value={writeInterval} onChange={e => setWriteInterval(e.target.value)} /><small>s</small></div><div><span>Iteration ceiling</span><input type="number" min="10" step="10" value={maxIterations} onChange={e => setMaxIterations(e.target.value)} /></div><div><span>Residual target</span><input type="number" min="0.000000000001" step="0.000001" value={residualTarget} onChange={e => setResidualTarget(e.target.value)} /></div></div></div>
+    <div className="wizard-section"><label>OPTIONAL OPENFOAM CASE CONTROLS</label><div className="wizard-fields thermal-case-grid"><div><span>Base cell size</span><input type="number" min="0.01" step="0.1" value={meshSize} onChange={e => setMeshSize(e.target.value)} /><small>mm</small></div><div><span>Boundary layers</span><input type="number" min="0" step="1" value={boundaryLayers} onChange={e => setBoundaryLayers(e.target.value)} /></div><div><span>Cell ceiling</span><input type="number" min="1" step="1000" value={maxCells} onChange={e => setMaxCells(e.target.value)} /></div><div><span>End time</span><input type="number" min="0.001" step="1" disabled={mode !== "transient"} value={endTime} onChange={e => setEndTime(e.target.value)} /><small>s</small></div><div><span>Write interval</span><input type="number" min="0.001" step="0.1" disabled={mode !== "transient"} value={writeInterval} onChange={e => setWriteInterval(e.target.value)} /><small>s</small></div><div><span>Iteration ceiling</span><input type="number" min="10" step="10" value={maxIterations} onChange={e => setMaxIterations(e.target.value)} /></div><div><span>Residual target</span><input type="number" min="0.000000000001" step="0.000001" value={residualTarget} onChange={e => setResidualTarget(e.target.value)} /></div></div></div>
     {medium === "vacuum" && <p className="capability-warning"><AlertTriangle size={14} /> Vacuum disables convection. Airflow CFD is not applicable; radiation and solid conduction require a solver-supported model.</p>}
-    {validation && <div className={`thermal-validation ${validation.valid ? "valid" : "invalid"}`}><b>{validation.valid ? "Preflight passed" : "Preflight blocked"}</b><span>{validation.solver_ready ? "Worker reports the setup is solver-ready. This is not validation evidence." : validation.capability?.reason ?? "OpenFOAM availability or case capability has not been confirmed."}</span>{validation.issues.map((issue, index) => <small key={index}>{issue.severity}: {issue.message}</small>)}</div>}
+    {validation && <div className={`thermal-validation ${validation.valid ? "valid" : "invalid"}`}><b>{validation.valid ? "Preflight passed" : "Preflight blocked"}</b><span>{validation.solver_ready ? "Worker reports the setup is solver-ready. This is not validation evidence." : validation.capability?.reason ?? "Optional OpenFOAM availability or case capability has not been confirmed."}</span>{validation.issues.map((issue, index) => <small key={index}>{issue.severity}: {issue.message}</small>)}</div>}
     {preparedCase && <div className={`thermal-validation ${preparedCase.can_run ? "valid" : "invalid"}`}><b>{preparedCase.can_run ? "OpenFOAM case prepared" : "OpenFOAM case not runnable"}</b><span>{preparedCase.case_dir ? `Case directory: ${preparedCase.case_dir}` : preparedCase.message ?? "The worker did not return a case directory."}</span>{preparedCase.issues?.map((issue, index) => <small key={index}>{issue.severity}: {issue.message}</small>)}</div>}
     {runResult && <div className={`thermal-validation ${runResult.status === "completed" ? "valid" : "invalid"}`}><b>{runResult.status === "completed" ? "OpenFOAM run completed" : "OpenFOAM run did not complete"}</b><span>{runResult.message ?? runResult.result_contract ?? "No result-conversion summary was returned."}</span><small>Only worker-imported result fields may be interpreted as OpenFOAM output. No result is marked validated here.</small></div>}
     {estimate && <div className={`thermal-validation ${estimate.status === "completed" ? "valid" : "invalid"}`}><b>{estimate.status === "completed" ? "Compact estimate complete" : "Compact estimate blocked"}</b><span>{estimate.summary.max_steady_temperature_c.toFixed(1)} deg C maximum · {estimate.summary.total_power_w.toFixed(2)} W</span>{estimate.sources.map(source => <small key={source.id}>{source.id}: +{source.temperature_rise_c.toFixed(1)} deg C, {source.steady_temperature_c.toFixed(1)} deg C steady{source.time_constant_s ? `, tau ${source.time_constant_s.toFixed(1)} s` : ""}</small>)}<small>Approximate independent RC sources only; CFD, board spreading, coupling, airflow, radiation, and enclosure fields are not solved.</small></div>}
-    <div className="wizard-actions thermal-actions"><button className="secondary-btn" onClick={onClose}>Close</button><button className="secondary-btn" disabled={busy !== null} onClick={() => onScenario(scenario)}>Save setup</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design} onClick={() => void compactEstimate()}>{busy === "estimate" ? "Screening" : "Screen"}</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design} onClick={() => void preflightCase()}>{busy === "preflight" ? "Checking" : "Preflight"}</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design} onClick={() => void prepareCase()}>{busy === "prepare" ? "Preparing" : "Prepare case"}</button>{busy === "run" && <button className="secondary-btn" onClick={() => void cancelRun()}><X size={15} /> Cancel</button>}<button className="run-btn" disabled={busy !== null || !preparedCase?.can_run} onClick={() => void runCase()}><Play size={15} /> {busy === "run" ? "Running" : "Run OpenFOAM"}</button></div>
+    <div className="wizard-actions thermal-actions"><button className="secondary-btn" onClick={onClose}>Close</button><button className="secondary-btn" disabled={busy !== null} onClick={() => onScenario(scenario)}>Save setup</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design || activeBoundaries.length > 0} onClick={() => void compactEstimate()}>{busy === "estimate" ? "Screening" : "Screen"}</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design || activeBoundaries.length > 0} onClick={() => void preflightCase()}>{busy === "preflight" ? "Checking" : "Preflight"}</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design || activeBoundaries.length > 0} onClick={() => void prepareCase()}>{busy === "prepare" ? "Preparing" : "Prepare case"}</button>{busy === "run" && <button className="secondary-btn" onClick={() => void cancelRun()}><X size={15} /> Cancel</button>}<button className="run-btn" disabled={busy !== null || !preparedCase?.can_run || activeBoundaries.length > 0} onClick={() => void runCase()}><Play size={15} /> {busy === "run" ? "Running" : "Run OpenFOAM"}</button></div>
+    </details>
   </div></div>;
 }
 
@@ -4724,6 +4865,7 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
   const [operation, setOperation] = useState<OperationTiming | null>(null);
   const [operationClock, setOperationClock] = useState(Date.now());
   const [lastOperation, setLastOperation] = useState<{ kind: OperationKind; seconds: number; succeeded: boolean } | null>(null);
+  const activeOperationStartedAt = useRef<number | null>(null);
   const mode = analysisMode === "AC Impedance Sweep" ? "ac" : analysisMode === "Transient PI" ? "transient" : "dc";
   const admissionWorkload: AssemblyWorkload = mode === "dc" ? "pi_dc" : "pi_ac";
   const availableNets = board ? [...new Set(Object.values(board.nets).filter(Boolean))].sort((a, b) => a.localeCompare(b)) : [];
@@ -4757,6 +4899,7 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
       meshCells,
       jobs,
     };
+    activeOperationStartedAt.current = timing.startedAt;
     setOperationClock(timing.startedAt);
     setOperation(timing);
     onRunState(true, { label, elapsedSeconds: 0, estimateSeconds: timing.estimateSeconds });
@@ -4773,6 +4916,7 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
     const seconds = Math.max(0, (Date.now() - startedAt) / 1000);
     if (succeeded) recordOperationTiming(kind, seconds, meshCells, jobs);
     setLastOperation({ kind, seconds, succeeded });
+    if (activeOperationStartedAt.current === startedAt) activeOperationStartedAt.current = null;
     setOperation(null);
     onRunState(false);
     return seconds;
@@ -4780,6 +4924,10 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
   useEffect(() => {
     if (!operation) return;
     const update = () => {
+      // React may not have cleaned up this interval yet when finishOperation
+      // publishes the terminal state. Ignore that queued tick so it cannot
+      // change the parent back to Running after a result has been generated.
+      if (activeOperationStartedAt.current !== operation.startedAt) return;
       const now = Date.now();
       setOperationClock(now);
       onRunState(true, {
@@ -5888,9 +6036,15 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
     <div className="analysis-net-options" role="listbox" aria-label={label}>{choices.map(net => <button type="button" role="option" aria-selected={net === value} className={net === value ? "selected" : ""} key={net} onMouseEnter={() => previewViewportTarget({ kind: "net", net, label: net })} onClick={event => { onNet(net); previewViewportTarget(null); const details = event.currentTarget.closest("details"); if (details) details.open = false; }}><Network size={12} /><span>{net}</span></button>)}</div>
   </details>;
   const terminalRows = (kind: "sources" | "loads", unit: string, job?: BatchNetJob) => <div className="terminal-list">
-    <TerminalTable key={`${job?.id ?? "single"}-${kind}`} rows={job?.[kind] ?? setup[kind]}
+    <PiSiTerminalEditor key={`${job?.id ?? "single"}-${kind}`} rows={job?.[kind] ?? setup[kind]}
       label={`${kind === "sources" ? "Voltage sources" : "Current sinks"} · ${kind === "sources" ? sourceNetFor(job) : loadNetFor(job)}`}
       layers={layers} valueLabel={unit} transient={(job?.mode ?? mode) === "transient"}
+      addLabel={kind === "sources" ? "Add source" : "Add sink"}
+      pickActive={pickTarget?.kind === kind && pickTarget.jobId === job?.id}
+      selectionAvailable={Boolean(selected)}
+      onAdd={() => addTerminal(kind, job?.id)}
+      onTogglePick={() => setPickTarget(current => current?.kind === kind && current.jobId === job?.id ? null : { kind, jobId: job?.id })}
+      onUseSelection={() => placeFromSelection(kind, job?.id)}
       onChange={(id, patch) => updateTerminal(kind, id, {
         ...patch, ...("x" in patch || "y" in patch ? { anchorId: "", anchorType: "coordinate", net: kind === "sources" ? sourceNetFor(job) : loadNetFor(job) } : {}),
       }, job?.id)}
@@ -5900,15 +6054,21 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
         {terminalPadPicker(item, kind === "sources" ? sourceNetFor(job) : loadNetFor(job), `${job?.id ?? "single"}-${kind}-${item.id}`, padId => selectTerminalPad(kind, item.id, padId, job?.id))}
         <div className="terminal-scope">{item.layer && item.layer !== "auto" ? `Restricted to ${item.layer}` : item.anchorId ? `Anchored to ${item.anchorType} ${item.anchorId} across ${item.layers?.length ? item.layers.join(", ") : "its connected copper layers"}` : "Coordinate resolves on the selected net's connected conductor"}</div>
       </>} />
-    <div className="terminal-actions"><button className="secondary-btn" onClick={() => addTerminal(kind, job?.id)}><Plus size={14} /> Add {kind === "sources" ? "source" : "sink"}</button><button className={`secondary-btn ${pickTarget?.kind === kind && pickTarget.jobId === job?.id ? "selected" : ""}`} onClick={() => setPickTarget(current => current?.kind === kind && current.jobId === job?.id ? null : { kind, jobId: job?.id })}><Focus size={14} /> {pickTarget?.kind === kind && pickTarget.jobId === job?.id ? "Click exact copper point" : "Pick exact point"}</button><button className="secondary-btn" disabled={!selected} onClick={() => placeFromSelection(kind, job?.id)}>Use current selection</button></div>
   </div>;
   const returnTerminalRows = (kind: "sources" | "loads") => {
     const pickerKind = kind === "sources" ? "returnSources" : "returnLoads";
     return <div className="terminal-list">
-      <TerminalTable key={`return-${kind}`} rows={setup.returnPath[kind]}
+      <PiSiTerminalEditor key={`return-${kind}`} rows={setup.returnPath[kind]}
         label={`${kind === "sources" ? "Return references" : "Paired returns"} · ${setup.returnPath.net}`}
         layers={layers} valueLabel={kind === "sources" ? "Reference (V)" : "Paired current"}
-        readOnlyValue={kind === "loads" ? (_item, index) => setup.loads[index]?.value ? `${setup.loads[index].value} A return` : "Assign matching sink" : undefined}
+        addLabel={kind === "sources" ? "Add reference" : "Add paired return"}
+        pickActive={pickTarget?.kind === pickerKind}
+        activePickLabel="Click exact return point"
+        selectionAvailable={Boolean(selected)}
+        onAdd={() => addReturnTerminal(kind)}
+        onTogglePick={() => setPickTarget(current => current?.kind === pickerKind ? null : { kind: pickerKind })}
+        onUseSelection={() => placeReturnFromSelection(kind)}
+        readOnlyValue={kind === "sources" ? () => "0 V reference" : (_item, index) => setup.loads[index]?.value ? `${setup.loads[index].value} A return` : "Assign matching sink"}
         onChange={(id, patch) => updateReturnTerminal(kind, id, {
           ...patch, ...("x" in patch || "y" in patch ? { anchorId: "", anchorType: "coordinate", net: setup.returnPath.net } : {}),
         })}
@@ -5917,7 +6077,6 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
           {terminalPadPicker(item, setup.returnPath.net, `return-${kind}-${item.id}`, padId => selectReturnPad(kind, item.id, padId))}
           <div className="terminal-scope">{item.anchorId ? `Anchored to ${item.anchorType} ${item.anchorId} across its connected copper layers` : `Coordinate resolves on ${setup.returnPath.net || "the selected return net"}`}</div>
         </>} />
-      <div className="terminal-actions"><button className="secondary-btn" onClick={() => addReturnTerminal(kind)}><Plus size={14} /> Add {kind === "sources" ? "reference" : "paired return"}</button><button className={`secondary-btn ${pickTarget?.kind === pickerKind ? "selected" : ""}`} onClick={() => setPickTarget(current => current?.kind === pickerKind ? null : { kind: pickerKind })}><Focus size={14} /> {pickTarget?.kind === pickerKind ? "Click exact return point" : "Pick exact point"}</button><button className="secondary-btn" disabled={!selected} onClick={() => placeReturnFromSelection(kind)}>Use current selection</button></div>
     </div>;
   };
   const activeBatchJob = setup.batchJobs.find(job => job.id === selectedBatchId)
@@ -6094,10 +6253,13 @@ function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWor
   </div></div>;
 }
 
-function ExtensionManager({ extensions, result, harness, onHarnessChange, onClose, onRefresh, onRun }: {
+function ExtensionManager({ extensions, result, harness, trustBusy, trustError, onTrust, onHarnessChange, onClose, onRefresh, onRun }: {
   extensions: ExtensionCatalogEntry[];
   result: Record<string, unknown> | null;
   harness: Record<string, any> | null;
+  trustBusy: string | null;
+  trustError: string;
+  onTrust: (extensionId: string) => void;
   onHarnessChange: (value: Record<string, any>) => void;
   onClose: () => void;
   onRefresh: () => void;
@@ -6134,11 +6296,12 @@ function ExtensionManager({ extensions, result, harness, onHarnessChange, onClos
         <div className="extension-permissions"><label>PERMISSIONS</label><div>{selectedExtension.permissions.length ? selectedExtension.permissions.map(permission => <span key={permission}>{permission}</span>) : <span>None</span>}</div></div>
         {selectedExtension.permissions.includes("harness.read") && <HarnessDocumentEditor value={harness} onChange={onHarnessChange} />}
         {selectedExtension.id === "spike.mcad" && <McadOptions text={parameterText} onChange={setParameterText} onError={setParameterError} />}
-        {contributions.some(c => c.input_schema) && <details><summary>Extension options</summary><p>For mechanical exchange, use the assembly schema or explicit geometry overrides. For ODB++ use “step” to select a board and “directory”: true to choose an unpacked job. For connection lists, “column_map” maps schema fields to your column headers.</p><textarea aria-label="Extension import options" rows={4} value={parameterText} onChange={e => setParameterText(e.target.value)} /></details>}
+        {(contributions.some(c => c.input_schema) || contributions.some(c => c.point === "analyses")) && <details><summary>Extension options</summary><p>JSON options sent to the selected extension. Leave as an empty object when no options are needed.</p><textarea aria-label="Extension options JSON" rows={4} value={parameterText} onChange={e => setParameterText(e.target.value)} /></details>}
         {parameterError && <p role="alert">{parameterError}</p>}
-        <div className="extension-contributions"><label>CONTRIBUTIONS</label>{contributions.map(contribution => <div key={`${contribution.point}-${contribution.id}`}><span><b>{contribution.name}</b><small>{contribution.point.replace("_", " ")} · {contribution.description ?? contribution.id}</small></span><button disabled={!selectedExtension.trusted || selectedExtension.state === "disabled" || !["applications", "commands", "reports", "validators", "importers", "exporters", "harness_engines", "schemas"].includes(contribution.point)} onClick={() => run(contribution.id)}><Play size={12} /> Run</button></div>)}</div>
+        <div className="extension-contributions"><label>CONTRIBUTIONS</label>{contributions.map(contribution => <div key={`${contribution.point}-${contribution.id}`}><span><b>{contribution.name}</b><small>{contribution.point.replace("_", " ")} · {contribution.description ?? contribution.id}</small></span><button disabled={!selectedExtension.trusted || selectedExtension.state === "disabled" || !["applications", "commands", "reports", "validators", "importers", "exporters", "harness_engines", "schemas", "analyses", "panels"].includes(contribution.point)} onClick={() => run(contribution.id)}><Play size={12} /> Run</button></div>)}</div>
         {result && <div className="extension-output"><label>EXTENSION OUTPUT</label><div className="extension-output-title"><CheckCircle2 size={14} /><b>{String(result.title ?? "Extension completed")}</b></div>{resultView?.type === "property_table" && Array.isArray(resultView.rows) ? <table><thead><tr>{(resultView.columns ?? []).map((column, index) => <th key={index}>{String(column)}</th>)}</tr></thead><tbody>{resultView.rows.map((row, rowIndex) => <tr key={rowIndex}>{row.map((cell, cellIndex) => <td key={cellIndex}>{String(cell)}</td>)}</tr>)}</tbody></table> : ["spike/mcad-export/v1", "spike/artifact-export/v1"].includes((result.data as any)?.contract) ? <ExtensionArtifacts data={result.data as Record<string, any>} /> : <pre>{JSON.stringify(result.data ?? result, null, 2)}</pre>}</div>}
-        {!selectedExtension.trusted && <div className="stack-warning"><ShieldAlert size={15} /> This extension is catalogued but cannot execute until its ID is explicitly trusted. Process separation is not a complete operating-system sandbox.</div>}
+        {!selectedExtension.trusted && <div className="stack-warning"><ShieldAlert size={15} /><span>Trusting this extension allows its local code to execute with the listed permissions for this session. Process separation is not a complete operating-system sandbox.</span><button type="button" disabled={trustBusy !== null || selectedExtension.state === "disabled"} onClick={() => onTrust(selectedExtension.id)}>{trustBusy === selectedExtension.id ? "Trusting…" : "Trust for session"}</button></div>}
+        {trustError && <p role="alert">{trustError}</p>}
       </> : <div className="extension-empty">No extensions are installed. Add a package root through SPIKE_EXTENSION_PATH and refresh.</div>}</div>
     </div>
     <div className="extension-footer"><span>Third-party JavaScript is never injected into the SPIKE webview.</span><button className="secondary-btn" onClick={onClose}>Close</button></div>

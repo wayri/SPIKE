@@ -767,7 +767,7 @@ explicit-netlist circuit adapter.
 
 ### Parallel SPIKES generic FEM runtime handoff
 
-`D:\workspace\SPIKES` is the separately developed native generic solver
+`D:\PROJECTS-DEV\SPIKES` is the separately developed native generic solver
 suite. Its current Milestone 0 process boundary now declares deterministic 1D
 diffusion and 2D triangular stationary/transient FEM verification workloads in
 addition to capability probing and self-tests. It also declares two explicitly

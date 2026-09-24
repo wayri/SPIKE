@@ -31,6 +31,12 @@
 .si-flow pre { white-space: pre-wrap; word-break: break-word; background: #101a29; padding: 12px; max-height: 400px; overflow: auto; font-size: 11px; }
 .si-flow details { margin: 14px 0; }
 .si-flow summary { cursor: pointer; padding: 8px 0; }
+.si-parameter-field { min-width: 0; display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
+.si-flow .si-parameter-field details { position: relative; margin: 0; min-width: 0; }
+.si-flow .si-parameter-field summary { box-sizing: border-box; width: 100%; min-height: 37px; padding: 8px 10px; border: 1px solid #62748a; border-radius: 4px; color: #f1f5f9; background: #111d2e; }
+.si-parameter-options { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; width: 100%; max-height: min(240px, 42vh); overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 4px; box-sizing: border-box; padding: 6px; border: 1px solid #62748a; border-radius: 4px; background: #111d2e; box-shadow: 0 12px 30px #0009; }
+.si-flow .si-parameter-options button { justify-content: center; min-height: 32px; padding: 4px 8px; }
+.si-flow .si-parameter-options button[aria-current="true"] { border-color: #f0bf67; color: #f0bf67; background: #2b281d; }
 .si-plot { border: 1px solid #334155; background: #101c2c; padding: 8px 12px; margin: 14px 0; border-radius: 6px; }
 .si-plot h4 { margin: 6px 0; font-size: 13px; color: #e2e8f0; }
 .si-plot-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

@@ -9,6 +9,7 @@ from typing import Any, Dict
 
 from .assembly_analysis_scope import attach_scope_provenance, write_case_scope
 from .contracts import AnalysisResult, AnalysisSpec, DesignIR, ValidationIssue
+from .component_thermal import run_component_thermal
 from .external_engines import prepare_openems_case, run_openems_case
 from .models import (
     build_model_manifest,
@@ -62,6 +63,8 @@ def handle_simulation_request(
         return {"ok": True, "result": validate_scenario(ThermalScenario(**params["scenario"]))}
     if method == "estimate_thermal":
         return {"ok": True, "result": estimate_compact_thermal(ThermalScenario(**params["scenario"]))}
+    if method == "run_component_thermal":
+        return {"ok": True, "result": attach_scope_provenance(run_component_thermal(params), assembly_scope)}
     if method == "plan_thermal_field_job":
         # Solver descriptors come from the worker-owned catalog.  A client may
         # select a solver ID but cannot inject its own qualification claims.

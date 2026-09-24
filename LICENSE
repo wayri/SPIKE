@@ -14,21 +14,15 @@ IMPORTANT: This repository does not currently have one blanket license.
    copyright and license terms. They are not relicensed by SPIKE. See
    THIRD_PARTY_NOTICES.md and the license files shipped with each component.
 
-4. Commercial SPIKE binary distributions and proprietary modules may be
-   offered under the SPIKE Commercial End User License Agreement. The current
-   legal-review draft is licenses/SPIKE-COMMERCIAL-EULA-DRAFT.md. It does not
-   replace an open-source license that applies to a component.
-
-5. For material that has no applicable open-source license, no permission is
+4. For material that has no applicable open-source license, no permission is
    granted by this notice beyond rights required by law. Such material is all
    rights reserved, but only to the extent that the applicable SPIKE licensor
    owns or is authorized to license it.
 
-6. Contributor and asset provenance cannot be established from this workspace
+5. Contributor and asset provenance cannot be established from this workspace
    because its Git history is unavailable. A commercial release must not rely
    on this notice as proof of ownership. The release gate in LICENSING.md must
    be completed first.
 
 This notice is not legal advice and is not a substitute for review by qualified
 intellectual-property and commercial counsel.
-

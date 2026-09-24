@@ -345,7 +345,7 @@ export const defaultResultVisualization = (): ResultVisualization => ({
   sceneMode: "opaque",
   showComponentModels: true,
   plotStyle: "flat",
-  fieldStyle: "cells",
+  fieldStyle: "smooth",
   waveHeightScale: 1,
   fusingAmbientC: 25,
   fusingDurationS: 1,

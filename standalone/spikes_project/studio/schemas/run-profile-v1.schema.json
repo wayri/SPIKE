@@ -4,6 +4,7 @@
   "required":["contract","name","execution","analysis","method","time_step","stop_time","uic","capture_samples","speed_ratio","electrical_temperature_c"],
   "properties":{
     "contract":{"const":"spikes/run-profile/v1"},"name":{"type":"string","minLength":1,"maxLength":128},
+    "backend":{"enum":["native","ngspice"],"default":"native","description":"Optional for v1 migration; absent profiles retain the owned native backend."},
     "execution":{"enum":["batch","continuous"]},"analysis":{"enum":["from_netlist","transient","operating_point"]},
     "method":{"enum":["hybrid_trapezoidal","backward_euler","bdf2"]},
     "time_step":{"type":"string"},"stop_time":{"type":"string"},"uic":{"type":"boolean"},
@@ -11,5 +12,6 @@
     "speed_ratio":{"type":"number","exclusiveMinimum":0,"maximum":1000000},
     "electrical_temperature_c":{"type":["number","null"],"exclusiveMinimum":-273.15,"maximum":2000}
   },
-  "description":"Runtime validation also checks SPICE time units, step <= stop and continuous/transient compatibility. Overrides do not modify circuit source. Speed and capture settings apply only to continuous mode."
+  "allOf":[{"if":{"properties":{"backend":{"const":"ngspice"}},"required":["backend"]},"then":{"properties":{"execution":{"const":"batch"}}}}],
+  "description":"Runtime validation also checks SPICE time units, step <= stop and continuous/transient compatibility. Overrides do not modify circuit source. ngspice is explicit, self-contained and batch-only; missing backend means native. Speed and capture settings apply only to native continuous mode."
 }

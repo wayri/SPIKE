@@ -178,7 +178,7 @@ class WindowsReleaseProvenanceImplementationTests(unittest.TestCase):
             "contract": "spike/windows-installer-manifest/v2", "product": "SPIKE",
             "version": "0.2.0", "application_version": "0.2.0-alpha.1",
             "channel": "production-candidate", "release_state": "production-candidate",
-            "license_key_id": "fixture-key", "production_qualified": False,
+            "production_qualified": False,
             "generated_at": "2026-08-27T00:00:00Z",
             "signing_policy": {
                 "required": True, "expected_signer_thumbprint": "A" * 40,

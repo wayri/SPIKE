@@ -23,6 +23,9 @@ assert.match(styles, /data-shared-stage="solve"[^}]*option\[value="surface_2_5d"
 assert.match(styles, /data-shared-stage="mesh"[^}]*\.pi-dialog-actions \.run-btn/s, "Mesh must not expose the solver run action");
 assert.match(app, /tab === "Mesh" && !selected[\s\S]{0,500}Solver selection and execution are available in the Solve tab/, "Mesh must replace the solver inspector with mesh-specific controls");
 assert.match(app, /<div hidden=\{!sparameterOpen\}><SParameterWorkbench/, "SI setup must remain mounted while shared tabs are selected");
+assert.match(app, /label="Ports" onClick=\{\(\) => openSiWorkbench\("workflow", "ports"\)\}/, "SI ports must open source and receiver assignments");
+assert.match(app, /label="NEXT \/ FEXT" onClick=\{\(\) => openSiWorkbench\("geometry", "crosstalk"\)\}/, "NEXT/FEXT must open a runnable coupled channel setup");
+assert.match(app, /siWorkspace\s*\? <div className="results-strip"/, "SI workspace must show SI status rather than stale PI metrics");
 assert.doesNotMatch(app, /const terminal = activity\.phase[\s\S]{0,180}setAnalysisRunning\(false\)/, "unrelated worker terminal events must not clear global analysis state");
 assert.match(app, /activity\.heavy[\s\S]{0,500}current\?\.id === activity\.operationId \? null : current/, "heavy worker completion must clear only its matching operation ID");
 assert.match(app, /const universalRunning = analysisRunning \|\| Boolean\(activeWorkerOperation\)/, "universal Stop must include local and tracked heavy work");

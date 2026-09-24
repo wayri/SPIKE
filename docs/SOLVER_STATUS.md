@@ -3,6 +3,11 @@
 This file describes executable behavior. Catalog entries marked unavailable are
 architecture contracts, not implemented physics.
 
+The [external analysis extension path](EXTENSION_ANALYSIS_API.md) now admits
+design-bound, finite `spike/v1` results into the desktop viewer and reports.
+This is an integration capability. The host does not qualify an external
+solver's physical method or turn imported field samples into validated data.
+
 For governing equations, implementation links and evidence interpretation, see
 the [solver handbook](SOLVER_HANDBOOK.md). The [annotated research references](SOLVER_REFERENCES.md)
 distinguish recorded method lineage from external tools, datasets and future candidates.
@@ -91,10 +96,27 @@ bases outside filled copper. The current opt-in runtime fails that Marble AC
 request with `PEEC_ZONE_BASIS_OUTSIDE_COPPER` before native integration;
 historical positive-energy matrices are not qualified board results. The
 original C383.1 terminal is physically disconnected. Geometry, contact,
-capacitance, mesh-refinement and deployment gates remain open. The revised
-zone/pad C estimator avoids internal-link double counting for a narrow simple
-geometry subset, but returns `unsupported`/0 F for ambiguous Marble copper;
-this is not a measured or field-derived capacitance. MODULAR-BUS-NIB
+capacitance, mesh-refinement and deployment gates remain open. The earlier
+zone/pad C estimator returns `unsupported`/0 F for ambiguous Marble copper.
+The newer opt-in volume dispatcher uses an experimental unique-source-area
+surrogate instead; its direct Marble sparse-DC audit reports about 3.82 pF,
+but source/via coverage is incomplete and the AC request still fails the
+zone-support gate before native integration. Neither value is a measured or
+field-derived capacitance. The conforming geometry prototype is not wired
+into production: its 32k–38k branches exceed the 8,192-pair dense field cap,
+its current two-point DC refinement does not converge monotonically, and the
+native pair kernel does not handle spatially separate annular via barrels.
+An isolated hybridized RT0 sparse-DC experiment passes finite-contact,
+conservation and affine patch fixtures but is not registered. Pinned Marble
+1/0.5/0.25 mm resistance is 4.8841/4.4545/4.2806 mOhm, so its final
+refinement change is still 4.06% against the 2% gate. Fixed-copper contact
+refinement changes less than 0.1%, while a bounded interior-cell diagnostic
+changes the result materially; neither is a qualified solution.
+An isolated spectral-energy prototype passes small mixed-geometry tests but is
+not integrated: finite-domain quadrature has no certified error bound and
+Marble-scale work remains unmeasured.
+See [the refinement repair record](validation/PEEC_REFINEMENT_REPAIR.md).
+MODULAR-BUS-NIB
 AC/DC convergence remain blocked; transient now rejects negative-energy modes
 instead of projecting the matrix. Do not infer readiness from preflight alone.
 The [PEEC safety policy](PEEC_SAFETY_POLICY.md) records native admission,
@@ -425,6 +447,13 @@ capacitance, MNA, failed-result/export and reviewed-port checks plus local rollo
   SIMPLIS, PSpice, and other engines require equal-model/equal-tolerance
   accuracy gates before timing results can be published.
 
+SPIKES Studio's engineering-preview run profile now selects the owned C++
+backend or the process-isolated ngspice compatibility adapter explicitly.
+Legacy profiles remain native. The ngspice Studio route is self-contained and
+batch-only; it maps only complete real transient voltage vectors to plots, while
+retaining raw vectors and solver-dependent status. It is not general vendor
+model qualification, full dialect parity, or a release-ready desktop workflow.
+
 ### Parallel-diode electrothermal sharing reference
 
 - State: implemented as `reference_qualification_only`; it is not general MNA
@@ -699,9 +728,10 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
 
 | Integration | Current executable state | Validation boundary |
 |---|---|---|
+| SPIKE object thermal network | Built-in local worker solves steady and transient object temperatures from explicit power, heat capacity, top/bottom paths, and per-object or named-face conduction, convection, and radiation boundaries; BOM CSV/TSV and ODB++ named property mapping are available in the GUI | Approximate lumped nodes, including explicit interobject conduction; face labels do not resolve spatial gradients. No geometry-derived path, board spreading, airflow, radiation view factors, CFD, or spatial temperature field; analytical checks do not establish measured-board correlation |
 | openEMS | Runnable through the isolated desktop adapter when discovery and preflight pass | Simple-patch reference fixture only; arbitrary PCB and compliance remain unvalidated |
 | OpenFOAM | v2606 is installed in Ubuntu 24.04 WSL; deterministic steady open-air natural/forced convection cases run through bounded fixed-argv processes and import aligned T/U/p cell fields | Experimental air-domain surrogate only; no PCB solids, conjugate heat transfer, advanced environments, mesh/energy validation, or measured correlation |
-| Siemens FloTHERM | No entitlement or adapter is present | Future licensed connector only; SPIKE cannot bundle or activate it without customer entitlement |
+| Siemens FloTHERM | No adapter is present | Future connector only; SPIKE cannot bundle or activate the customer-provided runtime without permitted automation rights |
 | FreeCAD | ECAD/MCAD workbench and inert exchange contracts are implemented; local FreeCAD kernel smoke passes | Geometry exchange is not solver or product validation |
 | sparseLizard | Native Windows self-test runtime compiled without WSL; DesignIR translation for DC, AC/RLCG, thermal, and field case contracts, process isolation/cancellation, strict result conversion, and qualification reporting are implemented | The installed executable is not the production PCB adapter. Its legacy manifest is unsigned, PETSc does not expose MUMPS, and no PCB fixture evidence is installed, so arbitrary PCB execution remains disabled |
 | PETSc/MUMPS | Native Windows PETSc/SLEPc and standalone MUMPS libraries are packaged for the sparseLizard development runtime, but that PETSc build does not register MUMPS as a factorization backend | PETSc LU runs the bounded DC fixture; a PETSc build configured with MUMPS plus equivalence/performance qualification is still required |

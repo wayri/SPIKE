@@ -23,3 +23,11 @@ class Sequences(unittest.TestCase):
         with self.assertRaises(ValueError):validate([s,s])
         s['entries'][1]['profile']['execution']='continuous'
         with self.assertRaises(ValueError):validate([s])
+
+    def test_explicit_compatibility_job_preserves_backend(self):
+        sequence=self.sequence()
+        sequence['entries'][0]['profile']['backend']='ngspice'
+        jobs=plan(RC_DECK,sequence,0)
+        self.assertEqual(jobs[0]['profile']['backend'],'ngspice')
+        with self.assertRaisesRegex(ValueError,'Unsafe ngspice directive'):
+            plan(RC_DECK.replace('.end','.include vendor.lib\n.end'),sequence,0)

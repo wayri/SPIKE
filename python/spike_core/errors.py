@@ -8,7 +8,6 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Any, Mapping
 from .error_catalog_pi import PI_ERROR_SPECS
-from .error_catalog_security import SECURITY_ERROR_SPECS
 ERROR_CONTRACT = "spike/error/v1"
 class ErrorOrigin(str, Enum):
     """The process tier that first detected an event."""
@@ -527,16 +526,6 @@ _CATALOG_ENTRIES = (
         user_action=user_action,
     )
     for code, title, message, recoverable, retryable, user_action in PI_ERROR_SPECS
-) + tuple(
-    _metadata(
-        code,
-        title,
-        message,
-        recoverable=recoverable,
-        retryable=retryable,
-        user_action=user_action,
-    )
-    for code, title, message, recoverable, retryable, user_action in SECURITY_ERROR_SPECS
 )
 
 

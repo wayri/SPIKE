@@ -531,106 +531,6 @@
       "classification": "E"
     },
     {
-      "code": "SPIKE-BE-SECURITY-E-0001",
-      "title": "License claims invalid",
-      "message": "Required entitlement claims are missing, inconsistent, or unsupported.",
-      "action": "Correct the issuer claims and issue a new signed entitlement.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-E-0002",
-      "title": "License product mismatch",
-      "message": "The entitlement targets a different product or incompatible major version.",
-      "action": "Use an entitlement issued for this SPIKE product major version.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-E-0003",
-      "title": "License validity period rejected",
-      "message": "The entitlement is not yet valid or has expired.",
-      "action": "Renew the entitlement or correct the trusted system clock before activating again.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-E-0004",
-      "title": "License storage failed",
-      "message": "The desktop host could not read, stage, replace, or remove the local entitlement.",
-      "action": "Check per-user application-data permissions and available disk space, then retry.",
-      "recoverable": true,
-      "retryable": true,
-      "domain": "SECURITY",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-E-0005",
-      "title": "License not installed",
-      "message": "No signed entitlement is installed for the current machine and user.",
-      "action": "Activate a signed temporary, timed, perpetual, or developer entitlement.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-E-0006",
-      "title": "Licensed capability required",
-      "message": "The installed entitlement does not grant the requested protected operation.",
-      "action": "Install an entitlement containing the required capability or continue in viewer mode.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-S-0001",
-      "title": "License issuer trust unavailable",
-      "message": "The desktop build has no usable pinned license issuer key.",
-      "action": "Install an official SPIKE build containing the expected issuer public key.",
-      "recoverable": false,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "S"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-S-0002",
-      "title": "License envelope invalid",
-      "message": "The entitlement envelope is malformed, unsupported, or exceeds its safety limit.",
-      "action": "Obtain a fresh entitlement from an authorized SPIKE issuer.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "S"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-S-0003",
-      "title": "License signature invalid",
-      "message": "The entitlement signature does not verify against the pinned issuer key.",
-      "action": "Do not use the entitlement; obtain a fresh signed entitlement from an authorized issuer.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "S"
-    },
-    {
-      "code": "SPIKE-BE-SECURITY-S-0004",
-      "title": "License device binding mismatch",
-      "message": "The entitlement is bound to a different machine or operating-system user.",
-      "action": "Deactivate the previous seat or issue a new entitlement for this device-user binding.",
-      "recoverable": true,
-      "retryable": false,
-      "domain": "SECURITY",
-      "classification": "S"
-    },
-    {
       "code": "SPIKE-BE-SOLVER-E-0001",
       "title": "Solver unavailable",
       "message": "No installed solver satisfies the requested capability and validity policy.",
@@ -878,16 +778,6 @@
       "recoverable": true,
       "retryable": true,
       "domain": "PROJECT",
-      "classification": "E"
-    },
-    {
-      "code": "SPIKE-FE-SECURITY-E-0001",
-      "title": "Desktop license service unavailable",
-      "message": "The licensing operation requires the native SPIKE desktop host.",
-      "action": "Open the installed SPIKE desktop application and retry the licensing operation.",
-      "recoverable": true,
-      "retryable": true,
-      "domain": "SECURITY",
       "classification": "E"
     },
     {

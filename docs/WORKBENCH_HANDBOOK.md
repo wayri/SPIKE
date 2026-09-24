@@ -138,9 +138,9 @@ See [Visualization and limits](RESULT_VISUALIZATION_AND_LIMITS.md).
 
 Preview the engineering report after selecting the relevant PI, SI or Thermal workspace. Verify result identity, model status, units, numerical warnings, plots and provenance. Print/PDF uses the report preview's print action. Probe CSV exports measurements; Touchstone exports network data; SPICE exports the explicit circuit; STEP exports available mechanical geometry. Save instance retains a project revision. Export buttons do not create solver results.
 
-Accuracy and validation runs the installed benchmark corpus. Inspect the individual check and tolerance; a passing corpus does not validate every model or every physical regime. External Engine Center distinguishes detection, registration, readiness and qualification. Settings includes interface, visualization, resource and shortcut preferences. A license grants capabilities and does not change numerical validity.
+Accuracy and validation runs the installed benchmark corpus. Inspect the individual check and tolerance; a passing corpus does not validate every model or every physical regime. External Engine Center distinguishes detection, registration, readiness and qualification. Settings includes interface, visualization, resource and shortcut preferences.
 
-See [Solver Manager](SOLVER_MANAGER.md), [Validation program](VALIDATION_PROGRAM.md), [Settings and users](LICENSING_AND_USERS.md), and [Troubleshooting](../TROUBLESHOOTING.md).
+See [Solver Manager](SOLVER_MANAGER.md), [Validation program](VALIDATION_PROGRAM.md), and [Troubleshooting](../TROUBLESHOOTING.md).
 
 ## CLI and repeatable automation
 

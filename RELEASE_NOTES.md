@@ -1,5 +1,22 @@
 # SPIKE Release Notes
 
+## SPIKE desktop 0.2.13 — engineering preview
+
+**Channel:** unsigned engineering preview; not production or physics signoff qualified.
+
+- Adds an in-app Python workspace with script open/save, run/stop, bounded
+  output, board/result context, worker automation, and checked field publishing.
+- Adds design-bound external analysis results through the extension SDK,
+  result viewer, project history, and reports; external packages can be
+  explicitly trusted for the current session.
+- Improves PI/SI result presentation and input editing, loaded SI/NEXT/FEXT
+  controls, thermal boundary/input workflows, viewport fields, navigation,
+  layer visibility, and result-panel recovery.
+- Includes experimental numerical changes. External and internal solver
+  output still requires model-specific validation and knowledgeable human
+  review before engineering signoff.
+
+
 ## Development — result display and probe workspace
 
 - Geometry-based smooth fields replace blurred scalar overlays; connected
@@ -355,7 +372,7 @@ installer and installed-image evidence is recorded separately after verification
 **Status:** unsigned engineering preview; installed for the current Windows user
 
 - Built MSI and NSIS installers from the current tree and installed the NSIS
-  current-user package at `C:\Users\example\AppData\Local\Programs\SPIKE`.
+  current-user package at `C:\Users\yawar\AppData\Local\Programs\SPIKE`.
 - Packaged-worker verification passes all 1,084 declared file hashes, 15/15
   native benchmarks, and 8/8 source/package runtime-parity checks. The installed
   desktop executable exactly matches the release executable.
@@ -524,7 +541,7 @@ This release establishes the foundational architecture and operational protocols
 ### 1. Initialize Python Environment
 
 ```powershell
-cd C:\Users\example\Documents\agws\KiCAD_plugins\SPIKE
+cd C:\Users\yawar\Documents\agws\KiCAD_plugins\SPIKE
 python infra/aether_boot.py --init
 ```
 
@@ -642,7 +659,7 @@ All C++ solver methods throw `std::runtime_error("Not yet implemented")`. This i
 
 ## 🔗 Additional Resources
 
-- **Project Root:** `C:\Users\example\Documents\agws\KiCAD_plugins\SPIKE`
+- **Project Root:** `C:\Users\yawar\Documents\agws\KiCAD_plugins\SPIKE`
 - **Session Tracker:** `ccd_tracker.json`
 - **Architecture Docs:** `ARCHITECTURE.md`
 - **Development Guide:** `DEVELOPMENT.md`

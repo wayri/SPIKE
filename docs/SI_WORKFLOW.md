@@ -13,6 +13,28 @@ tab. The Python worker owns calculations and validates every study. Browser
 preview supports configuration and saved-result visualization; execution uses
 the desktop worker.
 
+The **HF / SI** tab now selects SI setup and results in the main dock instead of
+retaining PI solver controls and metrics. **NEXT / FEXT** opens the geometry
+channel tab with a required separate victim net; the bounded solver reports
+source-to-victim-near and source-to-victim-far transfer. **Ports** opens the
+loaded workflow's source/receiver assignment page; these are channel ports,
+not PI measurement probes. **Eye diagram** and **PAM4** open runnable geometry
+channel settings with the corresponding modulation. Mesh and Solve with the SI
+domain selected open the same SI workflow. Choose the exact signal, victim,
+reference net and copper layer before running; no net pair is inferred as a
+qualified crosstalk path.
+
+Opening a named protocol suite or channel profile selects the geometry/protocol
+tab and its preset. Both loaded studies and geometry/protocol runs offer a
+Stop action while their worker is active; worker failures restore the Run
+action and retain their diagnostic. Browser preview disables worker execution
+and IBIS inspection with an explanation. Setup imports are disabled during a
+loaded run so its returned result remains associated with the submitted setup.
+New source/receiver rows use unused channel ports, and network edit defaults
+follow the known channel port count. A partial loaded result remains partial
+in the completion message; inspect its blocked time-domain or export reason
+before using that stage.
+
 PAM4 finite-record analysis excludes symbols whose delayed sample falls beyond
 the computed response. All phases use the same supported population and fewer
 than 64 symbols fails explicitly; increase the source length when needed.
@@ -135,7 +157,7 @@ Methods: `si_workflow_catalog`, `inspect_si_ibis`, `run_si_workflow`.
 Results use `spike/si-workflow-result/v1`, retain the complete request and its
 SHA256, and always set `production_qualified: false` and
 `compliance_status: not_evaluated`. The desktop routes execution through the
-heavy worker and existing `si.solve` entitlement.
+heavy worker and a compatible solver.
 
 Bounds: 2–16 ports, up to 8193 frequency points, 64 attached passives, 32 network
 edits, 128–2048 bits, and 1,048,576 waveform samples. Larger arbitrary topology,

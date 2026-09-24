@@ -163,7 +163,7 @@ double mutual_oracle(const TrianglePrism& a,const TrianglePrism& b,int order) {
 }
 void separated_integrals() {
   const auto a=triangle(),b=triangle(1,10);MutualOptions options;
-  options.relative_tolerance=0.03;
+  options.relative_tolerance=0.001;
   const double reference=mutual_oracle(a,b,8);
   near(reference,mutual_oracle(a,b,4),1e-9,"Independent reference refinement");
   const auto result=separated_mutual(a,b,options);
@@ -203,6 +203,99 @@ void separated_integrals() {
   std::cout<<"affine far mutual="<<result.inductance_h<<" reference="<<reference
            <<" bound="<<result.error_bound_estimate_h<<" evaluations="<<result.pair_evaluations<<'\n';
 }
+// Independent self-energy reference for the unit cube with constant density.
+// Difference coordinates reduce the six-dimensional integral to
+// 8*integral_[0,1]^3 (1-x)(1-y)(1-z)/sqrt(x*x+y*y+z*z).
+// Split into three largest-coordinate sectors: (x,y,z)=(s,s*u,s*v).
+// The s integral is 1/6-(u+v)/12+u*v/20, leaving smooth 2D quadrature.
+double cube_oracle(int order) {
+  double sum=0;
+  for(auto [u,wu]:gauss(order))for(auto [v,wv]:gauss(order))
+    sum+=wu*wv*(1.0/6-(u+v)/12+u*v/20)/std::sqrt(1+u*u+v*v);
+  return 24e-7*sum;
+}
+// Same difference-domain reduction for b=(x,y,0): integrating x*x' over
+// their overlap gives F(d)=integral_d^1 x*(x-d) dx=1/3-d/2+d^3/6.
+// Each largest-coordinate sector has a degree-six polynomial in s after
+// the singularity cancels, so four-point Gauss is exact in that coordinate.
+double affine_cube_oracle(int order) {
+  double sum=0;
+  auto f=[](double d){return 1.0/3-d/2+d*d*d/6;};
+  for(auto [u,wu]:gauss(order))for(auto [v,wv]:gauss(order))for(auto [s,ws]:gauss(4))
+    for(std::size_t sector=0;sector<3;++sector) {
+      Vector d{};d[sector]=s;d[(sector+1)%3]=s*u;d[(sector+2)%3]=s*v;
+      const double numerator=(f(d[0])*(1-d[1])+f(d[1])*(1-d[0]))*(1-d[2]);
+      sum+=wu*wv*ws*s*numerator/std::sqrt(1+u*u+v*v);
+    }
+  return 8e-7*sum;
+}
+void singular_integrals() {
+  TrianglePrism a{{Point{0,0},Point{1,0},Point{0,1}},0,1,
+                   {Vector{1,0,0},Vector{1,0,0},Vector{1,0,0}}};
+  TrianglePrism b{{Point{1,1},Point{0,1},Point{1,0}},0,1,a.density_per_a};
+  MutualOptions o;o.relative_tolerance=0.25;o.max_pair_evaluations=200001;
+  o.max_cells=100001;
+  const auto self=mutual(a,a,o),cross=mutual(a,b,o),other=mutual(b,b,o);
+  std::cout<<"singular self status="<<int(self.status)<<" value="<<self.inductance_h
+           <<" error="<<self.error_bound_estimate_h<<" evaluations="<<self.pair_evaluations
+           <<" cross status="<<int(cross.status)<<" error="<<cross.error_bound_estimate_h<<'\n';
+  require(cross.status==MutualStatus::converged,"Shared-face integration admission");
+  // This intentionally retains the failed tight self admission. Finite
+  // singular envelopes are useful evidence, not a production-accuracy claim.
+  // Strict MSVC run: 200001 evaluations yield 5.46505e-8 H with a
+  // 1.97691e-8 H envelope, insufficient even for this 25% relative target.
+  require(self.status==MutualStatus::resource_limit && other.status==MutualStatus::resource_limit,
+          "Self integration must preserve unmet tolerance under its cap");
+  const double reference=cube_oracle(16);
+  near(reference,cube_oracle(8),1e-11,"Singular cube reference convergence");
+  require(std::abs(self.inductance_h+other.inductance_h+2*cross.inductance_h-reference)<=
+          self.error_bound_estimate_h+other.error_bound_estimate_h+2*cross.error_bound_estimate_h,
+          "Independent cube singular-energy enclosure");
+  near(cross.inductance_h,mutual(b,a,o).inductance_h,1e-13,"Singular reciprocity");
+  near(cross.inductance_h,-mutual(a,reverse(b),o).inductance_h,1e-13,
+       "Singular orientation reversal");
+  auto overlap=a;for(auto& p:overlap.vertices_m)p[0]+=0.25;
+  const auto overlapping=mutual(a,overlap,o);
+  require(overlapping.status!=MutualStatus::unsupported_separation &&
+          std::isfinite(overlapping.error_bound_estimate_h),"Finite overlapping enclosure");
+  near(overlapping.inductance_h,mutual(overlap,a,o).inductance_h,1e-13,
+       "Overlapping support reciprocity");
+  auto zero=a;zero.density_per_a={};
+  require(mutual(a,zero).inductance_h==0 && mutual(a,zero).status==MutualStatus::converged,
+          "Zero affine field singular integral");
+  o.max_pair_evaluations=1;
+  const auto coarse=mutual(a,a,o);
+  require(coarse.status==MutualStatus::resource_limit && coarse.pair_evaluations==1,
+          "Singular budget must fail closed");
+  require(self.error_bound_estimate_h<coarse.error_bound_estimate_h,
+          "Singular refinement reduces conservative envelope");
+  o.max_pair_evaluations=32767;
+  const auto middle=mutual(a,a,o);
+  require(self.error_bound_estimate_h<middle.error_bound_estimate_h &&
+          middle.error_bound_estimate_h<coarse.error_bound_estimate_h,
+          "Three-level singular envelope refinement");
+  const auto affine=triangle();
+  const auto affine_self=mutual(affine,affine,o);
+  near(affine_self.inductance_h,-mutual(affine,reverse(affine),o).inductance_h,1e-12,
+       "Affine self orientation reversal");
+  near(affine_self.inductance_h,mutual(rotate_translate(affine),rotate_translate(affine),o).inductance_h,
+       1e-12,"Singular rigid transform");
+  near(2*affine_self.inductance_h,mutual(triangle(2),triangle(2),o).inductance_h,
+       1e-12,"Singular SI scaling");
+  a.density_per_a={Vector{0,0,0},Vector{1,0,0},Vector{0,1,0}};
+  b.density_per_a={Vector{1,1,0},Vector{0,1,0},Vector{1,0,0}};
+  const auto aa=mutual(a,a,o),ab=mutual(a,b,o),bb=mutual(b,b,o);
+  const double affine_reference=affine_cube_oracle(16);
+  near(affine_reference,affine_cube_oracle(8),1e-10,"Affine singular oracle convergence");
+  const double affine_value=aa.inductance_h+2*ab.inductance_h+bb.inductance_h;
+  const double affine_error=aa.error_bound_estimate_h+2*ab.error_bound_estimate_h+bb.error_bound_estimate_h;
+  require(std::abs(affine_value-affine_reference)<=affine_error,
+          "Independent affine cube singular-energy enclosure");
+  std::cout<<"cube independent reference="<<reference<<" assembled="
+           <<self.inductance_h+other.inductance_h+2*cross.inductance_h
+           <<" affine cube="<<affine_value<<" reference="<<affine_reference
+           <<" bound="<<affine_error<<'\n';
+}
 void unsupported_and_invalid() {
   const auto p=triangle();
   for(const auto& q:{p,triangle(1,1),triangle(1,0.5)})
@@ -230,7 +323,7 @@ void unsupported_and_invalid() {
 } // namespace
 int main() {
   try {
-    moments_and_flux();separated_integrals();unsupported_and_invalid();
+    moments_and_flux();separated_integrals();singular_integrals();unsupported_and_invalid();
     std::cout<<"Affine triangular-prism bounded-subset checks passed\n";
     return 0;
   }catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}

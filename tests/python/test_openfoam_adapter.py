@@ -136,7 +136,7 @@ class OpenFoamAdapterTests(unittest.TestCase):
         runtime = {"launcher": "C:/Windows/System32/wsl.exe", "distribution": "Ubuntu"}
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
         with patch("python.spike_core.openfoam.subprocess.run", return_value=completed) as spawned:
-            path = _wsl_case_path(runtime, Path(r"C:\\Users\\example\\AppData\\Local\\Temp\\case"))
+            path = _wsl_case_path(runtime, Path(r"C:\\Users\\yawar\\AppData\\Local\\Temp\\case"))
         self.assertEqual(path, "/mnt/c/Users/yawar/AppData/Local/Temp/case")
         self.assertEqual(spawned.call_args.args[0][-3:], ["test", "-d", path])
         self.assertFalse(spawned.call_args.kwargs["shell"])

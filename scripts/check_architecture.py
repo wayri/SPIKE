@@ -120,7 +120,6 @@ def main() -> int:
     ipc_boundaries = {
         "app/src/workerBridge.ts",
         "app/src/resourceMonitor.ts",
-        "app/src/licenseBridge.ts",
         "app/src/detachedToolWindows.tsx",
     }
     for path in typescript:

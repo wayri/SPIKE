@@ -128,8 +128,8 @@ assert.match(source, /var worldY=-dy/,
   "3D report projection must use the live viewport's board-Y to world-Y convention");
 assert.match(source, /const REPORT_TABLE_ROW_LIMIT = 500/,
   "large report tables must have an explicit responsive-display bound");
-assert.match(source, /<section id="thermal-results"><h2>Thermal Analysis Result<\/h2>/,
-  "thermal reports must expose a domain-specific result section");
+assert.match(source, /buildThermalReportSection\(input\.thermal\?\.scenario\)/,
+  "thermal reports must use the domain-specific result section");
 assert.match(source, /<section id="si-results"><h2>Signal-Integrity Channel Result<\/h2>/,
   "SI reports must expose a domain-specific result section");
 assert.match(source, /<section id="pi-results"><h2>Power-Integrity Result<\/h2>/,

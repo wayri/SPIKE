@@ -14,6 +14,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Sequence, Tuple
 
 MAX_NETWORK_NODES = 256
 MAX_TRANSIENT_STEPS = 10_000
+MAX_SURFACE_DENSE_WORK = 50_000_000
 
 
 def _issue(code: str, message: str, *, severity: str = "error") -> Dict[str, str]:
@@ -61,6 +62,12 @@ def _conductance(link: Mapping[str, Any], label: str) -> Tuple[float | None, Dic
 def _solve_linear(matrix: Sequence[Sequence[float]], rhs: Sequence[float]) -> List[float]:
     """Solve a small dense system using deterministic partial-pivot elimination."""
     n = len(rhs)
+    # Component top/bottom networks are diagonal. Preserve their O(n) solve
+    # rather than running elimination over zeros on every transient sample.
+    if all(value == 0 for row, values in enumerate(matrix) for column, value in enumerate(values) if row != column):
+        if any(matrix[row][row] <= 0 for row in range(n)):
+            raise ValueError("thermal network is singular")
+        return [rhs[row] / matrix[row][row] for row in range(n)]
     work = [list(row) + [float(rhs[index])] for index, row in enumerate(matrix)]
     for column in range(n):
         pivot = max(range(column, n), key=lambda row: abs(work[row][column]))
@@ -141,6 +148,7 @@ def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable
 
     powers: Dict[str, float] = {}
     capacitance: Dict[str, float] = {}
+    initial_rises: Dict[str, float] = {}
     for element in elements:
         node_id = str(element.get("id") or "")
         try:
@@ -156,6 +164,13 @@ def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable
                 issues.append(_issue("THERMAL_NETWORK_CAPACITANCE_REQUIRED", f"{node_id or '<unnamed>'} needs positive thermal_capacitance_j_per_c for transient analysis."))
             else:
                 capacitance[node_id] = value
+            try:
+                initial = float(element.get("initial_temperature_c", scenario.ambient_temperature_c))
+            except (TypeError, ValueError):
+                initial = float("nan")
+            if not math.isfinite(initial) or initial < -273.15:
+                issues.append(_issue("THERMAL_NETWORK_INITIAL_TEMPERATURE_INVALID", f"{node_id} initial_temperature_c must be finite and at least -273.15 C."))
+            initial_rises[node_id] = initial - float(scenario.ambient_temperature_c)
 
     # Power tables may contribute to an explicitly named element.  No component
     # reference is inferred: that would create a silent electro-thermal mapping.
@@ -226,7 +241,7 @@ def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable
                 "provenance": {"engine": "spike-lumped-thermal-network", "qualification": "not_executed"},
             }
         delta_t = end_time / steps
-        prior = [0.0] * len(ids)
+        prior = [initial_rises[node_id] for node_id in ids]
         for step in range(steps + 1):
             if step:
                 transient_matrix = [row[:] for row in matrix]
@@ -262,4 +277,179 @@ def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable
     }
 
 
-__all__ = ["MAX_NETWORK_NODES", "MAX_TRANSIENT_STEPS", "estimate_lumped_thermal_network"]
+def estimate_surface_thermal_network(scenario: Any, surfaces: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    """Solve admitted object boundaries, retaining a single temperature per object.
+
+    The component adapter owns admission and SI-unit conversion is explicit here.
+    Radiation is diffuse gray exchange with fixed, large isothermal surroundings
+    (view factor one). It is not interobject radiation or a spatial field solver.
+    """
+    sigma = 5.670374419e-8  # W/(m² K⁴), SI Stefan-Boltzmann constant.
+    ids = [str(element["id"]) for element in scenario.thermal_elements]
+    index = {identifier: offset for offset, identifier in enumerate(ids)}
+    ambient = float(scenario.ambient_temperature_c)
+    powers = [float(element["power_w"]) for element in scenario.thermal_elements]
+    legacy, issues = _network_links(scenario, set(ids))
+    if issues:
+        raise ValueError(issues[0]["message"])
+    # Each branch is (source, destination or fixed sink, coefficient, sink C,
+    # radiation flag). Linear coefficients are W/K; radiation is W/K^4.
+    branches = [(index[left], index[right] if right else None, conductance, ambient, False)
+                for left, right, conductance, _ in legacy]
+    for item in surfaces:
+        kind = item["kind"]
+        other = index[item["target_ref"]] if kind == "conduction" and item["target_ref"] != "ambient" else None
+        if kind == "conduction":
+            coefficient = 1 / item["resistance_c_per_w"]
+        elif kind == "convection":
+            coefficient = item["heat_transfer_coefficient_w_m2_k"] * item["area_mm2"] * 1e-6
+        else:
+            coefficient = sigma * item["emissivity"] * item["area_mm2"] * 1e-6
+        if not math.isfinite(coefficient) or coefficient <= 0:
+            raise ValueError(f"{item['id']} coefficient exceeds the positive finite numerical range.")
+        sink = item.get("surroundings_temperature_c", item.get("ambient_temperature_c", ambient))
+        branches.append((index[item["object_ref"]], other, coefficient, sink, kind == "radiation"))
+
+    reachable = {left for left, right, _, _, _ in branches if right is None}
+    adjacency = {i: set() for i in range(len(ids))}
+    for left, right, _, _, _ in branches:
+        if right is not None:
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+    frontier = list(reachable)
+    while frontier:
+        for neighbor in adjacency[frontier.pop()]:
+            if neighbor not in reachable:
+                reachable.add(neighbor)
+                frontier.append(neighbor)
+    if len(reachable) != len(ids):
+        missing = ", ".join(ids[i] for i in range(len(ids)) if i not in reachable)
+        raise ValueError(f"Objects without an explicit path to a fixed thermal sink: {missing}.")
+
+    steps = 0
+    if scenario.mode == "transient":
+        end = float(scenario.run["end_time_s"])
+        steps = max(1, math.ceil(end / float(scenario.run["write_interval_s"])))
+        if steps > MAX_TRANSIENT_STEPS:
+            raise ValueError(f"Transient output exceeds {MAX_TRANSIENT_STEPS} steps.")
+    # A single interobject branch selects dense elimination for this matrix.
+    # Bound both the minimum expected work and actual Newton factorizations;
+    # the latter prevents nonlinear iterations multiplying the admitted budget.
+    dense_solve_work = len(ids) ** 3 if any(right is not None for _, right, _, _, _ in branches) else 0
+    dense_work_used = 0
+    work_limit_message = (
+        f"Coupled surface solve exceeds the {MAX_SURFACE_DENSE_WORK:,} dense work-unit limit. "
+        "Reduce the number of objects, increase the time step, or shorten the duration."
+    )
+    if dense_solve_work * (steps + 1) > MAX_SURFACE_DENSE_WORK:
+        raise ValueError(work_limit_message)
+
+    matrix = [[0.0] * len(ids) for _ in ids]
+    for left, right, coefficient, _, radiation in branches:
+        if radiation:
+            continue
+        matrix[left][left] += coefficient
+        if right is not None:
+            matrix[right][right] += coefficient
+            matrix[left][right] -= coefficient
+            matrix[right][left] -= coefficient
+    if any(not math.isfinite(value) for row in matrix for value in row):
+        raise ValueError("Combined thermal conductance exceeds the finite numerical range.")
+
+    def evaluate(rises: Sequence[float], inertia: Sequence[float], prior: Sequence[float]):
+        residual = [-power + inertia[i] * (rises[i] - prior[i]) for i, power in enumerate(powers)]
+        scales = [max(1.0, abs(power), abs(inertia[i] * (rises[i] - prior[i]))) for i, power in enumerate(powers)]
+        flows = []
+        for left, right, coefficient, sink, radiation in branches:
+            delta = rises[left] - (rises[right] if right is not None else sink - ambient)
+            if radiation:
+                kelvin = rises[left] + ambient + 273.15
+                sink_kelvin = sink + 273.15
+                flow = coefficient * delta * (kelvin + sink_kelvin) * (kelvin * kelvin + sink_kelvin * sink_kelvin)
+            else:
+                flow = coefficient * delta
+            residual[left] += flow
+            scales[left] += abs(flow)
+            if right is not None:
+                residual[right] -= flow
+                scales[right] += abs(flow)
+            flows.append(flow)
+        if any(not math.isfinite(value) for value in [*residual, *scales, *flows]):
+            raise ValueError("Thermal heat balance exceeds the finite numerical range.")
+        error = max(abs(value) / scale for value, scale in zip(residual, scales))
+        return residual, error, flows
+
+    def solve(start: Sequence[float], inertia: Sequence[float], prior: Sequence[float]):
+        nonlocal dense_work_used
+        rises = list(start)
+        for _ in range(120):
+            residual, error, flows = evaluate(rises, inertia, prior)
+            if error <= 1e-10:
+                return rises, residual, flows
+            jacobian = [row[:] for row in matrix]
+            for i, value in enumerate(inertia):
+                jacobian[i][i] += value
+            for left, _, coefficient, _, radiation in branches:
+                if radiation:
+                    # A 1 K seed avoids a zero derivative at absolute zero.
+                    kelvin = max(1.0, rises[left] + ambient + 273.15)
+                    jacobian[left][left] += 4 * coefficient * kelvin ** 3
+            if dense_work_used + dense_solve_work > MAX_SURFACE_DENSE_WORK:
+                raise ValueError(work_limit_message)
+            dense_work_used += dense_solve_work
+            direction = _solve_linear(jacobian, [-value for value in residual])
+            if any(not math.isfinite(value) for value in direction):
+                raise ValueError("Thermal Newton update exceeds the finite numerical range.")
+            fraction = 1.0
+            for _ in range(80):
+                candidate = [value + fraction * delta for value, delta in zip(rises, direction)]
+                if all(math.isfinite(value) and value + ambient >= -273.15 for value in candidate):
+                    try:
+                        _, next_error, _ = evaluate(candidate, inertia, prior)
+                    except (ValueError, OverflowError):
+                        next_error = math.inf
+                    if next_error <= 1e-10 or next_error < error:
+                        rises = candidate
+                        break
+                fraction *= 0.5
+            else:
+                raise ValueError("Thermal heat balance failed to converge; review path scales and boundary temperatures.")
+        raise ValueError("Thermal heat balance exceeded its 120-iteration convergence limit.")
+
+    initial = [float(element.get("initial_temperature_c", ambient)) - ambient for element in scenario.thermal_elements]
+    zeros = [0.0] * len(ids)
+    steady, steady_residual, flows = solve(initial, zeros, zeros)
+    frames = []
+    transient_residual = 0.0
+    if scenario.mode == "transient":
+        dt = end / steps
+        inertia = [float(element["thermal_capacitance_j_per_c"]) / dt for element in scenario.thermal_elements]
+        prior = initial
+        for step in range(steps + 1):
+            if step:
+                prior, residual, _ = solve(prior, inertia, prior)
+                transient_residual = max(transient_residual, max(abs(value) for value in residual))
+            frames.append({"time_s": min(end, step * dt), "temperatures_c": {identifier: ambient + prior[i] for i, identifier in enumerate(ids)}})
+    temperatures = [ambient + value for value in steady]
+    return {
+        "contract": "spike/thermal-result/v1", "scenario_id": scenario.scenario_id,
+        "status": "completed", "model_status": "approximate", "mode": scenario.mode,
+        "ambient_temperature_c": ambient,
+        "nodes": [{"id": identifier, "power_w": powers[i], "temperature_rise_c": steady[i], "steady_temperature_c": temperatures[i]} for i, identifier in enumerate(ids)],
+        "links": [{"id": link_id, "from_id": left, "to_id": right or "ambient", "conductance_w_per_k": conductance, "heat_flow_w": flows[i]}
+                  for i, (left, right, conductance, link_id) in enumerate(legacy)],
+        "surfaces": [dict(item, heat_flow_w=flows[len(legacy) + i]) for i, item in enumerate(surfaces)],
+        "transient": frames,
+        "summary": {"node_count": len(ids), "link_count": len(branches), "total_power_w": sum(powers),
+                    "max_steady_temperature_c": max(temperatures), "steady_energy_balance_error_w": sum(steady_residual),
+                    "max_node_energy_balance_error_w": max(abs(value) for value in steady_residual),
+                    "max_transient_energy_balance_error_w": transient_residual},
+        "issues": [],
+        "provenance": {"engine": "spike-lumped-thermal-network", "method": "damped Newton heat balance; backward-Euler transient integration",
+                       "qualification": "engineering_precheck_only", "radiation_model": "gray body to fixed large surroundings, view factor one",
+                       "dense_work_units": dense_work_used, "dense_work_limit": MAX_SURFACE_DENSE_WORK,
+                       "stefan_boltzmann_w_m2_k4": sigma, "relative_heat_balance_tolerance": 1e-10},
+    }
+
+
+__all__ = ["MAX_NETWORK_NODES", "MAX_TRANSIENT_STEPS", "estimate_lumped_thermal_network", "estimate_surface_thermal_network"]

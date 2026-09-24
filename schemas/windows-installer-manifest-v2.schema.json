@@ -4,7 +4,7 @@
   "title": "SPIKE Windows Installer Manifest v2",
   "description": "Post-signing inventory for a non-qualified Windows production candidate.",
   "type": "object",
-  "required": ["contract", "product", "version", "application_version", "channel", "release_state", "license_key_id", "production_qualified", "generated_at", "signing_policy", "files"],
+  "required": ["contract", "product", "version", "application_version", "channel", "release_state", "production_qualified", "generated_at", "signing_policy", "files"],
   "properties": {
     "contract": {"const": "spike/windows-installer-manifest/v2"},
     "product": {"const": "SPIKE"},
@@ -12,7 +12,6 @@
     "application_version": {"type": "string", "minLength": 1},
     "channel": {"const": "production-candidate"},
     "release_state": {"const": "production-candidate"},
-    "license_key_id": {"type": "string", "minLength": 1},
     "production_qualified": {"const": false},
     "generated_at": {"type": "string", "format": "date-time"},
     "signing_policy": {"$ref": "#/$defs/signing_policy"},

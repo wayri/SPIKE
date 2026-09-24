@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
+from .extension_analysis_results import admit_analysis_result, design_binding
 from .si_protocol_suites import canonical_si_protocol_suite
 
 
@@ -130,6 +131,9 @@ class ExtensionManifest:
                         raise ValueError("accepts_directories must be boolean.")
                     if "filesystem.workspace" not in self.permissions:
                         raise ValueError("Design importer requires filesystem.workspace permission.")
+                if point == "analyses" and entry.get("output_contract") == "spike/v1":
+                    if not {"design.read", "results.write"}.issubset(self.permissions):
+                        raise ValueError("Analysis result contributions require design.read and results.write permissions.")
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -167,15 +171,22 @@ class ProcessExtension:
             raise PermissionError("Disabled extensions cannot execute.")
         if not self.trusted:
             raise PermissionError("Extension execution requires explicit trust.")
+        analysis_contribution = next((item for item in self.manifest.contributes.get("analyses", [])
+                                      if item["id"] == contribution_id and item.get("output_contract") == "spike/v1"), None)
+        binding = design_binding(context.get("design")) if analysis_contribution else None
         filtered_context: Dict[str, Any] = {}
         for key, value in context.items():
             required = CONTEXT_PERMISSIONS.get(key)
             if required and required not in self.manifest.permissions:
                 raise PermissionError(f"Extension lacks permission {required} for context field {key}.")
             if key in CONTEXT_PERMISSIONS or key == "parameters":
-                filtered_context[key] = value
+                filtered_context[key] = value.to_dict() if key == "design" and hasattr(value, "to_dict") else value
+        if binding is not None:
+            filtered_context["design_binding"] = binding
         timeout_seconds = max(1, min(int(self.manifest.limits.get("timeout_seconds", 300)), timeout_seconds or 3600, 3600))
         max_result_bytes = max(1024, min(int(self.manifest.limits.get("max_result_bytes", MAX_EXTENSION_RESULT_BYTES)), 1024 * 1024 * 1024))
+        if analysis_contribution:
+            max_result_bytes = min(max_result_bytes, MAX_EXTENSION_RESULT_BYTES)
         with tempfile.TemporaryDirectory(prefix="spike-extension-") as directory:
             job = Path(directory)
             request_path = job / "request.json"
@@ -230,6 +241,15 @@ class ProcessExtension:
             payload = json.loads(result_path.read_text(encoding="utf-8"))
             if not isinstance(payload, dict) or payload.get("contract") != EXTENSION_RESULT_CONTRACT:
                 raise ValueError(f"Extension must return {EXTENSION_RESULT_CONTRACT}.")
+            if binding is not None:
+                if payload.get("status") not in {"completed", "completed_with_warnings"}:
+                    raise ValueError("Analysis extension did not complete successfully.")
+                data = payload.get("data")
+                if not isinstance(data, dict):
+                    raise ValueError("Analysis extension must return data.analysis_result.")
+                admitted = admit_analysis_result(data.get("analysis_result"), binding, extension_id=self.manifest.id)
+                payload = {**payload, "data": {**data, "analysis_result": admitted,
+                                                "input_design_sha256": binding["digest_sha256"]}}
             return payload
 
 
@@ -279,6 +299,16 @@ class ExtensionRegistry:
 
     def diagnostics(self) -> List[Dict[str, Any]]:
         return list(self._diagnostics)
+
+    def trust(self, extension_id: str) -> Dict[str, Any]:
+        """Trust one already discovered local package for this worker session."""
+        extension = self._extensions.get(extension_id)
+        if extension is None:
+            raise ValueError(f"Extension is not installed: {extension_id}")
+        if extension.manifest.state == "disabled":
+            raise ValueError("Disabled extensions cannot be trusted for execution.")
+        extension.trusted = True
+        return extension.catalog_entry()
 
     def design_importers(self):
         from .extension_importers import ExtensionDesignImporter

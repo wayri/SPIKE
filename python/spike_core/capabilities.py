@@ -119,9 +119,9 @@ def capabilities() -> Dict[str, Any]:
             },
             "multi_board": {"state": "schema_ready", "model_status": "unsupported"},
             "thermal": {
-                "state": "case_preparation",
-                "model_status": "solver_dependent",
-                "validity": "Guided scenario and OpenFOAM case preparation are available; CFD results require a validated OpenFOAM setup.",
+                "state": "component_solver_available",
+                "model_status": "approximate",
+                "validity": "Built-in steady/transient component RC temperatures run without OpenFOAM from explicit power, complete ambient resistance paths, and transient heat capacity. No PCB field or measured correlation is claimed; optional CFD has separate gates.",
             },
         },
         "imports": {

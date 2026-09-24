@@ -114,6 +114,19 @@ else()
         -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
 endif()
 
+# Experimental positive-Gram prescribed-current energy probe. It is not an
+# assembled PEEC solver and has no certified finite-domain quadrature error.
+add_library(spike_peec_spectral_energy STATIC
+    src/peec/sparse_magnetic_energy.cpp)
+target_include_directories(spike_peec_spectral_energy PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
+if(MSVC)
+    target_compile_options(spike_peec_spectral_energy PRIVATE /W4 /WX /fp:strict)
+else()
+    target_compile_options(spike_peec_spectral_energy PRIVATE
+        -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+endif()
+
 # Strict typed geometry admission only. Keep this target independent of Eigen,
 # OpenMP, PEEC solver APIs, and legacy fast-math/ISA flags.
 add_library(spike_transition_handoff STATIC
@@ -301,6 +314,10 @@ if(BUILD_TESTING)
     add_executable(test_affine_triangle_basis tests/test_affine_triangle_basis.cpp)
     target_link_libraries(test_affine_triangle_basis PRIVATE spike_peec_affine_triangle)
     add_test(NAME test_affine_triangle_basis COMMAND test_affine_triangle_basis)
+
+    add_executable(test_sparse_magnetic_energy tests/test_sparse_magnetic_energy.cpp)
+    target_link_libraries(test_sparse_magnetic_energy PRIVATE spike_peec_spectral_energy)
+    add_test(NAME test_sparse_magnetic_energy COMMAND test_sparse_magnetic_energy)
 
     add_executable(test_via_transition_mesh_input
         tests/test_via_transition_mesh_input.cpp)

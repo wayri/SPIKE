@@ -23,7 +23,10 @@ def plan(source,sequence,selected=None):
     for i,entry in enumerate(sequence['entries']):
         if selected is not None and i!=selected or selected is None and not entry['enabled']:continue
         profile=deepcopy(entry['profile']);deck=effective_source(source,profile)
-        parse_netlist(deck,native_extensions=True)
+        if profile.get('backend','native')=='ngspice':
+            from python.spike_core.spice_netlist_safety import validate_netlist
+            validate_netlist(deck)
+        else:parse_netlist(deck,native_extensions=True)
         jobs.append({'index':i,'profile':profile,'source':deck})
     if not jobs:raise ValueError('Select an entry or enable at least one simulation')
     return jobs

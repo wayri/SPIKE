@@ -36,6 +36,8 @@ export type ParsedComponent = {
   bodyBounds?: { minX: number; minY: number; maxX: number; maxY: number };
   courtyardBounds?: { minX: number; minY: number; maxX: number; maxY: number };
   properties?: readonly { name?: unknown; values?: readonly unknown[] }[];
+  vendor_properties?: Record<string, unknown>;
+  bom_records?: readonly string[];
 };
 export type ParsedZone = { id: string; points: Point[]; holes?: Point[][]; layer: string; net?: string };
 export type ParsedDrawing = {

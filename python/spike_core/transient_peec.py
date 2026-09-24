@@ -462,13 +462,14 @@ def _extract_stackup_capacitance(
         index for index, item in enumerate(physical_metadata)
         if return_net and str(item.get("net", "")) == return_net and str(item.get("layer", "")) in copper_centers
     ]
+    from .peec_capacitance_dispatch import estimate_branch_capacitance
+    branch_capacitance, _, estimate_info = estimate_branch_capacitance(design, spec, physical_branches)
     extracted = 0
-    skipped_vias = 0
-    skipped_reference = 0
+    skipped_reference = int(estimate_info.get("skipped_reference_branch_count", 0))
     reference_layers: set[str] = set()
 
     def stamp(node: int, reference: int | None, value: float) -> None:
-        if value <= 0:
+        if value <= 0 or reference == node:
             return
         matrix[node, node] += value
         if reference is not None and reference != node:
@@ -477,18 +478,23 @@ def _extract_stackup_capacitance(
             matrix[reference, node] -= value
 
     for index, branch in enumerate(physical_branches):
-        if branch.kind == "via" or "via" in branch.kind:
-            skipped_vias += 1
+        capacitance = float(branch_capacitance[index])
+        if capacitance <= 0:
             continue
         layer = str(branch.layer)
         layer_z = copper_centers.get(layer)
         if layer_z is None or branch.length_mm <= 0:
             skipped_reference += 1
+            branch_capacitance[index] = 0.0
             continue
         reference_node: int | None = None
         reference_layer = ""
         if return_net:
-            candidates = [node for node in reference_nodes if str(node_metadata[node].get("layer", "")) != layer]
+            selected_layers = estimate_info.get("branch_reference_layers", [])
+            selected_layer = selected_layers[index] if index < len(selected_layers) else ""
+            candidates = [node for node in reference_nodes
+                          if str(node_metadata[node].get("layer", "")) != layer
+                          and (not selected_layer or str(node_metadata[node].get("layer", "")) == selected_layer)]
             if candidates:
                 midpoint_x = (branch.start_mm[0] + branch.end_mm[0]) / 2.0
                 midpoint_y = (branch.start_mm[1] + branch.end_mm[1]) / 2.0
@@ -503,16 +509,8 @@ def _extract_stackup_capacitance(
                 reference_layer = min(alternatives, key=lambda item: abs(item[1] - layer_z))[0]
         if not reference_layer:
             skipped_reference += 1
+            branch_capacitance[index] = 0.0
             continue
-        reference_z = copper_centers[reference_layer]
-        dielectric = _dielectric_between(layer_z, reference_z, dielectrics)
-        if dielectric is None:
-            skipped_reference += 1
-            continue
-        epsilon_r, height_mm = dielectric
-        capacitance = estimate_line_capacitance_per_m(branch.width_mm, height_mm, epsilon_r) * branch.length_mm * 1e-3
-        if branch.kind.startswith("zone") or branch.kind.startswith("pad"):
-            capacitance *= 0.5
         if not np.isfinite(capacitance) or capacitance <= 0:
             continue
         branch_capacitance[index] = capacitance
@@ -524,14 +522,12 @@ def _extract_stackup_capacitance(
 
     total = float(np.sum(branch_capacitance))
     return matrix, {
-        "contract": "spike/distributed-capacitance/v1",
-        "model": "hammerstad_jensen_single_reference",
+        **estimate_info,
         "status": "approximate" if extracted else "unsupported",
         "reference_mode": "explicit_return_conductor" if return_net else "implicit_nearest_copper",
         "reference_net": return_net,
         "reference_layers": sorted(reference_layers),
         "estimated_branch_count": extracted,
-        "skipped_via_branch_count": skipped_vias,
         "skipped_reference_branch_count": skipped_reference,
         "total_capacitance_f": total,
     }, branch_capacitance

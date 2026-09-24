@@ -3,7 +3,7 @@
   "design_id": "6522136d-bae9-4d68-b5e0-d0dc101c0444",
   "name": "MODULAR-BUS-NIB",
   "source_format": "kicad",
-  "source_path": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\MODULAR-BUS-NIB.kicad_pcb",
+  "source_path": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\MODULAR-BUS-NIB.kicad_pcb",
   "units": "mm",
   "layers": [
     {
@@ -152731,7 +152731,7 @@
       ],
       "library": "footprints_epc2302:EPC2302ENGRT_ECC",
       "model_path": "${KIPRJMOD}/local/Ganfet_/D0606F.step",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Ganfet_\\D0606F.step",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Ganfet_\\D0606F.step",
       "layer": "F.Cu",
       "rotation": 90.0
     },
@@ -152800,7 +152800,7 @@
       ],
       "library": "WSK12_current_shunt:WSK12162L000FEA",
       "model_path": "${KIPRJMOD}/local/Shunt_/LIB_WSK12162L000FEA/WSK12162L000FEA/3D/WSK12162L000FEA.stp",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Shunt_\\LIB_WSK12162L000FEA\\WSK12162L000FEA\\3D\\WSK12162L000FEA.stp",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Shunt_\\LIB_WSK12162L000FEA\\WSK12162L000FEA\\3D\\WSK12162L000FEA.stp",
       "layer": "F.Cu",
       "rotation": 0
     },
@@ -152969,7 +152969,7 @@
       ],
       "library": "footprints_epc2302:EPC2302ENGRT_ECC",
       "model_path": "${KIPRJMOD}/local/Ganfet_/D0606F.step",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Ganfet_\\D0606F.step",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Ganfet_\\D0606F.step",
       "layer": "F.Cu",
       "rotation": 90.0
     },
@@ -153135,7 +153135,7 @@
       ],
       "library": "footprints_srp1770_ind:IND_SRP1770TA_BRN-M",
       "model_path": "${KIPRJMOD}/local/inductor_/SRP1770TA.stp",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\inductor_\\SRP1770TA.stp",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\inductor_\\SRP1770TA.stp",
       "layer": "F.Cu",
       "rotation": 180.0
     },
@@ -153378,7 +153378,7 @@
       ],
       "library": "footprints:05-08-1682_ADI",
       "model_path": "${KIPRJMOD}/local/LTC7891RUFDM_PBF (1)/05-08-1682_ADI.step",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\LTC7891RUFDM_PBF (1)\\05-08-1682_ADI.step",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\LTC7891RUFDM_PBF (1)\\05-08-1682_ADI.step",
       "layer": "F.Cu",
       "rotation": 180.0
     },
@@ -153578,7 +153578,7 @@
       ],
       "library": "0679L9100_01:FUSC6125X279N",
       "model_path": "${KIPRJMOD}/local/fuse_/0679L9100_01/0679L9100-01.step",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\fuse_\\0679L9100_01\\0679L9100-01.step",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\fuse_\\0679L9100_01\\0679L9100-01.step",
       "layer": "F.Cu",
       "rotation": 0
     },
@@ -153628,7 +153628,7 @@
       ],
       "library": "footprints_cap_tan:CAPMP7.6X4.3_3.1N_KEM-L",
       "model_path": "${KIPRJMOD}/local/Output_tan_pol_cap_/T521D336M035ATE065/CTSM_TCM2NKKO_7343_L7.6W4.6H3.1T0.13S1.3F2.5A3.6B0.65P0.9R1X0.2.step",
-      "model_resolved": "C:\\Users\\example\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Output_tan_pol_cap_\\T521D336M035ATE065\\CTSM_TCM2NKKO_7343_L7.6W4.6H3.1T0.13S1.3F2.5A3.6B0.65P0.9R1X0.2.step",
+      "model_resolved": "C:\\Users\\yawar\\Documents\\Github\\TEST\\MODULAR-BUS-NIB\\local\\Output_tan_pol_cap_\\T521D336M035ATE065\\CTSM_TCM2NKKO_7343_L7.6W4.6H3.1T0.13S1.3F2.5A3.6B0.65P0.9R1X0.2.step",
       "layer": "F.Cu",
       "rotation": 90.0
     },

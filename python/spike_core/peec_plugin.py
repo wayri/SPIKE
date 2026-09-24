@@ -21,7 +21,7 @@ from .peec_network import (
     solve_shared_reference_port_matrix as _solve_shared_reference_port_matrix,
 )
 from .numerics import assess_symmetric_positive_semidefinite
-from .quasistatic_capacitance import estimate_branch_capacitance, zone_pad_mesh_dependence_issue
+from .peec_capacitance_dispatch import estimate_branch_capacitance, zone_pad_mesh_dependence_issue
 
 try:
     from python import spike_peec_native as native
@@ -530,7 +530,7 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         issues.append(ValidationIssue(
             "PEEC_CAPACITANCE_APPROXIMATE",
             "warning",
-            f"Estimated {float(capacitance_info.get('total_capacitance_f', 0.0)) * 1e12:.6g} pF across {int(capacitance_info.get('estimated_branch_count', 0))} planar mesh branches; {int(capacitance_info.get('skipped_via_branch_count', 0))} via/barrel branches were excluded.",
+            f"Estimated {float(capacitance_info.get('total_capacitance_f', 0.0)) * 1e12:.6g} pF across {int(capacitance_info.get('estimated_branch_count', 0))} planar mesh branches; {int(capacitance_info.get('skipped_via_branch_count', 0))} via/barrel branches were excluded; source coverage is {('complete' if capacitance_info.get('complete_source_coverage') is True else 'incomplete' if capacitance_info.get('complete_source_coverage') is False else 'not assessed')}.",
             suggestion="Provide an explicit return conductor and fabrication dielectric/loss data; use a validated electrostatic solver for sign-off capacitance.",
             status="approximate",
         ))

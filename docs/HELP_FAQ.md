@@ -2,7 +2,7 @@
 
 ## Why is Run disabled?
 
-Check for an active job, missing design/net/endpoints, failed preflight, unavailable compatible solver, or missing entitlement. Read the nearby validation message and the Issues/Console output. The control reference records which controls have conditional availability; resolve the workflow prerequisites before retrying.
+Check for an active job, missing design/net/endpoints, failed preflight, or an unavailable compatible solver. Read the nearby validation message and the Issues/Console output. The control reference records which controls have conditional availability; resolve the workflow prerequisites before retrying.
 
 ## Why can I configure a feature that cannot run?
 

@@ -107,7 +107,7 @@ class SimulationManager(wx.ScrolledWindow):
         heading=wx.StaticText(self,label='Simulation manager — one active simulation; bounded metadata history of the last 50 runs')
         box.Add(heading,0,wx.ALL,10)
         config=wx.FlexGridSizer(cols=4,hgap=10,vgap=7);config.AddGrowableCol(1,1);config.AddGrowableCol(3,1)
-        specs=[('name','Profile name',None),('execution','Execution',('batch','continuous')),
+        specs=[('name','Profile name',None),('backend','Solver backend',('native','ngspice')),('execution','Execution',('batch','continuous')),
                ('analysis','Analysis override',('from_netlist','transient','operating_point')),
                ('method','Integration',('hybrid_trapezoidal','backward_euler','bdf2')),
                ('time_step','Override timestep [s]',None),('stop_time','Override stop time [s]',None),
@@ -119,8 +119,9 @@ class SimulationManager(wx.ScrolledWindow):
             elif kind=='bool':control=wx.CheckBox(self,label='Use UIC')
             else:control=wx.TextCtrl(self)
             self.fields[key]=(control,kind);config.Add(control,1,wx.EXPAND)
+        self.fields['backend'][0].Bind(wx.EVT_CHOICE,lambda e:self.update_backend_controls())
         box.Add(config,0,wx.EXPAND|wx.ALL,10)
-        note=wx.StaticText(self,label='Timestep, stop and UIC override only when Transient is selected. Continuous ignores TSTOP and keeps a rolling window. Profile overrides do not rewrite the circuit editor. Ambient setup does not set .TEMP.')
+        note=wx.StaticText(self,label='Native runs use the owned C++ engine. ngspice is an explicitly selected, self-contained batch compatibility backend; includes/libraries and continuous controls are not accepted. Timestep, stop and UIC override only when Transient is selected. Ambient setup does not set .TEMP.')
         note.Wrap(800);box.Add(note,0,wx.EXPAND|wx.ALL,8)
         self.thermal_summary=wx.StaticText(self,label='');box.Add(self.thermal_summary,0,wx.EXPAND|wx.ALL,8)
         row=wx.WrapSizer(wx.HORIZONTAL,flags=wx.WRAPSIZER_DEFAULT_FLAGS & ~wx.EXTEND_LAST_ON_EACH_LINE)
@@ -151,9 +152,15 @@ class SimulationManager(wx.ScrolledWindow):
 
     def set_fields(self,profile):
         for key,(control,kind) in self.fields.items():
-            value=profile[key]
+            value=profile.get(key,'native' if key=='backend' else None)
             if isinstance(kind,tuple):control.SetSelection(kind.index(value))
             else:control.SetValue(value if kind=='bool' else '' if value is None else str(value))
+        self.update_backend_controls()
+
+    def update_backend_controls(self):
+        native=self.fields['backend'][0].GetSelection()==0
+        for key in ('method','capture_samples','speed_ratio'):
+            self.fields[key][0].Enable(native)
 
     def reflect_document(self):
         if hasattr(self,'sequences'):self.sequences.refresh()
@@ -203,7 +210,9 @@ class SimulationManager(wx.ScrolledWindow):
         self.runs.DeleteAllItems();self.record_ids=[]
         for record in records:
             self.record_ids.append(record['id']);i=self.runs.InsertItem(self.runs.GetItemCount(),record['started_utc'][11:23])
-            mode='frequency / Python-SciPy' if 'frequency_setup' in record else record['profile']['execution']+' / '+record['profile']['method']
+            mode='frequency / Python-SciPy' if 'frequency_setup' in record else record['profile']['execution']+' / '+(
+                record['profile'].get('backend','native') if record['profile'].get('backend','native')=='ngspice'
+                else record['profile']['method'])
             for col,text in enumerate((record['profile']['name'],record['state'],mode,f"{record['wall_seconds']:.3f}",str(record['samples'])),1):self.runs.SetItem(i,col,text)
             if record['id']==selected:self.runs.Select(i)
         if selected not in self.record_ids and records:self.runs.Select(0)

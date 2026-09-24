@@ -1,24 +1,15 @@
-import { BookOpen, CircleCheck, Gauge, Info, ShieldAlert, X } from "lucide-react";
+import { BookOpen, CircleCheck, Gauge, Info, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { AppSettings } from "./appSettings";
 import { APP_VERSION, PRODUCT_NAME, PRODUCT_TAGLINE, RELEASE_CHANNEL } from "./appVersion";
 import { getDesktopAppVersion } from "./workerBridge";
 
 type AboutDialogProps = {
-  license: AppSettings["license"];
   onClose: () => void;
   onOpenGuide: () => void;
   onOpenValidation: () => void;
 };
 
-function formatExpiry(value: string | null): string {
-  if (!value) return "no expiry";
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return `expires ${parsed.toLocaleDateString()}`;
-}
-
-export default function AboutDialog({ license, onClose, onOpenGuide, onOpenValidation }: AboutDialogProps) {
+export default function AboutDialog({ onClose, onOpenGuide, onOpenValidation }: AboutDialogProps) {
   const [hostVersion, setHostVersion] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,7 +26,6 @@ export default function AboutDialog({ license, onClose, onOpenGuide, onOpenValid
     return () => window.removeEventListener("keydown", key);
   }, [onClose]);
 
-  const statusTone = license.status === "active" ? "" : license.status === "expired" ? "warn" : "error";
   const runtimeLine = hostVersion
     ? "Native desktop shell"
     : "Browser preview · desktop host not detected";
@@ -57,16 +47,6 @@ export default function AboutDialog({ license, onClose, onOpenGuide, onOpenValid
           <span className="about-offline"><CircleCheck size={11} /> Offline-first</span>
           <small className="about-runtime">{runtimeLine} · {platform}</small>
         </div>
-        <div className="about-license">
-          <div className={`license-card ${statusTone}`}>
-            <ShieldAlert size={18} />
-            <div>
-              <b>{license.tier.charAt(0).toUpperCase() + license.tier.slice(1)} tier · {license.status}</b>
-              <span>{license.status === "active" ? `${license.licensee} · ${formatExpiry(license.expiresAt)}${license.licenseType ? ` · ${license.licenseType}` : ""}` : (license.message ?? "No entitlement is installed")}</span>
-              {license.capabilities.length > 0 && <span>{license.capabilities.length} capabilit{license.capabilities.length === 1 ? "y" : "ies"} granted{license.source === "signed-license" ? " · signed entitlement" : ""}</span>}
-            </div>
-          </div>
-        </div>
         <div className="about-grid" role="table" aria-label="Runtime information">
           <span>Interface</span><b>React + Three.js workspace · offline Tauri host</b>
           <span>Solver worker</span><b>Local Python / C++ analysis service (versioned JSON contracts)</b>
@@ -81,7 +61,7 @@ export default function AboutDialog({ license, onClose, onOpenGuide, onOpenValid
         </div>
       </div>
       <footer>
-        <span><Info size={11} /> {PRODUCT_NAME} is provided under its packaged license terms; third-party engine licenses are listed in External engines.</span>
+        <span><Info size={11} /> Third-party engine notices are listed in External engines.</span>
         <button className="secondary-btn" onClick={onClose}>Close</button>
       </footer>
     </section>

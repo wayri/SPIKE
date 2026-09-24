@@ -4,7 +4,7 @@ import unittest
 from copy import deepcopy
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'studio/python'))
 from spikes_studio.document import Document, RC_DECK
-from spikes_studio.model_fidelity import default_policy, inherited, preflight, resolve
+from spikes_studio.model_fidelity import default_policy, inherited, preflight, preflight_compatibility, resolve
 
 
 class FidelityTests(unittest.TestCase):
@@ -40,3 +40,20 @@ class FidelityTests(unittest.TestCase):
         doc=Document.from_netlist(RC_DECK)
         doc.data['model_policy']['schematic']={'tier':'ideal','enforce':True}
         with self.assertRaises(ValueError):preflight(doc.data,'noise')
+
+    def test_compatibility_preflight_is_explicit_and_does_not_rewrite_models(self):
+        doc=Document.from_netlist(RC_DECK);original=doc.data['source']
+        report=preflight_compatibility(doc.data)
+        self.assertEqual(report['backend'],'ngspice')
+        self.assertEqual(report['model_status'],'solver_dependent')
+        self.assertEqual(doc.data['source'],original)
+        for selection in ({'tier':'ideal','enforce':False},
+                          {'tier':'source','enforce':False,'parasitic_values':{'esr_ohm':0.1}}):
+            candidate=deepcopy(doc.data)
+            candidate['model_policy']['components']['C1']=selection
+            with self.assertRaisesRegex(ValueError,'Compatibility model preflight'):
+                preflight_compatibility(candidate)
+        candidate=deepcopy(doc.data)
+        candidate['source']=original.replace('.end','.include vendor.lib\n.end')
+        with self.assertRaisesRegex(ValueError,'Unsafe ngspice directive'):
+            preflight_compatibility(candidate)

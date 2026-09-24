@@ -37,6 +37,15 @@ Status: partial implementation, not a release. The installed beta.6 is unchanged
   modules and payload names for Qt dependencies, emits an initial CycloneDX
   inventory and requires reviewed release evidence for release distribution.
   The inventory is not yet a complete transitive/native licensing review.
+- Run profiles now select `native` or `ngspice` explicitly. The latter is a
+  self-contained, process-isolated batch compatibility run; missing ngspice,
+  rejected directives and unsupported model-policy rewrites fail instead of
+  falling back to C++. Only complete real transient voltage vectors are mapped
+  to the Studio plot contract; original backend vectors and issues are retained.
+  Existing profiles migrate to the historically used native backend.
+- `LibraryStore` persists data-only `.spklib` packages by installed/project/user
+  scope, content hash and semantic version, with activation and rollback.
+  This does not execute arbitrary models or qualify manufacturer parts.
 
 ## Architecture introduced
 
@@ -84,6 +93,14 @@ It isolates preferences and disables autosave. On this Windows host WebView2
 child processes require an ordinary desktop process rather than the restricted
 agent sandbox. No mocked waveform or browser is used in this integration test.
 
+`verify_workbench_stage_a.py --backend-only` exercises the same real wx
+editing and owned C++ RC path, then changes the simulation-manager backend and
+acquires the RC deck through the actual ngspice process adapter. Its separate
+`checks-backend.json` development record verifies no fallback or inferred
+current/power. It does not test the offline WebView. The default WebView check
+currently fails in this sandbox with `COREWEBVIEW2_WEB_ERROR_STATUS_CONNECTION_ABORTED`;
+that gate remains open and no browser-success screenshot is claimed.
+
 The waveform microbenchmark uses explicitly synthetic performance data. On this
 16-logical-CPU host, eight ten-million-sample traces used 720 MB of original NumPy
 arrays plus approximately 10 MB of indices. A 100-query run measured about 2.74 ms
@@ -114,8 +131,8 @@ release. Missing gate evidence is not inferred from passing unit tests.
 
 Stage A remains incomplete: authoritative hierarchical semantic graph and v1
 migration, full `.SUBCKT`/dependency paste and symbol placement, persistent unified
-executable libraries, general dynamic-device API/Device Studio, explicit
-native/ngspice session routing, complete property/fidelity integration, complete
+executable libraries, general dynamic-device API/Device Studio, broader ngspice
+model/deck compatibility and plotted analysis coverage, complete property/fidelity integration, complete
 replacement docking shell, full context-command migration and live Plotly
 dashboard bindings. Optional VTK integration has not been added.
 

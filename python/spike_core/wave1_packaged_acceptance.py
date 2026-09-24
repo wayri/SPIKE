@@ -228,7 +228,6 @@ def _verify_signed_installer_manifest_v2(
     identity_ok = (
         raw.get("product") == "SPIKE" and raw.get("channel") == "production-candidate"
         and raw.get("release_state") == "production-candidate" and raw.get("production_qualified") is False
-        and isinstance(raw.get("license_key_id"), str) and bool(raw["license_key_id"].strip())
         and isinstance(raw.get("version"), str) and bool(re.fullmatch(r"\d+\.\d+\.\d+", raw["version"]))
         and isinstance(raw.get("application_version"), str) and bool(raw["application_version"].strip())
         and (expected_application_version is None or raw["application_version"] == expected_application_version)
@@ -249,7 +248,6 @@ def _verify_signed_installer_manifest_v2(
         "manifest": str(manifest_file.resolve()), "manifest_sha256": _digest(manifest_file),
         "generated_at": raw.get("generated_at"), "version": raw.get("version"),
         "application_version": raw.get("application_version"), "channel": raw.get("channel"),
-        "license_key_id": raw.get("license_key_id"),
         "release_state": raw.get("release_state"), "production_qualified": False,
         "signing_policy": dict(policy), "artifacts": candidates,
     }

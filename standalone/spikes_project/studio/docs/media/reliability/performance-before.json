@@ -51,9 +51,9 @@
       "engine_id": "spikes.owned_cpp",
       "status": "passed",
       "identity": {
-        "executable": "C:\\Users\\example\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+        "executable": "C:\\Users\\yawar\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
         "sha256": "5f7b89a612c9b8af1d6456cdfcd1dbe5ca630849e79aebced9bee9a6694952ec",
-        "implementation_artifact": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
+        "implementation_artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-standalone-beta1-vs\\spikes_c_api.dll",
         "implementation_sha256": "42cd4bb430165d2e25297736f6014b6fe5f2acf5280fae10df475af76aa9aeb4"
       },
       "timing_scope": "isolated_process_per_run_including_startup_and_result_parse",
@@ -388,7 +388,7 @@
       "engine_id": "ngspice",
       "status": "passed",
       "identity": {
-        "executable": "C:\\Users\\example\\Documents\\agws\\KiCAD_plugins\\SPIKE\\runtime\\external\\Spice64\\bin\\ngspice_con.exe",
+        "executable": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\runtime\\external\\Spice64\\bin\\ngspice_con.exe",
         "sha256": "86c9ea5f645ca919e305639fa7bdb522355364c424d14e197f1ade617feb3453",
         "implementation_artifact": "",
         "implementation_sha256": ""
@@ -725,7 +725,7 @@
       "engine_id": "ltspice",
       "status": "passed",
       "identity": {
-        "executable": "C:\\Users\\example\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+        "executable": "C:\\Users\\yawar\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
         "sha256": "0b64462b25fc4cee94e8026e0450ccdd76adf28944c7af29c2e3885a2fe57b04",
         "implementation_artifact": "",
         "implementation_sha256": ""

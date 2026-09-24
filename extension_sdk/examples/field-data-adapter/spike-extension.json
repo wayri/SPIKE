@@ -1,0 +1,39 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "org.example.field-data-adapter",
+  "name": "External field data adapter",
+  "version": "1.0.0",
+  "provider": "SPIKE SDK example",
+  "description": "Import voltage samples produced by an external computation for the current board.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "available",
+  "license": "MIT",
+  "bundled": false,
+  "permissions": ["design.read", "results.write"],
+  "limits": {"timeout_seconds": 30, "max_result_bytes": 4194304},
+  "contributes": {
+    "analyses": [{
+      "id": "import-voltage-field",
+      "name": "Import external voltage field",
+      "description": "Admit externally computed voltage samples to the board result viewer.",
+      "output_contract": "spike/v1",
+      "input_schema": {
+        "type": "object",
+        "required": ["samples"],
+        "properties": {
+          "solver": {"type": "string"},
+          "samples": {"type": "array", "minItems": 1, "items": {
+            "type": "object", "required": ["x_mm", "y_mm", "value"],
+            "properties": {
+              "x_mm": {"type": "number"}, "y_mm": {"type": "number"},
+              "value": {"type": "number"}, "layer": {"type": "string"}
+            }
+          }}
+        }
+      }
+    }]
+  }
+}
