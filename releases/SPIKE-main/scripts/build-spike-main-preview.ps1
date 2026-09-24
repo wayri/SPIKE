@@ -25,27 +25,66 @@ if ($Bundle) {
     Get-FileHash -LiteralPath (Join-Path $artifactRoot $installers[0].Name) -Algorithm SHA256 | Format-List | Out-String | Set-Content -LiteralPath (Join-Path $artifactRoot "$($installers[0].Name).sha256.txt")
 }
 if ($Portable) {
-    $artifactRoot = Join-Path $variantRoot "artifacts"
-    $portableRoot = Join-Path $artifactRoot "SPIKE-main-portable"
-    $resourceRoot = Join-Path $portableRoot "resources"
-    New-Item -ItemType Directory -Force -Path (Join-Path $resourceRoot "bundled"), (Join-Path $resourceRoot "legal"), (Join-Path $resourceRoot "docs") | Out-Null
+    $artifactRoot = [System.IO.Path]::GetFullPath((Join-Path $variantRoot "artifacts"))
+    New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
+    $portableRoot = [System.IO.Path]::GetFullPath((Join-Path $artifactRoot "SPIKE-main-portable"))
+    $artifactPrefix = $artifactRoot.TrimEnd("\\", "/") + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $portableRoot.StartsWith($artifactPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw "Refusing to remove portable path outside this variant's artifacts directory: $portableRoot"
+    }
+    if (Test-Path -LiteralPath $portableRoot) { Remove-Item -LiteralPath $portableRoot -Recurse -Force }
+    New-Item -ItemType Directory -Force -Path $portableRoot | Out-Null
     Copy-Item -LiteralPath (Join-Path $env:CARGO_TARGET_DIR "release\\spike-desktop.exe") -Destination (Join-Path $portableRoot "SPIKE-main.exe") -Force
-    & robocopy (Join-Path $app "src-tauri\\resources\\worker") (Join-Path $resourceRoot "bundled") /E /NFL /NDL /NJH /NJS /NC /NS | Out-Null
-    if ($LASTEXITCODE -gt 7) { throw "Portable worker copy failed: $LASTEXITCODE" }
-    Copy-Item -LiteralPath (Join-Path $variantRoot "SPIKE-main-PREVIEW-NOTICE.md") -Destination (Join-Path $resourceRoot "legal\\SPIKE-main-PREVIEW-NOTICE.md") -Force
-    Copy-Item -LiteralPath (Join-Path $root "LICENSE"), (Join-Path $root "LICENSING.md"), (Join-Path $root "THIRD_PARTY_NOTICES.md") -Destination (Join-Path $resourceRoot "legal") -Force
-    Copy-Item -LiteralPath (Join-Path $root "docs\\ERROR_CODE_CATALOG.md"), (Join-Path $root "TROUBLESHOOTING.md") -Destination (Join-Path $resourceRoot "docs") -Force
+    $config = Get-Content -LiteralPath (Join-Path $app "src-tauri\\tauri.conf.json") -Raw | ConvertFrom-Json
+    $portableResourceAudit = @()
+    foreach ($entry in $config.bundle.resources.PSObject.Properties) {
+        $sourceKey = $entry.Name
+        $destination = Join-Path $portableRoot $entry.Value
+        if ($sourceKey.StartsWith("resources/")) {
+            $source = Join-Path $app (Join-Path "src-tauri" $sourceKey)
+        } elseif ($sourceKey.StartsWith("../../../../")) {
+            $source = Join-Path $root $sourceKey.Substring("../../../../".Length)
+        } elseif ($sourceKey.StartsWith("../../")) {
+            $source = Join-Path $variantRoot $sourceKey.Substring("../../".Length)
+        } else {
+            throw "Unsupported Tauri resource source: $sourceKey"
+        }
+        if (-not (Test-Path -LiteralPath $source)) { throw "Configured Tauri resource is missing: $source" }
+        if (Test-Path -LiteralPath $source -PathType Container) {
+            New-Item -ItemType Directory -Force -Path $destination | Out-Null
+            & robocopy $source $destination /E /NFL /NDL /NJH /NJS /NC /NS | Out-Null
+            if ($LASTEXITCODE -gt 7) { throw "Portable resource copy failed for ${sourceKey}: $LASTEXITCODE" }
+            $portableResourceAudit += [pscustomobject]@{ source = $sourceKey; destination = $entry.Value; kind = "directory" }
+        } else {
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $destination) | Out-Null
+            Copy-Item -LiteralPath $source -Destination $destination -Force
+            $portableResourceAudit += [pscustomobject]@{ source = $sourceKey; destination = $entry.Value; kind = "file" }
+        }
+    }
+    $missingResources = @($config.bundle.resources.PSObject.Properties | Where-Object { -not (Test-Path -LiteralPath (Join-Path $portableRoot $_.Value)) })
+    if ($missingResources.Count) { throw "Portable package is missing configured resources: $($missingResources.Name -join ', ')" }
     @'
 # SPIKE-main portable engineering preview
 
 Unpack this complete directory and start `SPIKE-main.exe`. Keep the bundled
-worker runtime under `resources\\bundled\\spike-worker` beside the executable.
+worker runtime under `bundled\\spike-worker` beside the executable.
 This unsigned preview suspends native entitlement capability enforcement only;
 project trust and package-signature checks remain active.
-'@ | Set-Content -LiteralPath (Join-Path $portableRoot "README.md") -NoNewline -Encoding utf8
+'@ | Set-Content -LiteralPath (Join-Path $portableRoot "PORTABLE-README.md") -NoNewline -Encoding utf8
     $archive = Join-Path $artifactRoot "SPIKE-main-portable-0.2.12.zip"
     if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
     Compress-Archive -Path $portableRoot -DestinationPath $archive -CompressionLevel Fastest
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
+    try {
+        foreach ($entry in $portableResourceAudit) {
+            $zipPrefix = "SPIKE-main-portable/" + $entry.destination.Replace("\\", "/")
+            $entry | Add-Member -NotePropertyName zip_present -NotePropertyValue ($(if ($entry.kind -eq "directory") { @($zip.Entries | Where-Object { $_.FullName.StartsWith($zipPrefix + "/", [System.StringComparison]::Ordinal) }).Count -gt 0 } else { $zip.Entries.FullName -contains $zipPrefix }))
+        }
+    } finally { $zip.Dispose() }
+    $failedZipAudit = @($portableResourceAudit | Where-Object { -not $_.zip_present })
+    if ($failedZipAudit.Count) { throw "Portable ZIP is missing configured resources: $($failedZipAudit.destination -join ', ')" }
+    $portableResourceAudit | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $artifactRoot "SPIKE-main-portable-resource-audit.json") -Encoding utf8
     Get-FileHash -LiteralPath $archive -Algorithm SHA256 | Format-List | Out-String | Set-Content -LiteralPath "$archive.sha256.txt"
 }
 Write-Output "SPIKE-main preview build completed"
