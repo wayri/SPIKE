@@ -3,11 +3,11 @@
 
 from __future__ import annotations
 
-from math import isfinite
+from collections import defaultdict
+from math import fsum, isfinite
 from typing import Any, Dict, List
 
 import numpy as np
-from scipy.sparse import csr_matrix
 
 from .contracts import AnalysisSpec
 from .dc_result_utils import terminal_net
@@ -127,10 +127,10 @@ def build_source_to_load_evidence(
     source_records: List[Dict[str, Any]],
     load_records: List[Dict[str, Any]],
     voltage: np.ndarray,
-    conductance: csr_matrix,
     rhs: np.ndarray,
     scaled_residual: float,
     explicit_return: bool,
+    active_edges: List[Dict[str, Any]],
 ) -> Dict[str, Any]:
     """Return signed terminal voltages, path drops, and KCL diagnostics."""
     def boundary_voltage(record: Dict[str, Any]) -> float:
@@ -138,7 +138,20 @@ def build_source_to_load_evidence(
 
     supply_records = [item for item in source_records if item["role"] != "source_return"]
     return_records = [item for item in source_records if item["role"] == "source_return"]
-    boundary_source_currents = conductance @ voltage - rhs
+    # A sparse G @ V product subtracts large absolute-voltage terms to recover
+    # small drops. Sum the already-solved branch currents at clamped nodes so
+    # KCL reflects the physical graph and does not lose digits as it refines.
+    source_nodes = {int(node) for item in source_records for node in item["boundary_nodes"]}
+    incident_currents: Dict[int, List[float]] = defaultdict(list)
+    for edge in active_edges:
+        current = float(edge["current_a"])
+        if edge["a"] in source_nodes:
+            incident_currents[edge["a"]].append(current)
+        if edge["b"] in source_nodes:
+            incident_currents[edge["b"]].append(-current)
+    boundary_source_currents = {
+        node: fsum(incident_currents[node]) - float(rhs[node]) for node in source_nodes
+    }
     terminal_voltages = [
         {
             "id": item["id"],
@@ -151,7 +164,7 @@ def build_source_to_load_evidence(
             **(
                 {"pair_id": item["pair_id"], "current_a": item["current_a"]}
                 if kind == "load"
-                else {"current_a": float(sum(boundary_source_currents[node] for node in item["boundary_nodes"]))}
+                else {"current_a": fsum(boundary_source_currents[node] for node in item["boundary_nodes"])}
             ),
         }
         for kind, records in (("source", source_records), ("load", load_records))
@@ -213,8 +226,8 @@ def build_source_to_load_evidence(
         paths.append(record)
     all_anchored = all(item["geometry_anchor_id"] for item in terminal_voltages)
     source_current_balance_a = float(
-        sum(item["current_a"] for item in terminal_voltages if item["kind"] == "source")
-        - sum(item["current_a"] for item in load_records)
+        fsum(item["current_a"] for item in terminal_voltages if item["kind"] == "source")
+        - fsum(item["current_a"] for item in load_records)
     )
     current_scale_a = max(1.0, sum(abs(item["current_a"]) for item in load_records))
     if scaled_residual > 1e-8 or abs(source_current_balance_a) > 1e-8 * current_scale_a:

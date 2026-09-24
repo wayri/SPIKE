@@ -7,9 +7,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import numpy as np
+from scipy.sparse import csr_matrix
+
 from python.spike_core.contracts import AnalysisSpec, DesignIR
 from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
-from python.spike_core.dc_terminal_validation import terminal_copper_weights
+from python.spike_core.dc_terminal_validation import build_source_to_load_evidence, terminal_copper_weights
 from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
 from python.spike_core.kicad_importer import import_kicad_design
 
@@ -40,6 +43,36 @@ def _line_spec() -> AnalysisSpec:
 
 
 class HybridDCTerminalValidationTests(unittest.TestCase):
+    def test_conductor_currents_are_invariant_to_absolute_source_offset(self) -> None:
+        reference = _line_spec()
+        shifted = _line_spec()
+        shifted.sources[0]["voltage_v"] = 1e9
+        low = solve_hybrid_dc(_line_design(), reference)
+        high = solve_hybrid_dc(_line_design(), shifted)
+        self.assertEqual((low.status, high.status), ("completed", "completed"))
+        self.assertAlmostEqual(low.summary["total_copper_loss_w"], high.summary["total_copper_loss_w"], places=14)
+        self.assertAlmostEqual(low.networks["source_to_load"]["source_current_balance_a"],
+                               high.networks["source_to_load"]["source_current_balance_a"], places=12)
+
+    def test_source_kcl_uses_branch_currents_without_absolute_voltage_cancellation(self) -> None:
+        voltage = np.array([12.0, 12.0 - 1e-11])
+        current = float((voltage[0] - voltage[1]) * 1e12)
+        source = {"id": "source", "role": "source_positive", "domain_id": "default",
+                  "net": "VCC", "geometry_anchor_id": "pad-source", "node": 0, "boundary_nodes": [0]}
+        load = {"id": "load", "role": "load_positive", "domain_id": "default",
+                "net": "VCC", "geometry_anchor_id": "pad-load", "node": 1, "boundary_nodes": [1],
+                "pair_id": "load", "current_a": current}
+        conductance = csr_matrix([[1e12, -1e12], [-1e12, 1e12]])
+        # Matrix multiplication loses low-order digits in the 12 V products;
+        # the solved branch current remains the correct graph KCL quantity.
+        self.assertGreater(abs(float((conductance @ voltage)[0]) - current), 1e-4)
+        evidence = build_source_to_load_evidence(
+            [source], [load], voltage, np.array([0.0, -current]), 0.0, False,
+            [{"a": 0, "b": 1, "current_a": current}],
+        )
+        self.assertEqual(evidence["status"], "validated")
+        self.assertAlmostEqual(evidence["source_current_balance_a"], 0.0, places=12)
+
     @staticmethod
     def _parallel_contact_mesh(split: bool) -> HybridMesh:
         # Two parallel copper paths partitioned in the same 1:3 area ratio.

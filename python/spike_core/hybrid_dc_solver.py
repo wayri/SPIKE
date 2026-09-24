@@ -22,6 +22,7 @@ from .dc_result_utils import (
     terminal_resistance,
     weighted_percentile_density,
 )
+from .dc_shifted_rhs import shifted_dc_rhs
 from .dc_terminal_validation import (
     build_source_to_load_evidence,
     terminal_anchor_id,
@@ -280,8 +281,11 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
     known_mask[known] = True
     unknown = np.flatnonzero(~known_mask)
     voltage = np.zeros(size, dtype=float)
+    voltage[known] = [source_nodes[int(node)] for node in known]
+    reference_voltage = max(source_nodes.values())
+    voltage_offset = np.zeros(size, dtype=float)
     for node, value in source_nodes.items():
-        voltage[node] = value
+        voltage_offset[node] = value - reference_voltage
     assembly_time_s = perf_counter() - assembly_started
     solve_started = perf_counter()
     scaled_residual = 0.0
@@ -289,14 +293,14 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
     try:
         if unknown.size:
             reduced = conductance[unknown][:, unknown].tocsr()
-            known_values = np.array([source_nodes[int(node)] for node in known])
-            reduced_rhs = rhs[unknown] - conductance[unknown][:, known] @ known_values
+            reduced_rhs = shifted_dc_rhs(active_edges, rhs, unknown, known_mask, voltage_offset)
             solution, linear_backend = solve_sparse_system(
                 reduced,
                 reduced_rhs,
                 requested=str(spec.options.get("sparse_backend", "auto")),
             )
-            voltage[unknown] = solution
+            voltage_offset[unknown] = solution
+            voltage[unknown] = reference_voltage + solution
             residual = reduced @ solution - reduced_rhs
             denominator = (
                 np.linalg.norm(reduced_rhs, ord=np.inf)
@@ -338,14 +342,14 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         ))
 
     for edge in active_edges:
-        edge["current_a"] = float((voltage[edge["a"]] - voltage[edge["b"]]) / edge["resistance_ohm"])
+        edge["current_a"] = float((voltage_offset[edge["a"]] - voltage_offset[edge["b"]]) / edge["resistance_ohm"])
         area_mm2 = edge["width_mm"] * edge["thickness_mm"]
         edge["current_density_a_mm2"] = (
             abs(edge["current_a"]) / area_mm2
             if area_mm2 and edge["current_density_supported"]
             else 0.0
         )
-        edge["voltage_drop_v"] = abs(voltage[edge["a"]] - voltage[edge["b"]])
+        edge["voltage_drop_v"] = abs(voltage_offset[edge["a"]] - voltage_offset[edge["b"]])
         edge["power_loss_w"] = edge["current_a"] ** 2 * edge["resistance_ohm"]
 
     source_voltage = max(source_nodes.values())
@@ -409,7 +413,8 @@ def solve_hybrid_dc(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
     max_drop = max_loop_drop if explicit_return else max_supply_drop
 
     terminal_evidence = build_source_to_load_evidence(
-        source_records, load_records, voltage, conductance, rhs, scaled_residual, explicit_return,
+        source_records, load_records, voltage, rhs, scaled_residual, explicit_return,
+        active_edges,
     )
     if exact_terminals and terminal_evidence["status"] != "validated":
         return AnalysisResult(
