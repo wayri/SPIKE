@@ -28,6 +28,14 @@ def builder(pad, target=.25, zone=True):
 
 
 class OwnedCopperTests(unittest.TestCase):
+    def test_branch_limit_reports_explicit_error(self):
+        b=builder({"shape":"rect","size":[2,1]},target=.25)
+        b.max_branches=16
+        b.branch_admission["limited_by_memory"]=False
+        mesh=b.build()
+        self.assertTrue(mesh.truncated)
+        self.assertTrue(any(i.code=="HYBRID_MESH_BRANCH_LIMIT" and i.severity=="error" for i in mesh.issues))
+
     def test_convex_difference_area_and_disjoint_pieces(self):
         square=[(-2,-2),(2,-2),(2,2),(-2,2)]
         diamond=[(0,-1),(1,0),(0,1),(-1,0)]

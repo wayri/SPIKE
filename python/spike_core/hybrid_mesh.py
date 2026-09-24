@@ -2457,6 +2457,15 @@ class _Builder:
                 couple(self)
             except ValueError as error:
                 fail(self, str(error))
+            if self.mesh.truncated:
+                memory_limited = bool(self.branch_admission.get("limited_by_memory"))
+                self.mesh.issues.append(ValidationIssue(
+                    "HYBRID_MESH_MEMORY_LIMIT" if memory_limited else "HYBRID_MESH_BRANCH_LIMIT",
+                    "error",
+                    f"Hybrid mesh exceeded the {'RAM-admitted' if memory_limited else 'configured'} {self.max_branches} branch capacity.",
+                    suggestion="Increase the solver memory limit only when system RAM permits, coarsen the mesh, or isolate fewer nets.",
+                    status="failed",
+                ))
             return self.mesh
         self.tracks()
         self.vias()
