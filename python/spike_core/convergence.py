@@ -243,8 +243,7 @@ def run_mesh_convergence(
                 })
                 required.extend(
                     _comparison(metric, thresholds["max_load_voltage_drop_v"],
-                                previous, current, True,
-                                absolute_thresholds.get("max_load_voltage_drop_v"))
+                                previous, current, True)
                     for metric in path_metrics
                 )
             required.append(_refinement_comparison(previous, current))

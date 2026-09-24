@@ -271,7 +271,9 @@ class MeshConvergenceTests(unittest.TestCase):
             nonlocal calls
             calls += 1
             # The maximum stays fixed, hiding an unstable second path.
-            second = (0.005, 0.007, 0.009)[calls - 1]
+            # The final 40 uV change is below the 50 uV global absolute
+            # allowance, but it is above 3% of this individual path drop.
+            second = (0.0010, 0.00102, 0.00106)[calls - 1]
             return AnalysisResult(status="completed", mode="dc", summary={
                 "max_load_voltage_drop_v": 0.01,
                 "total_copper_loss_w": 0.01,
@@ -288,6 +290,7 @@ class MeshConvergenceTests(unittest.TestCase):
         path = next(item for item in report["comparisons"]
                     if item["metric"] == "source_to_load_drop_v:source:load-2")
         self.assertEqual(path["status"], "failed")
+        self.assertIsNone(path["absolute_tolerance"])
         self.assertFalse(report["can_sign_off"])
 
     def test_exact_terminal_study_rejects_missing_path_evidence(self):
