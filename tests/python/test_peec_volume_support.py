@@ -4,6 +4,7 @@
 
 from copy import deepcopy
 from dataclasses import replace
+import hashlib
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
@@ -122,15 +123,17 @@ class ZoneBasisSupportTests(unittest.TestCase):
                  / "sources" / "Marble-v1.4.4" / "design" / "Marble.kicad_pcb")
         if not board.is_file():
             self.skipTest("pinned public Marble board has not been fetched")
+        self.assertEqual(hashlib.sha256(board.read_bytes()).hexdigest(),
+                         "3304ba37c2bd891849fc36b500cd940934aaf1f2013a95639c03564fb925c512")
         design = _design_from_kicad(str(board))
         net = "Net-(C383-Pad1)"
         for field in ("tracks", "vias", "pads", "zones"):
             setattr(design, field, [item for item in getattr(design, field)
                                    if str(item.get("net_name", item.get("net", ""))) == net])
         # Independent Shapely measurements recorded in MARBLE_PEEC_MESH_AUDIT.md.
-        for size, count, violations, outside in ((1.0, 18, 7, 0.558522869),
-                                                (0.5, 82, 19, 0.710276566),
-                                                (0.25, 315, 40, 0.294066074)):
+        for size, count, violations, outside in ((1.0, 18, 4, 0.0456514967673704),
+                                                (0.5, 82, 12, 0.04550708271969536),
+                                                (0.25, 315, 23, 0.006631754354124861)):
             mesh = build_hybrid_mesh(design, AnalysisSpec(mode="ac", net_names=[net],
                 mesh={"target_size_mm": size, "zone_cell_mm": size,
                       "max_zone_cells": 1000, "max_conductors": 2000}))
@@ -140,8 +143,10 @@ class ZoneBasisSupportTests(unittest.TestCase):
                 self.assertEqual(report["zone_basis_count"], count)
                 self.assertEqual(report["violating_basis_count"], violations)
                 self.assertAlmostEqual(report["outside_area_sum_mm2"], outside, delta=1e-8)
-                with self.assertRaises(ZoneBasisSupportError):
+                with self.assertRaises(ZoneBasisSupportError) as caught:
                     admit_zone_basis_support(design, mesh.branches)
+                self.assertEqual(caught.exception.code, "PEEC_ZONE_BASIS_OUTSIDE_COPPER")
+                self.assertEqual(caught.exception.report, report)
 
 
 if __name__ == "__main__":

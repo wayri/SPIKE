@@ -293,18 +293,29 @@ The isolated matrix-free RT0 trace-CG prototype fails closed on Marble at
 h=0.125 mm under both 2,000 and 10,000 Jacobi-preconditioned iterations;
 conditioning work is separate from geometry and AC qualification.
 
-### Concurrent legacy-mesh change is not yet an accepted baseline
+### Current legacy-mesh copper-support audit
 
-A 2026-09-24 rerun while `hybrid_mesh.py` had concurrent uncommitted edits
-preserved the 18/82/315 zone-basis counts but changed the out-of-copper
-violation counts to 4/12/23 and summed outside areas to
-0.045651497/0.045507083/0.006631754 mm2 at h=1/0.5/0.25 mm. This is an
-improvement relative to the independently audited baseline above but still
-violates the pre-native geometry admission rule. Consequently the exact-value
-optional Marble regression in `test_peec_volume_support.py` fails on this
-working tree at all three sizes. The mesher owner must reconcile the polygon
-geometry, test oracle, and committed documentation before these numbers replace
-the baseline. No native AC result is admitted from either mesh state.
+The committed `hybrid_mesh.py` shared-face change (`77f297c`) preserves the
+18/82/315 zone-basis counts at h=1/0.5/0.25 mm. For each basis, an independent
+Shapely `Polygon(basis).difference(Polygon(raw_source_zone).buffer(0)).area`
+measurement was compared with `zone_basis_support_report` by branch ID. The
+source is the one filled C383-net zone from the pinned board SHA above; its raw
+polygon is valid. All violating basis IDs and areas agree within 1e-9 mm^2.
+
+| Requested h, mm | Zone bases | Bases outside copper | Summed outside area, mm^2 | Largest single outside area, mm^2 |
+| ---: | ---: | ---: | ---: | ---: |
+| 1.0 | 18 | 4 | 0.0456514967673704 | 0.0363005379715354 |
+| 0.5 | 82 | 12 | 0.0455070827196954 | 0.0083648055827902 |
+| 0.25 | 315 | 23 | 0.0066317543541249 | 0.0014351988530894 |
+
+The areas above are independent Shapely values; the support report sums differ
+by less than 1e-13 mm^2 due to arithmetic order. The earlier 7/19/40 table
+records the historical pre-change mesh and historical ungated R/L results; it
+must not be used as the current mesh baseline. The updated pinned-board test
+asserts these measurements, board SHA, and `PEEC_ZONE_BASIS_OUTSIDE_COPPER`
+with the complete rejection report. Geometry leakage is smaller but remains
+far above the 1e-8 mm^2 per-basis admission threshold. No current Marble AC
+R/L result is admitted.
 
 ## Release checkpoint (2026-09-24)
 
@@ -318,10 +329,9 @@ RT0, unique-area capacitance and the pinned-board diagnostic passed 49/49.
 The architecture check passed. A separate CP312 Release-native adapter run
 passed 7/7 when explicitly loading the newly built binary. That binary was
 not installed into the shared runtime because other Python processes held the
-old extension open. The optional Marble support test on concurrent legacy
-`hybrid_mesh.py` edits failed three exact baseline assertions (18 tests total);
-the out-of-copper admission itself still rejects. The complete project test
-suite was not run in a stable tree and is not claimed green.
+old extension open. The optional Marble support regression now reflects the
+committed shared-face mesh and still requires fail-closed admission. The
+complete project test suite was not run in a stable tree and is not claimed green.
 
 The bounded matrix-free RT0 DC trace-CG prototype is not a Marble solve:
 Jacobi exhausted 10,000 iterations at h=0.125 mm; an experimental symmetric
@@ -330,8 +340,8 @@ Local RT0 mass condition numbers across 70,896 assembled triangles ranged up
 to 2.01e7 (99th percentile 5.88e3), exposing severe hanging/skinny triangle
 conditioning. Both iterative attempts correctly refused a result.
 
-Resume order: reconcile the concurrent legacy-mesh polygon audit; repair
-positive-face boundary topology and RT0 triangle quality under explicit work
+Resume order: repair the remaining out-of-copper zone bases, positive-face
+boundary topology and RT0 triangle quality under explicit work
 budgets; demonstrate two consecutive <=2% Marble R refinements with fixed
 terminal footprints; implement error-controlled self/touching RT0 magnetic
 integrals and a shared-basis scalable R/L operator; then qualify L/AC against
