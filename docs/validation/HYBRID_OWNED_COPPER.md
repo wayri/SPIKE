@@ -83,3 +83,31 @@ The JSON includes pad/zone face counts and cross-sections, area ownership,
 component counts, terminal drops, KCL, copper loss and load power deficit.
 Focused tests are `test_hybrid_owned_copper` plus the existing hybrid contact,
 zone-face, containment, and exact-terminal suites.
+
+## Short-face topology regression
+
+At zone cell .0625 mm (factor .125, 12 GiB admission budget), the former
+face routine discarded edges shorter than the .0001 mm containment band.
+Three real F.Cu triangles therefore had no zone neighbors; one had no other
+conductor attachment. Their areas were 6.8633424593e-10, 2.0457137164e-9 and
+6.4536322362e-10 mm2, all above the existing positive-area cutoff. The first
+triangle has vertices (158.542517556851,75.6225),
+(158.5425,75.622578184208), (158.5425,75.6225) mm. Its three real boundary
+faces measure 1.7556851020e-5, 7.8184207993e-5 and 8.0131226106e-5 mm.
+
+Edge degeneracy now uses a separate 1e-12 mm arithmetic threshold. When
+either edge is shorter than the containment band, collinearity uses the
+stricter 1e-10 mm clipping cleanup scale, preventing the broad containment
+band from turning a short point contact or clearance into conductance.
+The positive admitted-face threshold remains 1e-7 mm. No copper is removed
+and no distance tolerance is widened. Midpoint routing and the independent
+audit helper use the same distinction; analytic rectangle/triangle tests
+check real short faces in both argument orders, point contact and clearance.
+
+The complete mesh-only rebuild retains 170,524 nodes and has 338,437 branches
+(22 added). Its global component contains all nodes. Each of six zones has
+one component, with node counts 25,867; 28,289; 28,289; 28,289; 28,289; 26,116
+for F.Cu, B.Cu and In1.Cu through In4.Cu. Zone area balance is unchanged at
++3.1832314562e-12 mm2; pad metal and drill-void areas are unchanged. The mesh
+reports no issues. This verifies geometry and connectivity only; a fresh DC
+solve and convergence qualification remain separate requirements.

@@ -26,13 +26,20 @@ def shared_face_length(left, right, tolerance=1e-7):
     for a, b in zip(left, left[1:] + left[:1]):
         dx, dy = b[0] - a[0], b[1] - a[1]
         length = hypot(dx, dy)
-        if length <= tolerance:
+        if length <= 1e-12:
             continue
         for c, d in zip(right, right[1:] + right[:1]):
-            if max(abs(dx * (v[1] - a[1]) - dy * (v[0] - a[0])) / length for v in (c, d)) > tolerance:
+            other_length = hypot(d[0] - c[0], d[1] - c[1])
+            if other_length <= 1e-12:
+                continue
+            # A containment band cannot classify short edges as collinear.
+            edge_tolerance = min(tolerance, 1e-10) if min(length, other_length) <= tolerance else tolerance
+            if max(abs(dx * (v[1] - a[1]) - dy * (v[0] - a[0])) / length for v in (c, d)) > edge_tolerance:
                 continue
             lo, hi = sorted(((v[0] - a[0]) * dx / length + (v[1] - a[1]) * dy / length for v in (c, d)))
-            total += max(0.0, min(length, hi) - max(0.0, lo))
+            overlap = min(length, hi) - max(0.0, lo)
+            if overlap > 1e-12:
+                total += overlap
     return total
 
 

@@ -206,10 +206,13 @@ def bent_zone_link(builder, branch_id, a, b, width, thickness, layer, net, sourc
         length=hypot(dx,dy)
         if length<=1e-12:continue
         for p,q in _segments(right):
-            if any(abs(cross(start,end,v))/length>builder.containment_tolerance for v in (p,q)):continue
+            other_length=hypot(q[0]-p[0],q[1]-p[1])
+            if other_length<=1e-12:continue
+            tolerance=min(builder.containment_tolerance,1e-10) if min(length,other_length)<=builder.containment_tolerance else builder.containment_tolerance
+            if any(abs(cross(start,end,v))/length>tolerance for v in (p,q)):continue
             low,high=sorted(((v[0]-start[0])*dx+(v[1]-start[1])*dy)/length for v in (p,q))
             low,high=max(0,low),min(length,high)
-            if high>low:
+            if high-low>1e-12:
                 ratio=(low+high)/(2*length)
                 weighted.append((high-low,(start[0]+ratio*dx,start[1]+ratio*dy)))
     total=sum(w for w,p in weighted)

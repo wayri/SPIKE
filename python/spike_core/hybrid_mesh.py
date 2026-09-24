@@ -631,15 +631,25 @@ def _shared_polygon_face_length(
     for start, end in _segments(left):
         dx, dy = end[0] - start[0], end[1] - start[1]
         length = hypot(dx, dy)
-        if length <= tolerance:
+        if length <= 1e-12:
             continue
         for a, b in _segments(right):
-            if any(abs(dx * (p[1] - start[1]) - dy * (p[0] - start[0])) / length > tolerance for p in (a, b)):
+            other_length = hypot(b[0]-a[0], b[1]-a[1])
+            if other_length <= 1e-12:
+                continue
+            # Containment distance is not a minimum admitted edge length.
+            # For edges smaller than that band it also cannot distinguish
+            # collinearity from a tiny point contact or clearance. Restrict
+            # those pairs to the owned clipper's arithmetic cleanup scale.
+            face_tolerance = min(tolerance, 1e-10) if min(length,other_length) <= tolerance else tolerance
+            if any(abs(dx * (p[1] - start[1]) - dy * (p[0] - start[0])) / length > face_tolerance for p in (a, b)):
                 continue
             low, high = sorted(
                 ((p[0] - start[0]) * dx + (p[1] - start[1]) * dy) / length for p in (a, b)
             )
-            total += max(0.0, min(length, high) - max(0.0, low))
+            overlap = min(length, high) - max(0.0, low)
+            if overlap > 1e-12:
+                total += overlap
     return total
 
 
