@@ -358,10 +358,26 @@ def extract_pdn_multiport(
         float(np.linalg.norm(matrix - matrix.T) / max(np.linalg.norm(matrix), np.finfo(float).eps))
         for matrix in z_matrices
     ]
-    minimum_passivity_eigenvalue = min(
-        float(np.min(np.linalg.eigvalsh((matrix + matrix.conjugate().T) / 2.0)))
-        for matrix in z_matrices
-    )
+    passivity_samples = []
+    for frequency, matrix in zip(frequencies, z_matrices):
+        hermitian = (matrix + matrix.conjugate().T) / 2.0
+        eigenvalues = np.linalg.eigvalsh(hermitian)
+        minimum = float(eigenvalues[0])
+        scale = max(float(np.max(np.abs(eigenvalues))), 1e-30)
+        tolerance = max(1e-15, 1e-12 * scale)
+        passivity_samples.append((float(frequency), minimum, tolerance))
+    minimum_passivity_eigenvalue = min(item[1] for item in passivity_samples)
+    failing_sample = next((item for item in passivity_samples if item[1] < -item[2]), None)
+    if failing_sample is not None:
+        frequency, minimum, tolerance = failing_sample
+        issues.append(ValidationIssue(
+            "PEEC_PDN_NONPASSIVE", "error",
+            f"PDN impedance is nonpassive at {frequency:.9g} Hz: "
+            f"minimum Hermitian eigenvalue {minimum:.9g} ohm is below "
+            f"the {-tolerance:.9g} ohm tolerance. No projection was applied.",
+            path="networks.pdn_multiports",
+        ))
+        return None, issues
     maximum_reciprocity_error = max(reciprocity_errors, default=0.0)
     reciprocal = maximum_reciprocity_error <= 1e-8
     source_result_id = spec.analysis_id or "peec-local"

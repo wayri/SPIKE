@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -9,6 +10,7 @@ from python.spike_core.peec_plugin import (
     native_available,
     solve_peec_2_5d,
 )
+from python.spike_core.peec_network import extract_pdn_multiport
 
 
 class SharedReferenceMatrixTests(unittest.TestCase):
@@ -50,6 +52,41 @@ class SharedReferenceMatrixTests(unittest.TestCase):
         )
         self.assertEqual(quality["method"], "dense_direct")
         self.assertLess(quality["relative_residual"], 1e-12)
+
+    def test_nonpassive_pdn_matrix_is_rejected_without_projection(self):
+        mesh = HybridMesh(
+            nodes=[
+                MeshNode(0, 0.0, 0.0, 0.0, "F.Cu", "VCC"),
+                MeshNode(1, 1.0, 0.0, 0.0, "F.Cu", "VCC"),
+                MeshNode(2, 2.0, 0.0, 0.0, "F.Cu", "VCC"),
+            ],
+            branches=[
+                MeshBranch("rail", "track", 0, 1, (0., 0., 0.), (1., 0., 0.),
+                           1., .035, 5.8e7, "F.Cu", "VCC", "rail"),
+                MeshBranch("rail2", "track", 1, 2, (1., 0., 0.), (2., 0., 0.),
+                           1., .035, 5.8e7, "F.Cu", "VCC", "rail2"),
+            ],
+        )
+        spec = AnalysisSpec(mode="ac", net_names=["VCC"], options={
+            "pdn_candidate_ports": [{"id": "candidate", "net": "VCC",
+                                     "position_mm": [2., 0.], "layer": "F.Cu"}],
+        })
+        class Solver:
+            def compute_resistance(self, frequency):
+                return np.eye(2)
+
+        matrices = [np.array([[2., 0.], [0., 1.]], dtype=complex),
+                    np.array([[2., 0.], [0., -0.01]], dtype=complex)]
+        with patch("python.spike_core.peec_network.solve_shared_reference_port_matrix",
+                   side_effect=[(matrix, {"relative_residual": 0., "condition_number": None})
+                                for matrix in matrices]):
+            result, issues = extract_pdn_multiport(
+                mesh, spec, Solver(), "VCC", 0, ("observation", 1), False,
+                [0, 1, 2], [0, 1], np.zeros((2, 2)), np.zeros((3, 3)),
+                np.zeros((3, 3)), [1e3, 1e6],
+            )
+        self.assertIsNone(result)
+        self.assertIn("PEEC_PDN_NONPASSIVE", {issue.code for issue in issues})
 
 
 @unittest.skipUnless(native_available(), "Native PEEC extension is not built")
