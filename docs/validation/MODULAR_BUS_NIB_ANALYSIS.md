@@ -92,7 +92,7 @@ J20 and J15 path drops changed 16.79% and 4.86%, respectively, versus 3%
 allowed. The J14 path passed at 2.37%. The
 [corrected study evidence](modular-bus-nib-pinned-dc-convergence-anchored-corrected.json)
 records every level, input and solver hashes, exact pad IDs, per-load paths, and
-comparisons; its `can_sign_off` value is false. Pad-to-zone coupling remains
+comparisons; its `can_sign_off` value is false. Pad-to-zone coupling was then
 under review before another qualification run.
 
 An opt-in pad-owned shared-face study at solver revision `c0963b9` improved the
@@ -116,8 +116,50 @@ and [terminal diagnostic](modular-bus-nib-owned-faces-level5-12gb-terminal-diagn
 preserve this result. Independent [five-level topology evidence](modular-bus-nib-owned-faces-topology-audit-five-level-12gb.json)
 found six retained zones and area-balance error no larger than 3.19e-12 mm2,
 but the finest graph had one isolated node (components of 170,523 and 1), so
-connectivity and fifth-level source-to-load convergence remain open. The 12 GiB
+connectivity and fifth-level source-to-load convergence remained open at that
+revision. The 12 GiB
 budget changes resource admission only, on a host with 31.5 GiB physical RAM.
+
+### Repaired owned-copper DC qualification
+
+At solver revision `77f297c` (including the shifted-potential solve `f85a3fd`),
+the exact-pad, pad-owned shared-face study passed the unchanged strict
+five-level mesh gate with a 12 GiB solver admission budget. The pinned board and
+request hashes, exact R19.3/J14.2/J20.2/J15.2 pad IDs, six solver-source hashes,
+all level metrics and paths, and each adjacent comparison are in the
+[passing electrical evidence](modular-bus-nib-pinned-dc-convergence-owned-faces-five-level-repaired-12gb.json).
+The finest target/zone cells were 0.125/0.0625 mm, with 170,524 nodes and
+338,437 branches.
+
+| Finest comparison (0.25 to 0.125 factor) | Coarse | Fine | Change | Limit |
+| --- | ---: | ---: | ---: | ---: |
+| Maximum load drop | 1.234814 mV | 1.214125 mV | 1.676% | 3% |
+| Copper loss | 11.151702 mW | 10.959897 mW | 1.720% | 5% |
+| J14 source-to-load drop | 1.035783 mV | 1.016224 mV | 1.888% | 3% |
+| J20 source-to-load drop | 1.074913 mV | 1.057620 mV | 1.609% | 3% |
+| J15 source-to-load drop | 1.234814 mV | 1.214125 mV | 1.676% | 3% |
+
+All five source-to-load networks validated their exact terminals and balanced
+10 A. The largest source-current imbalance was 1.03e-11 A against the 1e-7 A
+gate; the largest scaled linear residual was 1.53e-16. Independent
+`sum(load current * source-to-load drop)` agreed with copper loss within
+3.12e-14 W across the study. The
+[repaired geometry audit](modular-bus-nib-owned-faces-topology-audit-five-level-repaired-12gb.json)
+found one global component, all six zones individually connected, and area
+balance within 3.19e-12 mm2 at every level. Positive pad-zone face areas stayed
+at about 0.310581 mm2 for R19.3 and 0.301119 mm2 for each load pad. The
+audit's mesh-source SHA-256 values match the electrical run, despite an
+unrelated later Git revision during the audit. The 12 GiB budget changed only
+resource admission. This passes the selected DC mesh and source-to-load
+qualification; material, package, manufacturing, omitted-physics, and human
+numerical-review requirements remain separate.
+
+Reproduce with `.venv/Scripts/python.exe -m scripts.verify_modular_bus_pi_convergence
+--exact-terminals --owned-shared-faces --include-fifth-level --solver-memory-gb
+12 --output docs/validation/modular-bus-nib-pinned-dc-convergence-owned-faces-five-level-repaired-12gb.json`
+and `.venv/Scripts/python.exe -m scripts.audit_hybrid_zone_topology
+--owned-shared-faces --factors 2 1 0.5 0.25 0.125 --solver-memory-gb 12 --output
+docs/validation/modular-bus-nib-owned-faces-topology-audit-five-level-repaired-12gb.json`.
 
 The reported peak current density of 95.56 A/mm2 is at the idealized R19 source
 injection element. This is a terminal singularity/model artifact and must not be

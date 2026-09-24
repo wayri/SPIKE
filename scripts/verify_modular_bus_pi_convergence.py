@@ -41,7 +41,7 @@ def main() -> int:
     solver_source_sha256 = {
         name: sha256(ROOT / "python/spike_core" / name)
         for name in (
-            "convergence.py", "dc_terminal_validation.py",
+            "convergence.py", "dc_terminal_validation.py", "dc_shifted_rhs.py",
             "hybrid_dc_solver.py", "hybrid_mesh.py", "hybrid_owned_copper.py",
         )
     }
