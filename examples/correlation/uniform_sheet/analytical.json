@@ -1,0 +1,18 @@
+{
+  "contract": "spike/analytical-correlation-reference/v1",
+  "case": "uniform_copper_sheet_end_to_end_dc",
+  "geometry": {
+    "length_m": 0.002,
+    "width_m": 0.001,
+    "thickness_m": 0.000035
+  },
+  "material": {
+    "conductivity_s_per_m": 58000000.0,
+    "isotropic": true,
+    "temperature_dependent": false
+  },
+  "terminal_model": "equipotential full-width ends; no contact or spreading resistance",
+  "equation": "R = length / (conductivity * width * thickness)",
+  "resistance_ohm": 0.0009852216748768474,
+  "validity": "stationary uniform current in a rectangular sheet; not a Marble or AC result"
+}

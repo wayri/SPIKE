@@ -2,6 +2,12 @@
 
 Status: in progress; not release qualification. Existing unrelated working-tree
 changes are preserved. Installed binaries have not been updated by this work.
+The later [2026-09-28 foundation increment](PEEC_FOUNDATION_INCREMENT_20260928.md)
+adds bounded local copper refinement, exact rectangle-spoke RT0 condensation,
+and a separated-annulus native kernel. Its pinned Marble rerun still fails
+the two-step 2% DC resistance convergence gate at a half-size interior rule.
+A subsequent, finer quarter-size interior 0.5/0.25/0.125 mm series passes that
+specific DC gate. None of these changes admits Marble AC as qualified.
 
 ## Reproduction
 
@@ -106,12 +112,17 @@ budget admitted all three levels and returned 4.300546/4.193714/4.139104
 mOhm. Consecutive changes were 2.55% and 1.32%, so the first of the last
 two changes still exceeds 2%. The report is
 `build/peec-refinement-fix/marble-rt0-dc-interior-quarter-audit.json`.
-A proposed finer 0.5/0.25/0.125 mm quarter-size series is not runnable within
-the experimental solver's 250,000-global-unknown cap: the 0.125 mm preflight
-alone produced 197,870 triangles and 316,235 globals, although its geometry
-passed the 1% area gate. It was not solved. Raising a counter or cherry-picking
-the two apparently stable coarse values would not establish convergence;
-scalable assembly/solve and independent physical validation remain necessary.
+Before rectangle-spoke condensation, a proposed finer 0.5/0.25/0.125 mm
+quarter-size series was not runnable within the experimental solver's
+250,000-global-unknown cap: the then-current 0.125 mm preflight produced
+197,870 triangles and 316,235 globals, although its geometry passed the 1%
+area gate. With the exact Schur reduction and current retained partition, the
+pinned finer series now completes at 4.193714/4.139104/4.108511 mOhm. The
+successive 1.3194% and 0.7446% changes pass the specific two-step DC
+resistance gate, with full details and hashes in
+[the foundation increment](PEEC_FOUNDATION_INCREMENT_20260928.md). This does
+not establish AC R/L/C convergence, scalable field extraction, complete via
+coverage, or independent physical validation.
 
 This geometry generates 522–732 million symmetric dense field pairs versus
 the native 8,192-pair admission limit, an estimated 93–131 GiB dense workspace.
@@ -150,7 +161,8 @@ diagnostic. Format reference: [KiCad pad specification](https://dev-docs.kicad.o
 1. Manufactured support/contact/conservation tests and stable finite pad contacts.
 2. Marble admitted geometry without copper leakage, preserving connectivity.
 3. Three refinements with the last two R/L changes <=2%, nonworsening trend,
-   residual <=1e-7 and KCL imbalance <=1e-8 of excitation.
+   residual <=1e-7 and KCL imbalance <=1e-8 of excitation. The isolated RT0
+   DC resistance portion passed on the pinned finer run; AC R/L has not.
 4. Fixed-mesh integration sensitivity <0.2%; C tessellation sensitivity <=2%.
 5. Full regression and source/binary identity checks. Independent reference and
    knowledgeable numerical review remain necessary before release qualification.
