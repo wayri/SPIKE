@@ -41,6 +41,9 @@ bounded board extraction to configurable endpoints, deterministic aggressors,
 graded passives, port edits, loaded transfer, waveform/eye/TDR and noise reports.
 IBIS support is inventory plus explicit DC-slope/ramp reduction, not nonlinear
 switching or AMI simulation. Results and exports retain these limitations.
+The [pinned Marble R293 teaching case](MARBLE_R293_SI_TUTORIAL.md) now checks a
+real pad/net series topology and executes illustrative Touchstone/IBIS
+before/after runs. It is not board-extracted SI or vendor-model correlation.
 
 The [2026-09-20 reliability increment](SI_FIELD_RELIABILITY_20260920.md)
 corrects finite-record PAM4 sampling and introduces controlled cross-board

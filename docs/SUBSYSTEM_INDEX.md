@@ -21,7 +21,10 @@ The loaded SI workflow is owned by `app/src/SiWorkflowWorkbench.tsx` and
 `app/src/SiWorkflowPlots.tsx`. Its worker orchestration is
 `python/spike_core/si_workflow.py`; network edits, passive models and IBIS
 inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
-`si_ibis.py`. See [SI workflow](SI_WORKFLOW.md) for scope and contracts.
+`si_ibis.py`. Touchstone parsing, export, and wave-domain renormalization live
+in `sparameters.py`. `scripts/run_marble_r293_si_tutorial.py` owns only the
+pinned real-board teaching case; it is not a production extractor. See
+[SI workflow](SI_WORKFLOW.md) for scope and contracts.
 
 | File | Responsibility | Notes |
 |---|---|---|

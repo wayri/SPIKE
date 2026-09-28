@@ -1,0 +1,45 @@
+| SPDX-License-Identifier: MIT
+| Copyright (c) 2026 SigHarmonic
+| Independently authored numerical teaching fixture; not a Marvell or AMD model.
+[IBIS Ver] 7.2
+[File Name] illustrative-rgmii.ibs
+[File Rev] 0.1
+[Component] EXAMPLE_PHY
+[Manufacturer] SigHarmonic Teaching Model
+[Package]
+R_pkg 0.10 0.08 0.12
+L_pkg 0.8n 0.6n 1.0n
+C_pkg 0.2p 0.1p 0.3p
+[Pin] signal_name model_name R_pin L_pin C_pin
+44 RXD0 example_output NA NA NA
+[Component] EXAMPLE_FPGA
+[Manufacturer] SigHarmonic Teaching Model
+[Package]
+R_pkg 0.10 0.08 0.12
+L_pkg 0.8n 0.6n 1.0n
+C_pkg 0.2p 0.1p 0.3p
+[Pin] signal_name model_name R_pin L_pin C_pin
+J10 RXD0 example_input NA NA NA
+[Model] example_output
+Model_type Output
+C_comp 1.5p 1.2p 1.8p
+[Voltage Range] 1.8 1.7 1.9
+[Pulldown]
+0 0 0 0
+0.9 0.018 0.015 0.021
+1.8 0.036 0.030 0.042
+[Pullup]
+0 0 0 0
+0.9 -0.018 -0.015 -0.021
+1.8 -0.036 -0.030 -0.042
+[Ramp]
+dV/dt_r 1.08/0.25n 1.02/0.30n 1.14/0.20n
+dV/dt_f 1.08/0.25n 1.02/0.30n 1.14/0.20n
+R_load = 50
+[Model] example_input
+Model_type Input
+Vinl = 0.3
+Vinh = 0.7
+C_comp 2.0p 1.8p 2.2p
+[Voltage Range] 1.8 1.7 1.9
+[End]

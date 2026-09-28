@@ -78,6 +78,16 @@ the ideal-CDR, training-DFE or Gaussian-BER approximation limits.
    reported loaded-system calculation. A changed setup marks results stale
    until rerun. Unsaved form changes can be retained using **Save setup**.
 
+The [Marble R293 tutorial](MARBLE_R293_SI_TUTORIAL.md) walks a pinned real-board
+pad/net map through channel-only Touchstone, illustrative IBIS reduction,
+mid-channel series-resistor insertion, before/after S21 and receiver-eye
+results. The board route is not extracted: the channel halves and IBIS are
+original teaching assumptions, explicitly recorded with the output. The
+Python `run_series_component_impact` helper provides a separate bounded
+before/after comparison for **endpoint** series R/L/C attachments, returning
+receiver-die transfer rather than channel-facing voltage; it rejects
+mid-channel placement and is not yet a separate desktop/process command.
+
 ## Physics and model scope
 
 The loaded solver uses power-wave boundary conditions to solve the complete
@@ -167,7 +177,10 @@ remain further work. This workflow does not claim to complete those features.
 
 Regression checks include analytic loaded dividers and RC transfer, thermal
 noise, decoupled/coupled networks, lossless DC, cascades, IBIS pin/corner binding,
-schema/default parity and asymmetric known-matrix Touchstone ordering.
+schema/default parity, asymmetric known-matrix Touchstone ordering, analytic
+series-resistor insertion and invalid endpoint mappings. The parser also
+checks bounded Touchstone 2.1 option categories, multiline per-port references
+and declared frequency count; this is not complete Touchstone 2.1 support.
 
 ## References
 

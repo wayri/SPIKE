@@ -8,6 +8,8 @@ returned fields, and a browser screenshot of the *executed artifact view*.
 The captures are not screenshots of the SPIKE desktop and do not certify a
 fabricated board. For desktop controls, use the [task sequences](USER_TASK_SEQUENCES.md)
 and [SI workflow reference](SI_WORKFLOW.md).
+For a pinned real-board component topology with separate illustrative
+Touchstone/IBIS inputs, continue with the [Marble R293 SI tutorial](MARBLE_R293_SI_TUTORIAL.md).
 
 Run from the repository root with a Python 3.11 environment containing the
 [development dependencies](../DEVELOPMENT.md) and a locally built compatible
@@ -185,7 +187,8 @@ replace the failed gate with passivity projection or an assumed capacitance.
 
 `scripts/render_pi_si_tutorial_pages.py` verifies the executable outputs,
 including the analytical DC check and explicit blocked SI uses, then creates
-up to eight offline HTML artifact views under `build/tutorial-pi-si/pages/`.
+up to nine offline HTML artifact views under `build/tutorial-pi-si/pages/`
+when the companion Marble R293 study is also run.
 The Marble page is optional unless the exact board and audit are present.
 Screenshots here were taken with local headless Chrome from those HTML pages.
 They show input, output, and returned result together; they are **not**

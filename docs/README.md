@@ -13,6 +13,7 @@ work plan (2026-09-05)](STABILIZATION_RELEASE_PLAN_20260905.md).
 |---|---|---|
 | Complete a desktop task | [User task guide](USER_TASK_SEQUENCES.md) | [Result visualization](RESULT_VISUALIZATION_AND_LIMITS.md), [project format](PROJECT_FORMAT.md) |
 | Reproduce PI/SI inputs, outputs, plots and fail-closed gates | [PI/SI worked casebook](PI_SI_WORKED_CASEBOOK.md) | [Capture provenance](tutorial-assets/pi-si-casebook/README.md), [solver status](SOLVER_STATUS.md) |
+| Walk through a pinned real-board R293 path with Touchstone, IBIS and series-impact boundaries | [Marble R293 SI tutorial](MARBLE_R293_SI_TUTORIAL.md) | [SI workflow](SI_WORKFLOW.md), [solver status](SOLVER_STATUS.md) |
 | Diagnose a failure | [Troubleshooting](../TROUBLESHOOTING.md) | [Error-code catalog](ERROR_CODE_CATALOG.md), [stability and recovery](STABILITY_AND_RECOVERY.md) |
 | Use the CLI | [CLI workflow](CLI_WORKFLOW.md) | [CLI reference](CLI.md) |
 | Check solver availability or validity | [Solver status](SOLVER_STATUS.md) | [Validation program](VALIDATION_PROGRAM.md), [release qualification](PI_RELEASE_QUALIFICATION.md) |

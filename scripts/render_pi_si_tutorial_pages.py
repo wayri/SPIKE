@@ -275,6 +275,38 @@ def main() -> None:
              "The retained positive-energy matrix is not an admitted Marble AC result: current bases extend outside copper.")
         count += 1
 
+    fitted_request = RUN / "marble-r293/fitted-22ohm-request.json"
+    impact_path = RUN / "marble-r293/impact-report.json"
+    if fitted_request.is_file() and impact_path.is_file():
+        request = json.loads(fitted_request.read_text(encoding="utf-8"))
+        impact = json.loads(impact_path.read_text(encoding="utf-8"))
+        evidence = impact["board_evidence"]
+        if (evidence["source_board_sha256"] !=
+                "3304ba37c2bd891849fc36b500cd940934aaf1f2013a95639c03564fb925c512"):
+            raise ValueError("Marble SI board evidence does not match the pinned board")
+        if (impact["status"] != "completed_experimental" or impact["production_qualified"] or
+                request["channel"]["kind"] != "touchstone" or len(impact["ibis_reductions"]["fitted-22ohm"]) != 2):
+            raise ValueError("Marble SI topology result is stale or lacks the declared model boundary")
+        frequencies = impact["frequency_comparison"]
+        page("marble-r293-si", "Marble R293: real connectivity, illustrative SI models", fitted_request,
+             "run_marble_r293_si_tutorial.py --board <pinned Marble PCB>",
+             {"board_sha256": evidence["source_board_sha256"],
+              "path": evidence["path"], "pad_nets": evidence["pads"],
+              "channel_input": "cascaded original analytic Touchstone, not board extraction",
+              "ibis_input": "original teaching fixture, not U4/U1 vendor model"},
+             impact_path,
+             {"status": impact["status"], "via_count_by_net": evidence["via_count_by_net"],
+              "s21_delta_db_at_250_mhz": frequencies[1]["s21_delta_db"],
+              "eye_height_delta_v": impact["eye_height_v"]["delta_v"],
+              "sampled_passivity": impact["touchstone_checks"]["fitted-22ohm"]["passivity"]["status"],
+              "causality": impact["touchstone_checks"]["fitted-22ohm"]["causality"]["status"],
+              "production_qualified": impact["production_qualified"]},
+             plot({"0 ohm counterfactual": [(row["frequency_hz"] / 1e9, row["s21_before_db"]) for row in frequencies],
+                   "fitted 22 ohm": [(row["frequency_hz"] / 1e9, row["s21_after_db"]) for row in frequencies]},
+                  "GHz", "dB"),
+             "The board contributes connectivity only. Both RLGC halves and IBIS are teaching models; no Marble channel extraction, vendor-device prediction or compliance claim.")
+        count += 1
+
     print(f"Rendered {count} offline artifact pages under {PAGES}")
 
 

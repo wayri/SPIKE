@@ -130,6 +130,10 @@ def parse_touchstone_text(text: str, name: str = "network.s2p") -> NetworkData:
     data_format = "MA"
     reference_values = [50.0]
     declared_ports: int | None = None
+    declared_frequencies: int | None = None
+    in_reference = False
+    has_reference = False
+    has_option = False
     matrix_format = "full"
     comments: List[str] = []
     warnings: List[str] = []
@@ -145,31 +149,56 @@ def parse_touchstone_text(text: str, name: str = "network.s2p") -> NetworkData:
         if not stripped:
             continue
         if stripped.startswith("#"):
+            if has_option:
+                continue
+            has_option = True
             option = stripped[1:].split()
-            lowered = [item.lower() for item in option]
-            if lowered and lowered[0] in _FREQUENCY_SCALE:
-                frequency_unit = lowered[0]
-            if len(lowered) >= 2:
-                parameter_kind = lowered[1].upper()
-            if len(lowered) >= 3:
-                data_format = lowered[2].upper()
-            if "r" in lowered:
-                index = lowered.index("r")
-                if index + 1 >= len(option):
-                    raise TouchstoneError(
-                        f"Reference impedance is missing on line {line_number}."
-                    )
-                reference_values = _parse_numbers([option[index + 1]], line_number)
+            # The option categories may appear in any order, with omitted
+            # categories retaining defaults (Touchstone 2.1, Option Line).
+            seen = set()
+            index = 0
+            while index < len(option):
+                token = option[index].lower()
+                if token in _FREQUENCY_SCALE:
+                    category, frequency_unit = "unit", token
+                elif token in {"s", "z", "y", "h", "g"}:
+                    category, parameter_kind = "parameter", token.upper()
+                elif token in {"ri", "ma", "db"}:
+                    category, data_format = "format", token.upper()
+                elif token == "r":
+                    category = "reference"
+                    index += 1
+                    if index >= len(option):
+                        raise TouchstoneError(f"Reference impedance is missing on line {line_number}.")
+                    reference_values = _parse_numbers([option[index]], line_number)
+                else:
+                    raise TouchstoneError(f"Unsupported option token {option[index]!r} on line {line_number}.")
+                if category in seen:
+                    raise TouchstoneError(f"Duplicate {category} option on line {line_number}.")
+                seen.add(category)
+                index += 1
             continue
         if stripped.startswith("["):
+            in_reference = False
             closing = stripped.find("]")
             if closing < 0:
                 raise TouchstoneError(f"Malformed Touchstone keyword on line {line_number}.")
             keyword = stripped[1:closing].strip().lower()
             value = stripped[closing + 1 :].strip()
             if keyword == "number of ports":
+                if not value.isascii() or not value.isdigit() or int(value) < 1:
+                    raise TouchstoneError("[Number of Ports] requires a positive integer.")
                 declared_ports = int(value)
+            elif keyword == "number of frequencies":
+                if not value.isascii() or not value.isdigit() or int(value) < 1:
+                    raise TouchstoneError("[Number of Frequencies] requires a positive integer.")
+                if declared_frequencies is not None:
+                    raise TouchstoneError("Duplicate [Number of Frequencies].")
+                declared_frequencies = int(value)
             elif keyword == "reference":
+                if has_reference or declared_ports is None or numeric_tokens:
+                    raise TouchstoneError("[Reference] must occur once after [Number of Ports] and before network data.")
+                has_reference = in_reference = True
                 reference_values = _parse_numbers(value.split(), line_number)
             elif keyword == "matrix format":
                 matrix_format = value.lower()
@@ -184,7 +213,9 @@ def parse_touchstone_text(text: str, name: str = "network.s2p") -> NetworkData:
             elif keyword in {"noise data", "end"}:
                 in_network_data = False
             continue
-        if in_network_data:
+        if in_reference:
+            reference_values.extend(_parse_numbers(stripped.split(), line_number))
+        elif in_network_data:
             numeric_tokens.extend((token, line_number) for token in stripped.split())
 
     ports = _port_count(source_path, declared_ports)
@@ -200,9 +231,10 @@ def parse_touchstone_text(text: str, name: str = "network.s2p") -> NetworkData:
         raise TouchstoneError(
             f"Touchstone data format {data_format!r} is unsupported; use RI, MA, or DB."
         )
-    if len(reference_values) not in {1, ports}:
+    if len(reference_values) not in ({ports} if has_reference else {1, ports}):
+        expected_references = str(ports) if has_reference else f"one or {ports}"
         raise TouchstoneError(
-            f"Expected one or {ports} reference impedances, got {len(reference_values)}."
+            f"Expected {expected_references} reference impedances, got {len(reference_values)}."
         )
     reference = np.asarray(
         reference_values if len(reference_values) == ports else reference_values * ports,
@@ -222,6 +254,10 @@ def parse_touchstone_text(text: str, name: str = "network.s2p") -> NetworkData:
         )
 
     records = len(numeric_tokens) // values_per_frequency
+    if declared_frequencies is not None and records != declared_frequencies:
+        raise TouchstoneError(
+            f"[Number of Frequencies] declares {declared_frequencies}, but found {records} network records."
+        )
     frequencies = np.empty(records, dtype=float)
     matrices = np.empty((records, ports, ports), dtype=complex)
     scale = _FREQUENCY_SCALE[frequency_unit]
@@ -354,7 +390,50 @@ def renormalize_s(
     old_reference_ohm: float | Sequence[float] | np.ndarray,
     new_reference_ohm: float | Sequence[float] | np.ndarray,
 ) -> np.ndarray:
-    return z_to_s(s_to_z(s_parameters, old_reference_ohm), new_reference_ohm)
+    """Change positive real power-wave references without an intermediate Z.
+
+    From V=sqrt(R)(a+b), I=(a-b)/sqrt(R), the new waves obey
+    a'=A*a+B*b and b'=B*a+A*b. Thus S'=(B+A*S)/(A+B*S),
+    with diagonal A=(q+1/q)/2, B=(q-1/q)/2, q=sqrt(Rold/Rnew).
+    This admits ideal throughs/open circuits whose Z representation is singular.
+    Cancellation-limited wave boundary systems are rejected, not regularized.
+    """
+    s = np.asarray(s_parameters, dtype=complex)
+    single = s.ndim == 2
+    if single:
+        s = s[np.newaxis, ...]
+    if s.ndim != 3 or s.shape[1] != s.shape[2] or not s.shape[1]:
+        raise ValueError("S-parameters must be a nonempty square matrix or frequency stack.")
+    if not np.all(np.isfinite(s)):
+        raise ValueError("Renormalization requires finite S-parameters.")
+    ports = s.shape[1]
+    old = _reference_vector(old_reference_ohm, ports)
+    new = _reference_vector(new_reference_ohm, ports)
+    with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+        ratio = np.sqrt(old) / np.sqrt(new)
+        a = np.diag((ratio + 1 / ratio) / 2)
+        b = np.diag((ratio - 1 / ratio) / 2)
+    if not np.all(np.isfinite(a)) or not np.all(np.isfinite(b)):
+        raise ValueError("Reference ratio exceeds finite renormalization range.")
+    result = np.empty_like(s)
+    for index, matrix in enumerate(s):
+        with np.errstate(over="ignore", invalid="ignore"):
+            denominator, numerator = a + b @ matrix, b + a @ matrix
+            # Compare against uncancelled terms as well as the system's own
+            # scale; condition number alone misses scalar cancellation poles.
+            scale = np.linalg.norm(np.abs(a) + np.abs(b) @ np.abs(matrix), ord=np.inf)
+        if not np.all(np.isfinite(denominator)) or not np.all(np.isfinite(numerator)) or not np.isfinite(scale):
+            raise ValueError(f"Non-finite renormalization system at sample {index}.")
+        try:
+            smallest = np.linalg.svd(denominator, compute_uv=False)[-1]
+            if smallest <= 64 * np.finfo(float).eps * ports * scale:
+                raise ValueError(f"Renormalization is singular or ill-conditioned at sample {index}.")
+            result[index] = np.linalg.solve(denominator.T, numerator.T).T
+        except np.linalg.LinAlgError as exc:
+            raise ValueError(f"Renormalization is singular at sample {index}.") from exc
+    if not np.all(np.isfinite(result)):
+        raise ValueError("Renormalization produced non-finite S-parameters.")
+    return result[0] if single else result
 
 
 def single_ended_to_mixed_mode(s_parameters: np.ndarray) -> np.ndarray:

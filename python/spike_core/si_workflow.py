@@ -18,6 +18,7 @@ from .si_clock_recovery import recover_nrz_clock, validate_cdr_model
 
 REQUEST = "spike/si-workflow-request/v1"
 RESULT = "spike/si-workflow-result/v1"
+SERIES_IMPACT_RESULT = "spike/si-series-component-impact-result/v1"
 SOURCE = {"resistance_ohm": 50.0, "low_v": 0.0, "high_v": 1.8, "rise_time_s": 100e-12,
           "fall_time_s": 100e-12, "capacitance_f": 0.0, "package_r_ohm": 0.0,
           "package_l_h": 0.0, "package_c_f": 0.0, "pattern_shift_bits": 0, "delay_s": 0.0}
@@ -281,12 +282,20 @@ def run_si_workflow(request: Mapping[str, Any], design=None) -> dict[str, Any]:
     f = network.frequencies_hz
     indices = np.unique(np.linspace(0, len(f) - 1, min(len(f), 1024)).astype(int))
     loaded = []
+    receiver_ports = {receiver["port"] for receiver in receivers}
     for source_index, source in enumerate(sources):
         for port in range(ports):
             h = transfer[:, port, source_index]
-            loaded.append({"source_port": source["port"], "observed_port": port,
-                           "trace": [{"frequency_hz": float(f[i]), "magnitude_db": float(20 * np.log10(max(abs(h[i]), 1e-15))),
-                                      "phase_deg": float(np.angle(h[i], deg=True)), "real": float(h[i].real), "imag": float(h[i].imag)} for i in indices]})
+            item = {"source_port": source["port"], "observed_port": port,
+                    "trace": [{"frequency_hz": float(f[i]), "magnitude_db": float(20 * np.log10(max(abs(h[i]), 1e-15))),
+                               "phase_deg": float(np.angle(h[i], deg=True)), "real": float(h[i].real), "imag": float(h[i].imag)} for i in indices]}
+            if port in receiver_ports:
+                die = h * receiver_factors[:, port]
+                item["receiver_die_trace"] = [
+                    {"frequency_hz": float(f[i]), "magnitude_db": float(20 * np.log10(max(abs(die[i]), 1e-15))),
+                     "phase_deg": float(np.angle(die[i], deg=True)), "real": float(die[i].real), "imag": float(die[i].imag)}
+                    for i in indices]
+            loaded.append(item)
     integrate = np.trapezoid if hasattr(np, "trapezoid") else np.trapz
     noise_rms = np.sqrt(np.maximum(integrate(noise_psd, f, axis=0), 0))
     positive = f > 0
@@ -328,3 +337,132 @@ def run_si_workflow(request: Mapping[str, Any], design=None) -> dict[str, Any]:
                             "Crosstalk is the loaded transfer from a chosen source to an explicitly mapped victim port; imported networks carry no geometry extraction claim.",
                             "Time-domain outputs require explicit DC and a uniform grid; finite bandwidth and periodic impulse tails can affect results.",
                             "Passive grade defaults are editable assumptions, not guaranteed part behavior. Min/max are parameter envelopes, not statistical yield."]}
+
+
+def run_series_component_impact(
+    request: Mapping[str, Any],
+    series_components: list[Mapping[str, Any]],
+    *,
+    source_port: int | None = None,
+    receiver_port: int | None = None,
+    design=None,
+) -> dict[str, Any]:
+    """Compare a loaded SI path before and after explicit endpoint series parts.
+
+    The component models are the same bounded SI-unit resistor/capacitor models
+    accepted by :func:`run_si_workflow`.  A resistor model is R-L with parallel
+    parasitic C; a capacitor model is C with series ESR/ESL and parallel leakage.
+    This helper does not synthesize a package, interconnect, nonlinear IBIS, or
+    AMI model.
+    """
+    if not isinstance(request, Mapping):
+        raise ValueError("SI request must be an object.")
+    if not isinstance(series_components, list) or not 1 <= len(series_components) <= 16:
+        raise ValueError("series_components must contain 1..16 explicit attachments.")
+
+    baseline_request = deepcopy(dict(request))
+    existing = baseline_request.get("passives", [])
+    if not isinstance(existing, list):
+        raise ValueError("request.passives must be an array.")
+    additions = []
+    existing_ids = {item.get("id") for item in existing if isinstance(item, Mapping) and item.get("id") is not None}
+    for index, raw in enumerate(series_components):
+        checked(raw, {"id", "port", "connection", "model"}, "series component")
+        if raw.get("connection", "series") != "series":
+            raise ValueError("Series-component impact accepts only connection='series'.")
+        if "port" not in raw or "model" not in raw:
+            raise ValueError("Each series component requires explicit port and model fields.")
+        item = deepcopy(dict(raw))
+        item["connection"] = "series"
+        item.setdefault("id", f"series-impact-{index + 1}")
+        if item["id"] in existing_ids or any(prior["id"] == item["id"] for prior in additions):
+            raise ValueError("Series component ids must be unique across existing and added passives.")
+        # Resolve before either run so units, finite bounds, positive passive
+        # values, grade envelopes and the declared topology fail closed.
+        resolve_passive(item["model"])
+        additions.append(item)
+
+    baseline = run_si_workflow(baseline_request, design)
+    passivity = baseline["network"]["checks"]["passivity"]
+    if passivity.get("status") != "pass":
+        raise ValueError(
+            "Series-component impact requires a passive input channel; "
+            f"network check reported {passivity.get('status', 'unknown')}."
+        )
+
+    sources = [item["port"] for item in baseline["sources"]]
+    receivers = [item["port"] for item in baseline["receivers"]]
+    if source_port is None:
+        if len(sources) != 1:
+            raise ValueError("Select source_port explicitly when the workflow has multiple sources.")
+        source_port = sources[0]
+    if receiver_port is None:
+        if len(receivers) != 1:
+            raise ValueError("Select receiver_port explicitly when the workflow has multiple receivers.")
+        receiver_port = receivers[0]
+    if source_port not in sources or receiver_port not in receivers:
+        raise ValueError("Impact ports must map to declared source and receiver endpoints.")
+    endpoint_ports = set(sources + receivers)
+    if any(item["port"] not in endpoint_ports for item in additions):
+        raise ValueError("Every series component must map to a declared source or receiver endpoint port.")
+
+    modified_request = deepcopy(baseline_request)
+    modified_request["passives"] = deepcopy(existing) + additions
+    modified = run_si_workflow(modified_request, design)
+
+    def selected_trace(result):
+        matches = [item.get("receiver_die_trace", item["trace"]) for item in result["loaded_transfers"]
+                   if item["source_port"] == source_port and item["observed_port"] == receiver_port]
+        if len(matches) != 1:
+            raise ValueError("Selected source-to-receiver transfer did not resolve exactly once.")
+        return matches[0]
+
+    before_trace, after_trace = selected_trace(baseline), selected_trace(modified)
+    if len(before_trace) != len(after_trace):
+        raise ValueError("Before/after transfer grids do not match.")
+    comparison = []
+    for before_point, after_point in zip(before_trace, after_trace):
+        if before_point["frequency_hz"] != after_point["frequency_hz"]:
+            raise ValueError("Before/after transfer frequencies do not match.")
+        before_complex = complex(before_point["real"], before_point["imag"])
+        after_complex = complex(after_point["real"], after_point["imag"])
+        comparison.append({
+            "frequency_hz": before_point["frequency_hz"],
+            "before_magnitude_db": before_point["magnitude_db"],
+            "after_magnitude_db": after_point["magnitude_db"],
+            "delta_magnitude_db": after_point["magnitude_db"] - before_point["magnitude_db"],
+            "complex_delta_magnitude": float(abs(after_complex - before_complex)),
+        })
+    worst = min(comparison, key=lambda point: point["delta_magnitude_db"])
+    return {
+        "contract": SERIES_IMPACT_RESULT,
+        "status": "completed" if baseline["status"] == modified["status"] == "completed" else "partial",
+        "model_status": "experimental",
+        "production_qualified": False,
+        "source_port": source_port,
+        "receiver_port": receiver_port,
+        "series_components": additions,
+        "validation": {
+            "channel_passivity": passivity,
+            "component_passivity": {
+                "status": "pass",
+                "method": "bounded positive R/L/C parameter and topology validation",
+                "count": len(additions),
+            },
+            "port_mapping": "Explicit declared source and receiver ports; zero-based Touchstone/workflow order.",
+            "component_units": "SI: ohm, henry, farad, volt, second and degrees Celsius.",
+        },
+        "comparison": comparison,
+        "summary": {
+            "worst_delta_magnitude_db": worst["delta_magnitude_db"],
+            "worst_delta_frequency_hz": worst["frequency_hz"],
+            "maximum_complex_transfer_change": max(point["complex_delta_magnitude"] for point in comparison),
+        },
+        "before": baseline,
+        "after": modified,
+        "limitations": [
+            "Linear endpoint series attachments only; placement inside an imported channel requires an explicit cascaded network.",
+            "IBIS endpoints, when present, use only the declared fixed DC-slope/ramp reduction; no nonlinear switching or IBIS-AMI execution.",
+            "A passing sampled S-parameter passivity check is not causality, fixture-deembedding, measurement-correlation or compliance qualification.",
+        ],
+    }
