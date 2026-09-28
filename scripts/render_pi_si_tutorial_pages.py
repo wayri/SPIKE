@@ -184,7 +184,8 @@ def main() -> None:
          {"status": si["status"], "model_status": si["model_status"],
           "port_count": si["network"]["port_count"], "time_domain": si["time_domain"]["status"],
           "tdr": si["tdr"]["status"], "eye_height_v": rx["eye_height_v"],
-          "field_maps": si["field_maps"]["status"], "production_qualified": si["production_qualified"]},
+          "field_maps": si.get("field_maps", {}).get("status", "not_returned"),
+          "production_qualified": si["production_qualified"]},
          plot({key: [(row["frequency_hz"] / 1e9,
                       max(-120.0, min(5.0, row["magnitude_db"])))
                       for row in si["network"]["traces"][key]]

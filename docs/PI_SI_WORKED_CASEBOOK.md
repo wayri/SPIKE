@@ -87,8 +87,9 @@ far, victim far. With port 1 excited, `S31` is through, `S21` NEXT, and
 
 The returned frequency, time-domain, and TDR stages completed, with four
 ports and a **1.765625 V** deterministic reference-eye height. The waveform,
-TDR and eye are in `time_domain.receivers` and `tdr`; spatial `field_maps`
-is `unsupported`, and `production_qualified` is false. The first capture
+TDR and eye are in `time_domain.receivers` and `tdr`; no spatial E/H samples
+are returned (the development UI may explicitly label them `unsupported`),
+and `production_qualified` is false. The first capture
 shows the exact input/output and a display-clipped S plot; the second shows
 four returned eye traces alongside the returned TDR.
 
@@ -184,7 +185,7 @@ replace the failed gate with passivity projection or an assumed capacitance.
 
 `scripts/render_pi_si_tutorial_pages.py` verifies the executable outputs,
 including the analytical DC check and explicit blocked SI uses, then creates
-eight offline HTML artifact views under `build/tutorial-pi-si/pages/`.
+up to eight offline HTML artifact views under `build/tutorial-pi-si/pages/`.
 The Marble page is optional unless the exact board and audit are present.
 Screenshots here were taken with local headless Chrome from those HTML pages.
 They show input, output, and returned result together; they are **not**
