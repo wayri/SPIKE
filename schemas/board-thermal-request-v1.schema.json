@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/board-thermal-request-v1.schema.json",
+  "title": "SPIKE board thermal request v1",
+  "type": "object",
+  "required": ["ambient_temperature_c", "board", "components"],
+  "properties": {
+    "ambient_temperature_c": {"type": "number", "minimum": -273.15},
+    "board": {
+      "type": "object",
+      "required": ["thickness_mm", "grid_step_mm", "convection_top_w_m2k", "convection_bottom_w_m2k"],
+      "properties": {
+        "model": {"enum": ["plate", "layered"]},
+        "conductivity_w_mk": {"type": "number", "exclusiveMinimum": 0},
+        "dielectric_conductivity_w_mk": {"type": "number", "exclusiveMinimum": 0},
+        "copper_conductivity_w_mk": {"type": "number", "exclusiveMinimum": 0},
+        "via_plating_thickness_mm": {"type": "number", "exclusiveMinimum": 0},
+        "include_copper": {"type": "boolean"},
+        "include_vias": {"type": "boolean"},
+        "include_tracks": {"type": "boolean"},
+        "include_pads": {"type": "boolean"},
+        "include_zones": {"type": "boolean"},
+        "fuzzy_sigma_mm": {"type": "number", "minimum": 0},
+        "thickness_mm": {"type": "number", "exclusiveMinimum": 0},
+        "grid_step_mm": {"type": "number", "exclusiveMinimum": 0},
+        "convection_top_w_m2k": {"type": "number", "minimum": 0},
+        "convection_bottom_w_m2k": {"type": "number", "minimum": 0}
+      },
+      "allOf": [{"if": {"properties": {"model": {"const": "layered"}}, "required": ["model"]},
+        "then": {"required": ["dielectric_conductivity_w_mk", "copper_conductivity_w_mk", "include_copper", "include_vias", "include_tracks", "include_pads", "include_zones", "fuzzy_sigma_mm"],
+                 "if": {"properties": {"include_vias": {"const": true}}},
+                 "then": {"required": ["via_plating_thickness_mm"]}},
+        "else": {"required": ["conductivity_w_mk"]}}],
+      "additionalProperties": false
+    },
+    "virtual_heatsinks": {
+      "type": "array", "maxItems": 16,
+      "items": {
+        "type": "object",
+        "required": ["id", "face", "x_mm", "y_mm", "width_mm", "height_mm", "interface_resistance_k_w", "sink_to_ambient_k_w"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "face": {"enum": ["top", "bottom"]},
+          "x_mm": {"type": "number"}, "y_mm": {"type": "number"},
+          "width_mm": {"type": "number", "exclusiveMinimum": 0},
+          "height_mm": {"type": "number", "exclusiveMinimum": 0},
+          "interface_resistance_k_w": {"type": "number", "minimum": 0},
+          "sink_to_ambient_k_w": {"type": "number", "exclusiveMinimum": 0}
+        },
+        "additionalProperties": false
+      }
+    },
+    "transient": {
+      "type": "object",
+      "required": ["end_time_s", "time_step_s", "output_stride", "copper_volumetric_heat_capacity_j_m3k", "dielectric_volumetric_heat_capacity_j_m3k"],
+      "properties": {
+        "end_time_s": {"type": "number", "exclusiveMinimum": 0},
+        "time_step_s": {"type": "number", "exclusiveMinimum": 0},
+        "output_stride": {"type": "integer", "minimum": 1},
+        "copper_volumetric_heat_capacity_j_m3k": {"type": "number", "exclusiveMinimum": 0},
+        "dielectric_volumetric_heat_capacity_j_m3k": {"type": "number", "exclusiveMinimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "components": {
+      "type": "array", "minItems": 1, "maxItems": 256,
+      "items": {
+        "type": "object",
+        "required": ["component_ref", "power_w", "r_junction_case_k_w", "r_case_board_k_w"],
+        "properties": {
+          "component_ref": {"type": "string", "minLength": 1},
+          "power_w": {"type": "number", "minimum": 0},
+          "contact_mode": {"enum": ["pads", "square"]},
+          "contact_size_mm": {"type": "number", "exclusiveMinimum": 0},
+          "r_junction_case_k_w": {"type": "number", "exclusiveMinimum": 0},
+          "r_case_board_k_w": {"type": "number", "exclusiveMinimum": 0}
+        },
+        "oneOf": [
+          {"properties": {"contact_mode": {"const": "pads"}}, "required": ["contact_mode"], "not": {"required": ["contact_size_mm"]}},
+          {"properties": {"contact_mode": {"enum": ["square"]}}, "required": ["contact_size_mm"]}
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "allOf": [{"if": {"properties": {"virtual_heatsinks": {"minItems": 1}}, "required": ["virtual_heatsinks"]},
+    "then": {"properties": {"board": {"properties": {"model": {"const": "layered"}}, "required": ["model"]}}}},
+    {"if": {"required": ["transient"]},
+      "then": {"properties": {"board": {"properties": {"model": {"const": "layered"}}, "required": ["model"]}}}}],
+  "additionalProperties": false
+}

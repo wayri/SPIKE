@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Public process-boundary adapter for the private SPIKES native runtime.
 
 Milestone 0 intentionally does not translate PCB DesignIR geometry into a

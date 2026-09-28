@@ -452,6 +452,7 @@ class SpikeCliTests(unittest.TestCase):
             "requested_analyses": ["conducted_screening"],
             "frequency": {"start_hz": 1e6, "stop_hz": 1e9, "points": 101},
             "environment": {"kind": "free_space"},
+            "radiated_emissions_standard": {"id": "cispr-32-2015-amd1-2019", "classification": "B"},
             "mesh": {"resolution_mm": 0.25, "padding_cells": 8},
             "max_solver_time_s": 3600,
             "excitation": {"mode": "prepass_results", "ports": []},
@@ -466,11 +467,14 @@ class SpikeCliTests(unittest.TestCase):
         self.assertEqual(code, EXIT_OK)
         self.assertEqual(preflight["contract"], "spike/emi-preflight/v1")
         self.assertTrue(preflight["can_screen"])
+        self.assertEqual(preflight["reference_standard"]["comparison_status"], "unavailable")
+        self.assertFalse(preflight["reference_standard"]["compliance_available"])
 
         code, screened = self.invoke("emi-screen", str(self.design_path), str(setup_path))
         self.assertEqual(code, EXIT_OK)
         self.assertEqual(screened["status"], "completed_screening_only")
         self.assertEqual(screened["screening"]["recommended_nets"][0]["net"], "VCC")
+        self.assertFalse(screened["provenance"]["compliance_prediction"])
 
     def test_dc_supports_multiple_terminals_and_saves_request(self):
         request_path = self.root / "request.json"

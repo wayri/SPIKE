@@ -22,6 +22,27 @@ def read_request(path: str | Path) -> dict[str, Any]:
     return request
 
 
+def mesh_exchange(request: Mapping[str, Any]) -> dict[str, Any]:
+    """Return host-generated solver geometry and complete admitted mesh.
+
+    ``mesh_preview`` is for display and may be sampled. Solvers must use the
+    complete ``mesh`` topology or generate their own mesh from solver_geometry.
+    """
+    context = request.get("context")
+    if not isinstance(context, Mapping):
+        raise ValueError("Extension request context must be an object.")
+    mesh = context.get("mesh")
+    preview = context.get("mesh_preview")
+    binding = context.get("mesh_binding")
+    geometry = context.get("solver_geometry")
+    if (not isinstance(mesh, dict) or mesh.get("contract") != "spike/hybrid-mesh-exchange/v1"
+            or mesh.get("truncated") is not False or not isinstance(preview, dict)
+            or not isinstance(binding, dict) or not isinstance(geometry, dict)):
+        raise ValueError("The host did not supply a complete mesh exchange; declare mesh.read.")
+    return {"mesh": mesh, "mesh_preview": preview, "mesh_binding": binding,
+            "solver_geometry": geometry, "analysis_spec": context.get("analysis_spec")}
+
+
 def analysis_result(
     request: Mapping[str, Any],
     *,
@@ -63,7 +84,11 @@ def analysis_result(
         "probes": [dict(item) for item in probes or []],
         "issues": [dict(item) for item in issues or []],
         "provenance": {**dict(provenance or {}), "design_id": binding["design_id"],
-                       "design_digest_sha256": binding["digest_sha256"], "solver": solver},
+                       "design_digest_sha256": binding["digest_sha256"], "solver": solver,
+                       **({"input_mesh_sha256": context["mesh_binding"]["mesh_digest_sha256"]}
+                          if isinstance(context.get("mesh_binding"), Mapping) else {}),
+                       **({"input_analysis_spec_sha256": context["mesh_binding"]["analysis_spec_digest_sha256"]}
+                          if isinstance(context.get("mesh_binding"), Mapping) else {})},
     }
     json.dumps(result, allow_nan=False)
     return result
@@ -87,4 +112,4 @@ def write_result(path: str | Path, envelope: Mapping[str, Any]) -> None:
     os.replace(temporary, target)
 
 
-__all__ = ["read_request", "analysis_result", "analysis_envelope", "write_result"]
+__all__ = ["read_request", "mesh_exchange", "analysis_result", "analysis_envelope", "write_result"]

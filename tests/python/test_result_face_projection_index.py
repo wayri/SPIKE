@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Indexed face projection must preserve the prior nearest-branch selection."""
 
 import random

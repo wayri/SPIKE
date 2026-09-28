@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Evaluate an existing immutable Yagi run without replaying the solver."""
 import argparse

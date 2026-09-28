@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import type { ScalarSample } from "./analysisResults";
 
 /** Display reconstruction on solver faces only. Never crosses a net/layer or

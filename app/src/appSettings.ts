@@ -14,6 +14,7 @@ export type AppSettings = {
   navigationInertia: boolean;
   selectionBlink: boolean;
   ribbonVisible: boolean;
+  extensionUiVisibility: Record<string, { menuBar: boolean; titleBar: boolean }>;
   solverMemoryFraction: number;
   solverMemoryLimitGb: number;
   restoreWorkspace: boolean;
@@ -35,6 +36,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   navigationInertia: false,
   selectionBlink: true,
   ribbonVisible: true,
+  extensionUiVisibility: {},
   solverMemoryFraction: 0.65,
   solverMemoryLimitGb: 2,
   restoreWorkspace: true,
@@ -68,6 +70,8 @@ export function loadAppSettings(): AppSettings {
         displayName: typeof saved.profile?.displayName === "string" ? saved.profile.displayName : DEFAULT_SETTINGS.profile.displayName,
         initials: typeof saved.profile?.initials === "string" ? saved.profile.initials : DEFAULT_SETTINGS.profile.initials,
       },
+      extensionUiVisibility: saved.extensionUiVisibility && typeof saved.extensionUiVisibility === "object" && !Array.isArray(saved.extensionUiVisibility)
+        ? saved.extensionUiVisibility : {},
     };
   } catch {
     return DEFAULT_SETTINGS;

@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # Detached result tool windows
 
 Status: implemented in development; native multi-monitor acceptance pending.

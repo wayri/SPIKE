@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Graph acquisition through the complete loaded SI workflow and local schema."""
 import copy

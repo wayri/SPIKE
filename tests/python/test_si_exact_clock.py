@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Exact physical symbol timing, independently checked on a matched channel."""
 import unittest

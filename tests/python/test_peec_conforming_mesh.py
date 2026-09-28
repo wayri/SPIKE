@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Manufactured copper-support, face-current and fixed-contact oracles."""
 
@@ -8,6 +8,7 @@ import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, DesignIR
 from python.spike_core.hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS
+from python.spike_core.conforming_local_refinement import LocalCopperRegion, refine_local_rectangles
 from python.spike_core.peec_conforming_mesh import build_conforming_mesh, _coalesce_rectangles
 from python.spike_core.peec_volume_resistance import _basis, assemble_overlap_resistance
 
@@ -31,6 +32,72 @@ def _mesh(design, target, **settings):
 
 @unittest.skipUnless(Polygon is not None, "optional Shapely geometry backend required")
 class ConformingCopperTests(unittest.TestCase):
+    def test_local_region_helper_never_exceeds_preallocation_budget(self):
+        region = LocalCopperRegion("F.Cu", "N", (0,0,1,1), .5)
+        with self.assertRaisesRegex(ValueError, "control-cell budget"):
+            refine_local_rectangles([(0,0,3,1)], (region,), "F.Cu", "N", 4)
+
+    def test_local_region_refines_only_retained_copper_without_changing_union(self):
+        from shapely.ops import unary_union
+        design = _design([[0,0],[2,0],[2,1],[0,1]])
+        control = {"contract":"spike/conforming-local-refinement/v1", "regions":[
+            {"layer":"F.Cu", "net":"N", "bounds_mm":[.5,0,1.5,1],
+             "maximum_edge_mm":.125}]}
+        baseline = _mesh(design, .5)
+        refined = _mesh(design, .5, conforming_local_refinements=control)
+        repeated = _mesh(design, .5, conforming_local_refinements=control)
+        self.assertFalse(refined.truncated, [issue.message for issue in refined.issues])
+        self.assertEqual(refined.cells, repeated.cells)
+        self.assertGreater(len(refined.cells), len(baseline.cells))
+        def copper(mesh):
+            return unary_union([Polygon([vertex[:2] for vertex in cell["vertices_mm"]])
+                for cell in mesh.cells])
+        self.assertLess(copper(baseline).symmetric_difference(copper(refined)).area, 1e-12)
+        for cell in refined.cells:
+            x0,y0,_ = cell["vertices_mm"][0]
+            x1,y1,_ = cell["vertices_mm"][2]
+            if .5 <= (x0+x1)/2 <= 1.5:
+                self.assertLessEqual(max(x1-x0,y1-y0), .125+1e-12)
+            else:
+                self.assertLessEqual(max(x1-x0,y1-y0), .5+1e-12)
+        report = refined.branch_admission["conforming_partition"]
+        self.assertEqual(report["local_refinement_region_count"], 1)
+        self.assertGreater(report["local_refinement_hits"][0], 0)
+        self.assertGreater(report["local_refinement_added_cells"], 0)
+        self.assertLessEqual(report["support_outside_area_max_mm2"], 1e-8)
+
+    def test_local_region_preserves_contacts_and_rejects_bad_or_ineffective_rules(self):
+        design = _design([[0,0],[2,0],[2,1],[0,1]])
+        design.pads = [{"id":"P1", "at":[.25,.5], "size":[.3,.3],
+            "shape":"rect", "layer":"F.Cu", "net_name":"N"}]
+        baseline = _mesh(design, .5)
+        region = {"layer":"F.Cu", "net":"N", "bounds_mm":[1,0,2,1],
+            "maximum_edge_mm":.125}
+        def controlled(row, **settings):
+            return _mesh(design, .5, conforming_local_refinements={
+                "contract":"spike/conforming-local-refinement/v1", "regions":[row]}, **settings)
+        refined = controlled(region)
+        self.assertFalse(refined.truncated, [issue.message for issue in refined.issues])
+        self.assertEqual(baseline.branch_admission["conforming_partition"]["terminal_contacts"],
+            refined.branch_admission["conforming_partition"]["terminal_contacts"])
+        for bad in (
+            {**region, "bounds_mm":[2,0,1,1]},
+            {**region, "maximum_edge_mm":1},
+            {**region, "maximum_edge_mm":float("nan")},
+            {**region, "bounds_mm":[True,0,2,1]},
+            {**region, "layer":"B.Cu"},
+            {**region, "bounds_mm":[10,10,11,11]},
+            {**region, "bounds_mm":[1.0000000000001,0,2,1]},
+        ):
+            with self.subTest(bad=bad):
+                failed = controlled(bad)
+                self.assertTrue(failed.truncated)
+                self.assertTrue(any(issue.code == "PEEC_CONFORMING_PARTITION_UNQUALIFIED"
+                    for issue in failed.issues))
+        over_budget = controlled(region, max_conforming_cells=20)
+        self.assertTrue(over_budget.truncated)
+        self.assertLessEqual(len(over_budget.cells), 20)
+
     def test_explicit_interior_edge_refinement_preserves_union_contacts_and_components(self):
         from shapely.ops import unary_union
         design = _design([[0,0],[2,0],[2,1],[0,1]])

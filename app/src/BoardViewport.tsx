@@ -18,6 +18,10 @@ import type { MeshCell, ResultVisualization, ScalarSample, SolverResultBundle } 
 import { layerCssColor, layerThreeColor } from "./layerPalette";
 import { stackupColor } from "./stackupVisual";
 import { thermalVolume, ThermalScenarioView, ThermalSceneVisibility } from "./thermalScene";
+import { boardThermalCellProbe, boardThermalViewportResult, type BoardThermalCellProbe, type BoardThermalViewportResult } from "./boardThermalViewportProbe";
+import { emRadiationMeshData, emRadiationProbeAtVertex, type EmRadiationProbe } from "./emRadiationViewport";
+import type { EMergeAngularPattern } from "./emergePatternInterpolation";
+import { admitSiCrosstalkViewport, type AdmittedSiCrosstalkViewport, type SiCrosstalkViewportResult } from "./siCrosstalkViewport";
 import { numericExtent, numericMaximum } from "./numericRange";
 import { meshCellEdgeIndexes, meshCellFaceVertices } from "./meshTopology";
 import { pointOnResultConductor, resultDatumFitsConductor, resultFaceTriangleIndices } from "./resultGeometryMask";
@@ -110,6 +114,11 @@ export type ModelLoadStatus = {
 };
 
 export type SelectionFilter = "all" | "part" | "net";
+export type EmRadiationViewportResult = {
+  pattern: EMergeAngularPattern;
+  surrogate: boolean;
+  sourceLabel?: string;
+};
 export type ViewportContextRequest = {
   clientX: number;
   clientY: number;
@@ -185,6 +194,8 @@ type Props = {
   terminalMarkers?: AnalysisTerminalMarker[];
   thermalScenario?: ThermalScenarioView | null;
   thermalVisibility?: ThermalSceneVisibility;
+  emRadiation?: EmRadiationViewportResult | null;
+  siCrosstalk?: SiCrosstalkViewportResult | null;
   board?: ParsedBoard | null;
   onSelect: (object: BoardObject) => void;
   onHoverProbe?: (target: HoverProbeTarget | null) => void;
@@ -319,6 +330,45 @@ function viewportScalarSamples(result: SolverResultBundle, mode: string): Scalar
       : piImpedanceSamples(result.scalar_fields.voltage_v, result.scalar_fields.current_a);
   }
   return [];
+}
+
+type Board3DNetLegendItem = { net: string; source: string; layer: string; id: string };
+
+/** Bounded 3D legend from actual netted copper, never from unnetted graphics. */
+function board3DNetLegend(
+  board: ParsedBoard, visibleLayers: Record<string, boolean>, isolatedNet: string | null, limit = 8,
+): Board3DNetLegendItem[] {
+  const candidates = new Map<string, Board3DNetLegendItem>();
+  for (const pad of board.pads) {
+    if (!pad.net || isolatedNet && pad.net !== isolatedNet) continue;
+    const layer = resolveBoardCopperLayers(board.layers, pad.layers).find(name => visibleLayers[name] !== false);
+    if (!layer || candidates.has(pad.net)) continue;
+    candidates.set(pad.net, { net: pad.net, source: `${pad.ref ?? "Pad"}.${pad.name}`, layer, id: pad.id });
+  }
+  for (const track of board.tracks) {
+    if (!track.net || isolatedNet && track.net !== isolatedNet || visibleLayers[track.layer] === false || candidates.has(track.net)) continue;
+    candidates.set(track.net, { net: track.net, source: "Trace", layer: track.layer, id: track.id });
+  }
+  const importance = (net: string) => /(?:^|[\/_])ANT(?:$|[\/_])/i.test(net) ? 4
+    : /^(?:GND|PGND|AGND)$/i.test(net) ? 3
+    : /(?:VCC|VDD|VBUS|\+\d|3V3|5V)/i.test(net) ? 2 : 1;
+  return [...candidates.values()].sort((a, b) => importance(b.net) - importance(a.net)).slice(0, Math.max(0, limit));
+}
+
+function antennaCopperCenter(board: ParsedBoard): Point | null {
+  const matches = (net?: string) => Boolean(net && /(?:^|[\/_-])(?:ANT|RF)(?:$|[\/_-])/i.test(net));
+  const points: Point[] = [];
+  board.tracks.forEach(track => { if (matches(track.net)) points.push(track.start, track.end); });
+  board.pads.forEach(pad => { if (matches(pad.net)) points.push(pad.at); });
+  board.zones.forEach(zone => { if (matches(zone.net)) points.push(...zone.points); });
+  if (!points.length) return null;
+  let minX = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
+  for (const point of points) {
+    minX = Math.min(minX, point[0]); maxX = Math.max(maxX, point[0]);
+    minY = Math.min(minY, point[1]); maxY = Math.max(maxY, point[1]);
+  }
+  return [(minX + maxX) / 2, (minY + maxY) / 2];
 }
 
 function resultHeightDisplayRange(values: readonly number[]): { minimum: number; maximum: number } {
@@ -932,7 +982,7 @@ function resultAxisTicks(minimumMm: number, maximumMm: number, desiredCount = 5)
   return ticks;
 }
 
-function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, layerSeparation, showVias, showNetNames = false, showModels, showSmdModels, showThtModels, assemblyModels = [], assemblySelectorPreviews = [], virtualBoards = [], selectedBoardInstanceId = null, onBoardInstanceSelect, virtualHarnesses = [], selectedHarnessId = null, onHarnessSelect, topologySelectorActive = false, selectedTopologyId = null, onTopologySelect, isolatedAssemblyPartId = null, assemblySection = DEFAULT_ASSEMBLY_SECTION, navigationMode, navigationInertia, showAxes = true, selectionBlink = true, cameraCommand, viewportRestore = null, selectionFilter, selectedId, selectedPosition, selectedNet = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, hoverProbeKind = "universal", terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true, field: true }, board, onSelect, onHoverProbe, onContextMenu, onOrbitCenter, onCamera, onLayoutView, onTelemetry, onModelStatus, onAssemblyPartViewportStatus }: Props) {
+function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, layerSeparation, showVias, showNetNames = false, showModels, showSmdModels, showThtModels, assemblyModels = [], assemblySelectorPreviews = [], virtualBoards = [], selectedBoardInstanceId = null, onBoardInstanceSelect, virtualHarnesses = [], selectedHarnessId = null, onHarnessSelect, topologySelectorActive = false, selectedTopologyId = null, onTopologySelect, isolatedAssemblyPartId = null, assemblySection = DEFAULT_ASSEMBLY_SECTION, navigationMode, navigationInertia, showAxes = true, selectionBlink = true, cameraCommand, viewportRestore = null, selectionFilter, selectedId, selectedPosition, selectedNet = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, hoverProbeKind = "universal", terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true, field: true }, emRadiation = null, siCrosstalk = null, board, onSelect, onHoverProbe, onContextMenu, onOrbitCenter, onCamera, onLayoutView, onTelemetry, onModelStatus, onAssemblyPartViewportStatus }: Props) {
   const [incomingBoard, setIncomingBoard] = useState<ParsedBoard | null>(null);
   const [fullModelState, setFullModelState] = useState<"none" | "loading" | "ready" | "failed">("none");
   const [componentModelState, setComponentModelState] = useState<"none" | "loading" | "ready" | "failed">("none");
@@ -945,7 +995,28 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
   const [missingModelRefs, setMissingModelRefs] = useState<string[]>([]);
   const [hoverPreview, setHoverPreview] = useState<ViewportHoverTarget | null>(null);
   const [hoverProbeTarget, setHoverProbeTarget] = useState<HoverProbeTarget | null>(null);
+  const [thermalCellProbe, setThermalCellProbe] = useState<BoardThermalCellProbe | null>(null);
+  const [emRadiationProbe, setEmRadiationProbe] = useState<EmRadiationProbe | null>(null);
+  const [emRadiationAnchorLabel, setEmRadiationAnchorLabel] = useState("board center directional reference");
+  const [siCrosstalkDisplay, setSiCrosstalkDisplay] = useState<AdmittedSiCrosstalkViewport | null>(null);
+  const [siCrosstalkProbeRole, setSiCrosstalkProbeRole] = useState<"aggressor" | "victim" | null>(null);
   const activeBoard = board ?? incomingBoard;
+  const thermalBoardResult = useMemo(() => boardThermalViewportResult(thermalScenario?.board_thermal_result),
+    [thermalScenario?.board_thermal_result]);
+  const boardNetNames = useMemo(() => new Set(activeBoard ? [
+    ...activeBoard.tracks.map(track => track.net), ...activeBoard.pads.map(pad => pad.net),
+    ...activeBoard.zones.map(zone => zone.net), ...activeBoard.vias.map(via => via.net),
+  ].filter((net): net is string => Boolean(net)) : []), [activeBoard]);
+  const siCrosstalkKey = siCrosstalk ? [
+    siCrosstalk.binding.sourceDesignId, siCrosstalk.binding.activeDesignId,
+    siCrosstalk.binding.aggressorNetId, siCrosstalk.binding.victimNetId,
+    siCrosstalk.binding.boardAggressorNetId, siCrosstalk.binding.boardVictimNetId,
+    siCrosstalk.aggressorNet, siCrosstalk.victimNet, siCrosstalk.nextDb,
+    siCrosstalk.fextDb, siCrosstalk.peakNextV, siCrosstalk.peakFextV,
+    siCrosstalk.modelStatus, siCrosstalk.sourceLabel,
+  ].join("\u0000") : "";
+  const netLegend3D = useMemo(() => showNetNames && activeBoard
+    ? board3DNetLegend(activeBoard, visibleLayers, isolatedNet) : [], [showNetNames, activeBoard, visibleLayers, isolatedNet]);
   const splitSceneAvailable = Boolean(activeBoard?.componentModelUrl);
   const layerFilterActive = activeBoard?.boardModelIncludesCopper === false
     || Object.entries(visibleLayers).some(([name, visible]) => visible !== defaultLayerVisible(name))
@@ -1017,6 +1088,12 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
   const axisGroupRef = useRef<THREE.Group>();
   const hoverProbeGroupRef = useRef<THREE.Group>();
   const thermalGroupRef = useRef<THREE.Group>();
+  const thermalCellPickablesRef = useRef<THREE.InstancedMesh[]>([]);
+  const thermalViewportResultRef = useRef<BoardThermalViewportResult | null>(null);
+  const emRadiationGroupRef = useRef<THREE.Group>();
+  const emRadiationPickablesRef = useRef<THREE.Object3D[]>([]);
+  const siCrosstalkGroupRef = useRef<THREE.Group>();
+  const siCrosstalkPickablesRef = useRef<THREE.Object3D[]>([]);
   const isolatedNetRef = useRef<string | null>(isolatedNet);
   const resultOverlayActiveRef = useRef(false);
   const selectionBlinkRef = useRef(selectionBlink);
@@ -1516,6 +1593,12 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     const thermalGroup = new THREE.Group();
     thermalGroup.name = "thermal-scene-overlay";
     scene.add(thermalGroup);
+    const emRadiationGroup = new THREE.Group();
+    emRadiationGroup.name = "board-relative-far-field-overlay";
+    scene.add(emRadiationGroup);
+    const siCrosstalkGroup = new THREE.Group();
+    siCrosstalkGroup.name = "bound-si-crosstalk-routes";
+    scene.add(siCrosstalkGroup);
     const axisGroup = new THREE.Group();
     axisGroup.name = "measurement-axes";
     scene.add(axisGroup);
@@ -1669,6 +1752,22 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
           || Math.abs(depthDelta) <= componentDepthTolerance && pickPriority(candidate) > pickPriority(best)) best = candidate;
       }
       return best;
+    };
+    const radiationHitAt = (event: PointerEvent | MouseEvent) => {
+      if (viewModeRef.current !== "3D" || !emRadiationPickablesRef.current.length) return undefined;
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, activeCameraRef.current!);
+      return raycaster.intersectObjects(emRadiationPickablesRef.current, false)[0];
+    };
+    const siCrosstalkHitAt = (event: PointerEvent | MouseEvent) => {
+      if (viewModeRef.current !== "3D" || !siCrosstalkPickablesRef.current.length) return undefined;
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, activeCameraRef.current!);
+      return raycaster.intersectObjects(siCrosstalkPickablesRef.current, false)[0];
     };
     const selectorHitAt = (event: PointerEvent | MouseEvent) => {
       if (!topologySelectorActiveRef.current || viewModeRef.current !== "3D" || !selectorPreviewPickablesRef.current.length) return undefined;
@@ -1916,6 +2015,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       return selectedObject;
     };
     let pointerStart = { x: 0, y: 0, button: -1 };
+    let lastThermalClick = { x: NaN, y: NaN, time: 0, index: -1 };
     const onPointerDown = (event: PointerEvent) => {
       pointerStart = { x: event.clientX, y: event.clientY, button: event.button };
       renderer.domElement.style.cursor = "grabbing";
@@ -1934,6 +2034,27 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         viewHelper.center.copy(controls3d.target);
         if (viewHelper.handleClick(event)) return;
       }
+      const siCrosstalkHit = siCrosstalkHitAt(event);
+      if (siCrosstalkHit?.object.userData.siCrosstalkRole === "aggressor" || siCrosstalkHit?.object.userData.siCrosstalkRole === "victim") {
+        setSiCrosstalkProbeRole(siCrosstalkHit.object.userData.siCrosstalkRole);
+        return;
+      }
+      const radiationHit = radiationHitAt(event);
+      if (radiationHit?.face && radiationHit.object instanceof THREE.Mesh) {
+        const meshData = radiationHit.object.userData.emRadiationMesh as ReturnType<typeof emRadiationMeshData> | undefined;
+        const position = radiationHit.object.geometry.getAttribute("position");
+        if (meshData && position) {
+          const candidates = [radiationHit.face.a, radiationHit.face.b, radiationHit.face.c];
+          const nearest = candidates.reduce((best, index) => {
+            const point = new THREE.Vector3().fromBufferAttribute(position, index);
+            radiationHit.object.localToWorld(point);
+            return point.distanceToSquared(radiationHit.point) < best.distance ? { index, distance: point.distanceToSquared(radiationHit.point) } : best;
+          }, { index: candidates[0], distance: Number.POSITIVE_INFINITY });
+          const probe = emRadiationProbeAtVertex(meshData, nearest.index);
+          if (probe) setEmRadiationProbe(probe);
+        }
+        return;
+      }
       const selectorHit = selectorHitAt(event);
       if (selectorHit) {
         onTopologySelectRef.current?.(selectorHit.object.userData.topologyReference as TopologyReference);
@@ -1948,6 +2069,37 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       if (virtualBoardHit) {
         onBoardInstanceSelectRef.current?.(virtualBoardHit.object.userData.virtualBoard as VirtualBoardVisual);
         return;
+      }
+      if (viewModeRef.current === "3D" && thermalViewportResultRef.current && thermalCellPickablesRef.current.length) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        pointer.set(((event.clientX - rect.left) / rect.width) * 2 - 1,
+          -((event.clientY - rect.top) / rect.height) * 2 + 1);
+        raycaster.setFromCamera(pointer, activeCameraRef.current!);
+        const hits = raycaster.intersectObjects(thermalCellPickablesRef.current, false)
+          .filter(hit => hit.instanceId !== undefined && visibleInScene(hit.object));
+        const blockers = hits.length ? raycaster.intersectObjects(resultOcclusionCandidates(), false) : [];
+        const visibleHits = hits.filter(hit => !blockers.some(blocker => {
+          if (!visibleInScene(blocker.object) || blocker.object.userData.pickingProxy) return false;
+          const mesh = blocker.object as THREE.Mesh;
+          const material = Array.isArray(mesh.material)
+            ? mesh.material[blocker.face?.materialIndex ?? 0] : mesh.material;
+          return material?.visible && material.colorWrite && resultHitOccluded(
+            hit.distance, blocker.distance, material.opacity, material.depthWrite);
+        }));
+        if (visibleHits.length) {
+          const samePoint = Math.hypot(event.clientX - lastThermalClick.x, event.clientY - lastThermalClick.y) <= 4
+            && performance.now() - lastThermalClick.time < 4000;
+          const index = samePoint ? (lastThermalClick.index + 1) % visibleHits.length : 0;
+          lastThermalClick = { x: event.clientX, y: event.clientY, time: performance.now(), index };
+          const hit = visibleHits[index];
+          const result = thermalViewportResultRef.current;
+          const layerIndex = Number(hit.object.userData.thermalLayerIndex);
+          if (result) {
+            const probe = boardThermalCellProbe(result, layerIndex, hit.instanceId!);
+            if (probe) setThermalCellProbe(probe);
+          }
+          return;
+        }
       }
       selectAt(event);
     };
@@ -1990,6 +2142,8 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     selectorPreviewGroupRef.current = selectorPreviewGroup;
     resultGroupRef.current = resultGroup;
     thermalGroupRef.current = thermalGroup;
+    emRadiationGroupRef.current = emRadiationGroup;
+    siCrosstalkGroupRef.current = siCrosstalkGroup;
     axisGroupRef.current = axisGroup;
     hoverProbeGroupRef.current = hoverProbeGroup;
     selectionBoxRef.current = selectionBox;
@@ -2113,6 +2267,10 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
       harnessPickablesRef.current = [];
       clearGroup(resultGroup);
       clearGroup(thermalGroup);
+      clearGroup(emRadiationGroup);
+      emRadiationPickablesRef.current = [];
+      clearGroup(siCrosstalkGroup);
+      siCrosstalkPickablesRef.current = [];
       clearGroup(axisGroup);
       clearGroup(hoverProbeGroup);
       selectionBox.geometry.dispose();
@@ -2477,6 +2635,25 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
 
     const drawingsByLayer = new Map<string, number[]>();
     activeBoard.drawings.filter((drawing) => drawing.layer !== "Edge.Cuts").forEach((drawing) => {
+      if (drawing.filled && drawing.layer.endsWith(".Cu") && drawing.points.length >= 3) {
+        const shape = pathFromPoints(drawing.points.map(world));
+        const mesh = new THREE.Mesh(
+          new THREE.ShapeGeometry(shape, 4),
+          displayMaterial(layerThreeColor(drawing.layer, activeBoard.layers.indexOf(drawing.layer)), { metalness: 0.42, roughness: 0.48 }),
+        );
+        const isTopCopper = drawing.layer === activeBoard.layers[0];
+        const isBottomCopper = drawing.layer === activeBoard.layers[activeBoard.layers.length - 1];
+        // The translucent mask is a full-board display sheet. Lift graphic
+        // copper above it for legibility; this is a visualization offset.
+        mesh.position.z = isTopCopper ? boardSurface + copperClearance * 3
+          : isBottomCopper ? -boardSurface - copperClearance * 3
+            : copperZ(drawing.layer, activeBoard.layers, boardThickness, activeBoard.stackup);
+        mesh.receiveShadow = true;
+        mesh.userData = { layer: drawing.layer, surface: true, copperGraphic: true, basePositionZ: mesh.position.z };
+        identifySceneObject(mesh, "copper-zone", drawing.layer, drawing.id, activeBoard.layers);
+        proceduralGroup.add(mesh);
+        return;
+      }
       const positions = drawingsByLayer.get(drawing.layer) ?? [];
       const bottom = drawing.layer.startsWith("B.");
       const z = bottom ? -boardSurface - copperClearance * 3 : drawing.layer.startsWith("F.") ? boardSurface + copperClearance * 3 : boardSurface + copperClearance * 4;
@@ -3176,9 +3353,138 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
   }, [showModels, viewMode]);
 
   useEffect(() => {
+    const group = emRadiationGroupRef.current;
+    if (!group) return;
+    clearGroup(group);
+    emRadiationPickablesRef.current = [];
+    setEmRadiationProbe(null);
+    if (!activeBoard || !emRadiation || viewMode !== "3D") {
+      if (hostRef.current) hostRef.current.dataset.emRadiation = "none";
+      refreshVisibleBoundsRef.current();
+      return;
+    }
+    try {
+      const data = emRadiationMeshData(emRadiation.pattern);
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(data.positions, 3));
+      geometry.setIndex(data.indices);
+      const colors: number[] = [];
+      const color = new THREE.Color();
+      data.relativeDb.forEach(value => {
+        const t = THREE.MathUtils.clamp((value + 40) / 40, 0, 1);
+        color.setHSL(0.62 * (1 - t), 0.9, 0.55);
+        colors.push(color.r, color.g, color.b);
+      });
+      geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geometry.computeVertexNormals();
+      const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({
+        vertexColors: true, transparent: true, opacity: 0.46, side: THREE.DoubleSide,
+        depthWrite: false, depthTest: true,
+      }));
+      const scale = boardTransformRef.current.scale;
+      const boardRadius = Math.max(activeBoard.width, activeBoard.height) * scale * 0.36;
+      const antenna = antennaCopperCenter(activeBoard);
+      const anchor = antenna ?? [
+        (activeBoard.bounds.minX + activeBoard.bounds.maxX) / 2,
+        (activeBoard.bounds.minY + activeBoard.bounds.maxY) / 2,
+      ] as Point;
+      mesh.scale.setScalar(Math.max(boardRadius, 18));
+      mesh.position.set(
+        (anchor[0] - boardTransformRef.current.centerX) * scale,
+        (boardTransformRef.current.centerY - anchor[1]) * scale,
+        boardThicknessMm(activeBoard) * scale / 2 + 0.25,
+      );
+      mesh.renderOrder = 155;
+      mesh.userData.emRadiationMesh = data;
+      mesh.userData.fieldMeaning = "relative far-field direction; radius is display amplitude, not distance";
+      group.add(mesh);
+      emRadiationPickablesRef.current = [mesh];
+
+      const wire = new THREE.LineSegments(
+        new THREE.WireframeGeometry(geometry),
+        new THREE.LineBasicMaterial({ color: 0xd9f6ff, transparent: true, opacity: 0.16, depthWrite: false }),
+      );
+      wire.position.copy(mesh.position);
+      wire.scale.copy(mesh.scale);
+      wire.renderOrder = 156;
+      group.add(wire);
+      setEmRadiationAnchorLabel(antenna ? "antenna/RF copper extent center" : "board center directional reference");
+      if (hostRef.current) hostRef.current.dataset.emRadiation = [
+        "relative-far-field", `frequency-hz=${emRadiation.pattern.frequency_hz}`,
+        `anchor=${antenna ? "antenna-copper" : "board-center"}`, `surrogate=${emRadiation.surrogate}`,
+      ].join(";");
+    } catch (error) {
+      if (hostRef.current) hostRef.current.dataset.emRadiation = `invalid;${error instanceof Error ? error.message : "unknown error"}`;
+    }
+    refreshVisibleBoundsRef.current();
+    return () => {
+      emRadiationPickablesRef.current = [];
+      clearGroup(group);
+    };
+  }, [activeBoard, emRadiation?.pattern, emRadiation?.sourceLabel, emRadiation?.surrogate, viewMode]);
+
+  useEffect(() => {
+    const group = siCrosstalkGroupRef.current;
+    if (!group) return;
+    clearGroup(group);
+    siCrosstalkPickablesRef.current = [];
+    setSiCrosstalkProbeRole(null);
+    const admitted = viewMode === "3D" ? admitSiCrosstalkViewport(siCrosstalk, boardNetNames) : null;
+    if (!activeBoard || !admitted) {
+      setSiCrosstalkDisplay(null);
+      if (hostRef.current) hostRef.current.dataset.siCrosstalk = siCrosstalk ? "binding-rejected" : "none";
+      return;
+    }
+    const aggressorTracks = activeBoard.tracks.filter(track => track.net === admitted.aggressorNet);
+    const victimTracks = activeBoard.tracks.filter(track => track.net === admitted.victimNet);
+    if (!aggressorTracks.length || !victimTracks.length) {
+      setSiCrosstalkDisplay(null);
+      if (hostRef.current) hostRef.current.dataset.siCrosstalk = "binding-rejected;route-tracks-missing";
+      return;
+    }
+    const { centerX, centerY, scale } = boardTransformRef.current;
+    const world = (point: Point) => new THREE.Vector2((point[0] - centerX) * scale, (centerY - point[1]) * scale);
+    const boardThickness = boardThicknessMm(activeBoard) * scale;
+    const addRoute = (tracks: typeof activeBoard.tracks, role: "aggressor" | "victim", color: number) => {
+      tracks.forEach(track => {
+        const start = world(track.start), end = world(track.end);
+        const length = start.distanceTo(end);
+        const width = Math.max(track.width * scale * 1.85, 1.4);
+        const capsule = trackCapsuleDimensions(length, width);
+        const mesh = new THREE.Mesh(
+          new THREE.ShapeGeometry(capsulePath(capsule.shapeLength, capsule.width), 8),
+          new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.78, depthWrite: false, side: THREE.DoubleSide }),
+        );
+        const surfaceDirection = track.layer === activeBoard.layers[activeBoard.layers.length - 1] ? -1 : 1;
+        mesh.position.set((start.x + end.x) / 2, (start.y + end.y) / 2,
+          copperZ(track.layer, activeBoard.layers, boardThickness, activeBoard.stackup) + 0.12 * surfaceDirection);
+        mesh.rotation.z = Math.atan2(end.y - start.y, end.x - start.x);
+        mesh.renderOrder = 165;
+        mesh.userData = { siCrosstalkRole: role, net: track.net, trackId: track.id, globalMetricsOnly: true };
+        group.add(mesh);
+        siCrosstalkPickablesRef.current.push(mesh);
+      });
+    };
+    addRoute(aggressorTracks, "aggressor", 0xff4ca0);
+    addRoute(victimTracks, "victim", 0x42d9ff);
+    setSiCrosstalkDisplay(admitted);
+    if (hostRef.current) hostRef.current.dataset.siCrosstalk = [
+      "bound-global-metrics", `aggressor=${admitted.aggressorNet}`,
+      `victim=${admitted.victimNet}`, `tracks=${aggressorTracks.length + victimTracks.length}`,
+    ].join(";");
+    return () => {
+      siCrosstalkPickablesRef.current = [];
+      clearGroup(group);
+    };
+  }, [activeBoard, boardNetNames, siCrosstalkKey, viewMode]);
+
+  useEffect(() => {
     const group = thermalGroupRef.current;
     if (!group) return;
     clearGroup(group);
+    thermalCellPickablesRef.current = [];
+    thermalViewportResultRef.current = null;
+    setThermalCellProbe(null);
     if (!activeBoard || !thermalScenario) {
       if (hostRef.current) hostRef.current.dataset.thermalScene = "none";
       refreshVisibleBoundsRef.current();
@@ -3357,6 +3663,52 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     // Field samples use instancing, a hard LOD budget, and the coordinate
     // contract shared with fixtures.  No interpolation or inferred heat map.
     if (thermalVisibility.field !== false) {
+      const boardResult = thermalBoardResult;
+      if (boardResult) {
+        thermalViewportResultRef.current = boardResult;
+        const boardGrid = boardResult.grid;
+        const { centerX, centerY } = boardTransformRef.current;
+        const [nx] = boardGrid.shape;
+        const geometry = new THREE.PlaneGeometry(boardGrid.spacing_mm[0] * scale, boardGrid.spacing_mm[1] * scale);
+        const extents = [boardGrid.temperatures_c, ...boardResult.layers.map(layer => layer.temperatures_c)]
+          .map(values => numericExtent(values));
+        const { minimum, maximum } = numericExtent(extents.flatMap(extent => [extent.minimum, extent.maximum]));
+        const surfaceZ = boardThicknessMm(activeBoard) * scale / 2 + 0.08;
+        // The lifted planes are display-only: the probe reports physical depth
+        // from the saved stack, not this separation above the opaque PCB.
+        const displayStep = Math.max(0.55, 0.7 * scale);
+        const drawCells = (values: number[], layerIndex: number, z: number, opacity: number) => {
+          const tiles = new THREE.InstancedMesh(geometry,
+            new THREE.MeshBasicMaterial({ transparent: true, opacity, depthWrite: false,
+              vertexColors: true, side: THREE.DoubleSide }), values.length);
+          const matrix = new THREE.Matrix4();
+          const color = new THREE.Color();
+          values.forEach((value, index) => {
+            const x = boardGrid.origin_mm[0] + (index % nx + 0.5) * boardGrid.spacing_mm[0];
+            const y = boardGrid.origin_mm[1] + (Math.floor(index / nx) + 0.5) * boardGrid.spacing_mm[1];
+            matrix.makeTranslation((x - centerX) * scale, (centerY - y) * scale, z);
+            tiles.setMatrixAt(index, matrix);
+            color.setRGB(...thermalFieldColor(value, minimum, maximum));
+            tiles.setColorAt(index, color);
+          });
+          tiles.instanceMatrix.needsUpdate = true;
+          if (tiles.instanceColor) tiles.instanceColor.needsUpdate = true;
+          tiles.renderOrder = 146 + layerIndex + 1;
+          tiles.userData.thermalLayerIndex = layerIndex;
+          tiles.userData.thermal = { type: "board-temperature-cell", displayed_cells: values.length,
+            model_status: boardResult.modelStatus };
+          group.add(tiles);
+          thermalCellPickablesRef.current.push(tiles);
+        };
+        boardResult.layers.forEach((layer, index) => {
+          if (visibleLayers[layer.name] === false) return;
+          drawCells(layer.temperatures_c, index,
+            surfaceZ + (boardResult.layers.length - index) * displayStep,
+            Math.max(0.15, 0.34 / Math.sqrt(boardResult.layers.length)));
+        });
+        drawCells(boardGrid.temperatures_c, -1,
+          surfaceZ + (boardResult.layers.length + 1) * displayStep, 0.3);
+      }
       const preferred: ThermalFieldName | undefined = normalizedThermalField?.fields?.temperature_c?.length ? "temperature_c"
         : normalizedThermalField?.fields?.heat_flux_w_m2?.length ? "heat_flux_w_m2"
           : normalizedThermalField?.fields?.temperature_gradient_c_per_mm?.length ? "temperature_gradient_c_per_mm" : undefined;
@@ -3397,7 +3749,7 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
     // Thermal fixtures should extend the depth range but must never replace
     // the PCB as the target of Fit.
     refreshVisibleBoundsRef.current();
-  }, [activeBoard, thermalScenario, thermalVisibility]);
+  }, [activeBoard, thermalScenario, thermalVisibility, visibleLayers, thermalBoardResult]);
 
   useEffect(() => {
     const group = axisGroupRef.current;
@@ -4749,6 +5101,53 @@ function BoardViewport({ onEmiScene, viewMode, visibleLayers, layerOpacity, laye
         onSelect={onSelect}
         onContextMenu={onContextMenu}
       />}
+      {viewMode === "3D" && netLegend3D.length > 0 && <aside aria-label="3D board net names" style={{ position: "absolute", zIndex: 11, top: 48, right: 10, width: "min(208px, calc(100% - 20px))", maxHeight: "min(42%, 270px)", overflow: "hidden", padding: "8px 10px", boxSizing: "border-box", border: "1px solid #708892", borderRadius: 5, background: "rgba(6, 19, 26, 0.94)", color: "#edf5f5", font: "11px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace", pointerEvents: "none" }}>
+        <strong style={{ display: "block", marginBottom: 5, color: "#ffe09c" }}>BOARD NETS · 3D</strong>
+        {netLegend3D.map(item => <div key={item.net} title={`${item.net} · ${item.source} · ${item.layer}`} style={{ padding: "3px 0", borderTop: "1px solid rgba(180, 205, 210, 0.14)" }}>
+          <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 650 }}>{item.net}</div>
+          <small style={{ display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "#aabdc3" }}>{item.source} · {item.layer}</small>
+        </div>)}
+      </aside>}
+      {viewMode === "3D" && siCrosstalkDisplay && <aside aria-label="Bound SI crosstalk routes" style={{ position: "absolute", zIndex: 12, left: 10, bottom: 42, width: "min(330px, calc(100% - 20px))", padding: "9px 11px", boxSizing: "border-box", border: "1px solid #8b72ad", borderRadius: 5, background: "rgba(10, 12, 27, 0.95)", color: "#edf3ff", font: "11px/1.42 ui-monospace, SFMono-Regular, Consolas, monospace", pointerEvents: "none" }}>
+        <strong style={{ display: "block", color: "#d2b9ff" }}>NEXT / FEXT · GLOBAL CHANNEL METRICS</strong>
+        <span style={{ display: "block", color: "#ff86bd" }}>Aggressor · {siCrosstalkDisplay.aggressorNet}</span>
+        <span style={{ display: "block", color: "#79e5ff" }}>Victim · {siCrosstalkDisplay.victimNet}</span>
+        <small style={{ display: "block", color: "#aeb8cb" }}>{siCrosstalkDisplay.modelStatus} · exact design and net identity bound{siCrosstalkDisplay.sourceLabel ? ` · ${siCrosstalkDisplay.sourceLabel}` : ""}</small>
+        <dl style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "2px 12px", margin: "7px 0" }}>
+          {siCrosstalkDisplay.metrics.nextDb !== undefined && <><dt>NEXT</dt><dd style={{ margin: 0 }}>{siCrosstalkDisplay.metrics.nextDb.toFixed(2)} dB</dd></>}
+          {siCrosstalkDisplay.metrics.fextDb !== undefined && <><dt>FEXT</dt><dd style={{ margin: 0 }}>{siCrosstalkDisplay.metrics.fextDb.toFixed(2)} dB</dd></>}
+          {siCrosstalkDisplay.metrics.peakNextV !== undefined && <><dt>Peak NEXT</dt><dd style={{ margin: 0 }}>{(siCrosstalkDisplay.metrics.peakNextV * 1e3).toFixed(3)} mV</dd></>}
+          {siCrosstalkDisplay.metrics.peakFextV !== undefined && <><dt>Peak FEXT</dt><dd style={{ margin: 0 }}>{(siCrosstalkDisplay.metrics.peakFextV * 1e3).toFixed(3)} mV</dd></>}
+          {siCrosstalkProbeRole && <><dt>Selected route</dt><dd style={{ margin: 0 }}>{siCrosstalkProbeRole}</dd></>}
+        </dl>
+        <small style={{ display: "block", color: "#9ca8ba" }}>Click either highlighted route for identity. Values apply to the complete bound channel; highlight color is categorical and does not represent spatial voltage or coupling magnitude.</small>
+      </aside>}
+      {viewMode === "3D" && emRadiation && <aside aria-label="EM far-field board overlay" style={{ position: "absolute", zIndex: 12, left: 10, bottom: 42, width: "min(310px, calc(100% - 20px))", padding: "9px 11px", boxSizing: "border-box", border: `1px solid ${emRadiation.surrogate ? "#e7a44f" : "#54bbce"}`, borderRadius: 5, background: "rgba(5, 17, 24, 0.94)", color: "#e9f7fa", font: "11px/1.42 ui-monospace, SFMono-Regular, Consolas, monospace", pointerEvents: "none" }}>
+        <strong style={{ display: "block", color: emRadiation.surrogate ? "#ffc978" : "#84e8f5" }}>RELATIVE FAR FIELD · {emRadiation.surrogate ? "APPROXIMATE SURROGATE" : "APPROXIMATE"}</strong>
+        <span style={{ display: "block" }}>{(emRadiation.pattern.frequency_hz / 1e9).toFixed(4)} GHz · {emRadiationAnchorLabel}</span>
+        {emRadiation.sourceLabel && <span style={{ display: "block", color: "#b9cbd0" }}>{emRadiation.sourceLabel}</span>}
+        <small style={{ display: "block", color: "#9fb4bb" }}>Directional pattern anchored for board review. Surface radius encodes relative amplitude and is not spatial distance or near field. Click the surface to probe a solved angular sample.</small>
+        {emRadiationProbe && <dl style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "2px 12px", margin: "7px 0 0", paddingTop: 6, borderTop: "1px solid rgba(150, 207, 218, 0.28)" }}>
+          <dt>Theta</dt><dd style={{ margin: 0 }}>{emRadiationProbe.thetaDeg.toFixed(1)} deg</dd>
+          <dt>Phi</dt><dd style={{ margin: 0 }}>{emRadiationProbe.phiDeg.toFixed(1)} deg</dd>
+          <dt>Relative amplitude</dt><dd style={{ margin: 0 }}>{emRadiationProbe.relativeDb.toFixed(2)} dB</dd>
+          <dt>Sample</dt><dd style={{ margin: 0 }}>solved grid</dd>
+        </dl>}
+      </aside>}
+      {viewMode === "3D" && activeBoard && thermalVisibility.field !== false && thermalBoardResult && <aside aria-label="Board thermal cell probe" style={{ position: "absolute", zIndex: 12, right: 10, bottom: 42, width: "min(280px, calc(100% - 20px))", padding: "9px 11px", boxSizing: "border-box", border: "1px solid #dc9360", borderRadius: 5, background: "rgba(27, 17, 12, 0.94)", color: "#fff2e8", font: "11px/1.42 ui-monospace, SFMono-Regular, Consolas, monospace" }}>
+        <strong style={{ color: "#ffc18c" }}>BOARD TEMPERATURE · {thermalBoardResult.modelStatus.toUpperCase()}</strong>
+        {thermalCellProbe ? <>
+          <button type="button" onClick={() => setThermalCellProbe(null)} aria-label="Clear thermal cell probe" style={{ float: "right", background: "none", border: "none", color: "#ffc18c", cursor: "pointer" }}>×</button>
+          <dl style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "2px 12px", margin: "7px 0" }}>
+            <dt>Saved cell temperature</dt><dd style={{ margin: 0 }}>{thermalCellProbe.temperature_c.toFixed(3)} °C</dd>
+            <dt>Layer</dt><dd style={{ margin: 0 }}>{thermalCellProbe.layer}</dd>
+            <dt>Cell</dt><dd style={{ margin: 0 }}>{thermalCellProbe.column + 1}, {thermalCellProbe.row + 1}</dd>
+            <dt>Cell center X, Y</dt><dd style={{ margin: 0 }}>{thermalCellProbe.center_mm[0].toFixed(3)}, {thermalCellProbe.center_mm[1].toFixed(3)} mm</dd>
+            {thermalCellProbe.depth_mm !== null && <><dt>Depth from top</dt><dd style={{ margin: 0 }}>{thermalCellProbe.depth_mm.toFixed(4)} mm</dd></>}
+          </dl>
+          <small style={{ color: "#cdb9aa" }}>Exact saved cell value; colors and layer spacing are display aids. Repeated clicks at this point cycle through visible layers. Thermal resistance needs local heat flow and is not inferred here.</small>
+        </> : <small style={{ display: "block", marginTop: 5, color: "#cdb9aa" }}>Click a colored board cell to probe its saved value. Repeated clicks at one point cycle through visible layers. The displayed layer spacing is enlarged for inspection.</small>}
+      </aside>}
       {hoverProbeEnabled && hoverProbeTarget && <>
         <div className="hover-probe-reticle" style={{ left: hoverProbeTarget.clientX, top: hoverProbeTarget.clientY }} />
         <div

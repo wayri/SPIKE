@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Loaded driving-point impedance; sampled extrema are not qualified resonances."""
 import numpy as np

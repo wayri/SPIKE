@@ -6,13 +6,13 @@
   "required": ["contract", "domain", "mode", "assembly", "designs"],
   "properties": {
     "contract": { "const": "spike/multiboard-analysis-request/v1" },
-    "domain": { "enum": ["pi", "si"] },
-    "mode": { "enum": ["independent_board_batch", "coupled_harness_network"] },
+    "domain": { "enum": ["pi", "si", "thermal", "emi"] },
+    "mode": { "enum": ["independent_board_batch", "coupled_harness_network", "coupled_assembly"] },
     "assembly": { "$ref": "assembly-ir-v1.schema.json" },
     "designs": {
       "type": "object",
       "minProperties": 1,
-      "maxProperties": 20,
+      "maxProperties": 30,
       "additionalProperties": {
         "anyOf": [
           { "$ref": "design-ir-v2.schema.json" },

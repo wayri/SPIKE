@@ -14,12 +14,16 @@ the installers to `artifacts/windows/installer`; and writes a SHA-256 manifest.
 The NSIS installer supports per-user or per-machine installation and registers
 the `.spike` project association.
 
-The current MSI/NSIS preview package and application version are `0.2.13`.
+The current MSI/NSIS preview package and application version are `0.3.0`.
 The SHA-256 installer manifest records the package and application versions.
 This does not promote the physics or release qualification state.
 
-Preview installers are unsigned and include troubleshooting and error-code
-references. They are not approved for production engineering reliance.
+The standard preview installers are unsigned and include troubleshooting and
+error-code references. For the 0.3.0 candidate, user-requested self-signed
+copies with subject `CN=Yawar B, O=wayri` are in
+`artifacts/windows/signed-preview`; see `docs/RELEASE_0_3_0_VERIFICATION.md`.
+Windows does not trust that certificate, and the copies have no timestamp.
+Neither set is approved for production engineering reliance.
 
 ## r10 package checkpoint
 

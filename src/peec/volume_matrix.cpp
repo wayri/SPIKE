@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 #include "volume_matrix.hpp"
 
@@ -18,6 +18,30 @@ bool perpendicular(const Vector &a, const Vector &b) {
 double norm2(const Vector &a) { return dot(a,a); }
 Vector subtract(const Vector &a,const Vector &b) {
   return {a[0]-b[0],a[1]-b[1],a[2]-b[2]};
+}
+double norm(const Vector &a) { return std::hypot(a[0],a[1],a[2]); }
+Vector cross(const Vector &a,const Vector &b) {
+  return {a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],
+          a[0]*b[1]-a[1]*b[0]};
+}
+bool coaxial(const CoaxialAnnulusVolume &a,const CoaxialAnnulusVolume &b,
+             const Vector &delta) {
+  // Dot-product closeness loses angular information quadratically: an angle
+  // of 1e-5 radians can previously pass |dot|-1 <= 1e-10. Cross products
+  // retain first-order angle/offset information. Allow arithmetic noise only,
+  // scaled to the smallest physical feature, never a fixed metre tolerance.
+  // For long thin annuli, angular drift over the length must also stay below
+  // this feature-scaled arithmetic threshold. Uncertain cases fail closed.
+  const double feature=std::min({a.length_m,b.length_m,a.outer_radius_m,
+      b.outer_radius_m,a.outer_radius_m-a.inner_radius_m,
+      b.outer_radius_m-b.inner_radius_m});
+  const double arithmetic=32*std::numeric_limits<double>::epsilon();
+  const double na=norm(a.direction),nb=norm(b.direction);
+  const double angle_tolerance=arithmetic*std::min(1.0,
+      feature/std::max(a.length_m,b.length_m));
+  const double offset_tolerance=arithmetic*std::min(feature,norm(delta));
+  return norm(cross(a.direction,b.direction))<=angle_tolerance*na*nb&&
+      norm(cross(delta,a.direction))<=offset_tolerance*na;
 }
 bool unit(const Vector &a) { return std::abs(norm2(a)-1.0)<=1e-10; }
 bool finite_vector(const Vector &a) {
@@ -105,34 +129,39 @@ MatrixIntegrationResult assemble_inductance_matrix(
       }
       const auto &b=std::get<CoaxialAnnulusVolume>(bases[j]);
       if(!valid(b)){fail(result,i,j,"VOLUME_MATRIX_INVALID_BASIS");return result;}
+      // Exactly disjoint nonzero coordinate components imply J1 dot J2=0
+      // pointwise, even for touching/overlapping supports. No angle tolerance
+      // or small nonzero coupling is rounded to zero in this admission path.
+      bool exact_perpendicular=true;
+      for(int k=0;k<3;++k)
+        exact_perpendicular=exact_perpendicular&&(a.direction[k]==0||b.direction[k]==0);
+      if(exact_perpendicular)continue;
       if (!unit(a.direction)||!unit(b.direction)) {
         fail(result,i,j,"VOLUME_MATRIX_INVALID_ANNULUS_AXIS");return result;
       }
       const double alignment=dot(a.direction,b.direction);
-      if (std::abs(std::abs(alignment)-1.0)>1e-10) {
-        fail(result,i,j,"VOLUME_MATRIX_NONCOAXIAL_ANNULI");return result;
-      }
       const auto delta=subtract(b.center_m,a.center_m);
-      const double axial=dot(delta,a.direction);
-      const Vector transverse={delta[0]-axial*a.direction[0],
-          delta[1]-axial*a.direction[1],delta[2]-axial*a.direction[2]};
-      if (norm2(transverse)>1e-24) {
-        fail(result,i,j,"VOLUME_MATRIX_NONCOAXIAL_ANNULI");return result;
-      }
+      const double axial=dot(delta,a.direction)/norm(a.direction);
+      const bool noncoaxial=!coaxial(a,b,delta);
       CoaxialAnnulus first{-a.length_m/2,a.length_m/2,
                             a.inner_radius_m,a.outer_radius_m};
-      const double signed_length=alignment*b.length_m;
+      const double signed_length=std::copysign(b.length_m,alignment);
       CoaxialAnnulus second{axial-signed_length/2,axial+signed_length/2,
                              b.inner_radius_m,b.outer_radius_m};
       auto pair_options=options.annular_pair;
       pair_options.max_evaluations=std::min(pair_options.max_evaluations,
           options.maximum_total_potential_evaluations-result.potential_evaluations);
-      const auto pair=coaxial_annular_inductance(first,second,pair_options);
+      const auto pair=noncoaxial ? separated_annular_inductance(a,b,pair_options) :
+          coaxial_annular_inductance(first,second,pair_options);
       result.potential_evaluations+=pair.evaluations;
       if (result.potential_evaluations>options.maximum_total_potential_evaluations) {
         fail(result,i,j,"VOLUME_MATRIX_TOTAL_WORK_LIMIT");return result;
       }
-      if(!pair.converged) {fail(result,i,j,"VOLUME_MATRIX_PAIR_NOT_CONVERGED");return result;}
+      if(!pair.converged) {
+        fail(result,i,j,noncoaxial ? "VOLUME_MATRIX_NONCOAXIAL_ANNULI" :
+                                   "VOLUME_MATRIX_PAIR_NOT_CONVERGED");
+        return result;
+      }
       result.inductance_h(i,j)=result.inductance_h(j,i)=pair.inductance_h;
       result.estimated_error_h(i,j)=result.estimated_error_h(j,i)=pair.estimated_error_h;
       continue;

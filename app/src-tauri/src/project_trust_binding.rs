@@ -21,9 +21,13 @@ impl ProjectManifestState {
 pub fn is_targeted_project_read(method: &str) -> bool {
     matches!(
         method,
-        "read_project_model_artifacts" | "read_project_package_shape_selector_previews"
-            | "read_project_state_artifact" | "read_project_visual_bundle"
-            | "export_mcad_session" | "preview_mcad_feedback" | "apply_mcad_feedback"
+        "read_project_model_artifacts"
+            | "read_project_package_shape_selector_previews"
+            | "read_project_state_artifact"
+            | "read_project_visual_bundle"
+            | "export_mcad_session"
+            | "preview_mcad_feedback"
+            | "apply_mcad_feedback"
     )
 }
 
@@ -217,15 +221,16 @@ mod tests {
         let request = json!({
             "params": {"expected_manifest_payload_sha256": "a".repeat(64)}
         });
-        require_targeted_read_binding(
-            "read_project_model_artifacts", &request, &path, &state,
-        )
-        .unwrap();
+        require_targeted_read_binding("read_project_model_artifacts", &request, &path, &state)
+            .unwrap();
         let stale = json!({
             "params": {"expected_manifest_payload_sha256": "b".repeat(64)}
         });
         assert!(require_targeted_read_binding(
-            "read_project_model_artifacts", &stale, &path, &state,
+            "read_project_model_artifacts",
+            &stale,
+            &path,
+            &state,
         )
         .unwrap_err()
         .contains("host-bound"));
@@ -259,9 +264,7 @@ mod tests {
         let request = json!({
             "params": {"expected_manifest_payload_sha256": "c".repeat(64)}
         });
-        require_targeted_read_binding(
-            "read_project_model_artifacts", &request, &path, &state,
-        )
-        .unwrap();
+        require_targeted_read_binding("read_project_model_artifacts", &request, &path, &state)
+            .unwrap();
     }
 }

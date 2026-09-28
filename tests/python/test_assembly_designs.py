@@ -152,6 +152,27 @@ class AssemblyDesignTests(unittest.TestCase):
             }, request_id="stale-structure", application_version="test")
             self.assertFalse(stale["ok"])
 
+    def test_manifest_bound_stack_mate_round_trip(self):
+        first, _, assembly, retained = self.fixture()
+        mate = {"id": "stack-mate", "name": "Stack header", "kind": "connector-mate",
+                "data": {"endpoint_a": "controller-board::J3", "endpoint_b": "load-board::J4",
+                         "pin_map": {"1": "2", "2": "1"}}}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "stack.spike"
+            manifest = write_spike_package(path, {
+                "project": {"id": "stack"}, "design_ir": first,
+                "assembly_ir": assembly, "assembly_designs": retained,
+            })
+            response = handle_project_request("update_assembly_structure_in_project", {
+                "project_path": str(path),
+                "expected_manifest_payload_sha256": manifest["manifest_payload_sha256"],
+                "boards": assembly["boards"], "harnesses": assembly["harnesses"],
+                "connector_mappings": [*assembly["connector_mappings"], mate],
+                "rigid_flex_links": assembly["rigid_flex_links"],
+            }, request_id="stack", application_version="test")
+            self.assertTrue(response["ok"], response)
+            self.assertEqual(read_project(path).payload["assembly_ir"]["connector_mappings"][-1]["data"], mate["data"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -238,6 +238,38 @@
       },
       "additionalProperties": false
     },
+    "radiated_emissions_standard": {
+      "description": "Edition-specific reference selection only. No limit values, detector response, comparison or compliance status are inferred.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["id", "classification"],
+          "properties": {
+            "id": {"const": "cispr-25-2021"},
+            "classification": {"enum": ["1", "2", "3", "4", "5"]}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["id", "classification"],
+          "properties": {
+            "id": {"const": "cispr-32-2015-amd1-2019"},
+            "classification": {"enum": ["A", "B"]}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["id", "platform"],
+          "properties": {
+            "id": {"enum": ["mil-std-461h-2026-re102", "mil-std-461g-2015-re102"]},
+            "platform": {"enum": ["ground", "surface_ship", "submarine", "aircraft", "space"]}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
     "chamber": {
       "type": "object",
       "description": "Virtual chamber fixture preview. Only distance_m is used as the NF2FF observation radius; fixture geometry is not solver geometry.",

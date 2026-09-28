@@ -36,7 +36,7 @@ from .converter_study import converter_capabilities, run_converter_study, valida
 from .errors import error_envelope
 from .convergence import run_mesh_convergence
 from .geometry import extract_net_geometry
-from .extensions import ExtensionRegistry, default_extension_roots
+from .extensions import ExtensionPackageManager, ExtensionRegistry, default_extension_roots
 from .script_runtime import run_python_script
 from .si_protocol_suites import (
     SiProtocolSuiteError,
@@ -110,6 +110,7 @@ from .service_assembly_handlers import handle_assembly_request, prepare_analysis
 from .assembly_analysis_scope import attach_scope_provenance
 from .service_project import importer_catalog
 from .service_project_handlers import handle_project_request
+from .service_extension_packages import handle_extension_package_request
 from .service_simulation_handlers import handle_simulation_request
 from .kicad_importer import import_kicad_design as _design_from_kicad
 from .external_pi_result_validation import validate_external_pi_multiport
@@ -118,8 +119,19 @@ from . import __version__
 
 _solver_registry = default_solver_registry()
 _extension_registry = ExtensionRegistry()
+_extension_packages = ExtensionPackageManager()
 _bundled_extension_root = Path(__file__).resolve().parents[2] / "extensions"
 _extension_registry.discover(default_extension_roots(), trusted_roots=[_bundled_extension_root])
+
+
+def _refresh_extensions(*, revoke_trust: set[str] | None = None) -> None:
+    revoked = revoke_trust or set()
+    trusted = [item["id"] for item in _extension_registry.catalog()
+               if item.get("trusted") and not item.get("bundled") and item["id"] not in revoked]
+    _extension_registry.reset()
+    _extension_registry.discover(
+        default_extension_roots(), trusted_ids=trusted, trusted_roots=[_bundled_extension_root],
+    )
 def _solver_catalog(*, refresh_external: bool = False) -> list[Dict[str, Any]]:
     return build_solver_catalog(_solver_registry, refresh_external=refresh_external)
 
@@ -300,14 +312,6 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
         )}
     if method == "recommend_emi_nets":
         return {"ok": True, "result": recommend_emi_nets(params.get("net_metrics") or [])}
-    if method in {"emi_preflight", "emi_screen"}:
-        try:
-            design = DesignIR(**params["design"])
-            setup = params.get("setup") or {}
-            operation = validate_emi_setup if method == "emi_preflight" else screen_emi_setup
-            return {"ok": True, "result": operation(design, setup, _solver_registry.catalog())}
-        except (KeyError, TypeError, ValueError) as exc:
-            return {"ok": False, "error": str(exc), "type": type(exc).__name__}
     if method == "validate_si_protocol_suite":
         try:
             suite = params.get("suite")
@@ -366,18 +370,18 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
                 context={"method": method, "capability": "si.protocol_test_suite"},
                 error_type=type(exc).__name__,
             )
-    if method == "list_extensions":
-        return {"ok": True, "result": {
-            "contract": "spike/extension-catalog/v1",
-            "extensions": _extension_registry.catalog(),
-            "diagnostics": _extension_registry.diagnostics(),
-        }}
+    extension_package_result = handle_extension_package_request(
+        method, params, _extension_registry, _extension_packages, _refresh_extensions,
+    )
+    if extension_package_result is not None:
+        return extension_package_result
     if method == "discover_extensions":
         roots = params.get("roots") or [str(path) for path in default_extension_roots()]
         diagnostics = _extension_registry.discover(roots)
+        browser = _extension_packages.browse(_extension_registry)
         return {"ok": True, "result": {
             "contract": "spike/extension-catalog/v1",
-            "extensions": _extension_registry.catalog(),
+            "extensions": browser["extensions"],
             "diagnostics": diagnostics,
         }}
     if method == "invoke_extension":
@@ -426,6 +430,14 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
     assembly_scope, scope_error = prepare_analysis_scope(method, params, request.get("id"))
     if scope_error is not None:
         return scope_error
+    if method in {"emi_preflight", "emi_screen"}:
+        try:
+            design = DesignIR(**params["design"])
+            operation = validate_emi_setup if method == "emi_preflight" else screen_emi_setup
+            result = operation(design, params.get("setup") or {}, _solver_registry.catalog())
+            return {"ok": True, "result": attach_scope_provenance(result, assembly_scope)}
+        except (KeyError, TypeError, ValueError) as exc:
+            return {"ok": False, "error": str(exc), "type": type(exc).__name__}
     if method == "validate_design":
         design = DesignIR(**params["design"])
         return {"ok": True, "result": validate_design(design)}

@@ -316,6 +316,8 @@ def run_si_workflow(request: Mapping[str, Any], design=None) -> dict[str, Any]:
             "edits": history, "sources": sources, "receivers": receivers, "passives": passives, "resonance_fits":resonance_fits,
             "ibis": tx_evidence + rx_evidence, "loaded_transfers": loaded, "time_domain": time_result,
             "tdr": tdr, "touchstone": {"name": f"si-channel.s{ports}p", "text": text, "error": export_error},
+            "field_maps": {"status": "unsupported", "electric": None, "magnetic": None,
+                           "reason": "A port network does not contain spatial E/H field samples; this workflow has no field solver."},
             "noise": {"band_hz": [float(f[0]), float(f[-1])], "thermal_rms_v_by_port": noise_rms.tolist(),
                       "excess_band_hz": [float(f[positive][0]), float(f[-1])] if np.any(positive) else None,
                       "excess_rms_v_by_port": excess_rms.tolist(),

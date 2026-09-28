@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Production failure paths preserve energy evidence, never synthetic results."""
 import json
@@ -60,13 +60,17 @@ class PEECEnergyAdmissionTests(unittest.TestCase):
         with patch('python.spike_core.peec_plugin.native', object()), patch(
             'python.spike_core.peec_plugin.build_hybrid_mesh', return_value=mesh), patch(
             'python.spike_core.peec_plugin._make_native_solver', return_value=(solver, None)), patch(
+            'python.spike_core.peec_volume_adapter.extract_volume_matrices',
+            side_effect=ValueError('volume backend unavailable')) as retry, patch(
             'python.spike_core.peec_plugin._solve_port') as solve:
             result = solve_peec_2_5d(DesignIR(), AnalysisSpec(mode='ac'))
+        retry.assert_called_once()
         solve.assert_not_called()
         self.assertEqual(result.status, 'failed')
         self.assertFalse(result.fields)
         self.assertFalse(result.networks)
         self.assertFalse(result.provenance['solved'])
+        self.assertIn('PEEC_VOLUME_RETRY_FAILED', {issue.code for issue in result.issues})
         self.assertEqual(result.provenance['inductance_units'], 'H')
         quality = result.provenance['numerical_quality']['inductance_passivity']
         self.assertEqual(quality['negative_eigenmode_count'], 1)
@@ -74,6 +78,15 @@ class PEECEnergyAdmissionTests(unittest.TestCase):
         self.assertFalse(quality['projection_applied'])
         np.testing.assert_array_equal(matrix, [[1e-9, 2e-9], [2e-9, 1e-9]])
         json.dumps(result.to_dict(), allow_nan=False)
+
+        with patch('python.spike_core.peec_plugin.native', object()), patch(
+            'python.spike_core.peec_plugin.build_hybrid_mesh', return_value=mesh), patch(
+            'python.spike_core.peec_plugin._make_native_solver', return_value=(solver, None)), patch(
+            'python.spike_core.peec_volume_adapter.extract_volume_matrices') as disabled_retry:
+            disabled = solve_peec_2_5d(DesignIR(), AnalysisSpec(
+                mode='ac', options={'peec_volume_extraction': 'disabled'}))
+        disabled_retry.assert_not_called()
+        self.assertIn('PEEC_INDUCTANCE_NONPASSIVE', {issue.code for issue in disabled.issues})
 
     def test_explicit_volume_request_fails_closed_when_backend_is_unavailable(self):
         mesh = HybridMesh(nodes=[MeshNode(i, i, 0, 0, 'F.Cu', 'VCC') for i in range(2)],

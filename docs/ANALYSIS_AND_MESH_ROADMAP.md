@@ -1,6 +1,6 @@
 # Analysis families and mesh development
 
-SPDX-License-Identifier: MIT  
+SPDX-License-Identifier: Apache-2.0
 Copyright (c) 2026 SigHarmonic
 
 ## Selection strategy
@@ -31,6 +31,12 @@ does not solve Maxwell's equations. Other broad workflow limitations remain in
   finest size; uncontrolled tracks preserve previous discretization. Unknown
   sources, collapsing nodes and excessive subdivisions are rejected. These
   controls do not move CAD geometry or constitute a 3-D mesh-editing UI.
+- The experimental conforming copper partition also accepts
+  `spike/conforming-local-refinement/v1` layer/net rectangular sizing regions.
+  It preserves the retained copper union and fixed contacts, rejects unused
+  or over-budget controls, and remains manual refinement rather than an
+  error-driven or qualified AC mesh. See [ADR 0025](adr/0025-local-conforming-copper-refinement.md)
+  and [the numerical increment](validation/PEEC_FOUNDATION_INCREMENT_20260928.md).
 - `refine_tetra_mesh` bisects the full incident-cell star of selected edges of
   supplied conforming tetrahedra. Shared midpoints prevent new hanging faces.
   Material IDs, source ownership and labeled exterior faces are preserved;
@@ -70,6 +76,11 @@ geometric intersection freedom.
    matrix-free FMM/MLFMA, suitable preconditioning, then distributed benchmarks.
 5. Hybrid FEM/BEM/circuit/thermal coupling with explicit transfer contracts,
    energy checks, independent-solver and measured correlation.
+6. Once the physical extraction path is converged: uncertainty propagation,
+   geometry/material sensitivity and adjoint gradients for router/placer
+   decisions; calibrated passive reduced-order models for repeated sweeps;
+   chip-package-board return-path and electrothermal reliability studies.
+   Each needs its own error/validity envelope, not a borrowed mesh pass mark.
 
 Modern methods are evaluated against reproducible accuracy/memory/time tests,
 not adopted merely because they are newer. Gmsh documents local sizing,

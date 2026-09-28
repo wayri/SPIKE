@@ -10,7 +10,7 @@ Requested 2026-09-06. This is a delivery target, not a claim of qualification.
    and reopen all assembly transforms. Verify world/local picking and probes.
 3. Create connector-bound harnesses with explicit pin maps, return paths and
    electrical parameters; highlight endpoints and routes across boards.
-4. Render the full assembly on the EMI table with consistent units and transforms.
+4. Render the full assembly on the EM table with consistent units and transforms.
    Table placement is not proof of a valid electromagnetic domain or excitation.
 5. Run independent and coupled PI/SI as distinct workflows. Qualify port binding,
    coupling, cancellation, result provenance and conservation independently.

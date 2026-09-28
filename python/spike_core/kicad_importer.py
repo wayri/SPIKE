@@ -141,6 +141,8 @@ def import_kicad_design(path: str) -> DesignIR:
             match = {"reference": footprint.get("reference", "U?"), "pad_count": 0, "nets": []}
             components.append(match)
         match["library"] = footprint.get("library", "")
+        match["value"] = footprint.get("value", "")
+        match["properties"] = dict(footprint.get("properties", {}))
         match["model_path"] = footprint.get("model_path", "")
         match["model_resolved"] = _resolve_model_reference(
             footprint.get("model_path", ""), Path(path).resolve().parent

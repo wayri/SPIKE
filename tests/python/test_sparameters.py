@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 
 from python.spike_core.sparameters import (
+    NetworkData,
     TouchstoneError,
     analyze_network,
     read_touchstone,
@@ -56,6 +57,15 @@ class SParameterTests(unittest.TestCase):
         report = analyze_network(read_touchstone(self.fixture(1.2)))
         self.assertEqual(report["checks"]["passivity"]["status"], "fail")
         self.assertTrue(any(issue["code"] == "SPARAM_PASSIVITY_VIOLATION" for issue in report["issues"]))
+
+    def test_matched_reflection_vswr_masks_open_and_active_samples(self):
+        gamma = np.asarray([0, 0.5, 1, 1.2], dtype=complex).reshape(4, 1, 1)
+        network = NetworkData(np.asarray([1e6, 2e6, 3e6, 4e6]), gamma, np.asarray([50.0]))
+        rows = analyze_network(network)["reflection_vswr"]["ports"][0]["trace"]
+        self.assertEqual([row["vswr_status"] for row in rows],
+                         ["finite", "finite", "infinite", "non_passive_reflection"])
+        self.assertEqual([row["vswr"] for row in rows], [1.0, 3.0, None, None])
+        self.assertEqual(rows[2]["reflection_magnitude"], 1.0)
 
     def test_s_z_y_and_renormalization_are_consistent(self):
         impedance = np.asarray([[75.0 + 3j]])

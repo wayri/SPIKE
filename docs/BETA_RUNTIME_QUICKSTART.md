@@ -1,12 +1,11 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # Beta runtime quickstart
 
-The SPIKE desktop and public integration product remains version 0.2.5. The
-separately versioned SPIKES circuit engine is 0.3.0-beta.1. Both are bounded
-beta candidates, and neither version promotes a capability or qualifies a
-physics workflow. Their process adapters intentionally report independent
-readiness states.
+The SPIKE desktop/CLI is version 0.3.0 (engineering preview). The separately
+versioned SPIKES circuit engine is 0.3.0-beta.1. Neither version promotes a
+capability or qualifies a physics workflow. Their process adapters intentionally
+report independent readiness states.
 
 ## Check this checkout
 

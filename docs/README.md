@@ -11,9 +11,14 @@ work plan (2026-09-05)](STABILIZATION_RELEASE_PLAN_20260905.md).
 
 | Need | Start here | Then read |
 |---|---|---|
+| Find the executable PI, SI, thermal and two solver-extension labs | [Capability tutorial atlas](CAPABILITY_TUTORIAL_ATLAS.md) | [Solver status](SOLVER_STATUS.md), [virtual EMI/EMerge lab](VIRTUAL_EMI_EMERGE_TUTORIAL.md) |
 | Complete a desktop task | [User task guide](USER_TASK_SEQUENCES.md) | [Result visualization](RESULT_VISUALIZATION_AND_LIMITS.md), [project format](PROJECT_FORMAT.md) |
+| Learn PI, SI, and OpenEMS Suite step by step | [Illustrated PI/SI and openEMS tutorial](PI_SI_OPENEMS_TUTORIAL.md) | [SI workflow](SI_WORKFLOW.md), [solver status](SOLVER_STATUS.md) |
+| Reproduce PI/SI inputs, outputs, plots and fail-closed gates | [PI/SI worked casebook](PI_SI_WORKED_CASEBOOK.md) | [Capture provenance](tutorial-assets/pi-si-casebook/README.md), [solver status](SOLVER_STATUS.md) |
+| Run the implemented SI suite step by step | [Full SI user guide](SI_USER_GUIDE.md) | [Analytical coupled-line input](../examples/si/analytical-coupled-rlgc.json), [SI capability record](validation/SI_CAPABILITY_VOLUME_PEEC_20260928.md) |
 | Diagnose a failure | [Troubleshooting](../TROUBLESHOOTING.md) | [Error-code catalog](ERROR_CODE_CATALOG.md), [stability and recovery](STABILITY_AND_RECOVERY.md) |
 | Use the CLI | [CLI workflow](CLI_WORKFLOW.md) | [CLI reference](CLI.md) |
+| Connect an offline local LLM | [Local LLM and MCP guide](LOCAL_LLM_MCP.md) | [User task guide](USER_TASK_SEQUENCES.md), [solver status](SOLVER_STATUS.md) |
 | Check solver availability or validity | [Solver status](SOLVER_STATUS.md) | [Validation program](VALIDATION_PROGRAM.md), [release qualification](PI_RELEASE_QUALIFICATION.md) |
 | Understand solver mathematics and research provenance | [Solver handbook](SOLVER_HANDBOOK.md) | [Annotated references](SOLVER_REFERENCES.md), [recorded citation inventory](generated/solver-reference-inventory.json) |
 | Run SERDES and actuator reference checks | [SERDES reference](SERDES_REFERENCE_QUALIFICATION.md) | [Actuator map review](ACTUATOR_FORCE_MAP.md), [delivery and recent research](SERDES_ACTUATOR_DELIVERY.md) |
@@ -21,7 +26,8 @@ work plan (2026-09-05)](STABILIZATION_RELEASE_PLAN_20260905.md).
 | Configure SI/network analysis | [Signal-integrity workbench](SIGNAL_INTEGRITY_NETWORK_WORKBENCH.md) | [Bounded geometry channels](GEOMETRY_DERIVED_SI_CHANNEL.md), [S-parameter integration](SIGNAL_INTEGRITY_NETWORK_INTEGRATION.md) |
 | Inspect the circuit language/analysis boundary | [SPIKES language and linear analysis wave 3](SPIKES_LANGUAGE_ANALYSIS_WAVE3.md) | [Solver status](SOLVER_STATUS.md) |
 | Inspect nonlinear behavioral analysis | [SPIKES nonlinear language and analysis wave 4](SPIKES_LANGUAGE_ANALYSIS_WAVE4.md) | [Solver status](SOLVER_STATUS.md) |
-| Configure thermal work | [Thermal workflow](THERMAL_WORKFLOW.md) | [Transient thermal and viewport](TRANSIENT_THERMAL_AND_VIEWPORT.md) |
+| Learn board thermal from setup to saved plots | [Illustrated thermal user guide](THERMAL_USER_GUIDE.md) | [Thermal workflow](THERMAL_WORKFLOW.md), [solver status](SOLVER_STATUS.md) |
+| Configure transient or external thermal work | [Thermal workflow](THERMAL_WORKFLOW.md) | [Transient thermal and viewport](TRANSIENT_THERMAL_AND_VIEWPORT.md) |
 | Configure EMI work | [EMI workflow](EMI_WORKFLOW.md) | [Engine gates](SI_SPICE_EMI_RF_ENGINE_GATES.md) |
 | Configure loaded SI and model handling | [SI workflow](SI_WORKFLOW.md) | [Solver status](SOLVER_STATUS.md) |
 | Use an optional external engine | [External-engine interoperability](EXTERNAL_ENGINE_INTEROPERABILITY.md) | [Deployment](EXTERNAL_SOLVER_DEPLOYMENT.md), engine-specific adapter documents |

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import type { BoardObject } from "./BoardViewport";
 import type { SolverResultBundle } from "./analysisResults";
 import { buildProbeRows, evaluateProbeFormulas, probeResultsCsv, type ProbeFormulaRow, type ProbeQuantity, type ProbeReferenceValues } from "./probeCalculations";

@@ -1,10 +1,11 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Runtime admission and topology-overlay checks for finite-volume PEEC."""
 
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import numpy as np
 
@@ -12,7 +13,8 @@ from python.spike_core.contracts import AnalysisSpec, DesignIR
 from python.spike_core.hybrid_mesh import MeshBranch, build_hybrid_mesh, nearest_mesh_node
 from python.spike_core.peec_plugin import _connected_component
 from python.spike_core.peec_volume_adapter import (
-    VolumeResistanceOverlay, extract_volume_matrices,
+    VolumeMatrices, VolumeResistanceOverlay, extract_volume_matrices,
+    retry_nonpassive_legacy,
 )
 from python.spike_core.quasistatic_capacitance import zone_pad_mesh_dependence_issue
 from python.spike_core.transient_peec import solve_peec_rl_transient
@@ -37,6 +39,20 @@ class _NativeResistance:
 
 
 class VolumeAdapterTests(unittest.TestCase):
+    def test_retry_uses_unmodified_positive_volume_matrix(self):
+        matrix = np.array([[1.0, 0.2], [0.2, 1.0]]) * 1e-9
+        volume = VolumeMatrices(matrix, np.eye(2), {"basis_count": 2})
+        with patch('python.spike_core.peec_volume_adapter.extract_volume_matrices',
+                   return_value=volume) as extract:
+            returned, admitted, quality, error = retry_nonpassive_legacy(
+                object(), DesignIR(), [_track("a"), _track("b")], 2, [0, 1])
+        extract.assert_called_once()
+        self.assertIs(returned, volume)
+        self.assertIsNone(error)
+        np.testing.assert_array_equal(admitted, matrix)
+        self.assertEqual(quality["negative_eigenmode_count"], 0)
+        self.assertFalse(quality["projection_applied"])
+
     def test_mesh_dependent_zone_capacitance_is_explicitly_warned(self):
         branches = [SimpleNamespace(kind="track"), SimpleNamespace(kind="zone")]
         self.assertIsNone(zone_pad_mesh_dependence_issue(branches, [0, 1], False))

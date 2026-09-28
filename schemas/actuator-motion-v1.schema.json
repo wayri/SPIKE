@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://spike.local/schemas/actuator-motion-v1.schema.json",
-  "$comment": "SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic",
   "title": "Fixed-excitation one-degree-of-freedom actuator motion",
   "type": "object",
   "additionalProperties": false,

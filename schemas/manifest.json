@@ -45,6 +45,8 @@
     "spike/thermal-solver-qualification-evidence/v1": "thermal-solver-qualification-evidence-v1.schema.json",
     "spike/structured-solid-thermal-request/v1": "structured-solid-thermal-request-v1.schema.json",
     "spike/structured-solid-thermal-result/v1": "structured-solid-thermal-result-v1.schema.json",
+    "spike/board-thermal-request/v1": "board-thermal-request-v1.schema.json",
+    "spike/board-thermal-result/v1": "board-thermal-result-v1.schema.json",
     "spike/openfoam-multiregion-request/v1": "openfoam-multiregion-request-v1.schema.json",
     "spike/openfoam-multiregion-case/v1": "openfoam-multiregion-case-v1.schema.json",
     "spike/openfoam-polymesh-request/v1": "openfoam-polymesh-request-v1.schema.json",

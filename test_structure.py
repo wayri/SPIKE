@@ -1,5 +1,5 @@
 """
-SPIKE v0.2.0-alpha.2 - Project Structure Validation Test
+SPIKE - Project Structure Validation Test
 ===================================================
 
 This script validates that all required files and directories exist.
@@ -45,7 +45,7 @@ def check_dir(path, description):
         return False
 
 def main():
-    print_header("SPIKE v0.2.0-alpha.2 - Project Structure Validation")
+    print_header("SPIKE - Project Structure Validation")
     
     # Get project root
     project_root = Path(__file__).parent
@@ -148,7 +148,7 @@ def main():
     
     if percentage == 100:
         print(f"\n{GREEN}{BOLD}[SUCCESS] All project structure checks passed!{RESET}")
-        print(f"{GREEN}SPIKE v0.2.0-alpha.2 repository structure is valid.{RESET}\n")
+        print(f"{GREEN}SPIKE repository structure is valid.{RESET}\n")
         return 0
     else:
         print(f"\n{RED}{BOLD}[WARNING] Some checks failed.{RESET}")

@@ -1,0 +1,60 @@
+{
+  "board_sha256": "b99976c1f8f09b1d03001e1de75401378d839d18c24cac034bc5d38f5a66b5e1",
+  "solver": "EMerge/3.0.0a19",
+  "frequencies_hz": [
+    3000000000.0,
+    3199999999.9999995,
+    3400000000.0000005,
+    3600000000.0,
+    3800000000.0,
+    3999999999.9999995,
+    4200000000.0
+  ],
+  "s11_db_bare": [
+    -1.034435034104701,
+    -1.7961300901197856,
+    -3.531627385294694,
+    -2.972844585853846,
+    -1.35289656636855,
+    -0.7581048611325402,
+    -0.5135554199194547
+  ],
+  "s11_db_covered": [
+    -1.029262352678955,
+    -1.9050777737424254,
+    -4.02081731781856,
+    -3.3940295760470347,
+    -1.576484985554928,
+    -0.873442797681761,
+    -0.5728196799366936
+  ],
+  "first_frequency_hz": 3000000000.0,
+  "theta_90_phi_0_relative_db_bare": -11.192212005715593,
+  "theta_90_phi_0_relative_db_covered": -11.073803163800523,
+  "theta_90_phi_0_normalized_shape_delta_db": 0.11840884191506973,
+  "theta_180_phi_0_relative_db_bare": -9.935138494773724,
+  "theta_180_phi_0_relative_db_covered": -11.929803236905736,
+  "theta_180_phi_0_normalized_shape_delta_db": -1.9946647421320112,
+  "radome": {
+    "contract": "spike/emerge-surroundings/v1",
+    "objects": [
+      {
+        "kind": "dielectric_box",
+        "name": "Radome slab",
+        "origin_mm": [
+          95,
+          95,
+          10
+        ],
+        "size_mm": [
+          50,
+          40,
+          1.5
+        ],
+        "epsilon_r": 2.1
+      }
+    ]
+  },
+  "interpretation": "Pattern difference compares independently peak-normalized display fields; it is not insertion loss, gain, or compliance margin.",
+  "qualification": "Unvalidated coarse mesh; no convergence, measured reference, or numerical human review."
+}

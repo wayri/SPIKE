@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 
 import { resultModeAvailable, type PdnReview, type ResultViewMode, type ResultVisualization, type SolverResultBundle } from "./analysisResults";
 import { DEFAULT_COPPER_FUSING_SETTINGS, buildResultEngineeringAnalytics } from "./resultAnalytics";

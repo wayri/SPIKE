@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Build and smoke-test the dedicated owned-SPICE process without downloading tools."""
 
 from __future__ import annotations

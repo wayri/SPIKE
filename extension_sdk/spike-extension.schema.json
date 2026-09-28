@@ -106,6 +106,15 @@
         }
       }
     },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "menu_bar": {"type": "boolean"},
+        "title_bar": {"type": "boolean"},
+        "menu_items": {"type": "array", "maxItems": 20, "uniqueItems": true, "items": {"type": "string"}}
+      }
+    },
     "contributes": {
       "type": "object",
       "minProperties": 1,

@@ -1,0 +1,24 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.openems-suite",
+  "name": "OpenEMS Suite",
+  "version": "0.1.0",
+  "provider": "SPIKE",
+  "description": "Optional OpenEMS full-wave PI and SI case workflows.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "experimental",
+  "license": "Apache-2.0",
+  "bundled": true,
+  "ui": {"menu_bar": true, "title_bar": true, "menu_items": ["openems-pi", "openems-si"]},
+  "permissions": ["design.read"],
+  "limits": {"timeout_seconds": 3600, "max_result_bytes": 8388608},
+  "contributes": {
+    "applications": [
+      {"id": "openems-pi", "name": "PI full-wave setup", "category": "Power integrity", "description": "Preflight, prepare or run an explicit high-frequency PDN port sweep; not DC PI.", "output_contract": "spike/extension-result/v1", "input_schema": {"type": "object", "required": ["analysis"], "properties": {"operation": {"enum": ["preflight", "prepare", "run"]}, "analysis": {"type": "object"}, "engine_options": {"type": "object"}}}},
+      {"id": "openems-si", "name": "SI full-wave setup", "category": "Signal integrity", "description": "Preflight, prepare or run an explicit interconnect port sweep.", "output_contract": "spike/extension-result/v1", "input_schema": {"type": "object", "required": ["analysis"], "properties": {"operation": {"enum": ["preflight", "prepare", "run"]}, "analysis": {"type": "object"}, "engine_options": {"type": "object"}}}}
+    ]
+  }
+}

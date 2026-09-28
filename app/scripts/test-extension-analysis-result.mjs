@@ -8,7 +8,11 @@ registerHooks({ resolve(specifier, context, nextResolve) {
 const { extensionAnalysisResult } = await import("../src/extensionAnalysisResult.ts");
 const result = {
   contract: "spike/v1", analysis_id: "external-1", status: "completed", mode: "dc", model_status: "experimental",
-  summary: { maximum_voltage_drop_v: 0.003 }, fields: { visualization: { scalar_fields: { voltage_v: [{ x_mm: 1, y_mm: 2, net: "VCC", value: 12 }] } } },
+  summary: { maximum_voltage_drop_v: 0.003 }, fields: { visualization: {
+    scalar_fields: { voltage_v: [{ x_mm: 1, y_mm: 2, net: "VCC", value: 12 }] },
+    mesh: [{ id: "cell-1", kind: "surface", layer: "F.Cu", net: "VCC",
+      vertices_mm: [[0, 0, 0], [1, 0, 0], [0, 1, 0]] }],
+  } },
   networks: {}, probes: [], issues: [], provenance: { solver: "test.adapter", design_id: "board-1", design_digest_sha256: "abc" },
 };
 const data = { analysis_result: result, input_design_sha256: "abc" };
@@ -18,6 +22,7 @@ assert.equal(bundle?.model_status, "experimental");
 assert.equal(bundle?.provenance.solver, "test.adapter");
 assert.equal(bundle?.scalar_fields.voltage_v[0].value, 12);
 assert.deepEqual(bundle?.scalar_fields.voltage_drop_v, []);
+assert.equal(bundle?.mesh[0].id, "cell-1");
 assert.equal(extensionAnalysisResult("panels", "spike/v1", data), null);
 assert.equal(extensionAnalysisResult("analyses", "other", data), null);
 assert.equal(extensionAnalysisResult("analyses", "spike/v1", { ...data, input_design_sha256: "wrong" }), null);

@@ -37,6 +37,12 @@ the native desktop worker or a completed solver result. See `MARBLE_CLI_QUALIFIC
 
 ## Inspect layout and select electrical objects
 
+Click a side dock's title to collapse it, then click its vertical title to
+expand it. In the bottom dock, click the selected tab title to hide the dock or
+another title to open that view. A docked PI analysis setup also toggles when
+its title is clicked; drag the heading to move it. Resize handles and pinning
+retain their existing behavior.
+
 1. Switch to 2D for layer-focused inspection or 3D for stackup/model context.
 2. Set the selection filter before selecting. Confirm the inspector's object
    ID, layer, connected net, and coordinate before using a terminal/probe anchor.
@@ -75,6 +81,23 @@ layer manager open. This is imported geometry, not an analysis result.*
 The Marble 3D workspace capture above records source-imported geometry and
 procedural models. It does not establish native-worker execution, material
 properties, or a solved result.
+
+For a multi-board assembly, select the board occurrence to analyze before
+opening PI, thermal, or EM setup. The occurrence must use the active
+detailed design. Select explicitly when several occurrences share that design.
+The result scope identifies the selected occurrence and omitted assembly
+entities. A selected proxy for a different design cannot be solved from the
+active view.
+For SI across several boards, use explicit board jobs in the SI multi-board
+workflow; a viewport selection does not create a coupled channel.
+In MCAD assembly, add a second board instance to expose the **Link Manager**.
+Use **Stacked board connector mates** for direct headers and **Harnesses**
+for cabled links. Give each mate two `board::connector`
+endpoints and explicit pin pairs. Review connector and return models in the
+solver workflow; board proximity alone does not connect them. Choose **Save
+boards and links**, then save the `.spike` project with results or export a
+separate result-free project copy. **Save results file** writes a standalone
+`.spike-results.json` file that **Open project** can load directly.
 
 ## Add and inspect probes
 
@@ -193,6 +216,7 @@ Studio circuit/HDL recordings belong to the separate Studio application.
 | Solvers / extensions | Gated external-engine capture | Installation, trust and adapter output |
 | Circuit / HDL Studio | Recorded signal/timing captures | Main-workbench solve evidence |
 | Settings / shortcuts | Written reference | Settings controls |
+| Local LLM / MCP | Written setup and allowlisted tool sequence | Live provider and desktop-bridge capture |
 | Diagnostics | Canonical catalog | Error-to-recovery pictures |
 
 ## Recorded DC interpretation example
@@ -213,4 +237,11 @@ resistance was absent; mesh convergence was requested before sign-off. A small
 linear residual does not establish physical validity. The help article includes
 the pinned board revision/hash. Raw evaluation inputs/results are not bundled
 with help, and no separate candidate screenshot is used as a main-UI picture.
-The historical Marble screenshots show Home / PI / HF-SI / EMI / Thermal tabs. The current workspace places Mesh and Solve directly after Home, followed by PI, HF / SI, EMI, Thermal, Probes, Results, Reports, and Settings. Follow command names and workflow prerequisites rather than relying on historical tab positions.
+The historical Marble screenshots show Home / PI / HF-SI / EMI / Thermal tabs. The current workspace places Mesh and Solve directly after Home, followed by PI, HF / SI, EM, Thermal, Probes, Results, Reports, and Settings. Follow command names and workflow prerequisites rather than relying on historical tab positions.
+
+## Operate SPIKE with a local LLM
+
+1. Open **Settings → LLM / MCP** in the desktop app and enable the local bridge. Copy the displayed rendezvous path if more than one SPIKE window is open.
+2. Configure LM Studio's local `mcp.json` to run `scripts/spike_mcp.py`, or start an Ollama/LM Studio local API and use `scripts/spike_local_chat.py`. Follow [the setup guide](LOCAL_LLM_MCP.md) for exact commands.
+3. Ask the model to inspect `spike_gui_status` and `spike_capabilities`, then create a study, add cases, select a workspace, or open its run controls. Read solver preflight and validity status before interpreting a result.
+4. Review the visible setup and save the SPIKE project to retain study changes. Opening run controls does not execute a solver.

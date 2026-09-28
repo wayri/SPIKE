@@ -1,0 +1,30 @@
+{
+  "board": {
+    "path": "app/public/demo/ebrake1.kicad_pcb",
+    "sha256": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca",
+    "virtual_nodes": ["BOARD"]
+  },
+  "scenario": {
+    "scenario_id": "ebrake1-exploratory-object-thermal",
+    "mode": "transient",
+    "ambient_temperature_c": 25.0,
+    "run": {"end_time_s": 300.0, "write_interval_s": 1.0}
+  },
+  "components": [
+    {"component_ref": "Q1", "power_w": 1.0, "thermal_capacitance_j_per_c": 5.0},
+    {"component_ref": "Q2", "power_w": 0.8, "thermal_capacitance_j_per_c": 5.0},
+    {"component_ref": "Q3", "power_w": 0.6, "thermal_capacitance_j_per_c": 5.0},
+    {"component_ref": "BOARD", "power_w": 0.0, "thermal_capacitance_j_per_c": 25.0}
+  ],
+  "surfaces": [
+    {"id": "Q1-to-board", "object_ref": "Q1", "surface": "bottom", "kind": "conduction", "target_ref": "BOARD", "resistance_c_per_w": 3.0},
+    {"id": "Q2-to-board", "object_ref": "Q2", "surface": "bottom", "kind": "conduction", "target_ref": "BOARD", "resistance_c_per_w": 4.0},
+    {"id": "Q3-to-board", "object_ref": "Q3", "surface": "bottom", "kind": "conduction", "target_ref": "BOARD", "resistance_c_per_w": 3.0},
+    {"id": "board-to-ambient", "object_ref": "BOARD", "surface": "whole", "kind": "conduction", "target_ref": "ambient", "resistance_c_per_w": 7.0}
+  ],
+  "assumptions": {
+    "power": "Illustrative constant Q1/Q2/Q3 losses, not measured or extracted from PI.",
+    "thermal_paths": "Illustrative complete effective component-to-board and board-to-ambient resistances; no copper spreading, airflow, or spatial temperature field.",
+    "heat_capacity": "Illustrative constant lumped heat capacities, not derived from mass and specific heat."
+  }
+}

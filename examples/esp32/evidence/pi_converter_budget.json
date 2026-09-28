@@ -1,0 +1,340 @@
+{
+  "contract": "spike/esp32-pi-converter-example/v1",
+  "model_status": "approximate",
+  "source_board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33",
+  "board_design_id": "kicad-3199ce0a25f8987020e716d8",
+  "source_component": {
+    "reference": "U41",
+    "value": "AZ1117-3.3",
+    "nets": [
+      "+3.3V",
+      "+5V",
+      "GND"
+    ]
+  },
+  "assumption": "The 0.15 A load is illustrative and assigned to +3.3V for this converter budget; the separate board DC IR example uses +3.3VMCU. No regulator SPICE model, quiescent current, dropout, switching ripple, copper return, or thermal feedback is included.",
+  "ldo": {
+    "topology": {
+      "contract": "spike/topology/v1",
+      "domain": "pi",
+      "name": "ESP32 board U41 5 V to 3.3 V budget",
+      "scenarios": [
+        {
+          "id": "typical",
+          "label": "Typical",
+          "loadMultiplier": 1
+        },
+        {
+          "id": "maximum",
+          "label": "Maximum",
+          "loadMultiplier": 1.25
+        },
+        {
+          "id": "standby",
+          "label": "Standby",
+          "loadMultiplier": 0.1
+        }
+      ],
+      "extraction": {
+        "source": "manual",
+        "generatedAt": "2026-09-29T00:00:00Z",
+        "warnings": []
+      },
+      "nodes": [
+        {
+          "id": "input",
+          "kind": "source",
+          "label": "+5V source",
+          "net": "+5V",
+          "voltageV": 5,
+          "x": 0,
+          "y": 0,
+          "origin": "user"
+        },
+        {
+          "id": "U41",
+          "kind": "regulator",
+          "ref": "U41",
+          "label": "U41 AZ1117-3.3",
+          "net": "+3.3V",
+          "converterKind": "ldo",
+          "voltageRatio": 0.6599999999999999,
+          "x": 140,
+          "y": 0,
+          "origin": "user"
+        },
+        {
+          "id": "rail",
+          "kind": "rail",
+          "label": "+3.3V",
+          "net": "+3.3V",
+          "x": 280,
+          "y": 0,
+          "origin": "user"
+        },
+        {
+          "id": "assumed_load",
+          "kind": "load",
+          "label": "Illustrative 0.15 A rail load",
+          "net": "+3.3V",
+          "loadCurrentA": 0.15,
+          "x": 420,
+          "y": 0,
+          "origin": "user"
+        }
+      ],
+      "edges": [
+        {
+          "id": "in-U41",
+          "from": "input",
+          "to": "U41",
+          "kind": "power",
+          "net": "+5V",
+          "origin": "user"
+        },
+        {
+          "id": "U41-rail",
+          "from": "U41",
+          "to": "rail",
+          "kind": "power",
+          "net": "+3.3V",
+          "origin": "user"
+        },
+        {
+          "id": "rail-load",
+          "from": "rail",
+          "to": "assumed_load",
+          "kind": "power",
+          "net": "+3.3V",
+          "origin": "user"
+        }
+      ]
+    },
+    "budget": {
+      "status": "complete",
+      "scenarioId": "typical",
+      "loadMultiplier": 1,
+      "sourcePowerW": 0.7499999999999999,
+      "loadPowerW": 0.49499999999999994,
+      "lossW": 0.25499999999999995,
+      "efficiencyPercent": 66,
+      "nodes": {
+        "assumed_load": {
+          "nodeId": "assumed_load",
+          "voltageV": 3.3,
+          "inputVoltageV": 3.3,
+          "currentA": 0.15,
+          "inputCurrentA": 0.15,
+          "inputPowerW": 0.49499999999999994,
+          "outputPowerW": 0.49499999999999994,
+          "lossW": 0
+        },
+        "rail": {
+          "nodeId": "rail",
+          "voltageV": 3.3,
+          "inputVoltageV": 3.3,
+          "currentA": 0.15,
+          "inputCurrentA": 0.15,
+          "inputPowerW": 0.49499999999999994,
+          "outputPowerW": 0.49499999999999994,
+          "lossW": 0
+        },
+        "U41": {
+          "nodeId": "U41",
+          "voltageV": 3.3,
+          "inputVoltageV": 5,
+          "currentA": 0.15,
+          "inputCurrentA": 0.14999999999999997,
+          "inputPowerW": 0.7499999999999999,
+          "outputPowerW": 0.49499999999999994,
+          "lossW": 0.25499999999999995,
+          "efficiencyPercent": 66
+        },
+        "input": {
+          "nodeId": "input",
+          "voltageV": 5,
+          "currentA": 0.14999999999999997,
+          "inputPowerW": 0.7499999999999999,
+          "outputPowerW": 0.7499999999999999,
+          "lossW": 0
+        }
+      },
+      "rails": [
+        {
+          "nodeId": "rail",
+          "net": "+3.3V",
+          "voltageV": 3.3,
+          "currentA": 0.15,
+          "powerW": 0.49499999999999994,
+          "downstreamLoadIds": [
+            "assumed_load"
+          ],
+          "status": "ready"
+        }
+      ],
+      "warnings": []
+    }
+  },
+  "hypothetical_buck": {
+    "topology": {
+      "contract": "spike/topology/v1",
+      "domain": "pi",
+      "name": "Hypothetical 90% buck substitution, not populated on ESP32 board",
+      "scenarios": [
+        {
+          "id": "typical",
+          "label": "Typical",
+          "loadMultiplier": 1
+        },
+        {
+          "id": "maximum",
+          "label": "Maximum",
+          "loadMultiplier": 1.25
+        },
+        {
+          "id": "standby",
+          "label": "Standby",
+          "loadMultiplier": 0.1
+        }
+      ],
+      "extraction": {
+        "source": "manual",
+        "generatedAt": "2026-09-29T00:00:00Z",
+        "warnings": []
+      },
+      "nodes": [
+        {
+          "id": "input",
+          "kind": "source",
+          "label": "+5V source",
+          "net": "+5V",
+          "voltageV": 5,
+          "x": 0,
+          "y": 0,
+          "origin": "user"
+        },
+        {
+          "id": "buck_study",
+          "kind": "regulator",
+          "label": "Hypothetical buck",
+          "net": "+3.3V",
+          "converterKind": "buck",
+          "voltageRatio": 0.6599999999999999,
+          "x": 140,
+          "y": 0,
+          "origin": "user",
+          "efficiencyPercent": 90
+        },
+        {
+          "id": "rail",
+          "kind": "rail",
+          "label": "+3.3V",
+          "net": "+3.3V",
+          "x": 280,
+          "y": 0,
+          "origin": "user"
+        },
+        {
+          "id": "assumed_load",
+          "kind": "load",
+          "label": "Illustrative 0.15 A rail load",
+          "net": "+3.3V",
+          "loadCurrentA": 0.15,
+          "x": 420,
+          "y": 0,
+          "origin": "user"
+        }
+      ],
+      "edges": [
+        {
+          "id": "in-U41",
+          "from": "input",
+          "to": "buck_study",
+          "kind": "power",
+          "net": "+5V",
+          "origin": "user"
+        },
+        {
+          "id": "U41-rail",
+          "from": "buck_study",
+          "to": "rail",
+          "kind": "power",
+          "net": "+3.3V",
+          "origin": "user"
+        },
+        {
+          "id": "rail-load",
+          "from": "rail",
+          "to": "assumed_load",
+          "kind": "power",
+          "net": "+3.3V",
+          "origin": "user"
+        }
+      ]
+    },
+    "budget": {
+      "status": "complete",
+      "scenarioId": "typical",
+      "loadMultiplier": 1,
+      "sourcePowerW": 0.5499999999999999,
+      "loadPowerW": 0.49499999999999994,
+      "lossW": 0.05499999999999999,
+      "efficiencyPercent": 90,
+      "nodes": {
+        "assumed_load": {
+          "nodeId": "assumed_load",
+          "voltageV": 3.3,
+          "inputVoltageV": 3.3,
+          "currentA": 0.15,
+          "inputCurrentA": 0.15,
+          "inputPowerW": 0.49499999999999994,
+          "outputPowerW": 0.49499999999999994,
+          "lossW": 0
+        },
+        "rail": {
+          "nodeId": "rail",
+          "voltageV": 3.3,
+          "inputVoltageV": 3.3,
+          "currentA": 0.15,
+          "inputCurrentA": 0.15,
+          "inputPowerW": 0.49499999999999994,
+          "outputPowerW": 0.49499999999999994,
+          "lossW": 0
+        },
+        "buck_study": {
+          "nodeId": "buck_study",
+          "voltageV": 3.3,
+          "inputVoltageV": 5,
+          "currentA": 0.15,
+          "inputCurrentA": 0.10999999999999999,
+          "inputPowerW": 0.5499999999999999,
+          "outputPowerW": 0.49499999999999994,
+          "lossW": 0.05499999999999999,
+          "efficiencyPercent": 90
+        },
+        "input": {
+          "nodeId": "input",
+          "voltageV": 5,
+          "currentA": 0.10999999999999999,
+          "inputPowerW": 0.5499999999999999,
+          "outputPowerW": 0.5499999999999999,
+          "lossW": 0
+        }
+      },
+      "rails": [
+        {
+          "nodeId": "rail",
+          "net": "+3.3V",
+          "voltageV": 3.3,
+          "currentA": 0.15,
+          "powerW": 0.49499999999999994,
+          "downstreamLoadIds": [
+            "assumed_load"
+          ],
+          "status": "ready"
+        }
+      ],
+      "warnings": []
+    }
+  }
+}

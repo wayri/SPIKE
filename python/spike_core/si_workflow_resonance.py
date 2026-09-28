@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Opt-in, declared single-RLC fits of matched driving-point impedance."""
 import numpy as np

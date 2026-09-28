@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { diagnosticMessage, frontendError, isSpikeErrorEnvelope } from "./errorCatalog";
 import type { SpikeErrorEnvelope } from "./errorCatalog";
 
@@ -64,6 +65,7 @@ const HEAVY_METHODS = new Set([
   "tessellate_mcad_part_in_project",
   "preview_mesh",
   "run_analysis",
+  "run_board_thermal",
   "run_converter_study",
   "run_field_circuit_cosimulation",
   "run_multiboard_si_independent_batch",
@@ -115,6 +117,17 @@ function publishWorkerActivity(activity: Omit<WorkerActivity, "heavy">): void {
 export function isDesktopShell(): boolean {
   return "__TAURI_INTERNALS__" in window;
 }
+
+export type McpBridgeStatus = { enabled: boolean; rendezvousPath: string | null; port: number | null };
+export type McpBridgeRequest = { requestId: string; command: string; args: Record<string, unknown> };
+
+export const mcpBridgeStatus = () => invoke<McpBridgeStatus>("mcp_bridge_status");
+export const startMcpBridge = () => invoke<McpBridgeStatus>("mcp_bridge_start");
+export const stopMcpBridge = () => invoke<McpBridgeStatus>("mcp_bridge_stop");
+export const respondMcpBridge = (requestId: string, result?: unknown, error?: string) =>
+  invoke<void>("mcp_bridge_respond", error === undefined ? { requestId, result } : { requestId, error });
+export const listenMcpBridge = (handler: (request: McpBridgeRequest) => void): Promise<UnlistenFn> =>
+  listen<McpBridgeRequest>("spike:mcp-request", event => handler(event.payload));
 
 export async function getDesktopAppVersion(): Promise<string | null> {
   if (!isDesktopShell()) return null;
@@ -301,7 +314,12 @@ export async function selectNativeProjectFile(): Promise<NativeSelectedFile | nu
   return invoke<NativeSelectedFile | null>("select_project_file");
 }
 
-export async function selectNativeImportFile(kind: "board" | "harness", directory = false): Promise<NativeSelectedFile | null> {
+export async function readApprovedResultFile(path: string): Promise<NativeTextFile> {
+  if (!isDesktopShell()) throw new Error("Result file access requires the SPIKE desktop shell.");
+  return invoke<NativeTextFile>("read_approved_result_file", { path });
+}
+
+export async function selectNativeImportFile(kind: "board" | "harness" | "extension", directory = false): Promise<NativeSelectedFile | null> {
   if (!isDesktopShell()) return null;
   return invoke<NativeSelectedFile | null>("select_import_file", { kind, directory });
 }

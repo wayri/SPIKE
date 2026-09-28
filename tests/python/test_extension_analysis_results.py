@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Process round-trip and rejection coverage for external analysis results."""
 
 import json

@@ -1013,6 +1013,9 @@ class KicadParser:
 
             # Capture Reference (RefDes)
             ref = "U?"
+            properties = {}
+            legacy_value = ""
+            property_reference = ""
             for item in node:
                 if isinstance(item, list) and len(item) > 2:
                     head = str(item[0]).replace('"', '')
@@ -1020,13 +1023,15 @@ class KicadParser:
                         type_str = str(item[1]).replace('"', '')
                         if type_str == 'reference':
                             ref = str(item[2]).replace('"', '')
-                            break
+                        elif type_str == 'value':
+                            legacy_value = str(item[2]).replace('"', '')
 
                     elif head == 'property':
                         prop_name = str(item[1]).replace('"', '')
+                        properties[prop_name] = str(item[2]).replace('"', '')
                         if prop_name in ['Reference', 'reference']:
-                            ref = str(item[2]).replace('"', '')
-                            break
+                            property_reference = str(item[2]).replace('"', '')
+            ref = property_reference or ref
 
             model_path = ""
             model_node = self._get_node(node, 'model')
@@ -1041,6 +1046,8 @@ class KicadParser:
                 'rotation': mod_rot,
                 'layer': layer,
                 'model_path': model_path,
+                'properties': properties,
+                'value': properties.get('Value', legacy_value),
                 'zone_connection_override': footprint_thermal['mode'],
                 'zone_connection_declared': footprint_thermal['declared'],
                 'thermal_gap_override_mm': footprint_thermal['thermal_gap_mm'],

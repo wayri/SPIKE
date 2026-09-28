@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Reproduce native PEEC energy defects without returning an AC solution."""
 from __future__ import annotations

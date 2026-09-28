@@ -12,6 +12,27 @@ SPEC.loader.exec_module(SDK)
 
 
 class ExtensionSdkPythonTests(unittest.TestCase):
+    def test_mesh_helper_and_result_carry_host_binding(self):
+        request = {"contract": "spike/extension/v1", "context": {
+            "design_binding": {"design_id": "board-a", "digest_sha256": "f" * 64},
+            "mesh": {"contract": "spike/hybrid-mesh-exchange/v1", "truncated": False,
+                     "nodes": [], "branches": [], "cells": []},
+            "mesh_preview": {"contract": "spike/mesh/v3", "cells": []},
+            "mesh_binding": {"mesh_digest_sha256": "a" * 64,
+                             "analysis_spec_digest_sha256": "b" * 64},
+            "solver_geometry": {"contract": "spike/solver-geometry/v1"},
+            "analysis_spec": {"mode": "si"},
+        }}
+        exchange = SDK.mesh_exchange(request)
+        self.assertEqual(exchange["analysis_spec"]["mode"], "si")
+        result = SDK.analysis_result(request, analysis_id="mesh", mode="si",
+            model_status="unvalidated", solver="external", summary={})
+        self.assertEqual(result["provenance"]["input_mesh_sha256"], "a" * 64)
+        self.assertEqual(result["provenance"]["input_analysis_spec_sha256"], "b" * 64)
+        request["context"]["mesh"]["truncated"] = True
+        with self.assertRaisesRegex(ValueError, "complete mesh"):
+            SDK.mesh_exchange(request)
+
     def test_bound_analysis_round_trip(self):
         request = {"contract": "spike/extension/v1", "context": {
             "design": {"contract": "spike/v1", "design_id": "board-a"},

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 export type SiChartPoint = Readonly<{ x: number; y: number }>;
 export type SiChartSeries = Readonly<{
@@ -11,6 +11,8 @@ export type SiChannelCharts = Readonly<{
   portOrder: readonly string[];
   sMagnitudeDb: readonly SiChartSeries[];
   sPhaseDeg: readonly SiChartSeries[];
+  reflectionMagnitude: readonly SiChartSeries[];
+  vswr: readonly SiChartSeries[];
   tdrReflection: SiChartSeries;
   tdrImpedanceOhm: SiChartSeries;
   tdtNormalizedStep: SiChartSeries;
@@ -77,6 +79,34 @@ const pointSeries = (
 });
 
 const emptySeries = (id: string, label: string): SiChartSeries => ({ id, label, points: [] });
+
+/** Preserve the worker's per-port reflection and finite/infinite VSWR decisions. */
+export function reflectionMetrics(network: Record<string, unknown>): { reflectionMagnitude: SiChartSeries[]; vswr: SiChartSeries[] } {
+  const reflectionMagnitude: SiChartSeries[] = [];
+  const vswr: SiChartSeries[] = [];
+  for (const port of objects(object(network.reflection_vswr).ports)) {
+    const index = finite(port.port);
+    if (index === null || !Number.isInteger(index) || index < 0) continue;
+    const name = `S${index + 1}${index + 1}`;
+    const reflection = pointSeries(`${name}-reflection`, `${name} |rho|`, port.trace, "frequency_hz", "reflection_magnitude");
+    if (reflection.points.length) reflectionMagnitude.push(reflection);
+    // The worker owns status classification; nulls split finite display runs.
+    let segment: SiChartPoint[] = [];
+    let segmentNumber = 0;
+    const flush = () => {
+      if (segment.length) vswr.push({ id: `${name}-vswr-${segmentNumber++}`, label: `${name} VSWR`, points: segment });
+      segment = [];
+    };
+    for (const row of objects(port.trace)) {
+      const frequency = finite(row.frequency_hz);
+      const value = finite(row.vswr);
+      if (frequency === null || row.vswr_status !== "finite" || value === null || value < 1) { flush(); continue; }
+      segment.push({ x: frequency, y: value });
+    }
+    flush();
+  }
+  return { reflectionMagnitude, vswr };
+}
 
 /** Split at masked poles, including invalid samples omitted by worker decimation. */
 function impedanceSegments(port: Record<string, unknown>, key: string): SiChartSeries[] {
@@ -146,6 +176,7 @@ export function normalizeSiChannelResult(value: unknown): SiChannelCharts {
   const sPhaseDeg = traceNames.map(name =>
     pointSeries(`${name}-phase-deg`, name, traces[name], "frequency_hz", "phase_deg"),
   );
+  const { reflectionMagnitude, vswr } = reflectionMetrics(network);
 
   const time = object(result.time_domain);
   const tdrReflection = pointSeries("tdr-reflection", "Reflection coefficient", time.tdr, "time_s", "reflection");
@@ -252,6 +283,8 @@ export function normalizeSiChannelResult(value: unknown): SiChannelCharts {
     portOrder,
     sMagnitudeDb,
     sPhaseDeg,
+    reflectionMagnitude,
+    vswr,
     tdrReflection,
     tdrImpedanceOhm,
     tdtNormalizedStep,

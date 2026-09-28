@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Machine-readable public release gate for the bounded SPIKES engine."""
 
 from __future__ import annotations

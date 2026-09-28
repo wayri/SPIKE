@@ -66,11 +66,30 @@ source provenance survive reopening without the original job archive. Imported
 PCB visual files reopen without running KiCad or resolving source model paths.
 Save As retains existing verified extension/model artifacts.
 
+Desktop study definitions are retained in the frontend snapshot under
+`studies` (inside the v3 legacy-extension projection). Each versioned study
+contains ordered PI, SI, thermal, or EM cases. A case keeps its own scenario
+description, setup snapshot, and optional captured result. Repeating a type
+creates a separate case with independent settings. Loading a case applies its
+setup to the matching workspace; execution still uses that workspace's solver
+controls and validity gates. **Save project copy without results** removes
+captured study results while keeping study and case setups.
+
 The transport limit is 96 MiB per result artifact and 96 MiB for the visual input
 of one save. Exceeding a limit fails explicitly before replacing the saved file.
 Standalone Save results emits `spike/result-package/v2` JSON with the embedded
 design and desktop state; Load results also accepts older v1 result exports when
 their source board is open. Use `.spike` for complete multi-board/MCAD portability.
+
+The desktop File and Project manager actions offer **Save with results** and
+**Save project copy without results**. The latter writes a separate v3 package,
+removes PI/SI, EMI, and thermal result payloads and unreferenced result
+artifacts, and retains board links, assembly placements, solver setups, and
+view settings. It leaves the active project and its current results untouched.
+**Save results file** writes a `.spike-results.json` v2 snapshot; **Open project**
+accepts that file directly and restores its embedded design and results. The
+v3 contract is extended additively, so existing v3 readers and older project
+migration remain applicable.
 
 ```text
 manifest.json
@@ -628,6 +647,10 @@ are read and migrated in memory. Migration validates the legacy revision,
 derives or preserves a project ID, converts compatible design data to DesignIR
 v2, preserves the full legacy payload under `extensions.legacy`, records
 migration provenance, and emits v3 only on a later explicit save.
+When the desktop opens a migrated `.spike` project, it offers **Upgrade now**
+or **Later**. Upgrade now uses Save As with a suggested `-upgraded.spike` name,
+requires a path different from the source, and opens the new v3 package after
+writing it. Later leaves the project open; its next explicit save emits v3.
 
 Unknown extension fields should be retained where possible. Unsupported
 revisions fail visibly. Migration does not upgrade solver accuracy, create

@@ -75,7 +75,8 @@ class AssemblyAnalysisScopeTests(unittest.TestCase):
         for method in (
             "run_analysis", "preflight_analysis", "run_spice_workspace_native_mna",
             "run_field_circuit_cosimulation", "prepare_openems_case", "prepare_thermal_case",
-            "run_openems_case", "run_thermal_case",
+            "run_openems_case", "run_thermal_case", "run_component_thermal",
+            "run_board_thermal", "emi_preflight", "emi_screen",
         ):
             with self.subTest(method=method):
                 response = handle({
@@ -88,6 +89,22 @@ class AssemblyAnalysisScopeTests(unittest.TestCase):
                 self.assertFalse(response["ok"])
                 self.assertEqual(response["error_code"], "SPIKE-BE-IPC-E-0001")
                 self.assertIn("Coupled assembly physics", response["error_detail"]["detail"])
+
+    def test_emi_preflight_and_screen_preserve_active_board_scope(self):
+        for method in ("emi_preflight", "emi_screen"):
+            with self.subTest(method=method):
+                response = handle({
+                    "method": method,
+                    "params": {
+                        "design": {"design_id": "design-a"},
+                        "setup": {},
+                        "assembly_scope": scope(),
+                    },
+                })
+                self.assertTrue(response["ok"])
+                provenance = response["result"]["provenance"]["assembly_analysis_scope"]
+                self.assertEqual(provenance["active_board_id"], "board-a")
+                self.assertEqual(provenance["ignored_entities"]["boards"], ["board-b"])
 
     def test_worker_result_provenance_preserves_active_board_scope(self):
         response = handle({

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { reflectionMetrics } from "./siChannelResults";
 
 export type Point = { x: number; y: number };
 export type Curve = { name: string; points: Point[] };
@@ -109,6 +110,7 @@ export default function SiWorkflowPlots({ result }: { result: Row }) {
   const selectedRx = rx[Math.min(rxIndex, rx.length - 1)] ?? {};
   const eye = rows(selectedRx.traces).map((trace, i) => ({ name: `UI ${i}`, points: (trace.phase_ui as number[]).map((phase, j) => ({ x: phase, y: (trace.voltage_v as number[])[j] })) }));
   const tdr = rec(result.tdr);
+  const reflection = reflectionMetrics(network);
   const floorDb = (c: Curve): Curve => ({ ...c, points: c.points.map(p => ({ ...p, y: Math.max(dbFloor, p.y) })) });
   const selectedKey = keys.includes(selected) ? selected : keys[0];
   const parameterPicker = useRef<HTMLDetailsElement>(null);
@@ -117,6 +119,9 @@ export default function SiWorkflowPlots({ result }: { result: Row }) {
       <label>Quantity<select value={metric} onChange={e => setMetric(e.target.value)}><option value="magnitude_db">Magnitude (dB)</option><option value="phase_deg">Phase (degrees)</option><option value="magnitude">Linear magnitude</option></select></label>
       <label>Display floor (dB)<input type="number" value={dbFloor} max="0" min="-6000" onChange={e => { const n = Number(e.target.value); if (Number.isFinite(n) && n <= 0) setDbFloor(n); }} /></label></div>
     <SiPlot title="Edited channel S-parameters" curves={selectedKey ? [(metric === "magnitude_db" ? floorDb : (v: Curve) => v)(curve(selectedKey, rows(traces[selectedKey]), "frequency_hz", metric, 1e-9))] : []} xLabel="Frequency (GHz)" yLabel={metric} />
+    <SiPlot title="Matched-port reflection magnitude" curves={reflection.reflectionMagnitude.map(item => ({ name: item.label, points: item.points.map(point => ({ x: point.x * 1e-9, y: point.y })) }))} xLabel="Frequency (GHz)" yLabel="|rho|" />
+    <SiPlot title="Matched-port VSWR" curves={reflection.vswr.map(item => ({ name: item.label, points: item.points.map(point => ({ x: point.x * 1e-9, y: point.y })) }))} xLabel="Frequency (GHz)" yLabel="ratio" />
+    <p>Matched-reference reflection and VSWR use worker-returned per-port samples. Infinite and non-passive VSWR statuses remain gaps. Older saved results without these samples show no returned trace data.</p>
     <label>Loaded transfer / crosstalk<select value={Math.min(observed, loaded.length - 1)} onChange={e => setObserved(Number(e.target.value))}>{loaded.map((t, i) => <option key={i} value={i}>Source port {Number(t.source_port) + 1} → observed port {Number(t.observed_port) + 1}</option>)}</select></label>
     <SiPlot title="Loaded voltage transfer at channel-facing ports" curves={[floorDb(curve("Vout / Vsource", rows(loaded[Math.min(observed, loaded.length - 1)]?.trace), "frequency_hz", "magnitude_db", 1e-9))]} xLabel="Frequency (GHz)" yLabel="Voltage gain (dB)" />
     <p>Values below {dbFloor} dB are clipped for display. Complete values remain in the exported result and Touchstone.</p>
@@ -127,6 +132,8 @@ export default function SiWorkflowPlots({ result }: { result: Row }) {
       <SiPlot title="Receiver waveform" curves={[curve("Receiver", rows(selectedRx.waveform), "time_s", "voltage_v", 1e9)]} xLabel="Time (ns)" yLabel="Voltage (V)" />
     </>}
     {tdr.status === "completed" && <SiPlot title="Channel TDR with reference terminations" curves={[curve("Impedance", rows(tdr.tdr), "time_s", "impedance_ohm", 1e9)]} xLabel="Time (ns)" yLabel="Impedance (ohm)" />}
+    {tdr.status === "completed" && <SiPlot title="Channel TDR reflection" curves={[curve("Reflection", rows(tdr.tdr), "time_s", "reflection", 1e9)]} xLabel="Time (ns)" yLabel="rho" />}
+    <p>Spatial E/H field plots: {String(rec(result.field_maps).reason ?? "No spatial field samples returned by this network result.")} Open a compatible field AnalysisResult to inspect returned vector samples.</p>
     <p>Eyes contain deterministic signals and crosstalk. Noise is reported separately; threshold margins are engineering measurements, not protocol compliance.</p>
   </div>;
 }

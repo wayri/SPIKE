@@ -17,6 +17,8 @@ def validate_harness_connections(assembly):
     mappings, occupied = {}, set()
     for mapping in assembly.connector_mappings:
         data = mapping.data
+        if not isinstance(data, dict):
+            raise ValueError(f"Connector mapping {mapping.id} data must be an object.")
         if data.get("board_id") and data.get("connector_id"):
             if data["board_id"] not in boards:
                 raise ValueError("Connector mapping references an unknown board.")
@@ -43,6 +45,37 @@ def validate_harness_connections(assembly):
                     raise ValueError(f"Unknown connector pin: {key}:{pin}")
                 if "spike.harness-routing" in h.extensions and mapping is None:
                     raise ValueError("Routed harnesses require retained connector mappings.")
+    for mate in assembly.connector_mappings:
+        if mate.kind != "connector-mate":
+            continue
+        data = mate.data
+        if not isinstance(data, dict) or set(data) != {"endpoint_a", "endpoint_b", "pin_map"}:
+            raise ValueError(f"Connector mate {mate.id} requires two endpoints and an explicit pin_map only.")
+        endpoints = []
+        for field in ("endpoint_a", "endpoint_b"):
+            value = data.get(field)
+            if not isinstance(value, str):
+                raise ValueError(f"Connector mate {mate.id} requires {field} as board::connector.")
+            board, separator, connector = value.partition("::")
+            if not separator or not board or not connector or board not in boards:
+                raise ValueError(f"Connector mate {mate.id} has an unresolved {field}.")
+            endpoints.append((board, value))
+        if endpoints[0][0] == endpoints[1][0]:
+            raise ValueError(f"Connector mate {mate.id} must join distinct board instances.")
+        pin_map = data.get("pin_map")
+        if not isinstance(pin_map, dict) or not pin_map or len(pin_map) > 512:
+            raise ValueError(f"Connector mate {mate.id} needs 1 through 512 explicit pin pairs.")
+        if any(not isinstance(a, str) or not a.strip() or not isinstance(b, str) or not b.strip()
+               for a, b in pin_map.items()) or len(set(pin_map.values())) != len(pin_map):
+            raise ValueError(f"Connector mate {mate.id} has invalid or duplicate pin identities.")
+        for a, b in pin_map.items():
+            for (_, endpoint), pin in zip(endpoints, (a, b)):
+                if (endpoint, pin) in occupied:
+                    raise ValueError(f"Connector pin already assigned: {endpoint}:{pin}")
+                occupied.add((endpoint, pin))
+                mapping = mappings.get(endpoint)
+                if mapping and "pins" in mapping and pin not in mapping["pins"]:
+                    raise ValueError(f"Unknown connector pin: {endpoint}:{pin}")
 
 
 def discover_connectors(assembly, designs):

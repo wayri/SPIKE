@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 // Independently authored API-admission regressions. These checks do not
 // establish physical validity of the legacy filament/patch approximation.

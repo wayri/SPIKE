@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 // Standalone opt-in verification, no production registration:
 // g++ -std=c++20 -O2 -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off

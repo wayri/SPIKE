@@ -14,7 +14,7 @@ export function workspaceIssues(input: {
       ? { kind: "ok", title: "Mesh convergence passed", detail: `${typeof input.convergenceLevels === "number" && Number.isFinite(input.convergenceLevels) ? input.convergenceLevels : 0} mesh levels passed the configured numerical stability thresholds. This does not establish physical signoff.` }
       : { kind: "info", title: "DC convergence review", detail: "Run the configured DC solve and mesh-convergence review before relying on its numerical result." });
   }
-  if (["Home", "PI", "HF / SI", "EMI"].includes(input.workspace)) {
+  if (["Home", "PI", "HF / SI", "EM", "EMI"].includes(input.workspace)) {
     issues.push(input.stackupComplete
       ? { kind: "ok", title: "Stackup available", detail: `${input.stackRows} stack rows include copper thickness and dielectric properties.` }
       : { kind: "warning", title: "Stackup needs attention", detail: "Open Stackup to supply missing thickness or dielectric properties before high-frequency extraction." });

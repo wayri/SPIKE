@@ -1,0 +1,9 @@
+.mcp-bridge-panel { left: 50%; right: auto; top: 50%; transform: translate(-50%, -50%); width: min(540px, 92vw); max-height: 85vh; overflow: auto; }
+.mcp-bridge-body { padding: 16px; color: #bdcdd3; font-size: 11px; line-height: 1.55; }
+.mcp-bridge-body p { margin: 0 0 12px; overflow-wrap: anywhere; }
+.mcp-bridge-body code { color: #dfb46d; }
+.mcp-bridge-actions { display: flex; gap: 8px; margin: 16px 0; }
+.mcp-bridge-actions button { padding: 7px 12px; color: #d6e4e7; background: #203943; border: 1px solid #53717b; cursor: pointer; }
+.mcp-bridge-actions button:disabled { opacity: .45; cursor: default; }
+.mcp-bridge-error { color: #ec9c91; }
+.mcp-bridge-help { color: #829ca6; }

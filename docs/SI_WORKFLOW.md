@@ -1,5 +1,10 @@
 # Source-to-receiver SI workflow
 
+For a step-by-step Marble board context and executable four-port tutorial
+covering S-parameters, reflection/VSWR, NEXT/FEXT, TDR/TDT, and eyes, see the
+[SI user guide](SI_USER_GUIDE.md). Its analytical channel is explicitly
+separate from the imported board.
+
 Programmatic requests can opt into a receiver `cdr` object, as shown in
 `examples/si/10g-nrz-cdr.json`. [Transition-PI recovery](SI_CLOCK_RECOVERY.md)
 uses full-resolution loaded voltage before plot decimation. Choose thresholds
@@ -23,6 +28,34 @@ channel settings with the corresponding modulation. Mesh and Solve with the SI
 domain selected open the same SI workflow. Choose the exact signal, victim,
 reference net and copper layer before running; no net pair is inferred as a
 qualified crosstalk path.
+
+With a single-ended aggressor and explicit victim selected, **Loaded NEXT /
+FEXT voltage** enables a separate terminal-voltage calculation. Enter the
+open-circuit Thevenin pulse amplitude and the four resistances in the displayed
+port order: aggressor-near source, victim-near load, aggressor-far load, and
+victim-far load. The pulse is a bounded 512-sample stimulus. Its sample interval
+comes from the uniformly spaced frequency grid, so this mode requires DC and
+at most 8,193 frequency points. The matched S-parameter NEXT/FEXT traces remain
+separate from these loaded victim voltages.
+
+When a completed geometry channel result is bound to the active canonical
+design and both canonical net IDs, SPIKE's 3D board viewport highlights the
+aggressor and victim routes. Click either route to identify it while reviewing
+the board from another side. The NEXT/FEXT values shown beside those routes
+are whole-channel transfer and loaded-terminal metrics; their route colors
+are categorical and do not encode local coupling voltage. A raw KiCad layout
+without a canonical DesignIR binding does not admit this overlay.
+
+For an imported two-layer board, the **S-parameter solver** selector in the
+**HF / SI** ribbon can route **S-parameters** and **Ports** to the optional
+EMerge Suite extension. SPIKE enables that choice only after the trusted
+extension's runtime probe reports `si_s_parameters`. The EMerge setup selects
+explicit signal/return pads, frequency sweep, and mesh target; **Run** executes
+its port sweep and shows the admitted S-parameter plots in SPIKE. These results
+remain `unvalidated` as described in [Solver Status](SOLVER_STATUS.md).
+Impedance, NEXT/FEXT, eye, PAM4, protocol suites, and Touchstone import keep
+their existing SI paths because the EMerge adapter does not expose those
+capabilities.
 
 Opening a named protocol suite or channel profile selects the geometry/protocol
 tab and its preset. Both loaded studies and geometry/protocol runs offer a
@@ -68,6 +101,18 @@ the ideal-CDR, training-DFE or Gaussian-BER approximation limits.
 6. Run and inspect channel S magnitude/phase, loaded voltage transfer,
    crosstalk, receiver waveform/eye and threshold margins, channel TDR,
    effective passive values, thermal/excess noise, and model limitations.
+   The result views also show per-port matched-reference reflection magnitude
+   and finite VSWR from the worker's returned samples. Infinite and non-passive
+   VSWR samples remain gaps; older saved results without this output show an
+   empty plot. TDR reflection is shown separately in the time domain.
+   Spatial E/H traces require an AnalysisResult containing actual vector
+   samples; this port-network workflow reports field maps as unsupported.
+   The network result also reports per-port matched Sii reflection and VSWR;
+   ideal unit reflection has infinite VSWR and active reflection above unity
+   has no passive VSWR value. These cases carry a status and null VSWR.
+   Driving-point impedance terminates every other port in its real reference
+   resistance. The result explicitly reports spatial E/H field maps as
+   unsupported because port-network samples do not contain field samples.
    Hover charts for trace readings. Source 1 to port 2 is NEXT and source 1
    to port 4 is FEXT for the default coupled ordering. Imported networks need
    the user's explicit port map.

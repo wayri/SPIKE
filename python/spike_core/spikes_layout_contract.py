@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Strict bounded contract primitives shared by SPIKES layout orchestration."""
 
 from __future__ import annotations

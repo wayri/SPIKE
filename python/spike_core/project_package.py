@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Dict, Iterable, Mapping, MutableMapping, Optional
 
+from . import __version__
 from .contracts import DesignIR, ValidationIssue
 from .design_ir_v2 import AssemblyIRV1, DesignIRV2, canonical_uuid, content_digest
 from .assembly_package_shapes import AssemblyPackageShapeError, canonicalize_assembly_package_shapes, validate_package_shape_artifacts
@@ -430,7 +431,7 @@ def write_spike_package(
     model_artifacts: Optional[Mapping[str, bytes]] = None,
     report_artifacts: Optional[Mapping[str, bytes]] = None,
     preserved_members: Optional[Mapping[str, bytes]] = None,
-    application_version: str = "0.2.10",
+    application_version: str = __version__,
     manifest_signer: ManifestSigner | None = None,
 ) -> Dict[str, Any]:
     if profile not in PROJECT_PROFILES:

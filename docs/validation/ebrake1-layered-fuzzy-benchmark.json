@@ -1,0 +1,81 @@
+{
+  "board_sha256": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca",
+  "model_status": "approximate",
+  "production_qualified": false,
+  "timing_scope": "Single sequential local run after one import; rasterization and linear solve included, image rendering excluded; timing is hardware-dependent.",
+  "warning": "Differences against the fine unsmoothed approximation are not error bounds or measured accuracy.",
+  "cases": [
+    {
+      "name": "fine_unsmoothed",
+      "grid_step_mm": 1.5,
+      "fuzzy_sigma_mm": 0.0,
+      "cells_per_layer": 5376,
+      "depth_layers": 7,
+      "solver_elapsed_s": 6.705596199986758,
+      "maximum_board_temperature_c": 50.055940241208965,
+      "maximum_junction_temperature_c": 54.02958296320774,
+      "junction_temperatures_c": {
+        "Q1": 54.02958296320774,
+        "Q2": 51.87534309130044,
+        "Q3": 50.67393424429127
+      },
+      "energy_balance_error_w": 1.34692257347524e-12,
+      "linear_relative_residual": 1.6252542050879232e-13,
+      "max_abs_junction_delta_vs_fine_unsmoothed_c": 0.0
+    },
+    {
+      "name": "fine_fuzzy",
+      "grid_step_mm": 1.5,
+      "fuzzy_sigma_mm": 1.5,
+      "cells_per_layer": 5376,
+      "depth_layers": 7,
+      "solver_elapsed_s": 6.119177699991269,
+      "maximum_board_temperature_c": 49.50440530996984,
+      "maximum_junction_temperature_c": 53.68246446672815,
+      "junction_temperatures_c": {
+        "Q1": 53.68246446672815,
+        "Q2": 51.16154503844232,
+        "Q3": 50.31034773505852
+      },
+      "energy_balance_error_w": 2.2737367544323206e-13,
+      "linear_relative_residual": 1.4954419757940216e-13,
+      "max_abs_junction_delta_vs_fine_unsmoothed_c": 0.7137980528581167
+    },
+    {
+      "name": "coarse_unsmoothed",
+      "grid_step_mm": 3.0,
+      "fuzzy_sigma_mm": 0.0,
+      "cells_per_layer": 1344,
+      "depth_layers": 7,
+      "solver_elapsed_s": 4.534826599992812,
+      "maximum_board_temperature_c": 49.460013513143515,
+      "maximum_junction_temperature_c": 54.08631333255953,
+      "junction_temperatures_c": {
+        "Q1": 54.08631333255953,
+        "Q2": 51.230436925864424,
+        "Q3": 49.9157055938401
+      },
+      "energy_balance_error_w": -5.608846720406291e-13,
+      "linear_relative_residual": 1.57328909481617e-13,
+      "max_abs_junction_delta_vs_fine_unsmoothed_c": 0.7582286504511657
+    },
+    {
+      "name": "coarse_fuzzy",
+      "grid_step_mm": 3.0,
+      "fuzzy_sigma_mm": 1.5,
+      "cells_per_layer": 1344,
+      "depth_layers": 7,
+      "solver_elapsed_s": 4.571597100002691,
+      "maximum_board_temperature_c": 49.234306397101946,
+      "maximum_junction_temperature_c": 53.88880338059725,
+      "junction_temperatures_c": {
+        "Q1": 53.88880338059725,
+        "Q2": 50.851019319356396,
+        "Q3": 49.71754004864683
+      },
+      "energy_balance_error_w": -6.581402089977928e-13,
+      "linear_relative_residual": 1.5419087792495664e-13,
+      "max_abs_junction_delta_vs_fine_unsmoothed_c": 1.0243237719440401
+    }
+  ]
+}

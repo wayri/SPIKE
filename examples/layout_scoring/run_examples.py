@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Run the complete bounded layout-scoring process example set.
 
 The worker prepares immutable native jobs or maps already-correlated results to

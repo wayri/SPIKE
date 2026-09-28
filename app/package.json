@@ -1,7 +1,8 @@
 {
   "name": "spike-desktop",
+  "license": "Apache-2.0",
   "private": true,
-  "version": "0.2.13",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "test:analysis-failure": "node scripts/test-analysis-failure.mjs",
@@ -12,6 +13,7 @@
     "build": "tsc && vite build",
     "check:architecture": "python ../scripts/check_architecture.py",
     "test:parser": "node scripts/test-board-parser.mjs",
+    "test:bug-report": "node scripts/test-bug-report.mjs",
     "test:project": "node scripts/test-project-package.mjs",
     "test:project-snapshot": "node scripts/test-project-snapshot-state.mjs",
     "test:project-persistence": "node scripts/test-project-persistence-artifacts.mjs",
@@ -71,7 +73,7 @@
     "test:pi-review-admission": "node scripts/test-dc-review.mjs && node scripts/test-source-load-review.mjs && node scripts/test-pi-pdn-review.mjs && node scripts/test-report-admission.mjs",
     "test:via-stress-map": "node scripts/test-via-stress-map.mjs",
     "test:assembly-si-batch": "node scripts/test-assembly-si-batch.mjs",
-    "test:thermal-ui": "node scripts/test-thermal-workflow.mjs && node scripts/test-thermal-assembly.mjs && node scripts/test-thermal-hardware.mjs && node scripts/test-thermal-input-import.mjs",
+    "test:thermal-ui": "node scripts/test-thermal-workflow.mjs && node scripts/test-thermal-environments.mjs && node scripts/test-thermal-assembly.mjs && node scripts/test-thermal-hardware.mjs && node scripts/test-thermal-input-import.mjs && node scripts/test-board-thermal-panel.mjs && node scripts/test-thermal-transient-overlay.mjs",
     "test:emi-chamber": "node scripts/test-emi-chamber.mjs",
     "test:thermal-coordinates": "node scripts/test-thermal-coordinates.mjs",
     "test:thermal-rendering": "node scripts/test-thermal-field-rendering.mjs && node scripts/test-thermal-coordinates.mjs",
@@ -83,6 +85,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",
+    "@tauri-apps/plugin-opener": "^2.5.0",
     "lucide-react": "^0.468.0",
     "plotly.js-dist-min": "3.7.0",
     "react": "^18.3.1",

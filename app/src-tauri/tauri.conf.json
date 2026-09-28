@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "SPIKE",
-  "version": "0.2.13",
+  "version": "0.3.0",
   "identifier": "org.spike.integrity",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -49,8 +49,10 @@
       "../../python/spike_core": "python/spike_core",
       "../../extensions": "extensions",
       "../../LICENSE": "legal/LICENSE",
+      "../../NOTICE": "legal/NOTICE",
       "../../LICENSING.md": "legal/LICENSING.md",
       "../../THIRD_PARTY_NOTICES.md": "legal/THIRD_PARTY_NOTICES.md",
+      "../../licenses/MIT.txt": "legal/licenses/MIT.txt",
       "../../docs/ERROR_CODE_CATALOG.md": "docs/ERROR_CODE_CATALOG.md",
       "../../TROUBLESHOOTING.md": "docs/TROUBLESHOOTING.md",
       "resources/worker": "bundled",

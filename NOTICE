@@ -1,0 +1,11 @@
+SPIKE
+Copyright 2026 SPIKE contributors
+
+SPIKE Main-owned material in this repository is licensed under the Apache
+License, Version 2.0, except where an individual file or subtree states
+otherwise. The separate SPIKES circuit engine and FreeCAD workbench keep
+their existing license terms.
+Earlier valid MIT grants remain in force; see licenses/MIT.txt and LICENSING.md.
+
+Third-party software and assets retain their own licenses and notices. See
+THIRD_PARTY_NOTICES.md and the license files supplied with those components.

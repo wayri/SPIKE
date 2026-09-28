@@ -23,7 +23,6 @@ PRODUCT_SOURCE_ROOTS = (
     ROOT / "extension_sdk",
     ROOT / "kicad_plugin",
     ROOT / "integrations",
-    ROOT / "wx_desktop",
 )
 
 # A new implementation language requires an ADR and an explicit guard update.

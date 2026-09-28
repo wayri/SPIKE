@@ -19,7 +19,7 @@ function load(file){
 }
 const {helpTopics,helpFeatureCoverage}=load(path.join(root,'src/HelpTopics.tsx'));
 const topics=helpTopics();const ids=new Set(topics.map(t=>t.id));
-assert.equal(ids.size,topics.length);assert.equal(helpFeatureCoverage.length,17);
+assert.equal(ids.size,topics.length);assert.equal(helpFeatureCoverage.length,18);assert.ok(ids.has('local-llm-mcp'));
 for(const row of helpFeatureCoverage){assert.ok(row.pictured&&row.gap);assert.ok(ids.has(row.topic)||row.topic.startsWith('doc:')&&fs.existsSync(path.resolve(root,'..',row.topic.slice(4))));}
 for(const id of ['picture-guide','recorded-pic-dc','feature-coverage']){
  const topic=topics.find(t=>t.id===id);assert.ok(topic);
@@ -30,4 +30,16 @@ for(const id of ['picture-guide','recorded-pic-dc','feature-coverage']){
  if(id==='recorded-pic-dc'){assert.match(rendered,/completed \/ approximate/);assert.match(rendered,/16.382762821/);assert.match(rendered,/49 excluded/);assert.match(rendered,/separate local PI-only evaluation/);}
 }
 const center=fs.readFileSync(path.join(root,'src/HelpCenter.tsx'),'utf8');assert.match(center,/data-help-topic/);assert.match(center,/navigate\(link.dataset.helpTopic\)/);
-console.log('Help picture workflows: 4 unchanged captures, 17 linked feature families, honest recordedDC provenance/status, existing assets and destinations passed');
+const guide=fs.readFileSync(path.join(root,'src/AnalysisGuide.tsx'),'utf8');
+const app=fs.readFileSync(path.join(root,'src/App.tsx'),'utf8');
+for(const target of ['si-sparameter-solver','si-check-emerge','si-sparameters','si-ports','emerge-si-run']){
+ assert.match(guide,new RegExp(`data-guide=\\"${target}\\"`),`Guide must target ${target}`);
+ assert.match(app,new RegExp(`(?:data-guide|guideTarget)=\\"${target}\\"`),`App must expose ${target}`);
+}
+assert.match(guide,/trusted runtime probe reports si_s_parameters/);
+assert.match(guide,/SPIKE internal is the default/);
+assert.match(guide,/destination: "emerge-em-result"/);
+assert.match(guide,/data-guide="emerge-em-result"/);
+assert.match(app,/destination === "emerge-em-result"/);
+assert.match(app,/data-guide="emerge-em-result"/);
+console.log('Help picture workflows: 4 unchanged captures, 18 linked feature families, HF/SI selector targets, honest recordedDC provenance/status, existing assets and destinations passed');

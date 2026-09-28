@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Pinned Marble RT0 DC refinement gate; intentionally not AC/L/C qualification."""
 from __future__ import annotations
@@ -36,9 +36,11 @@ def evaluate_rows(rows: list[dict]) -> tuple[bool, list[float]]:
 
 
 def audit(board: Path, sizes: list[float], *, max_unknowns: int = 150000,
+          max_triangles: int = 150000,
           interior_edge_factor: float | None = None) -> dict:
-    if not board.is_file() or max_unknowns < 10:
-        raise ValueError("An existing board and finite positive unknown budget are required")
+    if (not board.is_file() or not 10 <= max_unknowns <= 250000
+            or not 4 <= max_triangles <= 250000):
+        raise ValueError("An existing board and admitted unknown/triangle budgets are required")
     if interior_edge_factor is not None and not 0 < interior_edge_factor <= 1:
         raise ValueError("Interior edge factor must be in (0, 1]")
     design = _design_from_kicad(str(board))
@@ -92,7 +94,8 @@ def audit(board: Path, sizes: list[float], *, max_unknowns: int = 150000,
             continue
         try:
             result = solve_hybridized_conforming_dc(mesh, mapped["U37.18"],
-                mapped["R195.1"], max_unknowns=max_unknowns)
+                mapped["R195.1"], max_unknowns=max_unknowns,
+                max_triangles=max_triangles)
         except ValueError as error:
             row.update(status="blocked", reason=str(error))
         else:
@@ -105,8 +108,10 @@ def audit(board: Path, sizes: list[float], *, max_unknowns: int = 150000,
         "board_sha256":hashlib.sha256(board.read_bytes()).hexdigest(),
         "source_sha256":{str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
             for path in (Path(__file__), ROOT/"python/spike_core/peec_conforming_mesh.py",
-                         ROOT/"python/spike_core/peec_conforming_dc.py")},
-        "max_unknowns":max_unknowns, "interior_edge_factor":interior_edge_factor,
+                         ROOT/"python/spike_core/peec_conforming_dc.py",
+                         ROOT/"python/spike_core/conforming_local_refinement.py")},
+        "max_unknowns":max_unknowns, "max_triangles":max_triangles,
+        "interior_edge_factor":interior_edge_factor,
         "sizes_mm":sizes, "rows":rows,
         "relative_resistance_changes":changes}
 
@@ -116,6 +121,7 @@ if __name__ == "__main__":
     parser.add_argument("--board", type=Path, required=True)
     parser.add_argument("--sizes", nargs="+", type=float, default=[1,.5,.25])
     parser.add_argument("--max-unknowns", type=int, default=150000)
+    parser.add_argument("--max-triangles", type=int, default=150000)
     parser.add_argument("--interior-edge-factor", type=float)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -124,6 +130,7 @@ if __name__ == "__main__":
     if any(a <= b for a,b in zip(args.sizes,args.sizes[1:])):
         parser.error("Mesh sizes must strictly decrease")
     report = audit(args.board,args.sizes,max_unknowns=args.max_unknowns,
+        max_triangles=args.max_triangles,
         interior_edge_factor=args.interior_edge_factor)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(report,indent=2,allow_nan=False)+"\n",encoding="utf-8")

@@ -12,8 +12,9 @@ use std::time::{Duration, Instant};
 use sysinfo::{get_current_pid, Pid, ProcessRefreshKind, ProcessesToUpdate, System};
 use tauri::Manager;
 
-mod gpu_metrics;
 mod extension_artifacts;
+mod gpu_metrics;
+mod mcp_bridge;
 mod package_trust;
 mod project_trust_binding;
 
@@ -134,8 +135,12 @@ struct ResourceSnapshot {
 fn process_belongs_to_tree(system: &System, candidate: Pid, root: Pid) -> bool {
     let mut current = Some(candidate);
     for _ in 0..64 {
-        let Some(pid) = current else { return false; };
-        if pid == root { return true; }
+        let Some(pid) = current else {
+            return false;
+        };
+        if pid == root {
+            return true;
+        }
         current = system.process(pid).and_then(|process| process.parent());
     }
     false
@@ -151,14 +156,14 @@ fn worker_method(request: &serde_json::Value) -> &str {
 fn is_heavy_worker_method(method: &str) -> bool {
     matches!(
         method,
-          "benchmarks"
-              | "bind_multiboard_coupled_reduced_network"
-              | "execute_thermal_field_job"
-              | "import_into_assembly_project"
-              | "export_mcad_session"
-              | "preview_mcad_feedback"
-              | "apply_mcad_feedback"
-              | "plan_assembly_harnesses"
+        "benchmarks"
+            | "bind_multiboard_coupled_reduced_network"
+            | "execute_thermal_field_job"
+            | "import_into_assembly_project"
+            | "export_mcad_session"
+            | "preview_mcad_feedback"
+            | "apply_mcad_feedback"
+            | "plan_assembly_harnesses"
             | "export_step"
             | "extract_mcad_package_shape_in_project"
             | "generate_mcad_selector_preview_in_project"
@@ -191,6 +196,7 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "run_owned_spice_workspace"
             | "run_sparselizard_case"
             | "run_component_thermal"
+            | "run_board_thermal"
             | "run_thermal_case"
     )
 }
@@ -387,7 +393,9 @@ fn cancel_worker(
 }
 
 fn normalized_cpu(core_percent: f32, logical_cpus: usize) -> Option<f32> {
-    if !core_percent.is_finite() || core_percent < 0.0 { return None; }
+    if !core_percent.is_finite() || core_percent < 0.0 {
+        return None;
+    }
     Some((core_percent / logical_cpus.max(1) as f32).clamp(0.0, 100.0))
 }
 
@@ -397,36 +405,79 @@ async fn resource_snapshot(
     workers: tauri::State<'_, WorkerExecutionState>,
 ) -> Result<ResourceSnapshot, String> {
     let pid = get_current_pid().map_err(|error| format!("Unable to identify SPIKE: {error}"))?;
-    let mut sampler = state.0.lock().map_err(|_| "Resource monitor state is unavailable".to_string())?;
+    let mut sampler = state
+        .0
+        .lock()
+        .map_err(|_| "Resource monitor state is unavailable".to_string())?;
     let now = Instant::now();
-    let cpu_ready = sampler.last_sample.is_some_and(|last| now.duration_since(last) >= sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
+    let cpu_ready = sampler
+        .last_sample
+        .is_some_and(|last| now.duration_since(last) >= sysinfo::MINIMUM_CPU_UPDATE_INTERVAL);
     let system = &mut sampler.system;
     system.refresh_memory();
     system.refresh_cpu_usage();
     // Removing dead processes is essential: otherwise every completed worker
     // continues contributing its last CPU and RAM readings indefinitely.
-    system.refresh_processes_specifics(ProcessesToUpdate::All, true,
-        ProcessRefreshKind::nothing().with_cpu().with_memory());
-    let host_memory_bytes = system.process(pid).ok_or("SPIKE process metrics are unavailable")?.memory();
+    system.refresh_processes_specifics(
+        ProcessesToUpdate::All,
+        true,
+        ProcessRefreshKind::nothing().with_cpu().with_memory(),
+    );
+    let host_memory_bytes = system
+        .process(pid)
+        .ok_or("SPIKE process metrics are unavailable")?
+        .memory();
     let logical_cpus = system.cpus().len().max(1);
-    let pids: HashSet<_> = system.processes().keys().copied()
-        .filter(|candidate| process_belongs_to_tree(system, *candidate, pid)).collect();
-    let cpu = pids.iter().filter_map(|pid| system.process(*pid)).map(|p| p.cpu_usage()).sum::<f32>();
-    let rss = pids.iter().filter_map(|pid| system.process(*pid)).fold(0_u64, |sum, p| sum.saturating_add(p.memory()));
+    let pids: HashSet<_> = system
+        .processes()
+        .keys()
+        .copied()
+        .filter(|candidate| process_belongs_to_tree(system, *candidate, pid))
+        .collect();
+    let cpu = pids
+        .iter()
+        .filter_map(|pid| system.process(*pid))
+        .map(|p| p.cpu_usage())
+        .sum::<f32>();
+    let rss = pids
+        .iter()
+        .filter_map(|pid| system.process(*pid))
+        .fold(0_u64, |sum, p| sum.saturating_add(p.memory()));
     let total_memory_bytes = system.total_memory();
     let system_used_memory_bytes = system.used_memory().min(total_memory_bytes);
-    let system_cpu = cpu_ready.then(|| normalized_cpu(system.global_cpu_usage(), 1)).flatten();
-    let normalized = cpu_ready.then(|| normalized_cpu(cpu, logical_cpus)).flatten();
+    let system_cpu = cpu_ready
+        .then(|| normalized_cpu(system.global_cpu_usage(), 1))
+        .flatten();
+    let normalized = cpu_ready
+        .then(|| normalized_cpu(cpu, logical_cpus))
+        .flatten();
     let ids = pids.iter().map(|pid| pid.as_u32()).collect();
     let (gpu, private_memory) = sampler.gpu.sample(&ids);
     sampler.last_sample = Some(now);
     Ok(ResourceSnapshot {
-        source: "desktop", cpu_percent: normalized, capacity_cpu_percent: normalized, system_cpu_percent: system_cpu,
+        source: "desktop",
+        cpu_percent: normalized,
+        capacity_cpu_percent: normalized,
+        system_cpu_percent: system_cpu,
         core_cpu_percent: normalized.map(|percent| percent * logical_cpus as f32),
-        memory_bytes: private_memory.unwrap_or(rss), host_memory_bytes, total_memory_bytes,
-        system_used_memory_bytes, memory_kind: if private_memory.is_some() { "private-resident" } else { "aggregate-rss" },
-        gpu, worker_threads: worker_thread_budget(), logical_cpus, process_count: pids.len(),
-        worker_active: workers.0.lock().map(|active| active.is_some()).unwrap_or(false),
+        memory_bytes: private_memory.unwrap_or(rss),
+        host_memory_bytes,
+        total_memory_bytes,
+        system_used_memory_bytes,
+        memory_kind: if private_memory.is_some() {
+            "private-resident"
+        } else {
+            "aggregate-rss"
+        },
+        gpu,
+        worker_threads: worker_thread_budget(),
+        logical_cpus,
+        process_count: pids.len(),
+        worker_active: workers
+            .0
+            .lock()
+            .map(|active| active.is_some())
+            .unwrap_or(false),
     })
 }
 
@@ -443,7 +494,10 @@ fn register_approved_path(
     Ok(normalized)
 }
 
-fn selected_startup_project(path: &Path, max_bytes: u64) -> Result<(PathBuf, SelectedFile), String> {
+fn selected_startup_project(
+    path: &Path,
+    max_bytes: u64,
+) -> Result<(PathBuf, SelectedFile), String> {
     if !path
         .extension()
         .and_then(OsStr::to_str)
@@ -462,7 +516,8 @@ fn selected_startup_project(path: &Path, max_bytes: u64) -> Result<(PathBuf, Sel
     if metadata.len() > max_bytes {
         return Err(format!(
             "{} exceeds the {} MiB desktop project limit",
-            canonical.display(), max_bytes / (1024 * 1024)
+            canonical.display(),
+            max_bytes / (1024 * 1024)
         ));
     }
     let selected = SelectedFile {
@@ -514,11 +569,28 @@ fn project_worker_paths(request: &serde_json::Value) -> Result<Vec<PathBuf>, Str
         .get("params")
         .and_then(serde_json::Value::as_object)
         .ok_or("Project worker operations require approved path parameters")?;
-    let required_fields: &[&str] = if matches!(worker_method(request), "attach_mcad_part_to_project" | "import_into_assembly_project") {
+    let required_fields: &[&str] = if matches!(
+        worker_method(request),
+        "attach_mcad_part_to_project" | "import_into_assembly_project"
+    ) {
         &["project_path", "source_path"]
     } else if worker_method(request) == "prepare_visual_bundle" {
         &["board_path"]
-    } else if matches!(worker_method(request), "export_mcad_session" | "preview_mcad_feedback" | "apply_mcad_feedback" | "update_mcad_part_in_project" | "reparent_mcad_part_in_project" | "tessellate_mcad_part_in_project" | "extract_mcad_package_shape_in_project" | "generate_mcad_selector_preview_in_project" | "update_assembly_semantics_in_project" | "update_assembly_topology_setup_in_project" | "apply_assembly_geometric_constraint_in_project" | "update_assembly_structure_in_project") {
+    } else if matches!(
+        worker_method(request),
+        "export_mcad_session"
+            | "preview_mcad_feedback"
+            | "apply_mcad_feedback"
+            | "update_mcad_part_in_project"
+            | "reparent_mcad_part_in_project"
+            | "tessellate_mcad_part_in_project"
+            | "extract_mcad_package_shape_in_project"
+            | "generate_mcad_selector_preview_in_project"
+            | "update_assembly_semantics_in_project"
+            | "update_assembly_topology_setup_in_project"
+            | "apply_assembly_geometric_constraint_in_project"
+            | "update_assembly_structure_in_project"
+    ) {
         &["project_path"]
     } else {
         &["path"]
@@ -535,7 +607,10 @@ fn project_worker_paths(request: &serde_json::Value) -> Result<Vec<PathBuf>, Str
         })
         .collect::<Result<Vec<_>, _>>()?;
     if worker_method(request) == "write_project_package" {
-        if let Some(base_path) = params.get("base_package_path").filter(|value| !value.is_null()) {
+        if let Some(base_path) = params
+            .get("base_package_path")
+            .filter(|value| !value.is_null())
+        {
             let base_path = base_path
                 .as_str()
                 .filter(|value| !value.trim().is_empty())
@@ -546,9 +621,13 @@ fn project_worker_paths(request: &serde_json::Value) -> Result<Vec<PathBuf>, Str
     }
     if worker_method(request) == "prepare_visual_bundle" {
         if let Some(overrides) = params.get("model_overrides") {
-            let values = overrides.as_object().ok_or("Model overrides must be an object")?;
+            let values = overrides
+                .as_object()
+                .ok_or("Model overrides must be an object")?;
             for value in values.values() {
-                let path = value.as_str().ok_or("Model replacement path must be a string")?;
+                let path = value
+                    .as_str()
+                    .ok_or("Model replacement path must be a string")?;
                 paths.push(fs::canonicalize(path).map_err(|error| error.to_string())?);
             }
         }
@@ -560,7 +639,8 @@ fn dialog_for_kind(kind: &str, save: bool) -> rfd::FileDialog {
     let dialog = rfd::FileDialog::new();
     match (kind, save) {
         ("board", false) => dialog.add_filter("KiCad board", &["kicad_pcb"]),
-        ("project", _) => dialog.add_filter("SPIKE project", &["spike", "spike.json", "json"]),
+        ("project", false) => dialog.add_filter("SPIKE project or results", &["spike", "json"]),
+        ("project", true) => dialog.add_filter("SPIKE project", &["spike"]),
         ("report", _) => dialog.add_filter("HTML report", &["html", "htm"]),
         ("step", _) => dialog.add_filter("STEP model", &["step", "stp"]),
         ("netlist", _) => dialog.add_filter("SPICE netlist", &["cir", "sp", "spice", "net"]),
@@ -630,13 +710,56 @@ fn select_project_file(
 }
 
 #[tauri::command]
+fn read_approved_result_file(
+    path: String,
+    state: tauri::State<'_, ApprovedFileState>,
+) -> Result<OpenedTextFile, String> {
+    let canonical = PathBuf::from(&path)
+        .canonicalize()
+        .map_err(|error| format!("Unable to resolve result file: {error}"))?;
+    if !canonical
+        .file_name()
+        .and_then(OsStr::to_str)
+        .is_some_and(|name| name.to_ascii_lowercase().ends_with(".spike-results.json"))
+    {
+        return Err("Expected a .spike-results.json file".to_string());
+    }
+    if !state
+        .0
+        .lock()
+        .map_err(|_| "Approved file state is unavailable")?
+        .contains(&canonical)
+    {
+        return Err("The result path was not selected by SPIKE".to_string());
+    }
+    let metadata = fs::metadata(&canonical)
+        .map_err(|error| format!("Unable to inspect result file: {error}"))?;
+    if !metadata.is_file() || metadata.len() > MAX_TEXT_FILE_BYTES {
+        return Err("Result file is not a regular file within the 256 MiB limit".to_string());
+    }
+    Ok(OpenedTextFile {
+        file_name: canonical
+            .file_name()
+            .and_then(OsStr::to_str)
+            .unwrap_or("results.spike-results.json")
+            .to_string(),
+        path: canonical.to_string_lossy().into_owned(),
+        contents: fs::read_to_string(&canonical)
+            .map_err(|error| format!("Unable to read result file: {error}"))?,
+    })
+}
+
+#[tauri::command]
 fn select_mcad_file(
     state: tauri::State<'_, ApprovedFileState>,
 ) -> Result<Option<SelectedFile>, String> {
     let Some(path) = rfd::FileDialog::new()
         .add_filter("MCAD assembly part", &["step", "stp", "gltf", "glb"])
         .add_filter("PCB component model", &["step", "stp", "wrl", "vrml"])
-        .add_filter("Assembly exchange or board", &["spikeassembly", "kicad_pcb", "ipc2581"])
+        .add_filter(
+            "Assembly exchange or board",
+            &["spikeassembly", "kicad_pcb", "ipc2581"],
+        )
         .pick_file()
     else {
         return Ok(None);
@@ -664,16 +787,40 @@ fn select_mcad_file(
 }
 
 #[tauri::command]
-fn select_import_file(kind: String, directory: bool, state: tauri::State<'_, ApprovedFileState>) -> Result<Option<SelectedFile>, String> {
+fn select_import_file(
+    kind: String,
+    directory: bool,
+    state: tauri::State<'_, ApprovedFileState>,
+) -> Result<Option<SelectedFile>, String> {
     let dialog = match kind.as_str() {
-        "board" => rfd::FileDialog::new().add_filter("CAD board job", &["zip", "tgz", "tar", "gz", "odb", "odb++", "ipc2581"]),
-        "harness" => rfd::FileDialog::new().add_filter("Harness connection list", &["json", "csv", "tsv"]),
+        "board" => rfd::FileDialog::new().add_filter(
+            "CAD board job",
+            &["zip", "tgz", "tar", "gz", "odb", "odb++", "ipc2581"],
+        ),
+        "harness" => {
+            rfd::FileDialog::new().add_filter("Harness connection list", &["json", "csv", "tsv"])
+        }
+        "extension" => rfd::FileDialog::new()
+            .add_filter("SPIKE extension package", &["zip", "spike-extension"]),
         _ => return Err("Unknown import source kind".to_string()),
     };
-    let selected = if directory { dialog.pick_folder() } else { dialog.pick_file() };
-    let Some(path) = selected else { return Ok(None); };
+    let selected = if directory {
+        dialog.pick_folder()
+    } else {
+        dialog.pick_file()
+    };
+    let Some(path) = selected else {
+        return Ok(None);
+    };
     let approved = register_approved_path(&state, &path)?;
-    Ok(Some(SelectedFile { file_name: approved.file_name().and_then(|name| name.to_str()).unwrap_or("source").to_string(), path: approved.to_string_lossy().into_owned() }))
+    Ok(Some(SelectedFile {
+        file_name: approved
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("source")
+            .to_string(),
+        path: approved.to_string_lossy().into_owned(),
+    }))
 }
 
 #[tauri::command]
@@ -733,9 +880,18 @@ fn save_extension_artifact(
 ) -> Result<Option<String>, String> {
     let payload = extension_artifacts::decode(&data, &encoding, &sha256)?;
     let safe_name = extension_artifacts::file_name(&suggested_name)?;
-    let suffix = Path::new(&safe_name).extension().and_then(|s| s.to_str()).unwrap_or("").to_ascii_lowercase();
-    let Some(path) = rfd::FileDialog::new().add_filter("Engineering export", &[suffix.as_str()])
-        .set_file_name(&safe_name).save_file() else { return Ok(None); };
+    let suffix = Path::new(&safe_name)
+        .extension()
+        .and_then(|s| s.to_str())
+        .unwrap_or("")
+        .to_ascii_lowercase();
+    let Some(path) = rfd::FileDialog::new()
+        .add_filter("Engineering export", &[suffix.as_str()])
+        .set_file_name(&safe_name)
+        .save_file()
+    else {
+        return Ok(None);
+    };
     fs::write(&path, payload).map_err(|error| format!("Unable to save artifact: {error}"))?;
     let approved = register_approved_path(&state, &path)?;
     Ok(Some(approved.to_string_lossy().into_owned()))
@@ -892,13 +1048,20 @@ fn worker_launch_candidates(workspace: &Path) -> Vec<WorkerLaunchCandidate> {
 }
 
 fn worker_thread_budget() -> usize {
-    let available = std::thread::available_parallelism().map(|count| count.get()).unwrap_or(1);
-    std::env::var("SPIKE_CPU_THREADS").ok().and_then(|value| value.parse::<usize>().ok())
-        .filter(|value| *value > 0).unwrap_or_else(|| available.saturating_sub(2).max(1))
+    let available = std::thread::available_parallelism()
+        .map(|count| count.get())
+        .unwrap_or(1);
+    std::env::var("SPIKE_CPU_THREADS")
+        .ok()
+        .and_then(|value| value.parse::<usize>().ok())
+        .filter(|value| *value > 0)
+        .unwrap_or_else(|| available.saturating_sub(2).max(1))
         .clamp(1, available)
 }
 
-fn worker_thread_count() -> String { worker_thread_budget().to_string() }
+fn worker_thread_count() -> String {
+    worker_thread_budget().to_string()
+}
 
 fn spawn_worker_process(workspace: &Path) -> Result<Child, String> {
     let worker_threads = worker_thread_count();
@@ -1059,11 +1222,18 @@ fn run_resident_worker_request(
         *resident = None;
         return Err(format!(
             "Resident SPIKE worker exited before the request ({status}){}",
-            if detail.is_empty() { String::new() } else { format!(": {detail}") }
+            if detail.is_empty() {
+                String::new()
+            } else {
+                format!(": {detail}")
+            }
         ));
     }
     let started = Instant::now();
-    let stdin = worker.stdin.take().ok_or("Resident SPIKE worker stdin is busy")?;
+    let stdin = worker
+        .stdin
+        .take()
+        .ok_or("Resident SPIKE worker stdin is busy")?;
     let write_receiver = write_stdin_async(stdin, input);
     let mut write_pending = true;
     let line = loop {
@@ -1092,7 +1262,11 @@ fn run_resident_worker_request(
                     *resident = None;
                     return Err(format!(
                         "Unable to write resident SPIKE worker request: {error}{}",
-                        if detail.is_empty() { String::new() } else { format!(": {detail}") }
+                        if detail.is_empty() {
+                            String::new()
+                        } else {
+                            format!(": {detail}")
+                        }
                     ));
                 }
                 Err(mpsc::TryRecvError::Empty) => {
@@ -1101,7 +1275,9 @@ fn run_resident_worker_request(
                 }
                 Err(mpsc::TryRecvError::Disconnected) => {
                     *resident = None;
-                    return Err("Resident SPIKE worker stdin writer stopped unexpectedly".to_string());
+                    return Err(
+                        "Resident SPIKE worker stdin writer stopped unexpectedly".to_string()
+                    );
                 }
             }
         }
@@ -1122,7 +1298,11 @@ fn run_resident_worker_request(
                 *resident = None;
                 return Err(format!(
                     "Resident SPIKE worker response channel closed{}",
-                    if detail.is_empty() { String::new() } else { format!(": {detail}") }
+                    if detail.is_empty() {
+                        String::new()
+                    } else {
+                        format!(": {detail}")
+                    }
                 ));
             }
         }
@@ -1157,7 +1337,9 @@ fn terminate_worker_tree(child: &mut Child) {
             loop {
                 match killer.try_wait() {
                     Ok(Some(_)) => break,
-                    Ok(None) if Instant::now() < deadline => thread::sleep(Duration::from_millis(10)),
+                    Ok(None) if Instant::now() < deadline => {
+                        thread::sleep(Duration::from_millis(10))
+                    }
                     _ => {
                         let _ = killer.kill();
                         let _ = killer.wait();
@@ -1245,10 +1427,16 @@ fn run_worker_process(
             None => thread::sleep(Duration::from_millis(50)),
         }
     };
-    let output_deadline = if timed_out { Duration::from_secs(1) } else { Duration::from_secs(5) };
-    let (stdout, stdout_truncated) = stdout_reader.recv_timeout(output_deadline)
+    let output_deadline = if timed_out {
+        Duration::from_secs(1)
+    } else {
+        Duration::from_secs(5)
+    };
+    let (stdout, stdout_truncated) = stdout_reader
+        .recv_timeout(output_deadline)
         .map_err(|_| "Worker stdout did not close after process exit".to_string())?;
-    let (stderr, stderr_truncated) = stderr_reader.recv_timeout(output_deadline)
+    let (stderr, stderr_truncated) = stderr_reader
+        .recv_timeout(output_deadline)
         .map_err(|_| "Worker stderr did not close after process exit".to_string())?;
     if timed_out {
         return Err(format!(
@@ -1320,9 +1508,7 @@ async fn run_project_worker(
         .first()
         .ok_or_else(|| "Project worker operation has no approved project path".to_string())?
         .clone();
-    project_trust_binding::require_targeted_read_binding(
-        &method, &request, &project_path, &trust,
-    )?;
+    project_trust_binding::require_targeted_read_binding(&method, &request, &project_path, &trust)?;
     let guard = claim_heavy_worker(workers.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
     let response = tauri::async_runtime::spawn_blocking(move || {
@@ -1331,9 +1517,7 @@ async fn run_project_worker(
     })
     .await
     .map_err(|error| format!("SPIKE project worker task failed: {error}"))??;
-    project_trust_binding::update_from_worker_response(
-        &method, &project_path, &response, &trust,
-    )?;
+    project_trust_binding::update_from_worker_response(&method, &project_path, &response, &trust)?;
     Ok(response)
 }
 
@@ -1347,20 +1531,31 @@ fn verify_project_manifest_signature(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let startup_project = startup_project_from_args(std::env::args_os().skip(1), MAX_PROJECT_FILE_BYTES);
+    let startup_project =
+        startup_project_from_args(std::env::args_os().skip(1), MAX_PROJECT_FILE_BYTES);
     let mut approved_paths = HashSet::new();
     if let Some((path, _)) = startup_project.as_ref() {
         approved_paths.insert(path.clone());
     }
     let pending_project = startup_project.map(|(_, selected)| selected);
     tauri::Builder::default()
-        .manage(ResourceState(Mutex::new(ResourceSampler { system: System::new(), gpu: gpu_metrics::Sampler::default(), last_sample: None })))
+        .plugin(tauri_plugin_opener::init())
+        .manage(ResourceState(Mutex::new(ResourceSampler {
+            system: System::new(),
+            gpu: gpu_metrics::Sampler::default(),
+            last_sample: None,
+        })))
         .manage(ApprovedFileState(Mutex::new(approved_paths)))
         .manage(PendingOpenState(Mutex::new(pending_project)))
         .manage(WorkerExecutionState(Arc::new(Mutex::new(None))))
         .manage(ResidentWorkerState(Arc::new(Mutex::new(None))))
         .manage(project_trust_binding::ProjectManifestState::new())
+        .manage(mcp_bridge::BridgeState::default())
         .invoke_handler(tauri::generate_handler![
+            mcp_bridge::mcp_bridge_start,
+            mcp_bridge::mcp_bridge_stop,
+            mcp_bridge::mcp_bridge_status,
+            mcp_bridge::mcp_bridge_respond,
             run_worker,
             run_project_worker,
             worker_status,
@@ -1368,6 +1563,7 @@ pub fn run() {
             resource_snapshot,
             open_text_file,
             select_project_file,
+            read_approved_result_file,
             take_startup_project,
             select_mcad_file,
             select_import_file,
@@ -1377,8 +1573,13 @@ pub fn run() {
             write_approved_text_file,
             verify_project_manifest_signature
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running SPIKE desktop application");
+        .build(tauri::generate_context!())
+        .expect("error while building SPIKE desktop application")
+        .run(|app, event| {
+            if matches!(event, tauri::RunEvent::Exit) {
+                app.state::<mcp_bridge::BridgeState>().stop();
+            }
+        });
 }
 
 #[cfg(test)]
@@ -1415,11 +1616,9 @@ mod tests {
     #[test]
     fn startup_project_accepts_one_canonical_bounded_spike_file() {
         let path = temporary_startup_project("assembly.SPIKE", b"fixture");
-        let (canonical, selected) = startup_project_from_args(
-            [path.as_os_str().to_os_string()],
-            MAX_TEXT_FILE_BYTES,
-        )
-        .expect("valid startup project");
+        let (canonical, selected) =
+            startup_project_from_args([path.as_os_str().to_os_string()], MAX_TEXT_FILE_BYTES)
+                .expect("valid startup project");
         assert_eq!(canonical, path.canonicalize().unwrap());
         assert_eq!(selected.path, canonical.to_string_lossy());
         assert!(selected.file_name.eq_ignore_ascii_case("assembly.SPIKE"));
@@ -1429,8 +1628,12 @@ mod tests {
     #[test]
     fn startup_project_accepts_package_above_text_transport_limit() {
         let path = temporary_startup_project("large.spike", b"PK\x03\x04");
-        fs::OpenOptions::new().write(true).open(&path).unwrap()
-            .set_len(MAX_TEXT_FILE_BYTES + 1).unwrap();
+        fs::OpenOptions::new()
+            .write(true)
+            .open(&path)
+            .unwrap()
+            .set_len(MAX_TEXT_FILE_BYTES + 1)
+            .unwrap();
         assert!(selected_startup_project(&path, MAX_TEXT_FILE_BYTES).is_err());
         assert!(selected_startup_project(&path, MAX_PROJECT_FILE_BYTES).is_ok());
         fs::remove_dir_all(path.parent().unwrap()).unwrap();
@@ -1440,7 +1643,10 @@ mod tests {
     fn startup_project_rejects_ambiguous_wrong_extension_and_oversized_inputs() {
         let path = temporary_startup_project("assembly.spike", b"fixture");
         assert!(startup_project_from_args(
-            [path.as_os_str().to_os_string(), path.as_os_str().to_os_string()],
+            [
+                path.as_os_str().to_os_string(),
+                path.as_os_str().to_os_string()
+            ],
             MAX_TEXT_FILE_BYTES,
         )
         .is_none());
@@ -1467,19 +1673,30 @@ mod tests {
         assert!(is_heavy_worker_method("run_sparselizard_case"));
         assert!(is_heavy_worker_method("run_converter_study"));
         assert!(is_heavy_worker_method("run_component_thermal"));
+        assert!(is_heavy_worker_method("run_board_thermal"));
         assert!(is_heavy_worker_method("run_field_circuit_cosimulation"));
-        assert!(is_heavy_worker_method("run_multiboard_si_independent_batch"));
+        assert!(is_heavy_worker_method(
+            "run_multiboard_si_independent_batch"
+        ));
         assert!(is_heavy_worker_method("run_pi_path_native_mna"));
         assert!(is_heavy_worker_method("execute_thermal_field_job"));
-        assert!(is_heavy_worker_method("bind_multiboard_coupled_reduced_network"));
+        assert!(is_heavy_worker_method(
+            "bind_multiboard_coupled_reduced_network"
+        ));
         assert!(is_heavy_worker_method("run_spice_workspace_native_mna"));
         assert!(is_heavy_worker_method("run_owned_spice_workspace"));
         assert!(is_heavy_worker_method("read_project_model_artifacts"));
         assert!(is_heavy_worker_method("read_project_state_artifact"));
         assert!(is_heavy_worker_method("read_project_visual_bundle"));
-        assert!(is_heavy_worker_method("read_project_package_shape_selector_previews"));
-        assert!(is_heavy_worker_method("extract_mcad_package_shape_in_project"));
-        assert!(is_heavy_worker_method("generate_mcad_selector_preview_in_project"));
+        assert!(is_heavy_worker_method(
+            "read_project_package_shape_selector_previews"
+        ));
+        assert!(is_heavy_worker_method(
+            "extract_mcad_package_shape_in_project"
+        ));
+        assert!(is_heavy_worker_method(
+            "generate_mcad_selector_preview_in_project"
+        ));
         assert!(!is_heavy_worker_method("dependencies"));
     }
 
@@ -1495,7 +1712,11 @@ mod tests {
         let cancellation = guard.cancellation();
         {
             let active = state.lock().unwrap();
-            active.as_ref().unwrap().cancellation.store(true, Ordering::SeqCst);
+            active
+                .as_ref()
+                .unwrap()
+                .cancellation
+                .store(true, Ordering::SeqCst);
         }
         assert!(cancellation.load(Ordering::SeqCst));
         drop(guard);
@@ -1641,7 +1862,11 @@ mod tests {
             "params": { "project_path": "fixture.spike" }
         });
         assert_eq!(project_worker_paths(&assembly_structure).unwrap().len(), 1);
-        for method in ["export_mcad_session", "preview_mcad_feedback", "apply_mcad_feedback"] {
+        for method in [
+            "export_mcad_session",
+            "preview_mcad_feedback",
+            "apply_mcad_feedback",
+        ] {
             let request = json!({"method": method, "params": {"project_path": "fixture.spike"}});
             assert_eq!(project_worker_paths(&request).unwrap().len(), 1);
             assert!(project_trust_binding::is_targeted_project_read(method));
@@ -1709,7 +1934,8 @@ mod tests {
         assert!(packaged_worker.is_file(), "{}", packaged_worker.display());
 
         let state = Arc::new(Mutex::new(None));
-        let netlist = "* resident RC probe\nVdrive in 0 0\nR1 in out 1k\nC1 out 0 1u\n.tran 100u 2m\n.end\n";
+        let netlist =
+            "* resident RC probe\nVdrive in 0 0\nR1 in out 1k\nC1 out 0 1u\n.tran 100u 2m\n.end\n";
         let created = run_resident_worker_request(
             &workspace,
             &state,

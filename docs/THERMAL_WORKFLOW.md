@@ -1,11 +1,108 @@
 # SPIKE Thermal Workflow
 
-SPIKE's Thermal tab has a built-in component thermal path and an optional CFD
-path. The built-in path runs steady-state or transient lumped RC calculations in
-the local worker without OpenFOAM. It reports approximate temperatures keyed by
-part reference, not a spatial PCB temperature field. See
+For a step-by-step desktop and CLI tutorial with an open-source Marble board,
+saved temperature plots, and a layered copper example, see the
+[illustrated thermal user guide](THERMAL_USER_GUIDE.md).
+
+SPIKE's Thermal tab has a built-in component thermal path, a separate spatial
+board-plate path, and an optional CFD path. The component path runs steady-state
+or transient lumped RC calculations in the local worker without OpenFOAM. It
+reports approximate temperatures keyed by part reference. See
 [Component thermal calculations](COMPONENT_THERMAL.md) for equations, limits,
 worker contract, and numerical checks.
+
+### Air environment scenarios
+
+The Thermal setup provides three boundary presets for comparing a board in
+still room air, in a sealed box, and under forced air. Each preset states its
+assumptions and converts prescribed effective heat-transfer coefficients into
+top and bottom board-to-ambient resistances using `R = 1/(h A)`. The forced-air
+screen also reports the ideal bulk-air rise from `dT = P/(rho cp Q)`, using
+constant standard-air properties (`rho = 1.204 kg/m3`, `cp = 1005 J/(kg K)`).
+
+The supplied coefficients are engineering starting points: 8/5 W/(m2 K) for
+the top/bottom faces in open still air, 3/2 W/(m2 K) inside a closed box, and
+35/20 W/(m2 K) under nominal 0.012 m3/s forced flow. Applying a preset writes
+the resulting explicit resistance, enclosure, convection, fan-flow, and
+assumption inputs into the scenario. Users can edit them before running the
+object or board solver. The comparison remains `approximate`; it does not solve
+enclosure walls, fan pressure curves, flow bypass, recirculation, local air
+velocity, component hot spots, or conjugate heat transfer. The optional
+OpenFOAM path retains its separate experimental capability gates.
+
+For a reproducible source-board run with assigned Q1/Q2/Q3 losses, thermal
+paths, saved JSON, and a board-location visualization, see the
+[eBrake1 object thermal example](validation/EBRAKE1_OBJECT_THERMAL_20260928.md).
+Its plotted footprint colors are solved object temperatures, not a continuous
+board temperature field.
+
+The separate [board-plate gradient example](validation/EBRAKE1_BOARD_THERMAL_20260928.md)
+uses imported board bounds and component locations, explicit effective sheet
+conductivity/thickness, fixed board contact areas, prescribed convection, and
+per-part junction-to-case and case-to-board resistances. It returns a solved
+steady temperature grid and board-contact/case/junction temperatures. It is an
+experimental rectangular uniform-sheet approximation, not a conforming
+copper/FR-4 PCB thermal solve. The Tauri Thermal setup can display the
+returned grid and temperatures when the local worker completes the request.
+
+The [layered eBrake1 example](validation/EBRAKE1_LAYERED_THERMAL_20260928.md)
+adds imported copper coverage by layer, physical stackup thicknesses, via and
+plated-pad barrel links, and pad-land case coupling. Its optional fuzzy mode
+blurs copper coverage independently on each layer. This is an approximate
+structured volume model of the board, not a tetrahedral package/board solve;
+its assumed materials and cooling are unvalidated.
+The optional [layered board transient](validation/EBRAKE1_LAYERED_TRANSIENT_20260928.md)
+uses per-cell copper/dielectric heat capacity and implicit steps. The desktop
+plays saved layer-temperature frames with a fixed color scale and reports a
+peak curve, stored energy, and numerical balance. It assumes an initially
+ambient board and constant power. Component case/junction values in this
+board result remain steady resistance-chain estimates.
+Adjacent physical rows are coupled by vertical conduction. The optional
+**Virtual board heatsink** is an explicit top/bottom rectangular contact with
+a shared isothermal node, interface K/W, and sink-to-ambient K/W. It returns
+sink temperature and heat flow and is available only in layered board mode.
+The [illustrated example](THERMAL_USER_GUIDE.md#virtual-heatsink-comparison-on-the-same-fixture)
+compares the same board with and without it. Assembly/CFD heatsink shapes do
+not automatically affect this board solve; no fin/airflow field is resolved.
+
+### Board gradient in the desktop
+
+1. Import a KiCad board and open **Thermal → Thermal setup** in the native
+   desktop. The browser preview cannot execute the local worker. For layered
+   runs, the worker reimports the retained KiCad source through SPIKE's full
+   importer so custom pads and source-filled zones retain their geometry;
+   display-only board polygons are not treated as proved copper.
+2. In **Board thermal**, select **Uniform 2D plate** or **Layered 3D stack**.
+   Layered mode needs a complete ordered physical stackup and defaults only
+   when one is imported. Enter board thickness and grid step in mm,
+   top/bottom convection in W/(m2 K), and ambient in C. Plate mode needs an
+   effective in-plane conductivity; layered mode needs separate copper and
+   dielectric conductivities and optional via plating thickness.
+3. In layered mode, toggle copper, tracks, pads, zones and vias independently.
+   Enter 0 mm fuzzy sigma for unsmoothed sampled copper, or a positive sigma
+   to blur layer coverage; changing grid step controls the number of cells.
+   Select board component references. For each, enter dissipation W,
+   junction-to-case K/W, and case-to-board K/W. Choose imported pad lands or
+   an explicit square contact width. The UI warns when a selected pad is
+   narrower than the requested grid step.
+4. For layered transient, enable **Solve transient board field** and enter
+   duration, step, saved-frame stride, and volumetric heat capacities. Choose
+   **Run board thermal**. Review each layer's temperature grid and
+   optional copper coverage overlay, component markers, board-contact/case/
+   junction table, per-pad heat paths, `approximate` status, and diagnostics.
+   The display smoothing switch blends only plotted colors; hovering retains
+   the original cell temperature. In a transient run, use the time slider or
+   playback to see the solved frame and the peak-temperature history. Changing
+   an input makes the old plot stale until rerun.
+5. Save the project to retain setup and returned result. Compare at least
+   several grid steps with identical physical contact dimensions and inputs
+   before interpreting a hotspot. The eBrake1 refinement record remains
+   incomplete, so it is exploratory evidence only.
+
+The uniform board rectangle and prescribed convection are explicit model
+approximations. A case/junction resistance chain adds `P*R` to the contact-
+weighted board temperature. It does not resolve a case field or a device's
+internal junction geometry.
 
 In the GUI, sync board parts or import a BOM CSV/TSV. Match reference,
 dissipation W, top resistance K/W, and bottom resistance K/W columns in the
@@ -17,6 +114,9 @@ selected part in transient mode, then choose **Run steady state** or
 **Run transient**. The board-level fallback is used when no powered part is
 selected. Review the reference-linked temperature table and transient samples
 inside the Thermal setup panel.
+The component transient overlay maps actual solved lumped part-node samples
+onto board locations, with per-part peak time, time to 90% of steady rise,
+and final gap. It is a part map, not a continuous board field.
 
 **Object and surface heat transfer** adds a boundary to any enabled part,
 board, heatsink, enclosure, or mechanical object. Choose the whole object, an

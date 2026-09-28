@@ -15,7 +15,7 @@ for (const match of vocabularyBlock[1].matchAll(/^\s*(?:"([^"]+)"|([A-Za-z][\w ]
 const groups = {
   PI: ["DC drop", "Bulk nets", "AC sweep", "Transient", "Batch nets", "Terminals", "Power tree", "Probes", "Validate", "Run PI", "PI results", "PI report", "Export data"],
   SI: ["Channel tree", "Impedance", "Parasitics", "Coupling risk", "S-parameters", "NEXT / FEXT", "Eye diagram", "PAM4", "Stackup", "Layer view", "Ports", "Touchstone", "SPICE model", "External engines"],
-  EMI: ["Net domain", "Preflight", "Risk screen", "Ports", "PI transient", "SPICE", "Domain mesh", "Prepare case", "Run solver", "Solver manager", "Dashboard", "Near field", "Far field", "EMI report"],
+  EM: ["Net domain", "Preflight", "Risk screen", "Ports", "PI transient", "SPICE", "Domain mesh", "Prepare case", "Run solver", "Solver manager", "Dashboard", "Near field", "Far field", "EMI report"],
   Thermal: ["Bounding volume", "Board stack", "Heat sources", "Flow channels", "Fan placement", "Ambient", "Scenario", "Prepare case", "Solver console", "Temperature", "Report"],
   Probes: ["Hover probe", "Place probe", "Probe table", "Duplicate", "Voltage", "Current", "Impedance", "Compare", "Cross-layer", "Export CSV"],
   Results: ["Issues", "Probe table", "Power tree", "Console", "Fields", "Voltage / current", "Mesh", "Probe overlay", "Compare", "Limits", "Report"],

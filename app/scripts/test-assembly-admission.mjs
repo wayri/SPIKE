@@ -41,6 +41,9 @@ assert.equal(scope.active_board_id, "board-a");
 assert.equal(scope.active_design_id, "design-a");
 assert.equal(scope.assembly, multiBoard);
 assert.throws(() => assemblyAnalysisScope({ ...multiBoard, boards: [...multiBoard.boards, { id: "board-a-2", design_id: "design-a" }] }, "design-a"), /exactly one active board/i);
+const repeatedDesign = { ...multiBoard, boards: [...multiBoard.boards, { id: "board-a-2", design_id: "design-a" }] };
+assert.equal(assemblyAnalysisScope(repeatedDesign, "design-a", null, "board-a-2").active_board_id, "board-a-2");
+assert.throws(() => assemblyAnalysisScope(repeatedDesign, "design-a", null, "board-b"), /must reference the active design/i);
 
 requireAdmittedAssembly({
   contract: "spike/assembly-resource-admission/v1",

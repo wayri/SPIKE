@@ -221,6 +221,66 @@ class MultiboardAnalysisTests(unittest.TestCase):
             self.assertEqual(result["graph"]["domain"], domain)
             self.assertIn("MULTIBOARD_COUPLED_SOLVER_NOT_QUALIFIED", {issue["code"] for issue in result["issues"]})
 
+    def test_thermal_and_emi_plans_keep_domain_specific_assembly_scope(self):
+        for domain, retained_key in (("thermal", "thermal_contacts"), ("emi", "electrical_bonds")):
+            with self.subTest(domain=domain):
+                value = request(count=2)
+                value["domain"] = domain
+                value["assembly"]["thermal_contacts"] = [{"id": "contact-a-b", "endpoint_a": "board-00", "endpoint_b": "board-01", "contact_type": "board-stack"}]
+                value["assembly"]["electrical_bonds"] = [{"id": "bond-a-b", "endpoint_a": "board-00::J1", "endpoint_b": "board-01::J2", "bond_type": "ground-bond"}]
+                independent = plan_multiboard_analysis(value)
+                self.assertTrue(independent["independent_jobs_admissible"])
+                self.assertIn(retained_key, independent["graph"])
+                self.assertEqual(len(independent["graph"][retained_key]), 1)
+                self.assertIn("parts", independent["graph"])
+                schema = json.loads((ROOT / "schemas" / "multiboard-analysis-plan-v1.schema.json").read_text(encoding="utf-8"))
+                Draft202012Validator(schema).validate(independent)
+                value["mode"] = "coupled_assembly"
+                coupled = plan_multiboard_analysis(value)
+                self.assertFalse(coupled["can_plan"])
+                self.assertIn("MULTIBOARD_COUPLED_SOLVER_NOT_QUALIFIED", {issue["code"] for issue in coupled["issues"]})
+                Draft202012Validator(schema).validate(coupled)
+
+    def test_stack_mates_and_harnesses_remain_distinct_edges(self):
+        value = request(count=3)
+        value["assembly"]["connector_mappings"] = [{
+            "id": "stack-mate", "kind": "connector-mate", "name": "Stack header",
+            "data": {"endpoint_a": "board-00::J_STACK", "endpoint_b": "board-02::J_STACK",
+                     "pin_map": {"1": "2", "2": "1"}},
+        }]
+        plan = plan_multiboard_analysis(value)
+        self.assertTrue(plan["can_plan"])
+        self.assertEqual(len(plan["graph"]["harnesses"]), 1)
+        self.assertEqual(plan["graph"]["mated_connectors"][0]["pin_map"], {"1": "2", "2": "1"})
+        self.assertEqual(plan["graph"]["mated_connectors"][0]["endpoint_a"]["board_id"], "board-00")
+        value["selected_board_ids"] = ["board-00", "board-01"]
+        subset = plan_multiboard_analysis(value)
+        self.assertEqual(subset["graph"]["mated_connectors"], [])
+        self.assertEqual(subset["omitted_mate_ids"], ["stack-mate"])
+
+    def test_stack_mate_rejects_harness_pin_reuse_and_duplicate_mate_pins(self):
+        value = request(count=3)
+        mate = {"id": "stack-mate", "kind": "connector-mate", "name": "Stack header",
+                "data": {"endpoint_a": "board-00::J1", "endpoint_b": "board-02::J_STACK",
+                         "pin_map": {"1": "1"}}}
+        value["assembly"]["connector_mappings"] = [mate]
+        with self.assertRaisesRegex(ValueError, "already assigned"):
+            plan_multiboard_analysis(value)
+        mate["data"]["endpoint_a"] = "board-00::J_STACK"
+        mate["data"]["pin_map"] = {"1": "1", "2": "1"}
+        with self.assertRaisesRegex(ValueError, "duplicate pin"):
+            plan_multiboard_analysis(value)
+
+    def test_coupled_modes_are_specific_to_their_physics(self):
+        value = request(count=2, mode="coupled_harness_network")
+        value["domain"] = "thermal"
+        with self.assertRaisesRegex(MultiboardAnalysisError, "only to PI and SI"):
+            plan_multiboard_analysis(value)
+        value["domain"] = "pi"
+        value["mode"] = "coupled_assembly"
+        with self.assertRaisesRegex(MultiboardAnalysisError, "only to thermal and EMI"):
+            plan_multiboard_analysis(value)
+
     def test_layer_and_dimension_limits_block_without_truncating_geometry(self):
         value = request(count=2)
         value["designs"]["design-00"] = design("design-00", layers=33)

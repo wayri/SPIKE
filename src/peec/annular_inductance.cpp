@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 #include "annular_inductance.hpp"
 
@@ -171,6 +171,105 @@ AnnularIntegrationResult coaxial_annular_inductance(
   result.estimated_error_h=static_cast<double>(error);
   result.converged=std::isfinite(result.inductance_h)&&
       std::isfinite(result.estimated_error_h)&&value>=0&&error<=tolerance();
+  return result;
+}
+AnnularIntegrationResult separated_annular_inductance(
+    const CoaxialAnnulusVolume &first, const CoaxialAnnulusVolume &second,
+    const AnnularIntegrationOptions &options) {
+  // Clean-room derivation from the uniform-volume Coulomb energy integral.
+  // Generating function: https://dlmf.nist.gov/18.12.E11 ; |P_n(x)| <= 1
+  // on [-1,1]: https://dlmf.nist.gov/18.14.E1 (alpha=beta=0).
+  // With delta = X-Y and D = |center1-center2|, each centrally symmetric
+  // cylinder has zero odd moments. Thus only even Legendre degrees remain,
+  // and the omitted n>=6 terms are bounded by q^6/(D*(1-q^2)), where
+  // q=(enclosing_radius1+enclosing_radius2)/D. No external code was used.
+  using V = std::array<Real,3>;
+  const auto dot3=[](const V &a,const V &b) {
+    return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  };
+  const auto check=[&](const CoaxialAnnulusVolume &a) {
+    validate({0,a.length_m,a.inner_radius_m,a.outer_radius_m});
+    if(a.length_m<=0)throw std::invalid_argument("Invalid annulus length");
+    for(int k=0;k<3;++k)
+      if(!std::isfinite(a.center_m[k])||!std::isfinite(a.direction[k]))
+        throw std::invalid_argument("Invalid annulus center or direction");
+    const V u{a.direction[0],a.direction[1],a.direction[2]};
+    if(std::abs(dot3(u,u)-1)>1e-10L)
+      throw std::invalid_argument("Annulus direction must be unit length");
+  };
+  check(first);check(second);
+  if(!std::isfinite(options.relative_tolerance)||options.relative_tolerance<=0||
+      !std::isfinite(options.absolute_tolerance_h)||options.absolute_tolerance_h<0||
+      !std::isfinite(options.permeability_h_per_m)||options.permeability_h_per_m<=0)
+    throw std::invalid_argument("Invalid annular integration tolerance or permeability");
+  AnnularIntegrationResult result;
+  result.estimated_error_h=std::numeric_limits<double>::infinity();
+  if(options.max_evaluations==0||options.max_cells==0)return result;
+  V separation{},u{},v{};
+  for(int k=0;k<3;++k) {
+    separation[k]=Real(second.center_m[k])-first.center_m[k];
+    u[k]=first.direction[k];v[k]=second.direction[k];
+  }
+  const Real distance=std::sqrt(dot3(separation,separation));
+  if(!(distance>0)||!std::isfinite(distance))return result;
+  // Admit unit axes only to arithmetic precision. Other approximately unit
+  // descriptors remain unsupported here rather than silently rescaling them.
+  const Real axis_error=std::abs(dot3(u,u)-1)+std::abs(dot3(v,v)-1);
+  if(axis_error>64*std::numeric_limits<double>::epsilon())return result;
+  const Real q=(std::hypot(Real(first.length_m)/2,Real(first.outer_radius_m))+
+      std::hypot(Real(second.length_m)/2,Real(second.outer_radius_m)))/distance;
+  if(!(q<=0.25L))return result;
+  for(int k=0;k<3;++k)separation[k]/=distance;
+  struct Moments { Real transverse, axial, trace, projection, radial4,
+      projection4, projection_radial2; V covariance_projection; };
+  const auto moments=[&](const CoaxialAnnulusVolume &a,const V &axis) {
+    const Real ri=a.inner_radius_m/distance,ro=a.outer_radius_m/distance;
+    const Real length=a.length_m/distance;
+    const Real radial2=(ri*ri+ro*ro)/2;
+    const Real radial4=(ri*ri*ri*ri+ri*ri*ro*ro+ro*ro*ro*ro)/3;
+    const Real transverse=radial2/2,axial=length*length/12;
+    const Real axial4=length*length*length*length/80;
+    const Real c=dot3(axis,separation),c2=c*c,s2=1-c2;
+    Moments m{transverse,axial,radial2+axial,
+      transverse*s2+axial*c2,radial4+2*radial2*axial+axial4,
+      3*radial4*s2*s2/8+6*transverse*axial*s2*c2+axial4*c2*c2,
+      s2*(radial4/2+transverse*axial)+c2*(radial2*axial+axial4),{}};
+    for(int k=0;k<3;++k)
+      m.covariance_projection[k]=transverse*separation[k]+(axial-transverse)*c*axis[k];
+    return m;
+  };
+  const auto a=moments(first,u),b=moments(second,v);
+  const Real alignment=dot3(u,v);
+  const Real covariance_trace=3*a.transverse*b.transverse+
+      a.transverse*(b.axial-b.transverse)+b.transverse*(a.axial-a.transverse)+
+      (a.axial-a.transverse)*(b.axial-b.transverse)*alignment*alignment;
+  const Real r4=a.radial4+b.radial4+2*a.trace*b.trace+4*covariance_trace;
+  const Real p4=a.projection4+b.projection4+6*a.projection*b.projection;
+  const Real p2r2=a.projection_radial2+b.projection_radial2+
+      a.projection*b.trace+b.projection*a.trace+
+      4*dot3(a.covariance_projection,b.covariance_projection);
+  const Real expansion=1+(3*(a.projection+b.projection)-a.trace-b.trace)/2+
+      (35*p4-30*p2r2+3*r4)/8;
+  // Area factors cancel: dV1*dV2/(A1*A2) = length1*length2 times
+  // the expectation over uniform volumes. mu/(4*pi)*length1*length2/D is H.
+  const Real factor=Real(options.permeability_h_per_m)/(4*pi)*
+      first.length_m*(second.length_m/distance);
+  if(!std::isfinite(factor)||factor<1024*std::numeric_limits<double>::min())return result;
+  const Real q2=q*q;
+  const Real remainder=q2*q2*q2/(1-q2);
+  // q<=1/4 bounds all polynomial terms and keeps the sum away from zero.
+  // The allowance covers input-axis deviation and intermediate/final rounding;
+  // this is not a machine-certified interval enclosure.
+  const Real roundoff=8192*std::numeric_limits<double>::epsilon()+16*axis_error;
+  const Real value=factor*alignment*expansion;
+  const Real error=std::abs(factor)*(std::abs(alignment)*remainder+roundoff);
+  result.inductance_h=static_cast<double>(value);
+  result.estimated_error_h=static_cast<double>(error);
+  result.evaluations=1;
+  result.converged=std::isfinite(result.inductance_h)&&
+      std::isfinite(result.estimated_error_h)&&expansion>0&&
+      error<=std::max(Real(options.absolute_tolerance_h),
+                     options.relative_tolerance*std::abs(value));
   return result;
 }
 } // namespace spike::peec::volume

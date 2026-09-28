@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { mapThermalRecords, parseThermalDelimited, suggestThermalMapping, thermalRowsFromOdb } from "../src/thermalBomParsing.ts";
 

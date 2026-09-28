@@ -7,7 +7,7 @@
     "force_n": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
     "coenergy_j": [-0.0004, -0.0003, -0.0002, -0.0001, 0.0, 0.0001, 0.0002, 0.0003, 0.0004],
     "fixed_excitation": {"current_a": 2.0},
-    "provenance": "Original ideal constant-force example; not measured hardware data. SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+    "provenance": "Original ideal constant-force example; not measured hardware data. SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic",
     "relative_tolerance": 1e-10,
     "absolute_force_tolerance_n": 1e-12
   },

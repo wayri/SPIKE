@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Local SST forced-flow smoke; coarse mesh, no wall or turbulence qualification."""
 import argparse

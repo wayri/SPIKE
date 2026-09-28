@@ -28,7 +28,8 @@ ASSEMBLY_SCOPED_METHODS = {
     "run_converter_study", "validate_topology_circuit", "bridge_topology_to_analysis_spec", "validate_pi_path",
     "compile_pi_path_native_mna", "run_pi_path_native_mna", "run_hybrid_cosimulation", "prepare_sparselizard_case",
     "extract_net_geometry", "extract_power_path", "validate_thermal", "estimate_thermal", "prepare_thermal_case",
-    "run_thermal_case", "prepare_openems_case", "run_openems_case",
+    "run_thermal_case", "run_component_thermal", "run_board_thermal",
+    "prepare_openems_case", "run_openems_case",
 }
 
 

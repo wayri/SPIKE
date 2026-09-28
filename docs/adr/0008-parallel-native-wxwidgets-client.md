@@ -1,8 +1,12 @@
 # ADR 0008: Parallel Native wxWidgets Client
 
-- Status: Accepted
+- Status: Retired on 2026-09-28
 - Date: 2026-08-31
 - Supersedes: the C++ UI prohibition in ADR 0007 for the isolated client only
+
+The `wx_desktop/` implementation was removed after an unsuccessful UI and
+runtime trial. This ADR remains as the historical boundary for that client;
+it does not approve a replacement for release.
 
 ## Context
 

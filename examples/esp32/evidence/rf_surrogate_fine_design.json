@@ -1,0 +1,355 @@
+{
+  "contract": "spike/v1",
+  "units": "mm",
+  "design_id": "kicad-3199ce0a25f8987020e716d8-rf-two-conductor",
+  "stackup": [
+    {
+      "name": "F.Cu",
+      "type": "copper",
+      "thickness": 0.035
+    },
+    {
+      "name": "equivalent dielectric",
+      "type": "core",
+      "thickness": 1.5162,
+      "epsilon_r": 4.540694764082663,
+      "loss_tangent": 0.02
+    },
+    {
+      "name": "B.Cu",
+      "type": "copper",
+      "thickness": 0.035
+    }
+  ],
+  "tracks": [
+    {
+      "start": [
+        68.7705,
+        127.0
+      ],
+      "end": [
+        68.7705,
+        126.111
+      ],
+      "width": 0.381,
+      "layer": "F.Cu",
+      "net_id": 1,
+      "net_name": "/cpu/ANT",
+      "id": "069028c7-f3c4-48ac-901f-6e90d6b4143a",
+      "uuid": "069028c7-f3c4-48ac-901f-6e90d6b4143a"
+    },
+    {
+      "start": [
+        68.7705,
+        126.111
+      ],
+      "end": [
+        68.7705,
+        125.222
+      ],
+      "width": 0.381,
+      "layer": "F.Cu",
+      "net_id": 1,
+      "net_name": "/cpu/ANT",
+      "id": "93f46f25-8476-4774-b295-875744ff68ef",
+      "uuid": "93f46f25-8476-4774-b295-875744ff68ef"
+    }
+  ],
+  "pads": [
+    {
+      "name": "1",
+      "component": "C1",
+      "component_pad": "C1.1",
+      "type": "smd",
+      "shape": "roundrect",
+      "at": [
+        68.7705,
+        126.111
+      ],
+      "rotation": 360.0,
+      "size": [
+        0.381,
+        0.635
+      ],
+      "layers": [
+        "F.Cu"
+      ],
+      "layer": "F.Cu",
+      "net_id": 1,
+      "net_name": "/cpu/ANT",
+      "drill": 0,
+      "drill_size": [
+        0.0,
+        0.0
+      ],
+      "drill_shape": "none",
+      "pad_kind": "smd",
+      "zone_connection_override": "inherit",
+      "zone_connection_declared": false,
+      "zone_connection_layer_overrides": {},
+      "thermal_gap_override_mm": null,
+      "thermal_spoke_width_override_mm": null,
+      "thermal_spoke_angle_deg": null,
+      "thermal_settings_valid": true,
+      "id": "c4b13dc7-49e2-4743-ab3f-474e67139947",
+      "uuid": "c4b13dc7-49e2-4743-ab3f-474e67139947",
+      "roundrect_rratio": 0.4
+    },
+    {
+      "name": "2",
+      "component": "D1",
+      "component_pad": "D1.2",
+      "type": "smd",
+      "shape": "roundrect",
+      "at": [
+        68.7705,
+        125.222
+      ],
+      "rotation": 360.0,
+      "size": [
+        0.381,
+        0.635
+      ],
+      "layers": [
+        "F.Cu"
+      ],
+      "layer": "F.Cu",
+      "net_id": 1,
+      "net_name": "/cpu/ANT",
+      "drill": 0,
+      "drill_size": [
+        0.0,
+        0.0
+      ],
+      "drill_shape": "none",
+      "pad_kind": "smd",
+      "zone_connection_override": "inherit",
+      "zone_connection_declared": false,
+      "zone_connection_layer_overrides": {},
+      "thermal_gap_override_mm": null,
+      "thermal_spoke_width_override_mm": null,
+      "thermal_spoke_angle_deg": null,
+      "thermal_settings_valid": true,
+      "id": "b5ad6d18-4cc2-4549-b974-4a0148c79d01",
+      "uuid": "b5ad6d18-4cc2-4549-b974-4a0148c79d01",
+      "roundrect_rratio": 0.4
+    },
+    {
+      "name": "1",
+      "component": "L1",
+      "component_pad": "L1.1",
+      "type": "smd",
+      "shape": "roundrect",
+      "at": [
+        68.7705,
+        127.0
+      ],
+      "rotation": 360.0,
+      "size": [
+        0.381,
+        0.635
+      ],
+      "layers": [
+        "F.Cu"
+      ],
+      "layer": "F.Cu",
+      "net_id": 1,
+      "net_name": "/cpu/ANT",
+      "drill": 0,
+      "drill_size": [
+        0.0,
+        0.0
+      ],
+      "drill_shape": "none",
+      "pad_kind": "smd",
+      "zone_connection_override": "inherit",
+      "zone_connection_declared": false,
+      "zone_connection_layer_overrides": {},
+      "thermal_gap_override_mm": null,
+      "thermal_spoke_width_override_mm": null,
+      "thermal_spoke_angle_deg": null,
+      "thermal_settings_valid": true,
+      "id": "299e43a8-0dd7-48c2-8cc5-cb307c641030",
+      "uuid": "299e43a8-0dd7-48c2-8cc5-cb307c641030",
+      "roundrect_rratio": 0.4
+    },
+    {
+      "id": "surrogate-bcu-return-at-feed",
+      "net_name": "GND",
+      "layer": "B.Cu",
+      "layers": [
+        "B.Cu"
+      ],
+      "shape": "rect",
+      "at": [
+        68.7705,
+        125.222
+      ],
+      "size": [
+        0.5,
+        0.5
+      ],
+      "rotation": 0
+    }
+  ],
+  "zones": [
+    {
+      "id": "817c03f8-f9e8-4029-897c-528a2659f8a0",
+      "layer": "F.Cu",
+      "points": [
+        [
+          68.9356,
+          124.9934
+        ],
+        [
+          68.6054,
+          124.9934
+        ],
+        [
+          68.326,
+          122.936
+        ],
+        [
+          69.3166,
+          122.936
+        ],
+        [
+          68.9356,
+          124.9934
+        ]
+      ],
+      "net_id": 0,
+      "net_name": "/cpu/ANT",
+      "source_kind": "attributed_graphic_polygon",
+      "source_original_net_name": "",
+      "attribution_reason": "KiCad F.Cu radiator graphic touching the /cpu/ANT feed in the pinned board"
+    },
+    {
+      "id": "b3e2ed36-ac4c-4dfe-8147-1d61b463a2a2",
+      "layer": "F.Cu",
+      "points": [
+        [
+          78.4352,
+          114.935
+        ],
+        [
+          78.4352,
+          122.9614
+        ],
+        [
+          75.438,
+          122.9614
+        ],
+        [
+          75.438,
+          116.9416
+        ],
+        [
+          71.5264,
+          116.9416
+        ],
+        [
+          71.5264,
+          120.7262
+        ],
+        [
+          69.3166,
+          122.936
+        ],
+        [
+          68.326,
+          122.936
+        ],
+        [
+          68.326,
+          122.5042
+        ],
+        [
+          70.5358,
+          120.2944
+        ],
+        [
+          70.5358,
+          115.443
+        ],
+        [
+          52.6288,
+          115.443
+        ],
+        [
+          52.6288,
+          113.9444
+        ],
+        [
+          77.4446,
+          113.9444
+        ],
+        [
+          78.4352,
+          114.935
+        ]
+      ],
+      "net_id": 0,
+      "net_name": "/cpu/ANT",
+      "source_kind": "attributed_graphic_polygon",
+      "source_original_net_name": "",
+      "attribution_reason": "KiCad F.Cu radiator graphic touching the /cpu/ANT feed in the pinned board"
+    },
+    {
+      "id": "surrogate-bcu-reference-plane",
+      "net_name": "GND",
+      "layer": "B.Cu",
+      "source_kind": "idealized_reference_plane",
+      "attribution_reason": "Rectangle bounded by pinned source-filled B.Cu GND extents; source voids omitted",
+      "points": [
+        [
+          51.308,
+          122.930417
+        ],
+        [
+          79.756,
+          122.930417
+        ],
+        [
+          79.756,
+          177.286417
+        ],
+        [
+          51.308,
+          177.286417
+        ]
+      ]
+    }
+  ],
+  "vias": [
+    {
+      "at": [
+        78.232,
+        123.317
+      ],
+      "size": 0.635,
+      "drill": 0.3048,
+      "layers": [
+        "F.Cu",
+        "B.Cu"
+      ],
+      "start_layer": "F.Cu",
+      "end_layer": "B.Cu",
+      "type": "through",
+      "net_id": 2,
+      "net_name": "GND",
+      "id": "9959768f-ffca-4046-a521-ffad7c2dfe13",
+      "uuid": "9959768f-ffca-4046-a521-ffad7c2dfe13"
+    }
+  ],
+  "metadata": {
+    "board_bounds_mm": [
+      50.8,
+      113.284,
+      80.264,
+      177.8
+    ],
+    "source_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33",
+    "surrogate": true
+  }
+}

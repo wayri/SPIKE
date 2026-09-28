@@ -15,7 +15,7 @@ if (root / "python/spike_core/mcad_session_contract.py").read_bytes() != (source
     raise SystemExit("Run scripts/sync_freecad_contract.py before packaging.")
 target.parent.mkdir(parents=True, exist_ok=True)
 files = sorted(p for p in source.rglob("*") if p.is_file() and not p.is_symlink()
-               and "__pycache__" not in p.parts and (p.suffix in {".py", ".json", ".svg", ".xml", ".md"} or p.name == "LICENSE"))
+               and "__pycache__" not in p.parts and (p.suffix in {".py", ".json", ".svg", ".xml", ".md", ".jpg", ".png"} or p.name == "LICENSE"))
 with zipfile.ZipFile(target, "x", compression=zipfile.ZIP_DEFLATED) as archive:
     for path in files: archive.write(path, "SPIKEWorkbench/" + path.relative_to(source).as_posix())
 with zipfile.ZipFile(target) as archive:

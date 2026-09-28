@@ -15,7 +15,7 @@
   "state": "unavailable",
   "model_status": "unsupported",
   "validation": "Example only. A locally detected openEMS/CSXCAD runtime, fixed adapter probe, adapter fixture, and workflow-specific convergence/correlation evidence are required before activation.",
-  "license": "GPL-3.0-or-later engine; SPIKE adapter MIT; do not bundle without a reviewed distribution plan.",
+  "license": "GPL-3.0-or-later engine; SPIKE adapter Apache-2.0; do not bundle without a reviewed distribution plan.",
   "bundled": false,
   "priority": 0,
   "limits": {"timeout_s": 3600, "max_result_bytes": 268435456},

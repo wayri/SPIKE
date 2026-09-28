@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Dependency-free validation shared by visual and external SPICE adapters."""
 
 FORBIDDEN_DIRECTIVES = {

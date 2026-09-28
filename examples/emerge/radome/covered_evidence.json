@@ -1,0 +1,92 @@
+{
+  "board": "examples/emerge/radome/patch_with_radome.kicad_pcb",
+  "board_sha256": "b99976c1f8f09b1d03001e1de75401378d839d18c24cac034bc5d38f5a66b5e1",
+  "design_id": "kicad-b99976c1f8f09b1d03001e1d",
+  "design_digest_sha256": "97d24721197cd0c9669780035f84fa7d51d515c605da2b95f74ffd6f3dcc65a7",
+  "parameters": {
+    "signal_net": "RF",
+    "return_net": "GND",
+    "signal_pad_id": "51d0c420-4c7b-4da5-b9ec-001000000011",
+    "return_pad_id": "51d0c420-4c7b-4da5-b9ec-001000000012",
+    "frequency_start_hz": 3000000000,
+    "frequency_stop_hz": 4200000000,
+    "frequency_points": 7,
+    "mesh_resolution_mm": 2.0,
+    "surrounding_geometry": {
+      "contract": "spike/emerge-surroundings/v1",
+      "objects": [
+        {
+          "kind": "dielectric_box",
+          "name": "Radome slab",
+          "origin_mm": [
+            95,
+            95,
+            10
+          ],
+          "size_mm": [
+            50,
+            40,
+            1.5
+          ],
+          "epsilon_r": 2.1
+        }
+      ]
+    }
+  },
+  "runtime_executable": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\.venv-emerge3\\Scripts\\python.exe",
+  "solver": "EMerge/3.0.0a19",
+  "status": "completed",
+  "model_status": "unvalidated",
+  "frequencies_hz": [
+    3000000000.0,
+    3199999999.9999995,
+    3400000000.0000005,
+    3600000000.0,
+    3800000000.0,
+    3999999999.9999995,
+    4200000000.0
+  ],
+  "s11_db": [
+    -1.029262352678955,
+    -1.9050777737424254,
+    -4.02081731781856,
+    -3.3940295760470347,
+    -1.576484985554928,
+    -0.873442797681761,
+    -0.5728196799366936
+  ],
+  "ports": [
+    "P1"
+  ],
+  "radiation_peak_sample": {
+    "frequency_hz": 3000000000.0,
+    "theta_deg": 0.0,
+    "phi_deg": 60.0,
+    "relative_amplitude_db": 0.0,
+    "e_theta_v_m": [
+      -0.59936912940919,
+      3.1193771982757874
+    ],
+    "e_phi_v_m": [
+      1.0355848987203673,
+      -5.429612217000272
+    ],
+    "sample_kind": "solver_angular_grid_point"
+  },
+  "radiation_cut_peak_angles_deg": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "issue_codes": [
+    "EMERGE_BOARD_MODEL_UNVALIDATED",
+    "EMERGE_DIELECTRIC_LOSS_OMITTED",
+    "EMERGE_EMI_NOT_COMPLIANCE",
+    "EMERGE_SURROUNDINGS_UNVALIDATED"
+  ],
+  "qualification": "execution evidence only; no mesh or measurement correlation"
+}

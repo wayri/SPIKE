@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Bounded fixed-excitation, quasi-static 1DOF actuator motion review."""
 from __future__ import annotations

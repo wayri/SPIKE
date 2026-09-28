@@ -1,0 +1,13 @@
+{
+  "board": "examples/emerge/radome/patch_with_radome.kicad_pcb",
+  "parameters": {
+    "signal_net": "RF",
+    "return_net": "GND",
+    "signal_pad_id": "51d0c420-4c7b-4da5-b9ec-001000000011",
+    "return_pad_id": "51d0c420-4c7b-4da5-b9ec-001000000012",
+    "frequency_start_hz": 3000000000,
+    "frequency_stop_hz": 4200000000,
+    "frequency_points": 7,
+    "mesh_resolution_mm": 2.0
+  }
+}

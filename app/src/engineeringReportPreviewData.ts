@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 
 import type { ScalarSample } from "./analysisResults";
 import { sharedVertexValues } from "./resultSurfaceInterpolation";

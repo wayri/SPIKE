@@ -1,15 +1,17 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Model, visualization, thermal, EM-reference, and solver worker handlers."""
 
 from __future__ import annotations
 
 import tempfile
 import uuid
+from pathlib import Path
 from typing import Any, Dict
 
 from .assembly_analysis_scope import attach_scope_provenance, write_case_scope
 from .contracts import AnalysisResult, AnalysisSpec, DesignIR, ValidationIssue
 from .component_thermal import run_component_thermal
+from .board_thermal import run_board_thermal
 from .external_engines import prepare_openems_case, run_openems_case
 from .models import (
     build_model_manifest,
@@ -65,6 +67,29 @@ def handle_simulation_request(
         return {"ok": True, "result": estimate_compact_thermal(ThermalScenario(**params["scenario"]))}
     if method == "run_component_thermal":
         return {"ok": True, "result": attach_scope_provenance(run_component_thermal(params), assembly_scope)}
+    if method == "run_board_thermal":
+        source = params.get("source_kicad_pcb")
+        if source is not None:
+            if not isinstance(source, str) or len(source.encode("utf-8")) > 32 * 1024 * 1024 or not source.lstrip().startswith("(kicad_pcb"):
+                return {"ok": True, "result": {"contract": "spike/board-thermal-result/v1", "status": "blocked",
+                    "model_status": "failed", "grid": None, "components": [], "summary": {},
+                    "issues": [{"code": "BOARD_THERMAL_SOURCE_INVALID", "severity": "error",
+                                "message": "KiCad board source is missing, invalid, or exceeds 32 MiB."}],
+                    "provenance": {"solver_id": "spike.layered_board_thermal", "production_qualified": False}}}
+            from .kicad_importer import import_kicad_design
+            try:
+                with tempfile.TemporaryDirectory(prefix="spike-board-thermal-") as temporary:
+                    source_path = Path(temporary) / "source.kicad_pcb"
+                    source_path.write_text(source, encoding="utf-8")
+                    design = import_kicad_design(str(source_path))
+            except (OSError, ValueError, RuntimeError, UnicodeError) as exc:
+                return {"ok": True, "result": {"contract": "spike/board-thermal-result/v1", "status": "blocked",
+                    "model_status": "failed", "grid": None, "components": [], "summary": {},
+                    "issues": [{"code": "BOARD_THERMAL_SOURCE_IMPORT_FAILED", "severity": "error", "message": str(exc)}],
+                    "provenance": {"solver_id": "spike.layered_board_thermal", "production_qualified": False}}}
+        else:
+            design = DesignIR(**params["design"])
+        return {"ok": True, "result": attach_scope_provenance(run_board_thermal(design, params["request"]), assembly_scope)}
     if method == "plan_thermal_field_job":
         # Solver descriptors come from the worker-owned catalog.  A client may
         # select a solver ID but cannot inject its own qualification claims.

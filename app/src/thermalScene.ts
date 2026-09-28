@@ -117,6 +117,7 @@ export type ThermalScenarioView = {
   run?: { end_time_s?: number; write_interval_s?: number; max_iterations?: number; residual_target?: number };
   /** Completed solver result only; scenario summaries never become a displayed field. */
   field_result?: unknown;
+  board_thermal_result?: unknown;
 };
 
 export function asThermalScenario(value: Record<string, unknown> | null | undefined): ThermalScenarioView | null {

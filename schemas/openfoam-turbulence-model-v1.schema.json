@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://spike.local/schemas/openfoam-turbulence-model-v1.schema.json",
-  "$comment": "SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic",
   "title": "Explicit experimental kOmegaSST parameters",
   "type": "object",
   "additionalProperties": false,

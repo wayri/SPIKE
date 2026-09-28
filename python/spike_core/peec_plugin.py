@@ -10,9 +10,9 @@ import numpy as np
 from .contracts import AnalysisResult, AnalysisSpec, DesignIR, ValidationIssue
 from .hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS, HybridMesh, build_hybrid_mesh, nearest_mesh_node
 from .loop_parasitics import extract_loop_parasitics
-from .peec_matrices import TopologyResistanceSolver, embed_physical_inductance
+from .peec_matrices import TopologyResistanceSolver, connected_component as _connected_component, embed_physical_inductance
 from .peec_native_factory import dielectric_epsilon as _dielectric_epsilon, make_native_solver
-from .peec_volume_adapter import VolumeResistanceOverlay, extract_volume_matrices
+from .peec_volume_adapter import VolumeResistanceOverlay, extract_volume_matrices, retry_nonpassive_legacy
 from .peec_volume_support import ZoneBasisSupportError
 from .peec_network import (
     dense as _dense,
@@ -41,32 +41,6 @@ def _frequencies(spec: AnalysisSpec) -> np.ndarray:
     stop = float(spec.frequency_stop_hz or start)
     points = max(2, min(int(spec.frequency_points), 2001))
     return np.logspace(log10(start), log10(stop), points)
-
-
-def _connected_component(
-    mesh: HybridMesh,
-    net: str,
-    source_node: int,
-) -> Tuple[List[int], List[int]]:
-    branch_indices = [
-        index for index, branch in enumerate(mesh.branches) if branch.net == net
-    ]
-    adjacency: Dict[int, List[Tuple[int, int]]] = {}
-    for branch_index in branch_indices:
-        branch = mesh.branches[branch_index]
-        adjacency.setdefault(branch.node_p, []).append((branch.node_n, branch_index))
-        adjacency.setdefault(branch.node_n, []).append((branch.node_p, branch_index))
-    nodes = {source_node}
-    branches: set[int] = set()
-    pending = [source_node]
-    while pending:
-        current = pending.pop()
-        for neighbor, branch_index in adjacency.get(current, []):
-            branches.add(branch_index)
-            if neighbor not in nodes:
-                nodes.add(neighbor)
-                pending.append(neighbor)
-    return sorted(nodes), sorted(branches)
 
 
 def _inferred_port(mesh: HybridMesh, net: str) -> Tuple[int, int] | None:
@@ -238,7 +212,8 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
         branches=[mesh.branches[index] for index in physical_branch_indices],
         target_size_mm=mesh.target_size_mm,
     )
-    volume_extraction = spec.options.get("peec_volume_extraction") == "enabled"
+    volume_choice = spec.options.get("peec_volume_extraction", "auto")
+    volume_extraction = volume_choice == "enabled"
     volume_quality: Dict[str, Any] | None = None
     try:
         native_solver, config = _make_native_solver(physical_mesh, epsilon_r, spec)
@@ -255,6 +230,29 @@ def solve_peec_2_5d(design: DesignIR, spec: AnalysisSpec) -> AnalysisResult:
                 len(mesh.branches), physical_branch_indices,
             )
         inductance, inductance_quality = assess_symmetric_positive_semidefinite(raw_inductance)
+        if (inductance_quality["negative_eigenmode_count"] and not volume_extraction
+                and volume_choice == "auto"):
+            retried, matrix, quality, error = retry_nonpassive_legacy(
+                native, design, physical_mesh.branches, len(mesh.branches), physical_branch_indices,
+            )
+            if error is None:
+                volume = retried
+                volume_quality = dict(volume.quality)
+                inductance, inductance_quality = matrix, quality
+                volume_extraction = True
+                issues.append(ValidationIssue(
+                    "PEEC_VOLUME_RETRY_AFTER_NONPASSIVE_LEGACY",
+                    "warning",
+                    "The legacy partial-inductance matrix failed the energy gate; bounded finite-volume extraction was used without passivity projection.",
+                    status="approximate",
+                ))
+            else:
+                issues.append(ValidationIssue(
+                    "PEEC_VOLUME_RETRY_FAILED",
+                    "warning",
+                    f"Finite-volume retry after legacy nonpassivity failed: {error}",
+                    status="approximate",
+                ))
     except (ValueError, RuntimeError, np.linalg.LinAlgError) as error:
         issue_code = error.code if isinstance(error, ZoneBasisSupportError) else (
             "PEEC_VOLUME_EXTRACTION_FAILED" if volume_extraction else "PEEC_MATRIX_EXTRACTION_FAILED")

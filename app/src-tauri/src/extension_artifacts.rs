@@ -3,7 +3,10 @@ use base64::Engine;
 use sha2::{Digest, Sha256};
 
 pub fn file_name(name: &str) -> Result<String, String> {
-    if name.is_empty() || name.len() > 240 || name.chars().any(|c| c.is_control() || "/\\:".contains(c)) {
+    if name.is_empty()
+        || name.len() > 240
+        || name.chars().any(|c| c.is_control() || "/\\:".contains(c))
+    {
         return Err("Artifact must have a plain filename without a path".into());
     }
     let suffix = name.rsplit('.').next().unwrap_or("").to_ascii_lowercase();
@@ -19,7 +22,8 @@ pub fn decode(data: &str, encoding: &str, sha256: &str) -> Result<Vec<u8>, Strin
         return Err("Extension artifact exceeds 64 MiB".into());
     }
     let payload = match encoding {
-        "base64" => base64::engine::general_purpose::STANDARD.decode(data)
+        "base64" => base64::engine::general_purpose::STANDARD
+            .decode(data)
             .map_err(|_| "Invalid extension artifact base64".to_string())?,
         "utf-8" => data.as_bytes().to_vec(),
         _ => return Err("Unsupported extension artifact encoding".into()),
@@ -49,7 +53,14 @@ mod tests {
     #[test]
     fn rejects_paths_and_executable_suggestions() {
         assert_eq!(file_name("assembly.FCStd").unwrap(), "assembly.FCStd");
-        for name in ["../assembly.zip", "..\\assembly.zip", "C:\\assembly.step", "assembly.exe", "bad\n.zip", ""] {
+        for name in [
+            "../assembly.zip",
+            "..\\assembly.zip",
+            "C:\\assembly.step",
+            "assembly.exe",
+            "bad\n.zip",
+            "",
+        ] {
             assert!(file_name(name).is_err());
         }
     }

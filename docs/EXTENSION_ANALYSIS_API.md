@@ -18,6 +18,42 @@ names in solver output so probes and fields can be mapped back to the board.
 Optional `parameters` carry solver configuration. With `results.read`, the host
 may also pass a bounded summary of the current result.
 
+## Mesh and solver input handoff
+
+An analysis extension can declare `mesh.read` (which requires `design.read`).
+SPIKE then constructs the mesh in the worker before launching the extension.
+In **Settings → Extension manager**, the mesh controls select analysis mode,
+nets, target size, and a 2.5D surface or 3D conductor-volume display preview.
+Advanced JSON options can override those controls with `mesh_spec`, using
+ordinary `AnalysisSpec` fields. For example:
+
+```json
+{"mesh_spec":{"mode":"si","net_names":["DATA_P","DATA_N"],
+  "mesh":{"target_size_mm":0.5,"dimension":"volume_3d",
+          "max_conductors":4096,"max_preview_cells":1000}}}
+```
+
+The request includes these host-generated `context` members:
+
+| Member | Contract and meaning |
+| --- | --- |
+| `analysis_spec` | Normalized `spike/v1` AnalysisSpec with admitted mesh settings. |
+| `solver_geometry` | `spike/solver-geometry/v1`: selected nets, conductors, stackup/materials, components, excitations, ports, frequency settings, and source metadata. |
+| `mesh` | `spike/hybrid-mesh-exchange/v1`: complete admitted copper nodes, branches, and cells with source IDs and layer/net ownership. Truncated or erroneous topology is rejected before execution. |
+| `mesh_preview` | `spike/mesh/v3` display cells. It may be sampled and must not be used as the complete solve mesh. |
+| `mesh_binding` | `spike/mesh-binding/v1` with the design digest and SHA-256 digests of the exact full mesh and normalized analysis setup sent to the adapter. |
+
+The host bounds full topology to 8,192 branches and 32 MB, and the complete
+request to 64 MB. Select fewer nets or a coarser target when admission fails.
+These are transport and resource bounds, not mesh-convergence criteria. An
+adapter may instead discretize `solver_geometry`; record that choice in result
+provenance and validate its mesh. The SDK's `mesh_exchange(request)` checks
+the input shape. Its `analysis_result(...)` helper copies the mesh digest to
+`provenance.input_mesh_sha256` and the setup digest to
+`provenance.input_analysis_spec_sha256`; the host rejects missing or mismatched
+digests.
+This establishes lineage, not physical correctness.
+
 The host also passes `context.design_binding`:
 
 ```json
@@ -54,16 +90,24 @@ assumptions in the result summary or provenance. The total field sample count
 is limited to 250,000; the extension manifest also limits time and response
 bytes. Mesh cells and time frames use the normal result visualization format
 documented in [result visualization](RESULT_VISUALIZATION_AND_LIMITS.md).
+An adapter can return `fields.visualization.mesh` as bounded 2D/3D cells with
+stable IDs and finite XYZ vertices alongside computed scalar/vector samples.
+The viewer displays those cells and the admitted fields/probes, and reports
+retain the result. The host does not infer a field from a mesh.
 Only publish quantities the solver actually computed. In particular, do not
 turn voltage samples into a claimed current density or via stress field.
 
 The Python helper [spike_extension_sdk.py](../extension_sdk/python/spike_extension_sdk.py)
-offers `read_request`, `analysis_result`, `analysis_envelope`, and
+offers `read_request`, `mesh_exchange`, `analysis_result`, `analysis_envelope`, and
 `write_result`. A runnable [field data adapter](../extension_sdk/examples/field-data-adapter/extension.py)
 shows the exchange without asserting a physical solve. It accepts real
 voltage samples in `context.parameters.samples`, then returns an explicitly
 unvalidated voltage field. Copy or package the helper alongside your adapter
 when distributing it outside this source tree.
+The [mesh-aware adapter](../extension_sdk/examples/mesh-field-adapter/extension.py)
+also receives full host topology and returns a sampled mesh overlay with
+externally supplied voltage samples. It demonstrates the interface; it does
+not calculate voltage or qualify the mesh for SI, PI, or thermal physics.
 
 ## Running adapters and scripts
 

@@ -1,4 +1,7 @@
 import unittest
+import json
+from pathlib import Path
+
 
 from python.spike_core.contracts import DesignIR
 from python.spike_core.emi import (
@@ -83,6 +86,64 @@ class EmiWorkflowTests(unittest.TestCase):
                 result = validate_emi_setup(self.design, {**self.setup, "chamber": {"distance_m": value}}, self.solvers)
                 self.assertFalse(result["can_prepare"])
                 self.assertIn("EMI_CHAMBER_RANGE", {item["code"] for item in result["issues"]})
+
+    def test_radiated_emissions_reference_profiles_are_metadata_only(self):
+        selections = [
+            *({"id": "cispr-25-2021", "classification": classification} for classification in ("1", "2", "3", "4", "5")),
+            {"id": "cispr-32-2015-amd1-2019", "classification": "A"},
+            {"id": "cispr-32-2015-amd1-2019", "classification": "B"},
+            *({"id": edition, "platform": platform}
+              for edition in ("mil-std-461h-2026-re102", "mil-std-461g-2015-re102")
+              for platform in ("ground", "surface_ship", "submarine", "aircraft", "space")),
+        ]
+        schema = json.loads((Path(__file__).resolve().parents[2] / "schemas" / "emi-setup-v1.schema.json").read_text(encoding="utf-8"))
+        try:
+            from jsonschema import Draft202012Validator
+        except ImportError:
+            validator = None
+        else:
+            Draft202012Validator.check_schema(schema)
+            validator = Draft202012Validator(schema)
+        baseline = validate_emi_setup(self.design, self.setup, self.solvers)
+        for selection in selections:
+            with self.subTest(selection=selection):
+                setup = {**self.setup, "radiated_emissions_standard": selection}
+                if validator is not None:
+                    validator.validate(setup)
+                result = validate_emi_setup(self.design, setup, self.solvers)
+                self.assertEqual(result["can_run"], baseline["can_run"])
+                self.assertEqual(result["normalized"]["radiated_emissions_standard"], selection)
+                self.assertEqual(result["reference_standard"]["comparison_status"], "unavailable")
+                self.assertEqual(result["reference_standard"]["limit_data_status"], "not_bundled")
+                self.assertFalse(result["reference_standard"]["compliance_available"])
+                self.assertFalse(screen_emi_setup(self.design, setup, self.solvers)["provenance"]["compliance_prediction"])
+
+    def test_invalid_radiated_emissions_references_fail_closed(self):
+        cases = [
+            ({"id": "cispr-25-2021", "classification": "A"}, "EMI_STANDARD_CLASS"),
+            ({"id": "cispr-32-2015-amd1-2019", "classification": "1"}, "EMI_STANDARD_CLASS"),
+            ({"id": "mil-std-461h-2026-re102"}, "EMI_STANDARD_PLATFORM"),
+            ({"id": "mil-431"}, "EMI_STANDARD_NOT_RE"),
+            ({"id": "mil-std-461i-re102", "platform": "ground"}, "EMI_STANDARD_UNKNOWN"),
+            ({"id": [], "platform": "ground"}, "EMI_STANDARD_UNKNOWN"),
+            ({"id": "cispr-32-2015-amd1-2019", "classification": "A", "limit_dbuv_m": 0}, "EMI_STANDARD_INVALID"),
+            (None, "EMI_STANDARD_INVALID"),
+        ]
+        try:
+            from jsonschema import Draft202012Validator
+        except ImportError:
+            validator = None
+        else:
+            schema = json.loads((Path(__file__).resolve().parents[2] / "schemas" / "emi-setup-v1.schema.json").read_text(encoding="utf-8"))
+            validator = Draft202012Validator(schema)
+        for selection, code in cases:
+            with self.subTest(selection=selection):
+                if validator is not None:
+                    self.assertFalse(validator.is_valid({**self.setup, "radiated_emissions_standard": selection}))
+                result = validate_emi_setup(self.design, {**self.setup, "radiated_emissions_standard": selection}, self.solvers)
+                self.assertFalse(result["can_prepare"])
+                self.assertIsNone(result["reference_standard"])
+                self.assertIn(code, {item["code"] for item in result["issues"]})
 
     def test_screening_is_traceable_and_does_not_claim_field_results(self):
         result = screen_emi_setup(self.design, self.setup, self.solvers)

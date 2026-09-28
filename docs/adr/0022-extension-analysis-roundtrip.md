@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # ADR 0022: Design-bound external analysis results
 
 - Status: Accepted for the local engineering preview; not solver qualification.

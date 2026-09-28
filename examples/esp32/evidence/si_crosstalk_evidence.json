@@ -1,0 +1,71 @@
+{
+  "source_board": "examples/esp32/source/iot-esp-eth-ind.kicad_pcb",
+  "source_board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33",
+  "generated_design": "examples/esp32/evidence/si_crosstalk_design.json",
+  "request": "examples/esp32/si_crosstalk_request.json",
+  "result": "examples/esp32/evidence/si_crosstalk_result.json",
+  "selection": {
+    "aggressor_net": "/network/ERXD0",
+    "victim_net": "/network/ERXD1",
+    "reference_net": "GND",
+    "reference_layer": "In1.Cu",
+    "reference_zone_id": "80733dce-c2c6-5804-89dd-5511566386b8"
+  },
+  "status": "completed",
+  "model_status": "experimental",
+  "production_qualified": false,
+  "compliance_status": "not_evaluated",
+  "geometry": {
+    "design_id": "5a4cc283-e6c3-50bf-a322-8af299cacebc-si-crosstalk-erxd",
+    "signal_net_id": "003c2282-ada6-5497-9769-87f82767453a",
+    "victim_net_id": "2c319031-e0a6-574c-8c03-b00ad00d9c7a",
+    "reference_net_id": "1ac4a250-d7c3-5c2e-aee4-9bb352c85e16",
+    "signal_layer_id": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+    "reference_layer_id": "9981ee33-dbaa-5267-9888-57221d486a65",
+    "signal_track_ids": [
+      "27c99c21-3131-52e1-9fe0-817468f001c3-overlap"
+    ],
+    "victim_track_ids": [
+      "7a34f40a-cd02-57ef-ad71-487011316220-overlap"
+    ],
+    "reference_zone_id": "80733dce-c2c6-5804-89dd-5511566386b8",
+    "length_m": 0.0007873999999999911,
+    "signal_width_m": 0.000254,
+    "victim_width_m": 0.000254,
+    "center_separation_m": 0.0005080000000000097,
+    "edge_gap_m": 0.00025400000000000975,
+    "reference_spacing_m": 0.0002454,
+    "path_mode": "piecewise_planar",
+    "parallel_coextensive_verified": false,
+    "piecewise_parallel_pair_verified": true,
+    "piecewise_approximation": "length-weighted segment separation is reported; minimum observed center separation is applied over the longer retained path",
+    "piecewise_segment_evidence": [
+      {
+        "segment_index": 0,
+        "signal_length_mm": 0.787399999999991,
+        "victim_length_mm": 0.787399999999991,
+        "center_separation_mm": 0.5080000000000098,
+        "edge_gap_mm": 0.2540000000000098
+      }
+    ],
+    "length_weighted_average_center_separation_mm": 0.5080000000000098,
+    "conservative_extraction_center_separation_mm": 0.5080000000000098,
+    "coupled_separation_tolerance_mm": 0.3,
+    "coupled_skew_tolerance_mm": 0.15,
+    "reference_zone_full_path_coverage_verified": true
+  },
+  "peak_abs_next_v": 0.002591634626035657,
+  "peak_abs_fext_v": 0.001559303127389073,
+  "worst_matched_next_db": -45.67259760213652,
+  "worst_matched_fext_db": -49.94260873105073,
+  "limitations": [
+    "piecewise planar paired traces with bounded separation/skew variation only",
+    "single homogeneous dielectric and simple continuous reference polygon",
+    "finite cross-section truncation with natural outer boundaries",
+    "DC conductor resistance; no skin, proximity, roughness, dispersion, via, launch, connector, package, or radiation model",
+    "bend discontinuities and bend-local coupling are omitted; minimum observed separation is used over the longer path as an approximation, not a guaranteed NEXT/FEXT upper bound",
+    "Linear network result; no nonlinear receiver, compliance, BER or measured correlation claim.",
+    "NEXT/FEXT labels rely on caller-supplied physical near/far mapping.",
+    "Finite bandwidth and record length limit transient accuracy; no passivity or causality enforcement."
+  ]
+}

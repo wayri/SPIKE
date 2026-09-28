@@ -1,0 +1,140 @@
+name: Bug report
+description: Report a reproducible SPIKE problem with enough context for investigation.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve SPIKE. Describe the observed behavior in your own words and include only information you are allowed to share.
+
+        Do not attach secrets, credentials, license files, private board or project files, customer data, or screenshots containing sensitive information. Prefer a small synthetic or anonymized reproduction. Attach a real design only when you own it or have explicit permission to share it publicly.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Select the closest area; choose Other if none applies.
+      options:
+        - Import or project package
+        - Board editing or visualization
+        - DC / PEEC analysis
+        - AC, PI, or SI analysis
+        - Thermal analysis
+        - Electromagnetic analysis
+        - Extension or external solver
+        - Report, export, or CLI
+        - Installation, update, or runtime
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest sequence that consistently triggers the problem, including commands, settings, and inputs used.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Run ... with ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe the result, diagnostic, or recovery behavior you expected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include exact error messages, unexpected result values with units, and when the behavior started if known.
+    validations:
+      required: true
+
+  - type: input
+    id: spike-version
+    attributes:
+      label: SPIKE version or commit
+      description: Use the version shown by SPIKE, package version, or a Git commit identifier.
+      placeholder: "For example: 0.2.14 or a1b2c3d"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Platform and environment
+      description: Include OS and version, CPU architecture, relevant runtime or solver versions, and whether optional acceleration was enabled. Exclude usernames, paths, hostnames, and license details.
+      placeholder: |
+        OS: Windows 11 23H2
+        CPU architecture: x86_64
+        Runtime / solver: Python 3.11, ...
+        Acceleration: disabled
+    validations:
+      required: true
+
+  - type: textarea
+    id: solver-workflow
+    attributes:
+      label: Solver or workflow context
+      description: Name the workflow, solver or extension, analysis mode, key settings, and relevant units. For numerical results, include mesh or refinement settings, convergence status, and any warnings.
+      placeholder: |
+        Workflow / solver: ...
+        Analysis mode: ...
+        Key settings and units: ...
+        Mesh or refinement: ...
+        Convergence and warnings: ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: validity-state
+    attributes:
+      label: Reported validity or capability state
+      description: Select the state SPIKE displayed or documented. See docs/SOLVER_STATUS.md when applicable.
+      options:
+        - Validated or qualified
+        - Supported with stated limits
+        - Experimental or provisional
+        - Approximate
+        - Unsupported or blocked
+        - Unknown or not displayed
+    validations:
+      required: true
+
+  - type: textarea
+    id: minimal-reproduction
+    attributes:
+      label: Minimal reproduction or anonymized data
+      description: Provide a small synthetic or anonymized fixture, configuration, or script that reproduces the issue. Remove names, identifiers, coordinates, and values that could reveal a private design. Do not upload board or project files unless you have permission to make them public.
+      placeholder: Paste a minimal text fixture, configuration, or reproduction script here, or explain why one is not available.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or diagnostics
+      description: Paste the smallest relevant log excerpt in a code block. Redact secrets, tokens, usernames, paths, hostnames, license information, customer names, and proprietary design details before submitting.
+      render: text
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Data-sharing confirmation
+      description: Confirm the report is safe to publish in a public issue.
+      options:
+        - label: I removed secrets and sensitive or proprietary information from the report and attachments.
+          required: true
+        - label: Any shared design data is synthetic or anonymized, or I have explicit permission to publish it.
+          required: true

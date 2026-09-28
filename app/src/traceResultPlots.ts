@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import type { ParasiticResult, ScalarSample, SolverResultBundle } from "./analysisResults";
 import { resultFaceTriangleIndices } from "./resultGeometryMask";
 import { sharedVertexValues } from "./resultSurfaceInterpolation";
@@ -10,6 +10,9 @@ const traceIdentity = (sample: ScalarSample) => sample.source_id || sample.eleme
 export const traceGroupId = (sample: ScalarSample) => JSON.stringify([sample.net ?? "", sample.layer ?? "", traceIdentity(sample)]);
 const valid = (sample: ScalarSample) => [sample.x_mm, sample.y_mm, sample.value].every(Number.isFinite)
   && (sample.z_mm === undefined || Number.isFinite(sample.z_mm));
+const validVector = (sample: SolverResultBundle["vector_fields"]["electric_field"][number]) =>
+  Array.isArray(sample.vector) && sample.vector.length === 3 && sample.vector.every(Number.isFinite)
+  && Number.isFinite(sample.magnitude) && sample.magnitude >= 0;
 const escape = (value: string) => value.replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
 
 export function resultPlotFields(result: SolverResultBundle | null, domain: "pi" | "si"): ResultPlotField[] {
@@ -35,7 +38,8 @@ export function resultPlotFields(result: SolverResultBundle | null, domain: "pi"
     if (samples.length) fields.push({ key: String(key), label: String(label), unit: String(unit), scale: Number(scale), samples });
   }
   if (domain === "si") for (const [key, label, unit] of [["electric_field", "Electric field", "V/m"], ["magnetic_field", "Magnetic field", "A/m"]]) {
-    const samples = (result.vector_fields?.[key as "electric_field" | "magnetic_field"] ?? []).map(sample => ({ ...sample, value: sample.magnitude })).filter(valid).map(identify);
+    const samples = (result.vector_fields?.[key as "electric_field" | "magnetic_field"] ?? []).filter(validVector)
+      .map(sample => ({ ...sample, value: sample.magnitude })).filter(valid).map(identify);
     if (samples.length) fields.push({ key, label, unit, scale: 1, samples });
   }
   const impedance = (result.parasitics ?? []).filter(network => network.impedance?.some(point => Number.isFinite(point.frequency_hz) && point.frequency_hz > 0 && Number.isFinite(point.magnitude_ohm)));

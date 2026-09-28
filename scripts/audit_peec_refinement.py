@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Cheap, assertion-bearing Marble mesh/DC/C refinement audit before field solves."""
 from __future__ import annotations

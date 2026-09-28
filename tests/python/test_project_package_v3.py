@@ -7,6 +7,7 @@ import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
+from python.spike_core import __version__ as APP_VERSION
 from python.spike_core.contracts import DesignIR
 from python.spike_core.design_ir_v2 import AssemblyIRV1, DesignIRV2
 from python.spike_core.geometry_arrow import canonical_geometry_rows
@@ -129,6 +130,7 @@ class ProjectPackageV3Tests(unittest.TestCase):
             )
             reopened = read_spike_package(path, include_members=True)
         self.assertEqual(manifest["format"], "spike-project-package/v3")
+        self.assertEqual(manifest["application"]["version"], APP_VERSION)
         self.assertEqual(reopened.payload["design_ir"]["contract"], "spike/design-ir/v2")
         self.assertTrue(any(name.startswith("sources/") for name in reopened.members))
         self.assertIn("geometry/tracks.arrow", reopened.members)

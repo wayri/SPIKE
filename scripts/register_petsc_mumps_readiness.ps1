@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][ValidateSet("windows-ucrt64", "linux-x86_64")][string]$Platform,

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Execute three PEC cavity meshes with uniform conductive loss, not PCB modes."""
 import argparse

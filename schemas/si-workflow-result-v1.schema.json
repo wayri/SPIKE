@@ -13,6 +13,7 @@
     "request": {"$ref": "si-workflow-request-v1.schema.json"},
     "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "network": {"type": "object"},
+    "field_maps": {"type": "object", "required": ["status", "electric", "magnetic", "reason"], "properties": {"status": {"const": "unsupported"}, "electric": {"type": "null"}, "magnetic": {"type": "null"}, "reason": {"type": "string"}}},
     "loaded_transfers": {"type": "array"},
     "time_domain": {"type": "object", "required": ["status"], "properties": {"status": {"enum": ["completed", "blocked", "not_requested"]}}},
     "touchstone": {"type": "object", "required": ["name", "text", "error"], "properties": {"name": {"type": "string"}, "text": {"type": ["string", "null"]}, "error": {"type": ["string", "null"]}}},

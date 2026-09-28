@@ -74,6 +74,9 @@ class SiWorkflowTests(unittest.TestCase):
         self.assertEqual(r["network"]["port_count"], 4)
         self.assertEqual(r["network"]["checks"]["passivity"]["status"], "pass")
         self.assertFalse(r["production_qualified"])
+        self.assertEqual(r["field_maps"]["status"], "unsupported")
+        self.assertIsNone(r["field_maps"]["electric"])
+        self.assertIn("reflection_vswr", r["network"])
         json.dumps(r, allow_nan=False)
         self.assertEqual(parse_touchstone_text(r["touchstone"]["text"], "channel.s4p").port_count, 4)
 

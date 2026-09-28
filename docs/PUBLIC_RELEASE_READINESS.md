@@ -1,11 +1,12 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 
 # Public release readiness
 
 SPIKES `0.3.0-beta.1` is a technically verified public-release candidate for
 the bounded circuit-engine and SDK surface. It is not currently authorized for
-public distribution. The SPIKE desktop remains independently versioned at
-`0.2.5`, and the native multiphysics adapter remains `integration_pending`.
+public distribution. The SPIKE desktop/CLI is independently versioned at
+`0.3.0` (engineering preview), and the native multiphysics adapter remains
+`integration_pending`.
 
 Build into a fresh directory, then verify the exact report and archive:
 

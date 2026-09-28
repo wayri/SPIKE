@@ -1,5 +1,5 @@
 """
-SPIKE v0.2.0-alpha.2 - Python Module Import Test
+SPIKE - Python Module Import Test
 ===========================================
 
 Tests that Python modules can be imported correctly.
@@ -17,7 +17,7 @@ def test_imports():
     """Test all Python module imports"""
     
     print("\n" + "="*70)
-    print(" SPIKE v0.2.0-alpha.2 - Python Module Import Test".center(70))
+    print(" SPIKE - Python Module Import Test".center(70))
     print("="*70 + "\n")
     
     tests_passed = 0
@@ -66,7 +66,7 @@ def test_imports():
     
     if tests_passed == tests_total:
         print("[SUCCESS] All Python modules can be imported correctly!")
-        print("SPIKE v0.2.0-alpha.2 Python package structure is valid.\n")
+        print("SPIKE Python package structure is valid.\n")
         return 0
     else:
         print(f"[WARNING] {tests_total - tests_passed} import test(s) failed.\n")

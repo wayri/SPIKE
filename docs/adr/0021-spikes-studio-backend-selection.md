@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # ADR 0021: Explicit SPIKES Studio backend selection
 
 - Status: Accepted for the engineering preview; not a release qualification.

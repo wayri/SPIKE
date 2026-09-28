@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Run bounded owned-SPICE and fail-closed IBIS process examples.
 
 This is qualification-oriented example glue, not a general SPICE/IBIS API.

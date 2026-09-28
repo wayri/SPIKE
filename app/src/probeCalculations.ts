@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 export type ProbeDimension = "1" | "V" | "A" | "ohm" | "W" | "A/mm2";
 
 export type ProbeQuantity = { value: number; unit: ProbeDimension };

@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # ADR 0023: Integrated Python workspace
 
 - Status: Accepted for the local engineering preview.

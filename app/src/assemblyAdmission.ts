@@ -30,12 +30,16 @@ export function assemblyAnalysisScope(
   assembly: AssemblyIr | null,
   activeDesignId: string | null,
   projectManifestDigest?: string | null,
+  selectedBoardId?: string | null,
 ): AssemblyAnalysisScope | null {
   if (!assembly) return null;
   if (!activeDesignId) throw new Error("The verified active design identity is required for assembly-scoped analysis.");
-  const boards = assembly.boards.filter(board => String(board.design_id ?? "").trim() === activeDesignId);
+  const boards = assembly.boards.filter(board => String(board.design_id ?? "").trim() === activeDesignId
+    && (!selectedBoardId || String(board.id ?? "").trim() === selectedBoardId));
   if (boards.length !== 1) {
-    throw new Error(`Assembly-scoped analysis requires exactly one active board instance for design ${activeDesignId}; found ${boards.length}.`);
+    throw new Error(selectedBoardId
+      ? `Selected assembly board ${selectedBoardId} must reference the active design ${activeDesignId}.`
+      : `Assembly-scoped analysis requires exactly one active board instance for design ${activeDesignId}; found ${boards.length}. Select the intended board instance when the design is repeated.`);
   }
   const activeBoardId = String(boards[0].id ?? "").trim();
   if (!activeBoardId) throw new Error("The active AssemblyIR board instance has no stable identity.");
@@ -88,8 +92,8 @@ export function requireAdmittedAssembly(result: unknown, workload: AssemblyWorkl
   throw new Error(issue ?? `Assembly ${workload.replace(/_/g, " ")} resource admission was blocked.`);
 }
 
-export function requireSupportedAssemblyPhysics(assembly: AssemblyIr | null, workload: AssemblyWorkload, activeDesignId: string | null): void {
+export function requireSupportedAssemblyPhysics(assembly: AssemblyIr | null, workload: AssemblyWorkload, activeDesignId: string | null, selectedBoardId?: string | null): void {
   if (!assembly) return;
-  assemblyAnalysisScope(assembly, activeDesignId);
+  assemblyAnalysisScope(assembly, activeDesignId, null, selectedBoardId);
   void workload;
 }

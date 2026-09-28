@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Dedicated fail-closed process boundary for layout preparation and scoring.
 
 This process does not route, place, mesh, or solve physics.  It validates one

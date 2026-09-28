@@ -148,6 +148,9 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const [voltageNoise, setVoltageNoise] = useState("0.01");
   const [separationToleranceMm, setSeparationToleranceMm] = useState("0.15");
   const [skewToleranceMm, setSkewToleranceMm] = useState("2.0");
+  const [loadedCrosstalk, setLoadedCrosstalk] = useState(false);
+  const [crosstalkSourceV, setCrosstalkSourceV] = useState("1.0");
+  const [crosstalkTerminations, setCrosstalkTerminations] = useState(["50", "50", "50", "50"]);
   const [siBusy, setSiBusy] = useState(false);
   const [siError, setSiError] = useState("");
   const [siResult, setSiResult] = useState<SiResult | null>(() => initialResult?.contract === "spike/si-channel-result/v1" ? initialResult : null);
@@ -172,6 +175,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     const preset = suitePreset(suite, selectedProfile);
     setVictimNet("");
     setSignaling(initialFocus === "crosstalk" ? "single_ended" : preset.signaling);
+    setLoadedCrosstalk(initialFocus === "crosstalk");
     setDifferentialMateNet(suggestedDifferentialMate(signal, designNets));
     setReferenceNet(ground?.id ?? "");
     setReferenceLayer(copperLayers.find(layer => !/f\.cu|top/i.test(layer.name))?.id ?? copperLayers[0]?.id ?? "");
@@ -193,6 +197,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     if (start !== 0) { setSiError("TDR/TDT and eye reconstruction require the frequency range to start at exactly 0 Hz (DC)."); return; }
     if (!Number.isFinite(stop) || stop <= 0) { setSiError("Frequency stop must be positive and finite."); return; }
     if (!Number.isInteger(count) || count < 3 || count > 32769) { setSiError("Frequency points must be an integer from 3 through 32769."); return; }
+    if (loadedCrosstalk && count > 8193) { setSiError("Loaded NEXT/FEXT transient analysis admits at most 8,193 frequency points."); return; }
     if (!signalNet || !referenceNet || !referenceLayer) { setSiError("Select a signal net, reference net, and reference copper layer."); return; }
     if (initialFocus === "crosstalk" && !victimNet) { setSiError("Choose a separate victim net to calculate NEXT and FEXT."); return; }
     if (signalNet === referenceNet || (victimNet && [signalNet, referenceNet].includes(victimNet)) || (differentialMateNet && [signalNet, referenceNet, victimNet].includes(differentialMateNet))) { setSiError("Aggressor, differential mate, optional victim, and reference nets must be distinct."); return; }
@@ -247,6 +252,19 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
       request.cross_section_vertical_cells = 24;
       request.coupled_separation_tolerance_mm = separationTolerance;
       request.coupled_skew_tolerance_mm = skewTolerance;
+    }
+    if (victimNet && loadedCrosstalk) {
+      const sourceVoltage = Number(crosstalkSourceV);
+      const terminations = crosstalkTerminations.map(Number);
+      if (!Number.isFinite(sourceVoltage) || Math.abs(sourceVoltage) > 1e6) { setSiError("The NEXT/FEXT Thevenin source must be finite and within +/-1e6 V."); return; }
+      if (terminations.some(value => !Number.isFinite(value) || value < 1e-6 || value > 1e12)) { setSiError("Each NEXT/FEXT termination must be within 1e-6 through 1e12 ohm."); return; }
+      const waveform = Array.from({ length: 512 }, (_, index) => index < 16 || index >= 272 ? 0 : sourceVoltage);
+      request.crosstalk_model = {
+        port_map: { aggressor_near: 0, victim_near: 1, aggressor_far: 2, victim_far: 3 },
+        termination_ohm: terminations,
+        waveform_v: waveform,
+        trace_limit: 512,
+      };
     }
     setSiBusy(true);
     setSiError("");
@@ -336,6 +354,12 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
           <label className="setup-sublabel">Signaling<select className="select-control" value={signaling} disabled={initialFocus === "crosstalk"} onChange={event => setSignaling(event.target.value as "single_ended" | "differential")}><option value="single_ended">Single-ended aggressor</option><option value="differential">Differential aggressor pair</option></select></label>
           {signaling === "differential" ? <label className="setup-sublabel">Differential mate<select className="select-control" value={differentialMateNet} onChange={event => setDifferentialMateNet(event.target.value)}><option value="">Select mate (P/N)</option>{designNets.filter(net => net.id !== signalNet).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Explicit P/N mate for the bounded four-port and mixed-mode transform.</small></label> : <label className="setup-sublabel">{initialFocus === "crosstalk" ? "Victim net (required)" : "Victim net (optional)"}<select className="select-control" value={victimNet} onChange={event => setVictimNet(event.target.value)}><option value="">No separate victim</option>{designNets.filter(net => ![signalNet, referenceNet].includes(net.id)).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Select the separate coupled-line victim for NEXT/FEXT.</small></label>}
           {(signaling === "differential" || victimNet) && <><label className="setup-sublabel">Separation variation tolerance (mm)<input value={separationToleranceMm} onChange={event => setSeparationToleranceMm(event.target.value)} inputMode="decimal" /></label><label className="setup-sublabel">Path skew tolerance (mm)<input value={skewToleranceMm} onChange={event => setSkewToleranceMm(event.target.value)} inputMode="decimal" /><small>Fail-closed bounds for the piecewise paired-route approximation.</small></label></>}
+          {signaling === "single_ended" && victimNet && <fieldset className="setup-subgroup"><legend>Loaded NEXT / FEXT voltage</legend>
+            <label className="setup-sublabel"><span><input type="checkbox" checked={loadedCrosstalk} onChange={event => setLoadedCrosstalk(event.target.checked)} /> Apply explicit source and terminations</span><small>Computes victim volts from a 512-sample Thevenin pulse. Other sources are suppressed.</small></label>
+            {loadedCrosstalk && <><label className="setup-sublabel">Thevenin pulse amplitude (V)<input value={crosstalkSourceV} onChange={event => setCrosstalkSourceV(event.target.value)} inputMode="decimal" /></label>
+              {crosstalkTerminations.map((value, index) => <label className="setup-sublabel" key={index}>{["Aggressor near source R (ohm)", "Victim near load R (ohm)", "Aggressor far load R (ohm)", "Victim far load R (ohm)"][index]}<input value={value} onChange={event => setCrosstalkTerminations(values => values.map((item, itemIndex) => itemIndex === index ? event.target.value : item))} inputMode="decimal" /></label>)}
+              <small>Port order is explicit: aggressor near, victim near, aggressor far, victim far. Transient reconstruction requires DC, uniform spacing, and no more than 8,193 frequency points.</small></>}
+          </fieldset>}
           <label className="setup-sublabel">Reference net<select className="select-control" value={referenceNet} onChange={event => setReferenceNet(event.target.value)}><option value="">Select reference</option>{designNets.map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select></label>
           <label className="setup-sublabel">Reference layer<select className="select-control" value={referenceLayer} onChange={event => setReferenceLayer(event.target.value)}><option value="">Select copper layer</option>{copperLayers.map(layer => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label>
         </aside>

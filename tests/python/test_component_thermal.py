@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Independent resistance and RC analytical oracles; synthetic SI-unit data."""
 
 import copy
@@ -55,6 +55,17 @@ class ComponentThermalTests(unittest.TestCase):
             self.assertAlmostEqual(storage_w + (new - 25) * 0.3, 6, places=11)
             self.assertGreaterEqual(new, old)
         self.assertAlmostEqual(result["nodes"][0]["temperature_c"], 45, places=6)
+        node = result["nodes"][0]
+        self.assertAlmostEqual(node["peak_transient_temperature_c"], node["temperature_c"])
+        self.assertEqual(node["peak_transient_time_s"], 200)
+        self.assertGreater(node["time_to_90pct_steady_s"], 23)
+        self.assertLess(node["time_to_90pct_steady_s"], 25)
+        self.assertAlmostEqual(result["summary"]["peak_transient_temperature_c"], node["peak_transient_temperature_c"])
+
+    def test_short_transient_marks_steady_fraction_unreached(self):
+        result = run_component_thermal(request("transient", step=1, end=5))
+        self.assertEqual(result["status"], "completed", result)
+        self.assertIsNone(result["nodes"][0]["time_to_90pct_steady_s"])
 
     def test_transient_cooling_and_first_order_convergence(self):
         errors = []

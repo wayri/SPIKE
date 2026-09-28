@@ -281,11 +281,17 @@ class _PolygonContainmentCache:
 
 
 def _polygon_area(polygon: List[Point2D]) -> float:
-    return abs(sum(
-        point[0] * polygon[(index + 1) % len(polygon)][1]
-        - polygon[(index + 1) % len(polygon)][0] * point[1]
-        for index, point in enumerate(polygon)
-    )) / 2
+    # Preserve the established mesh ordering across Python versions: sum()
+    # changed float accumulation in 3.12, which can select another nearly
+    # equal-area triangle in _interior_polygon_point and move pad contacts.
+    # This is numerical compatibility, not an improved area/centroid model.
+    twice_area = 0.0
+    for index, point in enumerate(polygon):
+        twice_area += (
+            point[0] * polygon[(index + 1) % len(polygon)][1]
+            - polygon[(index + 1) % len(polygon)][0] * point[1]
+        )
+    return abs(twice_area) / 2
 
 
 def _signed_polygon_area(polygon: List[Point2D]) -> float:

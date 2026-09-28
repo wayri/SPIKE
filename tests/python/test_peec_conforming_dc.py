@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Independent affine, conservation and finite-contact analytical oracles."""
 
@@ -27,6 +27,46 @@ def rectangle_mesh(rectangles, contacts=(0, 1), conductance=1.0):
 
 
 class ConformingDCTests(unittest.TestCase):
+    def assert_condensation_equivalent(self, mesh, source=0, load=1):
+        mixed = solve_conforming_dc(mesh, source, load)
+        original = solve_hybridized_conforming_dc(mesh, source, load, condense_spokes=False)
+        condensed = solve_hybridized_conforming_dc(mesh, source, load)
+        reverse = solve_hybridized_conforming_dc(mesh, load, source)
+        for result in (mixed, original, reverse):
+            np.testing.assert_allclose(condensed["resistance_ohm"], result["resistance_ohm"],
+                                       rtol=1e-10, atol=1e-13)
+            np.testing.assert_allclose(condensed["dissipation_w_at_one_ampere"],
+                result["dissipation_w_at_one_ampere"], rtol=1e-10, atol=1e-13)
+        self.assertLess(condensed["global_unknown_count"], original["global_unknown_count"])
+        self.assertEqual(condensed["uncondensed_global_unknown_count"], original["global_unknown_count"])
+        self.assertEqual(condensed["global_unknown_count"]+condensed["eliminated_spoke_trace_count"],
+                         original["global_unknown_count"])
+        self.assertLess(condensed["relative_residual"], 1e-10)
+        self.assertLess(condensed["maximum_cell_kcl_error_a"], 1e-10)
+        self.assertLess(condensed["maximum_face_kcl_error_a"], 1e-10)
+        self.assertLess(condensed["relative_energy_error"], 1e-10)
+        self.assertFalse(condensed["production_qualified"])
+
+    def test_rectangle_condensation_hanging_faces_and_shared_contact_owners(self):
+        self.assert_condensation_equivalent(rectangle_mesh(
+            [(0,(0,0,1,2)), (1,(1,0,2,1)), (2,(1,1,2,2))]))
+        # Distinct rectangles with the same contact node must not be grouped
+        # into an equipotential cell or lose their uniform distributed source.
+        self.assert_condensation_equivalent(rectangle_mesh(
+            [(0,(0,0,.5,1)), (0,(.5,0,1,1)), (2,(1,0,2,1)),
+             (1,(2,0,2.5,1)), (1,(2.5,0,3,1))]))
+
+    def test_condensation_admits_smaller_actual_global_system_with_same_caps(self):
+        mesh = rectangle_mesh([(0,(0,0,1,1)), (2,(1,0,2,1)), (1,(2,0,3,1))])
+        with self.assertRaisesRegex(ValueError, "unknown budget"):
+            solve_hybridized_conforming_dc(mesh, 0, 1, max_unknowns=10, condense_spokes=False)
+        result = solve_hybridized_conforming_dc(mesh, 0, 1, max_unknowns=10)
+        self.assertEqual(result["global_unknown_count"], 9)
+        self.assertEqual(result["eliminated_spoke_trace_count"], 12)
+        self.assertEqual(result["global_unknown_budget"], 10)
+        with self.assertRaisesRegex(ValueError, "budget"):
+            solve_hybridized_conforming_dc(mesh, 0, 1, max_triangles=11)
+
     def test_hanging_face_affine_patch_each_face_and_rotation(self):
         mesh = rectangle_mesh([(0,(0,0,1,2)), (1,(1,0,2,1)), (2,(1,1,2,2))])
         system = assemble_conforming_dc(mesh)
@@ -111,6 +151,7 @@ class ConformingDCTests(unittest.TestCase):
         first = solve_conforming_dc(mesh, 0, 1)
         hybrid = solve_hybridized_conforming_dc(mesh, 0, 1)
         self.assertAlmostEqual(hybrid["resistance_ohm"],first["resistance_ohm"],places=11)
+        self.assert_condensation_equivalent(mesh)
         mesh.branches[-1].conductivity_s_m = 500
         second = solve_conforming_dc(mesh, 0, 1)
         self.assertGreater(first["resistance_ohm"], 1.0)
@@ -134,6 +175,7 @@ class ConformingDCTests(unittest.TestCase):
         self.assertAlmostEqual(mixed["resistance_ohm"],2.0,places=12)
         self.assertAlmostEqual(hybrid["resistance_ohm"],2.0,places=12)
         self.assertAlmostEqual(reverse["resistance_ohm"],2.0,places=12)
+        self.assert_condensation_equivalent(mesh,0,2)
 
     def test_rejects_partial_disconnected_malformed_and_over_budget(self):
         mesh = rectangle_mesh([(0,(0,0,1,1)), (1,(2,0,3,1))])
@@ -150,7 +192,9 @@ class ConformingDCTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "budget"):
             solve_hybridized_conforming_dc(mesh, 0, 1, max_triangles=4)
         with self.assertRaisesRegex(ValueError, "budget"):
-            solve_hybridized_conforming_dc(mesh, 0, 1, max_unknowns=10)
+            solve_hybridized_conforming_dc(rectangle_mesh(
+                [(0,(0,0,1,1)), (2,(1,0,2,1)), (3,(2,0,3,1)), (1,(3,0,4,1))]),
+                0, 1, max_unknowns=10)
         mesh = rectangle_mesh([(0,(0,0,1,1)), (1,(.5,0,1.5,1))])
         with self.assertRaisesRegex(ValueError, "overlap"):
             solve_conforming_dc(mesh, 0, 1)

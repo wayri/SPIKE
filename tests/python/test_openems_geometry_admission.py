@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Regressions for integrated guard, including executable existing-driver evidence."""
 import ast
@@ -104,7 +104,7 @@ class GeometryAdmissionTests(unittest.TestCase):
         self.design.pads = [self.pad(rotation=90)]
         self.assertNotIn("GEOMETRY_PAD_ROTATION_UNMODELED", self.codes())
 
-    def test_prepared_geometry_loss_blocks_run_but_preserves_inspection(self):
+    def test_prepared_geometry_loss_blocks_run_and_incomplete_setup(self):
         self.design.pads = [self.pad(shape="roundrect")]
         ready = ExternalEngineDescriptor(id="external.openems", name="openEMS",
             role="test", license="GPL-3.0-or-later", homepage="https://docs.openems.de/",
@@ -124,9 +124,11 @@ class GeometryAdmissionTests(unittest.TestCase):
                        side_effect=RuntimeError("inspection reached worker")) as worker:
                 self.assertEqual(run_openems_case(case)["status"], "blocked")
                 worker.assert_not_called()
-                with self.assertRaisesRegex(RuntimeError, "inspection reached worker"):
-                    run_openems_case(case, setup_only=True)
-                worker.assert_called_once()
+                setup = run_openems_case(case, setup_only=True)
+                self.assertEqual(setup["status"], "blocked")
+                self.assertIn("GEOMETRY_PAD_CONTOUR_UNQUALIFIED",
+                              {item["code"] for item in setup["validation"]["run_blockers"]})
+                worker.assert_not_called()
 
     def test_run_recomputes_screen_from_authenticated_geometry(self):
         self.design.pads = [self.pad(shape="roundrect")]

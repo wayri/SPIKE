@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 
 import type { MeshCell, ScalarSample, SolverResultBundle, VectorSample } from "./analysisResults";
 

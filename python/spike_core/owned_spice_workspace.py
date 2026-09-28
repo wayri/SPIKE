@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Strict structured-workspace bridge to SPIKE's release-owned SPICE engine.
 
 The bridge never accepts raw netlist text or a caller-selected executable/DLL.

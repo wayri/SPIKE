@@ -1,0 +1,77 @@
+{
+  "contract": "spike/openems-board-readiness-probe/v1",
+  "board": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\examples\\esp32\\source\\iot-esp-eth-ind.kicad_pcb",
+  "board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33",
+  "net": "/cpu/ANT",
+  "frequency_hz": [
+    100000000.0,
+    1000000000.0
+  ],
+  "mesh_resolution_mm": 0.25,
+  "import_seconds": 0.42073979999986477,
+  "preflight_seconds": 2.694477499986533,
+  "design_counts": {
+    "layers": 21,
+    "stackup": 13,
+    "nets": 111,
+    "tracks": 2603,
+    "zones": 76,
+    "vias": 289,
+    "pads": 1836
+  },
+  "runtime": {
+    "state": "experimental",
+    "version": "0.0.36",
+    "adapter_version": "1.3.4",
+    "model_status": "unvalidated"
+  },
+  "can_prepare": true,
+  "can_run": false,
+  "errors": [],
+  "warnings": [
+    {
+      "code": "OPENEMS_PORTS_REQUIRED_TO_RUN",
+      "message": "The case can be prepared for geometry inspection, but solving requires explicit ports."
+    },
+    {
+      "code": "OPENEMS_DIELECTRIC_LOSS_APPROXIMATION",
+      "message": "Loss tangent is converted to an equivalent conductivity at the band-center frequency; broadband dispersive material fitting is not implemented."
+    },
+    {
+      "code": "OPENEMS_PAD_CONTOUR_FACETING",
+      "message": "3 curved pads use polygons with at most 0.001 mm radial sagitta; verify contour and mesh convergence."
+    },
+    {
+      "code": "OPENEMS_OUTLINE_APPROXIMATION",
+      "message": "The first adapter uses the selected conductor bounds for dielectric slabs; inspect the generated setup where the physical board outline is significant."
+    },
+    {
+      "code": "OPENEMS_TRANSLATION_EXPERIMENTAL",
+      "message": "PCB-to-CSXCAD translation is experimental and requires mesh, port, and geometry inspection before interpretation."
+    }
+  ],
+  "run_blocker_count": 0,
+  "run_blocker_codes": {},
+  "run_blocker_examples": [],
+  "resources": {
+    "estimated_cells": 1697400,
+    "estimated_memory_bytes": 434534400,
+    "bytes_per_cell_assumption": 256,
+    "cell_limit": 25000000,
+    "memory_limit_bytes": 8589934592,
+    "air_padding_mm": 13.977895427959115,
+    "simulation_bounds_mm": {
+      "start": [
+        54.602104572040886,
+        110.92660457204089,
+        -15.564095427959115
+      ],
+      "stop": [
+        82.93889542795911,
+        141.2953954279591,
+        13.977895427959115
+      ]
+    }
+  },
+  "field_solve_executed": false
+}

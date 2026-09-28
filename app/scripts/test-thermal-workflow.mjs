@@ -64,7 +64,8 @@ function mountWizard(initialScenario, workerAvailable = true) {
     normalizeThermalFans: value => value ?? [], normalizeThermalHeatsinks: value => value ?? [],
     thermalAssemblyIssues: () => [], screenThermalElements: () => [], thermalSchematic: () => ({}),
     thermalMaterials: [], thermalSurfaceFinishes: [], WorkflowSchematic: emptyComponent,
-    ThermalInputImport: emptyComponent, ThermalAssemblyEditor: emptyComponent, ThermalBoundaryEditor: emptyComponent, ThermalHardwareEditor: emptyComponent,
+    ThermalInputImport: emptyComponent, ThermalAssemblyEditor: emptyComponent, ThermalBoundaryEditor: emptyComponent, ThermalHardwareEditor: emptyComponent, ThermalEnvironmentPanel: emptyComponent, BoardThermalPanel: emptyComponent,
+    ThermalTransientOverlay: emptyComponent,
     X: emptyComponent, Play: emptyComponent, AlertTriangle: emptyComponent,
     async runLocalWorker(value) {
       request = value;

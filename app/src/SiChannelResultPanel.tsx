@@ -1,11 +1,11 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 import { useMemo, useState } from "react";
 import { AlertTriangle, Download, Maximize2, Minimize2, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 import { buildSiChannelHtmlReport, buildSiCrosstalkCsv, buildSiImpedanceCsv, floorSiDb, normalizeSiChannelResult, projectSiSeries, siPlotExtent, siTickLabel, SiChartSeries } from "./siChannelResults";
 
 type Props = { result: Record<string, unknown>; onStatus: (message: string) => void };
-type Tab = "s" | "tdr" | "xtalk" | "z" | "eye" | "mixed";
+type Tab = "s" | "reflection" | "tdr" | "xtalk" | "z" | "eye" | "mixed";
 
 const download = (name: string, body: string, type: string) => {
   const url = URL.createObjectURL(new Blob([body], { type }));
@@ -90,8 +90,9 @@ export default function SiChannelResultPanel({ result, onStatus }: Props) {
   return <section className="si-channel-results">
     <header><div><b>Native channel results</b><small>Ports: {charts.portOrder.join(" → ") || "worker-declared order"}</small></div><div><button onClick={exportJson}><Download size={13} /> JSON</button><button onClick={exportReport}><Download size={13} /> SVG report</button></div></header>
     <div className="si-channel-warning"><AlertTriangle size={14} /> Experimental only: production qualified false; compliance {charts.complianceStatus}. Values are not protocol-compliance or signoff evidence.</div>
-    <nav aria-label="SI result views">{(["s", "tdr", "xtalk", "z", "eye", "mixed"] as Tab[]).map(item => <button key={item} className={tab === item ? "selected" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{({ s: "S parameters", tdr: "TDR / TDT", xtalk: "NEXT / FEXT", z: "Impedance / resonance", eye: "Eye", mixed: "Mixed mode" } as Record<Tab, string>)[item]}</button>)}</nav>
+    <nav aria-label="SI result views">{(["s", "reflection", "tdr", "xtalk", "z", "eye", "mixed"] as Tab[]).map(item => <button key={item} className={tab === item ? "selected" : ""} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{({ s: "S parameters", reflection: "Reflections / VSWR", tdr: "TDR / TDT", xtalk: "NEXT / FEXT", z: "Impedance / resonance", eye: "Eye", mixed: "Mixed mode" } as Record<Tab, string>)[item]}</button>)}</nav>
     {tab === "s" && <><Chart title="S magnitude" xLabel="Frequency (Hz)" yLabel="dB" series={charts.sMagnitudeDb} /><Chart title="S phase" xLabel="Frequency (Hz)" yLabel="deg" series={charts.sPhaseDeg} /></>}
+    {tab === "reflection" && <><p>Matched-reference port reflection and VSWR use worker-returned per-port samples. Infinite and non-passive VSWR statuses remain gaps. Older saved results without these samples show no retained trace data.</p><Chart title="Reflection magnitude" xLabel="Frequency (Hz)" yLabel="|rho|" series={charts.reflectionMagnitude} /><Chart title="VSWR" xLabel="Frequency (Hz)" yLabel="ratio" series={charts.vswr} /></>}
     {tab === "tdr" && <><Chart title="TDR impedance" xLabel="Time (s)" yLabel="ohm" series={[charts.tdrImpedanceOhm]} /><Chart title="TDR reflection" xLabel="Time (s)" yLabel="rho" series={[charts.tdrReflection]} /><Chart title="TDT normalized step" xLabel="Time (s)" yLabel="normalized" series={[charts.tdtNormalizedStep]} /></>}
     {tab === "xtalk" && <>
       <div className="si-channel-intro"><b>NEXT / FEXT from the bounded coupled channel</b><p>Matched-port power-wave coupling and loaded victim/source voltage transfer are separate results. The plotted dB floor is −160 dB; CSV preserves retained values.</p></div>
@@ -117,5 +118,6 @@ export default function SiChannelResultPanel({ result, onStatus }: Props) {
       {charts.eye.length === 0 && charts.pam4EyeHeights.length === 0 && <div className="si-channel-empty">No retained eye samples for this result.</div>}
     </>}
     {tab === "mixed" && <div className="si-channel-metrics">{Object.keys(charts.mixedModeMetrics).length ? Object.entries(charts.mixedModeMetrics).map(([name, value]) => <div key={name}><span>{name}</span><b>{value.toPrecision(6)}</b></div>) : <div className="si-channel-empty">No mixed-mode metrics were retained by this bounded result. The UI does not derive them from single-ended data.</div>}</div>}
+    <p className="si-channel-warning">E/H field plots require returned spatial electric or magnetic vector samples in an AnalysisResult. This channel result contains network and time-domain samples only.</p>
   </section>;
 }

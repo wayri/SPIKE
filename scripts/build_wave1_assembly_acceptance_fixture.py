@@ -13,14 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from python.spike_core import __version__ as APP_VERSION
 from python.spike_core.dependencies import dependency_status
 from python.spike_core.design_ir_v2 import AssemblyIRV1, DesignIRV2
 from python.spike_core.kicad_importer import import_kicad_design
 from python.spike_core.project_package import read_project, write_spike_package
 from python.spike_core.service_project_handlers import handle_project_request
-
-
-APP_VERSION = "0.2.5"
 
 
 def _freecad_executable() -> Path:

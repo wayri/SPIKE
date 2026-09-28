@@ -1,6 +1,11 @@
 # Multi-board, harness and external CAD assemblies
 
 Open **MCAD assembly → Board instances and harnesses** in the desktop shell.
+After a second board instance is added, the **Link Manager** appears in that
+panel. It owns cable harness rows, stacked board connector mates, connector
+mappings, rigid/flex links, and their pin maps. Choose **Save boards and links**
+to commit the draft to the `.spike` package; normal **Save project** then retains
+the assembly graph with the analysis and workspace state.
 Save the active board as a `.spike` project first. **Import board / external
 assembly** adds a KiCad `.kicad_pcb`, IPC-2581 `.ipc2581`, or `.spikeassembly`
 file to that project. Save pending structure edits before importing. Existing
@@ -13,6 +18,34 @@ are 30 boards, 32 copper layers per board, and 100 mechanical parts/groups.
 Other board instances currently use bounded envelope proxies in the viewport;
 the active board uses detailed geometry. This change does not implement
 simultaneous detailed rendering or a coupled multi-board field solver.
+
+For stacked boards, add a **Stacked board connector mate** with two explicit
+`board::connector` endpoints and a one-to-one pin map. This is a direct mating
+edge, distinct from a cable harness. SPIKE checks that both board instances
+exist, that they differ, and that no pin is assigned to both a mate and a
+harness. A board's XYZ placement does not create an electrical connection;
+the mate record does not infer contact resistance, return continuity, or
+connector SI behavior. Enter those models explicitly in the applicable solver
+workflow. A mate can be saved and included in a PI, SI, thermal, or EMI plan
+without claiming a coupled solve.
+
+For PI, thermal, or EMI analysis in the desktop, select the intended board
+instance in the assembly viewport before running a selected-board workflow.
+The selected instance must reference the active detailed design. This also
+disambiguates repeated occurrences of the same design. A selected proxy for a
+different design cannot be solved from the active design view. Analysis scope
+and results identify the selected board and list omitted boards and assembly
+entities; selection alone never activates electrical or thermal coupling.
+SI multi-board jobs bind board identities through their own explicit request.
+
+The `plan_multiboard_analysis` worker accepts PI, SI, thermal, and EMI domains.
+`independent_board_batch` retains selected occurrence identities and requires
+caller-controlled single-board dispatch. PI/SI use `coupled_harness_network`
+and thermal/EMI use `coupled_assembly` to request a coupled plan. Both coupled
+modes return a blocked plan until a qualified adapter consumes the corresponding
+assembly physics. Plans retain direct connector mates separately from harnesses.
+Thermal plans retain contacts and parts; EMI plans retain
+electrical bonds and parts. Their presence in a plan is not a solved effect.
 
 ## Harness authoring
 

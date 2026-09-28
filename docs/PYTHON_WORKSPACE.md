@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # Python workspace
 
 Open **Settings → Python workspace**, use **Tools → Python workspace**, or find

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Illustrative matched/unequal-load timings, not an equivalent-work speedup."""
 import argparse

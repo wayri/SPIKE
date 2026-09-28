@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Bounded authenticated transport for large normalized design snapshots."""
 from __future__ import annotations
 

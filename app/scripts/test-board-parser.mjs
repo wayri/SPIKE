@@ -16,6 +16,15 @@ const parser = await import(`data:text/javascript;base64,${Buffer.from(transpile
 for (const filename of process.argv.slice(2)) {
   const started = performance.now();
   const parsed = parser.parseKicadBoard(readFileSync(filename, "utf8"));
+  if (filename.replaceAll("\\", "/").endsWith("/ebrake1.kicad_pcb")) {
+    assert.equal(parsed.zones.length, 26, "placement keepouts must not masquerade as copper zones");
+    assert.ok(parsed.zones.every(zone => zone.filled_copper_state === "source_filled" && zone.source_fill_provenance_complete));
+    const q1 = parsed.pads.filter(pad => pad.ref === "Q1");
+    assert.equal(q1.length, 4);
+    assert.equal(q1.filter(pad => pad.type === "np_thru_hole").length, 1, "empty quoted pad names must retain token positions");
+    assert.equal(q1.filter(pad => pad.type === "thru_hole").length, 3);
+    assert.deepEqual(q1.find(pad => pad.name === "1")?.drill_size, [1.1, 1.1]);
+  }
   console.log(JSON.stringify({ file: filename, ms: Math.round(performance.now() - started), components: parsed.components.length, pads: parsed.pads.length, vias: parsed.vias.length, tracks: parsed.tracks.length, zones: parsed.zones.length, copper: parsed.layers.length, layers: parsed.layerDefinitions.length }));
 }
 

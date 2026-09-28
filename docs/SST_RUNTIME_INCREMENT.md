@@ -1,6 +1,6 @@
 # Experimental forced-flow SST runtime
 
-SPDX-License-Identifier: MIT  
+SPDX-License-Identifier: Apache-2.0
 Copyright (c) 2026 SigHarmonic
 
 The existing multi-region OpenCFD 2606 process can now execute explicitly

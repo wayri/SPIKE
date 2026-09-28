@@ -21,6 +21,33 @@ EMI_WORKFLOW_CONTRACT = "spike/emi-workflow/v1"
 _ANALYSES = {"conducted_screening", "near_field", "far_field"}
 _ENVIRONMENTS = {"free_space", "bench_ground_plane", "shielded_enclosure"}
 _EXCITATIONS = {"prepass_results", "explicit_ports", "spice"}
+_RE_STANDARDS = {
+    "cispr-25-2021": {
+        "title": "CISPR 25:2021",
+        "method": "automotive on-board receiver protection",
+        "source": "https://webstore.iec.ch/en/publication/64645",
+        "classifications": {"1", "2", "3", "4", "5"},
+    },
+    "cispr-32-2015-amd1-2019": {
+        "title": "CISPR 32:2015+AMD1:2019",
+        "method": "multimedia-equipment radiated emissions",
+        "source": "https://webstore.iec.ch/en/publication/65836",
+        "classifications": {"A", "B"},
+    },
+    "mil-std-461h-2026-re102": {
+        "title": "MIL-STD-461H:2026 RE102",
+        "method": "electric-field radiated emissions",
+        "source": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=35789",
+        "platform_required": True,
+    },
+    "mil-std-461g-2015-re102": {
+        "title": "MIL-STD-461G:2015 RE102 (historical)",
+        "method": "electric-field radiated emissions",
+        "source": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=35789",
+        "platform_required": True,
+    },
+}
+_RE_PLATFORMS = {"ground", "surface_ship", "submarine", "aircraft", "space"}
 _METRIC_FIELDS = (
     "dv_dt_v_per_s",
     "di_dt_a_per_s",
@@ -76,6 +103,51 @@ def _validate_chamber(raw: Any) -> Tuple[Dict[str, Any] | None, List[Dict[str, s
         issues.append(_issue("EMI_CHAMBER_OPTION", "error", "Cutaway must be a boolean.", "chamber.cutaway"))
     issues.append(_issue("EMI_CHAMBER_PREVIEW", "info", "The chamber, antenna polarization, table and DUT pose are a visual setup. The current field adapter solves its prepared domain; no chamber reflection, receive antenna or EMC detector response is inferred.", "chamber"))
     return chamber, issues
+
+
+def _validate_radiated_emissions_standard(raw: Any) -> Tuple[Dict[str, Any] | None, List[Dict[str, str]]]:
+    """Bind a reference edition only; no limit or compliance result is inferred."""
+    if raw is None:
+        return None, []
+    if not isinstance(raw, dict):
+        return None, [_issue("EMI_STANDARD_INVALID", "error", "Radiated-emissions standard must be an object.", "radiated_emissions_standard")]
+    identifier = raw.get("id")
+    if isinstance(identifier, str) and identifier in {"mil-431", "mil-std-431"}:
+        return None, [_issue("EMI_STANDARD_NOT_RE", "error", "MIL-431 is not a verified radiated-emissions method. Select an exact published standard and revision.", "radiated_emissions_standard.id")]
+    if not isinstance(identifier, str) or identifier not in _RE_STANDARDS:
+        return None, [_issue("EMI_STANDARD_UNKNOWN", "error", "Unknown or unsupported radiated-emissions standard edition.", "radiated_emissions_standard.id")]
+    profile = _RE_STANDARDS[identifier]
+    allowed = {"id", "classification"} if "classifications" in profile else {"id", "platform"}
+    if set(raw) - allowed:
+        return None, [_issue("EMI_STANDARD_INVALID", "error", "Unsupported field or classification/platform for this standard.", "radiated_emissions_standard")]
+    if "classifications" in profile:
+        classification = raw.get("classification")
+        if not isinstance(classification, str) or classification not in profile["classifications"]:
+            return None, [_issue("EMI_STANDARD_CLASS", "error", "Select a valid class for this exact standard edition.", "radiated_emissions_standard.classification")]
+        selection = {"id": identifier, "classification": classification}
+    else:
+        platform = raw.get("platform")
+        if not isinstance(platform, str) or platform not in _RE_PLATFORMS:
+            return None, [_issue("EMI_STANDARD_PLATFORM", "error", "Select a supported platform category; limit applicability still requires expert review.", "radiated_emissions_standard.platform")]
+        selection = {"id": identifier, "platform": platform}
+    reference = {
+        **selection,
+        "title": profile["title"],
+        "method": profile["method"],
+        "source": profile["source"],
+        "limit_data_status": "not_bundled",
+        "comparison_status": "unavailable",
+        "compliance_available": False,
+        "required_evidence_status": {
+            "detector": "not_qualified",
+            "measurement_bandwidth": "not_qualified",
+            "frequency_applicability": "not_qualified",
+            "antenna_and_polarization": "not_qualified",
+            "distance_and_fixture": "not_qualified",
+            "measured_correlation": "not_qualified",
+        },
+    }
+    return reference, [_issue("EMI_STANDARD_REFERENCE_ONLY", "warning", "The selected edition is reference metadata only. Licensed limits, detector, bandwidth, antenna, polarization, setup and measured correlation are not available; no pass/fail comparison is possible.", "radiated_emissions_standard")]
 
 
 def _names(values: Any, *, limit: int = 128) -> List[str]:
@@ -263,6 +335,10 @@ def validate_emi_setup(
 
     chamber, chamber_issues = _validate_chamber(setup.get("chamber"))
     issues.extend(chamber_issues)
+    reference_standard, standard_issues = _validate_radiated_emissions_standard(setup.get("radiated_emissions_standard"))
+    issues.extend(standard_issues)
+    if "radiated_emissions_standard" in setup and setup["radiated_emissions_standard"] is None:
+        issues.append(_issue("EMI_STANDARD_INVALID", "error", "Omit an unselected standard instead of using null.", "radiated_emissions_standard"))
     available_nets = _design_net_names(design)
     selected_nets = _names(setup.get("selected_nets"))
     return_nets = _names(setup.get("return_nets"))
@@ -393,6 +469,7 @@ def validate_emi_setup(
         "geometry_coverage": coverage,
         "normalized": {
             **({"chamber": chamber} if chamber is not None else {}),
+            **({"radiated_emissions_standard": {key: reference_standard[key] for key in ("id", "classification", "platform") if key in reference_standard}} if reference_standard is not None else {}),
             "selected_nets": selected_nets,
             "return_nets": return_nets,
             "requested_analyses": analyses,
@@ -404,6 +481,7 @@ def validate_emi_setup(
             "net_metrics": metrics,
         },
         "solver_recommendation": recommendation,
+        "reference_standard": reference_standard,
         "validity": {
             "model_status": "screening_only",
             "statement": "Preflight validates setup completeness; it does not validate radiated-emission accuracy.",

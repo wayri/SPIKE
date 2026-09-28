@@ -54,14 +54,15 @@ Linux uses the same commands with `npm` and the distro packages listed in
 ## Contribution licensing and provenance
 
 Before contributing, read `LICENSE`, `LICENSING.md`, and
-`THIRD_PARTY_NOTICES.md`. The workspace is mixed-license; do not assume a root
-MIT grant applies to every file.
+`THIRD_PARTY_NOTICES.md`. Original SPIKE-owned material is Apache-2.0-licensed; third-party
+material and files with another license retain their own terms.
 
 Every commit submitted for inclusion must include a Developer Certificate of
 Origin sign-off in the form `Signed-off-by: Name <email>`. The sign-off certifies
 that the contributor created the work or has the right to submit it under the
-license recorded for that file. A future project owner may require a separate
-contributor agreement for proprietary solver modules.
+license recorded for that file. Apache-licensed contributions remain available
+under Apache 2.0. Separately licensed future modules require an explicit project
+decision and any needed contributor agreement.
 
 New source files require an approved SPDX identifier after the module's license
 boundary and ownership have been reviewed. Do not add copied code, screenshots,

@@ -11,6 +11,12 @@
     "core:window:allow-show",
     "core:window:allow-set-focus",
     "core:window:allow-close",
-    "core:window:allow-destroy"
+    "core:window:allow-destroy",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://github.com/wayri/SPIKE-Main/issues/new*" }
+      ]
+    }
   ]
 }

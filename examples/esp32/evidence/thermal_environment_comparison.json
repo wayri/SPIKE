@@ -1,0 +1,98 @@
+{
+  "contract": "spike/esp32-thermal-environment-comparison/v1",
+  "model_status": "approximate",
+  "source": {
+    "board_path": "examples/esp32/source/iot-esp-eth-ind.kicad_pcb",
+    "board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33"
+  },
+  "inputs": {
+    "ambient_temperature_c": 25,
+    "aggregate_board_power_w": 1.35,
+    "board_width_mm": 29.464,
+    "board_height_mm": 64.516
+  },
+  "power_accounting": {
+    "basis": "The existing ESP32 thermal example totals 1.35 W from illustrative U1 0.60 W, U41 0.50 W, and U61 0.25 W entries.",
+    "u41_ldo_budget_w": 0.255,
+    "treatment": "The separately calculated U41 AZ1117 5 V to 3.3 V loss is not added to the 1.35 W aggregate. Add it only after replacing the illustrative per-device loss distribution, otherwise U41 may be counted twice."
+  },
+  "scenarios": {
+    "open_air": {
+      "name": "Board in still air",
+      "boundary_inputs": {
+        "enclosure": "open",
+        "convection": "natural",
+        "top_heat_transfer_coefficient_w_m2k": 8,
+        "bottom_heat_transfer_coefficient_w_m2k": 5,
+        "nominal_airflow_m3_s": 0
+      },
+      "screen": {
+        "model_status": "approximate",
+        "board_area_m2": 0.001900899424,
+        "top_resistance_k_w": 65.75834492966841,
+        "bottom_resistance_k_w": 105.21335188746946,
+        "equivalent_resistance_k_w": 40.46667380287287,
+        "estimated_board_temperature_c": 79.63000963387837,
+        "ideal_bulk_air_rise_c": null
+      },
+      "assumptions": [
+        "Horizontal board in room-temperature air",
+        "Unobstructed board faces",
+        "Natural convection and surface radiation are combined into prescribed effective coefficients"
+      ]
+    },
+    "closed_box": {
+      "name": "Board in closed box",
+      "boundary_inputs": {
+        "enclosure": "sealed",
+        "convection": "natural",
+        "top_heat_transfer_coefficient_w_m2k": 3,
+        "bottom_heat_transfer_coefficient_w_m2k": 2,
+        "nominal_airflow_m3_s": 0
+      },
+      "screen": {
+        "model_status": "approximate",
+        "board_area_m2": 0.001900899424,
+        "top_resistance_k_w": 175.35558647911577,
+        "bottom_resistance_k_w": 263.03337971867364,
+        "equivalent_resistance_k_w": 105.21335188746946,
+        "estimated_board_temperature_c": 167.03802504808377,
+        "ideal_bulk_air_rise_c": null
+      },
+      "assumptions": [
+        "Sealed stagnant-air enclosure",
+        "No ventilation or fan flow",
+        "Box walls and internal air are not resolved; coefficients represent a conservative internal path only"
+      ]
+    },
+    "forced_air": {
+      "name": "Board under forced air",
+      "boundary_inputs": {
+        "enclosure": "open",
+        "convection": "forced",
+        "top_heat_transfer_coefficient_w_m2k": 35,
+        "bottom_heat_transfer_coefficient_w_m2k": 20,
+        "nominal_airflow_m3_s": 0.012
+      },
+      "screen": {
+        "model_status": "approximate",
+        "board_area_m2": 0.001900899424,
+        "top_resistance_k_w": 15.030478841067064,
+        "bottom_resistance_k_w": 26.303337971867364,
+        "equivalent_resistance_k_w": 9.564850171588132,
+        "estimated_board_temperature_c": 37.91254773164398,
+        "ideal_bulk_air_rise_c": 0.0929736698566966
+      },
+      "assumptions": [
+        "Uniform fan flow parallel to the board",
+        "Both board faces remain exposed",
+        "Fan free-air flow is prescribed; pressure loss, bypass, recirculation, and local velocity are not solved"
+      ]
+    }
+  },
+  "limitations": [
+    "These are algebraic boundary-condition screens, not board-field, enclosure CFD, or conjugate heat-transfer solves.",
+    "Uniform effective coefficients do not resolve package hot spots, copper spreading, enclosure walls, radiation, fan pressure loss, bypass, recirculation, or local air velocity.",
+    "The 1.35 W power and all heat-transfer coefficients are assumptions, not measurements of this ESP32 board."
+  ]
+}

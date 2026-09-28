@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Verify a SPIKES engine archive and perform an offline staging smoke."""
 
 from __future__ import annotations

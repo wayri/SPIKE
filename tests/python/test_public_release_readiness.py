@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
 from pathlib import Path
@@ -31,8 +31,12 @@ class PublicReleaseReadinessTests(unittest.TestCase):
         self.assertFalse(report["public_distribution_authorized"])
         self.assertFalse(report["failures"])
         codes = {item["code"] for item in report["external_blockers"]}
-        self.assertIn("PUBLIC_RELEASE_OWNERSHIP_APPROVAL_REQUIRED", codes)
-        self.assertIn("PUBLIC_RELEASE_SIGNATURE_REQUIRED", codes)
+        self.assertSetEqual(codes, {
+            "PUBLIC_RELEASE_AUDITABLE_CI_REQUIRED",
+            "PUBLIC_RELEASE_CLEAN_MACHINE_EVIDENCE_REQUIRED",
+            "PUBLIC_RELEASE_DEPENDENCY_APPROVAL_REQUIRED",
+            "PUBLIC_RELEASE_SIGNATURE_REQUIRED",
+        })
         self.assertTrue(all(value is False for value in report["claim_boundary"].values()))
 
 

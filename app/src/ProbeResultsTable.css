@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: MIT */
+/* SPDX-License-Identifier: Apache-2.0 */
 .probe-table { min-width: 0; color: #cbd8dc; font-size: 11px; }
 .probe-table header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 9px; background: #15252e; border: 1px solid #314852; }
 .probe-table h3, .probe-table p { margin: 0; } .probe-table h3 { font-size: 12px; } .probe-table p { color: #9eb4be; }

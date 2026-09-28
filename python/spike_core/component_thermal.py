@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Component-table adapter for SPIKE's explicit thermal RC network kernel."""
 
 from __future__ import annotations
@@ -155,11 +155,30 @@ def run_component_thermal(request: Mapping[str, Any]) -> dict[str, Any]:
             node["heat_flow_top_w"] = rise / component["resistance_top_c_per_w"] if "resistance_top_c_per_w" in component else 0.0
             node["heat_flow_bottom_w"] = rise / component["resistance_bottom_c_per_w"] if "resistance_bottom_c_per_w" in component else 0.0
             node["temperature_c"] = result["transient"][-1]["temperatures_c"][node["id"]] if result["transient"] else node["steady_temperature_c"]
+            if result["transient"]:
+                samples = [(frame["time_s"], frame["temperatures_c"][node["id"]]) for frame in result["transient"]]
+                peak_time, peak_value = max(samples, key=lambda sample: sample[1])
+                initial = samples[0][1]
+                target = initial + 0.9 * (node["steady_temperature_c"] - initial)
+                direction = 1 if target >= initial else -1
+                time_to_90 = 0.0 if target == initial else None
+                for (before_time, before_value), (after_time, after_value) in zip(samples, samples[1:]):
+                    if direction * (before_value - target) >= 0:
+                        time_to_90 = before_time
+                        break
+                    if direction * (after_value - target) >= 0:
+                        time_to_90 = before_time + (target - before_value) * (after_time - before_time) / (after_value - before_value)
+                        break
+                node.update(peak_transient_temperature_c=peak_value, peak_transient_time_s=peak_time,
+                            time_to_90pct_steady_s=time_to_90,
+                            final_to_steady_gap_c=node["steady_temperature_c"] - node["temperature_c"])
             if not all(math.isfinite(node[key]) for key in ("temperature_rise_c", "steady_temperature_c", "temperature_c", "heat_flow_top_w", "heat_flow_bottom_w")):
                 raise ValueError(f"{node['id']} parameters exceed the finite numerical range.")
         if any(not math.isfinite(value) for frame in result["transient"] for value in frame["temperatures_c"].values()):
             raise ValueError("Transient parameters exceed the finite numerical range.")
         result["summary"]["max_temperature_c"] = max(node["temperature_c"] for node in result["nodes"])
+        if result["transient"]:
+            result["summary"]["peak_transient_temperature_c"] = max(node["peak_transient_temperature_c"] for node in result["nodes"])
         if not surfaces:
             result["summary"]["steady_energy_balance_error_w"] = sum(node["heat_flow_top_w"] + node["heat_flow_bottom_w"] - node["power_w"] for node in result["nodes"])
         if any(not math.isfinite(value) for value in result["summary"].values()):

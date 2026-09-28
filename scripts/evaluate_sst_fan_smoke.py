@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Audit retained SST fields and explicit Prt; not a turbulence accuracy gate."""
 import argparse

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Canonical supported-subset DesignIR handoff for the private SPIKES compiler.
 
 This module only translates normalized planar layout records.  It deliberately

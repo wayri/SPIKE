@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Evidence-backed capability negotiation for layout metric evaluators.
 
 The registry is intentionally separate from layout job construction.  Call

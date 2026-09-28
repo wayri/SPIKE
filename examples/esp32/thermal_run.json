@@ -1,0 +1,26 @@
+{
+  "source": {
+    "board_path": "examples/esp32/source/iot-esp-eth-ind.kicad_pcb",
+    "board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33"
+  },
+  "request": {
+    "ambient_temperature_c": 25.0,
+    "board": {
+      "conductivity_w_mk": 20.0,
+      "thickness_mm": 1.6,
+      "convection_top_w_m2k": 10.0,
+      "convection_bottom_w_m2k": 10.0,
+      "grid_step_mm": 2.0
+    },
+    "components": [
+      {"component_ref": "U1", "power_w": 0.6, "contact_size_mm": 5.0, "r_junction_case_k_w": 5.0, "r_case_board_k_w": 8.0},
+      {"component_ref": "U41", "power_w": 0.5, "contact_size_mm": 5.0, "r_junction_case_k_w": 3.0, "r_case_board_k_w": 5.0},
+      {"component_ref": "U61", "power_w": 0.25, "contact_size_mm": 5.0, "r_junction_case_k_w": 5.0, "r_case_board_k_w": 8.0}
+    ]
+  },
+  "assumptions": {
+    "losses": "U1 ESP32 0.6 W, U41 regulator 0.5 W, and U61 Ethernet PHY 0.25 W are illustrative power-budget inputs, not measured board losses.",
+    "thermal_paths": "All component heat is assigned through 5 mm square board contacts and assumed junction-case/case-board resistances.",
+    "board": "Uniform effective in-plane conductivity 20 W/mK, 1.6 mm thickness and 10 W/m2K convection on both faces are exploratory assumptions; airflow, package solids, copper detail and enclosure are not resolved."
+  }
+}

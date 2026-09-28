@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Opt-in pad-owned copper partition for hybrid DC; no geometry dependency.
 
 Convex half-plane clipping partitions retained zone cells outside convex pad

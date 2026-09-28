@@ -1,7 +1,8 @@
 [package]
 name = "spike-desktop"
-version = "0.2.13"
+version = "0.3.0"
 description = "SPIKE Electronic Systems Integrity Workbench"
+license = "Apache-2.0"
 authors = ["SPIKE contributors"]
 edition = "2021"
 default-run = "spike-desktop"
@@ -15,6 +16,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sysinfo = { version = "=0.39.6", default-features = false, features = ["system"] }
@@ -23,6 +25,7 @@ base64 = "0.22"
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
 sha2 = "0.10"
 hex = "0.4"
+getrandom = "0.3"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

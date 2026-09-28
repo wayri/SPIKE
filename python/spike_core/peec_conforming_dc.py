@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Experimental conservative DC probe; not a registered or qualified solver.
 
@@ -55,6 +55,7 @@ class RT0System:
     planar_edge_count: int
     local_edges: np.ndarray
     local_resistance: np.ndarray
+    triangle_rectangles: np.ndarray
 
 
 def triangle_resistance(vertices_mm: np.ndarray, sheet_conductance_s: float) -> np.ndarray:
@@ -97,7 +98,8 @@ def _triangulate(mesh: HybridMesh, max_triangles: int):
         groups.setdefault((cell["layer"], cell["net"]), []).append((int(cell["control_node"]), bounds))
     if not groups:
         raise ValueError("RT0 requires conforming surface cells")
-    triangles, owners, keys = [], [], []
+    triangles, owners, keys, rectangle_ids = [], [], [], []
+    rectangle_id = 0
     from shapely.geometry import box
     from shapely.ops import unary_union
     for key, cells in groups.items():
@@ -127,13 +129,16 @@ def _triangulate(mesh: HybridMesh, max_triangles: int):
                 triangles.append((center,a,b))
                 owners.append(node)
                 keys.append(key)
+                rectangle_ids.append(rectangle_id)
                 if len(triangles) > max_triangles:
                     raise ValueError("RT0 triangle work budget exceeded")
-    return np.asarray(triangles), np.asarray(owners), keys
+            rectangle_id += 1
+    return np.asarray(triangles), np.asarray(owners), keys, np.asarray(rectangle_ids)
 
 
 def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
-                          hybridized: bool = False, max_triangles: int = 150000) -> RT0System:
+                          hybridized: bool = False, max_triangles: int = 150000,
+                          condense_spokes: bool = False) -> RT0System:
     """Assemble all components; the port solve selects exactly one component."""
     if mesh.truncated or "conforming_partition" not in mesh.branch_admission:
         raise ValueError("RT0 rejects partial or nonconforming meshes")
@@ -141,7 +146,10 @@ def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
         raise ValueError("RT0 unknown budget must be an integer in 10..250000")
     if not isinstance(max_triangles, int) or not 4 <= max_triangles <= 250000:
         raise ValueError("RT0 local triangle budget must be an integer in 4..250000")
-    triangles, owners, keys = _triangulate(mesh, max_triangles if hybridized else max_unknowns//2)
+    if condense_spokes and not hybridized:
+        raise ValueError("RT0 spoke condensation requires hybridized assembly")
+    triangles, owners, keys, rectangle_ids = _triangulate(
+        mesh, max_triangles if hybridized else max_unknowns//2)
     materials = {}
     vias = []
     for branch in mesh.branches:
@@ -182,6 +190,10 @@ def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
         local_signs.append(signs)
     edge_count, triangle_count = len(edges), len(triangles)
     global_count = edge_count + (0 if hybridized else triangle_count) + len(vias)
+    if condense_spokes:
+        # Face zero opposes each fan triangle's center: only it lies on the
+        # rectangle perimeter. Spokes are local, not global solved unknowns.
+        global_count = len(set(edge[0] for edge in local_edges)) + len(vias)
     if global_count > max_unknowns:
         raise ValueError(f"RT0 {'hybrid' if hybridized else 'mixed'}-system unknown budget exceeded: "
             f"{global_count} > {max_unknowns}; triangles={triangle_count}, traces={edge_count}, vias={len(vias)}")
@@ -220,7 +232,8 @@ def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
     resistance = coo_matrix((values,(rows,cols)), shape=(current_count,current_count)).tocsr()
     incidence = coo_matrix((bv,(br,bc)), shape=(triangle_count,current_count)).tocsr()
     return RT0System(resistance, incidence, triangles, owners, areas, np.asarray(edges),
-        np.flatnonzero(np.asarray(counts) == 1), contacts, edge_count, local_edges, local_masses)
+        np.flatnonzero(np.asarray(counts) == 1), contacts, edge_count, local_edges,
+        local_masses, rectangle_ids)
 
 
 def solve_conforming_dc(mesh: HybridMesh, source_node: int, load_node: int,
@@ -287,9 +300,77 @@ def solve_conforming_dc(mesh: HybridMesh, source_node: int, load_node: int,
             "sparse LU fill and runtime are not tightly bounded"]}
 
 
+def _condense_rectangle_spokes(matrix, rhs, system, free):
+    """Exact block elimination, independently derived from the existing system.
+
+    For local spoke block Aii and retained neighbors E, solve X=Aii^-1 AiE
+    and y=Aii^-1 fi. Add -AEi X to AEE and -AEi y to fE; reconstruct
+    xi=y-X xE. All quantities retain the original scaled-system units.
+    No current/contact approximation or external implementation is used.
+    """
+    perimeter = np.unique(system.local_edges[:, 0])
+    spokes = np.unique(system.local_edges[:, 1:])
+    if np.intersect1d(perimeter, spokes).size:
+        raise ValueError("RT0 rectangle spoke is also a perimeter trace")
+    index = np.full(system.planar_edge_count, -1, dtype=int)
+    index[free] = np.arange(len(free))
+    eliminated = index[spokes]
+    eliminated = eliminated[eliminated >= 0]
+    keep_mask = np.ones(matrix.shape[0], dtype=bool)
+    keep_mask[eliminated] = False
+    keep = np.flatnonzero(keep_mask)
+    reduced_index = np.full(matrix.shape[0], -1, dtype=int)
+    reduced_index[keep] = np.arange(len(keep))
+    reduced_rhs = rhs[keep].copy()
+    rows, cols, values, recovery = [], [], [], []
+    entry_count = 0
+    # Triangles of each geometric rectangle are contiguous. Control-node IDs
+    # cannot group them: a finite terminal may own multiple rectangles.
+    starts = np.r_[0, np.flatnonzero(np.diff(system.triangle_rectangles))+1]
+    ends = np.r_[starts[1:], len(system.triangle_rectangles)]
+    csr = matrix.tocsr()
+    for start, end in zip(starts, ends):
+        ids = index[np.unique(system.local_edges[start:end, 1:])]
+        ids = ids[ids >= 0]
+        if not len(ids):
+            continue  # Entirely outside the driven component.
+        if len(ids) > 256:
+            raise ValueError("RT0 local spoke condensation exceeds 256-trace work budget")
+        block_rows = csr[ids]
+        neighbors = np.setdiff1d(np.unique(block_rows.indices), ids)
+        if np.any(~keep_mask[neighbors]):
+            raise ValueError("RT0 spoke blocks couple across geometric rectangles")
+        entry_count += len(neighbors)**2 + len(ids)*len(neighbors)
+        if entry_count > 4_000_000 or len(neighbors) > 512:
+            raise ValueError("RT0 spoke Schur fill exceeds local work budget")
+        local = block_rows[:, ids].toarray()
+        coupling = block_rows[:, neighbors].toarray()
+        try:
+            np.linalg.cholesky(local)  # A principal block must be positive definite.
+            solved = np.linalg.solve(local, np.column_stack((coupling, rhs[ids])))
+        except np.linalg.LinAlgError as error:
+            raise ValueError("RT0 local spoke block is singular or indefinite") from error
+        if not np.isfinite(solved).all():
+            raise ValueError("RT0 local spoke elimination returned nonfinite values")
+        x, y = solved[:, :-1], solved[:, -1]
+        exterior = csr[neighbors][:, ids].toarray()
+        mapped = reduced_index[neighbors]
+        rows.append(np.repeat(mapped, len(mapped)))
+        cols.append(np.tile(mapped, len(mapped)))
+        values.append((-exterior@x).ravel())
+        reduced_rhs[mapped] -= exterior@y
+        recovery.append((ids, neighbors, x, y))
+    reduced = csr[keep][:, keep].tocsc()
+    if rows:
+        reduced += coo_matrix((np.concatenate(values),
+            (np.concatenate(rows), np.concatenate(cols))), shape=reduced.shape).tocsc()
+    return reduced, reduced_rhs, keep, recovery
+
+
 def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node: int,
                                   *, max_unknowns: int = 150000,
-                                  max_triangles: int = 150000) -> dict[str, Any]:
+                                  max_triangles: int = 150000,
+                                  condense_spokes: bool = True) -> dict[str, Any]:
     """Equivalent RT0 probe with local flux/pressure static condensation.
 
     Write v=M^-1*1, d=1.T*v, a=1/d, b=v/d, H=M^-1-v*v.T/d.
@@ -302,11 +383,13 @@ def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node
     sparse augmented form to avoid explicitly forming a dense inverse/Schur.
     Boundary traces are retained with zero external normal current. All
     local fluxes are recovered and checked, including the eliminated gauge.
+    A second exact rectangle-level elimination removes fan spoke traces by
+    default. False retains the original hybrid system as an equivalence oracle.
     """
     if source_node == load_node:
         raise ValueError("RT0 source and load must be distinct finite contacts")
     system = assemble_conforming_dc(mesh, max_unknowns=max_unknowns,
-        hybridized=True, max_triangles=max_triangles)
+        hybridized=True, max_triangles=max_triangles, condense_spokes=condense_spokes)
     if source_node not in system.contacts or load_node not in system.contacts:
         raise ValueError("RT0 port terminals must resolve to fixed finite contacts")
     nt = len(system.triangles_mm)
@@ -348,17 +431,30 @@ def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node
     f = np.asarray(f_operator@injection)
     h = np.asarray(c.T@(a*injection))
     # Keep the same terminal support and finite R; only a trace gauge is fixed.
-    free = traces[1:]
+    # Gauge a retained perimeter trace, never an eliminated interior spoke.
+    gauge = np.intersect1d(traces, system.local_edges[:, 0])[0]
+    free = traces[traces != gauge]
     scale = float(np.median(system.resistance.diagonal()))
     g_selected = g[free][:,via_ids]
     matrix = bmat([[s[free][:,free]*scale, g_selected],
         [g_selected.T, -d[via_ids][:,via_ids]/scale]], format="csc")
     rhs = np.r_[f[free], -h[via_ids]/scale]
+    solved_matrix, solved_rhs = matrix, rhs
+    keep, recovery = np.arange(len(rhs)), []
+    if condense_spokes:
+        solved_matrix, solved_rhs, keep, recovery = _condense_rectangle_spokes(
+            matrix, rhs, system, free)
+    if len(solved_rhs) > max_unknowns:
+        raise ValueError("RT0 condensed-system unknown budget exceeded")
     try:
-        factor = splu(matrix)
-        solution = factor.solve(rhs)
+        factor = splu(solved_matrix)
+        retained_solution = factor.solve(solved_rhs)
     except RuntimeError as error:
         raise ValueError("Hybrid RT0 sparse solve is singular or failed") from error
+    solution = np.zeros(len(rhs))
+    solution[keep] = retained_solution
+    for ids, neighbors, x, y in recovery:
+        solution[ids] = y-x@solution[neighbors]
     if not np.isfinite(solution).all():
         raise ValueError("Hybrid RT0 sparse solve returned nonfinite values")
     residual = float(np.linalg.norm(matrix@solution-rhs)/max(np.linalg.norm(rhs),1e-30))
@@ -386,9 +482,13 @@ def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node
         "resistance_ohm":resistance, "dissipation_w_at_one_ampere":loss,
         "maximum_cell_kcl_error_a":cell_kcl, "maximum_face_kcl_error_a":face_kcl,
         "relative_residual":residual, "relative_energy_error":energy_error,
-        "triangle_count":len(cells), "global_unknown_count":len(solution),
-        "global_trace_count":len(traces), "via_current_unknown_count":len(via_ids),
-        "system_nonzeros":int(matrix.nnz), "factor_nonzeros":int(factor.L.nnz+factor.U.nnz),
+        "triangle_count":len(cells), "global_unknown_count":len(retained_solution),
+        "uncondensed_global_unknown_count":len(solution),
+        "eliminated_spoke_trace_count":len(solution)-len(retained_solution),
+        "rectangle_spoke_condensation":condense_spokes,
+        "global_trace_count":len(retained_solution)-len(via_ids)+1,
+        "uncondensed_global_trace_count":len(traces), "via_current_unknown_count":len(via_ids),
+        "system_nonzeros":int(solved_matrix.nnz), "factor_nonzeros":int(factor.L.nnz+factor.U.nnz),
         "local_triangle_budget":max_triangles, "global_unknown_budget":max_unknowns,
         "geometry_snap_tolerance_mm":5e-13,
         "limitations":["DC only; no PEEC L/C or field qualification",

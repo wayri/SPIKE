@@ -34,7 +34,7 @@ from .service_project_assembly import handle_assembly_project_request
 from .service_project_mcad_placement import handle_mcad_placement_project_request
 from .service_project_selector_preview import generate_mcad_selector_preview_in_project, read_mcad_selector_previews
 from .normalized_source_codec import compact_normalized_source_for_open
-from .service_project_persistence import project_for_desktop, prepare_persistent_state, read_persistent_artifact
+from .service_project_persistence import project_for_desktop, prepare_persistent_state, read_persistent_artifact, without_saved_results
 from .project_state_artifacts import hydrate_result_state
 
 
@@ -217,6 +217,12 @@ def handle_project_request(
                             "previous_source_digest": base_digest,
                             "current_source_digest": updated_digest,
                         })
+            include_results = params.get("include_results", True)
+            if not isinstance(include_results, bool):
+                raise ProjectPackageError("include_results must be a boolean.")
+            if not include_results:
+                payload = without_saved_results(payload)
+                payload.setdefault("audit", []).append({"event": "project_saved_without_results"})
             generate_geometry_tables = (
                 bool(params["generate_geometry_tables"])
                 if "generate_geometry_tables" in params

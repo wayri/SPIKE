@@ -87,6 +87,40 @@ Use a sequence of decreasing `target_size_mm` and `zone_cell_mm` values for
 mesh-convergence testing. A result must not be promoted from `Approximate` to
 `Validated` only because a finer mesh was selected.
 
+### Experimental conforming-copper local refinement
+
+The separate experimental conforming PEEC/DC partition accepts a versioned
+`AnalysisSpec.mesh.conforming_local_refinements` control. It refines retained
+*interior copper rectangles* in selected layer/net regions, without changing
+their copper union or fixed pad/via terminal footprints:
+
+```json
+{
+  "mesh": {
+    "target_size_mm": 0.5,
+    "zone_cell_mm": 0.5,
+    "conforming_local_refinements": {
+      "contract": "spike/conforming-local-refinement/v1",
+      "regions": [{
+        "layer": "F.Cu", "net": "+1V0",
+        "bounds_mm": [10.0, 20.0, 12.0, 21.0],
+        "maximum_edge_mm": 0.125
+      }]
+    }
+  }
+}
+```
+
+There are at most 64 rectangular regions. All coordinates and edge lengths are
+in millimetres; the local edge must not exceed the effective base target.
+Regions must intersect retained noncontact copper in the selected layer/net.
+Malformed, ineffective, or over-budget controls fail the partition rather
+than being silently ignored. The control only subdivides existing copper:
+it does not repair omitted boundary slivers, annular-via physics, port
+calibration, or AC basis support. `conforming_partition` reports per-region
+hits and added cells. Repeat the full mesh/physics convergence checks after
+changing any local rule; this control is not a validation shortcut.
+
 ## CLI
 
 ```powershell

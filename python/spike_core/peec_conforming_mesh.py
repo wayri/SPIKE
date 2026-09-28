@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Bounded interior rectangular copper partition for experimental volume PEEC.
 
@@ -17,6 +17,7 @@ from math import ceil, isfinite, pi, sqrt
 from typing import Any
 
 from .contracts import AnalysisSpec, DesignIR, ValidationIssue
+from .conforming_local_refinement import parse_local_copper_regions, refine_local_rectangles
 from .hybrid_mesh import (
     COPPER_CONDUCTIVITY_S_M, HybridMesh, MeshBranch, MeshNode, _Builder,
     _net, _pad_has_drill, _pad_layers, _pad_size, _point,
@@ -111,7 +112,8 @@ def build_conforming_mesh(design: DesignIR, spec: AnalysisSpec) -> HybridMesh:
     size while retaining one terminal identity and their exact physical area.
     Optional mesh.conforming_interior_max_edge_mm subdivides retained
     noncontact rectangles after geometry partition/coalescing. Neither changes
-    copper boundaries or finite terminal support.
+    copper boundaries or finite terminal support. Versioned local regions can
+    further refine only their exact intersection with retained interior copper.
     """
     builder = _Builder(design, spec)
     mesh = builder.mesh
@@ -146,6 +148,11 @@ def build_conforming_mesh(design: DesignIR, spec: AnalysisSpec) -> HybridMesh:
     if not isfinite(requested_target) or requested_target < 0.05:
         return _failure(mesh, "Conforming requested mesh size below 0.05 mm is not admitted; the base builder would silently clamp it.")
     target = min(builder.target, builder.zone_target)
+    try:
+        local_regions = parse_local_copper_regions(
+            spec.mesh.get("conforming_local_refinements"), target)
+    except ValueError as error:
+        return _failure(mesh, str(error))
     groups: dict[tuple[str, str], list[tuple[Any, str, str]]] = {}
     holes: dict[tuple[str, str], list[Any]] = {}
     contacts: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -255,6 +262,9 @@ def build_conforming_mesh(design: DesignIR, spec: AnalysisSpec) -> HybridMesh:
         "maximum_omitted_area_fraction": area_limit, "boundary_depth": max_depth,
         "requested_target_mm": requested_target, "effective_target_mm": target,
         "interior_max_edge_mm": interior_max_edge, "interior_subdivision_added_cells": 0,
+        "local_refinement_region_count": len(local_regions),
+        "local_refinement_added_cells": 0,
+        "local_refinement_hits": [0]*len(local_regions),
         "contact_max_edge_mm": target, "contact_subdivision_added_cells": 0,
         "groups": group_reports, "terminal_contacts": terminal_support,
         "potential_approximation": "cellwise_constant; nonorthogonal/adaptive-face accuracy requires refinement",
@@ -369,6 +379,13 @@ def build_conforming_mesh(design: DesignIR, spec: AnalysisSpec) -> HybridMesh:
                 subdivided = _subdivide_interior_rectangles(coalesced, interior_max_edge, max_cells-len(all_cells))
                 quality["interior_subdivision_added_cells"] += len(subdivided)-len(coalesced)
                 coalesced = subdivided
+            if local_regions:
+                subdivided, hits = refine_local_rectangles(coalesced, local_regions,
+                    layer, net, max_cells-len(all_cells))
+                quality["local_refinement_added_cells"] += len(subdivided)-len(coalesced)
+                for index, count in hits.items():
+                    quality["local_refinement_hits"][index] += count
+                coalesced = subdivided
             for bounds in coalesced:
                 accept(bounds)
         except ValueError as error:
@@ -450,6 +467,10 @@ def build_conforming_mesh(design: DesignIR, spec: AnalysisSpec) -> HybridMesh:
                 return _failure(mesh, f"{layer}/{net}: interior partition disconnected or omitted a source copper component ({len(roots)} retained components)")
         for kind in mesh.geometry_counts:
             mesh.geometry_counts[kind] += sum(record[2] == kind for record in records)
+    for index, hit_count in enumerate(quality["local_refinement_hits"]):
+        if not hit_count:
+            region = local_regions[index]
+            return _failure(mesh, f"Conforming local region {index} has no retained interior copper on {region.layer}/{region.net}")
     mesh.issues.append(ValidationIssue("PEEC_CONFORMING_PARTITION_APPROXIMATE", "warning",
         "Interior rectangular copper partition passed its area gate; port R/L convergence remains required.",
         status="approximate"))

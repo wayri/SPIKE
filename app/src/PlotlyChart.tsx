@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import { useEffect, useRef, useState } from "react";
 import type Plotly from "plotly.js-dist-min";
 

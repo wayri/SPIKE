@@ -10,11 +10,9 @@ The current implementation includes typed `DesignIR v2`, `AssemblyIR v1`, a
 secure `.spike` v3 package reader/writer, a published model-index contract,
 bounded STEP/STP/glTF/GLB attachment with artifact-integrity checks,
 native-solver request/result contracts, and a machine-readable capability
-ledger. Native DC PI remains the only implemented native solver workflow, and it remains `Approximate`. The
-PEEC AC/RLCG and geometry transient paths are `Experimental`. Native SPICE,
-full thermal/CHT, SI, EMI, magnetics, and multi-board solve paths are not
-released capabilities. See [SOLVER_STATUS.md](SOLVER_STATUS.md) and
-[../codex_migration/USER_REQUEST_TRACKER.md](../codex_migration/USER_REQUEST_TRACKER.md).
+ledger. Solver implementations, applicability, and qualification continue to
+change; the current capability states are recorded in
+[SOLVER_STATUS.md](SOLVER_STATUS.md).
 
 ## System boundary
 
@@ -919,7 +917,7 @@ modes. See [VALIDATION_PROGRAM.md](VALIDATION_PROGRAM.md),
 
 ### Bounded multi-board planning boundary
 
-The retained-project scale contract currently admits up to 20 board instances,
+The retained-project scale contract currently admits up to 30 board instances,
 32 copper layers per board, a 1,000 mm by 1,000 mm declared or derived board
 envelope, 20,000 components per board, and 100,000 nets per board. These are
 data and resource-admission ceilings, not throughput or numerical-accuracy
@@ -927,7 +925,7 @@ claims. Repeated instances of the same retained DesignIR are charged separately
 for component, net, area, and workload memory estimates.
 
 `spike/multiboard-analysis-request/v1` produces a deterministic
-`spike/multiboard-analysis-plan/v1` for PI or SI. The plan assigns a stable
+`spike/multiboard-analysis-plan/v1` for PI, SI, thermal, or EMI. The plan assigns a stable
 namespace to every selected board, resolves every virtual-harness endpoint to a
 retained board, normalizes pin maps and connector mappings, and binds the graph
 with SHA-256. The desktop may draw and highlight this graph without treating a
@@ -940,7 +938,9 @@ optional reference-bound C/G values and emits an inspectable circuit fragment;
 it does not infer values from AWG/material names and does not bind board ports.
 Coupled harness mode remains blocked until versioned board-network and solver
 adapters consume this graph and pass analytical, independent, and measured
-PI/SI fixtures.
+PI/SI fixtures. Thermal and EMI coupled-assembly plans remain blocked pending
+qualified cross-board heat-transfer and electromagnetic adapters. Their
+independent plans retain contact/bond and part context without solving it.
 
 Solver management now has an explicit `spike/solver-selection/v1` boundary.
 The user selects one candidate for one workload; the resolver returns that exact

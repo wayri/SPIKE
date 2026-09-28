@@ -19,6 +19,16 @@ extension packages. SPIKE discovers `*/spike-extension.json` beneath each
 root. Unbundled extensions are catalogued but cannot execute until their ID is
 explicitly trusted.
 
+For a simpler desktop install, open **Extensions → Browse and manage extensions →
+Browse**. Choose a `.zip` or `.spike-extension` archive, or enter a local package
+directory. SPIKE previews the manifest, permissions, file count, and package
+SHA-256 before **Install extension**. The package is copied into SPIKE's managed
+extension directory and appears immediately in the catalog. An update replaces
+only a package previously installed by this manager and revokes session trust.
+On **Manage**, select an extension to review and trust its permissions, run a
+capability, or **Remove** a manager-installed package. Built-in and externally
+discovered packages cannot be removed by the manager.
+
 ## Process protocol
 
 SPIKE launches the declared entrypoint with:
@@ -51,7 +61,28 @@ Third-party JavaScript is not loaded into the Tauri webview. Applications and
 panels return structured data or a schema-driven view description. This keeps
 extensions portable between desktop, CLI, and future cloud workers.
 
+An extension may declare host-rendered UI metadata in its manifest:
+
+```json
+"ui": {"menu_bar": true, "title_bar": true, "menu_items": ["my-action"]}
+```
+
+`menu_items` must name declared contributions. SPIKE retains this metadata for
+manifest compatibility; the current desktop UI displays each extension's
+declared capabilities in its shared toolbar. Extensions do not inject webview
+code. Installed extensions appear under the
+shared **Extensions** menu and in the **Extensions** ribbon tab. The ribbon has
+an extension selector and shows its declared capabilities. A capability opens
+its setup in the manager so inputs can be reviewed before execution. Users can
+independently show or hide each extension in the shared menu and toolbar from
+**Manage**. Visibility is saved as a local application preference. An untrusted
+extension remains visible but cannot run until explicitly trusted for the
+session.
+
 See `../extensions/net-inventory` for a complete Python example.
+The bundled `../extensions/openems_suite` package shows a multi-workflow
+external solver integration for PI and SI. OpenEMS itself has no native thermal
+solver; its extension exposes no thermal contribution.
 
 ## External analysis round trip
 
@@ -63,6 +94,17 @@ Declare an `analyses` contribution with `output_contract: "spike/v1"` and both
 must include the input `design_id`, `design_digest_sha256`, and solver identity.
 The host checks those fields and admits finite, bounded visualization samples
 before adding the result to the normal result viewer, history, and reports.
+
+For mesh-aware analyses, declare `mesh.read` in addition to `design.read` and
+`results.write`. The host supplies a complete bounded hybrid topology mesh,
+a separate sampled display preview, normalized analysis settings, and solver
+geometry with materials and excitations. Truncated or erroneous topology is
+rejected. Return the mesh SHA-256 in `provenance.input_mesh_sha256` and the
+analysis setup SHA-256 in `provenance.input_analysis_spec_sha256` (the Python
+helper does this automatically) and publish computed fields or explicit mesh
+cells through `fields.visualization`. See the
+[mesh-aware example](examples/mesh-field-adapter/extension.py). This exchange
+does not establish mesh convergence or qualify solver physics.
 
 The dependency-free [Python helper](python/spike_extension_sdk.py) constructs
 the bound result and writes the envelope atomically. See the
@@ -100,6 +142,7 @@ and BREP. The host rejects invalid base64, digest mismatches, path-like names an
 files over 64 MiB. `manifest` may describe verification, provenance and omissions.
 
 The minimal process environment now includes standard OS home/application
-locations so installed optional runtimes can be discovered. It does not copy
+locations and the explicit SPIKE state and OpenEMS runtime paths so installed
+optional runtimes can be discovered. It does not copy
 arbitrary environment variables or credentials. Extensions remain trusted local
 processes, not an OS security sandbox.

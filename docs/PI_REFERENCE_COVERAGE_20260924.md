@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # PI reference coverage and release acceptance
 
 Date: 2026-09-24. This maps the user-supplied PI references to SPIKE's current

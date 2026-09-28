@@ -1,0 +1,28 @@
+{
+  "source_board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33",
+  "conductors": [
+    "F.Cu antenna and feed",
+    "idealized B.Cu GND reference bounded by source fill"
+  ],
+  "removed_copper": [
+    "In1.Cu",
+    "In2.Cu"
+  ],
+  "dielectric_thickness_mm": 1.5162,
+  "effective_epsilon_r": 4.540694764082663,
+  "effective_epsilon_method": "series-capacitance slab reduction; internal copper thickness replaced with adjacent dielectric average",
+  "attributed_antenna_graphics": [
+    "817c03f8-f9e8-4029-897c-528a2659f8a0",
+    "b3e2ed36-ac4c-4dfe-8147-1d61b463a2a2"
+  ],
+  "reference_plane_bounds_mm": [
+    51.308,
+    122.930417,
+    79.756,
+    177.286417
+  ],
+  "return_port": "0.5 mm synthetic B.Cu pad marker inside source-filled GND at the antenna feed; vertical 50 ohm lumped port",
+  "short": "one pinned source GND via represented as a solid PEC cylinder",
+  "omissions": "Source GND plane voids, other nets, matching components, shield, extra ground vias, internal copper, solder mask, copper loss, dielectric loss and nonrectangular board outline",
+  "qualification": "illustrative surrogate; not a validated radiation prediction"
+}

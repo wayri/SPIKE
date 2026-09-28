@@ -72,6 +72,8 @@ export type TopologyNode = {
   loadCurrentA?: number;
   loadPowerW?: number;
   efficiencyPercent?: number;
+  converterKind?: "ldo" | "buck";
+  voltageRatio?: number;
   maxCurrentA?: number;
   resistanceOhm?: number;
   enabled?: boolean;
@@ -94,7 +96,9 @@ export type TopologyNode = {
 export type PowerNodeBudget = {
   nodeId: string;
   voltageV?: number;
+  inputVoltageV?: number;
   currentA: number;
+  inputCurrentA?: number;
   inputPowerW: number;
   outputPowerW: number;
   lossW: number;
@@ -438,11 +442,22 @@ export function calculatePowerTree(model: TopologyModel, operatingCase: number |
   });
   for (let pass = 0; pass < Math.max(2, activeNodes.length); pass += 1) {
     activeNodes.forEach(node => {
-      if (voltages.has(node.id)) return;
       const upstream = (incoming.get(node.id) ?? []).map(id => voltages.get(id)).find(value => value !== undefined);
-      if (upstream !== undefined) voltages.set(node.id, upstream);
+      if (upstream === undefined || voltages.has(node.id)) return;
+      const ratio = node.kind === "regulator" && node.voltageRatio !== undefined ? node.voltageRatio : 1;
+      if (Number.isFinite(ratio) && ratio > 0) voltages.set(node.id, upstream * ratio);
     });
   }
+  activeNodes.filter(node => node.kind === "regulator").forEach(node => {
+    const inputV = (incoming.get(node.id) ?? []).map(id => voltages.get(id)).find(value => value !== undefined);
+    const outputV = voltages.get(node.id);
+    if (node.converterKind && (inputV === undefined || outputV === undefined)) warnings.push(`${node.label} needs input and output voltage.`);
+    if (node.converterKind === "buck" && node.efficiencyPercent === undefined) warnings.push(`${node.label} needs an explicit buck efficiency.`);
+    if (node.voltageRatio !== undefined && (!Number.isFinite(node.voltageRatio) || node.voltageRatio <= 0)) warnings.push(`${node.label} has an invalid voltage ratio.`);
+    if (inputV !== undefined && outputV !== undefined && node.voltageRatio !== undefined && Math.abs(outputV / inputV - node.voltageRatio) > 1e-3) warnings.push(`${node.label} output voltage disagrees with its voltage ratio.`);
+    if (node.converterKind === "ldo" && inputV !== undefined && outputV !== undefined && outputV > inputV) warnings.push(`${node.label} LDO output exceeds input voltage; the operating point is invalid.`);
+    if (node.efficiencyPercent !== undefined && (!Number.isFinite(node.efficiencyPercent) || node.efficiencyPercent <= 0 || node.efficiencyPercent > 100)) warnings.push(`${node.label} has an invalid efficiency.`);
+  });
 
   const metrics: Record<string, PowerNodeBudget> = {};
   const visiting = new Set<string>();
@@ -454,6 +469,7 @@ export function calculatePowerTree(model: TopologyModel, operatingCase: number |
     visiting.add(id);
     const node = nodeById.get(id)!;
     const voltage = voltages.get(id);
+    const inputVoltage = (incoming.get(id) ?? []).map(parent => voltages.get(parent)).find(value => value !== undefined);
     const downstreamPower = (outgoing.get(id) ?? []).reduce((sum, child) => sum + demandAtInput(child), 0);
     let outputPower = downstreamPower;
     if (node.kind === "load") {
@@ -466,14 +482,19 @@ export function calculatePowerTree(model: TopologyModel, operatingCase: number |
       if (!explicitScenarioDemand) outputPower *= multiplier;
       if (outputPower === 0) warnings.push(`${node.label} has no load current or power assignment.`);
     }
-    const efficiency = node.kind === "regulator" || node.kind === "transformer" ? Math.min(100, Math.max(0.1, node.efficiencyPercent ?? 90)) : undefined;
+    const isLdo = node.kind === "regulator" && node.converterKind === "ldo";
+    const efficiency = isLdo
+      ? (inputVoltage && voltage ? 100 * voltage / inputVoltage : undefined)
+      : node.kind === "regulator" || node.kind === "transformer" ? node.efficiencyPercent ?? 90 : undefined;
     const resistance = Math.max(0, node.resistanceOhm ?? ((node.kind === "passive" || node.kind === "connector" || node.kind === "harness") ? inferredResistance(node.value) ?? 0 : 0));
     const point = operatingPoint(node);
     const current = voltage && voltage > 0 ? outputPower / voltage : point?.currentA ?? (node.loadCurrentA ? node.loadCurrentA * multiplier : 0);
     const conductionLoss = current * current * resistance;
-    const inputPower = efficiency !== undefined ? outputPower / (efficiency / 100) : outputPower + conductionLoss;
+    const inputPower = isLdo && inputVoltage && voltage && voltage <= inputVoltage
+      ? outputPower * inputVoltage / voltage
+      : efficiency !== undefined && efficiency > 0 && efficiency <= 100 ? outputPower / (efficiency / 100) : outputPower + conductionLoss;
     const loss = Math.max(0, inputPower - outputPower);
-    metrics[id] = { nodeId: id, voltageV: voltage, currentA: current, inputPowerW: inputPower, outputPowerW: outputPower, lossW: loss, efficiencyPercent: efficiency };
+    metrics[id] = { nodeId: id, voltageV: voltage, inputVoltageV: inputVoltage, currentA: current, inputCurrentA: inputVoltage && inputVoltage > 0 ? inputPower / inputVoltage : undefined, inputPowerW: inputPower, outputPowerW: outputPower, lossW: loss, efficiencyPercent: efficiency };
     if (node.maxCurrentA !== undefined && current > node.maxCurrentA) warnings.push(`${node.label} exceeds its ${node.maxCurrentA.toFixed(3)} A current limit (${current.toFixed(3)} A).`);
     visiting.delete(id);
     memo.set(id, inputPower);
@@ -499,8 +520,8 @@ export function calculatePowerTree(model: TopologyModel, operatingCase: number |
   loads.filter(node => sources.length && !reachable.has(node.id)).forEach(node => warnings.push(`${node.label} is not reachable from a source; complete the converter/rail connections or import the schematic netlist.`));
   sources.filter(node => !voltages.has(node.id)).forEach(node => warnings.push(`${node.label} has no source voltage assignment.`));
   if (cycleFound) warnings.push("The power tree contains a cycle; use the circuit solver for meshed or parallel networks.");
-  const invalid = cycleFound || !sources.length || !loads.length;
-  const incomplete = !invalid && (sourcePowerW <= 0 || warnings.some(warning => /no (load|source voltage)|not reachable|disconnected/i.test(warning)));
+  const invalid = cycleFound || !sources.length || !loads.length || warnings.some(warning => /output exceeds input voltage|invalid voltage ratio|invalid efficiency|disagrees with its voltage ratio/i.test(warning));
+  const incomplete = !invalid && (sourcePowerW <= 0 || warnings.some(warning => /no (load|source voltage)|not reachable|disconnected|needs input and output voltage|needs an explicit buck efficiency/i.test(warning)));
   const downstreamLoads = (rootId: string) => {
     const found = new Set<string>();
     const pendingIds = [...(outgoing.get(rootId) ?? [])];

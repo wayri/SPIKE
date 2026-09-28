@@ -1,5 +1,41 @@
 # SPIKE Release Notes
 
+## SPIKE desktop 0.3.0 — community engineering preview
+
+**Channel:** community engineering preview for testing. The current-source
+Windows MSI is unsigned and requests all-user privileges. Its size, SHA-256,
+package contents, and validation limits are recorded in
+`docs/RELEASE_0_3_0_VERIFICATION.md`. An NSIS installer is unavailable for
+this build. No PI/SI/thermal/EM solver is promoted to production or
+engineering-signoff qualification by this release.
+
+- Adds a managed extension browser for local ZIP/directory packages with
+  manifest preview, permission review, install/update, and managed removal.
+  Installed capabilities appear in a shared Extensions menu and ribbon.
+- Adds optional EMerge board SI/S-parameter and relative radiation workflows,
+  plots, sampled 3D patterns, probing, and EMI bench visualization. The HF / SI
+  ribbon selects EMerge for two-port S-parameters only when its trusted runtime
+  reports that capability. These solver results remain unvalidated.
+- Expands contextual help and the floating analysis guide with EMerge and
+  internal-solver steps, highlighted controls, and suggested next actions.
+- Adds project studies and ordered PI, SI, thermal, and EM cases; each case
+  retains its setup and any captured result. Project files can now be saved as
+  a separate result-free copy or a standalone result snapshot. Older project
+  packages offer an explicit v3 upgrade that preserves the source file.
+- Adds assembly-aware board occurrence selection and explicit direct-connector
+  and cable-harness planning. PI, thermal, and EM requests bind one selected
+  active-design board occurrence; multi-board SI uses explicit board jobs.
+  These are analysis-scope and persistence changes, not coupled multi-board
+  field physics.
+- Adds optional loopback-only local LLM/MCP setup for reviewed desktop study
+  and workspace actions. The bridge is opt-in and tool availability does not
+  execute a solver or establish numerical validity.
+- Refreshes dock controls, result tools, in-app Help Center topics, and the
+  checked-in user guides for the current interface. Solver qualification,
+  clean-machine installation, numerical human review, and fresh 0.3.0
+  release evidence remain separate gates; the recorded verification predates
+  the current source changes.
+
 ## SPIKE desktop 0.2.13 — engineering preview
 
 **Channel:** unsigned engineering preview; not production or physics signoff qualified.
@@ -140,8 +176,9 @@ installer and installed-image evidence is recorded separately after verification
 
 - CLI, Python package, built-in library metadata, and the engine-release
   builder now share one engine version source.
-- The SPIKE desktop remains separately versioned at 0.2.5. This engine version
-  does not promote desktop or PCB-physics capabilities.
+- At the time of this engine candidate, the SPIKE desktop was separately
+  versioned at 0.2.5. This engine version does not promote desktop or PCB-physics
+  capabilities.
 - The beta label covers the reviewed bounded engine interfaces accumulated in
   the alpha series. It does not claim complete SPICE3/IBIS coverage, arbitrary
   PCB physics, physical-HIL certification, or production qualification.

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Run an entity-bound PCB port through the actual optional openEMS workflow.
 
@@ -21,6 +21,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, help="New case directory (must not exist)")
     parser.add_argument("--run", action="store_true")
+    parser.add_argument("--experimental-compact-edge-grid", action="store_true",
+                        help="Opt in to reduced sheet-edge mesh lines; requires case-specific convergence")
     args = parser.parse_args()
     design, spec = patch_antenna_fixture()
     # Overlapping same-net metal exercises exact rotation without changing the patch contour.
@@ -32,7 +34,8 @@ def main():
         "impedance_ohm": 50., "excite": True}]}
     prepared = prepare_entity_port_case(design, spec, ports, output_dir=args.output,
         options={"mesh_resolution_mm": 3., "air_padding_mm": 30., "threads": 2,
-                 "max_timesteps": 50000, "max_solver_time_s": 120, "timeout_s": 180})
+                 "max_timesteps": 50000, "max_solver_time_s": 120, "timeout_s": 180,
+                 "experimental_compact_edge_grid": args.experimental_compact_edge_grid})
     print(json.dumps({"prepared_status": prepared["status"], "case_dir": prepared.get("case_dir")}, allow_nan=False))
     if args.run and prepared["status"] == "ready_to_run":
         result = run_openems_case(args.output)

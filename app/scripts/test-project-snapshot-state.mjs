@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mergeProjectSnapshot, createResultPackage, readResultPackage, retainOpaqueResultState, isSupportedSavedResult } from '../src/projectSnapshotState.ts';
+import { mergeProjectSnapshot, createResultPackage, readResultPackage, retainOpaqueResultState, isSupportedSavedResult, withoutSavedResults } from '../src/projectSnapshotState.ts';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 const normalizerSource = ts.transpileModule(readFileSync(new URL('../src/analysisResults.ts', import.meta.url), 'utf8'),
@@ -46,6 +46,28 @@ const reopened = readResultPackage(JSON.stringify(packed));
 assert.deepEqual(reopened.snapshot, snapshot);
 assert.equal(reopened.results.result_history.length, 25);
 assert.deepEqual(reopened.visuals, packed.visuals);
+const linked = { ...snapshot, assembly_ir: { boards: ['a', 'b'], connector_mappings: [{ kind: 'connector-mate' }], harnesses: [{ id: 'cable' }] },
+  studies: [{ version: 1, id: 'study-1', name: 'Mixed conditions', cases: [
+    { id: 'case-pi', type: 'pi', settings: { mode: 'DC IR Drop' }, resultSnapshot: { voltage: [1, 2] } },
+    { id: 'case-thermal', type: 'thermal', settings: { ambient_c: 25 } },
+  ] }],
+  thermal: { scenario: { ambient_c: 25, result: { peak_c: 55 }, field_result: { grid: [55] } } },
+  emi: { setup: { band: 'test' }, screening: { value: 1 }, field_result: { values: [3] } },
+  analysis: { ...snapshot.analysis, si: { suite: { name: 'test' }, latest_channel_result: { eye: [1] } }, pdn_review: { value: 2 } } };
+const resultFree = withoutSavedResults(linked);
+assert.deepEqual(resultFree.assembly_ir, linked.assembly_ir);
+assert.deepEqual(resultFree.analysis.si.suite, linked.analysis.si.suite);
+assert.equal(resultFree.analysis.latest_result, null);
+assert.deepEqual(resultFree.analysis.result_history, []);
+assert.equal(resultFree.analysis.si.latest_channel_result, null);
+assert.equal(resultFree.emi.screening, null);
+assert.equal(resultFree.thermal.scenario.field_result, null);
+assert.equal(resultFree.studies[0].cases[0].resultSnapshot, undefined);
+assert.deepEqual(resultFree.studies[0].cases[0].settings, linked.studies[0].cases[0].settings);
+assert.deepEqual(linked.studies[0].cases[0].resultSnapshot, { voltage: [1, 2] }, 'result-free copy must not modify active study');
+assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage({ design: linked.design, analysis: {}, studies: linked.studies }))).snapshot.studies, linked.studies);
+assert.deepEqual(linked.thermal.scenario.field_result, { grid: [55] }, 'export must not clear live results');
+assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage({ ...linked, analysis: {}, emi: {}, thermal: linked.thermal }))).snapshot.thermal, linked.thermal);
 const old = readResultPackage(JSON.stringify({ contract: 'spike/result-package/v1', active_result: results[0].bundle, results }));
 assert.equal(old.results.result_history.length, 25);
 assert.equal(old.snapshot, null, 'legacy result files must not pretend to contain design geometry');

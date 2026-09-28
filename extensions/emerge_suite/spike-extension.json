@@ -1,0 +1,39 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.emerge-suite",
+  "name": "EMerge Suite",
+  "version": "0.1.0",
+  "provider": "SPIKE",
+  "description": "Build a two-layer imported-board FEM case and run optional EMerge SI or radiation analysis.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "experimental",
+  "license": "Apache-2.0",
+  "bundled": true,
+  "ui": {"menu_bar": true, "title_bar": true, "menu_items": ["emerge-si", "emerge-radiation"]},
+  "permissions": ["design.read", "results.write"],
+  "limits": {"timeout_seconds": 3600, "max_result_bytes": 8388608},
+  "contributes": {
+    "applications": [
+      {"id": "emerge-probe", "name": "Check EMerge runtime", "category": "Simulation", "description": "Detect the selected EMerge Python runtime and report runnable adapter capabilities.", "output_contract": "spike/extension-result/v1"}
+    ],
+    "analyses": [
+      {
+        "id": "emerge-radiation",
+        "name": "EMerge radiation pattern",
+        "description": "Run a supported two-layer board model and import far-field angular cuts; no compliance claim.",
+        "output_contract": "spike/v1",
+        "input_schema": {"type": "object", "required": ["signal_net", "return_net", "signal_pad_id", "return_pad_id", "frequency_start_hz", "frequency_stop_hz", "frequency_points", "mesh_resolution_mm"], "properties": {"signal_net": {"type": "string"}, "return_net": {"type": "string"}, "signal_pad_id": {"type": "string"}, "return_pad_id": {"type": "string"}, "frequency_start_hz": {"type": "number"}, "frequency_stop_hz": {"type": "number"}, "frequency_points": {"type": "integer"}, "mesh_resolution_mm": {"type": "number"}, "receive_signal_pad_id": {"type": "string"}, "receive_return_pad_id": {"type": "string"}, "python_executable": {"type": "string"}, "surrounding_geometry": {"type": "object", "description": "Bounded spike/emerge-surroundings/v1 dielectric boxes"}}}
+      },
+      {
+        "id": "emerge-si",
+        "name": "EMerge SI port sweep",
+        "description": "Run a supported two-layer board model and import solved frequency-domain S-parameters.",
+        "output_contract": "spike/v1",
+        "input_schema": {"type": "object", "required": ["signal_net", "return_net", "signal_pad_id", "return_pad_id", "frequency_start_hz", "frequency_stop_hz", "frequency_points", "mesh_resolution_mm"], "properties": {"signal_net": {"type": "string"}, "return_net": {"type": "string"}, "signal_pad_id": {"type": "string"}, "return_pad_id": {"type": "string"}, "frequency_start_hz": {"type": "number"}, "frequency_stop_hz": {"type": "number"}, "frequency_points": {"type": "integer"}, "mesh_resolution_mm": {"type": "number"}, "receive_signal_pad_id": {"type": "string"}, "receive_return_pad_id": {"type": "string"}, "python_executable": {"type": "string"}, "surrounding_geometry": {"type": "object", "description": "Bounded spike/emerge-surroundings/v1 dielectric boxes"}}}
+      }
+    ]
+  }
+}

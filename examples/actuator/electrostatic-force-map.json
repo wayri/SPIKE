@@ -7,5 +7,5 @@
   "fixed_excitation": {"voltage_v": 100},
   "relative_tolerance": 0.000001,
   "absolute_force_tolerance_n": 0.000000000001,
-  "provenance": "Original ideal overlap capacitor C(x)=1e-12+1e-9*x F; W'=C*V^2/2. No fringing, breakdown or pull-in simulation. SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic"
+  "provenance": "Original ideal overlap capacitor C(x)=1e-12+1e-9*x F; W'=C*V^2/2. No fringing, breakdown or pull-in simulation. SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic"
 }

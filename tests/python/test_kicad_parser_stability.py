@@ -15,6 +15,23 @@ class KicadParserStabilityTests(unittest.TestCase):
         path.write_text(contents, encoding="utf-8")
         return path
 
+    def test_footprint_properties_survive_design_import(self):
+        path = self.write('''(kicad_pcb
+          (version 20260101)
+          (layers (0 "F.Cu" signal) (2 "B.Cu" signal))
+          (footprint "Fixture:Part" (layer "F.Cu") (at 5 6)
+            (property "Reference" "U1")
+            (property "Value" "Controller")
+            (property "MPN" "ABC-123")
+            (property "Manufacturer" "Example")
+            (pad "1" smd rect (at 0 0) (size 1 1) (layers "F.Cu")))
+        )''')
+        design = import_kicad_design(str(path))
+        part = next(item for item in design.components if item["reference"] == "U1")
+        self.assertEqual(part["value"], "Controller")
+        self.assertEqual(part["properties"]["MPN"], "ABC-123")
+        self.assertEqual(part["properties"]["Manufacturer"], "Example")
+
     def test_malformed_root_fails_instead_of_returning_partial_design(self):
         path = self.write("(not_a_board (layers (0 F.Cu signal)))")
         with self.assertRaises(RuntimeError):

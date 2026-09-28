@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Local pinned-board connector/placement smoke; electrical values are synthetic."""
 import argparse
 import hashlib

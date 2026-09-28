@@ -34,6 +34,49 @@ export type EmiPort = {
   excite: boolean;
 };
 
+export type EmiRadiatedEmissionsStandard = {
+  id: string;
+  classification?: string;
+  platform?: string;
+};
+
+const RADIATED_EMISSIONS_STANDARDS = [
+  { id: "cispr-32-2015-amd1-2019", label: "CISPR 32:2015+AMD1:2019", classificationLabel: "Class", classifications: ["A", "B"] },
+  { id: "cispr-25-2021", label: "CISPR 25:2021", classificationLabel: "Class", classifications: ["1", "2", "3", "4", "5"] },
+  { id: "mil-std-461h-2026-re102", label: "MIL-STD-461H:2026 RE102", requiresPlatform: true },
+  { id: "mil-std-461g-2015-re102", label: "MIL-STD-461G:2015 RE102 (historical)", requiresPlatform: true },
+] as const;
+
+const MIL_RE102_PLATFORMS = ["ground", "surface_ship", "submarine", "aircraft", "space"] as const;
+
+const radiatedEmissionsStandardFor = (id: string | undefined) =>
+  RADIATED_EMISSIONS_STANDARDS.find(standard => standard.id === id);
+
+const boundedProfileText = (value: unknown): string | undefined => {
+  if (typeof value !== "string") return undefined;
+  const text = value.trim();
+  return text && text.length <= 128 ? text : undefined;
+};
+
+const normalizeRadiatedEmissionsStandard = (raw: unknown): EmiRadiatedEmissionsStandard | undefined => {
+  if (raw == null) return undefined;
+  const invalid = { id: "__invalid_saved_re_profile__" };
+  if (typeof raw !== "object" || Array.isArray(raw)) return invalid;
+  const value = raw as Partial<EmiRadiatedEmissionsStandard>;
+  if (Object.keys(value).some(key => !["id", "classification", "platform"].includes(key))) return invalid;
+  const id = boundedProfileText(value.id);
+  if (!id) return invalid;
+  if (value.classification != null && !boundedProfileText(value.classification)) return invalid;
+  if (value.platform != null && !boundedProfileText(value.platform)) return invalid;
+  const classification = boundedProfileText(value.classification);
+  const platform = boundedProfileText(value.platform);
+  return {
+    id,
+    ...(classification ? { classification } : {}),
+    ...(platform ? { platform } : {}),
+  };
+};
+
 export type EmiSetup = {
   contract: typeof EMI_SETUP_CONTRACT;
   chamber: EmiChamberSetup;
@@ -45,6 +88,7 @@ export type EmiSetup = {
   mesh: { resolution_mm: number; padding_cells: number };
   max_solver_time_s: number;
   excitation: { mode: "prepass_results" | "explicit_ports" | "spice"; ports: EmiPort[] };
+  radiated_emissions_standard?: EmiRadiatedEmissionsStandard;
   net_metrics: EmiNetMetric[];
   viewport: { translucent_board: boolean; analysis_nets_only: boolean };
 };
@@ -168,6 +212,7 @@ export function defaultEmiSetup(netNames: string[] = []): EmiSetup {
     mesh: { resolution_mm: 0.5, padding_cells: 8 },
     max_solver_time_s: 3600,
     excitation: { mode: "prepass_results", ports: [] },
+    radiated_emissions_standard: undefined,
     net_metrics: selected.map(metricFor),
     viewport: { translucent_board: true, analysis_nets_only: false },
   };
@@ -197,6 +242,7 @@ export function normalizeEmiSetup(raw: unknown, netNames: string[] = []): EmiSet
       ...(value.excitation ?? {}),
       ports: Array.isArray(value.excitation?.ports) ? value.excitation.ports : [],
     },
+    radiated_emissions_standard: normalizeRadiatedEmissionsStandard(value.radiated_emissions_standard),
     net_metrics: selected.map(net => ({ ...metricFor(net), ...(metrics.find(item => item?.net === net) ?? {}), net })),
     viewport: { ...fallback.viewport, ...(value.viewport ?? {}) },
     chamber: normalizeEmiChamber(value.chamber),
@@ -287,6 +333,14 @@ export function EmiSetupPanel({
     next[axis] = Number(value) || 0;
     updatePort(index, { [endpoint]: next });
   };
+  const updateRadiatedEmissionsStandard = (id: string) => {
+    const standard = radiatedEmissionsStandardFor(id);
+    replace({ radiated_emissions_standard: standard ? { id: standard.id } : undefined });
+  };
+  const updateRadiatedEmissionsMetadata = (patch: Partial<EmiRadiatedEmissionsStandard>) => setSetup(current => {
+    const standard = current.radiated_emissions_standard;
+    return standard ? { ...current, radiated_emissions_standard: { ...standard, ...patch } } : current;
+  });
   const stages = preflight?.stages ?? [
     { id: "setup", name: "Design and domain", state: board ? "pending" : "blocked", detail: "Choose candidate and return nets." },
     { id: "screen", name: "Electrical pre-pass", state: "pending", detail: "Supply PI, transient, SPICE, or measured metrics." },
@@ -302,7 +356,7 @@ export function EmiSetupPanel({
       <b>{setup.selected_nets.length} candidate{setup.selected_nets.length === 1 ? "" : "s"}</b>
       <small>{preflight ? `${preflight.counts.errors} errors · ${preflight.counts.warnings} warnings` : "Run preflight before case preparation"}</small>
     </div>
-    <div className="emi-process" aria-label="EMI workflow stages">
+    <div className="emi-process" aria-label="EM workflow stages">
       {stages.map((stage, index) => <button key={stage.id} className={`${stageTone(stage.state)} ${section === (["domain", "prepass", "excitation", "solver", "solver"] as const)[index] ? "selected" : ""}`} onClick={() => setSection((["domain", "prepass", "excitation", "solver", "solver"] as const)[index])} title={stage.detail}>
         <span>{index + 1}</span><b>{stage.name}</b><small>{stage.state.replace(/_/g, " ")}</small>
       </button>)}
@@ -331,6 +385,23 @@ export function EmiSetupPanel({
         <select value={setup.environment.kind} onChange={event => replace({ environment: { kind: event.target.value as EmiSetup["environment"]["kind"] } })}>
           <option value="free_space">Free space</option><option value="bench_ground_plane">Bench ground plane</option><option value="shielded_enclosure">Shielded enclosure</option>
         </select>
+        <label>Radiated-emission reference profile
+          <select value={setup.radiated_emissions_standard?.id ?? ""} onChange={event => updateRadiatedEmissionsStandard(event.target.value)}>
+            <option value="">None</option>
+            {setup.radiated_emissions_standard && !radiatedEmissionsStandardFor(setup.radiated_emissions_standard.id) && <option value={setup.radiated_emissions_standard.id}>Unknown / invalid saved profile: {setup.radiated_emissions_standard.id}</option>}
+            {RADIATED_EMISSIONS_STANDARDS.map(standard => <option key={standard.id} value={standard.id}>{standard.label}</option>)}
+          </select>
+        </label>
+        {(() => {
+          const profile = setup.radiated_emissions_standard;
+          const standard = radiatedEmissionsStandardFor(profile?.id);
+          if (!profile) return null;
+          if (!standard) return <div className="emi-gate"><AlertTriangle size={14} /><span><b>Unknown or invalid saved profile</b> This profile is preserved for preflight validation and is not treated as a valid standard selection. Select a supported profile or None to replace it.</span></div>;
+          return <div className="emi-gate"><ShieldAlert size={14} /><span><b>Reference only</b> This profile records a versioned reference standard. No numeric limits, pass/fail assessment, or compliance determination is available.</span>
+            {"classifications" in standard && <label>{standard.classificationLabel}<select value={profile.classification ?? ""} onChange={event => updateRadiatedEmissionsMetadata({ classification: event.target.value || undefined })}>{profile.classification && !standard.classifications.includes(profile.classification as never) && <option value={profile.classification}>Invalid saved class: {profile.classification}</option>}<option value="">Select {standard.classificationLabel.toLowerCase()}</option>{standard.classifications.map(classification => <option key={classification} value={classification}>{classification}</option>)}</select></label>}
+            {"requiresPlatform" in standard && <label>Platform <select value={profile.platform ?? ""} onChange={event => updateRadiatedEmissionsMetadata({ platform: event.target.value || undefined })}>{profile.platform && !MIL_RE102_PLATFORMS.includes(profile.platform as typeof MIL_RE102_PLATFORMS[number]) && <option value={profile.platform}>Invalid saved platform: {profile.platform}</option>}<option value="">Select required platform</option>{MIL_RE102_PLATFORMS.map(platform => <option key={platform} value={platform}>{platform.replace(/_/g, " ")}</option>)}</select></label>}
+          </div>;
+        })()}
         <div className="emi-field-grid"><label>Start (Hz)<input type="number" min="1" value={setup.frequency.start_hz} onChange={event => replace({ frequency: { ...setup.frequency, start_hz: Number(event.target.value) } })} /></label><label>Stop (Hz)<input type="number" min="2" value={setup.frequency.stop_hz} onChange={event => replace({ frequency: { ...setup.frequency, stop_hz: Number(event.target.value) } })} /></label><label>Points<input type="number" min="2" max="100000" value={setup.frequency.points} onChange={event => replace({ frequency: { ...setup.frequency, points: Number(event.target.value) } })} /></label></div>
       </section>
     </>}
@@ -435,8 +506,8 @@ export function EmiDashboard({ embedded = false, preflight, screening, fieldResu
   const maximumLinear = farField?.directivity.maximum_linear[activeFrequencyIndex] ?? maximum;
   const maximumDirectivityDb = maximumLinear > 0 ? 10 * Math.log10(maximumLinear) : null;
   const radiatedPower = farField?.radiated_power.total_w[activeFrequencyIndex] ?? null;
-  return <div className={embedded ? "emi-dashboard-embedded" : "modal-shade"}><section className="emi-dashboard" role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : true} aria-label="EMI review dashboard">
-    <header><span><RadioTower size={18} /><b>EMI TESTER</b><small>Screening, solver readiness, and field-workflow review</small></span><button onClick={onClose} title="Close EMI dashboard"><X size={16} /></button></header>
+  return <div className={embedded ? "emi-dashboard-embedded" : "modal-shade"}><section className="emi-dashboard" role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : true} aria-label="EM review dashboard">
+    <header><span><RadioTower size={18} /><b>EM TESTER</b><small>Screening, solver readiness, and field-workflow review</small></span><button onClick={onClose} title="Close EM dashboard"><X size={16} /></button></header>
     <div className="emi-dashboard-summary">
       <article><small>Workflow status</small><b>{(active?.status ?? "not validated").replace(/_/g, " ")}</b></article>
       <article><small>Screening</small><b>{active?.can_screen ? "Ready" : "Needs input"}</b></article>

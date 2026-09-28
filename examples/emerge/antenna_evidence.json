@@ -1,0 +1,71 @@
+{
+  "board": "examples/emerge/antenna_example.kicad_pcb",
+  "board_sha256": "f8fd038633c5b49a3867c8f09dc4fb3341b9be5a4a3cd961a088dbde6a77a2f0",
+  "design_id": "kicad-f8fd038633c5b49a3867c8f0",
+  "design_digest_sha256": "8f5b257976341982ca6a996179b524f2f43c5bbbd41e943341756fa1d05284af",
+  "parameters": {
+    "signal_net": "RF",
+    "return_net": "GND",
+    "signal_pad_id": "51d0c420-4c7b-4da5-b9ec-001000000011",
+    "return_pad_id": "51d0c420-4c7b-4da5-b9ec-001000000012",
+    "frequency_start_hz": 3000000000,
+    "frequency_stop_hz": 4200000000,
+    "frequency_points": 7,
+    "mesh_resolution_mm": 2.0
+  },
+  "runtime_executable": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\.venv-emerge3\\Scripts\\python.exe",
+  "solver": "EMerge/3.0.0a19",
+  "status": "completed",
+  "model_status": "unvalidated",
+  "frequencies_hz": [
+    3000000000.0,
+    3199999999.9999995,
+    3400000000.0000005,
+    3600000000.0,
+    3800000000.0,
+    3999999999.9999995,
+    4200000000.0
+  ],
+  "s11_db": [
+    -1.034435034104701,
+    -1.7961300901197856,
+    -3.531627385294694,
+    -2.972844585853846,
+    -1.35289656636855,
+    -0.7581048611325402,
+    -0.5135554199194547
+  ],
+  "ports": [
+    "P1"
+  ],
+  "radiation_peak_sample": {
+    "frequency_hz": 3000000000.0,
+    "theta_deg": 0.0,
+    "phi_deg": 15.0,
+    "relative_amplitude_db": 0.0,
+    "e_theta_v_m": [
+      -1.1117133099499052,
+      6.051516513857456
+    ],
+    "e_phi_v_m": [
+      0.28255098715328403,
+      -1.5856361939080308
+    ],
+    "sample_kind": "solver_angular_grid_point"
+  },
+  "radiation_cut_peak_angles_deg": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "issue_codes": [
+    "EMERGE_BOARD_MODEL_UNVALIDATED",
+    "EMERGE_DIELECTRIC_LOSS_OMITTED",
+    "EMERGE_EMI_NOT_COMPLIANCE"
+  ],
+  "qualification": "execution evidence only; no mesh or measurement correlation"
+}

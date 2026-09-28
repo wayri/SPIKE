@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: MIT */
+/* SPDX-License-Identifier: Apache-2.0 */
 
 body:has(.detached-tool-root) { margin: 0; background: #0d171f; }
 .detached-tool-root { color-scheme: dark; min-height: 100vh; box-sizing: border-box; padding: 22px 24px 28px; color: #dce8ee; background: radial-gradient(circle at 85% -15%, #1d3848 0, #101d26 34%, #0d171f 72%); font-family: Inter, "Segoe UI", Arial, sans-serif; font-size: 13px; line-height: 1.45; }

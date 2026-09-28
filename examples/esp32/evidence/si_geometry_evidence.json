@@ -1,0 +1,107 @@
+{
+  "source_board": "examples/esp32/source/iot-esp-eth-ind.kicad_pcb",
+  "source_board_sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33",
+  "generated_design": "examples/esp32/evidence/si_geometry_design.json",
+  "request": "examples/esp32/si_geometry_request.json",
+  "result": "examples/esp32/evidence/si_geometry_result.json",
+  "selection": {
+    "signal_net": "/network/ERXD0",
+    "reference_net": "GND",
+    "reference_layer": "In1.Cu",
+    "reference_zone_id": "80733dce-c2c6-5804-89dd-5511566386b8",
+    "purpose": "bounded board-derived SI geometry channel"
+  },
+  "assumptions": {
+    "copper_conductivity_s_per_m": 58000000.0,
+    "reason": "the pinned KiCad stackup supplies copper thickness but no conductivity"
+  },
+  "status": "completed",
+  "model_status": "experimental",
+  "production_qualified": false,
+  "compliance_status": "not_evaluated",
+  "geometry_digest": "1df2ae73643b440e668fc54b902f22dd470188840f27c3f056f4f454b3abb8a2",
+  "geometry": {
+    "design_id": "5a4cc283-e6c3-50bf-a322-8af299cacebc-si-geometry-erxd0",
+    "signal_net_id": "003c2282-ada6-5497-9769-87f82767453a",
+    "reference_net_id": "1ac4a250-d7c3-5c2e-aee4-9bb352c85e16",
+    "signal_layer_id": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+    "reference_layer_id": "9981ee33-dbaa-5267-9888-57221d486a65",
+    "track_ids": [
+      "27c99c21-3131-52e1-9fe0-817468f001c3",
+      "bc842188-9122-51d1-96ef-a04f4d91f195",
+      "41c5d81d-baf4-58ad-8a14-ee9fdeec6cab",
+      "197c78e5-d35d-57da-8131-e612d65c9eda"
+    ],
+    "reference_zone_ids": [
+      "80733dce-c2c6-5804-89dd-5511566386b8"
+    ],
+    "path_id": "",
+    "length_m": 0.0013966261469056565,
+    "width_m": 0.000254,
+    "thickness_m": 3.5000000000000004e-05,
+    "reference_spacing_m": 0.0002454,
+    "path_mode": "piecewise_planar",
+    "uniform_cross_section_verified": true,
+    "straight_path_verified": false,
+    "piecewise_planar_path_verified": true,
+    "bend_evidence": [
+      {
+        "vertex_mm": [
+          66.5226,
+          152.1206
+        ],
+        "turn_angle_deg": 44.99999999998397,
+        "adjacent_track_ids": [
+          "27c99c21-3131-52e1-9fe0-817468f001c3",
+          "bc842188-9122-51d1-96ef-a04f4d91f195"
+        ],
+        "treatment": "distributed-line length retained; bend discontinuity omitted"
+      },
+      {
+        "vertex_mm": [
+          66.548,
+          152.146
+        ],
+        "turn_angle_deg": -44.99999999998397,
+        "adjacent_track_ids": [
+          "bc842188-9122-51d1-96ef-a04f4d91f195",
+          "41c5d81d-baf4-58ad-8a14-ee9fdeec6cab"
+        ],
+        "treatment": "distributed-line length retained; bend discontinuity omitted"
+      },
+      {
+        "vertex_mm": [
+          66.8655,
+          152.146
+        ],
+        "turn_angle_deg": 45.0,
+        "adjacent_track_ids": [
+          "41c5d81d-baf4-58ad-8a14-ee9fdeec6cab",
+          "197c78e5-d35d-57da-8131-e612d65c9eda"
+        ],
+        "treatment": "distributed-line length retained; bend discontinuity omitted"
+      }
+    ],
+    "reference_zone_declared": true,
+    "reference_zone_full_path_coverage_verified": true
+  },
+  "rlgc_per_m": {
+    "resistance_ohm_per_m": 1.9394127458205652,
+    "inductance_h_per_m": 4.145268099777935e-07,
+    "capacitance_f_per_m": 8.533005611119276e-11,
+    "loss_tangent": 0.02,
+    "loss_tangent_known": true
+  },
+  "limitations": [
+    "piecewise planar constant-width path; each segment uses one shared quasi-TEM cross-section",
+    "single homogeneous dielectric and one simple polygonal reference zone without holes",
+    "reference-zone coverage proves only the projected trace footprint, not return-current density",
+    "quasi-static zero-thickness Hammerstad-Jensen capacitance approximation",
+    "DC conductor resistance only; skin, proximity, roughness, dispersion, vias, launches, and connectors are excluded",
+    "bend discontinuities, corner radiation, and bend-local coupling are omitted; total centerline length is retained",
+    "finite-bandwidth unwindowed reconstruction",
+    "no extrapolated DC, resampling, delay removal, gating, or de-embedding",
+    "ideal normalized NRZ source; no IBIS, package, equalizer, CDR, jitter, or stochastic noise model",
+    "BER is a deterministic-ISI Gaussian proxy and is not a protocol or rare-event qualification"
+  ]
+}

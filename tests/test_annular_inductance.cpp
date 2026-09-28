@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 #include "peec/annular_inductance.hpp"
 #include <algorithm>
@@ -62,6 +62,48 @@ double self_reference(const CoaxialAnnulus &a,int order) {
       integral+=wx*wy*wu*r*s*longitudinal;
     }
   return static_cast<double>(integral*dr*dr*pi*4*pi*1e-7L/(area*area));
+}
+
+// Independent direct six-coordinate volume quadrature. No Legendre expansion,
+// analytic moments, or production geometry transform is used by this oracle.
+double separated_reference(const CoaxialAnnulusVolume &a,
+                           const CoaxialAnnulusVolume &b,int angular_order) {
+  struct Point { std::array<long double,3> x;long double w; };
+  const auto nodes=[&](const CoaxialAnnulusVolume &v) {
+    constexpr long double x[]={-.90617984593866399280L,-.53846931010568309104L,
+        0,.53846931010568309104L,.90617984593866399280L};
+    constexpr long double w[]={.23692688505618908751L,.47862867049936646804L,
+        .56888888888888888889L,.47862867049936646804L,.23692688505618908751L};
+    std::array<long double,3> e{},f{};
+    int least=0;
+    for(int k=1;k<3;++k)if(std::abs(v.direction[k])<std::abs(v.direction[least]))least=k;
+    e[(least+1)%3]=v.direction[(least+2)%3];
+    e[(least+2)%3]=-v.direction[(least+1)%3];
+    const auto norm=std::sqrt(e[0]*e[0]+e[1]*e[1]+e[2]*e[2]);
+    for(int k=0;k<3;++k)e[k]/=norm;
+    for(int k=0;k<3;++k)f[k]=v.direction[(k+1)%3]*e[(k+2)%3]-v.direction[(k+2)%3]*e[(k+1)%3];
+    std::vector<Point> points;
+    for(int i=0;i<5;++i)for(int j=0;j<5;++j)for(int k=0;k<angular_order;++k) {
+      const long double r=(v.outer_radius_m+v.inner_radius_m)/2+
+          (v.outer_radius_m-v.inner_radius_m)*x[i]/2;
+      const long double angle=2*std::acos(-1.0L)*(k+.25L)/angular_order;
+      Point p{};p.w=w[i]*w[j]*r/(2*(v.outer_radius_m+v.inner_radius_m)*angular_order);
+      // Radial normalized Gauss weight is w*r/(ro+ri); axial is w/2.
+      for(int d=0;d<3;++d)p.x[d]=v.center_m[d]+r*(e[d]*std::cos(angle)+f[d]*std::sin(angle))+
+          v.direction[d]*v.length_m*x[j]/2;
+      points.push_back(p);
+    }
+    return points;
+  };
+  const auto first=nodes(a),second=nodes(b);
+  long double sum=0,alignment=0;
+  for(int k=0;k<3;++k)alignment+=static_cast<long double>(a.direction[k])*b.direction[k];
+  for(const auto &p:first)for(const auto &q:second) {
+    long double distance2=0;
+    for(int k=0;k<3;++k)distance2+=(p.x[k]-q.x[k])*(p.x[k]-q.x[k]);
+    sum+=p.w*q.w/std::sqrt(distance2);
+  }
+  return static_cast<double>(1e-7L*a.length_m*b.length_m*alignment*sum);
 }
 }
 int main() {
@@ -132,6 +174,58 @@ int main() {
     require(!coaxial_annular_inductance(a,a,limited).converged,"Exhaustion accepted");
     limited.max_evaluations=2000000;limited.max_cells=1;
     require(!coaxial_annular_inductance(a,a,limited).converged,"Cell exhaustion accepted");
+    CoaxialAnnulusVolume far_a;far_a.length_m=.14e-3;
+    far_a.inner_radius_m=.076e-3;far_a.outer_radius_m=.101e-3;
+    auto far_b=far_a;far_b.center_m={3e-3,1e-3,.7e-3};
+    for(int orientation=0;orientation<3;++orientation) {
+      if(orientation==1)far_b.direction={.6,0,.8};
+      if(orientation==2)far_b.direction={-.6,0,-.8};
+      const auto far=separated_annular_inductance(far_a,far_b);
+      const auto oracle12=separated_reference(far_a,far_b,12);
+      const auto oracle20=separated_reference(far_a,far_b,20);
+      require(far.converged,"Separated annulus bound did not admit far pair");
+      require(close(oracle12,oracle20,1e-12),"Independent direct oracle did not refine");
+      require(std::abs(far.inductance_h-oracle20)<=far.estimated_error_h,
+          "Separated annulus analytic remainder violated");
+      const auto reciprocal=separated_annular_inductance(far_b,far_a);
+      require(reciprocal.converged&&close(far.inductance_h,reciprocal.inductance_h,1e-14),
+          "Separated annulus reciprocity");
+      std::cout<<"far L="<<far.inductance_h<<" oracle="<<oracle20<<
+          " bound="<<far.estimated_error_h<<'\n';
+    }
+    auto near_b=far_b;near_b.center_m={.2e-3,0,0};
+    require(!separated_annular_inductance(far_a,near_b).converged,"Near pair admitted");
+    // Close to the explicit q=1/4 admission ceiling, larger truncation is
+    // allowed only when requested; compare all retained moments to direct
+    // volume integration, not merely the asymptotic monopole.
+    AnnularIntegrationOptions loose;loose.relative_tolerance=1e-3;
+    auto edge=far_b;edge.center_m={1.01e-3,0,0};
+    for(const auto &axis:std::vector<Vector>{{0,0,1},{.6,0,.8},{0,.8,.6},{.8,.6,0}}) {
+      edge.direction=axis;
+      const auto bounded=separated_annular_inductance(far_a,edge,loose);
+      require(bounded.converged,"Permitted near-ceiling pair rejected");
+      const auto reference=separated_reference(far_a,edge,20);
+      require(std::abs(reference-bounded.inductance_h)<=bounded.estimated_error_h,
+          "Near-ceiling multipole remainder violated");
+      if(reference!=0)require(close(reference,separated_reference(far_a,edge,12),1e-10),
+          "Near-ceiling independent quadrature drift");
+    }
+    auto malformed=far_a;malformed.inner_radius_m=0;
+    bool malformed_rejected=false;
+    try {(void)separated_annular_inductance(malformed,far_b);}
+    catch(const std::invalid_argument &) {malformed_rejected=true;}
+    require(malformed_rejected,"Invalid separated annulus admitted");
+    AnnularIntegrationOptions strict;strict.relative_tolerance=1e-13;strict.absolute_tolerance_h=0;
+    require(!separated_annular_inductance(far_a,far_b,strict).converged,"Unattainable tolerance admitted");
+    strict.max_evaluations=0;
+    require(!separated_annular_inductance(far_a,far_b,strict).converged,"Far pair work cap");
+    auto scale_a=far_a,scale_b=far_b;
+    for(auto *v:{&scale_a,&scale_b}) {
+      v->length_m*=1000;v->inner_radius_m*=1000;v->outer_radius_m*=1000;
+      for(auto &coordinate:v->center_m)coordinate*=1000;
+    }
+    require(close(separated_annular_inductance(scale_a,scale_b).inductance_h,
+        1000*separated_annular_inductance(far_a,far_b).inductance_h,1e-12),"Far SI scaling");
     std::cout<<"Annular inductance checks passed\n";
     return 0;
   } catch(const std::exception &e) {

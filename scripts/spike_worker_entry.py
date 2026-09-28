@@ -1,10 +1,20 @@
 """Frozen-process entry point for the SPIKE local analysis worker."""
 
 import sys
+from pathlib import Path
+
+if not getattr(sys, "frozen", False):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--extension-host":
+    if len(sys.argv) > 1 and sys.argv[1] == "--mcp":
+        from python.spike_core.mcp_server import serve
+        serve()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--local-chat":
+        from python.spike_core.local_llm import main
+        raise SystemExit(main(sys.argv[2:]))
+    elif len(sys.argv) > 1 and sys.argv[1] == "--extension-host":
         # The trusted extension registry launches a fresh frozen worker as its
         # Python host. A frozen sys.executable is not a general Python CLI.
         import runpy

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Dedicated circuit-only process boundary for the release-owned SPIKES kernel."""
 
 from __future__ import annotations

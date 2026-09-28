@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Zone contact must not be duplicated by a centroid-dependent pad shortcut."""
 import unittest
 

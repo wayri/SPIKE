@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 # Supplemental local CPython 3.11 qualification dependencies, not a runtime lock.
 # Versions match the existing Windows runtime/build ledger; cp311 wheel hash

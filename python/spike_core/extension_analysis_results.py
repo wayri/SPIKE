@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Admission boundary for process-extension analysis results."""
 
 from __future__ import annotations
@@ -61,7 +61,9 @@ def design_binding(design: Any) -> dict[str, str]:
     return {"design_id": identifier, "digest_sha256": hashlib.sha256(canonical.encode("utf-8")).hexdigest()}
 
 
-def admit_analysis_result(raw: Any, binding: dict[str, str], *, extension_id: str) -> dict[str, Any]:
+def admit_analysis_result(raw: Any, binding: dict[str, str], *, extension_id: str,
+                          expected_mesh_digest: str | None = None,
+                          expected_spec_digest: str | None = None) -> dict[str, Any]:
     if not isinstance(raw, dict) or set(raw) - set(AnalysisResult.__dataclass_fields__):
         raise ValueError("Extension analysis_result has unsupported fields.")
     if raw.get("contract") != "spike/v1" or raw.get("status") not in {"completed", "completed_with_warnings"}:
@@ -77,6 +79,10 @@ def admit_analysis_result(raw: Any, binding: dict[str, str], *, extension_id: st
         raise ValueError("Extension analysis_result provenance does not match the input DesignIR binding.")
     if not isinstance(provenance.get("solver"), str) or not provenance["solver"].strip():
         raise ValueError("Extension analysis_result requires provenance.solver.")
+    if expected_mesh_digest is not None and provenance.get("input_mesh_sha256") != expected_mesh_digest:
+        raise ValueError("Extension analysis_result provenance does not match the host mesh binding.")
+    if expected_spec_digest is not None and provenance.get("input_analysis_spec_sha256") != expected_spec_digest:
+        raise ValueError("Extension analysis_result provenance does not match the host analysis specification.")
     if raw["model_status"] in {"validated", "reference_validated"} and not provenance.get("validation_evidence"):
         raise ValueError("Validated external results require provenance.validation_evidence.")
     for key in ("summary", "fields", "networks"):
@@ -124,6 +130,20 @@ def admit_analysis_result(raw: Any, binding: dict[str, str], *, extension_id: st
                         _number(sample.get("value"), "value")
         if "mesh" in visual and not isinstance(visual["mesh"], (dict, list)):
             raise ValueError("Extension visualization.mesh must be an object or array.")
+        if isinstance(visual.get("mesh"), list):
+            cells = visual["mesh"]
+            if len(cells) > MAX_VISUAL_SAMPLES or any(not isinstance(cell, dict) for cell in cells):
+                raise ValueError("Extension visualization.mesh exceeds the cell limit or contains invalid cells.")
+            for cell in cells:
+                vertices = cell.get("vertices_mm")
+                if (not isinstance(cell.get("id"), str) or not cell["id"]
+                        or not isinstance(vertices, list) or not 3 <= len(vertices) <= 64):
+                    raise ValueError("Extension visualization mesh cells require an ID and 3–64 vertices_mm.")
+                for vertex in vertices:
+                    if not isinstance(vertex, (list, tuple)) or len(vertex) != 3:
+                        raise ValueError("Extension visualization mesh vertices must contain XYZ millimetres.")
+                    for coordinate in vertex:
+                        _number(coordinate, "mesh vertex")
     _finite_tree(raw)
     # Preserve reported data and add only the origin attribution established by the host.
     return {**raw, "provenance": {**provenance, "extension_id": extension_id}}

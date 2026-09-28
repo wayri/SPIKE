@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Independent KVL/I2R oracles for explicit-return harness operating points."""
 import copy
 import json

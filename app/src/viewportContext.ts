@@ -38,7 +38,7 @@ export const viewportContextLabel = (input: ViewportContextInput) => {
   }
   if (input.hasStoredResults) return "RESULTS HIDDEN";
   if (input.tab === "Thermal") return "THERMAL SETUP";
-  if (input.tab === "EMI") return "EMI SETUP";
+  if (input.tab === "EM" || input.tab === "EMI") return "EM SETUP";
   if (input.tab === "HF / SI") return input.hasSelectedNet ? "NET EXTRACTION" : "SI SETUP";
   if (input.tab === "Probes") return input.hasSelection ? "SELECTION" : "PROBE SETUP";
   if (input.tab === "PI") {
@@ -53,4 +53,3 @@ export const viewportContextLabel = (input: ViewportContextInput) => {
 export const resultHasExtractedNetworks = (result: SolverResultBundle | null) => Boolean(
   result?.parasitics.length || result?.loop_parasitics.length || result?.pdn_multiports.length,
 );
-

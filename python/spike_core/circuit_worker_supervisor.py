@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """OS-enforced supervisor for the dedicated owned-circuit worker.
 
 This module is the trusted host-side boundary.  It admits exact worker/library

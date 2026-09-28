@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Exact DC terminal mapping and solved source-to-load evidence."""
 
 from __future__ import annotations

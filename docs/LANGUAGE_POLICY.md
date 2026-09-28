@@ -13,7 +13,7 @@ partially validated numerical work merely to change its language.
 |---|---|---|---|
 | TypeScript / TSX | Desktop presentation, interaction state, 2D/3D visualization, and typed client contracts | `app/src/` | UI only; no EDA parsing or numerical physics |
 | Python | Design contracts, import adapters, CLI, worker services, solver orchestration, reports, and external-process adapters | `python/core/`, `python/spike_core/`, narrow tools and adapters | Primary application-service language; no new desktop UI |
-| C++ | Performance-critical numerical kernels and the isolated native wxWidgets client | `src/`, `python/bindings/`, `wx_desktop/` | Native client consumes versioned worker/project contracts; no duplicated solver or EDA semantics |
+| C++ | Performance-critical numerical kernels | `src/`, `python/bindings/` | UI experiments remain outside production roots until a migration decision |
 | Rust | Tauri window/process/security boundary | `app/src-tauri/` | Frozen thin host; no solver, importer, project-model, or report logic |
 
 Rust remains a fourth compiled language because Tauri requires it. It is not a
@@ -53,7 +53,7 @@ formats rather than additional product implementation languages.
 
 - Enforce the language allowlist in `scripts/check_architecture.py`.
 - Keep one supported Tauri desktop launcher and one Python CLI/worker service.
-- Reject new domain code in the Rust host and new UI code in Python. C++ UI work is confined to `wx_desktop/` under ADR 0008.
+- Reject new domain code in the Rust host and new UI code in Python. The retired `wx_desktop/` client is no longer a production root; local UI experiments require a separate review before inclusion.
 
 ### PI stabilization: remove duplicate surfaces
 

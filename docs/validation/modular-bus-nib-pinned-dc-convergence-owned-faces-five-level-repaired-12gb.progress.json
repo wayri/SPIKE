@@ -1,0 +1,1368 @@
+{
+  "contract": "spike/real-board-pi-convergence-progress/v1",
+  "board_sha256": "37639b58aa75c11265ecf7867c2d358942b70c9e0011a10da99f524e767c2f07",
+  "request_sha256": "5f133d60414a52fc592e012559491abba690782a00c69d340debbce34687bad8",
+  "terminal_mode": "exact_pad_anchors",
+  "pad_zone_coupling": "owned_shared_faces",
+  "solver_memory_limit_gb": 12.0,
+  "requested_factors": [
+    2.0,
+    1.0,
+    0.5,
+    0.25,
+    0.125
+  ],
+  "solver_revision": "77f297c903bd1ce447f43a2c97cb2f65f5107ce1",
+  "solver_source_sha256": {
+    "convergence.py": "e493162698fee30dd364d49864150bab3e17cce25b79763777c3b8a6eb0e6410",
+    "dc_terminal_validation.py": "d2ca0f36937e49b999c8d71daac851a7bd8a30d87f176174862171b2fc22924a",
+    "dc_shifted_rhs.py": "21c7a93926b70b4f825314e8e255dac80f21e99fa46c3bbfb1b70cbcadd6270f",
+    "hybrid_dc_solver.py": "8a6d04576d2eedcbed305c57f4bf2e0faf6bcbebd18e65bb8491e38799ab7edb",
+    "hybrid_mesh.py": "95172a680375d181ee11df986b9528150e5e9485c78a8a0c350e83134c4c4c58",
+    "hybrid_owned_copper.py": "8b2eba0b08c0742b22500bb27f8516f0c8568cb73d6704a84ec6cc5b856d9062"
+  },
+  "completed_levels": [
+    {
+      "analysis_id": "analysis-convergence-1",
+      "status": "completed",
+      "model_status": "approximate",
+      "summary": {
+        "max_voltage_drop_v": 0.0015711637910591492,
+        "max_load_voltage_drop_v": 0.0014416360922857587,
+        "max_supply_drop_v": 0.0015711637910591492,
+        "max_return_rise_v": 0.0,
+        "max_loop_drop_v": 0.0015711637910591492,
+        "max_current_density_a_mm2": 78.56363079847311,
+        "p95_current_density_a_mm2": 6.2748780717349595,
+        "p99_current_density_a_mm2": 15.79763092210201,
+        "max_current_edge": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96:F.Cu:owned-zone:3bf83cac-dfa6-4dd7-9065-7ae809baa856:F.Cu:1:1227:2092",
+        "source_voltage_v": 12.0,
+        "total_load_current_a": 10.0,
+        "operating_point_impedance_ohm": 1.2,
+        "operating_point_impedance_definition": "absolute local conductor voltage divided by absolute branch current",
+        "return_path_count": 0,
+        "isolated_domain_count": 0,
+        "total_network_loss_w": 0.013166685411306915,
+        "total_copper_loss_w": 0.013166685411306915,
+        "series_component_loss_w": 0.0,
+        "series_component_count": 0,
+        "net_power_loss_w": {
+          "/12Vout": 0.013166685411306882
+        },
+        "layer_power_loss_w": {
+          "F.Cu": 0.007852581880461637,
+          "In3.Cu": 0.00042874123361802874,
+          "In4.Cu": 0.0002236805113431777,
+          "F.Cu->In1.Cu": 0.000758665710050557,
+          "In1.Cu->In2.Cu": 0.0011182376681882773,
+          "In2.Cu->In3.Cu": 0.00013339620832615663,
+          "In3.Cu->In4.Cu": 0.00023853200504084807,
+          "In4.Cu->B.Cu": 2.632844926940878e-05,
+          "In1.Cu": 0.0014714271622273448,
+          "In2.Cu": 0.000529745027554639,
+          "B.Cu": 0.0003853495552268431
+        },
+        "geometry_power_loss_w": {
+          "track": 3.3230183200698735e-10,
+          "via": 0.001492715142938552,
+          "pad": 0.0014435677160491679,
+          "pad_attachment": 0.00031503966655074535,
+          "pad_barrel": 0.0007824448979366963,
+          "zone": 0.005968283222423391,
+          "zone_attachment": 0.0002610589738224674,
+          "pad_zone_attachment": 0.002903575459284071
+        },
+        "component_power_loss_w": {},
+        "max_via_current_density_a_mm2": 48.67981469113771,
+        "via_branch_count": 380,
+        "node_count": 5213,
+        "edge_count": 9543,
+        "matrix_nnz": 24287,
+        "assembly_backend": "numpy",
+        "sparse_backend": "scipy-superlu",
+        "max_scaled_linear_residual": 9.75221766501922e-17,
+        "mesh_build_time_s": 9.594491199939512,
+        "matrix_assembly_time_s": 0.0031092000426724553,
+        "linear_solve_time_s": 0.01664299995172769,
+        "total_solver_time_s": 10.130716999992728,
+        "visualization_sample_count": 8921,
+        "visualization_decimated": true,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22,
+          "contact": 0
+        }
+      },
+      "provenance": {
+        "solver": "spike-hybrid-dc/v4",
+        "formulation": "sparse_finite_volume_conductor_network",
+        "mesh_contract": "spike/mesh-preview/v2",
+        "conductivity_s_m": 58000000.0,
+        "mesh_target_mm": 2.0,
+        "via_model": "extracted",
+        "via_plating_thickness_mm": 0.025,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22
+        },
+        "performance": {
+          "mesh_build_s": 9.594491199939512,
+          "matrix_assembly_s": 0.0031092000426724553,
+          "linear_solve_s": 0.01664299995172769,
+          "total_s": 10.130716999992728,
+          "matrix_nnz": 24287,
+          "scaled_residual": 9.75221766501922e-17
+        },
+        "acceleration": {
+          "assembly": {
+            "requested": "auto",
+            "selected": "numpy",
+            "selection_reason": "numpy selected for 9543 branches; Numba is unavailable or below the 50000 threshold.",
+            "branches": 9543,
+            "threads": 1,
+            "fallback": "",
+            "fallback_used": false
+          },
+          "linear_solver": {
+            "requested": "auto",
+            "selected": "scipy-superlu",
+            "selection_reason": "SuperLU selected for 5211 unknowns; PETSc/MUMPS is unavailable or below the 100000 auto-selection threshold.",
+            "unknowns": 5211,
+            "nnz": 24249,
+            "complex_values": false,
+            "estimated_csr_bytes": 429680,
+            "fallback": "",
+            "fallback_used": false
+          }
+        },
+        "assumptions": [
+          "uniform copper conductivity",
+          "explicit source and load terminals",
+          "explicit return copper is solved when a return path is configured",
+          "ideal contacts unless assigned",
+          "DC resistance only",
+          "operating-point impedance is local V/I and is not frequency-domain Z(f)"
+        ],
+        "model_limits": [],
+        "solver_plugin": "spike.routed_dc",
+        "solver_plugin_version": "2.0.0",
+        "solver_formulation": "resistive_network",
+        "geometry_contract": "spike/solver-geometry/v1"
+      },
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 12.0,
+            "current_a": 9.999999999999599
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.998774746838741,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.998716883630191,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.998558363907716,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.998774746838741,
+            "supply_drop_v": 0.0012252531612588768,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.998716883630191,
+            "supply_drop_v": 0.0012831163698088233,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.998558363907716,
+            "supply_drop_v": 0.0014416360922844262,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": -4.014566457044566e-13,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 9.75221766501922e-17,
+      "mesh_build_time_s": 9.594491199939512,
+      "linear_solve_time_s": 0.01664299995172769,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.0014416360922857587,
+        "total_copper_loss_w": 0.013166685411306915,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.2748780717349595,
+        "node_count": 5213,
+        "edge_count": 9543
+      },
+      "issues": [
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0005",
+          "severity": "warning",
+          "message": "No terminal package/contact resistance was assigned.",
+          "path": "",
+          "suggestion": "Assign measured connector, shunt, package, and contact resistance where applicable.",
+          "status": "approximate"
+        }
+      ]
+    },
+    {
+      "analysis_id": "analysis-convergence-2",
+      "status": "completed",
+      "model_status": "approximate",
+      "summary": {
+        "max_voltage_drop_v": 0.0014494595269436417,
+        "max_load_voltage_drop_v": 0.0013185104360401805,
+        "max_supply_drop_v": 0.0014494595269436417,
+        "max_return_rise_v": 0.0,
+        "max_loop_drop_v": 0.0014494595269436417,
+        "max_current_density_a_mm2": 76.12587592294183,
+        "p95_current_density_a_mm2": 6.152349283996498,
+        "p99_current_density_a_mm2": 14.960331116800155,
+        "max_current_edge": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96:F.Cu:owned-zone:3bf83cac-dfa6-4dd7-9065-7ae809baa856:F.Cu:1:1243:2212",
+        "source_voltage_v": 12.0,
+        "total_load_current_a": 10.0,
+        "operating_point_impedance_ohm": 1.2,
+        "operating_point_impedance_definition": "absolute local conductor voltage divided by absolute branch current",
+        "return_path_count": 0,
+        "isolated_domain_count": 0,
+        "total_network_loss_w": 0.012028421685333246,
+        "total_copper_loss_w": 0.012028421685333246,
+        "series_component_loss_w": 0.0,
+        "series_component_count": 0,
+        "net_power_loss_w": {
+          "/12Vout": 0.012028421685333157
+        },
+        "layer_power_loss_w": {
+          "F.Cu": 0.00709958373051326,
+          "In3.Cu": 0.0003920780051166959,
+          "In4.Cu": 0.00019757953397781257,
+          "F.Cu->In1.Cu": 0.0007016504756220332,
+          "In1.Cu->In2.Cu": 0.0010602510957496139,
+          "In2.Cu->In3.Cu": 0.00012546896131991793,
+          "In3.Cu->In4.Cu": 0.0002198910295015612,
+          "In4.Cu->B.Cu": 2.4112858693194497e-05,
+          "In1.Cu": 0.0013800521172210331,
+          "In2.Cu": 0.0004885843922730103,
+          "B.Cu": 0.0003391694853451046
+        },
+        "geometry_power_loss_w": {
+          "track": 3.728573273882833e-08,
+          "via": 0.0013806427766456005,
+          "pad": 0.001464842099885021,
+          "pad_attachment": 5.373081975266283e-05,
+          "pad_barrel": 0.0007507316442407204,
+          "zone": 0.00623583668169888,
+          "zone_attachment": 0.00016467434221242836,
+          "pad_zone_attachment": 0.001977926035165187
+        },
+        "component_power_loss_w": {},
+        "max_via_current_density_a_mm2": 49.1782518368036,
+        "via_branch_count": 380,
+        "node_count": 7524,
+        "edge_count": 14123,
+        "matrix_nnz": 35758,
+        "assembly_backend": "numpy",
+        "sparse_backend": "scipy-superlu",
+        "max_scaled_linear_residual": 1.530328744167544e-16,
+        "mesh_build_time_s": 10.197577400016598,
+        "matrix_assembly_time_s": 0.004058400052599609,
+        "linear_solve_time_s": 0.021935999975539744,
+        "total_solver_time_s": 10.861162999994121,
+        "visualization_sample_count": 11228,
+        "visualization_decimated": false,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22,
+          "contact": 0
+        }
+      },
+      "provenance": {
+        "solver": "spike-hybrid-dc/v4",
+        "formulation": "sparse_finite_volume_conductor_network",
+        "mesh_contract": "spike/mesh-preview/v2",
+        "conductivity_s_m": 58000000.0,
+        "mesh_target_mm": 1.0,
+        "via_model": "extracted",
+        "via_plating_thickness_mm": 0.025,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22
+        },
+        "performance": {
+          "mesh_build_s": 10.197577400016598,
+          "matrix_assembly_s": 0.004058400052599609,
+          "linear_solve_s": 0.021935999975539744,
+          "total_s": 10.861162999994121,
+          "matrix_nnz": 35758,
+          "scaled_residual": 1.530328744167544e-16
+        },
+        "acceleration": {
+          "assembly": {
+            "requested": "auto",
+            "selected": "numpy",
+            "selection_reason": "numpy selected for 14123 branches; Numba is unavailable or below the 50000 threshold.",
+            "branches": 14123,
+            "threads": 1,
+            "fallback": "",
+            "fallback_used": false
+          },
+          "linear_solver": {
+            "requested": "auto",
+            "selected": "scipy-superlu",
+            "selection_reason": "SuperLU selected for 7518 unknowns; PETSc/MUMPS is unavailable or below the 100000 auto-selection threshold.",
+            "unknowns": 7518,
+            "nnz": 35682,
+            "complex_values": false,
+            "estimated_csr_bytes": 631064,
+            "fallback": "",
+            "fallback_used": false
+          }
+        },
+        "assumptions": [
+          "uniform copper conductivity",
+          "explicit source and load terminals",
+          "explicit return copper is solved when a return path is configured",
+          "ideal contacts unless assigned",
+          "DC resistance only",
+          "operating-point impedance is local V/I and is not frequency-domain Z(f)"
+        ],
+        "model_limits": [],
+        "solver_plugin": "spike.routed_dc",
+        "solver_plugin_version": "2.0.0",
+        "solver_formulation": "resistive_network",
+        "geometry_contract": "spike/solver-geometry/v1"
+      },
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 12.0,
+            "current_a": 9.999999999999924
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.9988796977739,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.998830286156577,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.99868148956396,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.9988796977739,
+            "supply_drop_v": 0.001120302226100378,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.998830286156577,
+            "supply_drop_v": 0.0011697138434225707,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 12.0,
+            "load_voltage_v": 11.99868148956396,
+            "supply_drop_v": 0.0013185104360395883,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": -7.638334409421077e-14,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 1.530328744167544e-16,
+      "mesh_build_time_s": 10.197577400016598,
+      "linear_solve_time_s": 0.021935999975539744,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.0013185104360401805,
+        "total_copper_loss_w": 0.012028421685333246,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.152349283996498,
+        "node_count": 7524,
+        "edge_count": 14123
+      },
+      "issues": [
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0005",
+          "severity": "warning",
+          "message": "No terminal package/contact resistance was assigned.",
+          "path": "",
+          "suggestion": "Assign measured connector, shunt, package, and contact resistance where applicable.",
+          "status": "approximate"
+        }
+      ]
+    },
+    {
+      "analysis_id": "analysis-convergence-3",
+      "status": "completed",
+      "model_status": "approximate",
+      "summary": {
+        "max_voltage_drop_v": 0.0013935533644051645,
+        "max_load_voltage_drop_v": 0.0012624624145787244,
+        "max_supply_drop_v": 0.0013935533644051645,
+        "max_return_rise_v": 0.0,
+        "max_loop_drop_v": 0.0013935533644051645,
+        "max_current_density_a_mm2": 74.48241215073098,
+        "p95_current_density_a_mm2": 6.185937926810323,
+        "p99_current_density_a_mm2": 14.82926519417375,
+        "max_current_edge": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96:F.Cu:owned-zone:3bf83cac-dfa6-4dd7-9065-7ae809baa856:F.Cu:1:1293:2617",
+        "source_voltage_v": 12.0,
+        "total_load_current_a": 10.0,
+        "operating_point_impedance_ohm": 1.2,
+        "operating_point_impedance_definition": "absolute local conductor voltage divided by absolute branch current",
+        "return_path_count": 0,
+        "isolated_domain_count": 0,
+        "total_network_loss_w": 0.011481083530009841,
+        "total_copper_loss_w": 0.011481083530009841,
+        "series_component_loss_w": 0.0,
+        "series_component_count": 0,
+        "net_power_loss_w": {
+          "/12Vout": 0.011481083530009666
+        },
+        "layer_power_loss_w": {
+          "F.Cu": 0.006969895178277962,
+          "In3.Cu": 0.00036359634031253146,
+          "In4.Cu": 0.00018033190072049306,
+          "F.Cu->In1.Cu": 0.0006257679009292677,
+          "In1.Cu->In2.Cu": 0.000976849766556577,
+          "In2.Cu->In3.Cu": 0.00011584003873021458,
+          "In3.Cu->In4.Cu": 0.0002020729372459121,
+          "In4.Cu->B.Cu": 2.246270339789739e-05,
+          "In1.Cu": 0.0012578179807987,
+          "In2.Cu": 0.0004527519296710132,
+          "B.Cu": 0.00031369685336923907
+        },
+        "geometry_power_loss_w": {
+          "track": 1.7345695352453484e-08,
+          "via": 0.0012023052441110552,
+          "pad": 0.0015012743859999964,
+          "pad_attachment": 8.946891505610284e-05,
+          "pad_barrel": 0.0007406881027488139,
+          "zone": 0.006431132761811629,
+          "zone_attachment": 0.00012736946465562548,
+          "pad_zone_attachment": 0.001388827309931212
+        },
+        "component_power_loss_w": {},
+        "max_via_current_density_a_mm2": 39.986769659775604,
+        "via_branch_count": 380,
+        "node_count": 15941,
+        "edge_count": 30754,
+        "matrix_nnz": 77443,
+        "assembly_backend": "numpy",
+        "sparse_backend": "scipy-superlu",
+        "max_scaled_linear_residual": 1.0445223724937363e-16,
+        "mesh_build_time_s": 12.774245299980976,
+        "matrix_assembly_time_s": 0.010070400079712272,
+        "linear_solve_time_s": 0.04966149991378188,
+        "total_solver_time_s": 14.539328100043349,
+        "visualization_sample_count": 19646,
+        "visualization_decimated": false,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22,
+          "contact": 0
+        }
+      },
+      "provenance": {
+        "solver": "spike-hybrid-dc/v4",
+        "formulation": "sparse_finite_volume_conductor_network",
+        "mesh_contract": "spike/mesh-preview/v2",
+        "conductivity_s_m": 58000000.0,
+        "mesh_target_mm": 0.5,
+        "via_model": "extracted",
+        "via_plating_thickness_mm": 0.025,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22
+        },
+        "performance": {
+          "mesh_build_s": 12.774245299980976,
+          "matrix_assembly_s": 0.010070400079712272,
+          "linear_solve_s": 0.04966149991378188,
+          "total_s": 14.539328100043349,
+          "matrix_nnz": 77443,
+          "scaled_residual": 1.0445223724937363e-16
+        },
+        "acceleration": {
+          "assembly": {
+            "requested": "auto",
+            "selected": "numpy",
+            "selection_reason": "numpy selected for 30754 branches; Numba is unavailable or below the 50000 threshold.",
+            "branches": 30754,
+            "threads": 1,
+            "fallback": "",
+            "fallback_used": false
+          },
+          "linear_solver": {
+            "requested": "auto",
+            "selected": "scipy-superlu",
+            "selection_reason": "SuperLU selected for 15923 unknowns; PETSc/MUMPS is unavailable or below the 100000 auto-selection threshold.",
+            "unknowns": 15923,
+            "nnz": 77295,
+            "complex_values": false,
+            "estimated_csr_bytes": 1364112,
+            "fallback": "",
+            "fallback_used": false
+          }
+        },
+        "assumptions": [
+          "uniform copper conductivity",
+          "explicit source and load terminals",
+          "explicit return copper is solved when a return path is configured",
+          "ideal contacts unless assigned",
+          "DC resistance only",
+          "operating-point impedance is local V/I and is not frequency-domain Z(f)"
+        ],
+        "model_limits": [],
+        "solver_plugin": "spike.routed_dc",
+        "solver_plugin_version": "2.0.0",
+        "solver_formulation": "resistive_network",
+        "geometry_contract": "spike/solver-geometry/v1"
+      },
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 11.999999999999998,
+            "current_a": 9.999999999999956
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.99893022066435,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.998887916691263,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.998737537585422,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.99893022066435,
+            "supply_drop_v": 0.0010697793356477803,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.998887916691263,
+            "supply_drop_v": 0.0011120833087350235,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.998737537585422,
+            "supply_drop_v": 0.001262462414576504,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": -4.440892098500626e-14,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 1.0445223724937363e-16,
+      "mesh_build_time_s": 12.774245299980976,
+      "linear_solve_time_s": 0.04966149991378188,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.0012624624145787244,
+        "total_copper_loss_w": 0.011481083530009841,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.185937926810323,
+        "node_count": 15941,
+        "edge_count": 30754
+      },
+      "issues": [
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0005",
+          "severity": "warning",
+          "message": "No terminal package/contact resistance was assigned.",
+          "path": "",
+          "suggestion": "Assign measured connector, shunt, package, and contact resistance where applicable.",
+          "status": "approximate"
+        }
+      ]
+    },
+    {
+      "analysis_id": "analysis-convergence-4",
+      "status": "completed",
+      "model_status": "approximate",
+      "summary": {
+        "max_voltage_drop_v": 0.0013658894580910186,
+        "max_load_voltage_drop_v": 0.0012348140977435456,
+        "max_supply_drop_v": 0.0013658894580910186,
+        "max_return_rise_v": 0.0,
+        "max_loop_drop_v": 0.0013658894580910186,
+        "max_current_density_a_mm2": 76.4069375754559,
+        "p95_current_density_a_mm2": 6.023162953999883,
+        "p99_current_density_a_mm2": 14.486975961047106,
+        "max_current_edge": "3bf83cac-dfa6-4dd7-9065-7ae809baa856:In1.Cu:3:attachment:527",
+        "source_voltage_v": 12.0,
+        "total_load_current_a": 10.0,
+        "operating_point_impedance_ohm": 1.2,
+        "operating_point_impedance_definition": "absolute local conductor voltage divided by absolute branch current",
+        "return_path_count": 0,
+        "isolated_domain_count": 0,
+        "total_network_loss_w": 0.01115170167520716,
+        "total_copper_loss_w": 0.01115170167520716,
+        "series_component_loss_w": 0.0,
+        "series_component_count": 0,
+        "net_power_loss_w": {
+          "/12Vout": 0.011151701675207225
+        },
+        "layer_power_loss_w": {
+          "F.Cu": 0.006854837343918505,
+          "In3.Cu": 0.0003549017980109035,
+          "In4.Cu": 0.00017934468566153545,
+          "F.Cu->In1.Cu": 0.0005774754881842482,
+          "In1.Cu->In2.Cu": 0.0009242107874608677,
+          "In2.Cu->In3.Cu": 0.00011079534292434366,
+          "In3.Cu->In4.Cu": 0.0001958871966566548,
+          "In4.Cu->B.Cu": 2.1834576823029088e-05,
+          "In1.Cu": 0.0011804646058147217,
+          "In2.Cu": 0.0004388444439321352,
+          "B.Cu": 0.00031310540582022805
+        },
+        "geometry_power_loss_w": {
+          "track": 1.9277470790029346e-08,
+          "via": 0.00110269521255782,
+          "pad": 0.0015108691956723648,
+          "pad_attachment": 3.8949152645894835e-05,
+          "pad_barrel": 0.0007275081794913237,
+          "zone": 0.006613027225962951,
+          "zone_attachment": 0.00014696491440718357,
+          "pad_zone_attachment": 0.0010116685169987232
+        },
+        "component_power_loss_w": {},
+        "max_via_current_density_a_mm2": 39.644310531797295,
+        "via_branch_count": 380,
+        "node_count": 47688,
+        "edge_count": 93848,
+        "matrix_nnz": 235378,
+        "assembly_backend": "numpy",
+        "sparse_backend": "scipy-superlu",
+        "max_scaled_linear_residual": 8.367433260619189e-17,
+        "mesh_build_time_s": 25.719629400060512,
+        "matrix_assembly_time_s": 0.04082700004801154,
+        "linear_solve_time_s": 0.15361579996533692,
+        "total_solver_time_s": 37.9093189999694,
+        "visualization_sample_count": 50000,
+        "visualization_decimated": true,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22,
+          "contact": 0
+        }
+      },
+      "provenance": {
+        "solver": "spike-hybrid-dc/v4",
+        "formulation": "sparse_finite_volume_conductor_network",
+        "mesh_contract": "spike/mesh-preview/v2",
+        "conductivity_s_m": 58000000.0,
+        "mesh_target_mm": 0.25,
+        "via_model": "extracted",
+        "via_plating_thickness_mm": 0.025,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22
+        },
+        "performance": {
+          "mesh_build_s": 25.719629400060512,
+          "matrix_assembly_s": 0.04082700004801154,
+          "linear_solve_s": 0.15361579996533692,
+          "total_s": 37.9093189999694,
+          "matrix_nnz": 235378,
+          "scaled_residual": 8.367433260619189e-17
+        },
+        "acceleration": {
+          "assembly": {
+            "requested": "auto",
+            "selected": "numpy",
+            "selection_reason": "numpy selected for 93848 branches; Numba is unavailable or below the 50000 threshold.",
+            "branches": 93848,
+            "threads": 1,
+            "fallback": "",
+            "fallback_used": false
+          },
+          "linear_solver": {
+            "requested": "auto",
+            "selected": "scipy-superlu",
+            "selection_reason": "SuperLU selected for 47616 unknowns; PETSc/MUMPS is unavailable or below the 100000 auto-selection threshold.",
+            "unknowns": 47616,
+            "nnz": 234928,
+            "complex_values": false,
+            "estimated_csr_bytes": 4139784,
+            "fallback": "",
+            "fallback_used": false
+          }
+        },
+        "assumptions": [
+          "uniform copper conductivity",
+          "explicit source and load terminals",
+          "explicit return copper is solved when a return path is configured",
+          "ideal contacts unless assigned",
+          "DC resistance only",
+          "operating-point impedance is local V/I and is not frequency-domain Z(f)"
+        ],
+        "model_limits": [],
+        "solver_plugin": "spike.routed_dc",
+        "solver_plugin_version": "2.0.0",
+        "solver_formulation": "resistive_network",
+        "geometry_contract": "spike/solver-geometry/v1"
+      },
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 11.999999999999998,
+            "current_a": 9.999999999997199
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.998964216777136,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.998925086818083,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.998765185902258,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.998964216777136,
+            "supply_drop_v": 0.001035783222862463,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.998925086818083,
+            "supply_drop_v": 0.0010749131819149937,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.998765185902258,
+            "supply_drop_v": 0.0012348140977405109,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": -2.801314735734195e-12,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 8.367433260619189e-17,
+      "mesh_build_time_s": 25.719629400060512,
+      "linear_solve_time_s": 0.15361579996533692,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.0012348140977435456,
+        "total_copper_loss_w": 0.01115170167520716,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 6.023162953999883,
+        "node_count": 47688,
+        "edge_count": 93848
+      },
+      "issues": [
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0005",
+          "severity": "warning",
+          "message": "No terminal package/contact resistance was assigned.",
+          "path": "",
+          "suggestion": "Assign measured connector, shunt, package, and contact resistance where applicable.",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-SOLVER-P-0005",
+          "severity": "info",
+          "message": "Result-face output was deterministically reduced to 50000 cells.",
+          "path": "",
+          "suggestion": "Raise options.visual_sample_limit for a complete interactive field surface.",
+          "status": "validated"
+        }
+      ]
+    },
+    {
+      "analysis_id": "analysis-convergence-5",
+      "status": "completed",
+      "model_status": "approximate",
+      "summary": {
+        "max_voltage_drop_v": 0.0013449244511321012,
+        "max_load_voltage_drop_v": 0.001214124747501594,
+        "max_supply_drop_v": 0.0013449244511321012,
+        "max_return_rise_v": 0.0,
+        "max_loop_drop_v": 0.0013449244511321012,
+        "max_current_density_a_mm2": 125.017294137319,
+        "p95_current_density_a_mm2": 5.90477943651755,
+        "p99_current_density_a_mm2": 14.332563424920801,
+        "max_current_edge": "3bf83cac-dfa6-4dd7-9065-7ae809baa856:In1.Cu:3:attachment:784",
+        "source_voltage_v": 12.0,
+        "total_load_current_a": 10.0,
+        "operating_point_impedance_ohm": 1.2,
+        "operating_point_impedance_definition": "absolute local conductor voltage divided by absolute branch current",
+        "return_path_count": 0,
+        "isolated_domain_count": 0,
+        "total_network_loss_w": 0.010959896768722227,
+        "total_copper_loss_w": 0.010959896768722227,
+        "series_component_loss_w": 0.0,
+        "series_component_count": 0,
+        "net_power_loss_w": {
+          "/12Vout": 0.010959896768722248
+        },
+        "layer_power_loss_w": {
+          "F.Cu": 0.0068615731817730325,
+          "In3.Cu": 0.0003431443728046134,
+          "In4.Cu": 0.0001745134666841664,
+          "F.Cu->In1.Cu": 0.000537290707963726,
+          "In1.Cu->In2.Cu": 0.0008820147381614077,
+          "In2.Cu->In3.Cu": 0.00010630202145516277,
+          "In3.Cu->In4.Cu": 0.00018879052179520263,
+          "In4.Cu->B.Cu": 2.1058480653024188e-05,
+          "In1.Cu": 0.0011169619457832823,
+          "In2.Cu": 0.0004231542732439488,
+          "B.Cu": 0.0003050930584046425
+        },
+        "geometry_power_loss_w": {
+          "track": 1.882995842991362e-08,
+          "via": 0.0010534260886058086,
+          "pad": 0.0016782596512588497,
+          "pad_attachment": 1.143494865971888e-05,
+          "pad_barrel": 0.0006820303814227146,
+          "zone": 0.006787108496083735,
+          "zone_attachment": 0.00014670630177703847,
+          "pad_zone_attachment": 0.000600912070955708
+        },
+        "component_power_loss_w": {},
+        "max_via_current_density_a_mm2": 35.90343372013497,
+        "via_branch_count": 380,
+        "node_count": 170524,
+        "edge_count": 338437,
+        "matrix_nnz": 847388,
+        "assembly_backend": "numpy",
+        "sparse_backend": "scipy-superlu",
+        "max_scaled_linear_residual": 9.773424523700014e-17,
+        "mesh_build_time_s": 69.9088612999767,
+        "matrix_assembly_time_s": 0.19559350004419684,
+        "linear_solve_time_s": 0.8274844000115991,
+        "total_solver_time_s": 107.79994569998235,
+        "visualization_sample_count": 50000,
+        "visualization_decimated": true,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22,
+          "contact": 0
+        }
+      },
+      "provenance": {
+        "solver": "spike-hybrid-dc/v4",
+        "formulation": "sparse_finite_volume_conductor_network",
+        "mesh_contract": "spike/mesh-preview/v2",
+        "conductivity_s_m": 58000000.0,
+        "mesh_target_mm": 0.125,
+        "via_model": "extracted",
+        "via_plating_thickness_mm": 0.025,
+        "geometry_counts": {
+          "track": 33,
+          "zone": 6,
+          "via": 76,
+          "pad": 22
+        },
+        "performance": {
+          "mesh_build_s": 69.9088612999767,
+          "matrix_assembly_s": 0.19559350004419684,
+          "linear_solve_s": 0.8274844000115991,
+          "total_s": 107.79994569998235,
+          "matrix_nnz": 847388,
+          "scaled_residual": 9.773424523700014e-17
+        },
+        "acceleration": {
+          "assembly": {
+            "requested": "auto",
+            "selected": "numpy",
+            "selection_reason": "numpy selected for 338437 branches; Numba is unavailable or below the 50000 threshold.",
+            "branches": 338437,
+            "threads": 1,
+            "fallback": "",
+            "fallback_used": false
+          },
+          "linear_solver": {
+            "requested": "auto",
+            "selected": "scipy-superlu",
+            "selection_reason": "SuperLU selected for 170236 unknowns; PETSc/MUMPS is unavailable or below the 100000 auto-selection threshold.",
+            "unknowns": 170236,
+            "nnz": 845786,
+            "complex_values": false,
+            "estimated_csr_bytes": 14894472,
+            "fallback": "",
+            "fallback_used": false
+          }
+        },
+        "assumptions": [
+          "uniform copper conductivity",
+          "explicit source and load terminals",
+          "explicit return copper is solved when a return path is configured",
+          "ideal contacts unless assigned",
+          "DC resistance only",
+          "operating-point impedance is local V/I and is not frequency-domain Z(f)"
+        ],
+        "model_limits": [],
+        "solver_plugin": "spike.routed_dc",
+        "solver_plugin_version": "2.0.0",
+        "solver_formulation": "resistive_network",
+        "geometry_contract": "spike/solver-geometry/v1"
+      },
+      "source_to_load": {
+        "status": "validated",
+        "terminal_voltages": [
+          {
+            "id": "cli-source-1",
+            "kind": "source",
+            "role": "source_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ae0eb851-14bf-49a1-954d-73d4580e2440",
+            "voltage_v": 11.999999999999998,
+            "current_a": 9.999999999989702
+          },
+          {
+            "id": "cli-load-1",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "ed4521e1-9b74-4c9a-8c9c-0053ef245c96",
+            "voltage_v": 11.9989837760854,
+            "pair_id": "cli-load-1",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-2",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "8ea51d46-7561-4ec2-82c8-dde2f1106a9e",
+            "voltage_v": 11.99894237963152,
+            "pair_id": "cli-load-2",
+            "current_a": 3.333333333
+          },
+          {
+            "id": "cli-load-3",
+            "kind": "load",
+            "role": "load_positive",
+            "domain_id": "default",
+            "net": "/12Vout",
+            "geometry_anchor_id": "e11b3129-268b-47b6-a8a2-5ba7f5df2b22",
+            "voltage_v": 11.9987858752525,
+            "pair_id": "cli-load-3",
+            "current_a": 3.333333334
+          }
+        ],
+        "paths": [
+          {
+            "load_id": "cli-load-1",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-1",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.9989837760854,
+            "supply_drop_v": 0.0010162239145987684,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-2",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-2",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.99894237963152,
+            "supply_drop_v": 0.0010576203684777852,
+            "load_current_a": 3.333333333
+          },
+          {
+            "load_id": "cli-load-3",
+            "source_id": "cli-source-1",
+            "pair_id": "cli-load-3",
+            "domain_id": "default",
+            "supply_net": "/12Vout",
+            "source_voltage_v": 11.999999999999998,
+            "load_voltage_v": 11.9987858752525,
+            "supply_drop_v": 0.0012141247474986017,
+            "load_current_a": 3.333333334
+          }
+        ],
+        "issues": [],
+        "source_current_balance_a": -1.0297540598003252e-11,
+        "voltage_reference": "absolute DC potential at each solved boundary node; supply and loop drops preserve sign"
+      },
+      "max_scaled_linear_residual": 9.773424523700014e-17,
+      "mesh_build_time_s": 69.9088612999767,
+      "linear_solve_time_s": 0.8274844000115991,
+      "geometry_counts": {
+        "track": 33,
+        "zone": 6,
+        "via": 76,
+        "pad": 22,
+        "contact": 0
+      },
+      "required_metrics": {
+        "max_load_voltage_drop_v": 0.001214124747501594,
+        "total_copper_loss_w": 0.010959896768722227,
+        "total_load_current_a": 10.0,
+        "p95_current_density_a_mm2": 5.90477943651755,
+        "node_count": 170524,
+        "edge_count": 338437
+      },
+      "issues": [
+        {
+          "code": "SPIKE-BE-PI-W-0003",
+          "severity": "warning",
+          "message": "3bf83cac-dfa6-4dd7-9065-7ae809baa856:In1.Cu:3:attachment:784 reaches 125.017 A/mm2.",
+          "path": "result.edges[3bf83cac-dfa6-4dd7-9065-7ae809baa856:In1.Cu:3:attachment:784]",
+          "suggestion": "Inspect and increase the affected conductor cross-section or reduce current.",
+          "status": "violated"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Tracks, zones, pads, vias, and THT barrels use the shared finite-volume hybrid mesh; run mesh convergence before sign-off.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0004",
+          "severity": "warning",
+          "message": "Compatibility notice: conductor discretization remains approximate until a mesh-convergence run passes.",
+          "path": "",
+          "suggestion": "",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-PI-W-0005",
+          "severity": "warning",
+          "message": "No terminal package/contact resistance was assigned.",
+          "path": "",
+          "suggestion": "Assign measured connector, shunt, package, and contact resistance where applicable.",
+          "status": "approximate"
+        },
+        {
+          "code": "SPIKE-BE-SOLVER-P-0005",
+          "severity": "info",
+          "message": "Result-face output was deterministically reduced to 50000 cells.",
+          "path": "",
+          "suggestion": "Raise options.visual_sample_limit for a complete interactive field surface.",
+          "status": "validated"
+        },
+        {
+          "code": "SPIKE-BE-SOLVER-P-0005",
+          "severity": "info",
+          "message": "Detailed branch output was deterministically reduced to 100000 records; numerical summaries use the full solve.",
+          "path": "",
+          "suggestion": "Raise options.result_detail_limit when complete per-branch export is required.",
+          "status": "validated"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "contract": "spike/v1",
+  "analysis_id": "peec-rl-transient",
+  "status": "failed",
+  "mode": "transient",
+  "model_status": "failed",
+  "summary": {},
+  "fields": {},
+  "networks": {},
+  "probes": [],
+  "issues": [
+    {
+      "code": "SPIKE-BE-MESH-W-0003",
+      "severity": "warning",
+      "message": "Pad shape 'roundrect' is meshed using its extracted bounding dimensions.",
+      "path": "design.pads[056938c4-aef4-485e-856e-1a76181c1285]",
+      "suggestion": "Inspect the mesh preview and run convergence; custom pad primitives require a future polygonal-pad importer.",
+      "status": "approximate"
+    },
+    {
+      "code": "TRANSIENT_STATIC_BOUNDARIES",
+      "severity": "warning",
+      "message": "All source and load profiles are constant; the transient run will reproduce an operating point.",
+      "path": "",
+      "suggestion": "Assign a step, pulse, or piecewise-linear waveform to a source or current sink.",
+      "status": "approximate"
+    },
+    {
+      "code": "PEEC_MATRIX_EXTRACTION_FAILED",
+      "severity": "error",
+      "message": "Native PEEC matrix extraction failed: PEEC_INDUCTANCE_GEOMETRY_UNSUPPORTED: singular or unrepresentable line interaction; finite-volume extraction required..",
+      "path": "",
+      "suggestion": "",
+      "status": "open"
+    }
+  ],
+  "provenance": {
+    "solver": "spike-peec-rl-transient/v0.1",
+    "solved": false,
+    "failure_stage": "matrix_extraction",
+    "volume_current_model": "disabled",
+    "solver_plugin": "spike.peec_rl_transient",
+    "solver_plugin_version": "0.2.0",
+    "solver_formulation": "peec_rl_transient",
+    "geometry_contract": "spike/solver-geometry/v1"
+  }
+}

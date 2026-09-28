@@ -528,6 +528,8 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         "python.spike_core.mcad_export",
         "--hidden-import",
         "python.spike_core.mcad_export_design",
+        "--collect-submodules",
+        "extensions.openems_suite",
         "--add-data",
         f"{ROOT / 'python' / 'spike_core' / 'freecad_assembly_export.py'}{os.pathsep}python/spike_core",
         "--add-data",

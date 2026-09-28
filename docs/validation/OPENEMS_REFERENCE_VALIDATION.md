@@ -1,5 +1,12 @@
 # openEMS Reference Validation Record
 
+Historical version-bound record: the current adapter is 1.3.4, so the 1.1.0
+evidence below is **not** attached to the current capability catalog. A local
+three-level rerun for 1.3.4 passed the same limited fixture gate but remains
+unpackaged. See
+[the actual-grid increment](OPENEMS_ACTUAL_GRID_20260928.md). It has not yet
+been promoted to packaged/version-matched release evidence.
+
 ## Decision
 
 SPIKE's openEMS adapter version 1.1.0 is **reference-validated** with openEMS
@@ -8,7 +15,7 @@ the solver manager to recommend that exact runtime for inspectable full-wave and
 NF2FF execution. It does not validate arbitrary PCB layouts or compliance.
 
 Machine-readable evidence is packaged at
-`python/spike_core/validation_data/openems-simple-patch-v1.json`. The catalog
+`extensions/openems_suite/validation_data/openems-simple-patch-v1.json`. The catalog
 applies it only when both the openEMS and adapter versions match.
 
 Reproduce the gate with:

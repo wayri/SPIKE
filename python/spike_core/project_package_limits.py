@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Resource bounds for reading SPIKE project packages."""
 from dataclasses import dataclass
 

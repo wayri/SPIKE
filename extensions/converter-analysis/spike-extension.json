@@ -10,7 +10,7 @@
   "runtime": "python",
   "entrypoint": "extension.py",
   "state": "experimental",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bundled": true,
   "permissions": ["design.read", "selection.read"],
   "limits": { "timeout_seconds": 30, "max_result_bytes": 1048576 },

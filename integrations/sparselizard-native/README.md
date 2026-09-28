@@ -4,7 +4,7 @@ This directory builds the process-isolated sparseLizard runtime used by SPIKE.
 The produced executable is a native Windows UCRT64 binary. It does not use WSL.
 
 The adapter source in this directory is licensed under GPL-2.0-or-later because
-it links to sparseLizard. It remains a separate process from the MIT-licensed
+it links to sparseLizard. It remains a separate process from the Apache-licensed
 SPIKE desktop and exchanges only versioned files.
 
 The current executable implements a deterministic DC conduction FEM self-test

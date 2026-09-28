@@ -1,0 +1,71 @@
+{
+  "contract": "spike/v1",
+  "analysis_id": "",
+  "status": "failed",
+  "mode": "ac",
+  "model_status": "failed",
+  "summary": {},
+  "fields": {},
+  "networks": {},
+  "probes": [],
+  "issues": [
+    {
+      "code": "SPIKE-BE-MESH-W-0003",
+      "severity": "warning",
+      "message": "Pad shape 'roundrect' is meshed using its extracted bounding dimensions.",
+      "path": "design.pads[056938c4-aef4-485e-856e-1a76181c1285]",
+      "suggestion": "Inspect the mesh preview and run convergence; custom pad primitives require a future polygonal-pad importer.",
+      "status": "approximate"
+    },
+    {
+      "code": "PEEC_VOLUME_RETRY_FAILED",
+      "severity": "warning",
+      "message": "Finite-volume retry after legacy nonpassivity failed: VOLUME_MATRIX_PAIR_LIMIT: volume pair (18446744073709551615, 18446744073709551615) did not qualify",
+      "path": "",
+      "suggestion": "",
+      "status": "approximate"
+    },
+    {
+      "code": "PEEC_TOPOLOGY_FIELD_EXCLUDED",
+      "severity": "warning",
+      "message": "Excluded 68 graph-only link(s) from magnetic/capacitive field bases while retaining their mesh resistance in the circuit solve.",
+      "path": "",
+      "suggestion": "Review attachment geometry and DC resistance; graph links are not finite field filaments.",
+      "status": "approximate"
+    },
+    {
+      "code": "PEEC_INDUCTANCE_NONPASSIVE",
+      "severity": "error",
+      "message": "The physical partial-inductance matrix contains 22 negative-energy mode(s); no passivity projection was applied.",
+      "path": "",
+      "suggestion": "Refine overlapping physical copper primitives or use a validated volume-integral PEEC extractor.",
+      "status": "open"
+    }
+  ],
+  "provenance": {
+    "solver": "spike-peec-native/v0.4",
+    "solved": false,
+    "numerical_quality": {
+      "inductance_passivity": {
+        "negative_eigenmode_count": 22,
+        "eigenmode_count": 382,
+        "minimum_eigenvalue": -1.1916866369089454e-10,
+        "maximum_eigenvalue": 6.333374024618227e-10,
+        "passivity_tolerance": 1e-18,
+        "frobenius_correction_ratio": 0.0,
+        "projection_applied": false,
+        "field_branch_count": 314,
+        "topology_constraint_branch_count": 68,
+        "topology_constraint_kinds": [
+          "pad_attachment"
+        ]
+      }
+    },
+    "failure_stage": "physical_inductance_admission",
+    "inductance_units": "H",
+    "solver_plugin": "spike.peec_2_5d",
+    "solver_plugin_version": "0.4.0",
+    "solver_formulation": "peec_2_5d",
+    "geometry_contract": "spike/solver-geometry/v1"
+  }
+}

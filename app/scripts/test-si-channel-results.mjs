@@ -10,6 +10,16 @@ const normalized = module.normalizeSiChannelResult(result);
 assert.equal(normalized.productionQualified, false);
 assert.equal(normalized.complianceStatus, "not_evaluated");
 assert.equal(normalized.sMagnitudeDb[0].points.length, 2);
+const reflected = module.reflectionMetrics({ reflection_vswr: { ports: [{ port: 0, trace: [
+  { frequency_hz: 1, reflection_magnitude: 0, vswr: 1, vswr_status: "finite" },
+  { frequency_hz: 2, reflection_magnitude: 0.5, vswr: 3, vswr_status: "finite" },
+  { frequency_hz: 3, reflection_magnitude: 1, vswr: null, vswr_status: "infinite" },
+  { frequency_hz: 4, reflection_magnitude: 0.25, vswr: 5 / 3, vswr_status: "finite" },
+] }] } });
+assert.equal(reflected.reflectionMagnitude.length, 1, "only diagonal S terms are reflections");
+assert.deepEqual(reflected.vswr.map(series => series.points.map(point => point.y)), [[1, 3], [5 / 3]], "VSWR gaps preserve singular samples");
+assert.deepEqual(module.reflectionMetrics({ reflection_vswr: { ports: [{ port: 0, trace: [{ frequency_hz: 1, reflection_magnitude: 1.2, vswr: null, vswr_status: "non_passive_reflection" }] }] } }).vswr, [], "non-passive reflection has no finite positive VSWR");
+assert.deepEqual(module.reflectionMetrics({}).vswr, [], "older saved results do not fabricate VSWR");
 assert.equal(normalized.mixedModeMetrics.conversion_db, -40);
 assert.match(module.buildSiChannelHtmlReport(result), /not production\/signoff qualified/);
 const differential = { ...result, mixed_mode: undefined, differential: { transform: { single_ended_reference_impedance_ohm: 50, differential_reference_impedance_ohm: 100 } } };
@@ -28,4 +38,6 @@ const panel = readFileSync(new URL("../src/SiChannelResultPanel.tsx", import.met
 assert.match(panel, /const displayed = showAll \? available : selected \? available\.filter/, "trace selector must control the plotted series");
 assert.match(panel, /defaultShowAll \/>/, "NEXT and FEXT are shown together for direct comparison");
 assert.match(panel, /No matched NEXT\/FEXT samples were returned/, "absent crosstalk stays explicit");
+assert.match(panel, /Reflections \/ VSWR/);
+assert.match(panel, /E\/H field plots require returned spatial/);
 console.log("SI channel native result assertions passed");

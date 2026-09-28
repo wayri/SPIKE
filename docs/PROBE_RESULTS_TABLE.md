@@ -1,4 +1,4 @@
-<!-- SPDX-License-Identifier: MIT -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # Probe results table
 
 `app/src/ProbeResultsTable.tsx` presents solver-returned probe measurements and user-defined calculated rows. The parent owns `calculatedRows` and persists them as UI/project state; the table never changes solver results.

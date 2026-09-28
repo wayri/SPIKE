@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Explicit loaded NEXT/FEXT terminal voltages using the existing N-port solver."""
 from collections.abc import Mapping

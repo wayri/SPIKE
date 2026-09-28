@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Typed DesignIR copper bases for the bounded native finite-volume PEEC path."""
 
@@ -15,6 +15,8 @@ from .hybrid_mesh import MeshBranch
 from .peec_magnetic_geometry import describe_magnetic_cross_section
 from .peec_volume_resistance import assemble_overlap_resistance
 from .peec_volume_support import admit_zone_basis_support
+from .peec_matrices import embed_physical_inductance
+from .numerics import assess_symmetric_positive_semidefinite
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,22 @@ class VolumeMatrices:
     inductance_h: np.ndarray
     dc_resistance_ohm: np.ndarray
     quality: dict[str, float | int | str]
+
+
+def retry_nonpassive_legacy(
+    native: Any, design: DesignIR, branches: Sequence[MeshBranch],
+    total_branches: int, physical_indices: Sequence[int],
+) -> tuple[VolumeMatrices | None, np.ndarray | None, dict | None, str | None]:
+    """Try one bounded volume matrix after legacy energy rejection, without repair."""
+    try:
+        volume = extract_volume_matrices(native, design, branches)
+        embedded = embed_physical_inductance(
+            np.asarray(volume.inductance_h, dtype=float), total_branches, physical_indices,
+        )
+        matrix, quality = assess_symmetric_positive_semidefinite(embedded)
+        return volume, matrix, quality, None
+    except (ValueError, RuntimeError, np.linalg.LinAlgError) as error:
+        return None, None, None, str(error)
 
 
 def _add_basis(assembler: Any, native: Any, design: DesignIR, branch: MeshBranch) -> None:

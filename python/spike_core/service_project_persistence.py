@@ -32,6 +32,39 @@ def project_for_desktop(payload: dict, projected: dict) -> dict:
     return projected
 
 
+def without_saved_results(payload: dict) -> dict:
+    """Keep project setup while omitting persisted simulation outputs."""
+    clean = copy.deepcopy(payload)
+
+    def clear_desktop(snapshot: dict) -> None:
+        snapshot.pop("results", None)
+        analysis = snapshot.get("analysis")
+        if isinstance(analysis, dict):
+            for key in ("latest_result", "active_result", "pdn_review"):
+                analysis.pop(key, None)
+            analysis["result_history"] = []
+            si = analysis.get("si")
+            if isinstance(si, dict):
+                si.pop("latest_channel_result", None)
+        emi = snapshot.get("emi")
+        if isinstance(emi, dict):
+            for key in ("preflight", "screening", "field_result"):
+                emi.pop(key, None)
+        thermal = snapshot.get("thermal")
+        if isinstance(thermal, dict) and isinstance(thermal.get("scenario"), dict):
+            thermal["scenario"].pop("result", None)
+            thermal["scenario"].pop("field_result", None)
+
+    analyses = clean.get("analyses")
+    if isinstance(analyses, dict):
+        clear_desktop({"analysis": analyses})
+    clean["results"] = {}
+    extensions = clean.get("extensions")
+    if isinstance(extensions, dict) and isinstance(extensions.get("legacy"), dict):
+        clear_desktop(extensions["legacy"])
+    return clean
+
+
 def prepare_persistent_state(payload: dict, visuals: Any, members: dict[str, bytes]) -> tuple[dict, dict[str, bytes]]:
     """Move full results out of metadata, retaining exact future result fields."""
     payload, result_members = externalize_result_state(payload)
@@ -45,6 +78,7 @@ def prepare_persistent_state(payload: dict, visuals: Any, members: dict[str, byt
     legacy = payload.get("extensions", {}).get("legacy")
     if isinstance(legacy, dict):
         legacy.pop("board_visuals", None)
+    referenced_artifacts: set[str] = set()
     def validate_reference(value):
         if isinstance(value, list):
             for child in value:
@@ -54,10 +88,13 @@ def prepare_persistent_state(payload: dict, visuals: Any, members: dict[str, byt
                 data = members.get(value.get("path"))
                 if data is None or len(data) != value.get("bytes") or _sha256(data) != value.get("sha256"):
                     raise ProjectPackageError("A saved result reference has no matching verified artifact; reopen its original project.")
+                referenced_artifacts.add(value["path"])
             else:
                 for child in value.values():
                     validate_reference(child)
     validate_reference(payload)
+    members = {name: data for name, data in members.items()
+               if not name.startswith("state/artifacts/") or name in referenced_artifacts}
     return payload, members
 
 

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/board-thermal-result-v1.schema.json",
+  "title": "SPIKE board thermal result v1",
+  "type": "object",
+  "required": ["contract", "status", "model_status", "grid", "components", "summary", "issues", "provenance"],
+  "properties": {
+    "contract": {"const": "spike/board-thermal-result/v1"},
+    "status": {"enum": ["completed", "blocked"]},
+    "model_status": {"enum": ["approximate", "failed"]},
+    "grid": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object", "required": ["origin_mm", "spacing_mm", "shape", "temperatures_c", "order"],
+          "properties": {
+            "origin_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+            "spacing_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "exclusiveMinimum": 0}},
+            "shape": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}},
+            "temperatures_c": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": -273.15}},
+            "order": {"const": "x-fast"}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "layer_grids": {"type": "array", "maxItems": 32, "items": {"type": "object", "required": ["name", "thickness_mm", "temperatures_c", "copper_coverage"],
+      "properties": {"name": {"type": "string"}, "thickness_mm": {"type": "number", "exclusiveMinimum": 0},
+        "temperatures_c": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": -273.15}},
+        "copper_coverage": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": 0, "maximum": 1}}}, "additionalProperties": false}},
+    "components": {"type": "array", "maxItems": 256, "items": {"type": "object"}},
+    "virtual_heatsinks": {"type": "array", "maxItems": 16, "items": {"type": "object",
+      "required": ["id", "face", "temperature_c", "board_contact_temperature_c", "heat_flow_w"],
+      "properties": {"id": {"type": "string"}, "face": {"enum": ["top", "bottom"]},
+        "temperature_c": {"type": "number"}, "board_contact_temperature_c": {"type": "number"},
+        "heat_flow_w": {"type": "number"}}}},
+    "transient": {"type": "array", "maxItems": 24, "items": {"type": "object",
+      "required": ["time_s", "layer_temperatures_c", "maximum_board_temperature_c", "storage_rate_w", "energy_balance_error_w"],
+      "properties": {"time_s": {"type": "number", "minimum": 0},
+        "layer_temperatures_c": {"type": "array", "maxItems": 32, "items": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": -273.15}}},
+        "maximum_board_temperature_c": {"type": "number"},
+        "storage_rate_w": {"type": "number"},
+        "energy_balance_error_w": {"type": "number"}}}},
+    "summary": {"type": "object"},
+    "issues": {"type": "array", "items": {"type": "object"}},
+    "provenance": {"type": "object"}
+  },
+  "additionalProperties": false
+}

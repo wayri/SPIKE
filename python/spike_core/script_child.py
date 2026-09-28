@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Child-side API for user-authored Python scripts in the desktop workspace."""
 
 from __future__ import annotations

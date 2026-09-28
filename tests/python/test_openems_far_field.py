@@ -15,12 +15,21 @@ import numpy as np
 from python.spike_core.contracts import AnalysisSpec, DesignIR
 from python.spike_core.external_engines import prepare_openems_case
 from python.spike_core.openems_adapter_source import OPENEMS_DRIVER
+from extensions.openems_suite.openems_mesh_policy import actual_grid_report, require_time_window
 from python.spike_core.openems_validation import (
     FAR_FIELD_REQUEST_CONTRACT,
     FAR_FIELD_RESULT_CONTRACT,
     validate_far_field_request,
     validate_normalized_result,
 )
+
+
+def _fixture_mesh() -> dict:
+    lines = {axis: [0.0, 0.5, 1.0] for axis in ("x", "y", "z")}
+    actual = actual_grid_report(lines, 100, 100 * 256)
+    actual.update(require_time_window(actual, 10_000_000, 1e6, 1e9))
+    actual["edge_grid_policy"] = "conductor_edges"
+    return {"resolution_mm": 0.5, "actual_grid": actual}
 
 
 def far_field_design() -> DesignIR:
@@ -194,11 +203,12 @@ class OpenEmsFarFieldTests(unittest.TestCase):
                 "frequency_hz": [1e6, 2e6],
                 "s_parameters": {"s11": {"real": [0.1, 0.2], "imag": [0.0, 0.0]}},
                 "artifacts": ["simulation"],
-                "mesh": {"resolution_mm": 0.5},
+                "mesh": _fixture_mesh(),
                 "run_binding": {
                     "run_id": "run-1", "job_id": "job-1", "input_digest": "digest-1",
                     "mesh_resolution_mm": 0.5, "frequency_start_hz": 1e6,
                     "frequency_stop_hz": 2e6, "frequency_points": 2,
+                    "max_timesteps": 10_000_000,
                 },
                 "far_field": {
                     "contract": FAR_FIELD_RESULT_CONTRACT,
@@ -228,6 +238,10 @@ class OpenEmsFarFieldTests(unittest.TestCase):
                 "setup_only": False, "expected_points": 2, "expected_start_hz": 1e6,
                 "expected_stop_hz": 2e6, "expected_job_id": "job-1",
                 "expected_input_digest": "digest-1", "expected_run_id": "run-1",
+                "expected_max_timesteps": 10_000_000,
+                "expected_cell_limit": 100,
+                "expected_memory_limit_bytes": 100 * 256,
+                "expected_compact_edges": False,
                 "ports": [{"excite": True}], "root": root,
                 "expected_far_field": expected_far_field,
             }
@@ -267,17 +281,20 @@ class OpenEmsFarFieldTests(unittest.TestCase):
             result = {
                 "contract": "spike/external-result/v1", "engine_id": "external.openems",
                 "status": "setup_completed", "model_status": "approximate",
-                "artifacts": ["setup.xml"], "mesh": {"resolution_mm": 0.5},
+                "artifacts": ["setup.xml"], "mesh": _fixture_mesh(),
                 "run_binding": {
                     "run_id": "run-1", "job_id": "job-1", "input_digest": "digest-1",
                     "mesh_resolution_mm": 0.5, "frequency_start_hz": 1e6,
                     "frequency_stop_hz": 1e9, "frequency_points": 5,
+                    "max_timesteps": 10_000_000,
                 },
             }
             checked = validate_normalized_result(
                 result, setup_only=True, expected_points=5, expected_start_hz=1e6,
                 expected_stop_hz=1e9, expected_job_id="job-1", expected_input_digest="digest-1",
-                expected_run_id="run-1", ports=[{"excite": True}], root=root,
+                expected_run_id="run-1", expected_max_timesteps=10_000_000,
+                expected_cell_limit=100, expected_memory_limit_bytes=100 * 256,
+                expected_compact_edges=False, ports=[{"excite": True}], root=root,
                 expected_far_field=request,
             )
         self.assertEqual(checked["status"], "setup_completed")

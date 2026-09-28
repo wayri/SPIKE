@@ -293,10 +293,8 @@ mod tests {
             "{{\"format\":\"spike-project-package/v3\",\"manifest_payload_sha256\":\"{identity}\"}}\n"
         );
         let (envelope, records) = signed_fixture(payload.as_bytes());
-        let verified = verify_project_manifest_with_records(
-            payload.as_bytes(), &envelope, &records,
-        )
-        .unwrap();
+        let verified =
+            verify_project_manifest_with_records(payload.as_bytes(), &envelope, &records).unwrap();
         assert!(verified.trust.verified);
         assert_eq!(verified.manifest_payload_sha256, identity);
     }

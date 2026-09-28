@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import type { ThermalElement } from "./thermalAssembly";
 
 export type ThermalSurface = "whole" | "+X" | "-X" | "+Y" | "-Y" | "+Z" | "-Z" | (string & {});

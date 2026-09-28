@@ -1,23 +1,76 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import "./emiChamber.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { buildEmiChamber, disposeEmiGeometry, emiCameraCommandView, emiCameraPose, placeEmiDut, type EmiCameraView, type EmiChamberSetup } from "./emiChamber";
+import { interpolateEMergePattern, type EMergeAngularPattern } from "./emergePatternInterpolation";
 
-export function EmiChamberWorkspace({ source, setup, onChange, dashboard, reviewOpen, onReview, onSetup, onPrepare, onRun, busy, canRun, hasBoard, sourceNote, cameraCommand = "", navigationMode, onNavigationModeChange }: {
+type BenchDisplay = "visible" | "translucent" | "hidden";
+
+const MAX_PATTERN_SAMPLES = 4096;
+
+function validPattern(pattern: EMergeAngularPattern | undefined) {
+  return Boolean(pattern && Number.isFinite(pattern.frequency_hz) && pattern.frequency_hz > 0 &&
+    pattern.theta_deg.length >= 2 && pattern.phi_deg.length >= 2 &&
+    pattern.theta_deg.length * pattern.phi_deg.length === pattern.relative_amplitude_db.length && pattern.relative_amplitude_db.length <= MAX_PATTERN_SAMPLES &&
+    pattern.theta_deg.every(Number.isFinite) && pattern.phi_deg.every(Number.isFinite) && pattern.relative_amplitude_db.every(Number.isFinite));
+}
+
+/** Relative display only: it deliberately has no path back into EMI setup or solver parameters. */
+function createRadiationOverlay(pattern: EMergeAngularPattern) {
+  if (!validPattern(pattern)) return null;
+  const positions: number[] = [], colors: number[] = [], indices: number[] = [];
+  const color = new THREE.Color();
+  for (let thetaIndex = 0; thetaIndex < pattern.theta_deg.length; thetaIndex++) {
+    const theta = THREE.MathUtils.clamp(pattern.theta_deg[thetaIndex], 0, 180);
+    for (let phiIndex = 0; phiIndex < pattern.phi_deg.length; phiIndex++) {
+      const phi = THREE.MathUtils.euclideanModulo(pattern.phi_deg[phiIndex], 360);
+      const db = THREE.MathUtils.clamp(pattern.relative_amplitude_db[thetaIndex * pattern.phi_deg.length + phiIndex], -80, 0);
+      const magnitude = THREE.MathUtils.clamp((db + 40) / 40, 0, 1);
+      const radius = .26 * 10 ** (db / 20);
+      const thetaRadians = THREE.MathUtils.degToRad(theta), phiRadians = THREE.MathUtils.degToRad(phi);
+      positions.push(radius * Math.sin(thetaRadians) * Math.cos(phiRadians), radius * Math.sin(thetaRadians) * Math.sin(phiRadians), radius * Math.cos(thetaRadians));
+      color.setHSL((1 - magnitude) * .67, .9, .52); colors.push(color.r, color.g, color.b);
+    }
+  }
+  for (let thetaIndex = 0; thetaIndex < pattern.theta_deg.length - 1; thetaIndex++) for (let phiIndex = 0; phiIndex < pattern.phi_deg.length - 1; phiIndex++) {
+    const a = thetaIndex * pattern.phi_deg.length + phiIndex;
+    indices.push(a, a + pattern.phi_deg.length, a + 1, a + 1, a + pattern.phi_deg.length, a + pattern.phi_deg.length + 1);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3)); geometry.setIndex(indices); geometry.computeVertexNormals();
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, transparent: true, opacity: .72, side: THREE.DoubleSide, depthWrite: false, roughness: .48, metalness: .05 }));
+  mesh.name = "relative EMerge radiation pattern display";
+  const root = new THREE.Group(); root.name = "EMerge relative radiation overlay (display only)"; root.add(mesh);
+  return root;
+}
+
+export function EmiChamberWorkspace({ source, setup, onChange, dashboard, reviewOpen, onReview, onSetup, onPrepare, onRun, busy, canRun, hasBoard, sourceNote, cameraCommand = "", navigationMode, onNavigationModeChange, emergePatterns, emergeFrequencyIndex, onEmergeFrequencyIndexChange }: {
   source: THREE.Group | null; setup: EmiChamberSetup; onChange: (setup: EmiChamberSetup) => void;
   dashboard: ReactNode; reviewOpen: boolean; onReview: (open: boolean) => void;
   onSetup: () => void; onPrepare: () => void; onRun: () => void;
   busy: boolean; canRun: boolean; hasBoard: boolean;
   sourceNote?: string; cameraCommand?: string; navigationMode?: "orbit" | "pan"; onNavigationModeChange?: (mode: "orbit" | "pan") => void;
+  emergePatterns?: EMergeAngularPattern[]; emergeFrequencyIndex?: number; onEmergeFrequencyIndexChange?: (index: number) => void;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<"split" | "tab">("split");
   const [view, setView] = useState<"chamber" | "dut">("chamber");
   const [cameraView, setCameraView] = useState<EmiCameraView>("isometric");
   const [localNavigation, setLocalNavigation] = useState<"orbit" | "pan">("orbit");
+  const [benchDisplay, setBenchDisplay] = useState<BenchDisplay>("visible");
+  const [localEmergeFrequencyIndex, setLocalEmergeFrequencyIndex] = useState(0);
   const navigation = navigationMode ?? localNavigation;
   const setNavigation = onNavigationModeChange ?? setLocalNavigation;
+  const patternIndex = Math.min(Math.max(emergeFrequencyIndex ?? localEmergeFrequencyIndex, 0), Math.max((emergePatterns?.length ?? 1) - 1, 0));
+  const setPatternIndex = onEmergeFrequencyIndexChange ?? setLocalEmergeFrequencyIndex;
+  const solvedPattern = emergePatterns?.[patternIndex];
+  const displayPattern = useMemo(() => {
+    if (!solvedPattern) return undefined;
+    try { return interpolateEMergePattern(solvedPattern, 5); }
+    catch { return undefined; }
+  }, [solvedPattern]);
   const [error, setError] = useState("");
   const [size, setSize] = useState("");
   const cameraState = useRef<{ position: THREE.Vector3; target: THREE.Vector3; up: THREE.Vector3; view: string }>();
@@ -25,6 +78,8 @@ export function EmiChamberWorkspace({ source, setup, onChange, dashboard, review
   const controlsRef = useRef<OrbitControls>();
   const renderRef = useRef<() => void>();
   const frameCameraRef = useRef<(subject: "chamber" | "dut", nextCameraView: EmiCameraView) => void>();
+  const benchMeshesRef = useRef<THREE.Mesh[]>([]);
+  const benchDisplayRef = useRef<BenchDisplay>(benchDisplay); benchDisplayRef.current = benchDisplay;
   const viewRef = useRef(view); viewRef.current = view;
   const cameraViewRef = useRef(cameraView); cameraViewRef.current = cameraView;
   useEffect(() => {
@@ -49,6 +104,16 @@ export function EmiChamberWorkspace({ source, setup, onChange, dashboard, review
     const dutSize = bounds?.getSize(new THREE.Vector3()) ?? new THREE.Vector3(.2, .15, .1);
     setSize(bounds ? `${(dutSize.x * 1000).toFixed(1)} × ${(dutSize.y * 1000).toFixed(1)} × ${(dutSize.z * 1000).toFixed(1)} mm` : "Import a board or assembly to place the DUT");
     const chamber = buildEmiChamber(setup, dutSize); scene.add(chamber.root);
+    const benchNames = new Set(["turntable", "nonconductive test table", "table leg"]);
+    benchMeshesRef.current = [];
+    chamber.root.traverse(object => { if (object instanceof THREE.Mesh && benchNames.has(object.name)) benchMeshesRef.current.push(object); });
+    for (const mesh of benchMeshesRef.current) {
+      const display = benchDisplayRef.current;
+      mesh.visible = display !== "hidden";
+      (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(material => { material.transparent = display === "translucent"; material.opacity = display === "translucent" ? .28 : 1; material.depthWrite = display !== "translucent"; material.needsUpdate = true; });
+    }
+    const overlay = displayPattern ? createRadiationOverlay(displayPattern) : null;
+    if (overlay && bounds) { overlay.position.copy(bounds.getCenter(new THREE.Vector3())); scene.add(overlay); }
     const camera = new THREE.PerspectiveCamera(42, 1, .001, 150); camera.up.set(0, 0, 1);
     const controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = false;
     cameraRef.current = camera; controlsRef.current = controls;
@@ -84,9 +149,18 @@ export function EmiChamberWorkspace({ source, setup, onChange, dashboard, review
       observer.disconnect(); host.removeEventListener("dblclick", reset); controls.removeEventListener("change", onControlsChange); controls.dispose();
       if (cameraRef.current === camera) { cameraRef.current = undefined; controlsRef.current = undefined; renderRef.current = undefined; frameCameraRef.current = undefined; }
       if (source) dut.remove(source);
+      if (overlay) disposeEmiGeometry(overlay);
+      benchMeshesRef.current = [];
       disposeEmiGeometry(chamber.root); renderer.dispose(); renderer.domElement.remove();
     };
-  }, [source, setup, hasBoard]);
+  }, [source, setup, hasBoard, displayPattern]);
+  useEffect(() => {
+    for (const mesh of benchMeshesRef.current) {
+      mesh.visible = benchDisplay !== "hidden";
+      (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(material => { material.transparent = benchDisplay === "translucent"; material.opacity = benchDisplay === "translucent" ? .28 : 1; material.depthWrite = benchDisplay !== "translucent"; material.needsUpdate = true; });
+    }
+    renderRef.current?.();
+  }, [benchDisplay]);
   useEffect(() => {
     const controls = controlsRef.current;
     if (!controls) return;
@@ -130,8 +204,8 @@ export function EmiChamberWorkspace({ source, setup, onChange, dashboard, review
   const frame = (subject: "chamber" | "dut", nextCameraView = cameraView) => {
     setView(subject); setCameraView(nextCameraView); frameCameraRef.current?.(subject, nextCameraView);
   };
-  return <section className="emi-chamber-workspace" aria-label="EMI virtual chamber workspace">
-    <nav className="emi-chamber-nav" aria-label="EMI workspace views">
+  return <section className="emi-chamber-workspace" aria-label="EM virtual chamber workspace">
+    <nav className="emi-chamber-nav" aria-label="EM workspace views">
       <button className={!reviewOpen ? "active" : ""} onClick={() => onReview(false)}>Chamber</button>
       <button className={reviewOpen ? "active" : ""} onClick={() => onReview(true)}>Results dashboard</button>
       <button onClick={onSetup}>Board / ports setup</button>
@@ -141,7 +215,7 @@ export function EmiChamberWorkspace({ source, setup, onChange, dashboard, review
     <div className={`emi-chamber-content ${reviewOpen ? layout : "scene-only"}`}>
       <div className="emi-chamber-scene" style={reviewOpen && layout === "tab" ? { display: "none" } : undefined}>
         <div ref={hostRef} className="emi-chamber-canvas" aria-label="3D anechoic chamber, test table, DUT and receive antenna" />
-        <div className="emi-chamber-title"><b>VIRTUAL ANECHOIC CHAMBER</b><span>{setup.distance_m} m · {setup.polarization} · {setup.azimuth_deg}°</span><small>{navigation === "orbit" ? "Orbit" : "Pan"}: left drag · Zoom: wheel · Fit: double-click</small></div>
+        <div className="emi-chamber-title"><b>VIRTUAL ANECHOIC CHAMBER</b><span>{setup.distance_m} m · {setup.polarization} · {setup.azimuth_deg}°</span><small>{navigation === "orbit" ? "Orbit" : "Pan"}: left drag · Zoom: wheel · Fit: double-click</small>{validPattern(displayPattern) && <small className="emi-chamber-overlay-note">Relative EMerge radiation pattern · {(displayPattern!.frequency_hz / 1e9).toFixed(3)} GHz · 5° display interpolation of solved samples</small>}</div>
         <div className="emi-chamber-view" aria-label="Chamber navigation">
           <button onClick={() => frame("chamber")}>Fit chamber</button><button disabled={!hasDut} title={hasDut ? "Focus the placed device under test" : "Import a board or assembly to focus the DUT"} onClick={() => frame("dut")}>Focus DUT</button>
           <button className={cameraView === "top" ? "active" : ""} aria-pressed={cameraView === "top"} onClick={() => frame(view, "top")}>Top</button><button className={cameraView === "bottom" ? "active" : ""} aria-pressed={cameraView === "bottom"} onClick={() => frame(view, "bottom")}>Bottom</button><button className={cameraView === "isometric" ? "active" : ""} aria-pressed={cameraView === "isometric"} onClick={() => frame(view, "isometric")}>Isometric</button>
@@ -159,6 +233,8 @@ export function EmiChamberWorkspace({ source, setup, onChange, dashboard, review
       <label>DUT orientation<select value={setup.orientation} onChange={e => change({ orientation: e.target.value as EmiChamberSetup["orientation"] })}><option value="flat">Flat</option><option value="upright">Upright</option><option value="side">On side</option></select></label>
       <label>Turntable {setup.azimuth_deg}°<input type="range" min="0" max="360" step="5" value={setup.azimuth_deg} onChange={e => change({ azimuth_deg: Number(e.target.value) })} /></label>
       <label>Floor<select value={setup.floor} onChange={e => change({ floor: e.target.value as EmiChamberSetup["floor"] })}><option value="absorber">Absorbers</option><option value="ground_plane">Ground plane</option></select></label>
+      <label>Bench display<select value={benchDisplay} onChange={e => setBenchDisplay(e.target.value as BenchDisplay)} aria-label="Bench display only"><option value="visible">Visible</option><option value="translucent">Translucent</option><option value="hidden">Hidden</option></select></label>
+      {emergePatterns && emergePatterns.length > 0 && <label>EMerge pattern<select value={patternIndex} onChange={e => setPatternIndex(Number(e.target.value))} aria-label="Solved EMerge radiation pattern frequency">{emergePatterns.map((pattern, index) => <option key={`${pattern.frequency_hz}-${index}`} value={index}>Solved {(pattern.frequency_hz / 1e9).toFixed(3)} GHz</option>)}</select></label>}
       <label className="emi-chamber-check"><input type="checkbox" checked={setup.cutaway} onChange={e => change({ cutaway: e.target.checked })} />Cutaway</label>
       <button disabled={!hasDut} title={hasDut ? "Place and focus the DUT on the table" : "Import a board or assembly to place a DUT"} onClick={() => { frame("dut"); onChange({ ...setup, orientation: "flat", azimuth_deg: 0 }); }}>Auto-place DUT</button>
       <button disabled={!hasBoard || busy} onClick={onPrepare}>Prepare scan</button>

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Bounded, digest-correlated router/placer orchestration over SPIKES jobs."""
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 #pragma once
 
@@ -13,14 +13,6 @@
 #include <vector>
 
 namespace spike::peec::volume {
-
-struct CoaxialAnnulusVolume {
-  Vector center_m{};
-  Vector direction{0.0, 0.0, 1.0};
-  double length_m = 0.0;
-  double inner_radius_m = 0.0;
-  double outer_radius_m = 0.0;
-};
 
 using VolumeBasis = std::variant<RectangularVolume, CoaxialAnnulusVolume>;
 

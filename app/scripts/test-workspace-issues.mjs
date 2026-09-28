@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { workspaceIssues } from '../src/workspaceIssues.ts';
-const base = { hasBoard: false, workspace: 'EMI', mode: 'DC IR Drop', stackupComplete: false,
+const base = { hasBoard: false, workspace: 'EM', mode: 'DC IR Drop', stackupComplete: false,
   components: 0, nets: 0, copperLayers: 0, stackRows: 0 };
 const empty = workspaceIssues(base);
 assert.equal(empty.length, 1);
 assert.equal(empty[0].kind, 'info');
 assert.equal(empty[0].title, 'No design loaded');
 assert.equal(empty.filter(x => x.kind === 'warning').length, 0);
-for (const workspace of ['EMI', 'Thermal', 'HF / SI']) {
+for (const workspace of ['EM', 'EMI', 'Thermal', 'HF / SI']) {
   assert.ok(!workspaceIssues({ ...base, hasBoard: true, workspace }).some(x => /DC convergence|Mesh convergence/.test(x.title)));
 }
 assert.ok(!workspaceIssues({ ...base, hasBoard: true, workspace: 'PI', mode: 'AC Impedance Sweep' }).some(x => /DC convergence/.test(x.title)));

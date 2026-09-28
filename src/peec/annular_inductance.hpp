@@ -1,10 +1,19 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 #pragma once
 
 #include <cstddef>
+#include "volume_inductance.hpp"
 
 namespace spike::peec::volume {
+
+struct CoaxialAnnulusVolume {
+  Vector center_m{};
+  Vector direction{0.0, 0.0, 1.0};
+  double length_m = 0.0;
+  double inner_radius_m = 0.0;
+  double outer_radius_m = 0.0;
+};
 
 // Uniform axial volume current density, 1 / annular area amperes per square
 // metre per branch ampere. Both operands MUST refer to the same straight axis
@@ -27,7 +36,9 @@ struct AnnularIntegrationOptions {
 
 struct AnnularIntegrationResult {
   double inductance_h = 0.0;
-  // Adaptive rule difference plus roundoff indicator; NOT a certified bound.
+  // Coaxial: adaptive rule difference plus roundoff indicator. Separated:
+  // analytic truncation bound plus roundoff allowance. Neither is a
+  // machine-certified floating-point error enclosure.
   double estimated_error_h = 0.0;
   std::size_t evaluations = 0;
   bool converged = false;
@@ -38,6 +49,16 @@ struct AnnularIntegrationResult {
 // Malformed input throws invalid_argument; resource exhaustion fails closed.
 AnnularIntegrationResult coaxial_annular_inductance(
     const CoaxialAnnulus &first, const CoaxialAnnulus &second,
+    const AnnularIntegrationOptions &options = {});
+
+// Bounded far-field slice for finite annuli with arbitrary straight axes.
+// Integrates the Legendre expansion through degree four using exact volume
+// moments. The omitted series has an analytic bound; estimated_error_h also
+// includes a conservative floating-point allowance (not interval arithmetic).
+// Requires enclosing-sphere ratio <= 1/4 and the full error <= tolerance.
+// Closer pairs, tight unattainable tolerances and work exhaustion fail closed.
+AnnularIntegrationResult separated_annular_inductance(
+    const CoaxialAnnulusVolume &first, const CoaxialAnnulusVolume &second,
     const AnnularIntegrationOptions &options = {});
 
 } // namespace spike::peec::volume

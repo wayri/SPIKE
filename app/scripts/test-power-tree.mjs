@@ -40,6 +40,31 @@ assert.equal(maximum.nodes.load.currentA, 3);
 const numericMultiplier = powerTree.calculatePowerTree({ ...model, nodes: model.nodes.map(node => node.id === "load" ? { ...node, operatingPoints: undefined } : node) }, 1.25);
 assert.equal(numericMultiplier.loadPowerW, 30, "legacy numeric multipliers remain supported");
 
+const converterCase = (converterKind, efficiencyPercent) => powerTree.calculatePowerTree({
+  ...model,
+  nodes: [model.nodes[0], { id: "converter", kind: "regulator", label: "3.3 V stage", converterKind, voltageRatio: 3.3 / 12, efficiencyPercent, x: 100, y: 0, origin: "user" },
+    { ...model.nodes[1], voltageV: undefined, net: "+3.3V" }, { ...model.nodes[2], loadCurrentA: 0.15, operatingPoints: undefined, net: "+3.3V" }],
+  edges: [{ id: "source-converter", from: "source", to: "converter", kind: "power", origin: "user" },
+    { id: "converter-rail", from: "converter", to: "rail", kind: "power", origin: "user" }, model.edges[1]],
+}, "typical");
+const ldo = converterCase("ldo");
+assert.equal(ldo.status, "complete");
+assert.ok(Math.abs(ldo.nodes.converter.voltageV - 3.3) < 1e-12);
+assert.ok(Math.abs(ldo.nodes.converter.lossW - (12 - 3.3) * 0.15) < 1e-12);
+assert.ok(Math.abs(ldo.nodes.converter.inputCurrentA - 0.15) < 1e-12);
+const buck = converterCase("buck", 90);
+assert.equal(buck.status, "complete");
+assert.ok(Math.abs(buck.nodes.converter.lossW - (3.3 * 0.15 / 0.9 - 3.3 * 0.15)) < 1e-12);
+assert.ok(Math.abs(buck.nodes.converter.inputCurrentA - (3.3 * 0.15 / 0.9 / 12)) < 1e-12);
+assert.ok(Math.abs(buck.sourcePowerW - buck.loadPowerW - buck.lossW) < 1e-12);
+assert.equal(converterCase("ldo", undefined).warnings.length, 0);
+assert.equal(converterCase("buck", undefined).status, "incomplete", "buck efficiency must be supplied");
+const stepUpLdo = powerTree.calculatePowerTree({ ...model,
+  nodes: [model.nodes[0], { id: "ldo", kind: "regulator", label: "Invalid LDO", converterKind: "ldo", voltageV: 15, x: 100, y: 0, origin: "user" }, model.nodes[2]],
+  edges: [{ id: "source-ldo", from: "source", to: "ldo", kind: "power", origin: "user" }, { id: "ldo-load", from: "ldo", to: "load", kind: "power", origin: "user" }],
+}, "typical");
+assert.equal(stepUpLdo.status, "invalid", "an LDO cannot step voltage up");
+
 const plan = powerTree.buildPowerTreeAnalysisPlan(model, "maximum");
 assert.equal(plan.contract, "spike/power-tree-analysis-plan/v1");
 assert.equal(plan.status, "ready");

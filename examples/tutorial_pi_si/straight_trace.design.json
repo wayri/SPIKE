@@ -1,0 +1,33 @@
+{
+  "contract": "spike/v1",
+  "design_id": "tutorial-straight-trace",
+  "name": "PI tutorial straight trace",
+  "source_format": "fixture",
+  "source_path": "",
+  "units": "mm",
+  "layers": [{"name": "F.Cu"}],
+  "nets": [{"id": 1, "name": "VCC"}],
+  "tracks": [{
+    "id": "trace",
+    "start": [0.0, 0.0],
+    "end": [10.0, 0.0],
+    "width": 1.0,
+    "layer": "F.Cu",
+    "net_name": "VCC"
+  }],
+  "vias": [],
+  "pads": [],
+  "zones": [],
+  "components": [],
+  "component_bonds": [],
+  "connectors": [],
+  "stackup": [
+    {"name": "F.Cu", "type": "copper", "thickness": 0.035},
+    {"name": "Core", "type": "dielectric", "thickness": 0.2, "epsilon_r": 4.0}
+  ],
+  "technology": "rigid",
+  "regions": [],
+  "bends": [],
+  "issues": [],
+  "metadata": {"fixture_owner": "SigHarmonic", "license": "Apache-2.0", "purpose": "Synthetic tutorial fixture; not a fabricated board"}
+}

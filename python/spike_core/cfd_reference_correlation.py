@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Digest-bound measured-data admission and explicitly scoped CFD comparisons."""
 import hashlib

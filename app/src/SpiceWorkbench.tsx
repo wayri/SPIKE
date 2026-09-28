@@ -336,7 +336,7 @@ export default function SpiceWorkbench({
     { id: "run", label: "Validate & run", icon: ListChecks },
   ];
   const analysis = workspace.analysis;
-  return <div className="modal-shade" role="dialog" aria-modal="true" aria-label="SPICE model assistant"><section className="spice-workbench spice-assistant">
+  return <div className="modal-shade" role="dialog" aria-modal="true" aria-label="SPICE model assistant"><section className="spice-workbench spice-assistant" data-guide="circuit-workspace">
     <header><div><CircuitBoard size={18} /><span><b>SPICE MODEL ASSISTANT</b><small>{workspace.contract} | shared PI / SI circuit co-simulation</small></span></div><button className="canvas-icon" disabled={running} onClick={onClose}><X size={16} /></button></header>
     <div className="spice-toolbar">
       {pages.map(item => { const Icon = item.icon; return <button key={item.id} className={page === item.id ? "active" : ""} onClick={() => setPage(item.id)}><Icon size={13} />{item.label}</button>; })}

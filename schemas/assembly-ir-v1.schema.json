@@ -27,7 +27,13 @@
         }]
       }
     },
-    "connector_mappings": { "type": "array", "items": { "$ref": "design-ir-v2.schema.json#/$defs/entity" } },
+    "connector_mappings": { "type": "array", "items": {
+      "allOf": [
+        { "$ref": "design-ir-v2.schema.json#/$defs/entity" },
+        { "if": { "properties": { "kind": { "const": "connector-mate" } }, "required": ["kind"] },
+          "then": { "$ref": "#/$defs/connector_mate" } }
+      ]
+    } },
     "rigid_flex_links": { "type": "array", "items": { "$ref": "design-ir-v2.schema.json#/$defs/entity" } },
     "parts": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/assembly_part" } },
     "materials": { "type": "array", "items": { "$ref": "design-ir-v2.schema.json#/$defs/entity" } },
@@ -38,6 +44,18 @@
   },
   "additionalProperties": false,
   "$defs": {
+    "connector_mate": {
+      "type": "object", "required": ["kind", "data"],
+      "properties": { "kind": { "const": "connector-mate" }, "data": {
+        "type": "object", "required": ["endpoint_a", "endpoint_b", "pin_map"],
+        "properties": {
+          "endpoint_a": { "type": "string", "pattern": "^[^:]+::[^:]+$" },
+          "endpoint_b": { "type": "string", "pattern": "^[^:]+::[^:]+$" },
+          "pin_map": { "type": "object", "minProperties": 1, "maxProperties": 512,
+            "additionalProperties": { "type": "string", "minLength": 1 } }
+        }, "additionalProperties": false
+      } }
+    },
     "assembly_part": {
       "allOf": [
         { "$ref": "design-ir-v2.schema.json#/$defs/entity" },

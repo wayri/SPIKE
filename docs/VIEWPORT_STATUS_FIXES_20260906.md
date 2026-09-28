@@ -9,7 +9,7 @@ visually accepted in the native release executable.
 - Removed unconditional "Contract valid" from the bottom dock; design loading
   and analysis validation are no longer conflated. Warning counts match the
   rendered workspace warnings.
-- EMI chamber exposes Top/Bottom/Isometric, Orbit/Pan, Fit chamber and Focus DUT.
+- EM chamber exposes Top/Bottom/Isometric, Orbit/Pan, Fit chamber and Focus DUT.
   Global camera and navigation commands are forwarded to the chamber. Board
   coordinate orbit targets are not misinterpreted as chamber coordinates.
 - Camera actions update live camera/controls without reconstructing chamber

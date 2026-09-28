@@ -10,6 +10,26 @@ from .hybrid_mesh import HybridMesh
 from .peec_network import dense
 
 
+def connected_component(mesh: HybridMesh, net: str, source_node: int) -> tuple[list[int], list[int]]:
+    """Return nodes and branches reachable from a terminal on one net."""
+    adjacency: dict[int, list[tuple[int, int]]] = {}
+    for index, branch in enumerate(mesh.branches):
+        if branch.net != net:
+            continue
+        adjacency.setdefault(branch.node_p, []).append((branch.node_n, index))
+        adjacency.setdefault(branch.node_n, []).append((branch.node_p, index))
+    nodes = {source_node}
+    branches: set[int] = set()
+    pending = [source_node]
+    while pending:
+        for neighbor, index in adjacency.get(pending.pop(), []):
+            branches.add(index)
+            if neighbor not in nodes:
+                nodes.add(neighbor)
+                pending.append(neighbor)
+    return sorted(nodes), sorted(branches)
+
+
 class TopologyResistanceSolver:
     """Expand valid native resistance while retaining any degenerate link loss."""
 

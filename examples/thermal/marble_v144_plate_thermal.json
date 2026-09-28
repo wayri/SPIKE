@@ -1,0 +1,33 @@
+{
+  "source": {
+    "board_path": "build/marble-qualification/sources/Marble-v1.4.4/design/Marble.kicad_pcb",
+    "board_sha256": "3304ba37c2bd891849fc36b500cd940934aaf1f2013a95639c03564fb925c512"
+  },
+  "request": {
+    "ambient_temperature_c": 25.0,
+    "board": {
+      "model": "plate",
+      "conductivity_w_mk": 20.0,
+      "thickness_mm": 1.6,
+      "convection_top_w_m2k": 10.0,
+      "convection_bottom_w_m2k": 10.0,
+      "grid_step_mm": 4.0
+    },
+    "components": [
+      {
+        "component_ref": "U35",
+        "power_w": 1.0,
+        "contact_mode": "square",
+        "contact_size_mm": 10.0,
+        "r_junction_case_k_w": 2.0,
+        "r_case_board_k_w": 3.0
+      }
+    ]
+  },
+  "assumptions": {
+    "source": "BerkeleyLab/Marble v1.4.4, CERN OHL v1.2; source checkout and README remain upstream; this SPIKE example does not redistribute the board.",
+    "scope": "Exploratory uniform 2D plate over board bounds; not a copper-resolved Marble thermal prediction.",
+    "material_and_cooling": "Effective conductivity, 1.6 mm plate thickness, and top/bottom 10 W/m2K convection are teaching values, not verified Marble fabrication or cooling data.",
+    "component": "U35 1 W loss, 10 mm square case contact, 2 K/W junction-to-case and 3 K/W case-to-board resistance are hypothetical, not a regulator datasheet or measurement."
+  }
+}

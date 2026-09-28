@@ -11,6 +11,13 @@ export type ParsedPad = {
   shape: string;
   customPolygon?: Point[];
   drill: number;
+  drill_size?: [number, number];
+  drill_shape?: "circle" | "oval";
+  size?: [number, number];
+  type?: string;
+  pad_kind?: string;
+  plated?: boolean;
+  roundrect_rratio?: number;
   layers: string[];
   layer: string;
   net?: string;
@@ -39,7 +46,8 @@ export type ParsedComponent = {
   vendor_properties?: Record<string, unknown>;
   bom_records?: readonly string[];
 };
-export type ParsedZone = { id: string; points: Point[]; holes?: Point[][]; layer: string; net?: string };
+export type ParsedZone = { id: string; points: Point[]; holes?: Point[][]; layer: string; net?: string;
+  source_kind?: string; filled_copper_state?: string; source_fill_provenance_complete?: boolean; source_fill_representation?: string };
 export type ParsedDrawing = {
   id: string;
   type: "line" | "arc" | "circle" | "poly" | "rect";
@@ -47,6 +55,7 @@ export type ParsedDrawing = {
   layer: string;
   width: number;
   ref?: string;
+  filled?: boolean;
 };
 export type ParsedLayerDefinition = {
   id: number;
@@ -158,10 +167,12 @@ function tokenize(source: string): string[] {
   const tokens: string[] = [];
   let current = "";
   let quoted = false;
+  let quotedToken = false;
   let escaped = false;
   const flush = () => {
-    if (current) tokens.push(current);
+    if (current || quotedToken) tokens.push(current);
     current = "";
+    quotedToken = false;
   };
 
   for (const char of source) {
@@ -171,6 +182,7 @@ function tokenize(source: string): string[] {
     } else if (quoted && char === "\\") {
       escaped = true;
     } else if (char === "\"") {
+      if (!quoted) quotedToken = true;
       quoted = !quoted;
     } else if (quoted) {
       current += char;
@@ -345,7 +357,8 @@ function drawingFromNode(node: Node, id: string, transform?: (point: Point) => P
   } else {
     return null;
   }
-  return { id, type, points, layer, width, ref };
+  return { id, type, points, layer, width, ref,
+    filled: ["yes", "solid"].includes(stringAt(child(node, "fill"), 1).toLowerCase()) };
 }
 
 function closeEnough(a: Point, b: Point): boolean {
@@ -516,12 +529,19 @@ export function parseKicadBoard(source: string): ParsedBoard {
     } else if (head === "zone") {
       const defaultLayer = layerOf(item);
       const polygonNodes = children(item, "filled_polygon");
+      // KiCad also stores placement/keepout regions as zone outlines. They
+      // carry no copper and must not enter the thermal copper inventory.
+      if (!polygonNodes.length && (child(item, "placement") || child(item, "keepout"))) continue;
       const selectedPolygons = polygonNodes.length ? polygonNodes : children(item, "polygon");
       selectedPolygons.forEach((polygon, index) => {
         const points = pointsAt(polygon);
         if (points.length < 3) return;
         const layer = layerOf(polygon, defaultLayer);
-        zones.push({ id: `${nodeId(item, `zone-${zones.length + 1}`)}:${index}`, points, layer, net: netName(item) });
+        zones.push({ id: `${nodeId(item, `zone-${zones.length + 1}`)}:${index}`, points, layer, net: netName(item),
+          source_kind: polygonNodes.length ? "filled_zone" : "zone_outline_unfilled",
+          filled_copper_state: polygonNodes.length ? "source_filled" : "unfilled",
+          source_fill_provenance_complete: polygonNodes.length > 0,
+          source_fill_representation: polygonNodes.length ? "flat_polygon_path" : undefined });
         layers.add(layer);
       });
     } else if (head.startsWith("gr_")) {
@@ -554,18 +574,30 @@ export function parseKicadBoard(source: string): ParsedBoard {
           ? (mirrored ? "B.Cu" : "F.Cu")
           : rawLayers.find((entry) => entry.endsWith(".Cu")) ?? layer;
         const drillNode = child(padNode, "drill");
-        const drill = stringAt(drillNode, 1) === "oval" ? numberAt(drillNode, 2) : numberAt(drillNode, 1);
+        const ovalDrill = stringAt(drillNode, 1) === "oval";
+        const drill = ovalDrill ? numberAt(drillNode, 2) : numberAt(drillNode, 1);
+        const drillHeight = ovalDrill ? numberAt(drillNode, 3, drill) : drill;
+        const padKind = stringAt(padNode, 2);
+        const width = numberAt(size, 1, 1);
+        const height = numberAt(size, 2, 1);
         const pad: ParsedPad = {
           id: nodeId(padNode, `pad-${reference}-${stringAt(padNode, 1, String(index + 1))}`),
           name: stringAt(padNode, 1, String(index + 1)),
           at: transform(localAt),
-          width: numberAt(size, 1, 1),
-          height: numberAt(size, 2, 1),
+          width,
+          height,
+          size: [width, height],
           // KiCad stores the pad position in footprint-local coordinates, but
           // serializes the pad angle in board coordinates.
           rotation: numberAt(child(padNode, "at"), 3),
           shape: stringAt(padNode, 3, "rect"),
           drill,
+          drill_size: [drill, drillHeight],
+          drill_shape: ovalDrill ? "oval" : "circle",
+          type: padKind,
+          pad_kind: padKind,
+          plated: padKind !== "np_thru_hole",
+          roundrect_rratio: numberAt(child(padNode, "roundrect_rratio"), 1, 0),
           layers: rawLayers,
           layer: primaryLayer,
           net: netName(padNode),

@@ -37,6 +37,7 @@ Makefile
 venv/
 env/
 .venv/
+.venv-emerge*/
 aether_env/
 runtime/downloads/
 runtime/external/
@@ -66,3 +67,17 @@ htmlcov/
 
 # Documentation builds
 docs/_build/
+
+# Local wxWidgets interface replica experiment
+/wx_ui_experiment/
+
+# Local solver toolchains, settings, and generated HDL libraries
+/tools/hdl/ghdl/
+/tools/hdl/iverilog-standalone/
+/tools/hdl/openvaf/
+/tools/hdl/oss-cad-suite/
+/tools/hdl/*.zip
+/tools/ngspice*/
+/tools/models/berkeley/*.tar.gz
+/spike_settings.json
+/work-obj*.cf

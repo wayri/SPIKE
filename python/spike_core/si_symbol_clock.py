@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Sample continuous-time piecewise-linear NRZ edges on an unrelated FFT grid.
 

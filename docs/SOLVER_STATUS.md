@@ -8,6 +8,31 @@ design-bound, finite `spike/v1` results into the desktop viewer and reports.
 This is an integration capability. The host does not qualify an external
 solver's physical method or turn imported field samples into validated data.
 
+The optional [EMerge Suite](../extensions/emerge_suite/README.md) constructs
+a bounded two-layer PCB model from imported DesignIR, runs explicit pad-pair
+ports and a frequency sweep, then imports S-parameters, angular far-field
+cuts, and a coarse full-sphere sample grid for an interactive 3D pattern.
+Its selected-net surface-PEC geometry, rectangular substrate, omitted
+losses and air boundary need convergence and physical correlation. It has no
+EMI compliance qualification. Adapter contract tests use API doubles. The
+[four-layer ESP32 board surrogate](../examples/esp32/README.md) reduces the
+source to F.Cu antenna copper, an ideal B.Cu reference plane, equivalent
+dielectric and one explicit PEC short. EMerge 3.0.0a19 completed a three-point
+2.30–2.60 GHz radiation run and a 1.0/1.5 mm mesh comparison; its generated
+3D pattern and cuts are unvalidated and do not represent full-board RF
+performance. A two-frequency, two-port fixture completed SI and radiation solves with EMerge
+2.8.9 on Windows. A seven-frequency KiCad antenna fixture completed with the
+EMerge 3.0.0a19 prerelease, including SPIKE result admission and sample probes.
+Paired seven-frequency bare and ideal dielectric-cover cases also completed
+on the same KiCad board; the [radome fixture](../examples/emerge/radome/README.md)
+records their differing S11 and peak-normalized pattern samples. The cover is
+one bounded dielectric box in the FEM geometry; the 5° surface and EM chamber
+overlay are display interpolation. Curved radomes and imported complex
+surroundings remain unsupported.
+These are execution evidence, not mesh convergence or physical validation.
+The [antenna walkthrough](EMERGE_ANTENNA_WALKTHROUGH.md) records the setup,
+saved plots, numerical samples, and remaining qualification work.
+
 For governing equations, implementation links and evidence interpretation, see
 the [solver handbook](SOLVER_HANDBOOK.md). The [annotated research references](SOLVER_REFERENCES.md)
 distinguish recorded method lineage from external tools, datasets and future candidates.
@@ -41,6 +66,12 @@ bounded board extraction to configurable endpoints, deterministic aggressors,
 graded passives, port edits, loaded transfer, waveform/eye/TDR and noise reports.
 IBIS support is inventory plus explicit DC-slope/ramp reduction, not nonlinear
 switching or AMI simulation. Results and exports retain these limitations.
+The 2026-09-28 SI increment returns matched per-port reflection/VSWR with
+finite/infinite/non-passive sample status, plots returned TDR reflection, and
+requires actual finite E/H vectors for field plots. Network-only SI results
+explicitly report spatial field maps as unsupported. Bounded four-port
+NEXT/FEXT and eye execution evidence is in
+[the SI capability record](validation/SI_CAPABILITY_VOLUME_PEEC_20260928.md).
 
 The [2026-09-20 reliability increment](SI_FIELD_RELIABILITY_20260920.md)
 corrects finite-record PAM4 sampling and introduces controlled cross-board
@@ -63,6 +94,18 @@ circuit workflows has reached a validated release state. See
 comparison evidence and cannot independently promote a native SPIKE workflow.
 
 ## Operational
+
+### Multi-board analysis scope
+
+PI, SI, thermal, and EMI can plan independent board occurrences with stable
+assembly identities, separate direct connector mates and cable harnesses, and
+reject pin reuse across those links. Desktop PI, thermal, and EMI requests bind the selected
+active-design board occurrence; EMI preflight/screening and component thermal
+also validate that scope before execution and retain it in result provenance.
+An occurrence of another design is not silently substituted. Independent
+planning is a dispatch contract, not a coupled solve. General coupled PI/SI,
+cross-board heat transfer, and assembly EMI remain blocked pending qualified
+adapters and validation. See [assembly workflow](MULTIBOARD_HARNESS_ASSEMBLIES.md).
 
 ### Authored harness DC PI (`spike/harness-pi-request/v1`)
 
@@ -87,6 +130,14 @@ comparison evidence and cannot independently promote a native SPIKE workflow.
 - Limit: zone sign-off requires a mesh-convergence comparison
 
 ### Native PEEC RLCG (`spike.peec_2_5d`)
+
+The 2026-09-28 development runtime was rebuilt with the source finite-volume
+matrix bindings. On the two provisional local slices, the bounded common-volume
+path passes the energy gate where the legacy line kernel fails. AC now retries
+that path by default after legacy nonpassivity; explicit `disabled` preserves
+the fail-closed legacy behavior. Results remain approximate driving-point
+networks and are not calibrated SI S matrices; see
+[the volume PEEC record](validation/SI_CAPABILITY_VOLUME_PEEC_20260928.md).
 
 The [2026-09-24 correction record](PEEC_VOLUME_CORRECTION_20260924.md) documents
 the original real-board nonpassivity and a local finite-volume
@@ -571,6 +622,16 @@ model qualification, full dialect parity, or a release-ready desktop workflow.
 
 ### Reviewed multi-net PI path composition (`spike/pi-path-circuit-compile/v1`)
 
+The Power Tree also supports an explicit **screening budget** for a series LDO
+or buck stage. A selected LDO uses the user-specified input/output voltages
+and downstream output current for `(Vin - Vout) * Iout` loss, neglecting
+quiescent current. A buck uses a user-supplied efficiency for
+`Pout * (1/efficiency - 1)` loss and input-current estimate. The optional
+output/input voltage ratio propagates an output voltage when none is assigned;
+an inconsistent ratio or physically impossible LDO step-up is flagged. These
+algebraic budgets do not constitute a PCB circuit or switching solve. A
+physical inductor/MOSFET/IC model still needs the reviewed SPICE path below.
+
 - State: operational experimental composition for ordered, reviewed linear
   paths; not release-qualified
 - Geometry stage: each conductor segment is preflighted and extracted
@@ -728,8 +789,9 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
 
 | Integration | Current executable state | Validation boundary |
 |---|---|---|
-| SPIKE object thermal network | Built-in local worker solves steady and transient object temperatures from explicit power, heat capacity, top/bottom paths, and per-object or named-face conduction, convection, and radiation boundaries; BOM CSV/TSV and ODB++ named property mapping are available in the GUI | Approximate lumped nodes, including explicit interobject conduction; face labels do not resolve spatial gradients. No geometry-derived path, board spreading, airflow, radiation view factors, CFD, or spatial temperature field; analytical checks do not establish measured-board correlation |
-| openEMS | Runnable through the isolated desktop adapter when discovery and preflight pass | Simple-patch reference fixture only; arbitrary PCB and compliance remain unvalidated |
+| SPIKE object thermal network | Built-in local worker solves steady and transient object temperatures from explicit power, heat capacity, top/bottom paths, and per-object or named-face conduction, convection, and radiation boundaries; BOM CSV/TSV and ODB++ named property mapping are available in the GUI. The transient UI overlays solved part-node samples on board locations and reports per-part peak, peak time, time to 90% of steady rise, and final gap. A [board-linked eBrake1 example](validation/EBRAKE1_OBJECT_THERMAL_20260928.md) retains assumptions, result JSON, and object-temperature plots. | Approximate lumped nodes, including explicit interobject conduction; face labels do not resolve spatial gradients. The marker overlay is not a board temperature field. No geometry-derived path, board spreading, airflow, radiation view factors, CFD, or spatial temperature field; the eBrake1 assumptions and analytical checks do not establish measured-board correlation. |
+| SPIKE board thermal grids | Local worker supports the prior uniform 2D plate and an optional structured layered board volume. Imported pad lands locate heat injection; the layered mode samples track/pad/filled-zone/via-land copper coverage per physical copper stackup row, couples dielectric rows and plated barrels, and can blur each layer's copper occupancy. It solves lateral and vertical conduction across the physical stackup. Optional transient steps add per-cell copper/dielectric heat capacity, saved temperature frames, stored-energy and balance diagnostics, a peak history, and fixed-scale layer playback. Optional virtual board heatsinks add a shared isothermal top/bottom contact node with explicit interface and sink-to-ambient K/W; result heat flow is included in conservation. Layer temperature and coverage maps, pad heat paths, case/junction and sink temperatures, and toggles are available in Thermal setup. The [plate](validation/EBRAKE1_BOARD_THERMAL_20260928.md), [layered](validation/EBRAKE1_LAYERED_THERMAL_20260928.md), [transient](validation/EBRAKE1_LAYERED_TRANSIENT_20260928.md), and [virtual-sink](validation/EBRAKE1_VIRTUAL_HEATSINK_20260928.md) records retain results and assumptions. | Experimental bounding-rectangle model with sampled effective copper and one depth cell per stackup row; no conforming outline/cutouts, tetrahedra, 3D package/heatsink blocks, solder/lead/die field, airflow, measured calibration, or production qualification. Board-field transient assumes ambient initial state and constant losses; reported case/junction resistance-chain temperatures are steady. Virtual sink resistances are prescribed rather than derived from fin geometry and are not coupled to separate assembly/CFD heatsink shapes. Fuzzy copper changes connectivity, and mesh refinement remains incomplete. Results remain `approximate`. |
+| openEMS | Runnable through the isolated desktop adapter when discovery, preflight, and final-grid/time-window admission pass | Local three-level simple-patch rerun passed for current adapter 1.3.4, but packaged evidence still binds 1.1.0. The installed pair remains experimental pending evidence promotion; arbitrary PCB and compliance remain unvalidated. |
 | OpenFOAM | v2606 is installed in Ubuntu 24.04 WSL; deterministic steady open-air natural/forced convection cases run through bounded fixed-argv processes and import aligned T/U/p cell fields | Experimental air-domain surrogate only; no PCB solids, conjugate heat transfer, advanced environments, mesh/energy validation, or measured correlation |
 | Siemens FloTHERM | No adapter is present | Future connector only; SPIKE cannot bundle or activate the customer-provided runtime without permitted automation rights |
 | FreeCAD | ECAD/MCAD workbench and inert exchange contracts are implemented; local FreeCAD kernel smoke passes | Geometry exchange is not solver or product validation |
@@ -738,6 +800,12 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
 
 ### openEMS (`external.openems`)
 
+The adapter implementation and reference evidence are owned by the bundled
+`extensions/openems_suite` package. Its extension menu exposes explicit
+high-frequency PI and SI port-sweep workflows. The existing worker and CLI
+methods remain compatibility entry points into that package. OpenEMS is an
+electromagnetic solver and the extension does not advertise thermal analysis.
+
 - State: `reference_validated` only when the isolated native-object probe passes
   and the openEMS/adapter versions match the packaged three-level patch-antenna
   convergence record; otherwise experimental, unavailable, or interface-missing
@@ -745,6 +813,12 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
   finite increasing frequencies, bounded frequency points, selected conductor
   geometry, copper/layer mapping, physical stackup, dielectric permittivity, and
   bounded mesh/runtime/thread options
+- Final-grid admission: the isolated worker reads actual CSXCAD axis lines,
+  checks cell/memory budgets and an explicit conservative one-cycle screening
+  policy using a vacuum CFL reference timestep before FDTD execution. That
+  reference is not openEMS's actual nonuniform-grid timestep. Curved-pad facet lines
+  are no longer automatically pinned; this changes rasterized copper and must
+  be rechecked by mesh convergence. See [the executed grid record](validation/OPENEMS_ACTUAL_GRID_20260928.md).
 - Execution: requires explicit 3D lumped ports and exactly one excited port;
   coordinates and impedance must be finite, and ports are never inferred from
   pads, probes, or source/load terminals; both endpoints must intersect distinct
@@ -753,16 +827,27 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
   case preparation, run controls, and structured result import. A full run is
   enabled only when the runtime is runnable and geometry, stackup, NF2FF request,
   resource limits, and ports pass preflight
-- Geometry: tracks, zones, approximated pads, plated-via shells, conducting
-  sheets, and dielectric boxes
+- RE reference metadata: the EMI setup can retain CISPR 32 A/B, CISPR 25
+  classes 1–5, and MIL-STD-461H/G RE102 platform selections with exact edition
+  and source; unknown/mismatched selections fail preflight. Numeric limits,
+  qualified receiver/fixture evidence, and pass/fail comparison are absent.
+  Selecting a profile does not promote solver readiness or compliance status;
+  see [EMI workflow](EMI_WORKFLOW.md#radiated-emissions-reference-profiles)
+- Geometry: straight tracks, filled zone outer polygons without cutouts,
+  rotated undrilled rectangular pads, and faceted circle/oval/roundrect surface
+  pads, conducting sheets, and dielectric boxes. The worker contains a plated
+  via shell primitive, but geometry admission blocks via and drilled-pad
+  solves until bore, lands, antipads, and layer connectivity are qualified.
 - Results: setup XML, normalized S-parameter columns, shape-checked NF2FF
   electric-field components, directivity, radiated power, and raw artifacts.
   The desktop far-field view shows frequency-selectable polar cuts, metrics,
   angular sampling, observation radius, and the result validity boundary; the
   engineering report can retain the same structured NF2FF evidence
-- Model status: the installed engine/adapter pair is reference-validated only
-  for the official simple-patch fixture; arbitrary-board results keep their own
-  unvalidated status and never imply regulatory compliance
+- Model status: the current 1.3.4 adapter remains `experimental` because
+  packaged simple-patch evidence is version-bound to 1.1.0. A local 1.3.4
+  three-mesh rerun passed that fixture's gate but is not packaged release
+  evidence; arbitrary-board results remain unvalidated and never imply
+  regulatory compliance
 - Limits: no rigid-flex translation, production multiport calibration,
   measured-board/chamber correlation, immunity workflow, or compliance signoff
 - Installation: optional local/signed-offline engine only; no implicit downloads
@@ -782,6 +867,15 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
 The validation record and numerical results are documented in
 `docs/validation/OPENEMS_REFERENCE_VALIDATION.md`. This is not product-class or
 compliance validation for arbitrary boards.
+The separate board admission and provisional HForsten slice runs are recorded
+in `docs/validation/OPENEMS_BOARD_COMPARISON_20260927.md`; that completed
+board-derived FDTD run uses assumed materials, ground plane, and port, so its
+S11 is integration evidence only.
+The 2026-09-28 two-excitation HForsten provisional S matrix, native DC mesh
+sweeps, PEEC nonpassivity diagnosis, and Marble openEMS timeout are recorded in
+`docs/validation/PROVISIONAL_PI_SI_OPENEMS_INTERNAL_20260928.md`. No matched
+cross-solver S-parameter accuracy benchmark or full-board PI/SI solve has
+been established.
 
 The implemented NF2FF path is: define selected/return nets and explicit ports in
 the EMI workbench; request bounded frequencies, theta/phi sampling, radius, and

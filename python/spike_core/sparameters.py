@@ -474,6 +474,30 @@ def analyze_network(
                 trace_limit,
             )
 
+    # Sii is the port reflection when every OTHER port is matched to its
+    # reference resistance. A standing-wave ratio is meaningful only for a
+    # reflection magnitude strictly below one; an ideal open is infinite.
+    reflection_vswr = []
+    indices = np.arange(len(frequencies)) if trace_limit is None else np.unique(
+        np.linspace(0, len(frequencies) - 1, min(len(frequencies), trace_limit)).astype(int)
+    )
+    for port in range(ports):
+        samples = []
+        for index in indices:
+            gamma = s[index, port, port]
+            magnitude = float(abs(gamma))
+            if magnitude > 1.0 + 1e-12:
+                status, vswr = "non_passive_reflection", None
+            elif magnitude >= 1.0 - 1e-12:
+                status, vswr = "infinite", None
+            else:
+                status, vswr = "finite", float((1.0 + magnitude) / (1.0 - magnitude))
+            samples.append({"frequency_hz": float(frequencies[index]),
+                            "reflection_real": float(gamma.real), "reflection_imag": float(gamma.imag),
+                            "reflection_magnitude": magnitude, "vswr": vswr,
+                            "vswr_status": status})
+        reflection_vswr.append({"port": port, "trace": samples})
+
     mixed_mode: Dict[str, Any] | None = None
     if ports % 2 == 0:
         mixed = single_ended_to_mixed_mode(s)
@@ -586,6 +610,9 @@ def analyze_network(
             },
         },
         "traces": traces,
+        "reflection_vswr": {"ports": reflection_vswr,
+                            "definition": "Sii with all other ports matched to their real reference impedances; VSWR=(1+|Sii|)/(1-|Sii|) for |Sii|<1",
+                            "vswr_unavailable_as_null": True},
         "mixed_mode": mixed_mode,
         "group_delay_s21": group_delay,
         "input_impedance_port1": input_impedance,

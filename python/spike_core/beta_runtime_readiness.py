@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Offline beta-readiness probe for SPIKE's public process boundaries.
 
 This module verifies packaging and interface invariants.  It does not grant a

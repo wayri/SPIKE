@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Select the requested PEEC capacitance approximation at the worker boundary."""
 from __future__ import annotations

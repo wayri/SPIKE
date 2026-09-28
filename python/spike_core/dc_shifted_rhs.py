@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Build a DC load RHS using voltage deviations at clamped boundaries."""
 
 from __future__ import annotations

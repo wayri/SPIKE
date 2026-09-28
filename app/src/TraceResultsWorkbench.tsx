@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import type { ParasiticResult, ScalarSample, SolverResultBundle } from "./analysisResults";
 import { buildImpedancePlot, buildTracePlot, resultPlotFields, resultTraceGroups } from "./traceResultPlots";
@@ -40,7 +40,7 @@ export default function TraceResultsWorkbench({ result, domain, targetOhm, targe
   }, [field, net, impedance, networks, activeGroup, comparisons, mode, domain, targetOhm, targetNet]);
   const open = (id: string) => { setOpenTabs(tabs => tabs.includes(id) ? tabs : [...tabs.slice(-15), id]); setActiveTab(id); };
   if (!result) return <section className="trace-results-workbench"><header><div><small>{domain.toUpperCase()} RESULTS</small><h2>Trace graphs</h2></div>{onClose && <button onClick={onClose}>Close</button>}</header><div className="trace-empty">Run or load an analysis to inspect trace results.</div></section>;
-  if (!fields.length) return <section className="trace-results-workbench"><header><div><small>{domain.toUpperCase()} RESULTS</small><h2>Trace graphs</h2></div>{onClose && <button onClick={onClose}>Close</button>}</header><div className="trace-empty">This result contains no plottable {domain.toUpperCase()} trace fields.</div></section>;
+  if (!fields.length) return <section className="trace-results-workbench"><header><div><small>{domain.toUpperCase()} RESULTS</small><h2>Trace graphs</h2></div>{onClose && <button onClick={onClose}>Close</button>}</header><div className="trace-empty">{domain === "si" ? "No returned SI E/H vector samples or impedance sweep are available for plotting. A network-only result does not provide spatial fields." : "This result contains no plottable PI trace fields."}</div></section>;
   return <section className={`trace-results-workbench${impedance ? " trace-results-frequency" : ""}`} aria-label={`${domain.toUpperCase()} trace result graphs`}>
     <header><div><small>{domain.toUpperCase()} RESULTS</small><h2>Trace graphs</h2></div><span>Status: {result.status} · Model: {result.model_status} · {plot?.shown ?? 0} of {plot?.total ?? 0} samples</span>{onDetach && <button onClick={onDetach}>Open in window</button>}{onClose && <button onClick={onClose}>Close</button>}</header>
     <div className="trace-toolbar">

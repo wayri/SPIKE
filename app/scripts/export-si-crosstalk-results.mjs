@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 /** Export actual worker JSON through the application's renderer; no solver runs. */
 import assert from "node:assert/strict";

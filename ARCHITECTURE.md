@@ -163,10 +163,9 @@ SPIKE deliberately limits language ownership:
 No new implementation language is permitted without an accepted ADR and an
 architecture-guard change. The legacy wxPython/VTK UI is frozen and is not a
 supported runtime. See `docs/LANGUAGE_POLICY.md` and ADR 0007 for the reduction
-and retirement plan. ADR 0008 permits a separate C++20 wxWidgets/VTK
-engineering preview under `wx_desktop/`; it invokes the same JSON-lines worker
-and does not link numerical kernels or duplicate importer/solver semantics in
-its UI process.
+and retirement plan. The former C++20 wxWidgets/VTK preview under
+`wx_desktop/` was retired on 2026-09-28; ADR 0008 records its original
+boundary. The supported desktop remains the Tauri application.
 
 ## Dependency direction
 

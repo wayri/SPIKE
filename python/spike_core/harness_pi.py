@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Explicit-terminal, bounded DC operating points for authored harness circuits.
 
 This adapter composes existing circuit kernels; it does not extract board fields.

@@ -22,6 +22,10 @@ const projectPackage = await import(
 const payload = {
   emi: { setup: { contract: "spike/emi-setup/v1", chamber: { distance_m: 3, table_height_m: .8, antenna_height_m: 2, orientation: "upright", azimuth_deg: 45, polarization: "vertical", floor: "absorber", cutaway: true } } },
   project: { name: "round-trip.spike" },
+  studies: [{ version: 1, id: "study-1", name: "Mixed study", notes: "", cases: [
+    { id: "pi-1", type: "pi", mode: "DC IR Drop", name: "Baseline", notes: "", scenario: { label: "open air" }, settings: { boardFile: "fixture.kicad_pcb" } },
+    { id: "thermal-1", type: "thermal", mode: "", name: "Enclosed", notes: "", scenario: { label: "closed box" }, settings: { boardFile: "fixture.kicad_pcb" } },
+  ] }],
   design: {
     source_file: "fixture.kicad_pcb",
     source_board: "(kicad_pcb (version 20260101))",
@@ -70,6 +74,7 @@ const payload = {
 const created = projectPackage.createProjectPackage(payload);
 assert.equal(created.format, "spike-project-package/v2");
 assert.ok(created.manifest.content.includes("spice"));
+assert.ok(created.manifest.content.includes("studies"));
 assert.ok(created.manifest.content.includes("workspace"));
 assert.ok(created.manifest.content.includes("assembly_package_shapes"));
 assert.ok(created.manifest.content.includes("assembly_designs"));
@@ -79,6 +84,7 @@ const reopened = projectPackage.parseProjectPackage(JSON.stringify(created));
 assert.equal(reopened.migrated, false);
 assert.deepEqual(reopened.project.design.stackup, payload.design.stackup);
 assert.deepEqual(reopened.project.analysis.latest_result, payload.analysis.latest_result);
+assert.deepEqual(reopened.project.studies, payload.studies);
 assert.equal(reopened.project.analysis.result_display, "dc-result-1");
 assert.deepEqual(reopened.project.analysis.pdn_review, payload.analysis.pdn_review);
 assert.equal(reopened.project.analysis.show_net_names, true, "net-name visibility survives save/reopen");

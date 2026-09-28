@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Area, connectivity, and resistance oracles for opt-in owned copper."""
 import math
 import unittest

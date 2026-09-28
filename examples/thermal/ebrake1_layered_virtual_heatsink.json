@@ -1,0 +1,39 @@
+{
+  "source": {
+    "board_path": "app/public/demo/ebrake1.kicad_pcb",
+    "board_sha256": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca"
+  },
+  "request": {
+    "ambient_temperature_c": 25.0,
+    "board": {
+      "model": "layered",
+      "thickness_mm": 1.6,
+      "grid_step_mm": 1.5,
+      "convection_top_w_m2k": 10.0,
+      "convection_bottom_w_m2k": 10.0,
+      "dielectric_conductivity_w_mk": 0.3,
+      "copper_conductivity_w_mk": 385.0,
+      "via_plating_thickness_mm": 0.025,
+      "include_copper": true,
+      "include_vias": true,
+      "include_tracks": true,
+      "include_pads": true,
+      "include_zones": true,
+      "fuzzy_sigma_mm": 0.0
+    },
+    "components": [
+      {"component_ref": "Q1", "power_w": 1.0, "contact_mode": "pads", "r_junction_case_k_w": 2.0, "r_case_board_k_w": 3.0},
+      {"component_ref": "Q2", "power_w": 0.8, "contact_mode": "pads", "r_junction_case_k_w": 2.0, "r_case_board_k_w": 3.0},
+      {"component_ref": "Q3", "power_w": 0.6, "contact_mode": "pads", "r_junction_case_k_w": 2.0, "r_case_board_k_w": 3.0}
+    ],
+    "virtual_heatsinks": [
+      {"id": "HS-Q1", "face": "top", "x_mm": 95.01, "y_mm": 105.025,
+       "width_mm": 16.0, "height_mm": 16.0,
+       "interface_resistance_k_w": 1.0, "sink_to_ambient_k_w": 8.0}
+    ]
+  },
+  "assumptions": {
+    "heatsink": "Illustrative 16 mm square contact near Q1 with 1 K/W board-to-sink interface and 8 K/W sink-to-ambient resistance. This is a mathematical thermal boundary, not a 3D fin or airflow solve.",
+    "baseline": "All other hypothetical board and component inputs match ebrake1_layered_thermal.json."
+  }
+}

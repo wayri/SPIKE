@@ -1,16 +1,17 @@
-"""Deterministic planning boundary for multi-board PI and SI analyses.
+"""Deterministic planning boundary for multi-board analysis scopes.
 
 The planner makes retained board and harness scope explicit before any solver is
-allowed to run.  It deliberately does not turn a connectivity graph into a
-physics qualification claim: independent per-board execution is available to
-existing solver routes, while coupled harness execution remains fail-closed
-until a solver adapter consumes this exact graph contract.
+allowed to run. It does not turn a retained assembly graph into a physics
+qualification claim: independent board dispatch remains caller controlled,
+while coupled execution stays blocked until a qualified adapter consumes the
+domain-specific graph contract.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import asdict
 from math import isfinite
 from typing import Any, Dict, Iterable, Mapping, Sequence
 
@@ -23,13 +24,14 @@ from .assembly_scale import (
     design_scale,
 )
 from .design_ir_v2 import AssemblyIRV1
+from .harness_authoring import validate_harness_connections
 
 
 REQUEST_CONTRACT = "spike/multiboard-analysis-request/v1"
 PLAN_CONTRACT = "spike/multiboard-analysis-plan/v1"
 MAX_BOARD_DIMENSION_MM = MAX_BOARD_EXTENT_MM
-SUPPORTED_DOMAINS = {"pi", "si"}
-SUPPORTED_MODES = {"independent_board_batch", "coupled_harness_network"}
+SUPPORTED_DOMAINS = {"pi", "si", "thermal", "emi"}
+SUPPORTED_MODES = {"independent_board_batch", "coupled_harness_network", "coupled_assembly"}
 
 
 class MultiboardAnalysisError(ValueError):
@@ -124,16 +126,20 @@ def _endpoint(value: str, known_boards: set[str]) -> Dict[str, str]:
 
 
 def plan_multiboard_analysis(raw: Mapping[str, Any]) -> Dict[str, Any]:
-    """Validate and normalize a bounded multi-board PI/SI execution plan."""
+    """Validate and normalize a bounded, domain-specific multi-board plan."""
 
     if not isinstance(raw, Mapping) or raw.get("contract") != REQUEST_CONTRACT:
         raise MultiboardAnalysisError(f"Multi-board request contract must be {REQUEST_CONTRACT}.")
     domain = str(raw.get("domain") or "").strip().lower()
     mode = str(raw.get("mode") or "").strip().lower()
     if domain not in SUPPORTED_DOMAINS:
-        raise MultiboardAnalysisError("Multi-board domain must be pi or si.")
+        raise MultiboardAnalysisError("Multi-board domain must be pi, si, thermal, or emi.")
     if mode not in SUPPORTED_MODES:
-        raise MultiboardAnalysisError("Multi-board mode must be independent_board_batch or coupled_harness_network.")
+        raise MultiboardAnalysisError("Multi-board mode is unsupported.")
+    if mode == "coupled_harness_network" and domain not in {"pi", "si"}:
+        raise MultiboardAnalysisError("Coupled harness network mode applies only to PI and SI.")
+    if mode == "coupled_assembly" and domain not in {"thermal", "emi"}:
+        raise MultiboardAnalysisError("Coupled assembly mode applies only to thermal and EMI.")
     assembly_raw = raw.get("assembly")
     designs_raw = raw.get("designs")
     if not isinstance(assembly_raw, Mapping) or not isinstance(designs_raw, Mapping):
@@ -223,19 +229,48 @@ def plan_multiboard_analysis(raw: Mapping[str, Any]) -> Dict[str, Any]:
             "pin_map": {str(key): str(value) for key, value in sorted(harness.pin_map.items())},
         })
 
+    validate_harness_connections(assembly)
     graph = {
         "assembly_id": assembly.assembly_id,
         "domain": domain,
         "boards": boards,
         "harnesses": harnesses,
-        "connector_mappings": [item.to_dict() for item in sorted(assembly.connector_mappings, key=lambda item: item.id)],
+        "connector_mappings": [asdict(item) for item in sorted(assembly.connector_mappings, key=lambda item: item.id)],
+        "mated_connectors": [
+            {"mate_id": item.id, "endpoint_a": _endpoint(item.data["endpoint_a"], board_ids),
+             "endpoint_b": _endpoint(item.data["endpoint_b"], board_ids),
+             "pin_map": dict(sorted(item.data["pin_map"].items()))}
+            for item in sorted(assembly.connector_mappings, key=lambda item: item.id)
+            if item.kind == "connector-mate"
+            and item.data["endpoint_a"].split("::", 1)[0] in selected_set
+            and item.data["endpoint_b"].split("::", 1)[0] in selected_set
+        ],
     }
+    if domain == "thermal":
+        graph["thermal_contacts"] = [asdict(item) for item in sorted(assembly.thermal_contacts, key=lambda item: item.id)]
+        graph["parts"] = [asdict(item) for item in sorted(assembly.parts, key=lambda item: item.id)]
+    elif domain == "emi":
+        graph["electrical_bonds"] = [asdict(item) for item in sorted(assembly.electrical_bonds, key=lambda item: item.id)]
+        graph["parts"] = [asdict(item) for item in sorted(assembly.parts, key=lambda item: item.id)]
     graph_digest = _digest(graph)
-    coupled = mode == "coupled_harness_network"
+    omitted_mate_ids = sorted(
+        item.id for item in assembly.connector_mappings
+        if item.kind == "connector-mate" and (
+            item.data["endpoint_a"].split("::", 1)[0] not in selected_set
+            or item.data["endpoint_b"].split("::", 1)[0] not in selected_set
+        )
+    )
+    coupled = mode != "independent_board_batch"
     if coupled:
+        missing_physics = {
+            "pi": "board and harness network",
+            "si": "board and harness network",
+            "thermal": "cross-board heat transfer and contact",
+            "emi": "assembly electromagnetic field",
+        }[domain]
         issues.append({
             "code": "MULTIBOARD_COUPLED_SOLVER_NOT_QUALIFIED", "severity": "error",
-            "message": "The board/harness graph is valid, but no qualified PI or SI adapter currently consumes coupled cross-board entities.",
+            "message": f"The assembly graph is retained, but no qualified {domain.upper()} adapter currently solves {missing_physics} effects.",
         })
     admitted = bool(boards) and not any(issue["severity"] == "error" for issue in issues)
     result: Dict[str, Any] = {
@@ -256,12 +291,13 @@ def plan_multiboard_analysis(raw: Mapping[str, Any]) -> Dict[str, Any]:
         "net_limit_per_board": MAX_NETS_PER_BOARD,
         "selected_board_ids": selected,
         "omitted_harness_ids": omitted_harness_ids,
+        "omitted_mate_ids": omitted_mate_ids,
         "graph": graph,
         "graph_digest": graph_digest,
         "issues": issues,
         "meaning": (
-            "An admitted independent plan preserves board identity but still requires caller-controlled single-board dispatch and excludes cross-board coupling. "
-            "A coupled plan remains blocked until a solver consumes the retained harness graph and passes PI/SI validation."
+            "An admitted independent plan preserves board identity but still requires caller-controlled single-board dispatch and excludes cross-board effects. "
+            f"A coupled {domain.upper()} plan remains blocked until a qualified solver consumes the retained assembly entities."
         ),
     }
     result["plan_digest"] = _digest(result)

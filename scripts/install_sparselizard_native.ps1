@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 [CmdletBinding(DefaultParameterSetName = "Install")]
 param(
     [Parameter(ParameterSetName = "Install")][switch]$BuildOnly,

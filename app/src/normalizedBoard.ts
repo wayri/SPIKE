@@ -133,7 +133,11 @@ export function parseNormalizedBoard(source: string): ParsedBoard {
       width: (c.odb_package_ref ?? c.odb_package)?.bounds_mm ? (c.odb_package_ref ?? c.odb_package).bounds_mm[2] - (c.odb_package_ref ?? c.odb_package).bounds_mm[0] : 2,
       height: (c.odb_package_ref ?? c.odb_package)?.bounds_mm ? (c.odb_package_ref ?? c.odb_package).bounds_mm[3] - (c.odb_package_ref ?? c.odb_package).bounds_mm[1] : 2,
       layer: c.side === "bottom" ? layers[layers.length - 1] : c.side === "top" ? layers[0] : c.layer ?? layers[0], modelOffset: [0,0,0], modelScale: [1,1,1], modelRotation: [0,0,0] })),
-    zones: [...zoneRows, ...artwork.filter((r: any) => r.kind === "zone")].map((z: any) => ({ id: z.id, layer: z.layer, net: net(z), points: z.boundary_rings?.length ? ringPoints(z.boundary_rings[0]) : z.points ?? z.outlines_mm?.[0] ?? [], holes: z.boundary_rings?.length ? z.boundary_rings.slice(1).map(ringPoints) : z.holes_mm ?? [] })),
+    zones: [...zoneRows, ...artwork.filter((r: any) => r.kind === "zone")].map((z: any) => ({ id: z.id, layer: z.layer, net: net(z), points: z.boundary_rings?.length ? ringPoints(z.boundary_rings[0]) : z.points ?? z.outlines_mm?.[0] ?? [], holes: z.boundary_rings?.length ? z.boundary_rings.slice(1).map(ringPoints) : z.holes_mm ?? [],
+      ...(z.source_kind ? { source_kind: z.source_kind } : {}),
+      ...(z.filled_copper_state ? { filled_copper_state: z.filled_copper_state } : {}),
+      ...(z.source_fill_provenance_complete === true ? { source_fill_provenance_complete: true } : {}),
+      ...(z.source_fill_representation ? { source_fill_representation: z.source_fill_representation } : {}) })),
     drawings, stackup: d.stackup.map((s: any) => ({ ...s, epsilonR: s.epsilon_r, lossTangent: s.loss_tangent })), technology: d.technology ?? "rigid",
   };
 }

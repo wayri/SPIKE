@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Report whether a Python environment has source-qualification prerequisites.
 
@@ -27,6 +27,10 @@ REQUIRED_NATIVE_APIS = (
     "exact_quantized_planar_incircle",
     "PlanarPoint2",
     "QuantizedPlanarPoint2",
+    "VolumeMatrixAssembler",
+    "VolumeMatrixIntegrationOptions",
+    "VolumeRectangularBasis",
+    "VolumeCoaxialAnnulusBasis",
 )
 ROOT = Path(__file__).resolve().parents[1]
 

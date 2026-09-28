@@ -1,6 +1,6 @@
-# EMI chamber workspace
+# EM chamber workspace
 
-Open **EMI** to view the virtual chamber. It contains an absorber-lined shielded room, removable floor absorbers, a turntable, a nonconductive table, a log-periodic receive antenna and mast, and a receiver rack with coax routing. Cutaway removes the front, entry wall and ceiling to expose the DUT.
+Open **EM** to view the virtual chamber. It contains an absorber-lined shielded room, removable floor absorbers, a turntable, a nonconductive table, a log-periodic receive antenna and mast, and a receiver rack with coax routing. Cutaway removes the front, entry wall and ceiling to expose the DUT.
 
 The chamber copies visible geometry from the board/assembly viewport. It retains imported enclosure meshes, board geometry and assembly offsets. Additional boards retain their existing viewport representations; a board represented there by a proxy remains a proxy in the chamber. Model loading failures and proxy use are identified in the scene caption.
 

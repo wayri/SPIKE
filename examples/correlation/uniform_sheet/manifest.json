@@ -1,0 +1,50 @@
+{
+  "contract": "spike/correlation-evidence-manifest/v1",
+  "manifest_id": "uniform-sheet-dc-reference",
+  "subject": "Uniform sheet analytical DC reference; no independent or measured correlation yet",
+  "datasets": [
+    {
+      "id": "uniform-sheet-analytical",
+      "kind": "analytical",
+      "status": "qualified",
+      "status_reason": null,
+      "input": {
+        "path": "analytical.json",
+        "sha256": "9bafc7905404d4090a0ebd64d538929f253f92835aac334620bff479d29efeb8"
+      },
+      "quantities": [{
+        "name": "end_to_end_resistance",
+        "unit": "ohm",
+        "uncertainty": null,
+        "tolerance": {"absolute": 0.000000000001, "relative": 0.00000001}
+      }],
+      "provenance": {
+        "description": "Independently evaluated uniform-sheet Ohm-law expression",
+        "reference": "examples/correlation/uniform_sheet/analytical.json"
+      },
+      "solver": null
+    },
+    {
+      "id": "uniform-sheet-independent",
+      "kind": "independent_solver",
+      "status": "missing",
+      "status_reason": "No separately configured and version-pinned field solve has been admitted",
+      "input": null,
+      "quantities": [{"name": "end_to_end_resistance", "unit": "ohm",
+        "uncertainty": null, "tolerance": null}],
+      "provenance": null,
+      "solver": null
+    },
+    {
+      "id": "uniform-sheet-measured",
+      "kind": "measured",
+      "status": "missing",
+      "status_reason": "No geometry-matched measurement and uncertainty have been admitted",
+      "input": null,
+      "quantities": [{"name": "end_to_end_resistance", "unit": "ohm",
+        "uncertainty": null, "tolerance": null}],
+      "provenance": null,
+      "solver": null
+    }
+  ]
+}

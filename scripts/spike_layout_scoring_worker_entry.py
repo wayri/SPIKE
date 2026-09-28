@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Frozen entry point for the dedicated layout scoring process."""
 
 from pathlib import Path

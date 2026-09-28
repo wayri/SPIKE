@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import type { ProbeFormulaRow } from "./probeCalculations";
 
 export function normalizeProbeTableState(value: unknown): {

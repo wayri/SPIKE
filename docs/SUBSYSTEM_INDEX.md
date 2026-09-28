@@ -79,6 +79,9 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `app/src/sparameters.ts` | Network-data utilities |
 | `app/src/SParameterWorkbench.tsx` | S-parameter workflow UI |
 | `app/src/EmiWorkbench.tsx` | EMI domain, pre-pass, excitation, solver setup, and screening dashboard |
+| `app/src/emRadiationViewport.ts`, `app/src/BoardViewport.tsx` | Validated angular-grid display mesh and probe mapping for board-anchored relative far-field review; the viewport does not convert angular samples to a spatial near field |
+| `app/src/siCrosstalkViewport.ts`, `app/src/BoardViewport.tsx` | Strict design/net binding for categorical SI aggressor and victim route overlays with global NEXT/FEXT readout; no inferred spatial voltage field |
+| `app/src/boardThermalViewportProbe.ts`, `app/src/BoardViewport.tsx` | Saved board thermal grid/layer admission and exact cell probe mapping in the 3D board scene; display separation does not alter physical depth |
 | `app/src/engineeringReport.ts` | Report data and HTML generation |
 | `app/src/ReportPreview.tsx` | In-app report preview |
 | `app/src/BenchmarkCenter.tsx` | Validation benchmark presentation |
@@ -98,6 +101,7 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | File | Responsibility |
 |---|---|
 | `python/spike_core/contracts.py` | Versioned DesignIR, AnalysisSpec, and AnalysisResult |
+| `python/spike_core/design_ir_v2.py`, `harness_authoring.py`, `multiboard_analysis.py` | AssemblyIR board occurrences, distinct direct connector mates and cable harnesses, pin ownership, and four-domain planning; coupled physics remains gated |
 | `python/spike_core/errors.py` | Canonical FE/BE diagnostic envelopes and catalog | See `docs/ERROR_HANDLING.md` |
 | `python/spike_core/spice_workspace.py` | Validated SPICE intent and deterministic netlist composition | See `docs/SPICE_WORKSPACE.md` |
 | `python/spike_core/service.py` | JSON worker request dispatch and service composition |
@@ -112,7 +116,9 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `python/spike_core/layers.py` | Physical copper-layer ordering and helpers |
 | `python/spike_core/models.py` | 3D model discovery and KiCad scene export |
 | `python/spike_core/extensions.py` | General extension discovery and isolation |
+| `python/spike_core/service_extension_packages.py` | Managed extension package browse, preview, install, update, and removal worker handlers |
 | `python/spike_core/extension_analysis_results.py` | External analysis result and board-binding admission |
+| `python/spike_core/extension_mesh_exchange.py` | Bounded full mesh, preview, solver geometry, and digest handoff to analysis extensions |
 | `python/spike_core/automation.py` | Python scripting facade over versioned worker operations |
 | `python/spike_core/script_runtime.py`, `script_child.py` | In-app Python execution, output capture, cancellation boundary, and result admission |
 | `python/spike_core/dependencies.py` | Runtime dependency status and lock verification |
@@ -123,9 +129,9 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `python/spike_core/solver_manager.py` | Workload recommendations, execution gates, and EMI pre-pass screening |
 | `python/spike_core/emi.py` | Versioned EMI setup validation, geometry coverage, stage gates, and screening orchestration |
 | `python/spike_core/solver_state.py` | Private bounded registrations and allowlisted tuning persistence |
-| `python/spike_core/openems_adapter_source.py` | Trusted isolated openEMS payload source; executed with `python -I -` over stdin, while the exported job driver is inspect-only |
-| `python/spike_core/openems_case_integrity.py` | Per-user authenticated execution-input records and strict JSON loading for prepared openEMS cases |
-| `python/spike_core/openems_validation.py` | openEMS material/geometry/resource gates and normalized-result contract validation |
+| `extensions/openems_suite/` | OpenEMS PI/SI extension, engine adapter, case integrity, geometry and result validation, benchmarks, and reference evidence; `python/spike_core/openems_*.py` and `external_engines.py` are compatibility import bridges |
+| `extensions/emerge_suite/` | Optional EMerge board adapter for bounded two-layer geometry, solved S-parameters, radiation cuts, and sampled 3D patterns; results remain unvalidated. See [antenna walkthrough](EMERGE_ANTENNA_WALKTHROUGH.md) |
+| `app/src/AnalysisGuide.tsx`, `app/src/AnalysisGuide.css` | Floating, accessible Help-menu workflow guide with navigation and control highlighting; see `docs/ANALYSIS_GUIDE.md` |
 | `python/spike_core/sparselizard_adapter.py` | DesignIR-derived PCB mesh/material/terminal case export, cancellable process-tree-contained execution, digest binding, and strict scalar/vector/multiport result import; see `docs/SPARSELIZARD_ADAPTER.md` |
 | `python/spike_core/sparselizard_validation.py` | Fail-closed signed-runtime, PETSc/MUMPS, convergence, and five-class PCB qualification report used by CLI, worker, and Solver Manager |
 | `python/spike_core/peec_spice_export.py` | Reviewed PEEC RLCG endpoint mapping and staged geometry-parasitic handoff to process-isolated ngspice; see `docs/PEEC_NGSPICE_HYBRID.md` |
@@ -149,6 +155,7 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `numerics.py` | Shared numerical safeguards | Tests define supported behavior |
 | `pdn.py` | PDN target review, explicit mounting-path screening, and two-port candidate loading | `docs/PDN_SCREENING.md` |
 | `thermal.py` | Compact thermal scenario/model | `docs/THERMAL_WORKFLOW.md` |
+| `board_thermal.py`, `layered_board_thermal.py`, `thermal_copper_geometry.py` | Board plate and optional structured layered steady/transient thermal solve, imported pad contact coupling, sampled/blurred copper coverage and via links | `docs/validation/EBRAKE1_BOARD_THERMAL_20260928.md`, `docs/validation/EBRAKE1_LAYERED_THERMAL_20260928.md`, `docs/validation/EBRAKE1_LAYERED_TRANSIENT_20260928.md`; experimental, approximate geometry |
 | `component_thermal.py`, `thermal_network.py` | Built-in bounded component steady/transient RC solver and worker adapter | `docs/COMPONENT_THERMAL.md`; approximate, no spatial field |
 | `openfoam.py` | OpenFOAM case adapter | `docs/EXTERNAL_ENGINE_INTEROPERABILITY.md` |
 
@@ -170,6 +177,9 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 |---|---|
 | `solver_sdk` | Solver plugin API, manifests, and examples |
 | `extension_sdk` | General application extension API |
+| `python/spike_core/mcp_server.py`, `scripts/spike_mcp.py` | Allowlisted local stdio MCP tools over the existing Python automation worker |
+| `python/spike_core/local_llm.py`, `scripts/spike_local_chat.py` | Loopback-only LM Studio and Ollama tool-calling client |
+| `app/src-tauri/src/mcp_bridge.rs`, `app/src/McpBridgePanel.tsx` | Opt-in authenticated desktop MCP bridge and its settings panel |
 | `extensions` | Built-in or example extension packages |
 | `kicad_plugin` | Legacy/source-specific adapter scaffold; standalone product commands are CAD-neutral |
 
@@ -198,6 +208,7 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 |---|---|
 | `docs/README.md` | Audience- and task-based documentation entry point |
 | `docs/USER_TASK_SEQUENCES.md` | Detailed desktop task sequences using reviewed Help Center screenshots |
+| `docs/LOCAL_LLM_MCP.md` | Offline LM Studio and Ollama setup, MCP scope, and desktop bridge workflow |
 | `ARCHITECTURE.md` | Canonical runtime boundaries, dependency direction, and state authority |
 | `DEVELOPMENT.md` | Active setup, launch paths, build commands, and verification matrix |
 | `TROUBLESHOOTING.md` | Symptom-first operational diagnosis and recovery sequences |

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Ask actual OpenFOAM to evaluate t=0 fields in an input-only isolated clone."""
 import argparse

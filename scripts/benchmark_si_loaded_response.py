@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 """Compare identical scalar-frequency and batch-128 loaded N-port algebra."""
 import argparse

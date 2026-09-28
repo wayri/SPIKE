@@ -1,0 +1,26 @@
+{
+  "source": {
+    "board_path": "app/public/demo/ebrake1.kicad_pcb",
+    "board_sha256": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca"
+  },
+  "request": {
+    "ambient_temperature_c": 25.0,
+    "board": {
+      "conductivity_w_mk": 20.0,
+      "thickness_mm": 1.6,
+      "convection_top_w_m2k": 10.0,
+      "convection_bottom_w_m2k": 10.0,
+      "grid_step_mm": 4.0
+    },
+    "components": [
+      {"component_ref": "Q1", "power_w": 1.0, "contact_size_mm": 8.0, "r_junction_case_k_w": 2.0, "r_case_board_k_w": 3.0},
+      {"component_ref": "Q2", "power_w": 0.8, "contact_size_mm": 8.0, "r_junction_case_k_w": 2.0, "r_case_board_k_w": 3.0},
+      {"component_ref": "Q3", "power_w": 0.6, "contact_size_mm": 8.0, "r_junction_case_k_w": 2.0, "r_case_board_k_w": 3.0}
+    ]
+  },
+  "assumptions": {
+    "effective_board_conductivity": "20 W/mK is an illustrative uniform in-plane sheet property, not extracted from copper or measured.",
+    "cooling": "Top and bottom h=10 W/m2K are illustrative prescribed coefficients; airflow is not solved.",
+    "component_losses_and_paths": "Power, 8 mm square contact, Rjc and case-to-board R are hypothetical example assignments. All junction power flows through the case into the board."
+  }
+}

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Probe SPIKE's public beta process boundaries without launching a solve."""
 
 from __future__ import annotations

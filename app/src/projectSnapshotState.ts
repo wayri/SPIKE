@@ -16,6 +16,37 @@ export function mergeProjectSnapshot(retained: unknown, updated: unknown): any {
 
 export const RESULT_PACKAGE_CONTRACT = 'spike/result-package/v2';
 
+/** Produce a design/setup copy while leaving the live project and its results intact. */
+export function withoutSavedResults(snapshot: Record<string, any>): Record<string, any> {
+  const copy = structuredClone(snapshot);
+  if (Array.isArray(copy.studies)) for (const study of copy.studies) {
+    if (!Array.isArray(study?.cases)) continue;
+    for (const simulationCase of study.cases) {
+      if (!simulationCase || typeof simulationCase !== 'object') continue;
+      delete simulationCase.resultSnapshot;
+      delete simulationCase.resultRef;
+    }
+  }
+  if (copy.analysis) {
+    copy.analysis.latest_result = null;
+    copy.analysis.active_result = null;
+    copy.analysis.result_history = [];
+    copy.analysis.pdn_review = null;
+    if (copy.analysis.si) copy.analysis.si.latest_channel_result = null;
+  }
+  if (copy.emi) {
+    copy.emi.preflight = null;
+    copy.emi.screening = null;
+    copy.emi.field_result = null;
+  }
+  if (copy.thermal?.scenario) {
+    copy.thermal.scenario.result = null;
+    copy.thermal.scenario.field_result = null;
+  }
+  copy.results = {};
+  return copy;
+}
+
 export function isSupportedSavedResult(value: unknown): boolean {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const raw = value as Record<string, any>;
@@ -49,7 +80,10 @@ export function retainOpaqueResultState(retained: Record<string, any> | undefine
 export function createResultPackage(projectSnapshot: Record<string, any>, visuals?: unknown): Record<string, unknown> {
   const analysis = projectSnapshot.analysis ?? {};
   const hasResults = analysis.latest_result || analysis.result_history?.length || analysis.si?.latest_channel_result
-    || projectSnapshot.emi?.field_result || projectSnapshot.emi?.screening || projectSnapshot.thermal?.scenario?.result;
+    || projectSnapshot.emi?.field_result || projectSnapshot.emi?.screening || projectSnapshot.thermal?.scenario?.result
+    || projectSnapshot.thermal?.scenario?.field_result
+    || (Array.isArray(projectSnapshot.studies) && projectSnapshot.studies.some((study: any) =>
+      Array.isArray(study?.cases) && study.cases.some((item: any) => item?.resultSnapshot != null)));
   if (!hasResults) throw new Error('Run a simulation or load results before saving a result package.');
   return { contract: RESULT_PACKAGE_CONTRACT, generated_at: new Date().toISOString(), project_snapshot: projectSnapshot, visuals };
 }

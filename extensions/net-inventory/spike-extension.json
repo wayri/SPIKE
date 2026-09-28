@@ -10,7 +10,7 @@
   "runtime": "python",
   "entrypoint": "extension.py",
   "state": "available",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bundled": true,
   "permissions": ["design.read"],
   "limits": {

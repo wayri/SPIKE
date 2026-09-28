@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Frozen entry point for the dedicated release-owned circuit process."""
 
 from pathlib import Path

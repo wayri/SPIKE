@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { stripTypeScriptTypes } from 'node:module';
@@ -36,6 +36,17 @@ assert.equal(invalid.shown,1);assert.equal(invalid.data[0].type,'scatter3d','inv
 const groupedResult={scalar_fields:{voltage_drop_v:[samples[0],samples[1]]},mesh:[{id:'a',source_id:'track-1',net:'3V3',layer:'F.Cu'},{id:'b',source_id:'track-1',net:'3V3',layer:'F.Cu'}],parasitics:[]};
 assert.equal(resultTraceGroups(resultPlotFields(groupedResult,'pi')[0].samples).length,1,'exact mesh source IDs recover per-trace groups');
 assert.deepEqual(resultPlotFields(groupedResult,'si'),[],'SI must not display PI-only quantities');
+const eField = {...face('e1','SIG','F.Cu',0,0),vector:[3,4,0],magnitude:5};
+const hField = {...face('h1','SIG','F.Cu',1,0),vector:[0,0,2],magnitude:2};
+const fieldResult = {status:'completed',model_status:'approximate',scalar_fields:{},vector_fields:{
+  electric_field:[eField,{...eField,element_id:'bad',vector:undefined,magnitude:7}],magnetic_field:[hField]},mesh:[],parasitics:[]};
+const fieldView = resultPlotFields(fieldResult,'si');
+assert.deepEqual(fieldView.map(field=>[field.key,field.unit]),[['electric_field','V/m'],['magnetic_field','A/m']]);
+assert.deepEqual(fieldView[0].samples.map(sample=>sample.value),[5],'plots use returned vector magnitude, never a missing-vector scalar');
+assert.deepEqual(buildTracePlot(fieldView[0].samples,{net:'SIG',mode:'samples',label:fieldView[0].label,unit:fieldView[0].unit}).data[0].y,[5]);
+assert.deepEqual(resultPlotFields({...fieldResult,vector_fields:{electric_field:[],magnetic_field:[]},field_maps:{status:'unsupported',electric:null,magnetic:null}},'si'),[],
+  'unsupported network-only field maps cannot create a plot');
+assert.deepEqual(resultPlotFields({...fieldResult,status:'blocked'},'si'),[],'blocked field samples remain diagnostic, not plottable');
 const networks=[{net:'SIG',impedance:[{frequency_hz:1e6,magnitude_ohm:50,phase_deg:0},{frequency_hz:1e3,magnitude_ohm:49,phase_deg:1}]}];
 const ac=buildImpedancePlot(networks,'SIG'); assert.deepEqual(ac.data[0].x,[1e3,1e6]);assert.equal(ac.layout.xaxis.type,'log');
 const target=buildImpedancePlot(networks,'SIG',.05);

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://spike.local/schemas/voice-coil-drive-v1.schema.json",
-  "$comment": "SPDX-License-Identifier: MIT; Copyright (c) 2026 SigHarmonic. Runtime also enforces finite arithmetic, conditioning and step budgets.",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic. Runtime also enforces finite arithmetic, conditioning and step budgets.",
   "type": "object",
   "additionalProperties": false,
   "required": [

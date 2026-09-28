@@ -47,7 +47,7 @@ export function createProjectPackage(payload: Record<string, any>): SpikeProject
       application: "SPIKE",
       application_version: APP_VERSION,
       source_checksum: source ? `fnv1a32:${fnv1a(source)}` : undefined,
-      content: ["project", "design", "assembly_ir", "assembly_designs", "assembly_package_shapes", "models", "analysis", "spice", "emi", "thermal", "workspace", "probes", "selection"],
+      content: ["project", "design", "assembly_ir", "assembly_designs", "assembly_package_shapes", "models", "analysis", "spice", "emi", "thermal", "studies", "workspace", "probes", "selection"],
     },
   };
 }
