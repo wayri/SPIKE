@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import ts from "typescript";
 import { importTestTypescript } from "./import-test-typescript.mjs";
 
-const APP = "<SPIKE-checkout>/app";
+const APP = fileURLToPath(new URL("../", import.meta.url));
 const compilerOptions = { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 };
 
 async function loadModule(file, replacements = {}) {

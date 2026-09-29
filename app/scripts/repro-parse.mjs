@@ -5,10 +5,10 @@ const ARGS = process.argv.slice(2);
 if (!ARGS.length) { console.error("usage: repro-parse.mjs <file...>"); process.exit(2); }
 
 const compilerOptions = { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 };
-const numericRangeSource = readFileSync("<SPIKE-checkout>/app/src/numericRange.ts", "utf8");
+const numericRangeSource = readFileSync(new URL("../src/numericRange.ts", import.meta.url), "utf8");
 const numericRangeModule = ts.transpileModule(numericRangeSource, { compilerOptions }).outputText;
 const numericRangeUrl = `data:text/javascript;base64,${Buffer.from(numericRangeModule).toString("base64")}`;
-const parserSource = readFileSync("<SPIKE-checkout>/app/src/boardParser.ts", "utf8");
+const parserSource = readFileSync(new URL("../src/boardParser.ts", import.meta.url), "utf8");
 const parserModule = ts.transpileModule(parserSource, { compilerOptions }).outputText
   .replace('from "./numericRange";', `from "${numericRangeUrl}";`);
 const parser = await import(`data:text/javascript;base64,${Buffer.from(parserModule).toString("base64")}`);
