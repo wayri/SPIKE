@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DataTable from "./DataTable";
 import type { ParsedBoard } from "./boardParser";
 import { componentThermalElements, type ThermalElement } from "./thermalAssembly";
 import { mapThermalRecords, parseThermalDelimited, suggestThermalMapping, thermalRowsFromOdb, type ThermalImportMapping, type ThermalImportResult, type ThermalImportRow } from "./thermalBomParsing";
@@ -62,7 +63,7 @@ export default function ThermalInputImport({ board, elements, onElements }: Prop
     <p className="thermal-import-message" role="status">{message}</p>
     {preview && <>
       <div className="thermal-import-summary">{preview.rows.length} matched parts · {preview.issues.length} skipped or flagged rows</div>
-      {preview.rows.length > 0 && <div className="thermal-import-preview"><table><thead><tr><th>Reference</th><th>W</th><th>Top K/W</th><th>Bottom K/W</th></tr></thead><tbody>{preview.rows.slice(0, 12).map(row => <tr key={row.reference}><td>{row.reference}</td><td>{row.power_w}</td><td>{row.theta_top_c_per_w}</td><td>{row.theta_bottom_c_per_w}</td></tr>)}</tbody></table>{preview.rows.length > 12 && <small>Showing first 12 of {preview.rows.length} matched parts.</small>}</div>}
+      {preview.rows.length > 0 && <div className="thermal-import-preview"><DataTable label="Thermal import preview"><thead><tr><th>Reference</th><th>W</th><th>Top K/W</th><th>Bottom K/W</th></tr></thead><tbody>{preview.rows.slice(0, 12).map(row => <tr key={row.reference}><td>{row.reference}</td><td>{row.power_w}</td><td>{row.theta_top_c_per_w}</td><td>{row.theta_bottom_c_per_w}</td></tr>)}</tbody></DataTable>{preview.rows.length > 12 && <small>Showing first 12 of {preview.rows.length} matched parts.</small>}</div>}
       {preview.issues.length > 0 && <details className="thermal-import-issues"><summary>Review {preview.issues.length} import issues</summary>{preview.issues.slice(0, 40).map((issue, index) => <p key={index}>{issue}</p>)}{preview.issues.length > 40 && <p>Only the first 40 issues are shown.</p>}</details>}
       <button className="secondary-btn" disabled={!preview.rows.length || preview.rows.length > 256} onClick={() => applyRows(preview.rows)}>Apply matched values</button>
       {preview.rows.length > 256 && <p className="thermal-import-message">The SPIKE thermal run supports at most 256 parts per solve.</p>}

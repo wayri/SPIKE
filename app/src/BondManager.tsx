@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import DataTable from "./DataTable";
 import { CheckCircle2, Link2, Plus, Search, Trash2, WandSparkles, X } from "lucide-react";
 
 export type BondStatus = "draft" | "ready" | "warning" | "invalid" | "disabled";
@@ -160,7 +161,7 @@ export default function BondManager({
 
       <div className="bond-manager-body">
         <div className="bond-manager-table-wrap">
-          <table className="bond-manager-table">
+          <DataTable label="Component bonds" searchable={false} className="bond-manager-table">
             <thead><tr><th>Use</th><th>Part</th><th>Reference</th><th>Pad</th><th>Net</th><th>Connected copper</th><th>Search distance (mm)</th><th>Electrical R (ohm)</th><th>Current limit (A)</th><th>Thermal k (W/mK)</th><th>Contact area (mm2)</th><th>Bond material</th><th>Status</th><th /></tr></thead>
             <tbody>{visibleBonds.map(bond => {
               const result = validationFor(bond);
@@ -183,7 +184,7 @@ export default function BondManager({
                 <td><button onClick={() => deleteBond(bond)} title={`Delete bond ${bond.reference || bond.id}`} aria-label={`Delete bond ${bond.reference || bond.id}`}><Trash2 size={14} /></button></td>
               </tr>;
             })}</tbody>
-          </table>
+          </DataTable>
           {!visibleBonds.length && <div className="bond-manager-empty"><Link2 size={24} /><b>{bonds.length ? "No bonds match this filter" : "No component bonds configured"}</b><span>{bonds.length ? "Change the filter to show the remaining bonds." : "Add a bond or auto-connect nearby component pads and copper."}</span></div>}
         </div>
         {!!validation.length && <div className="bond-manager-validation" aria-label="Bond validation results">{validation.map((result, index) => <div key={`${result.bondId ?? "all"}-${index}`} className={result.status}><b>{result.status}</b><span>{result.message}</span></div>)}</div>}

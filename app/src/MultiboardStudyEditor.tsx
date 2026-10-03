@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useRef, useState } from "react";
+import DataTable from "./DataTable";
 import type { AssemblyIr } from "./mcadAssembly";
 import { openNativeTextFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile } from "./workerBridge";
 import { studyDraft, studyResultRows, studyResultSummary } from "./multiboardStudyPresentation";
@@ -164,7 +165,7 @@ export default function MultiboardStudyEditor({ assembly, projectPath, manifestD
     {result && <><p>Result: {String(result.status)} · {String(result.model_status)} · production qualified: {String(result.production_qualified)}</p>
       {resultFrequencies.length > 0 && <label>Result frequency <select value={displayPoint} onChange={event => setDisplayPoint(Number(event.target.value))}>{resultFrequencies.map((frequency: number, i: number) => <option key={i} value={i}>{frequency} Hz</option>)}</select></label>}
       <p>Full sweeps are retained in the project and exported study file.</p>
-      <table className="data-table"><thead><tr><th>Board</th><th>Node / loop</th><th>Value</th><th>Unit</th></tr></thead><tbody>{resultRows.map(row => <tr key={`${row.board}:${row.node}`}><td>{row.board}</td><td>{row.node}</td><td>{row.value === undefined ? "Unavailable" : String(row.value)}</td><td>{row.unit}</td></tr>)}</tbody></table>
+      <DataTable label="Multiboard study results" className="data-table"><thead><tr><th>Board</th><th>Node / loop</th><th>Value</th><th>Unit</th></tr></thead><tbody>{resultRows.map(row => <tr key={`${row.board}:${row.node}`}><td>{row.board}</td><td>{row.node}</td><td>{row.value === undefined ? "Unavailable" : String(row.value)}</td><td>{row.unit}</td></tr>)}</tbody></DataTable>
       <details><summary>Conservation, diagnostics and limitations</summary><pre>{JSON.stringify(studyResultSummary(result), null, 2)}</pre></details></>}
   </section>;
 }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import type { BoardObject } from "./BoardViewport";
+import DataTable from "./DataTable";
 import type { SolverResultBundle } from "./analysisResults";
 import { buildProbeRows, evaluateProbeFormulas, probeResultsCsv, type ProbeFormulaRow, type ProbeQuantity, type ProbeReferenceValues } from "./probeCalculations";
 import "./ProbeResultsTable.css";
@@ -35,7 +36,7 @@ export default function ProbeResultsTable({ probes, result, calculatedRows, onCa
       <div className="probe-table-actions"><button type="button" onClick={() => { const id = nextId(); onCalculatedRowsChange([...calculatedRows, { id, name: `Calculation ${id}`, formula: "" }]); }}>Add formula</button>
         <button type="button" onClick={exportCsv} disabled={!rows.length && !calculatedRows.length}>Export CSV</button></div></header>
     <div className="probe-table-scroll" role="region" aria-label="Probe measurements and calculated rows" tabIndex={0}>
-      <table><caption>{probes.length} measurement point{probes.length === 1 ? "" : "s"}; {calculatedRows.length} calculated row{calculatedRows.length === 1 ? "" : "s"}</caption>
+      <DataTable label="Probe results"><caption>{probes.length} measurement point{probes.length === 1 ? "" : "s"}; {calculatedRows.length} calculated row{calculatedRows.length === 1 ? "" : "s"}</caption>
         <thead><tr><th scope="col">ID / name</th><th scope="col">Status</th><th scope="col">Net / layer</th><th scope="col">Voltage</th><th scope="col">Drop</th><th scope="col">Current</th><th scope="col">Power</th><th scope="col">Density</th><th scope="col">Local Z / R</th><th scope="col">Actions</th></tr></thead>
         <tbody>{rows.map(row => <tr key={row.sourceId} title={row.message}>
           <th scope="row"><code>{row.id}</code>{onRenameProbe ? <input aria-label={`Name for probe ${row.id}`} value={row.name} onChange={event => onRenameProbe(row.sourceId, event.target.value)} /> : <span>{row.name}</span>}<small>{row.kind}</small></th>
@@ -47,7 +48,7 @@ export default function ProbeResultsTable({ probes, result, calculatedRows, onCa
             <td colSpan={2}><label>Formula<input aria-label={`Formula for ${row.id}`} value={row.formula} placeholder="P1.voltage / P1.current" onChange={event => updateFormula(row.id, { formula: event.target.value })} aria-invalid={Boolean(row.error)} aria-describedby={`formula-status-${row.id}`} /></label><small id={`formula-status-${row.id}`} role={row.error ? "alert" : undefined}>{row.error ?? "Calculated from displayed solver values"}</small></td>
             <td colSpan={6} className="probe-formula-value">{row.result ? shown(row.result) : "-"}</td>
             <td><button type="button" aria-label={`Delete calculated row ${row.name}`} onClick={() => onCalculatedRowsChange(calculatedRows.filter(item => item.id !== row.id))}>Delete</button></td></tr>)}
-        </tbody></table>
+        </tbody></DataTable>
       {!rows.length && !calculatedRows.length && <p className="probe-table-empty">No probes placed. Place a probe on a conductor to begin.</p>}
     </div>
   </section>;

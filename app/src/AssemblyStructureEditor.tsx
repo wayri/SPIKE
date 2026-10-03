@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import DataTable from "./DataTable";
+import TableIdentityInput from "./TableIdentityInput";
 import { Cable, CircuitBoard, Network, Plus, ShieldCheck } from "lucide-react";
 import { placementFromTransform, transformFromPlacement, type AssemblyDesigns, type AssemblyIr, type AssemblyPlacement } from "./mcadAssembly";
 import { runLocalWorker, runNativeProjectWorker, selectNativeAssemblySources } from "./workerBridge";
@@ -31,11 +33,11 @@ function AssemblyPinMapEditor({ harnessId, value, onChange }: { harnessId: strin
   try { const parsed = JSON.parse(value || "{}"); if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(); mapping = parsed; } catch { valid = false; }
   const replace = (next: Record<string, string>) => onChange(JSON.stringify(next));
   return <div className="assembly-pin-map-editor">
-    {valid ? <table><thead><tr><th>Endpoint A pin</th><th>Endpoint B pin</th><th /></tr></thead><tbody>{Object.entries(mapping).map(([source, target]) => <tr key={source}>
-      <td><input aria-label={`${harnessId} source pin ${source}`} value={source} onChange={event => { const next = { ...mapping }; delete next[source]; if (event.target.value) next[event.target.value] = target; replace(next); }} /></td>
+    {valid ? <DataTable label="Connector pin mapping"><thead><tr><th>Endpoint A pin</th><th>Endpoint B pin</th><th /></tr></thead><tbody>{Object.entries(mapping).map(([source, target]) => <tr key={source}>
+      <td><TableIdentityInput aria-label={`${harnessId} source pin ${source}`} value={source} onCommit={value => { const next = { ...mapping }; delete next[source]; next[value] = target; replace(next); }} validate={value => !value.trim() ? "Source pin cannot be blank." : value !== source && Object.prototype.hasOwnProperty.call(mapping, value) ? "Source pin already exists." : ""} /></td>
       <td><input aria-label={`${harnessId} target pin ${source}`} value={target} onChange={event => replace({ ...mapping, [source]: event.target.value })} /></td>
       <td><button className="secondary-btn" onClick={() => { const next = { ...mapping }; delete next[source]; replace(next); }}>Remove</button></td>
-    </tr>)}</tbody></table> : <p role="alert">Pin-map JSON is invalid; repair it below.</p>}
+    </tr>)}</tbody></DataTable> : <p role="alert">Pin-map JSON is invalid; repair it below.</p>}
     <button className="secondary-btn" disabled={!valid} onClick={() => { let index = Object.keys(mapping).length + 1; while (String(index) in mapping) index++; replace({ ...mapping, [String(index)]: String(index) }); }}>Add pin pair</button>
     <details><summary>Bulk / text pin mapping</summary><textarea aria-label={`${harnessId} bulk pin mappings`} rows={5} placeholder={'1=1\n2=2'} value={bulk} onChange={event => setBulk(event.target.value)} /><button className="secondary-btn" disabled={!valid} onClick={() => setBulk(formatPinMappings(mapping))}>Load table</button> <button className="secondary-btn" onClick={() => { try { replace(parsePinMappings(bulk)); setError(""); } catch (caught) { setError(caught instanceof Error ? caught.message : String(caught)); } }}>Apply text</button>{error && <p role="alert">{error}</p>}</details>
     <details><summary>Raw JSON</summary><textarea aria-label={`${harnessId} pin map JSON`} value={value} onChange={event => onChange(event.target.value)} /></details>
@@ -205,7 +207,7 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
     <button className="secondary-btn" disabled={busy || dirty || !projectPath || !projectManifestDigest} onClick={() => void importSource()}>Import boards / external assemblies…</button>
     <p>Select one or more KiCad or IPC-2581 boards, or portable .spikeassembly files, in one import. Native boards receive separated starter placements; edit XYZ and rotation below. {dirty ? "Save structure edits before importing another source." : "The active board and existing assembly are retained."}</p>
     {importSummary.length > 0 && <div className="mcad-gate" role="status"><b>Last import</b><ul>{importSummary.map((source, index) => <li key={`${source.source_name}:${index}`}>{source.source_name}: {source.board_count} board{source.board_count === 1 ? "" : "s"}, {source.part_count} mechanical part{source.part_count === 1 ? "" : "s"}</li>)}</ul></div>}
-    <table className="data-table"><thead><tr><th>ID / name</th><th>Retained design ID</th><th>XYZ (mm)</th><th>Rotation XYZ (deg)</th><th /></tr></thead><tbody>{boards.map(row => {
+    <DataTable label="Assembly boards" className="data-table"><thead><tr><th>ID / name</th><th>Retained design ID</th><th>XYZ (mm)</th><th>Rotation XYZ (deg)</th><th /></tr></thead><tbody>{boards.map(row => {
       const placement = placementFromTransform(row.frame.transform);
       return <tr key={row.id}>
         <td><input value={row.name ?? row.id} onChange={event => patchBoard(row.id, { name: event.target.value })} /><small>{row.id}</small></td>
@@ -218,7 +220,7 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
         <td>{(["rxDeg", "ryDeg", "rzDeg"] as const).map(field => <input key={field} aria-label={`${row.id} ${field}`} type="number" step="any" value={placement[field]} onChange={event => patchBoardPlacement(row, field, event.target.value)} />)}</td>
         <td><button className="secondary-btn" onClick={() => setBoards(current => current.filter(item => item.id !== row.id))}>Remove</button></td>
       </tr>;
-    })}</tbody></table>
+    })}</tbody></DataTable>
     <button className="secondary-btn" disabled={boards.length >= 30} onClick={() => {
       const id = identity("board");
       setBoards(current => [...current, { id, name: "Board", design_id: assemblyDesigns?.active_design_id ?? current[0]?.design_id ?? "", frame: { frame_id: `${id}-frame`, parent_frame_id: assemblyIr.frame?.frame_id || "assembly", transform: transformFromPlacement({ xMm: 0, yMm: 0, zMm: 0, rxDeg: 0, ryDeg: 0, rzDeg: 0 }) } }]);
@@ -238,18 +240,18 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
     <details className="assembly-link-details"><summary>Review and edit all link records</summary>
     <h4><Cable size={14} /> Harnesses</h4>
     <p className="mcad-gate">These rows place compact AssemblyIR board-to-board links. Author detailed connectors, wires, sources, loads, and explicit contact resistance in the project harness document.{onOpenHarnessEditor && <> <button className="secondary-btn" onClick={onOpenHarnessEditor}>Open Harness PI editor</button></>}</p>
-    <table className="data-table"><thead><tr><th>ID / name</th><th>Endpoint A</th><th>Endpoint B</th><th>Length (mm)</th><th>Connector-to-connector pin map</th><th /></tr></thead><tbody>{harnesses.map(row => <tr key={row.id}>
+    <DataTable label="Assembly harnesses" className="data-table"><thead><tr><th>ID / name</th><th>Endpoint A</th><th>Endpoint B</th><th>Length (mm)</th><th>Connector-to-connector pin map</th><th /></tr></thead><tbody>{harnesses.map(row => <tr key={row.id}>
       <td><input value={row.name ?? row.id} onChange={event => patchHarness(row.id, { name: event.target.value })} /><small>{row.id}</small></td>
       <td><input value={row.endpoint_a} onChange={event => patchHarness(row.id, { endpoint_a: event.target.value })} /></td>
       <td><input value={row.endpoint_b} onChange={event => patchHarness(row.id, { endpoint_b: event.target.value })} /></td>
       <td><input type="number" min="0" step="any" value={row.length_mm} onChange={event => patchHarness(row.id, { length_mm: Number(event.target.value) })} /></td>
       <td><AssemblyPinMapEditor harnessId={row.id} value={pinMapDrafts[row.id] ?? "{}"} onChange={next => setPinMapDrafts(current => ({ ...current, [row.id]: next }))} /></td>
       <td><button className="secondary-btn" onClick={() => setHarnesses(current => current.filter(item => item.id !== row.id))}>Remove</button></td>
-    </tr>)}</tbody></table>
+      </tr>)}</tbody></DataTable>
     <button className="secondary-btn" onClick={() => { const id = identity("harness"); setHarnesses(current => [...current, { id, name: "Harness", endpoint_a: "", endpoint_b: "", length_mm: 0, pin_map: {} }]); setPinMapDrafts(current => ({ ...current, [id]: "{}" })); }}><Plus size={13} /> Add harness</button>
     <h4>Stacked board connector mates</h4>
     <p className="mcad-gate">Declare direct mated connectors separately from cable harnesses. Enter both board::connector identities and an explicit pin map; placement alone does not establish a connection or contact impedance.</p>
-    <table className="data-table"><thead><tr><th>Name</th><th>Connector A</th><th>Connector B</th><th>Pin map JSON</th><th /></tr></thead><tbody>{connectorMappings.filter(row => row.kind === "connector-mate").map(row => {
+    <DataTable label="Assembly connector mates" className="data-table"><thead><tr><th>Name</th><th>Connector A</th><th>Connector B</th><th>Pin map JSON</th><th /></tr></thead><tbody>{connectorMappings.filter(row => row.kind === "connector-mate").map(row => {
       const data = mateData(row.id);
       return <tr key={row.id}>
         <td><input value={row.name ?? ""} onChange={event => setConnectorMappings(current => current.map(item => item.id === row.id ? { ...item, name: event.target.value } : item))} /></td>
@@ -258,7 +260,7 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
         <td><AssemblyPinMapEditor harnessId={row.id} value={JSON.stringify(data.pin_map ?? {})} onChange={next => { try { patchMate(row.id, { pin_map: JSON.parse(next) }); } catch { /* Keep the last valid map. */ } }} /></td>
         <td><button className="secondary-btn" onClick={() => setConnectorMappings(current => current.filter(item => item.id !== row.id))}>Remove</button></td>
       </tr>;
-    })}</tbody></table>
+    })}</tbody></DataTable>
     <button className="secondary-btn" onClick={() => { const id = identity("connector-mate"); setConnectorMappings(current => [...current, { id, name: "Mated connector", kind: "connector-mate", data: { endpoint_a: "", endpoint_b: "", pin_map: {} } }]); setLinkDrafts(current => ({ ...current, [id]: JSON.stringify({ endpoint_a: "", endpoint_b: "", pin_map: {} }) })); }}><Plus size={13} /> Add stacked connector mate</button>
     {plannerAssembly && <HarnessAutoPlanner assembly={plannerAssembly} designs={assemblyDesigns} onStatus={onStatus} onApply={applyHarnessPlan} />}
     {([[
@@ -267,13 +269,13 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
       "Rigid/flex links", rigidFlexLinks, setRigidFlexLinks, "rigid-flex-link",
     ]] as const).map(([label, rows, setter, prefix]) => <div key={label}>
       <h4>{label}</h4>
-      <table className="data-table"><thead><tr><th>ID</th><th>Name</th><th>Kind</th><th>Typed data JSON</th><th /></tr></thead><tbody>{rows.map(row => <tr key={row.id}>
+      <DataTable label={label} className="data-table"><thead><tr><th>ID</th><th>Name</th><th>Kind</th><th>Typed data JSON</th><th /></tr></thead><tbody>{rows.map(row => <tr key={row.id}>
         <td><code>{row.id}</code></td>
         <td><input value={row.name ?? ""} onChange={event => setter(current => current.map(item => item.id === row.id ? { ...item, name: event.target.value } : item))} /></td>
         <td><input value={row.kind ?? prefix} onChange={event => setter(current => current.map(item => item.id === row.id ? { ...item, kind: event.target.value } : item))} /></td>
         <td><textarea value={linkDrafts[row.id] ?? "{}"} onChange={event => setLinkDrafts(current => ({ ...current, [row.id]: event.target.value }))} /></td>
         <td><button className="secondary-btn" onClick={() => setter(current => current.filter(item => item.id !== row.id))}>Remove</button></td>
-      </tr>)}</tbody></table>
+    </tr>)}</tbody></DataTable>
       <button className="secondary-btn" onClick={() => { const id = identity(prefix); setter(current => [...current, { id, name: label.slice(0, -1), kind: prefix, data: {} }]); setLinkDrafts(current => ({ ...current, [id]: "{}" })); }}><Plus size={13} /> Add {label.slice(0, -1).toLowerCase()}</button>
     </div>)}
     </details>

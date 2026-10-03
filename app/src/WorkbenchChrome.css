@@ -1,0 +1,172 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+@import "./tableTheme.css";
+
+/* Workbench segments share density and palette, while tools retain their own layout. */
+.app-shell {
+  --ui-title-height: 38px;
+  --ui-tabs-height: 32px;
+  --ui-ribbon-height: 66px;
+  --ui-dock-tabs-height: 28px;
+  --ui-status-height: 24px;
+  --ui-control-height: 28px;
+  --ui-canvas-toolbar-height: 32px;
+  --ui-context-toolbar-height: 28px;
+  --ui-viewport-footer-height: 30px;
+  --ui-command-gap: 6px;
+  --ui-dock-height: min(var(--bottom-panel-height, 178px), 26dvh);
+  grid-template-rows: var(--ui-title-height) auto var(--ui-tabs-height) var(--ui-ribbon-height) minmax(0, 1fr) var(--ui-dock-height) var(--ui-status-height);
+}
+.app-shell.bottom-closed { --ui-dock-height: var(--ui-dock-tabs-height); grid-template-rows: var(--ui-title-height) auto var(--ui-tabs-height) var(--ui-ribbon-height) minmax(0, 1fr) var(--ui-dock-height) var(--ui-status-height); }
+.app-shell.ribbon-hidden, .app-shell.ribbon-hidden.bottom-closed { grid-template-rows: var(--ui-title-height) auto var(--ui-tabs-height) minmax(0, 1fr) var(--ui-dock-height) var(--ui-status-height); }
+.app-shell .topbar { min-width: 0; gap: 12px; padding-inline: 12px; color: var(--spike-table-text); background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
+.app-shell .brand-mark { flex: 0 0 auto; min-width: 0; gap: 7px; }
+.app-shell .brand-mark img { width: 24px; height: 24px; border-radius: 5px; }
+.app-shell .brand-mark b { color: var(--spike-table-text-strong); font-size: 13px; letter-spacing: 1.6px; }
+.app-shell .brand-mark small { color: var(--spike-table-muted); font-size: 7px; letter-spacing: .4px; }
+.app-shell .project-path { min-width: 0; flex: 1 1 0; max-width: 520px; height: var(--ui-control-height); gap: 6px; padding: 0 8px; font-size: 11px; color: var(--spike-table-muted); border-left: 1px solid var(--spike-table-border); }
+.app-shell .project-path b { min-width: 0; color: var(--spike-table-text-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-shell .project-path > span, .app-shell .project-path > svg { flex-shrink: 0; }
+.app-shell .top-actions { flex: 0 0 auto; gap: 3px; }
+.app-shell .top-actions .icon-btn { min-width: 28px; height: var(--ui-control-height); padding: 5px; color: var(--spike-table-muted); }
+.app-shell .universal-search-trigger { width: clamp(32px, 13vw, 170px); background: var(--spike-table-surface); border: 1px solid var(--spike-table-border); border-radius: 4px; }
+.app-shell .avatar { width: 25px; height: 25px; }
+.app-shell .menu-bar { min-height: 26px; flex-wrap: wrap; gap: 1px; padding-inline: 6px; color: var(--spike-table-text); background: var(--spike-table-surface); border-color: var(--spike-table-border); }
+.app-shell .menu-button { height: 26px; padding: 0 9px; color: var(--spike-table-muted); font-size: 11px; }
+.app-shell .menu-dropdown { top: 100%; z-index: var(--z-transient); max-width: calc(100vw - 12px); max-height: min(440px, calc(100dvh - 110px)); overflow-y: auto; scrollbar-width: thin; color: var(--spike-table-text); background: var(--spike-table-toolbar); border-color: var(--spike-table-border-strong); }
+.app-shell .menu-item { min-height: 28px; color: var(--spike-table-text); font-size: 11px; padding: 6px 8px; }
+.app-shell .menu-item small { color: var(--spike-table-muted); }
+.app-shell .menu-button:hover, .app-shell .menu-button.selected, .app-shell .menu-item:hover { color: var(--spike-table-focus); background: var(--spike-table-hover); }
+.app-shell .topbar button:focus-visible, .app-shell .menu-bar button:focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: -2px; }
+.app-shell .ribbon-tabs { height: var(--ui-tabs-height); padding-inline: 6px; background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
+.app-shell .ribbon-tab { height: var(--ui-tabs-height); min-height: 28px; padding-inline: 10px; gap: 5px; color: var(--spike-table-muted); font-size: 11px; }
+.app-shell .ribbon-tab.selected { color: var(--spike-table-focus); background: var(--spike-table-hover); border-bottom-color: var(--spike-table-focus); }
+.app-shell .ribbon-toggle { position: static; height: 100%; font-size: 10px; background: var(--spike-table-toolbar); border-left: 1px solid var(--spike-table-border); }
+.app-shell .ribbon-tools { padding: 3px 6px; gap: 0; background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
+.app-shell .ribbon-tools .command-strip-viewport { align-items: stretch; gap: 10px; }
+.app-shell .ribbon-tools .tool-group { display: flex; flex: 0 0 auto; justify-content: flex-start; gap: 2px; padding-right: 10px; border-color: var(--spike-table-border); }
+.app-shell .ribbon-tools .tool-group > label { color: var(--spike-table-muted); font-size: 8px; letter-spacing: .7px; }
+.app-shell .tool { height: 43px; min-width: 56px; padding-inline: 6px; gap: 3px; border-radius: 4px; color: var(--spike-table-text); font-size: 10px; }
+.app-shell .tool svg { width: 17px; height: 17px; }
+.app-shell .tool:hover:not(:disabled) { background: var(--spike-table-hover); color: var(--spike-table-text-strong); }
+.app-shell .tool.active { color: var(--spike-table-focus); background: var(--spike-table-hover); }
+.app-shell .tool:disabled { color: var(--spike-table-muted); opacity: .5; }
+.app-shell .ribbon-view-row { height: 43px; gap: 2px; }
+.app-shell .ribbon-view-row button { width: var(--ui-control-height); height: var(--ui-control-height); }
+.app-shell .ribbon-status { display: block; padding-inline: 6px; font-size: 10px; color: var(--spike-table-muted); }
+.app-shell .canvas-area { container-type: inline-size; container-name: workbench-viewport; grid-template-rows: var(--ui-canvas-toolbar-height) var(--ui-context-toolbar-height) minmax(0, 1fr) auto; }
+.app-shell .canvas-toolbar { padding-inline: 5px; font-size: 11px; color: var(--spike-table-muted); background: var(--spike-table-surface); border-color: var(--spike-table-border); }
+.app-shell .canvas-toolbar .command-strip-viewport { gap: var(--ui-command-gap); }
+/* Overflow arrows and keyboard scrolling retain access without a second row. */
+.app-shell :is(.canvas-toolbar, .result-mode-toolbar, .dock-tabs) .command-strip-viewport { scrollbar-width: none; }
+.app-shell :is(.canvas-toolbar, .result-mode-toolbar, .dock-tabs) .command-strip-viewport::-webkit-scrollbar { display: none; }
+.app-shell .canvas-toolbar > .command-strip-viewport { flex: 1 1 0; }
+.app-shell .canvas-toolbar .command-strip-viewport > :not(.canvas-spacer) { flex: 0 0 auto; }
+.app-shell .canvas-toolbar .canvas-spacer { min-width: 0; flex: 1 1 0; }
+.app-shell .canvas-toolbar .plain-btn { min-height: var(--ui-control-height); padding: 4px 6px; border-radius: 4px; color: var(--spike-table-text); font-size: 11px; }
+.app-shell .canvas-toolbar .plain-btn:hover:not(:disabled) { background: var(--spike-table-hover); }
+.app-shell .canvas-toolbar .plain-btn:disabled { opacity: .5; }
+.app-shell .canvas-toolbar .canvas-icon { min-width: 26px; min-height: 26px; display: grid; place-items: center; padding: 4px; }
+.app-shell .pan-pad { width: auto; height: 28px; display: flex; }
+.app-shell .pan-pad .canvas-icon { min-width: 26px; min-height: 26px; width: 26px; height: 26px; padding: 0; }
+.app-shell .result-mode-toolbar.command-strip { height: 100%; min-height: 0; padding-inline: 5px; gap: 0; }
+.app-shell .result-mode-toolbar .command-strip-viewport { gap: 5px; }
+.app-shell .result-mode-toolbar .command-strip-viewport > span:first-child { padding-inline: 4px; color: var(--spike-table-muted); font-size: 9px; letter-spacing: .6px; }
+.app-shell .result-mode-toolbar .command-strip-viewport button { width: auto; height: 26px; min-width: 26px; flex: 0 0 auto; gap: 4px; padding-inline: 6px; color: var(--spike-table-text); font-size: 10px; line-height: normal; }
+.app-shell .result-mode-toolbar .command-strip-viewport button:disabled { opacity: .5; }
+.app-shell .result-mode-toolbar .command-strip-viewport button.selected { color: var(--spike-table-text-strong); background: var(--spike-table-hover); box-shadow: inset 0 -2px var(--spike-table-focus); }
+.app-shell .result-mode-toolbar .result-toolbar-spacer { flex: 1 1 0; }
+/* Persistent footer controls and the drawing reserve the same compact height. */
+.app-shell .viewport-hud-bottom { box-sizing: border-box; height: var(--ui-viewport-footer-height); min-height: 0; gap: 8px; padding: 2px 10px; }
+.app-shell .viewport-legend { gap: 10px; }
+.app-shell .resolve-setup-button { height: 26px; min-height: 26px; padding-inline: 8px; }
+.app-shell .board-canvas .layout-scale { bottom: calc(var(--ui-viewport-footer-height) + 8px); }
+.app-shell .results-strip { min-width: 0; min-height: 44px; gap: 12px; padding: 4px 10px; overflow-x: auto; scrollbar-width: thin; }
+.app-shell .results-strip > div, .app-shell .results-strip > button { flex-shrink: 0; }
+.app-shell .results-strip b { font-size: 12px; margin-top: 2px; }
+.app-shell .results-strip .metric { min-width: 0; padding-left: 12px; }
+.app-shell .results-strip .metric strong { margin-top: 2px; font-size: 13px; }
+.app-shell .results-strip .metric .amber { font-size: 12px; }
+.app-shell .results-strip .run-btn, .app-shell .results-strip > .plain-btn { min-height: 28px; padding: 4px 8px; white-space: nowrap; }
+.app-shell .results-strip--summary { min-height: 28px; padding-block: 0; }
+.app-shell .results-strip--summary > div:first-child { min-width: 0; display: flex; align-items: center; gap: 8px; }
+.app-shell .results-strip--summary b { margin: 0; }
+.app-shell .dock-tabs { height: var(--ui-dock-tabs-height); padding-inline: 6px; background: var(--spike-table-surface); }
+.app-shell .dock-tabs .command-strip-viewport { gap: 3px; }
+.app-shell .dock-tabs .command-strip-viewport > button { display: flex; height: calc(var(--ui-dock-tabs-height) - 2px); padding-inline: 10px; color: var(--spike-table-muted); font-size: 11px; }
+.app-shell .dock-tabs .command-strip-viewport > button.selected { color: var(--spike-table-focus); border-bottom-color: var(--spike-table-focus); background: var(--spike-table-toolbar); }
+.app-shell .dock-tabs .dock-spacer { flex: 1 1 0; }
+.app-shell .dock-tabs .dock-notice-summary { flex: 0 1 240px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--spike-table-muted); font-size: 10px; }
+.app-shell .dock-tabs .resolve-setup-button { height: 26px; padding-inline: 8px; color: #ffd47d; }
+.app-shell .dock-tabs .board-import-status { height: 26px; padding-inline: 8px; color: var(--spike-table-text); }
+.app-shell .dock-tabs .viewport-quality-host { min-width: 0; flex: 0 1 auto; display: flex; }
+.app-shell .dock-tabs .view-quality { position: static; margin: 0; max-width: 240px; padding: 2px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-shell .notification-dock-content { height: calc(100% - var(--ui-dock-tabs-height)); min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; gap: 8px; padding: 8px; overflow: auto; scrollbar-width: thin; }
+.app-shell .notification-dock-content:not(:has(.board-import-panel)) { grid-template-columns: minmax(0, 1fr); }
+.app-shell .notification-workspace-tools { grid-column: 1 / -1; min-width: 0; display: grid; gap: 5px; }
+.app-shell .notification-workspace-tools:empty { display: none; }
+.app-shell .notification-workspace-tools > :is(.probe-mode-bar, .thermal-scene-bar, .emi-viewport-bar) { position: static; width: auto; max-width: none; margin: 0; padding: 3px; flex-wrap: wrap; }
+.app-shell .notification-dock-content .viewport-legend { grid-column: 1 / -1; }
+.app-shell .assembly-handling-slot { height: 32px; }
+.app-shell .assembly-quick-bar { height: 31px; padding: 1px 6px; }
+.app-shell .assembly-quick-bar :is(button, select) { min-height: 26px; height: 26px; padding-block: 2px; }
+.app-shell .statusbar { gap: 8px; padding-inline: 8px; background: var(--spike-table-surface); color: var(--spike-table-muted); }
+.app-shell .status-current { height: 23px; color: var(--spike-table-text); background: var(--spike-table-toolbar); }
+.app-shell .side-panel:not(.collapsed) { scrollbar-width: thin; scrollbar-color: var(--spike-table-border-strong) transparent; }
+.app-shell .side-panel:not(.collapsed)::-webkit-scrollbar { display: block; width: 6px; }
+.app-shell .side-panel:not(.collapsed)::-webkit-scrollbar-thumb { background: var(--spike-table-border-strong); }
+.app-shell .panel-heading { height: 32px; padding-inline: 8px; }
+.app-shell .side-panel.left:not(.collapsed) { grid-template-rows: 32px minmax(0, 1fr); }
+.app-shell .workspace { --workspace-left-track: min(var(--left-panel-width, 224px), 20vw); --workspace-right-track: min(var(--right-panel-width, 272px), 24vw); grid-template-columns: var(--workspace-left-track) minmax(0, 1fr) var(--workspace-right-track); }
+.app-shell .workspace.left-closed { --workspace-left-track: 34px; }
+.app-shell .workspace.right-closed { --workspace-right-track: 34px; }
+.app-shell .dock-resizer.left { left: var(--workspace-left-track); }
+.app-shell .dock-resizer.right { right: var(--workspace-right-track); }
+.app-shell .dock-resizer.bottom { bottom: calc(var(--ui-dock-height) + var(--ui-status-height) - 3px); }
+.app-shell .probe-results-overlay { bottom: var(--ui-status-height); height: calc(var(--ui-dock-height) - var(--ui-dock-tabs-height)); }
+.app-shell .global-progress, .app-shell.ribbon-hidden .global-progress { position: fixed; top: auto; bottom: var(--ui-status-height); height: 2px; }
+
+/* Let compact managers wrap their actions instead of sacrificing a button. */
+:is(.net-manager-toolbar, .extension-toolbar, .python-workspace-toolbar, .batch-toolbar, .activity-console-toolbar, .stack-actions) { min-width: 0; height: auto; flex-wrap: wrap; row-gap: 6px; }
+:is(.net-manager-toolbar, .extension-toolbar) > label { min-width: min(220px, 100%); }
+:is(.net-manager-toolbar, .extension-toolbar, .python-workspace-toolbar, .batch-toolbar, .stack-actions) > button { flex-shrink: 0; }
+
+@media (max-width: 1400px), (max-height: 820px) {
+  .app-shell { --ui-title-height: 34px; --ui-tabs-height: 30px; --ui-ribbon-height: 58px; --ui-control-height: 26px; --ui-command-gap: 4px; }
+  .app-shell .brand-mark small { display: none; }
+  .app-shell .tool { height: 36px; min-width: 52px; gap: 2px; }
+  .app-shell .ribbon-view-row { height: 36px; }
+}
+@media (max-width: 1100px) {
+  .app-shell .menu-entry:nth-last-child(-n+4) .menu-dropdown { left: auto; right: 0; }
+  .app-shell .topbar { padding-inline: 7px; gap: 8px; }
+  .app-shell .project-path span { display: none; }
+  .app-shell .ribbon-tab { padding-inline: 8px; }
+  .app-shell .workspace { --workspace-left-track: min(var(--left-panel-width, 224px), 18vw); --workspace-right-track: min(var(--right-panel-width, 272px), 23vw); }
+  .app-shell .workspace.left-closed { --workspace-left-track: 34px; }
+  .app-shell .workspace.right-closed { --workspace-right-track: 34px; }
+}
+@media (max-height: 700px) {
+  .app-shell { --ui-dock-height: min(var(--bottom-panel-height, 178px), 20dvh); }
+  .app-shell.bottom-closed { --ui-dock-height: var(--ui-dock-tabs-height); }
+  .app-shell .result-mode-toolbar .command-strip-viewport button { height: 24px; }
+}
+@container workbench-viewport (max-width: 600px) {
+  .app-shell .canvas-toolbar .plain-btn { font-size: 10px; padding-inline: 4px; }
+  .app-shell .canvas-toolbar .coordinate { display: none; }
+  .app-shell .result-mode-toolbar .command-strip-viewport > span:first-child { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (max-width: 720px) {
+  .app-shell .project-path { display: flex; }
+  .app-shell .universal-search-trigger { width: 30px; }
+  .app-shell .universal-search-trigger span, .app-shell .universal-search-trigger kbd { display: none; }
+  .app-shell .top-actions > button { display: grid; }
+  .app-shell .notification-dock-content { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .command-strip-viewport { scroll-behavior: auto; } }
+
+.app-shell .activity-console { height: calc(100% - var(--ui-dock-tabs-height)); grid-template-rows: auto minmax(0, 1fr); }
+.app-shell .bottom-dock > .issue-list, .app-shell .bottom-dock > .power-tree-dock { height: calc(100% - var(--ui-dock-tabs-height)); overflow: auto; }
+.net-manager { grid-template-rows: 40px auto minmax(0, 1fr) 42px; }
+.extension-manager { grid-template-rows: 40px auto minmax(0, 1fr) 40px; }
+.app-shell .canvas-area:has(> .simulation-workspace) { grid-template-rows: var(--ui-canvas-toolbar-height) var(--ui-context-toolbar-height) auto minmax(0, 1fr) auto; }
+.app-shell .simulation-workspace { max-height: min(180px, 25dvh); overflow: auto; scrollbar-width: thin; }

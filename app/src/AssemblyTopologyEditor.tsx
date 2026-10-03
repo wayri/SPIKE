@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import DataTable from "./DataTable";
+import TableIdentityInput from "./TableIdentityInput";
 import { Crosshair, Magnet, Plus, ShieldCheck } from "lucide-react";
 import type { AssemblyIr } from "./mcadAssembly";
 import {
@@ -150,7 +152,7 @@ export default function AssemblyTopologyEditor({ projectPath, projectManifestDig
     {focusedReference && <p className="mcad-gate">Scene-selected exact {focusedReference.topology_kind}: <code>{focusedReference.topology_id}</code>. Use it in a typed definition below; selection alone does not apply or solve a constraint.</p>}
 
     <h4>Topology constraints</h4>
-    <table className="data-table"><thead><tr><th>ID</th><th>Kind</th><th>Endpoint A (anchor)</th><th>Endpoint B (moves)</th><th>Value</th><th /></tr></thead><tbody>
+    <DataTable label="Assembly topology constraints" className="data-table"><thead><tr><th>ID</th><th>Kind</th><th>Endpoint A (anchor)</th><th>Endpoint B (moves)</th><th>Value</th><th /></tr></thead><tbody>
       {constraints.map(item => {
         const scoped = topologyEntityOptions(index, allowedForConstraint(item.kind), query);
         const persisted = index.constraints.find(candidate => candidate.constraint_id === item.constraint_id);
@@ -159,7 +161,7 @@ export default function AssemblyTopologyEditor({ projectPath, projectManifestDig
           && item.references.every(reference => index.shapes.find(shape => shape.shape_id === reference.shape_id)?.entities.find(entity => entity.topology_id === reference.topology_id)?.geometry?.representation !== undefined)
           && JSON.stringify(persisted) === JSON.stringify(item);
         return <tr key={item.constraint_id}>
-          <td><input value={item.constraint_id} onChange={event => patchConstraint(item.constraint_id, { constraint_id: event.target.value })} /></td>
+          <td><TableIdentityInput value={item.constraint_id} onCommit={constraint_id => patchConstraint(item.constraint_id, { constraint_id })} validate={constraintId => !constraintId.trim() ? "Constraint ID cannot be blank." : constraintId !== item.constraint_id && constraints.some(row => row.constraint_id === constraintId) ? "Constraint ID already exists." : ""} /></td>
           <td><select value={item.kind} onChange={event => {
             const kind = event.target.value as TopologyConstraint["kind"];
             patchConstraint(item.constraint_id, { kind, value_mm: kind === "distance" ? 0 : null, value_deg: kind === "angle" ? 0 : null });
@@ -170,25 +172,25 @@ export default function AssemblyTopologyEditor({ projectPath, projectManifestDig
           <td><button className="secondary-btn" disabled={!applicable || busy} title={applicable ? "Move endpoint B to endpoint A using exact BREP descriptors" : "Save a valid two-part descriptor-backed definition before applying"} onClick={() => void applyConstraint(item)}><Magnet size={13} /> Apply B→A</button> <button className="secondary-btn" onClick={() => setConstraints(current => current.filter(row => row.constraint_id !== item.constraint_id))}>Remove</button></td>
         </tr>;
       })}
-    </tbody></table>
+    </tbody></DataTable>
     <button className="secondary-btn" onClick={addConstraint} disabled={!options.all.length}><Plus size={13} /> Add topology definition</button>
 
     <h4>Thermal contact face bindings</h4>
-    <table className="data-table"><thead><tr><th>Contact ID</th><th>Face A</th><th>Face B</th><th /></tr></thead><tbody>{thermalBindings.map(item => <tr key={item.assembly_entity_id}>
+    <DataTable label="Assembly thermal bindings" className="data-table"><thead><tr><th>Contact ID</th><th>Face A</th><th>Face B</th><th /></tr></thead><tbody>{thermalBindings.map(item => <tr key={item.assembly_entity_id}>
       <td><select value={item.assembly_entity_id} onChange={event => patchBinding(setThermalBindings, item.assembly_entity_id, { assembly_entity_id: event.target.value })}>{contactIds.map(id => <option key={id}>{id}</option>)}</select></td>
       <td><ReferenceSelect value={item.endpoint_a} options={options.face} onChange={reference => patchBinding(setThermalBindings, item.assembly_entity_id, { endpoint_a: reference })} /></td>
       <td><ReferenceSelect value={item.endpoint_b} options={options.face} onChange={reference => patchBinding(setThermalBindings, item.assembly_entity_id, { endpoint_b: reference })} /></td>
       <td><button className="secondary-btn" onClick={() => setThermalBindings(current => current.filter(row => row.assembly_entity_id !== item.assembly_entity_id))}>Remove</button></td>
-    </tr>)}</tbody></table>
+    </tr>)}</tbody></DataTable>
     <button className="secondary-btn" onClick={() => addBinding("thermal")} disabled={!contactIds.length || options.face.length < 2}><Plus size={13} /> Bind thermal contact faces</button>
 
     <h4>Electrical bond topology bindings</h4>
-    <table className="data-table"><thead><tr><th>Bond ID</th><th>Endpoint A</th><th>Endpoint B</th><th /></tr></thead><tbody>{electricalBindings.map(item => <tr key={item.assembly_entity_id}>
+    <DataTable label="Assembly electrical bindings" className="data-table"><thead><tr><th>Bond ID</th><th>Endpoint A</th><th>Endpoint B</th><th /></tr></thead><tbody>{electricalBindings.map(item => <tr key={item.assembly_entity_id}>
       <td><select value={item.assembly_entity_id} onChange={event => patchBinding(setElectricalBindings, item.assembly_entity_id, { assembly_entity_id: event.target.value })}>{bondIds.map(id => <option key={id}>{id}</option>)}</select></td>
       <td><ReferenceSelect value={item.endpoint_a} options={options.electrical} onChange={reference => patchBinding(setElectricalBindings, item.assembly_entity_id, { endpoint_a: reference })} /></td>
       <td><ReferenceSelect value={item.endpoint_b} options={options.electrical} onChange={reference => patchBinding(setElectricalBindings, item.assembly_entity_id, { endpoint_b: reference })} /></td>
       <td><button className="secondary-btn" onClick={() => setElectricalBindings(current => current.filter(row => row.assembly_entity_id !== item.assembly_entity_id))}>Remove</button></td>
-    </tr>)}</tbody></table>
+    </tr>)}</tbody></DataTable>
     <button className="secondary-btn" onClick={() => addBinding("electrical")} disabled={!bondIds.length || options.electrical.length < 2}><Plus size={13} /> Bind electrical bond topology</button>
 
     <div><button className="run-btn" disabled={!projectPath || !projectManifestDigest || busy} onClick={() => void save()}>{busy ? "Saving topology setup..." : "Save topology-addressed setup"}</button></div>

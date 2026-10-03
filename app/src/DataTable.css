@@ -1,0 +1,78 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+@import "./tableTheme.css";
+.spike-data-table {
+  --table-row-pad: 9px; --table-control-height: 32px; --table-font: 12px;
+  min-width: 0; max-width: 100%; border: 1px solid var(--spike-table-border); border-radius: 9px; background: var(--spike-table-surface); color: var(--spike-table-text); font-size: var(--table-font); color-scheme: var(--spike-table-scheme);
+}
+.spike-data-table.spike-table-compact { --table-row-pad: 4px; --table-control-height: 28px; --table-font: 12px; }
+.spike-data-table > .spike-table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-height: 52px; padding: 10px 14px; background: var(--spike-table-toolbar); border-radius: 9px 9px 0 0; }
+.spike-data-table > .spike-table-toolbar > strong { flex: 1 1 150px; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 14px; font-weight: 650; color: var(--spike-table-text-strong); }
+.spike-data-table > .spike-table-toolbar > .spike-table-search { width: 185px; min-width: 100px; max-width: 100%; height: 32px; border: 1px solid var(--spike-table-border-strong); border-radius: 6px; padding: 5px 10px; background: var(--spike-table-surface); color: var(--spike-table-text); font: inherit; }
+.spike-data-table .spike-table-search::placeholder { color: var(--spike-table-muted); }
+.spike-data-table > :is(.spike-table-toolbar, .spike-table-pagination) > button { display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 0; height: 30px; padding: 4px 10px; border: 1px solid var(--spike-table-action-border); border-radius: 6px; background: var(--spike-table-action-bg); color: var(--spike-table-text); font: inherit; cursor: pointer; }
+.spike-data-table > .spike-table-toolbar > button[aria-pressed="true"] { background: var(--spike-table-edit-hover); border-color: var(--spike-table-edit); color: var(--spike-table-text); }
+.spike-table-count { color: var(--spike-table-muted); font-size: 11px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.spike-table-help { position: relative; color: var(--spike-table-muted); font-size: 11px; }
+.spike-table-help > summary { cursor: pointer; padding: 6px 2px; }
+.spike-table-help[open] { flex: 1 1 100%; }
+.spike-table-help > p { margin: 4px 0; max-width: 70ch; line-height: 1.6; color: var(--spike-table-muted); font-size: 12px; }
+.spike-table-field-guide { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding: 7px 14px 10px; background: var(--spike-table-toolbar); color: var(--spike-table-muted); font-size: 11px; }
+.spike-table-field-guide > span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.spike-table-field-guide i { display: inline-block; flex: 0 0 14px; width: 14px; height: 16px; background-position: center; background-repeat: no-repeat; font-style: normal; }
+.spike-table-edit-cue { background-image: var(--table-edit-icon); }
+.spike-table-choice-cue { background-image: var(--table-choice-icon); }
+.spike-table-lock-cue { background-image: var(--table-lock-icon); }
+.spike-table-field-guide .spike-table-action-cue { height: 18px; color: var(--spike-table-text); border: 1px solid var(--spike-table-action-border); border-radius: 4px; text-align: center; line-height: 15px; }
+/* Display-only tables do not need an editing guide. */
+.spike-data-table:not(:has(table :is(input, select, textarea, button))) > .spike-table-field-guide { display: none; }
+.spike-data-table > .spike-table-viewport { min-width: 0; max-height: var(--table-max-height, 420px); overflow: auto; scrollbar-width: thin; scrollbar-gutter: stable; }
+.spike-data-table > .spike-table-viewport > table.spike-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: auto; color: var(--spike-table-text); font-size: var(--table-font); font-variant-numeric: tabular-nums; }
+.spike-data-table table.spike-table > caption { padding: 8px 14px; text-align: left; color: var(--spike-table-muted); background: var(--spike-table-toolbar); font-size: 12px; }
+.spike-data-table table.spike-table > thead > tr > th { position: sticky; top: 0; z-index: 5; height: 36px; padding: 9px 12px; border: 0; border-top: 1px solid var(--spike-table-border); border-bottom: 2px solid var(--spike-table-border-strong); background: var(--spike-table-header); color: var(--spike-table-text-strong); font-size: 11px; font-weight: 650; text-align: left; text-transform: none; letter-spacing: .025em; white-space: nowrap; }
+.spike-data-table table.spike-table > tbody > tr { background: var(--spike-table-surface); }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) { height: auto; padding: var(--table-row-pad) 10px; border: 0; border-bottom: 1px solid var(--spike-table-border); background-color: inherit; color: inherit; font-size: var(--table-font); vertical-align: middle; overflow: visible; text-overflow: clip; }
+.spike-data-table table.spike-table > tbody > tr:nth-child(even) { background: var(--spike-table-stripe); }
+.spike-data-table table.spike-table > tbody > tr:hover { background: var(--spike-table-hover); }
+.spike-data-table table.spike-table > tbody > tr:focus-within { background: var(--spike-table-row-focus); }
+.spike-data-table table.spike-table > tbody > tr:is(.invalid, .critical, .thermal-screen-critical, .probe-formula-error) { background: var(--spike-table-danger-bg); }
+.spike-data-table table.spike-table > tbody > tr:is(.warning, .thermal-screen-warning) { background: var(--spike-table-warning-bg); }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th):focus-within { box-shadow: inset 3px 0 var(--spike-table-edit); }
+/* Direct entry has an underline; text fields also carry a pencil. */
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), select, textarea) { min-width: 8ch; max-width: 100%; min-height: var(--table-control-height); height: auto; padding: 6px 7px; border: 0; border-bottom: 1px solid var(--spike-table-edit-border); border-radius: 4px 4px 0 0; background: var(--spike-table-field); color: var(--spike-table-text); font-family: inherit; font-size: var(--table-font); font-weight: 400; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input:not([type]), input[type="text"], input[type="search"], input[type="email"], input[type="url"], input[type="tel"], input[type="password"], textarea):not([readonly]):not(:disabled) { padding-right: 25px; background-image: var(--table-edit-icon); background-repeat: no-repeat; background-position: right 6px top 9px; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input, textarea):not([readonly]):not(:disabled):hover { background-color: var(--spike-table-edit-hover); border-bottom-color: var(--spike-table-edit); }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input, textarea):not([readonly]):not(:disabled):focus { background-color: var(--spike-table-edit-hover); border-bottom-color: var(--spike-table-edit); }
+/* Native dropdown behavior with an explicit, larger chevron. */
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) select { color-scheme: var(--spike-table-scheme); appearance: none; min-width: 12ch; padding: 6px 29px 6px 9px; border: 1px solid var(--spike-table-choice-border); border-radius: 6px; background: var(--spike-table-choice-bg) var(--table-choice-icon) no-repeat right 8px center; color: var(--spike-table-text); cursor: pointer; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) select:not(:disabled):hover { background-color: var(--spike-table-choice-hover); border-color: var(--spike-table-choice); }
+.spike-data-table table.spike-table select :is(option, optgroup) { background: var(--spike-table-choice-bg); color: var(--spike-table-text); }
+.spike-data-table table.spike-table select option:disabled { color: var(--spike-table-muted); }
+.spike-data-table table.spike-table input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--spike-table-edit); }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: var(--table-control-height); height: auto; padding: 5px 10px; border: 1px solid var(--spike-table-action-border); border-radius: 6px; background: var(--spike-table-action-bg); color: var(--spike-table-text); font-family: inherit; font-size: 11px; font-weight: 600; line-height: 1.4; cursor: pointer; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) button:not(:disabled):hover { background: var(--spike-table-action-hover); border-color: var(--spike-table-choice); }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) button[aria-expanded="true"] { background: var(--spike-table-edit-hover); border-color: var(--spike-table-edit); }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) button:is(.spike-table-remove, .danger, [aria-label^="Remove "], [aria-label^="Delete "], [title^="Remove "], [title^="Delete "]) { padding: 5px; border-color: var(--spike-table-danger-border); background: var(--spike-table-danger-bg); color: var(--spike-table-danger-text); font-size: 18px; font-weight: 400; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) button:is(.spike-table-remove, .danger, [aria-label^="Remove "], [aria-label^="Delete "], [title^="Remove "], [title^="Delete "]):hover { background: var(--spike-table-danger-hover); border-color: var(--spike-table-danger-text); }
+.spike-data-table :is(input, select, textarea, button, summary):focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: 2px; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input[readonly], textarea[readonly], input:disabled:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), textarea:disabled, select:disabled) { padding-right: 25px; border: 0; border-bottom: 1px dashed var(--spike-table-lock-border); border-radius: 0; background: transparent var(--table-lock-icon) no-repeat right 6px top 9px; color: var(--spike-table-muted); cursor: default; opacity: 1; }
+.spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input:disabled, textarea:disabled, select:disabled) { cursor: not-allowed; }
+.spike-data-table .spike-table-readonly-value { display: inline-block; padding: 6px 22px 6px 0; background: var(--table-lock-icon) no-repeat right center; color: var(--spike-table-muted); }
+.spike-data-table button:disabled { opacity: .5; cursor: not-allowed; }
+.spike-data-table table.spike-table [aria-invalid="true"] { border-color: var(--spike-table-danger-border) !important; background-color: var(--spike-table-danger-bg) !important; }
+.table-identity-input { display: grid; gap: 4px; min-width: 12ch; }
+.table-identity-input > .table-identity-error { color: var(--spike-table-danger-text); white-space: normal; font-size: 11px; line-height: 1.4; }
+.spike-data-table table.spike-table.terminal-table > tbody > tr:not(.terminal-table-detail) > td:first-child input { min-width: 16ch; }
+.spike-data-table table.spike-table.terminal-table > thead > tr > th:nth-child(4) { min-width: 210px; }
+.spike-data-table table.spike-table > tbody > tr.terminal-table-detail > td { padding: 14px 20px; border-left: 3px solid var(--spike-table-edit); background: var(--spike-table-edit-hover); }
+.spike-data-table table.spike-table.thermal-input-table > tbody > tr > td { position: static; }
+.spike-data-table table.spike-table.thermal-input-table > thead > tr > th { left: auto; }
+.spike-data-table > .spike-table-pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; padding: 10px 14px; color: var(--spike-table-muted); border-top: 1px solid var(--spike-table-border); font-size: 11px; }
+.spike-data-table > .spike-table-pagination > span:first-child { margin-right: auto; }
+.spike-data-table .spike-table-empty { padding: 14px 12px; margin: 0; color: var(--spike-table-muted); font-size: 12px; }
+.terminal-table-scroll:has(> .spike-data-table) { border: 0; }
+@media (max-width: 600px) { .spike-data-table > .spike-table-toolbar > .spike-table-search { flex: 1 1 140px; } .spike-table-field-guide { gap: 8px 12px; } }
+@media (forced-colors: active) {
+  .spike-data-table table.spike-table > tbody > tr > :is(td, th) select { appearance: auto; background-image: none; padding-right: 7px; }
+  .spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input, textarea):not([readonly]):not(:disabled) { border-bottom: 2px solid LinkText; }
+  .spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input[readonly], textarea[readonly], input:disabled:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), textarea:disabled, select:disabled) { border-bottom: 1px dashed GrayText; }
+}

@@ -7,6 +7,8 @@ import argparse
 import contextlib
 import io
 import json
+import os
+import sys
 import traceback
 from pathlib import Path
 from typing import Any
@@ -131,11 +133,18 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
     errors = _CappedText()
     api = SpikeScriptAPI(request.get("context", {}))
     code = request["code"]
+    filename = str(request.get("filename") or "<SPIKE Python workspace>")
+    working_directory = request.get("working_directory")
+    if isinstance(working_directory, str):
+        os.chdir(working_directory)
+        if working_directory not in sys.path:
+            sys.path.insert(0, working_directory)
     status = "completed"
     with contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
         try:
-            compiled = compile(code, "<SPIKE Python workspace>", "exec")
-            exec(compiled, {"__name__": "__main__", "spike": api})
+            compiled = compile(code, filename, "exec")
+            exec(compiled, {"__name__": "__main__", "__file__": filename,
+                            "__package__": None, "spike": api})
         except BaseException:
             status = "failed"
             traceback.print_exc(limit=12)

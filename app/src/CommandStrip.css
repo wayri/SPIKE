@@ -1,0 +1,17 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.command-strip { min-width: 0; min-height: 0; display: flex; align-items: stretch; gap: 0; overflow: hidden; }
+.command-strip-viewport { min-width: 0; min-height: 0; flex: 1 1 0; align-self: stretch; display: flex; align-items: center; gap: var(--ui-command-gap, 6px); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: var(--spike-table-border-strong) transparent; overscroll-behavior-x: contain; }
+.command-strip-viewport > * { flex-shrink: 0; }
+.command-strip-viewport::-webkit-scrollbar { height: 5px; }
+.command-strip-viewport::-webkit-scrollbar-thumb { border-radius: 3px; background: var(--spike-table-border-strong); }
+.command-strip .command-strip-arrow { flex: 0 0 24px; min-width: 24px; height: auto; min-height: 24px; display: grid; place-items: center; align-self: stretch; border: 0; border-radius: 0; border-inline: 1px solid var(--spike-table-border); padding: 0; color: var(--spike-table-text); background: var(--spike-table-toolbar); font-size: 11px; }
+.command-strip .command-strip-arrow:hover:not(:disabled) { color: var(--spike-table-focus); background: var(--spike-table-hover); }
+.command-strip .command-strip-arrow:disabled { color: var(--spike-table-muted); opacity: .45; cursor: default; }
+.command-strip .command-strip-arrow[hidden] { display: none; }
+.command-strip :focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: -2px; }
+.command-strip-trailing { flex: 0 0 auto; display: flex; align-items: center; }
+@media (forced-colors: active) {
+  .command-strip .command-strip-arrow { color: ButtonText; background: ButtonFace; border-color: ButtonText; }
+  .command-strip .command-strip-arrow:disabled { color: GrayText; opacity: 1; }
+  .command-strip :focus-visible { outline-color: Highlight; }
+}

@@ -1,3 +1,8 @@
+| `app/src/PythonWorkspace.tsx`, `PythonCodeEditor.tsx`, `PythonFileExplorer.tsx`, `PythonDebugPanel.tsx`, `PythonRecoveryPanel.tsx`, `pythonWorkspaceModel.ts` | Tabbed script editing, folder/worktree browsing, explicit save states, bounded durable backup recovery and debugger presentation | Desktop execution stays behind `workerBridge`; recovery copies have no disk path and do not modify `.spike` design state |
+| `app/src/PlotlyChart.tsx`, `InteractivePlot.tsx`, `PlotlyChart.css`, `PlotAxisEditor.tsx`, `plotAxisSettings.ts`, `plotLayout.ts`, `plotInteraction.ts`, `plotClipboard.ts` | Shared axes, plot navigation, context menu and bounded presentation-only clipboard comparisons | Domain adapters retain sample/cursor/result authority; see `docs/PLOT_INTERFACES.md` |
+| `app/src/CommandStrip.tsx`, `CommandStrip.css`, `WorkbenchChrome.css` | Shared command overflow, keyboard reachability, compact shell density and bounded dock layout | Command callbacks remain with their workflow; see `docs/WORKBENCH_SEGMENTS.md` |
+| `app/src/DataTable.tsx`, `DataTable.css`, `tableTheme.css`, `dataTableModel.tsx`, `spreadsheetGrid.ts`, `TableIdentityInput.tsx` | Shared searchable, paged table presentation, theme palettes, keyboard navigation, and staged ID entry | Domain rows, units, validation, ordering, and writes remain with each workflow; see `docs/TABLE_INTERFACES.md` |
+| `app/src/pythonWorkspaceTemplates.ts`, `PythonTemplateLibrary.tsx`, `PythonWorkspaceHelp.tsx` | Searchable analysis templates and dedicated Python help | Guarded runners use existing worker contracts and preserve solver status; see `docs/PYTHON_WORKSPACE.md` |
 # Subsystem Index
 
 This is the maintainer ownership map for the active SPIKE application. Legacy
@@ -124,7 +129,7 @@ inventory/reduction live in `si_network_workflow.py`, `si_passives.py` and
 | `python/spike_core/extension_analysis_results.py` | External analysis result and board-binding admission |
 | `python/spike_core/extension_mesh_exchange.py` | Bounded full mesh, preview, solver geometry, and digest handoff to analysis extensions |
 | `python/spike_core/automation.py` | Python scripting facade over versioned worker operations |
-| `python/spike_core/script_runtime.py`, `script_child.py` | In-app Python execution, output capture, cancellation boundary, and result admission |
+| `python/spike_core/script_runtime.py`, `script_child.py`, `script_debug.py`, `script_debug_child.py`, `script_workspace_files.py`, `service_script_workspace.py` | Isolated script execution, supervised debugger and root-confined script files | Token-bound local sessions, bounded values/output, command acknowledgement and original result admission |
 | `python/spike_core/dependencies.py` | Runtime dependency status and lock verification |
 | `python/spike_core/capabilities.py` | Implemented capability reporting |
 | `python/spike_core/external_engines.py` | External-engine discovery, preflight, private jobs, isolated execution, quotas, and result import |

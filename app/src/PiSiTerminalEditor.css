@@ -2,6 +2,9 @@
 .pisi-terminal-editor__summary { min-height: 34px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #314852; border-bottom: 0; padding: 7px 10px; background: #15252e; }
 .pisi-terminal-editor__summary h3 { min-width: 0; margin: 0; overflow: hidden; color: #a7c3cb; font-size: 12px; font-weight: 650; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
 .pisi-terminal-editor__summary > span { flex: 0 0 auto; color: #78949e; font-size: 11px; }
+.pisi-terminal-editor__view { display: flex; gap: 4px; }
+.pisi-terminal-editor__view button { padding: 4px 9px; font-size: 11px; }
+.pisi-terminal-editor__view button[aria-pressed="true"] { border-color: #d2a04c; color: #f1c36d; background: #302818; }
 .pisi-terminal-editor__cards { display: grid; gap: 8px; }
 .pisi-terminal-editor__card { min-width: 0; border: 1px solid #314852; background: #101c23; }
 .pisi-terminal-editor__card-heading { min-height: 36px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid #273c45; padding: 4px 5px 4px 10px; }

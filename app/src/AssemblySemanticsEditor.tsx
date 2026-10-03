@@ -1,4 +1,6 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import DataTable from "./DataTable";
+import TableIdentityInput from "./TableIdentityInput";
 import { Link2, Plus } from "lucide-react";
 import type { AssemblyIr } from "./mcadAssembly";
 import { runNativeProjectWorker } from "./workerBridge";
@@ -68,37 +70,37 @@ export default function AssemblySemanticsEditor({ projectPath, projectManifestDi
     <p className="mcad-gate">Endpoint strings and reviewed properties are retained as setup data. They do not create contact geometry or qualify a solver.</p>
 
     <h4>Materials</h4>
-    <table className="data-table"><thead><tr><th>ID</th><th>Name</th><th>Class</th><th>Thermal k (W/mK)</th><th /></tr></thead><tbody>
+    <DataTable label="Assembly materials" className="data-table"><thead><tr><th>ID</th><th>Name</th><th>Class</th><th>Thermal k (W/mK)</th><th /></tr></thead><tbody>
       {materials.map(item => <tr key={item.id}>
-        <td><input value={item.id} onChange={event => patch(setMaterials, item.id, { id: event.target.value })} /></td>
+        <td><TableIdentityInput value={item.id} onCommit={id => patch(setMaterials, item.id, { id })} validate={id => !id.trim() ? "Material ID cannot be blank." : id !== item.id && materials.some(row => row.id === id) ? "Material ID already exists." : ""} /></td>
         <td><input value={text(item.name)} onChange={event => patch(setMaterials, item.id, { name: event.target.value })} /></td>
         <td><input value={text(item.material_class)} onChange={event => patch(setMaterials, item.id, { material_class: event.target.value })} /></td>
         <td><input type="number" min="0" step="any" value={number(item.thermal_conductivity_w_per_mk)} onChange={event => patch(setMaterials, item.id, { thermal_conductivity_w_per_mk: optionalNumber(event.target.value) })} /></td>
         <td><button className="secondary-btn" onClick={() => remove(setMaterials, item.id)}>Remove</button></td>
       </tr>)}
-    </tbody></table>
+    </tbody></DataTable>
     <button className="secondary-btn" onClick={() => setMaterials(current => [...current, { ...base(identity("material"), "Assembly material"), material_class: "unspecified", thermal_conductivity_w_per_mk: null }])}><Plus size={13} /> Add material</button>
 
     <h4>Thermal contacts</h4>
-    <table className="data-table"><thead><tr><th>ID</th><th>Endpoint A</th><th>Endpoint B</th><th>Type</th><th>Material</th><th>Area mm²</th><th>R K/W</th><th /></tr></thead><tbody>
+    <DataTable label="Assembly thermal paths" className="data-table"><thead><tr><th>ID</th><th>Endpoint A</th><th>Endpoint B</th><th>Type</th><th>Material</th><th>Area mm²</th><th>R K/W</th><th /></tr></thead><tbody>
       {contacts.map(item => <tr key={item.id}>
-        <td><input value={item.id} onChange={event => patch(setContacts, item.id, { id: event.target.value })} /></td>
+        <td><TableIdentityInput value={item.id} onCommit={id => patch(setContacts, item.id, { id })} validate={id => !id.trim() ? "Thermal contact ID cannot be blank." : id !== item.id && contacts.some(row => row.id === id) ? "Thermal contact ID already exists." : ""} /></td>
         {(["endpoint_a", "endpoint_b", "contact_type", "material_id"] as const).map(field => <td key={field}><input value={text(item[field])} onChange={event => patch(setContacts, item.id, { [field]: event.target.value })} /></td>)}
         {(["contact_area_mm2", "thermal_resistance_k_per_w"] as const).map(field => <td key={field}><input type="number" min="0" step="any" value={number(item[field])} onChange={event => patch(setContacts, item.id, { [field]: optionalNumber(event.target.value) })} /></td>)}
         <td><button className="secondary-btn" onClick={() => remove(setContacts, item.id)}>Remove</button></td>
       </tr>)}
-    </tbody></table>
+    </tbody></DataTable>
     <button className="secondary-btn" onClick={() => setContacts(current => [...current, { ...base(identity("thermal-contact"), "Thermal contact"), endpoint_a: "", endpoint_b: "", contact_type: "mechanical", material_id: "", contact_area_mm2: null, thermal_resistance_k_per_w: null }])}><Plus size={13} /> Add thermal contact</button>
 
     <h4>Electrical bonds</h4>
-    <table className="data-table"><thead><tr><th>ID</th><th>Endpoint A</th><th>Endpoint B</th><th>Type</th><th>Electrical material</th><th>Thermal material</th><th>Area mm²</th><th>Thickness mm</th><th>R Ω</th><th /></tr></thead><tbody>
+    <DataTable label="Assembly multiphysics bonds" className="data-table"><thead><tr><th>ID</th><th>Endpoint A</th><th>Endpoint B</th><th>Type</th><th>Electrical material</th><th>Thermal material</th><th>Area mm²</th><th>Thickness mm</th><th>R Ω</th><th /></tr></thead><tbody>
       {bonds.map(item => <tr key={item.id}>
-        <td><input value={item.id} onChange={event => patch(setBonds, item.id, { id: event.target.value })} /></td>
+        <td><TableIdentityInput value={item.id} onCommit={id => patch(setBonds, item.id, { id })} validate={id => !id.trim() ? "Electrical bond ID cannot be blank." : id !== item.id && bonds.some(row => row.id === id) ? "Electrical bond ID already exists." : ""} /></td>
         {(["endpoint_a", "endpoint_b", "bond_type", "electrical_material_id", "thermal_material_id"] as const).map(field => <td key={field}><input value={text(item[field])} onChange={event => patch(setBonds, item.id, { [field]: event.target.value })} /></td>)}
         {(["contact_area_mm2", "thickness_mm", "electrical_resistance_ohm"] as const).map(field => <td key={field}><input type="number" min="0" step="any" value={number(item[field])} onChange={event => patch(setBonds, item.id, { [field]: optionalNumber(event.target.value) })} /></td>)}
         <td><button className="secondary-btn" onClick={() => remove(setBonds, item.id)}>Remove</button></td>
       </tr>)}
-    </tbody></table>
+    </tbody></DataTable>
     <button className="secondary-btn" onClick={() => setBonds(current => [...current, { ...base(identity("electrical-bond"), "Electrical bond"), endpoint_a: "", endpoint_b: "", bond_type: "electrical", electrical_material_id: "", thermal_material_id: "", contact_area_mm2: null, thickness_mm: null, electrical_resistance_ohm: null }])}><Plus size={13} /> Add electrical bond</button>
 
     <div><button className="run-btn" disabled={!projectPath || !projectManifestDigest || busy} onClick={() => void save()}>{busy ? "Saving semantics..." : "Save assembly semantics"}</button></div>

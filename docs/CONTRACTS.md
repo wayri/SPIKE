@@ -110,3 +110,19 @@ mapping to a different mode.
 - Reports present recorded validation; they do not approve it.
 - EMI preflight owns setup, geometry-coverage, and execution-readiness gates;
   EMI screening ranks only supplied pre-pass metrics and never creates fields.
+
+### Python IDE files and recovery
+
+`python_workspace_files` returns `spike/python-workspace-files/v1`. List, read,
+and write remain confined to the selected root, reject symlink traversal, and
+limit files to 512 KB. Writes require the opened file's SHA-256 before replacing
+an existing path. The additive `worktrees` action inventories existing Git
+checkouts with argument-array invocation, a five-second timeout, and bounded
+porcelain parsing. It returns `root`, `available`, `worktrees`, and an optional
+diagnostic `message`; navigation never changes Git state.
+
+The IDE's v2 session record is validated before restoration. Durable local
+recovery retains at most five snapshots in a 2 MB record. Recovery opens a new
+unsaved identity without path, root, or overwrite hash. Failed storage writes
+retain the last valid backup and remain visible. Recovery does not establish a
+file save or a solver-result validation.

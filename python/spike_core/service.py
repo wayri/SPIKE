@@ -37,7 +37,7 @@ from .errors import error_envelope
 from .convergence import run_mesh_convergence
 from .geometry import extract_net_geometry
 from .extensions import ExtensionPackageManager, ExtensionRegistry, default_extension_roots
-from .script_runtime import run_python_script
+from .service_script_workspace import handle_script_workspace_request
 from .si_protocol_suites import (
     SiProtocolSuiteError,
     plan_si_protocol_analysis,
@@ -400,12 +400,11 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
             return {"ok": True, "result": _extension_registry.trust(str(params.get("extension_id", "")))}
         except ValueError as exc:
             return {"ok": False, "error": str(exc), "type": type(exc).__name__}
-    if method == "run_python_script":
-        try:
-            trusted = [item["id"] for item in _extension_registry.catalog() if item["trusted"]]
-            return {"ok": True, "result": run_python_script({**params, "_trusted_extension_ids": trusted})}
-        except (ValueError, TypeError, OSError) as exc:
-            return {"ok": False, "error": str(exc), "type": type(exc).__name__}
+    if method in {"run_python_script", "start_python_debug", "python_debug_command", "python_debug_status", "python_workspace_files"}:
+        trusted = [item["id"] for item in _extension_registry.catalog() if item["trusted"]]
+        response = handle_script_workspace_request(method, params, trusted_extension_ids=trusted)
+        if response is not None:
+            return response
     if method == "dependencies":
         return {"ok": True, "result": {"runtime": dependency_status(), "lockfile": verify_lockfile()}}
     if method == "list_importers":

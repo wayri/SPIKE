@@ -45,11 +45,11 @@ export const DEFAULT_SETTINGS: AppSettings = {
   profile: { displayName: "SPIKE User", initials: "USR" },
 };
 
-const STORAGE_KEY = "spike.application.settings.v1";
+export const APP_SETTINGS_STORAGE_KEY = "spike.application.settings.v1";
 
 export function loadAppSettings(): AppSettings {
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") as Partial<AppSettings> & { solverMemoryLimitMb?: number };
+    const saved = JSON.parse(localStorage.getItem(APP_SETTINGS_STORAGE_KEY) ?? "{}") as Partial<AppSettings> & { solverMemoryLimitMb?: number };
     const savedLimitGb = Number(saved.solverMemoryLimitGb);
     const legacyLimitMb = Number(saved.solverMemoryLimitMb);
     const solverMemoryLimitGb = Math.max(2,
@@ -80,7 +80,7 @@ export function loadAppSettings(): AppSettings {
 
 export function saveAppSettings(settings: AppSettings): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   } catch {
     // Hardened WebViews may deny persistent storage; runtime settings remain usable.
   }

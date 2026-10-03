@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import DataTable from "./DataTable";
 import {
   AlertTriangle, BarChart3, CheckCircle2, CircleHelp, FileInput, GitBranch, Link2,
   Copy, Download, FileText, LayoutGrid, Maximize2, Move, Network, Plus, RefreshCw, RotateCcw, Route, Save, Search,
@@ -692,7 +693,7 @@ export default function TopologyEditor({
           <details><summary>Accessible topology outline</summary><ol>{[...model.nodes].sort((a, b) => a.label.localeCompare(b.label)).map(node => <li key={node.id}><b>{node.label}</b> — {node.kind}. Ports: {topologyPorts(node, domain).map(port => `${port.label} (${port.direction} ${port.kind})`).join(", ")}.</li>)}</ol><h4>Connections</h4><ol>{model.edges.map(edge => { const from = model.nodes.find(node => node.id === edge.from); const to = model.nodes.find(node => node.id === edge.to); const fromPort = from ? topologyPorts(from, domain).find(port => port.id === edge.fromPort) : undefined; const toPort = to ? topologyPorts(to, domain).find(port => port.id === edge.toPort) : undefined; return <li key={edge.id}>{from?.label ?? edge.from}.{fromPort?.label ?? "unspecified"} to {to?.label ?? edge.to}.{toPort?.label ?? "unspecified"}, {edge.kind}{edge.net ? ` on ${edge.net}` : ""}.</li>; })}</ol></details>
         </section> : view === "consumption" ? <div className="topology-data-panel">
           <header><div><b>COMPONENT CONSUMPTION</b><span>{scenario.label} operating case</span></div><strong>{loads.length} loads</strong></header>
-          <table className="topology-table"><thead><tr><th>Use</th><th>Reference / load</th><th>Rail</th><th>Current (A)</th><th>Power (W)</th><th>Model</th><th>Status</th></tr></thead><tbody>{loads.map(node => {
+          <DataTable label="Component consumption" className="topology-table"><thead><tr><th>Use</th><th>Reference / load</th><th>Rail</th><th>Current (A)</th><th>Power (W)</th><th>Model</th><th>Status</th></tr></thead><tbody>{loads.map(node => {
             const point = node.operatingPoints?.[scenario.id]; const value = budget.nodes[node.id];
             const railNet = node.net ?? model.edges.find(edge => edge.to === node.id && edge.kind === "power")?.net ?? "Unassigned";
             return <tr key={node.id} className={selectedId === node.id ? "selected" : ""} onMouseEnter={() => previewNode(node)} onMouseLeave={() => previewNode(undefined)} onClick={() => selectOnly(node.id)}>
@@ -702,15 +703,15 @@ export default function TopologyEditor({
               <td><input type="number" min="0" step="0.1" value={point?.powerW ?? ""} placeholder={(value?.outputPowerW ?? 0).toFixed(3)} onClick={event => event.stopPropagation()} onChange={event => patchOperatingPoint(node, { powerW: optionalNumber(event.target.value) })} /></td>
               <td>{node.simulationModel || "Unassigned"}</td><td><span className={`topology-state ${value?.outputPowerW ? "ready" : "needs_setup"}`}>{value?.outputPowerW ? "Ready" : "Needs load"}</span></td>
             </tr>;
-          })}</tbody></table>
+          })}</tbody></DataTable>
         </div> : <div className="topology-data-panel">
           <header><div><b>RAIL ANALYSIS PLAN</b><span>Geometry-resolved PI jobs generated from the selected scenario</span></div><strong>{plan.jobs.filter(job => job.status === "ready").length} / {plan.jobs.length} ready</strong></header>
-          <table className="topology-table"><thead><tr><th>Rail / net</th><th>Voltage</th><th>Current</th><th>Load power</th><th>Loads</th><th>Terminals</th><th>Status</th></tr></thead><tbody>{rails.map(rail => {
+          <DataTable label="Rail analysis plan" className="topology-table"><thead><tr><th>Rail / net</th><th>Voltage</th><th>Current</th><th>Load power</th><th>Loads</th><th>Terminals</th><th>Status</th></tr></thead><tbody>{rails.map(rail => {
             const node = model.nodes.find(item => item.id === rail.nodeId); const job = plan.jobs.find(item => item.railNodeId === rail.nodeId);
             return <tr key={rail.nodeId} className={selectedId === rail.nodeId ? "selected" : ""} onMouseEnter={() => previewNode(node)} onMouseLeave={() => previewNode(undefined)} onClick={() => selectOnly(rail.nodeId)}>
               <td><b>{rail.net}</b><span>{node?.label}</span></td><td>{rail.voltageV === undefined ? "-- V" : metric(rail.voltageV, "V")}</td><td>{metric(rail.currentA, "A")}</td><td>{metric(rail.powerW, "W")}</td><td>{rail.downstreamLoadIds.length}</td><td>{job?.sourceNodeIds.length ?? 0} source / {job?.loadNodeIds.length ?? 0} load</td><td><span className={`topology-state ${job?.status ?? "needs_setup"}`}>{job?.status.replace("_", " ") ?? "needs setup"}</span></td>
             </tr>;
-          })}</tbody></table>
+          })}</tbody></DataTable>
         </div>}
       </main>
       <aside className="topology-inspector"><label>ELEMENT PROPERTIES</label>{selected ? <>
@@ -752,7 +753,7 @@ export default function TopologyEditor({
             <header><b>PIN AND DEVICE MODEL</b><span className={modelReady ? "ready" : "needs_setup"}>{modelReady ? <CheckCircle2 size={12} /> : <AlertTriangle size={12} />}{modelReady ? "Configured" : "Needs model data"}</span></header>
             <p>Primitive R/L/C values can enter the staged geometry + ngspice flow. Nonlinear devices require a reviewed model link and explicit pin mapping.</p>
             {activeModelFields.map(field => <label key={field.key}>{field.label}<input value={String(selected.modelParameters?.[field.key] ?? "")} placeholder={field.placeholder} onChange={event => patchModelParameter(field.key, event.target.value)} /></label>)}
-            {selectedPads.length > 0 ? <table><thead><tr><th>Pin</th><th>Net</th><th>Role</th></tr></thead><tbody>{selectedPads.map(pad => <tr key={pad.id}><td>{pad.name}</td><td title={pad.net}>{pad.net ?? "-"}</td><td><select value={selected.pinRoles?.[pad.name] ?? (pad.net && groundNet.test(pad.net) ? "return" : "unused")} onChange={event => patchPinRole(pad.name, event.target.value as TopologyPinRole)}><option value="input">Input</option><option value="output">Output</option><option value="return">Return</option><option value="control">Control</option><option value="passive">Passive terminal</option><option value="unused">Unused</option></select></td></tr>)}</tbody></table> : <p>No board pads resolve to this reference. Assign a component reference or use a subcircuit model without board binding.</p>}
+            {selectedPads.length > 0 ? <DataTable label="Topology pin roles"><thead><tr><th>Pin</th><th>Net</th><th>Role</th></tr></thead><tbody>{selectedPads.map(pad => <tr key={pad.id}><td>{pad.name}</td><td title={pad.net}>{pad.net ?? "-"}</td><td><select value={selected.pinRoles?.[pad.name] ?? (pad.net && groundNet.test(pad.net) ? "return" : "unused")} onChange={event => patchPinRole(pad.name, event.target.value as TopologyPinRole)}><option value="input">Input</option><option value="output">Output</option><option value="return">Return</option><option value="control">Control</option><option value="passive">Passive terminal</option><option value="unused">Unused</option></select></td></tr>)}</tbody></DataTable> : <p>No board pads resolve to this reference. Assign a component reference or use a subcircuit model without board binding.</p>}
             <label>Execution path<select value={selected.solverPolicy ?? "staged_hybrid"} onChange={event => patchSelected({ solverPolicy: event.target.value as TopologyNode["solverPolicy"] })}><option value="geometry">Geometry solver only</option><option value="ngspice">ngspice circuit model</option><option value="staged_hybrid">Geometry parasitics + ngspice</option></select></label>
           </section>}
         </>}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DataTable from "./DataTable";
 import { Download, Play, Plus, Trash2, Upload, X } from "lucide-react";
 import { cancelLocalWorker, isDesktopShell, runLocalWorker } from "./workerBridge";
 import catalogJson from "./siWorkflowCatalog.json";
@@ -134,12 +135,12 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
     const kind = key === "sources" ? "source" : "receiver";
     return <>
     <div className="si-row"><h3>{key === "sources" ? "Sources and aggressors" : "Receivers"}</h3><button disabled={freePort === undefined} title={freePort === undefined ? "All channel ports already have an endpoint." : "Assign the next unused channel port"} onClick={() => { if (freePort !== undefined) change(key, [...values, { ...clone(rec(catalog[key === "sources" ? "source" : "receiver"])), port: freePort }]); }}><Plus size={14} /> Add {key === "sources" ? "source" : "receiver"}</button></div>
-    <div className="si-endpoint-table-wrap"><table className="si-endpoint-table"><thead><tr><th scope="col">{key === "sources" ? "Endpoint" : "Receiver"}</th><th scope="col">Port</th>{numericKeys.map(field => <th scope="col" key={field}>{labels[field] ?? field.replace(/_/g, " ")}</th>)}<th scope="col">IBIS</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
+    <div className="si-endpoint-table-wrap"><DataTable label="Signal integrity endpoints" className="si-endpoint-table"><thead><tr><th scope="col">{key === "sources" ? "Endpoint" : "Receiver"}</th><th scope="col">Port</th>{numericKeys.map(field => <th scope="col" key={field}>{labels[field] ?? field.replace(/_/g, " ")}</th>)}<th scope="col">IBIS</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
       <tbody>{values.map((value, i) => <tr key={i}><th scope="row">{key === "sources" ? (i ? `Aggressor ${i}` : "Primary source") : `Receiver ${i + 1}`}</th>
         <td><input aria-label={`${kind} ${i + 1} port (1-based)`} type="number" min="1" value={Number(value.port) + 1} onChange={e => updateEndpoint(key, i, { ...value, port: Number(e.target.value) - 1 })} /></td>
         {numericKeys.map(field => <td key={field}><TableNumeric name={field} value={value[field]} onChange={n => updateEndpoint(key, i, { ...value, [field]: n })} /></td>)}
         <td>{value.ibis ? <span className="si-endpoint-ibis" title={`IBIS model ${String(rec(value.ibis).model)}, ${String(rec(value.ibis).corner)} corner`}>Bound <button onClick={() => { const next = { ...value }; delete next.ibis; updateEndpoint(key, i, next); }}>Detach</button></span> : "—"}</td>
-        <td><button title={`Remove ${kind}`} aria-label={`Remove ${kind} ${i + 1}`} onClick={() => change(key, values.filter((_, j) => j !== i))}><Trash2 size={14} /></button></td></tr>)}</tbody></table></div>
+        <td><button title={`Remove ${kind}`} aria-label={`Remove ${kind} ${i + 1}`} onClick={() => change(key, values.filter((_, j) => j !== i))}><Trash2 size={14} /></button></td></tr>)}</tbody></DataTable></div>
     <p className="si-endpoint-hint">Port numbers are 1-based. Column headings identify each editable parameter. Bound IBIS values override matching editable parameters.</p>
   </>;
   };

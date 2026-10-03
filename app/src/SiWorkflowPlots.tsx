@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import PlotlyChart from "./PlotlyChart";
 import { reflectionMetrics } from "./siChannelResults";
 
 export type Point = { x: number; y: number };
@@ -28,7 +29,6 @@ export function svgViewBoxX(clientX: number, left: number, width: number, height
 }
 
 export function SiPlot({ title, curves, xLabel, yLabel }: { title: string; curves: Curve[]; xLabel: string; yLabel: string }) {
-  const [cursor, setCursor] = useState(0.5);
   const [expanded, setExpanded] = useState(false);
   const expandButton = useRef<HTMLButtonElement>(null);
   const expandedWindow = useRef<HTMLElement>(null);
@@ -62,26 +62,33 @@ export function SiPlot({ title, curves, xLabel, yLabel }: { title: string; curve
     window.addEventListener("keydown", containKeyboardFocus);
     return () => window.removeEventListener("keydown", containKeyboardFocus);
   }, [expanded]);
-  let xmin = Infinity, xmax = -Infinity, ymin = Infinity, ymax = -Infinity;
-  for (const curve of curves) for (const point of curve.points) {
-    if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) continue;
-    xmin = Math.min(xmin, point.x); xmax = Math.max(xmax, point.x);
-    ymin = Math.min(ymin, point.y); ymax = Math.max(ymax, point.y);
-  }
-  if (!Number.isFinite(xmin)) return <div className="si-plot"><h4>{title}</h4><p>No returned trace data.</p></div>;
-  const dx = xmax - xmin || 1, dy = ymax - ymin || 1;
-  const x = (value: number) => 70 + (value - xmin) / dx * 670;
-  const y = (value: number) => 218 - (value - ymin) / dy * 178;
-  const cursorX = xmin + cursor * dx;
-  const selected = curves.slice(0, 5).map(curve => ({ name: curve.name, point: curve.points[nearestPointIndex(curve.points, cursorX)] }));
-  const chart = <><svg viewBox="0 0 790 270" role="img" aria-label={`${title}, ${xLabel} versus ${yLabel}`}
-    onPointerMove={event => { const box = event.currentTarget.getBoundingClientRect(); setCursor(Math.max(0, Math.min(1, (svgViewBoxX(event.clientX, box.left, box.width, box.height) - 70) / 670))); }}>
-    {[0, 0.25, 0.5, 0.75, 1].map(t => <g key={t}><line x1="70" x2="740" y1={40 + t * 178} y2={40 + t * 178} stroke="#334155" /><text x="64" y={44 + t * 178} textAnchor="end">{(ymax - t * dy).toPrecision(3)}</text><text x={70 + t * 670} y="238" textAnchor="middle">{(xmin + t * dx).toPrecision(3)}</text></g>)}
-    {curves.map((curve, index) => <polyline key={`${curve.name}-${index}`} points={curve.points.filter(p => Number.isFinite(p.x) && Number.isFinite(p.y)).map(p => `${x(p.x)},${y(p.y)}`).join(" ")}
-      fill="none" stroke={colors[index % colors.length]} strokeWidth={curves.length > 10 ? 0.6 : 1.7} opacity={curves.length > 10 ? 0.35 : 1} />)}
-    <line x1={70 + cursor * 670} x2={70 + cursor * 670} y1="40" y2="218" stroke="#94a3b8" strokeDasharray="3 3" />
-    <text x="405" y="263" textAnchor="middle">{xLabel}</text><text x="15" y="130" transform="rotate(-90 15 130)" textAnchor="middle">{yLabel}</text>
-  </svg><small>{selected.map(({ name, point }) => point ? `${name}: ${point.x.toPrecision(4)}, ${point.y.toPrecision(4)}` : `${name}: no finite data`).join(" · ")}</small></>;
+  const hasData = curves.some(curve => curve.points.some(point => Number.isFinite(point.x) && Number.isFinite(point.y)));
+  if (!hasData) return <div className="si-plot"><h4>{title}</h4><p>No returned trace data.</p></div>;
+  const data = curves.map((curve, index) => ({
+    type: "scatter",
+    mode: "lines",
+    name: curve.name,
+    x: curve.points.map(point => Number.isFinite(point.x) ? point.x : null),
+    y: curve.points.map(point => Number.isFinite(point.y) ? point.y : null),
+    connectgaps: false,
+    line: { color: colors[index % colors.length], width: curves.length > 10 ? 0.6 : 1.7 },
+    opacity: curves.length > 10 ? 0.35 : 1,
+    hovertemplate: "%{x:.4g}, %{y:.4g}<extra></extra>",
+  }));
+  const layout = {
+    paper_bgcolor: "#101c2c",
+    plot_bgcolor: "#101c2c",
+    font: { color: "#cbd5e1", size: 10 },
+    margin: { t: 16, r: 22, b: 52, l: 66 },
+    xaxis: { title: xLabel, gridcolor: "#334155", zerolinecolor: "#475569" },
+    yaxis: { title: yLabel, gridcolor: "#334155", zerolinecolor: "#475569" },
+    hovermode: "x",
+    legend: { orientation: "h", x: 0, y: 1.08 },
+  };
+  const revision = `${title}:${xLabel}:${yLabel}:${curves.map(curve => `${curve.name}:${curve.points.length}`).join("|")}`;
+  const chart = <div style={{ height: expanded ? "100%" : 320, minHeight: 280 }}>
+    <PlotlyChart title={title} data={data} layout={layout} revision={revision} />
+  </div>;
   return <><div className="si-plot"><div className="si-plot-heading"><h4>{title}</h4><button ref={expandButton} type="button" onClick={() => setExpanded(true)} aria-label={`Expand ${title}`}>Expand</button></div>{chart}</div>
     {expanded && <div className="si-plot-shade" role="presentation" onPointerDown={event => { if (event.target === event.currentTarget) setExpanded(false); }}>
       <section ref={expandedWindow} className="si-plot-window" role="dialog" aria-modal="true" aria-labelledby={`si-plot-title-${title.replace(/[^a-z0-9]+/gi, "-")}`}>

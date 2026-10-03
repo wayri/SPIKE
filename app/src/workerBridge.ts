@@ -326,7 +326,7 @@ export async function readApprovedResultFile(path: string): Promise<NativeTextFi
   return invoke<NativeTextFile>("read_approved_result_file", { path });
 }
 
-export async function selectNativeImportFile(kind: "board" | "harness" | "extension" | "structure", directory = false): Promise<NativeSelectedFile | null> {
+export async function selectNativeImportFile(kind: "board" | "harness" | "extension" | "structure" | "script", directory = false): Promise<NativeSelectedFile | null> {
   if (!isDesktopShell()) return null;
   return invoke<NativeSelectedFile | null>("select_import_file", { kind, directory });
 }

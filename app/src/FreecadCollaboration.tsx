@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import DataTable from "./DataTable";
 import { openNativeTextFile, saveNativeTextFile, runNativeProjectWorker } from "./workerBridge";
 
 type Props = {
@@ -69,12 +70,12 @@ export default function FreecadCollaboration({ projectPath, manifestDigest, disa
     {diagnostics.length > 0 && <details open><summary>Export geometry and limitations</summary><ul>{diagnostics.map((item, i) => <li key={i}>{item}</li>)}</ul></details>}
     {preview && <div>
       <p>{preview.already_applied ? "This feedback has already been applied." : `${preview.changes.length} changed occurrences.`}</p>
-      {preview.changes.length > 0 && <table className="data-table"><thead><tr><th>Occurrence</th><th>Name</th><th>XYZ before → after (mm)</th><th>Rigid transform</th></tr></thead><tbody>
+      {preview.changes.length > 0 && <DataTable label="FreeCAD placement changes" className="data-table"><thead><tr><th>Occurrence</th><th>Name</th><th>XYZ before → after (mm)</th><th>Rigid transform</th></tr></thead><tbody>
         {preview.changes.map(row => <tr key={row.id}><td>{row.id}</td><td>{row.before_name} → {row.after_name}</td><td>{xyz(row.before_transform)} → {xyz(row.after_transform)}</td><td><details><summary>{row.moved ? "Placement changed" : "Name only"}</summary><p>Before: {JSON.stringify(row.before_transform)}</p><p>After: {JSON.stringify(row.after_transform)}</p></details></td></tr>)}
-      </tbody></table>}
-      {preview.measurements.length > 0 && <table className="data-table"><thead><tr><th>Pair</th><th>Separation (mm)</th><th>Overlap (mm³)</th></tr></thead><tbody>
+      </tbody></DataTable>}
+      {preview.measurements.length > 0 && <DataTable label="FreeCAD clearance measurements" className="data-table"><thead><tr><th>Pair</th><th>Separation (mm)</th><th>Overlap (mm³)</th></tr></thead><tbody>
         {preview.measurements.map((row, i) => <tr key={i}><td>{row.object_a_id} / {row.object_b_id}</td><td>{row.distance_mm.toPrecision(6)}</td><td>{row.overlap_volume_mm3.toPrecision(6)}</td></tr>)}
-      </tbody></table>}
+      </tbody></DataTable>}
       <ul>{preview.warnings.map(w => <li key={w}>{w}</li>)}</ul>
       <button className="run-btn" disabled={unavailable || preview.changes.length === 0} onClick={() => void apply()}>Apply reviewed placements</button>
     </div>}

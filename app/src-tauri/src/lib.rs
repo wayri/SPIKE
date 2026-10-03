@@ -879,6 +879,7 @@ fn select_import_file(
         "extension" => rfd::FileDialog::new()
             .add_filter("SPIKE extension package", &["zip", "spike-extension"]),
         "structure" => rfd::FileDialog::new().add_filter("STEP structure", &["step", "stp"]),
+        "script" => rfd::FileDialog::new().set_title("Open Python workspace folder").add_filter("Python script", &["py"]),
         _ => return Err("Unknown import source kind".to_string()),
     };
     let selected = if directory {

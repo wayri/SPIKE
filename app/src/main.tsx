@@ -9,3 +9,5 @@ const detachedTool = detachedToolKindFromLocation();
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode><AppErrorBoundary>{detachedTool ? <DetachedToolWindowRoot kind={detachedTool} /> : <App />}</AppErrorBoundary></React.StrictMode>
 );
+
+import "./WorkbenchChrome.css";

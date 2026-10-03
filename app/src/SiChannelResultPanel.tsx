@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 import { useMemo, useState } from "react";
-import { AlertTriangle, Download, Maximize2, Minimize2, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
-import { buildSiChannelHtmlReport, buildSiCrosstalkCsv, buildSiImpedanceCsv, floorSiDb, normalizeSiChannelResult, projectSiSeries, siPlotExtent, siTickLabel, SiChartSeries } from "./siChannelResults";
+import { AlertTriangle, Download, Maximize2, Minimize2 } from "lucide-react";
+import PlotlyChart from "./PlotlyChart";
+import { buildSiChannelHtmlReport, buildSiCrosstalkCsv, buildSiImpedanceCsv, floorSiDb, normalizeSiChannelResult, SiChartSeries } from "./siChannelResults";
 
 type Props = { result: Record<string, unknown>; onStatus: (message: string) => void };
 type Tab = "s" | "reflection" | "tdr" | "xtalk" | "z" | "eye" | "mixed";
@@ -23,62 +24,40 @@ const engineering = (value: number) => {
 
 function Chart({ title, xLabel, yLabel, series, defaultShowAll = false }: { title: string; xLabel: string; yLabel: string; series: readonly SiChartSeries[]; defaultShowAll?: boolean }) {
   const available = useMemo(() => series.filter(item => item.points.length), [series]);
-  const fullExtent = useMemo(() => {
-    const points = available.flatMap(item => item.points);
-    if (!points.length) return [0, 1] as const;
-    let minimum = points[0].x;
-    let maximum = points[0].x;
-    for (let index = 1; index < points.length; index += 1) {
-      minimum = Math.min(minimum, points[index].x);
-      maximum = Math.max(maximum, points[index].x);
-    }
-    return [minimum, maximum] as const;
-  }, [available]);
   const [traceId, setTraceId] = useState("");
   const [activeCursor, setActiveCursor] = useState<"A" | "B">("A");
   const [cursorA, setCursorA] = useState<{ x: number; y: number } | null>(null);
   const [cursorB, setCursorB] = useState<{ x: number; y: number } | null>(null);
-  const [viewRange, setViewRange] = useState<[number, number] | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [showAll, setShowAll] = useState(defaultShowAll);
   const selected = available.find(item => item.id === traceId) ?? available[0];
   const displayed = showAll ? available : selected ? available.filter(item => item.id === selected.id) : [];
-  const range = viewRange ?? fullExtent;
-  const visible = displayed.map(item => ({ ...item, points: item.points.filter(point => point.x >= range[0] && point.x <= range[1]) }));
-  const projected = useMemo(() => projectSiSeries(visible, 760, 238, 24, 1200), [visible]);
-  const plotExtent = siPlotExtent(visible);
-  if (!projected.length) return <div className="si-channel-empty">No retained samples for this result.</div>;
-  const plotRange = plotExtent ? [plotExtent.xMin, plotExtent.xMax] : range;
-  const allVisiblePoints = visible.flatMap(item => item.points);
-  let yMin = allVisiblePoints[0]?.y ?? 0;
-  let yMax = allVisiblePoints[0]?.y ?? 1;
-  for (let index = 1; index < allVisiblePoints.length; index += 1) {
-    yMin = Math.min(yMin, allVisiblePoints[index].y);
-    yMax = Math.max(yMax, allVisiblePoints[index].y);
-  }
-  const xToSvg = (x: number) => 24 + (x - plotRange[0]) / Math.max(plotRange[1] - plotRange[0], Number.EPSILON) * 712;
-  const yToSvg = (y: number) => 24 + (yMax - y) / Math.max(yMax - yMin, Number.EPSILON) * 190;
-  const placeCursor = (event: React.PointerEvent<SVGSVGElement>) => {
+  const placeCursor = (targetX: number) => {
     if (!selected?.points.length) return;
-    const box = event.currentTarget.getBoundingClientRect();
-    const svgX = (event.clientX - box.left) / Math.max(box.width, 1) * 760;
-    const ratio = Math.max(0, Math.min(1, (svgX - 24) / 712));
-    const target = plotRange[0] + ratio * (plotRange[1] - plotRange[0]);
-    const candidates = selected.points.filter(point => point.x >= range[0] && point.x <= range[1]);
-    const nearest = candidates.reduce((best, point) => Math.abs(point.x - target) < Math.abs(best.x - target) ? point : best, candidates[0]);
+    const nearest = selected.points.reduce((best, point) => Math.abs(point.x - targetX) < Math.abs(best.x - targetX) ? point : best, selected.points[0]);
     if (!nearest) return;
     (activeCursor === "A" ? setCursorA : setCursorB)({ x: nearest.x, y: nearest.y });
   };
-  const zoom = (factor: number) => {
-    const current = viewRange ?? [fullExtent[0], fullExtent[1]];
-    const anchor = (activeCursor === "A" ? cursorA : cursorB)?.x ?? (current[0] + current[1]) / 2;
-    const half = Math.max((current[1] - current[0]) * factor / 2, Number.EPSILON);
-    const next: [number, number] = [Math.max(fullExtent[0], anchor - half), Math.min(fullExtent[1], anchor + half)];
-    if (next[1] > next[0]) setViewRange(next);
-  };
-  const cursor = (id: "A" | "B", point: { x: number; y: number } | null) => point && point.x >= range[0] && point.x <= range[1]
-    ? <g className={`si-cursor cursor-${id.toLowerCase()}`}><line x1={xToSvg(point.x)} y1="24" x2={xToSvg(point.x)} y2="214" /><line x1="24" y1={yToSvg(point.y)} x2="736" y2={yToSvg(point.y)} /><circle cx={xToSvg(point.x)} cy={yToSvg(point.y)} r="3.5" /><text x={xToSvg(point.x) + 8} y="37">{id}</text></g> : null;
-  return <section className={`si-channel-chart ${expanded ? "expanded" : ""}`}><div className="si-chart-toolbar"><h4>{title}</h4><label>Trace<select value={selected?.id ?? ""} onChange={event => { setTraceId(event.target.value); setCursorA(null); setCursorB(null); }}>{available.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>{available.length > 1 && <button className={showAll ? "selected" : ""} aria-pressed={showAll} onClick={() => setShowAll(value => !value)}>{showAll ? "Show selected" : `Compare all (${available.length})`}</button>}<button className={activeCursor === "A" ? "selected" : ""} onClick={() => setActiveCursor("A")}>Cursor A</button><button className={activeCursor === "B" ? "selected" : ""} onClick={() => setActiveCursor("B")}>Cursor B</button><button title="Zoom in" onClick={() => zoom(0.5)}><ZoomIn size={13} /></button><button title="Zoom out" onClick={() => zoom(2)}><ZoomOut size={13} /></button><button title="Reset plot" onClick={() => { setViewRange(null); setCursorA(null); setCursorB(null); }}><RotateCcw size={13} /></button><button title={expanded ? "Restore plot" : "Maximize plot"} onClick={() => setExpanded(value => !value)}>{expanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}</button></div><svg viewBox="0 0 760 258" role="img" aria-label={title} onPointerDown={placeCursor}><line x1="24" y1="214" x2="736" y2="214" /><line x1="24" y1="24" x2="24" y2="214" />{projected.map((item, index) => <polyline key={item.id} points={item.points} className={`series-${index % 6}`} />)}{cursor("A", cursorA)}{cursor("B", cursorB)}{[0, .5, 1].map(fraction => <g key={fraction}><text x={24 + 712*fraction} y="235" style={{ textAnchor: fraction === 0 ? "start" : fraction === 1 ? "end" : "middle" }}>{plotRange[0] === plotRange[1] && fraction !== 0 ? "" : siTickLabel(plotRange[0] + (plotRange[1]-plotRange[0])*fraction)}</text><text x="28" y={225 - 190*fraction} style={{ textAnchor: "start" }}>{yMin === yMax && fraction !== 1 ? "" : siTickLabel(yMin + (yMax-yMin)*fraction)}</text></g>)}<text x="380" y="253">{xLabel}</text><text x="10" y="119">{yLabel}</text></svg><div className="si-cursor-readout"><span>A: {cursorA ? `${engineering(cursorA.x)}${xLabel.includes("Hz") ? "Hz" : xLabel.includes("s") ? "s" : ""}, ${engineering(cursorA.y)}${yLabel}` : "click plot"}</span><span>B: {cursorB ? `${engineering(cursorB.x)}${xLabel.includes("Hz") ? "Hz" : xLabel.includes("s") ? "s" : ""}, ${engineering(cursorB.y)}${yLabel}` : "click plot"}</span><b>Δ: {cursorA && cursorB ? `${engineering(cursorB.x - cursorA.x)} x, ${engineering(cursorB.y - cursorA.y)} y` : "place A and B"}</b></div><div className="si-channel-legend">{projected.map((item, index) => <span key={item.id} className={`series-${index % 6}`}>{item.label} ({item.source.length} visible samples)</span>)}</div></section>;
+  if (!displayed.length) return <div className="si-channel-empty">No retained samples for this result.</div>;
+  const colors = ["#67e8f9", "#fbbf24", "#a78bfa", "#4ade80", "#fb7185", "#60a5fa"];
+  const data = displayed.map((item, index) => ({ type: "scatter", mode: "lines", name: item.label,
+    x: item.points.map(point => point.x), y: item.points.map(point => point.y), connectgaps: false,
+    line: { color: colors[index % colors.length], width: 1.35 }, hovertemplate: "%{x:.6g}, %{y:.6g}<extra></extra>" }));
+  const cursors: { id: "A" | "B"; point: { x: number; y: number }; color: string }[] = [];
+  if (cursorA) cursors.push({ id: "A", point: cursorA, color: "#fbbf24" });
+  if (cursorB) cursors.push({ id: "B", point: cursorB, color: "#67e8f9" });
+  const cursorShapes = cursors.flatMap(({ point, color }) => [
+    { type: "line", x0: point.x, x1: point.x, y0: 0, y1: 1, xref: "x", yref: "paper", line: { color, width: 1, dash: "dot" } },
+    { type: "line", x0: 0, x1: 1, y0: point.y, y1: point.y, xref: "paper", yref: "y", line: { color, width: 1, dash: "dot" } },
+  ]);
+  const cursorAnnotations = cursors.map(({ id, point, color }) => ({
+    x: point.x, y: 1, xref: "x", yref: "paper", text: id, showarrow: false, xanchor: "left", font: { color },
+  }));
+  const layout = { paper_bgcolor: "#08141b", plot_bgcolor: "#08141b", font: { color: "#b3c5cc", size: 10 },
+    margin: { t: 18, r: 22, b: 52, l: 66 }, xaxis: { title: xLabel, gridcolor: "#263d47" }, yaxis: { title: yLabel, gridcolor: "#263d47" },
+    showlegend: false, hovermode: "x", shapes: cursorShapes, annotations: cursorAnnotations };
+  const revision = `${title}:${displayed.map(item => item.id).join("|")}:${cursorA?.x ?? ""}:${cursorB?.x ?? ""}`;
+  return <section className={`si-channel-chart ${expanded ? "expanded" : ""}`}><div className="si-chart-toolbar"><h4>{title}</h4><label>Trace<select value={selected?.id ?? ""} onChange={event => { setTraceId(event.target.value); setCursorA(null); setCursorB(null); }}>{available.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>{available.length > 1 && <button className={showAll ? "selected" : ""} aria-pressed={showAll} onClick={() => setShowAll(value => !value)}>{showAll ? "Show selected" : `Compare all (${available.length})`}</button>}<button className={activeCursor === "A" ? "selected" : ""} onClick={() => setActiveCursor("A")}>Cursor A</button><button className={activeCursor === "B" ? "selected" : ""} onClick={() => setActiveCursor("B")}>Cursor B</button><button title={expanded ? "Restore plot" : "Maximize plot"} onClick={() => setExpanded(value => !value)}>{expanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}</button></div><div style={{ height: expanded ? "calc(100vh - 170px)" : 320 }}><PlotlyChart title={title} data={data} layout={layout} revision={revision} onPointClick={(point: { x: number }) => placeCursor(point.x)} /></div><div className="si-cursor-readout"><span>A: {cursorA ? `${engineering(cursorA.x)}${xLabel.includes("Hz") ? "Hz" : xLabel.includes("s") ? "s" : ""}, ${engineering(cursorA.y)}${yLabel}` : "click plot"}</span><span>B: {cursorB ? `${engineering(cursorB.x)}${xLabel.includes("Hz") ? "Hz" : xLabel.includes("s") ? "s" : ""}, ${engineering(cursorB.y)}${yLabel}` : "click plot"}</span><b>Δ: {cursorA && cursorB ? `${engineering(cursorB.x - cursorA.x)} x, ${engineering(cursorB.y - cursorA.y)} y` : "place A and B"}</b></div><div className="si-channel-legend">{displayed.map((item, index) => <span key={item.id} className={`series-${index % 6}`}>{item.label} ({item.points.length} retained samples)</span>)}</div></section>;
 }
 
 export default function SiChannelResultPanel({ result, onStatus }: Props) {

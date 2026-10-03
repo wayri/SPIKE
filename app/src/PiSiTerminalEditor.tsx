@@ -1,5 +1,6 @@
 import { useId, useState, type ReactNode } from "react";
 import { ChevronDown, Crosshair, MousePointer2, Plus, Trash2 } from "lucide-react";
+import TerminalTable from "./TerminalTable";
 import "./PiSiTerminalEditor.css";
 
 export type PiSiTerminalRow = {
@@ -35,7 +36,7 @@ export type PiSiTerminalEditorProps<T extends PiSiTerminalRow> = {
   onUseSelection: () => void;
 };
 
-/** Responsive PI/SI terminal cards. Record ownership and placement stay in the parent. */
+/** Table or responsive cards over the same terminal records and placement actions. */
 export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
   rows, label, layers, valueLabel, transient = false, readOnlyValue,
   onChange, onRemove, renderDetails, addLabel, pickLabel = "Pick exact point",
@@ -45,6 +46,7 @@ export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
   onAdd, onTogglePick, onUseSelection,
 }: PiSiTerminalEditorProps<T>) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [tableView, setTableView] = useState(rows.length > 6);
   const controlId = useId().replace(/:/g, "");
   const edit = (item: T, key: keyof Omit<PiSiTerminalRow, "id" | "layer">, fieldLabel: string) =>
     <input aria-label={`${label}: ${item.name} ${fieldLabel}`} value={item[key]}
@@ -54,8 +56,14 @@ export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
   return <section className="pisi-terminal-editor" aria-label={label}>
     <header className="pisi-terminal-editor__summary">
       <h3>{label}</h3><span>{rows.length} {rows.length === 1 ? "terminal" : "terminals"}</span>
+      <div className="pisi-terminal-editor__view" role="group" aria-label={`${label} layout`}>
+        <button type="button" aria-pressed={!tableView} onClick={() => setTableView(false)}>Cards</button>
+        <button type="button" aria-pressed={tableView} onClick={() => setTableView(true)}>Table</button>
+      </div>
     </header>
-    <div className="pisi-terminal-editor__cards">
+    {tableView ? <TerminalTable rows={rows} label={label} layers={layers} valueLabel={valueLabel}
+      transient={transient} readOnlyValue={readOnlyValue} onChange={onChange} onRemove={onRemove}
+      renderDetails={renderDetails} emptyMessage={emptyMessage} embedded /> : <div className="pisi-terminal-editor__cards">
       {rows.map((item, index) => {
         const detailsOpen = expanded === item.id;
         const detailsId = `${controlId}-terminal-details-${index}`;
@@ -98,8 +106,8 @@ export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
           {detailsOpen && <div className="pisi-terminal-editor__details" id={detailsId}>{renderDetails(item, index)}</div>}
         </article>;
       })}
-    </div>
-    {!rows.length && <p className="pisi-terminal-editor__empty">{emptyMessage}</p>}
+    </div>}
+    {!tableView && !rows.length && <p className="pisi-terminal-editor__empty">{emptyMessage}</p>}
     <footer className="pisi-terminal-editor__toolbar" aria-label={`${label} actions`}>
       <button type="button" onClick={onAdd}><Plus size={14} aria-hidden="true" /> {addLabel}</button>
       <button type="button" className={pickActive ? "selected" : ""} aria-pressed={pickActive} onClick={onTogglePick}>

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import DataTable from "./DataTable";
+import { APP_SETTINGS_STORAGE_KEY, loadAppSettings } from "./appSettings";
 import {
   isToolWindowKind,
   decodeDetachedRowId,
@@ -266,10 +268,10 @@ export function DetachedToolContent({ snapshot, kind, onAction }: {
   return <main className="detached-tool-root" data-detached-tool={kind}>
     <header className="detached-tool-header"><div><span className="detached-tool-eyebrow">{kind === "results" ? "SPIKE ANALYSIS RESULTS" : "SPIKE MEASUREMENT TABLE"}</span><h1>{snapshot?.title ?? (kind === "results" ? "Results" : "Probe table")}</h1>{snapshot?.status && <p>{snapshot.status}</p>}</div><button className="detached-tool-button detached-tool-button-primary" onClick={() => onAction({ type: "redock" })}>Return to workspace</button></header>
     {snapshot?.controls?.length ? <section className="detached-tool-toolbar" aria-label={`${snapshot.title} controls`}>{snapshot.controls.map(control => <ToolControl key={control.id} control={control} emit={value => onAction({ type: "control-change", controlId: control.id, value })} />)}</section> : null}
-    {!snapshot ? <p className="detached-tool-empty">Waiting for the workspace state...</p> : snapshot.rows.length === 0 ? <p className="detached-tool-empty">{snapshot.emptyMessage}</p> : <div className="detached-tool-table-scroll"><table className="detached-tool-table">
+    {!snapshot ? <p className="detached-tool-empty">Waiting for the workspace state...</p> : snapshot.rows.length === 0 ? <p className="detached-tool-empty">{snapshot.emptyMessage}</p> : <div className="detached-tool-table-scroll"><DataTable label="Detached tool results" className="detached-tool-table">
       <thead><tr>{snapshot.columns.map((column, index) => <th key={`${column}-${index}`}>{column}</th>)}{hasActions ? <th>Actions</th> : null}</tr></thead>
       <tbody>{snapshot.rows.map(row => { const actions = row.actions ?? snapshot.rowActions ?? []; return <tr key={row.id} title={row.title}>{row.cells.map((cell, index) => <td key={index}>{row.editActions?.[index] ? <EditableCell value={cell} commit={value => onAction({ type: "row-action", rowId: row.id, actionId: row.editActions![index], value })} /> : cell ?? "-"}</td>)}{hasActions ? <td className="detached-tool-row-actions">{actions.map(action => <button className={`detached-tool-button detached-tool-button-small${action.destructive ? " destructive" : ""}`} key={action.id} onClick={() => onAction({ type: "row-action", rowId: row.id, actionId: action.id })}>{action.label}</button>)}</td> : null}</tr>; })}</tbody>
-    </table></div>}
+    </DataTable></div>}
   </main>;
 }
 
@@ -277,6 +279,13 @@ export function DetachedToolWindowRoot({ kind }: { kind: ToolWindowKind }) {
   const [snapshot, setSnapshot] = useState<DetachedToolSnapshot | null>(null);
   const label = useMemo(() => labels[kind], [kind]);
   const token = useMemo(() => new URLSearchParams(window.location.search).get("spikeToolToken"), []);
+  useEffect(() => {
+    const syncTheme = () => { document.documentElement.dataset.theme = loadAppSettings().theme; };
+    const changed = (event: StorageEvent) => { if (event.key === APP_SETTINGS_STORAGE_KEY || event.key === null) syncTheme(); };
+    syncTheme();
+    window.addEventListener("storage", changed);
+    return () => window.removeEventListener("storage", changed);
+  }, []);
   useEffect(() => {
     let disposed = false;
     let unlisten: (() => void) | undefined;

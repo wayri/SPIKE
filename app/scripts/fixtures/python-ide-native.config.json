@@ -1,0 +1,4 @@
+{
+  "build": { "beforeDevCommand": "", "devUrl": "http://127.0.0.1:5173" },
+  "app": { "windows": [{ "label": "main", "title": "SPIKE | Python IDE fixture", "url": "scripts/fixtures/python-ide.html", "width": 1366, "height": 768, "minWidth": 900, "minHeight": 620, "resizable": true, "center": true }] }
+}

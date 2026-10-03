@@ -1,6 +1,7 @@
 import { solverReadinessLabel } from "./solverReadinessLabel";
+import DataTable from "./DataTable";
 import { Activity, Box, CheckCircle2, Cpu, FileCode2, Gauge, Play, RefreshCw, Save, ShieldAlert, Trash2, X, Zap } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 export type ExternalEngineCatalogEntry = {
   id: string;
@@ -74,6 +75,7 @@ export type SolverManagerCatalog = {
 };
 
 type Props = {
+  extensionWorkflows?: ReactNode;
   engines: ExternalEngineCatalogEntry[];
   accelerators: AccelerationCatalogEntry[];
   manager: SolverManagerCatalog;
@@ -157,8 +159,9 @@ export default function ExternalEngineCenter({
   onUnregister,
   onTune,
   onSelectSolver,
+  extensionWorkflows,
 }: Props) {
-  const [section, setSection] = useState<"engines" | "acceleration" | "manager">("engines");
+  const [section, setSection] = useState<"engines" | "acceleration" | "manager" | "extensions">("engines");
   const [selectedId, setSelectedId] = useState("external.openems");
   const [registrationPath, setRegistrationPath] = useState("");
   const [workloadId, setWorkloadId] = useState("dc_pi");
@@ -204,10 +207,11 @@ export default function ExternalEngineCenter({
         <button className={section === "engines" ? "selected" : ""} onClick={() => setSection("engines")}><Box size={14} /> Engines</button>
         <button className={section === "acceleration" ? "selected" : ""} onClick={() => setSection("acceleration")}><Cpu size={14} /> Acceleration</button>
         <button className={section === "manager" ? "selected" : ""} onClick={() => setSection("manager")}><Gauge size={14} /> Solver manager</button>
+        {extensionWorkflows && <button className={section === "extensions" ? "selected" : ""} onClick={() => setSection("extensions")}><Box size={14} /> Extension workflows</button>}
         <button className="engine-refresh" onClick={onRefresh} disabled={busy}><RefreshCw size={13} /> Detect</button>
       </div>
 
-      {section === "engines" ? <div className="engine-layout">
+      {section === "extensions" ? <article className="engine-detail">{extensionWorkflows}</article> : section === "engines" ? <div className="engine-layout">
         <nav className="engine-list" aria-label="External engines">{visibleEngines.map(engine => <button key={engine.id} className={selected?.id === engine.id ? "selected" : ""} onClick={() => setSelectedId(engine.id)}>
           <span className={`engine-dot ${available(engine.state) ? "ready" : "gated"}`} />
           <span><b>{engine.name}</b><small>{readableState(engine.state)}</small></span>
@@ -252,17 +256,17 @@ export default function ExternalEngineCenter({
           <div className="manager-policy"><Gauge size={17} /><span><b>Best available, never silent fallback</b><small>{readableState(manager.selection_policy)}. Approximate and experimental engines retain their validity labels.</small></span></div>
           <label className="engine-label" htmlFor="solver-workload">WORKLOAD</label>
           <select id="solver-workload" value={workload?.id ?? ""} onChange={event => setWorkloadId(event.target.value)}>{visibleWorkloads.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select>
-          {workload && <div className="engine-registration"><label className="engine-label" htmlFor="solver-candidate">EXPLICIT SOLVER PLUGIN</label><div className="register-path"><select id="solver-candidate" value={selectedCandidateId} onChange={event => setCandidateDrafts(current => ({ ...current, [workload.id]: event.target.value }))}>{workload.candidates.map(candidate => <option key={candidate.id} value={candidate.id}>{candidate.name} · {solverReadinessLabel(candidate)}</option>)}</select><button disabled={busy || !selectedCandidateId} onClick={() => onSelectSolver(workload.id, selectedCandidateId)}><Save size={13} /> Select</button></div><small>{solverSelections[workload.id] ? `Project selection: ${solverSelections[workload.id]}.` : "No project selection is stored for this workload."} Selection never substitutes another solver and does not bypass route-specific geometry or validation gates.</small></div>}
+          {workload && <div className="engine-registration"><label className="engine-label" htmlFor="solver-candidate">EXPLICIT SOLVER PLUGIN</label><div className="register-path"><select id="solver-candidate" value={selectedCandidateId} onChange={event => setCandidateDrafts(current => ({ ...current, [workload.id]: event.target.value }))}>{workload.candidates.map(candidate => <option key={candidate.id} value={candidate.id}>{candidate.name} Â· {solverReadinessLabel(candidate)}</option>)}</select><button disabled={busy || !selectedCandidateId} onClick={() => onSelectSolver(workload.id, selectedCandidateId)}><Save size={13} /> Select</button></div><small>{solverSelections[workload.id] ? `Project selection: ${solverSelections[workload.id]}.` : "No project selection is stored for this workload."} Selection never substitutes another solver and does not bypass route-specific geometry or validation gates.</small></div>}
           {workload && <div className={`manager-recommendation ${workload.recommended ? "ready" : "gated"}`}><header><span><b>{workload.recommended?.name ?? "No runnable solver"}</b><small>{readableState(workload.status)} / {workload.domain.toUpperCase()}</small></span><i>{workload.recommended ? readableState(workload.recommended.model_status) : "capability gap"}</i></header><p>{workload.recommended?.reason ?? `Required: ${workload.required.map(readableState).join(", ")}`}</p></div>}
           <label className="engine-label">SELECTED WORKLOAD CANDIDATES</label>
           <div className="manager-candidates">{workload?.candidates.map(candidate => <article key={candidate.id}><span className={`engine-dot ${candidate.eligible ? "ready" : "gated"}`} /><span><b>{candidate.name}</b><small>{readableState(candidate.state)}</small><em>{candidate.reason}</em>{candidate.missing.length > 0 && <small>Missing workflow capabilities: {candidate.missing.map(readableState).join(", ")}</small>}</span></article>)}</div>
           <label className="engine-label">WORKLOAD READINESS MATRIX</label>
-          <div className="manager-matrix-wrap"><table className="manager-matrix"><thead><tr><th>Workload</th><th>Candidate</th><th>State</th><th>Gate</th></tr></thead><tbody>{workloadRows.map(({ workload: matrixWorkload, candidate }) => <tr key={`${matrixWorkload.id}:${candidate.id}`}>
+          <div className="manager-matrix-wrap"><DataTable label="External engine workload matrix" className="manager-matrix"><thead><tr><th>Workload</th><th>Candidate</th><th>State</th><th>Gate</th></tr></thead><tbody>{workloadRows.map(({ workload: matrixWorkload, candidate }) => <tr key={`${matrixWorkload.id}:${candidate.id}`}>
             <td><b>{matrixWorkload.name}</b><small>{matrixWorkload.required.map(readableState).join(", ") || "No declared requirements"}</small></td>
             <td>{candidate.name}</td>
             <td><i className={candidate.eligible ? "ready" : "gated"}>{solverReadinessLabel(candidate)}</i></td>
             <td title={candidate.reason}>{candidate.missing.length ? candidate.missing.map(readableState).join(", ") : candidate.reason}</td>
-          </tr>)}</tbody></table></div>
+          </tr>)}</tbody></DataTable></div>
           <label className="engine-label">EMI PIPELINE</label>
           <div className="emi-pipeline">{manager.emi_pipeline.stages.map(stage => <article key={stage.id}><b>{readableState(stage.id)}</b><i>{readableState(stage.state)}</i><small>{stage.detail}</small></article>)}</div>
         </section>

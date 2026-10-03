@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DataTable from "./DataTable";
 import type { AssemblyIr, AssemblyDesigns } from "./mcadAssembly";
 import { runLocalWorker, saveNativeTextFile } from "./workerBridge";
 
@@ -68,7 +69,7 @@ export default function HarnessAutoPlanner({ assembly, designs, onApply, onStatu
     <button className="secondary-btn" disabled={busy || assembly.boards.length < 2} onClick={() => void generate()}>{busy ? "Planning…" : "Generate harness proposal"}</button>
     {plan && <div aria-live="polite">
       <p>{plan.harnesses.length} harnesses · {plan.wire_list.length} conductors · {(plan.total_wire_length_mm / 1000).toFixed(3)} m total cut length{stale ? " · Inputs changed; regenerate proposal" : ""}</p>
-      <table className="data-table"><thead><tr><th>From</th><th>To</th><th>Pins</th><th>Cut length</th></tr></thead><tbody>{plan.harnesses.map(h => <tr key={String(h.id)}><td>{String(h.endpoint_a)}</td><td>{String(h.endpoint_b)}</td><td>{JSON.stringify(h.pin_map)}</td><td>{Number(h.length_mm).toFixed(1)} mm</td></tr>)}</tbody></table>
+      <DataTable label="Planned harness routes" className="data-table"><thead><tr><th>From</th><th>To</th><th>Pins</th><th>Cut length</th></tr></thead><tbody>{plan.harnesses.map(h => <tr key={String(h.id)}><td>{String(h.endpoint_a)}</td><td>{String(h.endpoint_b)}</td><td>{JSON.stringify(h.pin_map)}</td><td>{Number(h.length_mm).toFixed(1)} mm</td></tr>)}</tbody></DataTable>
       {plan.diagnostics.map((d, i) => <p key={i}>{d.message}</p>)}
       <p>Routes avoid the declared boxes. Bend radius, physical fit, connector compatibility and electrical ratings require review.</p>
       <button className="run-btn" disabled={busy || stale || !plan.harnesses.length} onClick={() => { onApply(plan); setPlan(null); }}>Add proposal to assembly draft</button>

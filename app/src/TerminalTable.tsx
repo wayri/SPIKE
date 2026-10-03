@@ -1,4 +1,5 @@
 import { Fragment, useState, type ReactNode } from "react";
+import DataTable from "./DataTable";
 import "./TerminalTable.css";
 
 export type TerminalTableRow = {
@@ -9,20 +10,21 @@ export type TerminalTableRow = {
 /** One authoritative terminal record per row; expensive pad/waveform editors are lazy. */
 export default function TerminalTable<T extends TerminalTableRow>({
   rows, label, layers, valueLabel, transient = false, readOnlyValue,
-  onChange, onRemove, renderDetails,
+  onChange, onRemove, renderDetails, embedded = false, emptyMessage = "No terminals. Add one below or use the board selection.",
 }: {
   rows: T[]; label: string; layers: string[]; valueLabel: string;
   transient?: boolean; readOnlyValue?: (item: T, index: number) => string;
   onChange: (id: string, patch: Partial<TerminalTableRow>) => void;
   onRemove: (id: string) => void; renderDetails: (item: T, index: number) => ReactNode;
+  emptyMessage?: string;
+  embedded?: boolean;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const field = (item: T, key: keyof Omit<TerminalTableRow, "id" | "layer">, title: string) =>
-    <input aria-label={`${label}: ${item.name} ${title}`} value={item[key]}
+    <input aria-label={`${label}: ${item.name} ${title}`} title={`${title}: ${item[key]}`} value={item[key]}
       onChange={event => onChange(item.id, { [key]: event.target.value })} />;
   return <div className="terminal-table-scroll" role="region" aria-label={label} tabIndex={0}>
-    <table className="terminal-table">
-      <caption>{label} · {rows.length} {rows.length === 1 ? "terminal" : "terminals"}</caption>
+    <DataTable label={label} showLabel={!embedded} className="terminal-table" emptyMessage={emptyMessage}>
       <thead><tr><th scope="col">Name</th><th scope="col">X (mm)</th><th scope="col">Y (mm)</th>
         <th scope="col">Connection</th><th scope="col">{transient ? "Waveform" : valueLabel}</th>
         <th scope="col">Contact R (Ω)</th><th scope="col">Package R (Ω)</th><th scope="col">Actions</th></tr></thead>
@@ -34,7 +36,7 @@ export default function TerminalTable<T extends TerminalTableRow>({
             <option value="auto">Auto — connected copper</option>
             {layers.map(layer => <option key={layer} value={layer}>{layer} only</option>)}
           </select></td>
-          <td>{readOnlyValue ? <span>{readOnlyValue(item, index)}</span> : transient
+          <td>{readOnlyValue ? <span className="spike-table-readonly-value" title="Read only">{readOnlyValue(item, index)}</span> : transient
             ? <button type="button" onClick={() => setExpanded(item.id)}>Edit waveform</button>
             : field(item, "value", valueLabel)}</td>
           <td>{field(item, "contactResistance", "contact resistance")}</td>
@@ -42,11 +44,10 @@ export default function TerminalTable<T extends TerminalTableRow>({
           <td><div className="terminal-table-actions"><button type="button" aria-expanded={expanded === item.id}
             aria-label={`Edit pads and details for ${item.name}`} onClick={() => setExpanded(expanded === item.id ? null : item.id)}>
             {expanded === item.id ? "Close details" : "Pads / details"}</button>
-            <button type="button" aria-label={`Remove ${item.name}`} onClick={() => onRemove(item.id)}>×</button></div></td>
+            <button className="spike-table-remove" type="button" title={`Remove ${item.name}`} aria-label={`Remove ${item.name}`} onClick={() => onRemove(item.id)}>×</button></div></td>
         </tr>
         {expanded === item.id && <tr className="terminal-table-detail"><td colSpan={8}>{renderDetails(item, index)}</td></tr>}
       </Fragment>)}</tbody>
-    </table>
-    {!rows.length && <p className="terminal-table-empty">No terminals. Add one below or use the board selection.</p>}
+    </DataTable>
   </div>;
 }

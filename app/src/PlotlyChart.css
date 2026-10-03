@@ -1,0 +1,50 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+@import "./tableTheme.css";
+.spike-plot.trace-plot-host { position: relative; isolation: isolate; width: 100%; height: var(--spike-plot-height, 430px); min-width: 0; min-height: 320px; display: grid; grid-template-rows: auto minmax(160px, 1fr) auto; grid-auto-rows: auto; overflow: hidden; border: 1px solid var(--spike-table-border); border-radius: 5px; color: var(--spike-table-text); background: var(--spike-table-surface); font: 11px/1.4 Inter, "Segoe UI", sans-serif; }
+.spike-plot-toolbar.command-strip { min-height: 34px; padding: 3px; border-bottom: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); }
+.spike-plot-toolbar .command-strip-viewport { gap: 4px; align-items: center; }
+.spike-plot.spike-plot button, .spike-plot-menu button { min-height: 26px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 3px 7px; border: 1px solid var(--spike-table-border); border-radius: 4px; background: var(--spike-table-surface); color: var(--spike-table-text); font: 11px/1.3 Inter, "Segoe UI", sans-serif; cursor: pointer; white-space: nowrap; }
+.spike-plot.spike-plot button > svg { width: 14px; height: 14px; min-height: 0; max-height: none; flex: 0 0 14px; }
+.spike-plot.spike-plot button:hover:not(:disabled), .spike-plot-menu button:hover:not(:disabled) { background: var(--spike-table-hover); border-color: var(--spike-table-border-strong); }
+.spike-plot.spike-plot button:disabled, .spike-plot-menu button:disabled { opacity: .45; cursor: default; }
+.spike-plot.spike-plot button[aria-pressed="true"] { color: var(--spike-table-focus); border-color: var(--spike-table-focus); }
+.spike-plot :focus-visible, .spike-plot-menu :focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: -2px; }
+.spike-plot-surface { position: relative; min-height: 0; min-width: 0; overflow: hidden; }
+.spike-plot.trace-plot-host .trace-plot-canvas { position: absolute; inset: 0; min-width: 0; min-height: 0; }
+.spike-plot .main-svg { width: 100%; height: 100%; min-height: 0; max-height: none; }
+.spike-plot.trace-plot-host .trace-plot-loading, .spike-plot.trace-plot-host .trace-plot-error { position: absolute; inset: 0; min-height: 0; display: grid; place-content: center; gap: 8px; padding: 12px; color: var(--spike-table-text); background: var(--spike-table-surface); text-align: center; overflow: auto; }
+.spike-plot.trace-plot-host .trace-plot-loading { pointer-events: none; }
+.spike-plot-hint { padding: 4px 8px; color: var(--spike-table-muted); font-size: 10px; border-top: 1px solid var(--spike-table-border); }
+.spike-plot-notice { padding: 5px 8px; color: var(--spike-table-focus); background: var(--spike-table-toolbar); overflow-wrap: anywhere; }
+.spike-plot-paste { min-width: 0; display: grid; gap: 7px; padding: 8px; max-height: 180px; overflow: auto; border-top: 1px solid var(--spike-table-border); }
+.spike-plot-paste label { display: grid; gap: 4px; color: var(--spike-table-muted); }
+.spike-plot-paste textarea { width: 100%; min-height: 60px; max-height: 100px; resize: vertical; border: 1px solid var(--spike-table-choice-border); color: var(--spike-table-text); background: var(--spike-table-surface); padding: 6px; font: 11px/1.4 ui-monospace, monospace; }
+.spike-plot-paste > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.spike-plot-menu { position: fixed; z-index: var(--z-plot-menu, 1300); width: min(230px, calc(100vw - 16px)); max-height: min(330px, calc(100dvh - 16px)); overflow: auto; display: grid; gap: 3px; padding: 5px; border: 1px solid var(--spike-table-border-strong); border-radius: 6px; color: var(--spike-table-text); background: var(--spike-table-toolbar); box-shadow: 0 8px 30px #0008; font: 11px/1.4 Inter, "Segoe UI", sans-serif; }
+.spike-plot-menu button { width: 100%; justify-content: flex-start; min-height: 30px; border: 0; background: transparent; }
+.si-plot .spike-plot.trace-plot-host, .si-plot-window-body .spike-plot.trace-plot-host { height: 100%; }
+.si-channel-chart .spike-plot.trace-plot-host { height: 100%; }
+.si-channel-chart.expanded .spike-plot { height: 100%; }
+@media (max-height: 700px), (max-width: 1100px) { .spike-plot.trace-plot-host { height: var(--spike-plot-height, 350px); min-height: 280px; } }
+@media (forced-colors: active) { .spike-plot :focus-visible, .spike-plot-menu :focus-visible { outline-color: Highlight; } }
+
+.spike-plot-axis-editor { box-sizing: border-box; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 16px; border: 1px solid var(--spike-table-border-strong); border-radius: 7px; color: var(--spike-table-text); background: var(--spike-table-toolbar); font: 12px/1.4 Inter, "Segoe UI", sans-serif; }
+.spike-plot-axis-editor::backdrop { background: #0008; }
+.spike-plot-axis-editor header, .spike-plot-axis-editor footer, .spike-plot-axis-options { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.spike-plot-axis-editor header { justify-content: space-between; }
+.spike-plot-axis-editor h3 { margin: 0; font-size: 14px; }
+.spike-plot-axis-editor p { color: var(--spike-table-muted); }
+.spike-plot-axis-editor [role=alert] { color: var(--spike-table-focus); }
+.spike-plot-axis-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.spike-plot-axis-editor fieldset { display: grid; gap: 8px; min-width: 0; margin: 0; padding: 10px; border: 1px solid var(--spike-table-border); border-radius: 4px; }
+.spike-plot-axis-editor legend { overflow-wrap: anywhere; }
+.spike-plot-axis-editor label { display: grid; gap: 4px; }
+.spike-plot-axis-editor .spike-plot-axis-check { display: flex; align-items: center; gap: 6px; }
+.spike-plot-axis-editor input, .spike-plot-axis-editor select { min-width: 0; box-sizing: border-box; width: 100%; height: 28px; padding: 3px 6px; color: var(--spike-table-text); background: var(--spike-table-surface); border: 1px solid var(--spike-table-choice-border); border-radius: 4px; font: 12px/1.3 Inter, "Segoe UI", sans-serif; }
+.spike-plot-axis-editor input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--spike-table-focus); }
+.spike-plot-axis-editor input:disabled { opacity: .5; }
+.spike-plot-axis-options { margin: 12px 0; }
+.spike-plot-axis-editor :focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: 1px; }
+@media (max-width: 480px) { .spike-plot-axis-fields { grid-template-columns: minmax(0, 1fr); } }
+.spike-plot-scene-labels { display: block; color: var(--spike-table-text); overflow-wrap: anywhere; }
+.si-cursor-readout > span, .si-cursor-readout > b { min-width: 0; overflow-wrap: anywhere; }

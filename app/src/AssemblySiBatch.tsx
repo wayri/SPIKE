@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DataTable from "./DataTable";
 import type { AssemblyDesigns, AssemblyIr } from "./mcadAssembly";
 import { openNativeTextFile, runLocalWorker, saveNativeTextFile } from "./workerBridge";
 
@@ -38,8 +39,8 @@ export default function AssemblySiBatch({ assembly, designs, disabled, onStatus 
   const rows = (Array.isArray(result?.jobs) ? result.jobs : []) as Array<{ board_id: string; namespace: string; result?: { status?: string } }>;
   return <section><h4>Independent SI batch execution</h4>
     <p>Assign a reviewed SI suite request to each board to analyze. Unassigned boards are skipped. Harness and cross-board field coupling are excluded. Setups and results here are session-only; export results before closing.</p>
-    <table className="data-table"><thead><tr><th>Board</th><th>Design</th><th>Suite setup</th></tr></thead><tbody>{boards.map(board => <tr key={board.id}><td>{board.name || board.id}</td><td>{board.design_id}</td><td><button disabled={disabled || busy} onClick={() => void load(board.id)}>{jobs[board.id] ? "Replace suite JSON" : "Load suite JSON"}</button>{jobs[board.id] && <button disabled={busy} onClick={() => { setJobs(current => { const next = { ...current }; delete next[board.id]; return next; }); setResult(null); }}>Remove</button>}</td></tr>)}</tbody></table>
+    <DataTable label="Assembly SI batch setup" className="data-table"><thead><tr><th>Board</th><th>Design</th><th>Suite setup</th></tr></thead><tbody>{boards.map(board => <tr key={board.id}><td>{board.name || board.id}</td><td>{board.design_id}</td><td><button disabled={disabled || busy} onClick={() => void load(board.id)}>{jobs[board.id] ? "Replace suite JSON" : "Load suite JSON"}</button>{jobs[board.id] && <button disabled={busy} onClick={() => { setJobs(current => { const next = { ...current }; delete next[board.id]; return next; }); setResult(null); }}>Remove</button>}</td></tr>)}</tbody></DataTable>
     <button disabled={disabled || busy || !boards.some(board => jobs[board.id])} onClick={() => void run()}>{busy ? "Running sequential board jobs…" : "Run assigned independent SI jobs"}</button>
-    {result && <><button onClick={() => void saveNativeTextFile("assembly-si-batch.json", JSON.stringify(result, null, 2), "result").catch(error => onStatus(String(error)))}>Export batch results</button><table className="data-table"><thead><tr><th>Board</th><th>Namespace</th><th>Status</th></tr></thead><tbody>{rows.map(row => <tr key={row.board_id}><td>{row.board_id}</td><td>{row.namespace}</td><td>{row.result?.status || "Returned"}</td></tr>)}</tbody></table></>}
+    {result && <><button onClick={() => void saveNativeTextFile("assembly-si-batch.json", JSON.stringify(result, null, 2), "result").catch(error => onStatus(String(error)))}>Export batch results</button><DataTable label="Assembly SI batch results" className="data-table"><thead><tr><th>Board</th><th>Namespace</th><th>Status</th></tr></thead><tbody>{rows.map(row => <tr key={row.board_id}><td>{row.board_id}</td><td>{row.namespace}</td><td>{row.result?.status || "Returned"}</td></tr>)}</tbody></DataTable></>}
   </section>;
 }

@@ -1,6 +1,6 @@
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import DataTable from "./DataTable";
 import type { ParsedBoard } from "./boardParser";
-import { onSpreadsheetFocus, onSpreadsheetKeyDown } from "./spreadsheetGrid";
 import { componentThermalElements, screenThermalElements, thermalMaterials, ThermalElement, ThermalLink, thermalSurfaceFinishes } from "./thermalAssembly";
 
 type Props = { board: ParsedBoard | null; ambientC: number; elements: ThermalElement[]; links: ThermalLink[]; onElements: (value: ThermalElement[]) => void; onLinks: (value: ThermalLink[]) => void };
@@ -31,7 +31,7 @@ export default function ThermalAssemblyEditor({ board, ambientC, elements, links
       <div className="thermal-section-heading"><label>PARTS, BOARDS, AND MECHANICAL OBJECTS</label><span>{elements.length}/256</span><button disabled={!board} onClick={syncParts}><RefreshCw size={13} /> Sync board parts</button><button disabled={elements.length >= 256} onClick={addMechanical}><Plus size={13} /> Mechanical object</button></div>
       <p className="thermal-table-note">These solver inputs manipulate thermal representations without changing source CAD. Blank resistance or limit cells remain explicitly unspecified.</p>
       {(elements.length >= 256 || (board?.components.length ?? 0) > 256) && <p className="thermal-table-note">Sync preserves existing inputs and fills only available rows up to 256. Remove unused rows to add other board parts, or import a BOM containing the required references.</p>}
-      <div className="thermal-table-scroll"><table className="thermal-input-table thermal-spreadsheet" onFocusCapture={onSpreadsheetFocus} onKeyDown={onSpreadsheetKeyDown}><thead><tr><th>#</th><th>On</th><th>Object</th><th>Type</th><th>Model / STEP</th><th>Power W</th><th>Heat capacity J/K</th><th>Initial °C</th><th>Material</th><th>Surface</th><th>Emiss.</th><th>Rth top</th><th>Rth bottom</th><th>Rth JC</th><th>Tj max</th><th>Tcase max</th><th>X</th><th>Y</th><th>Z</th><th>Size X</th><th>Size Y</th><th>Size Z</th><th>Screen</th><th /></tr></thead><tbody>{elements.map((element, rowIndex) => {
+      <div className="thermal-table-scroll"><DataTable label="Thermal assembly elements" className="thermal-input-table thermal-spreadsheet"><thead><tr><th>#</th><th>On</th><th>Object</th><th>Type</th><th>Model / STEP</th><th>Power W</th><th>Heat capacity J/K</th><th>Initial °C</th><th>Material</th><th>Surface</th><th>Emiss.</th><th>Rth top</th><th>Rth bottom</th><th>Rth JC</th><th>Tj max</th><th>Tcase max</th><th>X</th><th>Y</th><th>Z</th><th>Size X</th><th>Size Y</th><th>Size Z</th><th>Screen</th><th /></tr></thead><tbody>{elements.map((element, rowIndex) => {
         const check = screening.find(item => item.element_id === element.id);
         return <tr key={element.id} className={`thermal-screen-${check?.status ?? "unrated"}`}>
           <td className="thermal-row-number">{rowIndex + 1}</td>
@@ -51,11 +51,11 @@ export default function ThermalAssemblyEditor({ board, ambientC, elements, links
           <td><span className={`thermal-screen-badge ${check?.status ?? "unrated"}`} title={check?.estimated_junction_c === null ? "Add thermal resistance data" : `Estimated ${check?.estimated_junction_c?.toFixed(1)} C; margin ${check?.margin_c?.toFixed(1)} C`}>{check?.status ?? "unrated"}</span></td>
           <td><button onClick={() => onElements(elements.filter(row => row.id !== element.id))}><Trash2 size={13} /></button></td>
         </tr>;
-      })}</tbody></table></div>
+      })}</tbody></DataTable></div>
     </div>
     <div className="wizard-section thermal-assembly-section">
       <div className="thermal-section-heading"><label>THERMAL LINKS AND CONTACTS</label><span>{links.length}</span><button disabled={elements.length < 2} onClick={addLink}><Plus size={13} /> Add link</button></div>
-      <div className="thermal-table-scroll"><table className="thermal-input-table thermal-link-table thermal-spreadsheet" onFocusCapture={onSpreadsheetFocus} onKeyDown={onSpreadsheetKeyDown}><thead><tr><th>#</th><th>On</th><th>From</th><th>To</th><th>Interface</th><th>Rth C/W</th><th>Area mm2</th><th>Thickness mm</th><th>Material</th><th /></tr></thead><tbody>{links.map((link, rowIndex) => <tr key={link.id}>
+      <div className="thermal-table-scroll"><DataTable label="Thermal assembly links" className="thermal-input-table thermal-link-table thermal-spreadsheet"><thead><tr><th>#</th><th>On</th><th>From</th><th>To</th><th>Interface</th><th>Rth C/W</th><th>Area mm2</th><th>Thickness mm</th><th>Material</th><th /></tr></thead><tbody>{links.map((link, rowIndex) => <tr key={link.id}>
         <td className="thermal-row-number">{rowIndex + 1}</td>
         <td><input type="checkbox" checked={link.enabled} onChange={event => editLink(link.id, { enabled: event.target.checked })} /></td>
         <td><select value={link.from_id} onChange={event => editLink(link.id, { from_id: event.target.value })}>{elements.map(element => <option key={element.id} value={element.id}>{element.reference}</option>)}</select></td>
@@ -64,8 +64,8 @@ export default function ThermalAssemblyEditor({ board, ambientC, elements, links
         {(["resistance_c_per_w", "contact_area_mm2", "thickness_mm"] as const).map(field => <td key={field}><input type="number" min="0" step="0.01" value={link[field]} onChange={event => editLink(link.id, { [field]: num(event.target.value) })} /></td>)}
         <td><select value={link.material_id} onChange={event => editLink(link.id, { material_id: event.target.value })}>{thermalMaterials.filter(material => material.category === "interface" || material.category === "metal").map(material => <option key={material.id} value={material.id}>{material.name}</option>)}</select></td>
         <td><button onClick={() => onLinks(links.filter(row => row.id !== link.id))}><Trash2 size={13} /></button></td>
-      </tr>)}</tbody></table></div>
+      </tr>)}</tbody></DataTable></div>
     </div>
-    <details className="wizard-section thermal-material-library"><summary>MATERIAL PROPERTY LIBRARY <span>{thermalMaterials.length} materials · {thermalSurfaceFinishes.length} finishes</span></summary><div className="thermal-table-scroll"><table className="thermal-input-table"><thead><tr><th>Material</th><th>Class</th><th>k W/mK</th><th>Density</th><th>Cp</th><th>Emiss.</th><th>Max C</th><th>Tg C</th></tr></thead><tbody>{thermalMaterials.map(material => <tr key={material.id}><td>{material.name}</td><td>{material.category}</td><td>{material.conductivity_w_mk}</td><td>{material.density_kg_m3}</td><td>{material.specific_heat_j_kgk}</td><td>{material.emissivity}</td><td>{material.max_temperature_c ?? "-"}</td><td>{material.glass_transition_c ?? "-"}</td></tr>)}</tbody></table></div></details>
+    <details className="wizard-section thermal-material-library"><summary>MATERIAL PROPERTY LIBRARY <span>{thermalMaterials.length} materials · {thermalSurfaceFinishes.length} finishes</span></summary><div className="thermal-table-scroll"><DataTable label="Thermal material library" className="thermal-input-table"><thead><tr><th>Material</th><th>Class</th><th>k W/mK</th><th>Density</th><th>Cp</th><th>Emiss.</th><th>Max C</th><th>Tg C</th></tr></thead><tbody>{thermalMaterials.map(material => <tr key={material.id}><td>{material.name}</td><td>{material.category}</td><td>{material.conductivity_w_mk}</td><td>{material.density_kg_m3}</td><td>{material.specific_heat_j_kgk}</td><td>{material.emissivity}</td><td>{material.max_temperature_c ?? "-"}</td><td>{material.glass_transition_c ?? "-"}</td></tr>)}</tbody></DataTable></div></details>
   </>;
 }

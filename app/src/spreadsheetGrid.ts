@@ -1,35 +1,45 @@
-import type { FocusEvent, KeyboardEvent } from "react";
+// SPDX-License-Identifier: Apache-2.0
+import type { KeyboardEvent } from "react";
 
-const focusGridCell = (table: HTMLTableElement, rowIndex: number, columnIndex: number) => {
-  const row = table.tBodies[0]?.rows[rowIndex];
-  const control = row?.cells[columnIndex]?.querySelector<HTMLInputElement | HTMLSelectElement>("input:not([type='checkbox']), select, input[type='checkbox']");
-  control?.focus();
-  if (control instanceof HTMLInputElement && control.type !== "checkbox") control.select();
-};
+const fields = "input:not([type='hidden']), select, textarea";
+const editable = (element: Element): element is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement =>
+  element.matches(fields) && !element.matches(":disabled, [readonly], [tabindex='-1']") && element.getClientRects().length > 0;
 
-export const onSpreadsheetFocus = (event: FocusEvent<HTMLTableElement>) => {
+/** Normal arrows edit text/numbers/selects. Explicit Alt+arrows navigate the table. */
+export function onSpreadsheetKeyDown(event: KeyboardEvent<HTMLTableElement>) {
+  if (event.defaultPrevented || event.nativeEvent.isComposing || event.ctrlKey || event.metaKey) return;
+  const target = event.target;
   const table = event.currentTarget;
-  table.querySelectorAll("td.grid-cell-active").forEach(cell => cell.classList.remove("grid-cell-active"));
-  (event.target as HTMLElement).closest("td")?.classList.add("grid-cell-active");
-};
-
-export const onSpreadsheetKeyDown = (event: KeyboardEvent<HTMLTableElement>) => {
-  const control = event.target as HTMLInputElement | HTMLSelectElement;
-  const cell = control.closest("td");
-  const row = control.closest("tr");
-  const table = event.currentTarget;
-  if (!cell || !row || !table.tBodies[0]) return;
-  const rowIndex = row.sectionRowIndex;
-  const columnIndex = cell.cellIndex;
-  let nextRow = rowIndex;
-  let nextColumn = columnIndex;
-  if (event.key === "Enter") nextRow += event.shiftKey ? -1 : 1;
-  else if (event.key === "ArrowUp") nextRow -= 1;
-  else if (event.key === "ArrowDown") nextRow += 1;
-  else if (event.key === "ArrowLeft" && (control instanceof HTMLSelectElement || control.selectionStart === 0)) nextColumn -= 1;
-  else if (event.key === "ArrowRight" && (control instanceof HTMLSelectElement || control.selectionEnd === control.value.length)) nextColumn += 1;
-  else return;
-  if (nextRow < 0 || nextRow >= table.tBodies[0].rows.length || nextColumn < 1 || nextColumn >= row.cells.length) return;
+  if (!(target instanceof HTMLElement) || target.closest("table") !== table || !editable(target)) return;
+  const enter = event.key === "Enter" && !event.altKey;
+  const direction = event.altKey ? ({ ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] } as Record<string, number[]>)[event.key]
+    : enter ? [event.shiftKey ? -1 : 1, 0] : undefined;
+  if (!direction || (enter && (target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement))) return;
+  const cell = target.closest<HTMLTableCellElement>("td, th");
+  const row = cell?.parentElement as HTMLTableRowElement | null;
+  if (!cell || !row || row.parentElement?.tagName !== "TBODY") return;
+  const rows = Array.from(table.tBodies).flatMap(body => Array.from(body.rows));
+  const controls = (candidate: HTMLTableCellElement) => Array.from(candidate.querySelectorAll(fields)).filter(field => field.closest("table") === table && editable(field));
+  const column = Array.from(row.cells).slice(0, cell.cellIndex).reduce((sum, item) => sum + item.colSpan, 0);
+  let next: Element | undefined;
+  if (direction[0]) {
+    for (let r = rows.indexOf(row) + direction[0]; r >= 0 && r < rows.length; r += direction[0]) {
+      let offset = 0;
+      const candidate = Array.from(rows[r].cells).find(item => { const matches = offset === column && item.colSpan === cell.colSpan; offset += item.colSpan; return matches; });
+      if (candidate) next = controls(candidate)[0];
+      if (next) break;
+    }
+  } else {
+    for (let c = cell.cellIndex + direction[1]; c >= 0 && c < row.cells.length; c += direction[1]) {
+      const candidates = controls(row.cells[c]);
+      next = direction[1] > 0 ? candidates[0] : candidates[candidates.length - 1];
+      if (next) break;
+    }
+  }
+  // Boundaries must not submit a form or trigger browser Alt+Left/Right history.
   event.preventDefault();
-  focusGridCell(table, nextRow, nextColumn);
-};
+  if (next instanceof HTMLElement) {
+    next.focus();
+    if (next instanceof HTMLInputElement && ["text", "search", "tel", "url", "password"].includes(next.type)) next.select();
+  }
+}
