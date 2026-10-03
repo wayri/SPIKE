@@ -126,3 +126,7 @@ recovery retains at most five snapshots in a 2 MB record. Recovery opens a new
 unsaved identity without path, root, or overwrite hash. Failed storage writes
 retain the last valid backup and remain visible. Recovery does not establish a
 file save or a solver-result validation.
+
+## Study resources and captured history
+
+The optional additions to the version-one frontend study projection are `tags`, `archived`, `datasets`, case `datasetIds`, and case `runs`. A run is a workspace capture with `capturedAt`, frozen settings/scenario, reported result facts, and the original payload or reference. Capture time is not execution time. Legacy current-result fields retain their invalidation behavior. Limits are 128 datasets per study, 2 MiB per dataset, 100 captures per case, 96 MiB of retained dataset/capture data per study, and 256 MiB per full study document including frozen setups. Exceeding a bound is an explicit error. Result-free copies remove result-derived payloads and references while preserving definitions. See [study model](SIMULATION_STUDIES.md) and ADR 0033.

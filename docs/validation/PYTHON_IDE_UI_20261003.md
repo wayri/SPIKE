@@ -62,6 +62,6 @@ The owner subsequently requested pushing to both projects. After confirming
 the existing file hashes matched the review diff and preserving originals,
 the eight replacements were applied to SPIKE-Em. Its workspace and resilience
 tests, TypeScript check, and production build passed. Its local repository has
-no existing commit or Git remote; publication requires a destination. Native
+a local Git history on codex/spike-em and no configured remote, following the owner's offline instruction. Native
 SPIKE-Em UI success is not claimed, and none of these UI checks establish
 numerical solver validity.

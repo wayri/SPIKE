@@ -201,3 +201,7 @@ available solver from CLI and GUI with matching results, produce a report, and
 launch offline on a clean supported machine. Capability text must match
 `docs/SOLVER_STATUS.md`; known limitations are release notes, not hidden tribal
 knowledge.
+
+## Study workspace integration
+
+The version-one study projection adds tags, archives, datasets, case links, and captured history without scheduling solvers. Captures freeze the supplied workspace setup; they do not establish the original solve inputs. Import copies use fresh IDs and preserve dataset links. Project copies without results omit result payloads, references, and solved Optycal sources. Run `npm.cmd run test:studies` and preview `scripts/fixtures/study-manager.html`. See [study workflow](SIMULATION_STUDIES.md) and ADR 0033.

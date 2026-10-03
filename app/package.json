@@ -89,7 +89,8 @@
     "test:table-theme": "node scripts/test-table-theme.mjs && node scripts/test-detached-table-theme.mjs",
     "test:command-strip": "node scripts/test-command-strip.mjs",
     "test:plot-interaction": "node scripts/test-plot-interaction.mjs",
-    "test:python-workspace": "node scripts/test-python-workspace.mjs && node scripts/test-python-workspace-backups.mjs && node scripts/test-python-file-explorer.mjs && node scripts/test-python-templates.mjs"
+    "test:python-workspace": "node scripts/test-python-workspace.mjs && node scripts/test-python-workspace-backups.mjs && node scripts/test-python-file-explorer.mjs && node scripts/test-python-templates.mjs",
+    "test:studies": "node scripts/test-simulation-studies.mjs && node scripts/test-study-workspace.mjs && node scripts/test-study-manager.mjs && node scripts/test-project-snapshot-state.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",

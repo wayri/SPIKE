@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { mergeProjectSnapshot, createResultPackage, readResultPackage, retainOpaqueResultState, isSupportedSavedResult, withoutSavedResults } from '../src/projectSnapshotState.ts';
+import { normalizeStudies, updateStudyCase } from '../src/simulationStudies.ts';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 const normalizerSource = ts.transpileModule(readFileSync(new URL('../src/analysisResults.ts', import.meta.url), 'utf8'),
@@ -18,6 +19,23 @@ assert.deepEqual(merged.design.metadata, previous.design.metadata);
 assert.deepEqual(merged.design.models, [{ id: 'm1', enabled: false, vendor_data: { future: 42 } }]);
 assert.equal(merged.analysis.latest_result, null, 'explicit clearing must remain possible');
 assert.deepEqual(merged.analysis.future_solver_setup, previous.analysis.future_solver_setup);
+
+const retainedStudyBase = normalizeStudies([{ id: 'saved-study', name: 'Saved', cases: [{ id: 'saved-case', type: 'pi', mode: 'dc',
+  scenario: {}, settings: { load: 1 }, resultSnapshot: { contract: 'spike/v1', values: [1] }, resultRef: 'old-result', runs: [{
+    id: 'saved-run', capturedAt: '2026-10-03T00:00:00Z', caseType: 'pi', mode: 'dc', scenario: {}, settings: { load: 1 }, facts: { contract: 'spike/v1' }, resultSnapshot: { contract: 'spike/v1', values: [1] }, resultRef: 'old-run-result',
+  }] }] }])[0];
+const retainedStudy = { ...retainedStudyBase, cases: retainedStudyBase.cases.map(item => ({ ...item, future_case_field: { keep: true } })) };
+const editedStudy = updateStudyCase(retainedStudy, 'saved-case', { settings: { load: 2 } });
+assert.equal(editedStudy.cases[0].resultSnapshot, undefined);
+const savedAfterInvalidation = JSON.parse(JSON.stringify(mergeProjectSnapshot({ studies: [retainedStudy] }, { studies: [editedStudy] })));
+const reloadedAfterInvalidation = normalizeStudies(savedAfterInvalidation.studies)[0];
+assert.equal(reloadedAfterInvalidation.cases[0].resultSnapshot, undefined, 'save/reload must not resurrect an invalidated current result');
+assert.equal(reloadedAfterInvalidation.cases[0].resultRef, undefined, 'save/reload must not resurrect an invalidated current result reference');
+assert.deepEqual(savedAfterInvalidation.studies[0].cases[0].future_case_field, { keep: true }, 'unknown case fields remain preserved');
+const strippedRetainedStudy = withoutSavedResults({ studies: [retainedStudy] });
+const savedResultFreeStudy = JSON.parse(JSON.stringify(mergeProjectSnapshot({ studies: [retainedStudy] }, strippedRetainedStudy)));
+assert.equal(savedResultFreeStudy.studies[0].cases[0].runs[0].resultSnapshot, undefined, 'merge must not resurrect stripped run payloads');
+assert.equal(savedResultFreeStudy.studies[0].cases[0].runs[0].resultRef, undefined, 'merge must not resurrect stripped run references');
 
 const results = Array.from({ length: 25 }, (_, i) => ({ id: `result-${i}`, label: `Run ${i}`, bundle: {
   analysis_id: `result-${i}`, scalar_fields: {}, time_series: { times_s: [0, 1], frames: [{ value: i }] }, future_field: { exact: true },
@@ -48,8 +66,13 @@ assert.equal(reopened.results.result_history.length, 25);
 assert.deepEqual(reopened.visuals, packed.visuals);
 const linked = { ...snapshot, assembly_ir: { boards: ['a', 'b'], connector_mappings: [{ kind: 'connector-mate' }], harnesses: [{ id: 'cable' }] },
   studies: [{ version: 1, id: 'study-1', name: 'Mixed conditions', cases: [
-    { id: 'case-pi', type: 'pi', settings: { mode: 'DC IR Drop' }, resultSnapshot: { voltage: [1, 2] } },
+    { id: 'case-pi', type: 'pi', settings: { mode: 'DC IR Drop', coreOptycalSetup: { enabled: true }, optycalSource: { solved_pattern: [1] } }, resultSnapshot: { voltage: [1, 2] }, runs: [
+      { id: 'run-1', capturedAt: '2026-10-03T00:00:00Z', scenario: { load: 2 }, settings: { mode: 'DC IR Drop', coreOptycalSetup: { enabled: true }, optycalSource: { solved_pattern: [1] } }, facts: { contract: 'spike/v1', status: 'completed' }, resultSnapshot: { voltage: [1, 2] }, resultRef: 'state/artifacts/result.json' },
+    ] },
     { id: 'case-thermal', type: 'thermal', settings: { ambient_c: 25 } },
+  ], datasets: [
+    { id: 'source-data', name: 'Measured', kind: 'csv', resultDerived: false, rawText: 'f,v\n1,2', provenance: 'lab' },
+    { id: 'result-data', name: 'Solved', kind: 'json', resultDerived: true, payload: { values: [3] }, artifactRef: 'state/artifacts/result-data.json', provenance: 'run' },
   ] }],
   thermal: { scenario: { ambient_c: 25, result: { peak_c: 55 }, field_result: { grid: [55] } } },
   emi: { setup: { band: 'test' }, screening: { value: 1 }, field_result: { values: [3] } },
@@ -63,9 +86,24 @@ assert.equal(resultFree.analysis.si.latest_channel_result, null);
 assert.equal(resultFree.emi.screening, null);
 assert.equal(resultFree.thermal.scenario.field_result, null);
 assert.equal(resultFree.studies[0].cases[0].resultSnapshot, undefined);
-assert.deepEqual(resultFree.studies[0].cases[0].settings, linked.studies[0].cases[0].settings);
+assert.equal(resultFree.studies[0].cases[0].runs[0].resultSnapshot, undefined);
+assert.equal(resultFree.studies[0].cases[0].runs[0].resultRef, undefined);
+assert.equal(resultFree.studies[0].cases[0].settings.optycalSource, undefined);
+assert.deepEqual(resultFree.studies[0].cases[0].settings.coreOptycalSetup, { enabled: true });
+assert.equal(resultFree.studies[0].cases[0].runs[0].settings.optycalSource, undefined);
+assert.deepEqual(resultFree.studies[0].cases[0].runs[0].settings.coreOptycalSetup, { enabled: true });
+assert.equal(resultFree.studies[0].datasets[1].payload, undefined);
+assert.equal(resultFree.studies[0].datasets[1].artifactRef, undefined);
+assert.deepEqual(resultFree.studies[0].datasets[0], linked.studies[0].datasets[0], 'source datasets stay attached');
+assert.equal(resultFree.studies[0].datasets[1].name, 'Solved', 'result-derived dataset definition stays attached');
+assert.equal(linked.studies[0].cases[0].settings.optycalSource.solved_pattern[0], 1, 'result-free copy must not modify live Optycal source data');
 assert.deepEqual(linked.studies[0].cases[0].resultSnapshot, { voltage: [1, 2] }, 'result-free copy must not modify active study');
+assert.deepEqual(linked.studies[0].cases[0].runs[0].resultSnapshot, { voltage: [1, 2] }, 'result-free copy must not modify active run history');
 assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage({ design: linked.design, analysis: {}, studies: linked.studies }))).snapshot.studies, linked.studies);
+const datasetOnlyPackage = createResultPackage({ design: linked.design, analysis: {}, studies: [{ cases: [], datasets: [
+  { id: 'derived', resultDerived: true, kind: 'json', payload: { samples: [1, 2] } },
+] }] });
+assert.deepEqual(datasetOnlyPackage.project_snapshot.studies[0].datasets[0].payload, { samples: [1, 2] });
 assert.deepEqual(linked.thermal.scenario.field_result, { grid: [55] }, 'export must not clear live results');
 assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage({ ...linked, analysis: {}, emi: {}, thermal: linked.thermal }))).snapshot.thermal, linked.thermal);
 const old = readResultPackage(JSON.stringify({ contract: 'spike/result-package/v1', active_result: results[0].bundle, results }));

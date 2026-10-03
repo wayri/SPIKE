@@ -1,3 +1,4 @@
+import { cloneImportedStudies, prepareStudyDataset, preflightStudyRunCapture, preflightStudyDatasetUpdate } from "./studyWorkspaceModel";
 import DataTable from "./DataTable";
 import CommandStrip from "./CommandStrip";
 import { openDetachedToolWindow, updateDetachedToolWindow, closeDetachedToolWindow, closeAllDetachedToolWindows, type DetachedToolAction, type ToolWindowKind } from "./detachedToolWindows";
@@ -1499,8 +1500,20 @@ export default function App() {
     }
     return null;
   };
+  const attachStudyDataset = (name: string, payload: unknown): string => {
+    const dataset = prepareStudyDataset(JSON.stringify(payload), { name, format: "json", provenance: "Published Python analysis result", resultDerived: true });
+    const target = studies.find(study => study.cases.some(item => item.id === activeStudyCaseId) && !study.archived) ?? studies.find(study => !study.archived);
+    const checked = preflightStudyDatasetUpdate([...(target?.datasets ?? []), dataset], target);
+    if (!checked.ok) throw new Error(checked.error);
+    recordChange();
+    if (target) setStudies(current => updateStudy(current, target.id, { datasets: [...target.datasets, dataset] }).map(study => study.id === target.id && activeStudyCaseId ? updateStudyCase(study, activeStudyCaseId, { datasetIds: [...(study.cases.find(item => item.id === activeStudyCaseId)?.datasetIds ?? []), dataset.id] }) : study));
+    else { const added = createStudy("Python datasets"); added.datasets = [dataset]; setStudies(current => [...current, added]); }
+    const message = name + " attached to the project study. Save the project to retain it.";
+    setStatus(message); setStudyManagerOpen(true); return message;
+  };
   const editStudyCase = (studyId: string, caseId: string, patch: Partial<SimulationStudyCase>) => {
-    recordChange(); setStudies(current => current.map(study => study.id === studyId ? updateStudyCase(study, caseId, patch) : study));
+    try { const updated = studies.map(study => study.id === studyId ? updateStudyCase(study, caseId, patch) : study); recordChange(); setStudies(updated); return true; }
+    catch (error) { setStatus(`Study update rejected: ${error instanceof Error ? error.message : String(error)}`); return false; }
   };
   const activateStudyCase = (studyId: string, item: SimulationStudyCase) => {
     if (!["pi", "si", "em", "thermal"].includes(item.type)) { setStatus(`Simulation type ${item.type} is not supported by this workspace.`); return; }
@@ -1573,14 +1586,17 @@ export default function App() {
     if (activeStudyCaseId !== item.id) { setStatus(`Activate ${item.name} before saving its setup.`); return; }
     const settings = currentStudySettings(item.type);
     const mode = item.type === "pi" ? analysisMode : item.type === "thermal" ? String(thermalScenario?.mode ?? "") : item.mode;
-    editStudyCase(studyId, item.id, { settings, mode });
+    if (!editStudyCase(studyId, item.id, { settings, mode })) return;
     setStatus(`${item.name} setup saved in its study.`);
   };
   const captureCaseResult = (studyId: string, item: SimulationStudyCase) => {
     if (activeStudyCaseId !== item.id) { setStatus(`Activate ${item.name} before capturing a result.`); return; }
     const result = currentStudyResult(item.type);
     if (!result || (item.type === "thermal" && !["result", "field_result", "board_thermal_result"].some(key => (result as Record<string, unknown>)[key] != null))) { setStatus(`No ${item.type.toUpperCase()} result is available to capture for ${item.name}.`); return; }
-    editStudyCase(studyId, item.id, { settings: currentStudySettings(item.type), resultSnapshot: JSON.parse(JSON.stringify(result)) as SimulationStudyCase["resultSnapshot"] });
+    const captureCheck = preflightStudyRunCapture(result, studies.find(study => study.id === studyId), item);
+    if (!captureCheck.ok) { setStatus(captureCheck.error); return; }
+    const capturedMode = item.type === "pi" ? analysisMode : item.type === "thermal" ? String(thermalScenario?.mode ?? "") : item.mode;
+    if (!editStudyCase(studyId, item.id, { mode: capturedMode, settings: currentStudySettings(item.type), resultSnapshot: JSON.parse(JSON.stringify(result)) as SimulationStudyCase["resultSnapshot"] })) return;
     setStatus(`${item.name} result captured in its study. Save the project to keep it.`);
   };
   mcpRequestHandler.current = ({ command, args }) => {
@@ -4803,6 +4819,8 @@ export default function App() {
     {projectManagerOpen && <ProjectManager projectName={projectName} projectPath={projectPath} boardFile={boardFile} counts={{ layers: boardData?.layers.length ?? 0, nets: Object.keys(boardData?.nets ?? {}).length, components: boardData?.components.length ?? 0, results: resultRecords.length + (analysisResult ? 1 : 0) + (siChannelResult ? 1 : 0) + (emiFieldResult ? 1 : 0) + (emiScreening ? 1 : 0) + (thermalScenario?.result || thermalScenario?.field_result ? 1 : 0) }} recent={recentProjects} onNew={newProject} onOpen={() => { setProjectManagerOpen(false); void openProject(); }} onSave={() => { setProjectManagerOpen(false); void saveProject(); }} onSaveAs={() => { setProjectManagerOpen(false); void saveProject(projectFileName(projectName), true); }} onSaveWithoutResults={() => { setProjectManagerOpen(false); saveProjectWithoutResults(); }} onSaveResultsFile={() => { setProjectManagerOpen(false); void exportReport(); }} onStudies={() => { setProjectManagerOpen(false); setStudyManagerOpen(true); }} onClose={() => setProjectManagerOpen(false)} />}
     {studyManagerOpen && <StudyManager studies={studies} currentType={studyTypeForTab()} activeCaseId={activeStudyCaseId}
       onCreateStudy={() => { recordChange(); const study = createStudy(`Study ${studies.length + 1}`); setStudies(current => [...current, study]); setStatus(`${study.name} created`); return study.id; }}
+      onImportStudies={items => { const imported = cloneImportedStudies(items); recordChange(); setStudies(current => [...current, ...imported]); }}
+      onOpenResult={(run, item) => { const study = studies.find(row => row.cases.some(saved => saved.id === item.id)); if (study) activateStudyCase(study.id, { ...item, type: run.caseType || item.type, mode: run.mode, settings: run.settings, scenario: run.scenario, resultSnapshot: run.resultSnapshot, resultRef: run.resultRef }); }}
       onUpdateStudy={(studyId, patch) => { recordChange(); setStudies(current => updateStudy(current, studyId, patch)); }}
       onRemoveStudy={studyId => { recordChange(); setStudies(current => removeStudy(current, studyId)); setActiveStudyCaseId(null); }}
       onAddCase={addCaseToStudy}
@@ -4818,7 +4836,7 @@ export default function App() {
     {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} onOpenGuide={() => { setAboutOpen(false); setHelpOpen(true); }} onOpenValidation={() => { setAboutOpen(false); setBenchmarkOpen(true); }} />}
     {benchmarkOpen && <BenchmarkCenter onClose={() => setBenchmarkOpen(false)} onStatus={setStatus} />}
     {spiceOpen && <SpiceWorkbench initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} />}
-    {pythonOpen && <PythonWorkspace design={designForExchange()} results={extensionResultsContext(activeAnalysisResult)} onClose={() => setPythonOpen(false)} onStatus={setStatus} />}
+    {pythonOpen && <PythonWorkspace onAttachDataset={attachStudyDataset} design={designForExchange()} results={extensionResultsContext(activeAnalysisResult)} onClose={() => setPythonOpen(false)} onStatus={setStatus} />}
     {bondManagerOpen && <BondManager
       bonds={componentBonds}
       validation={bondValidation}

@@ -241,3 +241,7 @@ unavailable capability.
 
 When ownership is unclear, add or update this index before adding another
 cross-cutting dependency.
+
+## Study workspace
+
+`app/src/StudyManager.tsx` and `studyManager.css` own navigation, simulation tables, and the responsive inspector. `simulationStudies.ts` owns the version-one study projection; `studyWorkspaceModel.ts` owns bounded dataset admission, import copying, and metadata compatibility. `App.tsx` owns project integration and admitted domain activation. See [simulation studies](SIMULATION_STUDIES.md) and ADR 0033.

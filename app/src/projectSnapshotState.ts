@@ -1,17 +1,26 @@
+const authoritativeStudyOmission = (path: readonly string[], key: string): boolean => {
+  const owner = path[path.length - 1];
+  return (owner === 'cases' || owner === 'runs') && (key === 'resultSnapshot' || key === 'resultRef')
+    || owner === 'datasets' && (key === 'payload' || key === 'rawText' || key === 'artifactRef');
+};
+
 /** Preserve future fields while replacing the fields the current UI edits. */
-export function mergeProjectSnapshot(retained: unknown, updated: unknown): any {
+export function mergeProjectSnapshot(retained: unknown, updated: unknown, path: readonly string[] = []): any {
   if (updated === undefined) return retained;
   if (Array.isArray(updated)) {
     const old = Array.isArray(retained) ? retained : [];
     const identity = (item: any) => item && typeof item === 'object' && !Array.isArray(item)
       ? item.id ?? item.design_id ?? item.analysis_id ?? item.ref : undefined;
     const indexed = new Map(old.map(item => [identity(item), item] as const).filter(([id]) => id !== undefined));
-    return updated.map(item => identity(item) !== undefined ? mergeProjectSnapshot(indexed.get(identity(item)), item) : item);
+    return updated.map(item => identity(item) !== undefined ? mergeProjectSnapshot(indexed.get(identity(item)), item, path) : item);
   }
   if (!updated || typeof updated !== 'object') return updated;
   const previous = retained && typeof retained === 'object' && !Array.isArray(retained) ? retained as Record<string, unknown> : {};
-  return Object.fromEntries([...new Set([...Object.keys(previous), ...Object.keys(updated)])]
-    .map(key => [key, mergeProjectSnapshot(previous[key], (updated as Record<string, unknown>)[key])]));
+  const current = updated as Record<string, unknown>;
+  return Object.fromEntries([...new Set([...Object.keys(previous), ...Object.keys(current)])]
+    .filter(key => !(path.includes('studies') && authoritativeStudyOmission(path, key)
+      && !Object.prototype.hasOwnProperty.call(current, key)))
+    .map(key => [key, mergeProjectSnapshot(previous[key], current[key], [...path, key])]));
 }
 
 export const RESULT_PACKAGE_CONTRACT = 'spike/result-package/v2';
@@ -20,11 +29,24 @@ export const RESULT_PACKAGE_CONTRACT = 'spike/result-package/v2';
 export function withoutSavedResults(snapshot: Record<string, any>): Record<string, any> {
   const copy = structuredClone(snapshot);
   if (Array.isArray(copy.studies)) for (const study of copy.studies) {
+    if (Array.isArray(study?.datasets)) for (const dataset of study.datasets) {
+      if (!dataset || typeof dataset !== 'object' || dataset.resultDerived !== true) continue;
+      delete dataset.payload;
+      delete dataset.rawText;
+      delete dataset.artifactRef;
+    }
     if (!Array.isArray(study?.cases)) continue;
     for (const simulationCase of study.cases) {
       if (!simulationCase || typeof simulationCase !== 'object') continue;
       delete simulationCase.resultSnapshot;
       delete simulationCase.resultRef;
+      if (simulationCase.settings && typeof simulationCase.settings === 'object') delete simulationCase.settings.optycalSource;
+      if (Array.isArray(simulationCase.runs)) for (const run of simulationCase.runs) {
+        if (!run || typeof run !== 'object') continue;
+        delete run.resultSnapshot;
+        delete run.resultRef;
+        if (run.settings && typeof run.settings === 'object') delete run.settings.optycalSource;
+      }
     }
   }
   if (copy.analysis) {
@@ -87,7 +109,10 @@ export function createResultPackage(projectSnapshot: Record<string, any>, visual
     || projectSnapshot.emi?.field_result || projectSnapshot.emi?.screening || projectSnapshot.thermal?.scenario?.result
     || projectSnapshot.thermal?.scenario?.field_result
     || (Array.isArray(projectSnapshot.studies) && projectSnapshot.studies.some((study: any) =>
-      Array.isArray(study?.cases) && study.cases.some((item: any) => item?.resultSnapshot != null)));
+      Array.isArray(study?.cases) && study.cases.some((item: any) => item?.resultSnapshot != null
+        || Array.isArray(item?.runs) && item.runs.some((run: any) => run?.resultSnapshot != null))
+      || Array.isArray(study?.datasets) && study.datasets.some((dataset: any) => dataset?.resultDerived === true
+        && (dataset.payload !== undefined || dataset.rawText !== undefined))));
   if (!hasResults) throw new Error('Run a simulation or load results before saving a result package.');
   return { contract: RESULT_PACKAGE_CONTRACT, generated_at: new Date().toISOString(), project_snapshot: projectSnapshot, visuals };
 }
