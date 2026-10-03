@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: Apache-2.0
+name: Documentation quality
+on:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+      - CONTRIBUTING.md
+      - docs/README.md
+      - scripts/check_documentation.py
+      - tests/python/test_documentation_quality.py
+      - .github/workflows/documentation.yml
+  pull_request:
+    paths:
+      - README.md
+      - CONTRIBUTING.md
+      - docs/README.md
+      - scripts/check_documentation.py
+      - tests/python/test_documentation_quality.py
+      - .github/workflows/documentation.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  documentation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check public entry-point documentation
+        run: python scripts/check_documentation.py README.md CONTRIBUTING.md docs/README.md
+      - name: Test the documentation guard
+        run: python -m unittest discover -s tests/python -p test_documentation_quality.py -v

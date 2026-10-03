@@ -155,3 +155,19 @@ Unicode. Mermaid is the standard for checked-in architecture diagrams.
 - Are licenses and third-party obligations understood?
 - Does the change stay within the accepted language budget?
 - Do focused and full test suites pass?
+
+## Public documentation checks
+
+Save Markdown as UTF-8. Check the README, contributing guide and documentation
+index before submitting changes:
+
+```powershell
+python scripts/check_documentation.py README.md CONTRIBUTING.md docs/README.md
+python -m unittest discover -s tests/python -p test_documentation_quality.py -v
+```
+
+The guard checks common encoding corruption, local inline links and images,
+self-heading anchors, heading hierarchy and code fences. Pass other changed
+Markdown paths explicitly to check them. External URL availability, fragments
+in other documents and rendered layout still require review. The Documentation
+quality workflow runs these checks when the public entry points or guard change.
