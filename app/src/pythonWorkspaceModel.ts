@@ -25,7 +25,8 @@ export interface PythonWorkspacePersistResult { ok: boolean; timestamp?: number;
 export interface PythonScriptResult {
   contract?: string; status?: string; stdout?: string; stderr?: string;
   return_code?: number; duration_ms?: number; published_result?: unknown;
-  ui_actions?: unknown;
+  ui_actions?: unknown; views?: unknown;
+  runtime?: { executable?: string; python_version?: string; emerge_version?: string; optycal_version?: string };
 }
 export interface PythonDebugFrame { name: string; filename: string; line: number; locals: Record<string, string> }
 export interface PythonDebugSnapshot extends PythonScriptResult {

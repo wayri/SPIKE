@@ -46,7 +46,7 @@
     "test:webview": "node scripts/test-webview-guards.mjs && node scripts/test-editable-shortcuts.mjs",
     "test:model-scene": "node scripts/test-model-scene-loader.mjs",
     "test:model-resolver": "node scripts/test-model-resolver-panel.mjs",
-    "test:python-workspace": "node scripts/test-python-workspace.mjs && node scripts/test-python-workspace-backups.mjs && node scripts/test-python-file-explorer.mjs && node scripts/test-python-templates.mjs && node scripts/test-python-completions.mjs",
+    "test:python-workspace": "node scripts/test-python-workspace.mjs && node scripts/test-python-workspace-backups.mjs && node scripts/test-python-file-explorer.mjs && node scripts/test-python-templates.mjs && node scripts/test-python-completions.mjs && node scripts/test-python-editor.mjs && node scripts/test-python-floating-window.mjs",
     "test:large-scene": "node scripts/test-scene-resource-cache.mjs && node scripts/test-dense-board-scenes.mjs && node scripts/test-viewport-performance.mjs && node scripts/test-assembly-performance.mjs && node scripts/test-assembly-scene-visibility.mjs",
     "test:mcad": "node scripts/test-mcad-assembly.mjs",
     "test:board-visuals": "node scripts/test-board-visual-bundles.mjs",
@@ -94,7 +94,7 @@
     "test:via-stress-map": "node scripts/test-via-stress-map.mjs",
     "test:assembly-si-batch": "node scripts/test-assembly-si-batch.mjs",
     "test:thermal-ui": "node scripts/test-thermal-workflow.mjs && node scripts/test-thermal-environments.mjs && node scripts/test-thermal-assembly.mjs && node scripts/test-thermal-hardware.mjs && node scripts/test-thermal-input-import.mjs && node scripts/test-board-thermal-panel.mjs && node scripts/test-thermal-transient-overlay.mjs",
-    "test:emerge": "node scripts/test-emerge-network-review.mjs",
+    "test:emerge": "node scripts/test-emerge-network-review.mjs && node scripts/test-emerge-runtime-presentation.mjs",
     "test:emi-chamber": "node scripts/test-emi-chamber.mjs",
     "test:thermal-coordinates": "node scripts/test-thermal-coordinates.mjs",
     "test:thermal-rendering": "node scripts/test-thermal-field-rendering.mjs && node scripts/test-thermal-coordinates.mjs",
@@ -109,7 +109,8 @@
     "test:flex-manager": "node scripts/test-flex-board-manager.mjs",
     "test:emerge-updates": "node scripts/test-emerge-runtime-updates.mjs",
     "test:emerge-gerber": "node scripts/test-emerge-gerber-ui.mjs",
-    "test:context-menus": "node scripts/test-context-menus.mjs"
+    "test:context-menus": "node scripts/test-context-menus.mjs",
+    "test:script-viewport": "node scripts/test-script-result-viewport.mjs && node scripts/test-script-viewport-import.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",

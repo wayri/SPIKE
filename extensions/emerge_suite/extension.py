@@ -27,6 +27,7 @@ from extensions.emerge_suite.normalize import network, radiation, nearfield
 from extensions.emerge_suite.script_builder import generate_script
 from extensions.emerge_suite.capability_inventory import capability_inventory
 from extensions.emerge_suite.mesh_extension import execute_mesh
+from extensions.engine_runtime import engine_interpreter_candidates
 
 
 CONTRIBUTIONS = {"emerge-radiation": "emi", "emerge-si": "si"}
@@ -170,12 +171,8 @@ def _probe_executable(executable: Path) -> dict:
 
 
 def probe_engine(python_executable: str | None) -> dict:
-    if python_executable:
-        return _probe_executable(Path(python_executable).expanduser().resolve())
     project = Path(__file__).resolve().parents[2]
-    candidates = [project / ".venv-emerge3" / "Scripts" / "python.exe",
-                  Path(sys.executable),
-                  project / ".venv-emerge" / "Scripts" / "python.exe"]
+    candidates = engine_interpreter_candidates("emerge", project, python_executable)
     last = None
     for candidate in candidates:
         last = _probe_executable(candidate)

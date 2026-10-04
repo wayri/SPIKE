@@ -1,0 +1,80 @@
+{
+  "contract": "spike/em-study/v1",
+  "id": "emerge-thermal-demo4-black-body-radiation",
+  "title": "EMerge upstream: Demo 4 black body radiation",
+  "summary": "Native parameter/source wrapper for the pinned upstream default. Thermal execution suspended.",
+  "category": "Thermal (suspended)",
+  "mode": "suspended",
+  "parameters": [
+    {
+      "key": "Wbar",
+      "label": "Wbar",
+      "value": 0.01,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Wpanel",
+      "label": "Wpanel",
+      "value": 0.8,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Lpanel",
+      "label": "Lpanel",
+      "value": 0.5,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "thpanel",
+      "label": "Thpanel",
+      "value": 0.005,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Npanels",
+      "label": "Npanels",
+      "value": 4,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "gap",
+      "label": "Gap",
+      "value": 0.02,
+      "unit": "source units (see original)"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Pinned EMerge upstream example",
+      "url": "https://github.com/FennisRobert/EMerge/blob/75e6e98170a6628688593f917c1bb63b52578d02/examples/heatconduction/demo4_black_body_radiation.py"
+    }
+  ],
+  "assumptions": [
+    "Original source and LICENSE are retained byte-for-byte in the isolated upstream pack.",
+    "Numeric scalar overrides use the units and conventions in the original script; integers remain integers.",
+    "Interactive view/show calls are suppressed; bounded numerical curves and spatial samples retain explicit stride and provenance. Desktop execution serializes sweeps, permits automatic solver selection and bounds adaptive refinement to two steps. Edit execution_options in the script for an unrestricted study; this is not convergence qualification.",
+    "Scalar/vector spatial display samples are captured in native views; full samples are preserved in NPZ sidecars. Gmsh surface-corner previews retain original solver coordinates and mesh sidecars. Parametric CAD, port-mode overlays and Smith grids are not converted.",
+    "Runtime compatibility and numerical convergence must be checked per example."
+  ],
+  "expected": [
+    "Original example behavior at unchanged parameter defaults, subject to installed engine compatibility.",
+    "Execution record and available numerical curves; no synthetic replacement results."
+  ],
+  "script": {
+    "language": "python",
+    "code": "raise RuntimeError('Thermal analyses are suspended in SPIKE-Em; original source is retained for catalog completeness.')\n"
+  },
+  "provenance": {
+    "origin": "upstream-example-native-wrapper",
+    "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+  },
+  "engine": {
+    "name": "emerge",
+    "version": "3.0.0 (upstream API; installed audit3.0.0a19)"
+  },
+  "upstream": {
+    "path": "examples/heatconduction/demo4_black_body_radiation.py",
+    "commit": "75e6e98170a6628688593f917c1bb63b52578d02"
+  },
+  "status": "suspended"
+}

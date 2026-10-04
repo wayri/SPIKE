@@ -12,6 +12,7 @@ from typing import Any
 
 from .automation import SpikeAutomation
 from .script_api_context import MAX_UI_ACTIONS, UI_PANELS
+from .script_views import ScriptViews
 
 
 MAX_ACTION_ID_CHARS = 256
@@ -178,11 +179,12 @@ class _UI:
         return self._append({"action": "open_panel", "panel": panel})
 
 
-class SpikeScriptAPI(types.ModuleType):
+class SpikeScriptAPI(types.ModuleType, ScriptViews):
     """Bound module facade; worker calls retain their normal admission path."""
 
     def __init__(self, context: dict[str, Any]) -> None:
         super().__init__("spike", "SPIKE Python workspace API")
+        ScriptViews.__init__(self)
         self._workspace = context.get("workspace") or {
             "boards": [], "selected_board_id": None, "assembly": {},
         }

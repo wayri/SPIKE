@@ -205,3 +205,5 @@ see [third-party notices](THIRD_PARTY_NOTICES.md).
 If we have missed a credit, please open an issue or pull request. License and
 source details for included examples and integrations are in the
 [third-party notices](THIRD_PARTY_NOTICES.md).
+
+See [Python workspace and aligned EMerge model results](docs/SPIKE_EM_UI_BACKPORT.md) for Load model, floating editing and solver-result visualization.

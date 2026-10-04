@@ -1,0 +1,439 @@
+{
+  "repository": "https://github.com/FennisRobert/EMerge",
+  "branch": "v3.0-dev",
+  "commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+  "example_count": 28,
+  "rf_count": 23,
+  "suspended_count": 5,
+  "files": {
+    "examples/demo0_parallel_plate.py": "564fc949c6a2eb5d40d0a230072155979cd7fbeec332b0f94b6c4d0132b8b531",
+    "examples/demo10_sgh.py": "c8cc2b384e73798467f500f482855d3ca283768727738d863ce1bf3ba55cbea3",
+    "examples/demo11_lumped_element_filter.py": "9040ed74f1bbbcbb81faddff5fd35f0df12d28097f1966191c905c24120b7436",
+    "examples/demo12_mode_alignment.py": "83c306ff836b249e1658d3ea3f5d0446436c34ea3f7fca4300c2351581513c5a",
+    "examples/demo13_helix_antenna.py": "ddd089892016dda43b563ec0bf0f338af596c5b9a16d3470a469cecd7b751667",
+    "examples/demo14_boundary_selection.py": "7bcbc75ca45c539a4d9627b13a05b95bec03a7420bc2d0cb6e3b2d15161fbf9e",
+    "examples/demo15_strip_slotline_transition.py": "0ea3cdd3bc964a99cf5b32454d60837e02987871d52f041ca38ad2b19570648b",
+    "examples/demo16_differential_common_mode.py": "ec62ee56b975519bbd7e33ae12f30703fef7930fbced677bf1649d68e6c31f18",
+    "examples/demo17_step_import.py": "307cf9c7877deaaea9e3c08c4a03509d80c9d5c039798283e209dac26592053a",
+    "examples/demo18_plotting_and_visualization.py": "1fa12c00545f4cfc5a8df066dc362879a9127d2e637d2ed80605f15f43206a54",
+    "examples/demo19_vivaldi_antenna.py": "548387fabcaf1fd05894417165a40cec96ba4580cd15e5059a75c2c533765b06",
+    "examples/demo1_stepped_imp_filter.py": "4be7e8c88031c89bb7c6d9b51093c39207c2347ae8bee160e68714a06e999379",
+    "examples/demo20_optimization.py": "101f5a816643b4de02c6007c81d1c3d6042dd318803c17d4ce17004f95a6dfe7",
+    "examples/demo21_inverted_F_antenna.py": "79ee08ad02d1b54d83241f9a6104fc0b4bb6cf86dbe64b1c9b71c353af31c46e",
+    "examples/demo22_RCS.py": "1c4c93bd3a233de736b189f3dfea999a7aae826f91fd92bff77ff7e328167d14",
+    "examples/demo2_combline_filter.py": "34d298e9e01fb496abc8fc4a8cea3adaadb42d03307b6c51f77fcd6e6d38613d",
+    "examples/demo3_coupled_line_filter.py": "b560afb754affd99eb39d8b5def5acb6d15b1df403df7cc205232f2f1f103575",
+    "examples/demo4_patch_antenna.py": "f28660efca403fe8ec9ddfeac8d8749375f76600c140915d2b96d218a2f98282",
+    "examples/demo5_revolve.py": "42ff1f1b379cbcce5e44f14a212fdd907629ef14ec9f8ec09289ea83e6f57453",
+    "examples/demo6_striplines_with_vias.py": "87e45c84ce038d79399c72963b640bf34449e70c8a8fa95ff4b3d2150733978e",
+    "examples/demo7_periodic_cells.py": "0396795705fddd4553ef5d6f7230f6b706cf91ebbb6a5f461419be228556b042",
+    "examples/demo8_waveguide_bpf_synthesis.py": "49c7d8b3b80af25c9e722ae63853dc60b242685e497a57da5641b46dc1400422",
+    "examples/demo9_dielectric_resonator.py": "f31087c677ee1cfd88669da185ba9711dde5b2dfe0c3bd3c13063477362fb38b",
+    "examples/DielectricRod.step": "398c850607eb9757e21a863dcde4cc2448cf10eb326a3661c71505654f8f824c",
+    "examples/heatconduction/demo1_basic_simulation.py": "22821ffcec4bebb7c97050c352f767955754933f4ecc1016d2005e2e4653e447",
+    "examples/heatconduction/demo2_chip_heating.py": "933bcdaddca072b1dfacc6b3547d761fb955b08989ecb88a4d7955eecb60dea4",
+    "examples/heatconduction/demo3_RF_heating.py": "430f963088fa19c872435272748e25d2240e5dc453dc641f6080a6dc1ba48a1f",
+    "examples/heatconduction/demo4_black_body_radiation.py": "c2a0457be2bbd745aed06f4183cf54eb3c56b833c5685a4638cef9684c95099b",
+    "examples/heatconduction/demo5_transient_heat_conduction.py": "48acd8ae88791cb90762023bcaa83d0c95e4091615291bd8283b6e0bb168d678",
+    "LICENSE": "54e09759d76b8cc3798fb4ef9d200e8750f1ee392e81dc2af4baa1c9c7f98a77"
+  },
+  "examples": [
+    {
+      "path": "examples/demo0_parallel_plate.py",
+      "sha256": "564fc949c6a2eb5d40d0a230072155979cd7fbeec332b0f94b6c4d0132b8b531",
+      "suspended": false,
+      "defaults": {}
+    },
+    {
+      "path": "examples/demo10_sgh.py",
+      "sha256": "c8cc2b384e73798467f500f482855d3ca283768727738d863ce1bf3ba55cbea3",
+      "suspended": false,
+      "defaults": {
+        "wga": 0.0020099999999999996,
+        "wgb": 0.00101,
+        "WH": 0.01,
+        "HH": 0.007,
+        "Lhorn": 0.021,
+        "Lfeed": 0.002,
+        "th": 0.001,
+        "dx": 0.002,
+        "rat": 1.6
+      }
+    },
+    {
+      "path": "examples/demo11_lumped_element_filter.py",
+      "sha256": "9040ed74f1bbbcbb81faddff5fd35f0df12d28097f1966191c905c24120b7436",
+      "suspended": false,
+      "defaults": {
+        "pF": 1e-12,
+        "fF": 1e-15,
+        "pH": 1e-12,
+        "nH": 1e-09,
+        "th": 0.5,
+        "Hair": 2.0,
+        "l0": 2,
+        "Lshunt": 3.5e-08,
+        "Cshunt": 3.5e-11,
+        "Lseries": 7e-08,
+        "Cseries": 1.8e-11
+      }
+    },
+    {
+      "path": "examples/demo12_mode_alignment.py",
+      "sha256": "83c306ff836b249e1658d3ea3f5d0446436c34ea3f7fca4300c2351581513c5a",
+      "suspended": false,
+      "defaults": {
+        "wr": 0.002,
+        "gap": 0.015
+      }
+    },
+    {
+      "path": "examples/demo13_helix_antenna.py",
+      "sha256": "ddd089892016dda43b563ec0bf0f338af596c5b9a16d3470a469cecd7b751667",
+      "suspended": false,
+      "defaults": {
+        "f0": 3000000000.0,
+        "c0": 299792458,
+        "wl": 0.09993081933333334,
+        "rad0": 0.015904952941800627,
+        "radw": 0.001,
+        "L": 0.06361981176720251,
+        "porth": 0.002,
+        "dfeed": 0.003
+      }
+    },
+    {
+      "path": "examples/demo14_boundary_selection.py",
+      "sha256": "7bcbc75ca45c539a4d9627b13a05b95bec03a7420bc2d0cb6e3b2d15161fbf9e",
+      "suspended": false,
+      "defaults": {
+        "wga": 0.02286,
+        "wgb": 0.01016,
+        "L": 0.05
+      }
+    },
+    {
+      "path": "examples/demo15_strip_slotline_transition.py",
+      "sha256": "0ea3cdd3bc964a99cf5b32454d60837e02987871d52f041ca38ad2b19570648b",
+      "suspended": false,
+      "defaults": {
+        "th": 1.54,
+        "Lprestub": 2,
+        "Lstub": 8,
+        "angstub": 100,
+        "Lfeed": 20,
+        "Lslot": 20,
+        "wslot": 0.8,
+        "Lleft": 4,
+        "Rcirc": 8
+      }
+    },
+    {
+      "path": "examples/demo16_differential_common_mode.py",
+      "sha256": "ec62ee56b975519bbd7e33ae12f30703fef7930fbced677bf1649d68e6c31f18",
+      "suspended": false,
+      "defaults": {}
+    },
+    {
+      "path": "examples/demo17_step_import.py",
+      "sha256": "307cf9c7877deaaea9e3c08c4a03509d80c9d5c039798283e209dac26592053a",
+      "suspended": false,
+      "defaults": {
+        "Lrod": 0.07
+      }
+    },
+    {
+      "path": "examples/demo18_plotting_and_visualization.py",
+      "sha256": "1fa12c00545f4cfc5a8df066dc362879a9127d2e637d2ed80605f15f43206a54",
+      "suspended": false,
+      "defaults": {
+        "wga": 0.02286,
+        "wgb": 0.01016,
+        "L": 0.05,
+        "rad": 0.03,
+        "th": 0.001,
+        "opening": 0.8,
+        "distance": 0.002
+      }
+    },
+    {
+      "path": "examples/demo19_vivaldi_antenna.py",
+      "sha256": "548387fabcaf1fd05894417165a40cec96ba4580cd15e5059a75c2c533765b06",
+      "suspended": false,
+      "defaults": {
+        "L": 0.07,
+        "W": 0.055,
+        "K": 200,
+        "Radius": 0.02,
+        "th": 0.5,
+        "Lstub": 7,
+        "stub_ang": 80,
+        "stub_ang_off": 20,
+        "slot_margin": 0.005,
+        "wslot": 0.004,
+        "wgap": 0.004,
+        "Wperiod": 0.008,
+        "A": 0.00013743718592964824
+      }
+    },
+    {
+      "path": "examples/demo1_stepped_imp_filter.py",
+      "sha256": "4be7e8c88031c89bb7c6d9b51093c39207c2347ae8bee160e68714a06e999379",
+      "suspended": false,
+      "defaults": {
+        "mil": 2.54e-05,
+        "th": 62,
+        "er": 2.2,
+        "Hair": 60
+      }
+    },
+    {
+      "path": "examples/demo20_optimization.py",
+      "sha256": "101f5a816643b4de02c6007c81d1c3d6042dd318803c17d4ce17004f95a6dfe7",
+      "suspended": false,
+      "defaults": {
+        "wga": 0.02286,
+        "wgb": 0.01016,
+        "Ltot": 0.05,
+        "rin": 0.001,
+        "Lcoax_outside": 0.01
+      }
+    },
+    {
+      "path": "examples/demo21_inverted_F_antenna.py",
+      "sha256": "79ee08ad02d1b54d83241f9a6104fc0b4bb6cf86dbe64b1c9b71c353af31c46e",
+      "suspended": false,
+      "defaults": {
+        "L1": 0.00394,
+        "L2": 0.0024700000000000004,
+        "L3": 0.0047599999999999995,
+        "L4": 0.00264,
+        "L5": 0.00177,
+        "L6": 0.004900000000000001,
+        "W1": 0.0009000000000000001,
+        "W2": 0.0005,
+        "D1": 0.0005,
+        "D2": 0.0003,
+        "D3": 0.0003,
+        "D4": 0.0005,
+        "D5": 0.0006500000000000001,
+        "D6": 0.0017,
+        "ground_W": 0.01404,
+        "ground_L": 0.03,
+        "f1": 2000000000.0,
+        "f2": 3000000000.0
+      }
+    },
+    {
+      "path": "examples/demo22_RCS.py",
+      "sha256": "1c4c93bd3a233de736b189f3dfea999a7aae826f91fd92bff77ff7e328167d14",
+      "suspended": false,
+      "defaults": {
+        "air_radius": 1.5
+      }
+    },
+    {
+      "path": "examples/demo2_combline_filter.py",
+      "sha256": "34d298e9e01fb496abc8fc4a8cea3adaadb42d03307b6c51f77fcd6e6d38613d",
+      "suspended": false,
+      "defaults": {
+        "mil": 2.54e-05,
+        "a": 0.006096,
+        "b": 0.0062992000000000005,
+        "d1": 0.000254,
+        "d2": 0.000254,
+        "dc": 0.00021590000000000002,
+        "lr1": 0.006045200000000001,
+        "lr2": 0.006045200000000001,
+        "W": 0.0021336000000000003,
+        "S1": 0.0029718,
+        "S2": 0.0034544000000000003,
+        "C1": 0.006083300000000001,
+        "h": 0.0018796000000000002,
+        "wi": 0.0021336000000000003,
+        "Lbox": 0.0277876,
+        "x1": 0.0032004000000000004,
+        "x2": 0.0083058,
+        "x3": 0.013893800000000001,
+        "x4": 0.0194818,
+        "x5": 0.0245872,
+        "rout": 0.0010287,
+        "rin": 0.0003175,
+        "lfeed": 0.00254
+      }
+    },
+    {
+      "path": "examples/demo3_coupled_line_filter.py",
+      "sha256": "b560afb754affd99eb39d8b5def5acb6d15b1df403df7cc205232f2f1f103575",
+      "suspended": false,
+      "defaults": {
+        "mil": 2.54e-05,
+        "W": 20.0,
+        "D": 20.0,
+        "w0": 37.0,
+        "l0": 100.0,
+        "l1": 314.22,
+        "l2": 301.658,
+        "l3": 300.589,
+        "th": 20.0,
+        "Wtot": 2336.73,
+        "WP": 200,
+        "Dtot": 750,
+        "extra": 100
+      }
+    },
+    {
+      "path": "examples/demo4_patch_antenna.py",
+      "sha256": "f28660efca403fe8ec9ddfeac8d8749375f76600c140915d2b96d218a2f98282",
+      "suspended": false,
+      "defaults": {
+        "Wpatch": 0.053,
+        "Lpatch": 0.052000000000000005,
+        "wline": 0.0032,
+        "wstub": 0.007,
+        "lstub": 0.0155,
+        "wsub": 0.1,
+        "hsub": 0.1,
+        "th": 0.001524,
+        "Rair": 0.1,
+        "f1": 1545000000.0,
+        "f2": 1605000000.0
+      }
+    },
+    {
+      "path": "examples/demo5_revolve.py",
+      "sha256": "42ff1f1b379cbcce5e44f14a212fdd907629ef14ec9f8ec09289ea83e6f57453",
+      "suspended": false,
+      "defaults": {
+        "aperture_radius": 0.05167,
+        "aperture_length": 0.07809,
+        "waveguide_radius": 0.013895,
+        "waveguide_length": 0.02872,
+        "airbox_length": 0.06,
+        "airbox_width": 0.15
+      }
+    },
+    {
+      "path": "examples/demo6_striplines_with_vias.py",
+      "sha256": "87e45c84ce038d79399c72963b640bf34449e70c8a8fa95ff4b3d2150733978e",
+      "suspended": false,
+      "defaults": {
+        "th": 1.0
+      }
+    },
+    {
+      "path": "examples/demo7_periodic_cells.py",
+      "sha256": "0396795705fddd4553ef5d6f7230f6b706cf91ebbb6a5f461419be228556b042",
+      "suspended": false,
+      "defaults": {
+        "a": 0.106,
+        "b": 0.03,
+        "H": 0.07,
+        "wga": 0.07,
+        "wgb": 0.018000000000000002,
+        "fl": 0.025
+      }
+    },
+    {
+      "path": "examples/demo8_waveguide_bpf_synthesis.py",
+      "sha256": "49c7d8b3b80af25c9e722ae63853dc60b242685e497a57da5641b46dc1400422",
+      "suspended": false,
+      "defaults": {
+        "dielectric_constant": 1.0,
+        "c0": 299792458,
+        "wga": 0.02286,
+        "wgb": 0.01016,
+        "f1": 9600000000.0,
+        "f2": 10000000000.0,
+        "Lfeed": 0.02,
+        "t_thickness": 0.001
+      }
+    },
+    {
+      "path": "examples/demo9_dielectric_resonator.py",
+      "sha256": "f31087c677ee1cfd88669da185ba9711dde5b2dfe0c3bd3c13063477362fb38b",
+      "suspended": false,
+      "defaults": {
+        "S": 0.05156199999999999,
+        "W": 0.0508,
+        "Dsup": 0.014224,
+        "Lsup": 0.02032,
+        "Dres": 0.0298704,
+        "Lres": 0.0122174,
+        "Nmodes": 5
+      }
+    },
+    {
+      "path": "examples/heatconduction/demo1_basic_simulation.py",
+      "sha256": "22821ffcec4bebb7c97050c352f767955754933f4ecc1016d2005e2e4653e447",
+      "suspended": true,
+      "defaults": {
+        "Tamb": 293.15,
+        "Length": 1.0,
+        "Diam": 0.1,
+        "heatflux": 10
+      }
+    },
+    {
+      "path": "examples/heatconduction/demo2_chip_heating.py",
+      "sha256": "933bcdaddca072b1dfacc6b3547d761fb955b08989ecb88a4d7955eecb60dea4",
+      "suspended": true,
+      "defaults": {
+        "Wchip": 0.008,
+        "Dchip": 0.008,
+        "thchip": 0.0005,
+        "W_TIM": 0.01,
+        "D_TIM": 0.01,
+        "th_TIM": 5e-05,
+        "wline": 0.0015,
+        "Lline": 0.005,
+        "thpcb": 0.0016,
+        "Wpcb": 0.02,
+        "Dpcb": 0.02,
+        "W_heatsource": 0.005,
+        "D_heatsource": 0.005,
+        "Power": 5,
+        "T_ambient": 293.15
+      }
+    },
+    {
+      "path": "examples/heatconduction/demo3_RF_heating.py",
+      "sha256": "430f963088fa19c872435272748e25d2240e5dc453dc641f6080a6dc1ba48a1f",
+      "suspended": true,
+      "defaults": {
+        "wga": 0.02286,
+        "wgb": 0.01016,
+        "L": 0.05,
+        "lblock": 0.01,
+        "hblock": 0.004,
+        "thmet": 0.001,
+        "T_amb": 293.15
+      }
+    },
+    {
+      "path": "examples/heatconduction/demo4_black_body_radiation.py",
+      "sha256": "c2a0457be2bbd745aed06f4183cf54eb3c56b833c5685a4638cef9684c95099b",
+      "suspended": true,
+      "defaults": {
+        "Wbar": 0.01,
+        "Wpanel": 0.8,
+        "Lpanel": 0.5,
+        "thpanel": 0.005,
+        "Npanels": 4,
+        "gap": 0.02
+      }
+    },
+    {
+      "path": "examples/heatconduction/demo5_transient_heat_conduction.py",
+      "sha256": "48acd8ae88791cb90762023bcaa83d0c95e4091615291bd8283b6e0bb168d678",
+      "suspended": true,
+      "defaults": {
+        "R": 0.0331,
+        "H": 0.122,
+        "th": 0.0005,
+        "time": 900,
+        "z": 0.061
+      }
+    }
+  ]
+}

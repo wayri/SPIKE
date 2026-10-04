@@ -61,6 +61,8 @@
       "../../python/spike_core": "python/spike_core",
       "../../python/spikes": "python/spikes",
       "../../extensions": "extensions",
+      "../../examples/upstream-emerge": "examples/upstream-emerge",
+      "../../extension_sdk/python": "extension_sdk/python",
       "../../schemas": "schemas",
       "../../LICENSE": "legal/LICENSE",
       "../../NOTICE": "legal/NOTICE",

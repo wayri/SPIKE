@@ -8,6 +8,8 @@ import contextlib
 import io
 import json
 import os
+import platform
+from importlib.metadata import PackageNotFoundError, version
 import sys
 import traceback
 from pathlib import Path
@@ -40,6 +42,13 @@ class _CappedText(io.TextIOBase):
         return "".join(self.parts) + ("\n[output truncated]" if self.truncated else "")
 
 
+def _package_version(name: str) -> str | None:
+    try:
+        return version(name)
+    except PackageNotFoundError:
+        return None
+
+
 def run(request: dict[str, Any]) -> dict[str, Any]:
     output = _CappedText()
     errors = _CappedText()
@@ -64,7 +73,11 @@ def run(request: dict[str, Any]) -> dict[str, Any]:
             "stdout": output.getvalue(), "stderr": errors.getvalue(),
             "return_code": 0 if status == "completed" else 1,
             "published_result": api.published_result if status == "completed" else None,
-            "ui_actions": api.ui_actions if status == "completed" else []}
+            "views": api.views if status == "completed" else [],
+            "ui_actions": api.ui_actions if status == "completed" else [],
+            "runtime": {"executable": sys.executable, "python_version": platform.python_version(),
+                        "emerge_version": _package_version("emerge"),
+                        "optycal_version": _package_version("optycal")}}
 
 
 def main() -> int:

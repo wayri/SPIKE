@@ -263,7 +263,7 @@ class ProcessExtension:
             # Standard OS locations allow installed optional runtimes and SPIKE
             # registrations to be discovered. Do not copy arbitrary environment
             # variables (tokens, Python paths, or application credentials).
-            for key in ("USERPROFILE", "LOCALAPPDATA", "APPDATA", "ProgramFiles", "ProgramFiles(x86)", "HOME", "XDG_STATE_HOME", "XDG_DATA_HOME", "SPIKE_STATE_HOME", "OPENEMS_INSTALL_PATH", "SPIKE_OPENEMS_PYTHON"):
+            for key in ("USERPROFILE", "LOCALAPPDATA", "APPDATA", "ProgramFiles", "ProgramFiles(x86)", "HOME", "XDG_STATE_HOME", "XDG_DATA_HOME", "SPIKE_STATE_HOME", "OPENEMS_INSTALL_PATH", "SPIKE_OPENEMS_PYTHON", "SPIKE_EMERGE_PYTHON", "SPIKE_OPTYCAL_PYTHON"):
                 if os.environ.get(key):
                     environment[key] = os.environ[key]
             try:

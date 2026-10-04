@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import { persistedEnginePython } from "./persistedEnginePython";
 /** UI admission of solved source metadata; numerical interpretation stays in the adapter. */
 export function optycalRecord(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
@@ -16,7 +17,7 @@ export type OptycalSetup = {
   antenna_translation_mm: [string, string, string]; antenna_rotation_deg: [string, string, string];
   structure_translation_mm: [string, string, string]; structure_rotation_deg: [string, string, string];
 };
-export const defaultOptycalSetup = (): OptycalSetup => ({ step_path: "", frequency_hz: "", mesh_size_mm: "25", observation_radius_m: "100", theta_step_deg: "15", phi_step_deg: "30", python_executable: "", antenna_aperture_mm: "100", source_phase_acknowledged: false, antenna_translation_mm: ["0", "0", "0"], antenna_rotation_deg: ["0", "0", "0"], structure_translation_mm: ["0", "0", "1000"], structure_rotation_deg: ["0", "0", "0"] });
+export const defaultOptycalSetup = (): OptycalSetup => ({ step_path: "", frequency_hz: "", mesh_size_mm: "25", observation_radius_m: "100", theta_step_deg: "15", phi_step_deg: "30", python_executable: persistedEnginePython(), antenna_aperture_mm: "100", source_phase_acknowledged: false, antenna_translation_mm: ["0", "0", "0"], antenna_rotation_deg: ["0", "0", "0"], structure_translation_mm: ["0", "0", "1000"], structure_rotation_deg: ["0", "0", "0"] });
 
 export function optycalParameters(setup: OptycalSetup, sourceResult: unknown): Record<string, unknown> {
   const source = admitOptycalSource(sourceResult);

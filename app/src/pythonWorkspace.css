@@ -15,6 +15,8 @@
 .python-workspace > header small { color: var(--spike-table-muted, #8097a0); font-size: 10px; }
 .python-workspace .python-workspace-toolbar { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 7px 10px; border-bottom: 1px solid var(--spike-table-border, #2d424b); }
 .python-workspace .python-toolbar-spacer { flex: 1; }
+.python-workspace .python-runtime-label { min-width: 130px; max-width: 340px; flex: 1 1 250px; display: flex; align-items: center; gap: 5px; color: var(--spike-table-muted, #9bb3bc); }
+.python-workspace .python-runtime-label input { width: 100%; min-width: 90px; height: 28px; padding: 3px 7px; border: 1px solid var(--spike-table-border, #2d424b); border-radius: 3px; color: var(--spike-table-text, #d8e4e8); background: var(--spike-table-surface, #0f1d26); font: 10px Consolas, 'Cascadia Code', monospace; }
 .python-workspace .python-run-button { color: #101b21; border-color: #d69d3b; background: #dba541; font-weight: 600; }
 .python-workspace-timeout { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; color: var(--spike-table-muted, #9bb3bc); font-size: 10px; }
 .python-workspace-timeout input { width: 56px; padding: 4px; }
@@ -167,3 +169,52 @@
 .python-workspace-help section, .python-workspace-help kbd { border-color: var(--spike-table-border); }
 .python-workspace-help dt { color: var(--spike-table-text); }
 .python-workspace-help dd { color: var(--spike-table-muted); }
+
+/* The editor paints only visible highlighted rows beneath the native textarea. */
+.python-code-editor {
+ --py-code-font: 12px/18px Consolas, 'Cascadia Code', monospace;
+ --py-code-text: var(--spike-table-text, #dce9e9); --py-code-muted: var(--spike-table-muted, #7d98a3);
+ --py-code-keyword: #d9a8ff; --py-code-builtin: #71d2dc; --py-code-definition: #f1d178; --py-code-class: #79dcc2;
+ --py-code-parameter: #e5c0a7; --py-code-decorator: #f4a6c8; --py-code-module: #91c4ff; --py-code-number: #f3aa79;
+ --py-code-string: #a8d58c; --py-code-comment: #94a590; --py-code-operator: #c8bbd2;
+ display: grid; grid-template-columns: 61px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); position: relative; overflow: hidden;
+}
+.python-code-editor .python-line-gutter { min-height: 0; }
+.python-editor-surface { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.python-syntax-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.python-syntax-window { position: absolute; top: 0; left: 12px; width: max-content; min-width: calc(100% - 24px); will-change: transform; white-space: pre; font: var(--py-code-font); tab-size: 4; }
+.python-syntax-line { height: 18px; min-width: 100%; }
+.python-code-editor .python-editor-surface textarea { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; min-width: 0; min-height: 0; padding: 12px; color: transparent; caret-color: var(--py-code-text); background: transparent; font: var(--py-code-font); white-space: pre; }
+.python-code-editor .python-editor-surface textarea::selection { color: transparent; background: color-mix(in srgb, var(--spike-table-edit, #75ded6) 30%, transparent); }
+.python-code-editor.highlight-pending .python-editor-surface textarea { color: var(--py-code-text); }
+.python-code-editor.highlight-pending .python-syntax-layer { visibility: hidden; }
+.python-code-editor.clipboard-pending textarea { cursor: wait; }
+.python-editor-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.python-token-keyword { color: var(--py-code-keyword); font-weight: 600; } .python-token-builtin { color: var(--py-code-builtin); }
+.python-token-definition { color: var(--py-code-definition); } .python-token-class-name { color: var(--py-code-class); }
+.python-token-parameter { color: var(--py-code-parameter); } .python-token-decorator { color: var(--py-code-decorator); }
+.python-token-module { color: var(--py-code-module); } .python-token-number { color: var(--py-code-number); }
+.python-token-string { color: var(--py-code-string); } .python-token-comment { color: var(--py-code-comment); font-style: italic; }
+.python-token-operator { color: var(--py-code-operator); }
+:root[data-theme="light"] .python-code-editor, [data-table-theme="light"] .python-code-editor { --py-code-keyword:#7b2da6; --py-code-builtin:#006b75; --py-code-definition:#855900; --py-code-class:#08705e; --py-code-parameter:#7a4931; --py-code-decorator:#a12f67; --py-code-module:#285da8; --py-code-number:#9a431e; --py-code-string:#3f7027; --py-code-comment:#60705a; --py-code-operator:#554b5d; }
+:root[data-theme="high-contrast"] .python-code-editor, [data-table-theme="high-contrast"] .python-code-editor { --py-code-keyword:#ffdc72; --py-code-builtin:#a7fff0; --py-code-definition:#fff2a3; --py-code-class:#9bffe5; --py-code-parameter:#ffd6bd; --py-code-decorator:#ffb8dd; --py-code-module:#b6deff; --py-code-number:#ffc09a; --py-code-string:#c7f5a8; --py-code-comment:#d1dfeb; --py-code-operator:#fff; }
+@media (forced-colors: active) { .python-code-editor .python-editor-surface textarea { color: CanvasText; caret-color: CanvasText; forced-color-adjust: auto; } .python-syntax-layer { display: none; } }
+
+/* Running state and viewport-compatible floating window. */
+.python-window-actions { display: flex; align-items: center; gap: 4px; }
+.python-run-status { flex: 0 0 auto; min-width: 0; padding: 5px 9px; border-bottom: 1px solid var(--spike-table-border); color: var(--spike-table-text); background: var(--spike-table-toolbar); }
+.python-run-status > div { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.python-run-status > div > span { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.python-run-status time { flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.python-run-status progress { display: block; width: 100%; height: 7px; margin: 4px 0; accent-color: var(--spike-table-edit); }
+.python-run-status small, .python-runtime-result { color: var(--spike-table-muted); }
+.python-workspace-shade.python-floating-shade { background: transparent; pointer-events: none; }
+.python-workspace.python-floating { position: fixed; pointer-events: auto; margin: 0; max-width: none; max-height: none; box-shadow: 0 12px 48px #0009; }
+.python-workspace.python-floating > header { cursor: move; touch-action: none; }
+.python-workspace .python-resize-handle { position: absolute; right: 1px; bottom: 1px; width: 23px; height: 23px; min-height: 0; padding: 0; border: 0; color: var(--spike-table-focus); background: var(--spike-table-toolbar); cursor: nwse-resize; touch-action: none; }
+.python-workspace.python-floating > footer { padding-right: 28px; }
+.python-workspace-output > .python-output-heading { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 7px; padding: 3px 8px; background: var(--spike-table-toolbar); }
+.python-workspace-output > .python-output-body { display: block; padding: 0; color: var(--spike-table-text); letter-spacing: normal; }
+.python-output-body .python-runtime-result { display: block; padding: 5px 12px 0; overflow-wrap: anywhere; }
+.python-output-body pre { margin: 0; }
+@media (max-width: 1040px) { .python-workspace.python-workspace.python-floating { width: auto; height: auto; } }

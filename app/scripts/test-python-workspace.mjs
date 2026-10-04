@@ -10,9 +10,16 @@ import { importTestTypescript } from "./import-test-typescript.mjs";
 globalThis.crypto ??= webcrypto;
 const storage = new Map();
 globalThis.sessionStorage = { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) };
+const localStorageValues = new Map();
+globalThis.localStorage = { getItem: key => localStorageValues.get(key) ?? null, setItem: (key, value) => localStorageValues.set(key, String(value)) };
+globalThis.window = { innerWidth: 1440, innerHeight: 900, addEventListener() {}, removeEventListener() {}, setTimeout };
 const model = await importTestTypescript("pythonWorkspaceModel");
 const templates = await importTestTypescript("pythonWorkspaceTemplates");
 const workspaceContext = await importTestTypescript("pythonWorkspaceContext");
+const floatingWindow = await importTestTypescript("pythonFloatingWindow");
+const geometryPreview = await importTestTypescript("emergeGeometryPreview");
+const scriptDataViews = await importTestTypescript("scriptDataViews");
+const viewportModel = await importTestTypescript("scriptResultViewportModel");
 assert.equal(model.pythonParent("C:\\a.py"), "C:\\");
 assert.equal(model.pythonParent("/a.py"), "/");
 assert.equal(model.pythonPathKey("C:\\Scripts\\Run.py"), model.pythonPathKey("c:/scripts/run.py"));
@@ -40,7 +47,7 @@ const mockReact = { ...React,
   useRef(initial) { const index = cell++; return cells[index] ??= { current: initial }; },
   useEffect() {}, useMemo: factory => factory(),
 };
-const stubs = Object.fromEntries(["PythonCodeEditor", "PythonDebugPanel", "PythonFileExplorer", "PythonTemplateLibrary", "PythonWorkspaceHelp", "PythonRecoveryPanel", "PythonNetBrowser"].map(name => [name, function Stub() { return null; }]));
+const stubs = Object.fromEntries(["PythonCodeEditor", "PythonDebugPanel", "PythonFileExplorer", "PythonTemplateLibrary", "PythonWorkspaceHelp", "PythonRecoveryPanel", "PythonNetBrowser", "PythonRunStatus"].map(name => [name, function Stub() { return null; }]));
 const bridge = {
   isDesktopShell: () => desktop,
   openNativeTextFile: async () => nativeFile,
@@ -67,6 +74,10 @@ new Function("require", "module", "exports", compiled)(name => {
   if (name === "./pythonWorkspaceContext") return workspaceContext;
   if (name === "./pythonWorkspaceModel") return model;
   if (name === "./pythonWorkspaceTemplates") return templates;
+  if (name === "./pythonFloatingWindow") return floatingWindow;
+  if (name === "./emergeGeometryPreview") return geometryPreview;
+  if (name === "./scriptDataViews") return scriptDataViews;
+  if (name === "./scriptResultViewportModel") return viewportModel;
   if (name === "./extensionAnalysisResult") return { extensionAnalysisResult: () => null };
   if (name.slice(2) in stubs) return { default: stubs[name.slice(2)] };
   return require(name);
@@ -78,6 +89,7 @@ let tree;
 const render = () => { cell = 0; tree = Workspace({ design: null, results: null, onClose: () => closed++, onStatus() {}, onUiAction: action => interfaceActions.push(action), ...workspaceProps }); return tree; };
 const button = label => { const found = elements(tree).find(node => node.type === "button" && (content(node).trim() === label || node.props["aria-label"] === label)); assert.ok(found, `button ${label} exists`); return found; };
 const editor = () => elements(tree).find(node => node.type === stubs.PythonCodeEditor);
+const interpreter = () => elements(tree).find(node => node.type === "input" && node.props["aria-label"] === "Python interpreter path");
 const tabs = () => elements(tree).filter(node => node.props.role === "tab");
 const flush = async (until = () => true) => {
   for (let attempt = 0; attempt < 100; attempt++) {
@@ -88,6 +100,11 @@ const flush = async (until = () => true) => {
 };
 
 render(); assert.equal(tabs().length, 1);
+assert.equal(interpreter().props.value, "", "worker default remains the initial interpreter");
+interpreter().props.onChange({ target: { value: "C:/Python/python.exe" } }); render();
+assert.equal(localStorageValues.get("spike-python-interpreter"), "C:/Python/python.exe");
+assert.equal(button("Debug").props.disabled, true, "external interpreters do not silently enter the worker-default debugger");
+interpreter().props.onChange({ target: { value: "" } }); render();
 button("Add Python tab").props.onClick(); render(); assert.equal(tabs().length, 2);
 button("Close untitled-2.py").props.onClick(); render(); assert.equal(tabs().length, 1);
 const workspaceDialog = () => elements(tree).find(node => node.props.role === "dialog");
@@ -159,6 +176,7 @@ scriptResult = { ...scriptResult, status: "completed" };
 let releaseRun;
 runGate = new Promise(resolve => { releaseRun = resolve; });
 button("Run").props.onClick(); render();
+assert.ok(elements(tree).some(node => node.type === stubs.PythonRunStatus), "pending runs render elapsed progress");
 workspaceProps = { workspace: { ...context, selected_board_id: "B" } }; render();
 releaseRun(); runGate = null; await flush();
 assert.equal(interfaceActions.length, 1, "context changes block stale run actions");
@@ -167,8 +185,30 @@ scriptResult = { ...scriptResult, ui_actions: [{ action: "select_net", board_id:
 button("Run").props.onClick(); await flush(); assert.equal(interfaceActions.length, 1, "invalid target cannot be dispatched");
 assert.ok(content(tree).includes("Python interface target is unavailable"));
 
+const physicalView = {
+  contract: "spike/data-view/v1", id: "11111111-1111-1111-1111-111111111111", kind: "mesh", title: "Physical model",
+  provenance: JSON.stringify({ scene_id: "a".repeat(64), run_id: "22222222-2222-2222-2222-222222222222", coordinate_frame: "emerge-global-xyz", coordinate_unit: "m", scene_role: "physical_geometry", phase: "solved", regions: [{ name: "model", material: "copper", triangle_start: 0, triangle_count: 1 }] }),
+  coordinate_unit: "m", vertices: [[0, 0, 0], [1, 0, 0], [0, 1, 0]], triangles: [[0, 1, 2]],
+};
+const viewportCalls = [];
+assert.equal(scriptDataViews.admitDataViews([physicalView]).length, 1, "physical fixture is an admitted data view");
+assert.ok(viewportModel.physicalGeometry(physicalView), "physical fixture has valid scene provenance");
+workspaceProps = { workspace: context, onShowViewport: (...args) => viewportCalls.push(args) };
+scriptResult = { contract: "spike/python-script-result/v1", status: "completed", stdout: "solved", return_code: 0, views: [physicalView] };
+render();
+interpreter().props.onChange({ target: { value: "C:/EMerge/python.exe" } }); render();
+requests.length = 0;
+button("Run").props.onClick(); await flush();
+assert.equal(requests.find(request => request.method === "run_python_script").params.python_executable, "C:/EMerge/python.exe", "Run forwards the selected interpreter explicitly");
+assert.equal(viewportCalls.length, 1, "a completed physical model opens in the viewport");
+assert.match(viewportCalls[0][1], /physical model$/); assert.equal(viewportCalls[0][2], true, "automatic viewport keeps the editor open");
+assert.equal(button("Center Python window").props.disabled, undefined, "successful physical output floats the workspace");
+button("Show in viewport").props.onClick(); assert.equal(viewportCalls.length, 2, "admitted completed output can be shown again");
+scriptResult = { ...scriptResult, status: "failed" };
+button("Run").props.onClick(); await flush();
+assert.equal(button("Show in viewport").props.disabled, true, "failed output cannot be sent to the viewport");
+
 desktop = false; render(); assert.equal(button("Run").props.disabled, true); assert.equal(button("Debug").props.disabled, true);
-globalThis.window = { setTimeout };
 globalThis.document = { createElement: () => ({ click() {} }) };
 button("Templates").props.onClick(); render();
 const library = elements(tree).find(node => node.type === stubs.PythonTemplateLibrary);

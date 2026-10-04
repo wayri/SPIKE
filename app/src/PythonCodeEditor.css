@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* The input overlays the syntax layer; it must never paint over highlighted text. */
+.python-workspace .python-code-editor textarea { background: transparent; color: transparent; font: var(--py-code-font); }
+.python-workspace .python-code-editor.highlight-pending textarea { color: var(--py-code-text); }
+.python-code-editor.read-only { filter: saturate(.8); }
+.python-editor-status { grid-column: 1 / -1; max-height: 64px; overflow: auto; margin: 0; padding: 5px 10px; color: var(--py-code-text); border-top: 1px solid var(--spike-table-border); font: 11px/16px ui-sans-serif, system-ui, sans-serif; overflow-wrap: anywhere; }
+.python-editor-status:empty { display: none; }
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] .python-code-editor, [data-table-theme="system"] .python-code-editor { --py-code-text:#2f2936; --py-code-muted:#8b8192; --py-code-keyword:#7b2da6; --py-code-builtin:#006b75; --py-code-definition:#855900; --py-code-class:#08705e; --py-code-parameter:#7a4931; --py-code-decorator:#a12f67; --py-code-module:#285da8; --py-code-number:#9a431e; --py-code-string:#3f7027; --py-code-comment:#60705a; --py-code-operator:#554b5d; }
+}
+@media (forced-colors: active) { .python-workspace .python-code-editor textarea { color: CanvasText; } }

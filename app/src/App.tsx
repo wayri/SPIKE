@@ -1,3 +1,4 @@
+import { completedScriptViewportRun, type ScriptViewportRun } from "./scriptViewportImport";
 import { cloneImportedStudies, prepareStudyDataset, preflightStudyRunCapture, preflightStudyDatasetUpdate } from "./studyWorkspaceModel";
 import { ownsKeyboardInput } from "./shortcutContext";
 import AssemblyQuickBar from "./AssemblyQuickBar";
@@ -110,6 +111,7 @@ import ProjectManager, { RecentProject } from "./ProjectManager";
 import ProjectUpgradeDialog from "./ProjectUpgradeDialog";
 import SpiceWorkbench from "./SpiceWorkbench";
 import { admitContextScript, CONTEXT_SCRIPT_EVENT, openContextScript, type ContextScript } from "./contextScript";
+const ScriptResultViewport = lazy(() => import("./ScriptResultViewport"));
 const PythonWorkspace = lazy(() => import("./PythonWorkspace"));
 import { admittedPythonUiActions, pythonBoardNets, pythonWorkspaceContext, type PythonUiAction } from "./pythonWorkspaceContext";
 import { defaultSpiceWorkspace, normalizeSpiceWorkspace, SpiceWorkspace } from "./spiceWorkspace";
@@ -1131,6 +1133,11 @@ export default function App() {
   const [benchmarkOpen, setBenchmarkOpen] = useState(false);
   const [spiceOpen, setSpiceOpen] = useState(false);
   const [pythonOpen, setPythonOpen] = useState(false);
+  const [scriptViewport, setScriptViewport] = useState<ScriptViewportRun | null>(null);
+  const showScriptViewport = (result: unknown, label: string, keepEditorOpen = false) => {
+    try { setScriptViewport(completedScriptViewportRun(result, label)); setPythonOpen(keepEditorOpen); setStatus(`${label}: simulation output shown in viewport.`); }
+    catch (error) { setStatus(error instanceof Error ? error.message : String(error)); }
+  };
   const [contextScriptDraft, setContextScriptDraft] = useState<ContextScript | null>(null);
   useEffect(() => {
     const open = (event: Event) => { const draft = admitContextScript((event as CustomEvent).detail); if (!draft) return;
@@ -5166,7 +5173,8 @@ export default function App() {
               onExpand={() => openAssemblyPlacement()} onWorkspace={() => openAssemblyWorkspace()}
               onLayers={() => openBoardManager("layers")} onNets={() => openBoardManager("nets")} onLinks={() => openBoardManager("links")} />
           </div>}
-          <BoardViewport
+          {scriptViewport && <div className="main-script-result-surface"><Suspense fallback={<div role="status">Loading simulation results…</div>}><ScriptResultViewport views={scriptViewport.views} runLabel={scriptViewport.label} onClose={() => setScriptViewport(null)}/></Suspense></div>}
+          {!scriptViewport && <BoardViewport
             qualityTarget={viewportQualityHost}
             onEmiScene={tab === "EM" ? handleEmiScene : undefined}
             board={boardData}
@@ -5240,7 +5248,7 @@ export default function App() {
             onTelemetry={handleTelemetry}
             onModelStatus={setModelLoadStatus}
             onAssemblyPartViewportStatus={handleAssemblyPartViewportStatus}
-          />
+          />}
           {emResultManagerOpen && emViewportRecords.length > 0 && <EMViewportResultManager records={emViewportRecords} activeRecordId={emViewportRecord?.id ?? ""} settings={emViewportSettings} data={emViewportData} onSelectRecord={id => { setResultDisplay(id); setEmViewportSettings(current => ({ ...current, visible: true, frequencyIndex: 0, selectedSample: 0, quantity: availableEMQuantities(emViewportRecords.find(row => row.id === id)!)[0]?.id ?? "far_e" })); setViewMode("3D"); setEmiChamberOpen(false); }} onSettingsChange={setEmViewportSettings} onClose={() => setEmResultManagerOpen(false)} />}
           {tab === "EM" && emiChamberOpen && <EmiChamberWorkspace
             source={emiScene} setup={emiSetup.chamber} hasBoard={Boolean(boardData)}
@@ -5431,7 +5439,7 @@ export default function App() {
     {aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} onOpenGuide={() => { setAboutOpen(false); setHelpOpen(true); }} onOpenValidation={() => { setAboutOpen(false); setBenchmarkOpen(true); }} />}
     {benchmarkOpen && <BenchmarkCenter onClose={() => setBenchmarkOpen(false)} onStatus={setStatus} />}
     {spiceOpen && <SpiceWorkbench initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} />}
-    {pythonOpen && <Suspense fallback={<div className="modal-shade" role="status">Loading Python editor…</div>}><PythonWorkspace initialScript={contextScriptDraft ?? undefined} workspace={pythonContext} onUiAction={handlePythonUiAction} onAttachDataset={attachStudyDataset} design={pythonContext.boards.find(board => board.id === pythonContext.selected_board_id)?.design ?? designForExchange()} results={extensionResultsContext(activeAnalysisResult)} onClose={() => { setPythonOpen(false); setContextScriptDraft(null); }} onStatus={setStatus} /></Suspense>}
+    {pythonOpen && <Suspense fallback={<div className="modal-shade" role="status">Loading Python editor…</div>}><PythonWorkspace onShowViewport={showScriptViewport} initialScript={contextScriptDraft ?? undefined} workspace={pythonContext} onUiAction={handlePythonUiAction} onAttachDataset={attachStudyDataset} design={pythonContext.boards.find(board => board.id === pythonContext.selected_board_id)?.design ?? designForExchange()} results={extensionResultsContext(activeAnalysisResult)} onClose={() => { setPythonOpen(false); setContextScriptDraft(null); }} onStatus={setStatus} /></Suspense>}
     {bondManagerOpen && <BondManager
       bonds={componentBonds}
       validation={bondValidation}

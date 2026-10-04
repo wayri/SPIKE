@@ -1,0 +1,110 @@
+{
+  "contract": "spike/em-study/v1",
+  "id": "emerge-demo11-lumped-element-filter",
+  "title": "EMerge upstream: Demo 11 lumped element filter",
+  "summary": "Native parameter/source wrapper for the pinned upstream default. Requires a compatible external EMerge3 runtime; wrapper is not solver qualification.",
+  "category": "EMerge defaults",
+  "mode": "emerge",
+  "parameters": [
+    {
+      "key": "pF",
+      "label": "Pf",
+      "value": 1e-12,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "fF",
+      "label": "Ff",
+      "value": 1e-15,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "pH",
+      "label": "Ph",
+      "value": 1e-12,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "nH",
+      "label": "Nh",
+      "value": 1e-09,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "th",
+      "label": "Th",
+      "value": 0.5,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Hair",
+      "label": "Hair",
+      "value": 2.0,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "l0",
+      "label": "L0",
+      "value": 2,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Lshunt",
+      "label": "Lshunt",
+      "value": 3.5e-08,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Cshunt",
+      "label": "Cshunt",
+      "value": 3.5e-11,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Lseries",
+      "label": "Lseries",
+      "value": 7e-08,
+      "unit": "source units (see original)"
+    },
+    {
+      "key": "Cseries",
+      "label": "Cseries",
+      "value": 1.8e-11,
+      "unit": "source units (see original)"
+    }
+  ],
+  "sources": [
+    {
+      "title": "Pinned EMerge upstream example",
+      "url": "https://github.com/FennisRobert/EMerge/blob/75e6e98170a6628688593f917c1bb63b52578d02/examples/demo11_lumped_element_filter.py"
+    }
+  ],
+  "assumptions": [
+    "Original source and LICENSE are retained byte-for-byte in the isolated upstream pack.",
+    "Numeric scalar overrides use the units and conventions in the original script; integers remain integers.",
+    "Interactive view/show calls are suppressed; bounded numerical curves and spatial samples retain explicit stride and provenance. Desktop execution serializes sweeps, permits automatic solver selection and bounds adaptive refinement to two steps. Edit execution_options in the script for an unrestricted study; this is not convergence qualification.",
+    "Scalar/vector spatial display samples are captured in native views; full samples are preserved in NPZ sidecars. Gmsh surface-corner previews retain original solver coordinates and mesh sidecars. Parametric CAD, port-mode overlays and Smith grids are not converted.",
+    "Runtime compatibility and numerical convergence must be checked per example."
+  ],
+  "expected": [
+    "Original example behavior at unchanged parameter defaults, subject to installed engine compatibility.",
+    "Execution record and available numerical curves; no synthetic replacement results."
+  ],
+  "script": {
+    "language": "python",
+    "code": "from pathlib import Path\nimport os, runpy\nresource_root=Path(os.environ.get('SPIKE_HOME') or os.environ.get('SPIKE_WORKSPACE') or Path.cwd())\nbridge=resource_root/'examples'/'upstream-emerge'/'bridge.py'\nif not bridge.is_file():\n    raise RuntimeError('EMerge example resources are unavailable; select a SPIKE-Em source/resource root with SPIKE_HOME')\n# Desktop profile preserves geometry/frequencies, serializes sweep jobs and lets EMerge select an available solver.\nexecution_options={'serial_sweep': True, 'solver': 'AUTO', 'max_adaptive_steps': 2}\nrunpy.run_path(str(bridge))['run_example']('examples/demo11_lumped_element_filter.py', study_parameters, spike, execution_options)\n"
+  },
+  "provenance": {
+    "origin": "upstream-example-native-wrapper",
+    "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+  },
+  "engine": {
+    "name": "emerge",
+    "version": "3.0.0 (upstream API; installed audit3.0.0a19)"
+  },
+  "upstream": {
+    "path": "examples/demo11_lumped_element_filter.py",
+    "commit": "75e6e98170a6628688593f917c1bb63b52578d02"
+  },
+  "status": "requires-engine"
+}

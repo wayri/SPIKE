@@ -14,11 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from extension_sdk.python.spike_extension_sdk import analysis_envelope, analysis_result, read_request, write_result
 from extensions.emerge_suite.normalize import radiation
 from extensions.optycal_suite.study import prepare_case, generate_script
+from extensions.engine_runtime import existing_engine_interpreter
 
 
 def probe_engine(python_executable=None):
     root = Path(__file__).resolve().parents[2]
-    executable = Path(python_executable).expanduser().resolve() if python_executable else root/".venv-emerge3"/"Scripts"/"python.exe"
+    executable = existing_engine_interpreter("optycal", root, python_executable)
     if not executable.is_file():
         return {"available": False, "reason": "Selected Optycal Python executable is missing.", "capabilities": []}
     # Disable import-time compilation only for discovery. Actual simulations

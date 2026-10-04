@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useMemo, useState } from "react";
+import { persistedEnginePython } from "./persistedEnginePython";
 import DataTable from "./DataTable";
+import { emergeRuntimePresentation } from "./emergeRuntimePresentation";
 import PlotlyChart from "./PlotlyChart";
 import { interpolateEMergePattern, type EMergeAngularPattern } from "./emergePatternInterpolation";
 import "./EMergeExtension.css";
@@ -16,6 +18,14 @@ import { downloadEMergeText, exportEMergeNetwork } from "./emergeSampleExport";
 export function EMergeCapabilityInventory({ rows }: { rows: unknown }) {
   if (!Array.isArray(rows)) return null;
   return <details className="extension-output"><summary>EMerge feature availability in SPIKE</summary><small>Upstream features are listed separately from the current adapter coverage. Integrated results remain unvalidated.</small><DataTable label="EMerge feature availability"><thead><tr><th>Feature</th><th>Adapter status</th><th>Scope</th></tr></thead><tbody>{rows.map((item, index) => { const feature = record(item); return <tr key={String(feature.id ?? index)}><td>{String(feature.name ?? feature.id)}</td><td>{feature.status === "implemented_unvalidated" ? "Integrated · unvalidated" : "Pending adapter"}</td><td>{String(feature.scope ?? "")}</td></tr>; })}</tbody></DataTable></details>;
+}
+
+export function EMergeRuntimeStatus({ value }: { value: Record<string, unknown> }) {
+  const runtime = emergeRuntimePresentation(value);
+  return <section className="extension-output" aria-label="EMerge runtime compatibility"><div className="extension-output-title"><b>{runtime.title}</b></div><small>{runtime.message}</small>
+    {runtime.available && <small>Enabled adapter tools: {runtime.capabilities.join(", ") || "none"}</small>}
+    {runtime.checks.length > 0 && <details><summary>Installed runtime API checks</summary><DataTable label="EMerge runtime API checks"><thead><tr><th>API family</th><th>Detected</th></tr></thead><tbody>{runtime.checks.map(check => <tr key={check.id}><td>{check.label}</td><td>{check.present ? "Yes" : "No"}</td></tr>)}</tbody></DataTable></details>}
+  </section>;
 }
 
 export function EMergeScriptPreview({ data }: { data: Record<string, unknown> | null }) {
@@ -77,7 +87,7 @@ export const defaultEMergeSetup = (signalNet = ""): EMergeSetup => ({
   frequency_stop_hz: "1000000000",
   frequency_points: "21",
   mesh_resolution_mm: "0.5",
-  python_executable: "",
+  python_executable: persistedEnginePython(),
   radome_enabled: false,
   radome_origin_x_mm: "0", radome_origin_y_mm: "0", radome_gap_mm: "10",
   radome_width_mm: "50", radome_depth_mm: "40", radome_thickness_mm: "1.5", radome_epsilon_r: "2.1",

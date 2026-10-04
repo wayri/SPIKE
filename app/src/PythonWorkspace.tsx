@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-import { BookOpen, Bug, ChevronDown, ChevronUp, Code2, FilePlus2, Files, FolderOpen, History, Library, Pause, Play, Plus, Save, SaveAll, Square, StepBack, StepForward, X } from "./icons";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { BookOpen, Bug, ChevronDown, ChevronUp, Code2, FilePlus2, Files, FolderOpen, History, Library, Maximize2, Minimize2, Pause, Play, Plus, Save, SaveAll, Square, StepBack, StepForward, X } from "./icons";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { extensionAnalysisResult } from "./extensionAnalysisResult";
 import { cancelLocalWorker, cancelLocalWorkerCleanup, isDesktopShell, openNativeTextFile, runLocalWorker, saveNativeTextFile, selectNativeImportFile } from "./workerBridge";
 import PythonCodeEditor from "./PythonCodeEditor";
+import PythonRunStatus from "./PythonRunStatus";
 import PythonDebugPanel from "./PythonDebugPanel";
 import PythonFileExplorer from "./PythonFileExplorer";
 import PythonTemplateLibrary from "./PythonTemplateLibrary";
@@ -13,16 +14,22 @@ import PythonNetBrowser from "./PythonNetBrowser";
 import { admittedPythonUiActions, pythonContextKey, pythonWorkspaceContext, type PythonUiAction, type PythonWorkspaceContext } from "./pythonWorkspaceContext";
 import { PYTHON_STARTER, PYTHON_TEMPLATES, type PythonTemplate } from "./pythonWorkspaceTemplates";
 import { debugFinished, newPythonDocument, persistPythonWorkspace, PYTHON_TAB_LIMIT, pythonAbsolutePath, pythonRelativePath, pythonCodeFits, pythonCodeHash, pythonDirty, pythonFileName, pythonParent, pythonPathKey, remapPythonBreakpoints, restorePythonWorkspace, savedPythonDocument, togglePythonBreakpoint, type PythonDebugSnapshot, type PythonDocument, type PythonScriptResult, type PythonWorkspaceSession } from "./pythonWorkspaceModel";
+import { boundFloatingRect, initialFloatingRect, type FloatingRect } from "./pythonFloatingWindow";
+import { emergeGeometryPreview } from "./emergeGeometryPreview";
+import { admitDataViews } from "./scriptDataViews";
+import { physicalGeometry } from "./scriptResultViewportModel";
 import "./pythonWorkspace.css";
+import "./PythonCodeEditor.css";
 
 const errorText = (error: unknown) => error instanceof Error ? error.message : String(error);
 type Closing = { kind: "tab"; id: string } | { kind: "workspace" };
 export type PythonInitialScript = { id: string; name: string; code: string };
 
-export default function PythonWorkspace({ design, results, workspace, initialScript, onUiAction, onClose, onStatus, onAttachDataset }: {
+export default function PythonWorkspace({ design, results, workspace, initialScript, onUiAction, onClose, onStatus, onAttachDataset, onShowViewport }: {
   design: Record<string, unknown> | null; results: unknown;
   workspace?: PythonWorkspaceContext; initialScript?: PythonInitialScript | null; onUiAction?: (action: PythonUiAction) => void;
   onClose: () => void; onStatus: (message: string) => void; onAttachDataset?: (name: string, payload: unknown) => string;
+  onShowViewport?: (result: unknown, label: string, keepEditorOpen?: boolean) => void;
 }) {
   const context = useMemo(() => workspace ?? pythonWorkspaceContext(design), [workspace, design]);
   const contextKey = useMemo(() => pythonContextKey(context), [context]);
@@ -36,14 +43,19 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   const [pane, setPane] = useState<"files" | "templates" | "help" | "backups" | "nets">("files");
   const [paneVisible, setPaneVisible] = useState(true);
   const [execution, setExecution] = useState<"idle" | "run" | "debug">("idle");
+  const [runStartedAt, setRunStartedAt] = useState(0);
   const [runDocumentId, setRunDocumentId] = useState<string | null>(null);
   const [timeoutSeconds, setTimeoutSeconds] = useState(120);
+  const [interpreter, setInterpreter] = useState(() => { try { return localStorage.getItem("spike-python-interpreter") || ""; } catch { return ""; } });
   const [stopping, setStopping] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [saveErrors, setSaveErrors] = useState<Record<string, string>>({});
   const [backup, setBackup] = useState<{ ok: boolean; pending?: boolean; timestamp?: number; error?: string }>({ ok: true, pending: true });
   const [outputVisible, setOutputVisible] = useState(true);
+  const [floating, setFloating] = useState(false);
+  const [floatingRect, setFloatingRect] = useState<FloatingRect>(() => initialFloatingRect(window.innerWidth, window.innerHeight));
+  const floatingDrag = useRef<{ kind: "move" | "resize"; rect: FloatingRect; x: number; y: number } | null>(null);
   const [inspectorVisible, setInspectorVisible] = useState(true);
   const tabStrip = useRef<HTMLDivElement>(null);
   const saveInFlight = useRef(false);
@@ -64,10 +76,30 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   const mounted = useRef(true);
   const openedInitialScript = useRef<string | null>(null);
   const desktop = isDesktopShell();
+  useEffect(() => {
+    const resize = () => setFloatingRect(rect => boundFloatingRect(rect, window.innerWidth, window.innerHeight));
+    window.addEventListener("resize", resize); return () => window.removeEventListener("resize", resize);
+  }, []);
+  const beginFloatingGesture = (event: PointerEvent<HTMLElement>, kind: "move" | "resize") => {
+    if (!floating || event.button !== 0 || kind === "move" && Boolean((event.target as HTMLElement).closest("button,input,select,a"))) return;
+    event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId);
+    floatingDrag.current = { kind, rect: floatingRect, x: event.clientX, y: event.clientY };
+  };
+  const moveFloatingGesture = (event: PointerEvent<HTMLElement>) => {
+    const drag = floatingDrag.current; if (!drag) return;
+    const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
+    setFloatingRect(boundFloatingRect(drag.kind === "move" ? { ...drag.rect, x: drag.rect.x + dx, y: drag.rect.y + dy } : { ...drag.rect, width: drag.rect.width + dx, height: drag.rect.height + dy }, window.innerWidth, window.innerHeight));
+  };
+  const endFloatingGesture = (event: PointerEvent<HTMLElement>) => {
+    floatingDrag.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  };
   const active = session.documents.find(document => document.id === session.activeId);
   const running = execution !== "idle";
   const locked = running && runDocumentId === active?.id;
   const output = active ? outputs[active.id] : undefined;
+  const admittedOutputViews = admitDataViews(output?.views);
+  const canShowOutput = output?.status === "completed" && output.return_code === 0 && admittedOutputViews.length > 0;
   const debugSourceMatches = Boolean(active && debug?.filename && (active.path ? pythonPathKey(active.path) === pythonPathKey(debug.filename) : pythonFileName(debug.filename) === active.name));
   const activeDebug = debugSourceMatches ? debug : null;
   const commit = (change: (current: PythonWorkspaceSession) => PythonWorkspaceSession) => {
@@ -272,15 +304,18 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
       persistPythonWorkspace(sessionRef.current); onClose();
     }
   };
-  const run = async (debugging = false) => {
+  const run = async (debugging = false, geometryOnly = false) => {
     const document = sessionRef.current.documents.find(item => item.id === sessionRef.current.activeId);
     if (!desktop || activeRun.current || debugSession.current || execution !== "idle" || !document?.code.trim()) return;
+    if (debugging && interpreter.trim()) { setMessage("Debugging with a selected external interpreter is not supported. Clear Interpreter to use the worker default debugger."); return; }
+    const preparedCode = geometryOnly ? emergeGeometryPreview(document.code) : document.code;
+    if (!preparedCode) { setMessage("Model preview is available only for a bundled EMerge example script with retained geometry resources."); return; }
     const id = crypto.randomUUID(); activeRun.current = id;
     runContextKey.current = contextKey; actionsApplied.current = false;
-    setOutputVisible(true); setInspectorVisible(true); setRunDocumentId(document.id); setExecution("run"); setDebug(null); setStopping(false); lastPause.current = ""; debugRevision.current = -1; pendingDebugSequence.current = 0;
-    setOutputs(current => ({ ...current, [document.id]: { status: "running" } })); setMessage(debugging ? "Starting debugger…" : "Running Python script…");
+    setOutputVisible(true); setInspectorVisible(true); setRunDocumentId(document.id); setExecution("run"); setRunStartedAt(performance.now()); setDebug(null); setStopping(false); lastPause.current = ""; debugRevision.current = -1; pendingDebugSequence.current = 0;
+    setOutputs(current => ({ ...current, [document.id]: { status: "running" } })); setMessage(debugging ? "Starting debugger…" : geometryOnly ? "Loading bundled EMerge model geometry…" : "Running Python script…");
     try {
-      const response = await runLocalWorker({ id, method: debugging ? "start_python_debug" : "run_python_script", params: { code: document.code, filename: document.path ?? document.name, working_directory: document.path ? pythonParent(document.path) : sessionRef.current.root, breakpoints: document.breakpoints, design, results, workspace: context, timeout_seconds: timeoutSeconds } });
+      const response = await runLocalWorker({ id, method: debugging ? "start_python_debug" : "run_python_script", params: { code: preparedCode, filename: document.path ?? document.name, working_directory: document.path ? pythonParent(document.path) : sessionRef.current.root, breakpoints: document.breakpoints, design, results, workspace: context, timeout_seconds: timeoutSeconds, ...(!debugging && interpreter.trim() ? { python_executable: interpreter.trim() } : {}) } });
       if (!mounted.current) return;
       if (!response.ok) throw new Error(response.error ?? "Python execution failed.");
       if (debugging) {
@@ -292,6 +327,10 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
         const result = response.result as PythonScriptResult | undefined;
         if (result?.contract !== "spike/python-script-result/v1") throw new Error("The worker returned no Python script result.");
         setOutputs(current => ({ ...current, [document.id]: result }));
+        const admittedViews = admitDataViews(result.views);
+        if (result.status === "completed" && result.return_code === 0 && admittedViews.some(view => physicalGeometry(view)) && onShowViewport) {
+          setFloating(true); onShowViewport(result, `${document.name} · ${geometryOnly ? "model preview" : "physical model"}`, true);
+        }
         setMessage(result.status === "completed" ? `Script completed${typeof result.duration_ms === "number" ? ` in ${(result.duration_ms / 1000).toFixed(2)} s` : ""}.` : "Script failed: see standard error below."); publish(result);
       }
     } catch (caught) { setMessage(`Execution failed: ${errorText(caught)}`); setOutputs(current => ({ ...current, [document.id]: { status: "failed", stderr: errorText(caught) } })); setExecution("idle"); }
@@ -359,16 +398,19 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
     setFocusLine(current => ({ line, revision: (current?.revision ?? 0) + 1 }));
   };
   const paused = debug?.status === "paused" && execution === "debug";
-  return <div className="modal-shade python-workspace-shade"><section className="python-workspace" role="dialog" aria-modal="true" aria-label="Python workspace" onKeyDown={shortcut}>
-    <header><div><Code2 size={20} /><span><b>PYTHON WORKSPACE</b><small>Files, analysis scripts and local debugging</small></span></div><button type="button" className="canvas-icon" onClick={() => requestClose()} disabled={running} aria-label="Close Python workspace"><X size={16} /></button></header>
+  return <div className={`modal-shade python-workspace-shade ${floating ? "python-floating-shade" : ""}`}><section style={floating ? { left: floatingRect.x, top: floatingRect.y, width: floatingRect.width, height: floatingRect.height } : undefined} className={`python-workspace ${floating ? "python-floating" : ""} ${running ? "is-running" : ""}`} role="dialog" aria-modal={!floating} aria-label="Python workspace" onKeyDown={shortcut}>
+    <header onPointerDown={event => beginFloatingGesture(event, "move")} onPointerMove={moveFloatingGesture} onPointerUp={endFloatingGesture} onPointerCancel={endFloatingGesture} title={floating ? "Drag this title bar to move the Python panel" : undefined}><div><Code2 size={20} /><span><b>PYTHON WORKSPACE</b><small>Files, analysis scripts and local debugging</small></span></div><div className="python-window-actions"><button type="button" className="canvas-icon" onClick={() => setFloating(value => !value)} aria-label={floating ? "Center Python window" : "Float Python window"} title={floating ? "Restore centered workspace" : "Float Python while using the viewport"}>{floating ? <Maximize2 size={16} /> : <Minimize2 size={16} />}</button><button type="button" className="canvas-icon" onClick={() => requestClose()} disabled={running} aria-label="Close Python workspace"><X size={16} /></button></div></header>
     <div className="python-workspace-toolbar" aria-label="Python file and execution controls">
       <button type="button" onClick={newFile} title="New script (Ctrl+N)"><FilePlus2 size={14} /> New</button><button type="button" onClick={() => void open()} title="Open script (Ctrl+O)"><FolderOpen size={14} /> Open</button>
       <button type="button" onClick={() => active && void saveDocument(active.id)} disabled={!active || saving} title="Save current file (Ctrl+S)"><Save size={14} /> Save</button><button type="button" onClick={() => active && void saveDocument(active.id, true)} disabled={!active || saving} title="Save to another file (Ctrl+Shift+S)">Save as</button><button type="button" onClick={() => void saveAll()} disabled={saving || !session.documents.some(pythonDirty)} title="Save all changed files"><SaveAll size={14} /> Save all</button>
+      <button type="button" onClick={() => void run(false, true)} disabled={!desktop || running || !active || !onShowViewport || !emergeGeometryPreview(active.code)} title="Load physical geometry from a retained bundled EMerge example without solving"><Code2 size={14} /> Load model</button>
       <span className="python-toolbar-spacer" />
+      <label className="python-runtime-label" title="Absolute path to a local Python interpreter. Leave empty to use the worker default."><span>Interpreter</span><input aria-label="Python interpreter path" placeholder="Worker default" value={interpreter} disabled={running} onChange={event => { setInterpreter(event.target.value); try { localStorage.setItem("spike-python-interpreter", event.target.value); } catch { /* Workspace recovery reports unavailable local storage elsewhere. */ } }} /></label>
       <label className="python-workspace-timeout">Limit <input aria-label="Python time limit in seconds" type="number" min={1} max={600} value={timeoutSeconds} disabled={running} onChange={event => setTimeoutSeconds(Math.max(1, Math.min(600, Number(event.target.value) || 1)))} /> s</label>
-      <button type="button" className="python-run-button" onClick={() => void run()} disabled={!desktop || running || !active?.code.trim()} title="Run active script (Ctrl+Enter)"><Play size={14} /> Run</button><button type="button" onClick={() => void (paused ? debugCommand("continue") : run(true))} disabled={!desktop || debugBusy || !paused && (!active?.code.trim() || running)} title={paused ? "Continue (F5)" : "Debug active script (F5)"}><Bug size={14} />{paused ? "Continue" : "Debug"}</button>
+      <button type="button" className="python-run-button" onClick={() => void run()} disabled={!desktop || running || !active?.code.trim()} title="Run active script (Ctrl+Enter)"><Play size={14} /> Run</button><button type="button" onClick={() => void (paused ? debugCommand("continue") : run(true))} disabled={!desktop || debugBusy || !paused && (!active?.code.trim() || running || Boolean(interpreter.trim()))} title={paused ? "Continue (F5)" : interpreter.trim() ? "Debugging with a selected external interpreter is not supported; clear Interpreter to use the worker default." : "Debug active script (F5)"}><Bug size={14} />{paused ? "Continue" : running ? "Debug unavailable" : "Debug"}</button>
       {running && <button type="button" onClick={() => void stop()} disabled={stopping} title="Stop execution"><Square size={14} />{stopping ? "Stopping…" : "Stop"}</button>}
     </div>
+    {running && <PythonRunStatus startedAt={runStartedAt} name={session.documents.find(document => document.id === runDocumentId)?.name ?? active?.name ?? "Python script"} stopping={stopping} timeoutSeconds={timeoutSeconds} />}
     <input ref={fileInput} type="file" accept=".py,text/x-python,text/plain" multiple className="hidden-input" aria-label="Open Python scripts" onChange={event => { for (const file of Array.from(event.target.files ?? [])) void file.text().then(code => addDocument(newPythonDocument(code, file.name))).catch(caught => setMessage(`Open failed: ${errorText(caught)}`)); event.target.value = ""; }} />
     <div className="python-workspace-body">
       <nav className="python-activity-bar" aria-label="Python workspace panels">{([{ id: "files", label: "Files", icon: Files }, { id: "templates", label: "Templates", icon: Library }, { id: "nets", label: "Nets", icon: Files }, { id: "backups", label: "Backups", icon: History }, { id: "help", label: "Help", icon: BookOpen }] as const).map(item => <button type="button" key={item.id} aria-label={item.label} title={`${item.label} · Click again to hide`} aria-pressed={pane === item.id && paneVisible} onClick={() => { if (pane === item.id) setPaneVisible(current => !current); else { setPane(item.id); setPaneVisible(true); } }}><item.icon size={17} /><small>{item.label}</small></button>)}</nav>
@@ -377,15 +419,16 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
         <div className="python-tab-bar"><div ref={tabStrip} className="python-document-tabs" role="tablist" aria-label="Open Python files">{session.documents.map(document => <div key={document.id} className={active?.id === document.id ? "active" : ""}><button type="button" role="tab" tabIndex={active?.id === document.id ? 0 : -1} aria-label={`${document.name} · ${saveState(document)}`} aria-selected={active?.id === document.id} onClick={() => activate(document.id)} onKeyDown={event => { if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return; event.preventDefault(); const index = session.documents.indexOf(document); const next = event.key === "Home" ? 0 : event.key === "End" ? session.documents.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + session.documents.length) % session.documents.length; activate(session.documents[next].id); tabStrip.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus(); }} title={document.path ?? document.name}><FilePlus2 size={12} /><span>{document.name}</span>{pythonDirty(document) && <span className="python-tab-dirty" aria-label="Unsaved changes">●</span>}<small className={`python-save-state ${saveErrors[document.id] ? "failed" : pythonDirty(document) ? "dirty" : ""}`}>{saveState(document)}</small>{runDocumentId === document.id && running && <span>▶</span>}</button><button type="button" aria-label={`Close ${document.name}`} disabled={savingId === document.id || running && runDocumentId === document.id} onClick={() => requestClose(document.id)}><X size={12} /></button></div>)}</div><button type="button" className="python-add-tab" aria-label="Add Python tab" title="New script (Ctrl+N)" disabled={session.documents.length >= PYTHON_TAB_LIMIT} onClick={newFile}><Plus size={16} /></button></div>
         <div className="python-editor-context"><span title={active?.path}>{active?.path ?? active?.name ?? "No file open"}</span>{active && <strong className={`python-save-state ${saveErrors[active.id] ? "failed" : pythonDirty(active) ? "dirty" : ""}`} title={saveErrors[active.id]}>{saveState(active)}</strong>}<small>{design ? "Design attached" : "No design"} · {results ? "Results attached" : "No result"}{locked ? " · execution snapshot locked" : ""}</small>{debug && <button type="button" aria-pressed={inspectorVisible} onClick={() => setInspectorVisible(current => !current)}>Inspector</button>}</div>
         {execution === "debug" && <div className="python-debug-toolbar"><span>{debug?.status ?? "starting"}{debug?.line ? ` · line ${debug.line}` : ""}</span><button type="button" onClick={() => void debugCommand("pause")} disabled={debugBusy || debug?.status !== "running"}><Pause size={13} /> Pause</button><button type="button" onClick={() => void debugCommand("step_over")} disabled={debugBusy || !paused} title="Step over (F10)"><StepForward size={13} /> Over</button><button type="button" onClick={() => void debugCommand("step_into")} disabled={debugBusy || !paused} title="Step into (F11)">Into</button><button type="button" onClick={() => void debugCommand("step_out")} disabled={debugBusy || !paused} title="Step out (Shift+F11)"><StepBack size={13} /> Out</button></div>}
-        <div className="python-editor-area">{active ? <PythonCodeEditor key={active.id} workspace={context} insertion={insertion} onInserted={() => setInsertion(undefined)} code={active.code} breakpoints={active.breakpoints} executionLine={activeDebug?.status === "paused" ? activeDebug.line : undefined} locked={locked} focusLine={focusLine} onChange={code => { if (pythonCodeFits(code)) updateDocument(active.id, document => ({ ...document, code, breakpoints: remapPythonBreakpoints(document.code, code, document.breakpoints) })); else setMessage("Script exceeds the 512 KB editor limit."); }} onBreakpoint={breakpoint} onCursor={(line, column) => setCursor({ line, column })} onShortcut={() => undefined} /> : <div className="python-empty-editor"><Code2 size={36} /><h3>Open a script or start from a template</h3><button type="button" onClick={newFile}>New Python file</button><button type="button" onClick={() => { setPane("templates"); setPaneVisible(true); }}>Browse templates</button></div>}
+        <div className="python-editor-area">{active ? <PythonCodeEditor key={active.id} documentKey={active.id} workspace={context} insertion={insertion} onInserted={() => setInsertion(undefined)} code={active.code} breakpoints={active.breakpoints} executionLine={activeDebug?.status === "paused" ? activeDebug.line : undefined} locked={locked} focusLine={focusLine} onChange={code => { if (pythonCodeFits(code)) updateDocument(active.id, document => ({ ...document, code, breakpoints: remapPythonBreakpoints(document.code, code, document.breakpoints) })); else setMessage("Script exceeds the 512 KB editor limit."); }} onBreakpoint={breakpoint} onCursor={(line, column) => setCursor({ line, column })} onShortcut={() => undefined} /> : <div className="python-empty-editor"><Code2 size={36} /><h3>Open a script or start from a template</h3><button type="button" onClick={newFile}>New Python file</button><button type="button" onClick={() => { setPane("templates"); setPaneVisible(true); }}>Browse templates</button></div>}
           {debug && inspectorVisible && <PythonDebugPanel snapshot={debug} breakpoints={active?.breakpoints ?? []} onLine={(line, filename) => void gotoLine(line, filename)} onRemove={breakpoint} onClear={clearBreakpoints} />}
         </div>
-        <div className={`python-workspace-output ${outputVisible ? "" : "collapsed"}`}><div><button type="button" aria-label={outputVisible ? "Collapse output" : "Expand output"} aria-expanded={outputVisible} onClick={() => setOutputVisible(current => !current)}>{outputVisible ? <ChevronDown size={12} /> : <ChevronUp size={12} />}<b>OUTPUT</b></button><span>{output ? `${output.status ?? "unknown"}${output.return_code !== undefined ? ` · exit ${output.return_code}` : ""}` : "print() and exceptions appear here"}</span><button type="button" disabled={!onAttachDataset || !output?.published_result} title="Attach the published analysis result to a project study" onClick={() => { try { if (onAttachDataset && output?.published_result) setMessage(onAttachDataset(active?.name ?? "Python result", output.published_result)); } catch (error) { setMessage(errorText(error)); } }}>Attach to study</button><button type="button" disabled={locked} onClick={() => active && setOutputs(current => { const next = { ...current }; delete next[active.id]; return next; })}>Clear</button></div>{outputVisible && <><pre aria-label="Python standard output">{output?.stdout || "No standard output yet."}</pre>{output?.stderr && <pre className="python-workspace-stderr" aria-label="Python standard error">{output.stderr}</pre>}</>}</div>
+        <div className={`python-workspace-output ${outputVisible ? "" : "collapsed"}`}><div className="python-output-heading"><button type="button" aria-label={outputVisible ? "Collapse output" : "Expand output"} aria-expanded={outputVisible} onClick={() => setOutputVisible(current => !current)}>{outputVisible ? <ChevronDown size={12} /> : <ChevronUp size={12} />}<b>OUTPUT</b></button><span>{output ? `${output.status ?? "unknown"}${output.return_code !== undefined ? ` · exit ${output.return_code}` : ""}` : "print() and exceptions appear here"}</span><button type="button" disabled={!onShowViewport || !canShowOutput} title="Show admitted script data in the main viewport" onClick={() => { if (onShowViewport && canShowOutput && output) onShowViewport(output, active?.name ?? "Python result", floating); }}>Show in viewport</button><button type="button" disabled={!onAttachDataset || !output?.published_result} title="Attach the published analysis result to a project study" onClick={() => { try { if (onAttachDataset && output?.published_result) setMessage(onAttachDataset(active?.name ?? "Python result", output.published_result)); } catch (error) { setMessage(errorText(error)); } }}>Attach to study</button><button type="button" disabled={locked} onClick={() => active && setOutputs(current => { const next = { ...current }; delete next[active.id]; return next; })}>Clear</button></div>{outputVisible && <div className="python-output-body">{output?.runtime && <small className="python-runtime-result">Python {output.runtime.python_version ?? "unknown"} · {output.runtime.executable}{output.runtime.emerge_version ? ` · EMerge ${output.runtime.emerge_version}` : ""}{output.runtime.optycal_version ? ` · Optycal ${output.runtime.optycal_version}` : ""}</small>}<pre aria-label="Python standard output">{output?.stdout || "No standard output yet."}</pre>{output?.stderr && <pre className="python-workspace-stderr" aria-label="Python standard error">{output.stderr}</pre>}</div>}</div>
       </main>
     </div>
     <footer><span role="status" title={message}>{message}</span><button type="button" className={`python-backup-status ${backup.ok ? "" : "failed"}`} title={backup.error ?? "Local recovery snapshots; Save writes your file."} onClick={() => { setPane("backups"); setPaneVisible(true); }}>{backup.ok ? backup.pending ? "Backing up…" : `Backed up${backup.timestamp ? ` ${new Date(backup.timestamp).toLocaleTimeString()}` : ""}` : "Backup unavailable"}</button><small>Ln {cursor.line}, Col {cursor.column} · Python{!desktop ? " · desktop required to run" : ""}</small><button type="button" onClick={() => requestClose()} disabled={running}>Close</button></footer>
     {!backup.ok && <p className="python-backup-error" role="alert">{backup.error ?? "Automatic recovery is unavailable. Save scripts to files."}</p>}
     {closing && <div className="python-close-shade"><section role="alertdialog" aria-modal="true" aria-label="Unsaved Python changes"><h3>Save your Python changes?</h3><p>{closing.kind === "tab" ? session.documents.find(document => document.id === closing.id)?.name : `${session.documents.filter(pythonDirty).length} changed files`} {closing.kind === "tab" ? "has" : "have"} unsaved edits.</p><div><button type="button" onClick={() => void finishClose(true)} disabled={saving}>Save and close</button><button type="button" onClick={() => void finishClose(false)} disabled={saving}>Discard edits</button><button type="button" onClick={() => setClosing(null)} disabled={saving} autoFocus>Cancel</button></div></section></div>}
+    {floating && <button type="button" className="python-resize-handle" aria-label="Resize Python window" title="Drag to resize; arrow keys resize by 20 px" onPointerDown={event => beginFloatingGesture(event, "resize")} onPointerMove={moveFloatingGesture} onPointerUp={endFloatingGesture} onPointerCancel={endFloatingGesture} onKeyDown={event => { const changes: Record<string, [number, number]> = { ArrowLeft: [-20, 0], ArrowRight: [20, 0], ArrowUp: [0, -20], ArrowDown: [0, 20] }; const change = changes[event.key]; if (change) { event.preventDefault(); setFloatingRect(rect => boundFloatingRect({ ...rect, width: rect.width + change[0], height: rect.height + change[1] }, window.innerWidth, window.innerHeight)); } }}>◢</button>}
   </section></div>;
 }
 

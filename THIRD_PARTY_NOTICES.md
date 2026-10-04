@@ -31,3 +31,7 @@ the license for the version you install or redistribute.
 - **Marble reference board:** Berkeley Lab's Marble v1.4.4 board and documentation are credited to the Regents of the University of California through Lawrence Berkeley National Laboratory. The upstream documentation states CERN OHL v1.2 and a U.S. Government rights notice. The board-documentation image and front-copper SVG in `app/public/help/` come from the pinned source recorded in [Help maintenance](docs/HELP_MAINTENANCE.md). SPIKE interface captures showing Marble are labeled as captures; the report preview says analysis was not run.
 
 If a source or credit is missing, please [open an issue](https://github.com/wayri/SPIKE-Main/issues). Preserve the original license and attribution when reusing third-party material.
+
+## Retained EMerge example source pack
+
+`examples/upstream-emerge/source` contains unchanged examples from [FennisRobert/EMerge](https://github.com/FennisRobert/EMerge), pinned by the adjacent manifest. These examples, the bridge and scene capture helper remain GPL-2.0-or-later, with their source license/notices retained separately. They are executed by an optional external EMerge runtime and are not part of SPIKE's numerical core.
