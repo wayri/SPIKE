@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+import { Plane, Vector3 } from "three";
+const source = readFileSync(new URL("../src/viewportSection.ts", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+const { sectionHitVisible } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
+const planes = [new Plane(new Vector3(1, 0, 0), -1), new Plane(new Vector3(-1, 0, 0), 3)];
+assert.equal(sectionHitVisible({ point: new Vector3(2, 0, 0) }, planes), true);
+assert.equal(sectionHitVisible({ point: new Vector3(1, 0, 0) }, planes), true);
+assert.equal(sectionHitVisible({ point: new Vector3(0, 0, 0) }, planes), false);
+assert.equal(sectionHitVisible({ point: new Vector3(4, 0, 0) }, planes), false);
+assert.equal(sectionHitVisible({ point: new Vector3(4, 0, 0) }, []), true);
+const viewport = readFileSync(new URL("../src/BoardViewport.tsx", import.meta.url), "utf8");
+assert.match(viewport, /renderer\.clippingPlanes = viewModeRef\.current === "3D" \? sectionPlanesRef\.current : \[\]/);
+for (const root of ["emRadiationPickablesRef", "siCrosstalkPickablesRef"]) assert.match(viewport, new RegExp(`intersectObjects\\(${root}\\.current, false\\)\\.find\\(sectionVisible\\)`));
+assert.match(viewport, /!sectionVisible\(blocker\)/);
+assert.match(viewport, /hit\.instanceId !== undefined && sectionVisible\(hit\)/);
+console.log("Viewport sections: retained halfspaces, thermal/result occluders and field picking passed.");

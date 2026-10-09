@@ -1057,6 +1057,7 @@ export default function App() {
   const [modelIndex, setModelIndex] = useState<ModelIndex>(() => normalizeModelIndex(null));
   const [assemblySceneModels, setAssemblySceneModels] = useState<AssemblySceneModel[]>([]);
   const [selectedHarnessId, setSelectedHarnessId] = useState<string | null>(null);
+  const [selectedHarnessConductorId, setSelectedHarnessConductorId] = useState<string | null>(null);
   const [selectedBoardInstanceId, setSelectedBoardInstanceId] = useState<string | null>(null);
   const [assemblyBoardVisibility, setAssemblyBoardVisibility] = useState<Record<string, boolean>>({});
   const [assemblyExplodedDistanceMm, setAssemblyExplodedDistanceMm] = useState(0);
@@ -2563,6 +2564,7 @@ export default function App() {
     setSelected(null);
     setSelectedBoardInstanceId(null);
     setSelectedHarnessId(harness.id);
+    setSelectedHarnessConductorId(harness.selectedConductorId ?? null);
     setRightOpen(true);
     setStatus(`Virtual harness ${harness.name} selected: ${harness.endpointA.boardId}::${harness.endpointA.connectorId} to ${harness.endpointB.boardId}::${harness.endpointB.connectorId}`);
   }, []);
@@ -5285,6 +5287,7 @@ export default function App() {
             linkedAssemblyNets={linkedAssemblyNets}
             virtualHarnesses={displayHarnesses}
             selectedHarnessId={selectedHarnessId}
+            selectedHarnessConductorId={selectedHarnessId ? selectedHarnessConductorId : null}
             onHarnessSelect={handleHarnessSelect}
             topologySelectorActive={mcadAttachmentOpen}
             selectedTopologyId={selectedTopologyReference?.topology_id ?? null}

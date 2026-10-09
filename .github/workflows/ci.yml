@@ -62,4 +62,11 @@ jobs:
           npm run test:python-workspace
           npm run test:emerge
           npm run test:button-standard
+          npm run test:viewport
+          npm run test:harness-visualization
+          node scripts/test-viewport-section.mjs
+          node scripts/test-viewport-occurrence-culling.mjs
+          node scripts/test-thermal-assembly-frame.mjs
+          node scripts/test-board-thermal-viewport.mjs
+          node scripts/test-board-thermal-viewport-probe.mjs
           npm run test:emi-chamber

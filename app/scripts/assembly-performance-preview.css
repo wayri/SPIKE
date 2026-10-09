@@ -1,0 +1,188 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+.assembly-preview-shell {
+  height: 100vh;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--spike-table-text);
+  background: var(--spike-table-surface);
+}
+
+.assembly-preview-header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--spike-table-border-strong);
+  background: var(--spike-table-toolbar);
+}
+
+.assembly-preview-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assembly-preview-header .assembly-icon-toolbar {
+  margin-left: auto;
+}
+
+.assembly-preview-status,
+.assembly-preview-telemetry {
+  min-width: 0;
+  margin: 0;
+  padding: 5px 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--spike-table-muted);
+}
+
+.assembly-preview-workspace {
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+.assembly-preview-workspace.has-side-panel {
+  grid-template-columns: 48px minmax(0, 1fr) minmax(240px, 290px);
+}
+
+.assembly-preview-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 5px;
+  border-right: 1px solid var(--spike-table-border-strong);
+  background: var(--spike-table-toolbar);
+}
+
+.assembly-preview-rail .spike-control--icon {
+  width: 38px;
+  min-height: 42px;
+  flex-direction: column;
+  gap: 1px;
+  padding: 3px;
+  font-size: 9px;
+}
+
+.assembly-preview-canvas {
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.assembly-preview-side-panel {
+  min-width: 0;
+  overflow: auto;
+  padding: 10px;
+  border-left: 1px solid var(--spike-table-border-strong);
+  background: var(--spike-table-surface);
+}
+
+.assembly-preview-panel-heading,
+.assembly-preview-control-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.assembly-preview-panel-heading h2,
+.assembly-preview-control-group h3 {
+  margin: 0;
+  font-size: 12px;
+}
+
+.assembly-preview-control-group {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--spike-table-border);
+}
+
+.assembly-preview-control-group label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+}
+
+.assembly-preview-control-group label > :is(input[type="number"], select) {
+  width: 92px;
+  margin-left: auto;
+}
+
+.assembly-preview-button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.assembly-preview-button-grid button:last-child {
+  grid-column: 1 / -1;
+}
+
+.assembly-preview-editor-link {
+  display: inline-flex;
+  margin-top: 12px;
+  color: var(--spike-table-edit);
+  font: var(--spike-control-font);
+}
+
+.assembly-preview-help {
+  min-width: 0;
+}
+
+.assembly-preview-help code {
+  display: block;
+  max-width: 100%;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--spike-table-border);
+  background: var(--spike-table-field);
+  font-size: 10px;
+}
+
+.assembly-preview-footer .dock-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (max-width: 850px) {
+  .assembly-preview-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .assembly-preview-header .assembly-icon-toolbar {
+    max-width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+
+  .assembly-preview-workspace.has-side-panel {
+    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-rows: minmax(220px, 1fr) minmax(150px, auto);
+  }
+
+  .assembly-preview-rail {
+    grid-row: 1 / -1;
+  }
+
+  .assembly-preview-side-panel {
+    grid-column: 2;
+    border-top: 1px solid var(--spike-table-border-strong);
+    border-left: 0;
+  }
+}

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { boardThermalViewportGrid, type BoardThermalGrid } from "./boardThermalViewport";
+import { boardThermalViewportGrid, boardThermalCellGeometry, type BoardThermalGrid } from "./boardThermalViewport";
 
 export type BoardThermalLayer = {
   name: string;
@@ -59,10 +59,7 @@ export function boardThermalCellProbe(
   const layer = layerIndex < 0 ? null : result.layers[layerIndex];
   return {
     column, row,
-    center_mm: [
-      result.grid.origin_mm[0] + (column + 0.5) * result.grid.spacing_mm[0],
-      result.grid.origin_mm[1] + (row + 0.5) * result.grid.spacing_mm[1],
-    ],
+    center_mm: boardThermalCellGeometry(result.grid, cellIndex).center_mm,
     temperature_c: layer ? layer.temperatures_c[cellIndex] : result.grid.temperatures_c[cellIndex],
     layer: layer?.name ?? "Top surface",
     depth_mm: layer?.depth_mm ?? null,

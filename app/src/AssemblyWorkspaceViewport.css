@@ -6,6 +6,10 @@
 .assembly-workspace-viewport-toolbar button.selected{border-color:var(--spike-table-edit-border,#55bcaa);background:var(--spike-table-edit,#255950);color:var(--spike-table-text-strong,#edf5f7)}
 .assembly-workspace-viewport-selection{min-width:90px;max-width:220px;margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--spike-table-text-strong,#edf5f7);font-weight:650}
 .assembly-workspace-viewport-stage{position:relative;flex:1;min-width:0;min-height:0;overflow:hidden}
+.assembly-workspace-viewport-body{display:flex;flex:1;min-width:0;min-height:0}
+.assembly-workspace-viewport-help{flex:0 0 250px;min-width:0;max-width:38%;overflow:auto;border-left:1px solid var(--spike-table-border);background:var(--spike-table-toolbar)}
+.assembly-workspace-viewport-help>button{margin:6px;display:flex;align-items:center;gap:5px}
+@media(max-width:650px){.assembly-workspace-viewport-body{flex-direction:column}.assembly-workspace-viewport-help{flex:0 0 auto;max-width:none;max-height:180px;border-left:0;border-top:1px solid var(--spike-table-border)}.assembly-workspace-viewport-stage{min-height:240px}}
 .assembly-workspace-viewport-stage>.three-host{position:absolute;inset:0}
 .assembly-workspace-viewport-stage .three-canvas{width:100%;height:100%;display:block}
 .assembly-workspace-viewport-stage .three-host.layout-active .three-canvas{visibility:hidden}

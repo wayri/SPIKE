@@ -62,6 +62,15 @@ function padShape(pad: ParsedPad) {
 /** Convert KiCad GLB metres (X right, Y up, Z source-board Y) to board-local
  * millimetres. Keep the imported root untouched because it may carry its own
  * transform; the coordinate-system swap is an explicit parent matrix. */
+export function kiCadLaminateMidplaneMm(source: ParsedBoard) {
+  // KiCad's GLB zero is the bottom laminate surface, not the centered board
+  // midplane used by procedural geometry. Outer copper/mask lie outside that
+  // laminate; retaining their thickness here would shift component mount planes.
+  const laminate = source.stackup.filter(row => !["F.Cu", "B.Cu", "F.Mask", "B.Mask"].includes(row.name))
+    .reduce((sum, row) => sum + (row.thickness ?? 0), 0);
+  return (laminate || 1.6) / 2;
+}
+
 export function normalizeKiCadScenes(boardScene: THREE.Object3D | null | undefined, componentScene: THREE.Object3D | null | undefined, source: ParsedBoard, center: readonly [number, number, number]) {
   const group = new THREE.Group(); group.name = "authoritative-board-geometry";
   for (const [kind, scene] of [["board", boardScene], ["components", componentScene]] as const) {
@@ -102,7 +111,8 @@ export function mountKiCadScenes(result: BoardInstanceSceneResult, board: Virtua
   const visit = (object: THREE.Object3D, inheritedRef?: string) => {
     const ref = inheritedRef ?? referenceFromName(object.name);
     if (ref) {
-      resolvedRefs.add(ref);
+      // A named exporter group is not evidence of resolved CAD geometry.
+      if (object instanceof THREE.Mesh && (object.geometry.getAttribute("position")?.count ?? 0) > 0) resolvedRefs.add(ref);
       object.userData.componentRef = ref;
       const kind = throughHole.has(ref) ? "tht" : "smd";
       object.userData.componentMount = kind;
@@ -131,6 +141,10 @@ export function mountKiCadScenes(result: BoardInstanceSceneResult, board: Virtua
 
 function procedural(board: VirtualBoardVisual, source: ParsedBoard, selected: boolean, linked: Set<string>, omitCopper: boolean) {
   const group = new THREE.Group(), pickables: THREE.Object3D[] = [], center = board.localCenterMm;
+  // The occurrence transform is expressed in the native board frame. Keep
+  // imported solids at their exact source Z and place centered fallback shapes
+  // around the same laminate midplane, including when no CAD solid resolves.
+  group.position.z = kiCadLaminateMidplaneMm(source) - center[2];
   const stackupThickness = source.stackup.reduce((sum, x) => sum + (x.thickness ?? 0), 0);
   const thickness = board.thicknessMm ?? (stackupThickness || 1.6), ordered = layers(source);
   const substrate = new THREE.Mesh(new THREE.ExtrudeGeometry(outline(source, center), { depth: thickness, bevelEnabled: false, curveSegments: 8 }), new THREE.MeshStandardMaterial({ color: selected ? 0x6c913a : 0x315f45, roughness: .82 }));
@@ -139,7 +153,7 @@ function procedural(board: VirtualBoardVisual, source: ParsedBoard, selected: bo
     for (const zone of source.zones) { if (zone.points.length < 3) continue; const s = shape(zone.points, center); for (const hole of zone.holes ?? []) if (hole.length >= 3) s.holes.push(shape(hole, center)); const net = netId(board, source, zone.net); const mesh = new THREE.Mesh(new THREE.ShapeGeometry(s, 4), copper(Boolean(net && linked.has(net)))); mesh.position.z = layerZ(zone.layer, ordered, thickness); tag(mesh, board, "copper-zone", zone.id, zone.layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
     // Render all retained tracks at imported width; assembly detail has no density truncation.
     for (const track of source.tracks) { const sx = track.start[0] - center[0], sy = track.start[1] - center[1], ex = track.end[0] - center[0], ey = track.end[1] - center[1], net = netId(board, source, track.net); const mesh = new THREE.Mesh(new THREE.ShapeGeometry(capsule(Math.hypot(ex - sx, ey - sy), track.width), 8), copper(Boolean(net && linked.has(net)))); mesh.position.set((sx + ex) / 2, (sy + ey) / 2, layerZ(track.layer, ordered, thickness)); mesh.rotation.z = Math.atan2(ey - sy, ex - sx); tag(mesh, board, "copper-track", track.id, track.layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
-    for (const pad of source.pads) for (const layer of ordered.filter(x => pad.layers.includes(x) || pad.layers.includes("*.Cu"))) { const net = netId(board, source, pad.net), mesh = new THREE.Mesh(new THREE.ShapeGeometry(padShape(pad), 8), copper(Boolean(net && linked.has(net)))); mesh.position.set(pad.at[0] - center[0], pad.at[1] - center[1], layerZ(layer, ordered, thickness)); mesh.rotation.z = pad.rotation * Math.PI / 180; tag(mesh, board, "copper-pad", `${pad.id}:${layer}`, layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
+    for (const pad of source.pads) for (const layer of ordered.filter(x => pad.layers.includes(x) || pad.layers.includes("*.Cu") || pad.layers.includes("F&B.Cu") && (x === "F.Cu" || x === "B.Cu"))) { const net = netId(board, source, pad.net), mesh = new THREE.Mesh(new THREE.ShapeGeometry(padShape(pad), 8), copper(Boolean(net && linked.has(net)))); mesh.position.set(pad.at[0] - center[0], pad.at[1] - center[1], layerZ(layer, ordered, thickness)); mesh.rotation.z = -pad.rotation * Math.PI / 180; tag(mesh, board, "copper-pad", `${pad.id}:${layer}`, layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
     for (const via of source.vias) { const outer = Math.max(via.size / 2, .001), inner = Math.min(Math.max(via.drill / 2, 0), outer), net = netId(board, source, via.net); const ring = new THREE.Mesh(new THREE.RingGeometry(inner, outer, 24), copper(Boolean(net && linked.has(net)))); ring.position.set(via.at[0] - center[0], via.at[1] - center[1], thickness / 2 + GAP); tag(ring, board, "via-face", via.id, "through", net); ring.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(ring); pickables.push(ring); if (inner > 0) { const barrel = new THREE.Mesh(new THREE.CylinderGeometry(inner, inner, thickness + .035, 20, 1, true), copper(false)); barrel.rotation.x = Math.PI / 2; barrel.position.set(ring.position.x, ring.position.y, 0); tag(barrel, board, "via-barrel", `${via.id}:barrel`, "through", net); barrel.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(barrel); } }
   }
   const lines = new Map<string, number[]>();
@@ -159,7 +173,22 @@ export function boardInstanceScene(board: VirtualBoardVisual, selected: boolean,
   if (!source) { const body = new THREE.Mesh(new THREE.BoxGeometry(board.widthMm, board.heightMm, board.thicknessMm ?? 1.6), new THREE.MeshBasicMaterial({ color: selected ? 0x658930 : 0x185841 })); tag(body, board, "substrate", "board-envelope"); group.add(body); pickables.push(body); return { group, pickables }; }
   const generated = procedural(board, source, selected, new Set(linked), false); group.add(generated.group);
   const throughHole = componentMountIndex(source.pads);
-  for (const component of source.components) { const kind = throughHole.has(component.ref) ? "tht" : "smd"; if (kind === "smd" && options.showSmd === false || kind === "tht" && options.showTht === false) continue; const bounds = component.bodyBounds ?? component.courtyardBounds, width = Math.max(bounds ? bounds.maxX - bounds.minX : component.width, .4), height = Math.max(bounds ? bounds.maxY - bounds.minY : component.height, .4), bodyHeight = kind === "tht" ? 3.2 : 1.25; const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, bodyHeight), new THREE.MeshStandardMaterial({ color: 0x343940, roughness: .58 })); const bottom = component.layer.startsWith("B."); mesh.position.set(component.at[0] - board.localCenterMm[0], component.at[1] - board.localCenterMm[1], (bottom ? -1 : 1) * (generated.thickness / 2 + bodyHeight / 2 + GAP)); mesh.rotation.z = component.rotation * Math.PI / 180; mesh.userData.componentMount = kind; mesh.userData.componentRef = component.ref; tag(mesh, board, "component-placeholder", component.id, component.layer); group.add(mesh); pickables.push(mesh); }
+  for (const component of source.components) {
+    const kind = throughHole.has(component.ref) ? "tht" : "smd";
+    if (kind === "smd" && options.showSmd === false || kind === "tht" && options.showTht === false) continue;
+    const bounds = component.bodyBounds ?? component.courtyardBounds;
+    const width = Math.max(bounds ? bounds.maxX - bounds.minX : component.width, .4);
+    const height = Math.max(bounds ? bounds.maxY - bounds.minY : component.height, .4), bodyHeight = kind === "tht" ? 3.2 : 1.25;
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, bodyHeight), new THREE.MeshStandardMaterial({ color: 0x343940, roughness: .58 }));
+    const bottom = component.layer.startsWith("B.");
+    mesh.position.set(component.at[0] - board.localCenterMm[0], component.at[1] - board.localCenterMm[1],
+      kiCadLaminateMidplaneMm(source) - board.localCenterMm[2] + (bottom ? -1 : 1) * (generated.thickness / 2 + bodyHeight / 2 + GAP));
+    // Native board XY has Y down; the enclosing viewport applies its Y flip.
+    mesh.rotation.z = -component.rotation * Math.PI / 180;
+    mesh.userData.componentMount = kind; mesh.userData.componentRef = component.ref;
+    mesh.userData.geometryStatus = "fallback-not-cad";
+    tag(mesh, board, "component-placeholder", component.id, component.layer); group.add(mesh); pickables.push(mesh);
+  }
   pickables.push(...generated.pickables);
   const result = { group, pickables };
   if (options.boardScene || options.componentScene) mountKiCadScenes(result, board, source, options.boardScene, options.componentScene);
