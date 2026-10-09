@@ -34,6 +34,8 @@ routedAssembly.harnesses = [{ ...assembly.harnesses[0], extensions: { "spike.har
 const routedProjection = harness.buildVirtualHarnessVisualization(routedAssembly);
 assert.deepEqual(routedProjection.visuals[0].routeMm, savedRoute, "authored keepout routes remain exact polylines");
 assert.equal(routedProjection.visuals[0].routedPolyline, true);
+const routedFallbackGeometry = harness.buildHarnessConductorGeometry(routedProjection.visuals[0]);
+for (const point of savedRoute) assert.ok(routedFallbackGeometry[0].pointsMm.some(candidate => candidate.every((value, index) => value === point[index])), "bounded fallback sampling retains each authored route vertex");
 routedAssembly.boards[1].frame.transform[3] += 10;
 const movedProjection = harness.buildVirtualHarnessVisualization(routedAssembly);
 assert.ok(movedProjection.diagnostics.some(d => d.code === "stale_route"), "moving a board invalidates the authored route");
@@ -46,6 +48,67 @@ assert.equal(projection.unresolvedHarnesses, 2);
 assert.ok(projection.diagnostics.some(item => item.code === "unresolved_connector"));
 assert.ok(projection.diagnostics.some(item => item.code === "duplicate_harness_id"));
 assert.equal(projection.visuals[0].routeMm.length, 4, "virtual route uses a bounded control-point count");
+assert.deepEqual(projection.visuals[0].conductors, [], "legacy harnesses retain an explicit schematic bundle fallback");
+const fallbackGeometry = harness.buildHarnessConductorGeometry(projection.visuals[0]);
+assert.equal(fallbackGeometry.length, 1);
+assert.equal(fallbackGeometry[0].presentation, "bundle-fallback");
+
+const conductorAssembly = structuredClone(assembly);
+conductorAssembly.harnesses = [{
+  ...assembly.harnesses[0],
+  pin_map: { "1": "A", "2": "B", "3": "C", "4": "D", "5": "E", "6": "F", "7": "G", "8": "H" },
+  extensions: {
+    "spike.harness-routing": { route_mm: savedRoute },
+    "spike.harness-conductors": {
+      contract: "spike/assembly-harness-conductors/v1",
+      wires: [
+        { id: "PWR", from_pin: "1", to_pin: "A", role: "power", return_wire_id: "RTN" },
+        { id: "RTN", from_pin: "2", to_pin: "B", role: "return" },
+        { id: "SIG+", from_pin: "3", to_pin: "C", role: "signal" },
+        { id: "SIG-", from_pin: "4", to_pin: "D", role: "signal" },
+        { id: "AUX+", from_pin: "5", to_pin: "E", role: "signal" },
+        { id: "AUX-", from_pin: "6", to_pin: "F", role: "signal" },
+        { id: "TW-A", from_pin: "7", to_pin: "G", role: "other" },
+        { id: "TW-B", from_pin: "8", to_pin: "H", role: "shield" },
+        { id: "WRONG", from_pin: "1", to_pin: "not-mapped", role: "signal" },
+      ],
+      pairs: [
+        { id: "power-pair", wire_ids: ["PWR", "RTN"], kind: "twisted", twist_pitch_mm: 12 },
+        { id: "data-pair", wire_ids: ["SIG+", "SIG-"], kind: "differential", twisted: true, twist_pitch_mm: 8 },
+        { id: "aux-pair", wire_ids: ["AUX+", "AUX-"], kind: "differential" },
+        { id: "pitch-missing", wire_ids: ["TW-A", "TW-B"], kind: "twisted" },
+      ],
+    },
+  },
+}];
+const conductorProjection = harness.buildVirtualHarnessVisualization(conductorAssembly);
+assert.equal(conductorProjection.conductorVisuals, 8, "each pin-map-backed wire is retained as an individual visual identity");
+assert.equal(conductorProjection.visuals[0].conductors.find(wire => wire.id === "PWR").returnWireId, "RTN");
+assert.equal(conductorProjection.visuals[0].conductors.find(wire => wire.id === "SIG+").twistPitchMm, 8);
+assert.equal(conductorProjection.visuals[0].conductors.find(wire => wire.id === "AUX+").twisted, false, "differential identity does not imply a physical twist");
+assert.equal(conductorProjection.visuals[0].conductors.find(wire => wire.id === "TW-A").role, "other");
+assert.equal(conductorProjection.visuals[0].conductors.find(wire => wire.id === "TW-A").twisted, false, "missing pitch cannot be inferred");
+assert.ok(conductorProjection.diagnostics.some(row => row.code === "incomplete_twist_metadata"));
+assert.ok(conductorProjection.diagnostics.some(row => row.code === "invalid_conductor_metadata" && row.message.includes("WRONG")));
+const conductorGeometry = harness.buildHarnessConductorGeometry(conductorProjection.visuals[0]);
+assert.equal(conductorGeometry.length, 8);
+assert.equal(conductorGeometry.find(row => row.wireId === "PWR").presentation, "twisted");
+assert.equal(conductorGeometry.find(row => row.wireId === "SIG+").presentation, "twisted");
+assert.equal(conductorGeometry.find(row => row.wireId === "AUX+").presentation, "schematic");
+assert.equal(conductorGeometry.find(row => row.wireId === "TW-A").presentation, "schematic");
+for (const geometry of conductorGeometry) {
+  assert.deepEqual(geometry.pointsMm[0], savedRoute[0], "display separation must not move source connectivity");
+  assert.deepEqual(geometry.pointsMm.at(-1), savedRoute.at(-1), "display separation must not move destination connectivity");
+  assert.ok(geometry.pointsMm.length <= harness.MAX_HARNESS_CONDUCTOR_POINTS, "conductor sampling remains bounded");
+}
+const tinyPitchAssembly = structuredClone(conductorAssembly);
+tinyPitchAssembly.harnesses[0].extensions["spike.harness-conductors"].pairs[0].twist_pitch_mm = 0.001;
+const tinyPitchGeometry = harness.buildHarnessConductorGeometry(harness.buildVirtualHarnessVisualization(tinyPitchAssembly).visuals[0]);
+assert.equal(tinyPitchGeometry.find(row => row.wireId === "PWR").samplingCapped, true, "dense saved twists report bounded sampling");
+const conductorCapped = harness.buildVirtualHarnessVisualization(conductorAssembly, 10, 3);
+assert.equal(conductorCapped.conductorVisuals, 3);
+assert.equal(conductorCapped.truncatedConductors, 5);
+assert.ok(conductorCapped.diagnostics.some(row => row.code === "conductor_visualization_limit"));
 
 const capped = harness.buildVirtualHarnessVisualization({
   ...assembly,
@@ -62,12 +125,14 @@ assert.equal(harness.MAX_VIRTUAL_HARNESS_VISUALS, 512);
 const boardProjection = harness.buildVirtualBoardVisualization(assembly, {
   contract: "spike/assembly-designs/v1", active_design_id: "power-design",
   designs: [
-    { contract: "spike/design-ir/v2", design_id: "power-design", metadata: { board_bounds_mm: [0, 0, 1000, 1000] } },
+    { contract: "spike/design-ir/v2", design_id: "power-design", source: { native_id: "native-power-board" }, metadata: { board_bounds_mm: [0, 0, 1000, 1000] } },
     { contract: "spike/design-ir/v2", design_id: "control-design", metadata: { board_size_mm: [120, 80] } },
   ],
 });
 assert.equal(boardProjection.visuals.length, 2);
 assert.equal(boardProjection.visuals[0].active, true);
+assert.equal(boardProjection.visuals[0].sourceNativeId, "native-power-board");
+assert.equal(boardProjection.visuals[1].sourceNativeId, undefined);
 assert.equal(boardProjection.visuals[0].widthMm, 1000);
 assert.equal(boardProjection.visuals[1].heightMm, 80);
 assert.deepEqual(boardProjection.unresolvedBoardIds, []);
@@ -121,9 +186,16 @@ const harnessProjectionSource = harnessSource.slice(harnessSource.indexOf("expor
 assert.ok(!harnessProjectionSource.includes("components") && !harnessProjectionSource.includes(".nets"), "harness endpoint projection must not scan dense board features");
 assert.ok(viewportSource.includes("harnessPickablesRef"), "harness picking must remain separate from dense board pickables");
 assert.ok(viewportSource.includes("virtualHarnessScene"), "viewport must expose bounded harness render diagnostics");
+assert.ok(viewportSource.includes("harnessWireId"), "conductor picking must preserve saved wire identity");
+assert.ok(viewportSource.includes("HARNESS_ROLE_COLOR_TOKENS"), "conductor colors must use shared role tokens");
+assert.ok(viewportSource.includes("clearGroup(group)"), "rebuilt harness resources must use the viewport disposal path");
 assert.ok(viewportSource.includes("virtualBoardPickablesRef"), "board-instance proxies need a bounded dedicated picking set");
 assert.ok(appSource.includes("buildVirtualHarnessVisualization"), "App must project canonical AssemblyIR harnesses");
 assert.ok(appSource.includes("buildVirtualBoardVisualization"), "App must project retained board instances without scanning dense features");
 assert.ok(appSource.includes("onHarnessSelect={handleHarnessSelect}"), "App must receive stable harness selections");
+assert(harness.harnessConductorSelected("loom", "W1", "loom", "W1"));
+assert(!harness.harnessConductorSelected("loom", "W2", "loom", "W1"), "selecting one conductor must not highlight its neighbors");
+assert(!harness.harnessConductorSelected("other", "W1", "loom", "W1"), "wire IDs remain occurrence/harness scoped");
+assert(harness.harnessConductorSelected("loom", "W2", "loom", null), "bundle selection retains all-wire highlighting");
 
 console.log("Virtual harness projection, diagnostics, bounded rendering, and viewport wiring passed.");

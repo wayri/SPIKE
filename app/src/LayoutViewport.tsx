@@ -4,7 +4,7 @@ import type { AnalysisTerminalMarker, BoardObject, HoverProbeTarget, SelectionFi
 import type { ResultViewMode, ResultVisualization, ScalarSample, SolverResultBundle } from "./analysisResults";
 import { layerCssColor } from "./layerPalette";
 import { thermalVolume, ThermalScenarioView, ThermalSceneVisibility } from "./thermalScene";
-import { boardThermalCellColor, boardThermalViewportGrid } from "./boardThermalViewport";
+import { boardThermalCellColor, boardThermalViewportGrid, boardThermalCellGeometry } from "./boardThermalViewport";
 import { numericExtent, numericMaximum } from "./numericRange";
 import { resolveBoardCopperLayers } from "./copperLayerSelection";
 import { solverResultOverlayActive } from "./viewportScenePolicy";
@@ -1274,11 +1274,10 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         const { minimum, maximum } = numericExtent(values);
         return <g className="board-thermal-viewport-grid" aria-label="Solved board temperature cells" pointerEvents="none">
           {values.map((value, index) => {
-            const x = boardThermalGrid.origin_mm[0] + (index % nx) * boardThermalGrid.spacing_mm[0];
-            const y = boardThermalGrid.origin_mm[1] + Math.floor(index / nx) * boardThermalGrid.spacing_mm[1];
-            const point = toLayout([x, y]);
-            return <rect key={index} x={point[0]} y={point[1]} width={boardThermalGrid.spacing_mm[0]}
-              height={boardThermalGrid.spacing_mm[1]} fill={boardThermalCellColor(value, minimum, maximum)} fillOpacity="0.4" />;
+            const { center_mm: [x, y], size_mm: [width, height] } = boardThermalCellGeometry(boardThermalGrid, index);
+            const point = toLayout([x - width / 2, y - height / 2]);
+            return <rect key={index} x={point[0]} y={point[1]} width={width}
+              height={height} fill={boardThermalCellColor(value, minimum, maximum)} fillOpacity="0.4" />;
           })}
         </g>;
       })()}

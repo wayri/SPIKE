@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.assembly-icon-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:0}
+.assembly-icon-toolbar .assembly-icon-tool{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:38px;min-height:38px;padding:4px 6px}
+.assembly-icon-tool span{font-size:10px;line-height:1.1;white-space:nowrap}
+.assembly-icon-toolbar .assembly-icon-tool.selected{border-color:var(--spike-table-edit-border);background:var(--spike-table-edit);color:var(--spike-table-text-strong)}
+.assembly-viewport-help{padding:12px;color:var(--spike-table-text);font-size:12px;line-height:1.5;overflow:auto}
+.assembly-viewport-help h3{font-size:13px;margin:0 0 8px;color:var(--spike-table-text-strong)}
+.assembly-viewport-help h4{font-size:12px;margin:12px 0 4px}
+.assembly-viewport-help p{margin:6px 0}
+.assembly-viewport-help code{display:block;white-space:pre-wrap;overflow-wrap:anywhere;padding:6px;background:var(--spike-table-surface);border:1px solid var(--spike-table-border);font-size:11px}

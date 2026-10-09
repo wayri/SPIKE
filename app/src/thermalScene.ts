@@ -118,6 +118,8 @@ export type ThermalScenarioView = {
   /** Completed solver result only; scenario summaries never become a displayed field. */
   field_result?: unknown;
   board_thermal_result?: unknown;
+  board_thermal_design_id?: string;
+  board_thermal_occurrence_id?: string;
 };
 
 export function asThermalScenario(value: Record<string, unknown> | null | undefined): ThermalScenarioView | null {
