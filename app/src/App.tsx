@@ -95,7 +95,7 @@ import { extractNetGeometry } from "./netGeometry";
 import { emptyProcessResources, ProcessResources, sampleProcessResources, systemMemoryPercent } from "./resourceMonitor";
 import { planResourceCapacity, ResourceCapacityPlan } from "./resourceCapacity";
 import { assemblyAdmissionParams, assemblyAnalysisScope, requireAdmittedAssembly, requireSupportedAssemblyPhysics, type AssemblyAnalysisScope, type AssemblyWorkload } from "./assemblyAdmission";
-import { cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
+import { acknowledgeDesktopClose, cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
 import { emptyTopology, extractTopologyFromBoard, PowerTreeAnalysisPlan, TopologyDomain, TopologyModel, TopologyNode } from "./powerTree";
 import { compilePiPaths, compilePiSeriesSolveHandoff, PiPathTerminalAnchor } from "./piPath";
 import { attachPiPathComponentBridges, combinePiPathPreflights, combinePiPathSegmentExtractions, createPiPathSegmentExtractionRequests, PiPathAnalysisRequest } from "./piPathCircuit";
@@ -2338,7 +2338,12 @@ export default function App() {
       showUnsaved: () => setUnsavedPrompt({ actionLabel: "close SPIKE", action: null, closeWindow: true }),
       close: () => { void finishDesktopClose(); },
     });
-    if (desktopShell) void subscribeDesktopCloseRequested(handleClose).then(closeListener => {
+    if (desktopShell) void subscribeDesktopCloseRequested((preventDefault, generation) => {
+      // Let the host distinguish a live save/discard guard from a dead renderer.
+      void acknowledgeDesktopClose(generation).then(accepted => {
+        if (accepted && !disposed) handleClose(preventDefault);
+      }).catch(error => setStatus(`Close recovery acknowledgement failed: ${String(error)}`));
+    }).then(closeListener => {
       if (disposed) closeListener();
       else unlisten = closeListener;
     }).catch(error => setStatus(`SPIKE close protection could not start: ${String(error)}`));

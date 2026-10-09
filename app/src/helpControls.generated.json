@@ -296,7 +296,7 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:796:49584",
+    "id": "App.tsx:796:49609",
     "file": "App.tsx",
     "line": 796,
     "kind": "button",
@@ -312,7 +312,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:826:51997",
+    "id": "App.tsx:826:52022",
     "file": "App.tsx",
     "line": 826,
     "kind": "button",
@@ -328,7 +328,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:846:53656",
+    "id": "App.tsx:846:53681",
     "file": "App.tsx",
     "line": 846,
     "kind": "button",
@@ -344,7 +344,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:846:53727",
+    "id": "App.tsx:846:53752",
     "file": "App.tsx",
     "line": 846,
     "kind": "button",
@@ -360,7 +360,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:856:54645",
+    "id": "App.tsx:856:54670",
     "file": "App.tsx",
     "line": 856,
     "kind": "button",
@@ -376,9 +376,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:4672:315319",
+    "id": "App.tsx:4677:315684",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Multi-board",
@@ -392,9 +392,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:315453",
+    "id": "App.tsx:4677:315818",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Import",
@@ -408,9 +408,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:315558",
+    "id": "App.tsx:4677:315923",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Open",
@@ -424,9 +424,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:315632",
+    "id": "App.tsx:4677:315997",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Manager",
@@ -440,9 +440,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:315719",
+    "id": "App.tsx:4677:316084",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Save",
@@ -456,9 +456,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:315856",
+    "id": "App.tsx:4677:316221",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "DESIGN READINESS",
     "label": "Validate",
@@ -472,9 +472,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:315932",
+    "id": "App.tsx:4677:316297",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "DESIGN READINESS",
     "label": "Stackup",
@@ -488,9 +488,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:316008",
+    "id": "App.tsx:4677:316373",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "DESIGN READINESS",
     "label": "Issues",
@@ -504,9 +504,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:316142",
+    "id": "App.tsx:4677:316507",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Layers",
@@ -520,9 +520,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:316336",
+    "id": "App.tsx:4677:316701",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "3D models",
@@ -536,9 +536,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:316436",
+    "id": "App.tsx:4677:316801",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Model resolver",
@@ -552,9 +552,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:316552",
+    "id": "App.tsx:4677:316917",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Bonds",
@@ -568,9 +568,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4672:316653",
+    "id": "App.tsx:4677:317018",
     "file": "App.tsx",
-    "line": 4672,
+    "line": 4677,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Power tree",
@@ -584,9 +584,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:316956",
+    "id": "App.tsx:4679:317321",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "input",
     "section": "PROJECT",
     "label": "Context-dependent control",
@@ -600,9 +600,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:4674:317047",
+    "id": "App.tsx:4679:317412",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Open",
@@ -616,9 +616,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317121",
+    "id": "App.tsx:4679:317486",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Manager",
@@ -632,9 +632,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317208",
+    "id": "App.tsx:4679:317573",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "PROJECT",
     "label": "Save",
@@ -648,9 +648,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317345",
+    "id": "App.tsx:4679:317710",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "DESIGN READINESS",
     "label": "Validate",
@@ -664,9 +664,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317421",
+    "id": "App.tsx:4679:317786",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "DESIGN READINESS",
     "label": "Stackup",
@@ -680,9 +680,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317497",
+    "id": "App.tsx:4679:317862",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "DESIGN READINESS",
     "label": "Issues",
@@ -696,9 +696,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317631",
+    "id": "App.tsx:4679:317996",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Layers",
@@ -712,9 +712,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317825",
+    "id": "App.tsx:4679:318190",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "3D models",
@@ -728,9 +728,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:317925",
+    "id": "App.tsx:4679:318290",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Bonds",
@@ -744,9 +744,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4674:318026",
+    "id": "App.tsx:4679:318391",
     "file": "App.tsx",
-    "line": 4674,
+    "line": 4679,
     "kind": "Tool",
     "section": "WORKSPACE",
     "label": "Power tree",
@@ -760,9 +760,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:318242",
+    "id": "App.tsx:4681:318607",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "DC drop",
@@ -776,9 +776,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:318404",
+    "id": "App.tsx:4681:318769",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "Series path",
@@ -792,9 +792,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:318576",
+    "id": "App.tsx:4681:318941",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "Bulk nets",
@@ -808,9 +808,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:318755",
+    "id": "App.tsx:4681:319120",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "AC sweep",
@@ -824,9 +824,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:318896",
+    "id": "App.tsx:4681:319261",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "AC effects",
@@ -840,9 +840,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:318998",
+    "id": "App.tsx:4681:319363",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "Transient",
@@ -856,9 +856,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319131",
+    "id": "App.tsx:4681:319496",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "POWER ANALYSES",
     "label": "Batch nets",
@@ -872,9 +872,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319349",
+    "id": "App.tsx:4681:319714",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "SOURCES AND LOADS",
     "label": "Net manager",
@@ -888,9 +888,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319458",
+    "id": "App.tsx:4681:319823",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "SOURCES AND LOADS",
     "label": "Terminals",
@@ -904,9 +904,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319545",
+    "id": "App.tsx:4681:319910",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "SOURCES AND LOADS",
     "label": "Power paths",
@@ -920,9 +920,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319689",
+    "id": "App.tsx:4681:320054",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "SOURCES AND LOADS",
     "label": "SPICE models",
@@ -936,9 +936,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319789",
+    "id": "App.tsx:4681:320154",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "SOURCES AND LOADS",
     "label": "Probes",
@@ -952,9 +952,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319920",
+    "id": "App.tsx:4681:320285",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "CHECK AND RUN",
     "label": "Validate",
@@ -968,9 +968,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:319989",
+    "id": "App.tsx:4681:320354",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "CHECK AND RUN",
     "label": "Running... / Run PI",
@@ -984,9 +984,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:320081",
+    "id": "App.tsx:4681:320446",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "CHECK AND RUN",
     "label": "PI results",
@@ -1000,9 +1000,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:320269",
+    "id": "App.tsx:4681:320634",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "OUTPUT",
     "label": "PI report",
@@ -1016,9 +1016,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:320338",
+    "id": "App.tsx:4681:320703",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "OUTPUT",
     "label": "Save results",
@@ -1032,9 +1032,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4676:320402",
+    "id": "App.tsx:4681:320767",
     "file": "App.tsx",
-    "line": 4676,
+    "line": 4681,
     "kind": "Tool",
     "section": "OUTPUT",
     "label": "Load results",
@@ -1048,9 +1048,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4679:320599",
+    "id": "App.tsx:4684:320964",
     "file": "App.tsx",
-    "line": 4679,
+    "line": 4684,
     "kind": "Tool",
     "section": "PROTOCOL WORKSPACES",
     "label": "Protocol suites",
@@ -1064,9 +1064,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4679:320720",
+    "id": "App.tsx:4684:321085",
     "file": "App.tsx",
-    "line": 4679,
+    "line": 4684,
     "kind": "Tool",
     "section": "PROTOCOL WORKSPACES",
     "label": "Channel tree",
@@ -1080,9 +1080,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4679:320837",
+    "id": "App.tsx:4684:321202",
     "file": "App.tsx",
-    "line": 4679,
+    "line": 4684,
     "kind": "Tool",
     "section": "PROTOCOL WORKSPACES",
     "label": "Impedance",
@@ -1096,9 +1096,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4679:320933",
+    "id": "App.tsx:4684:321298",
     "file": "App.tsx",
-    "line": 4679,
+    "line": 4684,
     "kind": "Tool",
     "section": "PROTOCOL WORKSPACES",
     "label": "Coupling risk",
@@ -1112,9 +1112,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4680:321116",
+    "id": "App.tsx:4685:321481",
     "file": "App.tsx",
-    "line": 4680,
+    "line": 4685,
     "kind": "Tool",
     "section": "SIGNAL ANALYSES",
     "label": "S-parameters",
@@ -1128,9 +1128,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4680:321221",
+    "id": "App.tsx:4685:321586",
     "file": "App.tsx",
-    "line": 4680,
+    "line": 4685,
     "kind": "Tool",
     "section": "SIGNAL ANALYSES",
     "label": "NEXT / FEXT",
@@ -1144,9 +1144,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4680:321319",
+    "id": "App.tsx:4685:321684",
     "file": "App.tsx",
-    "line": 4680,
+    "line": 4685,
     "kind": "Tool",
     "section": "SIGNAL ANALYSES",
     "label": "Eye diagram",
@@ -1160,9 +1160,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4680:321415",
+    "id": "App.tsx:4685:321780",
     "file": "App.tsx",
-    "line": 4680,
+    "line": 4685,
     "kind": "Tool",
     "section": "SIGNAL ANALYSES",
     "label": "PAM4",
@@ -1176,9 +1176,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4681:321666",
+    "id": "App.tsx:4686:322031",
     "file": "App.tsx",
-    "line": 4681,
+    "line": 4686,
     "kind": "select",
     "section": "S-PARAMETER SOLVER",
     "label": "S-parameter solver",
@@ -1195,9 +1195,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4681:322057",
+    "id": "App.tsx:4686:322422",
     "file": "App.tsx",
-    "line": 4681,
+    "line": 4686,
     "kind": "Tool",
     "section": "S-PARAMETER SOLVER",
     "label": "Check EMerge",
@@ -1211,9 +1211,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4682:322349",
+    "id": "App.tsx:4687:322714",
     "file": "App.tsx",
-    "line": 4682,
+    "line": 4687,
     "kind": "Tool",
     "section": "CHANNEL MODEL",
     "label": "Stackup",
@@ -1227,9 +1227,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4682:322425",
+    "id": "App.tsx:4687:322790",
     "file": "App.tsx",
-    "line": 4682,
+    "line": 4687,
     "kind": "Tool",
     "section": "CHANNEL MODEL",
     "label": "Layer view",
@@ -1243,9 +1243,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4682:322510",
+    "id": "App.tsx:4687:322875",
     "file": "App.tsx",
-    "line": 4682,
+    "line": 4687,
     "kind": "Tool",
     "section": "CHANNEL MODEL",
     "label": "Ports",
@@ -1259,9 +1259,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4683:322775",
+    "id": "App.tsx:4688:323140",
     "file": "App.tsx",
-    "line": 4683,
+    "line": 4688,
     "kind": "Tool",
     "section": "INTERCHANGE",
     "label": "Touchstone",
@@ -1275,9 +1275,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4683:322871",
+    "id": "App.tsx:4688:323236",
     "file": "App.tsx",
-    "line": 4683,
+    "line": 4688,
     "kind": "Tool",
     "section": "INTERCHANGE",
     "label": "Suite builder",
@@ -1291,9 +1291,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4683:322961",
+    "id": "App.tsx:4688:323326",
     "file": "App.tsx",
-    "line": 4683,
+    "line": 4688,
     "kind": "Tool",
     "section": "INTERCHANGE",
     "label": "External engines",
@@ -1307,9 +1307,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4686:323179",
+    "id": "App.tsx:4691:323544",
     "file": "App.tsx",
-    "line": 4686,
+    "line": 4691,
     "kind": "Tool",
     "section": "SHARED DOMAIN",
     "label": "PI mesh",
@@ -1323,9 +1323,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4686:323303",
+    "id": "App.tsx:4691:323668",
     "file": "App.tsx",
-    "line": 4686,
+    "line": 4691,
     "kind": "Tool",
     "section": "SHARED DOMAIN",
     "label": "SI mesh",
@@ -1339,9 +1339,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4686:323489",
+    "id": "App.tsx:4691:323854",
     "file": "App.tsx",
-    "line": 4686,
+    "line": 4691,
     "kind": "Tool",
     "section": "MESH INPUTS",
     "label": "Mesh settings",
@@ -1355,9 +1355,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4686:323639",
+    "id": "App.tsx:4691:324004",
     "file": "App.tsx",
-    "line": 4686,
+    "line": 4691,
     "kind": "Tool",
     "section": "MESH INPUTS",
     "label": "Stackup",
@@ -1371,9 +1371,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4686:323715",
+    "id": "App.tsx:4691:324080",
     "file": "App.tsx",
-    "line": 4686,
+    "line": 4691,
     "kind": "Tool",
     "section": "MESH INPUTS",
     "label": "Nets",
@@ -1387,9 +1387,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4686:323918",
+    "id": "App.tsx:4691:324283",
     "file": "App.tsx",
-    "line": 4686,
+    "line": 4691,
     "kind": "Tool",
     "section": "NEXT",
     "label": "Solve workspace",
@@ -1403,9 +1403,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:324133",
+    "id": "App.tsx:4693:324498",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "SHARED DOMAIN",
     "label": "PI solve",
@@ -1419,9 +1419,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:324258",
+    "id": "App.tsx:4693:324623",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "SHARED DOMAIN",
     "label": "SI solve",
@@ -1435,9 +1435,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:324443",
+    "id": "App.tsx:4693:324808",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "EXECUTION",
     "label": "Review setup",
@@ -1451,9 +1451,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:324602",
+    "id": "App.tsx:4693:324967",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "EXECUTION",
     "label": "Run SI channel / Running... / Run controls",
@@ -1467,9 +1467,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:324825",
+    "id": "App.tsx:4693:325190",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "EXECUTION",
     "label": "Stopping... / Stop",
@@ -1483,9 +1483,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:325077",
+    "id": "App.tsx:4693:325442",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "REVIEW",
     "label": "Results",
@@ -1499,9 +1499,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4688:325357",
+    "id": "App.tsx:4693:325722",
     "file": "App.tsx",
-    "line": 4688,
+    "line": 4693,
     "kind": "Tool",
     "section": "REVIEW",
     "label": "Console",
@@ -1515,9 +1515,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:325533",
+    "id": "App.tsx:4695:325898",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "SCREENING",
     "label": "Net domain",
@@ -1531,9 +1531,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:325781",
+    "id": "App.tsx:4695:326146",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "SCREENING",
     "label": "Preflight",
@@ -1547,9 +1547,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:325974",
+    "id": "App.tsx:4695:326339",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "SCREENING",
     "label": "Screening / Risk screen",
@@ -1563,9 +1563,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:326255",
+    "id": "App.tsx:4695:326620",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "EXCITATION",
     "label": "Ports",
@@ -1579,9 +1579,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:326497",
+    "id": "App.tsx:4695:326862",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "EXCITATION",
     "label": "Bonds",
@@ -1595,9 +1595,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:326598",
+    "id": "App.tsx:4695:326963",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "EXCITATION",
     "label": "PI transient",
@@ -1611,9 +1611,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:326693",
+    "id": "App.tsx:4695:327058",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "EXCITATION",
     "label": "SPICE",
@@ -1627,9 +1627,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:326831",
+    "id": "App.tsx:4695:327196",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "FULL-WAVE",
     "label": "Domain mesh",
@@ -1643,9 +1643,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:327069",
+    "id": "App.tsx:4695:327434",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "FULL-WAVE",
     "label": "Prepare case",
@@ -1659,9 +1659,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:327279",
+    "id": "App.tsx:4695:327644",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "FULL-WAVE",
     "label": "Run solver",
@@ -1675,9 +1675,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:327454",
+    "id": "App.tsx:4695:327819",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "FULL-WAVE",
     "label": "EMerge",
@@ -1691,9 +1691,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:327545",
+    "id": "App.tsx:4695:327910",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "FULL-WAVE",
     "label": "Solver manager",
@@ -1707,9 +1707,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:327709",
+    "id": "App.tsx:4695:328074",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "REVIEW",
     "label": "Dashboard",
@@ -1723,9 +1723,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:327912",
+    "id": "App.tsx:4695:328277",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "REVIEW",
     "label": "Near field",
@@ -1739,9 +1739,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:328060",
+    "id": "App.tsx:4695:328425",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "REVIEW",
     "label": "Far field",
@@ -1755,9 +1755,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4690:328444",
+    "id": "App.tsx:4695:328809",
     "file": "App.tsx",
-    "line": 4690,
+    "line": 4695,
     "kind": "Tool",
     "section": "REVIEW",
     "label": "EMI report",
@@ -1771,9 +1771,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:328628",
+    "id": "App.tsx:4697:328993",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "SIMULATION DOMAIN",
     "label": "Bounding volume",
@@ -1787,9 +1787,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:328716",
+    "id": "App.tsx:4697:329081",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "SIMULATION DOMAIN",
     "label": "Board stack",
@@ -1803,9 +1803,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:328796",
+    "id": "App.tsx:4697:329161",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "SIMULATION DOMAIN",
     "label": "Heat sources",
@@ -1819,9 +1819,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:328878",
+    "id": "App.tsx:4697:329243",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "SIMULATION DOMAIN",
     "label": "Bonds",
@@ -1835,9 +1835,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329039",
+    "id": "App.tsx:4697:329404",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "AIRFLOW",
     "label": "Flow channels",
@@ -1851,9 +1851,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329118",
+    "id": "App.tsx:4697:329483",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "AIRFLOW",
     "label": "Fan placement",
@@ -1867,9 +1867,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329196",
+    "id": "App.tsx:4697:329561",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "AIRFLOW",
     "label": "Ambient",
@@ -1883,9 +1883,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329334",
+    "id": "App.tsx:4697:329699",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "OPTIONAL CFD",
     "label": "Scenario",
@@ -1899,9 +1899,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329421",
+    "id": "App.tsx:4697:329786",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "OPTIONAL CFD",
     "label": "Prepare case",
@@ -1915,9 +1915,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329499",
+    "id": "App.tsx:4697:329864",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "OPTIONAL CFD",
     "label": "Solver console",
@@ -1931,9 +1931,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329650",
+    "id": "App.tsx:4697:330015",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "THERMAL RESULTS",
     "label": "Temperature",
@@ -1947,9 +1947,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4692:329732",
+    "id": "App.tsx:4697:330097",
     "file": "App.tsx",
-    "line": 4692,
+    "line": 4697,
     "kind": "Tool",
     "section": "THERMAL RESULTS",
     "label": "Report",
@@ -1963,9 +1963,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:329905",
+    "id": "App.tsx:4699:330270",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "PROBE TOOLS",
     "label": "Hover probe",
@@ -1979,9 +1979,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:330214",
+    "id": "App.tsx:4699:330579",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "PROBE TOOLS",
     "label": "Place probe",
@@ -1995,9 +1995,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:330295",
+    "id": "App.tsx:4699:330660",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "PROBE TOOLS",
     "label": "Probe table",
@@ -2011,9 +2011,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:330394",
+    "id": "App.tsx:4699:330759",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "PROBE TOOLS",
     "label": "Duplicate",
@@ -2027,9 +2027,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:330666",
+    "id": "App.tsx:4699:331031",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "MEASUREMENTS",
     "label": "Voltage",
@@ -2043,9 +2043,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:330797",
+    "id": "App.tsx:4699:331162",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "MEASUREMENTS",
     "label": "Current",
@@ -2059,9 +2059,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:330939",
+    "id": "App.tsx:4699:331304",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "MEASUREMENTS",
     "label": "Impedance",
@@ -2075,9 +2075,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:331160",
+    "id": "App.tsx:4699:331525",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "COMPARE AND EXPORT",
     "label": "Compare",
@@ -2091,9 +2091,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:331226",
+    "id": "App.tsx:4699:331591",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "COMPARE AND EXPORT",
     "label": "Cross-layer",
@@ -2107,9 +2107,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4694:331312",
+    "id": "App.tsx:4699:331677",
     "file": "App.tsx",
-    "line": 4694,
+    "line": 4699,
     "kind": "Tool",
     "section": "COMPARE AND EXPORT",
     "label": "Export CSV",
@@ -2123,9 +2123,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:331491",
+    "id": "App.tsx:4701:331856",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "RESULT VIEWS",
     "label": "Issues",
@@ -2139,9 +2139,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:331594",
+    "id": "App.tsx:4701:331959",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "RESULT VIEWS",
     "label": "Probe table",
@@ -2155,9 +2155,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:331693",
+    "id": "App.tsx:4701:332058",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "RESULT VIEWS",
     "label": "Power tree",
@@ -2171,9 +2171,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:331804",
+    "id": "App.tsx:4701:332169",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "RESULT VIEWS",
     "label": "Console",
@@ -2187,9 +2187,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:331973",
+    "id": "App.tsx:4701:332338",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "VISUALIZATION",
     "label": "Fields",
@@ -2203,9 +2203,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:332083",
+    "id": "App.tsx:4701:332448",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "VISUALIZATION",
     "label": "Voltage / current",
@@ -2219,9 +2219,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:332180",
+    "id": "App.tsx:4701:332545",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "VISUALIZATION",
     "label": "Mesh",
@@ -2235,9 +2235,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:332262",
+    "id": "App.tsx:4701:332627",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "VISUALIZATION",
     "label": "Probe overlay",
@@ -2251,9 +2251,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:332402",
+    "id": "App.tsx:4701:332767",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "REVISION REVIEW",
     "label": "Compare",
@@ -2267,9 +2267,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:332490",
+    "id": "App.tsx:4701:332855",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "REVISION REVIEW",
     "label": "Limits",
@@ -2283,9 +2283,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4696:332567",
+    "id": "App.tsx:4701:332932",
     "file": "App.tsx",
-    "line": 4696,
+    "line": 4701,
     "kind": "Tool",
     "section": "REVISION REVIEW",
     "label": "Report",
@@ -2299,9 +2299,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:332736",
+    "id": "App.tsx:4703:333101",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "REPORT",
     "label": "Preview",
@@ -2315,9 +2315,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:332801",
+    "id": "App.tsx:4703:333166",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "REPORT",
     "label": "Print / PDF",
@@ -2331,9 +2331,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:332960",
+    "id": "App.tsx:4703:333325",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "REPORT",
     "label": "Analytics",
@@ -2347,9 +2347,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333092",
+    "id": "App.tsx:4703:333457",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "DATA EXPORT",
     "label": "Probe CSV",
@@ -2363,9 +2363,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333157",
+    "id": "App.tsx:4703:333522",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "DATA EXPORT",
     "label": "Touchstone",
@@ -2379,9 +2379,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333252",
+    "id": "App.tsx:4703:333617",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "DATA EXPORT",
     "label": "SPICE",
@@ -2395,9 +2395,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333396",
+    "id": "App.tsx:4703:333761",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "CAD AND PACKAGE",
     "label": "STEP",
@@ -2411,9 +2411,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333471",
+    "id": "App.tsx:4703:333836",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "CAD AND PACKAGE",
     "label": "Save results",
@@ -2427,9 +2427,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333535",
+    "id": "App.tsx:4703:333900",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "CAD AND PACKAGE",
     "label": "Load results",
@@ -2443,9 +2443,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4698:333604",
+    "id": "App.tsx:4703:333969",
     "file": "App.tsx",
-    "line": 4698,
+    "line": 4703,
     "kind": "Tool",
     "section": "CAD AND PACKAGE",
     "label": "Save instance",
@@ -2459,9 +2459,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4700:333775",
+    "id": "App.tsx:4705:334140",
     "file": "App.tsx",
-    "line": 4700,
+    "line": 4705,
     "kind": "Tool",
     "section": "BROWSE",
     "label": "Extension manager",
@@ -2475,9 +2475,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4700:333867",
+    "id": "App.tsx:4705:334232",
     "file": "App.tsx",
-    "line": 4700,
+    "line": 4705,
     "kind": "Tool",
     "section": "BROWSE",
     "label": "Refresh",
@@ -2491,9 +2491,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4701:334084",
+    "id": "App.tsx:4706:334449",
     "file": "App.tsx",
-    "line": 4701,
+    "line": 4706,
     "kind": "select",
     "section": "SELECT EXTENSION",
     "label": "Select extension toolbar",
@@ -2507,9 +2507,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4701:334475",
+    "id": "App.tsx:4706:334840",
     "file": "App.tsx",
-    "line": 4701,
+    "line": 4706,
     "kind": "Tool",
     "section": "SELECT EXTENSION",
     "label": "Manage",
@@ -2523,9 +2523,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4702:334743",
+    "id": "App.tsx:4707:335108",
     "file": "App.tsx",
-    "line": 4702,
+    "line": 4707,
     "kind": "Tool",
     "section": "AVAILABLE CAPABILITIES",
     "label": "Context-dependent control",
@@ -2539,9 +2539,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4703:335200",
+    "id": "App.tsx:4708:335565",
     "file": "App.tsx",
-    "line": 4703,
+    "line": 4708,
     "kind": "Tool",
     "section": "MORE",
     "label": "Context-dependent control",
@@ -2555,9 +2555,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:335477",
+    "id": "App.tsx:4711:335842",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "APPLICATION",
     "label": "Settings",
@@ -2571,9 +2571,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:335560",
+    "id": "App.tsx:4711:335925",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "APPLICATION",
     "label": "Python",
@@ -2587,9 +2587,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:335661",
+    "id": "App.tsx:4711:336026",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "APPLICATION",
     "label": "Extensions",
@@ -2603,9 +2603,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:335747",
+    "id": "App.tsx:4711:336112",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "APPLICATION",
     "label": "External engines",
@@ -2619,9 +2619,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:335848",
+    "id": "App.tsx:4711:336213",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "APPLICATION",
     "label": "Dependencies",
@@ -2635,9 +2635,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:335943",
+    "id": "App.tsx:4711:336308",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "APPLICATION",
     "label": "Verification",
@@ -2651,9 +2651,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336093",
+    "id": "App.tsx:4711:336458",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "LOCAL AUTOMATION",
     "label": "LLM / MCP",
@@ -2667,9 +2667,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336302",
+    "id": "App.tsx:4711:336667",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "DESIGN LIBRARIES",
     "label": "Stackup",
@@ -2683,9 +2683,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336378",
+    "id": "App.tsx:4711:336743",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "DESIGN LIBRARIES",
     "label": "3D library",
@@ -2699,9 +2699,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336463",
+    "id": "App.tsx:4711:336828",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "DESIGN LIBRARIES",
     "label": "Models",
@@ -2715,9 +2715,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336621",
+    "id": "App.tsx:4711:336986",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "INTERFACE",
     "label": "Shortcuts",
@@ -2731,9 +2731,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336702",
+    "id": "App.tsx:4711:337067",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "INTERFACE",
     "label": "Icon gallery",
@@ -2747,9 +2747,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336795",
+    "id": "App.tsx:4711:337160",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "INTERFACE",
     "label": "Resources",
@@ -2763,9 +2763,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4706:336875",
+    "id": "App.tsx:4711:337240",
     "file": "App.tsx",
-    "line": 4706,
+    "line": 4711,
     "kind": "Tool",
     "section": "INTERFACE",
     "label": "User guide",
@@ -2779,9 +2779,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4896:361443",
+    "id": "App.tsx:4901:361808",
     "file": "App.tsx",
-    "line": 4896,
+    "line": 4901,
     "kind": "button",
     "section": "",
     "label": "Configure SI channel geometry and run settings",
@@ -2795,9 +2795,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4897:361693",
+    "id": "App.tsx:4902:362058",
     "file": "App.tsx",
-    "line": 4897,
+    "line": 4902,
     "kind": "button",
     "section": "",
     "label": "Configure EM excitation and solver",
@@ -2811,9 +2811,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4898:361946",
+    "id": "App.tsx:4903:362311",
     "file": "App.tsx",
-    "line": 4898,
+    "line": 4903,
     "kind": "button",
     "section": "",
     "label": "Configure thermal analysis",
@@ -2827,9 +2827,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4899:362144",
+    "id": "App.tsx:4904:362509",
     "file": "App.tsx",
-    "line": 4899,
+    "line": 4904,
     "kind": "button",
     "section": "",
     "label": "Resolve net, terminals, return path, solver selection, and mesh defaults",
@@ -2843,9 +2843,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4939:365749",
+    "id": "App.tsx:4944:366114",
     "file": "App.tsx",
-    "line": 4939,
+    "line": 4944,
     "kind": "button",
     "section": "",
     "label": "Board + pattern / Board / assembly",
@@ -2859,9 +2859,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4940:366143",
+    "id": "App.tsx:4945:366508",
     "file": "App.tsx",
-    "line": 4940,
+    "line": 4945,
     "kind": "select",
     "section": "",
     "label": "Board radiation frequency",
@@ -2875,9 +2875,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4941:366507",
+    "id": "App.tsx:4946:366872",
     "file": "App.tsx",
-    "line": 4941,
+    "line": 4946,
     "kind": "button",
     "section": "",
     "label": "Chamber",
@@ -2891,9 +2891,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4942:366632",
+    "id": "App.tsx:4947:366997",
     "file": "App.tsx",
-    "line": 4942,
+    "line": 4947,
     "kind": "button",
     "section": "",
     "label": "EMerge",
@@ -2907,9 +2907,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4943:366774",
+    "id": "App.tsx:4948:367139",
     "file": "App.tsx",
-    "line": 4943,
+    "line": 4948,
     "kind": "button",
     "section": "",
     "label": "Translucent",
@@ -2923,9 +2923,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4944:367139",
+    "id": "App.tsx:4949:367504",
     "file": "App.tsx",
-    "line": 4944,
+    "line": 4949,
     "kind": "button",
     "section": "",
     "label": "Nets only",
@@ -2939,9 +2939,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4945:367469",
+    "id": "App.tsx:4950:367834",
     "file": "App.tsx",
-    "line": 4945,
+    "line": 4950,
     "kind": "button",
     "section": "",
     "label": "Preflight",
@@ -2955,9 +2955,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4946:367594",
+    "id": "App.tsx:4951:367959",
     "file": "App.tsx",
-    "line": 4946,
+    "line": 4951,
     "kind": "button",
     "section": "",
     "label": "Screen",
@@ -2971,9 +2971,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4947:367711",
+    "id": "App.tsx:4952:368076",
     "file": "App.tsx",
-    "line": 4947,
+    "line": 4952,
     "kind": "button",
     "section": "",
     "label": "Minimize EM tools to bottom bar",
@@ -2987,9 +2987,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4952:368115",
+    "id": "App.tsx:4957:368480",
     "file": "App.tsx",
-    "line": 4952,
+    "line": 4957,
     "kind": "select",
     "section": "",
     "label": "Probe measurement type",
@@ -3009,9 +3009,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4959:368645",
+    "id": "App.tsx:4964:369010",
     "file": "App.tsx",
-    "line": 4959,
+    "line": 4964,
     "kind": "button",
     "section": "",
     "label": "Hover probe",
@@ -3025,9 +3025,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4960:368927",
+    "id": "App.tsx:4965:369292",
     "file": "App.tsx",
-    "line": 4960,
+    "line": 4965,
     "kind": "button",
     "section": "",
     "label": "Click measure",
@@ -3041,9 +3041,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4961:369206",
+    "id": "App.tsx:4966:369571",
     "file": "App.tsx",
-    "line": 4961,
+    "line": 4966,
     "kind": "button",
     "section": "",
     "label": "Place many",
@@ -3057,9 +3057,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4962:369462",
+    "id": "App.tsx:4967:369827",
     "file": "App.tsx",
-    "line": 4962,
+    "line": 4967,
     "kind": "button",
     "section": "",
     "label": "Hide probe markers / Show probe markers",
@@ -3073,9 +3073,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4963:369707",
+    "id": "App.tsx:4968:370072",
     "file": "App.tsx",
-    "line": 4963,
+    "line": 4968,
     "kind": "button",
     "section": "",
     "label": "Clear all probes",
@@ -3089,9 +3089,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4966:369984",
+    "id": "App.tsx:4971:370349",
     "file": "App.tsx",
-    "line": 4966,
+    "line": 4971,
     "kind": "button",
     "section": "",
     "label": "Field",
@@ -3105,9 +3105,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4967:370305",
+    "id": "App.tsx:4972:370670",
     "file": "App.tsx",
-    "line": 4967,
+    "line": 4972,
     "kind": "button",
     "section": "",
     "label": "Plots",
@@ -3121,9 +3121,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4968:370463",
+    "id": "App.tsx:4973:370828",
     "file": "App.tsx",
-    "line": 4968,
+    "line": 4973,
     "kind": "button",
     "section": "",
     "label": "Open saved",
@@ -3137,9 +3137,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4969:370630",
+    "id": "App.tsx:4974:370995",
     "file": "App.tsx",
-    "line": 4969,
+    "line": 4974,
     "kind": "button",
     "section": "",
     "label": "Domain",
@@ -3153,9 +3153,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4970:370870",
+    "id": "App.tsx:4975:371235",
     "file": "App.tsx",
-    "line": 4970,
+    "line": 4975,
     "kind": "button",
     "section": "",
     "label": "Sources",
@@ -3169,9 +3169,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4971:371124",
+    "id": "App.tsx:4976:371489",
     "file": "App.tsx",
-    "line": 4971,
+    "line": 4976,
     "kind": "button",
     "section": "",
     "label": "Airflow",
@@ -3185,9 +3185,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4972:371359",
+    "id": "App.tsx:4977:371724",
     "file": "App.tsx",
-    "line": 4972,
+    "line": 4977,
     "kind": "button",
     "section": "",
     "label": "Hardware",
@@ -3201,9 +3201,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4973:371621",
+    "id": "App.tsx:4978:371986",
     "file": "App.tsx",
-    "line": 4973,
+    "line": 4978,
     "kind": "button",
     "section": "",
     "label": "Show or hide the complete thermal scene",
@@ -3217,9 +3217,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4978:372246",
+    "id": "App.tsx:4983:372611",
     "file": "App.tsx",
-    "line": 4978,
+    "line": 4983,
     "kind": "button",
     "section": "",
     "label": "Open saved thermal",
@@ -3233,9 +3233,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4979:372426",
+    "id": "App.tsx:4984:372791",
     "file": "App.tsx",
-    "line": 4979,
+    "line": 4984,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -3249,9 +3249,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:4984:373112",
+    "id": "App.tsx:4989:373477",
     "file": "App.tsx",
-    "line": 4984,
+    "line": 4989,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -3265,9 +3265,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4984:373339",
+    "id": "App.tsx:4989:373704",
     "file": "App.tsx",
-    "line": 4984,
+    "line": 4989,
     "kind": "button",
     "section": "",
     "label": "Open universal search",
@@ -3281,9 +3281,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4984:373759",
+    "id": "App.tsx:4989:374124",
     "file": "App.tsx",
-    "line": 4984,
+    "line": 4989,
     "kind": "button",
     "section": "",
     "label": "Help and user guide",
@@ -3297,9 +3297,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4984:373883",
+    "id": "App.tsx:4989:374248",
     "file": "App.tsx",
-    "line": 4984,
+    "line": 4989,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -3313,9 +3313,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4987:374219",
+    "id": "App.tsx:4992:374584",
     "file": "App.tsx",
-    "line": 4987,
+    "line": 4992,
     "kind": "MenuItem",
     "section": "",
     "label": "New project",
@@ -3329,9 +3329,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4988:374344",
+    "id": "App.tsx:4993:374709",
     "file": "App.tsx",
-    "line": 4988,
+    "line": 4993,
     "kind": "MenuItem",
     "section": "",
     "label": "Project manager",
@@ -3345,9 +3345,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4989:374473",
+    "id": "App.tsx:4994:374838",
     "file": "App.tsx",
-    "line": 4989,
+    "line": 4994,
     "kind": "MenuItem",
     "section": "",
     "label": "Simulation studies",
@@ -3361,9 +3361,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4990:374600",
+    "id": "App.tsx:4995:374965",
     "file": "App.tsx",
-    "line": 4990,
+    "line": 4995,
     "kind": "MenuItem",
     "section": "",
     "label": "Open file or project",
@@ -3377,9 +3377,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4991:374742",
+    "id": "App.tsx:4996:375107",
     "file": "App.tsx",
-    "line": 4991,
+    "line": 4996,
     "kind": "MenuItem",
     "section": "",
     "label": "Save project",
@@ -3393,9 +3393,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4992:374870",
+    "id": "App.tsx:4997:375235",
     "file": "App.tsx",
-    "line": 4992,
+    "line": 4997,
     "kind": "MenuItem",
     "section": "",
     "label": "Save as",
@@ -3409,9 +3409,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4993:375033",
+    "id": "App.tsx:4998:375398",
     "file": "App.tsx",
-    "line": 4993,
+    "line": 4998,
     "kind": "MenuItem",
     "section": "",
     "label": "Save project copy without results",
@@ -3425,9 +3425,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4994:375173",
+    "id": "App.tsx:4999:375538",
     "file": "App.tsx",
-    "line": 4994,
+    "line": 4999,
     "kind": "MenuItem",
     "section": "",
     "label": "Save results file",
@@ -3441,9 +3441,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4995:375289",
+    "id": "App.tsx:5000:375654",
     "file": "App.tsx",
-    "line": 4995,
+    "line": 5000,
     "kind": "MenuItem",
     "section": "",
     "label": "Open results file",
@@ -3457,9 +3457,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4996:375405",
+    "id": "App.tsx:5001:375770",
     "file": "App.tsx",
-    "line": 4996,
+    "line": 5001,
     "kind": "MenuItem",
     "section": "",
     "label": "Import project / CAD",
@@ -3473,9 +3473,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4997:375531",
+    "id": "App.tsx:5002:375896",
     "file": "App.tsx",
-    "line": 4997,
+    "line": 5002,
     "kind": "MenuItem",
     "section": "",
     "label": "Import ODB++ archive",
@@ -3489,9 +3489,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4998:375654",
+    "id": "App.tsx:5003:376019",
     "file": "App.tsx",
-    "line": 4998,
+    "line": 5003,
     "kind": "MenuItem",
     "section": "",
     "label": "Import ODB++ folder",
@@ -3505,9 +3505,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:4999:375784",
+    "id": "App.tsx:5004:376149",
     "file": "App.tsx",
-    "line": 4999,
+    "line": 5004,
     "kind": "MenuItem",
     "section": "",
     "label": "Save instance",
@@ -3521,9 +3521,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5000:375891",
+    "id": "App.tsx:5005:376256",
     "file": "App.tsx",
-    "line": 5000,
+    "line": 5005,
     "kind": "MenuItem",
     "section": "",
     "label": "Preview report",
@@ -3537,9 +3537,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5001:376007",
+    "id": "App.tsx:5006:376372",
     "file": "App.tsx",
-    "line": 5001,
+    "line": 5006,
     "kind": "MenuItem",
     "section": "",
     "label": "Export STEP",
@@ -3553,9 +3553,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5004:376263",
+    "id": "App.tsx:5009:376628",
     "file": "App.tsx",
-    "line": 5004,
+    "line": 5009,
     "kind": "MenuItem",
     "section": "",
     "label": "Undo",
@@ -3569,9 +3569,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5005:376372",
+    "id": "App.tsx:5010:376737",
     "file": "App.tsx",
-    "line": 5005,
+    "line": 5010,
     "kind": "MenuItem",
     "section": "",
     "label": "Redo",
@@ -3585,9 +3585,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5006:376481",
+    "id": "App.tsx:5011:376846",
     "file": "App.tsx",
-    "line": 5006,
+    "line": 5011,
     "kind": "MenuItem",
     "section": "",
     "label": "Copy context",
@@ -3601,9 +3601,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5007:376611",
+    "id": "App.tsx:5012:376976",
     "file": "App.tsx",
-    "line": 5007,
+    "line": 5012,
     "kind": "MenuItem",
     "section": "",
     "label": "Paste context",
@@ -3617,9 +3617,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5010:376888",
+    "id": "App.tsx:5015:377253",
     "file": "App.tsx",
-    "line": 5010,
+    "line": 5015,
     "kind": "MenuItem",
     "section": "",
     "label": "Minimize command ribbon / Expand command ribbon",
@@ -3633,9 +3633,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5011:377109",
+    "id": "App.tsx:5016:377474",
     "file": "App.tsx",
-    "line": 5011,
+    "line": 5016,
     "kind": "MenuItem",
     "section": "",
     "label": "Layer manager",
@@ -3649,9 +3649,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5012:377231",
+    "id": "App.tsx:5017:377596",
     "file": "App.tsx",
-    "line": 5012,
+    "line": 5017,
     "kind": "MenuItem",
     "section": "",
     "label": "Flex PCB manager",
@@ -3665,9 +3665,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5013:377351",
+    "id": "App.tsx:5018:377716",
     "file": "App.tsx",
-    "line": 5013,
+    "line": 5018,
     "kind": "MenuItem",
     "section": "",
     "label": "3D board view",
@@ -3681,9 +3681,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5014:377460",
+    "id": "App.tsx:5019:377825",
     "file": "App.tsx",
-    "line": 5014,
+    "line": 5019,
     "kind": "MenuItem",
     "section": "",
     "label": "Hide net names / Show net names",
@@ -3697,9 +3697,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5015:377637",
+    "id": "App.tsx:5020:378002",
     "file": "App.tsx",
-    "line": 5015,
+    "line": 5020,
     "kind": "MenuItem",
     "section": "",
     "label": "2D layout view",
@@ -3713,9 +3713,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5016:377750",
+    "id": "App.tsx:5021:378115",
     "file": "App.tsx",
-    "line": 5016,
+    "line": 5021,
     "kind": "MenuItem",
     "section": "",
     "label": "Design navigator",
@@ -3729,9 +3729,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5017:377883",
+    "id": "App.tsx:5022:378248",
     "file": "App.tsx",
-    "line": 5017,
+    "line": 5022,
     "kind": "MenuItem",
     "section": "",
     "label": "Analysis panel",
@@ -3745,9 +3745,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5018:378016",
+    "id": "App.tsx:5023:378381",
     "file": "App.tsx",
-    "line": 5018,
+    "line": 5023,
     "kind": "MenuItem",
     "section": "",
     "label": "Results and console",
@@ -3761,9 +3761,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5021:378306",
+    "id": "App.tsx:5026:378671",
     "file": "App.tsx",
-    "line": 5021,
+    "line": 5026,
     "kind": "MenuItem",
     "section": "",
     "label": "DC PI setup",
@@ -3777,9 +3777,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5022:378429",
+    "id": "App.tsx:5027:378794",
     "file": "App.tsx",
-    "line": 5022,
+    "line": 5027,
     "kind": "MenuItem",
     "section": "",
     "label": "AC impedance setup",
@@ -3793,9 +3793,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5023:378567",
+    "id": "App.tsx:5028:378932",
     "file": "App.tsx",
-    "line": 5023,
+    "line": 5028,
     "kind": "MenuItem",
     "section": "",
     "label": "Transient PI setup",
@@ -3809,9 +3809,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5024:378702",
+    "id": "App.tsx:5029:379067",
     "file": "App.tsx",
-    "line": 5024,
+    "line": 5029,
     "kind": "MenuItem",
     "section": "",
     "label": "EM workspace",
@@ -3825,9 +3825,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5025:378832",
+    "id": "App.tsx:5030:379197",
     "file": "App.tsx",
-    "line": 5025,
+    "line": 5030,
     "kind": "MenuItem",
     "section": "",
     "label": "SPICE workbench",
@@ -3841,9 +3841,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5026:378953",
+    "id": "App.tsx:5031:379318",
     "file": "App.tsx",
-    "line": 5026,
+    "line": 5031,
     "kind": "MenuItem",
     "section": "",
     "label": "Result visualization",
@@ -3857,9 +3857,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5029:379239",
+    "id": "App.tsx:5034:379604",
     "file": "App.tsx",
-    "line": 5029,
+    "line": 5034,
     "kind": "MenuItem",
     "section": "",
     "label": "Engineering report preview",
@@ -3873,9 +3873,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5030:379365",
+    "id": "App.tsx:5035:379730",
     "file": "App.tsx",
-    "line": 5030,
+    "line": 5035,
     "kind": "MenuItem",
     "section": "",
     "label": "Print or export report",
@@ -3889,9 +3889,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5031:379553",
+    "id": "App.tsx:5036:379918",
     "file": "App.tsx",
-    "line": 5031,
+    "line": 5036,
     "kind": "MenuItem",
     "section": "",
     "label": "Export probe table",
@@ -3905,9 +3905,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5034:379821",
+    "id": "App.tsx:5039:380186",
     "file": "App.tsx",
-    "line": 5034,
+    "line": 5039,
     "kind": "MenuItem",
     "section": "",
     "label": "Multi-board workspace",
@@ -3921,9 +3921,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5035:379946",
+    "id": "App.tsx:5040:380311",
     "file": "App.tsx",
-    "line": 5035,
+    "line": 5040,
     "kind": "MenuItem",
     "section": "",
     "label": "Validate design",
@@ -3937,9 +3937,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5036:380064",
+    "id": "App.tsx:5041:380429",
     "file": "App.tsx",
-    "line": 5036,
+    "line": 5041,
     "kind": "MenuItem",
     "section": "",
     "label": "Power tree",
@@ -3953,9 +3953,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5037:380180",
+    "id": "App.tsx:5042:380545",
     "file": "App.tsx",
-    "line": 5037,
+    "line": 5042,
     "kind": "MenuItem",
     "section": "",
     "label": "Project and application settings",
@@ -3969,9 +3969,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5040:380459",
+    "id": "App.tsx:5045:380824",
     "file": "App.tsx",
-    "line": 5040,
+    "line": 5045,
     "kind": "MenuItem",
     "section": "",
     "label": "Python workspace",
@@ -3985,9 +3985,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5041:380584",
+    "id": "App.tsx:5046:380949",
     "file": "App.tsx",
-    "line": 5041,
+    "line": 5046,
     "kind": "MenuItem",
     "section": "",
     "label": "Solver verification",
@@ -4001,9 +4001,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5042:380706",
+    "id": "App.tsx:5047:381071",
     "file": "App.tsx",
-    "line": 5042,
+    "line": 5047,
     "kind": "MenuItem",
     "section": "",
     "label": "Dependency status",
@@ -4017,9 +4017,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5043:380834",
+    "id": "App.tsx:5048:381199",
     "file": "App.tsx",
-    "line": 5043,
+    "line": 5048,
     "kind": "MenuItem",
     "section": "",
     "label": "Shortcut manager",
@@ -4033,9 +4033,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5046:381114",
+    "id": "App.tsx:5051:381479",
     "file": "App.tsx",
-    "line": 5046,
+    "line": 5051,
     "kind": "MenuItem",
     "section": "",
     "label": "Browse and manage extensions",
@@ -4049,9 +4049,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5047:381382",
+    "id": "App.tsx:5052:381747",
     "file": "App.tsx",
-    "line": 5047,
+    "line": 5052,
     "kind": "MenuItem",
     "section": "",
     "label": "Context-dependent control",
@@ -4065,9 +4065,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5050:381730",
+    "id": "App.tsx:5055:382095",
     "file": "App.tsx",
-    "line": 5050,
+    "line": 5055,
     "kind": "MenuItem",
     "section": "",
     "label": "Help and user guide",
@@ -4081,9 +4081,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5051:381850",
+    "id": "App.tsx:5056:382215",
     "file": "App.tsx",
-    "line": 5051,
+    "line": 5056,
     "kind": "MenuItem",
     "section": "",
     "label": "Interactive analysis guide",
@@ -4097,9 +4097,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5052:381975",
+    "id": "App.tsx:5057:382340",
     "file": "App.tsx",
-    "line": 5052,
+    "line": 5057,
     "kind": "MenuItem",
     "section": "",
     "label": "Accuracy and validation",
@@ -4113,9 +4113,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5053:382101",
+    "id": "App.tsx:5058:382466",
     "file": "App.tsx",
-    "line": 5053,
+    "line": 5058,
     "kind": "MenuItem",
     "section": "",
     "label": "Report bug",
@@ -4129,9 +4129,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5054:382322",
+    "id": "App.tsx:5059:382687",
     "file": "App.tsx",
-    "line": 5054,
+    "line": 5059,
     "kind": "MenuItem",
     "section": "",
     "label": "About SPIKE",
@@ -4145,9 +4145,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5058:382560",
+    "id": "App.tsx:5063:382925",
     "file": "App.tsx",
-    "line": 5058,
+    "line": 5063,
     "kind": "button",
     "section": "",
     "label": "Minimize / Expand",
@@ -4161,9 +4161,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5058:382927",
+    "id": "App.tsx:5063:383292",
     "file": "App.tsx",
-    "line": 5058,
+    "line": 5063,
     "kind": "button",
     "section": "",
     "label": "Electromagnetics workspace",
@@ -4177,9 +4177,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5099:386225",
+    "id": "App.tsx:5104:386590",
     "file": "App.tsx",
-    "line": 5099,
+    "line": 5104,
     "kind": "button",
     "section": "",
     "label": "SCENE NAVIGATOR",
@@ -4193,9 +4193,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5099:386435",
+    "id": "App.tsx:5104:386800",
     "file": "App.tsx",
-    "line": 5099,
+    "line": 5104,
     "kind": "button",
     "section": "",
     "label": "Collapse scene navigator / Expand scene navigator",
@@ -4209,9 +4209,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5125:387968",
+    "id": "App.tsx:5130:388333",
     "file": "App.tsx",
-    "line": 5125,
+    "line": 5130,
     "kind": "button",
     "section": "",
     "label": "2D",
@@ -4225,9 +4225,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5125:388100",
+    "id": "App.tsx:5130:388465",
     "file": "App.tsx",
-    "line": 5125,
+    "line": 5130,
     "kind": "button",
     "section": "",
     "label": "3D",
@@ -4241,9 +4241,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5128:388337",
+    "id": "App.tsx:5133:388702",
     "file": "App.tsx",
-    "line": 5128,
+    "line": 5133,
     "kind": "button",
     "section": "",
     "label": "Select components or electrical geometry",
@@ -4257,9 +4257,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5129:388561",
+    "id": "App.tsx:5134:388926",
     "file": "App.tsx",
-    "line": 5129,
+    "line": 5134,
     "kind": "button",
     "section": "",
     "label": "Select components only",
@@ -4273,9 +4273,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5130:388766",
+    "id": "App.tsx:5135:389131",
     "file": "App.tsx",
-    "line": 5130,
+    "line": 5135,
     "kind": "button",
     "section": "",
     "label": "Select complete electrical nets through traces, zones, pads, or vias",
@@ -4289,9 +4289,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5133:389066",
+    "id": "App.tsx:5138:389431",
     "file": "App.tsx",
-    "line": 5133,
+    "line": 5138,
     "kind": "button",
     "section": "",
     "label": "Layers",
@@ -4305,9 +4305,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5134:389245",
+    "id": "App.tsx:5139:389610",
     "file": "App.tsx",
-    "line": 5134,
+    "line": 5139,
     "kind": "button",
     "section": "",
     "label": "Fit",
@@ -4321,9 +4321,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5135:389395",
+    "id": "App.tsx:5140:389760",
     "file": "App.tsx",
-    "line": 5135,
+    "line": 5140,
     "kind": "button",
     "section": "",
     "label": "Focus selected",
@@ -4337,9 +4337,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5136:389714",
+    "id": "App.tsx:5141:390079",
     "file": "App.tsx",
-    "line": 5136,
+    "line": 5141,
     "kind": "button",
     "section": "",
     "label": "Exit isolate / Isolate net",
@@ -4353,9 +4353,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5138:390115",
+    "id": "App.tsx:5143:390480",
     "file": "App.tsx",
-    "line": 5138,
+    "line": 5143,
     "kind": "select",
     "section": "",
     "label": "Camera view",
@@ -4378,9 +4378,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5140:390760",
+    "id": "App.tsx:5145:391125",
     "file": "App.tsx",
-    "line": 5140,
+    "line": 5145,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -4394,55 +4394,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5141:391010",
-    "file": "App.tsx",
-    "line": 5141,
-    "kind": "button",
-    "section": "",
-    "label": "Context-dependent control",
-    "dynamic": true,
-    "description": "",
-    "options": [],
-    "disabled": "",
-    "min": "",
-    "max": "",
-    "step": "",
-    "inputType": ""
-  },
-  {
-    "id": "App.tsx:5142:391222",
-    "file": "App.tsx",
-    "line": 5142,
-    "kind": "button",
-    "section": "",
-    "label": "Disable camera inertia / Enable camera inertia",
-    "dynamic": false,
-    "description": "Disable camera inertia / Enable camera inertia",
-    "options": [],
-    "disabled": "",
-    "min": "",
-    "max": "",
-    "step": "",
-    "inputType": ""
-  },
-  {
-    "id": "App.tsx:5143:391473",
-    "file": "App.tsx",
-    "line": 5143,
-    "kind": "button",
-    "section": "",
-    "label": "Hide measurement axes and background grid / Show measurement axes and background grid",
-    "dynamic": false,
-    "description": "Hide measurement axes and background grid / Show measurement axes and background grid",
-    "options": [],
-    "disabled": "",
-    "min": "",
-    "max": "",
-    "step": "",
-    "inputType": ""
-  },
-  {
-    "id": "App.tsx:5146:391813",
+    "id": "App.tsx:5146:391375",
     "file": "App.tsx",
     "line": 5146,
     "kind": "button",
@@ -4458,14 +4410,14 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5147:391974",
+    "id": "App.tsx:5147:391587",
     "file": "App.tsx",
     "line": 5147,
     "kind": "button",
     "section": "",
-    "label": "Context-dependent control",
-    "dynamic": true,
-    "description": "",
+    "label": "Disable camera inertia / Enable camera inertia",
+    "dynamic": false,
+    "description": "Disable camera inertia / Enable camera inertia",
     "options": [],
     "disabled": "",
     "min": "",
@@ -4474,14 +4426,14 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5148:392145",
+    "id": "App.tsx:5148:391838",
     "file": "App.tsx",
     "line": 5148,
     "kind": "button",
     "section": "",
-    "label": "Context-dependent control",
-    "dynamic": true,
-    "description": "",
+    "label": "Hide measurement axes and background grid / Show measurement axes and background grid",
+    "dynamic": false,
+    "description": "Hide measurement axes and background grid / Show measurement axes and background grid",
     "options": [],
     "disabled": "",
     "min": "",
@@ -4490,23 +4442,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5149:392321",
-    "file": "App.tsx",
-    "line": 5149,
-    "kind": "button",
-    "section": "",
-    "label": "Context-dependent control",
-    "dynamic": true,
-    "description": "",
-    "options": [],
-    "disabled": "",
-    "min": "",
-    "max": "",
-    "step": "",
-    "inputType": ""
-  },
-  {
-    "id": "App.tsx:5151:392508",
+    "id": "App.tsx:5151:392178",
     "file": "App.tsx",
     "line": 5151,
     "kind": "button",
@@ -4522,7 +4458,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5152:392662",
+    "id": "App.tsx:5152:392339",
     "file": "App.tsx",
     "line": 5152,
     "kind": "button",
@@ -4538,7 +4474,7 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5153:392820",
+    "id": "App.tsx:5153:392510",
     "file": "App.tsx",
     "line": 5153,
     "kind": "button",
@@ -4547,14 +4483,14 @@
     "dynamic": true,
     "description": "",
     "options": [],
-    "disabled": "viewMode === \"2D\"",
+    "disabled": "",
     "min": "",
     "max": "",
     "step": "",
     "inputType": ""
   },
   {
-    "id": "App.tsx:5154:393022",
+    "id": "App.tsx:5154:392686",
     "file": "App.tsx",
     "line": 5154,
     "kind": "button",
@@ -4570,9 +4506,73 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5155:393228",
+    "id": "App.tsx:5156:392873",
     "file": "App.tsx",
-    "line": 5155,
+    "line": 5156,
+    "kind": "button",
+    "section": "",
+    "label": "Context-dependent control",
+    "dynamic": true,
+    "description": "",
+    "options": [],
+    "disabled": "",
+    "min": "",
+    "max": "",
+    "step": "",
+    "inputType": ""
+  },
+  {
+    "id": "App.tsx:5157:393027",
+    "file": "App.tsx",
+    "line": 5157,
+    "kind": "button",
+    "section": "",
+    "label": "Context-dependent control",
+    "dynamic": true,
+    "description": "",
+    "options": [],
+    "disabled": "",
+    "min": "",
+    "max": "",
+    "step": "",
+    "inputType": ""
+  },
+  {
+    "id": "App.tsx:5158:393185",
+    "file": "App.tsx",
+    "line": 5158,
+    "kind": "button",
+    "section": "",
+    "label": "Context-dependent control",
+    "dynamic": true,
+    "description": "",
+    "options": [],
+    "disabled": "viewMode === \"2D\"",
+    "min": "",
+    "max": "",
+    "step": "",
+    "inputType": ""
+  },
+  {
+    "id": "App.tsx:5159:393387",
+    "file": "App.tsx",
+    "line": 5159,
+    "kind": "button",
+    "section": "",
+    "label": "Context-dependent control",
+    "dynamic": true,
+    "description": "",
+    "options": [],
+    "disabled": "",
+    "min": "",
+    "max": "",
+    "step": "",
+    "inputType": ""
+  },
+  {
+    "id": "App.tsx:5160:393593",
+    "file": "App.tsx",
+    "line": 5160,
     "kind": "button",
     "section": "",
     "label": "EM results manager: PCB/assembly overlays and linked graphs",
@@ -4586,9 +4586,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5156:393521",
+    "id": "App.tsx:5161:393886",
     "file": "App.tsx",
-    "line": 5156,
+    "line": 5161,
     "kind": "button",
     "section": "",
     "label": "Analysis visualization",
@@ -4602,9 +4602,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5157:393879",
+    "id": "App.tsx:5162:394244",
     "file": "App.tsx",
-    "line": 5157,
+    "line": 5162,
     "kind": "button",
     "section": "",
     "label": "Pause result animation / Animate transient result",
@@ -4618,9 +4618,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5160:394418",
+    "id": "App.tsx:5165:394783",
     "file": "App.tsx",
-    "line": 5160,
+    "line": 5165,
     "kind": "button",
     "section": "",
     "label": "Toggle design navigator",
@@ -4634,9 +4634,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5161:394597",
+    "id": "App.tsx:5166:394962",
     "file": "App.tsx",
-    "line": 5161,
+    "line": 5166,
     "kind": "button",
     "section": "",
     "label": "Toggle bottom results dock",
@@ -4650,9 +4650,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5162:394787",
+    "id": "App.tsx:5167:395152",
     "file": "App.tsx",
-    "line": 5162,
+    "line": 5167,
     "kind": "button",
     "section": "",
     "label": "Toggle analysis setup",
@@ -4666,9 +4666,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5163:394968",
+    "id": "App.tsx:5168:395333",
     "file": "App.tsx",
-    "line": 5163,
+    "line": 5168,
     "kind": "button",
     "section": "",
     "label": "Unpin docks for auto-hide / Pin all workspace docks",
@@ -4682,9 +4682,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5165:395525",
+    "id": "App.tsx:5170:395890",
     "file": "App.tsx",
-    "line": 5165,
+    "line": 5170,
     "kind": "button",
     "section": "",
     "label": "RIGID-FLEX / FLEX",
@@ -4698,9 +4698,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5171:396175",
+    "id": "App.tsx:5176:396540",
     "file": "App.tsx",
-    "line": 5171,
+    "line": 5176,
     "kind": "button",
     "section": "",
     "label": "Multi-board",
@@ -4714,9 +4714,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5172:396416",
+    "id": "App.tsx:5177:396781",
     "file": "App.tsx",
-    "line": 5172,
+    "line": 5177,
     "kind": "button",
     "section": "",
     "label": "Connector links",
@@ -4730,9 +4730,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5173:396607",
+    "id": "App.tsx:5178:396972",
     "file": "App.tsx",
-    "line": 5173,
+    "line": 5178,
     "kind": "select",
     "section": "",
     "label": "Displayed analysis result",
@@ -4748,9 +4748,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5180:397610",
+    "id": "App.tsx:5185:397975",
     "file": "App.tsx",
-    "line": 5180,
+    "line": 5185,
     "kind": "button",
     "section": "",
     "label": "Configure",
@@ -4764,9 +4764,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5181:397847",
+    "id": "App.tsx:5186:398212",
     "file": "App.tsx",
-    "line": 5181,
+    "line": 5186,
     "kind": "input",
     "section": "",
     "label": "Part branches",
@@ -4780,9 +4780,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:5182:398005",
+    "id": "App.tsx:5187:398370",
     "file": "App.tsx",
-    "line": 5182,
+    "line": 5187,
     "kind": "button",
     "section": "",
     "label": "Nets",
@@ -4796,9 +4796,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5183:398205",
+    "id": "App.tsx:5188:398570",
     "file": "App.tsx",
-    "line": 5183,
+    "line": 5188,
     "kind": "button",
     "section": "",
     "label": "Extract RLC",
@@ -4812,9 +4812,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5184:398425",
+    "id": "App.tsx:5189:398790",
     "file": "App.tsx",
-    "line": 5184,
+    "line": 5189,
     "kind": "button",
     "section": "",
     "label": "Running / Run",
@@ -4828,9 +4828,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5187:398821",
+    "id": "App.tsx:5192:399186",
     "file": "App.tsx",
-    "line": 5187,
+    "line": 5192,
     "kind": "button",
     "section": "",
     "label": "Extract RLC",
@@ -4844,9 +4844,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5188:399041",
+    "id": "App.tsx:5193:399406",
     "file": "App.tsx",
-    "line": 5188,
+    "line": 5193,
     "kind": "button",
     "section": "",
     "label": "S-parameters",
@@ -4860,9 +4860,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5189:399183",
+    "id": "App.tsx:5194:399548",
     "file": "App.tsx",
-    "line": 5189,
+    "line": 5194,
     "kind": "button",
     "section": "",
     "label": "Stackup",
@@ -4876,9 +4876,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5192:399503",
+    "id": "App.tsx:5197:399868",
     "file": "App.tsx",
-    "line": 5192,
+    "line": 5197,
     "kind": "button",
     "section": "",
     "label": "Thermal setup",
@@ -4892,9 +4892,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5193:399692",
+    "id": "App.tsx:5198:400057",
     "file": "App.tsx",
-    "line": 5193,
+    "line": 5198,
     "kind": "button",
     "section": "",
     "label": "Bonds",
@@ -4908,9 +4908,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5196:400003",
+    "id": "App.tsx:5201:400368",
     "file": "App.tsx",
-    "line": 5196,
+    "line": 5201,
     "kind": "button",
     "section": "",
     "label": "Domain",
@@ -4924,9 +4924,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5197:400200",
+    "id": "App.tsx:5202:400565",
     "file": "App.tsx",
-    "line": 5197,
+    "line": 5202,
     "kind": "button",
     "section": "",
     "label": "Ports",
@@ -4940,9 +4940,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5198:400382",
+    "id": "App.tsx:5203:400747",
     "file": "App.tsx",
-    "line": 5198,
+    "line": 5203,
     "kind": "button",
     "section": "",
     "label": "Preflight",
@@ -4956,9 +4956,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5201:400706",
+    "id": "App.tsx:5206:401071",
     "file": "App.tsx",
-    "line": 5201,
+    "line": 5206,
     "kind": "button",
     "section": "",
     "label": "Probe",
@@ -4972,9 +4972,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5202:400874",
+    "id": "App.tsx:5207:401239",
     "file": "App.tsx",
-    "line": 5202,
+    "line": 5207,
     "kind": "button",
     "section": "",
     "label": "Isolate",
@@ -4988,9 +4988,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5206:401324",
+    "id": "App.tsx:5211:401689",
     "file": "App.tsx",
-    "line": 5206,
+    "line": 5211,
     "kind": "button",
     "section": "",
     "label": "Geometry",
@@ -5004,9 +5004,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5207:401604",
+    "id": "App.tsx:5212:401969",
     "file": "App.tsx",
-    "line": 5207,
+    "line": 5212,
     "kind": "button",
     "section": "",
     "label": "Voltage",
@@ -5020,9 +5020,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5208:401908",
+    "id": "App.tsx:5213:402273",
     "file": "App.tsx",
-    "line": 5208,
+    "line": 5213,
     "kind": "button",
     "section": "",
     "label": "Drop",
@@ -5036,9 +5036,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5209:402229",
+    "id": "App.tsx:5214:402594",
     "file": "App.tsx",
-    "line": 5209,
+    "line": 5214,
     "kind": "button",
     "section": "",
     "label": "Current",
@@ -5052,9 +5052,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5210:402531",
+    "id": "App.tsx:5215:402896",
     "file": "App.tsx",
-    "line": 5210,
+    "line": 5215,
     "kind": "button",
     "section": "",
     "label": "Density",
@@ -5068,9 +5068,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5211:402870",
+    "id": "App.tsx:5216:403235",
     "file": "App.tsx",
-    "line": 5211,
+    "line": 5216,
     "kind": "button",
     "section": "",
     "label": "Loss",
@@ -5084,9 +5084,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5212:403162",
+    "id": "App.tsx:5217:403527",
     "file": "App.tsx",
-    "line": 5212,
+    "line": 5217,
     "kind": "button",
     "section": "",
     "label": "Via stress",
@@ -5100,9 +5100,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5213:403465",
+    "id": "App.tsx:5218:403830",
     "file": "App.tsx",
-    "line": 5213,
+    "line": 5218,
     "kind": "button",
     "section": "",
     "label": "Impedance",
@@ -5116,9 +5116,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5214:403773",
+    "id": "App.tsx:5219:404138",
     "file": "App.tsx",
-    "line": 5214,
+    "line": 5219,
     "kind": "button",
     "section": "",
     "label": "Mesh",
@@ -5132,9 +5132,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5215:404070",
+    "id": "App.tsx:5220:404435",
     "file": "App.tsx",
-    "line": 5215,
+    "line": 5220,
     "kind": "button",
     "section": "",
     "label": "E field",
@@ -5148,9 +5148,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5216:404379",
+    "id": "App.tsx:5221:404744",
     "file": "App.tsx",
-    "line": 5216,
+    "line": 5221,
     "kind": "button",
     "section": "",
     "label": "H field",
@@ -5164,9 +5164,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5217:404669",
+    "id": "App.tsx:5222:405034",
     "file": "App.tsx",
-    "line": 5217,
+    "line": 5222,
     "kind": "button",
     "section": "",
     "label": "RLC",
@@ -5180,9 +5180,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5221:405141",
+    "id": "App.tsx:5226:405506",
     "file": "App.tsx",
-    "line": 5221,
+    "line": 5226,
     "kind": "button",
     "section": "",
     "label": "Overlay",
@@ -5196,9 +5196,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5222:405511",
+    "id": "App.tsx:5227:405876",
     "file": "App.tsx",
-    "line": 5222,
+    "line": 5227,
     "kind": "button",
     "section": "",
     "label": "Translucent",
@@ -5212,9 +5212,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5223:405956",
+    "id": "App.tsx:5228:406321",
     "file": "App.tsx",
-    "line": 5223,
+    "line": 5228,
     "kind": "button",
     "section": "",
     "label": "Nets only",
@@ -5228,9 +5228,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5224:406386",
+    "id": "App.tsx:5229:406751",
     "file": "App.tsx",
-    "line": 5224,
+    "line": 5229,
     "kind": "button",
     "section": "",
     "label": "Analysis only",
@@ -5244,9 +5244,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5225:406797",
+    "id": "App.tsx:5230:407162",
     "file": "App.tsx",
-    "line": 5225,
+    "line": 5230,
     "kind": "button",
     "section": "",
     "label": "Models",
@@ -5260,9 +5260,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5226:407148",
+    "id": "App.tsx:5231:407513",
     "file": "App.tsx",
-    "line": 5226,
+    "line": 5231,
     "kind": "button",
     "section": "",
     "label": "Raw height",
@@ -5276,9 +5276,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5227:407540",
+    "id": "App.tsx:5232:407905",
     "file": "App.tsx",
-    "line": 5227,
+    "line": 5232,
     "kind": "button",
     "section": "",
     "label": "Contour",
@@ -5292,9 +5292,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5228:407954",
+    "id": "App.tsx:5233:408319",
     "file": "App.tsx",
-    "line": 5228,
+    "line": 5233,
     "kind": "button",
     "section": "",
     "label": "Smooth field",
@@ -5308,9 +5308,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5229:408478",
+    "id": "App.tsx:5234:408843",
     "file": "App.tsx",
-    "line": 5229,
+    "line": 5234,
     "kind": "button",
     "section": "",
     "label": "Arrows",
@@ -5324,9 +5324,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5362:419341",
+    "id": "App.tsx:5367:419706",
     "file": "App.tsx",
-    "line": 5362,
+    "line": 5367,
     "kind": "button",
     "section": "",
     "label": "Mesh controls",
@@ -5340,9 +5340,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5367:420200",
+    "id": "App.tsx:5372:420565",
     "file": "App.tsx",
-    "line": 5367,
+    "line": 5372,
     "kind": "button",
     "section": "",
     "label": "SI results",
@@ -5356,9 +5356,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5368:420493",
+    "id": "App.tsx:5373:420858",
     "file": "App.tsx",
-    "line": 5368,
+    "line": 5373,
     "kind": "button",
     "section": "",
     "label": "Configure EMerge SI / Configure SI run",
@@ -5372,9 +5372,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5373:421280",
+    "id": "App.tsx:5378:421645",
     "file": "App.tsx",
-    "line": 5373,
+    "line": 5378,
     "kind": "button",
     "section": "",
     "label": "Running EM / Run openEMS / Set up EM run",
@@ -5388,9 +5388,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5382:422512",
+    "id": "App.tsx:5387:422877",
     "file": "App.tsx",
-    "line": 5382,
+    "line": 5387,
     "kind": "button",
     "section": "",
     "label": "Set up thermal run",
@@ -5404,9 +5404,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5388:423376",
+    "id": "App.tsx:5393:423741",
     "file": "App.tsx",
-    "line": 5388,
+    "line": 5393,
     "kind": "button",
     "section": "",
     "label": "Results manager",
@@ -5420,9 +5420,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5389:423704",
+    "id": "App.tsx:5394:424069",
     "file": "App.tsx",
-    "line": 5389,
+    "line": 5394,
     "kind": "button",
     "section": "",
     "label": "Stop / Run series path / Run batch nets / Configure AC / Run transient / Run bulk nets / Run DC",
@@ -5436,9 +5436,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5395:424659",
+    "id": "App.tsx:5400:425024",
     "file": "App.tsx",
-    "line": 5395,
+    "line": 5400,
     "kind": "button",
     "section": "",
     "label": "EM SETUP / SI SETUP / SELECTION INSPECTOR / ANALYSIS SETUP",
@@ -5452,9 +5452,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5396:425019",
+    "id": "App.tsx:5401:425384",
     "file": "App.tsx",
-    "line": 5396,
+    "line": 5401,
     "kind": "button",
     "section": "",
     "label": "Collapse analysis setup / Expand analysis setup",
@@ -5468,9 +5468,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5402:428036",
+    "id": "App.tsx:5407:428401",
     "file": "App.tsx",
-    "line": 5402,
+    "line": 5407,
     "kind": "textarea",
     "section": "",
     "label": "Prepared openEMS adapter source",
@@ -5484,9 +5484,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5403:428488",
+    "id": "App.tsx:5408:428853",
     "file": "App.tsx",
-    "line": 5403,
+    "line": 5408,
     "kind": "button",
     "section": "",
     "label": "Configure solve with this engine",
@@ -5500,9 +5500,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5403:429140",
+    "id": "App.tsx:5408:429505",
     "file": "App.tsx",
-    "line": 5403,
+    "line": 5408,
     "kind": "button",
     "section": "",
     "label": "Hide mesh",
@@ -5516,9 +5516,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5408:430248",
+    "id": "App.tsx:5413:430613",
     "file": "App.tsx",
-    "line": 5408,
+    "line": 5413,
     "kind": "button",
     "section": "",
     "label": "S-parameters and eye",
@@ -5532,9 +5532,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5408:430366",
+    "id": "App.tsx:5413:430731",
     "file": "App.tsx",
-    "line": 5408,
+    "line": 5413,
     "kind": "button",
     "section": "",
     "label": "NEXT / FEXT setup",
@@ -5548,9 +5548,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5408:430483",
+    "id": "App.tsx:5413:430848",
     "file": "App.tsx",
-    "line": 5408,
+    "line": 5413,
     "kind": "button",
     "section": "",
     "label": "Source / receiver ports",
@@ -5564,9 +5564,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5408:430602",
+    "id": "App.tsx:5413:430967",
     "file": "App.tsx",
-    "line": 5408,
+    "line": 5413,
     "kind": "button",
     "section": "",
     "label": "Loaded channel workflow",
@@ -5580,9 +5580,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5410:431224",
+    "id": "App.tsx:5415:431589",
     "file": "App.tsx",
-    "line": 5410,
+    "line": 5415,
     "kind": "button",
     "section": "",
     "label": "Open mesh controls",
@@ -5596,9 +5596,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5425:434948",
+    "id": "App.tsx:5430:435313",
     "file": "App.tsx",
-    "line": 5425,
+    "line": 5430,
     "kind": "button",
     "section": "",
     "label": "Issues",
@@ -5612,9 +5612,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5425:435255",
+    "id": "App.tsx:5430:435620",
     "file": "App.tsx",
-    "line": 5425,
+    "line": 5430,
     "kind": "button",
     "section": "",
     "label": "Probe table",
@@ -5628,9 +5628,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5425:435584",
+    "id": "App.tsx:5430:435949",
     "file": "App.tsx",
-    "line": 5425,
+    "line": 5430,
     "kind": "button",
     "section": "",
     "label": "Power tree",
@@ -5644,9 +5644,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5425:435878",
+    "id": "App.tsx:5430:436243",
     "file": "App.tsx",
-    "line": 5425,
+    "line": 5430,
     "kind": "button",
     "section": "",
     "label": "Console",
@@ -5660,9 +5660,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5425:436200",
+    "id": "App.tsx:5430:436565",
     "file": "App.tsx",
-    "line": 5425,
+    "line": 5430,
     "kind": "button",
     "section": "",
     "label": "Notifications",
@@ -5676,9 +5676,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5425:436738",
+    "id": "App.tsx:5430:437103",
     "file": "App.tsx",
-    "line": 5425,
+    "line": 5430,
     "kind": "button",
     "section": "",
     "label": "Import needs review / Import details",
@@ -5692,9 +5692,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5430:438479",
+    "id": "App.tsx:5435:438844",
     "file": "App.tsx",
-    "line": 5430,
+    "line": 5435,
     "kind": "button",
     "section": "",
     "label": "Show probe window",
@@ -5708,9 +5708,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5430:438883",
+    "id": "App.tsx:5435:439248",
     "file": "App.tsx",
-    "line": 5430,
+    "line": 5435,
     "kind": "button",
     "section": "",
     "label": "Edit terminals",
@@ -5724,9 +5724,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5431:439248",
+    "id": "App.tsx:5436:439613",
     "file": "App.tsx",
-    "line": 5431,
+    "line": 5436,
     "kind": "button",
     "section": "",
     "label": "Detach probe table",
@@ -5740,9 +5740,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5431:439325",
+    "id": "App.tsx:5436:439690",
     "file": "App.tsx",
-    "line": 5431,
+    "line": 5436,
     "kind": "button",
     "section": "",
     "label": "Close table",
@@ -5756,9 +5756,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5455:441152",
+    "id": "App.tsx:5460:441517",
     "file": "App.tsx",
-    "line": 5455,
+    "line": 5460,
     "kind": "button",
     "section": "",
     "label": "Open activity console",
@@ -5772,9 +5772,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5456:441744",
+    "id": "App.tsx:5461:442109",
     "file": "App.tsx",
-    "line": 5456,
+    "line": 5461,
     "kind": "button",
     "section": "",
     "label": "Stopping… / Stop",
@@ -5788,9 +5788,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5458:442156",
+    "id": "App.tsx:5463:442521",
     "file": "App.tsx",
-    "line": 5458,
+    "line": 5463,
     "kind": "button",
     "section": "",
     "label": "Generate engineering report",
@@ -5804,9 +5804,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5470:448902",
+    "id": "App.tsx:5475:449267",
     "file": "App.tsx",
-    "line": 5470,
+    "line": 5475,
     "kind": "button",
     "section": "",
     "label": "Close ECAD–MCAD collaboration",
@@ -5820,9 +5820,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:5480:451782",
+    "id": "App.tsx:5485:452147",
     "file": "App.tsx",
-    "line": 5480,
+    "line": 5485,
     "kind": "button",
     "section": "",
     "label": "Close Harness PI editor",
@@ -5836,9 +5836,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5482:452197",
+    "id": "App.tsx:5487:452562",
     "file": "App.tsx",
-    "line": 5482,
+    "line": 5487,
     "kind": "button",
     "section": "",
     "label": "Close",
@@ -5852,9 +5852,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5493:455970",
+    "id": "App.tsx:5498:456335",
     "file": "App.tsx",
-    "line": 5493,
+    "line": 5498,
     "kind": "button",
     "section": "",
     "label": "Close AC effects",
@@ -5868,9 +5868,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5493:456069",
+    "id": "App.tsx:5498:456434",
     "file": "App.tsx",
-    "line": 5493,
+    "line": 5498,
     "kind": "button",
     "section": "",
     "label": "AC report",
@@ -5884,9 +5884,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5499:457683",
+    "id": "App.tsx:5504:458048",
     "file": "App.tsx",
-    "line": 5499,
+    "line": 5504,
     "kind": "button",
     "section": "",
     "label": "Cancel",
@@ -5900,9 +5900,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5499:457784",
+    "id": "App.tsx:5504:458149",
     "file": "App.tsx",
-    "line": 5499,
+    "line": 5504,
     "kind": "button",
     "section": "",
     "label": "Discard changes",
@@ -5916,9 +5916,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5499:457892",
+    "id": "App.tsx:5504:458257",
     "file": "App.tsx",
-    "line": 5499,
+    "line": 5504,
     "kind": "button",
     "section": "",
     "label": "Save and continue",
@@ -5932,9 +5932,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5503:458307",
+    "id": "App.tsx:5508:458672",
     "file": "App.tsx",
-    "line": 5503,
+    "line": 5508,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -5948,9 +5948,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:5504:458458",
+    "id": "App.tsx:5509:458823",
     "file": "App.tsx",
-    "line": 5504,
+    "line": 5509,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -5964,9 +5964,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:5505:458599",
+    "id": "App.tsx:5510:458964",
     "file": "App.tsx",
-    "line": 5505,
+    "line": 5510,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -5980,9 +5980,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:5506:458734",
+    "id": "App.tsx:5511:459099",
     "file": "App.tsx",
-    "line": 5506,
+    "line": 5511,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -5996,9 +5996,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:5574:469299",
+    "id": "App.tsx:5579:469664",
     "file": "App.tsx",
-    "line": 5574,
+    "line": 5579,
     "kind": "button",
     "section": "",
     "label": "Close EMerge analysis",
@@ -6012,9 +6012,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5582:471175",
+    "id": "App.tsx:5587:471540",
     "file": "App.tsx",
-    "line": 5582,
+    "line": 5587,
     "kind": "button",
     "section": "",
     "label": "Checking or running… / Check EMerge runtime",
@@ -6028,9 +6028,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5583:471506",
+    "id": "App.tsx:5588:471871",
     "file": "App.tsx",
-    "line": 5583,
+    "line": 5588,
     "kind": "button",
     "section": "",
     "label": "Open saved radiation result",
@@ -6044,9 +6044,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5583:471663",
+    "id": "App.tsx:5588:472028",
     "file": "App.tsx",
-    "line": 5583,
+    "line": 5588,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6060,9 +6060,9 @@
     "inputType": "file"
   },
   {
-    "id": "App.tsx:5584:471990",
+    "id": "App.tsx:5589:472355",
     "file": "App.tsx",
-    "line": 5584,
+    "line": 5589,
     "kind": "button",
     "section": "",
     "label": "Extension manager",
@@ -6076,9 +6076,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5586:472242",
+    "id": "App.tsx:5591:472607",
     "file": "App.tsx",
-    "line": 5586,
+    "line": 5591,
     "kind": "button",
     "section": "",
     "label": "Preview SI Python / Preview radiation Python",
@@ -6092,9 +6092,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5587:472889",
+    "id": "App.tsx:5592:473254",
     "file": "App.tsx",
-    "line": 5587,
+    "line": 5592,
     "kind": "button",
     "section": "",
     "label": "Prepare native Gerber mesh",
@@ -6108,9 +6108,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5593:473966",
+    "id": "App.tsx:5598:474331",
     "file": "App.tsx",
-    "line": 5593,
+    "line": 5598,
     "kind": "button",
     "section": "",
     "label": "Run",
@@ -6124,9 +6124,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5594:474440",
+    "id": "App.tsx:5599:474805",
     "file": "App.tsx",
-    "line": 5594,
+    "line": 5599,
     "kind": "button",
     "section": "",
     "label": "Run",
@@ -6140,9 +6140,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5597:475414",
+    "id": "App.tsx:5602:475779",
     "file": "App.tsx",
-    "line": 5597,
+    "line": 5602,
     "kind": "button",
     "section": "",
     "label": "View radiation on bench",
@@ -6156,9 +6156,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5599:475725",
+    "id": "App.tsx:5604:476090",
     "file": "App.tsx",
-    "line": 5599,
+    "line": 5604,
     "kind": "button",
     "section": "",
     "label": "Close",
@@ -6172,9 +6172,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5609:477010",
+    "id": "App.tsx:5614:477375",
     "file": "App.tsx",
-    "line": 5609,
+    "line": 5614,
     "kind": "button",
     "section": "",
     "label": "· ·",
@@ -6188,9 +6188,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5661:482607",
+    "id": "App.tsx:5666:482972",
     "file": "App.tsx",
-    "line": 5661,
+    "line": 5666,
     "kind": "button",
     "section": "",
     "label": "Close comparison",
@@ -6204,9 +6204,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5664:483602",
+    "id": "App.tsx:5669:483967",
     "file": "App.tsx",
-    "line": 5664,
+    "line": 5669,
     "kind": "button",
     "section": "",
     "label": "Close",
@@ -6220,9 +6220,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5674:484408",
+    "id": "App.tsx:5679:484773",
     "file": "App.tsx",
-    "line": 5674,
+    "line": 5679,
     "kind": "button",
     "section": "",
     "label": "Resource monitor",
@@ -6236,9 +6236,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5734:490032",
+    "id": "App.tsx:5739:490397",
     "file": "App.tsx",
-    "line": 5734,
+    "line": 5739,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -6257,9 +6257,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5735:490397",
+    "id": "App.tsx:5740:490762",
     "file": "App.tsx",
-    "line": 5735,
+    "line": 5740,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -6275,9 +6275,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5735:490848",
+    "id": "App.tsx:5740:491213",
     "file": "App.tsx",
-    "line": 5735,
+    "line": 5740,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -6293,9 +6293,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5736:492052",
+    "id": "App.tsx:5741:492417",
     "file": "App.tsx",
-    "line": 5736,
+    "line": 5741,
     "kind": "button",
     "section": "",
     "label": "Open Net Manager",
@@ -6309,9 +6309,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5737:492368",
+    "id": "App.tsx:5742:492733",
     "file": "App.tsx",
-    "line": 5737,
+    "line": 5742,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -6325,9 +6325,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5738:492737",
+    "id": "App.tsx:5743:493102",
     "file": "App.tsx",
-    "line": 5738,
+    "line": 5743,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -6341,9 +6341,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5738:493232",
+    "id": "App.tsx:5743:493597",
     "file": "App.tsx",
-    "line": 5738,
+    "line": 5743,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -6357,9 +6357,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5739:493641",
+    "id": "App.tsx:5744:494006",
     "file": "App.tsx",
-    "line": 5739,
+    "line": 5744,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6373,9 +6373,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5739:493823",
+    "id": "App.tsx:5744:494188",
     "file": "App.tsx",
-    "line": 5739,
+    "line": 5744,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6389,9 +6389,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5740:494846",
+    "id": "App.tsx:5745:495211",
     "file": "App.tsx",
-    "line": 5740,
+    "line": 5745,
     "kind": "button",
     "section": "",
     "label": "Edit stackup",
@@ -6405,9 +6405,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:495272",
+    "id": "App.tsx:5750:495637",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "button",
     "section": "",
     "label": "DC IR Drop",
@@ -6421,9 +6421,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:495637",
+    "id": "App.tsx:5750:496002",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "button",
     "section": "",
     "label": "Add net",
@@ -6437,9 +6437,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:495793",
+    "id": "App.tsx:5750:496158",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6453,9 +6453,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:495841",
+    "id": "App.tsx:5750:496206",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -6473,9 +6473,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:496191",
+    "id": "App.tsx:5750:496556",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6489,9 +6489,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:496302",
+    "id": "App.tsx:5750:496667",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6505,9 +6505,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5745:496510",
+    "id": "App.tsx:5750:496875",
     "file": "App.tsx",
-    "line": 5745,
+    "line": 5750,
     "kind": "button",
     "section": "",
     "label": "Edit stackup",
@@ -6521,9 +6521,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5807:502775",
+    "id": "App.tsx:5812:503140",
     "file": "App.tsx",
-    "line": 5807,
+    "line": 5812,
     "kind": "button",
     "section": "",
     "label": "Clear selection",
@@ -6537,9 +6537,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5807:503050",
+    "id": "App.tsx:5812:503415",
     "file": "App.tsx",
-    "line": 5807,
+    "line": 5812,
     "kind": "button",
     "section": "",
     "label": "Add probe",
@@ -6553,9 +6553,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5807:503153",
+    "id": "App.tsx:5812:503518",
     "file": "App.tsx",
-    "line": 5807,
+    "line": 5812,
     "kind": "button",
     "section": "",
     "label": "Exit net isolation / Isolate complete net",
@@ -6569,9 +6569,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5807:503359",
+    "id": "App.tsx:5812:503724",
     "file": "App.tsx",
-    "line": 5807,
+    "line": 5812,
     "kind": "button",
     "section": "",
     "label": "Browse global model library",
@@ -6585,9 +6585,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5818:504146",
+    "id": "App.tsx:5823:504511",
     "file": "App.tsx",
-    "line": 5818,
+    "line": 5823,
     "kind": "button",
     "section": "",
     "label": "Clear harness selection",
@@ -6601,9 +6601,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5829:504958",
+    "id": "App.tsx:5834:505323",
     "file": "App.tsx",
-    "line": 5829,
+    "line": 5834,
     "kind": "button",
     "section": "",
     "label": "Clear board selection",
@@ -6617,9 +6617,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5858:508304",
+    "id": "App.tsx:5863:508669",
     "file": "App.tsx",
-    "line": 5858,
+    "line": 5863,
     "kind": "button",
     "section": "",
     "label": "Fit board",
@@ -6633,9 +6633,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5858:508434",
+    "id": "App.tsx:5863:508799",
     "file": "App.tsx",
-    "line": 5858,
+    "line": 5863,
     "kind": "button",
     "section": "",
     "label": "Set orbit center here",
@@ -6649,9 +6649,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5858:508545",
+    "id": "App.tsx:5863:508910",
     "file": "App.tsx",
-    "line": 5858,
+    "line": 5863,
     "kind": "button",
     "section": "",
     "label": "Switch to 3D / 2D",
@@ -6665,9 +6665,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5858:508672",
+    "id": "App.tsx:5863:509037",
     "file": "App.tsx",
-    "line": 5858,
+    "line": 5863,
     "kind": "button",
     "section": "",
     "label": "Layer manager",
@@ -6681,9 +6681,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:508845",
+    "id": "App.tsx:5864:509210",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Copy metadata",
@@ -6697,9 +6697,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:508935",
+    "id": "App.tsx:5864:509300",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Open in script",
@@ -6713,9 +6713,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:509121",
+    "id": "App.tsx:5864:509486",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Add probe here",
@@ -6729,9 +6729,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:509250",
+    "id": "App.tsx:5864:509615",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Add to PI Net Manager",
@@ -6745,9 +6745,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:509375",
+    "id": "App.tsx:5864:509740",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Exit net isolation / Isolate complete net",
@@ -6761,9 +6761,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:509569",
+    "id": "App.tsx:5864:509934",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Delete source / sink return",
@@ -6777,9 +6777,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5859:509781",
+    "id": "App.tsx:5864:510146",
     "file": "App.tsx",
-    "line": 5859,
+    "line": 5864,
     "kind": "button",
     "section": "",
     "label": "Clear selection",
@@ -6793,9 +6793,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5860:509954",
+    "id": "App.tsx:5865:510319",
     "file": "App.tsx",
-    "line": 5860,
+    "line": 5865,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -6809,9 +6809,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5866:510534",
+    "id": "App.tsx:5871:510899",
     "file": "App.tsx",
-    "line": 5866,
+    "line": 5871,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -6825,9 +6825,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5866:511568",
+    "id": "App.tsx:5871:511933",
     "file": "App.tsx",
-    "line": 5866,
+    "line": 5871,
     "kind": "button",
     "section": "",
     "label": "Close",
@@ -6841,9 +6841,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:514361",
+    "id": "App.tsx:5906:514726",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "button",
     "section": "",
     "label": "Close stackup",
@@ -6857,9 +6857,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:515466",
+    "id": "App.tsx:5906:515831",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6873,9 +6873,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:515606",
+    "id": "App.tsx:5906:515971",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -6897,9 +6897,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:516031",
+    "id": "App.tsx:5906:516396",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6913,9 +6913,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:5901:516319",
+    "id": "App.tsx:5906:516684",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6929,9 +6929,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:516477",
+    "id": "App.tsx:5906:516842",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6945,9 +6945,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:5901:516760",
+    "id": "App.tsx:5906:517125",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -6961,9 +6961,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:5901:517041",
+    "id": "App.tsx:5906:517406",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -6977,9 +6977,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:517272",
+    "id": "App.tsx:5906:517637",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "button",
     "section": "",
     "label": "Add layer",
@@ -6993,9 +6993,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:517956",
+    "id": "App.tsx:5906:518321",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "button",
     "section": "",
     "label": "Cancel",
@@ -7009,9 +7009,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5901:518023",
+    "id": "App.tsx:5906:518388",
     "file": "App.tsx",
-    "line": 5901,
+    "line": 5906,
     "kind": "button",
     "section": "",
     "label": "Apply to project",
@@ -7025,9 +7025,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5906:518598",
+    "id": "App.tsx:5911:518963",
     "file": "App.tsx",
-    "line": 5906,
+    "line": 5911,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -7041,9 +7041,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:5906:519019",
+    "id": "App.tsx:5911:519384",
     "file": "App.tsx",
-    "line": 5906,
+    "line": 5911,
     "kind": "button",
     "section": "",
     "label": "Save stackup",
@@ -7057,9 +7057,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6124:540183",
+    "id": "App.tsx:6129:540548",
     "file": "App.tsx",
-    "line": 6124,
+    "line": 6129,
     "kind": "button",
     "section": "",
     "label": "Close thermal setup",
@@ -7073,9 +7073,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:6128:541263",
+    "id": "App.tsx:6133:541628",
     "file": "App.tsx",
-    "line": 6128,
+    "line": 6133,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7089,9 +7089,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6128:541395",
+    "id": "App.tsx:6133:541760",
     "file": "App.tsx",
-    "line": 6128,
+    "line": 6133,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7105,9 +7105,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6128:541528",
+    "id": "App.tsx:6133:541893",
     "file": "App.tsx",
-    "line": 6128,
+    "line": 6133,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7121,9 +7121,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6129:541773",
+    "id": "App.tsx:6134:542138",
     "file": "App.tsx",
-    "line": 6129,
+    "line": 6134,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -7143,9 +7143,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6129:542095",
+    "id": "App.tsx:6134:542460",
     "file": "App.tsx",
-    "line": 6129,
+    "line": 6134,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -7163,9 +7163,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6129:542407",
+    "id": "App.tsx:6134:542772",
     "file": "App.tsx",
-    "line": 6129,
+    "line": 6134,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -7183,9 +7183,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6129:542687",
+    "id": "App.tsx:6134:543052",
     "file": "App.tsx",
-    "line": 6129,
+    "line": 6134,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -7202,9 +7202,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6136:544442",
+    "id": "App.tsx:6141:544807",
     "file": "App.tsx",
-    "line": 6136,
+    "line": 6141,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7218,9 +7218,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6136:544610",
+    "id": "App.tsx:6141:544975",
     "file": "App.tsx",
-    "line": 6136,
+    "line": 6141,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7234,9 +7234,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6136:544789",
+    "id": "App.tsx:6141:545154",
     "file": "App.tsx",
-    "line": 6136,
+    "line": 6141,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7250,9 +7250,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6136:544974",
+    "id": "App.tsx:6141:545339",
     "file": "App.tsx",
-    "line": 6136,
+    "line": 6141,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7266,9 +7266,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6136:545174",
+    "id": "App.tsx:6141:545539",
     "file": "App.tsx",
-    "line": 6136,
+    "line": 6141,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7282,9 +7282,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6138:545580",
+    "id": "App.tsx:6143:545945",
     "file": "App.tsx",
-    "line": 6138,
+    "line": 6143,
     "kind": "input",
     "section": "",
     "label": "Component transient duration",
@@ -7298,9 +7298,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6138:545792",
+    "id": "App.tsx:6143:546157",
     "file": "App.tsx",
-    "line": 6138,
+    "line": 6143,
     "kind": "input",
     "section": "",
     "label": "Component transient time step",
@@ -7314,9 +7314,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6142:547301",
+    "id": "App.tsx:6147:547666",
     "file": "App.tsx",
-    "line": 6142,
+    "line": 6147,
     "kind": "button",
     "section": "",
     "label": "Running SPIKE thermal",
@@ -7330,9 +7330,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6142:547575",
+    "id": "App.tsx:6147:547940",
     "file": "App.tsx",
-    "line": 6142,
+    "line": 6147,
     "kind": "button",
     "section": "",
     "label": "Save setup",
@@ -7346,9 +7346,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6153:553351",
+    "id": "App.tsx:6158:553716",
     "file": "App.tsx",
-    "line": 6153,
+    "line": 6158,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -7366,9 +7366,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6153:553667",
+    "id": "App.tsx:6158:554032",
     "file": "App.tsx",
-    "line": 6153,
+    "line": 6158,
     "kind": "button",
     "section": "",
     "label": "Enabled / Disabled",
@@ -7382,9 +7382,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6156:554407",
+    "id": "App.tsx:6161:554772",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7398,9 +7398,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6156:554569",
+    "id": "App.tsx:6161:554934",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7414,9 +7414,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6156:554718",
+    "id": "App.tsx:6161:555083",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7430,9 +7430,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6156:554854",
+    "id": "App.tsx:6161:555219",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7446,9 +7446,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6156:555043",
+    "id": "App.tsx:6161:555408",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7462,9 +7462,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6156:555249",
+    "id": "App.tsx:6161:555614",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7478,9 +7478,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6156:555401",
+    "id": "App.tsx:6161:555766",
     "file": "App.tsx",
-    "line": 6156,
+    "line": 6161,
     "kind": "input",
     "section": "",
     "label": "Context-dependent control",
@@ -7494,9 +7494,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:6162:558000",
+    "id": "App.tsx:6167:558365",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Close",
@@ -7510,9 +7510,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6162:558066",
+    "id": "App.tsx:6167:558431",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Save setup",
@@ -7526,9 +7526,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6162:558181",
+    "id": "App.tsx:6167:558546",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Screening / Screen",
@@ -7542,9 +7542,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6162:558396",
+    "id": "App.tsx:6167:558761",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Checking / Preflight",
@@ -7558,9 +7558,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6162:558612",
+    "id": "App.tsx:6167:558977",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Preparing / Prepare case",
@@ -7574,9 +7574,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6162:558847",
+    "id": "App.tsx:6167:559212",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Cancel",
@@ -7590,9 +7590,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:6162:558946",
+    "id": "App.tsx:6167:559311",
     "file": "App.tsx",
-    "line": 6162,
+    "line": 6167,
     "kind": "button",
     "section": "",
     "label": "Running / Run OpenFOAM",
@@ -7606,9 +7606,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7419:634681",
+    "id": "App.tsx:7424:635046",
     "file": "App.tsx",
-    "line": 7419,
+    "line": 7424,
     "kind": "input",
     "section": "",
     "label": "Filter reference, pad, layer, or coordinate",
@@ -7622,9 +7622,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7422:635133",
+    "id": "App.tsx:7427:635498",
     "file": "App.tsx",
-    "line": 7422,
+    "line": 7427,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -7638,9 +7638,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7429:636300",
+    "id": "App.tsx:7434:636665",
     "file": "App.tsx",
-    "line": 7429,
+    "line": 7434,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -7654,9 +7654,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7518:644430",
+    "id": "App.tsx:7523:644795",
     "file": "App.tsx",
-    "line": 7518,
+    "line": 7523,
     "kind": "button",
     "section": "",
     "label": "Fast event",
@@ -7670,9 +7670,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7518:644542",
+    "id": "App.tsx:7523:644907",
     "file": "App.tsx",
-    "line": 7518,
+    "line": 7523,
     "kind": "button",
     "section": "",
     "label": "Load transient",
@@ -7686,9 +7686,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7518:644655",
+    "id": "App.tsx:7523:645020",
     "file": "App.tsx",
-    "line": 7518,
+    "line": 7523,
     "kind": "button",
     "section": "",
     "label": "Startup",
@@ -7702,9 +7702,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7520:644852",
+    "id": "App.tsx:7525:645217",
     "file": "App.tsx",
-    "line": 7520,
+    "line": 7525,
     "kind": "input",
     "section": "",
     "label": "Simulation stop",
@@ -7718,9 +7718,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7521:645041",
+    "id": "App.tsx:7526:645406",
     "file": "App.tsx",
-    "line": 7521,
+    "line": 7526,
     "kind": "select",
     "section": "",
     "label": "Time-step policy",
@@ -7737,9 +7737,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7522:645360",
+    "id": "App.tsx:7527:645725",
     "file": "App.tsx",
-    "line": 7522,
+    "line": 7527,
     "kind": "input",
     "section": "",
     "label": "Integration step",
@@ -7753,9 +7753,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7523:645703",
+    "id": "App.tsx:7528:646068",
     "file": "App.tsx",
-    "line": 7523,
+    "line": 7528,
     "kind": "select",
     "section": "",
     "label": "Saved-frame policy",
@@ -7772,9 +7772,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7524:646043",
+    "id": "App.tsx:7529:646408",
     "file": "App.tsx",
-    "line": 7524,
+    "line": 7529,
     "kind": "input",
     "section": "",
     "label": "Save every N steps",
@@ -7788,9 +7788,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7525:646297",
+    "id": "App.tsx:7530:646662",
     "file": "App.tsx",
-    "line": 7525,
+    "line": 7530,
     "kind": "input",
     "section": "",
     "label": "Playback rate (FPS)",
@@ -7804,9 +7804,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7526:646483",
+    "id": "App.tsx:7531:646848",
     "file": "App.tsx",
-    "line": 7526,
+    "line": 7531,
     "kind": "input",
     "section": "",
     "label": "Maximum solver time",
@@ -7820,9 +7820,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7527:646693",
+    "id": "App.tsx:7532:647058",
     "file": "App.tsx",
-    "line": 7527,
+    "line": 7532,
     "kind": "input",
     "section": "",
     "label": "Memory budget (MB)",
@@ -7836,9 +7836,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7528:646885",
+    "id": "App.tsx:7533:647250",
     "file": "App.tsx",
-    "line": 7528,
+    "line": 7533,
     "kind": "input",
     "section": "",
     "label": "Visual sample limit",
@@ -7852,9 +7852,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7529:647087",
+    "id": "App.tsx:7534:647452",
     "file": "App.tsx",
-    "line": 7529,
+    "line": 7534,
     "kind": "select",
     "section": "",
     "label": "Distributed capacitance",
@@ -7872,9 +7872,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7530:647476",
+    "id": "App.tsx:7535:647841",
     "file": "App.tsx",
-    "line": 7530,
+    "line": 7535,
     "kind": "select",
     "section": "",
     "label": "Initial state",
@@ -7891,9 +7891,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7575:651896",
+    "id": "App.tsx:7580:652261",
     "file": "App.tsx",
-    "line": 7575,
+    "line": 7580,
     "kind": "button",
     "section": "",
     "label": "Dock setup left",
@@ -7907,9 +7907,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7575:652046",
+    "id": "App.tsx:7580:652411",
     "file": "App.tsx",
-    "line": 7575,
+    "line": 7580,
     "kind": "button",
     "section": "",
     "label": "Dock setup bottom",
@@ -7923,9 +7923,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7575:652204",
+    "id": "App.tsx:7580:652569",
     "file": "App.tsx",
-    "line": 7575,
+    "line": 7580,
     "kind": "button",
     "section": "",
     "label": "Dock setup right",
@@ -7939,9 +7939,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7575:652358",
+    "id": "App.tsx:7580:652723",
     "file": "App.tsx",
-    "line": 7575,
+    "line": 7580,
     "kind": "button",
     "section": "",
     "label": "Float setup panel",
@@ -7955,9 +7955,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7575:652509",
+    "id": "App.tsx:7580:652874",
     "file": "App.tsx",
-    "line": 7575,
+    "line": 7580,
     "kind": "button",
     "section": "",
     "label": "Minimize setup to the bottom tool shelf",
@@ -7971,9 +7971,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7575:652623",
+    "id": "App.tsx:7580:652988",
     "file": "App.tsx",
-    "line": 7575,
+    "line": 7580,
     "kind": "button",
     "section": "",
     "label": "Wait for the active operation to finish / Close setup",
@@ -7987,9 +7987,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7577:652910",
+    "id": "App.tsx:7582:653275",
     "file": "App.tsx",
-    "line": 7577,
+    "line": 7582,
     "kind": "button",
     "section": "",
     "label": "Mesh",
@@ -8003,9 +8003,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7577:653094",
+    "id": "App.tsx:7582:653459",
     "file": "App.tsx",
-    "line": 7577,
+    "line": 7582,
     "kind": "button",
     "section": "",
     "label": "Solve",
@@ -8019,9 +8019,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7579:653391",
+    "id": "App.tsx:7584:653756",
     "file": "App.tsx",
-    "line": 7579,
+    "line": 7584,
     "kind": "button",
     "section": "",
     "label": "Direct net",
@@ -8035,9 +8035,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7580:653571",
+    "id": "App.tsx:7585:653936",
     "file": "App.tsx",
-    "line": 7580,
+    "line": 7585,
     "kind": "button",
     "section": "",
     "label": "Series path",
@@ -8051,9 +8051,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7581:653867",
+    "id": "App.tsx:7586:654232",
     "file": "App.tsx",
-    "line": 7581,
+    "line": 7586,
     "kind": "button",
     "section": "",
     "label": "Independent batch",
@@ -8067,9 +8067,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7590:654873",
+    "id": "App.tsx:7595:655238",
     "file": "App.tsx",
-    "line": 7590,
+    "line": 7595,
     "kind": "select",
     "section": "",
     "label": "Series power path",
@@ -8085,9 +8085,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7601:656356",
+    "id": "App.tsx:7606:656721",
     "file": "App.tsx",
-    "line": 7601,
+    "line": 7606,
     "kind": "button",
     "section": "",
     "label": "Edit power paths / Create power path",
@@ -8101,9 +8101,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7601:656515",
+    "id": "App.tsx:7606:656880",
     "file": "App.tsx",
-    "line": 7601,
+    "line": 7606,
     "kind": "button",
     "section": "",
     "label": "Review component models",
@@ -8117,9 +8117,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7608:657358",
+    "id": "App.tsx:7613:657723",
     "file": "App.tsx",
-    "line": 7608,
+    "line": 7613,
     "kind": "select",
     "section": "",
     "label": "Loop model",
@@ -8137,9 +8137,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7609:658184",
+    "id": "App.tsx:7614:658549",
     "file": "App.tsx",
-    "line": 7609,
+    "line": 7614,
     "kind": "input",
     "section": "",
     "label": "Power domain",
@@ -8153,9 +8153,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7614:659409",
+    "id": "App.tsx:7619:659774",
     "file": "App.tsx",
-    "line": 7614,
+    "line": 7619,
     "kind": "select",
     "section": "",
     "label": "Representation",
@@ -8172,9 +8172,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7614:659722",
+    "id": "App.tsx:7619:660087",
     "file": "App.tsx",
-    "line": 7614,
+    "line": 7619,
     "kind": "input",
     "section": "",
     "label": "Target size (mm)",
@@ -8188,9 +8188,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7614:659879",
+    "id": "App.tsx:7619:660244",
     "file": "App.tsx",
-    "line": 7614,
+    "line": 7619,
     "kind": "input",
     "section": "",
     "label": "Zone cell (mm)",
@@ -8204,9 +8204,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7614:660036",
+    "id": "App.tsx:7619:660401",
     "file": "App.tsx",
-    "line": 7614,
+    "line": 7619,
     "kind": "input",
     "section": "",
     "label": "Preview cell limit",
@@ -8220,9 +8220,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7615:661188",
+    "id": "App.tsx:7620:661553",
     "file": "App.tsx",
-    "line": 7615,
+    "line": 7620,
     "kind": "select",
     "section": "",
     "label": "Representation",
@@ -8239,9 +8239,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7615:661505",
+    "id": "App.tsx:7620:661870",
     "file": "App.tsx",
-    "line": 7615,
+    "line": 7620,
     "kind": "input",
     "section": "",
     "label": "Plating thickness (mm)",
@@ -8255,9 +8255,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:661788",
+    "id": "App.tsx:7621:662153",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Start (Hz)",
@@ -8271,9 +8271,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:661944",
+    "id": "App.tsx:7621:662309",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Stop (Hz)",
@@ -8287,9 +8287,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:662095",
+    "id": "App.tsx:7621:662460",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Points",
@@ -8303,9 +8303,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:662351",
+    "id": "App.tsx:7621:662716",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Skin effect",
@@ -8319,9 +8319,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7616:662522",
+    "id": "App.tsx:7621:662887",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Proximity effect",
@@ -8335,9 +8335,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7616:662725",
+    "id": "App.tsx:7621:663090",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "select",
     "section": "",
     "label": "Surface roughness",
@@ -8356,9 +8356,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:663153",
+    "id": "App.tsx:7621:663518",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Nodule radius (µm)",
@@ -8372,9 +8372,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:663328",
+    "id": "App.tsx:7621:663693",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "Surface-area ratio",
@@ -8388,9 +8388,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7616:663539",
+    "id": "App.tsx:7621:663904",
     "file": "App.tsx",
-    "line": 7616,
+    "line": 7621,
     "kind": "input",
     "section": "",
     "label": "RMS roughness (µm)",
@@ -8404,9 +8404,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:664851",
+    "id": "App.tsx:7627:665216",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "input",
     "section": "",
     "label": "Filter batch nets",
@@ -8420,9 +8420,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:665099",
+    "id": "App.tsx:7627:665464",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "button",
     "section": "",
     "label": "All DC",
@@ -8436,9 +8436,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:665261",
+    "id": "App.tsx:7627:665626",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "button",
     "section": "",
     "label": "All AC",
@@ -8452,9 +8452,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:665423",
+    "id": "App.tsx:7627:665788",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "button",
     "section": "",
     "label": "All transient",
@@ -8468,9 +8468,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:665599",
+    "id": "App.tsx:7627:665964",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "button",
     "section": "",
     "label": "Clear",
@@ -8484,9 +8484,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:666255",
+    "id": "App.tsx:7627:666620",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -8500,9 +8500,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:666433",
+    "id": "App.tsx:7627:666798",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -8521,9 +8521,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7622:666801",
+    "id": "App.tsx:7627:667166",
     "file": "App.tsx",
-    "line": 7622,
+    "line": 7627,
     "kind": "select",
     "section": "",
     "label": "Context-dependent control",
@@ -8539,9 +8539,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7628:668328",
+    "id": "App.tsx:7633:668693",
     "file": "App.tsx",
-    "line": 7628,
+    "line": 7633,
     "kind": "input",
     "section": "",
     "label": "Start (Hz)",
@@ -8555,9 +8555,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7628:668484",
+    "id": "App.tsx:7633:668849",
     "file": "App.tsx",
-    "line": 7628,
+    "line": 7633,
     "kind": "input",
     "section": "",
     "label": "Stop (Hz)",
@@ -8571,9 +8571,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7628:668635",
+    "id": "App.tsx:7633:669000",
     "file": "App.tsx",
-    "line": 7628,
+    "line": 7633,
     "kind": "input",
     "section": "",
     "label": "Points",
@@ -8587,9 +8587,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7629:668908",
+    "id": "App.tsx:7634:669273",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Analyse interference from nearby conductors",
@@ -8603,9 +8603,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7629:669271",
+    "id": "App.tsx:7634:669636",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Electric-field coupling",
@@ -8619,9 +8619,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7629:669475",
+    "id": "App.tsx:7634:669840",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Magnetic-field coupling",
@@ -8635,9 +8635,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7629:669679",
+    "id": "App.tsx:7634:670044",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Include other layers",
@@ -8651,9 +8651,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7629:669889",
+    "id": "App.tsx:7634:670254",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "select",
     "section": "",
     "label": "Neighbour scope",
@@ -8671,9 +8671,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7629:670264",
+    "id": "App.tsx:7634:670629",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Radius (mm)",
@@ -8687,9 +8687,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7629:670415",
+    "id": "App.tsx:7634:670780",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Traces",
@@ -8703,9 +8703,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7629:670602",
+    "id": "App.tsx:7634:670967",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Planes",
@@ -8719,9 +8719,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7629:670789",
+    "id": "App.tsx:7634:671154",
     "file": "App.tsx",
-    "line": 7629,
+    "line": 7634,
     "kind": "input",
     "section": "",
     "label": "Zones",
@@ -8735,9 +8735,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7632:671169",
+    "id": "App.tsx:7637:671534",
     "file": "App.tsx",
-    "line": 7632,
+    "line": 7637,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -8751,9 +8751,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7645:674471",
+    "id": "App.tsx:7650:674836",
     "file": "App.tsx",
-    "line": 7645,
+    "line": 7650,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -8767,9 +8767,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7645:674739",
+    "id": "App.tsx:7650:675104",
     "file": "App.tsx",
-    "line": 7645,
+    "line": 7650,
     "kind": "button",
     "section": "",
     "label": "Validate setup and preview the solver mesh",
@@ -8783,9 +8783,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7645:674979",
+    "id": "App.tsx:7650:675344",
     "file": "App.tsx",
-    "line": 7645,
+    "line": 7650,
     "kind": "button",
     "section": "",
     "label": "Run the configured mesh convergence study",
@@ -8799,9 +8799,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7645:675215",
+    "id": "App.tsx:7650:675580",
     "file": "App.tsx",
-    "line": 7645,
+    "line": 7650,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -8815,9 +8815,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7796:686352",
+    "id": "App.tsx:7801:686717",
     "file": "App.tsx",
-    "line": 7796,
+    "line": 7801,
     "kind": "button",
     "section": "",
     "label": "Close extension manager",
@@ -8831,9 +8831,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7797:686486",
+    "id": "App.tsx:7802:686851",
     "file": "App.tsx",
-    "line": 7797,
+    "line": 7802,
     "kind": "button",
     "section": "",
     "label": "Browse",
@@ -8847,9 +8847,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7797:686633",
+    "id": "App.tsx:7802:686998",
     "file": "App.tsx",
-    "line": 7797,
+    "line": 7802,
     "kind": "button",
     "section": "",
     "label": "Manage",
@@ -8863,9 +8863,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7797:686803",
+    "id": "App.tsx:7802:687168",
     "file": "App.tsx",
-    "line": 7797,
+    "line": 7802,
     "kind": "input",
     "section": "",
     "label": "Search extensions",
@@ -8879,9 +8879,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7797:686915",
+    "id": "App.tsx:7802:687280",
     "file": "App.tsx",
-    "line": 7797,
+    "line": 7802,
     "kind": "button",
     "section": "",
     "label": "Refresh",
@@ -8895,9 +8895,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7799:687320",
+    "id": "App.tsx:7804:687685",
     "file": "App.tsx",
-    "line": 7799,
+    "line": 7804,
     "kind": "input",
     "section": "",
     "label": "Extension package path",
@@ -8911,9 +8911,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7799:687529",
+    "id": "App.tsx:7804:687894",
     "file": "App.tsx",
-    "line": 7799,
+    "line": 7804,
     "kind": "button",
     "section": "",
     "label": "Choose package",
@@ -8927,9 +8927,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7799:687671",
+    "id": "App.tsx:7804:688036",
     "file": "App.tsx",
-    "line": 7799,
+    "line": 7804,
     "kind": "button",
     "section": "",
     "label": "Inspect",
@@ -8943,9 +8943,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7800:688520",
+    "id": "App.tsx:7805:688885",
     "file": "App.tsx",
-    "line": 7800,
+    "line": 7805,
     "kind": "button",
     "section": "",
     "label": "Update extension / Install extension",
@@ -8959,41 +8959,41 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7801:689105",
-    "file": "App.tsx",
-    "line": 7801,
-    "kind": "button",
-    "section": "",
-    "label": "Context-dependent control",
-    "dynamic": true,
-    "description": "",
-    "options": [],
-    "disabled": "",
-    "min": "",
-    "max": "",
-    "step": "",
-    "inputType": ""
-  },
-  {
-    "id": "App.tsx:7803:689651",
-    "file": "App.tsx",
-    "line": 7803,
-    "kind": "button",
-    "section": "",
-    "label": "Context-dependent control",
-    "dynamic": true,
-    "description": "",
-    "options": [],
-    "disabled": "",
-    "min": "",
-    "max": "",
-    "step": "",
-    "inputType": ""
-  },
-  {
-    "id": "App.tsx:7806:690557",
+    "id": "App.tsx:7806:689470",
     "file": "App.tsx",
     "line": 7806,
+    "kind": "button",
+    "section": "",
+    "label": "Context-dependent control",
+    "dynamic": true,
+    "description": "",
+    "options": [],
+    "disabled": "",
+    "min": "",
+    "max": "",
+    "step": "",
+    "inputType": ""
+  },
+  {
+    "id": "App.tsx:7808:690016",
+    "file": "App.tsx",
+    "line": 7808,
+    "kind": "button",
+    "section": "",
+    "label": "Context-dependent control",
+    "dynamic": true,
+    "description": "",
+    "options": [],
+    "disabled": "",
+    "min": "",
+    "max": "",
+    "step": "",
+    "inputType": ""
+  },
+  {
+    "id": "App.tsx:7811:690922",
+    "file": "App.tsx",
+    "line": 7811,
     "kind": "input",
     "section": "",
     "label": "Extensions menu",
@@ -9007,9 +9007,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7806:690724",
+    "id": "App.tsx:7811:691089",
     "file": "App.tsx",
-    "line": 7806,
+    "line": 7811,
     "kind": "input",
     "section": "",
     "label": "Extensions toolbar",
@@ -9023,9 +9023,9 @@
     "inputType": "checkbox"
   },
   {
-    "id": "App.tsx:7807:691120",
+    "id": "App.tsx:7812:691485",
     "file": "App.tsx",
-    "line": 7807,
+    "line": 7812,
     "kind": "button",
     "section": "",
     "label": "Remove",
@@ -9039,9 +9039,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7811:692246",
+    "id": "App.tsx:7816:692611",
     "file": "App.tsx",
-    "line": 7811,
+    "line": 7816,
     "kind": "select",
     "section": "",
     "label": "Analysis mode",
@@ -9060,9 +9060,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7811:692511",
+    "id": "App.tsx:7816:692876",
     "file": "App.tsx",
-    "line": 7811,
+    "line": 7816,
     "kind": "input",
     "section": "",
     "label": "Nets (comma separated)",
@@ -9076,9 +9076,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7811:692643",
+    "id": "App.tsx:7816:693008",
     "file": "App.tsx",
-    "line": 7811,
+    "line": 7816,
     "kind": "input",
     "section": "",
     "label": "Target size (mm)",
@@ -9092,9 +9092,9 @@
     "inputType": "number"
   },
   {
-    "id": "App.tsx:7811:692795",
+    "id": "App.tsx:7816:693160",
     "file": "App.tsx",
-    "line": 7811,
+    "line": 7816,
     "kind": "select",
     "section": "",
     "label": "Representation",
@@ -9111,9 +9111,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7817:694521",
+    "id": "App.tsx:7822:694886",
     "file": "App.tsx",
-    "line": 7817,
+    "line": 7822,
     "kind": "textarea",
     "section": "",
     "label": "Extension options JSON",
@@ -9127,9 +9127,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7819:695107",
+    "id": "App.tsx:7824:695472",
     "file": "App.tsx",
-    "line": 7819,
+    "line": 7824,
     "kind": "button",
     "section": "",
     "label": "Run",
@@ -9143,9 +9143,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7820:695736",
+    "id": "App.tsx:7825:696101",
     "file": "App.tsx",
-    "line": 7820,
+    "line": 7825,
     "kind": "select",
     "section": "",
     "label": "EMerge Python preview study",
@@ -9162,9 +9162,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7823:697899",
+    "id": "App.tsx:7828:698264",
     "file": "App.tsx",
-    "line": 7823,
+    "line": 7828,
     "kind": "button",
     "section": "",
     "label": "Trusting… / Trust for session",
@@ -9178,9 +9178,9 @@
     "inputType": "button"
   },
   {
-    "id": "App.tsx:7827:698523",
+    "id": "App.tsx:7832:698888",
     "file": "App.tsx",
-    "line": 7827,
+    "line": 7832,
     "kind": "button",
     "section": "",
     "label": "Close",
@@ -9194,9 +9194,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7849:699544",
+    "id": "App.tsx:7854:699909",
     "file": "App.tsx",
-    "line": 7849,
+    "line": 7854,
     "kind": "button",
     "section": "",
     "label": "Close keyboard shortcuts",
@@ -9210,9 +9210,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7851:699897",
+    "id": "App.tsx:7856:700262",
     "file": "App.tsx",
-    "line": 7851,
+    "line": 7856,
     "kind": "button",
     "section": "",
     "label": "Press key",
@@ -9226,9 +9226,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7854:700462",
+    "id": "App.tsx:7859:700827",
     "file": "App.tsx",
-    "line": 7854,
+    "line": 7859,
     "kind": "button",
     "section": "",
     "label": "Reset defaults",
@@ -9242,9 +9242,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7878:702812",
+    "id": "App.tsx:7883:703177",
     "file": "App.tsx",
-    "line": 7878,
+    "line": 7883,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",
@@ -9258,9 +9258,9 @@
     "inputType": ""
   },
   {
-    "id": "App.tsx:7878:703007",
+    "id": "App.tsx:7883:703372",
     "file": "App.tsx",
-    "line": 7878,
+    "line": 7883,
     "kind": "button",
     "section": "",
     "label": "Context-dependent control",

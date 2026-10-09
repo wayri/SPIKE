@@ -43,5 +43,27 @@ const bridgeClose = bridge.slice(bridge.indexOf("export async function closeDesk
 assert.ok(bridgeClose.includes('invoke<void>("close_desktop_app")'));
 assert.ok(!bridgeClose.includes(".destroy()"), "main close must not destroy only one window");
 assert.ok(app.includes('if (!desktopShell) window.addEventListener("beforeunload"'), "native close has one save/discard guard instead of a second hidden browser prompt");
+assert.ok(bridge.includes('"spike://desktop-close-requested"') && bridge.includes('invoke<boolean>("acknowledge_desktop_close", { generation })'), "native acknowledgement belongs to the exact close generation");
+assert.ok(app.includes("if (accepted && !disposed) handleClose(preventDefault)"), "stale acknowledgements cannot reopen a save guard");
+assert.ok(app.includes("void acknowledgeDesktopClose(generation)"), "a live renderer must acknowledge close even when a dirty draft keeps it open");
 assert.ok(app.includes("<DesktopCloseDraftDialog"), "draft-blocked close must have a visible recovery dialog");
+// Exercise the actual bridge functions with only the native transport substituted.
+let nativeListener, invoked = [], delivered = [], desktop = true;
+const transportSource = bridge.slice(bridge.indexOf("export async function subscribeDesktopCloseRequested"), bridge.indexOf("export async function closeDesktopWindow"))
+  .replace('const { getCurrentWindow } = await import("@tauri-apps/api/window");', 'const getCurrentWindow = nativeWindow;');
+const transportCode = ts.transpileModule(transportSource, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+const nativeExports = {};
+new Function("exports", "isDesktopShell", "nativeWindow", "invoke", transportCode)(nativeExports, () => desktop,
+  () => ({ listen: async (name, callback) => { assert.equal(name, "spike://desktop-close-requested"); nativeListener = callback; return () => {}; } }),
+  async (command, args) => { invoked.push([command, args]); return args.generation === 7; });
+await nativeExports.subscribeDesktopCloseRequested((prevent, generation) => { prevent(); delivered.push(generation); });
+for (const generation of [7, 0, -1, 1.5, NaN]) nativeListener({ payload: { generation } });
+assert.deepEqual(delivered, [7], "only valid close generations reach the renderer guard");
+assert.equal(await nativeExports.acknowledgeDesktopClose(7), true);
+assert.equal(await nativeExports.acknowledgeDesktopClose(8), false, "stale requests retain native admission result");
+assert.deepEqual(invoked, [["acknowledge_desktop_close", { generation: 7 }], ["acknowledge_desktop_close", { generation: 8 }]]);
+desktop = false;
+assert.equal(await nativeExports.acknowledgeDesktopClose(9), false);
+assert.equal(invoked.length, 2, "browser previews never dispatch native close acknowledgements");
+
 console.log("Desktop close: clean, repeated, dirty, draft, save failure, save/discard/cancel and native dispatch checks passed.");

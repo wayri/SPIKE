@@ -18,6 +18,15 @@ An unavailable draft window is reported without silently discarding its state.
 Reopen the assembly tool and review it. If native close IPC fails, the main
 workspace remains open and the status message invites another close attempt.
 
+## Unresponsive workspace
+
+If the renderer cannot acknowledge a close request within three seconds, a
+native dialog offers to close anyway and warns that unsaved work may be lost.
+Choose No to keep SPIKE open. Choose Yes only when you accept that loss.
+Repeated close clicks cannot stack recovery dialogs. If the renderer recovers
+while this dialog is open, its save/draft guard takes ownership and a stale Yes
+response cannot bypass that guard.
+
 ## Worker shutdown
 
 After the main workspace admits closing, the native host rejects new worker

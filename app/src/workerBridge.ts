@@ -155,11 +155,18 @@ export async function getDesktopAppVersion(): Promise<string | null> {
 }
 
 export async function subscribeDesktopCloseRequested(
-  onRequested: (preventDefault: () => void) => void,
+  onRequested: (preventDefault: () => void, generation: number) => void,
 ): Promise<() => void> {
   if (!isDesktopShell()) return () => undefined;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  return getCurrentWindow().onCloseRequested(event => onRequested(() => event.preventDefault()));
+  return getCurrentWindow().listen<{ generation: number }>("spike://desktop-close-requested", event => {
+    const generation = event.payload.generation;
+    if (Number.isSafeInteger(generation) && generation > 0) onRequested(() => undefined, generation);
+  });
+}
+
+export async function acknowledgeDesktopClose(generation: number): Promise<boolean> {
+  return isDesktopShell() ? invoke<boolean>("acknowledge_desktop_close", { generation }) : false;
 }
 
 export async function closeDesktopWindow(): Promise<void> {

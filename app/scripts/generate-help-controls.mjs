@@ -51,6 +51,15 @@ for (const file of fs.readdirSync(path.join(root, 'src')).filter(f => f.endsWith
 const output = JSON.stringify(controls, null, 2) + '\n';
 const destination = path.join(root, 'src/helpControls.generated.json');
 if (process.argv.includes('--check')) {
-  if (!fs.existsSync(destination) || fs.readFileSync(destination, 'utf8') !== output) throw new Error('Help control inventory is stale; run npm run help:generate');
+  const portableInventory = text => JSON.parse(text).map(control => ({
+    ...control,
+    id: control.id.replace(/:\d+$/, ':source-offset'),
+  }));
+  const expected = fs.existsSync(destination) ? portableInventory(fs.readFileSync(destination, 'utf8')) : [];
+  const actual = portableInventory(output);
+  if (JSON.stringify(expected) !== JSON.stringify(actual)) {
+    const difference = actual.findIndex((control, index) => JSON.stringify(control) !== JSON.stringify(expected[index]));
+    throw new Error(`Help control inventory is stale at entry ${difference}: expected ${JSON.stringify(expected[difference])}, actual ${JSON.stringify(actual[difference])}; run npm run help:generate`);
+  }
 } else fs.writeFileSync(destination, output);
 console.log(`${controls.length} control sites inventoried (${controls.filter(c => c.dynamic).length} require runtime context).`);

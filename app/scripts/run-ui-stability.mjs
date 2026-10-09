@@ -124,6 +124,10 @@ for (const suite of suites) {
   writeCheckpoint(false);
   const current = results.at(-1);
   console.log(`[${results.length}/${suites.length}] ${suite.name}: ${current.status}${current.durationSeconds === undefined ? "" : ` (${current.durationSeconds.toFixed(2)}s)`}`);
+  if (current.status === "failed") {
+    const diagnosticLines = current.failureLines.length > 0 ? current.failureLines : current.outputTail;
+    console.error(diagnosticLines.slice(-60).join("\n"));
+  }
 }
 
 writeCheckpoint(true);

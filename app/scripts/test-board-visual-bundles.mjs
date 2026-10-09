@@ -7,7 +7,8 @@ const board = () => ({
 });
 
 const ebrake = board();
-assert.equal(await configureKnownVisuals(ebrake, "C:\\projects\\ebrake1.kicad_pcb", readFileSync(new URL('../public/demo/ebrake1.kicad_pcb', import.meta.url), 'utf8')), true);
+const ebrakeSource = readFileSync(new URL('../public/demo/ebrake1.kicad_pcb', import.meta.url), 'utf8').replace(/\r?\n/g, '\r\n');
+assert.equal(await configureKnownVisuals(ebrake, "C:\\projects\\ebrake1.kicad_pcb", ebrakeSource), true);
 assert.equal(ebrake.boardModelUrl, "/demo/models/ebrake1_board.glb");
 assert.equal(ebrake.componentModelUrl, "/demo/models/ebrake1_components.glb");
 assert.equal(ebrake.modelManifestUrl, "/demo/models/ebrake1_scene.json");

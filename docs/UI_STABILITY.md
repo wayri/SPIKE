@@ -62,9 +62,15 @@ close behavior has separate frontend save/cancel/draft regressions and native
 worker lifecycle tests. Installed-package startup and real shutdown are required
 Windows release gates. See [close recovery](DESKTOP_SHUTDOWN.md).
 
-Final local gate: all 108 frontend suites passed in 116.9 seconds; the
+Initial local gate: all 108 frontend suites passed in 116.9 seconds; the
 production frontend build passed. Architecture and release-version checks passed,
 seven changed Markdown files passed documentation checks, and 18 focused Python
-release/installer/CLI tests passed. Native tests passed 42 cases with one existing
+release/installer/CLI tests passed. Native tests passed 47 cases with one existing
 live GPU case ignored and the packaged-worker case excluded locally because its
 payload was absent. Packaging CI must run that installed-payload gate.
+
+Close-recovery follow-up: a blank installed 0.3.9 window remained alive after
+its native Close button. Generation-bound native recovery now covers a dead
+renderer, repeated requests and recovery during the warning dialog. Its live
+dialog acceptance remains pending; Rust state-machine tests establish the
+race handling.

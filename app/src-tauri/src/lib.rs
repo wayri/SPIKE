@@ -1848,6 +1848,16 @@ pub fn run() {
     let pending_project = startup_project.map(|(_, selected)| selected);
     tauri::Builder::default()
         .on_page_load(|webview, _| webview_policy::apply(webview))
+        .on_window_event(|window, event| {
+            if window.label() == "main" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    // Also protect startup and a crashed renderer without a JS listener.
+                    // Tauri still delivers its standard close event to any listeners.
+                    api.prevent_close();
+                    desktop_lifecycle::on_main_close_requested(window);
+                }
+            }
+        })
         .plugin(tauri_plugin_opener::init())
         .manage(ResourceState(Mutex::new(ResourceSampler {
             system: System::new(),
@@ -1867,6 +1877,7 @@ pub fn run() {
             mcp_bridge::mcp_bridge_status,
             mcp_bridge::mcp_bridge_respond,
             desktop_lifecycle::close_desktop_app,
+            desktop_lifecycle::acknowledge_desktop_close,
             run_worker,
             run_project_worker,
             worker_status,
