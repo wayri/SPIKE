@@ -1,10 +1,5 @@
-# SPIKE Icon Placeholder
+# SPIKE Plugin Icon
 
-For now, we'll use KiCad's default plugin icon.
-A custom icon can be added later by placing a PNG file here named "spike_icon.png"
-
-Recommended icon specs:
-- Size: 24x24 pixels (or 48x48 for high-DPI)
-- Format: PNG with transparency
-- Design: Lightning bolt + circuit traces
-- Colors: Electric blue and orange
+spike_icon.png is the approved SPIKE symbol rendered at 48x48 with transparency.
+Regenerate it with python scripts/render_brand_assets.py from the repository root.
+See docs/BRANDING.md for source and licensing provenance.

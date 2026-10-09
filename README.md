@@ -1,4 +1,4 @@
-<img src="app/public/spike-icon.png" alt="SPIKE icon" width="96" height="96">
+<img src="app/public/spike-logo.png" alt="SPIKE logo" width="420">
 
 # SPIKE - PCB Simulation for KiCad
 

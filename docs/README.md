@@ -1,5 +1,7 @@
 # SPIKE documentation
 
+<img src="../app/public/spike-logo.png" alt="SPIKE logo" width="420">
+
 Start with the guides that match what you want to do. [Solver status](SOLVER_STATUS.md)
 describes which analyses are available and what their results mean.
 

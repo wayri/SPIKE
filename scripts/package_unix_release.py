@@ -58,10 +58,23 @@ else:
     desktop = files / 'share/applications/org.spike.integrity.desktop'
     desktop.parent.mkdir(parents=True, exist_ok=True)
     desktop.write_text('[Desktop Entry]\nType=Application\nName=SPIKE\nComment=PCB analysis for KiCad\n'
-                       'Exec=spike-gui\nIcon=org.spike.integrity\nCategories=Science;Electronics;\nTerminal=false\n')
+                       'Exec=spike-gui %f\nIcon=org.spike.integrity\nCategories=Science;Electronics;\n'
+                       'MimeType=application/x-spike-project;\nTerminal=false\n')
     icon = files / 'share/icons/hicolor/128x128/apps/org.spike.integrity.png'
     icon.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT / 'app/src-tauri/icons/icon.png', icon)
+    shutil.copy2(ROOT / 'app/src-tauri/icons/128x128.png', icon)
+    mime_icon = files / 'share/icons/hicolor/128x128/mimetypes/application-x-spike-project.png'
+    mime_icon.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / 'app/src-tauri/icons/128x128.png', mime_icon)
+    mime = files / 'share/mime/packages/org.spike.integrity.xml'
+    mime.parent.mkdir(parents=True, exist_ok=True)
+    mime.write_text('<?xml version="1.0" encoding="UTF-8"?>\n'
+                    '<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">\n'
+                    '  <mime-type type="application/x-spike-project">\n'
+                    '    <comment>SPIKE project package</comment>\n'
+                    '    <glob pattern="*.spike"/>\n'
+                    '    <icon name="application-x-spike-project"/>\n'
+                    '  </mime-type>\n</mime-info>\n')
     run('flatpak', 'build-finish', bundle, '--command=spike-gui', '--socket=wayland',
         '--socket=fallback-x11', '--share=ipc', '--device=dri', '--share=network', '--filesystem=home')
     repo = ROOT / 'build/flatpak-repo'
