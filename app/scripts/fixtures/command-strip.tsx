@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import "../../src/buttonStandard.css";
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Focus, Layers3, Save, Settings2 } from "lucide-react";

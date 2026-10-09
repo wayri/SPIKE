@@ -17,7 +17,8 @@ async function sourceModule(path, replacements) {
 
 const plotUrl = moduleUrl(readFileSync(new URL("../src/reportPlotInteraction.ts", import.meta.url), "utf8"));
 const presentationUrl = moduleUrl(readFileSync(new URL("../src/reportPresentation.ts", import.meta.url), "utf8").replace('"./reportPlotInteraction"', JSON.stringify(plotUrl)));
-const studyUrl = moduleUrl(readFileSync(new URL("../src/optycalStudy.ts", import.meta.url), "utf8"));
+const studyUrl = moduleUrl(readFileSync(new URL("../src/optycalStudy.ts", import.meta.url), "utf8")
+  .replace('import { persistedEnginePython } from "./persistedEnginePython";', 'const persistedEnginePython = () => "";'));
 const assertNavigableSections = html => {
   const ids = [...html.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length, "report section IDs must be unique");

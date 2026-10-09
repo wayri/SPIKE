@@ -164,11 +164,9 @@ export async function subscribeDesktopCloseRequested(
 
 export async function closeDesktopWindow(): Promise<void> {
   if (!isDesktopShell()) return;
-  const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  // Called only after the main workspace's save/discard close decision.
-  // A second close request would re-enter the listener and hide permission
-  // failures inside Tauri's asynchronous event callback.
-  await getCurrentWindow().destroy();
+  // The main workspace has already admitted save/discard. The host closes
+  // every native tool and cancels owned workers; destroying one window is not exit.
+  await invoke<void>("close_desktop_app");
 }
 
 export async function runLocalWorker(request: Record<string, unknown>): Promise<WorkerResponse> {

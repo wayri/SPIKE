@@ -1,6 +1,6 @@
 [package]
 name = "spike-desktop"
-version = "0.3.9"
+version = "0.3.10"
 description = "SPIKE Electronic Systems Integrity Workbench"
 license = "Apache-2.0"
 authors = ["SPIKE contributors"]

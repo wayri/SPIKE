@@ -326,3 +326,8 @@ cross-cutting dependency.
 `app/src/StudyManager.tsx` and `studyManager.css` own navigation, simulation tables, and the responsive inspector. `simulationStudies.ts` owns the version-one study projection; `studyWorkspaceModel.ts` owns bounded dataset admission, import copying, and metadata compatibility. `App.tsx` owns project integration and admitted domain activation. See [simulation studies](SIMULATION_STUDIES.md) and ADR 0033.
 
 Script result admission is owned by `python/spike_core/script_views.py` and `app/src/scriptDataViews.ts`. `ScriptResultViewport.tsx` and `SpatialDataViewport.tsx` own the script model viewport; see [workflow](SPIKE_EM_UI_BACKPORT.md).
+
+Desktop close admission is owned by `app/src/desktopClose.ts`,
+`DesktopCloseDraftDialog.tsx` and the main workspace save/discard flow.
+`app/src-tauri/src/desktop_lifecycle.rs` owns bounded whole-app exit and local
+worker cancellation. See [closing SPIKE](DESKTOP_SHUTDOWN.md).

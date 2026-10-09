@@ -184,6 +184,16 @@ try {
     if ($desktop.HasExited) {
         throw "Installed SPIKE desktop exited during the 10-second startup smoke check (exit code $($desktop.ExitCode))."
     }
+    # Exercise the real title-bar close path. A forced stop cannot qualify shutdown.
+    if (-not $desktop.CloseMainWindow()) {
+        throw "Installed SPIKE did not accept its native main-window close request."
+    }
+    if (-not $desktop.WaitForExit(10000)) {
+        throw "Installed SPIKE remained running more than 10 seconds after closing its main window."
+    }
+    if ($desktop.ExitCode -ne 0) {
+        throw "Installed SPIKE close failed with exit code $($desktop.ExitCode)."
+    }
 }
 finally {
     if (-not $desktop.HasExited) {

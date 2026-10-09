@@ -1,0 +1,4 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.menu-bar .menu-button[aria-expanded="true"] { position: relative; }
+.menu-bar .menu-dropdown[role="menu"] { overscroll-behavior: contain; }
+.menu-bar .menu-item:focus-visible { position: relative; z-index: 1; }

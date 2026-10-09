@@ -323,7 +323,15 @@ view only and do not become solver results.
 
 ## Operate SPIKE with a local LLM
 
-1. Open **Settings → LLM / MCP** in the desktop app and enable the local bridge. Copy the displayed rendezvous path if more than one SPIKE window is open.
+1. Open **Settings -> LLM / MCP** in the desktop app and enable the local bridge. Copy the displayed rendezvous path if more than one SPIKE window is open.
 2. Configure LM Studio's local `mcp.json` to run `scripts/spike_mcp.py`, or start an Ollama/LM Studio local API and use `scripts/spike_local_chat.py`. Follow [the setup guide](LOCAL_LLM_MCP.md) for exact commands.
 3. Ask the model to inspect `spike_gui_status` and `spike_capabilities`, then create a study, add cases, select a workspace, or open its run controls. Read solver preflight and validity status before interpreting a result.
 4. Review the visible setup and save the SPIKE project to retain study changes. Opening run controls does not execute a solver.
+
+## Close SPIKE
+
+Close the main window to exit the application and its detached tools. Save or
+discard main-project changes in the close dialog, or choose Cancel. An assembly
+draft must first be saved or discarded in its tool; **Review draft** restores
+that window. A failed or canceled save keeps SPIKE open. See
+[close and worker shutdown](DESKTOP_SHUTDOWN.md) for recovery and limits.

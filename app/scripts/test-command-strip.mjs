@@ -31,6 +31,7 @@ new Function("require", "module", "exports", "ResizeObserver", "HTMLElement", co
   if (name === "react") return { ...React, useId: () => "test-strip", useRef: () => ({ current: viewport }),
     useState: () => [state, change => { state = typeof change === "function" ? change(state) : change; }],
     useLayoutEffect: callback => effects.push(callback) };
+  if (name === "./icons") return new Proxy({}, { get: () => () => null });
   if (name.endsWith(".css")) return {};
   return require(name);
 }, module, module.exports, Observer, Element);

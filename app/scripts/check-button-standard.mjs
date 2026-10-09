@@ -23,6 +23,16 @@ for (const name of previewsWithButtons) {
   assert.doesNotMatch(source, /<button\b[^>]*\bstyle=\{/, `${name} must not bypass the standard with an inline button style`);
 }
 
+// Acceptance fixtures are first-party entrypoints too; production components
+// must be evaluated with the same shared control styling as the application.
+const fixtureEntrypoints = ['scripts/fixtures', 'test-fixtures'].flatMap(directory =>
+  readdirSync(resolve(appDir, directory)).filter(name => name.endsWith('.tsx'))
+    .map(name => `${directory}/${name}`)
+    .filter(path => /createRoot\(/.test(read(path))));
+for (const path of fixtureEntrypoints) {
+  assert.match(read(path), /import\s+["'][^"']*buttonStandard\.css["'];/, `${path} must evaluate controls with buttonStandard.css`);
+}
+
 const selectors = [];
 standard.walkRules(rule => selectors.push(rule.selector));
 const hasSelector = fragment => selectors.some(selector => selector.includes(fragment));

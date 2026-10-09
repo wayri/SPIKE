@@ -3,8 +3,7 @@ import { readFileSync } from "node:fs";
 import ts from "typescript";
 
 const projectPackageSource = readFileSync(new URL("../src/projectPackage.ts", import.meta.url), "utf8");
-const versionSource = readFileSync(new URL("../src/appVersion.ts", import.meta.url), "utf8");
-const version = versionSource.match(/APP_VERSION\s*=\s*"([^"]+)"/)?.[1];
+const version = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
 assert.ok(version, "the application version must be declared");
 const source = projectPackageSource.replace(
   /import \{ APP_VERSION \} from "\.\/appVersion";\s*/,

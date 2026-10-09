@@ -16,6 +16,7 @@ import {
 import { openNativeTextFile, runLocalWorker, saveNativeTextFile } from "./workerBridge";
 import type { AssemblyAnalysisScope, AssemblyWorkload } from "./assemblyAdmission";
 import DataTable from "./DataTable";
+import { useModalFocusScope } from "./modalFocusScope";
 
 type Page = "setup" | "models" | "assignments" | "parasitics" | "run";
 type RunEngine = "native_mna" | "peec_mna" | "owned_spice" | "ngspice";
@@ -63,6 +64,7 @@ export default function SpiceWorkbench({
   const [ownedProbeText, setOwnedProbeText] = useState("");
   const [ownedResult, setOwnedResult] = useState<OwnedCircuitResult | null>(null);
   const [running, setRunning] = useState(false);
+  const modal = useModalFocusScope(onClose, running);
   const workspaceRef = useRef(workspace);
   const activeRunId = useRef<string | null>(null);
   const [diagnostic, setDiagnostic] = useState("Compose the workspace to validate models, pin mappings, parasitic endpoints, and analysis limits.");
@@ -337,8 +339,8 @@ export default function SpiceWorkbench({
     { id: "run", label: "Validate & run", icon: ListChecks },
   ];
   const analysis = workspace.analysis;
-  return <div className="modal-shade" role="dialog" aria-modal="true" aria-label="SPICE model assistant"><section className="spice-workbench spice-assistant" data-guide="circuit-workspace">
-    <header><div><CircuitBoard size={18} /><span><b>SPICE MODEL ASSISTANT</b><small>{workspace.contract} | shared PI / SI circuit co-simulation</small></span></div><button className="canvas-icon" disabled={running} onClick={onClose}><X size={16} /></button></header>
+  return <div className="modal-shade"><section ref={modal.scopeRef} onKeyDown={modal.onKeyDown} tabIndex={-1} className="spice-workbench spice-assistant" role="dialog" aria-modal="true" aria-label="SPICE model assistant" data-guide="circuit-workspace">
+    <header><div><CircuitBoard size={18} /><span><b>SPICE MODEL ASSISTANT</b><small>{workspace.contract} | shared PI / SI circuit co-simulation</small></span></div><button type="button" data-modal-initial-focus className="canvas-icon" disabled={running} onClick={onClose} aria-label="Close SPICE model assistant"><X size={16} /></button></header>
     <div className="spice-toolbar">
       {pages.map(item => { const Icon = item.icon; return <button key={item.id} className={page === item.id ? "active" : ""} onClick={() => setPage(item.id)}><Icon size={13} />{item.label}</button>; })}
       <button onClick={() => void importSubcircuit()}><FolderOpen size={13} /> Import model</button>
