@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Synthetic presentation fixture: these values are not a solver validation.
+import "../src/buttonStandard.css";
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import BoardViewport from '../src/BoardViewport';

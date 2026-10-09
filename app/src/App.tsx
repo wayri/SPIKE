@@ -4,6 +4,10 @@ import { ownsKeyboardInput } from "./shortcutContext";
 import AssemblyQuickBar from "./AssemblyQuickBar";
 import ViewportNotifications from "./ViewportNotifications";
 import CommandStrip from "./CommandStrip";
+import { MenuBar, MenuButton, MenuItem } from "./MenuBar";
+import { useModalFocusScope } from "./modalFocusScope";
+import { createDesktopCloseHandler } from "./desktopClose";
+import { DesktopCloseDraftDialog } from "./DesktopCloseDraftDialog";
 import ToolRestoreShelf, { type ToolRestoreItem } from "./ToolRestoreShelf";
 import { minimizeTool, removeMinimizedTool } from "./minimizedTools";
 import AssemblyToolHost from "./AssemblyToolHost";
@@ -91,7 +95,7 @@ import { extractNetGeometry } from "./netGeometry";
 import { emptyProcessResources, ProcessResources, sampleProcessResources, systemMemoryPercent } from "./resourceMonitor";
 import { planResourceCapacity, ResourceCapacityPlan } from "./resourceCapacity";
 import { assemblyAdmissionParams, assemblyAnalysisScope, requireAdmittedAssembly, requireSupportedAssemblyPhysics, type AssemblyAnalysisScope, type AssemblyWorkload } from "./assemblyAdmission";
-import { cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
+import { acknowledgeDesktopClose, cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
 import { emptyTopology, extractTopologyFromBoard, PowerTreeAnalysisPlan, TopologyDomain, TopologyModel, TopologyNode } from "./powerTree";
 import { compilePiPaths, compilePiSeriesSolveHandoff, PiPathTerminalAnchor } from "./piPath";
 import { attachPiPathComponentBridges, combinePiPathPreflights, combinePiPathSegmentExtractions, createPiPathSegmentExtractionRequests, PiPathAnalysisRequest } from "./piPathCircuit";
@@ -846,13 +850,6 @@ function ActivityConsole({ entries, onClear }: { entries: ActivityEntry[]; onCle
     </div>
   </div>;
 }
-function MenuButton({ label, open, onClick, children }: { label: string; open: boolean; onClick: () => void; children: React.ReactNode }) {
-  return <div className="menu-entry"><button className={open ? "menu-button selected" : "menu-button"} onClick={onClick}>{label}</button>{open && <div className="menu-dropdown">{children}</div>}</div>;
-}
-function MenuItem({ icon: Icon, label, shortcut, onClick }: { icon: typeof Activity; label: string; shortcut?: string; onClick: () => void }) {
-  return <button className="menu-item" onClick={onClick}><Icon size={14} /><span>{label}</span>{shortcut && <small>{shortcut}</small>}</button>;
-}
-
 function DiagnosticItem({ issue, onHelp }: { issue: DiagnosticIssue; onHelp?: (code: string) => void }) {
   const code = issue.code || (issue.severity === "error" ? "SPIKE-FE-APP-E-0001" : "SPIKE-FE-APP-W-0001");
   return <div className={`diagnostic-item ${issue.severity || "warning"}`}>
@@ -1298,6 +1295,7 @@ export default function App() {
   const redoRef = useRef<ProjectSnapshot[]>([]);
   const projectDirtyRef = useRef(false);
   const allowWindowCloseRef = useRef(false);
+  const [assemblyCloseBlocked, setAssemblyCloseBlocked] = useState<AssemblyToolKind | null>(null);
   const startupProjectConsumedRef = useRef(false);
   const responsiveTierRef = useRef("");
   const activityIdRef = useRef(2);
@@ -2300,6 +2298,16 @@ export default function App() {
     setIsolatedAssemblyPartId(null);
     setAssemblySection({ ...DEFAULT_ASSEMBLY_SECTION });
   }, [projectPath]);
+  const finishDesktopClose = async () => {
+    if (allowWindowCloseRef.current) return;
+    allowWindowCloseRef.current = true;
+    setStatus("Closing SPIKE and stopping its workers...");
+    try { await closeDesktopWindow(); }
+    catch (error) {
+      allowWindowCloseRef.current = false;
+      setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}. Retry Close; your project remains open.`);
+    }
+  };
   const resolveUnsavedPrompt = async (choice: "save" | "discard" | "cancel") => {
     const pending = unsavedPrompt;
     if (!pending) return;
@@ -2308,13 +2316,7 @@ export default function App() {
     if (choice === "discard" && !pending.preserveDirtyUntilApplied) setProjectClean();
     setUnsavedPrompt(null);
     if (pending.closeWindow) {
-      allowWindowCloseRef.current = true;
-      try {
-        await closeDesktopWindow();
-      } catch (error) {
-        allowWindowCloseRef.current = false;
-        setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}`);
-      }
+      await finishDesktopClose();
       return;
     }
     await pending.action?.();
@@ -2325,19 +2327,26 @@ export default function App() {
       event.preventDefault();
       event.returnValue = "";
     };
-    window.addEventListener("beforeunload", onBeforeUnload);
+    if (!desktopShell) window.addEventListener("beforeunload", onBeforeUnload);
     let disposed = false;
     let unlisten: (() => void) | undefined;
-    if (desktopShell) void subscribeDesktopCloseRequested(preventDefault => {
-      if (disposed) return;
-      if (assemblyToolDraftOwnerRef.current) { preventDefault(); setStatus(`Save or discard the assembly ${assemblyToolDraftOwnerRef.current} tool draft before closing SPIKE.`); return; }
-      if (!projectDirtyRef.current || allowWindowCloseRef.current) return;
-      preventDefault();
-      setUnsavedPrompt({ actionLabel: "close SPIKE", action: null, closeWindow: true });
+    const handleClose = createDesktopCloseHandler({
+      isClosing: () => disposed || allowWindowCloseRef.current,
+      draftOwner: () => assemblyToolDraftOwnerRef.current,
+      isDirty: () => projectDirtyRef.current,
+      showDraft: owner => setAssemblyCloseBlocked(owner as AssemblyToolKind),
+      showUnsaved: () => setUnsavedPrompt({ actionLabel: "close SPIKE", action: null, closeWindow: true }),
+      close: () => { void finishDesktopClose(); },
+    });
+    if (desktopShell) void subscribeDesktopCloseRequested((preventDefault, generation) => {
+      // Let the host distinguish a live save/discard guard from a dead renderer.
+      void acknowledgeDesktopClose(generation).then(accepted => {
+        if (accepted && !disposed) handleClose(preventDefault);
+      }).catch(error => setStatus(`Close recovery acknowledgement failed: ${String(error)}`));
     }).then(closeListener => {
       if (disposed) closeListener();
       else unlisten = closeListener;
-    });
+    }).catch(error => setStatus(`SPIKE close protection could not start: ${String(error)}`));
     return () => { disposed = true; unlisten?.(); window.removeEventListener("beforeunload", onBeforeUnload); };
   }, [desktopShell]);
   const loadComparisonBaseline = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -2875,6 +2884,7 @@ export default function App() {
   }, [resultRecords.length]);
   useEffect(() => {
     const openSearch = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.isComposing || event.altKey || ownsKeyboardInput(event.target)) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setMenu(null);
@@ -4702,7 +4712,7 @@ export default function App() {
     }
   })();
 
-  const universalSearchItems: UniversalSearchItem[] = [
+  const universalSearchItems: UniversalSearchItem[] = globalSearchOpen ? [
     ...tabs.map(({ name, icon }) => ({
       id: `workspace:${name}`,
       label: `${name} workspace`,
@@ -4771,7 +4781,7 @@ export default function App() {
         run: () => { showOnlyLayer(layer); openBoardManager("layers"); setStatus(`${layer} shown from universal search`); },
       })),
     ] : []),
-  ];
+  ] : [];
 
   const shellStyle = {
     "--left-panel-width": `${leftPanelWidth}px`,
@@ -4977,7 +4987,7 @@ export default function App() {
 
   return <div className={`app-shell ${bottomOpen ? "bottom-open" : "bottom-closed"} ${appSettings.ribbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} style={shellStyle}>
     <header className="topbar"><div className="brand-mark"><img src="/spike-mark.svg" alt="SPIKE" /><div><b>SPIKE</b><small>ELECTRONIC SYSTEMS INTEGRITY WORKBENCH</small></div></div><button className="project-path" onClick={() => setProjectManagerOpen(true)} title={`Open project manager: ${projectName}`}><span>Project</span><b>{projectName}</b><ChevronDown size={15} /></button><div className="top-actions"><button className={`icon-btn universal-search-trigger ${globalSearchOpen ? "active" : ""}`} title="Universal search (Ctrl+K)" aria-label="Open universal search" aria-keyshortcuts="Control+K Meta+K" aria-expanded={globalSearchOpen} onClick={() => { setMenu(null); setGlobalSearchOpen(true); }}><Search size={17} /><span>Search</span><kbd>Ctrl K</kbd></button><ViewportNotifications {...notificationProps} mode="button" /><button className="icon-btn" title="Help and user guide" onClick={() => setHelpOpen(true)}><CircleHelp size={17} /></button><button className="avatar" title={appSettings.profile.displayName} onClick={() => setPreferencesOpen(true)}>{appSettings.profile.initials}</button></div></header>
-    <nav className="menu-bar" aria-label="Application menu">
+    <MenuBar onClose={() => setMenu(null)}>
       <MenuButton label={tr("File")} open={menu === "File"} onClick={() => setMenu(menu === "File" ? null : "File")}>
         <MenuItem icon={FilePlus} label="New project" shortcut="Ctrl+N" onClick={() => { newProject(); setMenu(null); }} />
         <MenuItem icon={FileArchive} label="Project manager" onClick={() => { setProjectManagerOpen(true); setMenu(null); }} />
@@ -5002,7 +5012,7 @@ export default function App() {
         <MenuItem icon={Clipboard} label="Paste context" shortcut="Ctrl+V" onClick={() => { void pasteSelection(); setMenu(null); }} />
       </MenuButton>
       <MenuButton label={tr("View")} open={menu === "View"} onClick={() => setMenu(menu === "View" ? null : "View")}>
-        <MenuItem icon={PanelTop} label={appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon"} shortcut={shortcuts.toggleRibbon} onClick={toggleRibbonVisibility} />
+        <MenuItem icon={PanelTop} label={appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon"} shortcut={shortcuts.toggleRibbon} onClick={() => { toggleRibbonVisibility(); setMenu(null); }} />
         <MenuItem icon={Layers3} label="Layer manager" onClick={() => { openBoardManager("layers"); setMenu(null); }} />
         <MenuItem icon={Spline} label="Flex PCB manager" onClick={() => { setFlexBoardOpen(true); setMenu(null); }} />
         <MenuItem icon={Eye} label="3D board view" onClick={() => { setViewMode("3D"); setMenu(null); }} />
@@ -5048,7 +5058,7 @@ export default function App() {
         <MenuItem icon={BadgeAlert} label="Report bug" onClick={() => { setMenu(null); void openBugReport(tab).catch(() => setStatus("Could not open the bug report. Visit github.com/wayri/SPIKE-Main/issues/new")); }} />
         <MenuItem icon={CircleHelp} label="About SPIKE" onClick={() => { setAboutOpen(true); setMenu(null); }} />
       </MenuButton>
-    </nav>
+    </MenuBar>
     <>
       <CommandStrip className="ribbon-tabs" label="Analysis tools" as="nav" trailing={<button className="ribbon-tab ribbon-toggle" onClick={toggleRibbonVisibility} aria-expanded={appSettings.ribbonVisible} aria-controls="workspace-ribbon-tools" title={appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon"}><PanelTop size={16} />{appSettings.ribbonVisible ? "Minimize" : "Expand"}</button>}>{tabs.map(({ name, icon: Icon }) => <button key={name} data-guide={name === "PI" ? "pi-run" : name === "HF / SI" ? "si-setup" : name === "EM" ? "emi-setup" : name === "Thermal" ? "thermal-setup" : name === "Results" ? "results" : undefined} className={tab === name ? "ribbon-tab selected" : "ribbon-tab"} title={name === "EM" ? "Electromagnetics workspace" : undefined} onClick={() => { setTab(name); if (name === "Results") setResultVisualizerOpen(true); setStatus(`${name} workspace selected`); }}><Icon size={16} />{name}</button>)}</CommandStrip>
       {appSettings.ribbonVisible && <CommandStrip id="workspace-ribbon-tools" label="Ribbon" className={`ribbon-tools ribbon-${tab.toLowerCase().replace(/[^a-z]+/g, "-")}`}>
@@ -5486,6 +5496,7 @@ export default function App() {
     </Suspense>
     {emiDashboardOpen && tab === "EM" && !emiChamberOpen && <EmiDashboard preflight={emiPreflight} screening={emiScreening} fieldResult={emiFieldResult} onClose={() => setEmiDashboardOpen(false)} onScreen={() => void runEmiScreening()} onPrepare={() => void prepareEmiCase()} onSolverManager={() => void openExternalEngineCenter()} />}
     {acEffectsOpen && <div className="modal-backdrop"><div className="floating-panel" role="dialog" aria-modal="true" aria-label="AC power integrity effects" style={{ width: "min(1100px, 95vw)", maxHeight: "90vh", overflow: "auto" }}><button className="secondary-btn" onClick={() => setAcEffectsOpen(false)}>Close AC effects</button><button className="secondary-btn" disabled={!acEffectsResult} onClick={async () => { if (!acEffectsResult) return; const { buildAcPowerIntegrityReport } = await import("./acPowerIntegrityReport"); setReportPreview({ fileName: "ac-power-integrity.html", html: buildAcPowerIntegrityReport(projectName, acEffectsRequest, acEffectsResult) }); }}>AC report</button><ACPowerIntegrityEffects callWorker={runLocalWorker} onStatus={setStatus} initialRequest={acEffectsRequest} initialResult={acEffectsResult} onResult={(result, request) => { markProjectDirty(); setAcEffectsRequest(request); setAcEffectsResult(result); }} /></div></div>}
+    {assemblyCloseBlocked && <DesktopCloseDraftDialog owner={assemblyCloseBlocked} onCancel={() => setAssemblyCloseBlocked(null)} onReview={() => focusAssemblyToolWindow(assemblyCloseBlocked)} />}
     {unsavedPrompt && <div className="modal-backdrop unsaved-project-backdrop" role="presentation">
       <section className="modal unsaved-project-dialog" role="alertdialog" aria-modal="true" aria-labelledby="unsaved-project-title" aria-describedby="unsaved-project-description">
         <header><div><small>UNSAVED PROJECT</small><h2 id="unsaved-project-title">Save changes before you {unsavedPrompt.actionLabel}?</h2></div><AlertTriangle size={22} /></header>
@@ -5861,6 +5872,7 @@ function StackupManager({ stackup, onClose }: { stackup: ParsedStackupLayer[]; o
 }
 
 function EditableStackupManager({ stackup, copperLayers, onSave, onClose }: { stackup: ParsedStackupLayer[]; copperLayers: string[]; onSave: (rows: ParsedStackupLayer[]) => void; onClose: () => void }) {
+  useModalFocusScope(onClose, false, ".stackup-manager.editable", "Physical stackup");
   const normalizedType = (row: ParsedStackupLayer) => {
     const identity = `${row.type} ${row.name}`.toLowerCase();
     if (row.name.endsWith(".Cu") || identity.includes("copper")) return "copper";
@@ -5900,6 +5912,7 @@ function LegacyStackupManager({ onClose }: { onClose: () => void }) {
 }
 
 function ThermalWizard({ initialScenario, componentBonds, board, design, boardSource, workerAvailable, onRequireAdmission, onClose, onStatus, onPreview, onScenario }: { initialScenario: Record<string, unknown> | null; componentBonds: BondRecord[]; board: ParsedBoard | null; design: Record<string, unknown> | null; boardSource?: string | null; workerAvailable: boolean; onRequireAdmission: (workload: AssemblyWorkload) => Promise<AssemblyAnalysisScope | null>; onClose: () => void; onStatus: (value: string) => void; onPreview: (value: Record<string, unknown>) => void; onScenario: (value: Record<string, unknown>) => void }) {
+  const modal = useModalFocusScope(onClose);
   const initial = asThermalScenario(initialScenario);
   const [volume, setVolume] = useState({ x: String(initial?.bounding_volume_mm?.x ?? 160), y: String(initial?.bounding_volume_mm?.y ?? 100), z: String(initial?.bounding_volume_mm?.z ?? 60) });
   const [ambient, setAmbient] = useState(String(initial?.ambient_temperature_c ?? 25));
@@ -6112,8 +6125,8 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, boardSo
     const cancelled = await cancelLocalWorker();
     onStatus(cancelled ? "OpenFOAM cancellation requested" : "No cancellable OpenFOAM operation is active");
   };
-  return <div className="modal-shade thermal-setup-shade"><div className="floating-panel thermal-wizard">
-    <div className="floating-heading"><div><b>THERMAL SETUP</b><small>SPIKE steady-state and transient component solver</small></div><button onClick={onClose}><X size={15} /></button></div>
+  return <div className="modal-shade thermal-setup-shade"><section ref={modal.scopeRef} onKeyDown={modal.onKeyDown} tabIndex={-1} className="floating-panel thermal-wizard" role="dialog" aria-modal="true" aria-label="Thermal setup">
+    <div className="floating-heading"><div><b>THERMAL SETUP</b><small>SPIKE steady-state and transient component solver</small></div><button type="button" data-modal-initial-focus onClick={onClose} aria-label="Close thermal setup"><X size={15} /></button></div>
     <p className="wizard-intro">Run the local lumped object model for steady-state or transient part temperatures. The separate spatial board model below solves a steady rectangular board temperature grid and reports board-contact, case, and junction temperatures from explicit part heat paths. Both are approximate.</p>
     <div className="thermal-workflow"><div className="active"><b>1. Inputs</b><span>Part W, K/W and transient J/K</span></div><div className={nativeResult ? "active" : ""}><b>2. SPIKE run</b><span>{nativeResult?.status ?? "Not run"}</span></div><div className={nativeResult?.status === "completed" ? "active" : ""}><b>3. Review</b><span>{nativeResult?.model_status ?? "Approximate model"}</span></div></div>
     <WorkflowSchematic title="Thermal network schematic" diagram={thermalSchematic(scenario)} />
@@ -6153,7 +6166,7 @@ function ThermalWizard({ initialScenario, componentBonds, board, design, boardSo
     {estimate && <div className={`thermal-validation ${estimate.status === "completed" ? "valid" : "invalid"}`}><b>{estimate.status === "completed" ? "Compact estimate complete" : "Compact estimate blocked"}</b><span>{estimate.summary.max_steady_temperature_c.toFixed(1)} deg C maximum · {estimate.summary.total_power_w.toFixed(2)} W</span>{estimate.sources.map(source => <small key={source.id}>{source.id}: +{source.temperature_rise_c.toFixed(1)} deg C, {source.steady_temperature_c.toFixed(1)} deg C steady{source.time_constant_s ? `, tau ${source.time_constant_s.toFixed(1)} s` : ""}</small>)}<small>Approximate independent RC sources only; CFD, board spreading, coupling, airflow, radiation, and enclosure fields are not solved.</small></div>}
     <div className="wizard-actions thermal-actions"><button className="secondary-btn" onClick={onClose}>Close</button><button className="secondary-btn" disabled={busy !== null} onClick={() => onScenario(scenario)}>Save setup</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design || activeBoundaries.length > 0} onClick={() => void compactEstimate()}>{busy === "estimate" ? "Screening" : "Screen"}</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design || activeBoundaries.length > 0} onClick={() => void preflightCase()}>{busy === "preflight" ? "Checking" : "Preflight"}</button><button className="secondary-btn" disabled={busy !== null || !workerAvailable || !design || activeBoundaries.length > 0} onClick={() => void prepareCase()}>{busy === "prepare" ? "Preparing" : "Prepare case"}</button>{busy === "run" && <button className="secondary-btn" onClick={() => void cancelRun()}><X size={15} /> Cancel</button>}<button className="run-btn" disabled={busy !== null || !preparedCase?.can_run || activeBoundaries.length > 0} onClick={() => void runCase()}><Play size={15} /> {busy === "run" ? "Running" : "Run OpenFOAM"}</button></div>
     </details>
-  </div></div>;
+  </section></div>;
 }
 
 function PiRunDialog({ board, importedDesign, selected, analysisMode, initialWorkflow, sharedStage, onSharedStage, setup, setSetup, topology, limits, solverId, formulation, solverCatalog, probes, resources, appSettings, onRequireAdmission, onOpenPowerPaths, onOpenSpice, onDiagnosticHelp, onClose, onRunState, onResult }: {
@@ -7785,7 +7798,7 @@ function ExtensionManager({ extensions, board, gerberSource, onOpenGerber, prefe
     finally { setOptycalBusy(false); }
   };
   return <div className="modal-shade"><div className="floating-panel extension-manager">
-    <div className="floating-heading"><div><b>EXTENSION MANAGER</b><small>Applications, solvers, tools, importers, reports, and validators</small></div><button onClick={onClose}><X size={15} /></button></div>
+    <div className="floating-heading"><div><b>EXTENSION MANAGER</b><small>Applications, solvers, tools, importers, reports, and validators</small></div><button onClick={onClose} aria-label="Close extension manager"><X size={15} /></button></div>
     <div className="extension-toolbar"><button className={managerPage === "browse" ? "selected" : ""} onClick={() => setManagerPage("browse")}><PackageSearch size={13} /> Browse</button><button className={managerPage === "manage" ? "selected" : ""} onClick={() => setManagerPage("manage")}><Settings2 size={13} /> Manage</button><label><Search size={13} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search extensions" /></label><button onClick={onRefresh}><Activity size={13} /> Refresh</button></div>
     {managerPage === "browse" ? <div className="extension-browser">
       <section className="extension-browser-install"><h3>Install a local extension</h3><p>Choose a ZIP package or enter the path to an unpacked extension directory. SPIKE will inspect its manifest before installation.</p><div className="extension-browser-path"><input aria-label="Extension package path" value={packagePath} onChange={event => { setPackagePath(event.target.value); setPackagePreview(null); }} placeholder="Path to .zip, .spike-extension, or directory" /><button className="secondary-btn" onClick={() => void choosePackage()} disabled={packageBusy}><FolderOpen size={14} /> Choose package</button><button className="secondary-btn" onClick={() => void inspectPackage(packagePath)} disabled={packageBusy || !packagePath.trim()}><Search size={14} /> Inspect</button></div>
@@ -7838,7 +7851,7 @@ function ShortcutWindow({ shortcuts, onAssign, onReset, onClose }: { shortcuts: 
     setCapturing(null);
   };
   return <div className="modal-shade" onKeyDown={onKeyDown}><div className="floating-panel shortcut-modal">
-    <div className="floating-heading"><b>KEYBOARD SHORTCUTS</b><button onClick={onClose}><X size={15} /></button></div>
+    <div className="floating-heading"><b>KEYBOARD SHORTCUTS</b><button onClick={onClose} aria-label="Close keyboard shortcuts"><X size={15} /></button></div>
     <div className="shortcut-list">
       {shortcutGroups.map(group => <section className="shortcut-group" key={group.label}><h3>{group.label}</h3>{group.actions.map(action => <div className="shortcut-row" key={action}><span>{shortcutLabels[action]}</span><button className={capturing === action ? "capturing" : ""} onClick={() => setCapturing(action)} autoFocus={capturing === action}>{capturing === action ? "Press key" : <kbd>{shortcuts[action]}</kbd>}</button></div>)}</section>)}
       <section className="shortcut-group shortcut-fixed"><h3>Editing and files</h3>{fixedShortcuts.map(item => <div className="shortcut-row" key={item.key}><span>{item.label}</span><kbd>{item.key}</kbd></div>)}</section>

@@ -1,6 +1,7 @@
 import { AlertTriangle, CheckCircle2, Gauge, Play, X, XCircle } from "./icons";
 import { useState } from "react";
 import { runLocalWorker } from "./workerBridge";
+import { useModalFocusScope } from "./modalFocusScope";
 
 type BenchmarkRow = { name: string; status: string; measured: number | null; expected: number | null; relative_error: number | null; tolerance: number | null; units: string; detail: string };
 type BenchmarkReport = { contract: string; status: string; summary: { total: number; passed: number; failed: number; skipped: number }; benchmarks: BenchmarkRow[]; limitations: string[] };
@@ -8,6 +9,7 @@ type BenchmarkReport = { contract: string; status: string; summary: { total: num
 export default function BenchmarkCenter({ onClose, onStatus }: { onClose: () => void; onStatus: (message: string) => void }) {
   const [report, setReport] = useState<BenchmarkReport | null>(null);
   const [running, setRunning] = useState(false);
+  const modal = useModalFocusScope(onClose, running);
   const run = async () => {
     setRunning(true);
     onStatus("Running the local solver verification corpus");
@@ -21,8 +23,8 @@ export default function BenchmarkCenter({ onClose, onStatus }: { onClose: () => 
       onStatus(error instanceof Error ? error.message : "Solver verification failed");
     } finally { setRunning(false); }
   };
-  return <div className="modal-shade" role="dialog" aria-modal="true" aria-label="Solver verification"><section className="benchmark-center">
-    <header><div><Gauge size={18} /><span><b>Solver verification</b><small>Deterministic analytical, topology, convergence, and native-kernel checks</small></span></div><button className="canvas-icon" onClick={onClose}><X size={16} /></button></header>
+  return <div className="modal-shade"><section ref={modal.scopeRef} onKeyDown={modal.onKeyDown} tabIndex={-1} className="benchmark-center" role="dialog" aria-modal="true" aria-label="Solver verification">
+    <header><div><Gauge size={18} /><span><b>Solver verification</b><small>Deterministic analytical, topology, convergence, and native-kernel checks</small></span></div><button type="button" data-modal-initial-focus className="canvas-icon" disabled={running} onClick={onClose} aria-label="Close solver verification"><X size={16} /></button></header>
     <div className="validation-gates">
       <Gate status={report?.status === "passed" ? "pass" : "pending"} title="Analytical and convergence corpus" detail={report ? `${report.summary.passed} passed · ${report.summary.failed} failed · ${report.summary.skipped} skipped` : "Run on this installed runtime"} />
       <Gate status="pending" title="Independent trusted-solver correlation" detail="Required before arbitrary-board sign-off claims" />

@@ -59,13 +59,13 @@ function mountWizard(initialScenario, workerAvailable = true) {
       if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
       return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
     },
-    useMemo: callback => callback(), useEffect() {}, asThermalScenario: value => value,
+    useMemo: callback => callback(), useEffect() {}, useModalFocusScope: () => ({ scopeRef: { current: null }, onKeyDown() {} }), asThermalScenario: value => value,
     normalizeThermalElements: value => value ?? [], normalizeThermalLinks: value => value ?? [], normalizeThermalBoundaries, nativeThermalInputs,
     normalizeThermalFans: value => value ?? [], normalizeThermalHeatsinks: value => value ?? [],
     thermalAssemblyIssues: () => [], screenThermalElements: () => [], thermalSchematic: () => ({}),
     thermalMaterials: [], thermalSurfaceFinishes: [], WorkflowSchematic: emptyComponent,
     ThermalInputImport: emptyComponent, ThermalAssemblyEditor: emptyComponent, ThermalBoundaryEditor: emptyComponent, ThermalHardwareEditor: emptyComponent, ThermalEnvironmentPanel: emptyComponent, BoardThermalPanel: emptyComponent,
-    ThermalTransientOverlay: emptyComponent,
+    ThermalTransientOverlay: emptyComponent, DataTable: ({ children }) => children,
     X: emptyComponent, Play: emptyComponent, AlertTriangle: emptyComponent,
     async runLocalWorker(value) {
       request = value;
@@ -130,7 +130,7 @@ boundaryEditor.props.onBoundaries(boundaryEditor.props.boundaries.map(item => it
 assert.match(renderToStaticMarkup(coupledReopened.render()), /Inputs changed/);
 const editorModule = { exports: {} };
 const editorCode = ts.transpileModule(readFileSync(resolve(appRoot, "src", "ThermalBoundaryEditor.tsx"), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX } }).outputText;
-new Function("require", "module", "exports", editorCode)(name => name === "react" ? { useState: initial => [initial, () => {}] } : name === "./thermalBoundaries" ? boundaryModule.exports : name === "lucide-react" ? { Plus: emptyComponent, Trash2: emptyComponent } : require(name), editorModule, editorModule.exports);
+new Function("require", "module", "exports", editorCode)(name => name === "react" ? { useState: initial => [initial, () => {}] } : name === "./thermalBoundaries" ? boundaryModule.exports : ["./icons", "lucide-react"].includes(name) ? { Plus: emptyComponent, Trash2: emptyComponent } : require(name), editorModule, editorModule.exports);
 const Editor = editorModule.exports.default;
 const boardObject = { id: "board", reference: "BOARD", kind: "board", enabled: true, emissivity: 0.8, dimensions_mm: { x: 10, y: 20, z: 2 } };
 let editedBoundaries = [];

@@ -12,6 +12,7 @@ use std::time::{Duration, Instant};
 use sysinfo::{get_current_pid, Pid, ProcessRefreshKind, ProcessesToUpdate, System};
 use tauri::Manager;
 
+mod desktop_lifecycle;
 mod extension_artifacts;
 mod gpu_metrics;
 mod mcp_bridge;
@@ -117,7 +118,7 @@ struct ResidentWorker {
 impl Drop for ResidentWorker {
     fn drop(&mut self) {
         terminate_worker_tree(&mut self.child);
-        let _ = self.child.wait();
+        let _ = desktop_lifecycle::wait_for_child(&mut self.child, Duration::from_millis(250));
     }
 }
 
@@ -1452,10 +1453,12 @@ fn run_resident_worker_request(
     state: &Arc<Mutex<Option<ResidentWorker>>>,
     request: serde_json::Value,
     cancellation: Option<Arc<AtomicBool>>,
+    lifecycle: &desktop_lifecycle::Lifecycle,
 ) -> Result<serde_json::Value, String> {
-    if cancellation
-        .as_ref()
-        .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing()
+        || cancellation
+            .as_ref()
+            .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         return Err("SPIKE worker operation was cancelled".to_string());
     }
@@ -1472,11 +1475,16 @@ fn run_resident_worker_request(
         .lock()
         .map_err(|_| "Resident SPIKE worker state is unavailable".to_string())?;
     if resident.is_none() {
+        // A queued request may acquire this mutex after close was committed.
+        if lifecycle.is_closing() {
+            return Err("SPIKE worker operation was cancelled".to_string());
+        }
         *resident = Some(spawn_resident_worker(workspace)?);
     }
-    if cancellation
-        .as_ref()
-        .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing()
+        || cancellation
+            .as_ref()
+            .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         *resident = None;
         return Err("SPIKE worker operation was cancelled".to_string());
@@ -1504,9 +1512,10 @@ fn run_resident_worker_request(
     let write_receiver = write_stdin_async(stdin, input);
     let mut write_pending = true;
     let line = loop {
-        if cancellation
-            .as_ref()
-            .is_some_and(|flag| flag.load(Ordering::SeqCst))
+        if lifecycle.is_closing()
+            || cancellation
+                .as_ref()
+                .is_some_and(|flag| flag.load(Ordering::SeqCst))
         {
             *resident = None;
             return Err("SPIKE worker operation was cancelled".to_string());
@@ -1589,6 +1598,10 @@ fn run_resident_worker_request(
 }
 
 fn terminate_worker_tree(child: &mut Child) {
+    // Never target a PID after this child has already been observed/reaped.
+    if matches!(child.try_wait(), Ok(Some(_))) {
+        return;
+    }
     #[cfg(target_os = "windows")]
     {
         // Preserve descendant cleanup without allowing taskkill itself to make
@@ -1609,7 +1622,10 @@ fn terminate_worker_tree(child: &mut Child) {
                     }
                     _ => {
                         let _ = killer.kill();
-                        let _ = killer.wait();
+                        let _ = desktop_lifecycle::wait_for_child(
+                            &mut killer,
+                            Duration::from_millis(100),
+                        );
                         break;
                     }
                 }
@@ -1623,12 +1639,14 @@ fn run_worker_process(
     app: tauri::AppHandle,
     request: serde_json::Value,
     cancellation: Option<Arc<AtomicBool>>,
+    lifecycle: &desktop_lifecycle::Lifecycle,
 ) -> Result<serde_json::Value, String> {
     // Stop pressed during capability checks / blocking-task scheduling must not
     // start a process that the user has already cancelled.
-    if cancellation
-        .as_ref()
-        .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing()
+        || cancellation
+            .as_ref()
+            .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         return Err("SPIKE worker operation was cancelled".to_string());
     }
@@ -1640,13 +1658,17 @@ fn run_worker_process(
     if input.len() > MAX_WORKER_REQUEST_BYTES {
         return Err("SPIKE worker request exceeds the 256 MiB safety limit".to_string());
     }
+    if lifecycle.is_closing() {
+        return Err("SPIKE worker operation was cancelled".to_string());
+    }
     let mut child = spawn_worker_process(&workspace)?;
-    if cancellation
-        .as_ref()
-        .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing()
+        || cancellation
+            .as_ref()
+            .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         terminate_worker_tree(&mut child);
-        let _ = child.wait();
+        let _ = desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
         return Err("SPIKE worker operation was cancelled".to_string());
     }
     let stdout = child.stdout.take().ok_or("Worker stdout is unavailable")?;
@@ -1665,12 +1687,14 @@ fn run_worker_process(
                 Ok((_stdin, Ok(()))) => write_pending = false,
                 Ok((_stdin, Err(error))) => {
                     terminate_worker_tree(&mut child);
-                    let _ = child.wait();
+                    let _ =
+                        desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
                     return Err(format!("Unable to write SPIKE worker request: {error}"));
                 }
                 Err(mpsc::TryRecvError::Disconnected) => {
                     terminate_worker_tree(&mut child);
-                    let _ = child.wait();
+                    let _ =
+                        desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
                     return Err("SPIKE worker stdin writer stopped unexpectedly".to_string());
                 }
                 Err(mpsc::TryRecvError::Empty) => {}
@@ -1678,17 +1702,20 @@ fn run_worker_process(
         }
         match child.try_wait().map_err(|error| error.to_string())? {
             Some(status) => break (status, false),
-            None if cancellation
-                .as_ref()
-                .is_some_and(|flag| flag.load(Ordering::SeqCst)) =>
+            None if lifecycle.is_closing()
+                || cancellation
+                    .as_ref()
+                    .is_some_and(|flag| flag.load(Ordering::SeqCst)) =>
             {
                 terminate_worker_tree(&mut child);
-                let _ = child.wait();
+                let _ = desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
                 return Err("SPIKE worker operation was cancelled".to_string());
             }
             None if started.elapsed() >= timeout => {
                 terminate_worker_tree(&mut child);
-                let status = child.wait().map_err(|error| error.to_string())?;
+                let status =
+                    desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250))
+                        .ok_or("SPIKE worker did not terminate after its watchdog")?;
                 break (status, true);
             }
             None => thread::sleep(Duration::from_millis(50)),
@@ -1730,18 +1757,28 @@ async fn run_worker(
     request: serde_json::Value,
     state: tauri::State<'_, WorkerExecutionState>,
     resident: tauri::State<'_, ResidentWorkerState>,
+    lifecycle: tauri::State<'_, desktop_lifecycle::Lifecycle>,
 ) -> Result<serde_json::Value, String> {
+    let request_guard = lifecycle.enter()?;
+    let lifecycle = lifecycle.inner().clone();
     let guard = claim_heavy_worker(state.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
     let resident_state = resident.0.clone();
     let use_resident = is_resident_worker_method(worker_method(&request));
     tauri::async_runtime::spawn_blocking(move || {
+        let _request_guard = request_guard;
         let _guard = guard;
         if use_resident {
             let workspace = resolve_worker_root(&app)?;
-            run_resident_worker_request(&workspace, &resident_state, request, cancellation)
+            run_resident_worker_request(
+                &workspace,
+                &resident_state,
+                request,
+                cancellation,
+                &lifecycle,
+            )
         } else {
-            run_worker_process(app, request, cancellation)
+            run_worker_process(app, request, cancellation, &lifecycle)
         }
     })
     .await
@@ -1755,7 +1792,10 @@ async fn run_project_worker(
     files: tauri::State<'_, ApprovedFileState>,
     workers: tauri::State<'_, WorkerExecutionState>,
     trust: tauri::State<'_, project_trust_binding::ProjectManifestState>,
+    lifecycle: tauri::State<'_, desktop_lifecycle::Lifecycle>,
 ) -> Result<serde_json::Value, String> {
+    let request_guard = lifecycle.enter()?;
+    let lifecycle = lifecycle.inner().clone();
     let method = worker_method(&request).to_string();
     let requested_paths = project_worker_paths(&request)?;
     let all_approved = {
@@ -1779,8 +1819,9 @@ async fn run_project_worker(
     let guard = claim_heavy_worker(workers.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
     let response = tauri::async_runtime::spawn_blocking(move || {
+        let _request_guard = request_guard;
         let _guard = guard;
-        run_worker_process(app, request, cancellation)
+        run_worker_process(app, request, cancellation, &lifecycle)
     })
     .await
     .map_err(|error| format!("SPIKE project worker task failed: {error}"))??;
@@ -1807,6 +1848,16 @@ pub fn run() {
     let pending_project = startup_project.map(|(_, selected)| selected);
     tauri::Builder::default()
         .on_page_load(|webview, _| webview_policy::apply(webview))
+        .on_window_event(|window, event| {
+            if window.label() == "main" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    // Also protect startup and a crashed renderer without a JS listener.
+                    // Tauri still delivers its standard close event to any listeners.
+                    api.prevent_close();
+                    desktop_lifecycle::on_main_close_requested(window);
+                }
+            }
+        })
         .plugin(tauri_plugin_opener::init())
         .manage(ResourceState(Mutex::new(ResourceSampler {
             system: System::new(),
@@ -1815,6 +1866,7 @@ pub fn run() {
         })))
         .manage(ApprovedFileState(Mutex::new(approved_paths)))
         .manage(PendingOpenState(Mutex::new(pending_project)))
+        .manage(desktop_lifecycle::Lifecycle::default())
         .manage(WorkerExecutionState(Arc::new(Mutex::new(None))))
         .manage(ResidentWorkerState(Arc::new(Mutex::new(None))))
         .manage(project_trust_binding::ProjectManifestState::new())
@@ -1824,6 +1876,8 @@ pub fn run() {
             mcp_bridge::mcp_bridge_stop,
             mcp_bridge::mcp_bridge_status,
             mcp_bridge::mcp_bridge_respond,
+            desktop_lifecycle::close_desktop_app,
+            desktop_lifecycle::acknowledge_desktop_close,
             run_worker,
             run_project_worker,
             worker_status,
@@ -1847,8 +1901,13 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building SPIKE desktop application")
         .run(|app, event| {
-            if matches!(event, tauri::RunEvent::Exit) {
-                app.state::<mcp_bridge::BridgeState>().stop();
+            if let tauri::RunEvent::ExitRequested { api, .. } = event {
+                // Cover OS/runtime exit as well as the renderer's committed close.
+                // Reissue the request only after bounded off-thread cleanup.
+                if !app.state::<desktop_lifecycle::Lifecycle>().exit_ready() {
+                    api.prevent_exit();
+                    desktop_lifecycle::begin_shutdown(app.clone());
+                }
             }
         });
 }
@@ -2139,7 +2198,7 @@ mod tests {
         let writer = write_stdin_async(stdin, "x".repeat(16 * 1024 * 1024));
         thread::sleep(Duration::from_millis(50));
         terminate_worker_tree(&mut child);
-        let _ = child.wait();
+        let _ = desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
         assert!(writer.recv_timeout(Duration::from_secs(2)).is_ok());
     }
 
@@ -2227,7 +2286,10 @@ mod tests {
             "params": { "project_path": "fixture.spike" }
         });
         assert_eq!(project_worker_paths(&assembly_structure).unwrap().len(), 1);
-        for method in ["read_assembly_field_study_in_project", "save_assembly_field_study_in_project"] {
+        for method in [
+            "read_assembly_field_study_in_project",
+            "save_assembly_field_study_in_project",
+        ] {
             let request = json!({"method": method, "params": {"project_path": "fixture.spike"}});
             assert_eq!(project_worker_paths(&request).unwrap().len(), 1);
             assert!(is_heavy_worker_method(method));
@@ -2319,6 +2381,7 @@ mod tests {
                 }
             }),
             None,
+            &desktop_lifecycle::Lifecycle::default(),
         )
         .expect("create resident session");
         assert_eq!(created["ok"], true);
@@ -2348,6 +2411,7 @@ mod tests {
                 }
             }),
             None,
+            &desktop_lifecycle::Lifecycle::default(),
         )
         .expect("step resident session");
         assert_eq!(stepped["ok"], true);
@@ -2370,6 +2434,7 @@ mod tests {
                 "params": {"session_id": session_id}
             }),
             None,
+            &desktop_lifecycle::Lifecycle::default(),
         )
         .expect("checkpoint resident session");
         let checkpoint_id = checkpointed["result"]["checkpoint_id"]
@@ -2389,6 +2454,7 @@ mod tests {
                 }
             }),
             None,
+            &desktop_lifecycle::Lifecycle::default(),
         )
         .expect("perturb resident session");
         let restored = run_resident_worker_request(
@@ -2403,6 +2469,7 @@ mod tests {
                 }
             }),
             None,
+            &desktop_lifecycle::Lifecycle::default(),
         )
         .expect("restore resident session");
         assert_eq!(
@@ -2421,6 +2488,7 @@ mod tests {
                 "params": {"session_id": session_id}
             }),
             None,
+            &desktop_lifecycle::Lifecycle::default(),
         )
         .expect("close resident session");
         assert_eq!(closed["result"]["status"], "closed");

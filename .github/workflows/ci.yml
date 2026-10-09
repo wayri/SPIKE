@@ -45,28 +45,4 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm run test:parser
-          npm run test:tetra-mesh-panel
-          npm run test:em-viewport
-          npm run test:mcp-analysis
-          npm run test:assembly-layout
-          npm run test:assembly-structure-studies
-          npm run test:large-scene
-          node scripts/test-viewport-layer-visibility.mjs
-          npm run test:assembly-board-managers
-          npm run test:assembly-tools
-          npm run test:assembly-workspace
-          npm run test:assembly-handling
-          npm run test:assembly-field-study
-          npm run test:project-snapshot
-          npm run test:python-workspace
-          npm run test:emerge
-          npm run test:button-standard
-          npm run test:viewport
-          npm run test:harness-visualization
-          node scripts/test-viewport-section.mjs
-          node scripts/test-viewport-occurrence-culling.mjs
-          node scripts/test-thermal-assembly-frame.mjs
-          node scripts/test-board-thermal-viewport.mjs
-          node scripts/test-board-thermal-viewport-probe.mjs
-          npm run test:emi-chamber
+          npm run test:ui-stability

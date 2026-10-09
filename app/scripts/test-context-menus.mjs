@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
 
 async function module(name) {
   const source = readFileSync(new URL(`../src/${name}.ts`, import.meta.url), "utf8");
@@ -17,8 +16,8 @@ const draft = context.contextScript({ kind: "selection", title: dangerous, paylo
 assert.equal(draft.id, "ticket-1"); assert.ok(draft.name.endsWith(".py")); assert.equal(context.admitContextScript(draft)?.code, draft.code);
 assert.equal(context.admitContextScript({ id: "a", name: "unsafe.txt", code: "" }), null);
 assert.throws(() => context.contextScript({ kind: "selection", title: "large", payload: "a".repeat(context.MAX_CONTEXT_BYTES) }, "id"), /no samples were truncated/);
-const python = process.platform === "win32" ? new URL("../../.venv/Scripts/python.exe", import.meta.url) : new URL("../../.venv/bin/python", import.meta.url);
-const checked = spawnSync(fileURLToPath(python), ["-X", "utf8", "-c", "import sys,json,contextlib,io\nfrom types import SimpleNamespace\nsink=io.StringIO()\nwith contextlib.redirect_stdout(sink): exec(compile(sys.stdin.read(), '<context-draft>', 'exec'), {'spike':SimpleNamespace(design=None,results=None)})\nprint(sink.getvalue())"], { input: draft.code, encoding: "utf8" });
+const python = process.env.PYTHON ?? (process.platform === "win32" ? "python" : "python3");
+const checked = spawnSync(python, ["-X", "utf8", "-c", "import sys,json,contextlib,io\nfrom types import SimpleNamespace\nsink=io.StringIO()\nwith contextlib.redirect_stdout(sink): exec(compile(sys.stdin.read(), '<context-draft>', 'exec'), {'spike':SimpleNamespace(design=None,results=None)})\nprint(sink.getvalue())"], { input: draft.code, encoding: "utf8" });
 assert.equal(checked.status, 0, checked.stderr); assert.deepEqual(JSON.parse(checked.stdout), { kind: "selection", title: dangerous, payload });
 const trace = Object.freeze({ type: "scatter", name: "S11", x: Object.freeze([1e9, 2e9]), y: Object.freeze([-10, null]) });
 const snapshot = context.plotScriptContext([trace], { xaxis: { title: "Frequency [Hz]" }, yaxis: { title: "S11 [dB]" } }, "result-3");

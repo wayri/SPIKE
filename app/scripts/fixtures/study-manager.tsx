@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import "../../src/buttonStandard.css";
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import StudyManager from "../../src/StudyManager";

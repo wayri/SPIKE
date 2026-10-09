@@ -2,9 +2,9 @@
 
 # SPIKE - PCB Simulation for KiCad
 
-[![Latest release: v0.3.9](https://img.shields.io/badge/latest_release-v0.3.9-blue)](https://github.com/wayri/SPIKE/releases/tag/v0.3.9)
-[![Community preview](https://img.shields.io/badge/status-early_community_preview-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.9)
-[![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.9/SPIKE_0.3.9_x64-setup.exe)
+[![Latest release: v0.3.10](https://img.shields.io/badge/latest_release-v0.3.10-blue)](https://github.com/wayri/SPIKE/releases/tag/v0.3.10)
+[![Community preview](https://img.shields.io/badge/status-early_community_preview-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.10)
+[![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.10/SPIKE_0.3.10_x64-setup.exe)
 [![Linux Flatpak download](https://img.shields.io/badge/download-Linux_Flatpak-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak)
 [![macOS download](https://img.shields.io/badge/download-macOS_DMG-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.5)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)](LICENSE)
@@ -23,16 +23,16 @@ board viewport. Optional **[EMerge](https://github.com/FennisRobert/EMerge)** an
 **[openEMS](https://openems.de/)** extensions add electromagnetic
 simulation workflows.
 
-SPIKE runs locally and includes a command-line interface. Version 0.3.9 is an
+SPIKE runs locally and includes a command-line interface. Version 0.3.10 is an
 early community preview for Windows x64. Its installer is unsigned. The
 experimental Linux Flatpak and Apple Silicon macOS DMG remain available in
 [version 0.3.5](https://github.com/wayri/SPIKE/releases/tag/v0.3.5). Intel macOS
 remains held pending completion of its platform checks.
 
-[Windows downloads and release notes](https://github.com/wayri/SPIKE/releases/tag/v0.3.9)
-· [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
-· [User guides](docs/README.md)
-· [Build from source](docs/DEVELOPER_GUIDE.md)
+[Windows downloads and release notes](https://github.com/wayri/SPIKE/releases/tag/v0.3.10)
+Ã‚Â| [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
+Ã‚Â| [User guides](docs/README.md)
+Ã‚Â| [Build from source](docs/DEVELOPER_GUIDE.md)
 
 See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md).
 

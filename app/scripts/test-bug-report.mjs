@@ -4,8 +4,8 @@ import { readFileSync } from "node:fs";
 import ts from "typescript";
 
 const options = { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 };
-const version = ts.transpileModule(readFileSync(new URL("../src/appVersion.ts", import.meta.url), "utf8"), { compilerOptions: options }).outputText;
-const versionUrl = `data:text/javascript;base64,${Buffer.from(version).toString("base64")}`;
+const packageVersion = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
+const versionUrl = `data:text/javascript;base64,${Buffer.from(`export const APP_VERSION = ${JSON.stringify(packageVersion)}; export const RELEASE_CHANNEL = "engineering-preview";`).toString("base64")}`;
 const { APP_VERSION } = await import(versionUrl);
 const source = ts.transpileModule(readFileSync(new URL("../src/bugReport.ts", import.meta.url), "utf8"), { compilerOptions: options }).outputText;
 const moduleUrl = `data:text/javascript;base64,${Buffer.from(source.replace('from "./appVersion";', `from "${versionUrl}";`)).toString("base64")}`;

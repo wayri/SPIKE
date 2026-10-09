@@ -35,8 +35,11 @@ const bounded=annotate(many,{...view,maxX:510,maxY:510},{},'All',null,false,[]);
 assert.match(source,/return layoutFeatureAnnotations\(board/);assert.match(source,/data-pin-one-count=/);
 console.log('Actual2D annotation function: pad numbers/nets, trace/zone labels, pin1/A1, visible-layer/isolated-net filters, zoom, collisions and600text budget passed');
 const numeric=await readFile(new URL('../src/numericRange.ts',import.meta.url),'utf8');
-const parser=(await readFile(new URL('../src/boardParser.ts',import.meta.url),'utf8')).replace('import { numericExtent } from "./numericRange";','');
-const {parseKicadBoard}=await load(numeric+'\n'+parser);
+const parser=(await readFile(new URL('../src/boardParser.ts',import.meta.url),'utf8'))
+ .replace('import { numericExtent } from "./numericRange";','')
+ .replace('import { parseKikakukaBends } from "./kikakukaFlex";','');
+const kikakuka=await readFile(new URL('../src/kikakukaFlex.ts',import.meta.url),'utf8');
+const {parseKicadBoard}=await load(numeric+'\n'+kikakuka+'\n'+parser);
 for(const path of process.argv.slice(2)){
  const real=parseKicadBoard(await readFile(path,'utf8'));
  const padIds=new Set();let repeatedPadIds=0;
