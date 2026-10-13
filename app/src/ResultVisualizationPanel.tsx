@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import DataTable from "./DataTable";
+import SourceCapacityResults from "./SourceCapacityResults";
 import SavedAssemblyResults from "./SavedAssemblyResults";
 import type { AssemblyIr } from "./mcadAssembly";
 import PlotlyChart from "./PlotlyChart";
-import { Activity, AlertTriangle, Download, Eye, EyeOff, Grid3X3, Layers3, Pause, Play, RadioTower, SlidersHorizontal, Waves, X } from "./icons";
+import { Activity, AlertTriangle, Eye, EyeOff, Grid3X3, Layers3, Play, RadioTower, SlidersHorizontal, Waves, X } from "./icons";
 import type { ParsedBoard } from "./boardParser";
 import { previewViewportTarget } from "./BoardViewport";
 import {
@@ -17,6 +18,8 @@ import PiPdnReview from "./PiPdnReview";
 import { viaStressMapSvg } from "./viaStressMap";
 import { resultDatumLayers, resultLayerMatchesSelection } from "./resultLayerSelection";
 import { numericExtent } from "./numericRange";
+import SavedFramePlaybackControls from "./SavedFramePlaybackControls";
+import type { AnimationExportRequest } from "./animationExport";
 
 const modes: { id: ResultViewMode; label: string; icon: typeof Activity }[] = [
   { id: "geometry", label: "Geometry", icon: Eye },
@@ -51,7 +54,7 @@ type Props = {
   onRunParasitics: (viaModel: ViaModel) => void;
   onRunRisk: (victims: string[], aggressors: string[]) => void;
   onRunPdn: (targetOhm: number, candidate: PdnCandidateRequest) => void;
-  onExportAnimation: () => void;
+  onExportAnimation: (request: AnimationExportRequest, signal: AbortSignal) => Promise<void> | void;
   onClose: () => void;
   onDetach?: () => void;
   onTracePlots?: () => void;
@@ -198,7 +201,6 @@ export default function ResultVisualizationPanel({
     : result.status === "preview" ? `${result.mode.toUpperCase()} mesh preview / not solved`
       : `${result.mode.toUpperCase()} / ${result.model_status}`;
   const frameCount = sourceResult?.time_series.frames.length ?? 0;
-  const activeTime = sourceResult?.time_series.frames[visualization.animationFrame]?.time_s;
   const transientSummary = sourceResult?.summary ?? {};
   const engineeringAnalytics = buildResultEngineeringAnalytics(result?.status === "preview" ? null : result, densityLimitAMm2, {
     ambientTemperatureC: visualization.fusingAmbientC,
@@ -248,6 +250,7 @@ export default function ResultVisualizationPanel({
         })}
       </nav>
       <main>
+        {domain === "pi" && result && <SourceCapacityResults status={result.summary.source_capacity_status} rows={result.source_current_results ?? []} />}
         {coupledAssembly && <SavedAssemblyResults assembly={coupledAssembly} manifestDigest={projectManifestDigest ?? null} />}
         <div className="result-toolbar">
           <button className={visualization.visible ? "selected" : ""} disabled={domain === "si" && visualization.mode === "impedance"} onClick={() => update({ visible: !visualization.visible })}>
@@ -295,18 +298,20 @@ export default function ResultVisualizationPanel({
             title={`Toggle ${layer} solver samples while preserving physical layer height`}
           >{layer}</button>)}
         </div>}
-        <div className="result-animation-bar">
-          <button disabled={frameCount < 2} onClick={() => update({ animationPlaying: !visualization.animationPlaying })}>
-            {visualization.animationPlaying ? <Pause size={14} /> : <Play size={14} />} {visualization.animationPlaying ? "Pause" : "Animate"}
-          </button>
-          <input aria-label="Animation frame" type="range" min="0" max={Math.max(0, frameCount - 1)} value={Math.min(visualization.animationFrame, Math.max(0, frameCount - 1))} disabled={frameCount < 2} onChange={event => update({ animationPlaying: false, animationFrame: Number(event.target.value) })} />
-          <span>{frameCount ? `Frame ${visualization.animationFrame + 1}/${frameCount}${activeTime === undefined ? "" : ` / ${activeTime.toPrecision(6)} s`}` : "Static result"}</span>
-          <label>FPS <input type="number" min="1" max="30" value={visualization.animationFps} onChange={event => update({ animationFps: Math.max(1, Math.min(30, Number(event.target.value) || 1)) })} /></label>
-          <button disabled={frameCount < 2} onClick={onExportAnimation}><Download size={14} /> Export GIF</button>
-          {frameCount > 0 && <span className="transient-resource-readout" title="Solver workspace is a deterministic allocation total; peak is a conservative pre-solve estimate.">
-            Stored {bytes(transientSummary.stored_transient_numeric_bytes)} / arrays {bytes(transientSummary.actual_dense_array_bytes)} / peak estimate {bytes(transientSummary.estimated_peak_worker_bytes)} / {Number(transientSummary.solve_wall_time_s ?? 0).toPrecision(4)} s
-          </span>}
-        </div>
+        <SavedFramePlaybackControls
+          timesS={sourceResult?.time_series.frames.map(frame => frame.time_s) ?? []}
+          frameIndex={visualization.animationFrame}
+          playing={visualization.animationPlaying}
+          playbackSpeed={Number.isFinite(visualization.animationPlaybackSpeed) && visualization.animationPlaybackSpeed > 0 ? visualization.animationPlaybackSpeed : 1}
+          managedPlayback
+          onFrame={animationFrame => update({ animationFrame })}
+          onPlaying={animationPlaying => update({ animationPlaying })}
+          onPlaybackSpeed={animationPlaybackSpeed => update({ animationPlaybackSpeed })}
+          onExport={onExportAnimation}
+        />
+        {frameCount > 0 && <div className="result-animation-resources transient-resource-readout" title="Solver workspace is a deterministic allocation total; peak is a conservative pre-solve estimate.">
+          Stored {bytes(transientSummary.stored_transient_numeric_bytes)} / arrays {bytes(transientSummary.actual_dense_array_bytes)} / peak estimate {bytes(transientSummary.estimated_peak_worker_bytes)} / {Number(transientSummary.solve_wall_time_s ?? 0).toPrecision(4)} s
+        </div>}
         <section className="result-overlay-notice">
           <Eye size={14} /><div><b>{visualization.mode === "impedance" ? domain === "pi" ? "OPERATING-POINT V/I OVERLAY" : "FREQUENCY-DOMAIN R/L/C/G NETWORK" : "LIVE BOARD OVERLAY"}</b><span>{visualization.mode === "impedance" ? domain === "pi" ? "Each solved conductor sample is |Vlocal / Ibranch| in ohms. This DC operating-point ratio is spatially rendered and is not broadband Z(f)." : "The SI/HF view reports extracted resistance, partial inductance, capacitance, conductance, and the port-defined Z(f) sweep. It is not inferred from DC color fields." : "The selected view is rendered in the 2D/3D board viewport beside this panel. Close this panel for the full canvas."}</span></div>
         </section>

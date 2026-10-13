@@ -62,6 +62,17 @@ const suggestedSuiteSignal = (nets: readonly NamedRecord[], suite?: Props["suite
 type NamedRecord = Record<string, unknown> & { id: string; name: string };
 type SiResult = Record<string, unknown>;
 
+type EyeMask = {
+  schema: "spike/si-eye-mask/v1";
+  id: string;
+  name: string;
+  protocol: string;
+  revision: string;
+  source: { locator: string; clause: string };
+  voltage_unit: "V" | "normalized";
+  polygons: number[][][];
+};
+
 const record = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const records = (value: unknown): Record<string, unknown>[] => Array.isArray(value) ? value.filter(item => item && typeof item === "object" && !Array.isArray(item)) as Record<string, unknown>[] : [];
 const namedRecords = (value: unknown): NamedRecord[] => records(value).flatMap(item => {
@@ -70,6 +81,18 @@ const namedRecords = (value: unknown): NamedRecord[] => records(value).flatMap(i
   return [{ ...item, id, name: typeof item.name === "string" && item.name ? item.name : id }];
 });
 const finite = (value: unknown): number | null => typeof value === "number" && Number.isFinite(value) ? value : null;
+const parseEyeMask = (source: string): EyeMask | null => {
+  if (!source.trim()) return null;
+  const value = JSON.parse(source) as Record<string, unknown>;
+  const keys = Object.keys(value).sort().join("|");
+  if (keys !== "id|name|polygons|protocol|revision|schema|source|voltage_unit" || value.schema !== "spike/si-eye-mask/v1") throw new Error("Eye mask must contain exactly the spike/si-eye-mask/v1 fields.");
+  if (!["id", "name", "protocol", "revision"].every(key => typeof value[key] === "string" && String(value[key]).trim())) throw new Error("Eye mask id, name, protocol, and revision must be non-empty text.");
+  const provenance = record(value.source);
+  if (Object.keys(provenance).sort().join("|") !== "clause|locator" || typeof provenance.locator !== "string" || !provenance.locator.trim() || typeof provenance.clause !== "string" || !provenance.clause.trim()) throw new Error("Eye mask source requires non-empty locator and clause fields.");
+  if (value.voltage_unit !== "V" && value.voltage_unit !== "normalized") throw new Error("Eye mask voltage_unit must be V or normalized.");
+  if (!Array.isArray(value.polygons) || value.polygons.length < 1 || value.polygons.length > 16 || value.polygons.some(polygon => !Array.isArray(polygon) || polygon.length < 3 || polygon.length > 64 || polygon.some(point => !Array.isArray(point) || point.length !== 2 || point.some(coordinate => typeof coordinate !== "number" || !Number.isFinite(coordinate))))) throw new Error("Eye mask polygons require 1–16 polygons of 3–64 finite [time_ui, voltage] vertices.");
+  return value as EyeMask;
+};
 const engineering = (value: unknown, unit = "") => {
   const number = finite(value);
   if (number === null) return "Not available";
@@ -156,6 +179,10 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const [siError, setSiError] = useState("");
   const [siResult, setSiResult] = useState<SiResult | null>(() => initialResult?.contract === "spike/si-channel-result/v1" ? initialResult : null);
   const [suiteResult, setSuiteResult] = useState<Record<string, unknown> | null>(null);
+  const [eyeMaskJson, setEyeMaskJson] = useState("");
+  const [eyeMaskProfileId, setEyeMaskProfileId] = useState("");
+  const [eyeVoltageScale, setEyeVoltageScale] = useState("");
+  const [eyeVoltageOffset, setEyeVoltageOffset] = useState("");
   const activeDesign = useMemo(() => {
     if (!assemblyDesigns || assemblyDesigns.contract !== "spike/assembly-designs/v1") return canonicalDesign?.contract === "spike/design-ir/v2" ? canonicalDesign : null;
     const design = assemblyDesigns.designs.find(item => item.design_id === assemblyDesigns.active_design_id);
@@ -182,6 +209,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     setReferenceLayer(copperLayers.find(layer => !/f\.cu|top/i.test(layer.name))?.id ?? copperLayers[0]?.id ?? "");
     setFrequencyStopHz(String(preset.frequencyStopHz)); setBitRateHz(String(preset.bitRateHz));
     setModulation(initialFocus === "pam4" || (initialFocus !== "eye" && suite?.encoding === "PAM4") ? "PAM4" : "NRZ");
+    setEyeMaskProfileId("");
+    setEyeMaskJson("");
     setSuiteResult(null);
     setSiError("");
   }, [activeDesign?.design_id, suite?.id, selectedProfile?.id, initialFocus]);
@@ -195,6 +224,9 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     const stop = Number(frequencyStopHz);
     const count = Number(frequencyPoints);
     const bitRate = Number(bitRateHz);
+    let eyeMask: EyeMask | null = null;
+    try { eyeMask = parseEyeMask(eyeMaskJson); } catch (error) { setSiError(error instanceof Error ? error.message : String(error)); return; }
+    if (eyeMaskProfileId && eyeMask) { setSiError("Choose either a built-in eye mask profile or supplied mask JSON."); return; }
     if (start !== 0) { setSiError("TDR/TDT and eye reconstruction require the frequency range to start at exactly 0 Hz (DC)."); return; }
     if (!Number.isFinite(stop) || stop <= 0) { setSiError("Frequency stop must be positive and finite."); return; }
     if (!Number.isInteger(count) || count < 3 || count > 32769) { setSiError("Frequency points must be an integer from 3 through 32769."); return; }
@@ -271,11 +303,23 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     setSiError("");
     onStatus(`Running bounded experimental ${signaling === "differential" ? "differential" : "single-ended"} aggressor ${signalNet}${differentialMateNet ? ` / mate ${differentialMateNet}` : ""}${victimNet ? ` with separate victim ${victimNet}` : ""}`);
     try {
+      const lane: Record<string, unknown> = { lane_id: String(request.channel_id), channel_request: request };
+      if (eyeMask || eyeMaskProfileId) {
+        if (eyeMask) lane.eye_mask = eyeMask;
+        if (eyeMaskProfileId) lane.eye_mask_id = eyeMaskProfileId;
+        if (eyeMaskProfileId || eyeMask?.voltage_unit === "V") {
+          if (!eyeVoltageScale.trim() || !eyeVoltageOffset.trim()) { setSiError("A volts mask requires explicit scale and offset values for normalized eye samples."); setSiBusy(false); return; }
+          const scaleV = Number(eyeVoltageScale);
+          const offsetV = Number(eyeVoltageOffset);
+          if (!Number.isFinite(scaleV) || scaleV <= 0 || !Number.isFinite(offsetV)) { setSiError("A volts mask requires a finite positive scale and finite offset for normalized eye samples."); setSiBusy(false); return; }
+          lane.eye_voltage_mapping = { scale_v: scaleV, offset_v: offsetV, bit_rate_hz: bitRate };
+        }
+      }
       const response = suite
         ? await runSiProtocolTestSuite(activeDesign, {
           contract: "spike/si-protocol-test-suite-request/v1",
           suite,
-          lanes: [{ lane_id: String(request.channel_id), channel_request: request }],
+          lanes: [lane],
         })
         : await runSiUniformChannel(activeDesign, request);
       if (!response.ok || !response.result) {
@@ -327,6 +371,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const chartLayout: Record<string, unknown> = { margin: { t: 16, r: 20, b: 52, l: 64 }, showlegend: false,
     xaxis: { title: "Frequency (Hz)", type: "log" }, yaxis: { title: "Magnitude (dB)" },
     ...(selected ? { shapes: [{ type: "line", x0: selected.frequencyHz, x1: selected.frequencyHz, y0: 0, y1: 1, xref: "x", yref: "paper", line: { color: "#ffbd69", width: 1, dash: "dot" } }] } : {}) };
+  const suiteLane = records(suiteResult?.lanes)[0];
+  const eyeMaskResult = record(suiteLane?.eye_mask_result);
 
   return <div className="modal-backdrop"><section className="modal sparam-workbench" role="dialog" aria-modal="true" aria-label="S-parameter workbench">
     <header><div><span className="eyebrow">HF / SI NETWORK ANALYSIS</span><h2>S-parameter workbench</h2></div><button className="icon-btn" onClick={onClose} title="Close"><X size={17} /></button></header>
@@ -340,7 +386,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
         <aside>
           <h3>Canonical geometry</h3>
           <label className="setup-sublabel">Signal net<select className="select-control" value={signalNet} onChange={event => { const next = event.target.value; setSignalNet(next); setDifferentialMateNet(suggestedDifferentialMate(designNets.find(net => net.id === next), designNets)); }}><option value="">Select signal</option>{designNets.map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>{suite ? `${suite.name} candidates are prioritized; review the exact board net before running.` : "Select the exact board route to analyze."}</small></label>
-          <label className="setup-sublabel">Signaling<select className="select-control" value={signaling} disabled={initialFocus === "crosstalk"} onChange={event => setSignaling(event.target.value as "single_ended" | "differential")}><option value="single_ended">Single-ended aggressor</option><option value="differential">Differential aggressor pair</option></select></label>
+          <label className="setup-sublabel">Signaling<select className="select-control" value={signaling} disabled={initialFocus === "crosstalk" || Boolean(eyeMaskProfileId)} onChange={event => setSignaling(event.target.value as "single_ended" | "differential")}><option value="single_ended">Single-ended aggressor</option><option value="differential">Differential aggressor pair</option></select></label>
           {signaling === "differential" ? <label className="setup-sublabel">Differential mate<select className="select-control" value={differentialMateNet} onChange={event => setDifferentialMateNet(event.target.value)}><option value="">Select mate (P/N)</option>{designNets.filter(net => net.id !== signalNet).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Explicit P/N mate for the bounded four-port and mixed-mode transform.</small></label> : <label className="setup-sublabel">{initialFocus === "crosstalk" ? "Victim net (required)" : "Victim net (optional)"}<select className="select-control" value={victimNet} onChange={event => setVictimNet(event.target.value)}><option value="">No separate victim</option>{designNets.filter(net => ![signalNet, referenceNet].includes(net.id)).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Select the separate coupled-line victim for NEXT/FEXT.</small></label>}
           {(signaling === "differential" || victimNet) && <><label className="setup-sublabel">Separation variation tolerance (mm)<input value={separationToleranceMm} onChange={event => setSeparationToleranceMm(event.target.value)} inputMode="decimal" /></label><label className="setup-sublabel">Path skew tolerance (mm)<input value={skewToleranceMm} onChange={event => setSkewToleranceMm(event.target.value)} inputMode="decimal" /><small>Fail-closed bounds for the piecewise paired-route approximation.</small></label></>}
           {signaling === "single_ended" && victimNet && <fieldset className="setup-subgroup"><legend>Loaded NEXT / FEXT voltage</legend>
@@ -358,8 +404,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
             <label><span>Start frequency (Hz)</span><input value={frequencyStartHz} onChange={event => setFrequencyStartHz(event.target.value)} inputMode="decimal" /></label>
             <label><span>Stop frequency (Hz)</span><input value={frequencyStopHz} onChange={event => setFrequencyStopHz(event.target.value)} inputMode="decimal" /></label>
             <label><span>Uniform points</span><input value={frequencyPoints} onChange={event => setFrequencyPoints(event.target.value)} inputMode="numeric" /></label>
-            <label><span>Modulation</span><select value={modulation} onChange={event => setModulation(event.target.value as "NRZ" | "PAM4")}><option>NRZ</option><option>PAM4</option></select></label>
-            <label><span>{modulation === "PAM4" ? "Symbol rate (baud)" : "Bit rate (bit/s)"}</span><input value={bitRateHz} onChange={event => setBitRateHz(event.target.value)} inputMode="decimal" /></label>
+            <label><span>Modulation</span><select value={modulation} disabled={Boolean(eyeMaskProfileId)} onChange={event => setModulation(event.target.value as "NRZ" | "PAM4")}><option>NRZ</option><option>PAM4</option></select></label>
+            <label><span>{modulation === "PAM4" ? "Symbol rate (baud)" : "Bit rate (bit/s)"}</span><input value={bitRateHz} disabled={Boolean(eyeMaskProfileId)} onChange={event => setBitRateHz(event.target.value)} inputMode="decimal" /></label>
           </div>
           {modulation === "PAM4" && <div className="sparam-readout">
             <label><span>Tx FFE taps</span><input value={txFfeTaps} onChange={event => setTxFfeTaps(event.target.value)} /></label>
@@ -367,6 +413,13 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
             <label><span>CTLE zero / pole (Hz)</span><input value={`${ctleZeroHz}, ${ctlePoleHz}`} onChange={event => { const [zero = "", pole = ""] = event.target.value.split(","); setCtleZeroHz(zero.trim()); setCtlePoleHz(pole.trim()); }} /></label>
             <label><span>Normalized voltage noise RMS</span><input value={voltageNoise} onChange={event => setVoltageNoise(event.target.value)} inputMode="decimal" /></label>
           </div>}
+          {suite && <fieldset className="si-eye-mask-input"><legend>Optional sourced eye mask</legend>
+            {suite.family === "USB" && <label>USB 2.0 high-speed profile<select value={eyeMaskProfileId} onChange={event => { const id = event.target.value; setEyeMaskProfileId(id); if (id) { setEyeMaskJson(""); setSignaling("differential"); setBitRateHz("480e6"); setModulation("NRZ"); } }}><option value="">Unassigned / supplied JSON</option><option value="usb2.hs.template1.inner">Template 1 inner opening</option><option value="usb2.hs.template2.inner">Template 2 inner opening</option></select></label>}
+            {eyeMaskProfileId && <div className="si-eye-mask-scope"><b>USB 2.0 high-speed inner opening screening</b><span>Uses a 480 Mbit/s differential NRZ channel. Transition-dependent 475/525 mV outer limits are not assessed, so this is not complete template compliance.</span></div>}
+            <label>Mask JSON<textarea value={eyeMaskJson} disabled={Boolean(eyeMaskProfileId)} onChange={event => setEyeMaskJson(event.target.value)} spellCheck={false} placeholder={'Unassigned. Paste a sourced spike/si-eye-mask/v1 object; no protocol limits are built in.'} /></label>
+            <small>Forbidden polygons use [time_ui, voltage] vertices with implicit closure. Source locator and clause are required. A mask pass applies only to the returned sampled polylines; overall protocol compliance remains not evaluated.</small>
+            {(eyeMaskProfileId || eyeMaskJson.trim()) && (() => { try { const mask = parseEyeMask(eyeMaskJson); return eyeMaskProfileId || mask?.voltage_unit === "V" ? <div className="si-eye-voltage-mapping"><label>Normalized-to-volts scale (V)<input value={eyeVoltageScale} onChange={event => setEyeVoltageScale(event.target.value)} inputMode="decimal" /></label><label>Normalized zero offset (V)<input value={eyeVoltageOffset} onChange={event => setEyeVoltageOffset(event.target.value)} inputMode="decimal" /></label><small>Required evidence mapping: V = normalized × scale + offset at 480 Mbit/s for the built-in profiles. Values are never guessed.</small></div> : <span className="si-eye-mask-ready">Normalized mask assigned</span>; } catch { return <span className="si-eye-mask-invalid">Mask JSON is not ready to run.</span>; } })()}
+          </fieldset>}
           {siBusy
             ? <button className="primary-btn" onClick={() => { void cancelLocalWorker().catch(error => setSiError(error instanceof Error ? error.message : String(error))); }}><X size={15} />Stop SI channel</button>
             : <button className="primary-btn" disabled={!desktop} onClick={() => void runGeometryChannel()}><Play size={15} />{initialFocus === "crosstalk" ? "Run NEXT / FEXT" : initialFocus === "pam4" ? "Run PAM4 channel" : "Run experimental SI channel"}</button>}
@@ -383,7 +436,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
             </div>
             <button className="secondary-btn" onClick={() => downloadJson("geometry-channel.experimental.json", { ...siResult, production_qualified: false, compliance_status: "not_evaluated" })}><Download size={15} /> Export experimental channel result</button>
             <div className="sparam-check warning"><AlertTriangle size={14} /><span>Piecewise planar routing length is included, but bend discontinuities, vias, launches, connectors, packages, skin/proximity/roughness and receiver nonlinearity require explicit models. NRZ and PAM4 BER values remain bounded numerical proxies, never protocol compliance evidence.</span></div>
-            <SiChannelResultPanel result={siResult!} onStatus={onStatus} />
+            <SiChannelResultPanel result={siResult!} eyeMaskResult={Object.keys(eyeMaskResult).length ? eyeMaskResult : null} onStatus={onStatus} />
           </>}
         </main>
       </div>

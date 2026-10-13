@@ -40,6 +40,7 @@ def detect(text):
     text = text.lstrip("\ufeff \r\n\t")
     if text.startswith("{"): return "spikes"
     if text.startswith("(kicad_sch"): return "kicad"
+    if text.startswith("(export"): return "kicad_netlist"
     if re.match(r"Version\s+4\b", text): return "ltspice_asc"
     if text.startswith("«") or text.startswith("\ufffd"): return "qspice_qsch"
     if re.match(r"(?im)^\s*\.model\s", text): return "model" if not re.search(r"(?im)^\s*[RCLVIX]\w+\s", text) else "spice_netlist"
@@ -51,6 +52,9 @@ def import_text(text):
     fmt = detect(text)
     if fmt == "spikes": return ImportReport(fmt, text, Document(json.loads(text)), [], [])
     if fmt == "model": return ImportReport(fmt, text, None, [convert_model_statement(text)], ["Model draft created; choose pins/backend before placement."])
+    if fmt == 'kicad_netlist':
+        from .kicad_import import import_generic_netlist
+        return import_generic_netlist(text)
     if fmt == "kicad":
         tree = sexpr(text)
         inventory = []

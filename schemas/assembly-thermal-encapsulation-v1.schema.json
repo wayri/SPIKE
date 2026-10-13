@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/assembly-thermal-encapsulation/v1",
+  "title": "Explicit world-mm physical encapsulation recipes",
+  "type": "array",
+  "maxItems": 8,
+  "items": {
+    "oneOf": [
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "material_id",
+          "kind",
+          "body_ids",
+          "thickness_mm"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "material_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "kind": {
+            "const": "coating"
+          },
+          "body_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "thickness_mm": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 100
+          }
+        }
+      },
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "material_id",
+          "kind",
+          "fill_region",
+          "exclusions"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "material_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "kind": {
+            "const": "potting"
+          },
+          "fill_region": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "outer_mm",
+              "holes_mm",
+              "z_min_mm",
+              "z_max_mm"
+            ],
+            "properties": {
+              "kind": {
+                "const": "polygon_prism"
+              },
+              "outer_mm": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 2048,
+                "items": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "holes_mm": {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 2048,
+                  "items": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "z_min_mm": {
+                "type": "number"
+              },
+              "z_max_mm": {
+                "type": "number"
+              }
+            }
+          },
+          "exclusions": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "outer_mm",
+                "holes_mm",
+                "z_min_mm",
+                "z_max_mm"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "polygon_prism"
+                },
+                "outer_mm": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 2048,
+                  "items": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "holes_mm": {
+                  "type": "array",
+                  "maxItems": 128,
+                  "items": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 2048,
+                    "items": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                },
+                "z_min_mm": {
+                  "type": "number"
+                },
+                "z_max_mm": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

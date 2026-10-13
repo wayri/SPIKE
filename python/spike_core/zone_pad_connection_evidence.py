@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+from math import inf, nextafter
 from typing import Any, Callable, Dict, Mapping
 
 from .spider_v2 import SpiDeRV2
@@ -93,6 +94,8 @@ def _observes_contact(raw_pad, pad_boundary, pad_bounds, polygon, zone_edges, to
     from .hybrid_mesh import (
         _point, _point_in_pad, _point_in_polygon, _segment_intersection_points, _segments,
     )
+    from .source_filled_boundary import SourceFilledBoundary
+    indexed = isinstance(polygon, SourceFilledBoundary)
     center = _point(raw_pad.get("at", (0, 0)))
     if _point_in_pad(center, raw_pad) and _point_in_polygon(center, polygon, tolerance):
         return True
@@ -102,13 +105,30 @@ def _observes_contact(raw_pad, pad_boundary, pad_bounds, polygon, zone_edges, to
         pad_bounds[0] - tolerance <= point[0] <= pad_bounds[2] + tolerance
         and pad_bounds[1] - tolerance <= point[1] <= pad_bounds[3] + tolerance
         and _point_in_pad(point, raw_pad) and _point_in_polygon(point, polygon, tolerance)
-        for point in polygon
+        for point in (polygon.query_points((
+            pad_bounds[0] - tolerance, pad_bounds[1] - tolerance,
+            pad_bounds[2] + tolerance, pad_bounds[3] + tolerance,
+        )) if indexed else polygon)
     ):
         return True
     for pad_start, pad_end in _segments(pad_boundary):
         edge_min_x, edge_max_x = sorted((pad_start[0], pad_end[0]))
         edge_min_y, edge_max_y = sorted((pad_start[1], pad_end[1]))
-        for zone_start, zone_end, zone_bounds in zone_edges:
+        candidates = zone_edges
+        if indexed:
+            # Preserve the old rounded rejection thresholds. The upper bound
+            # encloses the inverse of fl(zone_min - tolerance) <= pad_max.
+            bounds = (
+                edge_min_x - tolerance, edge_min_y - tolerance,
+                nextafter(nextafter(edge_max_x, inf) + tolerance, inf),
+                nextafter(nextafter(edge_max_y, inf) + tolerance, inf),
+            )
+            candidates = (
+                (start, end, (min(start[0], end[0]), min(start[1], end[1]),
+                              max(start[0], end[0]), max(start[1], end[1])))
+                for start, end in polygon.query_edges(bounds)
+            )
+        for zone_start, zone_end, zone_bounds in candidates:
             if (edge_max_x < zone_bounds[0] - tolerance or zone_bounds[2] < edge_min_x - tolerance
                     or edge_max_y < zone_bounds[1] - tolerance or zone_bounds[3] < edge_min_y - tolerance):
                 continue
@@ -164,7 +184,7 @@ def build_zone_pad_connection_evidence(
     zones = [item for item in design.zones if item.filled_copper_state == "source_filled"]
     if len(pads) > MAX_PADS or len(zones) > MAX_SOURCE_FILLED_ZONES:
         _fail("connection-evidence source counts exceed bounded limits")
-    legacy = design.to_v1()
+    legacy = design.to_v1(allow_unprojected_arcs=True)
     raw_pads = {str(item.get("id")): item for item in legacy.pads if isinstance(item, Mapping)}
     raw_zones = {str(item.get("id")): item for item in legacy.zones if isinstance(item, Mapping)}
     components = {item.id: item for item in design.components}
@@ -173,12 +193,18 @@ def build_zone_pad_connection_evidence(
     from .hybrid_mesh import (
         _normalize_filled_zone_polygon, _pad_boundary_polygon, _point, _segments,
     )
+    from .source_filled_boundary import prepare_source_filled_boundary
     zone_geometry = {}
     for zone in zones:
         raw_zone = raw_zones.get(zone.source_id or zone.id)
         if raw_zone is None or not zone.source_zone_id or not zone.filled_copper_id:
             _fail(f"zone {zone.id!r} lacks source-filled identity or solver projection")
-        polygon = _normalize_filled_zone_polygon([_point(value) for value in raw_zone.get("points", [])])
+        try:
+            points = [_point(value) for value in raw_zone.get("points", [])]
+            boundary = prepare_source_filled_boundary(points, cancel_check=cancel_check)
+            polygon = boundary if boundary is not None else _normalize_filled_zone_polygon(points)
+        except ValueError as error:
+            _fail(f"zone {zone.id!r} source-filled boundary admission failed: {error}")
         if len(polygon) < 3:
             _fail(f"zone {zone.id!r} has no observable source-filled polygon")
         zone_geometry[zone.id] = (
@@ -188,7 +214,7 @@ def build_zone_pad_connection_evidence(
             [
                 (start, end, (min(start[0], end[0]), min(start[1], end[1]), max(start[0], end[0]), max(start[1], end[1])))
                 for start, end in _segments(polygon)
-            ],
+            ] if boundary is None else (),
         )
 
     for pad in pads:

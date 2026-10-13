@@ -1,6 +1,22 @@
 # SPIKE Brand Assets
 
-<img src="../app/public/spike-logo.png" alt="SPIKE logo" width="420">
+<img src="../app/public/spike-logo-tagline.png" alt="SPIKE — SI, PI, Thermal, EM" width="420">
+
+## Public tagline
+
+Use **SI, PI, Thermal, EM** in that order, with that capitalization, on
+public-facing documentation, presentation covers, demo title cards and
+promotional material. Pair it with the SPIKE wordmark. SI means signal
+integrity, PI means power integrity, and EM means electromagnetics.
+
+Use `app/public/spike-logo-tagline.png` for slide decks and documents, or
+`app/public/spike-logo-tagline.svg` for web layouts. Both have transparent
+backgrounds and light blue text suited to dark backgrounds. The SVG retains
+the approved raster logo with an accessible, editable text tagline.
+Regenerate just these public lockups with
+`python scripts/render_brand_assets.py --tagline-only`.
+The tagline names analysis domains; retain each solver's existing capability
+and validation qualifications alongside technical claims.
 
 The approved 2026-10-10 identity combines an angular PCB-trace S, a signal
 spike, and a light blue SPIKE wordmark. Use the horizontal logo for documentation
@@ -18,17 +34,19 @@ SPIKE's Apache-2.0 license; this does not establish trademark clearance.
 
 Run `python scripts/render_brand_assets.py` with Pillow installed to regenerate:
 
-- `app/public/spike-logo.png`: horizontal documentation logo.
+- `app/public/spike-logo.png`: horizontal documentation and application-header logo.
+- `app/public/spike-logo-tagline.png` and `spike-logo-tagline.svg`: public
+  documentation and presentation lockups with **SI, PI, Thermal, EM**.
 - `app/public/spike-mark.svg`: raster-backed SVG compatibility wrapper for the
-  header, About dialog, and browser favicon; not an editable vector master.
+  About dialog and browser favicon; not an editable vector master.
 - `app/public/spike-icon.png`: 512px symbol.
 - `app/public/favicon.png`: 64px fallback.
 - `app/src-tauri/icons/icon.png`, `128x128.png`, `icon.ico`, and `icon.icns`:
   native application, installer, Linux, and macOS assets.
 - `kicad_plugin/spike_icon.png`: 48px plugin toolbar icon.
 
-The renderer only crops, pads, and resizes approved artwork; it does not call a
-generation service. SPIKES Studio is a separate product and retains its own
+The renderer crops, pads, and resizes approved artwork and typesets the public
+tagline; it does not call a generation service. SPIKES Studio is a separate product and retains its own
 identity. Historical screenshots and archived releases retain their original
 artwork.
 

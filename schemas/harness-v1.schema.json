@@ -9,6 +9,7 @@
     "id": {"$ref": "#/$defs/id"}, "name": {"$ref": "#/$defs/id"},
     "connectors": {"type": "array", "maxItems": 100000, "items": {"$ref": "#/$defs/connector"}},
     "wires": {"type": "array", "maxItems": 100000, "items": {"$ref": "#/$defs/wire"}},
+    "pairs": {"type": "array", "maxItems": 100000, "items": {"$ref": "#/$defs/pair"}},
     "splices": {"type": "array", "maxItems": 100000, "items": {"type": "object", "required": ["id"], "additionalProperties": false, "properties": {
       "id": {"$ref": "#/$defs/id"}, "part_number": {"type": "string"}, "properties": {"type": "object"}, "extensions": {"type": "object"}
     }}},
@@ -41,6 +42,8 @@
     }},
     "wire": {"type": "object", "required": ["id", "from", "to"], "additionalProperties": false, "properties": {
       "id": {"$ref": "#/$defs/id"}, "from": {"$ref": "#/$defs/endpoint"}, "to": {"$ref": "#/$defs/endpoint"},
+      "role": {"enum": ["unspecified", "power", "return", "signal", "other", "shield"]},
+      "return_wire_id": {"$ref": "#/$defs/id"},
       "net": {"type": "string"}, "color": {"type": "string"}, "part_number": {"type": "string"},
       "length_mm": {"type": "number", "exclusiveMinimum": 0}, "area_mm2": {"type": "number", "exclusiveMinimum": 0}, "route_id": {"$ref": "#/$defs/id"},
       "material": {"type": "object", "additionalProperties": false, "properties": {
@@ -51,6 +54,13 @@
         "capacitance_to_reference_f": {"type": "number", "minimum": 0}, "conductance_to_reference_s": {"type": "number", "minimum": 0},
         "reference": {"$ref": "#/$defs/endpoint"}, "provenance": {"type": "object"}, "extensions": {"type": "object"}
       }}, "properties": {"type": "object"}, "extensions": {"type": "object"}
+    }},
+    "pair": {"type": "object", "required": ["id", "wire_ids", "kind"], "additionalProperties": false, "properties": {
+      "id": {"$ref": "#/$defs/id"},
+      "wire_ids": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+      "kind": {"enum": ["differential", "twisted"]}, "twisted": {"type": "boolean"},
+      "twist_pitch_mm": {"type": "number", "exclusiveMinimum": 0},
+      "properties": {"type": "object"}, "extensions": {"type": "object"}
     }}
   }
 }

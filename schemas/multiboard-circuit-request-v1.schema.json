@@ -8,6 +8,9 @@
   "properties": {
     "contract": {"const": "spike/multiboard-circuit-request/v1"},
     "domain": {"enum": ["pi", "si"]},
+    "thermal_only_part_ids": {"type": "array", "maxItems": 100, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 256},
+      "description": "Explicitly excluded promoted thermal component bodies; source-board provenance and absence of electrical bonds are checked semantically."},
     "assembly": {"type": "object", "required": ["contract", "assembly_id", "name", "boards"], "properties": {"contract": {"const": "spike/assembly-ir/v1"}}},
     "board_models": {"type": "array", "minItems": 1, "maxItems": 30, "items": {
       "type": "object", "additionalProperties": false, "required": ["board_id", "elements"],

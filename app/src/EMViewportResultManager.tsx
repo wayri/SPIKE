@@ -32,7 +32,7 @@ export default function EMViewportResultManager({ records, activeRecordId, setti
   const scalarQuantity = ["pattern_delta", "interference"].includes(settings.quantity);
   const exportSamples = () => {
     if (!data) return;
-    const rows = ["frequency_hz,sample_index,x_mm,y_mm,z_mm,display_value,unit", ...data.values.map((value, index) => [data.frequencyHz, index, ...data.positionsMm[index], value, JSON.stringify(data.unit)].join(","))];
+    const rows = ["frequency_hz,sample_index,x_mm,y_mm,z_mm,display_value,unit", ...data.values.map((value, index) => [data.frequencyHz, data.nativeSampleIndices?.[index] ?? index, ...data.positionsMm[index], value, JSON.stringify(data.unit)].join(","))];
     downloadEMergeText("em-viewport-samples.csv", rows.join("\n") + "\n");
   };
   if (minimized) return null;
@@ -57,7 +57,7 @@ export default function EMViewportResultManager({ records, activeRecordId, setti
         {data ? <>
           <small>{data.label} · {data.frequencyHz.toPrecision(6)} Hz · {data.values.length} actual samples · {data.unit}</small>
           <div className="em-manager-controls"><label className="em-manager-wide">Linked viewport probe<input aria-label="EM viewport sample probe" type="number" min="0" max={Math.max(0, data.values.length - 1)} step="1" value={sample} onChange={event => { const value = Number(event.target.value); if (Number.isInteger(value) && value >= 0 && value < data.values.length) update({ selectedSample: value }); }} /></label></div>
-          {data.positionsMm[sample] && <small role="status">Sample {sample}: ({data.positionsMm[sample].map(value => value.toPrecision(6)).join(", ")}) mm · {typeof data.values[sample] === "number" ? data.values[sample]!.toPrecision(6) : "invalid / unavailable"} {data.unit}</small>}
+          {data.positionsMm[sample] && <small role="status">Sample {sample}{data.nativeSampleIndices ? ` (native ${data.nativeSampleIndices[sample]})` : ""}: ({data.positionsMm[sample].map(value => value.toPrecision(6)).join(", ")}) mm · {typeof data.values[sample] === "number" ? data.values[sample]!.toPrecision(6) : "invalid / unavailable"} {data.unit}</small>}
           <LinkedSampleGraph values={data.values} selected={sample} label={`${data.label} (${data.unit})`} onSelect={index => update({ selectedSample: index })} />
           {data.notices.map((notice, index) => <small key={index} className="em-manager-warning">{notice}</small>)}
         </> : <small className="em-manager-warning">This result has no admitted samples for the current quantity/frequency. Choose an available quantity; missing fields are not synthesized.</small>}

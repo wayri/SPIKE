@@ -55,15 +55,23 @@ def instruments_dialog(owner):
     with wx.Dialog(owner,title='Schematic instruments · saved with circuit',size=(850,660),style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER) as dlg:
         box=wx.BoxSizer(wx.VERTICAL);listing=wx.ListBox(dlg);box.Add(listing,1,wx.EXPAND|wx.ALL,6)
         parts=owner.doc.data['components'];fields={};grid=wx.FlexGridSizer(cols=2,hgap=8,vgap=5);grid.AddGrowableCol(1)
-        specs=[('anchor','Attached component',[p['ref'] for p in parts]),('expression','Probe / expression','V(out)'),('kind','Display',['Readout','Mini plot']),
+        specs=[('anchor','Attached component',[p['ref'] for p in parts]),('pin_index','Attached terminal',[]),('expression','Probe / expression','V(out)'),('kind','Display',['Readout','Mini plot']),
                ('source','Data source',['Selected run','AC frequency']),('format','Notation',list(FORMATS)),('frequency_hz','AC readout frequency [Hz]','1000'),('x','Canvas X','120'),('y','Canvas Y','360')]
         for key,label,value in specs:
             grid.Add(wx.StaticText(dlg,label=label),0,wx.ALIGN_CENTER_VERTICAL)
             c=wx.Choice(dlg,choices=value) if isinstance(value,list) else wx.TextCtrl(dlg,value=value)
             if isinstance(value,list) and value:c.SetSelection(0)
             fields[key]=c;grid.Add(c,1,wx.EXPAND)
+        def refresh_terminals(selection=None):
+            part_index=fields['anchor'].GetSelection()
+            terminals=[] if part_index<0 else [f"{index+1}: {node}" for index,node in enumerate(parts[part_index]['nodes'])]
+            fields['pin_index'].Set(terminals)
+            if terminals:fields['pin_index'].SetSelection(min(selection or 0,len(terminals)-1))
+        fields['anchor'].Bind(wx.EVT_CHOICE,lambda event:refresh_terminals())
+        refresh_terminals()
         if owner.canvas.selected:
             index=next((i for i,p in enumerate(parts) if p['id'] in owner.canvas.selected),0);fields['anchor'].SetSelection(index)
+            refresh_terminals()
             fields['expression'].SetValue(f"V({parts[index]['nodes'][0]})")
         box.Add(grid,0,wx.EXPAND|wx.ALL,8)
         def refresh():listing.Set([v['kind']+' · '+v['expression']+' · '+v['source'] for v in owner.doc.data['instruments']]);owner.canvas.Refresh()
@@ -72,7 +80,9 @@ def instruments_dialog(owner):
             if index<0:return
             item=owner.doc.data['instruments'][index]
             for key,c in fields.items():
-                if key=='anchor':c.SetSelection(next((i for i,p in enumerate(parts) if p['id']==item[key]),wx.NOT_FOUND))
+                if key=='anchor':
+                    c.SetSelection(next((i for i,p in enumerate(parts) if p['id']==item[key]),wx.NOT_FOUND));refresh_terminals(item.get('pin_index',0))
+                elif key=='pin_index':continue
                 elif isinstance(c,wx.Choice):c.SetStringSelection(item[key])
                 else:c.SetValue(str(item[key]))
         listing.Bind(wx.EVT_LISTBOX,select)
@@ -80,10 +90,15 @@ def instruments_dialog(owner):
             index=listing.GetSelection()
             if update and index<0:raise ValueError('Select an instrument to update')
             if fields['anchor'].GetSelection()<0:raise ValueError('Select an attached component')
-            item={key:c.GetStringSelection() if isinstance(c,wx.Choice) else c.GetValue() for key,c in fields.items()}
+            if fields['pin_index'].GetSelection()<0:raise ValueError('Select an attached terminal')
+            item={key:c.GetStringSelection() if isinstance(c,wx.Choice) else c.GetValue() for key,c in fields.items() if key!='pin_index'}
             item['anchor']=parts[fields['anchor'].GetSelection()]['id']
+            item['pin_index']=fields['pin_index'].GetSelection()
             for key in ('x','y','frequency_hz'):item[key]=float(item[key])
-            item['id']=owner.doc.data['instruments'][index]['id'] if update else uuid.uuid4().hex
+            previous=owner.doc.data['instruments'][index] if update else None
+            item['id']=previous['id'] if update else uuid.uuid4().hex
+            if previous and previous.get('anchor')==item['anchor'] and previous.get('pin_index')==item['pin_index'] and 'attach_point' in previous:
+                item['attach_point']=previous['attach_point']
             def mutate(d):
                 if update:d['instruments'][index]=item
                 else:d['instruments'].append(item)

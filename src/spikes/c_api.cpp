@@ -1,4 +1,5 @@
 #include "spikes/c_api.h"
+#include "spikes/smps_stability.hpp"
 
 #include "spikes/dc_solver.hpp"
 #include "spikes/osdi_device.hpp"
@@ -16,6 +17,37 @@
 
 struct spikes_circuit {
   spikes::Circuit value;
+};
+
+struct spikes_smps_result {
+  spikes::smps::Result value;
+  std::array<std::vector<double>,18> fields;
+  explicit spikes_smps_result(spikes::smps::Result result):value(std::move(result)) {
+    fields[0]=value.frequency_hz;fields[3]=value.plant_gain_db;fields[4]=value.plant_phase_deg;
+    fields[5]=value.loop_gain_db;fields[6]=value.loop_phase_deg;
+    auto pairs=[&](size_t field,const auto& source) {
+      fields[field].reserve(2*source.size());
+      for(const auto z:source){fields[field].push_back(z.real());fields[field].push_back(z.imag());}
+    };
+    pairs(1,value.plant);pairs(2,value.loop);pairs(7,value.plant_poles_rad_s);
+    pairs(8,value.plant_zeros_rad_s);pairs(9,value.closed_loop_poles_rad_s);
+    auto crossings=[&](size_t field,const auto& source) {
+      fields[field].reserve(7*source.size());
+      for(const auto& x:source)fields[field].insert(fields[field].end(),
+        {x.frequency_hz,double(x.in_sweep),double(x.below_averaging_limit),x.phase_deg,
+         x.phase_margin_deg,x.gain_db,x.gain_margin_db});
+    };
+    crossings(10,value.gain_crossings);crossings(11,value.phase_crossings);
+    fields[12]={value.output_voltage_v,value.output_current_a,value.output_power_w,
+      double(value.output_polarity),value.inductor_current_a,value.reference_voltage_v,
+      value.inductor_ripple_pp_a,value.valley_current_a,value.peak_current_a,
+      value.output_ripple_pp_v_estimate,value.plant_dc_gain_v_per_duty,value.omega_scale_rad_s,
+      value.a_per_s[0][0],value.a_per_s[0][1],value.a_per_s[1][0],value.a_per_s[1][1],
+      value.b_duty_per_s[0],value.b_duty_per_s[1]};
+    fields[13]=value.plant_numerator;fields[14]=value.plant_denominator;
+    fields[15]=value.loop_numerator;fields[16]=value.loop_denominator;
+    fields[17]=value.closed_loop_denominator;
+  }
 };
 
 struct spikes_result {
@@ -208,6 +240,26 @@ spikes_error_code spikes_circuit_add_dependent_source(
       !valid_text(cp) || !valid_text(cn) || !control_source || (voltage_output!=0 && voltage_output!=1))
     return invalid("dependent source requires valid names and output type");
   return guard([&] { circuit->value.add_dependent_source(id,positive,negative,voltage_output!=0,cp,cn,control_source,gain); });
+}
+
+spikes_error_code spikes_circuit_add_sine_current_source(
+    spikes_circuit *circuit, const char *id, const char *positive_node,
+    const char *negative_node, double offset, double amplitude,
+    double frequency_hz, double delay_s, double damping_per_s, double phase_deg) {
+  if (!circuit || !valid_text(id) || !valid_text(positive_node) || !valid_text(negative_node))
+    return invalid("circuit, id, and node names are required");
+  return guard([&] { circuit->value.add_sine_current_source(id, positive_node, negative_node,
+      {offset, amplitude, frequency_hz, delay_s, damping_per_s, phase_deg}); });
+}
+
+spikes_error_code spikes_circuit_add_sine_voltage_source(
+    spikes_circuit *circuit, const char *id, const char *positive_node,
+    const char *negative_node, double offset, double amplitude,
+    double frequency_hz, double delay_s, double damping_per_s, double phase_deg) {
+  if (!circuit || !valid_text(id) || !valid_text(positive_node) || !valid_text(negative_node))
+    return invalid("circuit, id, and node names are required");
+  return guard([&] { circuit->value.add_sine_voltage_source(id, positive_node, negative_node,
+      {offset, amplitude, frequency_hz, delay_s, damping_per_s, phase_deg}); });
 }
 
 spikes_error_code spikes_circuit_add_pulse_current_source(
@@ -1025,6 +1077,16 @@ spikes_error_code spikes_transient_result_sparse_lte_diagnostics(
   return SPIKES_OK;
 }
 
+spikes_error_code spikes_transient_result_recovery_diagnostics(
+    const spikes_transient_result *result, size_t *out_rejected_newton_steps) {
+  if (result == nullptr || out_rejected_newton_steps == nullptr) {
+    return invalid("transient result and Newton rejection output are required");
+  }
+  *out_rejected_newton_steps = result->value.diagnostics().rejected_newton_steps;
+  last_error.clear();
+  return SPIKES_OK;
+}
+
 spikes_error_code spikes_transient_session_create(
     const spikes_circuit *circuit, const spikes_transient_options *options,
     spikes_transient_session **out_session) {
@@ -1082,6 +1144,22 @@ spikes_error_code spikes_transient_session_set_source_value(
     return invalid("session and source element id are required");
   }
   return guard([&] { session->value.set_source_value(element_id, value); });
+}
+
+spikes_error_code spikes_transient_session_set_resistance(
+    spikes_transient_session *session, const char *element_id, double value) {
+  if (session == nullptr || !valid_text(element_id)) {
+    return invalid("session and resistor element id are required");
+  }
+  return guard([&] { session->value.set_resistance(element_id, value); });
+}
+
+spikes_error_code spikes_transient_session_set_mosfet_threshold(
+    spikes_transient_session *session, const char *element_id, double value) {
+  if (session == nullptr || !valid_text(element_id)) {
+    return invalid("session and MOSFET element id are required");
+  }
+  return guard([&] { session->value.set_mosfet_threshold(element_id, value); });
 }
 
 spikes_error_code spikes_transient_session_step(
@@ -1250,5 +1328,36 @@ spikes_error_code spikes_transient_session_restore(
   }
   return guard([&] { session->value.restore(checkpoint->value); });
 }
+
+spikes_error_code spikes_smps_analyze(const spikes_smps_config* input,spikes_smps_result** output) {
+  if(output==nullptr)return invalid("SMPS output handle required");
+  *output=nullptr;
+  if(input==nullptr || input->api_version!=1 || input->struct_size!=sizeof(spikes_smps_config))
+    return invalid("SMPS config API/version/size mismatch");
+  return guard([&] {
+    spikes::smps::Config c;
+    c.topology=int(input->topology);c.controller_type=int(input->controller_type);c.points=int(input->points);
+    c.input_voltage_v=input->input_voltage_v;c.duty_cycle=input->duty_cycle;
+    c.inductance_h=input->inductance_h;c.capacitance_f=input->capacitance_f;
+    c.load_resistance_ohm=input->load_resistance_ohm;c.switching_frequency_hz=input->switching_frequency_hz;
+    c.turns_ratio=input->turns_ratio;c.start_hz=input->start_hz;c.stop_hz=input->stop_hz;
+    c.controller_gain=input->controller_gain;c.zero1_hz=input->zero1_hz;c.zero2_hz=input->zero2_hz;
+    c.pole1_hz=input->pole1_hz;c.pole2_hz=input->pole2_hz;
+    c.feedback_gain=input->feedback_gain;c.pwm_gain=input->pwm_gain;
+    *output=new spikes_smps_result(spikes::smps::analyze(c));
+  });
+}
+size_t spikes_smps_result_size(const spikes_smps_result* r,uint32_t f) {
+  return r && f<r->fields.size()?r->fields[f].size():0;
+}
+const double* spikes_smps_result_data(const spikes_smps_result* r,uint32_t f) {
+  return r && f<r->fields.size()?r->fields[f].data():nullptr;
+}
+const char* spikes_smps_result_stability(const spikes_smps_result* r) {return r?r->value.stability.c_str():nullptr;}
+size_t spikes_smps_result_warning_count(const spikes_smps_result* r) {return r?r->value.warnings.size():0;}
+const char* spikes_smps_result_warning(const spikes_smps_result* r,size_t i) {
+  return r && i<r->value.warnings.size()?r->value.warnings[i].c_str():nullptr;
+}
+void spikes_smps_result_destroy(spikes_smps_result* r) {delete r;}
 
 } // extern "C"

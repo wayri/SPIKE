@@ -1,5 +1,12 @@
 # SPIKE Task Sequences
 
+The Focus shell uses **Menu > Analyze > Workspaces** for task commands and
+**Menu > Design & view > Workspace panels** for studies, inspectors and
+diagnostics. Existing task sequences below retain their engineering actions;
+menu categories now open on demand in one reserved panel. Hide preserves
+inputs, and Tools > Open panels restores a hidden editor. Expand provides
+room for large tables and plots.
+
 This guide turns the integrated-help workflows into reviewable task sequences.
 It uses only screenshots shipped in `app/public/help/`; captions describe what
 is visible and do not claim unshown behavior. Missing screenshots are marked
@@ -323,15 +330,18 @@ view only and do not become solver results.
 
 ## Operate SPIKE with a local LLM
 
-1. Open **Settings -> LLM / MCP** in the desktop app and enable the local bridge. Copy the displayed rendezvous path if more than one SPIKE window is open.
+1. Open **Settings → LLM / MCP** in the desktop app and enable the local bridge. Copy the displayed rendezvous path if more than one SPIKE window is open.
 2. Configure LM Studio's local `mcp.json` to run `scripts/spike_mcp.py`, or start an Ollama/LM Studio local API and use `scripts/spike_local_chat.py`. Follow [the setup guide](LOCAL_LLM_MCP.md) for exact commands.
 3. Ask the model to inspect `spike_gui_status` and `spike_capabilities`, then create a study, add cases, select a workspace, or open its run controls. Read solver preflight and validity status before interpreting a result.
 4. Review the visible setup and save the SPIKE project to retain study changes. Opening run controls does not execute a solver.
 
-## Close SPIKE
+## External volume meshing and thermal solution
 
-Close the main window to exit the application and its detached tools. Save or
-discard main-project changes in the close dialog, or choose Cancel. An assembly
-draft must first be saved or discarded in its tool; **Review draft** restores
-that window. A failed or canceled save keeps SPIKE open. See
-[close and worker shutdown](DESKTOP_SHUTDOWN.md) for recovery and limits.
+Save the assembly project before selecting a retained volume workflow. In the
+Thermal setup dock choose the Gmsh mesher, open **Mesher setup**, assign reviewed
+materials and generate the retained volume mesh. Assign explicit thermal
+boundaries, sources and matched contacts. Choose CalculiX as solver, open
+**Solver setup**, prepare and run the case. Save with results; the embedded
+field is available when reopening the project without a separate result file.
+See [external volume workflows](EXTENSION_WORKSPACE_ENGINES.md#calculix-and-gmsh-volume-workflows)
+for runtime prerequisites, unsupported inputs and geometry-only PI/SI/EM routes.

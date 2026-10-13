@@ -1,0 +1,22 @@
+{
+  "contract": "spikes/equation-device/v1",
+  "name": "USER_HEMT",
+  "material": "Generic illustrative HEMT-like electrical equations; no manufacturer or material qualification",
+  "pins": ["D", "G", "S", "FP"],
+  "parameters": {
+    "gain": {"value": 0.01, "unit": "A/V^2"},
+    "threshold": {"value": 1.5, "unit": "V"},
+    "smoothing": {"value": 0.1, "unit": "V"},
+    "vsat": {"value": 2.0, "unit": "V"},
+    "cgs": {"value": 1e-9, "unit": "F"},
+    "cgd": {"value": 1e-10, "unit": "F"},
+    "cfield": {"value": 1e-11, "unit": "F"}
+  },
+  "branches": [
+    {"name": "channel", "positive": "D", "negative": "S", "current_a": "gain*(smoothing*log(1+exp(limit((V(G,S)-threshold)/smoothing,-50,50))))^2*tanh(V(D,S)/vsat)"},
+    {"name": "gate_source", "positive": "G", "negative": "S", "charge_c": "cgs*V(G,S)"},
+    {"name": "miller", "positive": "G", "negative": "D", "charge_c": "cgd*(V(G,D)+atan(V(G,D)))"},
+    {"name": "field_plate", "positive": "FP", "negative": "D", "charge_c": "cfield*V(FP,D)"}
+  ],
+  "notes": "Explicit field-plate terminal. Expressions are illustrative, not a physical GaN/AlGaN or diamond compact model. No trapping, breakdown, recovery or self-heating. Numeric voltages in nonlinear functions use an implicit 1 V reference here. Supply real coefficients and qualification evidence before engineering use."
+}

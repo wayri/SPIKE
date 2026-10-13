@@ -94,17 +94,11 @@ def _native_extension() -> Path:
 
 
 def _spikes_library() -> Path:
-    names = {
-        "win32": "spikes_c_api.dll",
-        "darwin": "libspikes_c_api.dylib",
-    }
-    library = ROOT / "build-spikes-hybrid" / names.get(sys.platform, "libspikes_c_api.so")
-    if not library.is_file():
-        raise RuntimeError(
-            "The owned SPIKES C ABI library is missing: "
-            f"{library}. Build the native circuit engine before packaging."
-        )
-    return library
+    # Use the same fixed, first-party native payload selected by development.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from python.spike_core.spikes_runtime import owned_library_path
+    return owned_library_path()
 
 
 def _require_pyinstaller() -> str:
@@ -539,6 +533,12 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         "python.spike_core.mcad_export_design",
         "--collect-submodules",
         "extensions.openems_suite",
+        "--hidden-import",
+        "python.spike_core.sparselizard_process",
+        "--hidden-import",
+        "python.spike_core.circuit_worker_supervisor",
+        "--hidden-import",
+        "python.spike_core.solver_state",
         "--add-data",
         f"{ROOT / 'python' / 'spike_core' / 'freecad_assembly_export.py'}{os.pathsep}python/spike_core",
         "--add-data",

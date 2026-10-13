@@ -119,9 +119,9 @@ const importSource = readFileSync(new URL("../src/boardImport.ts", import.meta.u
 assert.match(appSource, /await parseDesignSourceOffThread\(fileName, source\)/,
   "raw board import must parse off the UI thread");
 assert.match(appSource, /const file = await selectNativeWorkbenchFile\(\)/,
-  "desktop source selection must return an approved native file with its path");
+  "desktop source import must use the native approved-path picker");
 assert.match(appSource, /setSourceImport\(\{ source: file, kind \}\)/,
-  "desktop board import must retain its approved native file for project-relative 3D models");
+  "desktop board import must retain its approved native source record for project-relative 3D models");
 const workflowSource = readFileSync(new URL("../src/useBoardVisualImport.ts", import.meta.url), "utf8");
 assert.match(workflowSource, /board_path: input.path/,
   "native visual export must use the approved source path instead of a basename-only temporary board");

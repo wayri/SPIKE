@@ -1,0 +1,4 @@
+{
+  "build": {"beforeDevCommand": "", "devUrl": "http://127.0.0.1:1420"},
+  "app": {"windows": [{"label": "main", "title": "SPIKE | Internal airflow verification", "url": "scripts/fixtures/internal-airflow.html", "width": 1320, "height": 850, "minWidth": 700, "minHeight": 600, "resizable": true, "center": true}]}
+}

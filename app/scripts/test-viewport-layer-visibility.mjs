@@ -21,8 +21,9 @@ const importedLayerAst=ts.createSourceFile('importedBoardLayers.ts',importedLaye
 let importedVisibilityFunction;importedLayerAst.forEachChild(node=>{if(ts.isFunctionDeclaration(node)&&node.name?.text==='importedBoardLayerVisible')importedVisibilityFunction=node.getText(importedLayerAst);});
 assert.ok(importedVisibilityFunction);const importedBoardLayerVisible=new Function(compile(`${importedVisibilityFunction.replace(/^export\s+/,'')}\nreturn importedBoardLayerVisible;`))();
 const policy=await import(`data:text/javascript;base64,${Buffer.from(compile(await readFile(new URL('../src/viewportScenePolicy.ts',import.meta.url),'utf8'))).toString('base64')}`);
-const keys=['group','placeholderRoot','visibleLayers','copperLayers','viewMode','missingModelSet','importedBoardLayers','showThtModels','showSmdModels','showModels','resultModelsVisible','proceduralModelsAllowed','authoritativeView','presentation','showVias','isolatedNet','analysisNetSet','analysisOnlyScene','resultVisualization','offsetForLayer','layerOpacity','selectedId','hoverPreview','hoverMaterials','selectionMaterials'];
-const execute=new Function('THREE','env','layerObjectVisible','viaSpanVisible',compile(`const {${keys.join(',')}}=env; group.traverse(${traversal});`));
+const netFocusPolicy=await import(`data:text/javascript;base64,${Buffer.from(compile(await readFile(new URL('../src/netFocusMaterial.ts',import.meta.url),'utf8'))).toString('base64')}`);
+const keys=['group','placeholderRoot','visibleLayers','copperLayers','viewMode','missingModelSet','importedBoardLayers','showThtModels','showSmdModels','showModels','resultModelsVisible','proceduralModelsAllowed','authoritativeView','presentation','showVias','isolatedNet','analysisNetSet','analysisOnlyScene','resultVisualization','offsetForLayer','layerOpacity','selectedId','hoverPreview','hoverMaterials','selectionMaterials','netFocusActive'];
+const execute=new Function('THREE','env','layerObjectVisible','viaSpanVisible','applyNetFocusColor',compile(`const {${keys.join(',')}}=env; group.traverse(${traversal});`));
 const batch=new Function('THREE','mergeGeometries','viewportSceneIdentity','viewportRenderOrder',compile(`${functions.identifySceneObject}\n${functions.batchProceduralGeometry}\nreturn batchProceduralGeometry;`))(THREE,mergeGeometries,policy.viewportSceneIdentity,policy.viewportRenderOrder);
 const effective=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true;};
 const importedRoot=new THREE.Group();
@@ -45,8 +46,8 @@ for(const count of [2,6,12,16,32])for(const batched of [false,true]){
  for(let i=0;i<layers.length-1;i++){const barrel=add({type:'via',layer:'through',viaBarrel:true,viaStartLayer:layers[i],viaEndLayer:layers[i+1]});viaGroup.add(barrel);}
  for(const [start,end] of [[0,layers.length-1],[1,Math.max(1,layers.length-2)]]){if(end>=layers.length)continue;const barrel=add({type:'via',layer:'through',viaBarrel:true,viaStartLayer:layers[start],viaEndLayer:layers[end]});viaGroup.add(barrel);}
  if(batched)batch(group,layers);
- const env={group,placeholderRoot:null,copperLayers:layers,viewMode:'3D',missingModelSet:new Set(),importedBoardLayers:new Set(),showThtModels:true,showSmdModels:true,showModels:true,resultModelsVisible:true,proceduralModelsAllowed:true,authoritativeView:false,presentation:{proceduralComponents:true},showVias:true,isolatedNet:null,analysisNetSet:new Set(),analysisOnlyScene:false,resultVisualization:null,offsetForLayer:()=>0,layerOpacity:{},selectedId:null,hoverPreview:null,hoverMaterials:new Set(),selectionMaterials:new Set()};
- const run=()=>execute(THREE,env,policy.layerObjectVisible,policy.viaSpanVisible);
+ const env={netFocusActive:false,group,placeholderRoot:null,copperLayers:layers,viewMode:'3D',missingModelSet:new Set(),importedBoardLayers:new Set(),showThtModels:true,showSmdModels:true,showModels:true,resultModelsVisible:true,proceduralModelsAllowed:true,authoritativeView:false,presentation:{proceduralComponents:true},showVias:true,isolatedNet:null,analysisNetSet:new Set(),analysisOnlyScene:false,resultVisualization:null,offsetForLayer:()=>0,layerOpacity:{},selectedId:null,hoverPreview:null,hoverMaterials:new Set(),selectionMaterials:new Set()};
+ const run=()=>execute(THREE,env,policy.layerObjectVisible,policy.viaSpanVisible,netFocusPolicy.applyNetFocusColor);
  const check=()=>group.traverse(object=>{
   const d=object.userData;if(d.model||d.substrate)return;
   if(d.viaBarrel){const span=layers.slice(layers.indexOf(d.viaStartLayer),layers.indexOf(d.viaEndLayer)+1);assert.equal(effective(object),span.some(l=>env.visibleLayers[l]!==false),`${count}/${batched} barrel span`);}
@@ -69,6 +70,10 @@ for(const count of [2,6,12,16,32])for(const batched of [false,true]){
  env.layerOpacity['Board body']=.5;run();assert.equal(substrate.material.opacity,.2);
  delete env.layerOpacity['Board body'];run();
  group.traverse(o=>{if(o.userData.viaFaceLayer)assert.ok(Math.abs(o.material.opacity-(o.userData.viaFaceLayer==='F.Cu'?.12:.4))<1e-12,'Pooled via opacity must remain independent');});
+ env.netFocusActive=true;run();
+ group.traverse(o=>{if(o instanceof THREE.Mesh && o.userData.layer?.endsWith('.Cu') && !o.userData.model){assert.equal(o.material.color.getHex(),0x667076,'actual copper traversal desaturates unselected context');}});
+ env.netFocusActive=false;run();
+ group.traverse(o=>{if(o instanceof THREE.Mesh && o.userData.layer?.endsWith('.Cu') && !o.userData.model){assert.equal(o.material.color.getHex(),0xffffff,'clear focus restores the original copper material');}});
  env.showSmdModels=false;run();assert.equal(effective(component),false);assert.equal(effective(substrate),true);assert.equal(effective(frontMask),true);
  env.showSmdModels=true;env.showVias=false;run();assert.equal(effective(component),true);assert.equal(effective(substrate),true);
  group.traverse(o=>{if(o.userData.viaFaceLayer||o.userData.viaBarrel)assert.equal(effective(o),false);});

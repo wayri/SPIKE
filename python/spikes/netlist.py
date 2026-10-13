@@ -9,7 +9,7 @@ import math
 import re
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 from .behavioral import compile_behavioral_expression
 
@@ -26,12 +26,17 @@ from .contracts import (
     StepVariant,
     SwitchModel,
 )
+from .transient_controls import (
+    MAX_TRANSIENT_POINTS,
+    effective_integration_step_s,
+    output_times_s,
+    transient_integration_point_count,
+)
 
 
 MAX_NETLIST_BYTES = 8 * 1024 * 1024
 MAX_NETLIST_LINES = 100_000
 MAX_SWEEP_POINTS = 1_000_000
-MAX_TRANSIENT_POINTS = 1_000_000
 MAX_SUBCIRCUITS = 4096
 MAX_HIERARCHY_DEPTH = 64
 MAX_EXPANDED_INSTANCES = 100_000
@@ -546,7 +551,7 @@ def _measure_directive(
         raise _error("SPIKES_NETLIST_MEASURE_INVALID", str(exc), line, source_name) from exc
 
 
-def _expand_local_includes(text: str, source_name: str) -> str:
+def _expand_local_includes(text: str, source_name: str, source_snapshots: Mapping[str, str] | None = None) -> str:
     if not re.search(r"(?im)^\s*\.(?:include|lib)\b", text):
         return text
     main = Path(source_name)
@@ -614,10 +619,19 @@ def _expand_local_includes(text: str, source_name: str) -> str:
             if len(visited) > MAX_INCLUDE_FILES:
                 raise _error("SPIKES_NETLIST_INCLUDE_LIMIT", f"Netlist references more than {MAX_INCLUDE_FILES} files.", line_number, str(current))
             try:
-                file_bytes = target.stat().st_size
+                if source_snapshots is not None:
+                    if str(target) not in source_snapshots:
+                        raise _error("SPIKES_NETLIST_INCLUDE_UNADMITTED", "Included source has no admitted snapshot.", line_number, str(current))
+                    loaded = source_snapshots[str(target)]
+                    if not isinstance(loaded, str):
+                        raise _error("SPIKES_NETLIST_INCLUDE_UNADMITTED", "Source snapshots must contain UTF-8 decoded text.", line_number, str(current))
+                    file_bytes = len(loaded.encode("utf-8"))
+                else:
+                    file_bytes = target.stat().st_size
                 if file_bytes > MAX_NETLIST_BYTES or total_bytes + file_bytes > MAX_NETLIST_BYTES:
                     raise _error("SPIKES_NETLIST_SIZE_LIMIT", "Aggregate included source exceeds the 8 MiB input limit.", line_number, str(current))
-                loaded = target.read_text(encoding="utf-8")
+                if source_snapshots is None:
+                    loaded = target.read_text(encoding="utf-8")
                 total_bytes += file_bytes
             except (OSError, UnicodeError) as exc:
                 raise _error("SPIKES_NETLIST_INCLUDE_READ", f"Cannot read included file: {exc}", line_number, str(current)) from exc
@@ -630,9 +644,9 @@ def _expand_local_includes(text: str, source_name: str) -> str:
 
 
 def _source_waveform(expression: str, kind: str, parameters: dict[str, float]) -> SourceWaveform:
-    matched = re.fullmatch(r"(?is)\s*(pulse|pwl)\s*\((.*)\)\s*", expression)
+    matched = re.fullmatch(r"(?is)\s*(pulse|pwl|sin|exp|sffm)\s*\((.*)\)\s*", expression)
     if matched is None:
-        raise ValueError("Native source form must be PULSE(...) or PWL(...).")
+        raise ValueError("Native source form must be PULSE(...), PWL(...), SIN(...), EXP(...), or SFFM(...).")
     form = matched.group(1).lower()
     raw_values = _tokens(matched.group(2).replace(",", " "))
     if form == "pulse":
@@ -644,6 +658,43 @@ def _source_waveform(expression: str, kind: str, parameters: dict[str, float]) -
             *(_evaluate_expression(item, parameters, "time") for item in raw_values[2:]),
         )
         return SourceWaveform(kind="pulse", pulse=tuple(values))
+    if form == "sin":
+        if not 3 <= len(raw_values) <= 6:
+            raise ValueError("SIN requires VO VA FREQ with optional TD THETA PHASE.")
+        padded = [*raw_values, *("0" for _ in range(6 - len(raw_values)))]
+        values = (
+            _evaluate_expression(padded[0], parameters, kind),
+            _evaluate_expression(padded[1], parameters, kind),
+            _evaluate_expression(padded[2], parameters, "scalar"),
+            _evaluate_expression(padded[3], parameters, "time"),
+            _evaluate_expression(padded[4], parameters, "scalar"),
+            _evaluate_expression(padded[5], parameters, "scalar"),
+        )
+        return SourceWaveform(kind="sin", sine=values)
+    if form == "exp":
+        if len(raw_values) != 6:
+            raise ValueError("EXP requires explicit V1 V2 TD1 TAU1 TD2 TAU2.")
+        values = (
+            _evaluate_expression(raw_values[0], parameters, kind),
+            _evaluate_expression(raw_values[1], parameters, kind),
+            *(_evaluate_expression(item, parameters, "time") for item in raw_values[2:]),
+        )
+        return SourceWaveform(kind="exp", exponential=tuple(values))
+    if form == "sffm":
+        if not 5 <= len(raw_values) <= 8:
+            raise ValueError("SFFM requires VO VA FC MDI FM with optional TD PHASEM PHASEC.")
+        padded = [*raw_values, *("0" for _ in range(8 - len(raw_values)))]
+        values = (
+            _evaluate_expression(padded[0], parameters, kind),
+            _evaluate_expression(padded[1], parameters, kind),
+            _evaluate_expression(padded[2], parameters, "scalar"),
+            _evaluate_expression(padded[3], parameters, "scalar"),
+            _evaluate_expression(padded[4], parameters, "scalar"),
+            _evaluate_expression(padded[5], parameters, "time"),
+            _evaluate_expression(padded[6], parameters, "scalar"),
+            _evaluate_expression(padded[7], parameters, "scalar"),
+        )
+        return SourceWaveform(kind="sffm", sffm=values)
     if len(raw_values) < 2 or len(raw_values) % 2:
         raise ValueError("PWL requires one or more TIME VALUE pairs.")
     points = tuple(
@@ -910,9 +961,15 @@ def _element(
             )
         if prefix in {"V", "I"} and native_extensions and len(tokens) >= 4:
             expression = " ".join(tokens[3:])
-            if re.match(r"(?is)^\s*(pulse|pwl)\s*\(", expression):
+            if re.match(r"(?is)^\s*(pulse|pwl|sin|exp|sffm)\s*\(", expression):
                 waveform = _source_waveform(expression, kind, parameters)
-                initial = waveform.pulse[0] if waveform.kind == "pulse" else waveform.points[0][1]
+                initial = (
+                    waveform.pulse[0]
+                    if waveform.kind == "pulse"
+                    else waveform.points[0][1]
+                    if waveform.kind == "pwl"
+                    else waveform.value_at(0.0)
+                )
                 return CircuitElement(
                     name=name,
                     kind=kind,
@@ -1168,6 +1225,7 @@ def _flatten(
     global_nodes: set[str],
     source_name: str,
     top_parameter_overrides: dict[str, float] | None = None,
+    explicit_initial_conditions: set[str] | None = None,
 ) -> tuple[tuple[CircuitElement, ...], tuple[HierarchyInstance, ...]]:
     elements: list[CircuitElement] = []
     hierarchy: list[HierarchyInstance] = []
@@ -1288,6 +1346,9 @@ def _flatten(
                             list(value.tokens), statement.line, source_name,
                             native_extensions=value.native_extensions, parameters=parameters,
                         )
+                        if (explicit_initial_conditions is not None
+                                and resolved.kind == "capacitor" and len(value.tokens) == 5):
+                            explicit_initial_conditions.add(name.upper())
                         elements.append(CircuitElement(
                             name=name,
                             kind=resolved.kind,
@@ -1360,6 +1421,51 @@ def _flatten(
     return tuple(elements), tuple(hierarchy)
 
 
+def _lower_initial_voltages(
+    elements: tuple[CircuitElement, ...],
+    assignments: tuple[tuple[str, str], ...],
+    parameters: Mapping[str, float],
+    explicit_initial_conditions: set[str],
+    line: int,
+    source_name: str,
+) -> tuple[CircuitElement, ...]:
+    """Lower the admitted UIC capacitor-state subset, never infer node state."""
+    voltages = {"0": 0.0}
+    try:
+        for node, expression in assignments:
+            value = _evaluate_expression(expression, parameters, "voltage_source")
+            if node == "0" and value != 0.0:
+                raise ValueError("The initial voltage of reference node 0 must be zero.")
+            voltages[node] = value
+        used: set[str] = {"0"}
+        result: list[CircuitElement] = []
+        declared = {node for node, _ in assignments} - {"0"}
+        for element in elements:
+            terminals = {element.positive_node, element.negative_node}
+            if element.kind == "capacitor" and terminals & declared:
+                used.update(terminals & declared)
+                # Inline device state takes precedence, including explicit IC=0.
+                if element.name.upper() not in explicit_initial_conditions:
+                    if not terminals <= voltages.keys():
+                        raise ValueError(
+                            f".ic requires both terminal voltages for capacitor {element.name}; "
+                            "only reference node 0 is implicitly zero."
+                        )
+                    element = replace(element, initial_condition=(
+                        voltages[element.positive_node] - voltages[element.negative_node]
+                    ))
+            result.append(element)
+        unused = declared - used
+        if unused:
+            raise ValueError(
+                ".ic supports capacitor state only; no capacitor uses node(s): "
+                + ", ".join(sorted(unused)) + "."
+            )
+        return tuple(result)
+    except ValueError as exc:
+        raise _error("SPIKES_NETLIST_IC_UNSUPPORTED", str(exc), line, source_name) from exc
+
+
 def parse_netlist(
     text: str,
     *,
@@ -1367,6 +1473,7 @@ def parse_netlist(
     probes: Iterable[ProbeDescriptor] = (),
     native_extensions: bool = False,
     transient_capture: str = "full",
+    source_snapshots: Mapping[str, str] | None = None,
 ) -> CircuitProject:
     """Parse the bounded owned-engine subset with deterministic elaboration.
 
@@ -1383,7 +1490,7 @@ def parse_netlist(
     original_encoded = text.encode("utf-8")
     if len(original_encoded) > MAX_NETLIST_BYTES or len(text.splitlines()) > MAX_NETLIST_LINES:
         raise _error("SPIKES_NETLIST_SIZE_LIMIT", "Top-level netlist exceeds the input resource limits.", 0, source_name)
-    text = _expand_local_includes(text, source_name)
+    text = _expand_local_includes(text, source_name, source_snapshots)
     encoded = text.encode("utf-8")
     if len(encoded) > MAX_NETLIST_BYTES:
         raise _error("SPIKES_NETLIST_SIZE_LIMIT", "Netlist exceeds the 8 MiB input limit.", 0, source_name)
@@ -1442,6 +1549,9 @@ def parse_netlist(
     measurements: list[MeasureDirective] = []
     temperature_c = 27.0
     temperature_declared = False
+    initial_voltages: tuple[tuple[str, str], ...] = ()
+    initial_line = 0
+    initial_parameter_statements: tuple[_Statement, ...] = ()
 
     for line_number, line in lines:
         significant_index += 1
@@ -1516,6 +1626,35 @@ def parse_netlist(
                     top_parameter_values, assignments, line_number, source_name
                 )
                 saw_statement = True
+            continue
+
+        if keyword == ".ic":
+            if current_name or not native_extensions:
+                raise _error("SPIKES_NETLIST_IC_UNSUPPORTED", ".ic requires the native route and top-level capacitor node voltages.", line_number, source_name)
+            if initial_line:
+                raise _error("SPIKES_NETLIST_IC_DUPLICATE", "Use one .ic directive with V(node)=value assignments.", line_number, source_name)
+            body = line[len(tokens[0]):].strip()
+            pattern = re.compile(r"(?i)V\(\s*([A-Za-z0-9_.$:+-]+)\s*\)\s*=\s*(\{[^{}]+\}|[^\s,]+)")
+            entries: list[tuple[str, str]] = []
+            seen_nodes: set[str] = set()
+            position = 0
+            for matched in pattern.finditer(body):
+                if body[position:matched.start()].strip(" \t,"):
+                    raise _error("SPIKES_NETLIST_IC_INVALID", "Use .ic V(node)=value; only node voltages are supported.", line_number, source_name)
+                node = matched.group(1).lower()
+                if node in seen_nodes:
+                    raise _error("SPIKES_NETLIST_IC_DUPLICATE", f"Initial voltage for node {node} is duplicated.", line_number, source_name)
+                if len(entries) >= MAX_PARAMETERS:
+                    raise _error("SPIKES_NETLIST_IC_INVALID", "Use at most 4096 .ic V(node)=value assignments.", line_number, source_name)
+                entries.append((node, matched.group(2)))
+                seen_nodes.add(node)
+                position = matched.end()
+            if not entries or body[position:].strip(" \t,"):
+                raise _error("SPIKES_NETLIST_IC_INVALID", "Use at most 4096 .ic V(node)=value assignments.", line_number, source_name)
+            initial_voltages = tuple(entries)
+            initial_line = line_number
+            initial_parameter_statements = tuple(item for item in top if isinstance(item.value, _ParamStatement))
+            saw_statement = True
             continue
 
         if keyword == ".temp":
@@ -1701,10 +1840,12 @@ def parse_netlist(
             saw_statement = True
             continue
         if keyword == ".tran":
-            if len(tokens) not in {3, 4} or (len(tokens) == 4 and tokens[3].lower() != "uic"):
+            use_initial_conditions = tokens[-1].lower() == "uic"
+            values = tokens[1:-1] if use_initial_conditions else tokens[1:]
+            if len(values) not in {2, 3, 4}:
                 raise _error(
                     "SPIKES_NETLIST_TRAN_ARITY",
-                    ".tran requires TSTEP TSTOP with an optional UIC token; TSTART and TMAX remain unsupported.",
+                    ".tran requires TSTEP TSTOP [TSTART [TMAX]] [UIC].",
                     line_number,
                     source_name,
                 )
@@ -1718,24 +1859,39 @@ def parse_netlist(
             try:
                 analysis = AnalysisDirective(
                     mode="transient",
-                    time_step_s=_evaluate_expression(tokens[1], top_parameter_values, "time"),
-                    stop_time_s=_evaluate_expression(tokens[2], top_parameter_values, "time"),
-                    use_initial_conditions=len(tokens) == 4,
+                    time_step_s=_evaluate_expression(values[0], top_parameter_values, "time"),
+                    stop_time_s=_evaluate_expression(values[1], top_parameter_values, "time"),
+                    start_time_s=(
+                        _evaluate_expression(values[2], top_parameter_values, "time")
+                        if len(values) >= 3 else 0.0
+                    ),
+                    maximum_time_step_s=(
+                        _evaluate_expression(values[3], top_parameter_values, "time")
+                        if len(values) == 4 else None
+                    ),
+                    use_initial_conditions=use_initial_conditions,
                 )
+                assert analysis.time_step_s is not None
+                assert analysis.stop_time_s is not None
+                if transient_capture == "full":
+                    effective_integration_step_s(
+                        analysis.time_step_s,
+                        analysis.stop_time_s,
+                        analysis.maximum_time_step_s,
+                    )
+                    output_times_s(
+                        analysis.time_step_s,
+                        analysis.start_time_s,
+                        analysis.stop_time_s,
+                    )
+                else:
+                    # Rolling/continuous sessions retain a bounded ring, not a
+                    # full integration history. Still reject nonfinite grids.
+                    limit = min(analysis.time_step_s, analysis.maximum_time_step_s or analysis.time_step_s)
+                    if not math.isfinite(analysis.stop_time_s / limit):
+                        raise ValueError("Transient time grid is not finite.")
             except ValueError as exc:
                 raise _error("SPIKES_NETLIST_TRAN_INVALID", str(exc), line_number, source_name) from exc
-            assert analysis.time_step_s is not None and analysis.stop_time_s is not None
-            point_ratio = analysis.stop_time_s / analysis.time_step_s
-            if transient_capture == 'full' and (
-                not math.isfinite(point_ratio)
-                or int(math.floor(point_ratio + 1e-12)) + 1 > MAX_TRANSIENT_POINTS
-            ):
-                raise _error(
-                    "SPIKES_NETLIST_TRAN_LIMIT",
-                    f"Transient analysis exceeds {MAX_TRANSIENT_POINTS} output points.",
-                    line_number,
-                    source_name,
-                )
             saw_statement = True
             continue
         if keyword.startswith("."):
@@ -1779,8 +1935,10 @@ def parse_netlist(
             source_name,
         )
     _validate_hierarchy(definitions, tuple(top), source_name)
+    explicit_initial_conditions: set[str] = set()
     elements, hierarchy = _flatten(
-        tuple(top), definitions, diode_models, global_nodes, source_name
+        tuple(top), definitions, diode_models, global_nodes, source_name,
+        explicit_initial_conditions=explicit_initial_conditions,
     )
     temperature_k = temperature_c + 273.15
     if temperature_c != 27 and any(e.semiconductor_nodes for e in elements):
@@ -1818,13 +1976,49 @@ def parse_netlist(
             0,
             source_name,
         )
+    def apply_initial_voltages(items: tuple[CircuitElement, ...], overrides: dict[str, float]) -> tuple[CircuitElement, ...]:
+        if not initial_voltages:
+            return items
+        if analysis.mode != "transient" or not analysis.use_initial_conditions:
+            raise _error("SPIKES_NETLIST_IC_ANALYSIS", ".ic capacitor state requires .tran ... UIC; constrained DC initialization is unsupported.", initial_line, source_name)
+        parameters: dict[str, float] = {}
+        for statement in initial_parameter_statements:
+            assert isinstance(statement.value, _ParamStatement)
+            parameters = _apply_assignments(parameters, statement.value.assignments, statement.line, source_name)
+            for name, _ in statement.value.assignments:
+                if name in overrides:
+                    parameters[name] = overrides[name]
+        return _lower_initial_voltages(items, initial_voltages, parameters, explicit_initial_conditions, initial_line, source_name)
+
+    elements = apply_initial_voltages(elements, {})
     analysis_points = 1
     if analysis.mode == "dc_sweep":
         assert analysis.start is not None and analysis.stop is not None and analysis.step is not None
         analysis_points = int(math.floor(abs((analysis.stop - analysis.start) / analysis.step) + 1e-12)) + 1
-    elif analysis.mode == "transient":
+    elif analysis.mode == "transient" and transient_capture == "full":
         assert analysis.time_step_s is not None and analysis.stop_time_s is not None
-        analysis_points = int(math.floor(analysis.stop_time_s / analysis.time_step_s + 1e-12)) + 1
+        _, integration_points = effective_integration_step_s(
+            analysis.time_step_s,
+            analysis.stop_time_s,
+            analysis.maximum_time_step_s,
+        )
+        analysis_points = max(
+            integration_points,
+            len(output_times_s(
+                analysis.time_step_s,
+                analysis.start_time_s,
+                analysis.stop_time_s,
+            )),
+        )
+    elif analysis.mode == "transient" and steps:
+        assert analysis.time_step_s is not None and analysis.stop_time_s is not None
+        # Rolling capture avoids full-history allocation, while STEP expansion
+        # remains subject to its independent total-work bound below.
+        analysis_points = transient_integration_point_count(
+            analysis.time_step_s,
+            analysis.stop_time_s,
+            analysis.maximum_time_step_s,
+        )
     elif analysis.mode == "ac":
         assert analysis.frequency_points is not None
         analysis_points = analysis.frequency_points
@@ -1851,6 +2045,7 @@ def parse_netlist(
                 else element
                 for element in variant_elements
             )
+            variant_elements = apply_initial_voltages(variant_elements, parameters)
             if variant_hierarchy != hierarchy:
                 raise _error("SPIKES_NETLIST_STEP_TOPOLOGY", "STEP parameters may not alter hierarchy topology.", 0, source_name)
             step_variants.append(StepVariant(tuple(zip(names, values, strict=True)), variant_elements))

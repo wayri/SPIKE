@@ -98,3 +98,63 @@ assert.equal(stale.filter(item => item.status === 'rejected').length, 99);
 console.log(JSON.stringify({ occurrences: 10_000, geometryAllocations: 1, retainedBytes,
   elapsedMs: Math.round(performance.now() - started), maximumConcurrentLoads: peak,
   disposal: 'verified', cancellation: 'verified' }));
+
+// Closing a viewport must release even under-budget sources, including sources
+// whose requests finish after teardown, without invalidating a sibling viewport.
+const lifecycleDisposals = new Map();
+const lifecycleLoads = new Map();
+const lifecycleScene = key => {
+  const source = makeScene();
+  const counts = { geometry: 0, texture: 0, material: 0 };
+  lifecycleDisposals.set(key, counts);
+  const mesh = source.children[0];
+  mesh.geometry.addEventListener('dispose', () => counts.geometry++);
+  mesh.material.map.addEventListener('dispose', () => counts.texture++);
+  mesh.material.addEventListener('dispose', () => counts.material++);
+  return source;
+};
+let resolvePending, rejectPending;
+const lateSource = new Promise(resolve => { resolvePending = resolve; });
+const failedSource = new Promise((_resolve, reject) => { rejectPending = reject; });
+const lifecycle = new SceneResourceCache(async key => {
+  lifecycleLoads.set(key, (lifecycleLoads.get(key) ?? 0) + 1);
+  return key === 'pending' ? lateSource : key === 'failed' ? failedSource : lifecycleScene(key);
+});
+const retained = await lifecycle.clone('idle');
+disposeScene(retained);
+assert.ok(lifecycle.stats.bytes > 0, 'ordinary changes retain a bounded cache while mounted');
+const siblingA = await lifecycle.clone('shared');
+const siblingB = await lifecycle.clone('shared');
+const pendingClone = lifecycle.clone('pending');
+const pendingFailure = lifecycle.clone('failed');
+const failureCheck = assert.rejects(pendingFailure, /late failure/);
+lifecycle.releaseIdle();
+lifecycle.releaseIdle();
+assert.deepEqual(lifecycleDisposals.get('idle'), { geometry: 1, texture: 1, material: 1 });
+assert.deepEqual(lifecycleDisposals.get('shared'), { geometry: 0, texture: 0, material: 0 });
+assert.equal(lifecycle.stats.users, 4, 'live clones and pending requests remain pinned during teardown');
+resolvePending(lifecycleScene('pending'));
+rejectPending(new Error('late failure'));
+const loadedAfterClose = await pendingClone;
+await failureCheck;
+assert.deepEqual(lifecycleDisposals.get('pending'), { geometry: 0, texture: 0, material: 0 });
+let cloneMaterialDisposals = 0;
+loadedAfterClose.children[0].material.addEventListener('dispose', () => cloneMaterialDisposals++);
+disposeScene(loadedAfterClose);
+disposeScene(loadedAfterClose);
+assert.equal(cloneMaterialDisposals, 1, 'cancelled late clone owns one material instance shared by its children');
+assert.deepEqual(lifecycleDisposals.get('pending'), { geometry: 1, texture: 1, material: 1 });
+disposeScene(siblingA);
+assert.deepEqual(lifecycleDisposals.get('shared'), { geometry: 0, texture: 0, material: 0 });
+assert.ok(siblingB.children[0].geometry.getAttribute('position').count > 0);
+disposeScene(siblingB);
+assert.deepEqual(lifecycleDisposals.get('shared'), { geometry: 1, texture: 1, material: 1 });
+assert.deepEqual(lifecycle.stats, { entries: 0, bytes: 0, users: 0 });
+const reopened = await lifecycle.clone('shared');
+assert.equal(lifecycleLoads.get('shared'), 2, 'a later viewport reloads a released source');
+disposeScene(reopened);
+assert.equal(lifecycle.stats.entries, 1, 'future loads recover normal bounded retention');
+lifecycle.releaseIdle();
+assert.deepEqual(lifecycle.stats, { entries: 0, bytes: 0, users: 0 });
+assert.deepEqual(lifecycleDisposals.get('shared'), { geometry: 1, texture: 1, material: 1 });
+console.log('Viewport teardown releases retained and late sources exactly once; shared clones and future cache reuse remain safe.');

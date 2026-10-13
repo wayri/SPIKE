@@ -1,0 +1,329 @@
+{
+  "contract": "spike/openems-spatial-eh-field-input/v1",
+  "geometry": {
+    "contract": "spike/openems-box-assembly/v1",
+    "air_margin_mm": 35.0,
+    "boards": [
+      {
+        "id": "A",
+        "world_from_local_mm": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "boxes": [
+          {
+            "id": "substrate",
+            "kind": "dielectric",
+            "start_mm": [
+              -20,
+              -10,
+              -1.0
+            ],
+            "stop_mm": [
+              20,
+              10,
+              0.0
+            ],
+            "epsilon_r": 3.4,
+            "conductivity_s_m": 0.0
+          },
+          {
+            "id": "signal",
+            "kind": "conductor",
+            "start_mm": [
+              -15,
+              -1,
+              0.0
+            ],
+            "stop_mm": [
+              15,
+              1,
+              0.1
+            ],
+            "epsilon_r": 1.0,
+            "conductivity_s_m": 58000000.0
+          },
+          {
+            "id": "return",
+            "kind": "conductor",
+            "start_mm": [
+              -20,
+              -10,
+              -1.1
+            ],
+            "stop_mm": [
+              20,
+              10,
+              -1.0
+            ],
+            "epsilon_r": 1.0,
+            "conductivity_s_m": 58000000.0
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "world_from_local_mm": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "boxes": [
+          {
+            "id": "substrate",
+            "kind": "dielectric",
+            "start_mm": [
+              -20,
+              -10,
+              4.0
+            ],
+            "stop_mm": [
+              20,
+              10,
+              5.0
+            ],
+            "epsilon_r": 3.4,
+            "conductivity_s_m": 0.0
+          },
+          {
+            "id": "signal",
+            "kind": "conductor",
+            "start_mm": [
+              -15,
+              -1,
+              3.9
+            ],
+            "stop_mm": [
+              15,
+              1,
+              4.0
+            ],
+            "epsilon_r": 1.0,
+            "conductivity_s_m": 58000000.0
+          },
+          {
+            "id": "return",
+            "kind": "conductor",
+            "start_mm": [
+              -20,
+              -10,
+              5.0
+            ],
+            "stop_mm": [
+              20,
+              10,
+              5.1
+            ],
+            "epsilon_r": 1.0,
+            "conductivity_s_m": 58000000.0
+          }
+        ]
+      }
+    ]
+  },
+  "compiled_geometry": {
+    "contract": "spike/openems-world-box-geometry/v1",
+    "input_sha256": "bbcfbc6700e573645e22f668c87251fb4dcb7f9d44ca483b25e451bde79c711e",
+    "units": "mm",
+    "background": {
+      "epsilon_r": 1.0,
+      "conductivity_s_m": 0.0
+    },
+    "boxes": [
+      {
+        "board_id": "A",
+        "id": "substrate",
+        "kind": "dielectric",
+        "start_mm": [
+          -20.0,
+          -10.0,
+          -1.0
+        ],
+        "stop_mm": [
+          20.0,
+          10.0,
+          0.0
+        ],
+        "epsilon_r": 3.4,
+        "conductivity_s_m": 0.0
+      },
+      {
+        "board_id": "A",
+        "id": "signal",
+        "kind": "conductor",
+        "start_mm": [
+          -15.0,
+          -1.0,
+          0.0
+        ],
+        "stop_mm": [
+          15.0,
+          1.0,
+          0.1
+        ],
+        "epsilon_r": 1.0,
+        "conductivity_s_m": 58000000.0
+      },
+      {
+        "board_id": "A",
+        "id": "return",
+        "kind": "conductor",
+        "start_mm": [
+          -20.0,
+          -10.0,
+          -1.1
+        ],
+        "stop_mm": [
+          20.0,
+          10.0,
+          -1.0
+        ],
+        "epsilon_r": 1.0,
+        "conductivity_s_m": 58000000.0
+      },
+      {
+        "board_id": "B",
+        "id": "substrate",
+        "kind": "dielectric",
+        "start_mm": [
+          -20.0,
+          -10.0,
+          4.0
+        ],
+        "stop_mm": [
+          20.0,
+          10.0,
+          5.0
+        ],
+        "epsilon_r": 3.4,
+        "conductivity_s_m": 0.0
+      },
+      {
+        "board_id": "B",
+        "id": "signal",
+        "kind": "conductor",
+        "start_mm": [
+          -15.0,
+          -1.0,
+          3.9
+        ],
+        "stop_mm": [
+          15.0,
+          1.0,
+          4.0
+        ],
+        "epsilon_r": 1.0,
+        "conductivity_s_m": 58000000.0
+      },
+      {
+        "board_id": "B",
+        "id": "return",
+        "kind": "conductor",
+        "start_mm": [
+          -20.0,
+          -10.0,
+          5.0
+        ],
+        "stop_mm": [
+          20.0,
+          10.0,
+          5.1
+        ],
+        "epsilon_r": 1.0,
+        "conductivity_s_m": 58000000.0
+      }
+    ],
+    "domain": {
+      "start_mm": [
+        -55.0,
+        -45.0,
+        -36.1
+      ],
+      "stop_mm": [
+        55.0,
+        45.0,
+        40.1
+      ]
+    },
+    "mandatory_mesh_lines_mm": [
+      [
+        -55.0,
+        -20.0,
+        -15.0,
+        15.0,
+        20.0,
+        55.0
+      ],
+      [
+        -45.0,
+        -10.0,
+        -1.0,
+        1.0,
+        10.0,
+        45.0
+      ],
+      [
+        -36.1,
+        -1.1,
+        -1.0,
+        0.0,
+        0.1,
+        3.9,
+        4.0,
+        5.0,
+        5.1,
+        40.1
+      ]
+    ],
+    "production_qualified": false,
+    "limitations": [
+      "exact orthogonal boxes only; no curved, cutout, via or inferred connector lowering",
+      "mesh lines are interface constraints, not a wavelength/CFL qualified mesh",
+      "no port construction, solver execution or independent field validation"
+    ]
+  },
+  "frequencies_hz": [
+    500000000.0,
+    1500000000.0,
+    2500000000.0
+  ],
+  "excited_port": "A.near",
+  "mesh": {
+    "base_spacing_mm": 2.0,
+    "level": 0,
+    "policy": "nested-interior-fixed-pml/v1"
+  },
+  "solver_controls": {
+    "end_criteria": 1e-07,
+    "max_timesteps": 120000,
+    "threads": 1
+  },
+  "production_qualified": false
+}

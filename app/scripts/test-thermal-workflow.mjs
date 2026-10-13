@@ -49,7 +49,7 @@ const boundaryModule = { exports: {} };
 new Function("require", "module", "exports", ts.transpileModule(readFileSync(resolve(appRoot, "src", "thermalBoundaries.ts"), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText)(require, boundaryModule, boundaryModule.exports);
 const { normalizeThermalBoundaries, nativeThermalInputs } = boundaryModule.exports;
 const emptyComponent = () => null;
-function mountWizard(initialScenario, workerAvailable = true) {
+function mountWizard(initialScenario, workerAvailable = true, onOpenSolidStudy) {
   const states = [];
   let cursor = 0, saved, request;
   const dependencies = {
@@ -59,14 +59,14 @@ function mountWizard(initialScenario, workerAvailable = true) {
       if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
       return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
     },
-    useMemo: callback => callback(), useEffect() {}, useModalFocusScope: () => ({ scopeRef: { current: null }, onKeyDown() {} }), asThermalScenario: value => value,
+    useMemo: callback => callback(), useEffect() {}, asThermalScenario: value => value,
     normalizeThermalElements: value => value ?? [], normalizeThermalLinks: value => value ?? [], normalizeThermalBoundaries, nativeThermalInputs,
     normalizeThermalFans: value => value ?? [], normalizeThermalHeatsinks: value => value ?? [],
     thermalAssemblyIssues: () => [], screenThermalElements: () => [], thermalSchematic: () => ({}),
     thermalMaterials: [], thermalSurfaceFinishes: [], WorkflowSchematic: emptyComponent,
     ThermalInputImport: emptyComponent, ThermalAssemblyEditor: emptyComponent, ThermalBoundaryEditor: emptyComponent, ThermalHardwareEditor: emptyComponent, ThermalEnvironmentPanel: emptyComponent, BoardThermalPanel: emptyComponent,
-    ThermalTransientOverlay: emptyComponent, DataTable: ({ children }) => children,
-    X: emptyComponent, Play: emptyComponent, AlertTriangle: emptyComponent,
+    InternalAirflowPanel: emptyComponent, PwmElectrothermalPanel: emptyComponent, ThermalTransientOverlay: emptyComponent, DataTable: ({ children }) => children,
+    X: emptyComponent, Play: emptyComponent, AlertTriangle: emptyComponent, Boxes: emptyComponent, BarChart3: emptyComponent,
     async runLocalWorker(value) {
       request = value;
       return { ok: true, result: { contract: "spike/component-thermal-result/v1", status: "completed", model_status: "approximate", nodes: [], transient: [], summary: {}, issues: [] } };
@@ -74,7 +74,7 @@ function mountWizard(initialScenario, workerAvailable = true) {
   };
   const Wizard = new Function(...Object.keys(dependencies), `${compiled}\nreturn ThermalWizard;`)(...Object.values(dependencies));
   return {
-    render() { cursor = 0; return Wizard({ initialScenario, componentBonds: [], board: null, design: null, workerAvailable,
+    render() { cursor = 0; return Wizard({ initialScenario, assemblyBoards: [], onOpenSolidStudy, componentBonds: [], board: null, design: null, workerAvailable,
       onRequireAdmission: async () => null, onClose() {}, onStatus() {}, onPreview() {}, onScenario(value) { saved = value; } }); },
     get saved() { return saved; }, get request() { return request; },
   };
@@ -149,3 +149,12 @@ editorTree = Editor({ elements: [boardObject], boundaries: editedBoundaries, onB
 findNode(editorTree, node => node.type === "input" && node.props["aria-label"] === "Boundary 1 surface name").props.onChange({ target: { value: "fin-outer-7" } });
 assert.equal(editedBoundaries[0].surface, "fin-outer-7");
 console.log("Thermal wizard native run, transient controls, save/reopen, stale-result and unavailable-worker checks passed.");
+
+let solidStudyOpens = 0;
+const solidStudyWizard = mountWizard(null, true, () => { solidStudyOpens++; });
+const boardThermalChild = findNode(solidStudyWizard.render(), node => typeof node.props?.onOpenSolidStudy === "function");
+assert.ok(boardThermalChild, "wizard passes solid study navigation to the board thermal child");
+boardThermalChild.props.onOpenSolidStudy();
+assert.equal(solidStudyOpens, 1);
+assert.equal(solidStudyWizard.request, undefined, "opening the volume setup does not start a thermal solve");
+console.log("Thermal wizard passes explicit solid study navigation without invoking a solver.");

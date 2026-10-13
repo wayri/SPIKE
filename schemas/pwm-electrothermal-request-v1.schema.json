@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/pwm-electrothermal-request/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "parameters"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/pwm-electrothermal-request/v1"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "input_voltage_v": {
+          "type": "number"
+        },
+        "target_voltage_v": {
+          "type": "number"
+        },
+        "inductance_h": {
+          "type": "number"
+        },
+        "capacitance_f": {
+          "type": "number"
+        },
+        "load_resistance_ohm": {
+          "type": "number"
+        },
+        "winding_resistance_ohm": {
+          "type": "number"
+        },
+        "temperature_coefficient_per_k": {
+          "type": "number"
+        },
+        "ambient_temperature_k": {
+          "type": "number"
+        },
+        "thermal_resistance_k_per_w": {
+          "type": "number"
+        },
+        "thermal_capacitance_j_per_k": {
+          "type": "number"
+        },
+        "switch_on_resistance_ohm": {
+          "type": "number"
+        },
+        "switch_off_resistance_ohm": {
+          "type": "number"
+        },
+        "switching_frequency_hz": {
+          "type": "number"
+        },
+        "maximum_step_s": {
+          "type": "number"
+        },
+        "controller_kp_per_v": {
+          "type": "number"
+        },
+        "controller_ki_per_v_s": {
+          "type": "number"
+        },
+        "cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      }
+    },
+    "restart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "completed_cycles",
+        "configuration_sha256",
+        "library_sha256",
+        "state_sha256"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/pwm-electrothermal-checkpoint/v1"
+        },
+        "completed_cycles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "configuration_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "library_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "state_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

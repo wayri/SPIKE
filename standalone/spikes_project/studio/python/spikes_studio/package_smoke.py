@@ -48,7 +48,14 @@ def run(library,destination):
             check((resource_dir('docs')/'COMPONENT_LIBRARY.md').is_file(),'current illustrated library guide bundled')
             check(len(frame.symbols)>1,'real schematic symbol library loaded')
             panel=frame.catalog_panel;panel.search.ChangeValue('family:resistor');panel.filter()
-            check(len(panel.visible)==50,'catalog search works')
+            # The passive library has expanded beyond the original 50 presets.
+            # Compare complete identities against an independent field predicate,
+            # not an obsolete fixed count or merely a nonempty search result.
+            expected={row['id'] for row in panel.catalog['records']
+                      if 'resistor' in row['family'].casefold()}
+            actual={row['id'] for row in panel.visible}
+            check(bool(expected) and actual==expected and len(actual)==len(panel.visible),
+                  'catalog search works')
             frame.pin_browser(True);check(panel.GetParent() is frame.browser_side,'browser pins')
             frame.canvas.selected={frame.doc.data['components'][1]['id']};frame.pin_properties(True)
             check(frame.properties_editor is not None,'editable properties pin')

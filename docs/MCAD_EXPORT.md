@@ -41,6 +41,34 @@ properties; STEP display-color transfer has not been qualified.
 
 ## Assembly schema
 
+Board projection also accepts explicit `parameters.component_models` bindings
+through the Python/extension context API. Preview the board first with
+`assembly_from_context(context)` and `parameters.allow_partial: true`. Its
+`properties.component_occurrences`, `retained_design_models` and
+`retained_design_digests` provide the exact ownership and baseline identifiers.
+For each model occurrence, supply:
+
+- `occurrence_id` and one of that component's retained `model_id` values;
+- `design_digest` from the preview's retained design baseline;
+- `model_to_board_mm`: explicit right-handed, row-major 4x4 proper-rigid matrix;
+- `geometry`: `type: "step"`, `data_base64` and the STEP byte `sha256`;
+- `placement_reference`: a bounded source/review reference;
+- optional `material_id`, backed by the context's explicit material table.
+
+Preview again before export. Missing or partial model coverage stays diagnostic;
+only complete coverage closes that component occurrence's missing-solid warning.
+Bindings for repeated boards are separate. Reimport or regenerate the preview
+after source edits; stale digests fail rather than reusing old geometry. Invalid
+STEP bytes, foreign ownership, duplicate bindings, scale/shear/reflection and
+unknown materials reject the handoff. No asset is fetched or inferred.
+
+The supplied placement is board-local and the body follows the board's assembly
+frame. Source KiCad vectors are retained unchanged and remain unapplied. Material
+properties can be retained, but every supplied body records material qualification
+and solver readiness as false. No new desktop binding editor is provided by this
+increment. See [the handoff decision](adr/0078-explicit-component-solid-handoff.md)
+and [native solid checks](validation/parity/WF01-S04C1.json).
+
 [Mechanical assembly v1](../schemas/mcad-assembly-v1.schema.json) uses millimetres,
 right-handed coordinates, stable string IDs and parent-relative row-major 4×4
 rigid transforms. Translation occupies indices 3, 7 and 11. Scale, shear,

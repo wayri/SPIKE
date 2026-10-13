@@ -26,6 +26,7 @@ pub fn is_targeted_project_read(method: &str) -> bool {
             | "read_project_state_artifact"
             | "read_project_visual_bundle"
             | "read_assembly_field_study_in_project"
+            | "read_volume_electrothermal_in_project"
             | "prepare_assembly_design_visual_bundle"
             | "export_mcad_session"
             | "preview_mcad_feedback"

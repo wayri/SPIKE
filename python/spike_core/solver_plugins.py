@@ -17,6 +17,7 @@ from typing import Any, Callable, Dict, Iterable, List, Protocol
 
 from .contracts import AnalysisResult, AnalysisSpec, SpiDeR, ValidationIssue
 from .dc_solver import solve_dc
+from .source_current_limits import CAPABILITY, capacity_failure, current_limit_issues, has_current_limits
 from .solver_geometry import build_solver_geometry
 
 
@@ -137,7 +138,8 @@ class BuiltinSolverPlugin:
         self._runner = runner
 
     def run(self, design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
-        return self._runner(design, spec)
+        issues = current_limit_issues(spec, CAPABILITY in self.manifest.capabilities)
+        return capacity_failure(spec, issues) if issues else self._runner(design, spec)
 
 
 class DeclaredSolverPlugin:
@@ -236,6 +238,9 @@ class ExternalProcessSolverPlugin:
         return dict(result)
 
     def run(self, design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
+        issues = current_limit_issues(spec, CAPABILITY in self.manifest.capabilities)
+        if issues:
+            return capacity_failure(spec, issues)
         if self.manifest.qualification.get("runtime_probe_required", False):
             probe = self.probe()
             if probe.get("status") != "passed":
@@ -393,16 +398,18 @@ class SolverRegistry:
         return self._plugins.get(solver_id)
 
     def select(self, spec: AnalysisSpec) -> SolverPlugin | None:
+        required = set(spec.required_capabilities)
+        if has_current_limits(spec):
+            required.add(CAPABILITY)
         if spec.solver_id and spec.solver_id != "auto":
             plugin = self.get(spec.solver_id)
             if plugin is None or spec.mode not in plugin.manifest.analyses:
                 return None
             if spec.formulation != "auto" and spec.formulation not in plugin.manifest.formulations:
                 return None
-            if not set(spec.required_capabilities).issubset(set(plugin.manifest.capabilities)):
+            if not required.issubset(set(plugin.manifest.capabilities)):
                 return None
             return plugin
-        required = set(spec.required_capabilities)
         candidates = []
         for plugin in self._plugins.values():
             manifest = plugin.manifest
@@ -417,6 +424,9 @@ class SolverRegistry:
 
     def run(self, design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
         plugin = self.select(spec)
+        issues = current_limit_issues(spec, plugin is not None and CAPABILITY in plugin.manifest.capabilities)
+        if issues:
+            return capacity_failure(spec, issues)
         from .importers import import_analysis_blockers
         blockers = import_analysis_blockers(design, spec.mode)
         if blockers:
@@ -510,7 +520,7 @@ def default_solver_registry() -> SolverRegistry:
             provider="SPIKE",
             analyses=["dc"],
             formulations=["resistive_network"],
-            capabilities=["dc_resistance", "voltage_drop", "current_density", "tracks", "through_vias", "pads", "copper_zones", "package_resistance", "contact_resistance", "sparse_network", "explicit_return_path", "isolated_power_domain"],
+            capabilities=["dc_resistance", "voltage_drop", "current_density", "tracks", "through_vias", "pads", "copper_zones", "package_resistance", "contact_resistance", "sparse_network", "explicit_return_path", "isolated_power_domain", CAPABILITY],
             state="available",
             model_status="approximate",
             validation="Analytical resistor-network, multi-sink, pad, zone, and package/contact fixtures pass. Zone sign-off requires mesh convergence.",

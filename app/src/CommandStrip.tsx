@@ -3,7 +3,7 @@ import { useId, useLayoutEffect, useRef, useState, type ReactNode } from "react"
 import { ChevronLeft, ChevronRight } from "./icons";
 import "./CommandStrip.css";
 
-/** A bounded command row. Overflow stays reachable by arrows, scrollbar and keyboard. */
+/** A bounded command row. Overflow stays reachable by edge arrows, touch scrolling and keyboard. */
 export default function CommandStrip({ children, label, className = "", id, as = "div", trailing }: {
   children: ReactNode;
   label: string;

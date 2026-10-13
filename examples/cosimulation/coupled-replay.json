@@ -1,0 +1,65 @@
+{
+  "contract": "spike/cosimulation-request/v1",
+  "model_id": "synthetic-gain-loop",
+  "model_revision": "example-v1",
+  "step_s": 1,
+  "steps": 3,
+  "participants": [
+    {
+      "id": "source",
+      "adapter": "replay",
+      "model_revision": "1",
+      "model_status": "experimental",
+      "inputs": {},
+      "outputs": {
+        "v": "V"
+      },
+      "initial_outputs": {
+        "v": 1
+      },
+      "config": {
+        "values": [
+          {
+            "v": 2
+          },
+          {
+            "v": 3
+          },
+          {
+            "v": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "load",
+      "adapter": "gain",
+      "model_revision": "1",
+      "model_status": "approximate",
+      "inputs": {
+        "u": "V"
+      },
+      "outputs": {
+        "y": "V"
+      },
+      "initial_outputs": {
+        "y": 0
+      },
+      "config": {
+        "gain": 2
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source": [
+        "source",
+        "v"
+      ],
+      "target": [
+        "load",
+        "u"
+      ]
+    }
+  ]
+}

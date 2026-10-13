@@ -1,0 +1,934 @@
+{
+  "contract": "spike/parity-development-backlog/v1",
+  "baseline_date": "2026-10-12",
+  "purpose": "Development tracking only; does not enable or qualify runtime capabilities.",
+  "items": [
+    {
+      "id": "SI01",
+      "title": "Pre-layout topology exploration and constraints",
+      "owner_role": "SI",
+      "baseline": "Partial: configurable RLGC/Touchstone endpoints and passives in [SI workflow](SI_WORKFLOW.md).",
+      "target": "Reusable topology editor, corners, termination sweeps and export of reviewed layout constraints.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "SI_WORKFLOW.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Reusable topology editor, corners, termination sweeps and export of reviewed layout constraints."
+      ]
+    },
+    {
+      "id": "SI02",
+      "title": "General post-layout channel extraction",
+      "owner_role": "SI",
+      "baseline": "Experimental straight/pair and piecewise planar paths; bends omit discontinuity physics. [Geometry channel](GEOMETRY_DERIVED_SI_CHANNEL.md).",
+      "target": "Branches, layer changes, return planes, arbitrary coupled conductors; geometry coverage report and converged extraction.",
+      "priority": "P0 M1, P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "GEOMETRY_DERIVED_SI_CHANNEL.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Branches, layer changes, return planes, arbitrary coupled conductors; geometry coverage report and converged extraction."
+      ]
+    },
+    {
+      "id": "SI03",
+      "title": "Vias, launches, connectors and package discontinuities",
+      "owner_role": "SI",
+      "baseline": "Bounded optional EM workflows; general board extraction is unqualified. [Solver status](SOLVER_STATUS.md).",
+      "target": "Calibrated multiport submodels, explicit reference planes, de-embedding, package/board composition and stitched return paths.",
+      "priority": "P1 M4",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Calibrated multiport submodels, explicit reference planes, de-embedding, package/board composition and stitched return paths."
+      ]
+    },
+    {
+      "id": "SI04",
+      "title": "Nonlinear IBIS driver and receiver behavior",
+      "owner_role": "SI",
+      "baseline": "Inventory and explicit DC-slope/ramp reduction; nonlinear switching and AMI absent. [SI guide](SI_USER_GUIDE.md).",
+      "target": "Qualified IBIS parser/model execution, clamps, V/T behavior, package parasitics, corners and model diagnostics.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "SI_USER_GUIDE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Qualified IBIS parser/model execution, clamps, V/T behavior, package parasitics, corners and model diagnostics."
+      ]
+    },
+    {
+      "id": "SI05",
+      "title": "SerDes statistical analysis and IBIS-AMI",
+      "owner_role": "SI",
+      "baseline": "Deterministic loaded NRZ/PAM4 records and bounded clock recovery; no established AMI or rare-event BER capability. [Solver status](SOLVER_STATUS.md).",
+      "target": "Bounded AMI execution, statistical/time-domain modes, CTLE/FFE/DFE, jitter/noise/CDR models and protocol-specific acceptance.",
+      "priority": "P1 M4",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Bounded AMI execution, statistical/time-domain modes, CTLE/FFE/DFE, jitter/noise/CDR models and protocol-specific acceptance."
+      ]
+    },
+    {
+      "id": "SI06",
+      "title": "DDR full-interface SI and timing verification",
+      "owner_role": "SI",
+      "baseline": "No qualified DDR interface workflow established by the inspected ledger.",
+      "target": "Controller/DRAM model binding, read/write timing, strobes, byte lanes, ODT, topology and corners; versioned JEDEC requirements.",
+      "priority": "P1 M4",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Controller/DRAM model binding, read/write timing, strobes, byte lanes, ODT, topology and corners; versioned JEDEC requirements."
+      ]
+    },
+    {
+      "id": "SI07",
+      "title": "Crosstalk, waveform, eye and TDR diagnostics",
+      "owner_role": "SI",
+      "baseline": "Partial experimental NEXT/FEXT, deterministic eyes, loaded transfer and TDR. [SI guide](SI_USER_GUIDE.md).",
+      "target": "Multi-aggressor switching, timing/noise budgets, spatial cross-probing and independent two/four-port VNA/TDR correlation.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "SI_USER_GUIDE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Multi-aggressor switching, timing/noise budgets, spatial cross-probing and independent two/four-port VNA/TDR correlation."
+      ]
+    },
+    {
+      "id": "SI08",
+      "title": "Network quality and interoperability",
+      "owner_role": "SI",
+      "baseline": "Operational Touchstone S/Z/Y, renormalization, bounded mixed mode, passivity/reciprocity; arbitrary causality checks unavailable. [Solver status](SOLVER_STATUS.md#network-data-workbench).",
+      "target": "Reviewed causality/resampling/DC policy, calibrated fixture removal, general port pairing and passive causal broadband model fitting.",
+      "priority": "P0 M1, P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md#network-data-workbench"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Reviewed causality/resampling/DC policy, calibrated fixture removal, general port pairing and passive causal broadband model fitting."
+      ]
+    },
+    {
+      "id": "PI01",
+      "title": "Board DC drop, current density and via loading",
+      "owner_role": "PI",
+      "baseline": "Executable routed/hybrid DC with bounded analytical benchmarks. [Solver status](SOLVER_STATUS.md#copper-geometry-dc-spikerouted_dc).",
+      "target": "Representative geometry qualification, full rail coverage, contacts, source/load regimes and measured-board correlation.",
+      "priority": "P0 M1, P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md#copper-geometry-dc-spikerouted_dc"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Representative geometry qualification, full rail coverage, contacts, source/load regimes and measured-board correlation."
+      ]
+    },
+    {
+      "id": "PI02",
+      "title": "Broadband AC PDN extraction",
+      "owner_role": "PI",
+      "baseline": "Approximate PEEC driving-point networks and candidate review; C/G estimates and scaling limits remain. [AC PI](AC_POWER_INTEGRITY_EFFECTS.md).",
+      "target": "Converged capacitance/dielectric loss, proximity redistribution, plane/via/package multiports and passivity-preserving reduction.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "AC_POWER_INTEGRITY_EFFECTS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Converged capacitance/dielectric loss, proximity redistribution, plane/via/package multiports and passivity-preserving reduction."
+      ]
+    },
+    {
+      "id": "PI03",
+      "title": "Physical decap selection and placement optimization",
+      "owner_role": "PI",
+      "baseline": "Supplied-network candidate/single-cap comparison exists. [PI tools](PI_ENGINEERING_TOOLS.md).",
+      "target": "Location-dependent extraction, bias/temperature/tolerance models, BOM constraints and validated optimizer; retain rejected candidates.",
+      "priority": "P1 M2, P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "PI_ENGINEERING_TOOLS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Location-dependent extraction, bias/temperature/tolerance models, BOM constraints and validated optimizer; retain rejected candidates."
+      ]
+    },
+    {
+      "id": "PI04",
+      "title": "Switching loads, SSN and circuit/field interaction",
+      "owner_role": "PI",
+      "baseline": "Native transient, staged ngspice and bounded field/circuit paths exist. [Solver status](SOLVER_STATUS.md).",
+      "target": "Qualified switching/model subsets, package PDN, simultaneous-switching return currents, stable broadband N-port coupling and reference comparisons.",
+      "priority": "P1 M2, P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Qualified switching/model subsets, package PDN, simultaneous-switching return currents, stable broadband N-port coupling and reference comparisons."
+      ]
+    },
+    {
+      "id": "PI05",
+      "title": "SI/PI/EMI/safety electrical DRC",
+      "owner_role": "PI",
+      "baseline": "Contextual checks, return-path tools and evidence export; no HyperLynx-class ruleset established. [Engineering review](ENGINEERING_REVIEW.md).",
+      "target": "Versioned geometric rule engine, explicit coverage, waivers, cross-probing and original fixture library; separate native EDA DRC/ERC evidence.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "ENGINEERING_REVIEW.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Versioned geometric rule engine, explicit coverage, waivers, cross-probing and original fixture library; separate native EDA DRC/ERC evidence."
+      ]
+    },
+    {
+      "id": "PI06",
+      "title": "Power-circuit and converter model completeness",
+      "owner_role": "PI",
+      "baseline": "Behavioral PWM electrothermal and sourced model checks are bounded. [Power qualification](SOURCED_POWER_QUALIFICATION.md).",
+      "target": "Real controller/device models, deadtime, startup/protection, semiconductor temperature feedback and measured loss/thermal correlation.",
+      "priority": "P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOURCED_POWER_QUALIFICATION.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Real controller/device models, deadtime, startup/protection, semiconductor temperature feedback and measured loss/thermal correlation."
+      ]
+    },
+    {
+      "id": "SA01",
+      "title": "Schematic net and component electrical analysis",
+      "owner_role": "schematic",
+      "baseline": "Connectivity/BoM/contextual checks exist; no qualified complete schematic-analysis workflow established. [Engineering review](ENGINEERING_REVIEW.md).",
+      "target": "Reviewed schematic import and hierarchy, model/pin assignment, operating-condition compatibility and net-wide checks; actionable cross-probed findings and explicit coverage.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "ENGINEERING_REVIEW.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Reviewed schematic import and hierarchy, model/pin assignment, operating-condition compatibility and net-wide checks; actionable cross-probed findings and explicit coverage."
+      ]
+    },
+    {
+      "id": "AMS01",
+      "title": "Analog and mixed-signal circuit verification",
+      "owner_role": "circuit",
+      "baseline": "Native circuit/transient kernels and optional circuit adapters execute bounded subsets. [Solver status](SOLVER_STATUS.md).",
+      "target": "Pin comparator device/model/dialect coverage; OP/DC/AC/transient/noise and analog/digital event interaction as required by that inventory; schematic-to-netlist traceability and independent numerical verification.",
+      "priority": "P1 M2, P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Pin comparator device/model/dialect coverage; OP/DC/AC/transient/noise and analog/digital event interaction as required by that inventory; schematic-to-netlist traceability and independent numerical verification."
+      ]
+    },
+    {
+      "id": "EM01",
+      "title": "Quasi-static R/L/C/G extraction",
+      "owner_role": "EM",
+      "baseline": "PEEC and bounded quasi-TEM cross sections; general convergent capacitance and proximity physics remain open. [Solver status](SOLVER_STATUS.md).",
+      "target": "Independent electrostatic/magnetoquasistatic oracles, explicit material ranges, frequency validity and full conductor matrices.",
+      "priority": "P1 M2",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Independent electrostatic/magnetoquasistatic oracles, explicit material ranges, frequency validity and full conductor matrices."
+      ]
+    },
+    {
+      "id": "EM02",
+      "title": "Hybrid planar full-board/package extraction",
+      "owner_role": "EM",
+      "baseline": "No qualified general hybrid extraction path established.",
+      "target": "Segment planar regions and 3D discontinuities without losing return currents; validate interface continuity and multiport composition.",
+      "priority": "P1 M4",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Segment planar regions and 3D discontinuities without losing return currents; validate interface continuity and multiport composition."
+      ]
+    },
+    {
+      "id": "EM03",
+      "title": "Full-wave 3D multiport SI/PI/RF",
+      "owner_role": "EM",
+      "baseline": "Optional EMerge/openEMS execute bounded cases; native `spike.fullwave_3d` remains unavailable. [Solver status](SOLVER_STATUS.md).",
+      "target": "Complete geometry/ports, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package fixtures.",
+      "priority": "P1 M4",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Complete geometry/ports, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package fixtures."
+      ]
+    },
+    {
+      "id": "EM04",
+      "title": "Antennas, near/far fields and scattering",
+      "owner_role": "EM",
+      "baseline": "Experimental fields/NF2FF and one-way physical optics; public MoM unavailable. [Retained EM](RETAINED_ASSEMBLY_EM.md), [mesh roadmap](ANALYSIS_AND_MESH_ROADMAP.md).",
+      "target": "Power calibration, fed antenna matching, antenna/enclosure/cable interaction; complete and qualify MoM only when its use cases justify it.",
+      "priority": "P2 M4, P3 M6",
+      "status": "planned",
+      "baseline_evidence": [
+        "RETAINED_ASSEMBLY_EM.md",
+        "ANALYSIS_AND_MESH_ROADMAP.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Power calibration, fed antenna matching, antenna/enclosure/cable interaction; complete and qualify MoM only when its use cases justify it."
+      ]
+    },
+    {
+      "id": "EM05",
+      "title": "Conducted/radiated EMC and immunity",
+      "owner_role": "EM",
+      "baseline": "EMI screening and reference-profile metadata; regulatory pass/fail and signoff absent. [EMI workflow](EMI_WORKFLOW.md).",
+      "target": "Cable/common-mode sources, LISN/receiver/fixture models, shielding/transfer paths, immunity excitation and licensed edition-specific limits with chamber correlation.",
+      "priority": "P2 M6",
+      "status": "planned",
+      "baseline_evidence": [
+        "EMI_WORKFLOW.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Cable/common-mode sources, LISN/receiver/fixture models, shielding/transfer paths, immunity excitation and licensed edition-specific limits with chamber correlation."
+      ]
+    },
+    {
+      "id": "EM06",
+      "title": "Nonlinear magnetics, machines and actuators",
+      "owner_role": "EM",
+      "baseline": "Experimental planar FEM, stationary eddy currents and reduced motion/thermal models. [Machine studies](MAGNETIC_MACHINE_STUDIES.md).",
+      "target": "3D material-qualified magnetics, moving interfaces, hysteresis/core loss, drive-circuit feedback and force/torque/loss measurement.",
+      "priority": "P3 M6",
+      "status": "planned",
+      "baseline_evidence": [
+        "MAGNETIC_MACHINE_STUDIES.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "3D material-qualified magnetics, moving interfaces, hysteresis/core loss, drive-circuit feedback and force/torque/loss measurement."
+      ]
+    },
+    {
+      "id": "TH01",
+      "title": "PCB/package/assembly solid heat transfer",
+      "owner_role": "thermal/CFD",
+      "baseline": "Experimental layered and retained tetrahedral steady/transient conduction, contacts and ambient radiation; CalculiX comparisons exist. [Thermal roadmap](THERMAL_RESEARCH_ROADMAP.md).",
+      "target": "Resolve existing refinement failures; qualify copper/package detail, thin layers, temperature-dependent materials and nonmatching contacts.",
+      "priority": "P0 M1, P1 M3",
+      "status": "planned",
+      "baseline_evidence": [
+        "THERMAL_RESEARCH_ROADMAP.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Resolve existing refinement failures; qualify copper/package detail, thin layers, temperature-dependent materials and nonmatching contacts."
+      ]
+    },
+    {
+      "id": "TH02",
+      "title": "Junction and compact package models",
+      "owner_role": "thermal/CFD",
+      "baseline": "Reviewed solids and explicit losses/resistances; decorative STEP does not reveal internal package physics. [Component solids](THERMAL_COMPONENT_SOLIDS.md).",
+      "target": "Conditioned die/TIM/lead models, multi-node dynamic compact models, Zth import/fit and independent package measurements.",
+      "priority": "P1 M3",
+      "status": "planned",
+      "baseline_evidence": [
+        "THERMAL_COMPONENT_SOLIDS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Conditioned die/TIM/lead models, multi-node dynamic compact models, Zth import/fit and independent package measurements."
+      ]
+    },
+    {
+      "id": "TH03",
+      "title": "General enclosure airflow and CHT",
+      "owner_role": "thermal/CFD",
+      "baseline": "Native/SU2 2D cavity, SU2 three-zone CHT and synthetic OpenFOAM fan/duct cases are experimental; arbitrary retained-assembly execution has blockers. [Solver status](SOLVER_STATUS.md), [fan evidence](FAN_CHT_QUALIFICATION.md).",
+      "target": "Robust imported fluid domains, natural/forced convection, boundary layers, fan curves and pressure losses; independently refined CFD and measured cooling.",
+      "priority": "P1 M3",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "FAN_CHT_QUALIFICATION.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Robust imported fluid domains, natural/forced convection, boundary layers, fan curves and pressure losses; independently refined CFD and measured cooling."
+      ]
+    },
+    {
+      "id": "TH04",
+      "title": "Enclosure radiation, vacuum and potting",
+      "owner_role": "thermal/CFD",
+      "baseline": "Ambient radiation, geometric view-factor work and bounded coating/potting paths; coupled enclosure radiosity remains open. [Thermal roadmap](THERMAL_RESEARCH_ROADMAP.md).",
+      "target": "Conservative surface-to-surface radiation, occlusion/closure, reviewed optical properties, vacuum boundaries and qualified thin/effective layers.",
+      "priority": "P2 M3",
+      "status": "planned",
+      "baseline_evidence": [
+        "THERMAL_RESEARCH_ROADMAP.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Conservative surface-to-surface radiation, occlusion/closure, reviewed optical properties, vacuum boundaries and qualified thin/effective layers."
+      ]
+    },
+    {
+      "id": "TH05",
+      "title": "Bidirectional transient electrothermal",
+      "owner_role": "thermal/CFD",
+      "baseline": "Steady DC/AC multiboard and bounded PWM retained-volume coupling exist. [Volume PWM](PWM_VOLUME_ELECTROTHERMAL.md), [multiboard](MULTIBOARD_VOLUME_ELECTROTHERMAL.md).",
+      "target": "Device/PCB loss mapping, temperature-dependent semiconductor behavior, multiple time scales, rollback and coupled mesh/time/energy convergence.",
+      "priority": "P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "PWM_VOLUME_ELECTROTHERMAL.md",
+        "MULTIBOARD_VOLUME_ELECTROTHERMAL.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Device/PCB loss mapping, temperature-dependent semiconductor behavior, multiple time scales, rollback and coupled mesh/time/energy convergence."
+      ]
+    },
+    {
+      "id": "TH06",
+      "title": "Thermal stress and reliability",
+      "owner_role": "thermal/CFD",
+      "baseline": "No qualified general thermomechanical/reliability route established by this baseline.",
+      "target": "Conservative temperature-to-structure transfer, CTE/material/contact models, deformation/stress; fatigue/lifetime only with calibrated material and mission data.",
+      "priority": "P3 M6",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Conservative temperature-to-structure transfer, CTE/material/contact models, deformation/stress; fatigue/lifetime only with calibrated material and mission data."
+      ]
+    },
+    {
+      "id": "WF01",
+      "title": "CAD-neutral board/package/assembly ingestion",
+      "owner_role": "contracts/validation",
+      "baseline": "SpiDeR/AssemblyIR and importer boundaries exist; schema coverage exceeds executable support. [Foundation](CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md).",
+      "target": "Tested format/version coverage, unit/object/topology audits, source-ID mapping and explicit omissions across licensed ECAD/MCAD inputs.",
+      "priority": "P0 M0\u2013M1",
+      "status": "in_progress",
+      "baseline_evidence": [
+        "CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+        "validation/parity/WF01-S04A.json"
+      ],
+      "benchmark": {
+        "status": "implemented_bounded",
+        "manifest": "benchmarks/parity-import/manifest.json",
+        "acceptance": "Bounded CLI import: 24 straight/via, 12 rotated-pad/material, and 18 exact-arc assertions; recomputed one canonical/Arrow/native Arc-only record, 8 legacy chords, 647 mm2 area and 1035.2 mm3 retained stack. Absolute source-geometry tolerance 1e-9 mm. Package-model source retention: 3 occurrences, 30 CLI assertions and native KiCad placement-vector agreement; source placement is unapplied."
+      },
+      "open_gaps": [
+        "Additional format/version coverage, curved Edge.Cuts and unresolved tiny/degenerate arcs.",
+        "General package models, general routed curved-conductor meshing and physical solver correlation remain open."
+      ]
+    },
+    {
+      "id": "WF02",
+      "title": "Shared materials, models and operating conditions",
+      "owner_role": "contracts/validation",
+      "baseline": "Environment profiles and domain-specific models exist; readiness does not validate physics. [Solver status](SOLVER_STATUS.md).",
+      "target": "One conditioned model catalog with property functions, frequency/temperature ranges, uncertainty, provenance and redistribution rights.",
+      "priority": "P0 M1",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "One conditioned model catalog with property functions, frequency/temperature ranges, uncertainty, provenance and redistribution rights."
+      ]
+    },
+    {
+      "id": "WF03",
+      "title": "Adaptive meshing and error control",
+      "owner_role": "contracts/validation",
+      "baseline": "Manual/local refinement and bounded adaptive reference tools exist. [Mesh roadmap](ANALYSIS_AND_MESH_ROADMAP.md).",
+      "target": "Quantity-of-interest error control, interfaces/ports/loss-preserving transfer, mesh/time studies and explicit uncertainty; physics-specific meshes.",
+      "priority": "P0 M1, P1 M3\u2013M4",
+      "status": "planned",
+      "baseline_evidence": [
+        "ANALYSIS_AND_MESH_ROADMAP.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Quantity-of-interest error control, interfaces/ports/loss-preserving transfer, mesh/time studies and explicit uncertainty; physics-specific meshes."
+      ]
+    },
+    {
+      "id": "WF04",
+      "title": "Unified study orchestration and cross-probing",
+      "owner_role": "contracts/validation",
+      "baseline": "Worker/CLI, saved studies, provenance and several domain viewers exist; unified ordered evidence pipeline pending. [Review](ENGINEERING_REVIEW.md).",
+      "target": "Dependency graph, stale-result propagation, synchronized occurrence/time/frequency probes, replay and consolidated review report.",
+      "priority": "P0 M1, P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "ENGINEERING_REVIEW.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Dependency graph, stale-result propagation, synchronized occurrence/time/frequency probes, replay and consolidated review report."
+      ]
+    },
+    {
+      "id": "WF05",
+      "title": "Batch, optimization and scalable execution",
+      "owner_role": "contracts/validation",
+      "baseline": "Bounded independent local/remote worker jobs exist; no general single-solve MPI or AMD/Intel GPU claim. [Worker manager](PARALLEL_WORKER_MANAGER.md).",
+      "target": "Workload-specific scheduling, checkpoint/recovery, reuse caches; profile before adding distributed kernels/GPU; validate each backend.",
+      "priority": "P1 M2, P2 M5",
+      "status": "planned",
+      "baseline_evidence": [
+        "PARALLEL_WORKER_MANAGER.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Workload-specific scheduling, checkpoint/recovery, reuse caches; profile before adding distributed kernels/GPU; validate each backend."
+      ]
+    },
+    {
+      "id": "WF06",
+      "title": "Measurement correlation and release qualification",
+      "owner_role": "contracts/validation",
+      "baseline": "Analytical/reference records and recorded telemetry comparison exist; general physical parity is unqualified. [Co-simulation](COSIMULATION_DIGITAL_TWIN.md), [contributing](../CONTRIBUTING.md).",
+      "target": "Version-bound qualification packs, calibrated measurements, separate calibration/validation sets, supported-envelope reports and human numerical release review.",
+      "priority": "P0 M0, all milestones",
+      "status": "planned",
+      "baseline_evidence": [
+        "COSIMULATION_DIGITAL_TWIN.md",
+        "../CONTRIBUTING.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
+      },
+      "open_gaps": [
+        "Version-bound qualification packs, calibrated measurements, separate calibration/validation sets, supported-envelope reports and human numerical release review."
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "id": "WF01-S01",
+      "capability_id": "WF01",
+      "title": "Straight-track and via import assurance",
+      "status": "done",
+      "depends_on": [],
+      "acceptance": [
+        "Real CLI import passes count, unit, source-digest and identity gates.",
+        "All 24 independently specified geometry/reference assertions pass."
+      ],
+      "evidence": "docs/validation/parity/WF01-S01.json"
+    },
+    {
+      "id": "WF01-S02",
+      "capability_id": "WF01",
+      "title": "Rotated-footprint pad and material import assurance",
+      "status": "done",
+      "depends_on": [
+        "WF01-S01"
+      ],
+      "acceptance": [
+        "Native KiCad parses and renders the source; DRC findings are retained without claiming DRC cleanliness.",
+        "All 12 rotated-pad, native-origin, model-value and reference assertions pass real CLI import."
+      ],
+      "evidence": "docs/validation/parity/WF01-S02.json"
+    },
+    {
+      "id": "WF01-S03",
+      "capability_id": "WF01",
+      "title": "Exact copper arcs and straight-outline cutout fidelity",
+      "status": "done",
+      "depends_on": [
+        "WF01-S02"
+      ],
+      "acceptance": [
+        "Preserve and qualify exact curved-source geometry without duplicate conductor representations.",
+        "Verify cutout topology through canonical geometry consumers and independent source oracles."
+      ],
+      "evidence": "docs/validation/parity/WF01-S03.json",
+      "failure_evidence": "docs/validation/parity/WF01-S03-failed-arc.json",
+      "verification": {
+        "focused_geometry_tests": 48,
+        "focused_skipped_optional_runtime": 1,
+        "backlog_and_corpus_tests": 20,
+        "full_python_suite": {
+          "tests": 3654,
+          "failures": 1,
+          "skipped": 68,
+          "log": "build/parity-stage03-full-python-unsandboxed.log",
+          "failure_context": "TEMP was inside the repository; non-repository fixture inherited its parent Git repository."
+        },
+        "default_temp_rerun": {
+          "module": "tests.python.test_script_workspace_worktrees",
+          "tests": 5,
+          "status": "passed"
+        },
+        "scope": "Bounded import and transport, not solver accuracy or release qualification."
+      }
+    },
+    {
+      "id": "WF01-S04",
+      "capability_id": "WF01",
+      "title": "Additional format and package-model coverage",
+      "status": "in_progress",
+      "depends_on": [
+        "WF01-S03"
+      ],
+      "acceptance": [
+        "Qualify additional importer formats and source-geometry classes against independent native geometry/model checks."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "WF01-S04A",
+      "capability_id": "WF01",
+      "title": "KiCad package-model occurrence and source-placement retention",
+      "status": "done",
+      "depends_on": [
+        "WF01-S03"
+      ],
+      "acceptance": [
+        "Real CLI import preserves all three model occurrences and passes 30 independently specified assertions.",
+        "Native pcbnew confirms all paths and declared offset/scale/rotation vectors; JSON and legacy round-trip preserve occurrence identity and component links.",
+        "Unapplied source placement remains explicit; malformed vectors are retained with diagnostics without losing the component or pad."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04A.json",
+      "verification": {
+        "focused_tests": 39,
+        "architecture": "passed",
+        "documentation_files": 3,
+        "backlog": "passed",
+        "cli_assertions": 30,
+        "native_model_occurrences": 3,
+        "full_python_suite": {
+          "tests": 3706,
+          "failures": 1,
+          "skipped": 69,
+          "elapsed_s": 1031.175,
+          "log": "build/parity-stage04a-full-python.log",
+          "failure": "test_python_debug.PythonDebugTest.test_parent_admits_design_bound_result: session stayed starting past the 4-second test deadline."
+        },
+        "unchanged_module_rerun": {
+          "module": "tests.python.test_python_debug",
+          "tests": 8,
+          "status": "passed",
+          "elapsed_s": 22.517,
+          "log": "build/parity-stage04a-debug-rerun.log"
+        },
+        "limitation": "Timeout did not reproduce in the module rerun; root cause is not established. This is not a zero-failure full-suite claim or a physics/release qualification."
+      }
+    },
+    {
+      "id": "WF01-S04B",
+      "capability_id": "WF01",
+      "title": "Additional-format native-export fixture qualification",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04A"
+      ],
+      "acceptance": [
+        "Real CLI imports the digest-bound KiCad 10.0.6 native ODB geometry archive; all 14 independently specified assertions pass.",
+        "Native source/export gates recompute byte bindings, arc/pad/component geometry, cutout area/topology and net ownership; missing stackup/models and omitted generated font are explicit.",
+        "All 48 native pose and eight supported custom-pad/slot cases agree with current source import and geometry consumers; solver readiness stays false."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04B.json",
+      "failure_evidence": "docs/validation/parity/WF01-S04B-progress.json",
+      "verification": {
+        "native_geometry": {
+          "pose_cases": 48,
+          "supported_shape_cases": 8,
+          "status": "passed"
+        },
+        "native_odb_cli": {
+          "assertions": 14,
+          "status": "passed"
+        },
+        "focused_tests": {
+          "tests": 58,
+          "status": "passed",
+          "elapsed_s": 11.503,
+          "log": "build/parity-stage04b-native-final-focused.log"
+        },
+        "downstream_geometry_import_tests": {
+          "tests": 81,
+          "status": "passed",
+          "elapsed_s": 59.512,
+          "log": "build/parity-stage04b-post-frame-numerical.log"
+        },
+        "frontend": {
+          "status": "passed",
+          "checks": [
+            "test-board-parser.mjs",
+            "test-normalized-board.mjs",
+            "test-assembly-board-scene.mjs",
+            "tsc --noEmit"
+          ]
+        },
+        "architecture": "passed",
+        "backlog": "passed",
+        "documentation_files": 5,
+        "full_python_suite": {
+          "status": "failed",
+          "tests": 3761,
+          "failures": 2,
+          "errors": 1,
+          "skipped": 69,
+          "elapsed_s": 1599.904,
+          "log": "build/parity-stage04b-post-frame-full-python.log",
+          "reported_failures": [
+            "test_emerge_gerber.EMergeGerberTests.test_real_filebasedpcb_loads_units_clear_region_and_native_mesh: native subprocess exceeded its 60-second limit.",
+            "test_peec_volume_adapter.VolumeAdapterTests.test_optional_marble_ports_reflect_copper_connectivity: old isolation oracle contradicted native KiCad; subsequently corrected with native source-bound evidence and passing eight-test module.",
+            "test_python_debug.PythonDebugTest.test_parent_admits_design_bound_result: starting did not reach completed/failed within the 4-second deadline."
+          ],
+          "followup": "Native Gerber timeout reproduced unchanged earlier. Debug deadline failures remain unresolved. Marble oracle correction passed with no-zone separation controls. Full suite was not rerun after the test-only oracle correction; no zero-failure full-suite claim."
+        },
+        "historical_runtime_failures": "docs/validation/parity/WF01-S04B-progress.json",
+        "limitation": "Bounded import/source/display geometry acceptance only; no full-format, physical solver or release qualification.",
+        "marble_connectivity_oracle_correction": {
+          "native_file": "docs/validation/parity/WF01-S04B-marble-native-connectivity.json",
+          "native_sha256": "521cf825daa06cf0f0e5f98545933dee08480c53a3a42d523ab480dd0712e5ee",
+          "result": "Native saved copper connects C383.1, U37.18 and R195.1 through the shared B.Cu zone; old isolation assertion corrected.",
+          "negative_control": "Removing zones separates C383.1 and R195.1 from U37.18.",
+          "corrected_module": {
+            "tests": 8,
+            "status": "passed",
+            "elapsed_s": 13.347,
+            "log": "build/parity-stage04b-marble-corrected.log"
+          },
+          "historical_failure_log": "build/parity-stage04b-marble-connectivity.log"
+        }
+      }
+    },
+    {
+      "id": "WF01-S04C",
+      "capability_id": "WF01",
+      "title": "Explicit package-model placement and solid/material qualification",
+      "status": "in_progress",
+      "depends_on": [
+        "WF01-S04B"
+      ],
+      "acceptance": [
+        "Qualify composed model-to-component-to-board placement using explicit source conventions and independent geometry references.",
+        "Bind actual model solids and required thermal/electrical material evidence without treating source references as physical qualification."
+      ],
+      "evidence": null,
+      "progress_evidence": "docs/validation/parity/WF01-S04C-progress.json"
+    },
+    {
+      "id": "WF01-S04C1",
+      "capability_id": "WF01",
+      "title": "Explicit source-bound component STEP handoff",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04B"
+      ],
+      "acceptance": [
+        "Bind complete embedded STEP assets and explicit proper-rigid board-local placements to exact model/component/board occurrences and retained design digests.",
+        "Reject stale/foreign/duplicate/nonrigid handoffs; partial model coverage stays diagnostic and source transforms remain unapplied.",
+        "Three native solids match independently specified 24 mm3 volumes and transformed cuboid bounds; STEP round trips pass without material or solver readiness promotion."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04C1.json",
+      "verification": {
+        "focused": {
+          "status": "passed",
+          "tests": 57,
+          "elapsed_s": 50.533,
+          "log": "build/parity-stage04c-reviewed-focused.log"
+        },
+        "architecture": "passed",
+        "documentation_files": 5,
+        "native_solids": 3,
+        "cli_model_assertions": 30,
+        "full_python_suite": {
+          "status": "running",
+          "log": "build/parity-stage04c-full-python.log"
+        },
+        "limitation": "Explicit neutral mechanical geometry only. KiCad composed placement and material/physics qualification remain pending."
+      }
+    }
+  ]
+}

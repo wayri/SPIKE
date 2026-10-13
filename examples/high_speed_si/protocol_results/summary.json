@@ -1,0 +1,444 @@
+{
+  "contract": "spike/protocol-rate-study-evidence/v1",
+  "status": "pass",
+  "backend": "python.spike_core.service.handle(run_si_workflow)",
+  "backend_source_sha256": {
+    "service.py": "73b6895f7678de14c2f12b582b3a581cbcd58a9bf3a48022a709b63600d3e1a3",
+    "si_workflow.py": "ab6acb229e8fca9b7b660b851a2d99e89e3f2c68dac770901593bf9357ec5da5",
+    "si_network_workflow.py": "16d72390831b1675487b13c2d73dc4cc95574478c216d8b8ce9eb772ae41e40c",
+    "si_channel.py": "b6f221339a49d85376ca8d97e94a0b14a2d2b558a367280bcaf6e6132d42e504",
+    "si_symbol_clock.py": "b1a52279a3a989efb55822a57a2172d8ee0d80efe767abfdb3565f4d0d7d3448",
+    "sparameters.py": "1de5e766324d4c2ac35bdeea319a83cabd0f89ecb6360b24aabb6c9794203a35"
+  },
+  "git_head": "537023f84e70ed0d45915c7ef2b5cdb858d18228",
+  "script_sha256": "bcac0097a52121d7836b7864b808184ca60ea16fdd8c9337a451a50bd9665669",
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "model_status": "experimental",
+  "production_qualified": false,
+  "compliance_status": "not_evaluated",
+  "criteria": {
+    "complex_transfer_absolute_tolerance": 1e-10,
+    "matched_eye_absolute_tolerance_v": 1e-10,
+    "fixed_band_final_eye_change_limit_v": 0.005,
+    "rate_error_limit_hz": 0.01,
+    "normative": false,
+    "refinement_gate_is_error_bound": false
+  },
+  "cases": [
+    {
+      "id": "ethernet_1g",
+      "label": "1000BASE-X host serial reference",
+      "aggregate_payload_rate_bps": 1000000000.0,
+      "architecture_lane_count": 1,
+      "simulated_lane_count": 1,
+      "lane_symbol_rate_baud": 1250000000.0,
+      "modulation": "NRZ",
+      "architecture_encoding": "8b/10b",
+      "stimulus": "PRBS7, no PCS encoding or FEC simulation",
+      "ui_ps": 800.0,
+      "nyquist_hz": 625000000.0,
+      "request_sha256": "ea498c68d65b25dfae367ce983ca01b287b20ba337b8dc6850199eb763a2210b",
+      "result_path": "protocol_results/ethernet_1g.json",
+      "input_path": "protocol_inputs/ethernet_1g.json",
+      "initial_2049_point_refinement_pass": true,
+      "samples_per_ui": 16.0,
+      "frequency_stop_hz": 9990243902.439024,
+      "max_complex_loaded_transfer_error": 3.0893589031391915e-15,
+      "expected_matched_eye_v": 0.8,
+      "actual_matched_eye_v": 0.7999999999999985,
+      "matched_request_sha256": "da0a0e92effdcb8dfc0b8b3b20e3d0af6fb2524ea0c69f16d3d7956c314f28b6",
+      "loaded_eye": {
+        "port": 1,
+        "eye_height_v": 0.7940116947182136,
+        "cursor_delay_s": 4e-10,
+        "sampling_phase_ui": 0.5,
+        "high_margin_v": 0.2969673038473677,
+        "low_margin_v": 0.2970443908708459,
+        "high_min_v": 0.3969673038473677,
+        "low_max_v": -0.3970443908708459,
+        "overshoot_v": 0.0,
+        "undershoot_v": 0.0
+      },
+      "channel_sample_near_nyquist_hz": 624390243.902439,
+      "insertion_loss_near_nyquist_db": 0.06868219525781606,
+      "return_loss_near_nyquist_db": 60.41562849050666,
+      "refinements": [
+        {
+          "frequency_points": 513,
+          "request_sha256": "ea498c68d65b25dfae367ce983ca01b287b20ba337b8dc6850199eb763a2210b",
+          "eye_height_v": 0.7940116947182136,
+          "represented_bit_rate_hz": 1250000000.0,
+          "max_complex_transfer_error": 3.0893589031391915e-15
+        },
+        {
+          "frequency_points": 1025,
+          "request_sha256": "9a5fdd24b8666daaf5411c44354a559a11ac54cb334d8b26662bbdb10ec28984",
+          "eye_height_v": 0.7950170005226576,
+          "represented_bit_rate_hz": 1250000000.0,
+          "max_complex_transfer_error": 3.0893589031391915e-15
+        },
+        {
+          "frequency_points": 2049,
+          "request_sha256": "4d7cd5a6ffcb69cc51c6f429bf01335c257dc6354553334050d90cca09af150e",
+          "eye_height_v": 0.7979984804443473,
+          "represented_bit_rate_hz": 1250000000.0,
+          "max_complex_transfer_error": 3.9506627632986034e-15
+        }
+      ],
+      "successive_eye_change_v": [
+        0.0010053058044439123,
+        0.0029814799216897336
+      ],
+      "insufficient_bandwidth_reason": "Time grid needs at least 8 samples/UI; adjust bandwidth/point count.",
+      "checks": {
+        "completed": true,
+        "analytic_loaded_transfer": true,
+        "matched_eye_absolute": true,
+        "exact_rate": true,
+        "passive_channel": true,
+        "fixed_band_refinement": true,
+        "refinement_absolute_transfer": true,
+        "insufficient_bandwidth_blocked": true,
+        "spatial_fields_withheld": true,
+        "qualification_withheld": true
+      },
+      "status": "pass"
+    },
+    {
+      "id": "ethernet_10g",
+      "label": "10GBASE-R/KR NRZ reference",
+      "aggregate_payload_rate_bps": 10000000000.0,
+      "architecture_lane_count": 1,
+      "simulated_lane_count": 1,
+      "lane_symbol_rate_baud": 10312500000.0,
+      "modulation": "NRZ",
+      "architecture_encoding": "64b/66b",
+      "stimulus": "PRBS7, no PCS encoding or FEC simulation",
+      "ui_ps": 96.96969696969697,
+      "nyquist_hz": 5156250000.0,
+      "request_sha256": "f5fea41444c2819d7628d814f98ef0fe6f7846db8fcee7bcabd6389de7a65f8d",
+      "result_path": "protocol_results/ethernet_10g.json",
+      "input_path": "protocol_inputs/ethernet_10g.json",
+      "initial_2049_point_refinement_pass": true,
+      "samples_per_ui": 16.000000000000004,
+      "frequency_stop_hz": 82419512195.12195,
+      "max_complex_loaded_transfer_error": 6.570879732444145e-15,
+      "expected_matched_eye_v": 0.8,
+      "actual_matched_eye_v": 0.7999999999999992,
+      "matched_request_sha256": "6858712d90363cfaa0ebbc416a7c2c778067e787edbccbf745bf22296bade1e2",
+      "loaded_eye": {
+        "port": 1,
+        "eye_height_v": 0.764098021363151,
+        "cursor_delay_s": 4.06060606060606e-10,
+        "sampling_phase_ui": 0.5,
+        "high_margin_v": 0.28193409927821333,
+        "low_margin_v": 0.28216392208493757,
+        "high_min_v": 0.3819340992782133,
+        "low_max_v": -0.3821639220849376,
+        "overshoot_v": 0.0,
+        "undershoot_v": 0.0
+      },
+      "channel_sample_near_nyquist_hz": 5151219512.195122,
+      "insertion_loss_near_nyquist_db": 0.3651417398035841,
+      "return_loss_near_nyquist_db": 60.126303397144916,
+      "refinements": [
+        {
+          "frequency_points": 513,
+          "request_sha256": "f5fea41444c2819d7628d814f98ef0fe6f7846db8fcee7bcabd6389de7a65f8d",
+          "eye_height_v": 0.764098021363151,
+          "represented_bit_rate_hz": 10312500000.0,
+          "max_complex_transfer_error": 6.570879732444145e-15
+        },
+        {
+          "frequency_points": 1025,
+          "request_sha256": "165e3d6eb547a53b4ce2aba54fb65a7ec469d28747f2c807bd9fdd82a035805e",
+          "eye_height_v": 0.765346289561236,
+          "represented_bit_rate_hz": 10312500000.0,
+          "max_complex_transfer_error": 6.570879732444145e-15
+        },
+        {
+          "frequency_points": 2049,
+          "request_sha256": "a173680060f5136c31f32d9a6b10c8d5d9d9aab29dbf53edc24a1f72265cfa18",
+          "eye_height_v": 0.7654382586633464,
+          "represented_bit_rate_hz": 10312500000.0,
+          "max_complex_transfer_error": 6.570879732444145e-15
+        }
+      ],
+      "successive_eye_change_v": [
+        0.0012482681980849897,
+        9.196910211040077e-05
+      ],
+      "insufficient_bandwidth_reason": "Time grid needs at least 8 samples/UI; adjust bandwidth/point count.",
+      "checks": {
+        "completed": true,
+        "analytic_loaded_transfer": true,
+        "matched_eye_absolute": true,
+        "exact_rate": true,
+        "passive_channel": true,
+        "fixed_band_refinement": true,
+        "refinement_absolute_transfer": true,
+        "insufficient_bandwidth_blocked": true,
+        "spatial_fields_withheld": true,
+        "qualification_withheld": true
+      },
+      "status": "pass"
+    },
+    {
+      "id": "ethernet_100g",
+      "label": "100GBASE-KR4 representative lane",
+      "aggregate_payload_rate_bps": 100000000000.0,
+      "architecture_lane_count": 4,
+      "simulated_lane_count": 1,
+      "lane_symbol_rate_baud": 25781250000.0,
+      "modulation": "NRZ",
+      "architecture_encoding": "64b/66b PCS, 256b/257b transcoding and RS-FEC architecture; not encoded here",
+      "stimulus": "PRBS7, no PCS encoding or FEC simulation",
+      "ui_ps": 38.78787878787879,
+      "nyquist_hz": 12890625000.0,
+      "request_sha256": "a80eea0500420a3bcf65cdb92c484ba6f1a04490033332b67202bccc447706dc",
+      "result_path": "protocol_results/ethernet_100g.json",
+      "input_path": "protocol_inputs/ethernet_100g.json",
+      "initial_2049_point_refinement_pass": true,
+      "samples_per_ui": 16.000000000000004,
+      "frequency_stop_hz": 206048780487.80487,
+      "max_complex_loaded_transfer_error": 4.742651497580662e-15,
+      "expected_matched_eye_v": 0.8,
+      "actual_matched_eye_v": 0.7999999999999988,
+      "matched_request_sha256": "145e0fd7db28aea37b78a5a9efc14796dbf53b7852b60c57c97c6518d2d25035",
+      "loaded_eye": {
+        "port": 1,
+        "eye_height_v": 0.5871198594639115,
+        "cursor_delay_s": 4.024242424242424e-10,
+        "sampling_phase_ui": 0.5,
+        "high_margin_v": 0.1931247702497557,
+        "low_margin_v": 0.19399508921415584,
+        "high_min_v": 0.2931247702497557,
+        "low_max_v": -0.29399508921415585,
+        "overshoot_v": 0.0,
+        "undershoot_v": 0.0
+      },
+      "channel_sample_near_nyquist_hz": 12878048780.487804,
+      "insertion_loss_near_nyquist_db": 0.8711524019391031,
+      "return_loss_near_nyquist_db": 53.34619263852734,
+      "refinements": [
+        {
+          "frequency_points": 513,
+          "request_sha256": "a80eea0500420a3bcf65cdb92c484ba6f1a04490033332b67202bccc447706dc",
+          "eye_height_v": 0.5871198594639115,
+          "represented_bit_rate_hz": 25781250000.0,
+          "max_complex_transfer_error": 4.742651497580662e-15
+        },
+        {
+          "frequency_points": 1025,
+          "request_sha256": "2cba290904d39a7f1a5908cc441c08338414f677b995fdf580dc12550b752eb3",
+          "eye_height_v": 0.5892740199675705,
+          "represented_bit_rate_hz": 25781250000.0,
+          "max_complex_transfer_error": 5.484124628243316e-15
+        },
+        {
+          "frequency_points": 2049,
+          "request_sha256": "7db982fb7c5387c9a2530bda347e1d07bd183b3211179866386faa467ec865bd",
+          "eye_height_v": 0.5898384335477751,
+          "represented_bit_rate_hz": 25781250000.0,
+          "max_complex_transfer_error": 5.484124628243316e-15
+        }
+      ],
+      "successive_eye_change_v": [
+        0.0021541605036589084,
+        0.0005644135802046479
+      ],
+      "insufficient_bandwidth_reason": "Time grid needs at least 8 samples/UI; adjust bandwidth/point count.",
+      "checks": {
+        "completed": true,
+        "analytic_loaded_transfer": true,
+        "matched_eye_absolute": true,
+        "exact_rate": true,
+        "passive_channel": true,
+        "fixed_band_refinement": true,
+        "refinement_absolute_transfer": true,
+        "insufficient_bandwidth_blocked": true,
+        "spatial_fields_withheld": true,
+        "qualification_withheld": true
+      },
+      "status": "pass"
+    },
+    {
+      "id": "lvds_1g",
+      "label": "LVDS illustrative 1 GBd differential mode",
+      "aggregate_payload_rate_bps": null,
+      "architecture_lane_count": 1,
+      "simulated_lane_count": 1,
+      "lane_symbol_rate_baud": 1000000000.0,
+      "modulation": "NRZ",
+      "architecture_encoding": "user-defined NRZ",
+      "stimulus": "PRBS7, no PCS encoding or FEC simulation",
+      "ui_ps": 1000.0,
+      "nyquist_hz": 500000000.0,
+      "request_sha256": "dcf95fb66fa08db0f23a168af042b22487902626e37a7c4ccde33077b519fbd0",
+      "result_path": "protocol_results/lvds_1g.json",
+      "input_path": "protocol_inputs/lvds_1g.json",
+      "initial_2049_point_refinement_pass": false,
+      "samples_per_ui": 16.0,
+      "frequency_stop_hz": 7992195121.95122,
+      "max_complex_loaded_transfer_error": 2.62231441029382e-15,
+      "expected_matched_eye_v": 0.7,
+      "actual_matched_eye_v": 0.6999999999999988,
+      "matched_request_sha256": "d76bed04b3b624e5c5afd7f12393a9521ebb88bf34082ff21037787a9f7b2416",
+      "loaded_eye": {
+        "port": 1,
+        "eye_height_v": 0.6881562301523585,
+        "cursor_delay_s": 4.3750000000000004e-10,
+        "sampling_phase_ui": 0.5,
+        "high_margin_v": 0.24419186795449008,
+        "low_margin_v": 0.24396436219786835,
+        "high_min_v": 0.3441918679544901,
+        "low_max_v": -0.34396436219786836,
+        "overshoot_v": 0.0,
+        "undershoot_v": 0.0
+      },
+      "channel_sample_near_nyquist_hz": 499512195.1219512,
+      "insertion_loss_near_nyquist_db": 0.0605071361775645,
+      "return_loss_near_nyquist_db": 67.4155610684559,
+      "refinements": [
+        {
+          "frequency_points": 513,
+          "request_sha256": "dcf95fb66fa08db0f23a168af042b22487902626e37a7c4ccde33077b519fbd0",
+          "eye_height_v": 0.6881562301523585,
+          "represented_bit_rate_hz": 1000000000.0,
+          "max_complex_transfer_error": 2.62231441029382e-15
+        },
+        {
+          "frequency_points": 1025,
+          "request_sha256": "64f3af5d36cd7719f29469e112eba677b053c1feabf407b8190144f32cfd8784",
+          "eye_height_v": 0.6944437492333124,
+          "represented_bit_rate_hz": 1000000000.0,
+          "max_complex_transfer_error": 2.967640889611469e-15
+        },
+        {
+          "frequency_points": 2049,
+          "request_sha256": "0e29bd2d0f1bf8c2dabfee2545744cc5f439fcbe0a1273ac9b8d9916d3c20087",
+          "eye_height_v": 0.7017990678767356,
+          "represented_bit_rate_hz": 1000000000.0,
+          "max_complex_transfer_error": 2.4916813433854866e-15
+        },
+        {
+          "frequency_points": 4097,
+          "request_sha256": "50de1d8a5db27976de1bdee6a2a5c7d9a5d822cbc8b9f33e6766352c2e759a7c",
+          "eye_height_v": 0.7011388166671234,
+          "represented_bit_rate_hz": 1000000000.0,
+          "max_complex_transfer_error": 2.9878203557482693e-15
+        },
+        {
+          "frequency_points": 8193,
+          "request_sha256": "69eab97ab330e911771f4bbb627bf28ffc8aae00678fcf6bf395cbb35ccde683",
+          "eye_height_v": 0.7015246319630994,
+          "represented_bit_rate_hz": 1000000000.0,
+          "max_complex_transfer_error": 2.772919528217795e-15
+        }
+      ],
+      "successive_eye_change_v": [
+        0.006287519080953929,
+        0.007355318643423203,
+        0.0006602512096122171,
+        0.00038581529597603303
+      ],
+      "insufficient_bandwidth_reason": "Time grid needs at least 8 samples/UI; adjust bandwidth/point count.",
+      "checks": {
+        "completed": true,
+        "analytic_loaded_transfer": true,
+        "matched_eye_absolute": true,
+        "exact_rate": true,
+        "passive_channel": true,
+        "fixed_band_refinement": true,
+        "refinement_absolute_transfer": true,
+        "insufficient_bandwidth_blocked": true,
+        "spatial_fields_withheld": true,
+        "qualification_withheld": true
+      },
+      "status": "pass"
+    },
+    {
+      "id": "serdes_32g",
+      "label": "Generic 32 GBd NRZ SerDes",
+      "aggregate_payload_rate_bps": null,
+      "architecture_lane_count": 1,
+      "simulated_lane_count": 1,
+      "lane_symbol_rate_baud": 32000000000.0,
+      "modulation": "NRZ",
+      "architecture_encoding": "user-defined NRZ",
+      "stimulus": "PRBS7, no PCS encoding or FEC simulation",
+      "ui_ps": 31.25,
+      "nyquist_hz": 16000000000.0,
+      "request_sha256": "e718a56a5791cc4d18ea6bf04971e0754cdf530b9ab86348b5b375c198b71865",
+      "result_path": "protocol_results/serdes_32g.json",
+      "input_path": "protocol_inputs/serdes_32g.json",
+      "initial_2049_point_refinement_pass": true,
+      "samples_per_ui": 16.0,
+      "frequency_stop_hz": 255750243902.43903,
+      "max_complex_loaded_transfer_error": 5.308086030520035e-15,
+      "expected_matched_eye_v": 0.8,
+      "actual_matched_eye_v": 0.7999999999999989,
+      "matched_request_sha256": "3e2fc508d21eb906e163b0e52595a434eef6aa1b56ef5e4c3a125fe0fdeb15bd",
+      "loaded_eye": {
+        "port": 1,
+        "eye_height_v": 0.5048922708994585,
+        "cursor_delay_s": 4.0234375000000004e-10,
+        "sampling_phase_ui": 0.5,
+        "high_margin_v": 0.1516260968178096,
+        "low_margin_v": 0.15326617408164886,
+        "high_min_v": 0.2516260968178096,
+        "low_max_v": -0.25326617408164886,
+        "overshoot_v": 0.0,
+        "undershoot_v": 0.0
+      },
+      "channel_sample_near_nyquist_hz": 15984390243.90244,
+      "insertion_loss_near_nyquist_db": 1.0745937965319818,
+      "return_loss_near_nyquist_db": 55.762162401934376,
+      "refinements": [
+        {
+          "frequency_points": 513,
+          "request_sha256": "e718a56a5791cc4d18ea6bf04971e0754cdf530b9ab86348b5b375c198b71865",
+          "eye_height_v": 0.5048922708994585,
+          "represented_bit_rate_hz": 32000000000.0,
+          "max_complex_transfer_error": 5.308086030520035e-15
+        },
+        {
+          "frequency_points": 1025,
+          "request_sha256": "6d5d808d21a191461a82efd235719e51194305f1f0ea456f03c089e73cdf6932",
+          "eye_height_v": 0.5086121961822796,
+          "represented_bit_rate_hz": 32000000000.0,
+          "max_complex_transfer_error": 5.308086030520035e-15
+        },
+        {
+          "frequency_points": 2049,
+          "request_sha256": "b65a374d9bc4b4aa42ab6ed9c68d07be5583872132aa39be57697d731b767ae5",
+          "eye_height_v": 0.509954018530701,
+          "represented_bit_rate_hz": 32000000000.0,
+          "max_complex_transfer_error": 5.308086030520035e-15
+        }
+      ],
+      "successive_eye_change_v": [
+        0.003719925282821057,
+        0.0013418223484213954
+      ],
+      "insufficient_bandwidth_reason": "Time grid needs at least 8 samples/UI; adjust bandwidth/point count.",
+      "checks": {
+        "completed": true,
+        "analytic_loaded_transfer": true,
+        "matched_eye_absolute": true,
+        "exact_rate": true,
+        "passive_channel": true,
+        "fixed_band_refinement": true,
+        "refinement_absolute_transfer": true,
+        "insufficient_bandwidth_blocked": true,
+        "spatial_fields_withheld": true,
+        "qualification_withheld": true
+      },
+      "status": "pass"
+    }
+  ]
+}

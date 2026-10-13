@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "$id": "https://spike.local/schemas/smps-converter-request-v1.schema.json",
+  "title": "SPIKE explicit steady CCM converter block",
+  "description": "Original Apache-2.0 contract. Runtime checks finite SI values, topology polarity and voltage ratio, unique occurrence/reference bindings, device-count product, RL and transition envelope, root convergence, CCM, supplied ratings and energy balance. Values are caller-supplied operating values, without device or wiring inference.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "block_id", "topology", "input_voltage_v", "output_voltage_v", "output_current_a", "switching_frequency_hz", "switches", "inductor"],
+  "properties": {
+    "contract": {"const": "spike/smps-converter-request/v1"},
+    "block_id": {"$ref": "#/$defs/id"},
+    "topology": {"enum": ["synchronous_buck", "synchronous_boost", "inverting_buck_boost"]},
+    "input_voltage_v": {"type": "number", "minimum": 0.000001, "maximum": 1000000},
+    "output_voltage_v": {"type": "number", "minimum": -1000000, "maximum": 1000000, "not": {"const": 0}},
+    "output_current_a": {"type": "number", "minimum": 0.000000001, "maximum": 1000000},
+    "switching_frequency_hz": {"type": "number", "minimum": 1, "maximum": 1000000000},
+    "switches": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/switchGroup"}},
+    "inductor": {"$ref": "#/$defs/inductor"}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^\\S(?:[\\s\\S]*\\S)?$"},
+    "nonnegative": {"type": "number", "minimum": 0},
+    "positive": {"type": "number", "exclusiveMinimum": 0},
+    "binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["occurrence_id", "component_ref"],
+      "properties": {"occurrence_id": {"$ref": "#/$defs/id"}, "component_ref": {"$ref": "#/$defs/id"}}
+    },
+    "switchGroup": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "devices", "series_count", "parallel_count", "rds_on_ohm", "rise_time_s", "fall_time_s", "gate_charge_c", "gate_drive_v", "voltage_rating_v", "current_rating_a"],
+      "properties": {
+        "role": {"enum": ["on", "off"]},
+        "devices": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/binding"}},
+        "series_count": {"type": "integer", "minimum": 1, "maximum": 64},
+        "parallel_count": {"type": "integer", "minimum": 1, "maximum": 64},
+        "rds_on_ohm": {"$ref": "#/$defs/nonnegative"},
+        "rise_time_s": {"$ref": "#/$defs/nonnegative"},
+        "fall_time_s": {"$ref": "#/$defs/nonnegative"},
+        "gate_charge_c": {"$ref": "#/$defs/nonnegative"},
+        "gate_drive_v": {"$ref": "#/$defs/nonnegative"},
+        "voltage_rating_v": {"$ref": "#/$defs/positive"},
+        "current_rating_a": {"$ref": "#/$defs/positive"}
+      }
+    },
+    "inductor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["occurrence_id", "component_ref", "inductance_h", "dcr_ohm", "current_rating_a"],
+      "properties": {
+        "occurrence_id": {"$ref": "#/$defs/id"}, "component_ref": {"$ref": "#/$defs/id"},
+        "inductance_h": {"type": "number", "minimum": 0.000000000001, "maximum": 1000},
+        "dcr_ohm": {"$ref": "#/$defs/nonnegative"},
+        "current_rating_a": {"$ref": "#/$defs/positive"}
+      }
+    }
+  }
+}

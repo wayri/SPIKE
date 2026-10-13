@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { useId, useMemo, useRef, useState, type TableHTMLAttributes } from "react";
+import { useId, useMemo, useRef, useState, type ReactNode, type TableHTMLAttributes } from "react";
 import { matchTableRows, renderTableBodies, tablePage, tableRowGroups } from "./dataTableModel";
 import { onSpreadsheetKeyDown } from "./spreadsheetGrid";
 import ActionContextMenu from "./ActionContextMenu";
@@ -11,6 +11,8 @@ export type DataTableTheme = "professional-dark" | "light" | "high-contrast" | "
 export type DataTableProps = TableHTMLAttributes<HTMLTableElement> & {
   label: string;
   showLabel?: boolean;
+  showTools?: boolean;
+  toolbarActions?: ReactNode;
   searchable?: boolean;
   pageSize?: number;
   emptyMessage?: string;
@@ -18,10 +20,10 @@ export type DataTableProps = TableHTMLAttributes<HTMLTableElement> & {
 };
 
 /** Presentation only: validation, units, row identity and writes stay in each editor. */
-export default function DataTable({ label, children, className = "", showLabel = true, searchable = true, pageSize = 100,
+export default function DataTable({ label, children, className = "", showLabel = true, showTools = true, toolbarActions, searchable = true, pageSize = 100,
   emptyMessage = "No rows to display.", theme, onKeyDown, onContextMenu, onFocusCapture, onBlurCapture, ...tableProps }: DataTableProps) {
   const [query, setQuery] = useState("");
-  const [compact, setCompact] = useState(false);
+  const [compact, setCompact] = useState(true);
   const [page, setPage] = useState(0);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const search = useRef<HTMLInputElement>(null);
@@ -40,7 +42,7 @@ export default function DataTable({ label, children, className = "", showLabel =
     if (viewport.current) viewport.current.scrollTop = 0;
   };
   return <div className={`spike-data-table${compact ? " spike-table-compact" : ""}`} data-table-theme={theme}>
-    <div className="spike-table-toolbar" role="group" aria-label={`${label} table tools`}>
+    {showTools && <div className="spike-table-toolbar" role="group" aria-label={`${label} table tools`}>
       {showLabel && <strong title={label}>{label}</strong>}
       {searchable && <input ref={search} className="spike-table-search" type="search" aria-label={`Find in ${label}`} placeholder="Find rows..." title="Match all words across a row. Use quotes for an exact phrase." value={query}
         onChange={event => { setQuery(event.target.value); setPage(0); setActiveKey(null); }} />}
@@ -50,13 +52,14 @@ export default function DataTable({ label, children, className = "", showLabel =
       <details className="spike-table-help"><summary aria-label={`Keyboard help for ${label}`}>Help</summary>
         <p id={`${id}-keys`}>Tab / Shift+Tab: next / previous field. Enter / Shift+Enter: same column in the next / previous row. Alt+Arrow: move between cells. Arrow keys keep their normal editing behavior.</p>
       </details>
-    </div>
-    <div className="spike-table-field-guide" aria-label={`${label} field guide`}>
+      {toolbarActions}
+    </div>}
+    {showTools && <div className="spike-table-field-guide" aria-label={`${label} field guide`}>
       <span><i className="spike-table-edit-cue" aria-hidden="true" />Editable</span>
       <span><i className="spike-table-choice-cue" aria-hidden="true" />Dropdown</span>
       <span><i className="spike-table-lock-cue" aria-hidden="true" />Read only / unavailable</span>
       <span><i className="spike-table-action-cue" aria-hidden="true">↗</i>Action</span>
-    </div>
+    </div>}
     <div ref={viewport} className="spike-table-viewport" role="region" aria-label={`${label} rows`} tabIndex={0}>
       <table {...tableProps} className={`spike-table ${className}`} aria-label={tableProps["aria-label"] ?? label}
         onFocusCapture={event => {

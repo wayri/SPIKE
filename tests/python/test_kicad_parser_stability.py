@@ -8,6 +8,18 @@ from python.spike_core.kicad_importer import import_kicad_design
 
 
 class KicadParserStabilityTests(unittest.TestCase):
+    def test_native_placement_remains_distinct_from_asymmetric_pad_centroid(self):
+        path = self.write('''(kicad_pcb
+          (layers (0 "F.Cu" signal) (31 "B.Cu" signal))
+          (footprint "Original:Asymmetric" (layer "F.Cu") (at 10 20)
+            (property "Reference" "U1")
+            (pad "1" smd rect (at 0 0) (size 1 1) (layers "F.Cu"))
+            (pad "2" smd rect (at 4 0) (size 1 1) (layers "F.Cu")))
+        )''')
+        part = next(p for p in import_kicad_design(str(path)).components if p['reference'] == 'U1')
+        self.assertEqual(part['native_footprint_at_mm'], [10, 20])
+        self.assertEqual(part['at'], [12, 20], 'legacy centroid semantics must not silently change')
+
     def write(self, contents: str) -> Path:
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)

@@ -45,6 +45,8 @@ def validate_harness_connections(assembly):
                     raise ValueError(f"Unknown connector pin: {key}:{pin}")
                 if "spike.harness-routing" in h.extensions and mapping is None:
                     raise ValueError("Routed harnesses require retained connector mappings.")
+        from .harness_intent import validate_assembly_conductors
+        validate_assembly_conductors(h)
     for mate in assembly.connector_mappings:
         if mate.kind != "connector-mate":
             continue

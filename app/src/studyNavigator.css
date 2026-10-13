@@ -1,0 +1,45 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+@import "./tableTheme.css";
+.study-tree-panel { display:flex; flex-direction:column; min-width:0; min-height:0; width:100%; height:100%; overflow:hidden; color:var(--spike-table-text); background:var(--spike-table-surface); border:1px solid var(--spike-table-border); font:12px/1.35 Inter,ui-sans-serif,system-ui,sans-serif; }
+.study-tree-panel.is-floating { width:min(380px,calc(100vw - 24px)); height:min(680px,calc(100vh - 120px)); border-radius:7px; resize:both; box-shadow:0 12px 30px color-mix(in srgb,var(--spike-table-surface) 70%,transparent); }
+.study-tree-header { display:flex; align-items:center; gap:8px; padding:8px; border-bottom:1px solid var(--spike-table-border); background:var(--spike-table-toolbar); }
+.study-tree-header strong { display:flex; align-items:center; gap:6px; flex:1; min-width:0; font-size:12px; }
+.study-tree-header strong svg,.study-tree-actions { flex:none; }
+.study-tree-actions { display:flex; gap:4px; }
+.study-tree-tools { padding:8px; display:flex; flex-direction:column; gap:7px; border-bottom:1px solid var(--spike-table-border); }
+.study-tree-search { display:flex; align-items:center; gap:6px; min-width:0; }
+.study-tree-search svg { flex:none; color:var(--spike-table-muted); }
+.study-tree-search input { width:100%; min-width:0; font:var(--spike-control-font); }
+.study-tree-options { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
+.study-tree-options label { display:flex; align-items:center; gap:5px; color:var(--spike-table-muted); }
+.study-tree-options input { margin:0; }
+.study-tree-content { flex:1; min-height:0; overflow:auto; padding:4px 0; }
+.study-tree-row { box-sizing:border-box; display:flex; align-items:center; gap:5px; min-width:0; min-height:36px; padding:5px 8px; cursor:pointer; outline-offset:-2px; }
+.study-tree-row:hover { background:var(--spike-table-hover); }
+.study-tree-row.is-active { background:var(--spike-table-choice-bg); box-shadow:inset 3px 0 var(--spike-table-choice); }
+.study-tree-row:focus-visible { outline:2px solid var(--spike-table-focus); background:var(--spike-table-row-focus); }
+.study-tree-panel .study-tree-disclosure { width:18px; min-width:18px; min-height:24px; padding:0; flex:none; color:var(--spike-table-text); }
+.study-tree-disclosure-space { width:18px; flex:none; }
+.study-tree-icon { flex:none; color:var(--spike-table-choice); }
+.study-tree-text { display:flex; flex-direction:column; min-width:0; flex:1; gap:2px; }
+.study-tree-text > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.study-tree-text small { font-size:10px; color:var(--spike-table-muted); overflow-wrap:anywhere; }
+.study-tree-empty { padding:8px 12px; color:var(--spike-table-muted); overflow-wrap:anywhere; }
+.study-tree-footer { flex:none; padding:8px; border-top:1px solid var(--spike-table-border); font-size:10px; color:var(--spike-table-muted); }
+@media (max-width:600px) { .study-tree-panel.is-floating { max-width:calc(100vw - 24px); max-height:calc(100vh - 100px); } }
+
+.study-sidebar-tabs { display: flex; flex: 0 0 auto; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--spike-table-border); }
+.study-sidebar-tabs button { display: inline-flex; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.study-sidebar-tabs button[aria-pressed="true"] { border-color: var(--spike-table-accent); }
+.study-floating-host { position: fixed; z-index: 18; left: 16px; top: 170px; width: min(360px, calc(100vw - 32px)); height: min(620px, calc(100vh - 220px)); min-height: 180px; resize: both; overflow: auto; border: 1px solid var(--spike-table-border); background: var(--spike-table-surface); box-shadow: 0 12px 32px rgba(0,0,0,.35); }
+.study-floating-host > .study-tree-panel.is-floating { width: 100%; height: 100%; }
+.side-panel.left > .study-tree-panel { min-height: 0; flex: 1; }
+
+/* Explicit compact tracks keep global sidebar button rules out of the tree. */
+.study-tree-panel > header, .study-tree-panel > footer, .study-tree-panel > .study-tree-tools { flex: 0 0 auto; }
+.study-tree-panel button { flex: 0 0 auto; height: 26px; min-height: 26px; width: auto; font: inherit; padding: 2px 6px; }
+.study-tree-panel .study-tree-actions button { width: 26px; padding: 2px; display: grid; place-items: center; }
+.study-tree-panel .study-tree-search input { height: 28px; min-height: 28px; font: inherit; padding: 3px 6px; }
+.study-tree-panel .study-tree-row { min-height: 32px; padding-block: 3px; }
+.study-tree-panel .study-tree-disclosure { height: 24px; width: 18px; padding: 0; }
+.study-tree-text small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

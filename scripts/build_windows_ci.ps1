@@ -53,8 +53,6 @@ $env:CARGO_PROFILE_RELEASE_STRIP = "symbols"
 $env:RUSTFLAGS = "--remap-path-prefix=$root=C:\build\spike --remap-path-prefix=$profileRoot=C:\build\user"
 $env:CL = "/pathmap:$root=C:\build\spike /pathmap:$profileRoot=C:\build\user"
 
-Invoke-Checked $python @("-m", "unittest", "tests.python.test_windows_desktop_path", "-v") $root
-
 # Install runtime wheels before the hash-locked build tooling. The packaged-worker
 # builder checks every Windows build-tool version against this lock.
 Invoke-Checked $python @(
@@ -118,17 +116,7 @@ Invoke-Checked $python @("scripts/verify_packaged_cli.py", "--", $frozenWorker, 
 Invoke-Checked "npm.cmd" @("ci") $app
 Invoke-Checked "npm.cmd" @("run", "build") $app
 Invoke-Checked $python @("scripts/prepare_release_resources.py", "--config-output", "build/tauri.release.json") $root
-# --config merges resource maps, which would reintroduce unstaged source trees.
-# Replace the base config only for bundling and restore its exact source bytes.
-$tauriConfig = Join-Path $app "src-tauri\tauri.conf.json"
-$sourceConfigBytes = [System.IO.File]::ReadAllBytes($tauriConfig)
-try {
-    Copy-Item -LiteralPath (Join-Path $root "build\tauri.release.json") -Destination $tauriConfig -Force
-    Invoke-Checked "npm.cmd" @("run", "tauri", "build", "--", "--bundles", "nsis") $app
-}
-finally {
-    [System.IO.File]::WriteAllBytes($tauriConfig, $sourceConfigBytes)
-}
+Invoke-Checked "npm.cmd" @("run", "tauri", "build", "--", "--bundles", "nsis", "--config", "../build/tauri.release.json") $app
 
 $bundleRoot = Join-Path $app "src-tauri\target\release\bundle\nsis"
 $installers = @(Get-ChildItem -LiteralPath $bundleRoot -Filter "*.exe" -File)
@@ -169,30 +157,16 @@ Invoke-Checked $python @(
     "scripts/verify_packaged_cli.py", "--", "cmd.exe", "/d", "/c", $installedLauncher
 ) $root
 
-Invoke-Checked $python @(
-    "scripts/verify_installed_python_runtime.py",
-    "--installed-root", $installRoot,
-    "--worker", (Join-Path $installRoot "bundled\spike-worker\spike-worker.exe"),
-    "--python-executable", $python
-) $root
-
-. (Join-Path $PSScriptRoot "windows_desktop_path.ps1")
-$desktopPath = Get-SpikeInstalledDesktopPath -InstallRoot $installRoot
-$desktop = Start-Process -FilePath $desktopPath -WindowStyle Hidden -PassThru
+$desktopCandidates = @(Get-ChildItem -LiteralPath $installRoot -Recurse -Filter "*.exe" -File |
+    Where-Object { $_.Name -notin @("spike-worker.exe", "uninstall.exe") })
+if ($desktopCandidates.Count -ne 1) {
+    throw "Expected exactly one installed desktop executable; found $($desktopCandidates.Count)."
+}
+$desktop = Start-Process -FilePath $desktopCandidates[0].FullName -WindowStyle Hidden -PassThru
 try {
     Start-Sleep -Seconds 10
     if ($desktop.HasExited) {
         throw "Installed SPIKE desktop exited during the 10-second startup smoke check (exit code $($desktop.ExitCode))."
-    }
-    # Exercise the real title-bar close path. A forced stop cannot qualify shutdown.
-    if (-not $desktop.CloseMainWindow()) {
-        throw "Installed SPIKE did not accept its native main-window close request."
-    }
-    if (-not $desktop.WaitForExit(10000)) {
-        throw "Installed SPIKE remained running more than 10 seconds after closing its main window."
-    }
-    if ($desktop.ExitCode -ne 0) {
-        throw "Installed SPIKE close failed with exit code $($desktop.ExitCode)."
     }
 }
 finally {

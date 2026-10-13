@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, CircuitBoard, FileBox, Link2, Move3d, PackageOpen, ShieldAlert, X } from "./icons";
 import { runNativeProjectWorker, selectNativeMcadFile, type NativeSelectedFile } from "./workerBridge";
-import { buildAssemblyHierarchy, localTransformFromAssembly, partVisualSettings, placementFromTransform, placementPolicySettings, transformFromPlacement, validReparentTargets, type AssemblyDesigns, type AssemblyHierarchyNode, type AssemblyIr, type AssemblyPartVisual, type AssemblyPlacement, type AssemblySection } from "./mcadAssembly";
+import { buildAssemblyHierarchy, localTransformFromAssembly, MAX_ASSEMBLY_SECTION_PLANES, nextAssemblySectionPlane, partVisualSettings, placementFromTransform, placementPolicySettings, transformFromPlacement, validReparentTargets, type AssemblyDesigns, type AssemblyHierarchyNode, type AssemblyIr, type AssemblyPartVisual, type AssemblyPlacement, type AssemblySection, type AssemblySectionPlane } from "./mcadAssembly";
 import AssemblySemanticsEditor from "./AssemblySemanticsEditor";
 import AssemblyTopologyEditor from "./AssemblyTopologyEditor";
 import { packageShapeForPart, type AssemblyPackageShapesIndex, type TopologyReference } from "./assemblyPackageShapes";
@@ -78,6 +78,16 @@ export default function McadAttachmentPanel({ initialSource, projectPath, projec
   const canTessellate = canSavePart && selectedIsRetainedStep;
   const canExtractExactShape = canSavePart && selectedHasRetainedStep;
   const canGenerateSelectorPreview = canSavePart && Boolean(selectedPackageShape);
+
+  const updateSectionPlane = (id: string, update: Partial<AssemblySectionPlane>) => {
+    onSection({ ...section, planes: section.planes.map(plane => plane.id === id ? { ...plane, ...update } : plane) });
+  };
+  const updateSectionPlaneNormal = (plane: AssemblySectionPlane, index: number, rawValue: string) => {
+    const value = Number(rawValue);
+    const normal: [number, number, number] = [...plane.normal];
+    normal[index] = Number.isFinite(value) ? value : 0;
+    updateSectionPlane(plane.id, { normal });
+  };
 
   useEffect(() => {
     if (focusedPartId && assemblyIr?.parts.some(part => part.id === focusedPartId)) setSelectedPartId(focusedPartId);
@@ -375,20 +385,33 @@ export default function McadAttachmentPanel({ initialSource, projectPath, projec
         </section> : null}
         <section className="mcad-section-controls">
           <h3>Visual cross-section</h3>
-          <p className="mcad-gate">Temporary visual-only viewport clipping for visualized glTF/GLB meshes and exact-selector previews. It does not create solver regions, section geometry, package data, or physics.</p>
+          <p className="mcad-gate">Saved presentation-only clipping for boards, harnesses, aligned result overlays, visualized glTF/GLB meshes, and exact-selector previews. It does not create solver regions, section geometry, package data, or physics.</p>
           <label><input type="checkbox" checked={section.enabled} onChange={event => onSection({ ...section, enabled: event.target.checked })} /> Enable assembly section</label>
-          <label>MODE<select value={section.mode} onChange={event => onSection({ ...section, mode: event.target.value as AssemblySection["mode"] })}><option value="plane">Plane</option><option value="box">Bounded box</option></select></label>
+          <label>MODE<select value={section.mode} onChange={event => onSection({ ...section, mode: event.target.value as AssemblySection["mode"] })}><option value="plane">Axis plane</option><option value="planes">Multiple planes</option><option value="box">Bounded box</option></select></label>
           {section.mode === "plane" ? <>
             <label>AXIS<select value={section.axis} onChange={event => onSection({ ...section, axis: event.target.value as AssemblySection["axis"] })}><option value="x">X</option><option value="y">Y</option><option value="z">Z</option></select></label>
             <label>OFFSET (mm)<input type="number" step="any" value={section.offsetMm} onChange={event => onSection({ ...section, offsetMm: Number(event.target.value) || 0 })} /></label>
-          </> : <div className="mcad-fields">
+          </> : section.mode === "planes" ? <div className="mcad-section-plane-editor">
+            <div className="mcad-section-plane-heading"><span>Arbitrary assembly-space planes</span><button className="secondary-btn" disabled={section.planes.length >= MAX_ASSEMBLY_SECTION_PLANES} onClick={() => onSection({ ...section, planes: [...section.planes, nextAssemblySectionPlane(section)] })}>Add plane</button></div>
+            {section.planes.length === 0 ? <p className="mcad-gate">Add up to {MAX_ASSEMBLY_SECTION_PLANES} planes. Each normal is normalized; offset is the signed distance from the assembly origin in mm. The retained volume is the intersection of the enabled half-spaces.</p> : section.planes.map((plane, index) => <fieldset className="mcad-section-plane" key={plane.id}>
+              <legend>Plane {index + 1}</legend>
+              <label className="mcad-section-plane-toggle"><input type="checkbox" checked={plane.enabled} onChange={event => updateSectionPlane(plane.id, { enabled: event.target.checked })} /> Enabled</label>
+              <label>NORMAL X<input aria-label={`Plane ${index + 1} normal X`} type="number" step="any" value={plane.normal[0]} onChange={event => updateSectionPlaneNormal(plane, 0, event.target.value)} /></label>
+              <label>NORMAL Y<input aria-label={`Plane ${index + 1} normal Y`} type="number" step="any" value={plane.normal[1]} onChange={event => updateSectionPlaneNormal(plane, 1, event.target.value)} /></label>
+              <label>NORMAL Z<input aria-label={`Plane ${index + 1} normal Z`} type="number" step="any" value={plane.normal[2]} onChange={event => updateSectionPlaneNormal(plane, 2, event.target.value)} /></label>
+              <label>OFFSET (mm)<input aria-label={`Plane ${index + 1} offset mm`} type="number" step="any" value={plane.offsetMm} onChange={event => updateSectionPlane(plane.id, { offsetMm: Number(event.target.value) || 0 })} /></label>
+              <label className="mcad-section-plane-toggle"><input type="checkbox" checked={plane.flipped} onChange={event => updateSectionPlane(plane.id, { flipped: event.target.checked })} /> Flip retained side</label>
+              <button className="secondary-btn" aria-label={`Remove plane ${index + 1}`} onClick={() => onSection({ ...section, planes: section.planes.filter(candidate => candidate.id !== plane.id) })}>Remove</button>
+            </fieldset>)}
+            {section.planes.length > 0 && <p className="mcad-gate">A zero normal is ignored. Flip retained side reverses clipping without moving the plane.</p>}
+          </div> : <div className="mcad-fields">
             <label>MIN X (mm)<input type="number" step="any" value={section.minXMm} onChange={event => onSection({ ...section, minXMm: Number(event.target.value) })} /></label>
             <label>MAX X (mm)<input type="number" step="any" value={section.maxXMm} onChange={event => onSection({ ...section, maxXMm: Number(event.target.value) })} /></label>
             <label>MIN Y (mm)<input type="number" step="any" value={section.minYMm} onChange={event => onSection({ ...section, minYMm: Number(event.target.value) })} /></label>
             <label>MAX Y (mm)<input type="number" step="any" value={section.maxYMm} onChange={event => onSection({ ...section, maxYMm: Number(event.target.value) })} /></label>
             <label>MIN Z (mm)<input type="number" step="any" value={section.minZMm} onChange={event => onSection({ ...section, minZMm: Number(event.target.value) })} /></label>
             <label>MAX Z (mm)<input type="number" step="any" value={section.maxZMm} onChange={event => onSection({ ...section, maxZMm: Number(event.target.value) })} /></label>
-            <p className="mcad-gate">Bounds must be finite and each minimum must not exceed its maximum; invalid bounds fail closed and apply no clipping.</p>
+            <p className="mcad-gate">Bounds must be finite and each minimum must not exceed its maximum; invalid bounds apply no clipping.</p>
           </div>}
           <button className="secondary-btn" onClick={() => onSection({ ...section, enabled: false })}>Clear section</button>
         </section>

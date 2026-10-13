@@ -49,7 +49,12 @@ def _point(value: Any, label: str) -> tuple[float, float]:
 def _ring(value: Any, label: str, *, allow_source_path: bool = False) -> list[tuple[float, float]]:
     if not isinstance(value, (list, tuple)):
         raise ValueError(f"{label} must be a polygon")
-    points = _normalize_filled_zone_polygon([_point(p, label) for p in value])
+    points = [_point(p, label) for p in value]
+    # Authoritative source paths can encode cutouts with retraced bridges.
+    # Feed those coordinates unchanged to the even-odd scanline rasterizer;
+    # simple-polygon repair is both inappropriate and quadratic for large fills.
+    if not allow_source_path:
+        points = _normalize_filled_zone_polygon(points)
     if (len(points) < 3 or _polygon_area(points) <= 1e-12
             or (not allow_source_path and not _polygon_is_simple(points))):
         raise ValueError(f"{label} must be a nonempty simple polygon")
@@ -104,13 +109,19 @@ def _scanline_polygon(mask: np.ndarray, bounds: tuple[float, float, float, float
     vertices = np.asarray(ring, dtype=float)
     x_a, y_a = vertices[:, 0], vertices[:, 1]
     x_b, y_b = np.roll(x_a, -1), np.roll(y_a, -1)
+    # Evaluate an edge from its lower endpoint in either traversal direction.
+    # Retraced source bridges must produce bit-identical intersections or a
+    # sample exactly on a bridge can acquire spurious even-odd occupancy.
+    upward = y_a < y_b
+    x_low, y_low = np.where(upward, x_a, x_b), np.minimum(y_a, y_b)
+    x_high, y_high = np.where(upward, x_b, x_a), np.maximum(y_a, y_b)
     x = xmin + (np.arange(col0, col1) + 0.5) * dx / samples
     for row in range(row0, row1):
         y = ymin + (row + 0.5) * dy / samples
         crossing = ((y_a <= y) & (y < y_b)) | ((y_b <= y) & (y < y_a))
-        intersections = np.sort(x_a[crossing] + (y - y_a[crossing])
-                                * (x_b[crossing] - x_a[crossing])
-                                / (y_b[crossing] - y_a[crossing]))
+        intersections = np.sort(x_low[crossing] + (y - y_low[crossing])
+                                * (x_high[crossing] - x_low[crossing])
+                                / (y_high[crossing] - y_low[crossing]))
         if len(intersections) % 2:
             raise ValueError("source polygon has unmatched scanline intersections")
         hit = np.searchsorted(intersections, x, side="right") % 2 == 1
@@ -157,6 +168,9 @@ def rasterize_copper(
     """
     if design.units != "mm":
         raise ValueError("Copper geometry requires SpiDeR millimetres")
+    if include_tracks:
+        from .arc_legacy_projection import require_legacy_arc_geometry
+        require_legacy_arc_geometry(design)
     if len(bounds) != 4 or len(shape) != 2 or len(spacing_mm) != 2:
         raise ValueError("Invalid copper raster grid")
     box = tuple(_number(v, "board bound") for v in bounds)

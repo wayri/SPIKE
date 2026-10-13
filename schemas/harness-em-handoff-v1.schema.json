@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-em-handoff-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "status",
+    "model_status",
+    "production_qualified",
+    "field_coupling_executed",
+    "harness_digest",
+    "request_digest",
+    "geometry",
+    "pairs",
+    "cables",
+    "issues",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/harness-em-handoff/v1"
+    },
+    "status": {
+      "const": "unsupported"
+    },
+    "model_status": {
+      "const": "unsupported"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "field_coupling_executed": {
+      "const": false
+    },
+    "harness_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "request_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "geometry": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "wire_id",
+          "wire",
+          "route"
+        ],
+        "properties": {
+          "wire_id": {
+            "type": "string"
+          },
+          "wire": {
+            "type": "object"
+          },
+          "route": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "pairs": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 100000,
+      "items": {
+        "type": "object"
+      }
+    },
+    "cables": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 100000,
+      "items": {
+        "type": "object"
+      }
+    },
+    "issues": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16384,
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "severity",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "severity": {
+            "const": "error"
+          },
+          "message": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 4096,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

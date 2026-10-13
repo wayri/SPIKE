@@ -1,5 +1,14 @@
 # SPIKE Developer Guide
 
+For native circuit stepping, the standalone C++ regression harness, adaptive
+runner/ABI semantics and cache benchmarking, see
+[SPIKES adaptive switching foundation](SPIKES_ADAPTIVE_SWITCHING_FOUNDATION.md)
+and [ADR 0065](adr/0065-adaptive-native-transient-recovery.md).
+
+For scalar participant adapters and offline telemetry admission, see
+[co-simulation and digital twin API](COSIMULATION_DIGITAL_TWIN.md) and
+[ADR 0063](adr/0063-offline-cosimulation-and-digital-twins.md).
+
 This guide is for engineers working on SPIKE without relying on prior chat or
 agent context. Start with `ARCHITECTURE.md` and use `docs/SUBSYSTEM_INDEX.md` to
 find ownership.
@@ -189,6 +198,21 @@ entire scene for hover, selection pulse, or panel resize.
 
 ## Documentation and ADRs
 
+Import-assurance parity work uses [the original coupon and rerun instructions](../benchmarks/parity-import/README.md).
+`scripts/benchmark_board_corpus.py` verifies current import-report errors/status,
+canonical millimetre/right-handed frames, unique IDs, pinned source digests,
+counts and optional source-scoped field/reference assertions. Expectations must
+come from independent source geometry. Preserve warnings and readiness metadata;
+an import pass establishes no physical solver validity. The development backlog
+is checked by `scripts/check_parity_backlog.py` and is separate from release controls.
+Bounded stages use `planned`, `in_progress`, `done` or `blocked`. Mark `done`
+only after acceptance passes, attach the actual source-bound receipt, and update
+the roadmap's stage table. The stage checker rejects stale or failing evidence
+and unfinished dependencies. It never promotes an overall physics capability.
+Literal slash paths address namespaced nested fields such as
+`/extensions/spike.v1/native_footprint_at_mm`; dotted/index paths address ordinary
+keys such as `layer_ids.0`. Named material selectors must resolve uniquely.
+
 Update docs in the same change as behavior. Create an ADR under `docs/adr` for
 new process boundaries, contract versions, persistence changes, rendering
 engines, or plugin models. Use Mermaid for maintainable diagrams and include
@@ -205,3 +229,15 @@ knowledge.
 ## Study workspace integration
 
 The version-one study projection adds tags, archives, datasets, case links, and captured history without scheduling solvers. Captures freeze the supplied workspace setup; they do not establish the original solve inputs. Import copies use fresh IDs and preserve dataset links. Project copies without results omit result payloads, references, and solved Optycal sources. Run `npm.cmd run test:studies` and preview `scripts/fixtures/study-manager.html`. See [study workflow](SIMULATION_STUDIES.md) and ADR 0033.
+
+## Board-bound Studio integration
+
+See [SPIKES board Studio](SPIKES_BOARD_STUDIO.md) for the inert graph, explicit
+model review and process-isolated feedback boundary.
+
+## Extending SpiDeR and MCP
+
+Follow [MCP/SpiDeR interfaces](MCP_SPIDER_INTERFACES.md). Register explicit typed
+tools over worker methods; keep neutral document semantics in Python and native
+bridge commands in its fixed allowlist. Add interface/projection regression
+checks before accepting a new legacy-worker design operation.

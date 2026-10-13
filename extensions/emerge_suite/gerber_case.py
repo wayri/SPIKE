@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import math
 
-from extensions.emerge_suite.board_adapter import _surroundings, number
+from extensions.emerge_suite.board_adapter import admit_conductor_loss, _surroundings, number
 from extensions.emerge_suite.gerber_source import normalize_gerber_source, source_digest
 
 
@@ -51,6 +51,7 @@ def compile_gerber(design: dict, parameters: dict) -> dict:
         raise ValueError("Native Gerber execution requires design.source_format emerge-gerber.")
     if not isinstance(parameters, dict):
         raise ValueError("EMerge Gerber setup parameters must be an object.")
+    admit_conductor_loss(parameters)
     if parameters.get("geometry_source") not in {None, "gerber"}:
         raise ValueError("geometry_source does not match the imported Gerber design.")
     metadata = design.get("metadata")

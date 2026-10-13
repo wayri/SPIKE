@@ -4,33 +4,36 @@ import DataTable from "./DataTable";
 import PlotlyChart from "./PlotlyChart";
 import type { ParsedBoard } from "./boardParser";
 import { thermalFieldColor } from "./thermalResultFields";
-import { boardThermalCuts } from "./boardThermalViewport";
+import { boardThermalCuts, boardThermalAxisEdges, boardThermalViewportGrid, type BoardThermalGrid } from "./boardThermalViewport";
 import { numericExtent } from "./numericRange";
 import { runLocalWorker } from "./workerBridge";
 import type { AssemblyAnalysisScope } from "./assemblyAdmission";
 
 type ContactMode = "pads" | "square";
-type ComponentInput = { component_ref: string; power_w: number; r_junction_case_k_w: number; r_case_board_k_w: number; contact_mode?: ContactMode; contact_size_mm?: number };
+type ComponentInput = { component_ref: string; power_w: number; r_junction_case_k_w: number; r_case_board_k_w: number; contact_mode?: ContactMode; contact_size_mm?: number; contact_pad_numbers?: string[] };
+type BoardHeatInput = Pick<ComponentInput, "component_ref" | "power_w" | "contact_mode" | "contact_size_mm" | "contact_pad_numbers"> & { id: string };
+type AdvancedBoardInput = { x_edges_mm?: number[]; y_edges_mm?: number[]; copper_raster_step_mm?: number; convection_top_grid_w_m2k?: number[]; convection_bottom_grid_w_m2k?: number[]; ambient_top_grid_c?: number[]; ambient_bottom_grid_c?: number[] };
 type VirtualHeatsink = { id: string; face: "top" | "bottom"; x_mm: number; y_mm: number; width_mm: number; height_mm: number; interface_resistance_k_w: number; sink_to_ambient_k_w: number };
 type TransientInput = { end_time_s: number; time_step_s: number; output_stride: number; copper_volumetric_heat_capacity_j_m3k: number; dielectric_volumetric_heat_capacity_j_m3k: number };
 type BoardModel = "plate" | "layered";
-type BoardInput = { model?: BoardModel; conductivity_w_mk?: number; thickness_mm: number; convection_top_w_m2k: number; convection_bottom_w_m2k: number; grid_step_mm: number; dielectric_conductivity_w_mk?: number; copper_conductivity_w_mk?: number; via_plating_thickness_mm?: number; include_copper?: boolean; include_vias?: boolean; include_tracks?: boolean; include_pads?: boolean; include_zones?: boolean; fuzzy_sigma_mm?: number };
-type BoardSettings = Required<BoardInput>;
-export type BoardThermalRequest = { ambient_temperature_c: number; board: BoardInput; components: ComponentInput[]; virtual_heatsinks?: VirtualHeatsink[]; transient?: TransientInput };
+type BoardInput = AdvancedBoardInput & { model?: BoardModel; conductivity_w_mk?: number; thickness_mm: number; convection_top_w_m2k: number; convection_bottom_w_m2k: number; grid_step_mm?: number; dielectric_conductivity_w_mk?: number; copper_conductivity_w_mk?: number; via_plating_thickness_mm?: number; include_copper?: boolean; include_vias?: boolean; include_tracks?: boolean; include_pads?: boolean; include_zones?: boolean; fuzzy_sigma_mm?: number };
+type BoardSettings = Required<Omit<BoardInput, keyof AdvancedBoardInput>> & AdvancedBoardInput;
+export type BoardThermalRequest = { ambient_temperature_c: number; board: BoardInput; components: ComponentInput[]; board_heat_sources?: BoardHeatInput[]; virtual_heatsinks?: VirtualHeatsink[]; transient?: TransientInput };
 type Request = BoardThermalRequest;
 type BoardResult = {
   contract: string; status: "completed" | "blocked"; model_status: string;
-  grid?: { origin_mm: [number, number]; spacing_mm: [number, number]; shape: [number, number]; temperatures_c: number[]; order?: string };
+  grid?: BoardThermalGrid & { order?: string };
   layer_grids?: Array<{ name: string; thickness_mm: number; temperatures_c: number[]; copper_coverage: number[] }>;
   components?: Array<ComponentInput & { position_mm?: [number, number]; board_temperature_c: number; case_temperature_c: number; junction_temperature_c: number; pad_count?: number; pad_contacts?: Array<{ pad_name: string; position_mm: [number, number]; area_mm2: number; board_temperature_c: number; heat_w: number }> }>;
+  board_heat_sources?: Array<BoardHeatInput & { board_temperature_c: number; case_temperature_c: null; junction_temperature_c: null; temperature_status: "board_only_junction_unsolved" }>;
   virtual_heatsinks?: Array<VirtualHeatsink & { temperature_c: number; board_contact_temperature_c: number; heat_flow_w: number }>;
   transient?: Array<{ time_s: number; layer_temperatures_c: number[][]; maximum_board_temperature_c: number; storage_rate_w: number; energy_balance_error_w: number }>;
-  summary?: { minimum_board_temperature_c?: number; maximum_board_temperature_c?: number; maximum_junction_temperature_c?: number; total_power_w?: number; outward_heat_w?: number; heatsink_outward_heat_w?: number; energy_balance_error_w?: number; linear_relative_residual?: number; transient_peak_board_temperature_c?: number; transient_final_stored_energy_j?: number; max_transient_energy_balance_error_w?: number };
+  summary?: { minimum_board_temperature_c?: number; maximum_board_temperature_c?: number; maximum_junction_temperature_c?: number | null; total_power_w?: number; outward_heat_w?: number; heatsink_outward_heat_w?: number; energy_balance_error_w?: number; linear_relative_residual?: number; transient_peak_board_temperature_c?: number; transient_final_stored_energy_j?: number; max_transient_energy_balance_error_w?: number };
   issues?: Array<{ severity?: string; message?: string }>;
   message?: string;
 };
 type Row = Omit<ComponentInput, "contact_size_mm" | "contact_mode"> & { selected: boolean; contact_mode: ContactMode; contact_size_mm: number };
-type Props = { board: ParsedBoard | null; design: Record<string, unknown> | null; sourceText?: string | null; ambientC: number; workerAvailable: boolean; savedRequest?: Request; savedResult?: BoardResult; onRequireAdmission: () => Promise<AssemblyAnalysisScope | null>; onSave: (request: Request, result: BoardResult | null) => void; onStatus: (message: string) => void };
+type Props = { board: ParsedBoard | null; design: Record<string, unknown> | null; sourceText?: string | null; ambientC: number; workerAvailable: boolean; savedRequest?: Request; savedResult?: BoardResult; onRequireAdmission: () => Promise<AssemblyAnalysisScope | null>; onSave: (request: Request, result: BoardResult | null) => void; onStatus: (message: string) => void; onOpenSolidStudy?: () => void };
 function TemperatureCut({ label, points, unit }: { label: string; points: [number, number][]; unit: string }) {
   if (!points.length) return null;
   return <figure className="board-thermal-cut"><PlotlyChart title={`${label} temperature profile`} revision={`thermal-cut:${label}:${JSON.stringify(points)}`}
@@ -89,30 +92,37 @@ export function validBoardThermalResult(raw: unknown, request: Request): raw is 
   const result = raw as BoardResult;
   if (result.contract !== "spike/board-thermal-result/v1" || !["completed", "blocked"].includes(result.status) || typeof result.model_status !== "string") return false;
   if (result.status === "blocked") return Array.isArray(result.issues) && result.issues.every(issue => typeof issue?.message === "string");
+  if (request.board_heat_sources?.length && request.board.model !== "layered") return false;
   const grid = result.grid;
-  if (!grid || grid.order !== "x-fast" || !Array.isArray(grid.shape) || !Array.isArray(grid.origin_mm) || !Array.isArray(grid.spacing_mm) || !Array.isArray(grid.temperatures_c)) return false;
+  if (!grid || !boardThermalViewportGrid(result)) return false;
   const [nx, ny] = grid.shape;
-  if (!Number.isInteger(nx) || !Number.isInteger(ny) || nx < 1 || ny < 1 || nx * ny > 8192 || grid.origin_mm.length !== 2 || grid.spacing_mm.length !== 2 || grid.temperatures_c.length !== nx * ny || !grid.temperatures_c.every(finite) || !grid.origin_mm.every(finite) || !grid.spacing_mm.every(value => finite(value) && value > 0)) return false;
   if (request.board.model === "layered" && (!Array.isArray(result.layer_grids) || !result.layer_grids.length || !result.layer_grids.every(layer => typeof layer.name === "string" && finite(layer.thickness_mm) && layer.thickness_mm > 0 && Array.isArray(layer.temperatures_c) && layer.temperatures_c.length === nx * ny && layer.temperatures_c.every(finite) && Array.isArray(layer.copper_coverage) && layer.copper_coverage.length === nx * ny && layer.copper_coverage.every(value => finite(value) && value >= 0 && value <= 1)))) return false;
   const expected = new Set(request.components.map(part => part.component_ref));
   if (!Array.isArray(result.components) || result.components.length !== expected.size || !result.components.every(part => {
     const selected = request.components.find(item => item.component_ref === part.component_ref);
-    const validPads = selected?.contact_mode !== "pads" || (part.contact_mode === "pads" && Number.isInteger(part.pad_count) && (part.pad_count ?? 0) > 0 && Array.isArray(part.pad_contacts) && part.pad_contacts.length === part.pad_count && part.pad_contacts.every(pad => typeof pad.pad_name === "string" && Array.isArray(pad.position_mm) && pad.position_mm.length === 2 && pad.position_mm.every(finite) && [pad.area_mm2, pad.board_temperature_c, pad.heat_w].every(finite) && pad.area_mm2 > 0));
-    return expected.delete(part.component_ref) && [part.power_w, part.board_temperature_c, part.case_temperature_c, part.junction_temperature_c].every(finite) && Array.isArray(part.position_mm) && part.position_mm.length === 2 && part.position_mm.every(finite) && validPads;
+    const validPads = selected?.contact_mode !== "pads" || (part.contact_mode === "pads" && Number.isInteger(part.pad_count) && (part.pad_count ?? 0) > 0 && Array.isArray(part.pad_contacts) && part.pad_contacts.length === part.pad_count && part.pad_contacts.every(pad => typeof pad.pad_name === "string" && (!selected?.contact_pad_numbers || selected.contact_pad_numbers.includes(pad.pad_name)) && Array.isArray(pad.position_mm) && pad.position_mm.length === 2 && pad.position_mm.every(finite) && [pad.area_mm2, pad.board_temperature_c, pad.heat_w].every(finite) && pad.area_mm2 > 0));
+    return expected.delete(part.component_ref) && part.power_w === selected?.power_w && [part.power_w, part.board_temperature_c, part.case_temperature_c, part.junction_temperature_c].every(finite) && Array.isArray(part.position_mm) && part.position_mm.length === 2 && part.position_mm.every(finite) && validPads;
   })) return false;
   const summary = result.summary;
   if (request.virtual_heatsinks?.length && (!Array.isArray(result.virtual_heatsinks) || result.virtual_heatsinks.length !== request.virtual_heatsinks.length || !result.virtual_heatsinks.every(sink => [sink.temperature_c, sink.board_contact_temperature_c, sink.heat_flow_w].every(finite)))) return false;
   if (request.transient && (!Array.isArray(result.transient) || result.transient.length < 2 || !result.transient.every(frame => finite(frame.time_s) && finite(frame.maximum_board_temperature_c) && finite(frame.storage_rate_w) && finite(frame.energy_balance_error_w) && Array.isArray(frame.layer_temperatures_c) && frame.layer_temperatures_c.length === result.layer_grids?.length && frame.layer_temperatures_c.every(values => Array.isArray(values) && values.length === nx * ny && values.every(finite))) || !finite(summary?.transient_peak_board_temperature_c) || !finite(summary?.max_transient_energy_balance_error_w))) return false;
-  return Boolean(summary && [summary.minimum_board_temperature_c, summary.maximum_board_temperature_c, summary.maximum_junction_temperature_c, summary.total_power_w, summary.energy_balance_error_w, summary.linear_relative_residual].every(finite));
+  const heatSources = new Map((request.board_heat_sources ?? []).map(source => [source.id, source]));
+  if (heatSources.size && (!Array.isArray(result.board_heat_sources) || result.board_heat_sources.length !== heatSources.size || !result.board_heat_sources.every(source => {
+    const input = heatSources.get(source.id); heatSources.delete(source.id);
+    return input?.component_ref === source.component_ref && input?.power_w === source.power_w && finite(source.board_temperature_c)
+      && source.case_temperature_c === null && source.junction_temperature_c === null && source.temperature_status === "board_only_junction_unsolved";
+  }))) return false;
+  return Boolean(summary && [summary.minimum_board_temperature_c, summary.maximum_board_temperature_c, summary.total_power_w, summary.energy_balance_error_w, summary.linear_relative_residual].every(finite)
+    && (request.components.length ? finite(summary.maximum_junction_temperature_c) : summary.maximum_junction_temperature_c === null));
 }
 
-export default function BoardThermalPanel({ board, design, sourceText, ambientC, workerAvailable, savedRequest, savedResult, onRequireAdmission, onSave, onStatus }: Props) {
+export default function BoardThermalPanel({ board, design, sourceText, ambientC, workerAvailable, savedRequest, savedResult, onRequireAdmission, onSave, onStatus, onOpenSolidStudy }: Props) {
   const { counts, minimumSizes } = padInventory(board, design);
   const stack = physicalStackup(board);
   const [settings, setSettings] = useState<BoardSettings>(() => ({ ...blankSettings, model: stack.complete ? "layered" : "plate", ...savedRequest?.board }));
   const [rows, setRows] = useState<Row[]>(() => (board?.components ?? []).map(part => {
     const saved = savedRequest?.components.find(row => row.component_ref === part.ref);
-    return { component_ref: part.ref, selected: Boolean(saved), power_w: saved?.power_w ?? NaN, r_junction_case_k_w: saved?.r_junction_case_k_w ?? NaN, r_case_board_k_w: saved?.r_case_board_k_w ?? NaN, contact_mode: saved ? saved.contact_mode ?? "square" : counts.has(part.ref) ? "pads" : "square", contact_size_mm: saved?.contact_size_mm ?? NaN };
+    return { component_ref: part.ref, selected: Boolean(saved), power_w: saved?.power_w ?? NaN, r_junction_case_k_w: saved?.r_junction_case_k_w ?? NaN, r_case_board_k_w: saved?.r_case_board_k_w ?? NaN, contact_mode: saved ? saved.contact_mode ?? "square" : counts.has(part.ref) ? "pads" : "square", contact_size_mm: saved?.contact_size_mm ?? NaN, ...(saved?.contact_pad_numbers ? { contact_pad_numbers: saved.contact_pad_numbers } : {}) };
   }));
   const [virtualHeatsinks, setVirtualHeatsinks] = useState<VirtualHeatsink[]>(() => savedRequest?.virtual_heatsinks ?? []);
   const [transientEnabled, setTransientEnabled] = useState(Boolean(savedRequest?.transient));
@@ -123,24 +133,27 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
   const [error, setError] = useState("");
   const [layerIndex, setLayerIndex] = useState(-1);
   const [showCopperCoverage, setShowCopperCoverage] = useState(false);
-  const [smoothDisplay, setSmoothDisplay] = useState(true);
+  const [smoothDisplay, setSmoothDisplay] = useState(false);
   const [frameIndex, setFrameIndex] = useState(-1);
   const [playing, setPlaying] = useState(false);
-  const gridX = board && finite(settings.grid_step_mm) && settings.grid_step_mm > 0 ? Math.ceil((board.bounds.maxX - board.bounds.minX) / settings.grid_step_mm) : 0;
-  const gridY = board && finite(settings.grid_step_mm) && settings.grid_step_mm > 0 ? Math.ceil((board.bounds.maxY - board.bounds.minY) / settings.grid_step_mm) : 0;
+  const explicitGrid = settings.x_edges_mm !== undefined || settings.y_edges_mm !== undefined;
+  const gridX = explicitGrid ? (settings.x_edges_mm?.length ?? 1) - 1 : board && finite(settings.grid_step_mm) && settings.grid_step_mm > 0 ? Math.ceil((board.bounds.maxX - board.bounds.minX) / settings.grid_step_mm) : 0;
+  const gridY = explicitGrid ? (settings.y_edges_mm?.length ?? 1) - 1 : board && finite(settings.grid_step_mm) && settings.grid_step_mm > 0 ? Math.ceil((board.bounds.maxY - board.bounds.minY) / settings.grid_step_mm) : 0;
   const cellsPerLayer = gridX * gridY;
   const unresolvedPads = rows.filter(row => row.selected && row.contact_mode === "pads" && (minimumSizes.get(row.component_ref) ?? Infinity) < settings.grid_step_mm).map(row => row.component_ref);
-  const commonBoard = { thickness_mm: settings.thickness_mm, convection_top_w_m2k: settings.convection_top_w_m2k, convection_bottom_w_m2k: settings.convection_bottom_w_m2k, grid_step_mm: settings.grid_step_mm };
+  const advanced = Object.fromEntries((["x_edges_mm", "y_edges_mm", "copper_raster_step_mm", "convection_top_grid_w_m2k", "convection_bottom_grid_w_m2k", "ambient_top_grid_c", "ambient_bottom_grid_c"] as const).filter(key => settings[key] !== undefined).map(key => [key, settings[key]]));
+  const commonBoard = { thickness_mm: settings.thickness_mm, convection_top_w_m2k: settings.convection_top_w_m2k, convection_bottom_w_m2k: settings.convection_bottom_w_m2k, ...(explicitGrid ? {} : { grid_step_mm: settings.grid_step_mm }) };
   const requestBoard: BoardInput = settings.model === "layered"
-    ? { ...commonBoard, model: "layered", dielectric_conductivity_w_mk: settings.dielectric_conductivity_w_mk, copper_conductivity_w_mk: settings.copper_conductivity_w_mk, ...(settings.include_vias ? { via_plating_thickness_mm: settings.via_plating_thickness_mm } : {}), include_copper: settings.include_copper, include_vias: settings.include_vias, include_tracks: settings.include_tracks, include_pads: settings.include_pads, include_zones: settings.include_zones, fuzzy_sigma_mm: settings.fuzzy_sigma_mm }
+    ? { ...commonBoard, ...advanced, model: "layered", dielectric_conductivity_w_mk: settings.dielectric_conductivity_w_mk, copper_conductivity_w_mk: settings.copper_conductivity_w_mk, ...(settings.include_vias ? { via_plating_thickness_mm: settings.via_plating_thickness_mm } : {}), include_copper: settings.include_copper, include_vias: settings.include_vias, include_tracks: settings.include_tracks, include_pads: settings.include_pads, include_zones: settings.include_zones, fuzzy_sigma_mm: settings.fuzzy_sigma_mm }
     : { ...commonBoard, model: "plate", conductivity_w_mk: settings.conductivity_w_mk };
-  const request: Request = { ambient_temperature_c: ambientC, board: requestBoard, components: rows.filter(row => row.selected).map(({ component_ref, power_w, r_junction_case_k_w, r_case_board_k_w, contact_mode, contact_size_mm }) => ({ component_ref, power_w, r_junction_case_k_w, r_case_board_k_w, contact_mode, ...(contact_mode === "square" ? { contact_size_mm } : {}) })), ...(virtualHeatsinks.length ? { virtual_heatsinks: virtualHeatsinks } : {}), ...(transientEnabled ? { transient: transientSettings } : {}) };
+  const request: Request = { ambient_temperature_c: ambientC, board: requestBoard, components: rows.filter(row => row.selected).map(({ component_ref, power_w, r_junction_case_k_w, r_case_board_k_w, contact_mode, contact_size_mm, contact_pad_numbers }) => ({ component_ref, power_w, r_junction_case_k_w, r_case_board_k_w, contact_mode, ...(contact_mode === "square" ? { contact_size_mm } : contact_pad_numbers ? { contact_pad_numbers } : {}) })), ...(savedRequest?.board_heat_sources ? { board_heat_sources: savedRequest.board_heat_sources } : {}), ...(virtualHeatsinks.length ? { virtual_heatsinks: virtualHeatsinks } : {}), ...(transientEnabled ? { transient: transientSettings } : {}) };
   const inputKey = requestKey(request);
   const changeSetting = (key: "conductivity_w_mk" | "thickness_mm" | "convection_top_w_m2k" | "convection_bottom_w_m2k" | "grid_step_mm" | "dielectric_conductivity_w_mk" | "copper_conductivity_w_mk" | "via_plating_thickness_mm" | "fuzzy_sigma_mm", value: string) => setSettings(current => ({ ...current, [key]: value === "" ? NaN : Number(value) }));
   const changeRow = (ref: string, patch: Partial<Row>) => setRows(current => current.map(row => row.component_ref === ref ? { ...row, ...patch } : row));
   const changeHeatsink = (id: string, patch: Partial<VirtualHeatsink>) => setVirtualHeatsinks(current => current.map(sink => sink.id === id ? { ...sink, ...patch } : sink));
   const inputError = () => {
-    if (!request.components.length || !request.components.some(row => row.power_w > 0)) return "Select at least one board part with positive power.";
+    if (![...request.components, ...(request.board_heat_sources ?? [])].some(row => row.power_w > 0)) return "Select at least one board part with positive power.";
+    if (explicitGrid && (!board || !Array.isArray(settings.x_edges_mm) || !Array.isArray(settings.y_edges_mm) || !boardThermalViewportGrid({ contract: "spike/board-thermal-result/v1", status: "completed", grid: { origin_mm: [board.bounds.minX, board.bounds.minY], shape: [gridX, gridY], x_edges_mm: settings.x_edges_mm, y_edges_mm: settings.y_edges_mm, temperatures_c: Array(Math.max(0, Math.min(8192, cellsPerLayer))).fill(0), order: "x-fast" } }) || settings.x_edges_mm.slice(-1)[0] !== board.bounds.maxX || settings.y_edges_mm.slice(-1)[0] !== board.bounds.maxY)) return "Local grid must have valid full-board physical edges within the cell budget.";
     if (settings.model === "layered" && !stack.complete) return "Layered mode needs an imported physical stackup with positive thickness for every copper and dielectric layer. Choose plate mode or import a complete stackup.";
     if (virtualHeatsinks.length && settings.model !== "layered") return "Virtual board heatsinks need the layered model and an imported physical stackup.";
     if (transientEnabled && settings.model !== "layered") return "Spatial board transient needs the layered model and an imported physical stackup.";
@@ -152,7 +165,8 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
     if (settings.model === "layered" && finite(settings.thickness_mm) && Math.abs(settings.thickness_mm - stack.thicknessMm) > 0.05 * stack.thicknessMm) return `Board thickness must agree with imported physical stackup thickness ${formatted(stack.thicknessMm, 3)} mm within 5%.`;
     if (settings.model === "layered" && (![settings.dielectric_conductivity_w_mk, settings.copper_conductivity_w_mk].every(value => finite(value) && value > 0) || settings.include_vias && (!finite(settings.via_plating_thickness_mm) || settings.via_plating_thickness_mm <= 0) || !finite(settings.fuzzy_sigma_mm) || settings.fuzzy_sigma_mm < 0)) return "For layered board mode, enter positive dielectric and copper conductivity, positive via plating thickness when vias are included, and nonnegative spread sigma.";
     if (settings.model === "plate" && (!finite(settings.conductivity_w_mk) || settings.conductivity_w_mk <= 0)) return "Enter positive effective board conductivity for plate mode.";
-    if (![settings.thickness_mm, settings.grid_step_mm].every(value => finite(value) && value > 0) || ![settings.convection_top_w_m2k, settings.convection_bottom_w_m2k].every(value => finite(value) && value >= 0) || settings.convection_top_w_m2k + settings.convection_bottom_w_m2k <= 0 || !finite(ambientC) || ambientC < -273.15 || request.components.some(row => !finite(row.power_w) || row.power_w < 0 || !finite(row.r_junction_case_k_w) || row.r_junction_case_k_w <= 0 || !finite(row.r_case_board_k_w) || row.r_case_board_k_w <= 0 || row.contact_mode === "square" && (!finite(row.contact_size_mm) || Number(row.contact_size_mm) <= 0))) return "Enter positive thickness, grid step, resistances, and square contact size where selected; nonnegative power and convection with at least one positive convection value; and valid ambient temperature.";
+    const effectiveConvection = [...(settings.convection_top_grid_w_m2k ?? [settings.convection_top_w_m2k]), ...(settings.convection_bottom_grid_w_m2k ?? [settings.convection_bottom_w_m2k])];
+    if (![settings.thickness_mm, ...(explicitGrid ? [] : [settings.grid_step_mm])].every(value => finite(value) && value > 0) || ![settings.convection_top_w_m2k, settings.convection_bottom_w_m2k].every(value => finite(value) && value >= 0) || !effectiveConvection.some(value => finite(value) && value > 0) || !finite(ambientC) || ambientC < -273.15 || request.components.some(row => !finite(row.power_w) || row.power_w < 0 || !finite(row.r_junction_case_k_w) || row.r_junction_case_k_w <= 0 || !finite(row.r_case_board_k_w) || row.r_case_board_k_w <= 0 || row.contact_mode === "square" && (!finite(row.contact_size_mm) || Number(row.contact_size_mm) <= 0))) return "Enter positive thickness, grid step or valid local edges, resistances, and square contact size where selected; nonnegative power and convection with at least one positive convection value; and valid ambient temperature.";
     return "";
   };
   const run = async () => {
@@ -195,6 +209,8 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
   return <div className="wizard-section board-thermal-section" data-guide="thermal-board-setup">
     <label>{settings.model === "layered" ? "LAYERED BOARD THERMAL" : "2D BOARD THERMAL"} · APPROXIMATE</label>
     <p className="thermal-table-note">Enter measured or justified board and component properties. Imported copper pads locate pad contacts; conductivity, convection, thermal resistance, and package heat flow are not inferred. Plate mode is a uniform 2D sheet. Layered mode is an approximate 3D stack discretization with optional imported copper/vias and Gaussian spread. Neither resolves package blocks, a tetrahedral mesh, airflow, or CFD.</p>
+    <p className="thermal-table-note" role="status">3D model coverage: this board-grid solve has no meshed package solids. Case/junction values use the entered thermal resistances. For temperatures throughout real parts, retain closed STEP solids, assign materials and heat contacts, then solve a thermal volume study.</p>
+    {onOpenSolidStudy && <button type="button" className="secondary-btn" title="Open the assembly workspace; use Coupled studies to retain component STEP solids, prepare the volume mesh and solve their temperatures" onClick={onOpenSolidStudy}>3D parts and volume thermal study</button>}
     <div className="board-thermal-settings"><label>Board model<span><select aria-label="Board thermal model" value={settings.model} onChange={event => setSettings(current => ({ ...current, model: event.target.value as BoardModel }))}><option value="plate">Uniform 2D plate</option><option value="layered" disabled={!stack.complete}>Layered 3D stack (approximate)</option></select></span></label></div>
     {!stack.complete && <p className="thermal-table-note">Layered mode is unavailable: import an ordered physical stackup with positive thickness for each copper and dielectric layer.</p>}
     <div className="board-thermal-settings">{([
@@ -235,10 +251,10 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
       <label className="thermal-table-note"><input aria-label="Smooth thermal display" type="checkbox" checked={smoothDisplay} onChange={event => setSmoothDisplay(event.target.checked)} /> Smooth displayed temperature colors (solver cells unchanged)</label>
       {layerGrids.length > 0 && <div className="board-thermal-settings"><label>Temperature layer<span><select aria-label="Temperature layer" value={selectedLayer ? layerIndex : -1} onChange={event => setLayerIndex(Number(event.target.value))}><option value={-1}>Top surface</option>{layerGrids.map((layer, index) => <option key={`${layer.name}:${index}`} value={index}>{layer.name} · {formatted(layer.thickness_mm, 3)} mm</option>)}</select></span></label>{selectedLayer && <label><span><input aria-label="Show copper coverage" type="checkbox" checked={showCopperCoverage} onChange={event => setShowCopperCoverage(event.target.checked)} /> Show copper coverage</span></label>}</div>}
       {plotReady && grid ? <figure className="board-thermal-figure"><PlotlyChart title={`${selectedLayer?.name ?? "Board"} temperature grid`} revision={`board-thermal-grid:${resultKey}:${layerIndex}:${smoothDisplay}:${coverageReady}`}
-        data={[{ type: "heatmap", x: Array.from({ length: nx }, (_, index) => grid.origin_mm[0] + index * grid.spacing_mm[0]), y: Array.from({ length: ny }, (_, index) => grid.origin_mm[1] + index * grid.spacing_mm[1]),
+        data={[{ type: "heatmap", x: boardThermalAxisEdges(grid, 0), y: boardThermalAxisEdges(grid, 1),
           z: Array.from({ length: ny }, (_, row) => values.slice(row * nx, (row + 1) * nx)), zmin: minimum, zmax: maximum, zsmooth: smoothDisplay ? "best" : false, connectgaps: false, colorscale: thermalColorscale,
           colorbar: { title: "°C" }, hovertemplate: "x %{x:.5g} mm<br>y %{y:.5g} mm<br>%{z:.5g} °C<extra></extra>" },
-          ...(coverageReady && coverage ? [{ type: "heatmap", x: Array.from({ length: nx }, (_, index) => grid.origin_mm[0] + index * grid.spacing_mm[0]), y: Array.from({ length: ny }, (_, index) => grid.origin_mm[1] + index * grid.spacing_mm[1]),
+          ...(coverageReady && coverage ? [{ type: "heatmap", x: boardThermalAxisEdges(grid, 0), y: boardThermalAxisEdges(grid, 1),
             z: Array.from({ length: ny }, (_, row) => coverage.slice(row * nx, (row + 1) * nx).map(value => value > 0 ? value : null)), zmin: 0, zmax: 1, showscale: false, connectgaps: false,
             colorscale: [[0, "rgba(255,255,255,0)"], [1, "rgba(255,255,255,0.55)"]], hovertemplate: "x %{x:.5g} mm<br>y %{y:.5g} mm<br>Copper coverage %{z:.1%}<extra></extra>" }] : []),
           { type: "scatter", mode: "markers+text", name: "Components", x: componentPositions.map(part => part.position_mm![0]),
@@ -259,6 +275,7 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
         </div>;
       })}
       <div className="thermal-native-results"><DataTable label="Board thermal component results"><thead><tr><th>Reference</th><th>Contact</th><th>Power W</th><th>Board °C</th><th>Case °C</th><th>Junction °C</th></tr></thead><tbody>{result.components?.map(part => <tr key={part.component_ref}><td>{part.component_ref}</td><td>{part.contact_mode === "pads" ? `${part.pad_count} pads` : "Square"}</td><td>{formatted(part.power_w, 3)}</td><td>{formatted(part.board_temperature_c)}</td><td>{formatted(part.case_temperature_c)}</td><td>{formatted(part.junction_temperature_c)}</td></tr>)}</tbody></DataTable></div>
+      {result.board_heat_sources?.length ? <DataTable label="Direct board heating results"><thead><tr><th>Reference</th><th>Power W</th><th>Board °C</th><th>Package temperatures</th></tr></thead><tbody>{result.board_heat_sources.map(source => <tr key={source.id}><td>{source.component_ref}</td><td>{formatted(source.power_w, 3)}</td><td>{formatted(source.board_temperature_c)}</td><td>Case / junction unsolved</td></tr>)}</tbody></DataTable> : null}
       {result.virtual_heatsinks?.length ? <div className="thermal-native-results"><b>Virtual heatsink heat paths · {formatted(result.summary?.heatsink_outward_heat_w, 3)} W to ambient</b><DataTable label="Virtual heatsink results"><thead><tr><th>ID</th><th>Face</th><th>Board contact °C</th><th>Sink °C</th><th>Heat to ambient W</th></tr></thead><tbody>{result.virtual_heatsinks.map(sink => <tr key={sink.id}><td>{sink.id}</td><td>{sink.face}</td><td>{formatted(sink.board_contact_temperature_c)}</td><td>{formatted(sink.temperature_c)}</td><td>{formatted(sink.heat_flow_w, 4)}</td></tr>)}</tbody></DataTable></div> : null}
       {result.components?.filter(part => part.contact_mode === "pads" && part.pad_contacts?.length).map(part => <details key={part.component_ref}><summary>{part.component_ref} pad heat paths ({part.pad_count})</summary><div className="thermal-native-results"><DataTable label="Board thermal pad heat paths"><thead><tr><th>Pad</th><th>Area mm²</th><th>Board °C</th><th>Heat W</th></tr></thead><tbody>{part.pad_contacts?.map((pad, index) => <tr key={`${pad.pad_name}:${index}`}><td>{pad.pad_name}</td><td>{formatted(pad.area_mm2, 3)}</td><td>{formatted(pad.board_temperature_c)}</td><td>{formatted(pad.heat_w, 4)}</td></tr>)}</tbody></DataTable></div></details>)}
     </>}

@@ -18,7 +18,7 @@ from python.spike_core.harness_authoring import discover_connectors, validate_ha
 from python.spike_core.multiboard_circuit import run_multiboard_circuit
 from python.spike_core.multiboard_thermal import run_multiboard_thermal
 from python.spike_core.multiboard_identity import assembly_physics_digest
-from python.spike_core.project_package import read_project, write_spike_package
+from python.spike_core.project_package import _source_member_name, read_project, write_spike_package
 from python.spike_core.service_project import import_design
 from python.spike_core.service_project_handlers import handle_project_request
 from python.spike_core.spider_v2 import AssemblyIRV1
@@ -151,6 +151,29 @@ def _acceptance(results: dict) -> dict:
     return evidence
 
 
+def _verify_packaged_board_sources(project: Path, expected_sources: dict[str, Path]) -> None:
+    """Check every board occurrence through the same worker route used by the UI."""
+
+    opened = read_project(project)
+    designs = {item["design_id"]: item for item in opened.payload["assembly_designs"]["designs"]}
+    manifest_digest = opened.manifest["manifest_payload_sha256"]
+    for board in opened.payload["assembly_ir"]["boards"]:
+        source_path = expected_sources[board["id"]]
+        source_bytes = source_path.read_bytes()
+        design_id = board["design_id"]
+        if designs[design_id]["source"]["source_digest"] != hashlib.sha256(source_bytes).hexdigest():
+            raise ValueError(f"Retained source digest changed for {board['id']}.")
+        response = handle_project_request("prepare_assembly_design_visual_bundle", {
+            "project_path": str(project), "expected_manifest_payload_sha256": manifest_digest,
+            "design_id": design_id, "stage": "source",
+        }, request_id=f"rpi-hat-source-{board['id']}", application_version=__version__)
+        if not response or not response.get("ok"):
+            raise RuntimeError(f"Could not read packaged board source for {board['id']}: {response}")
+        result = response["result"]
+        if result["design_id"] != design_id or result["source_board"].encode("utf-8") != source_bytes:
+            raise ValueError(f"Packaged board source does not match {board['id']}.")
+
+
 def build(output: Path, source_dir: Path = DEFAULT_SOURCE_DIR) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     cm4_path, hat_path, provenance = _sources(output, source_dir)
@@ -163,9 +186,11 @@ def build(output: Path, source_dir: Path = DEFAULT_SOURCE_DIR) -> dict:
         raise ValueError(f"Real-board import counts changed: {counts}")
     project = output / "cm4io-sailor-hat.spike"
     base = designs["cm4io"]
-    base["source"].pop("artifact_path", None)
+    base_digest = base["source"]["source_digest"]
+    base["source"]["artifact_path"] = "package:" + _source_member_name(cm4_path.name, base_digest)
     manifest = write_spike_package(project, {"project": {"id": "rpi-hat-acceptance-20261002",
         "name": "Raspberry Pi CM4 IO plus Sailor Hat local acceptance"}, "design_ir": base},
+        source_artifacts={cm4_path.name: cm4_path.read_bytes()},
         application_version=__version__)
     response = handle_project_request("import_into_assembly_project", {"project_path": str(project),
         "source_paths": [str(hat_path)], "expected_manifest_payload_sha256": manifest["manifest_payload_sha256"]},
@@ -188,9 +213,6 @@ def build(output: Path, source_dir: Path = DEFAULT_SOURCE_DIR) -> dict:
     raw["thermal_contacts"] = [{"id": "gpio-standoffs", "name": "assumed header and standoffs",
         "endpoint_a": ids[0], "endpoint_b": ids[1], "contact_type": "mechanical"}]
     assembly = AssemblyIRV1.from_dict(raw); validate_harness_connections(assembly); payload["assembly_ir"] = assembly.to_dict()
-    payload["design_ir"]["source"].pop("artifact_path", None)
-    for retained_design in payload["assembly_designs"]["designs"]:
-        retained_design["source"].pop("artifact_path", None)
     placement = {"contract": "spike/connector-aligned-placement-evidence/v1", "z_gap_mm": 14.0,
         "rotation": "proper 180 degree Y rotation", "matches": []}
     transforms = {b["id"]: b["frame"]["transform"] for b in raw["boards"]}
@@ -205,10 +227,11 @@ def build(output: Path, source_dir: Path = DEFAULT_SOURCE_DIR) -> dict:
     _json(output/"placement-evidence.json", placement)
     payload["audit"] = [*(payload.get("audit") or []), {"event": "rpi_hat_local_acceptance",
         "cm4io_archive_sha256": CM4_ARCHIVE_SHA256, "hat_commit": HAT_COMMIT,
+        "source_provenance": provenance,
         "redistribution": "local build artifact only", "model_status": "experimental"}]
-    retained_members = {name: data for name, data in opened.members.items() if not name.startswith("sources/")}
-    manifest = write_spike_package(project, payload, preserved_members=retained_members,
+    manifest = write_spike_package(project, payload, preserved_members=opened.members,
         application_version=__version__)
+    _verify_packaged_board_sources(project, {ids[0]: cm4_path, ids[1]: hat_path})
     saved = read_project(project, include_members=True); results = {}
     for domain in ("pi", "si"):
         request = _circuit(saved.payload["assembly_ir"], domain); results[domain] = run_multiboard_circuit(request)

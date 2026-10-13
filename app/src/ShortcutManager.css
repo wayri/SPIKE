@@ -1,0 +1,28 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.shortcut-manager-shade { position: fixed; inset: 0; z-index: 250; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--spike-table-field); }
+.shortcut-manager { display: flex; flex-direction: column; min-width: 0; width: min(820px, 100%); max-height: calc(100dvh - 32px); border: 1px solid var(--spike-table-border-strong); border-radius: 8px; padding: 18px; background: var(--spike-table-surface); color: var(--spike-table-text); font: 12px/1.5 Inter, ui-sans-serif, system-ui, sans-serif; }
+.shortcut-manager header, .shortcut-manager footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; }
+.shortcut-manager h2 { margin: 0; font-size: 18px; }
+.shortcut-manager h3 { margin: 10px 0 5px; font-size: 13px; }
+.shortcut-manager p { margin: 10px 0; }
+.shortcut-manager-tools { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; flex: none; }
+.shortcut-manager-tools label { display: flex; flex-direction: column; gap: 4px; flex: 1 1 220px; min-width: 0; }
+.shortcut-manager input { width: 100%; min-width: 0; font: var(--spike-control-font); min-height: var(--spike-control-height); padding: var(--spike-control-padding); }
+.shortcut-manager input:focus-visible { outline: 2px solid var(--spike-control-focus); outline-offset: 2px; }
+.shortcut-manager-status { margin: 10px 0; padding: 8px; border: 1px solid var(--spike-table-border); flex: none; overflow-wrap: anywhere; }
+.shortcut-manager-status > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.shortcut-manager-warning { color: var(--spike-table-danger-text); }
+.shortcut-manager-list { overflow: auto; min-height: 0; padding-right: 5px; }
+.shortcut-manager-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(130px, 170px) 52px; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--spike-table-border); }
+.shortcut-manager-row > span { min-width: 0; overflow-wrap: anywhere; }
+.shortcut-manager-row small { display: block; color: var(--spike-table-muted); font-size: 10px; }
+.shortcut-manager kbd { font: 11px/1.4 ui-monospace, monospace; overflow-wrap: anywhere; }
+.shortcut-manager-fixed { grid-template-columns: minmax(0, 1fr) 230px; }
+.shortcut-manager footer { margin-top: 12px; font-size: 11px; color: var(--spike-table-muted); flex-wrap: wrap; }
+.shortcut-manager a { color: var(--spike-table-choice); }
+@media (max-width: 560px) {
+  .shortcut-manager-shade { padding: 8px; }
+  .shortcut-manager { padding: 12px; max-height: calc(100dvh - 16px); }
+  .shortcut-manager-row { grid-template-columns: minmax(0, 1fr) 120px 45px; gap: 4px; }
+  .shortcut-manager-fixed { grid-template-columns: minmax(0, 1fr) 169px; }
+}

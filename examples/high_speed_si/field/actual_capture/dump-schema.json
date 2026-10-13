@@ -1,0 +1,254 @@
+[
+  {
+    "file": "interboard_Ef.h5",
+    "bytes": 298176,
+    "sha256": "0b61f4b9ca72b47da1b3b228a326b4f5da4f3c11a15fdc57e56ea670c70c682e",
+    "attributes": {
+      "openEMS_HDF5_version": [
+        0.2
+      ]
+    },
+    "datasets": [
+      {
+        "path": "/FieldData/FD/f0_imag",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f0_real",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f1_imag",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            1500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f1_real",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            1500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f2_imag",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            2500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f2_real",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            2500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/Mesh/x",
+        "shape": [
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {}
+      },
+      {
+        "path": "/Mesh/y",
+        "shape": [
+          14
+        ],
+        "dtype": "float32",
+        "attributes": {}
+      },
+      {
+        "path": "/Mesh/z",
+        "shape": [
+          12
+        ],
+        "dtype": "float32",
+        "attributes": {}
+      }
+    ]
+  },
+  {
+    "file": "interboard_Hf.h5",
+    "bytes": 298176,
+    "sha256": "bdeefc6865f5703ad3ad1e21846f5a203c41b64e4fa7adacd35c760ca21dd91c",
+    "attributes": {
+      "openEMS_HDF5_version": [
+        0.2
+      ]
+    },
+    "datasets": [
+      {
+        "path": "/FieldData/FD/f0_imag",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f0_real",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f1_imag",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            1500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f1_real",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            1500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f2_imag",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            2500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/FieldData/FD/f2_real",
+        "shape": [
+          3,
+          12,
+          14,
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {
+          "frequency": [
+            2500000000.0
+          ]
+        }
+      },
+      {
+        "path": "/Mesh/x",
+        "shape": [
+          23
+        ],
+        "dtype": "float32",
+        "attributes": {}
+      },
+      {
+        "path": "/Mesh/y",
+        "shape": [
+          14
+        ],
+        "dtype": "float32",
+        "attributes": {}
+      },
+      {
+        "path": "/Mesh/z",
+        "shape": [
+          12
+        ],
+        "dtype": "float32",
+        "attributes": {}
+      }
+    ]
+  }
+]

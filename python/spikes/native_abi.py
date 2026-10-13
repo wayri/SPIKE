@@ -322,6 +322,7 @@ class NativeLibrary:
         self.transient_available = all(present)
         self.waveform_sources_available = False
         self.transient_session_available = False
+        self.session_fault_parameters_available = False
         if not self.transient_available:
             return
         for name in ("spikes_circuit_add_capacitor", "spikes_circuit_add_inductor"):
@@ -438,6 +439,14 @@ class NativeLibrary:
                 ctypes.POINTER(ctypes.c_size_t), ctypes.POINTER(ctypes.c_size_t),
             )
             lib.spikes_transient_result_sparse_lte_diagnostics.restype = ctypes.c_int
+        self.recovery_diagnostics_available = hasattr(
+            lib, "spikes_transient_result_recovery_diagnostics"
+        )
+        if self.recovery_diagnostics_available:
+            lib.spikes_transient_result_recovery_diagnostics.argtypes = (
+                pointer, ctypes.POINTER(ctypes.c_size_t),
+            )
+            lib.spikes_transient_result_recovery_diagnostics.restype = ctypes.c_int
         session_symbols = (
             "spikes_transient_session_create",
             "spikes_transient_session_destroy",
@@ -465,6 +474,18 @@ class NativeLibrary:
         self.session_integration_diagnostics_available = False
         self.session_bdf2_available = False
         self.session_element_voltage_available = False
+        fault_symbols = (
+            "spikes_transient_session_set_resistance",
+            "spikes_transient_session_set_mosfet_threshold",
+        )
+        self.session_fault_parameters_available = all(
+            hasattr(lib, name) for name in fault_symbols
+        )
+        if self.session_fault_parameters_available:
+            for name in fault_symbols:
+                function = getattr(lib, name)
+                function.argtypes = (pointer, char_pointer, ctypes.c_double)
+                function.restype = ctypes.c_int
         if self.transient_session_available:
             lib.spikes_transient_session_create.argtypes = (
                 pointer, ctypes.POINTER(_TransientOptions), ctypes.POINTER(pointer),
@@ -556,6 +577,16 @@ class NativeLibrary:
             lib.spikes_transient_checkpoint_destroy.restype = None
             lib.spikes_transient_session_restore.argtypes = (pointer, pointer)
             lib.spikes_transient_session_restore.restype = ctypes.c_int
+        sine_symbols = ("spikes_circuit_add_sine_current_source", "spikes_circuit_add_sine_voltage_source")
+        sine_present = tuple(hasattr(lib, name) for name in sine_symbols)
+        if any(sine_present) and not all(sine_present):
+            raise NativeABIError("SPIKES library exposes an incomplete analytic SIN API.")
+        self.sine_sources_available = all(sine_present)
+        if self.sine_sources_available:
+            for name in sine_symbols:
+                function = getattr(lib, name)
+                function.argtypes = (pointer, char_pointer, char_pointer, char_pointer) + (ctypes.c_double,) * 6
+                function.restype = ctypes.c_int
         waveform_symbols = (
             "spikes_circuit_add_pulse_current_source",
             "spikes_circuit_add_pulse_voltage_source",
@@ -681,6 +712,26 @@ class NativeCircuit:
 
     def add_voltage_source(self, element_id: str, positive: str, negative: str, voltage_v: float) -> None:
         self._add("spikes_circuit_add_voltage_source", element_id, positive, negative, voltage_v)
+
+    def _add_sine_source(self, function_name, element_id, positive, negative, values):
+        if not self.library.sine_sources_available:
+            raise NativeABIError("Loaded SPIKES library lacks analytic SIN sources; rebuild the native library.")
+        if len(values) != 6:
+            raise ValueError("SIN requires offset, amplitude, frequency, delay, damping, and phase.")
+        code = getattr(self.library._library, function_name)(
+            self._open_handle(), _text(element_id, "element id"),
+            _text(positive, "positive node"), _text(negative, "negative node"),
+            *(_finite(value, "SIN parameter") for value in values),
+        )
+        self.library._check(code, f"adding {element_id}")
+
+    def add_sine_voltage_source(self, element_id, positive, negative, values):
+        """Add analytic SIN (offset, amplitude, Hz, seconds, 1/seconds, degrees)."""
+        self._add_sine_source("spikes_circuit_add_sine_voltage_source", element_id, positive, negative, values)
+
+    def add_sine_current_source(self, element_id, positive, negative, values):
+        """Add analytic SIN in amperes with the same parameter order as voltage."""
+        self._add_sine_source("spikes_circuit_add_sine_current_source", element_id, positive, negative, values)
 
     def _add_pulse_source(
         self, function_name: str, element_id: str, positive: str, negative: str,
@@ -1418,7 +1469,7 @@ class NativeTransientResult:
         self.library._check(function(*arguments), f"querying transient point {point_index}")
         return float(output.value)
 
-    def diagnostics(self) -> dict[str, float | int]:
+    def diagnostics(self) -> dict[str, float | int | None]:
         integer_outputs = [ctypes.c_size_t() for _ in range(5)]
         failed_time = ctypes.c_double()
         residual = ctypes.c_double()
@@ -1500,7 +1551,9 @@ class NativeTransientResult:
             )
             result.update(
                 rejected_lte_steps=int(rejected.value),
-                last_lte_ratio=float(last_ratio.value),
+                last_lte_ratio=(float(last_ratio.value)
+                                if math.isfinite(last_ratio.value) else None),
+                last_lte_estimate_finite=math.isfinite(last_ratio.value),
                 minimum_accepted_step_s=float(minimum_step.value),
                 maximum_accepted_step_s=float(maximum_step.value),
             )
@@ -1525,6 +1578,17 @@ class NativeTransientResult:
                 sparse_numeric_factorizations=int(numeric.value),
                 partial_numeric_refactorizations=int(partial.value),
             )
+            # Keep the legacy key for consumers, but do not imply local LU updates.
+            result["symbolic_pattern_numeric_refactorizations"] = int(partial.value)
+        if self.library.recovery_diagnostics_available:
+            rejected = ctypes.c_size_t()
+            self.library._check(
+                self.library._library.spikes_transient_result_recovery_diagnostics(
+                    self._open_handle(), ctypes.byref(rejected)
+                ),
+                "querying transient Newton recovery diagnostics",
+            )
+            result["rejected_newton_steps"] = int(rejected.value)
         return result
 
 
@@ -1614,6 +1678,29 @@ class NativeTransientSession:
                 _finite(value, "source value"),
             ),
             f"setting persistent source {element_id}",
+        )
+
+    def _set_fault_parameter(self, function: str, element_id: str, value: float) -> None:
+        if not self.library.session_fault_parameters_available:
+            raise NativeABIError("native library lacks persistent fault parameter setters")
+        self.library._check(
+            getattr(self.library._library, function)(
+                self._open_handle(), _text(element_id, "fault element id"),
+                _finite(value, "fault parameter"),
+            ),
+            f"setting persistent fault parameter on {element_id}",
+        )
+
+    def set_resistance(self, element_id: str, resistance_ohm: float) -> None:
+        """Set an ordinary resistor to 1e-6 through 1e15 ohm before next step."""
+        self._set_fault_parameter(
+            "spikes_transient_session_set_resistance", element_id, resistance_ohm
+        )
+
+    def set_mosfet_threshold(self, element_id: str, threshold_voltage_v: float) -> None:
+        """Set NMOS Level-1 VTO to -100 through 100 V before next step."""
+        self._set_fault_parameter(
+            "spikes_transient_session_set_mosfet_threshold", element_id, threshold_voltage_v
         )
 
     def step(self, step_s: float) -> bool:

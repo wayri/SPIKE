@@ -1,0 +1,145 @@
+{
+  "boards": [
+    {
+      "path": "geometry-native-odb-qualified.zip",
+      "format": "odb++",
+      "sha256": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+      "source_url": "repository:benchmarks/parity-import/geometry.kicad_pcb (KiCad 10.0.6 native ODB writer; generated font omitted)",
+      "license": "Apache-2.0",
+      "expected_counts": {
+        "arcs": 1,
+        "pads": 1,
+        "components": 1,
+        "nets": 1,
+        "tracks": 0,
+        "layers": 8
+      },
+      "expected_entities": [
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "start_mm",
+          "value": [
+            14,
+            0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "mid_mm",
+          "value": [
+            12,
+            -2
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "end_mm",
+          "value": [
+            10,
+            0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "width_mm",
+          "value": 0.3,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "center_mm",
+          "value": [
+            21,
+            -8
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "size_mm",
+          "value": [
+            1.2,
+            0.8
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "/extensions/spike.v1/rotation",
+          "value": 0,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "odb:comp_+_top:component:0",
+          "field": "position_mm",
+          "value": [
+            20,
+            -10
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "odb:comp_+_top:component:0",
+          "field": "rotation_deg",
+          "value": -270,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "odb:comp_+_top:component:0",
+          "field": "reference",
+          "value": "J1",
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "name": "SIGNAL"
+          }
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "layer_id",
+          "reference": {
+            "collection": "layers",
+            "name": "F.Cu"
+          }
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "name": "SIGNAL"
+          }
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "component_id",
+          "reference": {
+            "collection": "components",
+            "source_id": "odb:comp_+_top:component:0"
+          }
+        }
+      ]
+    }
+  ]
+}

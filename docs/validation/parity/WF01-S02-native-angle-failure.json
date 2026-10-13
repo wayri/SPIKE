@@ -1,0 +1,219 @@
+{
+  "contract": "spike/parity-historical-failure/v1",
+  "stage_id": "WF01-S02",
+  "manifest": "benchmarks/parity-import/geometry-manifest.json",
+  "summary": {
+    "contract": "spike/board-corpus-benchmark/v1",
+    "status": "passed",
+    "runner_sources": {
+      "scripts/benchmark_board_corpus.py": "d517581391d7ac036113d3ba0b549f4af9b81231713dc006e3d64af88ba02d48",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/kicad_importer.py": "19a3e3ff0639ed7eb848137670700b72019efe6c22d6057b74cb96e4e9820b14",
+      "python/core/board_parser.py": "28f6c2b641b1cb5061aef7c05f710d1f9942a0b8708799bfbc5c79c0eaaec0bb",
+      "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+      "python/spike_core/arc_legacy_projection.py": "ac80beed70089e90ff3184ec5482c7d778a95f64c9d26c488dd50f0b0b8ea047",
+      "python/spike_core/board_outline_geometry.py": "9ab3703d6906ca758c993b34c7d86972e5dea31e3e56242d0328f5d524af9634",
+      "python/spike_core/mcad_export_design.py": "b9fb4eb20ed0f16ef0c9f93e4e8d294f3b592730fd3165702c6ce2a11340ff02",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/pcb_volume_compiler.py": "41c939afc72275a87208a52f900c084794daeca40936f87bdb82a6331eb67cba",
+      "python/spike_core/geometry_arrow.py": "cf34e0c6e2259104317ef9b748d63589703f787d6f39523946ecf52917e854f6",
+      "python/spike_core/spikes_layout_geometry_handoff.py": "220fc2b515f16aaf792404c4cf0df487085a54dfe33652a9b1c74fe01691e537",
+      "scripts/parity_geometry_gate.py": "f3cf39867826203adf1459a4a8ec7e6a31e9a3761fede23a5b15aaeb7b7d9f8e",
+      "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+      "python/spike_core/odb_importer.py": "09fe71f2732eb95f5006f9dacdad9b094e14fd20f2fe91d3d6f0c9d7ea30cf1b",
+      "python/spike_core/odb_features.py": "393bbb3a4a2b027d8b291ad74863e5a12ea23ed242103f7d9ad28e2894c14edd",
+      "python/spike_core/odb_stackup.py": "7c51d02e64965435c7b700be24ef1b09501bbda59ce9932974daf9a7a0b7fba1",
+      "python/spike_core/source_package.py": "c57670b2882c30cd18b5963decfa51ee139a2b0aba20804fc0b22aaeb11f2cf9",
+      "python/spike_core/importers.py": "248d48b2d8cf72fb11aedc360bdc860ef62967d3c5983baf6251078eddc17146",
+      "extensions/odb-import/extension.py": "22a8549d79bce15286c0c6d739892e0c70d3b66894cdfbc564e60aaeca6dde46"
+    },
+    "python_version": "3.12.9 (main, Feb  8 2026, 03:56:09) [MSC v.1950 64 bit (AMD64)]",
+    "manifest_sha256": "6d1d82db89d32863a550cd85fa0a4b48c2215acb0b42db6416bca76369c578cc",
+    "production_qualified": false,
+    "scope": "CLI import status, canonical units/identity, pinned source and optional independent counts/entity values; no viewport or physics validation",
+    "boards": [
+      {
+        "fixture": "geometry.kicad_pcb",
+        "source_url": "repository:benchmarks/parity-import/geometry.kicad_pcb",
+        "license": "Apache-2.0",
+        "sha256": "d4eb7b96fd703216f1c57266f0a6be8b471482773cd2d7e0248578f68b230395",
+        "exit_code": 0,
+        "stderr": "",
+        "counts": {
+          "materials": 3,
+          "layers": 4,
+          "nets": 1,
+          "tracks": 0,
+          "arcs": 1,
+          "zones": 0,
+          "pads": 1,
+          "vias": 0,
+          "drills": 0,
+          "castellations": 0,
+          "pins": 1,
+          "components": 1,
+          "regions": 0,
+          "models": 0
+        },
+        "mismatches": {},
+        "import_status": "completed_with_warnings",
+        "errors": [],
+        "diagnostics": [
+          {
+            "code": "KICAD_ARC_LINEARIZED",
+            "severity": "warning",
+            "source_id": "77777777-7777-4777-8777-777777777777",
+            "segment_count": 8,
+            "exact_source_retained": true,
+            "message": "Legacy solver projection uses straight chords; nondegenerate exact source arcs are retained separately."
+          }
+        ],
+        "source_issues": [
+          {
+            "code": "IMPORT_OBJECT_DIAGNOSTICS",
+            "severity": "warning",
+            "message": "The KiCad importer recorded 1 recoverable object diagnostics.",
+            "path": "",
+            "suggestion": "Review importer diagnostics before relying on geometry completeness.",
+            "status": "open"
+          },
+          {
+            "code": "KICAD_ARC_LINEARIZED",
+            "severity": "warning",
+            "message": "1 source copper arcs use straight chords in the legacy solver projection.",
+            "path": "",
+            "suggestion": "Use retained canonical arcs for exact geometry; qualify chord error before relying on legacy curved-source accuracy.",
+            "status": "open"
+          }
+        ],
+        "inferred": [],
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": true,
+            "reasons": []
+          },
+          "pi_ac": {
+            "ready": true,
+            "reasons": []
+          },
+          "si": {
+            "ready": true,
+            "reasons": []
+          },
+          "thermal": {
+            "ready": true,
+            "reasons": []
+          },
+          "emi": {
+            "ready": true,
+            "reasons": []
+          }
+        },
+        "geometry_mismatches": [],
+        "entity_assertions_checked": 12,
+        "source_digest_checked": true,
+        "passed": true,
+        "elapsed_s": 1.86
+      }
+    ]
+  },
+  "native_validation": {
+    "kicad_version": "10.0.6",
+    "coordinate_units": "mm",
+    "pad_center_mm": [
+      21.0,
+      8.0
+    ],
+    "footprint_origin_mm": [
+      20.0,
+      10.0
+    ],
+    "drc_violations": [
+      {
+        "description": "Track has unconnected end",
+        "items": [
+          {
+            "description": "Track (arc) [SIGNAL] on F.Cu, length 6.2832 mm",
+            "pos": {
+              "x": 12.0,
+              "y": 0.0
+            },
+            "uuid": "77777777-7777-4777-8777-777777777777"
+          }
+        ],
+        "severity": "warning",
+        "type": "track_dangling"
+      },
+      {
+        "description": "The current configuration does not include the footprint library 'Parity'",
+        "items": [
+          {
+            "description": "Footprint J1",
+            "pos": {
+              "x": 20.0,
+              "y": 10.0
+            },
+            "uuid": "55555555-5555-4555-8555-555555555555"
+          }
+        ],
+        "severity": "warning",
+        "type": "lib_footprint_issues"
+      }
+    ],
+    "unconnected_items": [
+      {
+        "description": "Missing connection between items",
+        "items": [
+          {
+            "description": "Pad 1 [SIGNAL] of J1 on F.Cu",
+            "pos": {
+              "x": 21.0,
+              "y": 8.0
+            },
+            "uuid": "66666666-6666-4666-8666-666666666666"
+          },
+          {
+            "description": "Track (arc) [SIGNAL] on F.Cu, length 6.2832 mm",
+            "pos": {
+              "x": 12.0,
+              "y": 0.0
+            },
+            "uuid": "77777777-7777-4777-8777-777777777777"
+          }
+        ],
+        "severity": "error",
+        "type": "unconnected_items"
+      }
+    ],
+    "ignored_checks": [
+      {
+        "description": "Footprint has no courtyard defined",
+        "key": "missing_courtyard"
+      },
+      {
+        "description": "Track endpoint not centered on via",
+        "key": "track_not_centered_on_via"
+      },
+      {
+        "description": "Tuning profile track geometries",
+        "key": "tuning_profile_track_geometries"
+      },
+      {
+        "description": "Footprint doesn't match symbol's footprint filters",
+        "key": "footprint_filters_mismatch"
+      },
+      {
+        "description": "Footprint component type doesn't match footprint pads",
+        "key": "footprint_type_mismatch"
+      }
+    ],
+    "render": "build/parity-native/geometry.png",
+    "render_review": "Arc, board cutout and rotated pad visually inspected; no manufactured-board clearance or connectivity pass claimed."
+  },
+  "failure": {
+    "native_pad_rotation_deg": 0,
+    "previous_imported_pad_rotation_deg": 90,
+    "source": "KiCad 10.0.6 public PAD.GetOrientationDegrees",
+    "note": "Previous assertion used an incorrect footprint-relative pad angle; source unchanged. Corrected at the importer boundary and strengthened with native source/shape gates."
+  }
+}

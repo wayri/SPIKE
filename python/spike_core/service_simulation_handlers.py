@@ -24,7 +24,7 @@ from .openfoam_multiregion import prepare_multiregion_case, prepare_runnable_mul
 from .openfoam_multiregion_execution import MultiRegionExecutionError, probe_v2606_commands, run_multiregion_case
 from .openfoam_multiregion_validation import import_v2606_validation_evidence
 from .openfoam_polymesh import OpenFoamPolyMeshError, write_polymesh
-from .service_helpers import prepare_visual_bundle
+from .service_helpers import prepare_visual_bundle, error_response
 from .thermal import ThermalScenario, estimate_compact_thermal, validate_scenario
 from .thermal_field_job import execute_thermal_field_job, plan_thermal_field_job
 
@@ -38,6 +38,56 @@ def handle_simulation_request(
     thermal_adapter_registry: Dict[str, Any] | None = None,
 ) -> Dict[str, Any] | None:
     """Handle model and simulation requests, or return ``None``."""
+    from .service_pdn_network import handle_pdn_network_request
+    pdn_response = handle_pdn_network_request(method, params)
+    if pdn_response is not None:
+        return pdn_response
+    from .service_cfd import handle_cfd_request
+    cfd_response = handle_cfd_request(method, params)
+    if cfd_response is not None:
+        return cfd_response
+    if method == "run_magnetic_machine":
+        try:
+            if not isinstance(params, dict) or set(params) != {"request"}:
+                raise ValueError("Exactly one magnetic machine request is required")
+            from .magnetic_machine_study import run_magnetic_machine
+            return {"ok": True, "result": run_magnetic_machine(params["request"])}
+        except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
+            return error_response("SPIKE-BE-IPC-E-0001", "Magnetic FEM study failed.",
+                                  detail=str(exc), context={"method": method}, error_type=type(exc).__name__)
+    if method == "run_em_machine":
+        try:
+            if not isinstance(params, dict) or set(params) != {"request"}:
+                raise ValueError("Exactly one machine request is required")
+            from .em_machines import run_machine
+            return {"ok": True, "result": run_machine(params["request"])}
+        except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
+            return error_response("SPIKE-BE-IPC-E-0001", "Machine model input is invalid.",
+                                  detail=str(exc), context={"method": method}, error_type=type(exc).__name__)
+    if method in {"cosimulation_catalog", "run_cosimulation", "compare_digital_twin"}:
+        from .service_cosimulation import handle_cosimulation_request
+        return handle_cosimulation_request(method, params)
+    if method in {"run_smps_converter", "evaluate_capacitor_placement", "plan_pi_return_path"}:
+        expected = {"request", "design"} if method == "plan_pi_return_path" else {"request"}
+        if not isinstance(params, dict) or set(params) != expected:
+            return {**error_response("SPIKE-BE-PI-E-0120", "PI_ENGINEERING_FIELDS: unexpected or missing worker parameters",
+                                    context={"method": method}, error_type="ValueError"), "code": "PI_ENGINEERING_FIELDS"}
+        try:
+            if method == "run_smps_converter":
+                from .smps_converter import evaluate_smps_converter
+                result = evaluate_smps_converter(params["request"])
+            elif method == "evaluate_capacitor_placement":
+                from .capacitor_placement import evaluate_capacitor_placement
+                result = evaluate_capacitor_placement(params["request"])
+            else:
+                from .pi_return_path import plan_pi_return_path
+                result = plan_pi_return_path(params["design"], params["request"])
+            return {"ok": True, "result": result}
+        except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
+            kernel_code = getattr(exc, "code", "PI_ENGINEERING_INPUT")
+            return {**error_response("SPIKE-BE-PI-E-0121", str(exc),
+                                    context={"method": method, "kernel_code": kernel_code}, error_type=type(exc).__name__),
+                    "code": kernel_code}
     if method == "analyze_ac_power_integrity":
         from .ac_power_integrity import analyze_ac_power_integrity
         return {"ok": True, "result": analyze_ac_power_integrity(params["request"])}
@@ -76,6 +126,11 @@ def handle_simulation_request(
         return {"ok": True, "result": prepare_visual_bundle(params)}
     if method == "thermal_capabilities":
         return {"ok": True, "result": openfoam_capabilities()}
+    if method == "run_internal_airflow":
+        if not isinstance(params, dict) or set(params) != {"request"}:
+            raise ValueError("INTERNAL_AIRFLOW_FIELDS: only request accepted")
+        from .internal_airflow import run_internal_airflow
+        return {"ok": True, "result": run_internal_airflow(params["request"])}
     if method == "validate_thermal":
         return {"ok": True, "result": validate_scenario(ThermalScenario(**params["scenario"]))}
     if method == "estimate_thermal":

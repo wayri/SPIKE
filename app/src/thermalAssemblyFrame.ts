@@ -20,13 +20,18 @@ export function thermalAssemblyPoint(point: readonly [number, number, number], t
     + transform[row * 4 + 2] * point[2] + transform[row * 4 + 3]) as [number, number, number];
 }
 
-/** Map board-centred viewport coordinates through the native occurrence frame.
- * Transform the complete frame so cell planes, normals and picking agree.
+/** Map source-board-centred viewport coordinates through an occurrence frame.
+ * Source and viewport centres differ when a retained result belongs to a
+ * non-active assembly board.  Keeping both centres explicit prevents the
+ * overlay from being translated twice or recentered on the wrong design.
  */
-export function thermalOverlayTransform(board: VirtualBoardVisual, center: readonly [number, number], scale: number, midplaneMm: number, explodeMm = 0): number[] {
+export function thermalOverlayTransform(board: VirtualBoardVisual, sourceCenter: readonly [number, number],
+  viewportCenter: readonly [number, number], scale: number, midplaneMm: number, explodeMm = 0): number[] {
   const map = (x: number, y: number, z: number) => {
-    const p = thermalAssemblyPoint([x / scale + center[0], center[1] - y / scale, z / scale + midplaneMm], board.transform);
-    return [(p[0] - center[0]) * scale, (center[1] - p[1]) * scale, (p[2] + explodeMm) * scale];
+    const p = thermalAssemblyPoint([x / scale + sourceCenter[0], sourceCenter[1] - y / scale,
+      z / scale + midplaneMm], board.transform);
+    return [(p[0] - viewportCenter[0]) * scale, (viewportCenter[1] - p[1]) * scale,
+      (p[2] + explodeMm) * scale];
   };
   const origin = map(0, 0, 0), x = map(1, 0, 0), y = map(0, 1, 0), z = map(0, 0, 1);
   return [x[0] - origin[0], y[0] - origin[0], z[0] - origin[0], origin[0],

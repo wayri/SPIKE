@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(SPIKE VERSION 0.3.10 LANGUAGES CXX)
+project(SPIKE VERSION 0.3.11 LANGUAGES CXX)
 
 set(SPIKES_ENGINE_PRERELEASE "beta.1" CACHE STRING
     "SPIKES engine prerelease identifier")
@@ -180,6 +180,7 @@ target_link_libraries(spike_math INTERFACE
 # dense Phase-1 backend is a correctness oracle; sparse/nonlinear backends can
 # replace it without changing the public circuit API.
 add_library(spikes_core STATIC
+    src/spikes/smps_stability.cpp
     src/spikes/dc_solver.cpp
     src/spikes/osdi_device.cpp
     src/spikes/transient_solver.cpp
@@ -191,12 +192,26 @@ target_include_directories(spikes_core PUBLIC
 )
 set_target_properties(spikes_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+# Separate device-field subsystem; not a circuit compact-model substitute.
+add_library(spikes_tcad STATIC src/spikes/tcad_equilibrium.cpp)
+target_include_directories(spikes_tcad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_executable(spikes_tcad_console src/spikes/tcad_console.cpp)
+target_link_libraries(spikes_tcad_console PRIVATE spikes_tcad)
+if(MSVC)
+    target_compile_options(spikes_tcad PRIVATE /EHsc /fp:strict)
+    target_compile_options(spikes_tcad_console PRIVATE /EHsc /fp:strict)
+else()
+    target_compile_options(spikes_tcad PRIVATE -fno-fast-math)
+    target_compile_options(spikes_tcad_console PRIVATE -fno-fast-math)
+endif()
+
 # Stable language-neutral embedding boundary.  Keep this wrapper separate from
 # the numerical archive so Python, C dashboards, and HIL hosts can load one
 # versioned shared library without exposing C++ ABI types.
 add_library(spikes_c_api SHARED
     src/spikes/c_api.cpp
 )
+
 target_include_directories(spikes_c_api PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -286,6 +301,42 @@ install(FILES
 option(BUILD_TESTING "Build tests" ON)
 if(BUILD_TESTING)
     enable_testing()
+    add_executable(test_spikes_digital_kernel tests/native/spikes_digital_kernel_test.cpp)
+    target_include_directories(test_spikes_digital_kernel PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    if(MSVC)
+        target_compile_options(test_spikes_digital_kernel PRIVATE /EHsc /W4 /WX)
+    else()
+        target_compile_options(test_spikes_digital_kernel PRIVATE -Wall -Wextra -Werror)
+    endif()
+    add_test(NAME test_spikes_digital_kernel COMMAND test_spikes_digital_kernel)
+    find_package(Threads REQUIRED)
+    add_executable(test_spikes_behavioral_speed tests/native/spikes_behavioral_speed_test.cpp)
+    target_include_directories(test_spikes_behavioral_speed PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+    target_link_libraries(test_spikes_behavioral_speed PRIVATE Threads::Threads)
+    if(MSVC)
+        target_compile_options(test_spikes_behavioral_speed PRIVATE /EHsc /fp:strict)
+    else()
+        target_compile_options(test_spikes_behavioral_speed PRIVATE -fno-fast-math)
+    endif()
+    add_test(NAME test_spikes_behavioral_speed COMMAND test_spikes_behavioral_speed)
+
+    add_executable(test_spikes_tcad_equilibrium tests/native/spikes_tcad_equilibrium_test.cpp)
+    target_link_libraries(test_spikes_tcad_equilibrium PRIVATE spikes_tcad)
+    if(MSVC)
+        target_compile_options(test_spikes_tcad_equilibrium PRIVATE /EHsc /fp:strict)
+    else()
+        target_compile_options(test_spikes_tcad_equilibrium PRIVATE -fno-fast-math)
+    endif()
+    add_test(NAME test_spikes_tcad_equilibrium COMMAND test_spikes_tcad_equilibrium)
+
+    add_executable(test_spikes_smps_native tests/native/spikes_smps_stability_test.cpp)
+    target_link_libraries(test_spikes_smps_native PRIVATE spikes_core Eigen3::Eigen)
+    if(MSVC)
+        target_compile_options(test_spikes_smps_native PRIVATE /EHsc /fp:strict)
+    else()
+        target_compile_options(test_spikes_smps_native PRIVATE -fno-fast-math)
+    endif()
+    add_test(NAME test_spikes_smps_native COMMAND test_spikes_smps_native)
 
     add_executable(spikes_sandbox_probe tests/spikes_sandbox_probe.cpp)
     if(WIN32)
@@ -350,12 +401,6 @@ if(BUILD_TESTING)
     # SPIKES Phase-1 deterministic DC operating-point tests
     add_executable(test_spikes_core tests/test_spikes_dc.cpp)
     target_link_libraries(test_spikes_core PRIVATE spikes_core)
-    target_compile_definitions(test_spikes_core PRIVATE
-        SPIKES_TEST_OSDI_ARTIFACT="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave4-current/spikes_linear_resistor.osdi"
-        SPIKES_TEST_OSDI04_CAPACITOR="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave5-capacitor.osdi"
-        SPIKES_TEST_OSDI04_NOISE="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave5-noise.osdi"
-        SPIKES_TEST_BSIM_BULK_OSDI="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/models/bsimbulk-107.2.1-windows-x64.osdi"
-        SPIKES_TEST_BSIM_CMG_OSDI="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/models/bsimcmg-112.1.0-windows-x64.osdi")
     add_test(NAME test_spikes_core COMMAND test_spikes_core)
 
     add_executable(test_spikes_c_api tests/test_spikes_c_api.cpp)
@@ -364,9 +409,34 @@ if(BUILD_TESTING)
 
     add_executable(test_spikes_transient tests/test_spikes_transient.cpp)
     target_link_libraries(test_spikes_transient PRIVATE spikes_core)
-    target_compile_definitions(test_spikes_transient PRIVATE
-        SPIKES_TEST_OSDI04_CAPACITOR="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave5-capacitor.osdi")
     add_test(NAME test_spikes_transient COMMAND test_spikes_transient)
+
+    # Optional trusted callback fixtures are generated outside source control.
+    # Match the standalone native harness: report unavailable fixtures explicitly.
+    # A separate root lets isolated release checkouts use the qualified artifacts.
+    set(SPIKES_TEST_FIXTURE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH
+        "Root containing artifacts/ for native OSDI regression fixtures")
+    foreach(binding IN ITEMS
+        "SPIKES_TEST_OSDI_ARTIFACT|artifacts/hdl-qualification-wave4-current/spikes_linear_resistor.osdi"
+        "SPIKES_TEST_OSDI04_CAPACITOR|artifacts/hdl-qualification-wave5-capacitor.osdi"
+        "SPIKES_TEST_OSDI04_NOISE|artifacts/hdl-qualification-wave5-noise.osdi"
+        "SPIKES_TEST_BSIM_BULK_OSDI|artifacts/models/bsimbulk-107.2.1-windows-x64.osdi"
+        "SPIKES_TEST_BSIM_CMG_OSDI|artifacts/models/bsimcmg-112.1.0-windows-x64.osdi")
+        string(REPLACE "|" ";" fields "${binding}")
+        list(GET fields 0 macro)
+        list(GET fields 1 relative_path)
+        if(EXISTS "${SPIKES_TEST_FIXTURE_ROOT}/${relative_path}")
+            target_compile_definitions(test_spikes_core PRIVATE
+                ${macro}="${SPIKES_TEST_FIXTURE_ROOT}/${relative_path}")
+            if(macro STREQUAL "SPIKES_TEST_OSDI04_CAPACITOR")
+                target_compile_definitions(test_spikes_transient PRIVATE
+                    ${macro}="${SPIKES_TEST_FIXTURE_ROOT}/${relative_path}")
+            endif()
+            message(STATUS "Native callback fixture enabled: ${relative_path}")
+        else()
+            message(STATUS "Native callback fixture unavailable: ${relative_path}")
+        endif()
+    endforeach()
 
     add_executable(test_spikes_transient_c_api
         tests/test_spikes_transient_c_api.cpp)
@@ -380,11 +450,35 @@ if(BUILD_TESTING)
     add_test(NAME test_spikes_transient_session
         COMMAND test_spikes_transient_session)
 
+    add_executable(test_spikes_electrothermal_reference
+        tests/test_spikes_electrothermal_reference.cpp)
+    target_link_libraries(test_spikes_electrothermal_reference PRIVATE spikes_core)
+    if(MSVC)
+        target_compile_options(test_spikes_electrothermal_reference PRIVATE /W4 /WX)
+    else()
+        target_compile_options(test_spikes_electrothermal_reference PRIVATE -Wall -Wextra -Werror)
+    endif()
+    add_test(NAME test_spikes_electrothermal_reference
+        COMMAND test_spikes_electrothermal_reference)
+
+    add_executable(test_spikes_pwm_electrothermal tests/test_spikes_pwm_electrothermal.cpp)
+    target_link_libraries(test_spikes_pwm_electrothermal PRIVATE spikes_core)
+    if(MSVC)
+        target_compile_options(test_spikes_pwm_electrothermal PRIVATE /W4 /WX)
+    else()
+        target_compile_options(test_spikes_pwm_electrothermal PRIVATE -Wall -Wextra -Werror)
+    endif()
+    add_test(NAME test_spikes_pwm_electrothermal COMMAND test_spikes_pwm_electrothermal)
+
     add_executable(test_spikes_transient_session_c_api
         tests/test_spikes_transient_session_c_api.cpp)
     target_link_libraries(test_spikes_transient_session_c_api PRIVATE spikes_c_api)
     add_test(NAME test_spikes_transient_session_c_api
         COMMAND test_spikes_transient_session_c_api)
+
+    add_executable(test_spikes_fault_injection tests/test_spikes_fault_injection.cpp)
+    target_link_libraries(test_spikes_fault_injection PRIVATE spikes_c_api)
+    add_test(NAME test_spikes_fault_injection COMMAND test_spikes_fault_injection)
 
     add_executable(test_spikes_console_dashboard
         tests/test_spikes_console_dashboard.cpp)

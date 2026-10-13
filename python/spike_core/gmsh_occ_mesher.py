@@ -44,6 +44,14 @@ def _loop(value, max_points=2048):
 
 def validate_request(request):
     """Validate all geometry before calling the native kernel."""
+    if isinstance(request, dict) and request.get('contract') == 'spike/gmsh-occ-assembly/v1':
+        from .assembly_thermal_joint_mesh import validate_joint_job
+        validate_joint_job(request)
+        return
+    if isinstance(request, dict) and request.get('contract') == 'spike/gmsh-occ-step/v1':
+        from .assembly_thermal_cad import validate_step_job
+        validate_step_job(request)
+        return
     _require(isinstance(request, dict), 'Request must be an object.')
     focused = request.get('contract') == 'spike/gmsh-occ-mesh/v2'
     _keys(request, ('contract', 'solids', 'mesh', 'object_metadata', 'focus') if focused
@@ -137,8 +145,17 @@ def _focus_fields(gmsh, plan, coarse_size):
     gmsh.option.setNumber('Mesh.MeshSizeFromPoints', 0)
 
 
-def _solid(occ, shape):
+def _solid(occ, shape, model=None, *, apply_transform=True):
+    if shape['kind'] == 'step_solid':
+        from .assembly_thermal_cad import import_step_solid
+        return import_step_solid(occ, shape, model, apply_transform=apply_transform)
     z, height = shape['z_min_mm'], shape['z_max_mm']-shape['z_min_mm']
+    if shape['kind'] == 'polygon_prism' and not shape['holes_mm']:
+        ring = shape['outer_mm']
+        xs, ys = sorted({p[0] for p in ring}), sorted({p[1] for p in ring})
+        if len(ring) == 4 and len(xs) == len(ys) == 2 and all(
+                a[0] == b[0] or a[1] == b[1] for a,b in zip(ring,ring[1:]+ring[:1])):
+            return occ.addBox(xs[0],ys[0],z,xs[1]-xs[0],ys[1]-ys[0],height)
     if shape['kind'] == 'tube':
         x, y = shape['center_mm']
         outer = occ.addCylinder(x, y, z, 0, 0, height, shape['outer_radius_mm'])
@@ -176,6 +193,9 @@ def build_occ_mesh(gmsh, request):
                                         include_solids=False)
     gmsh.clear()
     gmsh.model.add('spike_typed_pcb')
+    joint = request['contract'] == 'spike/gmsh-occ-assembly/v1'
+    if request['contract'] == 'spike/gmsh-occ-step/v1' or joint:
+        gmsh.option.setString('Geometry.OCCTargetUnit', 'MM')
     for key, value in {'General.NumThreads': 1, 'General.Terminal': 0,
                        'Mesh.Algorithm3D': 1, 'Mesh.ElementOrder': 1,
                        'Mesh.MeshSizeMin': request['mesh']['min_size_mm'],
@@ -183,7 +203,17 @@ def build_occ_mesh(gmsh, request):
                        'Mesh.MeshSizeFromCurvature': 16}.items():
         gmsh.option.setNumber(key, value)
     solids, occ = request['solids'], gmsh.model.occ
-    initial = [(3, _solid(occ, solid['shape'])) for solid in solids]
+    initial = [(3, _solid(occ, solid['shape'], gmsh.model, apply_transform=not joint)) for solid in solids]
+    if joint:
+        from .assembly_thermal_joint_geometry import capture_joint_source_boundaries, source_world_transform
+        source_geometry = capture_joint_source_boundaries(gmsh, solids, initial)
+        for solid, entity in zip(solids, initial):
+            from .assembly_thermal_encapsulation_occ import rigid_place
+            rigid_place(occ, entity, source_world_transform(solid))
+    encapsulation_exports = []
+    if joint and request.get('encapsulation'):
+        from .assembly_thermal_encapsulation_occ import construct_encapsulation
+        solids, initial, encapsulation_exports = construct_encapsulation(gmsh, request['encapsulation'], solids, initial, source_geometry)
     source_volumes = {solid['id']: occ.getMass(3, entity[1]) for solid, entity in zip(solids, initial)}
     if len(initial) > 1:
         fragments, mapping = occ.fragment(initial[:1], initial[1:])
@@ -196,6 +226,9 @@ def build_occ_mesh(gmsh, request):
             continue
         ancestors = [s for s, descendants in zip(solids, mapping) if (3, tag) in descendants]
         _require(bool(ancestors), 'Fragment lacks source ancestry.')
+        if joint:
+            _require(len({s['occurrence_id'] for s in ancestors}) == 1,
+                     'ASSEMBLY_JOINT_OVERLAP: retained occurrences have intersecting positive CAD volumes.')
         priority = max(s['priority'] for s in ancestors)
         materials = {s['material_id'] for s in ancestors if s['priority'] == priority}
         _require(len(materials) == 1, 'Overlapping equal-priority materials are ambiguous.')
@@ -273,6 +306,9 @@ def build_occ_mesh(gmsh, request):
                       'source_object_ids': sorted({s for item in adjacent for s in cells[item[0]]['source_object_ids']})}
             (boundary if len(adjacent) == 1 else interfaces).append(record)
     _require(set(surface_tags) <= set(faces), 'Orphan geometric surface triangle.')
+    if joint:
+        from .assembly_thermal_joint_geometry import verify_joint_source_interfaces
+        interface_admission = verify_joint_source_interfaces(source_geometry, interfaces, points)
     mesh = {'contract': 'spike/solver-mesh/v1', 'units': 'mm', 'coordinate_system': 'right_handed_xyz',
             'vertices': points, 'cells': cells, 'object_map': (
                 {key: dict(value) for key, value in request['object_metadata'].items()} if focused
@@ -295,6 +331,15 @@ def build_occ_mesh(gmsh, request):
                         'fragment_mesh_volumes_mm3': {str(k): v for k,v in volumes.items()}},
             'production_qualified': False,
             'scope': 'planar_polygon_prisms_and_analytic_tubes_first_order_tetrahedra'}
+    if request['contract'] == 'spike/gmsh-occ-step/v1':
+        result['scope'] = 'single_closed_step_solid_first_order_tetrahedra'
+    if joint:
+        result['scope'] = 'joint_retained_occurrence_conformal_first_order_tetrahedra'
+        result['joint_interface_admission'] = interface_admission
+        result['encapsulation_exports'] = encapsulation_exports
+        result['encapsulation_origins'] = {s['id']: {'occurrence_id':s['occurrence_id'],
+            'local_source_id':s['id'], 'metadata':{'kind':s['shape']['kind']}}
+            for s in solids if s['shape']['kind'] in ('coating','potting')}
     if focus_plan is not None:
         from .pcb_focus_sizing import assess_focus_mesh
         result['focus_plan'] = focus_plan

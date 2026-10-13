@@ -19,3 +19,19 @@
 .probe-results-overlay .probe-table-scroll { overflow: auto; min-height: 0; }
 .probe-window-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 5px 8px; background: #15252e; }
 .probe-window-actions button { color: #d6e9ef; background: #203843; border: 1px solid #58717b; padding: 5px 10px; cursor: pointer; }
+
+/* One command row above the measurements, instead of stacked window/table bars. */
+.probe-table > header { flex: 0 0 auto; min-height: 34px; padding: 3px 8px; border-block: 0; font-size: 12px; }
+.probe-table-actions { flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
+.probe-table > header button { min-height: 26px; padding: 3px 6px; font-size: 12px; }
+.probe-table-scroll { border-inline: 0; }
+.probe-results-overlay .probe-table { flex: 1 1 0; }
+.probe-results-overlay .probe-table-scroll { flex: 1 1 0; }
+.probe-table .spike-data-table { border-radius: 0; }
+.probe-table table { min-width: 900px; }
+
+.probe-table .spike-table-toolbar { flex: 0 0 auto; }
+.probe-table .probe-table-actions { margin-left: auto; }
+.probe-results-overlay .probe-table-scroll { overflow: hidden; }
+.probe-results-overlay .spike-data-table { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.probe-results-overlay .spike-table-viewport { flex: 1 1 0; min-height: 0; max-height: none; }

@@ -16,9 +16,10 @@ def preset(name):
 
 def validate(data, pages=None):
     if not isinstance(data,dict) or data.get('contract')!=CONTRACT:raise ValueError('Unsupported workspace format')
-    if set(data)-{'contract','name','page','split','browser','properties'}:raise ValueError('Unknown workspace field')
+    if set(data)-{'contract','name','page','split','browser','properties','split_orientation'}:raise ValueError('Unknown workspace field')
     if not isinstance(data.get('name'),str) or not 1<=len(data['name'])<=120:raise ValueError('Workspace needs a bounded name')
     if not isinstance(data.get('page'),str) or not 1<=len(data['page'])<=120:raise ValueError('Workspace needs a page name')
     if pages is not None and data['page'] not in pages:raise ValueError('This workspace page is unavailable: '+data['page'])
     if any(type(data.get(key)) is not bool for key in ('split','browser','properties')):raise ValueError('Workspace pane flags must be boolean')
+    if data.get('split_orientation','top_bottom') not in ('top_bottom','side_by_side'):raise ValueError('Unknown split orientation')
     return deepcopy(data)

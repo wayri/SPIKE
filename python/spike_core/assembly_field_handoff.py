@@ -23,15 +23,26 @@ from .spider_v2 import AssemblyIRV1
 REQUEST_CONTRACT = 'spike/assembly-field-handoff-request/v1'
 RESULT_CONTRACT = 'spike/assembly-field-handoff/v1'
 MAX_CONTROL_BYTES = 8*1024*1024
+ROUTED_EM_PROFILE = 'routed_pcb_em_v1'
 
 
-def bounded_json(value):
+def field_resource_limits(value):
+    """Explicit EM-only larger envelope; ordinary thermal/SI limits are unchanged."""
+    profile=value.get('resource_profile') if isinstance(value,dict) else None
+    if profile is None:
+        return {'max_cells':MAX_CELLS,'max_vertices':MAX_VERTICES,'max_control_bytes':MAX_CONTROL_BYTES}
+    if profile != ROUTED_EM_PROFILE or value.get('domain') != 'em':
+        raise ValueError('ASSEMBLY_FIELD_RESOURCE: routed_pcb_em_v1 is an explicit EM-only profile')
+    return {'max_cells':600000,'max_vertices':200000,'max_control_bytes':128*1024*1024}
+
+
+def bounded_json(value, *, max_bytes=MAX_CONTROL_BYTES):
     try:
         payload = json.dumps(value, allow_nan=False, separators=(',', ':')).encode()
     except (TypeError, ValueError, OverflowError, RecursionError) as exc:
         raise ValueError('ASSEMBLY_FIELD_JSON: finite bounded JSON required') from exc
-    if len(payload) > MAX_CONTROL_BYTES:
-        raise ValueError('ASSEMBLY_FIELD_RESOURCE: control payload exceeds 8 MiB')
+    if len(payload) > max_bytes:
+        raise ValueError('ASSEMBLY_FIELD_RESOURCE: control payload exceeds '+str(max_bytes//1024**2)+' MiB')
 
 
 def text(value):
@@ -89,8 +100,9 @@ def _assembly(raw):
 
 def prepare_assembly_field_handoff(request):
     """Return geometry plus explicit execution limits, not a field solution."""
-    bounded_json(request)
-    keys(request, ('contract', 'assembly', 'domain', 'bodies', 'materials'), ('ports',))
+    limits=field_resource_limits(request)
+    bounded_json(request,max_bytes=limits['max_control_bytes'])
+    keys(request, ('contract', 'assembly', 'domain', 'bodies', 'materials'), ('ports','resource_profile'))
     domain = request['domain']
     if request['contract'] != REQUEST_CONTRACT or domain not in ('thermal', 'em', 'si'):
         raise ValueError('ASSEMBLY_FIELD_CONTRACT: unsupported handoff')
@@ -103,7 +115,8 @@ def prepare_assembly_field_handoff(request):
     mesh = {'contract': 'spike/solver-mesh/v1', 'units': 'm', 'coordinate_system': 'right_handed_xyz',
             'vertices': [], 'cells': [], 'object_map': {}, 'counts': {}}
     faces, traces, world_materials, owners, seen, used_materials = [], [], [], [], set(), set()
-    for body in request['bodies']:
+    compact=request.get('resource_profile')==ROUTED_EM_PROFILE
+    for body_index,body in enumerate(request['bodies']):
         keys(body, ('occurrence_id', 'reference_id', 'source_sha256', 'mesh', 'boundary_faces', 'material_map'),
              ('stack_binding',))
         oid = text(body['occurrence_id'])
@@ -122,16 +135,23 @@ def prepare_assembly_field_handoff(request):
             digest(body['stack_binding']['source_sha256'])
         elif 'stack_binding' in body:
             raise ValueError('ASSEMBLY_FIELD_STACK: stack binding is board-only')
-        local, matrix, volume = lower_body(assembly, occurrence, body, set(materials))
-        if len(mesh['vertices'])+len(local['vertices']) > MAX_VERTICES or len(mesh['cells'])+len(local['cells']) > MAX_CELLS:
+        placement_audit={}
+        local, matrix, volume = lower_body(assembly, occurrence, body, set(materials),
+            max_cells=limits['max_cells'],max_vertices=limits['max_vertices'],
+            roundoff_aware=compact,transform_audit=placement_audit)
+        if domain != 'em' and any(item.get('kind')=='em_material_region' for item in local['object_map'].values()):
+            raise ValueError('ASSEMBLY_FIELD_GEOMETRY: planar EM material regions do not assert global FEM conformity')
+        if len(mesh['vertices'])+len(local['vertices']) > limits['max_vertices'] or len(mesh['cells'])+len(local['cells']) > limits['max_cells']:
             raise ValueError('ASSEMBLY_FIELD_RESOURCE: aggregate mesh budget exceeded')
         offset = len(mesh['vertices'])
         mesh['vertices'].extend(local['vertices'])
-        object_ids = {sid: identity('source', oid, sid) for sid in local['object_map']}
+        object_ids = {sid: ('source:'+str(body_index)+':'+str(i) if compact else identity('source',oid,sid))
+                      for i,sid in enumerate(sorted(local['object_map']) if compact else local['object_map'])}
         material_ids = {}
-        for local_id, physical_id in body['material_map'].items():
+        material_entries=sorted(body['material_map'].items()) if compact else body['material_map'].items()
+        for material_index,(local_id, physical_id) in enumerate(material_entries):
             used_materials.add(physical_id)
-            global_id = identity('material', oid, local_id)
+            global_id = ('material:'+str(body_index)+':'+str(material_index) if compact else identity('material',oid,local_id))
             material_ids[local_id] = global_id
             entry = {**materials[physical_id], 'id': global_id}
             if domain == 'thermal':
@@ -143,16 +163,16 @@ def prepare_assembly_field_handoff(request):
         mesh['object_map'].update({object_ids[sid]: copy.deepcopy(data)
                                    for sid, data in local['object_map'].items()})
         cell_map = {}
-        for cell in local['cells']:
-            cell_id = identity('cell', oid, cell['id'])
+        for cell_index,cell in enumerate(local['cells']):
+            cell_id = ('cell:'+str(body_index)+':'+str(cell_index) if compact else identity('cell',oid,cell['id']))
             cell_map[cell['id']] = cell_id
             mesh['cells'].append({**cell, 'id': cell_id, 'vertices': [v+offset for v in cell['vertices']],
                                  'material_id': material_ids[cell['material_id']],
                                  'source_object_ids': [object_ids[sid] for sid in cell['source_object_ids']]})
             owners.append(oid)
         face_map = {}
-        for face in body['boundary_faces']:
-            fid = identity('face', oid, face['id'])
+        for face_index,face in enumerate(body['boundary_faces']):
+            fid = ('face:'+str(body_index)+':'+str(face_index) if compact else identity('face',oid,face['id']))
             face_map[face['id']] = fid
             faces.append({'id': fid, 'occurrence_id': oid, 'local_face_id': face['id'],
                           'vertices': [v+offset for v in face['vertices']]})
@@ -163,10 +183,12 @@ def prepare_assembly_field_handoff(request):
                        'vertex_range': [offset, offset+len(local['vertices'])],
                        'source_map': object_ids, 'cell_map': cell_map, 'face_map': face_map,
                        'material_map': material_ids, 'stack_binding': body.get('stack_binding')})
+        if compact:
+            traces[-1]['placement_audit']=placement_audit
     if used_materials != set(materials):
         raise ValueError('ASSEMBLY_FIELD_MATERIAL: unused material records are not admitted')
     mesh['counts'] = {'vertices': len(mesh['vertices']), 'cells': len(mesh['cells'])}
-    audit = assert_disjoint_occurrences(mesh, owners)
+    audit = assert_disjoint_occurrences(mesh, owners,spatial_index=compact)
     ports = _ports(request.get('ports', []), faces, mesh, world_materials, domain)
     pending = []
     for field in ('harnesses', 'connector_mappings', 'rigid_flex_links', 'electrical_bonds'):
@@ -188,8 +210,11 @@ def prepare_assembly_field_handoff(request):
                               'Separate occurrence nodes; no implicit welding or thermal/electrical bonds.',
                               'Bounded floating-point intersection tests are not exact CAD certification.',
                               'No automatic airflow, nonlinear radiation, transient or full-wave execution.']}
+    if compact:
+        result['resource_profile']=ROUTED_EM_PROFILE
+        result['limitations'].append('EM-only closed material regions; global FEM interface conformity is not asserted.')
     result['handoff_digest'] = canonical_json_digest(result)
-    bounded_json(result)
+    bounded_json(result,max_bytes=limits['max_control_bytes'])
     return copy.deepcopy(result)
 
 

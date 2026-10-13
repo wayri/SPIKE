@@ -41,26 +41,8 @@ assert.equal(calls.at(-1), "redo");
 assert.equal(context.ownsKeyboardInput(null), false);
 assert.equal(context.ownsKeyboardInput({ closest: () => null }), false);
 
-const searchHandler = app.match(/const openSearch = \(event: KeyboardEvent\) => \{([\s\S]*?)\n    \};\n    window\.addEventListener\("keydown", openSearch\)/);
-assert.ok(searchHandler, "exercise universal search's actual global shortcut handler");
-const searchCalls = [];
-const openSearch = new Function("ownsKeyboardInput", "setMenu", "setGlobalSearchOpen",
-  `${transpile(`const openSearch = (event: KeyboardEvent) => {${searchHandler[1]}\n};`)}\nreturn openSearch;`)(
-  context.ownsKeyboardInput, value => searchCalls.push(["menu", value]), value => searchCalls.push(["search", value]));
-for (const patch of [{ target: { isContentEditable: true } }, { target: { closest: () => ({ tagName: "INPUT" }) } },
-  { defaultPrevented: true }, { isComposing: true }, { altKey: true }]) {
-  openSearch(event("k", patch));
-}
-assert.deepEqual(searchCalls, [], "search respects editor ownership, composition and handled keys");
-openSearch(event("k"));
-assert.deepEqual(searchCalls, [["menu", null], ["search", true]], "workspace search remains available");
-
-const navigation = app.match(/const onNavigationKey = \(event: KeyboardEvent\) => \{([\s\S]*?)\n    \};\n    document\.addEventListener\("keydown", onNavigationKey\)/);
-assert.ok(navigation);
-const closed = [];
-const onNavigationKey = new Function("ownsKeyboardInput", "shortcutsOpen", "setShortcutsOpen",
-  `${transpile(`const onNavigationKey = (event: KeyboardEvent) => {${navigation[1]}\n};`)}\nreturn onNavigationKey;`)(
-  context.ownsKeyboardInput, true, value => closed.push(value));
-onNavigationKey(event("Escape", { ctrlKey: false, target: { isContentEditable: true } }));
-assert.deepEqual(closed, [false], "Escape retains the shortcut dialog's dismissal even from its editor");
+// Viewport dispatch ownership is exercised against the actual TS AST handler.
+// The shortcut manager owns Escape even while an assignment editor has focus.
+await import("./test-viewport-shortcut-dispatch.mjs");
+await import("./test-shortcut-manager.mjs");
 console.log("editable and workspace shortcut assertions passed");

@@ -1,6 +1,5 @@
 """Pin-property grid for the existing trusted sampled C/C++ bridge."""
 from copy import deepcopy
-import json
 import wx
 import wx.grid
 from .controller_block import validate
@@ -36,4 +35,4 @@ def edit_pins(panel):
             except Exception as exc:error.SetLabel(str(exc))
         dlg.Bind(wx.EVT_BUTTON,accept,id=wx.ID_OK);dlg.SetSizer(box);apply_window(dlg,panel.owner.palette)
         if dlg.ShowModal()!=wx.ID_OK:return
-    panel.owner.doc.commit(lambda d:d.update(controller_setup=config));settings=deepcopy(config);settings.pop('source');panel.settings.SetValue(json.dumps(settings,indent=2));panel.owner.update_title()
+    panel.owner.doc.commit(lambda d:d.update(controller_setup=config));panel.settings.load(config);panel.owner.update_title();panel.owner.refresh_document();panel.owner.configure_code_editors()

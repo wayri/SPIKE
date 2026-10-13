@@ -29,6 +29,7 @@ confidential data unless they have been reviewed for disclosure.
 | Symptom | Start here | Common code/domain |
 |---|---|---|
 | Desktop opens but analysis commands fail | [Worker unavailable](#worker-unavailable-or-busy) | `FE-IPC`, `BE-IPC` |
+| Development desktop shows localhost timeout | [Development frontend unavailable](#development-frontend-unavailable) | Local frontend server |
 | Browser preview cannot open files or run a solver | [Browser preview limitations](#browser-preview-limitations) | Expected development limitation |
 | Board will not import or looks incomplete | [Import failures](#import-fails-or-import-quality-is-low) | `BE-IMPORT` |
 | Project will not open or save | [Project/package recovery](#project-will-not-open-or-save) | `FE-PROJECT`, `BE-PACKAGE` |
@@ -77,6 +78,40 @@ worker. A busy rejection can also include the active operation ID.
 A malformed response (`SPIKE-FE-IPC-E-0002`) or unknown method
 (`SPIKE-BE-IPC-E-0002`) usually indicates frontend/worker version drift. Keep
 the diagnostic and restore a matched build rather than repeatedly retrying.
+
+## Development frontend unavailable
+
+A source development binary loads the frontend from the configured local Vite
+server. Launching `target/debug/spike-desktop.exe` alone does not start that
+server. An embedded browser `localhost` timeout concerns the frontend connection;
+it does not establish a Python worker or solver failure.
+
+From `app`, use `npm.cmd run tauri dev` to start both processes. If deliberately
+launching the native binary separately, first run `npm.cmd run dev` and leave
+that terminal running. Both default to `http://127.0.0.1:1420` so the native
+webview and server use the same IPv4 loopback address without relying on
+`localhost` IPv4/IPv6 resolution. Match its listening address and port to `build.devUrl`
+in `app/src-tauri/tauri.conf.json` (including any development configuration
+override). When a server is launched by an isolated development tool, verify
+that it responds from the same host environment as the native application;
+a server's `ready` message alone does not establish reachability. Check both
+IPv4 and IPv6 when diagnosing a custom `localhost` configuration.
+Changing an existing development URL from `localhost` to `127.0.0.1` also
+changes its browser storage origin. Save active projects before relaunching;
+development UI preferences or unsaved browser drafts do not migrate between
+origins. Saved `.spike` project files remain available through Open Project.
+
+Development startup checks the configured HTTP loopback endpoint before opening
+the webview. Connection and response waits are bounded, and non-200 HTTP status
+is reported. The native error dialog offers one retry after the server is
+restarted, or Exit. A failed retry stops startup with the specific diagnostic in
+a final native dialog and the launch terminal. No running project is reloaded automatically. The check
+does not start or terminate another process, and rejects remote endpoints.
+Packaged builds use embedded frontend assets and skip this development check.
+
+This check establishes that the server returned HTTP status 200. It cannot detect
+a later renderer failure, JavaScript error, or server termination after startup;
+preserve the project before deliberately restarting an active workbench.
 
 ## Browser preview limitations
 

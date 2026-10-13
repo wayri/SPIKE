@@ -216,8 +216,25 @@ def _semiconductor(model, temperature):
                             "No extrapolation, arbitrary SPICE dialect, switching waveform, or thermal transient model."]}
 
 
+def _energy_balanced(model, temperature):
+    from .energy_balanced_heat import evaluate_energy_balanced_heat
+    return evaluate_energy_balanced_heat(model, temperature)
+
+
+def _operating_semiconductor(model, temperature):
+    from .semiconductor_operating_losses import (
+        evaluate_semiconductor_operating_loss, SemiconductorOperatingLossError,
+    )
+    try:
+        return evaluate_semiconductor_operating_loss(model, temperature)
+    except SemiconductorOperatingLossError as exc:
+        raise ElectricalHeatSourceError(exc.code, str(exc)) from exc
+
+
 _MODELS = {"terminal_waveform": _waveform, "spectral_resistive": _spectral,
-           "semiconductor_loss_table": _semiconductor}
+           "semiconductor_loss_table": _semiconductor,
+           "energy_balanced_terminal_waveform": _energy_balanced,
+           "semiconductor_operating_loss_table": _operating_semiconductor}
 
 
 def evaluate_electrical_heat_source(request, temperature_k):

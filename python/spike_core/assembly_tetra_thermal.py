@@ -11,8 +11,8 @@ is INTO the solid; returned Fourier heat flux is -k grad T (W/m^2).
 This implementation and tests are original, not adapted from vendor code or
 examples. The weak-form identity and analytical slab/manufactured fields are
 the method derivation and independent oracles. Constant cell conductivity,
-linear fixed-temperature/flux/convection boundaries, exact matching contacts,
-and a conforming straight-sided mesh only. No transient, radiation, fluid,
+fixed-temperature/flux/convection/ambient-radiation boundaries, exact matching contacts,
+and a conforming straight-sided mesh only. Ambient Stefan-Boltzmann radiation is nonlinear. No transient, fluid,
 EM, mechanical, automatic meshing, or production-qualification claims.
 """
 from __future__ import annotations
@@ -22,8 +22,10 @@ from scipy.sparse import coo_matrix, diags
 from scipy.sparse.csgraph import connected_components
 from scipy.sparse.linalg import cg
 
+from .assembly_tetra_radiation import solve_radiation
 from .assembly_tetra_thermal_validation import (
     AssemblyTetraThermalError, MAX_CELLS, MAX_COMPARISONS, MAX_NODES,
+    MAX_MATRIX_ENTRIES, MAX_WORKSPACE_BYTES, MAX_HIERARCHY_VISITS,
     require, validate_request,
 )
 
@@ -48,20 +50,23 @@ def run_assembly_tetra_thermal(request):
 def _run(request):
     data = validate_request(request)
     n = len(data["xyz"])
-    rows, columns, values = [], [], []
-    graph_rows, graph_columns = [], []
+    capacity = data["matrix_entry_budget"]
+    rows = np.empty(capacity, dtype=np.int32)
+    columns = np.empty(capacity, dtype=np.int32)
+    values = np.empty(capacity, dtype=float)
+    used = 0
     load = np.zeros(n)
     source_power = 0.0
 
     def block(nodes, matrix):
+        nonlocal used
         require(np.isfinite(matrix).all(), "Nonfinite assembled thermal coefficient.")
-        for i, row in enumerate(nodes):
-            for j, column in enumerate(nodes):
-                rows.append(row)
-                columns.append(column)
-                values.append(float(matrix[i, j]))
-                graph_rows.append(row)
-                graph_columns.append(column)
+        count = len(nodes) ** 2
+        require(used + count <= capacity, "Sparse matrix entry budget exceeded.")
+        rows[used:used + count] = np.repeat(nodes, len(nodes))
+        columns[used:used + count] = np.tile(nodes, len(nodes))
+        values[used:used + count] = matrix.ravel()
+        used += count
 
     for cell, (volume, gradients) in zip(data["cells"], data["geometry"]):
         nodes = cell["vertices"]
@@ -75,6 +80,9 @@ def _run(request):
         block(face, h * area * face_template)
         load[list(face)] += h * area * ambient / 3
         anchors.update(face)
+    for face, _, emissivity, _ in data["radiation"]:
+        if emissivity > 0:
+            anchors.update(face)
     prescribed_inward = 0.0
     for face, area, flux in data["fluxes"]:
         load[list(face)] += area * flux / 3
@@ -83,11 +91,14 @@ def _run(request):
         mass = area * h * face_template
         block(left + right, np.block([[mass, -mass], [-mass, mass]]))
     require(np.isfinite(load).all(), "Nonfinite assembled thermal load.")
-    graph = coo_matrix((np.ones(len(graph_rows)), (graph_rows, graph_columns)), shape=(n, n)).tocsr()
+    graph = coo_matrix((np.ones(used, dtype=bool),
+                        (rows[:used], columns[:used])), shape=(n, n)).tocsr()
     component_count, labels = connected_components(graph, directed=False)
     require({int(labels[i]) for i in anchors} == set(range(component_count)),
-            "Unanchored thermal component: supply temperature/convection or an explicit contact to an anchor.")
-    matrix = coo_matrix((values, (rows, columns)), shape=(n, n)).tocsr()
+            "Unanchored thermal component: supply temperature/convection/radiation or an explicit contact to an anchor.")
+    del graph
+    matrix = coo_matrix((values[:used], (rows[:used], columns[:used])), shape=(n, n)).tocsr()
+    del rows, columns, values
     difference = matrix - matrix.T
     reciprocity_error = float(np.max(np.abs(difference.data), initial=0))
     matrix_scale = float(np.max(np.abs(matrix.data), initial=0))
@@ -100,7 +111,12 @@ def _run(request):
     iterations = 0
     positive_energy = True
     relative_residual = 0.0
-    if len(free):
+    newton_iterations = 0
+    radiation_power = np.zeros(n)
+    if data["radiation"]:
+        temperatures, radiation_power, newton_iterations, iterations, relative_residual = solve_radiation(
+            matrix, load, fixed, free, temperatures, data["radiation"])
+    elif len(free):
         operator = matrix[free][:, free]
         rhs = load[free] - matrix[free][:, fixed] @ temperatures[fixed]
         diagonal = operator.diagonal()
@@ -128,13 +144,14 @@ def _run(request):
         require(relative_residual <= 1e-8, "Thermal free-node residual tolerance exceeded.")
     require(np.isfinite(temperatures).all() and np.min(temperatures) >= -1e-8,
             "Nonfinite or below-absolute-zero temperature result.")
-    reactions = matrix @ temperatures - load
+    reactions = matrix @ temperatures + radiation_power - load
     reaction_inward = float(np.sum(reactions[fixed]))
     convection_outward = sum(area * h * (float(np.mean(temperatures[list(face)])) - ambient)
                              for face, area, h, ambient in data["convection"])
-    balance = source_power + prescribed_inward + reaction_inward - convection_outward
+    radiation_outward = float(np.sum(radiation_power))
+    balance = source_power + prescribed_inward + reaction_inward - convection_outward - radiation_outward
     power_scale = max(abs(source_power), abs(prescribed_inward), abs(reaction_inward),
-                      abs(convection_outward), float(np.sum(np.abs(load))),
+                      abs(convection_outward), abs(radiation_outward), float(np.sum(np.abs(load))),
                       float(np.sum(np.abs(reactions[fixed]))), 1e-30)
     roundoff_w = 100 * np.finfo(float).eps * n * matrix_scale * float(np.max(np.abs(temperatures)))
     balance_tolerance = 1e-8 * power_scale + roundoff_w
@@ -162,9 +179,10 @@ def _run(request):
             "contacts": contacts, "reactions_w": {str(i): float(reactions[i]) for i in fixed},
             "heat_balance": {"source_w": float(source_power), "prescribed_flux_inward_w": float(prescribed_inward),
                              "temperature_reaction_inward_w": reaction_inward,
+                             "radiation_outward_w": radiation_outward,
                              "convection_outward_w": float(convection_outward), "imbalance_w": float(balance),
                              "acceptance_tolerance_w": float(balance_tolerance)},
-            "diagnostics": {"free_relative_residual": relative_residual,
+            "diagnostics": {"newton_iterations": newton_iterations, "free_relative_residual": relative_residual,
                             "free_max_residual_w": float(np.max(np.abs(reactions[free]), initial=0)),
                             "reciprocity_max_error_w_k": reciprocity_error,
                             "positive_energy_check": bool(positive_energy), "volume_gradient_energy_w_k": volume_energy,
@@ -176,8 +194,13 @@ def _run(request):
             "resources": {"nodes": n, "tetrahedra": len(data["cells"]), "matrix_nonzeros": int(matrix.nnz),
                           "thermal_components": int(component_count), "geometry_comparisons": data["comparisons"],
                           "hanging_node_comparisons": data["hanging_comparisons"],
-                          "limits": {"nodes": MAX_NODES, "tetrahedra": MAX_CELLS, "comparisons": MAX_COMPARISONS}},
-            "limitations": ["experimental steady P1 solid conduction only", "constant cell conductivity",
+                          "matrix_assembly_entries": used,
+                          "estimated_workspace_bytes": data["estimated_workspace_bytes"],
+                          "limits": {"nodes": MAX_NODES, "tetrahedra": MAX_CELLS, "comparisons": MAX_COMPARISONS,
+                                     "hierarchy_visits": MAX_HIERARCHY_VISITS,
+                                     "matrix_entries": MAX_MATRIX_ENTRIES,
+                                     "workspace_estimate_bytes": MAX_WORKSPACE_BYTES}},
+            "limitations": ["experimental steady P1 solid conduction with prescribed ambient heat exchange", "constant cell conductivity",
                             "exact matched contacts with user-supplied h only", "omitted exterior faces are adiabatic",
                             "conforming straight-sided mesh required; no curved or nonmatching interfaces",
-                            "no transient, radiation, airflow, full-field EM, or production qualification"]}
+                            "no transient, enclosure radiosity, airflow, full-field EM, or production qualification"]}

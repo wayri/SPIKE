@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.application-menu-bar { display:flex; align-items:stretch; overflow:visible; }
+.application-menu-entry,.application-submenu { position:relative; }
+.application-menu-popup { position:absolute; z-index:1000; min-width:210px; overscroll-behavior:contain; }
+.application-menu-entry > .application-menu-popup { inset-block-start:100%; inset-inline-start:0; }
+.application-submenu-popup { position:fixed; inset:auto; }
+.application-menu-popup [role="menuitem"] { width:100%; justify-content:flex-start; white-space:nowrap; }
+.application-menu-popup [role="menuitem"] > span { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; text-align:start; }
+.application-menu-popup [role="menuitem"] > small { margin-inline-start:auto; color:var(--spike-control-muted); }
+.application-menu-popup [role="menuitem"]:focus-visible { position:relative; z-index:1; }
+@media (max-width:640px) { .application-menu-popup { min-width:min(210px,calc(100vw - 16px)); } }

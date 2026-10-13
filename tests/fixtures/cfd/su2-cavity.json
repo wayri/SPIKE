@@ -1,0 +1,7 @@
+{
+  "case": "lid_driven_cavity",
+  "cells": 16,
+  "reynolds": 100,
+  "iterations": 10000,
+  "timeout_s": 300
+}

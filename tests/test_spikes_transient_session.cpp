@@ -137,10 +137,36 @@ void persistent_waveforms_and_checkpointed_hybrid_history() {
           "persistent hybrid factorization history");
 }
 
+void persistent_analytic_sine_keeps_global_time_and_checkpoint() {
+  spikes::Circuit circuit;
+  circuit.add_sine_voltage_source("V1", "in", "0", {0.25, 1.0, 713.0, 0.00023, 73.0, 35.0});
+  circuit.add_resistor("R1", "in", "out", 1000.0);
+  circuit.add_capacitor("C1", "out", "0", 1e-7);
+  spikes::TransientOptions options;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.adaptive_time_step = true;
+  spikes::TransientSession session(circuit, options);
+  require(session.step(0.00017), "sine first step");
+  const auto checkpoint = session.checkpoint();
+  for (int i = 0; i < 4; ++i) {
+    require(session.step(0.00017), "sine adaptive session step");
+    const double elapsed = std::max(0.0, (i + 2) * 0.00017 - 0.00023);
+    const double expected = 0.25 + std::exp(-73.0 * elapsed) *
+        std::sin(2.0 * 3.14159265358979323846 * 713.0 * elapsed +
+                 35.0 * 3.14159265358979323846 / 180.0);
+    require(std::abs(session.node_voltage("in") - expected) < 2e-12, "sine global time");
+  }
+  const double final = session.node_voltage("out");
+  session.restore(checkpoint);
+  for (int i = 0; i < 4; ++i) require(session.step(0.00017), "sine replay step");
+  require(session.node_voltage("out") == final, "sine checkpoint replay");
+}
+
 } // namespace
 
 int main() {
   try {
+    persistent_analytic_sine_keeps_global_time_and_checkpoint();
     persistent_rc_control_and_checkpoint_replay();
     persistent_waveforms_and_checkpointed_hybrid_history();
   } catch (const std::exception &error) {

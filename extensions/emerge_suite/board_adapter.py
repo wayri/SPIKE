@@ -18,6 +18,51 @@ MAX_VERTICES = 200_000
 MAX_SURROUNDING_BOXES = 8
 
 
+def admit_conductor_loss(parameters: dict) -> None:
+    """Reject finite-conductor requests until the generated model represents them."""
+    enabled = parameters.get("include_conductor_loss", False)
+    if not isinstance(enabled, bool):
+        raise ValueError("include_conductor_loss must be a boolean.")
+    model = parameters.get("conductor_loss_model", "pec")
+    if not isinstance(model, str):
+        raise ValueError("conductor_loss_model must be a string.")
+    finite_conductor = enabled or model.strip().lower() not in {
+        "", "none", "pec", "perfect_conductor",
+    }
+    internal_reactance = parameters.get("include_internal_reactance", False)
+    if not isinstance(internal_reactance, bool):
+        raise ValueError("include_internal_reactance must be a boolean.")
+    finite_conductor = finite_conductor or internal_reactance
+    for key in ("enable_skin_effect", "skin_effect", "include_proximity_loss", "enable_proximity_effect"):
+        flag = parameters.get(key, False)
+        if not isinstance(flag, bool):
+            raise ValueError(f"{key} must be a boolean.")
+        finite_conductor = finite_conductor or flag
+    finite_conductor = finite_conductor or parameters.get("loss_model") is not None
+    finite_conductor = finite_conductor or any(
+        parameters.get(key) is not None
+        for key in ("copper_conductivity_s_per_m", "copper_thickness_um",
+                    "surface_impedance_ohm", "conductivity_s_m", "thickness_m")
+    )
+    roughness_model = parameters.get(
+        "surface_roughness_model", parameters.get("roughness_model", "none")
+    )
+    if not isinstance(roughness_model, str):
+        raise ValueError("roughness_model must be a string.")
+    roughness = roughness_model.strip().lower() not in {"", "none", "smooth"}
+    roughness = roughness or any(
+        parameters.get(key) is not None
+        for key in ("surface_roughness_um", "roughness_rms_um", "rms_roughness_um")
+    )
+    if finite_conductor or roughness:
+        raise ValueError(
+            "EMerge board export currently uses zero-thickness PEC copper. "
+            "Finite conductivity, copper thickness, surface impedance, skin/proximity loss, "
+            "and conductor roughness are unsupported; disable conductor and roughness loss "
+            "requests before preparing or running this case."
+        )
+
+
 def number(value: object, label: str, *, low: float = -math.inf, high: float = math.inf) -> float:
     if isinstance(value, bool) or not isinstance(value, (float, int)):
         raise ValueError(f"{label} must be a finite number.")
@@ -158,6 +203,7 @@ def _port(pads: dict[str, dict], signal_id: str, return_id: str,
 def compile_board(design: dict, parameters: dict) -> dict:
     if not isinstance(design, dict) or design.get("contract") != "spike/v1" or design.get("units", "mm") != "mm":
         raise ValueError("EMerge requires a millimetre SpiDeR board.")
+    admit_conductor_loss(parameters)
     signal_net = parameters.get("signal_net")
     return_net = parameters.get("return_net")
     if not isinstance(signal_net, str) or not isinstance(return_net, str) or not signal_net or not return_net or signal_net == return_net:

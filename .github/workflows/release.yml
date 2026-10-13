@@ -1,7 +1,9 @@
 name: Build and release SPIKE
 on:
   push:
-    tags: ['v*']
+    # Gamma Windows previews are published from verified local artifacts.
+    # Do not start the all-platform publication chain for these tags.
+    tags: ['v*', '!v*-gamma.*']
   workflow_dispatch:
     inputs:
       publish:

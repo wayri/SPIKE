@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/digital-twin-request-v1.schema.json",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "title": "Offline digital twin telemetry comparison request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "model_id", "model_revision", "model_status", "channels", "prediction", "telemetry"],
+  "properties": {
+    "contract": {"const": "spike/digital-twin-request/v1"},
+    "model_id": {"$ref": "#/$defs/text"},
+    "model_revision": {"$ref": "#/$defs/text"},
+    "model_status": {"enum": ["approximate", "experimental", "validated", "unsupported"]},
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {"$ref": "#/$defs/channelSpec"},
+      "uniqueItems": true
+    },
+    "prediction": {"$ref": "#/$defs/series"},
+    "telemetry": {"$ref": "#/$defs/series"}
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+    "channelSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "unit", "tolerance"],
+      "properties": {
+        "id": {"$ref": "#/$defs/text"},
+        "unit": {"$ref": "#/$defs/text"},
+        "tolerance": {"type": "number", "minimum": 0}
+      }
+    },
+    "channelDeclaration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "unit"],
+      "properties": {
+        "id": {"$ref": "#/$defs/text"},
+        "unit": {"$ref": "#/$defs/text"}
+      }
+    },
+    "sample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time_s", "values"],
+      "properties": {
+        "time_s": {"type": "number", "minimum": 0},
+        "values": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 128,
+          "additionalProperties": {"type": "number"}
+        }
+      }
+    },
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "model_revision", "channels", "samples"],
+      "properties": {
+        "model_id": {"$ref": "#/$defs/text"},
+        "model_revision": {"$ref": "#/$defs/text"},
+        "channels": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "items": {"$ref": "#/$defs/channelDeclaration"},
+          "uniqueItems": true
+        },
+        "samples": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {"$ref": "#/$defs/sample"}
+        }
+      }
+    }
+  }
+}

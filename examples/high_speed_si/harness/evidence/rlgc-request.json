@@ -1,0 +1,97 @@
+{
+  "contract": "spike/harness-round-wire-rlgc/v1",
+  "harness_id": "synthetic-interboard-harness",
+  "occurrence_id": "synthetic-interboard-harness-assembly/harness-1",
+  "reference_plane": {
+    "kind": "ideal_infinite_ground_plane"
+  },
+  "wires": [
+    {
+      "wire_id": "agg-p",
+      "x_m": -0.007,
+      "height_m": 0.008,
+      "radius_m": 0.00015,
+      "conductivity_s_m": 58000000.0,
+      "relative_permeability": 1.0,
+      "role": "signal",
+      "occurrence_id": "synthetic-interboard-harness-assembly/harness-1"
+    },
+    {
+      "wire_id": "agg-n",
+      "x_m": -0.003,
+      "height_m": 0.008,
+      "radius_m": 0.00015,
+      "conductivity_s_m": 58000000.0,
+      "relative_permeability": 1.0,
+      "role": "signal",
+      "occurrence_id": "synthetic-interboard-harness-assembly/harness-1"
+    },
+    {
+      "wire_id": "vic-p",
+      "x_m": 0.003,
+      "height_m": 0.008,
+      "radius_m": 0.00015,
+      "conductivity_s_m": 58000000.0,
+      "relative_permeability": 1.0,
+      "role": "signal",
+      "occurrence_id": "synthetic-interboard-harness-assembly/harness-1"
+    },
+    {
+      "wire_id": "vic-n",
+      "x_m": 0.007,
+      "height_m": 0.008,
+      "radius_m": 0.00015,
+      "conductivity_s_m": 58000000.0,
+      "relative_permeability": 1.0,
+      "role": "signal",
+      "occurrence_id": "synthetic-interboard-harness-assembly/harness-1"
+    }
+  ],
+  "dielectric": {
+    "relative_permittivity": 2.4,
+    "loss_tangent": 0.008
+  },
+  "frequency_hz": [
+    0.0,
+    7812500.0,
+    15625000.0,
+    23437500.0,
+    31250000.0,
+    39062500.0,
+    46875000.0,
+    54687500.0,
+    62500000.0,
+    70312500.0,
+    78125000.0,
+    85937500.0,
+    93750000.0,
+    101562500.0,
+    109375000.0,
+    117187500.0,
+    125000000.0,
+    132812500.0,
+    140625000.0,
+    148437500.0,
+    156250000.0,
+    164062500.0,
+    171875000.0,
+    179687500.0,
+    187500000.0,
+    195312500.0,
+    203125000.0,
+    210937500.0,
+    218750000.0,
+    226562500.0,
+    234375000.0,
+    242187500.0,
+    250000000.0
+  ],
+  "provenance": {
+    "source": "Original assumed straight solid round-wire cross-section; coordinates and constant material values are explicit",
+    "board_occurrences": [
+      "harness-board-A",
+      "harness-board-B"
+    ],
+    "not_measured": true
+  }
+}

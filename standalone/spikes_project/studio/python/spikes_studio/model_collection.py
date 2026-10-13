@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 
 from .vendor_intake import inspect_text
+from .fuzzy_search import ranked
 
 EXTENSIONS = frozenset(('.lib', '.cir', '.sp', '.spi', '.spice', '.mod', '.model', '.sub', '.ckt', '.inc'))
 
@@ -122,12 +123,10 @@ def scan_collection(root, maximum_files=20000, maximum_bytes=256*1024*1024,
 
 
 def search_entries(index, query='', kind=None):
-    """Case-insensitive AND search of names, paths, types, pins and features."""
-    terms = str(query).casefold().split()
-    return [entry for entry in index['entries']
-            if (kind is None or entry['kind'] == kind)
-            and all(term in ' '.join(str(entry.get(key, '')) for key in
-                                    ('name', 'path', 'type', 'pins', 'features')).casefold() for term in terms)]
+    """Fuzzy search of names, paths, types, pins and features."""
+    eligible = [entry for entry in index['entries'] if kind is None or entry['kind'] == kind]
+    return ranked(eligible, str(query), text=lambda entry:' '.join(
+        str(entry.get(key, '')) for key in ('name', 'path', 'type', 'pins', 'features')))
 
 
 def read_entry(index, entry_or_id):

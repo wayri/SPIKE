@@ -47,8 +47,12 @@ try {
   const geometry = a.copper.geometry;
   updateAssemblySceneSelection(a.root, true, ["gnd"]);
   applyAssemblySceneVisibility(a.root, source, {}, {}, true);
+  assert.equal(a.copper.material.depthTest,false,"linked net remains visible through board/mask surfaces");
+  assert.equal(a.copper.renderOrder,390);
   assert.equal(a.copper.material.color.getHex(), 0x55e5d5); assert.equal(a.copper.material.colorWrite, true);
   updateAssemblySceneSelection(a.root, false, []); applyAssemblySceneVisibility(a.root, source, {}, {}, true);
+  assert.equal(a.copper.material.depthTest,true,"deselection restores occlusion");
+  assert.equal(a.copper.renderOrder,0,"deselection restores render order");
   assert.equal(a.copper.geometry, geometry, "selection reuses GPU geometry"); assert.equal(a.copper.material.color.getHex(), 0xc47b2b);
   assert.equal(a.copper.material.colorWrite, false);
   assert.equal(updateAssemblySceneSelection(a.root, false, []), 0, "unchanged selection skips all meshes");
@@ -68,5 +72,14 @@ try {
   assert.ok(applyAssemblySceneVisibility(a.root, source, {}, {}, false) > 0, "late model mounts invalidate traversal caches");
   assert.equal(late.visible, true, "hiding vias never disables independent baked surfaces");
   applyAssemblySceneVisibility(a.root, source, {}, {}, true); assert.equal(late.visible, true);
+  const unrelated = occurrence(), plainSource = {...source, boardModelIncludesCopper:false};
+  updateAssemblySceneSelection(unrelated.root,false,[],true);
+  applyAssemblySceneVisibility(unrelated.root,plainSource,{}, {"F.Cu":.5},true);
+  assert.equal(unrelated.copper.material.color.getHex(),0x667076);
+  assert.equal(unrelated.copper.material.opacity,.14,"net focus composes with saved layer opacity");
+  updateAssemblySceneSelection(unrelated.root,false,[],false);
+  applyAssemblySceneVisibility(unrelated.root,plainSource,{}, {"F.Cu":.5},true);
+  assert.equal(unrelated.copper.material.color.getHex(),0xc47b2b);
+  assert.equal(unrelated.copper.material.opacity,.5,"clearing focus restores saved opacity");
   console.log("Occurrence layer isolation, baked geometry fallback and selection reuse passed");
 } finally { unlinkSync(target); for (const name of deps) unlinkSync(new URL(`./.test-${name}.mjs`, import.meta.url)); }

@@ -1,3 +1,4 @@
+import type { EmMachineStudy } from "./EmMachineWorkbench";
 import { validEmiFarField } from "./emiFieldData";
 import { EmiFieldPlots } from "./EmiFieldPlots";
 import PlotlyChart from "./PlotlyChart";
@@ -81,6 +82,7 @@ const normalizeRadiatedEmissionsStandard = (raw: unknown): EmiRadiatedEmissionsS
 export type EmiSetup = {
   contract: typeof EMI_SETUP_CONTRACT;
   chamber: EmiChamberSetup;
+  machine_study?: EmMachineStudy;
   selected_nets: string[];
   return_nets: string[];
   requested_analyses: Array<"conducted_screening" | "near_field" | "far_field">;
@@ -182,7 +184,7 @@ export function normalizeEmiFieldResult(raw: unknown): EmiFieldResult | null {
   };
 }
 
-export type EmiSetupSection = "domain" | "prepass" | "excitation" | "solver";
+export type EmiSetupSection = "domain" | "prepass" | "excitation" | "solver" | "machines";
 
 const metricFor = (net: string): EmiNetMetric => ({
   net,
@@ -350,7 +352,10 @@ export function EmiSetupPanel({
     { id: "far_field", name: "Far field and compliance", state: "capability_gated", detail: "A reference-validated openEMS adapter and an explicit NF2FF request are required." },
   ];
 
+  if (section === "machines") return <div className="emi-setup-panel"><button type="button" onClick={() => setSection("domain")}>Back to PCB EM</button><p>Machine geometry, field results and motion plots are in the main workspace.</p><p>Studies retain experimental status. Review mesh and time-step convergence before relying on forces or torque.</p></div>;
+
   return <div className="emi-setup-panel">
+    <button type="button" onClick={() => setSection("machines")} title="Run motor, generator and electromagnet reference models">Machines and electromagnets</button>
     <WorkflowSchematic title="EMI / EMC test schematic" diagram={emiSchematic(setup)} onSelect={target => setSection(target as EmiSetupSection)} />
     <div className="emi-readiness">
       <span className={`emi-state ${preflight?.status ?? "not-validated"}`}>{(preflight?.status ?? "NOT VALIDATED").replace(/_/g, " ")}</span>

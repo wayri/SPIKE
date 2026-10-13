@@ -15,6 +15,7 @@ type Prepared = { id: string; kind: string; scope: string; parameters: Record<st
 type Job = { id: string; caseId: string; phase: "preflight" | "solve"; status: string; result?: Record<string, unknown>; error?: string };
 const rec = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const FLOWS: Record<string, { method: string; key: string; schema?: string; description: string }> = {
+  studio_feedback: { method: "run_studio_board_cosimulation", key: "request", schema: "studio-board-feedback-request-v1.schema.json", description: "Explicit board-bound RLC/ideal-source electrical, lumped thermal and uniform conductor feedback. No inferred semiconductor losses or spatial FEM fields." },
   pi: { method: "run_preflighted_analysis", key: "spec", schema: "analysis-spec-v1.schema.json", description: "Loaded-board PI with worker solver admission and explicit sources, loads and return path." },
   si: { method: "run_si_uniform_channel", key: "request", schema: "si-uniform-channel-request-v1.schema.json", description: "Loaded uniform/piecewise geometry SI, explicit aggressor/victim and crosstalk port map for NEXT/FEXT; unsupported geometry stays blocked." },
   si_workflow: { method: "run_si_workflow", key: "request", schema: "si-workflow-request-v1.schema.json", description: "Explicit channel/source/receiver workflow with supported network analysis and optional time-domain eyes. User models are not inferred from board geometry." },
@@ -81,6 +82,9 @@ function missingInputs(item: Prepared, context: McpLoadedContext): string[] {
     }
     if (rec(input.channel).kind === "geometry" && !context.canonicalDesign) missing.push("loaded canonical SpiDeR v2");
   }
+  if (item.kind === "studio_feedback") {
+    for (const key of ["contract", "netlist", "board_revision", "mode", "bindings", "thermal", "controls"]) if (input[key] === undefined) missing.push(`request.${key}`);
+  }
   if (item.kind === "thermal") {
     for (const key of ["mode", "ambient_temperature_c"]) if (input[key] === undefined) missing.push(`scenario.${key}`);
     const sources = Array.isArray(input.heat_sources) && input.heat_sources.length ? input.heat_sources : Array.isArray(input.thermal_elements) ? input.thermal_elements : [];
@@ -119,6 +123,11 @@ function missingInputs(item: Prepared, context: McpLoadedContext): string[] {
 
 export function createMcpAnalysisConversation(options: Options) {
   const cases = new Map<string, Prepared>(), jobs = new Map<string, Job>();
+  // Include broker-owned mutable state in assistant review bindings. React's
+  // project revision alone cannot observe external MCP patches or job admission.
+  const revisionIdentity = crypto.randomUUID();
+  let stateRevision = 0;
+  const changed = () => { stateRevision += 1; };
   const worker = async (method: string, params: Record<string, unknown>) => { const reply = await options.callWorker({ method, params }); if (!reply.ok || !reply.result) throw new Error(reply.error ?? `${method} returned no result.`); return reply.result; };
   const lookup = (id: unknown) => { const item = typeof id === "string" ? cases.get(id) : undefined; if (!item) throw new Error("Prepared case was not found."); return item; };
   const fresh = async (item: Prepared) => { const context = options.getContext(); if (item.binding !== await binding(context)) throw new Error("Loaded design or assembly changed; prepare a new case."); return context; };
@@ -131,13 +140,15 @@ export function createMcpAnalysisConversation(options: Options) {
     if (jobs.size >= 32) { const oldest = [...jobs.values()].find(job => job.status !== "running"); if (oldest) jobs.delete(oldest.id); }
     const job: Job = { id: crypto.randomUUID(), caseId: item.id, phase, status: "running" }; jobs.set(job.id, job);
     if (phase === "preflight") item.preflightJobId = job.id; else item.runJobId = job.id;
+    changed();
     void execute().then(async result => { job.result = result; const payload = rec(rec(result.data).analysis_result ?? result.analysis_result ?? result);
       const partial = phase === "solve" && payload.status === "partial";
       const screening = phase === "solve" && item.kind === "em" && payload.status === "completed_screening_only";
       const blocked = phase === "solve" && !partial && !screening && !["completed", "completed_with_warnings", "solved"].includes(String(payload.status));
       if (phase === "solve" && !blocked) await options.publishResult?.(result, { kind: item.kind, caseId: item.id, jobId: job.id, scope: item.scope, parameters: item.preflight?.parameters ?? item.parameters });
       job.status = blocked ? "blocked" : partial ? "partial" : screening ? "completed_screening_only" : "completed";
-    }).catch(error => { job.status = "failed"; job.error = error instanceof Error ? error.message : String(error); });
+      changed();
+    }).catch(error => { job.status = "failed"; job.error = error instanceof Error ? error.message : String(error); changed(); });
     return summary(job);
   };
   const extension = (item: Prepared, context: McpLoadedContext) => {
@@ -160,6 +171,7 @@ export function createMcpAnalysisConversation(options: Options) {
   };
   const preflight = async (item: Prepared) => {
     item.preflight = undefined;
+    changed();
     const revision = item.revision, context = await fresh(item), missing = missingInputs(item, context);
     if (missing.length) return { status: "needs_input", ready: false, missing, caseId: item.id, numerical_admission: "not_run" };
     if (context.assembly && item.scope === "active_board") { if (!context.assemblyScope) throw new Error("An explicit active-board assembly scope is required."); await worker("validate_assembly_analysis_scope", { design: context.design, assembly_scope: context.assemblyScope }); }
@@ -167,6 +179,7 @@ export function createMcpAnalysisConversation(options: Options) {
     let result: Record<string, unknown>, parameters = { ...item.parameters }, ready = true;
     const scope = context.assemblyScope ? { assembly_scope: context.assemblyScope } : {};
     if (item.kind === "pi") { result = await worker("preflight_analysis", { design: context.design, spec: parameters.spec, ...scope }); ready = result.can_solve === true; }
+    else if (item.kind === "studio_feedback") { result = await worker("validate_studio_board_cosimulation", { design: context.design, request: parameters.request, ...scope }); ready = result.status === "accepted"; }
     else if (item.kind === "thermal") { result = await worker("validate_thermal", { scenario: parameters.scenario, ...scope }); ready = result.valid === true; }
     else if (item.kind === "em") { result = await worker("emi_preflight", { design: context.design, setup: parameters.setup, ...scope }); ready = result.can_screen === true; }
     else if (item.kind === "extension") {
@@ -182,6 +195,7 @@ export function createMcpAnalysisConversation(options: Options) {
     await fresh(item);
     if (item.revision !== revision) throw new Error("Case changed during preflight; preflight its new revision.");
     item.preflight = { revision, binding: item.binding, ready, result, parameters };
+    changed();
     return { status: ready ? "ready_for_execution" : "blocked", ready, caseId: item.id, revision, evidence: result };
   };
   const run = async (item: Prepared) => {
@@ -200,8 +214,29 @@ export function createMcpAnalysisConversation(options: Options) {
     await fresh(item);
     return result;
   };
-  return { async handle(command: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return { getRevision: () => `${revisionIdentity}:${stateRevision}`, reviewCase: (caseId: string) => { const item = lookup(caseId); return safeObject({ caseId: item.id, kind: item.kind, scope: item.scope, revision: item.revision, loadedDesignBinding: item.binding, parameters: item.preflight?.parameters ?? item.parameters, preflight: item.preflight?.result ?? null }); }, async handle(command: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
     const context = options.getContext();
+    if (command === "studio_board_context") {
+      if (!context.design || Object.keys(args).length) throw new Error("Load a board and use no caller-supplied context overrides.");
+      const loadedDesignBinding = await binding(context), result = await worker("prepare_studio_board_context", { design: context.design });
+      if (loadedDesignBinding !== await binding(options.getContext())) throw new Error("The loaded board changed during Studio context inspection.");
+      return { ...result, loadedDesignBinding, activeDesignId: context.activeDesignId };
+    }
+    if (["spider_context", "spider_query", "spider_compare"].includes(command)) {
+      if (!context.design) throw new Error("Load a board before inspecting its SpiDeR document.");
+      const allowed = command === "spider_compare" ? ["before", "query"] : command === "spider_query" ? ["query"] : [];
+      if (Object.keys(args).some(key => !allowed.includes(key))) throw new Error("Unknown SpiDeR bridge argument.");
+      const query = safeObject(args.query ?? {}), allowedQuery = command === "spider_compare" ? ["entity_types", "offset", "limit"] : ["entity_types", "ids", "source_ids", "name_contains", "offset", "limit", "expected_revision"];
+      if (Object.keys(query).some(key => !allowedQuery.includes(key))) throw new Error("Unknown SpiDeR query field.");
+      const loadedDesignBinding = await binding(context), document = context.canonicalDesign ?? context.design;
+      const result = command === "spider_context"
+        ? await worker("validate_spider", { document, max_issues: 50 })
+        : command === "spider_query"
+        ? await worker("query_spider", { document, ...query })
+        : await worker("compare_spider", { before: safeObject(args.before), after: document, ...query });
+      if (loadedDesignBinding !== await binding(options.getContext())) throw new Error("The loaded design changed during SpiDeR inspection; query its new revision.");
+      return { ...result, loadedDesignBinding, activeDesignId: context.activeDesignId, readOnly: true };
+    }
     if (command === "analysis_context") {
       const query = rec(args.query), offset = Number(query.pad_offset ?? 0), limit = Number(query.pad_limit ?? 500);
       if (!Number.isInteger(offset) || offset < 0 || !Number.isInteger(limit) || limit < 1 || limit > 1000 || query.net_names !== undefined && (!Array.isArray(query.net_names) || query.net_names.length > 128 || !query.net_names.every(value => typeof value === "string" && value.length <= 512))) throw new Error("Pad query requires pad_offset ≥0, pad_limit 1..1000 and at most 128 net_names strings.");
@@ -209,7 +244,7 @@ export function createMcpAnalysisConversation(options: Options) {
       const pads = (Array.isArray(rec(context.design).pads) ? rec(context.design).pads as unknown[] : []).filter(item => !filter || filter.has(String(rec(item).net_name ?? rec(item).net ?? "")));
       return { boardLoaded: Boolean(context.design), boardFile: context.boardFile, activeDesignId: context.activeDesignId, loadedDesignBinding: await binding(context), nets: nets(context), layers: rec(context.design).stackup,
       padOffset: offset, padCount: pads.length, padsTruncated: offset + limit < pads.length,
-      pads: pads.slice(offset, offset + limit).map(item => { const pad = rec(item); return { id: pad.id, reference: pad.reference, net: pad.net_name ?? pad.net, layer: pad.layer, at: pad.at }; }),
+      pads: pads.slice(offset, offset + limit).map(item => { const pad = rec(item); return { id: pad.id, reference: pad.reference ?? pad.ref ?? pad.component_ref, net: pad.net_name ?? pad.net, layer: pad.layer, at: pad.at }; }),
       assembly: context.assembly ? { id: rec(context.assembly).assembly_id, boards: rec(context.assembly).boards, harnesses: rec(context.assembly).harnesses, thermal_contacts: rec(context.assembly).thermal_contacts } : null,
       extensions: context.extensions ?? [], resultCount: context.results?.length ?? 0,
       results: (context.results ?? []).map((value, index) => { const payload = rec(rec(rec(value).data).analysis_result ?? rec(value).analysis_result ?? value); return { index, resultId: payload.analysis_id, analysis_id: payload.analysis_id, status: payload.status, mode: payload.mode, model_status: payload.model_status, provenance: payload.provenance, datasets: Object.keys(rec(payload.em_fields ?? payload.fields)) }; }),
@@ -222,10 +257,11 @@ export function createMcpAnalysisConversation(options: Options) {
       if (!context.design) throw new Error("Load a board in SPIKE before preparing a loaded-design analysis.");
       if (cases.size >= 32) throw new Error("Prepared case limit reached; restart SPIKE to reset it.");
       const parameters = checkedParameters(kind, args.parameters ?? {}), item: Prepared = { id: crypto.randomUUID(), kind, scope, parameters, binding: await binding(context), revision: 1 }; cases.set(item.id, item);
-      if (scope === "reduced_assembly" && !parameters.request) { const draft = await worker("prepare_multiboard_study", { request: { assembly: context.assembly, domain: kind.replace("multiboard_", "").replace("em", "emi") } }); item.parameters.request = draft.request; }
+      changed();
+      if (scope === "reduced_assembly" && !parameters.request) { const draft = await worker("prepare_multiboard_study", { request: { assembly: context.assembly, domain: kind.replace("multiboard_", "").replace("em", "emi") } }); item.parameters.request = draft.request; changed(); }
       return { caseId: item.id, kind, scope, revision: item.revision, loadedDesignBinding: item.binding, parameters: item.parameters, missing: missingInputs(item, context), solved: false };
     }
-    if (command === "analysis_patch") { const item = lookup(args.caseId); await fresh(item); if ([...jobs.values()].some(job => job.caseId === item.id && job.status === "running")) throw new Error("Wait for the active job before changing its case."); item.parameters = { ...item.parameters, ...checkedParameters(item.kind, args.patch) }; item.revision++; item.preflight = undefined; item.preflightJobId = undefined; item.runJobId = undefined; return { caseId: item.id, revision: item.revision, parameters: item.parameters, missing: missingInputs(item, context), solved: false }; }
+    if (command === "analysis_patch") { const item = lookup(args.caseId); await fresh(item); if ([...jobs.values()].some(job => job.caseId === item.id && job.status === "running")) throw new Error("Wait for the active job before changing its case."); item.parameters = { ...item.parameters, ...checkedParameters(item.kind, args.patch) }; item.revision++; item.preflight = undefined; item.preflightJobId = undefined; item.runJobId = undefined; changed(); return { caseId: item.id, revision: item.revision, parameters: item.parameters, missing: missingInputs(item, context), solved: false }; }
     if (command === "analysis_preflight") { const item = lookup(args.caseId); await fresh(item); if (item.preflightJobId && jobs.has(item.preflightJobId)) return summary(jobs.get(item.preflightJobId)!); return spawn(item, "preflight", () => preflight(item)); }
     if (command === "analysis_run") { const item = lookup(args.caseId); await fresh(item); if (item.runJobId && jobs.has(item.runJobId)) return summary(jobs.get(item.runJobId)!); if (!item.preflight?.ready) throw new Error("Poll the passing preflight job before running."); return spawn(item, "solve", () => run(item)); }
     if (command === "analysis_job" || command === "analysis_evidence") {

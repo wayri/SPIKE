@@ -68,6 +68,14 @@ void c_abi_exposes_rc_transient_samples_and_diagnostics() {
   assert(newton_iterations == 0u);
   assert(failed_time == 0.0);
   assert(residual < 1.0e-12);
+  size_t rejected_newton_steps = 99;
+  assert(spikes_transient_result_recovery_diagnostics(
+             result, &rejected_newton_steps) == SPIKES_OK);
+  assert(rejected_newton_steps == 0);
+  assert(spikes_transient_result_recovery_diagnostics(
+             nullptr, &rejected_newton_steps) == SPIKES_INVALID_ARGUMENT);
+  assert(spikes_transient_result_recovery_diagnostics(
+             result, nullptr) == SPIKES_INVALID_ARGUMENT);
   size_t factorizations = 0;
   size_t reuses = 0;
   size_t cache_entries = 0;

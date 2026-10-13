@@ -1,0 +1,4 @@
+{
+  "build": {"beforeDevCommand": "", "devUrl": "http://127.0.0.1:1420"},
+  "app": {"windows": [{"label": "main", "title": "SPIKE | PI engineering verification", "url": "scripts/fixtures/pi-engineering.html", "width": 1320, "height": 850, "minWidth": 700, "minHeight": 600, "resizable": true, "center": true}]}
+}

@@ -247,9 +247,12 @@ def compile_pi_path_to_native_mna(
 ) -> Dict[str, Any]:
     """Compile an explicitly mapped PI path and reviewed RLCG extraction."""
 
+    from .source_current_limits import current_limit_issues
+
     path = spec.options.get("pi_path") if isinstance(spec.options.get("pi_path"), dict) else {}
     validation = validate_pi_path(path, design, spec.mode)
     issues: List[Dict[str, str]] = list(validation.get("issues") or [])
+    issues.extend(issue.__dict__ for issue in current_limit_issues(spec, supported=False))
     segments = path.get("segments") if isinstance(path.get("segments"), list) else []
     mappings = list(segment_mappings)
     networks = _network_list(extraction_result)

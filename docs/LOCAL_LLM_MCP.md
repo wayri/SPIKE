@@ -1,5 +1,19 @@
 # Local LLM control with MCP
 
+
+Integrated desktop chat: [SPIKE Assistant](INTEGRATED_ASSISTANT.md), including provider consent, reviewed tools and assembly workflows.
+Harness automation uses `spike_run_harness_pi`, `spike_run_harness_si` and
+`spike_prepare_harness_em` with explicit request contracts. The first two run
+bounded DC and supplied uniform-line SI models; EM returns unsupported field
+requirements. See [harness engineering](HARNESS_ENGINEERING.md). Roles, net
+names and twist pitch must not be used to invent missing electrical models.
+
+For operation without a desktop, use the [headless workflow and portable agent
+skill](HEADLESS_AUTOMATION.md). Saved-project and assembly tools use supervised
+workers; `SPIKE_HEADLESS_TIMEOUT_SECONDS` sets their per-call limit (default 120,
+maximum 86400 seconds). Tool results include structured content and retain worker
+error codes. These additions are currently in source, after Windows v0.3.8.
+
 SPIKE exposes a local [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle) stdio server. It offers a fixed set of worker tools for capability inspection, design loading and validation, admitted PI and SI workflows, thermal estimates, and EM screening. Solver qualification, assumptions, and blocked preflights come from the existing SPIKE worker. The server also offers desktop tools for workspace selection, 2D/3D view, and study management when the desktop bridge is enabled.
 
 The server does not expose a shell, generic worker dispatch, extension trust, project save, or arbitrary file write. Analysis tools may take time and return large results. A model response is guidance until a SPIKE tool reports a completed result.
@@ -124,3 +138,9 @@ offline engineering report preview for the loaded board and selected results. It
 neither saves a file nor prints automatically. Unsupported output contracts remain
 available through job evidence and the Local LLM panel rather than becoming a fake
 viewport layer. EMI `completed_screening_only` retains its screening qualification.
+
+## Updated MCP and SpiDeR interfaces
+
+See [MCP/SpiDeR workflow](MCP_SPIDER_INTERFACES.md) for dual-era discovery, schema
+resources, typed read-only design queries, revision comparisons and Studio
+feedback admission. The existing desktop bridge still requires opt-in.

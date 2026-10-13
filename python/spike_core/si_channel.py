@@ -23,6 +23,7 @@ from .hybrid_mesh import _segment_inside_polygon
 from .quasistatic_capacitance import estimate_line_capacitance_per_m
 from .sparameters import NetworkData, analyze_network
 from .si_symbol_clock import sample_nrz_clock
+from .si_frequency_loss import validate_loss_model, trace_impedance
 
 
 REQUEST_CONTRACT = "spike/si-uniform-channel-request/v1"
@@ -45,7 +46,7 @@ _REQUEST_KEYS = {
     "cross_section_vertical_cells", "coupled_separation_tolerance_mm",
     "coupled_skew_tolerance_mm", "reference_impedance_ohm", "frequencies_hz",
     "bit_rate_hz", "bit_count", "statistical_eye_model", "trace_limit",
-    "signaling", "pam4_model", "symbol_rate_hz", "symbol_count", "crosstalk_model",
+    "loss_model", "signaling", "pam4_model", "symbol_rate_hz", "symbol_count", "crosstalk_model",
 }
 
 
@@ -59,6 +60,10 @@ def _validate_channel_request(request: Mapping[str, Any]) -> None:
     unknown = set(request) - _REQUEST_KEYS
     if unknown:
         raise SiChannelError(f"SI channel request has unknown fields: {sorted(unknown)}.")
+    try:
+        validate_loss_model(request.get("loss_model"))
+    except ValueError as exc:
+        raise SiChannelError(str(exc)) from exc
     path_mode = request.get("path_mode", "strict_uniform")
     if path_mode not in {"strict_uniform", "piecewise_planar"}:
         raise SiChannelError("path_mode must be strict_uniform or piecewise_planar.")
@@ -326,6 +331,9 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
         "geometry_digest": _canonical_digest(geometry),
         "rlgc_per_m": {
             "resistance_ohm_per_m": resistance_per_m,
+            "conductivity_s_per_m": conductivity,
+            "conductor_thickness_m": thickness_m,
+            "conductor_loss": validate_loss_model(request.get("loss_model")),
             "inductance_h_per_m": inductance_per_m,
             "capacitance_f_per_m": capacitance_per_m,
             "loss_tangent": loss_tangent,
@@ -349,7 +357,8 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
             "single homogeneous dielectric and one simple polygonal reference zone without holes",
             "reference-zone coverage proves only the projected trace footprint, not return-current density",
             "quasi-static zero-thickness Hammerstad-Jensen capacitance approximation",
-            "DC conductor resistance only; skin, proximity, roughness, dispersion, vias, launches, and connectors are excluded",
+            "Isolated symmetric slab skin impedance; optional empirical RMS roughness resistance correction. Return-plane loss and geometry-derived proximity, dispersion, vias, launches, and connectors are excluded",
+            "Roughness corrects resistance only, not causal broadband phase; roughened TDR/eye results are exploratory",
             *([] if path_mode == "strict_uniform" else ["bend discontinuities, corner radiation, and bend-local coupling are omitted; total centerline length is retained"]),
         ],
     }
@@ -377,7 +386,8 @@ def uniform_rlgc_network(
         if cancel_check is not None and cancel_check():
             raise SiChannelError("SI channel analysis was cancelled.")
         omega = 2.0 * pi * float(frequency)
-        z_total = complex(resistance, omega * inductance) * length_m
+        internal_z = trace_impedance(extraction, float(frequency), float(geometry.get("width_m", 0)), resistance)
+        z_total = (internal_z + 1j * omega * inductance) * length_m
         y_total = complex(omega * capacitance * loss_tangent, omega * capacitance) * length_m
         gamma_length = np.sqrt(z_total * y_total)
         sinhc = 1.0 + 0j if abs(gamma_length) < 1e-14 else np.sinh(gamma_length) / gamma_length
@@ -557,6 +567,7 @@ def normalized_nrz_eye(
         if len(segment) > 1:
             traces.append({
                 "source_bit_index": index,
+                "phase_ui": [float(phase) for phase in phases],
                 "values": [float(value) for value in segment],
             })
     return {

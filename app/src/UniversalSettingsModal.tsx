@@ -4,11 +4,11 @@ import { AppSettings, LANGUAGE_NAMES } from "./appSettings";
 
 type SettingsTab = "General" | "Units" | "Interface" | "Language" | "Profile" | "Privacy";
 
-export default function UniversalSettingsModal({ settings, onSave, onClose }: { settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void }) {
+export default function UniversalSettingsModal({ settings, onSave, onClose, onOpenUpdates }: { onOpenUpdates?: () => void; settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void }) {
   const [draft, setDraft] = useState<AppSettings>(() => structuredClone(settings));
   const [tab, setTab] = useState<SettingsTab>("General");
   useEffect(() => {
-    const key = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    const key = (event: KeyboardEvent) => { if (document.querySelector(".settings-shade")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   }, [onClose]);
@@ -24,6 +24,7 @@ export default function UniversalSettingsModal({ settings, onSave, onClose }: { 
         <nav>{tabs.map(item => <button key={item.id} className={tab === item.id ? "active" : ""} onClick={() => setTab(item.id)}><item.icon size={15} />{item.id}</button>)}</nav>
         <main>
           {tab === "General" && <SettingsSection title="Workspace">
+            {onOpenUpdates && <button type="button" onClick={onOpenUpdates}>SPIKE updates · check GitHub releases</button>}
             <Setting label="Restore last workspace"><input type="checkbox" checked={draft.restoreWorkspace} onChange={event => update("restoreWorkspace", event.target.checked)} /></Setting>
             <Setting label="Autosave interval"><select value={draft.autosaveMinutes} onChange={event => update("autosaveMinutes", Number(event.target.value) as AppSettings["autosaveMinutes"])}><option value={0}>Disabled</option><option value={1}>1 minute</option><option value={5}>5 minutes</option><option value={10}>10 minutes</option><option value={30}>30 minutes</option></select></Setting>
             <Setting label="Numerical precision"><input type="number" min={3} max={12} value={draft.significantDigits} onChange={event => update("significantDigits", Math.max(3, Math.min(12, Number(event.target.value))))} /></Setting>
@@ -37,13 +38,12 @@ export default function UniversalSettingsModal({ settings, onSave, onClose }: { 
             <Setting label="Temperature"><select value={draft.temperatureUnit} onChange={event => update("temperatureUnit", event.target.value as AppSettings["temperatureUnit"])}><option value="C">Celsius</option><option value="F">Fahrenheit</option><option value="K">Kelvin</option></select></Setting>
           </SettingsSection>}
           {tab === "Interface" && <SettingsSection title="Rendering and interaction">
-            <Setting label="Theme"><select value={draft.theme} onChange={event => update("theme", event.target.value as AppSettings["theme"])}><option value="professional-dark">Professional dark</option><option value="high-contrast">High contrast</option><option value="system">Follow system</option></select></Setting>
+            <Setting label="Theme"><select value={draft.theme} onChange={event => update("theme", event.target.value as AppSettings["theme"])}><option value="professional-dark">Graphite + Teal</option><option value="high-contrast">High contrast</option><option value="system">Follow system</option></select></Setting>
             <Setting label="Rendering profile"><select value={draft.renderQuality} onChange={event => update("renderQuality", event.target.value as AppSettings["renderQuality"])}><option value="quality">Quality</option><option value="balanced">Balanced</option><option value="performance">Performance</option></select></Setting>
             <Setting label="Maximum frame rate"><select value={draft.maximumFps} onChange={event => update("maximumFps", Number(event.target.value) as AppSettings["maximumFps"])}><option value={30}>30 FPS</option><option value={60}>60 FPS</option><option value={120}>120 FPS</option></select></Setting>
             <Setting label="Antialiasing"><input type="checkbox" checked={draft.antialiasing} onChange={event => update("antialiasing", event.target.checked)} /></Setting>
             <Setting label="Navigation inertia"><input type="checkbox" checked={draft.navigationInertia} onChange={event => update("navigationInertia", event.target.checked)} /></Setting>
             <Setting label="Blink selected objects"><input type="checkbox" checked={draft.selectionBlink} onChange={event => update("selectionBlink", event.target.checked)} /></Setting>
-            <Setting label="Show command ribbon"><input type="checkbox" checked={draft.ribbonVisible} onChange={event => update("ribbonVisible", event.target.checked)} /></Setting>
           </SettingsSection>}
           {tab === "Language" && <SettingsSection title="Display language">
             <Setting label="Application language"><select value={draft.language} onChange={event => update("language", event.target.value as AppSettings["language"])}>{Object.entries(LANGUAGE_NAMES).map(([code, name]) => <option key={code} value={code}>{name}</option>)}</select></Setting>

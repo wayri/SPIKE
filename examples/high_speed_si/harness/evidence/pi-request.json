@@ -1,0 +1,430 @@
+{
+  "contract": "spike/harness-pi-request/v1",
+  "harness": {
+    "contract": "spike/harness/v1",
+    "id": "synthetic-interboard-harness",
+    "name": "Synthetic board A to board B power and coupled signal harness",
+    "connectors": [
+      {
+        "id": "harness-board-A::JH1",
+        "name": "Board A reviewed harness connector",
+        "board_binding": {
+          "board_id": "harness-board-A",
+          "connector_id": "JH1"
+        },
+        "pins": [
+          {
+            "id": "PWR",
+            "net": "SYNTH_PWR"
+          },
+          {
+            "id": "RET",
+            "net": "SYNTH_RET"
+          },
+          {
+            "id": "AGG_P",
+            "net": "SYNTH_AGG_P"
+          },
+          {
+            "id": "AGG_N",
+            "net": "SYNTH_AGG_N"
+          },
+          {
+            "id": "VIC_P",
+            "net": "SYNTH_VIC_P"
+          },
+          {
+            "id": "VIC_N",
+            "net": "SYNTH_VIC_N"
+          }
+        ]
+      },
+      {
+        "id": "harness-board-B::JH1",
+        "name": "Board B reviewed harness connector",
+        "board_binding": {
+          "board_id": "harness-board-B",
+          "connector_id": "JH1"
+        },
+        "pins": [
+          {
+            "id": "PWR",
+            "net": "SYNTH_PWR"
+          },
+          {
+            "id": "RET",
+            "net": "SYNTH_RET"
+          },
+          {
+            "id": "AGG_P",
+            "net": "SYNTH_AGG_P"
+          },
+          {
+            "id": "AGG_N",
+            "net": "SYNTH_AGG_N"
+          },
+          {
+            "id": "VIC_P",
+            "net": "SYNTH_VIC_P"
+          },
+          {
+            "id": "VIC_N",
+            "net": "SYNTH_VIC_N"
+          }
+        ]
+      }
+    ],
+    "wires": [
+      {
+        "id": "pwr",
+        "from": {
+          "connector": "harness-board-A::JH1",
+          "pin": "PWR"
+        },
+        "to": {
+          "connector": "harness-board-B::JH1",
+          "pin": "PWR"
+        },
+        "role": "power",
+        "return_wire_id": "return",
+        "length_mm": 600.0,
+        "area_mm2": 0.5,
+        "route_id": "interboard-route",
+        "color": "#e36f4f",
+        "material": {
+          "name": "assumed copper",
+          "resistivity_ohm_m": 1.724137931034483e-08,
+          "reference_temperature_c": 20.0
+        },
+        "electrical": {
+          "resistance_ohm": 0.020689655172413793,
+          "provenance": {
+            "source": "R=L/(sigma*A) from explicit synthetic inputs"
+          }
+        },
+        "properties": {
+          "cross_section_position_mm": [
+            -12.0,
+            8.0
+          ],
+          "radius_mm": 0.39894228040143265
+        }
+      },
+      {
+        "id": "return",
+        "from": {
+          "connector": "harness-board-B::JH1",
+          "pin": "RET"
+        },
+        "to": {
+          "connector": "harness-board-A::JH1",
+          "pin": "RET"
+        },
+        "role": "return",
+        "length_mm": 600.0,
+        "area_mm2": 0.5,
+        "route_id": "interboard-route",
+        "color": "#8090aa",
+        "material": {
+          "name": "assumed copper",
+          "resistivity_ohm_m": 1.724137931034483e-08,
+          "reference_temperature_c": 20.0
+        },
+        "electrical": {
+          "resistance_ohm": 0.020689655172413793,
+          "provenance": {
+            "source": "R=L/(sigma*A) from explicit synthetic inputs"
+          }
+        },
+        "properties": {
+          "cross_section_position_mm": [
+            12.0,
+            8.0
+          ],
+          "radius_mm": 0.39894228040143265
+        }
+      },
+      {
+        "id": "agg-p",
+        "from": {
+          "connector": "harness-board-A::JH1",
+          "pin": "AGG_P"
+        },
+        "to": {
+          "connector": "harness-board-B::JH1",
+          "pin": "AGG_P"
+        },
+        "role": "signal",
+        "length_mm": 600.0,
+        "area_mm2": 0.07068583470577035,
+        "route_id": "interboard-route",
+        "color": "#55c7dc",
+        "material": {
+          "name": "assumed copper",
+          "resistivity_ohm_m": 1.724137931034483e-08,
+          "reference_temperature_c": 20.0
+        },
+        "electrical": {
+          "resistance_ohm": 0.1463493729580647,
+          "provenance": {
+            "source": "DC metadata from the same solid round-wire geometry"
+          }
+        },
+        "properties": {
+          "cross_section_position_mm": [
+            -7.0,
+            8.0
+          ],
+          "radius_mm": 0.15
+        }
+      },
+      {
+        "id": "agg-n",
+        "from": {
+          "connector": "harness-board-A::JH1",
+          "pin": "AGG_N"
+        },
+        "to": {
+          "connector": "harness-board-B::JH1",
+          "pin": "AGG_N"
+        },
+        "role": "signal",
+        "length_mm": 600.0,
+        "area_mm2": 0.07068583470577035,
+        "route_id": "interboard-route",
+        "color": "#55c7dc",
+        "material": {
+          "name": "assumed copper",
+          "resistivity_ohm_m": 1.724137931034483e-08,
+          "reference_temperature_c": 20.0
+        },
+        "electrical": {
+          "resistance_ohm": 0.1463493729580647,
+          "provenance": {
+            "source": "DC metadata from the same solid round-wire geometry"
+          }
+        },
+        "properties": {
+          "cross_section_position_mm": [
+            -3.0,
+            8.0
+          ],
+          "radius_mm": 0.15
+        }
+      },
+      {
+        "id": "vic-p",
+        "from": {
+          "connector": "harness-board-A::JH1",
+          "pin": "VIC_P"
+        },
+        "to": {
+          "connector": "harness-board-B::JH1",
+          "pin": "VIC_P"
+        },
+        "role": "signal",
+        "length_mm": 600.0,
+        "area_mm2": 0.07068583470577035,
+        "route_id": "interboard-route",
+        "color": "#55c7dc",
+        "material": {
+          "name": "assumed copper",
+          "resistivity_ohm_m": 1.724137931034483e-08,
+          "reference_temperature_c": 20.0
+        },
+        "electrical": {
+          "resistance_ohm": 0.1463493729580647,
+          "provenance": {
+            "source": "DC metadata from the same solid round-wire geometry"
+          }
+        },
+        "properties": {
+          "cross_section_position_mm": [
+            3.0,
+            8.0
+          ],
+          "radius_mm": 0.15
+        }
+      },
+      {
+        "id": "vic-n",
+        "from": {
+          "connector": "harness-board-A::JH1",
+          "pin": "VIC_N"
+        },
+        "to": {
+          "connector": "harness-board-B::JH1",
+          "pin": "VIC_N"
+        },
+        "role": "signal",
+        "length_mm": 600.0,
+        "area_mm2": 0.07068583470577035,
+        "route_id": "interboard-route",
+        "color": "#55c7dc",
+        "material": {
+          "name": "assumed copper",
+          "resistivity_ohm_m": 1.724137931034483e-08,
+          "reference_temperature_c": 20.0
+        },
+        "electrical": {
+          "resistance_ohm": 0.1463493729580647,
+          "provenance": {
+            "source": "DC metadata from the same solid round-wire geometry"
+          }
+        },
+        "properties": {
+          "cross_section_position_mm": [
+            7.0,
+            8.0
+          ],
+          "radius_mm": 0.15
+        }
+      }
+    ],
+    "pairs": [
+      {
+        "id": "aggressor-pair",
+        "wire_ids": [
+          "agg-p",
+          "agg-n"
+        ],
+        "kind": "differential",
+        "twisted": false
+      },
+      {
+        "id": "victim-pair",
+        "wire_ids": [
+          "vic-p",
+          "vic-n"
+        ],
+        "kind": "differential",
+        "twisted": false
+      }
+    ],
+    "cables": [
+      {
+        "id": "six-conductor-bundle",
+        "wire_ids": [
+          "pwr",
+          "return",
+          "agg-p",
+          "agg-n",
+          "vic-p",
+          "vic-n"
+        ],
+        "twisted": false
+      }
+    ],
+    "routes": [
+      {
+        "id": "interboard-route",
+        "frame_id": "assembly",
+        "points_mm": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            600,
+            0,
+            0
+          ]
+        ]
+      }
+    ],
+    "extensions": {
+      "spike.harness-pi": {
+        "wire_ids": [
+          "pwr",
+          "return"
+        ],
+        "ground": {
+          "connector": "harness-board-A::JH1",
+          "pin": "RET"
+        },
+        "contacts": [],
+        "terminals": [
+          {
+            "id": "board-A-source",
+            "type": "voltage_source",
+            "positive": {
+              "connector": "harness-board-A::JH1",
+              "pin": "PWR"
+            },
+            "negative": {
+              "connector": "harness-board-A::JH1",
+              "pin": "RET"
+            },
+            "value": 12.0
+          },
+          {
+            "id": "board-B-load",
+            "type": "current_load",
+            "positive": {
+              "connector": "harness-board-B::JH1",
+              "pin": "PWR"
+            },
+            "negative": {
+              "connector": "harness-board-B::JH1",
+              "pin": "RET"
+            },
+            "value": 4.0
+          }
+        ]
+      },
+      "spike.harness-si": {
+        "selection": {
+          "pair_id": "aggressor-pair"
+        },
+        "source": "Differential scalar modal model derived from the checked geometry RLGC artifact",
+        "model_input": {}
+      },
+      "spike.harness-mtl-evidence": {
+        "status": "external-example-artifact",
+        "request": "mtl-request.json",
+        "result": "mtl-result.json"
+      }
+    },
+    "provenance": {
+      "source": "Original synthetic SPIKE interboard harness; no imported board pinout or measured cable data"
+    }
+  },
+  "wire_ids": [
+    "pwr",
+    "return"
+  ],
+  "ground": {
+    "connector": "harness-board-A::JH1",
+    "pin": "RET"
+  },
+  "contacts": [],
+  "terminals": [
+    {
+      "id": "board-A-source",
+      "type": "voltage_source",
+      "positive": {
+        "connector": "harness-board-A::JH1",
+        "pin": "PWR"
+      },
+      "negative": {
+        "connector": "harness-board-A::JH1",
+        "pin": "RET"
+      },
+      "value": 12.0
+    },
+    {
+      "id": "board-B-load",
+      "type": "current_load",
+      "positive": {
+        "connector": "harness-board-B::JH1",
+        "pin": "PWR"
+      },
+      "negative": {
+        "connector": "harness-board-B::JH1",
+        "pin": "RET"
+      },
+      "value": 4.0
+    }
+  ]
+}

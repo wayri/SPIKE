@@ -2,6 +2,8 @@
 # Copyright (c) 2026 SigHarmonic
 """Runtime admission and topology-overlay checks for finite-volume PEEC."""
 
+import hashlib
+import json
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -129,6 +131,15 @@ class VolumeAdapterTests(unittest.TestCase):
                  / "sources" / "Marble-v1.4.4" / "design" / "Marble.kicad_pcb")
         if not board.is_file():
             self.skipTest("pinned public Marble board has not been fetched")
+        # Native KiCad connectivity/filled-zone facts bind this optional oracle
+        # to the exact public source, rather than the earlier mirrored-pad import.
+        evidence = json.loads((Path(__file__).resolve().parents[2] / "docs" /
+            "validation" / "parity" / "WF01-S04B-marble-native-connectivity.json"
+            ).read_text(encoding="utf-8"))
+        self.assertEqual(hashlib.sha256(board.read_bytes()).hexdigest(), evidence["sha256"])
+        native_pads = {item["name"]: item for item in evidence["pads"]}
+        for name in ("U37.18", "R195.1", "C383.1"):
+            self.assertIn("C383.1", native_pads[name]["connected_items"])
         design = _design_from_kicad(str(board))
         net = "Net-(C383-Pad1)"
         for field in ("tracks", "vias", "pads", "zones"):
@@ -140,18 +151,33 @@ class VolumeAdapterTests(unittest.TestCase):
         self.assertFalse(mesh.truncated)
         pads = {str(item.get("component_pad")): item for item in design.pads}
 
-        def pad_node(name):
+        def pad_node(name, target_mesh):
             pad = pads[name]
-            return nearest_mesh_node(mesh, {"id": name, "net": net,
+            return nearest_mesh_node(target_mesh, {"id": name, "net": net,
                 "position_mm": pad["at"], "layer": pad.get("layer", "F.Cu"),
                 "geometry_anchor": {"id": pad["id"], "type": "pad"}}, net)
 
-        source, routed, isolated = (pad_node(name) for name in
+        source, routed, zone_connected = (pad_node(name, mesh) for name in
                                     ("U37.18", "R195.1", "C383.1"))
         self.assertIsNotNone(source)
         component_nodes, _ = _connected_component(mesh, net, source)
         self.assertIn(routed, component_nodes)
-        self.assertNotIn(isolated, component_nodes)
+        self.assertIn(zone_connected, component_nodes)
+
+        # Removing the actual connecting copper must separate the pad again.
+        # R195.1 also relies on the zone/via path from its front-copper layer.
+        design.zones = []
+        without_zone = build_hybrid_mesh(design, AnalysisSpec(mode="ac", net_names=[net],
+            mesh={"target_size_mm": 1.0, "zone_cell_mm": 1.0,
+                  "max_zone_cells": 1000, "max_conductors": 2000}))
+        self.assertFalse(without_zone.truncated)
+        no_zone_source = pad_node("U37.18", without_zone)
+        self.assertIsNotNone(no_zone_source)
+        separated_nodes, _ = _connected_component(without_zone, net, no_zone_source)
+        for name in ("C383.1", "R195.1"):
+            separated = pad_node(name, without_zone)
+            self.assertIsNotNone(separated)
+            self.assertNotIn(separated, separated_nodes)
 
 
 if __name__ == "__main__":

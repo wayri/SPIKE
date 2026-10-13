@@ -16,6 +16,21 @@ from python.spike_core.mcp_server import McpServer, PROTOCOL_VERSION, TOOLS, ser
 
 
 class McpServerTests(unittest.TestCase):
+    def test_thermal_contact_number_schema_and_actual_worker_admission(self):
+        from examples.assembly_field.run_examples import setup
+        request, problem = setup()
+        server = McpServer(SpikeAutomation())
+        schema = TOOLS['spike_prepare_thermal_contact'].schema()
+        self.assertEqual(schema['properties']['contact_id']['type'], 'string')
+        self.assertEqual(schema['properties']['thermal_resistance_k_per_w']['type'], 'number')
+        args = {'request': request, 'problem': problem, 'contact_id': 'contact', 'thermal_resistance_k_per_w': .25}
+        result = server.call_tool('spike_prepare_thermal_contact', args)
+        self.assertFalse(result['isError'])
+        self.assertEqual(result['structuredContent']['thermal_resistance_k_per_w'], .25)
+        for value in [True, float('nan'), '0.25']:
+            with self.assertRaises(ValueError):
+                server.call_tool('spike_prepare_thermal_contact', {**args, 'thermal_resistance_k_per_w': value})
+
     def setUp(self):
         self.calls = []
 
@@ -42,7 +57,7 @@ class McpServerTests(unittest.TestCase):
         self.assertEqual(self.rpc(0, "tools/list")["error"]["code"], -32002)
         initialized = self.initialize()["result"]
         self.assertEqual(initialized["protocolVersion"], PROTOCOL_VERSION)
-        self.assertEqual(initialized["capabilities"], {"tools": {"listChanged": False}})
+        self.assertEqual(initialized["capabilities"], {"tools": {"listChanged": False}, "resources": {"subscribe": False, "listChanged": False}})
         self.assertIsNone(self.server.handle({"jsonrpc": "2.0", "method": "notifications/initialized"}))
         self.assertEqual(self.rpc(2, "ping")["result"], {})
         listed = self.rpc(3, "tools/list")["result"]["tools"]

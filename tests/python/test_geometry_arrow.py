@@ -115,7 +115,8 @@ class GeometryArrowTests(unittest.TestCase):
             validate_geometry_arrow(data, fixture())
 
     def test_exact_curved_boundaries_use_deterministic_arrow_v3(self):
-        legacy = fixture(path=True).to_v1()
+        # This authors a transport fixture; no legacy numerical solve is requested.
+        legacy = fixture(path=True).to_v1(allow_unprojected_arcs=True)
         legacy.zones = [{
             "id": "Z-CURVE", "net_name": "VCC", "layer": "TOP",
             "boundary_rings": [

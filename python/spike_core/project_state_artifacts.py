@@ -86,10 +86,16 @@ def externalize_result_state(payload: dict[str, Any]) -> tuple[dict[str, Any], d
         if value.get("contract") == STATE_REFERENCE:
             return copy.deepcopy(value)
         contract = str(value.get("contract", ""))
+        if contract == "spike/parallel-workspace/v1":
+            # Batch digests bind inline requests exactly; only the saved result
+            # envelopes may become references, never nested request inputs.
+            return {**copy.deepcopy({name: item for name, item in value.items() if name != "runs"}),
+                    "runs": [{**copy.deepcopy({name: item for name, item in run.items() if name != "result"}),
+                              "result": walk(run.get("result"), "result")} for run in value["runs"]]}
         # The file digest binds the complete field-study envelope, including
         # its nested result. Replacing that result with an artifact reference
         # would make the retained record fail its own import admission.
-        if contract == ASSEMBLY_FIELD_STUDY:
+        if contract in {ASSEMBLY_FIELD_STUDY, "spike/assembly-em-study/v1"}:
             return copy.deepcopy(value)
         is_result = bool(value) and (
             key in {"latest_result", "active_result", "bundle", "latest_channel_result", "field_result"}
@@ -127,6 +133,10 @@ def hydrate_result_state(value: Any, path: str | Path, digest: str) -> Any:
             return [walk(child) for child in item]
         if not isinstance(item, dict):
             return item
+        if item.get("contract") == "spike/parallel-workspace/v1":
+            return {**copy.deepcopy({key: child for key, child in item.items() if key != "runs"}),
+                    "runs": [{**copy.deepcopy({key: child for key, child in run.items() if key != "result"}),
+                              "result": walk(run.get("result"))} for run in item["runs"]]}
         if item.get("contract") == STATE_REFERENCE:
             name = item["path"]
             if name not in cache:

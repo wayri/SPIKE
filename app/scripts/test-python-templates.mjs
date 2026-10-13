@@ -67,6 +67,8 @@ for (const id of smokeIds) {
 }
 
 const executionMethods = new Map([
+  ["run-cosimulation-request", { method: "run_cosimulation", key: "request", value: {} }],
+  ["compare-digital-twin-request", { method: "compare_digital_twin", key: "request", value: {} }],
   ["run-dc-request", { method: "run_analysis", key: "spec", value: { mode: "dc" } }],
   ["run-ac-request", { method: "run_analysis", key: "spec", value: { mode: "ac" } }],
   ["run-si-workflow-request", { method: "run_si_workflow", key: "request", value: {} }],

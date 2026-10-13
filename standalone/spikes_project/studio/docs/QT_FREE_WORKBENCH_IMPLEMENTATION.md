@@ -4,6 +4,12 @@ Status: partial implementation, not a release. The installed beta.6 is unchanged
 
 ## Working changes
 
+- Schematic net navigation has a searchable nets/pins viewer with terminal
+  cross-probing, whole-net canvas highlights and voltage-probe insertion. It
+  reports disconnected drawing groups without mislabeling them as electrically
+  disconnected: equal named nodes remain connected by the source. Closing the
+  viewer clears the transient highlight. This is not an electrical-rule checker.
+
 - `.MODEL` placement now exposes all existing native semiconductor terminals to
   drawing, hit testing and routing. MOSFET gate/bulk and BJT base connections edit
   only terminal tokens, preserving model names and parameter suffixes. Electrical
@@ -128,6 +134,33 @@ evidence directory. Any changed source manifest or evidence artifact blocks
 release. Missing gate evidence is not inferred from passing unit tests.
 
 ## Still required from the approved plan
+
+### KiCad-like schematic maker and viewer acceptance track
+
+The requested destination is a full schematic authoring tool, not just a
+netlist layout viewer. The current source-authoritative editor does not meet
+that destination. Complete it in two implementation stages:
+
+1. Authoritative graph and authoring: empty-sheet creation without a runnable
+   deck; stable symbol-unit/pin/net identities; explicit power symbols, labels,
+   buses/bus entries and no-connect markers; wire deletion/splitting with
+   electrical reconnection; placement and continuous orthogonal routing;
+   connectivity-preserving drag; block copy/paste/delete and undo/redo;
+   multi-unit labeled IC symbols; synchronized complete properties; netlist
+   generation from the graph rather than global node-name rewriting.
+2. Hierarchy, verification and exchange: sheet navigator and port cross-probing;
+   hierarchical buses and repeated instances; annotation, symbol-library
+   management, pin-type ERC with waiver evidence, search/cross-reference and
+   print/SVG/PDF export; reviewed KiCad schematic/symbol import/export with
+   loss reports; large-sheet interaction tests; real screenshots and editing
+   tutorials; migration/save/reopen compatibility.
+
+Current KiCad import preserves an inventory and original text only. It does
+not translate electrical connectivity. No KiCad round-trip or full-editor
+parity claim is permitted until graph migration, pin/net/hierarchy comparisons,
+edit/undo/save/reopen tests, and actual GUI interactions pass. Existing source
+circuits must remain preserved and simulation must retain explicit backend
+selection throughout that migration.
 
 Stage A remains incomplete: authoritative hierarchical semantic graph and v1
 migration, full `.SUBCKT`/dependency paste and symbol placement, persistent unified

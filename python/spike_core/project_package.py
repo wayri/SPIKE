@@ -23,6 +23,7 @@ from .assembly_designs import AssemblyDesignError, canonicalize_assembly_designs
 from .project_design_artifacts import validate_design_source_artifacts as _validate_design_source_artifacts
 from .project_geometry_index import build_geometry_members, validate_geometry_index
 from .project_package_limits import PackageLimits
+from .project_parallel_state import admit_payload_parallel, admit_archive_parallel
 
 
 PROJECT_FORMAT_V3 = "spike-project-package/v3"
@@ -197,6 +198,8 @@ def _validate_profile_content(
         raise ProjectPackageError(f"Unsupported SPIKE package profile: {profile or 'missing'}")
     names = set(member_names)
     if profile == "design_exchange":
+        if (payload.get("analyses", {}).get("parallel_execution") or {}).get("runs"):
+            raise ProjectPackageError("A design_exchange package cannot contain parallel execution runs.")
         if _has_payload_content(payload.get("results", {})):
             raise ProjectPackageError("A design_exchange package cannot contain populated result metadata.")
         if _has_payload_content(payload.get("reports", {})):
@@ -257,7 +260,7 @@ def _minimal_v2_design(legacy: Mapping[str, Any]) -> SpiDeRV2:
     return SpiDeRV2.from_v1(legacy_design, source_digest=digest)
 
 
-def migrate_legacy_payload(raw: Mapping[str, Any]) -> Dict[str, Any]:
+def migrate_legacy_payload(raw: Mapping[str, Any], *, validate_parallel: bool = True) -> Dict[str, Any]:
     """Migrate a v1/v2 JSON package in memory without discarding unknown data."""
 
     source_format = str(raw.get("format", ""))
@@ -267,7 +270,7 @@ def migrate_legacy_payload(raw: Mapping[str, Any]) -> Dict[str, Any]:
     design = _minimal_v2_design(raw)
     project_name = str(project.get("name") or "migrated.spike")
     project_id = str(project.get("id") or canonical_uuid("spike", content_digest(raw), "project", project_name))
-    return {
+    payload = {
         "project": {**project, "id": project_id, "name": project_name},
         "workspace": raw.get("workspace"),
         "design_ir": design.to_dict(),
@@ -282,6 +285,9 @@ def migrate_legacy_payload(raw: Mapping[str, Any]) -> Dict[str, Any]:
         },
         "audit": [{"event": "project_migrated", "from": source_format, "to": PROJECT_FORMAT_V3}],
     }
+    if validate_parallel:
+        admit_payload_parallel(payload)
+    return payload
 
 
 def _validate_assembly_model_references(
@@ -318,6 +324,9 @@ def build_package_members(
 ) -> Dict[str, bytes]:
     """Build the canonical member map without writing to disk."""
 
+    payload = dict(payload)
+    payload["analyses"] = dict(payload.get("analyses") or {})
+    admit_payload_parallel(payload, resolve=lambda name: (preserved_members or {})[name])
     if not isinstance(payload.get("project"), Mapping):
         raise ProjectPackageError("A v3 project payload requires project metadata.")
     design_ir = payload.get("design_ir")
@@ -432,7 +441,7 @@ def write_spike_package(
     report_artifacts: Optional[Mapping[str, bytes]] = None,
     preserved_members: Optional[Mapping[str, bytes]] = None,
     application_version: str = __version__,
-    manifest_signer: ManifestSigner | None = None,
+    manifest_signer: ManifestSigner | None = None, expected_manifest_payload_sha256: str | None = None,
 ) -> Dict[str, Any]:
     if profile not in PROJECT_PROFILES:
         raise ProjectPackageError(f"Unknown SPIKE package profile: {profile}")
@@ -474,6 +483,7 @@ def write_spike_package(
             "model_index": "spike/model-index/v1",
             "geometry_index": "spike/geometry-index/v1",
             "workspace": "spike/workspace-state/v1",
+            "parallel_execution": "spike/parallel-workspace/v1",
         },
         "audit_identity": {"project_id": project_id, "design_id": payload["design_ir"].get("design_id", "")},
         "members": [asdict(item) for item in member_records],
@@ -493,7 +503,6 @@ def write_spike_package(
         }
         manifest["signature"] = _validate_signature_envelope(signature, signed_payload)
     manifest_bytes = _json_bytes(manifest)
-
     destination.parent.mkdir(parents=True, exist_ok=True)
     file_descriptor, temporary_name = tempfile.mkstemp(prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent)
     os.close(file_descriptor)
@@ -503,7 +512,8 @@ def write_spike_package(
             archive.writestr(_zip_info("manifest.json"), manifest_bytes)
             for name, data in members.items():
                 archive.writestr(_zip_info(_safe_member_path(name)), data)
-        os.replace(temporary, destination)
+        from .project_package_write_lock import replace_package
+        replace_package(temporary, destination, expected_manifest_payload_sha256)
     except BaseException:
         temporary.unlink(missing_ok=True)
         raise
@@ -664,10 +674,15 @@ def read_spike_package(
                 return json.loads(payload_data[name]) if name in declared else default
 
             design_ir = read_json("design/design-ir.json", {})
+            try:
+                validated_design = SpiDeRV2.from_dict(design_ir)
+            except (TypeError, ValueError) as exc:
+                raise ProjectPackageError(f"Package design/design-ir.json is invalid: {exc}") from exc
             geometry_index = validate_geometry_index(
                 read_json("geometry/index.json", {"contract": "spike/geometry-index/v1", "tables": []}),
                 {name: str(record.get("sha256", "")) for name, record in declared.items()},
                 design_ir,
+                validated_design=validated_design,
                 safe_member_path=_safe_member_path,
                 error_type=ProjectPackageError,
             )
@@ -680,7 +695,7 @@ def read_spike_package(
             try:
                 assembly_designs = canonicalize_assembly_designs(
                     read_json("design/assembly-designs.json", {}),
-                    design_ir, assembly_ir,
+                    design_ir, assembly_ir, validated_active=validated_design,
                 )
             except AssemblyDesignError as exc:
                 raise ProjectPackageError(f"Package assembly design set is invalid: {exc}") from exc
@@ -734,6 +749,7 @@ def read_spike_package(
                     raise ProjectPackageError(f"Audit event {line_number} is not a JSON object.")
                 audit.append(event)
             payload["audit"] = audit
+            admit_archive_parallel(payload, archive, infos, declared)
             if payload["design_ir"].get("contract") != "spike/design-ir/v2":
                 raise ProjectPackageError("Package design/design-ir.json is not SpiDeR v2.")
             _validate_profile_content(profile, payload, declared)

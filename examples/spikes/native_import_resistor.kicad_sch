@@ -1,0 +1,28 @@
+(kicad_sch
+ (version 20250114) (generator "spikes_tests")
+ (uuid "10000000-0000-0000-0000-000000000001") (paper "A4")
+ (lib_symbols
+  (symbol "SPIKES:R" (pin_names (offset 0)) (in_bom yes) (on_board yes)
+   (property "Reference" "R" (at 0 2.54 0) (effects (font (size 1.27 1.27))))
+   (property "Value" "R" (at 0 -2.54 0) (effects (font (size 1.27 1.27))))
+   (symbol "R_0_1"
+    (rectangle (start -2.54 1.27) (end 2.54 -1.27)
+     (stroke (width 0) (type default)) (fill (type none))))
+   (symbol "R_1_1"
+    (pin passive line (at -5.08 0 0) (length 2.54)
+     (name "1" (effects (font (size 1.27 1.27)))) (number "1" (effects (font (size 1.27 1.27)))))
+    (pin passive line (at 5.08 0 180) (length 2.54)
+     (name "2" (effects (font (size 1.27 1.27)))) (number "2" (effects (font (size 1.27 1.27))))))))
+ (label "IN" (at 44.92 50 0) (effects (font (size 1.27 1.27)))
+  (uuid "10000000-0000-0000-0000-000000000002"))
+ (label "GND" (at 55.08 50 0) (effects (font (size 1.27 1.27)))
+  (uuid "10000000-0000-0000-0000-000000000003"))
+ (symbol (lib_id "SPIKES:R") (at 50 50 0) (unit 1) (in_bom yes) (on_board yes) (dnp no)
+  (uuid "10000000-0000-0000-0000-000000000004")
+  (property "Reference" "R1" (at 50 46 0) (effects (font (size 1.27 1.27))))
+  (property "Value" "1k" (at 50 54 0) (effects (font (size 1.27 1.27))))
+  (pin "1" (uuid "10000000-0000-0000-0000-000000000005"))
+  (pin "2" (uuid "10000000-0000-0000-0000-000000000006"))
+  (instances (project "native_import_resistor"
+   (path "/10000000-0000-0000-0000-000000000001" (reference "R1") (unit 1)))))
+ (sheet_instances (path "/" (page "1"))))

@@ -250,14 +250,18 @@ future graph, collision, contact, and multi-constraint solving. Valid
 parent-frame chains are checked for missing parents
 and cycles and composed for viewport display. Per-part visibility and opacity
 are stored under a namespaced AssemblyIR presentation extension through the
-same verified-manifest transaction. Temporary isolation and axis/offset section
-planes operate only on cloned glTF/GLB viewport materials; they do not alter
-geometry, define solver regions, or imply STEP visualization. The bounded
-six-plane MCAD section box is likewise temporary and visual-only: one shared
-clipping builder applies it to glTF/GLB visuals and exact-selector previews,
-while invalid, non-finite, or inverted bounds disable clipping. Its state is
-not persisted to AssemblyIR/package and it has no topology, mesh, solver, or
-physics semantics.
+same verified-manifest transaction. Temporary isolation remains viewport-only.
+The saved 3-D presentation state supports one axis plane, a bounded six-plane
+box, or up to six enabled user planes defined by an assembly-space normal,
+signed origin offset, and retained-side flip. Normals are normalized before
+rendering. One shared builder transforms planes through the viewport center,
+Y reflection, and uniform scale. The resulting planes clip boards, harnesses,
+aligned result overlays, glTF/GLB parts, and exact-selector previews; pick tests
+use the same retained half-spaces. Exploded board, harness, and aligned-result
+offsets remain display-only. Invalid, non-finite, zero-normal, or inverted
+section inputs apply no clipping. Section state is retained with project
+analysis presentation settings, not AssemblyIR, and does not alter physical
+coordinates, 2-D layout, topology, meshes, solver inputs, or physics.
 
 The Assembly hierarchy now reports a viewport-only state for each part:
 pending, ready, failed, hidden, unavailable, or STEP awaiting tessellation.

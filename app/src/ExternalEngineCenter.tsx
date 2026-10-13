@@ -2,6 +2,8 @@ import { solverReadinessLabel } from "./solverReadinessLabel";
 import DataTable from "./DataTable";
 import { Activity, Box, CheckCircle2, Cpu, FileCode2, Gauge, Play, RefreshCw, Save, ShieldAlert, Trash2, X, Zap } from "./icons";
 import { useMemo, useState, type ReactNode } from "react";
+import ParallelWorkerPanel from "./ParallelWorkerPanel";
+import type { ParallelWorkspace } from "./parallelWorkspace";
 
 export type ExternalEngineCatalogEntry = {
   id: string;
@@ -75,6 +77,8 @@ export type SolverManagerCatalog = {
 };
 
 type Props = {
+  parallelWorkspace?: ParallelWorkspace;
+  onParallelWorkspaceChange?: (next: ParallelWorkspace) => void;
   extensionWorkflows?: ReactNode;
   engines: ExternalEngineCatalogEntry[];
   accelerators: AccelerationCatalogEntry[];
@@ -143,6 +147,8 @@ const engineReadiness = (engine: ExternalEngineCatalogEntry): Readiness[] => {
 };
 
 export default function ExternalEngineCenter({
+  parallelWorkspace,
+  onParallelWorkspaceChange,
   engines,
   accelerators,
   manager,
@@ -161,7 +167,7 @@ export default function ExternalEngineCenter({
   onSelectSolver,
   extensionWorkflows,
 }: Props) {
-  const [section, setSection] = useState<"engines" | "acceleration" | "manager" | "extensions">("engines");
+  const [section, setSection] = useState<"engines" | "acceleration" | "manager" | "pool" | "extensions">("engines");
   const [selectedId, setSelectedId] = useState("external.openems");
   const [registrationPath, setRegistrationPath] = useState("");
   const [workloadId, setWorkloadId] = useState("dc_pi");
@@ -207,11 +213,12 @@ export default function ExternalEngineCenter({
         <button className={section === "engines" ? "selected" : ""} onClick={() => setSection("engines")}><Box size={14} /> Engines</button>
         <button className={section === "acceleration" ? "selected" : ""} onClick={() => setSection("acceleration")}><Cpu size={14} /> Acceleration</button>
         <button className={section === "manager" ? "selected" : ""} onClick={() => setSection("manager")}><Gauge size={14} /> Solver manager</button>
+        <button className={section === "pool" ? "selected" : ""} onClick={() => setSection("pool")}><Cpu size={14} /> Worker pool</button>
         {extensionWorkflows && <button className={section === "extensions" ? "selected" : ""} onClick={() => setSection("extensions")}><Box size={14} /> Extension workflows</button>}
         <button className="engine-refresh" onClick={onRefresh} disabled={busy}><RefreshCw size={13} /> Detect</button>
       </div>
 
-      {section === "extensions" ? <article className="engine-detail">{extensionWorkflows}</article> : section === "engines" ? <div className="engine-layout">
+      {section === "pool" ? <ParallelWorkerPanel workspace={parallelWorkspace} onWorkspaceChange={onParallelWorkspaceChange} /> : section === "extensions" ? <article className="engine-detail">{extensionWorkflows}</article> : section === "engines" ? <div className="engine-layout">
         <nav className="engine-list" aria-label="External engines">{visibleEngines.map(engine => <button key={engine.id} className={selected?.id === engine.id ? "selected" : ""} onClick={() => setSelectedId(engine.id)}>
           <span className={`engine-dot ${available(engine.state) ? "ready" : "gated"}`} />
           <span><b>{engine.name}</b><small>{readableState(engine.state)}</small></span>

@@ -3,26 +3,12 @@ name: Windows x64 package
 on:
   workflow_call:
   workflow_dispatch:
-    inputs:
-      verified_run_id:
-        description: Successful Windows package run to publish (empty builds only)
-        type: string
-        default: ''
-      release_commit:
-        description: Exact reviewed commit used by that Windows build
-        type: string
-        default: ''
-      human_review_complete:
-        description: Required maintainer and numerical review is complete
-        type: boolean
-        default: false
 
 permissions:
   contents: read
 
 jobs:
   build:
-    if: inputs.verified_run_id == ''
     runs-on: windows-2022
     timeout-minutes: 90
     steps:
@@ -57,28 +43,3 @@ jobs:
           path: dist-release/*
           if-no-files-found: error
           retention-days: 14
-  publish-verified:
-    if: github.event_name == 'workflow_dispatch' && inputs.verified_run_id != '' && inputs.human_review_complete
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-      actions: read
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: actions/download-artifact@v4
-        with:
-          name: SPIKE-windows-x64
-          path: dist-release
-          run-id: ${{ inputs.verified_run_id }}
-          github-token: ${{ github.token }}
-      - name: Verify build identity and publish reviewed Windows preview
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERIFIED_WINDOWS_RUN: ${{ inputs.verified_run_id }}
-          REVIEWED_RELEASE_COMMIT: ${{ inputs.release_commit }}
-        run: python scripts/publish_verified_windows.py

@@ -1,0 +1,16 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.assembly-airflow-panel { margin: 12px 0; padding: 10px; border: 1px solid var(--table-border); min-width: 0; }
+.assembly-airflow-panel summary { cursor: pointer; font-weight: 600; }
+.assembly-airflow-panel p { overflow-wrap: anywhere; }
+.assembly-airflow-panel fieldset { margin: 10px 0; min-width: 0; border: 1px solid var(--table-border); }
+.assembly-airflow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 10px; align-items: end; margin: 8px 0; }
+.assembly-airflow-grid > *, .assembly-airflow-panel label { min-width: 0; overflow-wrap: anywhere; }
+.assembly-airflow-panel label { display: flex; flex-direction: column; gap: 4px; }
+.assembly-airflow-panel input, .assembly-airflow-panel select, .assembly-airflow-panel textarea { box-sizing: border-box; max-width: 100%; font: inherit; min-height: 28px; padding: 4px 6px; }
+.assembly-airflow-panel input[type=checkbox] { align-self: flex-start; min-height: auto; }
+.assembly-airflow-panel textarea { width: 100%; min-height: 180px; font-family: monospace; }
+.assembly-airflow-toolbar { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+.assembly-airflow-material { margin: 12px 0; }
+.assembly-airflow-material strong { overflow-wrap: anywhere; }
+.assembly-airflow-fields svg { width: 100%; max-height: 450px; border: 1px solid var(--table-border); margin-top: 10px; }
+.assembly-airflow-fields text { font-size: 12px; }

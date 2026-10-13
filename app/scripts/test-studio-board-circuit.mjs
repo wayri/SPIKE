@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import {importTestTypescript} from "./import-test-typescript.mjs";
+const {extractStudioBoardCircuit,studioBindingFingerprint}=await importTestTypescript("studioBoardCircuit");
+const part=(id,x,y)=>({id,ref:id,value:"10k",at:[x,y],width:2,height:1,rotation:90,layer:"F.Cu"});
+const pin=(id,ref,name,x,y,net)=>({id,ref,name,at:[x,y],net,type:"smd"});
+const board={width:40,height:20,bounds:{minX:0,minY:0,maxX:40,maxY:20},components:[part("R1",5,5),part("U2",25,8)],pads:[pin("p1","R1","1",4,5,"1"),pin("p2","R1","2",6,5,"2"),pin("p3","U2","1",24,8,"1")],nets:{1:"VCC",2:"GND"},tracks:[{id:"t",net:"1",start:[4,5],end:[24,8],width:.25,layer:"F.Cu"}],zones:[]};
+const workspace={name:"Example",models:[{id:"r",kind:"primitive",primitive:"resistor",pins:["1","2"],value:"10k"}],assignments:[{id:"a",component_ref:"R1",model_id:"r",enabled:true,pin_bindings:[{model_pin:"1",pad_id:"p1",board_net:"1",circuit_node:"VCC"},{model_pin:"2",pad_id:"p2",board_net:"2",circuit_node:"GND"}]}]};
+const digest="a".repeat(64),graph=extractStudioBoardCircuit(board,workspace,digest,"board-a");
+assert.deepEqual(graph.components[0].placement,{x_mm:5,y_mm:5,rotation_deg:90,side:"top"});
+assert.equal(graph.components[0].model_binding.status,"unavailable","an inferred or unchecked part is never executable");
+assert.equal(graph.nets.find(net=>net.id==="1").pins.length,2);
+assert(graph.wires.some(wire=>wire.style==="wire"));
+assert(graph.wires.every(wire=>wire.points_mm.every(point=>point.every(Number.isFinite))));
+assert.equal(graph.components[0].cross_selection_id,`${digest}:board-a:R1`);
+const reviewed=extractStudioBoardCircuit(board,workspace,digest,"board-a",{R1:studioBindingFingerprint(workspace,"R1")});
+assert.equal(reviewed.components[0].model_binding.status,"reviewed");
+const edited={...workspace,models:[{...workspace.models[0],value:"20k"}]};
+assert.equal(extractStudioBoardCircuit(board,edited,digest,"board-a",{R1:studioBindingFingerprint(workspace,"R1")}).components[0].model_binding.status,"unavailable","model changes invalidate confirmation");
+const dense={...board,components:Array.from({length:8},(_,i)=>part(`J${i}`,i*3,10)),pads:Array.from({length:8},(_,i)=>pin(`q${i}`,`J${i}`,"1",i*3,10,"1"))};
+assert(extractStudioBoardCircuit(dense,workspace,digest).wires.every(wire=>wire.style==="label"),"high-fanout nets use readable labels");
+assert.throws(()=>extractStudioBoardCircuit({...board,components:[...board.components,board.components[0]]},workspace,digest),/Duplicate/);
+assert.throws(()=>extractStudioBoardCircuit(board,workspace,"stale"),/digest/);
+assert.throws(()=>extractStudioBoardCircuit({...board,nets:{1:"VCC",2:"VCC"}},workspace,digest),/Ambiguous/);
+assert.throws(()=>extractStudioBoardCircuit({...board,pads:[...board.pads,pin("duplicate","R1","1",4,5,"2")]},workspace,digest),/Conflicting/);
+assert.equal(extractStudioBoardCircuit({...board,nets:{...board.nets,0:""},pads:[...board.pads,pin("unconnected","R1","3",5,5,"0")]},workspace,digest).components[0].pins.length,2,"unconnected pad zero never creates a fake shared net");
+console.log("Studio board circuit: placement, exact connectivity, orthogonal/label routes, binding confirmation and source identity passed");

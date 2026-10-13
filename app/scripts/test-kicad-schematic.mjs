@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import ts from "typescript";
+const source=readFileSync(new URL("../src/kicadSchematicModel.ts",import.meta.url),"utf8");
+const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {normalizeSchematicDocument,restoreSchematicWorkspace,boardNetForSchematic,schematicSelectionForBoard}=await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
+const doc={contract:"spike/kicad-schematic-view/v1",source:{file_name:"original.kicad_sch",sha256:"a".repeat(64),format:"kicad_sch",units:"mm"},pages:[{id:"one",name:"Root",sheet_path:"/",source_file:"original.kicad_sch",view_box:[0,0,297,210],svg:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 297 210"><path d="M 1 1 L 2 2"/></svg>'}],symbols:[{id:"u1",reference:"U1",value:"Part",source_uuid:"b",page_id:"one",sheet_path:"/",source_file:"original.kicad_sch",position_mm:{x:10,y:20},hit_box_mm:{x:5,y:15,width:10,height:10,quality:"approximate_source_anchor"},nets:["schematic/rail"],pins:[{number:"1",uuid:"c"}]}],nets:[{code:"1",name:"schematic/rail",nodes:[{reference:"U1",pin:"1",symbol_ids:["u1"]}]}],source_files:[],diagnostics:[],limitations:[]};
+assert.equal(normalizeSchematicDocument(doc),doc);
+const board={pads:[{ref:"U1",name:"1",net:"actual-board-rail"},{ref:"U2",name:"1",net:"schematic/rail"}]};
+assert.equal(boardNetForSchematic(doc.nets[0],board),"actual-board-rail","cross-selection follows compiled pin identity instead of coincident net names");
+assert.deepEqual(schematicSelectionForBoard(doc,board,{ref:"U1",net:"actual-board-rail"}),{reference:"U1",netCode:"1"});
+assert.equal(boardNetForSchematic(doc.nets[0],{pads:[...board.pads,{ref:"U1",name:"1",net:"conflicting"}]}),null,"conflicting pins cannot silently select a net");
+assert.equal(boardNetForSchematic(doc.nets[0],{pads:[]}),null);
+const stored={document:doc,binding:{boardSha256:"b".repeat(64),boardName:"original.kicad_pcb",designId:null}};
+assert.deepEqual(restoreSchematicWorkspace(JSON.parse(JSON.stringify(stored))),stored,"portable schematic and explicit binding survive save/reopen");
+for(const svg of ['<svg><script>alert(1)</script></svg>','<svg onload="evil()"/>','<svg><image href="https://outside/x"/></svg>','<!DOCTYPE svg [<!ENTITY x SYSTEM "file:///x">]><svg/>']) assert.throws(()=>normalizeSchematicDocument({...doc,pages:[{...doc.pages[0],svg}]}));
+assert.throws(()=>normalizeSchematicDocument({...doc,symbols:[{...doc.symbols[0],page_id:"missing"}]}));
+assert.throws(()=>normalizeSchematicDocument({...doc,pages:[{...doc.pages[0],view_box:[0,0,NaN,210]}]}));
+assert.deepEqual(restoreSchematicWorkspace({document:{bad:true}}),{document:null,binding:null});
+console.log("Schematic identity, pin-based cross-selection, ambiguity rejection, SVG safety and portable save/reopen checks passed.");
+
+const generated=structuredClone(doc);generated.source={...generated.source,format:"odb++",units:"diagram",presentation:"generated_connectivity"};
+generated.symbols[0].position={x:10,y:20,units:"diagram"};generated.symbols[0].hit_box={x:5,y:15,width:10,height:10,quality:"generated",units:"diagram"};delete generated.symbols[0].position_mm;delete generated.symbols[0].hit_box_mm;
+assert.equal(normalizeSchematicDocument(generated),generated);
+assert.equal(boardNetForSchematic(generated.nets[0],board),"actual-board-rail");
+assert.throws(()=>normalizeSchematicDocument({...generated,source:{...generated.source,units:"mm"}}));
+assert.equal(restoreSchematicWorkspace({...stored,binding:{...stored.binding,occurrenceId:{bad:true}}}).binding,null);
+assert.equal(restoreSchematicWorkspace({...stored,binding:{...stored.binding,occurrenceId:"board-B"}}).binding.occurrenceId,"board-B");
+console.log("Generated diagram units, pin selection and scoped binding admission passed.");

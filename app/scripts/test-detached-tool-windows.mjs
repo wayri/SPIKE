@@ -42,6 +42,7 @@ assert.equal(model.normalizeDetachedToolAction({ kind: "unknown", type: "ready" 
 assert.equal(model.normalizeDetachedToolAction({ kind: "results", type: "ready" }, "probes"), null);
 assert.equal(model.normalizeDetachedToolAction({ kind: "probes", type: "row-action", rowId: "unsafe/id", actionId: "delete-probe" }), null);
 assert.equal(model.normalizeDetachedToolSnapshot({ kind: "probes", title: "x", revision: 0, columns: ["x"], rows: [{ id: "unsafe/id", cells: ["x"] }] }).rows.length, 0);
+assert.match(await (await import("node:fs/promises")).readFile(new URL("../src/detachedToolWindows.tsx", import.meta.url), "utf8"), /skipTaskbar:\s*false/, "detached native tools retain independent Windows taskbar entries");
 
 const nativeHandle = () => {
   const handlers = new Map();

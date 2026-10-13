@@ -1,6 +1,6 @@
 """Stable application contracts and local analysis service for SPIKE."""
 
-__version__ = "0.3.10"
+__version__ = "0.3.11-gamma.1"
 
 from .capabilities import capabilities
 from .capability_ledger import native_capability_ledger
@@ -11,7 +11,6 @@ from .spider_v2 import AssemblyIRV1, SpiDeRV2
 DesignIR = SpiDeR
 DesignIRV2 = SpiDeRV2
 from .assembly_resources import estimate_assembly_resources
-from .extensions import ExtensionManifest, ExtensionRegistry
 from .native_solver_contracts import NativeSolveRequest, NativeSolveResult, NativeSolverDescriptor
 from .field_circuit_cosim import run_iterative_field_circuit_cosimulation, validate_field_circuit_request
 from .peec_field_provider import NativePeecFieldReductionProvider
@@ -40,6 +39,15 @@ from .spikes_layout_geometry_handoff import (
     canonical_designir_layout_handoff_json,
     validate_designir_layout_handoff_identity,
 )
+
+
+def __getattr__(name):
+    # Keep narrow runtime entry points free of the extension adapter import.
+    # Public compatibility exports remain available when explicitly requested.
+    if name in {"ExtensionManifest", "ExtensionRegistry"}:
+        from . import extensions
+        return getattr(extensions, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
     "DesignIR",

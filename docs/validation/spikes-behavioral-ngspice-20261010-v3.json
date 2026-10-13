@@ -1,0 +1,1473 @@
+{
+  "contract": "spikes/competitive-benchmark-report/v1",
+  "corpus": {
+    "case_count": 14,
+    "classes": [
+      "behavioral_sources",
+      "convergence",
+      "converter",
+      "dc",
+      "electrical_surrogate",
+      "energy_storage",
+      "ideal_pulse_load",
+      "ideal_pwm_buck",
+      "motor",
+      "operating_point",
+      "passive_rc",
+      "passive_rl",
+      "passive_rlc",
+      "rf",
+      "ringing",
+      "same_model",
+      "scalar_measurement",
+      "small",
+      "smps",
+      "switching",
+      "transient"
+    ],
+    "missing_required_classes": [
+      "medium",
+      "large",
+      "ac",
+      "noise",
+      "physical_motor_mechanics",
+      "compact_models",
+      "robustness",
+      "thread_scaling",
+      "peak_memory"
+    ]
+  },
+  "engines": [
+    {
+      "aggregate": {
+        "median_case_elapsed_ns": 854424400
+      },
+      "cases": [
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.divider.equal",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 5.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "3b7b5b098e97f646bf59665e5021bffd89045078be0553b293d0cff64c0fb0ff",
+            "probe": "V(out)",
+            "title": "Equal divider"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 958561500,
+          "observed": {
+            "maximum": 5.0,
+            "median": 5.0,
+            "minimum": 5.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            958561500
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.divider.unequal",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 4.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "557d255f6cd240f22c1e8f51a2a7cc4237664bbd4f326c5f5b4514d0b4726f49",
+            "probe": "V(out)",
+            "title": "Unequal divider"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 824485200,
+          "observed": {
+            "maximum": 4.0,
+            "median": 4.0,
+            "minimum": 4.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            824485200
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.current_load",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 2.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "219a6e4bb9e4b56629dafe3ced6d3b2f298f45240ee597a7282307669f0db62c",
+            "probe": "V(out)",
+            "title": "Current source load"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 842713100,
+          "observed": {
+            "maximum": 2.0,
+            "median": 2.0,
+            "minimum": 2.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            842713100
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 5e-05,
+            "case_id": "transient.rc_step",
+            "classes": [
+              "small",
+              "transient",
+              "same_model",
+              "scalar_measurement",
+              "passive_rc"
+            ],
+            "expected": 0.6339538400081017,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.00101
+            },
+            "netlist_sha256": "812c12b9506b83f0606b56bac56e3b6faafd29730d1cdc2ff23c105c47ff6db1",
+            "probe": "V(out)",
+            "title": "RC unit-step response at one time constant"
+          },
+          "issue": "",
+          "maximum_absolute_error": 3.640387258152522e-05,
+          "median_elapsed_ns": 983808400,
+          "observed": {
+            "maximum": 0.6339902438806833,
+            "median": 0.6339902438806833,
+            "minimum": 0.6339902438806833
+          },
+          "status": "passed",
+          "timing_ns": [
+            983808400
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.0003,
+            "case_id": "transient.rl_step",
+            "classes": [
+              "small",
+              "transient",
+              "same_model",
+              "scalar_measurement",
+              "passive_rl"
+            ],
+            "expected": 0.6339538400081017,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.00101
+            },
+            "netlist_sha256": "77d5bc7b58c49e8cb55e4901075d719d9ef518e918a19c8656df2d95063ba1b9",
+            "probe": "V(in,out)",
+            "title": "RL unit-step current through a 1 ohm sense resistor"
+          },
+          "issue": "",
+          "maximum_absolute_error": 3.640387262882072e-05,
+          "median_elapsed_ns": 856893600,
+          "observed": {
+            "maximum": 0.6339902438807306,
+            "median": 0.6339902438807306,
+            "minimum": 0.6339902438807306
+          },
+          "status": "passed",
+          "timing_ns": [
+            856893600
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.002,
+            "case_id": "switching.pulse_duty",
+            "classes": [
+              "small",
+              "transient",
+              "switching",
+              "same_model",
+              "scalar_measurement",
+              "ideal_pulse_load"
+            ],
+            "expected": 4.1,
+            "measurement": {
+              "kind": "average_window",
+              "start_s": 0.0,
+              "stop_s": 0.004
+            },
+            "netlist_sha256": "c834c9135a8b76eaff3e3b420e0bd9a30c54ddd164253038afc69f3d48a9f754",
+            "probe": "V(out)",
+            "title": "PULSE-driven resistive-load duty average"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 862611700,
+          "observed": {
+            "maximum": 4.1,
+            "median": 4.1,
+            "minimum": 4.1
+          },
+          "status": "passed",
+          "timing_ns": [
+            862611700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.06,
+            "case_id": "converter.buck_lc_pwm",
+            "classes": [
+              "small",
+              "transient",
+              "switching",
+              "converter",
+              "smps",
+              "energy_storage",
+              "same_model",
+              "scalar_measurement",
+              "ideal_pwm_buck"
+            ],
+            "expected": 19.264928616536867,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.0001
+            },
+            "netlist_sha256": "270ef4bf2ae09eea27ff08498c1afa6f6c7ee45525679550a2ccf3dec20f0ef4",
+            "probe": "V(out)",
+            "title": "Ideal PWM buck LC endpoint after ten periods"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0038397594911749877,
+          "median_elapsed_ns": 1188233100,
+          "observed": {
+            "maximum": 19.268768376028042,
+            "median": 19.268768376028042,
+            "minimum": 19.268768376028042
+          },
+          "status": "passed",
+          "timing_ns": [
+            1188233100
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.015,
+            "case_id": "rf.series_rlc_step",
+            "classes": [
+              "small",
+              "transient",
+              "rf",
+              "ringing",
+              "same_model",
+              "scalar_measurement",
+              "passive_rlc"
+            ],
+            "expected": 0.8212141937012332,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 5.0001e-08
+            },
+            "netlist_sha256": "8101c9033ebdbcf43422dc9c6eff354327776b6d92b1c8ecafc6d508bf3f8c84",
+            "probe": "V(out)",
+            "title": "Underdamped RF RLC step response"
+          },
+          "issue": "",
+          "maximum_absolute_error": 6.737028199665929e-05,
+          "median_elapsed_ns": 820091700,
+          "observed": {
+            "maximum": 0.8211468234192365,
+            "median": 0.8211468234192365,
+            "minimum": 0.8211468234192365
+          },
+          "status": "passed",
+          "timing_ns": [
+            820091700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.002,
+            "case_id": "motor.armature_rl",
+            "classes": [
+              "small",
+              "transient",
+              "motor",
+              "electrical_surrogate",
+              "same_model",
+              "scalar_measurement",
+              "passive_rl"
+            ],
+            "expected": 0.7585446705942692,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.005005
+            },
+            "netlist_sha256": "a443770192c27eb5b5e0f9a102f2fd1235cd1461b1d8b7b43af69ed4986a3294",
+            "probe": "V(drive,mid)",
+            "title": "Motor-armature electrical RL current rise"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.001455329405728789,
+          "median_elapsed_ns": 860204800,
+          "observed": {
+            "maximum": 0.759999999999998,
+            "median": 0.759999999999998,
+            "minimum": 0.759999999999998
+          },
+          "status": "passed",
+          "timing_ns": [
+            860204800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.tangent",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 0.25534192122103627,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "97e300666277f8c691d5125e1187380b254ef97a3c55a9c448590edba83c4f56",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral tangent"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 772991700,
+          "observed": {
+            "maximum": 0.25534192122103627,
+            "median": 0.25534192122103627,
+            "minimum": 0.25534192122103627
+          },
+          "status": "passed",
+          "timing_ns": [
+            772991700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.inverse_hyperbolic",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 0.25541281188299536,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "3efc3f3e7028a0879c2fcd30525ea5ac98b67ea5c7f6e558b9861663b85c8424",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral inverse_hyperbolic"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 837836800,
+          "observed": {
+            "maximum": 0.25541281188299536,
+            "median": 0.25541281188299536,
+            "minimum": 0.25541281188299536
+          },
+          "status": "passed",
+          "timing_ns": [
+            837836800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.composed",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 1.523738185989843,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "2e8d77be6a63b1ede5a37a3ba96a07064d9e4cda43bf67b60598414e94db4659",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral composed"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 893464100,
+          "observed": {
+            "maximum": 1.523738185989843,
+            "median": 1.523738185989843,
+            "minimum": 1.523738185989843
+          },
+          "status": "passed",
+          "timing_ns": [
+            893464100
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.current_feedback",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": -0.1875,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "1ce74eaddbdea205066db77d730a9ff9bc74bbd0885c6f534d04355470576b56",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral current_feedback"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 797838800,
+          "observed": {
+            "maximum": -0.1875,
+            "median": -0.1875,
+            "minimum": -0.1875
+          },
+          "status": "passed",
+          "timing_ns": [
+            797838800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-07,
+            "case_id": "behavioral.nonlinear_kcl",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources",
+              "convergence"
+            ],
+            "expected": 0.25,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "381ba3c295ef66200be3914be46da7ec1799270c45a992abffeebeba5e887e58",
+            "probe": "V(out)",
+            "title": "Newton tangent current balance"
+          },
+          "issue": "",
+          "maximum_absolute_error": 1.180722186688854e-13,
+          "median_elapsed_ns": 851955200,
+          "observed": {
+            "maximum": 0.25000000000011807,
+            "median": 0.25000000000011807,
+            "minimum": 0.25000000000011807
+          },
+          "status": "passed",
+          "timing_ns": [
+            851955200
+          ]
+        }
+      ],
+      "engine_id": "spikes.owned_cpp",
+      "identity": {
+        "executable": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\.venv\\Scripts\\python.exe",
+        "implementation_artifact": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-current-vs18-20260906\\Release\\spikes_c_api.dll",
+        "implementation_sha256": "c41ba13cd396dc69afc156527dabf96286d48c033074fa32385c96b0af418589",
+        "sha256": "01b30fba0a39f141954c6cad7dd352632082131d7044ba279adecafc76ffc34d"
+      },
+      "status": "passed",
+      "summary": {
+        "failed": 0,
+        "passed": 14,
+        "total": 14
+      },
+      "timing_scope": "isolated_process_per_run_including_startup_and_result_parse"
+    },
+    {
+      "aggregate": {
+        "median_case_elapsed_ns": 56871150
+      },
+      "cases": [
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.divider.equal",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 5.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "3b7b5b098e97f646bf59665e5021bffd89045078be0553b293d0cff64c0fb0ff",
+            "probe": "V(out)",
+            "title": "Equal divider"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 70810000,
+          "observed": {
+            "maximum": 5.0,
+            "median": 5.0,
+            "minimum": 5.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            70810000
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.divider.unequal",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 4.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "557d255f6cd240f22c1e8f51a2a7cc4237664bbd4f326c5f5b4514d0b4726f49",
+            "probe": "V(out)",
+            "title": "Unequal divider"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 48535400,
+          "observed": {
+            "maximum": 4.0,
+            "median": 4.0,
+            "minimum": 4.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            48535400
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.current_load",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 2.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "219a6e4bb9e4b56629dafe3ced6d3b2f298f45240ee597a7282307669f0db62c",
+            "probe": "V(out)",
+            "title": "Current source load"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 46837700,
+          "observed": {
+            "maximum": 2.0,
+            "median": 2.0,
+            "minimum": 2.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            46837700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 5e-05,
+            "case_id": "transient.rc_step",
+            "classes": [
+              "small",
+              "transient",
+              "same_model",
+              "scalar_measurement",
+              "passive_rc"
+            ],
+            "expected": 0.6339538400081017,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.00101
+            },
+            "netlist_sha256": "812c12b9506b83f0606b56bac56e3b6faafd29730d1cdc2ff23c105c47ff6db1",
+            "probe": "V(out)",
+            "title": "RC unit-step response at one time constant"
+          },
+          "issue": "",
+          "maximum_absolute_error": 5.44979250616251e-09,
+          "median_elapsed_ns": 51004400,
+          "observed": {
+            "maximum": 0.6339538454578942,
+            "median": 0.6339538454578942,
+            "minimum": 0.6339538454578942
+          },
+          "status": "passed",
+          "timing_ns": [
+            51004400
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.0003,
+            "case_id": "transient.rl_step",
+            "classes": [
+              "small",
+              "transient",
+              "same_model",
+              "scalar_measurement",
+              "passive_rl"
+            ],
+            "expected": 0.6339538400081017,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.00101
+            },
+            "netlist_sha256": "77d5bc7b58c49e8cb55e4901075d719d9ef518e918a19c8656df2d95063ba1b9",
+            "probe": "V(in,out)",
+            "title": "RL unit-step current through a 1 ohm sense resistor"
+          },
+          "issue": "",
+          "maximum_absolute_error": 5.449838580418032e-09,
+          "median_elapsed_ns": 56398300,
+          "observed": {
+            "maximum": 0.6339538454579403,
+            "median": 0.6339538454579403,
+            "minimum": 0.6339538454579403
+          },
+          "status": "passed",
+          "timing_ns": [
+            56398300
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.002,
+            "case_id": "switching.pulse_duty",
+            "classes": [
+              "small",
+              "transient",
+              "switching",
+              "same_model",
+              "scalar_measurement",
+              "ideal_pulse_load"
+            ],
+            "expected": 4.1,
+            "measurement": {
+              "kind": "average_window",
+              "start_s": 0.0,
+              "stop_s": 0.004
+            },
+            "netlist_sha256": "c834c9135a8b76eaff3e3b420e0bd9a30c54ddd164253038afc69f3d48a9f754",
+            "probe": "V(out)",
+            "title": "PULSE-driven resistive-load duty average"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 55993200,
+          "observed": {
+            "maximum": 4.1,
+            "median": 4.1,
+            "minimum": 4.1
+          },
+          "status": "passed",
+          "timing_ns": [
+            55993200
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.06,
+            "case_id": "converter.buck_lc_pwm",
+            "classes": [
+              "small",
+              "transient",
+              "switching",
+              "converter",
+              "smps",
+              "energy_storage",
+              "same_model",
+              "scalar_measurement",
+              "ideal_pwm_buck"
+            ],
+            "expected": 19.264928616536867,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.0001
+            },
+            "netlist_sha256": "270ef4bf2ae09eea27ff08498c1afa6f6c7ee45525679550a2ccf3dec20f0ef4",
+            "probe": "V(out)",
+            "title": "Ideal PWM buck LC endpoint after ten periods"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.003889056425961712,
+          "median_elapsed_ns": 87331100,
+          "observed": {
+            "maximum": 19.26881767296283,
+            "median": 19.26881767296283,
+            "minimum": 19.26881767296283
+          },
+          "status": "passed",
+          "timing_ns": [
+            87331100
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.015,
+            "case_id": "rf.series_rlc_step",
+            "classes": [
+              "small",
+              "transient",
+              "rf",
+              "ringing",
+              "same_model",
+              "scalar_measurement",
+              "passive_rlc"
+            ],
+            "expected": 0.8212141937012332,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 5.0001e-08
+            },
+            "netlist_sha256": "8101c9033ebdbcf43422dc9c6eff354327776b6d92b1c8ecafc6d508bf3f8c84",
+            "probe": "V(out)",
+            "title": "Underdamped RF RLC step response"
+          },
+          "issue": "",
+          "maximum_absolute_error": 2.9935039924988693e-05,
+          "median_elapsed_ns": 55180700,
+          "observed": {
+            "maximum": 0.8211842586613082,
+            "median": 0.8211842586613082,
+            "minimum": 0.8211842586613082
+          },
+          "status": "passed",
+          "timing_ns": [
+            55180700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.002,
+            "case_id": "motor.armature_rl",
+            "classes": [
+              "small",
+              "transient",
+              "motor",
+              "electrical_surrogate",
+              "same_model",
+              "scalar_measurement",
+              "passive_rl"
+            ],
+            "expected": 0.7585446705942692,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.005005
+            },
+            "netlist_sha256": "a443770192c27eb5b5e0f9a102f2fd1235cd1461b1d8b7b43af69ed4986a3294",
+            "probe": "V(drive,mid)",
+            "title": "Motor-armature electrical RL current rise"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.00022071029006143217,
+          "median_elapsed_ns": 98092800,
+          "observed": {
+            "maximum": 0.7587653808843307,
+            "median": 0.7587653808843307,
+            "minimum": 0.7587653808843307
+          },
+          "status": "passed",
+          "timing_ns": [
+            98092800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.tangent",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 0.25534192122103627,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "97e300666277f8c691d5125e1187380b254ef97a3c55a9c448590edba83c4f56",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral tangent"
+          },
+          "issue": "",
+          "maximum_absolute_error": 5.551115123125783e-17,
+          "median_elapsed_ns": 64375800,
+          "observed": {
+            "maximum": 0.2553419212210363,
+            "median": 0.2553419212210363,
+            "minimum": 0.2553419212210363
+          },
+          "status": "passed",
+          "timing_ns": [
+            64375800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.inverse_hyperbolic",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 0.25541281188299536,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "3efc3f3e7028a0879c2fcd30525ea5ac98b67ea5c7f6e558b9861663b85c8424",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral inverse_hyperbolic"
+          },
+          "issue": "",
+          "maximum_absolute_error": 5.551115123125783e-17,
+          "median_elapsed_ns": 47427500,
+          "observed": {
+            "maximum": 0.2554128118829954,
+            "median": 0.2554128118829954,
+            "minimum": 0.2554128118829954
+          },
+          "status": "passed",
+          "timing_ns": [
+            47427500
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.composed",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 1.523738185989843,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "2e8d77be6a63b1ede5a37a3ba96a07064d9e4cda43bf67b60598414e94db4659",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral composed"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 57344000,
+          "observed": {
+            "maximum": 1.523738185989843,
+            "median": 1.523738185989843,
+            "minimum": 1.523738185989843
+          },
+          "status": "passed",
+          "timing_ns": [
+            57344000
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.current_feedback",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": -0.1875,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "1ce74eaddbdea205066db77d730a9ff9bc74bbd0885c6f534d04355470576b56",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral current_feedback"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 58276500,
+          "observed": {
+            "maximum": -0.1875,
+            "median": -0.1875,
+            "minimum": -0.1875
+          },
+          "status": "passed",
+          "timing_ns": [
+            58276500
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-07,
+            "case_id": "behavioral.nonlinear_kcl",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources",
+              "convergence"
+            ],
+            "expected": 0.25,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "381ba3c295ef66200be3914be46da7ec1799270c45a992abffeebeba5e887e58",
+            "probe": "V(out)",
+            "title": "Newton tangent current balance"
+          },
+          "issue": "",
+          "maximum_absolute_error": 1.1801670751765414e-13,
+          "median_elapsed_ns": 59381600,
+          "observed": {
+            "maximum": 0.250000000000118,
+            "median": 0.250000000000118,
+            "minimum": 0.250000000000118
+          },
+          "status": "passed",
+          "timing_ns": [
+            59381600
+          ]
+        }
+      ],
+      "engine_id": "ngspice",
+      "identity": {
+        "executable": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\runtime\\external\\Spice64\\bin\\ngspice_con.exe",
+        "implementation_artifact": "",
+        "implementation_sha256": "",
+        "sha256": "86c9ea5f645ca919e305639fa7bdb522355364c424d14e197f1ade617feb3453"
+      },
+      "status": "passed",
+      "summary": {
+        "failed": 0,
+        "passed": 14,
+        "total": 14
+      },
+      "timing_scope": "isolated_process_per_run_including_startup_and_result_parse"
+    },
+    {
+      "aggregate": {
+        "median_case_elapsed_ns": 529649900
+      },
+      "cases": [
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.divider.equal",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 5.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "3b7b5b098e97f646bf59665e5021bffd89045078be0553b293d0cff64c0fb0ff",
+            "probe": "V(out)",
+            "title": "Equal divider"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 5665049100,
+          "observed": {
+            "maximum": 5.0,
+            "median": 5.0,
+            "minimum": 5.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            5665049100
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.divider.unequal",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 4.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "557d255f6cd240f22c1e8f51a2a7cc4237664bbd4f326c5f5b4514d0b4726f49",
+            "probe": "V(out)",
+            "title": "Unequal divider"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 521385700,
+          "observed": {
+            "maximum": 4.0,
+            "median": 4.0,
+            "minimum": 4.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            521385700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-10,
+            "case_id": "dc.current_load",
+            "classes": [
+              "small",
+              "dc",
+              "operating_point"
+            ],
+            "expected": 2.0,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "219a6e4bb9e4b56629dafe3ced6d3b2f298f45240ee597a7282307669f0db62c",
+            "probe": "V(out)",
+            "title": "Current source load"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 519822300,
+          "observed": {
+            "maximum": 2.0,
+            "median": 2.0,
+            "minimum": 2.0
+          },
+          "status": "passed",
+          "timing_ns": [
+            519822300
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 5e-05,
+            "case_id": "transient.rc_step",
+            "classes": [
+              "small",
+              "transient",
+              "same_model",
+              "scalar_measurement",
+              "passive_rc"
+            ],
+            "expected": 0.6339538400081017,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.00101
+            },
+            "netlist_sha256": "812c12b9506b83f0606b56bac56e3b6faafd29730d1cdc2ff23c105c47ff6db1",
+            "probe": "V(out)",
+            "title": "RC unit-step response at one time constant"
+          },
+          "issue": "",
+          "maximum_absolute_error": 2.9334898288269073e-08,
+          "median_elapsed_ns": 1291013800,
+          "observed": {
+            "maximum": 0.633953869343,
+            "median": 0.633953869343,
+            "minimum": 0.633953869343
+          },
+          "status": "passed",
+          "timing_ns": [
+            1291013800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.0003,
+            "case_id": "transient.rl_step",
+            "classes": [
+              "small",
+              "transient",
+              "same_model",
+              "scalar_measurement",
+              "passive_rl"
+            ],
+            "expected": 0.6339538400081017,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.00101
+            },
+            "netlist_sha256": "77d5bc7b58c49e8cb55e4901075d719d9ef518e918a19c8656df2d95063ba1b9",
+            "probe": "V(in,out)",
+            "title": "RL unit-step current through a 1 ohm sense resistor"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0002659861951017639,
+          "median_elapsed_ns": 498254500,
+          "observed": {
+            "maximum": 0.633687853813,
+            "median": 0.633687853813,
+            "minimum": 0.633687853813
+          },
+          "status": "passed",
+          "timing_ns": [
+            498254500
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.002,
+            "case_id": "switching.pulse_duty",
+            "classes": [
+              "small",
+              "transient",
+              "switching",
+              "same_model",
+              "scalar_measurement",
+              "ideal_pulse_load"
+            ],
+            "expected": 4.1,
+            "measurement": {
+              "kind": "average_window",
+              "start_s": 0.0,
+              "stop_s": 0.004
+            },
+            "netlist_sha256": "c834c9135a8b76eaff3e3b420e0bd9a30c54ddd164253038afc69f3d48a9f754",
+            "probe": "V(out)",
+            "title": "PULSE-driven resistive-load duty average"
+          },
+          "issue": "",
+          "maximum_absolute_error": 1.4000001158365194e-10,
+          "median_elapsed_ns": 534828300,
+          "observed": {
+            "maximum": 4.09999999986,
+            "median": 4.09999999986,
+            "minimum": 4.09999999986
+          },
+          "status": "passed",
+          "timing_ns": [
+            534828300
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.06,
+            "case_id": "converter.buck_lc_pwm",
+            "classes": [
+              "small",
+              "transient",
+              "switching",
+              "converter",
+              "smps",
+              "energy_storage",
+              "same_model",
+              "scalar_measurement",
+              "ideal_pwm_buck"
+            ],
+            "expected": 19.264928616536867,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.0001
+            },
+            "netlist_sha256": "270ef4bf2ae09eea27ff08498c1afa6f6c7ee45525679550a2ccf3dec20f0ef4",
+            "probe": "V(out)",
+            "title": "Ideal PWM buck LC endpoint after ten periods"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0016267671368659364,
+          "median_elapsed_ns": 533729700,
+          "observed": {
+            "maximum": 19.2633018494,
+            "median": 19.2633018494,
+            "minimum": 19.2633018494
+          },
+          "status": "passed",
+          "timing_ns": [
+            533729700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.015,
+            "case_id": "rf.series_rlc_step",
+            "classes": [
+              "small",
+              "transient",
+              "rf",
+              "ringing",
+              "same_model",
+              "scalar_measurement",
+              "passive_rlc"
+            ],
+            "expected": 0.8212141937012332,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 5.0001e-08
+            },
+            "netlist_sha256": "8101c9033ebdbcf43422dc9c6eff354327776b6d92b1c8ecafc6d508bf3f8c84",
+            "probe": "V(out)",
+            "title": "Underdamped RF RLC step response"
+          },
+          "issue": "",
+          "maximum_absolute_error": 1.4012456766798742e-05,
+          "median_elapsed_ns": 502273900,
+          "observed": {
+            "maximum": 0.821228206158,
+            "median": 0.821228206158,
+            "minimum": 0.821228206158
+          },
+          "status": "passed",
+          "timing_ns": [
+            502273900
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 0.002,
+            "case_id": "motor.armature_rl",
+            "classes": [
+              "small",
+              "transient",
+              "motor",
+              "electrical_surrogate",
+              "same_model",
+              "scalar_measurement",
+              "passive_rl"
+            ],
+            "expected": 0.7585446705942692,
+            "measurement": {
+              "kind": "find_at_time",
+              "time_s": 0.005005
+            },
+            "netlist_sha256": "a443770192c27eb5b5e0f9a102f2fd1235cd1461b1d8b7b43af69ed4986a3294",
+            "probe": "V(drive,mid)",
+            "title": "Motor-armature electrical RL current rise"
+          },
+          "issue": "",
+          "maximum_absolute_error": 6.12864367307564e-05,
+          "median_elapsed_ns": 516243000,
+          "observed": {
+            "maximum": 0.758605957031,
+            "median": 0.758605957031,
+            "minimum": 0.758605957031
+          },
+          "status": "passed",
+          "timing_ns": [
+            516243000
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.tangent",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 0.25534192122103627,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "97e300666277f8c691d5125e1187380b254ef97a3c55a9c448590edba83c4f56",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral tangent"
+          },
+          "issue": "",
+          "maximum_absolute_error": 3.9450362976367614e-09,
+          "median_elapsed_ns": 1809762700,
+          "observed": {
+            "maximum": 0.255341917276,
+            "median": 0.255341917276,
+            "minimum": 0.255341917276
+          },
+          "status": "passed",
+          "timing_ns": [
+            1809762700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.inverse_hyperbolic",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 0.25541281188299536,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "3efc3f3e7028a0879c2fcd30525ea5ac98b67ea5c7f6e558b9861663b85c8424",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral inverse_hyperbolic"
+          },
+          "issue": "",
+          "maximum_absolute_error": 5.118004631210482e-09,
+          "median_elapsed_ns": 480633700,
+          "observed": {
+            "maximum": 0.255412817001,
+            "median": 0.255412817001,
+            "minimum": 0.255412817001
+          },
+          "status": "passed",
+          "timing_ns": [
+            480633700
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.composed",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": 1.523738185989843,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "2e8d77be6a63b1ede5a37a3ba96a07064d9e4cda43bf67b60598414e94db4659",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral composed"
+          },
+          "issue": "",
+          "maximum_absolute_error": 4.0159843006648543e-08,
+          "median_elapsed_ns": 563594800,
+          "observed": {
+            "maximum": 1.52373814583,
+            "median": 1.52373814583,
+            "minimum": 1.52373814583
+          },
+          "status": "failed",
+          "timing_ns": [
+            563594800
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-08,
+            "case_id": "behavioral.current_feedback",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources"
+            ],
+            "expected": -0.1875,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "1ce74eaddbdea205066db77d730a9ff9bc74bbd0885c6f534d04355470576b56",
+            "probe": "V(out)",
+            "title": "Nonlinear behavioral current_feedback"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 525570100,
+          "observed": {
+            "maximum": -0.1875,
+            "median": -0.1875,
+            "minimum": -0.1875
+          },
+          "status": "passed",
+          "timing_ns": [
+            525570100
+          ]
+        },
+        {
+          "case": {
+            "absolute_tolerance": 1e-07,
+            "case_id": "behavioral.nonlinear_kcl",
+            "classes": [
+              "small",
+              "operating_point",
+              "behavioral_sources",
+              "convergence"
+            ],
+            "expected": 0.25,
+            "measurement": {
+              "kind": "scalar"
+            },
+            "netlist_sha256": "381ba3c295ef66200be3914be46da7ec1799270c45a992abffeebeba5e887e58",
+            "probe": "V(out)",
+            "title": "Newton tangent current balance"
+          },
+          "issue": "",
+          "maximum_absolute_error": 0.0,
+          "median_elapsed_ns": 848087500,
+          "observed": {
+            "maximum": 0.25,
+            "median": 0.25,
+            "minimum": 0.25
+          },
+          "status": "passed",
+          "timing_ns": [
+            848087500
+          ]
+        }
+      ],
+      "engine_id": "ltspice",
+      "identity": {
+        "executable": "C:\\Users\\yawar\\AppData\\Local\\Programs\\ADI\\LTspice\\LTspice.exe",
+        "implementation_artifact": "",
+        "implementation_sha256": "",
+        "sha256": "0b64462b25fc4cee94e8026e0450ccdd76adf28944c7af29c2e3885a2fe57b04"
+      },
+      "status": "failed",
+      "summary": {
+        "failed": 1,
+        "passed": 13,
+        "total": 14
+      },
+      "timing_scope": "isolated_process_per_run_including_startup_and_result_parse"
+    }
+  ],
+  "generated_at_epoch_s": 1791636091.3341923,
+  "host": {
+    "machine": "AMD64",
+    "python": "3.12.9",
+    "release": "11",
+    "system": "Windows"
+  },
+  "limitations": [
+    "The shared corpus contains three small DC cases, two passive first-order transients, one duty reduction, and idealized converter/RF/motor electrical fixtures.",
+    "Cold process-launch wall time is comparable only for this scalar-output subset; it is not a warm-solver throughput result.",
+    "The converter fixture includes LC energy storage but uses an ideal PWM source; it has no semiconductor compact model, parasitic switching loss, reverse recovery, dead time, or control loop.",
+    "The RF case is a passive time-domain RLC ringing check, not an S-parameter/noise/nonlinear RF qualification.",
+    "The motor case is an armature R-L electrical surrogate, not a mechanical, magnetic, torque, saturation, or back-EMF co-simulation.",
+    "Peak memory, warm solves, thread scaling, and large public decks are not measured.",
+    "No parity or superiority claim is permitted from this report.",
+    "Optional behavioral cases check five smooth DC expressions including nonlinear KCL, not arbitrary expression/dialect coverage or behavioral AC/transient qualification."
+  ],
+  "performance_claim_eligible": false,
+  "shared_subset_accuracy_passed": false,
+  "status": "blocked",
+  "timing_comparable": false
+}

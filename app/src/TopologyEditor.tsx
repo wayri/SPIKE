@@ -11,6 +11,7 @@ import CircuitSymbol, { paletteSymbol } from "./CircuitSymbol";
 import { schematicWire } from "./schematicGeometry";
 import TopologyGenerator from "./TopologyGenerator";
 import TopologyPreview from "./TopologyPreview";
+import PdnNetworkPanel from "./PdnNetworkPanel";
 import { appendTopology } from "./topologyGeneration";
 import "./schematic.css";
 import { isDesktopShell, runLocalWorker } from "./workerBridge";
@@ -119,6 +120,7 @@ export default function TopologyEditor({
   onStatus: (message: string) => void;
 }) {
   const treeName = domain === "pi" ? "Power Tree" : "Channel Tree";
+  const [acPdnOpen, setAcPdnOpen] = useState(false);
   const scenarios = topologyScenarios(model);
   const [selectedId, setSelectedId] = useState(model.nodes[0]?.id ?? "");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(model.nodes[0]?.id ? [model.nodes[0].id] : []));
@@ -492,6 +494,7 @@ export default function TopologyEditor({
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (canvasRef.current?.closest("[hidden]")) return;
       const target = event.target as HTMLElement | null;
       if (target?.closest("input, select, textarea, [contenteditable='true']")) { event.stopPropagation(); return; }
       if ((event.ctrlKey || event.metaKey) && ["z", "y"].includes(event.key.toLowerCase())) { event.preventDefault(); event.stopImmediatePropagation(); (event.shiftKey || event.key.toLowerCase() === "y" ? onRedo : onUndo)?.(); return; }
@@ -516,12 +519,14 @@ export default function TopologyEditor({
     onStatus(`${generated.nodes.length} symbols and ${generated.edges.length} connections ${replace ? "replaced the sheet" : "added to the sheet"}. Select a symbol to review its model and terminals.`);
   };
 
+  if (acPdnOpen) return <div className="modal-shade topology-shade"><div className="pdn-network-dialog"><PdnNetworkPanel initial={model.acPdnRequest} availableNets={Object.values(board?.nets ?? {})} groundNets={Object.values(board?.nets ?? {}).filter(net => /(?:^|[/_.+-])(gnd|agnd|dgnd|pgnd|vss|0)(?:$|[/_.+-])/i.test(net))} onSave={request => setModel({ ...model, acPdnRequest: request })} onClose={() => setAcPdnOpen(false)} /></div></div>;
   return <div className="modal-shade topology-shade"><div className={`topology-editor schematic-editor ${domain === "pi" ? "pi" : ""}`}>
     <header>
       <div><b>{domain === "pi" ? "POWER SCHEMATIC" : "SIGNAL SCHEMATIC"}</b><small>Define inputs → Review wiring → Assign models → {domain === "pi" ? "Use for analysis" : "Save channel setup"}</small></div>
       <button onClick={onClose} title="Close topology editor"><X size={17} /></button>
     </header>
     <div className="topology-toolbar">
+      {domain === "pi" && <button type="button" onClick={() => setAcPdnOpen(value => !value)}>AC PDN / CM–DM filters</button>}
       <button onClick={() => { setGeneratorOpen(true); setView("diagram"); }}><Plus size={14} /> Generate from inputs</button>
       <button onClick={onUndo} disabled={!onUndo} title="Undo (Ctrl+Z)"><Undo2 size={14} /></button>
       <button onClick={onRedo} disabled={!onRedo} title="Redo (Ctrl+Shift+Z)"><Redo2 size={14} /></button>

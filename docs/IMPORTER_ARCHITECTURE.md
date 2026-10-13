@@ -64,6 +64,18 @@ issue. It must not invent a common default without recording the assumption.
 
 ## Identity and cross-selection
 
+Exact KiCad copper arcs use one canonical Arc representation. Their validated
+legacy chord chains are excluded from canonical tracks and retained with order,
+source ownership, geometry basis and content digest for approximate v1 solvers.
+Strict `to_v1()` rejects an arc without an admitted surrogate; explicitly
+nonnumerical views can request `allow_unprojected_arcs=True`. Legacy numerical
+geometry boundaries independently reject missing arcs. See [ADR 0073](adr/0073-exact-source-arcs-and-outline-ownership.md).
+
+Straight outline normalization is shared by import, MCAD and retained-volume
+preparation. It preserves cutouts, rejects ambiguous topology and computes
+bounds from the actual outer loop. This is source/transport assurance rather
+than meshing or solver-accuracy qualification.
+
 Normalized objects require stable IDs for project persistence, probes,
 terminals, revision comparison, and cross-selection. An adapter should retain
 source UUIDs when available. Synthesized IDs must be deterministic from source
@@ -135,8 +147,10 @@ atomically rather than being tessellated or silently reinterpreted. Remaining
 work includes curved/non-round polylines; other contours, zones, and cutouts;
 user/custom primitives; mask/paste semantics;
 standalone and non-plated holes; blind, buried, and microvias; richer material
-data; and exporters. ODB++ and Gerber/drill + BOM/netlist package adapters
-remain unimplemented. XML input is rejected for DOCTYPE/ENTITY declarations
+data; and exporters. The registered ODB++ package adapter has separate bounded
+coverage, including the parity archive candidate; native-export parity remains
+pending. Gerber/drill + BOM/netlist package ingestion is outside this IPC slice.
+XML input is rejected for DOCTYPE/ENTITY declarations
 anywhere in the payload and is bounded by source size, element, nesting,
 attribute, and primitive limits.
 
@@ -165,6 +179,49 @@ tests, the pinned-venv suite passes 787 with one skip, and architecture passes.
 This is bounded exact import persistence, not a production-physics claim.
 
 ## Import validation
+
+### Native pad frame and ODB fixture fidelity
+
+Native KiCad board pad angles are absolute, not relative to footprint angle.
+Import converts their sign to neutral mathematical XY rotation and retains
+`native_pad_rotation_deg` as source provenance. Stored back-side pad positions
+and primitive coordinates already encode reflection. Normalized UI projection
+converts neutral pad angles to the inverse `ParsedPad` display convention.
+The importer revision is `kicad-pad-frame-v3`; old erroneous saved geometry
+requires source reimport. See [ADR 0077](adr/0077-native-pad-angle-and-reflection-boundary.md).
+
+The parity corpus includes an actual KiCad 10.0.6 native ODB export, generated
+using an absolute output path and typed `str_utf8_Map`. It binds native member
+bytes and independent original-source geometry to 14 CLI assertions. The
+bounded gate verifies arcs, pad/component placement, profile/cutout area and
+connectivity; observed XY reflection and arc endpoint reversal are explicit.
+Generated fonts are excluded from the redistributed geometry fixture. Missing
+exported stackup/model assignments remain warnings and block solver readiness.
+This is not full ODB conformance or solver qualification.
+
+### Bounded KiCad model-source retention
+
+The KiCad adapter retains every footprint model occurrence, including repeated
+paths, with source-order identities and component links. Each typed model keeps
+the original declaration and any finite declared offset, scale and rotation
+triples in its `spike.v1.source_placement` extension. Unknown fields and invalid
+declarations remain source evidence; malformed vectors generate
+`KICAD_MODEL_SOURCE_INVALID` warnings without dropping the footprint or pad.
+`KICAD_MODEL_PLACEMENT_UNAPPLIED` explicitly records the remaining geometry gap.
+The URI remains the source URI; a separately retained `resolved_uri` is only a
+path lookup result. No model file is loaded or qualified by this import step.
+
+The envelope uses `semantic_state=source_placement_unapplied` and
+`projection=forbidden`; the canonical transform remains empty. These triples
+are source facts, not a composed component-to-board matrix or solver geometry.
+Legacy `model_path`/`model_resolved` still describe the first occurrence for
+compatibility, while all occurrences persist through canonical JSON and legacy
+round-trip without generating a second copy of the first model. The original
+`benchmarks/parity-import/models.kicad_pcb` fixture and
+`docs/validation/parity/WF01-S04A.json` bind 30 independent CLI assertions to
+KiCad 10.0.6 native model reads. The fixture references unresolved solid files,
+so neither the native board render nor this source-fidelity stage validates
+package geometry or thermal/EM properties.
 
 Tests for every adapter cover:
 

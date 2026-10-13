@@ -1,0 +1,22 @@
+{
+  "owner": "SPIKE contributors",
+  "license": "Apache-2.0",
+  "source": "Original 2x3x4 mm cuboid authored through the existing native MCAD box contract. No vendor model or source geometry copied.",
+  "generator": "Existing SPIKE MCAD exporter with separately installed FreeCAD 1.1.3/Open CASCADE",
+  "files": {
+    "component-solid.step": "9144054f0ec8ae87e131c88f9383815d4ffaf6605557c891cd95c9451e29bdfc",
+    "component-models-placed.step": "bc89a90009ca7ee1cfacb62abc2a4386afd6396bca15f7e49f8f5dd0bda165f6"
+  },
+  "reference": {
+    "volume_mm3": 24,
+    "local_bounds_mm": [
+      0,
+      0,
+      0,
+      2,
+      3,
+      4
+    ]
+  },
+  "scope": "Owned mechanical geometry and explicit neutral placements only; no KiCad frame composition or thermal/electrical material qualification."
+}

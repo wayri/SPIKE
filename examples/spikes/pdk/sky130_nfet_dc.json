@@ -1,0 +1,9 @@
+{
+  "pdk_id": "sky130",
+  "root": "C:/PDKs",
+  "entry": "sky130A/libs.tech/ngspice/sky130.lib.spice",
+  "corner": "tt",
+  "temperature_c": 27,
+  "backend": "ngspice",
+  "circuit": "* User must verify dimensions against the installed PDK revision\nVD d 0 1.8\nVG g 0 0\nXDEVICE d g 0 0 sky130_fd_pr__nfet_01v8 w=1 l=0.15\n.dc VG 0 1.8 .01"
+}

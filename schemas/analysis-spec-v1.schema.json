@@ -12,7 +12,7 @@
     "formulation": { "type": "string" },
     "required_capabilities": { "type": "array", "items": { "type": "string" } },
     "net_names": { "type": "array", "items": { "type": "string" } },
-    "sources": { "type": "array", "items": { "type": "object" } },
+    "sources": { "type": "array", "items": { "type": "object", "properties": { "current_limit_a": { "type": "number", "exclusiveMinimum": 0, "description": "Optional forward sourcing capacity in amperes; omit for unlimited ideal voltage. DC feasibility check only." } } } },
     "loads": { "type": "array", "items": { "type": "object" } },
     "return_path": { "type": "object" },
     "probes": { "type": "array", "items": { "type": "object" } },

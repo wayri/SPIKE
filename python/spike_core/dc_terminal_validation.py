@@ -177,53 +177,53 @@ def build_source_to_load_evidence(
             item for item in supply_records
             if item["net"] == load["net"] and item["domain_id"] == load["domain_id"]
         ]
-        if len(source_matches) != 1:
+        if not source_matches:
             errors.append(f"Load {load['id']} has {len(source_matches)} matching source terminals on its net and domain.")
             continue
-        source = source_matches[0]
-        record = {
-            "load_id": load["id"],
-            "source_id": source["id"],
-            "pair_id": load["pair_id"],
-            "domain_id": load["domain_id"],
-            "supply_net": load["net"],
-            "source_voltage_v": boundary_voltage(source),
-            "load_voltage_v": boundary_voltage(load),
-            "supply_drop_v": boundary_voltage(source) - boundary_voltage(load),
-            "load_current_a": load["current_a"],
-        }
-        if explicit_return:
-            return_loads = [
-                item for item in load_records
-                if item["role"] == "load_return"
-                and item["pair_id"] == load["pair_id"]
-                and item["domain_id"] == load["domain_id"]
-            ]
-            if len(return_loads) != 1:
-                errors.append(f"Load {load['id']} has {len(return_loads)} matching return load terminals.")
-                continue
-            return_load = return_loads[0]
-            return_sources = [
-                item for item in return_records
-                if item["net"] == return_load["net"] and item["domain_id"] == load["domain_id"]
-            ]
-            if len(return_sources) != 1:
-                errors.append(f"Load {load['id']} has {len(return_sources)} matching return source terminals.")
-                continue
-            return_source = return_sources[0]
-            source_differential = boundary_voltage(source) - boundary_voltage(return_source)
-            load_differential = boundary_voltage(load) - boundary_voltage(return_load)
-            record.update(
-                return_net=return_load["net"],
-                return_source_id=return_source["id"],
-                return_load_id=return_load["id"],
-                return_source_voltage_v=boundary_voltage(return_source),
-                return_load_voltage_v=boundary_voltage(return_load),
-                source_differential_v=source_differential,
-                load_differential_v=load_differential,
-                loop_drop_v=source_differential - load_differential,
-            )
-        paths.append(record)
+        for source in source_matches:
+            record = {
+                "load_id": load["id"],
+                "source_id": source["id"],
+                "pair_id": load["pair_id"],
+                "domain_id": load["domain_id"],
+                "supply_net": load["net"],
+                "source_voltage_v": boundary_voltage(source),
+                "load_voltage_v": boundary_voltage(load),
+                "supply_drop_v": boundary_voltage(source) - boundary_voltage(load),
+                "load_current_a": load["current_a"],
+            }
+            if explicit_return:
+                return_loads = [
+                    item for item in load_records
+                    if item["role"] == "load_return"
+                    and item["pair_id"] == load["pair_id"]
+                    and item["domain_id"] == load["domain_id"]
+                ]
+                if len(return_loads) != 1:
+                    errors.append(f"Load {load['id']} has {len(return_loads)} matching return load terminals.")
+                    continue
+                return_load = return_loads[0]
+                return_sources = [
+                    item for item in return_records
+                    if item["net"] == return_load["net"] and item["domain_id"] == load["domain_id"]
+                ]
+                if len(return_sources) != 1:
+                    errors.append(f"Load {load['id']} has {len(return_sources)} matching return source terminals.")
+                    continue
+                return_source = return_sources[0]
+                source_differential = boundary_voltage(source) - boundary_voltage(return_source)
+                load_differential = boundary_voltage(load) - boundary_voltage(return_load)
+                record.update(
+                    return_net=return_load["net"],
+                    return_source_id=return_source["id"],
+                    return_load_id=return_load["id"],
+                    return_source_voltage_v=boundary_voltage(return_source),
+                    return_load_voltage_v=boundary_voltage(return_load),
+                    source_differential_v=source_differential,
+                    load_differential_v=load_differential,
+                    loop_drop_v=source_differential - load_differential,
+                )
+            paths.append(record)
     all_anchored = all(item["geometry_anchor_id"] for item in terminal_voltages)
     source_current_balance_a = float(
         fsum(item["current_a"] for item in terminal_voltages if item["kind"] == "source")
@@ -234,7 +234,7 @@ def build_source_to_load_evidence(
         errors.append("The terminal current balance or linear residual exceeds tolerance.")
     status = (
         "validated" if all_anchored and not errors
-        and len(paths) == len([item for item in load_records if item["role"] != "load_return"])
+        and {item["load_id"] for item in paths} == {item["id"] for item in load_records if item["role"] != "load_return"}
         else "approximate"
     )
     return {

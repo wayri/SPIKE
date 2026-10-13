@@ -26,6 +26,7 @@ class OccFixedLaunchTests(unittest.TestCase):
                 self.assertNotIn('site.addsitedir', options['stdin_payload'].decode())
                 digest = hashlib.sha256((case/'request.json').read_bytes()).hexdigest()
                 (case/'result.json').write_text(json.dumps({'request_sha256': digest, 'runtime_provenance': {}}))
+                (case/'environment.json').write_text(json.dumps({'status': 'passed', 'isolated': True, 'site_disabled': True}))
                 return {'return_code': 0, 'stdout': '', 'stderr': ''}
 
             with patch.object(runtime, 'verify_installation', return_value={}), \

@@ -68,7 +68,13 @@ class WorkerCliEntryTests(unittest.TestCase):
 
         version_result = self.invoke("--version")
         self.assertEqual(version_result.returncode, 0, version_result.stderr)
-        self.assertRegex(version_result.stdout.strip(), r"^SPIKE CLI \d+\.\d+\.\d+$")
+        self.assertRegex(
+            version_result.stdout.strip(),
+            r"^SPIKE CLI (?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)"
+            r"(?:-(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)"
+            r"(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*)?"
+            r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$",
+        )
         self.assertEqual(version_result.stderr, "")
 
     def test_inspect_forwards_the_complete_cli_argument_vector(self) -> None:

@@ -1,18 +1,234 @@
 # SPIKE Solver Status
 
+[Requested active-part library work](library/REQUESTED_LIBRARY_CAMPAIGN.md) adds
+20 functional logic families, an owned C++ four-state digital SDK and two
+original compiled sampled controller models. Manufacturer acquisition metadata
+is separate from runnable models. Full 54/74 coverage, 100 qualified variants
+per active category, electrical/timing qualification and native Studio logic
+binding remain open.
+
+[SPIKES/KLayout IC/ASIC foundations](SPIKES_ASIC_TWO_APPLICATION_FLOW.md) now
+include revision-bound flow preflight and actual native read-only layout
+inspection. No technology-mapped physical closure, PDK DRC/LVS execution,
+parasitic extraction or end-to-end ASIC qualification is established by them.
+
+The [native 1D equilibrium semiconductor-field kernel](SPIKES_TCAD_EQUILIBRIUM.md)
+solves homogeneous-material Poisson-Boltzmann electrostatics with prescribed
+doping. Native analytical/manufactured-solution and Gauss-law tests establish
+bounded mathematical behavior, not device qualification. Biased carrier
+transport, I-V, device geometry/process simulation and full TCAD remain open.
+
+Experimental [open-PDK profiles and circuit workflow](SPIKES_OPEN_PDK_WORKFLOW.md)
+now inspect local SKY130/GF180/IHP installations, prepare corner/temperature
+decks and execute them through explicitly selected ngspice after run-digest
+approval. Actual execution evidence currently uses an original synthetic NMOS
+fixture, not qualified foundry models. No full owned-engine PDK compatibility,
+compiled-model loader, layout extraction or TCAD is established.
+
+Experimental [user-defined electrical I/Q models and arbitrary-pin package
+parasitics](SPIKES_EQUATION_DEVICES.md) now compose native-ready subcircuits.
+Four-quadrant/NDR current and nonlinear conservative charge have native BE/BDF2
+oracles. Package R/L/C/leakage works around user-supplied cores including HEMT
+interfaces. This is not complete semiconductor parasitic physics, manufacturer
+qualification, arbitrary-state DAE support or owned `K`-element execution.
+
+The [native ideal CCM SMPS analytical model](SPIKES_SMPS_STABILITY.md), with
+an explicitly selectable Python test reference, supports
+supplied-parameter buck/boost/inverting buck-boost/flyback plants and rational
+PI/Type-II/Type-III voltage-mode loops. It reports model crossings, poles and CCM
+screening, not schematic extraction, native switching-loop stability or power-
+level/hardware qualification. DCM, current-mode, delays and parasitics are
+excluded. [Full SMPS coverage remains a roadmap](SPIKES_SMPS_ROADMAP.md).
+See [native execution boundaries and measured acceleration](SPIKES_NATIVE_EXECUTION.md).
+
+The source [AC PDN/filter workbench](PDN_SCREENING.md#explicit-ac-pdn-and-filter-workflow)
+supports explicitly modeled R/L/C, ESR/ESL, signed coupled CM chokes, DM chokes,
+ground/mutual capacitors, multiport/node transfer impedance and finite-rise
+load-spike voltage histories. Its finite retained-dielectric P1 extractor derives
+Maxwell C from electrode charge and independently checked field energy. Series
+capacitor sharing review retains intermediate-node and leakage/balancing limits;
+it never automatically adds voltage ratings. These are bounded approximate or
+experimental source capabilities, not automatic arbitrary-PCB/full-wave PI,
+dispersive/saturating magnetics, VRM control or deployed release qualification.
+
+SPIKES now has an unqualified prescribed-current one-RC battery reference study
+with configurable thermal response, self-discharge and empirical degradation.
+Chemistry labels have synthetic defaults; no native battery MNA stamping or
+manufacturer qualification is established. See [equations and validation](SPIKES_BATTERY_MODEL.md)
+and [Studio workflow](SPIKES_POWER_BATTERY_WORKFLOW.md).
+
+Original native laminar CFD and native Windows SU2 8.5.0 now share an executed
+Re=100 square-cavity reference. Both converged on 16/32/64 grids; finest
+centerline maximum differences were 0.016001 and 0.015698 times lid speed,
+decreasing with refinement and meeting the predeclared 0.03 gate. See
+[recorded validation](validation/NATIVE_SU2_CFD_20261011.md). This is experimental
+isothermal 2D evidence, not general assembly CFD, turbulence or CHT qualification.
+The isothermal cavity adapters do not advertise thermal or CAD support.
+The separate SU2 CHT adapter now executes a three-zone fluid cavity between
+hot and cold solid slabs through the bundled SU2 extension. Its 16/32-cell
+stationary and moving-flow checks passed: conduction agrees with the analytical
+series resistance to 0.000048 K; the finer moving case has 0.05853% global
+heat-balance mismatch and 7.0718% heat-rate change from the coarser mesh.
+These are experimental reference-case checks, not general assembly CHT or
+mesh independence. The earlier two-zone moving case failed temperature
+admission; a 64-cell three-zone conduction attempt timed out. Both remain
+explicitly excluded from passed evidence. See [CHT evidence](SU2_CHT.md) and
+[extension selection](EXTENSION_WORKSPACE_ENGINES.md#su2-cfd-and-cht).
+Existing channel and OpenFOAM assembly results retain their own distinct scopes.
+
+Geometry-based machine and actuator work now has an experimental planar
+nonlinear P1 FEM workflow with Maxwell-stress force/torque, prescribed-current
+quasi-static motion, stationary eddy-current diffusion and conservative planar
+thermal coupling. See [machine study workflow](MAGNETIC_MACHINE_STUDIES.md),
+[magnetic derivation](MAGNETIC_FEM.md) and [thermal derivation](MAGNETIC_THERMAL.md).
+This does not qualify 3D STEP machines, conforming sliding interfaces,
+moving-conductor losses, hysteresis, field/circuit drives or CFD coupling.
+
+SPIKES native transient now exposes opt-in adaptive BDF2/trapezoidal controls,
+bounded Newton-failure retries, source-corner history restart and sparse BE
+companion cache reuse. Ordinary C/L nonlinear residuals use stable accepted-state
+differences. [Validation and known switching limits](SPIKES_ADAPTIVE_SWITCHING_FOUNDATION.md)
+include a buck conditioning repair that completes at the default 1-fs minimum
+but rejects an insufficient 1-ps floor; these changes do not establish
+ngspice parity, universal LTE or converter qualification.
+
+Experimental [EM machine models](EM_MACHINES.md) execute reciprocal PM DC
+motor/generator dynamics and a linear single-gap electromagnet. Independent
+analytical/refinement and energy checks cover these supplied-parameter models.
+They do not solve rotating CAD, nonlinear magnetic materials or spatial fields.
+
+Experimental scalar co-simulation provides fixed-grid explicit-lag orchestration
+with replay/gain adapters. Digital twin support compares recorded predictions
+and telemetry at exact timestamps. These verify scheduling and residual
+calculation only; they do not qualify physics, integrate FMI, acquire live
+measurements or control hardware. Existing field/circuit and electrothermal
+capabilities retain their separate limits.
+See [workflow, evidence and staged plan](COSIMULATION_DIGITAL_TWIN.md).
+
+Experimental [PALACE and Xyce workbenches](PALACE_XYCE_WORKBENCHES.md) provide
+native configuration, bounded serial execution, diagnostics and native output
+inspection through separately installed engines. PALACE supports six native
+problem modes and optional sampled VTU field previews; Xyce accepts a deliberately
+bounded circuit/netlist subset and CSV waveforms. Adapter and UI regression tests
+do not establish native solver accuracy: neither runtime was available for live
+qualification during this integration. These applications do not automatically
+map board geometry, assign materials/ports or admit results as canonical SPIKE
+PI/SI/EM fields. MPI, arbitrary plugins and automatic multiphysics coupling remain
+unsupported. Platform and packaged-runtime limits are documented in each adapter.
+
+Independent-job parallel execution is available in the source worker runtime
+and local Solver manager panel, with explicit mutual-TLS remote enrollment.
+This schedules existing bounded models; it does not provide single-solve MPI
+or additional AMD/Intel GPU support. See
+[worker pool capabilities and acceptance limits](PARALLEL_WORKER_MANAGER.md).
+
+The experimental [PI engineering tools](PI_ENGINEERING_TOOLS.md) provide a
+steady CCM converter loss estimate, approximate copper resistance routes, and
+single-capacitor comparison on supplied passive sampled impedance networks.
+Their analytical/circuit regression checks establish bounded software behavior.
+They do not establish closed-loop switching transients, converter thermal
+feedback, a continuous capacitor-placement optimum or HV hardware qualification.
+
+A separate [native PWM electrothermal path](SOURCED_POWER_QUALIFICATION.md#actual-native-pwm-with-winding-thermal-feedback-2026-10-09)
+now executes a synchronous behavioral-switch buck with persistent switching MNA,
+cycle-sampled PI and winding-only lumped thermal feedback. Strict contracts,
+cycle frames, explicit external switch/load losses, energy ledgers and
+build-bound deterministic-replay restart are implemented. Independent switched
+ODE/refinement and actual Python/native integration checks passed. This does not
+upgrade the steady estimator above or establish vendor transistor switching
+losses, semiconductor thermal feedback, deadtime, spatial cooling or hardware
+correlation. Numerical human release review remains required.
+
+A separate [retained-volume PWM mode](PWM_VOLUME_ELECTROTHERMAL.md) removes
+embedded thermal RCs, conservatively maps all four device losses to explicit
+tetrahedral cells and returns volume histories. It reuses prepared sparse solid
+operators and native snapshots for window rollback, midpoint winding R(T)
+feedback and unrelaxed temperature/energy convergence checks. Analytical,
+switched-ODE refinement and actual uniform CalculiX history comparisons pass
+within the [declared numerical fixtures](validation/PWM_VOLUME_CORRELATION_20261010.md).
+General semiconductor temperature feedback, automatically mapped PCB devices,
+airflow, measured correlation and release qualification are not implied.
+
+The internal [laminar channel screen](INTERNAL_AIRFLOW.md) now returns conservative
+wall-heated fluid temperatures, prescribed fully developed velocity and pressure
+drop, with analytical and mesh-refinement regression checks. It is experimental,
+not a general geometry Navier-Stokes, turbulence or solid-fluid CHT solver.
+Retained solid transient studies also expose a [time-refinement check](THERMAL_ACCURACY_CHECKS.md).
+Fresh [CalculiX and OpenFOAM cooling evidence](validation/THERMAL_COOLING_ENVIRONMENTS_20261009.md)
+states the exact synthetic cases and untested interfaces.
+
+The approximate DC resistive-network solver supports optional per-source
+current-capacity feasibility using solved branch KCL. Over-capacity multi-sink
+setups fail without regulated operating-point fields. This does not implement
+CV/CC or foldback; other engines and modes reject the setting. See
+[derivation, evidence and recovery](SOURCE_CURRENT_LIMITS.md).
+
+Experimental native multiboard PI DC and SI single-frequency AC circuits can
+deposit every explicitly mapped resistor/contact loss into retained tetra
+volumes and iterate temperature-dependent resistance with the internal thermal
+kernel or CalculiX. Analytical two-board and mechanical-part fixtures cover
+DC/AC losses, RMS/peak conventions, feedback, contacts and saved-result admission.
+This is steady reduced-circuit electrothermal coupling. See
+[scope and evidence](MULTIBOARD_VOLUME_ELECTROTHERMAL.md).
+
+The layered board thermal path now supports bounded manually specified local
+rectilinear refinement and prescribed per-cell air/convection boundaries.
+Physical-cell result plots/probes and an analytical parallel-passage fan-system
+worker are integrated; see [inputs and evidence](ASSEMBLY_ELECTROTHERMAL.md).
+Selective thermal pad numbers retain all copper artwork. Direct board losses
+can now run without fabricated package resistances or junction temperatures.
+Six native-board-bound estimated loss cases executed with explicit omissions;
+the unlocated auxiliary loss and physical package/cooling qualification remain open.
+The real single-Blade local-refinement replay conserves energy but **fails** its
+0.1 K temperature comparison gate. Neither it nor the synthetic fan fixture
+qualifies installed assembly cooling, package bodies or arbitrary enclosure CFD.
+
+The [sourced power developer workflow](SOURCED_POWER_QUALIFICATION.md) adds
+hash-admitted native OP/transient regression checks, source snapshots, actual
+event-step caps and waveform evidence export. The separate resistor-feedback
+thermal transient reuses MNA OP and thermal RC kernels; it is not an electrical
+or semiconductor switching transient, airflow or hardware qualification.
+
 The [coupled assembly electrothermal worker](ASSEMBLY_ELECTROTHERMAL.md) adds
 experimental steady DC tetrahedral current/temperature feedback, matched-bond
 Joule heating and supplied waveform, RMS spectral and semiconductor-table
-averaged losses. A two-board ownership fixture, analytical energy balance and
+averaged losses. Stored-energy-aware multi-terminal heat, rectangular
+temperature/voltage/current loss tensors and a generated-PCB-mesh occurrence
+binding are also executable, without arbitrary device or CAD inference.
+A two-board ownership fixture, analytical energy balance and
 four-grid electrical convergence are tested. General PCB extraction, arbitrary
 device subcircuits, transient switching and measured qualification remain open.
+
+The [retained thermal meshing workflow](ASSEMBLY_THERMAL_MESHING.md) now generates
+project-bound tetrahedra for explicitly reviewed effective board layers and
+single closed STEP mechanical solids. It requires the separately admitted local
+Gmsh development runtime. [Reviewed component STEP promotion](THERMAL_COMPONENT_SOLIDS.md)
+retains package volumes with explicit material and mounting transforms. Joint
+OCC meshing gives touching occurrences conforming interfaces; automatic linking
+uses reviewed retained resistance and rejects gaps, overlaps and conflicting
+boundaries. Package volumes can receive existing board-circuit losses through
+explicit thermal-only declarations without duplicating electrical devices.
+Ambient convection and nonlinear Stefan-Boltzmann
+radiation may act together on exterior faces; solid conduction and explicit
+matched thermal contacts remain experimental. The desktop previews actual
+mesh surfaces and saved nodal temperatures. The new retained-assembly airflow
+compiler prepares conforming CHT cases and imports native fields, but native
+execution and acceptance are pending because WSL is unresponsive. Box coating,
+potting subtraction and larger solid mesh admission are described with their
+actual evidence and remaining gaps in [capability integration](ASSEMBLY_CAPABILITY_INTEGRATION.md).
+Arbitrary compound CAD remains unsupported. Experimental transient solid solves now add explicit material heat capacity and time-dependent heat loads; see [transient workflow](ASSEMBLY_THERMAL_TRANSIENT.md).
+
+The [retained-volume EM adapter](RETAINED_ASSEMBLY_EM.md) executes explicit
+conductor-resolved polyhedra with face-bound ports and E/H capture. It remains
+unvalidated; mechanical board solids without copper/stack/excitations cannot
+establish a device EM result.
 
 The [retained assembly field reference](ASSEMBLY_FIELD_HANDOFF.md) adds bounded
 experimental steady 3-D tetrahedral solid conduction, anisotropic material
 rotation, matched thermal contacts and offline result bindings. Original
 analytical/manufactured tests and geometric view-factor checks are recorded in
 [validation](validation/ASSEMBLY_FIELD_20261004.md). This is not arbitrary CAD
-extraction, airflow, transient thermal, coupled radiosity or a general assembly
+extraction, airflow, coupled radiosity or a general assembly
 Maxwell/SI backend. EM/SI handoffs retain ports but explicitly reject execution.
 
 The assembly desktop workspace now imports these supplied volume studies,
@@ -20,7 +236,10 @@ edits thermal boundary values, executes the admitted steady thermal path and
 reviews occurrence extrema and conservation evidence. `.spike` and standalone
 records retain setup and optional results with stale-assembly withholding; see
 [desktop integration checks](validation/ASSEMBLY_FIELD_DESKTOP_20261004.md).
-This UI does not yet integrate the separate coupled electrothermal contract.
+The volume electrothermal editor integrates the separate native circuit coupling
+contract, including CalculiX selection and saved temperature results. The viewer
+offers occurrence filtering, Celsius/kelvin, exterior/interior mesh inspection
+and a temperature scale shared across occurrences.
 
 This file describes executable behavior. Catalog entries marked unavailable are
 architecture contracts, not implemented physics.
@@ -225,6 +444,25 @@ See [coupled studies](MULTIBOARD_COUPLED_ANALYSIS.md) and
   no Marble copper or measured multiboard correlation is claimed.
 - See [Harness PI](HARNESS_PI.md) for limits and remaining coupled PI/SI work.
 
+### Authored harness SI and EM preparation
+
+- State: executable experimental supplied uniform two-port RLGC SI. Explicit
+  differential pairs or signal/return wires preserve physical endpoint identity.
+- DC supports an explicit power/return subset in a mixed harness. Parallel
+  conductors remain distinct elements; no resistance is inferred from roles.
+- SI reuses the owned uniform-line network kernel. A matched 100-ohm, 10 ns
+  lossless-line oracle checks complex transmission and zero reflection.
+- Saved SI results are bound to their complete request. A separate experimental
+  Python multi-conductor backend now supports exact sampled matrix RLGC,
+  branches/parallel paths, explicit contact/load models, mode conversion and
+  crosstalk. A bounded approximate straight round-wire/ideal-plane extractor
+  supplies frequency-dependent skin-effect RLGC. Twelve network and twelve
+  geometry analytical/refining-oracle tests pass; desktop integration is separate.
+  Arbitrary shielded/twisted cable extraction, PCB field coupling, independent
+  external-solver/measured qualification and radiation fields remain pending.
+- EM preparation returns unsupported requirements, never a field result.
+  See [harness engineering](HARNESS_ENGINEERING.md) for contracts and recovery.
+
 ### Copper Geometry DC (`spike.routed_dc`)
 
 - State: available
@@ -338,7 +576,21 @@ capacitance, MNA, failed-result/export and reviewed-port checks plus local rollo
 
 ### SPIKES owned circuit kernel and CLI
 
+- Native SIN increment (2026-10-12): analytic voltage/current sources execute
+  at internal adaptive solve times, preserve phase-dependent predelay values,
+  force the delay breakpoint and retain persistent-session global time.
+  Equal-model source/RC ngspice checks pass; EXP/SFFM remain sampled PWL.
+  See [scope and numerical checks](validation/NATIVE_SIN_PARITY_2026-10-12.md).
+
 - State: experimental circuit and integration foundation; not performance-qualified
+- Native parity increment (2026-10-10): owned `native-run` now orchestrates the
+  bounded `.step` and `.measure` subset without backend substitution. Transient
+  measurements integrate the piecewise-linear samples in time; DC statistics
+  remain sample-weighted. Behavioral tangent/inverse-hyperbolic-tangent values
+  and Jacobians execute in the C++ DAG. Fourteen small equal-model fixtures
+  pass native/ngspice common absolute-error gates; this is not matched internal
+  tolerance, complete compatibility, manufacturer, or performance evidence.
+  See [deck qualification](../standalone/spikes_project/studio/docs/NATIVE_DECK_QUALIFICATION.md).
 - Native kernel: strict-floating-point C++ modified nodal analysis for linear
   R/C/L elements and independent DC current/voltage sources, plus DC
   Shockley-diode, three-terminal Ebers-Moll BJT, and four-terminal Level-1
@@ -404,7 +656,9 @@ capacitance, MNA, failed-result/export and reviewed-port checks plus local rollo
   The bounded five-terminal GaN/SiC WBG model integrates conservative terminal
   charge and its electrothermal `Rth-Cth` state under BE/BDF2, including
   reverse conduction and avalanche. Level-1 MOSFET and Ebers-Moll BJT charge
-  storage is deliberately rejected in transient analysis. The
+  storage supports conservative lumped CGS/CGD/CDS and CBE/CBC/TF/TR companion
+  stamps under backward Euler/BDF2; hybrid trapezoidal is explicitly rejected.
+  These are bounded original charge models, not full production compact physics. The
   transient engine remains a correctness reference, not production SPICE.
 - Native switching: a four-terminal voltage-controlled switch provides finite
   Ron/Roff, a smooth threshold transition, an analytic control Jacobian, and
@@ -580,9 +834,40 @@ capacitance, MNA, failed-result/export and reviewed-port checks plus local rollo
   virtual MCU/FPGA, mixed-signal bridge, multimodal LLM runtime, or HIL
   qualification yet
 - Competitive claim gate: whole-product ngspice parity/superiority is blocked.
+  Current development adds bounded SIN/EXP/SFFM source parsing/reference evaluation and
+  owned-kernel analytic SIN evaluation plus EXP/SFFM PWL lowering on the requested
+  transient grid, with analytical native tests. The bounded SIN/RC ngspice checks
+  do not qualify all source families. See [analytic source limits](INTERNAL_SPICE_SOURCE_WAVEFORMS.md)
+  and [remaining development milestones](INTERNAL_SPICE_DEVELOPMENT.md).
   The ten fail-closed gates and current machine-readable status are documented
   in the separate circuit engine tests and
   `docs/validation/spikes-ngspice-competitive-gate.json`.
+- Compiled board preview: an internal-engine-only exporter generates a native
+  shared library with C/C++ object APIs and explicit Python loading. Independent
+  instances accept finite-resistance voltage drives, bounded steps and named
+  voltage/current observations, with save/restore/reset. The exporter admits RLC,
+  constant independent sources, static Shockley diodes and static Level-1 NMOS.
+  Explicit finite-resistance fault bridges and VTO edits retain accepted dynamic
+  state and are restored by checkpoints. A linked host C++ firmware example
+  exercises RC settling, loading drops, ADC quantization and sampled threshold
+  polling; broader engine device support is not automatically admitted. No MCU
+  instruction execution, FMI conformance, external-engine board libraries or
+  automatic PCB parasitic/multiphysics extraction is established. See
+  [package contract and numerical evidence](COMPILED_BOARD_LIBRARY.md) and
+  [research/adapter boundaries](BOARD_LIBRARY_RESEARCH.md).
+- Fault co-simulation: native resistor/VTO setters and compiled-board fault
+  descriptors support finite gate-source, drain-source/body-diode shunts,
+  degraded shunts and threshold shifts. Scheduled events split integration
+  steps, preserve capacitor/inductor state and replay with checkpoints. Supplied
+  FIT plus early-life/wear-out Weibull hazards can select event times; supplied
+  environmental coefficients map Kelvin, rad(Si), humidity and vibration into
+  explicit fault parameters. These are conditional scenarios, not calibrated
+  failure mechanisms, SEE prediction or hardware qualification. See
+  [fault/reliability scope](SPICE_FAULT_RELIABILITY.md).
+- Transient deck controls: `.tran TSTEP TSTOP [TSTART [TMAX]] [UIC]` now
+  distinguishes integration from retained output, enforces bounded TMAX and
+  retains the final stop point. An actual ngspice 46 RC comparison is covered in
+  [control evidence](INTERNAL_SPICE_TRANSIENT_CONTROLS.md).
 - Benchmarks: a bounded accuracy-first harness supplies analytical cases,
   warmups/repeats, hashes, explicit timing scope, and a no-shell external JSON
   adapter; speed is withheld whenever any measured repeat fails accuracy.
@@ -898,7 +1183,7 @@ Managed downloads remain disabled. See `docs/SOLVER_MANAGER.md`.
 | SPIKE object thermal network | Built-in local worker solves steady and transient object temperatures from explicit power, heat capacity, top/bottom paths, and per-object or named-face conduction, convection, and radiation boundaries; BOM CSV/TSV and ODB++ named property mapping are available in the GUI. The transient UI overlays solved part-node samples on board locations and reports per-part peak, peak time, time to 90% of steady rise, and final gap. A [board-linked eBrake1 example](validation/EBRAKE1_OBJECT_THERMAL_20260928.md) retains assumptions, result JSON, and object-temperature plots. | Approximate lumped nodes, including explicit interobject conduction; face labels do not resolve spatial gradients. The marker overlay is not a board temperature field. No geometry-derived path, board spreading, airflow, radiation view factors, CFD, or spatial temperature field; the eBrake1 assumptions and analytical checks do not establish measured-board correlation. |
 | SPIKE board thermal grids | Local worker supports the prior uniform 2D plate and an optional structured layered board volume. Imported pad lands locate heat injection; the layered mode samples track/pad/filled-zone/via-land copper coverage per physical copper stackup row, couples dielectric rows and plated barrels, and can blur each layer's copper occupancy. It solves lateral and vertical conduction across the physical stackup. Optional transient steps add per-cell copper/dielectric heat capacity, saved temperature frames, stored-energy and balance diagnostics, a peak history, and fixed-scale layer playback. Optional virtual board heatsinks add a shared isothermal top/bottom contact node with explicit interface and sink-to-ambient K/W; result heat flow is included in conservation. Layer temperature and coverage maps, pad heat paths, case/junction and sink temperatures, and toggles are available in Thermal setup. The [plate](validation/EBRAKE1_BOARD_THERMAL_20260928.md), [layered](validation/EBRAKE1_LAYERED_THERMAL_20260928.md), [transient](validation/EBRAKE1_LAYERED_TRANSIENT_20260928.md), and [virtual-sink](validation/EBRAKE1_VIRTUAL_HEATSINK_20260928.md) records retain results and assumptions. | Experimental bounding-rectangle model with sampled effective copper and one depth cell per stackup row; no conforming outline/cutouts, tetrahedra, 3D package/heatsink blocks, solder/lead/die field, airflow, measured calibration, or production qualification. Board-field transient assumes ambient initial state and constant losses; reported case/junction resistance-chain temperatures are steady. Virtual sink resistances are prescribed rather than derived from fin geometry and are not coupled to separate assembly/CFD heatsink shapes. Fuzzy copper changes connectivity, and mesh refinement remains incomplete. Results remain `approximate`. |
 | openEMS | Runnable through the isolated desktop adapter when discovery, preflight, and final-grid/time-window admission pass | Local three-level simple-patch rerun passed for current adapter 1.3.4, but packaged evidence still binds 1.1.0. The installed pair remains experimental pending evidence promotion; arbitrary PCB and compliance remain unvalidated. |
-| OpenFOAM | v2606 is installed in Ubuntu 24.04 WSL; deterministic steady open-air natural/forced convection cases run through bounded fixed-argv processes and import aligned T/U/p cell fields | Experimental air-domain surrogate only; no PCB solids, conjugate heat transfer, advanced environments, mesh/energy validation, or measured correlation |
+| OpenFOAM | v2606 is installed in Ubuntu 24.04 WSL; original single-region and separate multiregion solid/fluid cases execute through bounded processes and import fields; synthetic one/two-board fan CHT and solid-only radiation records exist | Experimental; general imported assembly CHT, paired CFD interface-flow histories, independent CFD comparison and measured correlation remain open. See [fan evidence](FAN_CHT_QUALIFICATION.md) and [fresh cooling checks](validation/THERMAL_COOLING_ENVIRONMENTS_20261009.md) for exact scopes |
 | Siemens FloTHERM | No adapter is present | Future connector only; SPIKE cannot bundle or activate the customer-provided runtime without permitted automation rights |
 | FreeCAD | ECAD/MCAD workbench and inert exchange contracts are implemented; local FreeCAD kernel smoke passes | Geometry exchange is not solver or product validation |
 | sparseLizard | Native Windows self-test runtime compiled without WSL; SpiDeR translation for DC, AC/RLCG, thermal, and field case contracts, process isolation/cancellation, strict result conversion, and qualification reporting are implemented | The installed executable is not the production PCB adapter. Its legacy manifest is unsigned, PETSc does not expose MUMPS, and no PCB fixture evidence is installed, so arbitrary PCB execution remains disabled |
@@ -1186,3 +1471,51 @@ environment, or assess compliance. Certification remains explicitly
 9. Promote SI beyond the bounded experimental single/pair extractors only after
    analytical modal, four-port S/NEXT/FEXT, independent-field, and measured
    coupled-line fixtures pass with accepted convergence and uncertainty.
+
+## Optional CalculiX and Gmsh extensions
+
+`spike.calculix-suite` executes separately installed CalculiX for experimental
+steady tetrahedral conduction, volumetric heating, prescribed temperature/flux,
+ambient convection/radiation and congruent matched thermal contacts. Actual
+CCX 2.23 analytical checks cover slab conduction, convection, radiation,
+volume-source refinement and separately indexed contact bodies. This is not
+production qualification. The dedicated `spike/calculix-thermal-result/v1`
+records external execution evidence; internal CG/Newton diagnostics and global
+heat balance are not fabricated. See [scope and checks](CALCULIX_THERMAL.md).
+
+`spike.gmsh-suite` generates complete bounded OCC tetrahedral geometry, including
+explicit normalized copper, dielectric, plated vias/drills, or reviewed retained
+assembly solids. It provides native mesher choices in all five analysis setup
+docks. Geometry admission does not establish PI/SI/EM translation, physics
+validation, or cross-engine reuse. Runtime prerequisites and source-geometry
+limits are described in [the extension](../extensions/gmsh_suite/README.md).
+
+## High-frequency loss update
+
+Bounded single/coupled SI now includes isolated slab complex skin impedance
+and optional empirical RMS roughness resistance. Explicit AC PI adds RMS
+roughness and opt-in internal reactance with external-only L. EMerge PEC
+board/Gerber generation rejects unsupported conductor loss requests.
+See [High-frequency conductor loss](HIGH_FREQUENCY_LOSSES.md) for controls,
+numerical evidence and limits; proximity redistribution, dispersive materials
+and arbitrary full-wave finite-conductor losses remain unvalidated.
+
+## Protocol eye-mask evaluation
+
+Retained NRZ polylines support strict polygon PASS/FAIL with boundary and
+segment-crossing checks, explicit units and source metadata. USB HS Template
+1/2 inner-opening profiles are selectable; outer and fixture conditions remain
+unassessed. PAM4 statistics and legacy records without phase coordinates are
+blocked. See [Eye-mask testing](SI_EYE_MASK_TESTING.md). Overall protocol
+compliance remains not_evaluated.
+
+## Retained assembly EM execution and saved fields
+
+Explicit copper/dielectric/connector tetrahedral volumes and conductor-face
+ports execute through the experimental OpenEMS retained-volume route. Saved
+studies bind geometry and results, persist in `.spike` and activate normalized
+E/H samples through the assembly EM workbench. The independent finite-cavity
+fixture reports 2.36% capacitance and 4.91% maximum gap-field discrepancy;
+Arduino qualification and dissipative-loss validation remain separate gates.
+See [retained assembly EM](RETAINED_ASSEMBLY_EM.md) and
+[independent reference](RETAINED_EM_INDEPENDENT_REFERENCE.md).

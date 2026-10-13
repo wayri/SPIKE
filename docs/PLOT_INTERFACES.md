@@ -8,6 +8,15 @@ samples, units, gaps, cursor measurements, result status and export reports.
 
 ## Navigation and clipboard
 
+Scalar-colored results include a persistent value-scale row with the quantity,
+units, color mapping and numeric bounds. The board viewport reserves a separate
+row for thermal, PI/SI and EM scales; hiding a probe card does not hide the scale.
+Plot scales follow the resolved Plotly color domain, palette and visible traces.
+Vector arrows show their magnitude range without inventing a color gradient.
+Categorical geometry/net colors and plots without scalar color data do not get
+a quantitative color scale. Constant values and unavailable ranges are handled
+explicitly; a missing unit is not guessed.
+
 - Ordinary wheel movement zooms around the pointer by default. Inside a
   Cartesian plot it zooms both axes; over an axis rail, ticks or title it zooms
   only that axis. **Wheel target** locks to X or Y inside the plot. The hovered
@@ -91,3 +100,16 @@ and [axis reference](https://plotly.com/javascript/reference/layout/xaxis/),
 and [Matplotlib tick concepts](https://matplotlib.org/stable/users/explain/axes/axes_ticks.html).
 SPIKE owns the interaction/exchange implementation; no external example code
 was copied.
+# Exact sample probes
+
+Click a saved sample in a Cartesian line plot to pin **A**, then click another
+to pin **B**. Markers and a readout show the trace, stored sample index and both
+axis quantities. A third click starts a new pair. **Clear probes** removes the
+pair; **Copy probes** copies exact numeric values and quantity labels as a table.
+B − A appears only when both axis labels agree. Missing units are explicitly
+labelled unspecified; the viewer does not infer units or interpolate samples.
+Pasted comparison traces are labelled and cannot select a solver sample.
+Changing the data or result revision clears probes.
+
+These cursors apply to line/scatter samples. Field maps retain their domain
+specific cell/geometry probing; a heatmap pixel is not treated as a line sample.

@@ -130,6 +130,11 @@ impl Lifecycle {
         self.0.exit_ready.load(Ordering::SeqCst)
     }
 
+    pub(crate) fn admit_update_exit(&self) {
+        self.0.closing.store(true, Ordering::SeqCst);
+        self.0.exit_ready.store(true, Ordering::SeqCst);
+    }
+
     fn begin(&self) -> bool {
         !self.0.closing.swap(true, Ordering::SeqCst)
     }
@@ -222,6 +227,7 @@ pub(crate) fn begin_shutdown(app: tauri::AppHandle) {
     let cleanup_lifecycle = lifecycle.clone();
     let (done, completion) = mpsc::channel();
     thread::spawn(move || {
+        cleanup_app.state::<super::mcp_bridge::BridgeState>().stop();
         let started = Instant::now();
         loop {
             if clear_resident(&resident) && cleanup_lifecycle.idle() {
@@ -232,7 +238,7 @@ pub(crate) fn begin_shutdown(app: tauri::AppHandle) {
             }
             thread::sleep(Duration::from_millis(20));
         }
-        cleanup_app.state::<super::mcp_bridge::BridgeState>().stop();
+        super::close_recovery::retire_owned_children();
         let _ = done.send(());
     });
     thread::spawn(move || {
@@ -414,6 +420,7 @@ mod tests {
         let (_stderr_sender, stderr) = mpsc::channel();
         let resident = Arc::new(Mutex::new(Some(super::super::ResidentWorker {
             child,
+            sessions: super::super::resident_worker_lifecycle::ResidentSessions::default(),
             stdin,
             responses,
             stderr,

@@ -31,7 +31,7 @@ BATTERY_VOLTAGES={'battery_liion':(3.,4.2),'battery_lifepo4':(2.5,3.65),'battery
 COMMON_LIMITATION='Original generic approximation; not fitted to a named product, not safety-qualified. No package parasitics, thermal network, aging, statistical spread or breakdown unless explicitly stated. Pin/input units are SI.'
 
 
-def catalog():
+def catalog(*,include_passives=False):
     records=[]
     for category,families in FAMILIES.items():
         for family,param,base,unit in families:
@@ -50,13 +50,19 @@ def catalog():
                     'manufacturer':None,'fidelity':'generic_reduced_order','license':'Original SPIKES project contribution; repository license',
                     'limitations':COMMON_LIMITATION+(' Equation bench only: not connected to circuit MNA.' if family not in NATIVE else ' Native recipe uses R/L/C, independent sources or static Shockley diode only.'),
                     'qualification':'unqualified_presets','origin':'deterministic engineering parameter grid v1'})
-    return {'contract':CONTRACT,'version':'1.0.0','records':records,
+    if include_passives:
+        from .passive_catalog import records as passive_records
+        records.extend(passive_records())
+    return {'contract':CONTRACT,'version':'1.1.0' if include_passives else '1.0.0','records':records,
             'counts':dict(Counter(r['category'] for r in records)),
             'archetype_count':sum(map(len,FAMILIES.values())),
-            'notice':'500 presets per category from 10 archetypes each; NOT 500 distinct validated component models per category.'}
+            'notice':'Original presets plus optional configurable preferred-value passives; NOT distinct validated manufacturer component models.' if include_passives else '500 presets per category from 10 archetypes each; NOT 500 distinct validated component models per category.'}
 
 
 def validate_record(record):
+    if isinstance(record,dict) and record.get('model_type')=='lumped_passive_rlc_v1':
+        from .passive_catalog import validate_record as validate_passive
+        return validate_passive(record)
     if not isinstance(record,dict) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,128}',record.get('id','')):raise ValueError('Invalid catalog ID')
     if record.get('family') not in {f[0] for rows in FAMILIES.values() for f in rows}:raise ValueError('Unknown model family')
     params=record['parameters']
@@ -77,6 +83,9 @@ def validate_record(record):
 
 
 def native_recipe(record):
+    if record.get('model_type')=='lumped_passive_rlc_v1':
+        from .passive_catalog import validate_record as validate_passive,model
+        validate_passive(record);return model(record)
     validate_record(record);f=record['family'];p=record['parameters']
     if f not in NATIVE:raise ValueError('Equation bench model: native circuit stamping is not implemented for this family')
     pins=['P','N'];lines=[]
@@ -106,6 +115,9 @@ def evaluate(record,inputs=None,state=None,dt=1e-4):
 
     Ideal stateful blocks use sampled updates, not implicit circuit DAE stamping.
     """
+    if record.get('model_type')=='lumped_passive_rlc_v1':
+        from .passive_catalog import validate_record as validate_passive,evaluate as evaluate_passive
+        validate_passive(record);return evaluate_passive(record,inputs)
     validate_record(record);u=dict(inputs or {});s=dict(state or {});p=record['parameters'];f=record['family']
     if not math.isfinite(dt) or not 0<dt<=1:raise ValueError('Bench step must be in (0,1] seconds')
     for values in (u,s):
@@ -219,4 +231,4 @@ def evaluate(record,inputs=None,state=None,dt=1e-4):
 
 def materialize(path):
     from .document import write_json
-    payload=catalog();write_json(path,payload);return payload
+    payload=catalog(include_passives=True);write_json(path,payload);return payload

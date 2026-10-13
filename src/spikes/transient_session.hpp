@@ -31,6 +31,10 @@ public:
   /** Update one constant independent voltage/current source by element id. */
   void set_source_value(std::string_view element_id, double value);
 
+  /** Bounded live parameter perturbations, effective at the next step. */
+  void set_resistance(std::string_view element_id, double resistance_ohm);
+  void set_mosfet_threshold(std::string_view element_id, double threshold_voltage_v);
+
   /** Advance exactly one step. Failure leaves the last accepted state intact. */
   [[nodiscard]] bool step(double step_s);
 
@@ -51,6 +55,7 @@ public:
   void restore(const TransientSessionCheckpoint &checkpoint);
 
 private:
+  void mark_parameter_discontinuity();
   Circuit circuit_;
   TransientOptions options_;
   TransientWorkspace workspace_;

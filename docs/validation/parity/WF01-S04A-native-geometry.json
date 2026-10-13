@@ -1,0 +1,1416 @@
+{
+  "contract": "spike/native-kicad-geometry/v1",
+  "kicad_version": "10.0.6",
+  "source_sha256": "84cccc5d0b59a17dfdf35ffd162c5a50574d5520eb386a91c4dc2f3bbf5a2211",
+  "runner_sha256": "0cda49f707aa5f38857a320650483381c22b2d94eb4cd8dc69135beea304eece",
+  "pads": [
+    {
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    }
+  ],
+  "components": [
+    {
+      "reference": "J1",
+      "position_mm": [
+        20.0,
+        10.0
+      ],
+      "native_angle_deg": 90.0
+    }
+  ],
+  "arcs": [
+    {
+      "start_mm": [
+        10.0,
+        0.0
+      ],
+      "mid_mm": [
+        12.0,
+        2.0
+      ],
+      "end_mm": [
+        14.0,
+        0.0
+      ],
+      "width_mm": 0.3,
+      "net": "SIGNAL",
+      "layer": "F.Cu"
+    }
+  ],
+  "outline": {
+    "area_mm2": 647.0,
+    "outer_count": 1,
+    "cutout_count": 1
+  },
+  "pad_cases": [
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": null,
+      "source_sha256": "55d90b594fb58bbac060359c128021eeb54a06b54bc06cd6f730be1d75fc951c",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 0,
+      "source_sha256": "1fb68e14c80d418a939cd642b3adfc46b951f3a86399d3b309f41de71d75bd06",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 23,
+      "source_sha256": "c6af3817bbd5e6a7b538c0cc18b6a255d90c5b6253b520a24da56d7c88342726",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.291405,
+        10.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 90,
+      "source_sha256": "dcba28adc13483690769e8642c0bbb2ab2320d111248d5fc1dc577f423d0c923",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.6,
+        10.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": null,
+      "source_sha256": "22ae6cab64e47eeece34400247d1ef90d109d5b2877bec7d0c1e958b6d6fbf27",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 0,
+      "source_sha256": "84cccc5d0b59a17dfdf35ffd162c5a50574d5520eb386a91c4dc2f3bbf5a2211",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 23,
+      "source_sha256": "38420b30f5362e84ece6f2c9e72f84f5a88cf2ae35676f3ada8386f46f13f7b0",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        20.291405,
+        7.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 90,
+      "source_sha256": "bab7043f277d5f46ff93c83b14264fbfd67731b6c368e62526cff4d5fd9d4776",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.6,
+        7.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": null,
+      "source_sha256": "b8acbd62e07be472f90d7979b50be9ca84dc6aceb46c73ba950927adbe1cf17a",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 0,
+      "source_sha256": "24dd878ce8371b5e79054bee9a7c96a479448d6c86a35160b2a7784ddc4aa315",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 23,
+      "source_sha256": "551e3bb543019d07afb7eb0be419ab50910f7256dba61b0cc1bfa629e947fb85",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.490491,
+        8.992364,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 90,
+      "source_sha256": "3977b0b4befe3e788868b00a7332803a3f44fac5b362512feaec0f0476328750",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.799086,
+        8.995005,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": null,
+      "source_sha256": "08fe600cb80a47bb085fd7b603517b1ccdfafeed671bb697118a0b9682a2297f",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 0,
+      "source_sha256": "839227fbaef09b5fb662fe69ef4b8541891790db5d30635edf29119a59510f82",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 23,
+      "source_sha256": "aa1b95d657797493866d3be1fdb9d3afd883b7c83ea9373444aabde40ed94830",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.291405,
+        10.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 90,
+      "source_sha256": "2a9453c540417481884095554f4d043f148ac3a7fa92b1eb0c373b90bdc5bc2c",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.6,
+        10.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": null,
+      "source_sha256": "fdba1d8010f75ba64f4c08afa17ff9fd8cfeb9ecb2c02b77e3e93f2b00e189fe",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 0,
+      "source_sha256": "b6806a4b9f04a3f12ecb6ffff468afa6f5787bdd899b972b36e115ac85bade47",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 23,
+      "source_sha256": "8e22a3d1c6dae0754edf454d08423e72d7bcc0b4f09b6f0708e8007dc4607d89",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        20.291405,
+        7.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 90,
+      "source_sha256": "6120d95b13d8a8da44b02d46c8dd7e4f5e9c0d0aae46af970fcbe8f45c118c40",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.6,
+        7.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": null,
+      "source_sha256": "fe4955696582aa864a145daf14873ed670322efe95a49e4da9957e0ce2076edb",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 0,
+      "source_sha256": "b4550a0a446a73a87749807f0315739767ef2ed272593f554d4722672e9604e9",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 23,
+      "source_sha256": "c88452f4eca0649ec36bc4addd0559d3330a32759a712f5f432b8074ddc389af",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.490491,
+        8.992364,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "footprint",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 90,
+      "source_sha256": "a7b13974948a3e144a9c80a75a8a1d0f90933f7fecaed0185aa298333b8dbdfe",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.799086,
+        8.995005,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": null,
+      "source_sha256": "7167c0a48a4bbba966d111214e6e40cac9184d9c264f2a6dca4eebac89e5d2d0",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 0,
+      "source_sha256": "d640d6232900e3b114e4522db638bcbae14821fe459981e45b08988e76850580",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 23,
+      "source_sha256": "be912598d0a849b884b60256bf94cbb827a28ddbfeb3286ef3aea1ffc6221674",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.291405,
+        10.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 90,
+      "source_sha256": "6b5a300bb5c4809fd00517648c2129ac08bddfc1e22fd82e586eed8e56605ac4",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.6,
+        10.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": null,
+      "source_sha256": "194329f5cae5bfa28878b79684ecc3f4fdb7ed02d7481a9dd606fec7b636f92d",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 0,
+      "source_sha256": "14eeb16e450fdf343177914723f4aa83a753236ae2314ea606fcd13cc31a9fe9",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 23,
+      "source_sha256": "c9c82dbe8794512a91efffe84aa1d7cca2f3a5e6701e2328611bbced2533cece",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        20.291405,
+        7.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 90,
+      "source_sha256": "826f25c74b2d334dd3ff01899324fdeac8a62ad90a5b350c447f67d1bb700d9e",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.6,
+        7.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": null,
+      "source_sha256": "9a3740805189791bf7e5de7ab6dd1062473b49ffacca0a5f12c730fd70891770",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 0,
+      "source_sha256": "890480ac5c7e2cc2b4978e3e568db845fc14d0df1b5646a71428ea54849cf3e5",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 23,
+      "source_sha256": "45b61b6f2656a8af6085e8c6745e368a2188f8357fde2504ebeb30d7c4c6a9a6",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.490491,
+        8.992364,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "module",
+      "side": "F.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 90,
+      "source_sha256": "1eea2159eca538e1d13c07c666abcfd8e74267a2d88211609bbf37a22107a98c",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.799086,
+        8.995005,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": null,
+      "source_sha256": "8d29f7e94ebdf2e5be734cd4ae116888eb62c44587e03e4266cdbae4c6f93674",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 0,
+      "source_sha256": "35f43befe9f4439eb80291e37b1605ac196af9b32ebd8d1727c91e10d87e2bf3",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.4,
+        10.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 23,
+      "source_sha256": "1f7833f098d827231e7da0cb0eac3ddf341bb741c0fd40a206b1d6017077f738",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.291405,
+        10.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 0,
+      "pad_angle": 90,
+      "source_sha256": "96a10f6ed3ff58acb30b36a3584700808346ed0641297e34fae141fa8f1c12f4",
+      "native_footprint_angle_deg": 0.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.0,
+        11.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.6,
+        10.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": null,
+      "source_sha256": "405cd5e2b42f9a020d414ac8a6acda9d781c1b5699fedd0aedd3177ee831dc2e",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 0,
+      "source_sha256": "ae1369dcf39a31822757fa6a6176ca64e56bd33ff1cd107007f247ed84cdd157",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.4,
+        7.6,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 23,
+      "source_sha256": "5973abc4f49e9a6bd2e69c204b923c7d76f89bf0cbffdd9e34e7b4afdd10e766",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        20.291405,
+        7.397359,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 90,
+      "pad_angle": 90,
+      "source_sha256": "f2490e15867e8ccc68141905a7cd9702b7a8647f2a8305f043ef1863853f8f23",
+      "native_footprint_angle_deg": 90.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.6,
+        7.4,
+        0.8,
+        1.2
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": null,
+      "source_sha256": "49343d11759dfe40bab06d97b2d858f8e8eab2b424b9ff26183246d7c3e4c8f8",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 0,
+      "source_sha256": "eb45ae150604ba64920db282547aecd1239800e6dc9c37fd816b73069fada17e",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        21.599086,
+        9.195005,
+        1.2,
+        0.8
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 23,
+      "source_sha256": "d89ca0461948e30e096661059d40323b05c8ba68ff98d09dedd343e8f1cd22c8",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 23.0,
+      "bbox_mm": [
+        21.490491,
+        8.992364,
+        1.41719,
+        1.205282
+      ]
+    },
+    {
+      "token": "module",
+      "side": "B.Cu",
+      "footprint_angle": 37,
+      "pad_angle": 90,
+      "source_sha256": "8711ed68fae1d700179aba799384744d90a2927c629ee12e9d2af58d47fd6dbb",
+      "native_footprint_angle_deg": 37.0,
+      "source_id": "66666666-6666-4666-8666-666666666666",
+      "center_mm": [
+        22.199086,
+        9.595005
+      ],
+      "size_mm": [
+        1.2,
+        0.8
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        21.799086,
+        8.995005,
+        0.8,
+        1.2
+      ]
+    }
+  ],
+  "shape_cases": [
+    {
+      "kind": "slot",
+      "side": "F.Cu",
+      "pad_angle": 0,
+      "source_sha256": "f566634ee4d7ca9e8b97c2e029ab6e0bd4cf7e5c66e6ce7eb50d0faf08158fda",
+      "source_id": "b69435d9-d2cd-4c73-bf65-950b6b2d1b4a",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        2.0,
+        1.0
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.0,
+        7.5,
+        2.0,
+        1.0
+      ],
+      "hole_bbox_mm": [
+        20.4,
+        7.8,
+        1.2,
+        0.4
+      ]
+    },
+    {
+      "kind": "custom",
+      "side": "F.Cu",
+      "pad_angle": 0,
+      "source_sha256": "747d2370a8e309db35b139c0d502c3505d411cc53f11024a6c012fe695838f08",
+      "source_id": "3356b04b-a169-44d6-ac78-0d5774e26531",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        0.2,
+        0.2
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.9,
+        7.9,
+        2.1,
+        0.6
+      ]
+    },
+    {
+      "kind": "slot",
+      "side": "F.Cu",
+      "pad_angle": 90,
+      "source_sha256": "f37c1cd5f808199d4cc0ca8323dca0061f68e4038d0da77dca9cc3442e2f01dc",
+      "source_id": "e52452f3-6023-4cd0-b61d-d39d54e661b1",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        2.0,
+        1.0
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.5,
+        7.0,
+        1.0,
+        2.0
+      ],
+      "hole_bbox_mm": [
+        20.8,
+        7.4,
+        0.4,
+        1.2
+      ]
+    },
+    {
+      "kind": "custom",
+      "side": "F.Cu",
+      "pad_angle": 90,
+      "source_sha256": "4aaacc1251228801d05f98e13d6b734e9b0642a10f5244a824f153bd59f34be3",
+      "source_id": "bac5ab66-cb11-421b-8c64-9371e252def5",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        0.2,
+        0.2
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.9,
+        6.0,
+        0.6,
+        2.1
+      ]
+    },
+    {
+      "kind": "slot",
+      "side": "B.Cu",
+      "pad_angle": 0,
+      "source_sha256": "1f2e9a6e834e30105b6d4e7f318ed555c6ee228545ead381b4cc316b3437504b",
+      "source_id": "0f68bd45-367b-4882-9232-c81e083fa5ba",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        2.0,
+        1.0
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.0,
+        7.5,
+        2.0,
+        1.0
+      ],
+      "hole_bbox_mm": [
+        20.4,
+        7.8,
+        1.2,
+        0.4
+      ]
+    },
+    {
+      "kind": "custom",
+      "side": "B.Cu",
+      "pad_angle": 0,
+      "source_sha256": "572fa5e9b78980194d462b6603fc658b66cd4348d4911b11b9362453b6687046",
+      "source_id": "cc11b4b4-ebfc-425a-8d19-4447cea28eb7",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        0.2,
+        0.2
+      ],
+      "native_angle_deg": 0.0,
+      "bbox_mm": [
+        20.9,
+        7.9,
+        2.1,
+        0.6
+      ]
+    },
+    {
+      "kind": "slot",
+      "side": "B.Cu",
+      "pad_angle": 90,
+      "source_sha256": "009b6ce0a530ac23dfd012b0eb6ff30c6edc8eb1b0b644197e051c2bde1a717d",
+      "source_id": "f0d07dfe-df39-4f7b-871e-f52078db1479",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        2.0,
+        1.0
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.5,
+        7.0,
+        1.0,
+        2.0
+      ],
+      "hole_bbox_mm": [
+        20.8,
+        7.4,
+        0.4,
+        1.2
+      ]
+    },
+    {
+      "kind": "custom",
+      "side": "B.Cu",
+      "pad_angle": 90,
+      "source_sha256": "95e73d3f766f5ea993fd657cd6eee35ed6094288033a1291199dac0311739e40",
+      "source_id": "389eed4a-f723-461e-ab82-41c10d853f49",
+      "center_mm": [
+        21.0,
+        8.0
+      ],
+      "size_mm": [
+        0.2,
+        0.2
+      ],
+      "native_angle_deg": 90.0,
+      "bbox_mm": [
+        20.9,
+        6.0,
+        0.6,
+        2.1
+      ]
+    }
+  ]
+}

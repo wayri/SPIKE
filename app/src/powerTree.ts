@@ -169,6 +169,7 @@ export type TopologyModel = {
   nodes: TopologyNode[];
   edges: TopologyEdge[];
   scenarios?: TopologyScenario[];
+  acPdnRequest?: Record<string, unknown>;
   extraction: {
     source: "board_netlist" | "kicad_schematic+board_netlist" | "kicad_xml_netlist" | "manual";
     generatedAt: string;

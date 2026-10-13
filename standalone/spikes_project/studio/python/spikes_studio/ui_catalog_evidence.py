@@ -19,8 +19,8 @@ def verify_catalog(frame,destination):
     def begin():
         try:
             panel=frame.catalog_panel;frame.book.SetSelection(11)
-            check(len(panel.catalog['records'])==5000,'catalog exposes 5000 labeled presets')
-            panel.category.SetStringSelection('Passives');panel.filter();check(len(panel.visible)==500,'category filter returns 500 presets')
+            check(len(panel.catalog['records'])==7908,'catalog exposes original presets plus preferred-value passives')
+            panel.category.SetStringSelection('Passives');panel.filter();check(len(panel.visible)==3408,'passive category includes 2908 standard templates plus 500 original presets')
             panel.search.SetValue('fuse');panel.filter();panel.list.SetSelection(0);panel.select();panel.inputs.SetValue('{"current":100}');panel.evaluate()
             check('TRIPPED' in panel.output.GetValue(),'bench fuse threshold produces visible alert text')
             capture_window(frame,destination/'catalog-bench.png')

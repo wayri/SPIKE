@@ -16,12 +16,22 @@ from python.spikes.native_runner import run_native_project
 ROOT = Path(__file__).resolve().parents[2]
 LIBRARY = Path(os.environ.get(
     "SPIKES_TEST_NATIVE_LIBRARY",
-    ROOT / "build-peec-native" / "spikes_c_api.dll",
+    os.environ.get(
+        "SPIKES_NATIVE_LIBRARY",
+        ROOT / "build-peec-native" / "spikes_c_api.dll",
+    ),
 ))
 EXAMPLE = ROOT / "examples" / "spikes" / "native_pwm_switch.cir"
 
 
 class NativeExtensionParserTests(unittest.TestCase):
+    def test_native_runner_rejects_unsupported_analysis_before_loading_library(self):
+        project = parse_netlist(
+            "V1 out 0 AC 1\nR1 out 0 1k\n.ac lin 2 1k 2k\n"
+        )
+        with self.assertRaisesRegex(ValueError, "does not support ac analysis"):
+            run_native_project(project, ROOT / "does-not-exist.dll")
+
     def test_standard_diode_model_resolves_forward_and_round_trips(self):
         source = """diode model compatibility
 I1 0 out 1m
@@ -110,6 +120,61 @@ Xpower in out gate stage
 
 @unittest.skipUnless(LIBRARY.is_file(), "built SPIKES C ABI library is unavailable")
 class NativeCliExecutionTests(unittest.TestCase):
+    def test_owned_native_transient_measurements_integrate_a_ramp(self):
+        project = parse_netlist(
+            "V1 out 0 PWL(0 0 1 1)\nR1 out 0 1k\n"
+            ".measure tran average AVG V(out) FROM=.2 TO=.8\n"
+            ".measure tran rms RMS V(out) FROM=.2 TO=.8\n"
+            ".tran .1 1\n", native_extensions=True,
+        )
+        result = run_native_project(project, LIBRARY)
+        self.assertEqual(result.status, "completed")
+        self.assertAlmostEqual(result.measurements["average"]["value"], .5)
+        self.assertAlmostEqual(result.measurements["rms"]["value"], math.sqrt(.28))
+        self.assertEqual(result.measurements["average"]["weighting"], "time")
+
+    def test_owned_native_step_and_measure_use_each_elaborated_variant(self):
+        project = parse_netlist(
+            ".param load=1k\n"
+            "V1 in 0 10\nR1 in out {load}\nR2 out 0 1k\n"
+            ".step param load list 1k 3k\n"
+            ".measure op output FIND V(out)\n.op\n",
+            probes=(ProbeDescriptor.parse("V(out)"),),
+        )
+        result = run_native_project(project, LIBRARY).to_dict()
+        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["diagnostics"]["step_variants"], 2)
+        self.assertEqual(
+            [item["result"]["value"] for item in result["probes"]["V(out)"]["by_step"]],
+            [5.0, 2.5],
+        )
+        self.assertEqual(
+            [item["result"]["value"] for item in result["measurements"]["output"]["by_step"]],
+            [5.0, 2.5],
+        )
+        for point in result["data"]["points"]:
+            self.assertEqual(point["measurements"]["output"]["status"], "completed")
+        self.assertEqual(
+            result["provenance"]["step_orchestration"],
+            "deterministic_cartesian_owned_cpp",
+        )
+
+    def test_owned_native_step_propagates_a_failed_variant(self):
+        project = parse_netlist(
+            ".param opposing=1\n"
+            "V1 out 0 1\nV2 out 0 {opposing}\n"
+            ".step param opposing list 1 2\n.op\n"
+        )
+        result = run_native_project(project, LIBRARY).to_dict()
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["diagnostics"]["completed_step_variants"], 0)
+        self.assertEqual(result["issues"][-1]["code"], "SPIKES_STEP_POINT_FAILED")
+        self.assertEqual(result["issues"][-1]["parameters"], {"opposing": 1.0})
+        self.assertTrue(any(
+            issue["code"] == "SPIKES_NATIVE_SOLVE_FAILED"
+            for issue in result["issues"]
+        ))
+
     def test_owned_native_execution_uses_elaborated_parameters_and_globals(self):
         project = parse_netlist(
             """.param supply=10 base=1k

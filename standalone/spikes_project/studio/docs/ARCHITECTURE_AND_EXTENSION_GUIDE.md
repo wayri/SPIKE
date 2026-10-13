@@ -25,6 +25,14 @@ Data flow: editor/netlist → validated project → selected analysis/backend �
 and provenance → plots, probes, reports. Python reference analyses and native C++
 analyses are distinct backends; record which one produced a result.
 
+Studio code pairing reuses the actual source widgets: `editor_canvas_split.py`
+temporarily reparents a document and canvas into a splitter;
+`controller_code_window.py` reparents the sampled controller editor into a
+hide-on-close floating frame. Neither creates a second source authority.
+`code_crossprobe.py` owns theme-aware lexical styling and bounded exact-name
+navigation to known component/net/controller identities. It does not evaluate
+source, infer connectivity from arbitrary identifiers, or perform HDL elaboration.
+
 ## 2. Embedding and CLI
 
 From the repository root, these are actual CLI entry points:

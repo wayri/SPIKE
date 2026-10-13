@@ -1,0 +1,195 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.gmsh-suite",
+  "name": "Gmsh Volume Mesher",
+  "version": "0.1.0",
+  "provider": "SPIKE",
+  "description": "Generate bounded complete tetrahedral volumes from normalized PCB copper, vias and layers or reviewed retained assembly solids. Geometry only; no physics solve.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "experimental",
+  "license": "Apache-2.0",
+  "bundled": true,
+  "ui": {
+    "menu_bar": true,
+    "title_bar": true,
+    "menu_items": [
+      "gmsh-probe",
+      "gmsh-mesh-pcb",
+      "gmsh-mesh-assembly"
+    ]
+  },
+  "permissions": [
+    "design.read",
+    "project.read",
+    "results.write",
+    "filesystem.workspace"
+  ],
+  "limits": {
+    "timeout_seconds": 1000,
+    "max_result_bytes": 8388608
+  },
+  "contributes": {
+    "applications": [
+      {
+        "id": "gmsh-probe",
+        "name": "Check Gmsh runtime",
+        "category": "Mesh",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      {
+        "id": "gmsh-prepare-pcb",
+        "name": "Prepare complete PCB solids",
+        "category": "Mesh",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request"
+          ],
+          "properties": {
+            "request": {
+              "type": "object",
+              "description": "Complete spike/pcb-volume-mesh-request/v1 normalized volume model, sizing and resource limits"
+            },
+            "expected_design_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        }
+      },
+      {
+        "id": "gmsh-mesh-pcb",
+        "name": "Generate complete PCB tetrahedra",
+        "category": "Mesh",
+        "output_contract": "spike/gmsh-mesh/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request",
+            "expected_design_sha256"
+          ],
+          "properties": {
+            "request": {
+              "type": "object",
+              "description": "Complete normalized PCB model; no automatic source conversion or net omission"
+            },
+            "expected_design_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "timeout_s": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600,
+              "default": 180
+            },
+            "memory_limit_mb": {
+              "type": "integer",
+              "minimum": 256,
+              "maximum": 8192,
+              "default": 2048
+            }
+          }
+        },
+        "workspace_routes": [
+          {
+            "id": "gmsh-mesh-workspace",
+            "workspace": "mesh",
+            "operation": "mesh",
+            "label": "Gmsh complete PCB volumes",
+            "setup_contribution_id": "gmsh-mesh-pcb",
+            "preview_contribution_id": "gmsh-prepare-pcb",
+            "mesh_kind": "tetrahedral",
+            "model_status": "experimental",
+            "compatible_solver_ids": []
+          },
+          {
+            "id": "gmsh-em-geometry",
+            "workspace": "em",
+            "operation": "mesh",
+            "label": "Gmsh geometry for explicit EM translation",
+            "setup_contribution_id": "gmsh-mesh-pcb",
+            "mesh_kind": "tetrahedral",
+            "model_status": "experimental",
+            "compatible_solver_ids": []
+          },
+          {
+            "id": "gmsh-si-geometry",
+            "workspace": "si",
+            "operation": "mesh",
+            "label": "Gmsh geometry for explicit SI translation",
+            "setup_contribution_id": "gmsh-mesh-pcb",
+            "mesh_kind": "tetrahedral",
+            "model_status": "experimental",
+            "compatible_solver_ids": []
+          },
+          {
+            "id": "gmsh-pi-geometry",
+            "workspace": "pi",
+            "operation": "mesh",
+            "label": "Gmsh geometry for explicit PI translation",
+            "setup_contribution_id": "gmsh-mesh-pcb",
+            "mesh_kind": "tetrahedral",
+            "model_status": "experimental",
+            "compatible_solver_ids": []
+          }
+        ]
+      },
+      {
+        "id": "gmsh-mesh-assembly",
+        "name": "Generate retained assembly thermal volumes",
+        "category": "Thermal",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "project_path",
+            "expected_manifest_payload_sha256",
+            "assignments",
+            "mesh_options"
+          ],
+          "properties": {
+            "project_path": {
+              "type": "string"
+            },
+            "expected_manifest_payload_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "assignments": {
+              "type": "object",
+              "description": "Reviewed effective layer and exact single-solid part materials"
+            },
+            "mesh_options": {
+              "type": "object",
+              "description": "min_size_mm, max_size_mm, max_cells, max_vertices"
+            }
+          }
+        },
+        "workspace_routes": [
+          {
+            "id": "gmsh-thermal-geometry",
+            "workspace": "thermal",
+            "operation": "mesh",
+            "label": "Gmsh retained assembly volumes",
+            "setup_contribution_id": "gmsh-mesh-assembly",
+            "mesh_kind": "tetrahedral",
+            "model_status": "experimental",
+            "compatible_solver_ids": []
+          }
+        ]
+      }
+    ]
+  }
+}

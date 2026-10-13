@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/studio-board-feedback-request-v1.schema.json",
+  "title": "Board-bound Studio feedback supplied inputs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "netlist",
+    "board_revision",
+    "mode",
+    "bindings",
+    "thermal",
+    "controls"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/studio-board-cosimulation-request/v1"
+    },
+    "netlist": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2097152
+    },
+    "board_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "mode": {
+      "enum": [
+        "steady_state",
+        "transient"
+      ]
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "element_id",
+          "component_id",
+          "thermal_node_id",
+          "reference_temperature_k",
+          "temperature_coefficient_per_k"
+        ],
+        "properties": {
+          "element_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "component_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "thermal_node_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "reference_temperature_k": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "temperature_coefficient_per_k": {
+            "type": "number"
+          },
+          "geometry": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "length_m",
+              "width_m",
+              "thickness_m",
+              "resistivity_ohm_m",
+              "expansion_per_k"
+            ],
+            "properties": {
+              "length_m": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "width_m": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "thickness_m": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "resistivity_ohm_m": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "expansion_per_k": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "thermal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ambient_temperature_k",
+        "nodes",
+        "links"
+      ],
+      "properties": {
+        "ambient_temperature_k": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "capacitance_j_per_k",
+              "initial_temperature_k",
+              "minimum_temperature_k",
+              "maximum_temperature_k"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "capacitance_j_per_k": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "initial_temperature_k": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "minimum_temperature_k": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "maximum_temperature_k": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        },
+        "links": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "from_id",
+              "to_id",
+              "resistance_k_per_w"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "from_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "to_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "resistance_k_per_w": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "window_s",
+        "electrical_step_s",
+        "stop_time_s",
+        "temperature_tolerance_k",
+        "power_tolerance_w",
+        "balance_tolerance_w",
+        "maximum_iterations",
+        "relaxation",
+        "time_limit_s"
+      ],
+      "properties": {
+        "window_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "electrical_step_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "stop_time_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "temperature_tolerance_k": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "power_tolerance_w": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "balance_tolerance_w": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximum_iterations": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 100
+        },
+        "relaxation": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "time_limit_s": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 120
+        }
+      }
+    }
+  }
+}

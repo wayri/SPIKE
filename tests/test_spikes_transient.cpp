@@ -427,6 +427,333 @@ void adaptive_embedded_lte_solves_nonlinear_diode_dae() {
                   reference.points().back().node_voltage("out")) < 6.0e-3);
 }
 
+void adaptive_newton_failure_retries_without_committing_charge_history() {
+  spikes::Circuit circuit;
+  circuit.add_voltage_source("V1", "in", "0", 5.0);
+  circuit.add_resistor("R1", "in", "out", 100.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0e-6);
+  circuit.add_diode("D1", "out", "0");
+  spikes::TransientOptions options;
+  options.initialize_from_operating_point = false;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.time_step_s = 2.0e-5;
+  options.stop_time_s = 1.0e-4;
+  options.nonlinear.max_newton_iterations = 3;
+  options.nonlinear.absolute_tolerance = 1.0e-12;
+  options.nonlinear.relative_tolerance = 1.0e-10;
+  const auto fixed = spikes::solve_transient(circuit, options);
+  assert(!fixed.converged());
+  assert(fixed.diagnostics().rejected_newton_steps == 0);
+
+  auto reference_options = options;
+  reference_options.time_step_s = 1.0e-7;
+  reference_options.nonlinear.max_newton_iterations = 100;
+  const auto reference = spikes::solve_transient(circuit, reference_options);
+  assert(reference.converged());
+
+  options.adaptive_time_step = true;
+  options.minimum_time_step_s = 1.0e-9;
+  options.lte_absolute_tolerance = 1.0e-6;
+  options.lte_relative_tolerance = 1.0e-4;
+  for (const std::size_t sparse_threshold : {std::size_t{1}, std::size_t{128}}) {
+    options.sparse_linear_threshold = sparse_threshold;
+    const auto recovered = spikes::solve_transient(circuit, options);
+    assert(recovered.converged());
+    assert(recovered.diagnostics().rejected_newton_steps > 0);
+    assert(recovered.diagnostics().failed_time_s == 0.0);
+    assert(recovered.diagnostics().minimum_accepted_step_s < options.time_step_s);
+    assert(near(recovered.points().back().node_voltage("out"),
+                reference.points().back().node_voltage("out"), 6.0e-3));
+    assert(recovered.points().back().time_s == options.stop_time_s);
+    for (std::size_t index = 1; index < recovered.points().size(); ++index) {
+      assert(recovered.points()[index].time_s > recovered.points()[index - 1].time_s);
+    }
+    if (sparse_threshold == 1) {
+      // One primary and one BE companion pattern, not one ordering per Newton solve.
+      assert(recovered.diagnostics().sparse_symbolic_analyses == 2);
+      assert(recovered.diagnostics().embedded_lte_solves > 2);
+    }
+  }
+  options.nonlinear.max_newton_iterations = 1;
+  options.minimum_time_step_s = 1.0e-5;
+  const auto bounded = spikes::solve_transient(circuit, options);
+  assert(!bounded.converged());
+  assert(bounded.diagnostics().rejected_newton_steps > 0);
+  assert(bounded.message().find("minimum timestep") != std::string::npos);
+  assert(bounded.points().empty());
+  options.minimum_time_step_s = 1.0e-9;
+  options.max_rejected_steps = 1;
+  const auto limited = spikes::solve_transient(circuit, options);
+  assert(!limited.converged());
+  assert(limited.diagnostics().rejected_newton_steps == 2);
+  assert(limited.message().find("rejection limit") != std::string::npos);
+  assert(limited.points().empty());
+}
+
+void adaptive_sparse_linear_companion_reuses_symbolic_ordering() {
+  spikes::Circuit circuit;
+  circuit.add_voltage_source("V1", "in", "0", 1.0);
+  circuit.add_resistor("R1", "in", "out", 1000.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0e-6);
+  spikes::TransientOptions options;
+  options.initialize_from_operating_point = false;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.adaptive_time_step = true;
+  options.time_step_s = 1.0e-4;
+  options.stop_time_s = 1.0e-3;
+  options.sparse_linear_threshold = 1;
+  const auto sparse = spikes::solve_transient(circuit, options);
+  assert(sparse.converged());
+  assert(sparse.diagnostics().embedded_lte_solves > 2);
+  assert(sparse.diagnostics().sparse_symbolic_analyses == 2);
+  assert(sparse.diagnostics().sparse_numeric_factorizations > 2);
+  options.sparse_linear_threshold = 128;
+  const auto dense = spikes::solve_transient(circuit, options);
+  assert(dense.converged());
+  assert(sparse.points().size() == dense.points().size());
+  for (std::size_t index = 0; index < sparse.points().size(); ++index) {
+    assert(near(sparse.points()[index].time_s, dense.points()[index].time_s, 1.0e-14));
+    assert(near(sparse.points()[index].node_voltage("out"),
+                dense.points()[index].node_voltage("out"), 1.0e-10));
+  }
+}
+
+void adaptive_bdf2_restarts_order_and_bounds_growth_after_short_source_edges() {
+  spikes::Circuit circuit;
+  spikes::PulseWaveform pulse;
+  pulse.initial_value = 0.0;
+  pulse.pulsed_value = 1.0;
+  pulse.delay_s = 99e-9;
+  pulse.rise_time_s = 1e-9;
+  pulse.fall_time_s = 1e-9;
+  pulse.pulse_width_s = 100e-9;
+  pulse.period_s = 1e-6;
+  circuit.add_pulse_voltage_source("V1", "in", "0", pulse);
+  circuit.add_resistor("R1", "in", "out", 100.0);
+  circuit.add_capacitor("C1", "out", "0", 1e-9);
+  spikes::TransientOptions options;
+  options.initialize_from_operating_point = false;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.adaptive_time_step = true;
+  options.time_step_s = 100e-9;
+  options.stop_time_s = 500e-9;
+  options.minimum_time_step_s = 1e-12;
+  const auto adaptive = spikes::solve_transient(circuit, options);
+  assert(adaptive.converged());
+  double previous_step = 0.0;
+  double previous_time = 0.0;
+  for (const auto &point : adaptive.points()) {
+    const double step = point.time_s - previous_time;
+    if (previous_step > 0.0) {
+      assert(step <= 2.0 * previous_step * (1.0 + 1e-8));
+    }
+    previous_step = step;
+    previous_time = point.time_s;
+  }
+  // Startup, four pulse corners and two post-corner restarts. Adjacent
+  // 1-ns corners share their restart; they are not eight independent steps.
+  assert(adaptive.diagnostics().backward_euler_steps == 7);
+  for (const double corner : {99e-9, 100e-9, 200e-9, 201e-9}) {
+    assert(std::any_of(adaptive.points().begin(), adaptive.points().end(),
+                       [corner](const auto &point) {
+                         return near(point.time_s, corner, 1e-18);
+                       }));
+  }
+  auto reference_options = options;
+  reference_options.adaptive_time_step = false;
+  reference_options.time_step_s = 0.1e-9;
+  reference_options.minimum_time_step_s = 1e-12;
+  const auto reference = spikes::solve_transient(circuit, reference_options);
+  assert(reference.converged());
+  assert(near(adaptive.points().back().node_voltage("out"),
+              reference.points().back().node_voltage("out"), 3e-3));
+}
+
+void nonlinear_storage_residual_preserves_microamp_kcl_at_picosecond_steps() {
+  spikes::Circuit circuit;
+  circuit.add_voltage_source("V1", "out", "0", 1.0);
+  circuit.add_resistor("R1", "out", "0", 1e6);
+  circuit.add_capacitor("C1", "out", "0", 100e-6, 1.0);
+  circuit.add_diode("D1", "0", "out");
+  spikes::TransientOptions options;
+  options.time_step_s = 1e-12;
+  options.stop_time_s = 3e-12;
+  options.nonlinear.absolute_tolerance = 1e-12;
+  options.nonlinear.relative_tolerance = 0.0;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  for (const std::size_t threshold : {std::size_t{1}, std::size_t{128}}) {
+    options.sparse_linear_threshold = threshold;
+    const auto result = spikes::solve_transient(circuit, options);
+    assert(result.converged());
+    assert(result.diagnostics().residual_inf_norm <= 1e-12);
+    for (const auto &point : result.points()) {
+      assert(near(point.node_voltage("out"), 1.0, 1e-14));
+      assert(near(point.element_current("C1"), 0.0, 1e-12));
+      assert(near(point.element_current("V1"), -1e-6, 1e-12));
+    }
+  }
+}
+
+void nonlinear_storage_step_coordinates_preserve_charging_kcl() {
+  for (const auto method : {spikes::TransientIntegrationMethod::backward_euler,
+                            spikes::TransientIntegrationMethod::hybrid_trapezoidal,
+                            spikes::TransientIntegrationMethod::bdf2}) {
+    for (const std::size_t threshold : {std::size_t{1}, std::size_t{128}}) {
+      spikes::Circuit circuit;
+      circuit.add_current_source("I1", "0", "out", 1e-3);
+      circuit.add_capacitor("C1", "out", "0", 100e-6, 1.0);
+      circuit.add_diode("D1", "0", "out");
+      spikes::TransientOptions options;
+      options.initialize_from_operating_point = false;
+      options.time_step_s = 1e-12;
+      options.stop_time_s = 8e-12;
+      options.integration_method = method;
+      options.sparse_linear_threshold = threshold;
+      options.nonlinear.absolute_tolerance = 1e-12;
+      options.nonlinear.relative_tolerance = 0.0;
+      spikes::TransientWorkspace workspace;
+      const auto result = spikes::solve_transient(circuit, options, workspace);
+      assert(result.converged());
+      for (const auto &point : result.points()) {
+        // Reverse diode current is approximately -Is; independent KCL oracle.
+        assert(near(point.element_current("C1"),
+                    1e-3 + point.element_current("D1"), 1e-12));
+        assert(near(point.node_voltage("out"), 1.0 + 10.0 * point.time_s, 2e-14));
+      }
+      // Session-style continuation preserves the unrounded storage change.
+      const auto continued = spikes::solve_transient(circuit, options, workspace);
+      assert(continued.converged());
+      for (const auto &point : continued.points()) {
+        assert(near(point.element_current("C1"),
+                    1e-3 + point.element_current("D1"), 1e-12));
+        assert(near(point.node_voltage("out"),
+                    1.0 + 10.0 * (options.stop_time_s + point.time_s), 4e-14));
+      }
+    }
+  }
+}
+
+void stiff_buck_extinction_completes_without_algebraic_error_suppression() {
+  const auto make_circuit = [] {
+    spikes::Circuit circuit;
+    circuit.add_voltage_source("Vs", "in", "0", 12.0);
+    spikes::PulseWaveform gate;
+    gate.initial_value = 0.0;
+    gate.pulsed_value = 5.0;
+    gate.delay_s = 1e-6;
+    gate.rise_time_s = gate.fall_time_s = 50e-9;
+    gate.pulse_width_s = 4e-6;
+    gate.period_s = 10e-6;
+    circuit.add_pulse_voltage_source("Vgate", "gate", "0", gate);
+    spikes::VoltageControlledSwitchModel model;
+    model.on_resistance_ohm = .02;
+    model.off_resistance_ohm = 1e6;
+    model.threshold_voltage_v = 2.5;
+    model.transition_voltage_v = .1;
+    circuit.add_voltage_controlled_switch("Smain", "in", "sw", "gate", "0", model);
+    spikes::DiodeModel diode;
+    diode.saturation_current_a = 1e-9;
+    circuit.add_diode("Dfree", "0", "sw", diode);
+    circuit.add_inductor("L1", "sw", "out", 10e-6);
+    circuit.add_resistor("Rload", "out", "0", 10.0);
+    circuit.add_resistor("Resr", "out", "cap", .03);
+    circuit.add_capacitor("Cout", "cap", "0", 100e-6);
+    return circuit;
+  };
+  const auto circuit = make_circuit();
+  spikes::TransientOptions options;
+  options.initialize_from_operating_point = false;
+  options.time_step_s = 200e-9;
+  options.stop_time_s = 200e-6;
+  options.minimum_time_step_s = 1e-15;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.adaptive_time_step = true;
+  options.lte_absolute_tolerance = 1e-6;
+  options.lte_relative_tolerance = 1e-4;
+  const auto dense = spikes::solve_transient(circuit, options);
+  assert(dense.converged());
+  assert(near(dense.points().back().time_s, options.stop_time_s, 1e-18));
+  assert(dense.diagnostics().minimum_accepted_step_s < 1e-12);
+  assert(dense.diagnostics().last_lte_ratio <= 1.0);
+  options.sparse_linear_threshold = 1;
+  const auto sparse = spikes::solve_transient(circuit, options);
+  assert(sparse.converged());
+  options.time_step_s = 20e-9;
+  options.minimum_time_step_s = 1e-17;
+  const auto accurate = spikes::solve_transient(circuit, options);
+  assert(accurate.converged());
+  options.time_step_s = 10e-9;
+  options.minimum_time_step_s = 1e-17;
+  options.lte_relative_tolerance = 2.5e-5;
+  options.lte_absolute_tolerance = 2.5e-7;
+  const auto refined = spikes::solve_transient(circuit, options);
+  assert(refined.converged());
+  const auto sample = [](const auto &result, double time, bool current) {
+    const auto &points = result.points();
+    const auto upper = std::lower_bound(points.begin(), points.end(), time,
+        [](const auto &point, double target) { return point.time_s < target; });
+    const auto value = [current](const auto &point) {
+      return current ? point.element_current("L1") : point.node_voltage("out");
+    };
+    if (upper == points.begin()) return value(*upper);
+    if (upper == points.end()) return value(points.back());
+    const auto &lower = *(upper - 1);
+    const double fraction = (time - lower.time_s) / (upper->time_s - lower.time_s);
+    return value(lower) + fraction * (value(*upper) - value(lower));
+  };
+  double maximum_voltage_difference = 0.0;
+  double maximum_current_difference = 0.0;
+  for (const auto *comparison : {&sparse, &refined}) {
+    assert(near(dense.points().back().node_voltage("out"),
+                comparison->points().back().node_voltage("out"), .02));
+    assert(near(dense.points().back().element_current("L1"),
+                comparison->points().back().element_current("L1"), .01));
+  }
+  for (int microsecond = 1; microsecond <= 200; ++microsecond) {
+      const double time = microsecond * 1e-6;
+      maximum_voltage_difference = std::max(maximum_voltage_difference,
+          std::abs(sample(accurate, time, false) - sample(refined, time, false)));
+      maximum_current_difference = std::max(maximum_current_difference,
+          std::abs(sample(accurate, time, true) - sample(refined, time, true)));
+  }
+  std::cout << "Buck 20-ns/10-ns refined comparison: max dV="
+            << maximum_voltage_difference << " V, max dI="
+            << maximum_current_difference << " A, minimum h="
+            << dense.diagnostics().minimum_accepted_step_s << " s" << std::endl;
+  assert(maximum_voltage_difference < .02);
+  assert(maximum_current_difference < .02);
+  // Too-large user step floors remain failures, not silently relaxed accuracy.
+  options = spikes::TransientOptions{};
+  options.initialize_from_operating_point = false;
+  options.time_step_s = 200e-9;
+  options.stop_time_s = 200e-6;
+  options.minimum_time_step_s = 1e-12;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.adaptive_time_step = true;
+  options.lte_absolute_tolerance = 1e-6;
+  options.lte_relative_tolerance = 1e-4;
+  const auto limited = spikes::solve_transient(circuit, options);
+  assert(!limited.converged());
+  assert(limited.message().find("minimum timestep") != std::string::npos);
+}
+
+void uic_storage_predictor_cannot_hide_a_floating_singular_subsystem() {
+  for (const std::size_t threshold : {std::size_t{1}, std::size_t{128}}) {
+    spikes::Circuit circuit;
+    circuit.add_capacitor("C1", "out", "0", 100e-6, 1.0);
+    circuit.add_diode("D1", "0", "out");
+    circuit.add_resistor("Rf", "floating1", "floating2", 100.0);
+    spikes::TransientOptions options;
+    options.initialize_from_operating_point = false;
+    options.time_step_s = 1e-12;
+    options.stop_time_s = 2e-12;
+    options.sparse_linear_threshold = threshold;
+    const auto result = spikes::solve_transient(circuit, options);
+    assert(result.status() == spikes::SolveStatus::singular);
+    assert(result.points().empty());
+  }
+}
+
 void dynamic_diode_releases_stored_charge_as_reverse_recovery_current() {
   spikes::Circuit circuit;
   circuit.add_voltage_source("Vreverse", "rail", "0", -5.0);
@@ -632,9 +959,48 @@ void osdi_0_4_reactive_callbacks_stamp_native_transient_mna() {
 }
 #endif
 
+void analytic_sine_sources_use_internal_time_and_delay_breakpoints() {
+  spikes::Circuit circuit;
+  const spikes::SineWaveform wave{0.75, 2.0, 1000.0, 0.00023, 250.0, 30.0};
+  circuit.add_sine_voltage_source("V1", "vin", "0", wave);
+  circuit.add_sine_current_source("I1", "0", "cur", wave);
+  circuit.add_resistor("R1", "vin", "out", 1000.0);
+  circuit.add_capacitor("C1", "out", "0", 1e-7);
+  circuit.add_resistor("R2", "cur", "0", 1.0);
+  spikes::TransientOptions options;
+  options.time_step_s = 1e-4;
+  options.stop_time_s = 1e-3;
+  options.integration_method = spikes::TransientIntegrationMethod::bdf2;
+  options.adaptive_time_step = true;
+  options.lte_absolute_tolerance = 1e-6;
+  options.lte_relative_tolerance = 1e-4;
+  const auto result = spikes::solve_transient(circuit, options);
+  assert(result.converged());
+  assert(result.diagnostics().source_breakpoint_steps >= 1);
+  assert(result.points().size() > 11);
+  bool found_delay = false;
+  for (const auto &point : result.points()) {
+    const double elapsed = std::max(0.0, point.time_s - 0.00023);
+    const double expected = 0.75 + 2.0 * std::exp(-250.0 * elapsed) *
+        std::sin(2.0 * 3.14159265358979323846 * 1000.0 * elapsed +
+                 3.14159265358979323846 / 6.0);
+    assert(near(point.node_voltage("vin"), expected, 2e-11));
+    assert(near(point.node_voltage("cur"), expected, 2e-11));
+    found_delay = found_delay || near(point.time_s, wave.delay_s, 1e-15);
+  }
+  assert(found_delay);
+  for (const double invalid : {-1.0, 0.0, std::numeric_limits<double>::infinity()}) {
+    bool rejected = false;
+    try { circuit.add_sine_voltage_source("bad", "x", "0", {0, 1, invalid}); }
+    catch (const std::invalid_argument &) { rejected = true; }
+    assert(rejected);
+  }
+}
+
 } // namespace
 
-int main() {
+int main() try {
+  analytic_sine_sources_use_internal_time_and_delay_breakpoints();
   rc_step_matches_backward_euler_recurrence();
   rl_step_matches_backward_euler_recurrence();
   dc_initialization_produces_a_time_zero_sample();
@@ -649,6 +1015,13 @@ int main() {
   bdf2_improves_smooth_rc_accuracy_and_reports_order_restarts();
   adaptive_embedded_lte_rejects_and_refines_rc_steps();
   adaptive_embedded_lte_solves_nonlinear_diode_dae();
+  adaptive_newton_failure_retries_without_committing_charge_history();
+  adaptive_sparse_linear_companion_reuses_symbolic_ordering();
+  adaptive_bdf2_restarts_order_and_bounds_growth_after_short_source_edges();
+  nonlinear_storage_residual_preserves_microamp_kcl_at_picosecond_steps();
+  nonlinear_storage_step_coordinates_preserve_charging_kcl();
+  stiff_buck_extinction_completes_without_algebraic_error_suppression();
+  uic_storage_predictor_cannot_hide_a_floating_singular_subsystem();
   dynamic_diode_releases_stored_charge_as_reverse_recovery_current();
   electrothermal_resistor_couples_joule_heat_and_resistance();
   saturating_inductor_uses_flux_linkage_dae();
@@ -660,4 +1033,8 @@ int main() {
 #endif
   std::cout << "SPIKES transient tests passed\n";
   return 0;
+}
+catch (const std::exception &error) {
+  std::cerr << "SPIKES native regression failed: " << error.what() << '\n';
+  return 1;
 }

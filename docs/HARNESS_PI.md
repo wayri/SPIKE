@@ -1,5 +1,8 @@
 # Connector authoring and native harness DC PI
 
+The shared diagram, wire roles, splices, pair authoring, selected-wire DC and
+supplied-model SI are documented in [harness engineering](HARNESS_ENGINEERING.md).
+
 ## Workflow
 
 1. Import boards and orient their occurrences through the existing
@@ -46,6 +49,8 @@ copied into the catalog.
 Worker: `run_harness_pi`, parameters `{ "request": ... }`.
 Request: `spike/harness-pi-request/v1`, containing the existing `spike/harness/v1`
 document, `ground`, `terminals`, `contacts` and optional resource limits.
+Optional `wire_ids` selects an explicit nonempty wire subset; omitting it
+retains the all-wire behavior. Selected wires must include their declared returns.
 Schemas: `harness-pi-request-v1.schema.json`, `harness-pi-result-v1.schema.json`.
 Endpoints are `{ "connector": "J1", "pin": "1" }` or `{ "splice": "S1" }`.
 Sources use `type: voltage_source` with value in volts; loads use
@@ -82,9 +87,9 @@ was not copied. SPIKE reuses its own FreeCAD exchange and placement feedback.
 This is **experimental lumped DC**, not full multiboard PI. Coupled PCB copper
 models, arbitrary AC/transient board networks, SI connector/launch models,
 mutual coupling, automatic pin-rating checks and assembly-wide field results
-remain pending. Future SI adapters can reuse endpoint identity, board bindings,
-wire models and explicit references, but must supply their own qualified
-frequency-dependent/distributed models. Numerical release review is required.
+remain pending. The current supplied uniform SI adapter preserves explicit
+endpoint identity but does not extract these missing field/connector models.
+Numerical release review is required.
 
 Final integration checks: 1808 Python tests passed (nine skipped), 38 Rust tests
 passed (one ignored), connector/pin preservation tests, rendered PI-panel failure

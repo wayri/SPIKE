@@ -50,6 +50,13 @@ export function withoutSavedResults(snapshot: Record<string, any>): Record<strin
     }
   }
   if (copy.analysis) {
+    if (copy.analysis.retained_assembly_em) copy.analysis.retained_assembly_em.result = null;
+    if (copy.analysis.engineering_review) copy.analysis.engineering_review.result = null;
+    const nativeSolvers = copy.analysis.extension_workflows?.native_solvers;
+    if (nativeSolvers && typeof nativeSolvers === 'object') for (const entry of Object.values(nativeSolvers)) {
+      if (entry && typeof entry === 'object') (entry as Record<string, unknown>).result = null;
+    }
+    if (copy.analysis.parallel_execution) copy.analysis.parallel_execution.runs = [];
     copy.analysis.latest_result = null;
     copy.analysis.active_result = null;
     copy.analysis.result_history = [];

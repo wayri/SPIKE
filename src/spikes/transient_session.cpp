@@ -101,6 +101,52 @@ void TransientSession::set_source_value(std::string_view element_id,
   found->value = value;
 }
 
+void TransientSession::mark_parameter_discontinuity() {
+  auto history = workspace_.integration_history();
+  history.parameter_discontinuity = true;
+  history.history_depth = 1;
+  history.solution_history_depth = 1;
+  history.previous_step_s = 0.0;
+  workspace_.clear();
+  workspace_.restore_integration_history(history);
+}
+
+void TransientSession::set_resistance(std::string_view element_id, double value) {
+  if (!std::isfinite(value) || value < 1.0e-6 || value > 1.0e15) {
+    throw std::invalid_argument("fault resistance must be within [1e-6, 1e15] ohm");
+  }
+  const auto found = std::find_if(circuit_.elements_.begin(), circuit_.elements_.end(),
+      [element_id](const Circuit::Element &element) { return element.id == element_id; });
+  if (found == circuit_.elements_.end()) {
+    throw std::out_of_range("unknown persistent-session element");
+  }
+  if (found->type != Circuit::ElementType::resistor || found->behavioral) {
+    throw std::invalid_argument("fault resistance requires an ordinary resistor");
+  }
+  if (found->value != value) {
+    mark_parameter_discontinuity();
+    found->value = value;
+  }
+}
+
+void TransientSession::set_mosfet_threshold(std::string_view element_id, double value) {
+  if (!std::isfinite(value) || value < -100.0 || value > 100.0) {
+    throw std::invalid_argument("fault threshold must be within [-100, 100] V");
+  }
+  const auto found = std::find_if(circuit_.elements_.begin(), circuit_.elements_.end(),
+      [element_id](const Circuit::Element &element) { return element.id == element_id; });
+  if (found == circuit_.elements_.end()) {
+    throw std::out_of_range("unknown persistent-session element");
+  }
+  if (found->type != Circuit::ElementType::mosfet_level1) {
+    throw std::invalid_argument("fault threshold requires an NMOS Level-1 element");
+  }
+  if (found->mosfet_level1.threshold_voltage_v != value) {
+    mark_parameter_discontinuity();
+    found->mosfet_level1.threshold_voltage_v = value;
+  }
+}
+
 bool TransientSession::step(double step_s) {
   if (!std::isfinite(step_s) || step_s <= 0.0) {
     throw std::invalid_argument("persistent transient step must be positive");
@@ -122,6 +168,12 @@ bool TransientSession::step(double step_s) {
     local_circuit = circuit_;
     const double interval_end = time_s_ + step_s;
     for (auto &element : local_circuit.elements_) {
+      if (element.waveform_type == Circuit::WaveformType::sine) {
+        // Keep the analytic source for every adaptive substep, not endpoint PWL.
+        element.waveform_time_offset_s = time_s_;
+        element.value = sine_value_at(element.sine, time_s_);
+        continue;
+      }
       if (element.waveform_type == Circuit::WaveformType::constant) {
         continue;
       }
@@ -209,6 +261,10 @@ bool TransientSession::step(double step_s) {
   diagnostics_.backward_euler_steps += step_diagnostics.backward_euler_steps;
   diagnostics_.trapezoidal_steps += step_diagnostics.trapezoidal_steps;
   diagnostics_.bdf2_steps += step_diagnostics.bdf2_steps;
+  diagnostics_.sparse_assemblies += step_diagnostics.sparse_assemblies;
+  diagnostics_.sparse_symbolic_analyses += step_diagnostics.sparse_symbolic_analyses;
+  diagnostics_.sparse_numeric_factorizations += step_diagnostics.sparse_numeric_factorizations;
+  diagnostics_.partial_numeric_refactorizations += step_diagnostics.partial_numeric_refactorizations;
   diagnostics_.residual_inf_norm = step_diagnostics.residual_inf_norm;
   if (!solved.converged() || solved.points().empty()) {
     status_ = solved.status();

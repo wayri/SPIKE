@@ -23,6 +23,7 @@ from .dc_result_utils import (
     weighted_percentile_density,
 )
 from .dc_shifted_rhs import shifted_dc_rhs
+from .source_current_limits import current_limit_issues, capacity_failure, source_capacity, source_boundary_record
 from .dc_terminal_validation import (
     build_source_to_load_evidence,
     terminal_anchor_id,
@@ -41,6 +42,9 @@ from .result_face_projection import (
 
 def solve_hybrid_dc(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
     overall_started = perf_counter()
+    limit_issues = current_limit_issues(spec)
+    if limit_issues:
+        return capacity_failure(spec, limit_issues)
     if spec.mode != "dc":
         return AnalysisResult(
             analysis_id=spec.analysis_id,
@@ -161,17 +165,7 @@ def solve_hybrid_dc(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
             if terminal in source_nodes and source_nodes[terminal] != source_voltage:
                 issues.append(ValidationIssue("SPIKE-BE-PI-E-0006", "error", "Two source boundaries assign different voltages to the same copper node.", path="analysis.sources", suggestion="Remove the duplicate source or place it on a distinct conductor domain."))
             source_nodes[terminal] = source_voltage
-        source_records.append({
-            "id": str(source.get("id", index + 1)),
-            "geometry_anchor_id": terminal_anchor_id(source),
-            "node": next(iter(terminals)),
-            "boundary_nodes": list(terminals),
-            "boundary_weights": list(terminals.values()),
-            "net": node_nets[next(iter(terminals))],
-            "voltage_v": source_voltage,
-            "role": str(source.get("terminal_role", "source_positive")),
-            "domain_id": str(source.get("domain_id", "default")),
-        })
+        source_records.append(source_boundary_record(source, index, terminals, node_nets, terminal_anchor_id(source)))
 
     for index, load in enumerate(spec.loads):
         coppers = terminal_copper_weights(mesh, spec, load, exact_terminals)
@@ -352,6 +346,9 @@ def solve_hybrid_dc(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
         edge["voltage_drop_v"] = abs(voltage_offset[edge["a"]] - voltage_offset[edge["b"]])
         edge["power_loss_w"] = edge["current_a"] ** 2 * edge["resistance_ohm"]
 
+    source_current_results, limit_issues, capacity_status = source_capacity(spec, source_records, active_edges, rhs)
+    if limit_issues:
+        return capacity_failure(spec, issues + limit_issues, source_current_results, capacity_status)
     source_voltage = max(source_nodes.values())
     return_mode = str(spec.return_path.get("mode", "implicit"))
     explicit_return = return_mode in {"explicit", "isolated_secondary"}
@@ -679,6 +676,7 @@ def solve_hybrid_dc(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
         status="completed",
         model_status="approximate",
         summary={
+            "source_capacity_status": capacity_status,
             "max_voltage_drop_v": float(max_drop),
             "max_load_voltage_drop_v": float(max_load_drop),
             "max_supply_drop_v": float(max_supply_drop),
@@ -722,6 +720,7 @@ def solve_hybrid_dc(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
             "geometry_counts": {**mesh.geometry_counts, "contact": contact_count},
         },
         fields={
+            "source_current_results": source_current_results,
             "node_voltages": [
                 {"x_mm": x, "y_mm": y, "layer": layer, "net": node_nets[index], "voltage_v": float(voltage[index])}
                 for index in node_detail_indexes

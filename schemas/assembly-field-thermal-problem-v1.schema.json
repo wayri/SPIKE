@@ -3,25 +3,128 @@
   "$id": "https://spike.local/schemas/assembly-field-thermal-problem-v1.schema.json",
   "title": "SPIKE retained assembly steady thermal problem",
   "description": "Original Apache-2.0 contract, Copyright 2026 SigHarmonic. K, W/m3, W/m2 and W/(m2 K). Positive flux is inward. Unspecified exterior faces are explicitly reported adiabatic.",
-  "type": "object", "additionalProperties": false,
-  "required": ["contract", "boundaries", "heat_sources", "contacts"],
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "boundaries",
+    "heat_sources",
+    "contacts"
+  ],
   "properties": {
-    "contract": {"const": "spike/assembly-field-thermal-problem/v1"},
-    "boundaries": {"type": "array", "maxItems": 20000, "items": {"$ref": "#/$defs/boundary"}},
-    "heat_sources": {"type": "array", "maxItems": 5000, "items": {"type": "object", "additionalProperties": false, "required": ["occurrence_id", "cell_id", "heat_source_w_m3"], "properties": {"occurrence_id": {"$ref": "#/$defs/id"}, "cell_id": {"$ref": "#/$defs/id"}, "heat_source_w_m3": {"type": "number"}}}},
-    "contacts": {"type": "array", "maxItems": 5000, "items": {"type": "object", "additionalProperties": false, "required": ["contact_id", "face_pairs", "thermal_contact_conductance_w_m2k"], "properties": {"contact_id": {"$ref": "#/$defs/id"}, "thermal_contact_conductance_w_m2k": {"type": "number", "exclusiveMinimum": 0}, "face_pairs": {"type": "array", "minItems": 1, "maxItems": 256, "items": {"type": "object", "additionalProperties": false, "required": ["left", "right"], "properties": {"left": {"$ref": "#/$defs/endpoint"}, "right": {"$ref": "#/$defs/endpoint"}}}}}}}
+    "contract": {
+      "const": "spike/assembly-field-thermal-problem/v1"
+    },
+    "boundaries": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "$ref": "#/$defs/boundary"
+      }
+    },
+    "heat_sources": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "occurrence_id",
+          "cell_id",
+          "heat_source_w_m3"
+        ],
+        "properties": {
+          "occurrence_id": {
+            "$ref": "#/$defs/id"
+          },
+          "cell_id": {
+            "$ref": "#/$defs/id"
+          },
+          "heat_source_w_m3": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "contacts": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contact_id",
+          "face_pairs",
+          "thermal_contact_conductance_w_m2k"
+        ],
+        "properties": {
+          "contact_id": {
+            "$ref": "#/$defs/id"
+          },
+          "thermal_contact_conductance_w_m2k": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "face_pairs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 256,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "left",
+                "right"
+              ],
+              "properties": {
+                "left": {
+                  "$ref": "#/$defs/endpoint"
+                },
+                "right": {
+                  "$ref": "#/$defs/endpoint"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
   "$defs": {
-    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
-    "endpoint": {"type": "object", "additionalProperties": false, "required": ["occurrence_id", "face_id"], "properties": {"occurrence_id": {"$ref": "#/$defs/id"}, "face_id": {"$ref": "#/$defs/id"}}},
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "\\S"
+    },
+    "endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrence_id",
+        "face_id"
+      ],
+      "properties": {
+        "occurrence_id": {
+          "$ref": "#/$defs/id"
+        },
+        "face_id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
     "boundary": {
-      "type": "object", "additionalProperties": false, "required": ["face", "type"],
-      "properties": {"face": {"$ref": "#/$defs/endpoint"}, "type": {"enum": ["temperature", "heat_flux", "convection", "adiabatic"]}, "temperature_k": {"type": "number", "minimum": 0}, "heat_flux_w_m2": {"type": "number"}, "heat_transfer_coefficient_w_m2k": {"type": "number", "exclusiveMinimum": 0}, "ambient_temperature_k": {"type": "number", "minimum": 0}},
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["face", "type"],
+      "properties": {"face": {"$ref": "#/$defs/endpoint"}, "type": {"enum": ["temperature", "heat_flux", "convection", "adiabatic", "radiation", "convection_radiation"]}, "temperature_k": {"type": "number", "minimum": 0}, "heat_flux_w_m2": {"type": "number"}, "heat_transfer_coefficient_w_m2k": {"type": "number", "exclusiveMinimum": 0}, "ambient_temperature_k": {"type": "number", "minimum": 0}, "emissivity": {"type": "number", "minimum": 0, "maximum": 1}, "radiation_temperature_k": {"type": "number", "exclusiveMinimum": 0, "maximum": 10000}},
       "oneOf": [
-        {"properties": {"type": {"const": "temperature"}}, "required": ["temperature_k"], "not": {"anyOf": [{"required": ["heat_flux_w_m2"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}]}},
-        {"properties": {"type": {"const": "heat_flux"}}, "required": ["heat_flux_w_m2"], "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}]}},
-        {"properties": {"type": {"const": "convection"}}, "required": ["heat_transfer_coefficient_w_m2k", "ambient_temperature_k"], "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_flux_w_m2"]}]}},
-        {"properties": {"type": {"const": "adiabatic"}}, "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_flux_w_m2"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}]}}
+        {"properties": {"type": {"const": "temperature"}}, "not": {"anyOf": [{"required": ["heat_flux_w_m2"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}, {"required": ["emissivity"]}, {"required": ["radiation_temperature_k"]}]}, "required": ["temperature_k"]},
+        {"properties": {"type": {"const": "heat_flux"}}, "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}, {"required": ["emissivity"]}, {"required": ["radiation_temperature_k"]}]}, "required": ["heat_flux_w_m2"]},
+        {"properties": {"type": {"const": "convection"}}, "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_flux_w_m2"]}, {"required": ["emissivity"]}, {"required": ["radiation_temperature_k"]}]}, "required": ["heat_transfer_coefficient_w_m2k", "ambient_temperature_k"]},
+        {"properties": {"type": {"const": "adiabatic"}}, "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_flux_w_m2"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}, {"required": ["emissivity"]}, {"required": ["radiation_temperature_k"]}]}},
+        {"properties": {"type": {"const": "radiation"}}, "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_flux_w_m2"]}, {"required": ["heat_transfer_coefficient_w_m2k"]}, {"required": ["ambient_temperature_k"]}]}, "required": ["emissivity", "radiation_temperature_k"]},
+        {"properties": {"type": {"const": "convection_radiation"}, "ambient_temperature_k": {"exclusiveMinimum": 0, "maximum": 10000}}, "not": {"anyOf": [{"required": ["temperature_k"]}, {"required": ["heat_flux_w_m2"]}]}, "required": ["heat_transfer_coefficient_w_m2k", "ambient_temperature_k", "emissivity", "radiation_temperature_k"]}
       ]
     }
   }

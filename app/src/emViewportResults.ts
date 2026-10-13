@@ -1,3 +1,4 @@
+import { retainedEmPreview } from "./retainedAssemblyEm";
 // SPDX-License-Identifier: Apache-2.0
 import { admitEMergeFieldPlanes, type Vector } from "./emergeNearFieldSamples";
 import { admitOpenEMSFarfield, openEMSFarfieldVectors } from "./openEMSFarfield";
@@ -16,7 +17,7 @@ export type EMViewportData = {
   positionsMm: [number, number, number][]; indices: number[]; values: (number | null)[];
   directions: ([number, number, number] | null)[]; highlights: ("node" | "antinode" | null)[];
   range: [number, number]; notices: string[]; structure?: { vertices_mm: number[][]; triangles: number[][] };
-  angularNeedsBoardAnchor?: boolean;
+  angularNeedsBoardAnchor?: boolean; assemblyFrame?: boolean; nativeSampleIndices?: number[];
 };
 export function emViewportPayload(value: unknown): Record<string, unknown> {
   const envelope = rec(value);
@@ -25,6 +26,8 @@ export function emViewportPayload(value: unknown): Record<string, unknown> {
 }
 export function availableEMQuantities(record: EMViewportRecord): { id: string; label: string }[] {
   const f = rec(emViewportPayload(record.result).fields), result = [];
+  if (retainedEmPreview(f.retained_volume, "volume_e")) result.push({id:"volume_e",label:"Assembly electric field"});
+  if (retainedEmPreview(f.retained_volume, "volume_h")) result.push({id:"volume_h",label:"Assembly magnetic field"});
   if (Array.isArray(rec(f.radiation).patterns_3d) || admitOpenEMSFarfield(f.openems_far_field)) result.push({ id: "far_e", label: "Far-field E pattern" });
   if (admitEMergeFieldPlanes(f.nearfield).length) result.push({ id: "near_e", label: "Spatial electric field" }, { id: "near_h", label: "Spatial magnetic field" }, { id: "poynting", label: "Time-average Poynting vector" });
   if (admitOptycalComparison(rec(f.comparison))) result.push({ id: "bare_e", label: "Bare antenna" }, { id: "scattered_e", label: "Scattered field" }, { id: "installed_e", label: "Antenna + structure" }, { id: "pattern_delta", label: "Installed / bare change" }, { id: "interference", label: "Coherent interference" });
@@ -32,7 +35,7 @@ export function availableEMQuantities(record: EMViewportRecord): { id: string; l
 }
 export function emResultFrequencies(record: EMViewportRecord): number[] {
   const f = rec(emViewportPayload(record.result).fields);
-  const arrays = [rec(f.radiation).frequencies_hz, rec(f.nearfield).frequencies_hz, admitOpenEMSFarfield(f.openems_far_field)?.frequencies, rec(rec(emViewportPayload(record.result).networks).s_parameters).frequencies_hz];
+  const arrays = [[rec(f.retained_volume).frequency_hz], rec(f.radiation).frequencies_hz, rec(f.nearfield).frequencies_hz, admitOpenEMSFarfield(f.openems_far_field)?.frequencies, rec(rec(emViewportPayload(record.result).networks).s_parameters).frequencies_hz];
   return [...new Set(arrays.flatMap(values => Array.isArray(values) ? values.filter((v): v is number => typeof v === "number" && Number.isFinite(v) && v > 0) : []))].sort((a, b) => a - b);
 }
 function project(v: Vector, s: EMViewportSettings): number | null {
@@ -69,6 +72,20 @@ export function buildEMViewportData(record: EMViewportRecord, s: EMViewportSetti
   let positionsMm: [number, number, number][] = [], vectors: (Vector | null)[] = [], values: (number | null)[] = [], ny = 0, nx = 0;
   const notices = ["Only returned samples are probed. Surfaces and contours connect samples for display; they do not create solved field data."];
   let angularNeedsBoardAnchor = false;
+  if (["volume_e","volume_h"].includes(s.quantity)) {
+    const preview=retainedEmPreview(fields.retained_volume,s.quantity);
+    if(!preview || preview.frequencyHz!==frequencyHz)return null;
+    const values=preview.vectors.map(v=>project(v,s));
+    const valid=values.filter((v):v is number=>v!==null&&Number.isFinite(v));
+    if(!valid.length || values.some(v=>v!==null&&!Number.isFinite(v)))return null;
+    return {domain:"spatial",frequencyHz,label:s.quantity==="volume_e"?"Assembly electric field":"Assembly magnetic field",
+      unit:s.projection==="phase"?"degrees":preview.unit,positionsMm:preview.positionsMm,indices:[],values,
+      directions:preview.vectors.map(v=>v.map(([r,i])=>r*Math.cos(s.phaseDeg*Math.PI/180)-i*Math.sin(s.phaseDeg*Math.PI/180)) as [number,number,number]),
+      highlights:values.map(()=>null),range:[valid.reduce((a,b)=>Math.min(a,b),Infinity),valid.reduce((a,b)=>Math.max(a,b),-Infinity)],assemblyFrame:true,nativeSampleIndices:preview.nativeIndices,
+      notices:[`${values.length} retained samples of ${preview.sourceSampleCount}; displayed sampling adds no solved resolution.`,
+        "Assembly-frame coordinates; 1 V peak incident phasor normalization. No EMI compliance or hardware qualification.",
+        "Volume data is shown as samples/vectors; no interpolated surface is inferred."]};
+  }
   if (["near_e", "near_h", "poynting"].includes(s.quantity)) {
     const plane = admitEMergeFieldPlanes(fields.nearfield).find(p => p.frequency_hz === frequencyHz);
     if (!plane) return null;

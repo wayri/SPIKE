@@ -1,5 +1,69 @@
 # Text-deck and native-kernel evidence
 
+## Native parity increment (2026-10-10)
+
+`native-run` now orchestrates the parser's bounded parameter `.step` variants
+through the same owned C++ library and evaluates the existing OP/DC/transient
+`.measure` subset on native results. A failed variant stops the sweep, retains
+native diagnostics, and reports its parameter coordinates. No reference engine
+is substituted. The Studio batch UI does not yet consume stepped result sets.
+Native AC and other unsupported analysis requests fail before DLL loading.
+
+Transient AVG and RMS now integrate time rather than count samples. For a
+linearly interpolated interval of duration h with endpoint values a,b, the
+integrals are h*(a+b)/2 and h*(a*a+a*b+b*b)/3 respectively. Windows interpolate
+their boundaries, never extrapolate. MAX/MIN also include those boundaries.
+These are exact moments of the sample interpolant, not of an unknown waveform
+between samples. DC statistics retain their existing sample-weighted convention.
+Measurement failures remain distinct from circuit-solve failures.
+
+Behavioral `tan` and `atanh` now execute in both the expression evaluator and
+the owned C++ DAG. Independently derived Jacobians are 1+tan(x)^2 and
+1/(1-x*x). Atanh rejects |x|>=1; tangent poles and atanh endpoints are
+ill-conditioned and are not qualified operating regions. Inputs are
+dimensionless; this expression layer does not establish dimensional typing.
+Function coverage follows the official ngspice manual, chapter 5:
+https://ngspice.sourceforge.io/docs/ngspice-manual.pdf . This is a clean-room
+implementation; no external source code or example deck was copied.
+
+Five independently authored DC behavioral fixtures supplement the nine existing
+small fixtures. They cover tangent, inverse hyperbolic tangent, composed
+exponential/trigonometric expressions, branch-current dependence, and a
+nonlinear tangent-current KCL balance. The latter checks Newton convergence,
+not only direct expression evaluation. The Python tests also compare analytic
+derivatives with central differences at positive and negative arguments.
+
+The generated report lives at
+`docs/validation/spikes-behavioral-ngspice-20261010-v3.json` in the parent SPIKE
+repository. Reproduce it with `run_competitive_benchmarks(library,
+repetitions=1, include_behavioral=True)` from `python.spikes.competitive_benchmark`.
+The report binds engine identities and deck digests and retains all failures.
+These are equal-model, common absolute-error gates, not matched internal solver
+tolerances or a speed comparison. One repetition is not performance evidence.
+Full syntax/device/analysis coverage, manufacturer qualification, large-deck
+scaling, and physical HIL remain outside this increment. Numerical release
+still requires knowledgeable human review.
+
+The earlier v1/v2 reports are retained as diagnostics. Their branch-current
+deck used `^`, which LTspice 26 interpreted as XOR rather than exponentiation;
+v3 uses explicit `pow` for identical semantics without relaxing the error gate.
+In v3, native SPIKES and ngspice each pass 14/14; LTspice passes 13/14. The
+composed expression exceeds its unchanged 1e-8 V gate by an absolute error
+of 4.016e-8 V. The overall three-engine report therefore remains blocked.
+
+Rolling parser admission no longer invokes full-history point limits at either
+admission site. It still validates a finite time grid; full-capture parsing and
+native batch allocation retain their budgets. This fixes the standalone
+long-duration continuous-editor regression, not unrestricted batch allocation.
+
+Executed checks for this increment: 393 circuit-subsystem tests pass (16
+skipped); 238 standalone tests pass (33 skipped); the explicit rebuilt-DLL
+native/measurement set passes 24 tests. Architecture, frontend TypeScript and
+parser checks pass. Rust passes 44 tests with one live-counter test ignored.
+The full repository Python run was stopped after exceeding eleven minutes of
+CPU time without a result; full-repository verification is incomplete. Skips
+and that incomplete run prevent treating this as release acceptance.
+
 The owned engine must pass both the text input path and the lower-level C ABI.
 The new deck runner supplements, rather than replaces, the existing 14-case
 native qualification suite.

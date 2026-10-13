@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<meta charset="utf-8">
+<title>Thermal instance-color rendering regression</title>
+<script type="module">
+import * as THREE from '../../node_modules/three/build/three.module.js';
+const renderer=new THREE.WebGLRenderer({antialias:false});
+renderer.setSize(128,64);
+document.body.append(renderer.domElement);
+const target=new THREE.WebGLRenderTarget(128,64);
+const scene=new THREE.Scene();
+const camera=new THREE.OrthographicCamera(-2,2,1,-1,.1,10);
+camera.position.z=3;
+const geometry=new THREE.PlaneGeometry(1.5,1.5);
+function sample(vertexColors) {
+  const material=new THREE.MeshBasicMaterial({vertexColors,side:THREE.DoubleSide});
+  const cells=new THREE.InstancedMesh(geometry,material,2);
+  for (let i=0;i<2;i++) {
+    cells.setMatrixAt(i,new THREE.Matrix4().makeTranslation(i?1:-1,0,0));
+    cells.setColorAt(i,new THREE.Color(i?'#ff0000':'#0000ff'));
+  }
+  scene.add(cells);renderer.setRenderTarget(target);renderer.render(scene,camera);
+  const pixels=[];
+  for(const x of [32,96]) {const p=new Uint8Array(4);renderer.readRenderTargetPixels(target,x,32,1,1,p);pixels.push(Array.from(p));}
+  scene.remove(cells);material.dispose();cells.dispose();
+  return pixels;
+}
+window.evidence={old:sample(true),fixed:sample(false)};
+renderer.setRenderTarget(null);
+geometry.dispose();target.dispose();renderer.dispose();
+</script>

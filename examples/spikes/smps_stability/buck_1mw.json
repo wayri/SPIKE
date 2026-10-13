@@ -1,0 +1,15 @@
+{
+  "topology": "buck",
+  "input_voltage_v": 1500,
+  "duty_cycle": 0.5,
+  "load_resistance_ohm": 0.5625,
+  "inductance_h": 0.00012,
+  "capacitance_f": 0.0047,
+  "switching_frequency_hz": 20000,
+  "feedback_gain": 0.0032,
+  "pwm_gain": 0.2,
+  "controller_gain": 5,
+  "zero1_hz": 50,
+  "pole1_hz": 2000,
+  "stop_hz": 1000
+}

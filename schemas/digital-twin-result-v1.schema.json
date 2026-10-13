@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/digital-twin-result-v1.schema.json",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "title": "Offline digital twin telemetry comparison result",
+  "oneOf": [
+    {"$ref": "#/$defs/rejectedResult"},
+    {"$ref": "#/$defs/completedResult"}
+  ],
+  "$defs": {
+    "nullableText": {"type": ["string", "null"], "maxLength": 256},
+    "modelStatus": {"enum": ["approximate", "experimental", "validated", "unsupported"]},
+    "nullableModelStatus": {"enum": ["approximate", "experimental", "validated", "unsupported", null]},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "limitations": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "code", "message", "path"],
+      "properties": {
+        "severity": {"const": "error"},
+        "code": {"type": "string", "minLength": 1},
+        "message": {"type": "string", "minLength": 1},
+        "path": {"type": "string", "minLength": 1}
+      }
+    },
+    "tracePoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["time_s", "predicted", "measured", "residual", "threshold_violated"],
+      "properties": {
+        "time_s": {"type": "number", "minimum": 0},
+        "predicted": {"type": "number"},
+        "measured": {"type": "number"},
+        "residual": {"type": "number"},
+        "threshold_violated": {"type": "boolean"}
+      }
+    },
+    "channelResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "unit", "tolerance", "matched_count", "unmatched_prediction_count", "unmatched_telemetry_count", "max_abs_error", "rmse", "threshold_violation_count", "trace", "trace_truncated"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+        "unit": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+        "tolerance": {"type": "number", "minimum": 0},
+        "matched_count": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "unmatched_prediction_count": {"type": "integer", "minimum": 0, "maximum": 9999},
+        "unmatched_telemetry_count": {"type": "integer", "minimum": 0, "maximum": 9999},
+        "max_abs_error": {"type": "number", "minimum": 0},
+        "rmse": {"type": "number", "minimum": 0},
+        "threshold_violation_count": {"type": "integer", "minimum": 0, "maximum": 10000},
+        "trace": {"type": "array", "minItems": 1, "maxItems": 2048, "items": {"$ref": "#/$defs/tracePoint"}},
+        "trace_truncated": {"type": "boolean"}
+      }
+    },
+    "rejectedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "status", "request_sha256", "model_id", "model_revision", "model_status", "issues", "limitations"],
+      "properties": {
+        "contract": {"const": "spike/digital-twin-result/v1"},
+        "status": {"const": "rejected"},
+        "request_sha256": {"oneOf": [{"$ref": "#/$defs/sha256"}, {"type": "null"}]},
+        "model_id": {"$ref": "#/$defs/nullableText"},
+        "model_revision": {"$ref": "#/$defs/nullableText"},
+        "model_status": {"$ref": "#/$defs/nullableModelStatus"},
+        "issues": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"$ref": "#/$defs/issue"}},
+        "limitations": {"$ref": "#/$defs/limitations"}
+      }
+    },
+    "completedResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "status", "request_sha256", "model_id", "model_revision", "model_status", "issues", "limitations", "matched_sample_count", "unmatched_prediction_sample_count", "unmatched_telemetry_sample_count", "threshold_violation_count", "channels"],
+      "properties": {
+        "contract": {"const": "spike/digital-twin-result/v1"},
+        "status": {"const": "completed"},
+        "request_sha256": {"$ref": "#/$defs/sha256"},
+        "model_id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+        "model_revision": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+        "model_status": {"$ref": "#/$defs/modelStatus"},
+        "issues": {"type": "array", "maxItems": 0},
+        "limitations": {"$ref": "#/$defs/limitations"},
+        "matched_sample_count": {"type": "integer", "minimum": 1, "maximum": 10000},
+        "unmatched_prediction_sample_count": {"type": "integer", "minimum": 0, "maximum": 9999},
+        "unmatched_telemetry_sample_count": {"type": "integer", "minimum": 0, "maximum": 9999},
+        "threshold_violation_count": {"type": "integer", "minimum": 0, "maximum": 1280000},
+        "channels": {"type": "array", "minItems": 1, "maxItems": 128, "items": {"$ref": "#/$defs/channelResult"}}
+      }
+    }
+  }
+}

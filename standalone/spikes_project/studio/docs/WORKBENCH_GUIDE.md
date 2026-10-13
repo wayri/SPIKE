@@ -1,5 +1,175 @@
 # SPIKES Studio workbench guide
 
+The source increment dated 2026-10-12 adds a cleaner plot/dashboard workflow,
+exact-MPN manufacturer seed, offline NMOS table fitting, direct virtual source
+controls and explicit hidden-wire RLC. See the complete
+[workflow and limits](../../../../docs/SPIKES_SOURCED_PARTS_WORKBENCH.md).
+It does not update the installed beta or qualify all vendor device families.
+
+## Clean workspaces and appearance
+
+### Analysis forms and canvas text (T)
+
+**Simulation → Manager → Analysis command / parameters** opens the saved analysis
+directive. **S** also opens the directive editor, or double-click a directive on
+the canvas. The **Directive type** dropdown selects the relevant labeled fields:
+transient timing, AC sweep, DC source ranges, operating point, noise, transfer,
+pole/zero, sensitivity, distortion, Fourier, temperature, initial conditions,
+parameters, sweeps, options and measurement. **Raw SPICE** remains available;
+commands that cannot be safely split stay raw and are not silently rewritten.
+An editor form does not establish execution support: enabled cards still undergo
+the selected parser/backend validation. Pole-zero port ordering follows the
+[ngspice manual](https://nmg.gitlab.io/ngspice-manual/analysesandoutputcontrol_batchmode/analyses/pz_pole-zeroanalysis.html).
+
+Press **T** on the schematic to enter text. Text starting with **.** is a SPICE
+directive or a block of top-level directives; other text is an inert note.
+Validate, then click to place it. Escape cancels placement. Continuations start
+with **+**. Uncheck **Enable SPICE commands** or start with **\* .command** to place
+commented-out directives. The whole block is one undoable transaction, with no
+partial changes if validation fails. Structural `.subckt`, `.control` and `.lib`
+blocks still require Circuit text/model-import workflows, not this text tool.
+
+Right-click a directive and choose **Comment out directive** or **Enable directive**.
+Disabled cards have a muted **[COMMENTED OUT]** heading and **\*** prefixes; their
+source lines are actual comments. Comment state, grouping and placement persist
+with the project. Run-profile overrides remain separate from saved directives.
+
+### Symbol-and-text browsing
+
+The schematic palette, catalog family tree, generic/manufacturer result rows,
+component-model dropdown, symbol library, circuit-component list and battery
+market list pair small symbols with text. Search, filtering, sorting, keyboard
+selection and insertion retain their existing semantics. Symbols follow light
+and dark themes; a bounded family-level image set is reused rather than allocating
+an image per catalog record. Unknown/custom families use a generic terminal block
+beside their name. These navigation glyphs are common-convention family markers,
+not evidence of a validated model or an exact manufacturer pinout.
+
+### Click-to-edit waveforms and draggable cursors
+
+**Grid** and **Legends** in the plot toolbar show/hide these elements. Right-click
+a pane to add a text box or labeled arrow. Drag the text to move it; dragging an
+arrow tip moves its endpoint. Right-click the annotation to edit its text or
+delete it. Annotations persist in project metadata in pane/data coordinates and
+are included in image exports. Escape cancels a drag; accepted moves are one
+undoable project transaction.
+
+**Sweep values…** shows every retained run at each cursor, optionally for every
+plotted expression, with parameter coordinates and original-sample values.
+Out-of-range or missing signals are labeled unavailable, never extrapolated.
+The table updates during cursor drag and is bounded to 16,384 readings.
+Native parameter `.step` batch results retain individual runs for selection and
+overlay; continuous simulation still does not execute `.step`.
+
+Select **Tools → Monte Carlo**. Enter explicit component-value
+tolerances, distribution, case count, seed and probe; **Run Monte Carlo** executes
+the existing Python linear R/L/C/V/I reference backend, not the native nonlinear
+solver. Maximums are 256 cases, 16 varied values and 250,000 aggregate solve points.
+The plot shows actual per-case probe values (final sample for time series), not
+waveform envelopes. Applied circuit text and validity checks are mandatory.
+For `.ic`, `.temp`, and B/E/F/G/H coverage and exclusions see
+[initial state and source support](../../../../docs/SPIKES_INITIAL_DIRECTIVES.md).
+
+Click a trace name in the plot heading/legend to open the waveform editor, or
+double-click it in **Plotted traces**. Select a recorded voltage/current/power
+channel or enter an expression. Examples: `v(in)-v(out)`, `v(out)*i(R1)`,
+`derivative(v(out))`, `integral(v(out)*i(R1))`, `sin(v(out)/V)`.
+Use **Validate** to check units and finite values, then **Apply waveform**.
+Changing units reallocates a compatible custom pane; cursor bindings for that
+trace follow the new expression on their original runs. Invalid expressions,
+duplicate traces and missing run channels leave the current trace unchanged.
+Right-click the heading for edit or visibility actions; checkbox visibility
+remains available. Right-click the plot → **Add signal / mathematical expression**
+opens the same picker for a new trace. This is recorded-signal mathematics, not
+arbitrary executable Python or a simulator equation.
+
+Click a waveform to place a cursor. Drag its vertical line or A/B badge to move
+it; the mouse is captured until release. Time is bounded by that cursor's original
+run, and docked readings refresh during motion using original samples. No
+floating window is forced open by placement. **Cursors…** opens the detailed
+run/expression bindings and relative math (`a`, `b`, `dt`, e.g. `(b-a)/dt`). Escape
+ends an active drag. Actual heading/edit/drag verification and captured solver
+results are in `artifacts/studio-waveform-edit-20261012/`.
+
+The compact shell has **Back**, **Forward** and **Home** navigation beside the
+file/run controls, with a current-section label. **Alt+Left / Alt+Right / Alt+Home**
+perform the same actions. Home returns to the live schematic, including from a
+split layout. Navigation keeps a bounded session history (128 visits), separate
+from circuit undo; opening a new section after Back discards the forward branch.
+It does not apply, discard or undo text drafts and circuit changes.
+
+**Schematic**, **Waveforms**, **Netlist** and **Dashboard** are the main-window tabs.
+Specialist tools open in dedicated modeless windows from grouped menus:
+
+- **Libraries**: parts, component catalog, manufacturer parts, symbols and controllers.
+- **Analysis**: directives, frequency/pole-zero, power tree, analytics and reports.
+- **Tools**: C/C++/Verilog IDE, battery laboratory and Monte Carlo.
+- **Simulation**: simulation manager; **Help**: the help workspace.
+
+These windows contain the original stateful panel, not a duplicate circuit or
+simulation. Closing hides a tool and retains drafts, filters and selections;
+selecting its menu command reopens it. Multiple tools can remain open while
+switching the main view. **Return to workspace** puts the same panel back in
+the central area. Existing workspace profiles can still select specialist pages.
+Returned panels receive their own main-window tab. Right-click a specialist tab
+to open it as a floating window again; its tab is removed without losing state.
+Back/Forward follow workspace changes and opened tool windows; Forward can reopen
+a previously hidden tool. Navigation history and temporary tabs are session-local.
+Catalog openers float by default, including the direct component-browser opener;
+opening a previously side-pinned catalog returns it to its floating window.
+Side-pinning remains an explicit option. **Add component** opens a separate,
+resizable selection/value dialog over the main workbench, including when invoked
+through placement shortcuts; it does not replace the schematic.
+
+Schematic tools occupy a short labeled row: **Select, Wire, Move, Rotate,
+Properties, Probe V, Parts, Fit**. Icons supplement the labels. Tooltips explain
+click sequences, shortcuts and disabled reasons. Rotate/Properties/Move require
+a selected component; the active Select/Wire/Probe tool is highlighted.
+Wire and Probe keep the actual editor active in split mode. Fit on this row fits
+the schematic, not waveform axes. Drag, mirror and lasso are in **Edit**;
+differential/current/power probes are in **Probes**; split layouts and mini plots
+are in **View**. Interaction, limit markers and libraries remain menu commands;
+the duplicate navigator tools and permanent canvas instruction banners are
+removed. **Navigator** hides/restores the schematic sidebar. Empty properties
+and probe lists take no space; selecting a part reveals its summary and property
+actions. View → Theme owns appearance selection. A stale running source session
+retains its imported UI code until restarted; an old installed build is separate.
+
+To inspect the light appearance without changing saved preferences:
+`python scripts/launch_spikes_studio.py --theme Light`.
+Actual schematic and acquired waveform screenshots and geometry checks are in
+`artifacts/studio-compact-shell-20261012/`.
+
+For terminal-bound power flags, reference/signal/chassis/earth grounds and the
+prescribed-current battery laboratory, see
+[power and battery workflows](../../../../docs/SPIKES_POWER_BATTERY_WORKFLOW.md).
+The battery laboratory is not yet coupled to circuit simulation; market-cell
+metadata is not a qualified fitted device model.
+
+Windows startup sets the `SPIKES.Studio` shell identity before creating wx
+windows. Window icons use the bundled multi-size ICO rather than a single PNG;
+the Windows installer shortcuts use the same identity and executable icon.
+Restart an updated build to apply it. Previously pinned shortcuts to Python or
+an older build may need to be unpinned and the updated application re-pinned.
+Source changes do not update an already installed executable.
+
+Light is the default for new appearance preferences. Dark and the legacy
+Midnight selection now share a neutral graphite palette; High contrast remains
+available. Existing theme choices are retained. Top-level commands and workspace
+navigation use quiet controls with hover, keyboard focus, selection and disabled
+states. Tab moves focus; Space or Enter activates a focused command.
+
+Waveforms has one navigation strip; **More…** reveals archive, sweep, analysis
+and continuous-control tools. **Browser** hides or restores signal and cursor
+readings. Charts use restrained grids and frameless legends. Original retained
+samples still supply all measurements.
+
+Dashboard **Inspector** hides or restores properties. Global run commands replace
+duplicate dashboard run buttons. Hover over the session summary to inspect full
+solver/source provenance and hardware-disconnected status. Captures in
+`artifacts/studio-polish-final-20261012/` are real wx windows driven by the owned
+C++ RC and continuous simulations, not rendered mockups.
+
 This guide describes the runnable wxPython/wxWidgets workbench. It uses the
 owned C++ solver through the C ABI and Matplotlib for plots. The earlier HTML
 preview is a design reference; its canned values are not used in this application.
@@ -9,19 +179,76 @@ the existing Python/SciPy linear AC and descriptor pole-zero analysis backend.
 
 ## Connect, rotate and enter passive values
 
+**Add component** opens on **Value & parameters**, with engineering-value inputs
+and instance count. **Pins & connections** is a separate optional tab; it edits
+net assignments, not model pin order. Every default pin/instance starts isolated,
+and no pin is automatically grounded. Defaults are unique across separate
+insertions. Wire after placing the component, or intentionally assign shared net
+names in the connections tab. Invalid parameters keep the dialog open.
+Basic R/C/L, termination and cable presets place directly wireable primitives;
+other compound recipes retain their existing subcircuit placement limitations.
+Manufacturer insertion also separates nominal/model details from net mapping;
+sourced nominal values are not silently relabeled as arbitrary manufacturer parts.
+
+## Search and select manufacturer parts
+
+**Manufacturer library** presents sortable Manufacturer, MPN, Category, Nominal
+and Model readiness columns. Click a heading to change sorting; the arrow shows
+direction. Search and manufacturer/category/readiness filters combine. Selection
+is preserved while its record remains in the results. Drag the divider or resize
+columns to give the list or details more space. Overview, Pins and Evidence tabs
+separate ratings, pin labels and source/qualification information.
+
+In **Add component → Value & parameters**, **Component / library model** offers
+matching exact-MPN records alongside **Custom / generic**. Filter by MPN or maker.
+Available nominal R/C approximations show their sourced values read-only; choose
+Custom / generic to edit arbitrary values (your draft is retained). Records
+without a runnable model remain selectable for discovery but disable placement.
+Placed manufacturer R/C primitives retain identity, provenance and ratings through
+save/reopen and can be wired normally. Ratings remain metadata, not enforced
+solver limits. The current catalog is a 23-record seed, not a complete or qualified
+manufacturer-model library.
+
 Select a component, then **Rotate** on the toolbar, **Edit → Rotate**, or **Space**
 to turn it 90 degrees. The angle is saved with the project and undoable. Text stays
-upright. **Wire** on the toolbar or **W** enters terminal-to-terminal wiring: click
-one terminal marker, then the other. **Escape** cancels. This is an electrical
-net merge, not a decorative line: the destination net is renamed to the first net,
-except that ground wins. Undo restores both the drawing and source in one step.
+upright. **M** arms Move: the next click places the selection and calculates fresh
+routes for attached wires. **G** arms Drag: the next click places the selection
+while retaining nearby attached-wire bends. Pointer dragging uses Drag behavior.
+All placement previews snap to the 10-unit schematic grid; **Escape** cancels an
+armed move without changing the document.
 
-The initial wire editor supports the two primary terminals of top-level components.
-It does not yet provide arbitrary junctions, user-routed waypoints or multi-pin
-subcircuit editing. Hierarchical/model-library source and dependent expressions
-that cannot be rewritten safely are rejected instead of silently changing behavior.
-Wire crossings are not automatic junctions. Existing equal node names remain
-electrically connected even when no drawn wire joins them.
+**Wire** on the toolbar or **W** enters continuous terminal-to-terminal wiring.
+Click a terminal marker, optional grid-snapped corners, then the destination
+terminal. The dashed orthogonal preview follows the pointer. **/** flips its
+horizontal-first or vertical-first bend posture, and **Backspace** retracts the
+last explicit corner. The first **Escape** cancels the wire in progress while
+leaving Wire active; a second **Escape** exits the tool. After a wire is committed,
+Wire remains active for the next connection. This is an electrical net merge, not
+a decorative line: the destination net is renamed to the first net, except that
+ground wins. The preview latches to a terminal inside its hit radius and shows the
+same route that will be committed. For terminal-to-terminal connections, if the
+selected no-corner posture would enter an endpoint symbol body, both preview and
+commit use the body-avoiding autoroute.
+Undo restores both the drawing and source in one step.
+
+To create a deliberate branch, start **Wire** at the new branch terminal and
+finish on the interior of an existing wire. Studio first checks whether its
+authoritative SPICE node can be merged safely, then splits the drawn route at a
+saved junction dot and adds the branch as one transaction. The junction records
+both a stable source-terminal identity and its current source-node name; rotate
+and mirror operations therefore do not infer connectivity from screen position.
+If source rewriting is unsupported, no junction, route split, or partial source
+change is retained. Save/open and Undo preserve the complete junction topology.
+
+The wire editor supports every terminal exposed by a top-level component, stored
+orthogonal waypoints, shared-terminal dots, and explicit three-leg branches on
+existing wire interiors. Arbitrary free-standing junctions, bus entry, joining
+two existing wires at a crossing, and multi-pin subcircuit editing are not yet
+available. Hierarchical/model-library source and dependent expressions that
+cannot be rewritten safely are rejected instead of silently changing behavior.
+Wire crossings remain distinct unless a branch was explicitly finished on that
+wire. Existing equal node names remain electrically connected even when no drawn
+wire joins them.
 
 Press **E** for properties. Enter the value manually using SPICE engineering
 suffixes. For R/C/L, choose E6, E12 or E24 and use **Nearest standard value…** to
@@ -354,7 +581,210 @@ failure warnings. Run applies edited circuit text and captures that revision.
 File > Bill of materials groups current parts by kind, value, package and variant
 and exports a real CSV. It does not fabricate supplier or qualification data.
 
-## C/C++ and Verilog IDE
+## C/C++, Verilog and VHDL IDE
+
+### Configurable standard passives
+
+Search `id:standard.` in Component catalog for preferred-value R/L/C and
+four-terminal Kelvin templates. Double-click to edit nominal value, package
+(inch code), construction and tolerance; the nearest-value control offers
+E3 through E192 without claiming a stocked manufacturer part. Open Parasitics
+& temperature for explicit ESR/DCR, ESL, parallel C, leakage and static TC/corner
+coefficients; Pins & connections remains separate. A package or construction
+label never guesses parasitics, ratings, thermal drift or accuracy.
+Standard resistor templates span 1mΩ to 1GΩ; arbitrary custom values remain
+editable. Zero parasitics mean omitted. Manufacturer library entries are
+selectively sourced: ideal nominal R/L/C placements are not manufacturer
+models, and four-terminal Isabellenhuette entries remain review-only.
+
+### Fuzzy discovery search
+
+Studio discovery searches share typo-tolerant matching: component and manufacturer
+catalogs, component model selectors, canvas quick insert, symbol browser, model
+collections and library packages, command palette, nets/pins, directives, battery
+entries, waveform/run/trace selectors and HDL timing signals. Literal matches
+rank before misspellings. Multiword queries require every positive term.
+Words of 4..7 characters allow one edit; longer words allow two, including
+adjacent-letter swaps. Package suffixes can follow a typo-matched part stem.
+Terms shorter than four characters and numeric terms stay literal. Quoted
+phrases, exclusions and catalog field values (such as family:resistor) stay
+literal. Category, readiness, scope and model-kind filters are never relaxed.
+Search cannot change a circuit, approve a model, place a part or rewrite a net.
+Exact ID/MPN resolution and code syntax remain exact. No dependency is added.
+
+### Derived analysis plots
+
+After a transient run, choose **Analysis plots...** from the waveform toolbar
+or right-click menu. The floating window captures that run and provides XY,
+FFT amplitude, PSD, eye diagrams, histograms and cumulative integrals using
+signal/math expressions. Select an interval to keep calculations within
+262144 samples. FFT requires uniform timestamps; eyes need a supplied symbol
+period and at least eight retained samples per symbol. Reports show measured
+retained-data statistics, not model qualification. Shift-wheel zooms Y;
+the toolbar/context menu provides fit, pan, zoom, grid and PNG/SVG/PDF export.
+
+Six original domain-circuits netlists in the examples folder demonstrate RF RLC,
+ideal high-speed interconnect, precision bridge, idealized buck, HV divider and
+high-current path behavior. Select ngspice explicitly for those decks. These
+examples do not qualify real silicon, PCB SI, high-voltage safety or thermal
+behavior.
+
+### Standard IC discovery and functional logic
+
+The manufacturer browser and canvas search include sourced TI 54HC/74HC logic
+packages and additional common opamps, instrumentation amplifiers, BJTs and
+MOSFETs, with explicit package pins and source links. Review-only records are
+not insertable electrical models. Functional HC logic can be exercised through
+the standard_logic Python API; it is not yet coupled to the Studio circuit.
+Arduino/Pico/ESP32/STM32 firmware execution is not available. Do not interpret
+a controller symbol, package pinout or emulator target record as a runnable MCU
+or a validated SPI signal-integrity model.
+
+### Canvas quick insert and completion
+
+Double-click blank schematic space to open the small search palette at that
+location. Components, Monitors, Text and SPICE filters narrow the suggestions;
+the list shows symbols and placement/review status. Up/Down selects, Enter
+accepts, Tab fills a completion, and Escape or clicking elsewhere cancels.
+Double-clicking an existing object retains its normal editor behavior; wires
+do not count as blank space.
+
+Search component names, families, exact manufacturer MPNs or catalog IDs.
+Runnable entries open the existing value/model/pin editor and place at the
+clicked coordinate after acceptance. Vendor entries without runnable models
+and equation-bench-only presets open review instead of pretending to simulate.
+Sourced R/C entries retain their ideal-nominal approximation status. Shared
+subsheet component insertion still requires Circuit text; the palette reports
+that restriction rather than adding an invisible top-level component.
+
+Type free text and choose **Add as text** for an inert note. Dot-prefixed input
+offers **Add as SPICE directive** and **Add as text** separately; selecting text
+never executes it. Directive placement validates the actual source and is one
+undoable edit; failure leaves the draft and saved circuit intact. Partial dot
+commands suggest labeled parameter templates. Enter on a template fills it;
+Enter again on the directive action validates and places it.
+
+Voltage/current/power meters and Mini scope open a signal/expression binding
+dialog using real visible circuit names. They create normal schematic readouts
+or attached mini plots, not invented readings. Known `V(net)`, `I(ref)`, `P(ref)`
+and basic mathematical function names are suggested while typing; complete
+expressions can open a meter-binding editor. This is bounded context-aware
+completion, not a compiler/LSP IntelliSense implementation. Unknown or absent
+recorded channels remain unavailable until a suitable real simulation provides
+them. The displayed search list is capped at 48 suggestions.
+
+### Junctions, wire hops, labels and hierarchy
+
+Branching a wire creates an explicit junction and merges admitted native nets
+in one undoable transaction. Junctions can start or end wires. Right-click a
+wire and choose **Add junction on clicked wire** to split it at a new connection
+point. This alone does not join another net crossing there. Connected T/4-way
+points also display automatic dots based on actual net identity; hovering a
+junction or highlighting its net shows a halo.
+
+**View > Toggle wire hops** or context **View / navigation > Wire hops** enables
+automatic bridges where different nets cross. The newer route bridges the older
+route. Hops are presentation only and never change Circuit text or connectivity.
+The setting saves in the project and supports undo. Geometry detection assumes
+orthogonal routes and is capped at 20,000 markers; an exceeded budget reports a
+display error instead of silently changing connectivity.
+
+**Edit > Net label** / **Ctrl+L** arms label placement; click a pin or wire, choose
+Local, Global or Hierarchical and review the resolved native net. Double-click
+or right-click a marker to edit it. Scope and electrical changes are described
+in [scoped net labels](SCOPED_NET_LABELS.md). Source edits that invalidate label
+bindings are rejected atomically and require marker review; old labels are not
+silently attached to unrelated nets.
+
+**View > Schematic hierarchy** lists real subcircuit instances with ordered port
+mappings. Open an instance to view its components and nested descendants;
+**Parent sheet** and **Flat schematic** navigate back. Component context menus
+also open the containing subsheet. Label, selection and wire hit-testing respect
+the current instance view. These are scoped views of source-backed flattened
+devices, not full graphical sheet-block authoring. Shared definitions and new
+hierarchy ports still use the existing explicit subcircuit/Circuit text workflow.
+
+### Context menus
+
+Right-click a component or empty schematic area for grouped **Edit / selection**,
+**Move / transform**, **Place / annotate**, **Probe / instruments** and **View /
+navigation** actions. Component properties appear directly for a selection;
+wire parasitics appear only when a wire is hit. Existing directive, controller,
+annotation and attached-instrument menus remain object-specific. Keyboard menu
+invocation (Menu key / Shift+F10) uses the selected symbol or canvas center.
+
+Waveform menus group expression editing, cursors/original-sample measurements,
+view controls and annotations, with image export through the plotting toolbar.
+Catalog menus target the clicked row; keyboard invocation keeps the selection,
+and blank space does not reuse a stale part. Manufacturer menus expose ideal
+R/C insertion only where supported, pinouts, provenance, vendor-model review and
+exact-MPN copying; a context action does not qualify a manufacturer model.
+
+Dashboard menus select the clicked item and offer properties, duplication,
+visual linking, stacking order, grid snapping and deletion. Design edits are
+disabled in Run mode. Source-control application still requires an actual
+continuous simulation; DUT mapping remains disconnected metadata.
+
+Code editors have their own Undo/Redo, Cut/Copy/Paste, Delete selection, Select
+all and Word wrap menus. These operate on the editor, not circuit history or
+schematic clipboard. Read-only or unavailable operations are disabled. Shortcut
+labels are shown where assigned; unavailable operations stay visibly disabled.
+
+### Code beside the schematic
+
+Controller setup uses visual fields for language, sample interval and state
+count, alongside a scrollable block preview with labeled AI/DI/AO/DO pins and
+their circuit bindings. Configuration JSON is internal, not an editor the user
+must understand. Double-click the preview or use **Pin properties** to edit the
+pin table separately. **Apply / save setup** validates before committing;
+invalid values leave the saved setup unchanged.
+
+### Dashboard diagrams and future DUT mappings
+
+In Dashboard **Design** mode, add **Block** or **Note** alongside meters, scopes
+and source controls. The Signal / expression field is the description for
+diagram items, not executable equations. Select an item, press **Connect**, then
+click the target; click empty space to cancel. **Unlink** removes links attached
+to the selected item. Links follow movement/resizing and are saved with stable
+item IDs. Deleting an item removes its incident links; edits support undo/redo.
+These connectors are visual relationships, not schematic nets or causal solvers.
+
+**DUT mapping** stores a device/debug-adapter label, connector and pin, MCU GPIO,
+Read/Write direction and requested disconnect-safe digital level. These mappings
+are data-only drafts: opening, saving or clicking them never accesses hardware.
+The existing Source control still controls a simulated DC source, never the DUT.
+The preview explicitly marks mappings disconnected.
+
+Future SIL/PIL/HIL adapters must use an explicit target/session selection rather
+than silently substituting hardware for simulation, validate bindings against a
+target manifest, and require deliberate connect/arm actions for writes. Results
+must distinguish requested, acknowledged and measured values and record target
+timestamps, latency and errors. Stop, disconnect, stale telemetry and process
+failure need tested disarm/watchdog behavior; the requested safe level is not
+an implemented safety guarantee. A debug connection alone does not establish
+physical real-time performance, instrument safety or hardware qualification.
+
+Use **View > Netlist beside schematic**, **Netlist above/below schematic**, or
+**IDE beside schematic** to share the actual editor and canvas in a resizable
+split. The editor's **Beside schematic** action does the same. **Home** or
+**Code only** restores the ordinary workspace. These views retain the same
+draft; they do not copy the source into a second editor. Split layout is
+session-only.
+
+Select a known net/component name in SPICE, C/C++ or Verilog source to highlight
+the corresponding schematic objects. Controller pin names and indexed
+`inputs[n]` / `outputs[n]` references use the configured controller bindings.
+Clicking a word also works. Names are matched exactly, not by substring; unknown
+names do not create connections. This is a navigation aid, not compiler-level
+HDL elaboration or C data-flow analysis. Lexical syntax colors follow the theme.
+
+Double-click a controller card to open its compact floating code editor. **Pins**
+opens the settings and **Return editor** puts the same source widget back into
+the controller workspace. Closing the floating window hides it and preserves
+the draft. **Save setup** commits the controller configuration. Compilation
+requires explicit trust; opening the editor does not grant it. The sampled
+controller currently executes C/C++, not HDL co-simulation, and runs with the
+user's permissions rather than in a hostile-code sandbox.
 
 The editor has line numbers, syntax highlighting, source open/save and actual
 compiler logs. Check / compile invokes Icarus for Verilog and Clang or MSVC for
@@ -390,10 +820,36 @@ endmodule
 
 ![Timing from an actual Icarus/VVP run](media/06-real-vcd-timing.png)
 
-Open VCD also accepts existing simulation captures. Hierarchical scalar and vector
-signals, timescale, X/Z and value transitions are retained. Nonzero vector levels
-are drawn high and exact vector values are annotated. This is not an analog
-value plot. Technology-specific timing closure, STA constraints, place-and-route,
+The lower IDE suite has **Diagnostics**, **Synthesis** and **Timing** tabs. Drag
+the divider between source and the suite to allocate space. Synthesis displays
+actual Yosys module hierarchy, labeled ports and cell-type counts, not estimated
+hardware resources. The inventory tooltip distinguishes detected tools from
+connected capabilities. Select **VHDL** for GHDL VHDL-2008 analysis and bounded
+testbench execution. The selected top entity is elaborated before execution;
+the generated VCD enters the same viewer. Simulation is bounded to 1 ms model
+time and 15 seconds wall time per execution stage; build logs and VCD sizes are
+limited. VHDL synthesis remains explicitly unsupported. Source dialogs accept
+`.vhd` and `.vhdl`, and the editor uses VHDL lexical highlighting.
+
+![Actual GHDL testbench and VCD timing in Studio](media/hdl-suite/vhdl.png)
+
+![Actual native HDL suite with Yosys cell report beside schematic](media/hdl-suite/synthesis.png)
+
+Open VCD also accepts existing simulation captures. Search and check signals to
+choose their visibility. Hierarchical scalar and vector signals, timescale, X/Z
+and value transitions are retained. Nonzero vector levels are drawn high and
+exact vector values are annotated. Drag the dashed A/B cursors directly when
+pan/zoom is inactive; the dedicated table shows original-data values, delta,
+edge counts, mean complete-cycle period and known-time duty ratio. X/Z intervals
+do not count as known duration or invent edges. Export measurements as JSON/CSV.
+Display is bounded to 128 signals, 5,000 transitions per signal and 256 value
+annotations per signal; skipped display transitions may conceal narrow pulses.
+Measurements use the original transitions, not the displayed reduction. This is
+a digital value plot, not electrical delay prediction.
+
+![Actual Icarus VCD and dragged cursor readings in the HDL suite](media/hdl-suite/timing.png)
+
+Technology-specific timing closure, STA constraints, place-and-route,
 language-server completion and debugging are not yet integrated. Generated/native
 code must be trusted; this IDE does not claim an OS hostile-code sandbox.
 
@@ -526,13 +982,23 @@ blocks remain in Circuit text. Their bodies are not flattened into this editor.
 
 Batch `.measure` supports the parser's OP/DC/transient MIN, MAX, AVG, RMS and
 FIND subset. The C++ solver produces the electrical samples, then Python reduces
-those samples. AVG/RMS are **sample-weighted**, not adaptive-time-weighted
-integrals; FIND uses linear interpolation. Measurements appear in the plot's
+those samples. Transient AVG/RMS use time-weighted integrals of the
+piecewise-linear sample interpolant with interpolated window boundaries;
+DC reductions remain sample-weighted. FIND uses linear interpolation. Measurements appear in the plot's
 measurement panel, run report and capture provenance. A failed measurement is
 reported separately from a successful circuit solve. Full arbitrary SPICE
 post-processing is not implied: batch `.step` and continuous `.measure`/`.step`
 remain unsupported by this workbench. Run-profile overrides may supersede the
 deck's analysis and `.TEMP`; inspect the simulation manager's recorded profile.
+
+For schematic cross-probing, choose View > Nets and pins (Ctrl+Shift+N), or
+Nets and pins from the canvas context menu. Search by net name or component
+reference, choose a net, and double-click a terminal to center its component.
+All matching terminal circles and drawn routes are highlighted. Add voltage
+probe binds an actual V(net) probe to the project; merely viewing nets does not
+modify the circuit. Closing the viewer clears its highlight. Drawing groups
+describe routed geometry, not electrical isolation: matching named nodes are
+connected even when they have no drawn wire. This is not a pin-type ERC check.
 
 ![Actual directive editor](media/reliability/directive-editor.png)
 
@@ -632,13 +1098,27 @@ explicitly reloaded. **R/C/L/D** open part placement; **Edit → Enable
 part-placement shortcuts** turns those bindings off. Right-click a native preset
 to assign its own key, and save/load the bindings in Keyboard shortcuts.
 
-In **Plots**, select **Split canvas / plots** to put the actual editable schematic
-above the graphs. Drag the divider to resize. **Tools / readout** expands the
+In **Plots**, choose **Layout → Side by side** or **Top / bottom** to put the
+actual editable schematic beside or above the graphs. **Plot only** returns
+the editor to its schematic workspace. These options are also in the View menu.
+Drag the divider to resize. Workspace exports retain the chosen orientation;
+older profiles use top/bottom. **Tools / readout** expands the
 measurement output, archive controls and continuous-source controls; these are
 collapsed initially in split mode to leave room for graphs. Toggle split again
 to return the editor to its Schematic tab. **Plot grid** and **View → Canvas grid**
 toggle independently. **Stack / arrange panes** overlays same-unit traces or
 assigns them to separate, height-weighted panels sharing time zoom/pan.
+
+Use the **Mini plot** schematic tool (or **View → Insert attached mini plot**):
+click a terminal or wire, then click to drop the waveform card. Right-click a
+pin/wire and choose **Drop mini plot attached here…** to start at that point.
+Escape cancels placement. Drag a card to move it; right-click it to edit or
+remove it. The card, leader line and attached net's wires/pins use one stable,
+theme-aware color. Terminal leaders follow component movement/rotation; wire
+leaders retain the exact clicked schematic coordinate. Cards show real retained
+run data, with explicit unavailable/stale messages rather than invented curves.
+Cards and attachment bindings are saved with the circuit and are undoable.
+**Fit view** includes cards; wheel zoom and pan operate on the whole schematic.
 
 Batch F5 now executes each parameter variant through the owned C++ solver:
 
@@ -730,3 +1210,13 @@ solver, placing a differential probe, applying/reopening properties, synthesizin
 with Yosys, and simulating a counter with Icarus/VVP. The capture helper asks only
 SPIKES' own windows to paint; it does not substitute mockups or sampled formulas.
 All screenshot hashes and run provenance are saved in `media/evidence.json`.
+# Board-circuit handoff
+
+The desktop can explicitly open a staged board-circuit review with
+`spikes-studio --board-circuit-handoff <workspace>/.local/studio-handoff/<file>.json`.
+The v1 JSON retains exact board component centers, rotations, sides, pins, nets,
+display wires, source digest, occurrence, and reference cross-selection IDs.
+Only bindings already marked `reviewed` by the source workspace and supported as
+Studio primitives become executable records. Unavailable parts and reviewed
+subcircuits without an admitted implementation remain visible and inert with an
+explicit reason. Studio never infers a model from a reference or displayed value.

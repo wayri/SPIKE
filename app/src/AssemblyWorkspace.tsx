@@ -25,10 +25,11 @@ type Props = { assembly: AssemblyIr | null; designs: AssemblyDesigns | null; vis
   onSnapMode?: (mode: "off" | "hole" | "edge") => void; onSnapGapChange?: (value: number) => void; onSnapTarget?: (target: AssemblySnapTarget) => void;
   onLayerFocus?: (boardId: string, layer: string) => void;
   onSelectNet?: (boardId: string, netId: string) => void;
-  embedded?: boolean; closeRequested?: number; onDirtyChange?: (dirty: boolean) => void };
+  thermalStudyRequest?: string | null; embedded?: boolean; nativeWindow?: boolean; closeRequested?: number; onDirtyChange?: (dirty: boolean) => void };
 
 export default function AssemblyWorkspace(props: Props) {
   const [section, setSection] = useState<"boards" | "placement" | "links" | "analysis" | undefined>(undefined);
+  useEffect(() => { if (props.thermalStudyRequest) setSection("analysis"); }, [props.thermalStudyRequest]);
   const [boardQuery, setBoardQuery] = useState("");
   const [draftDirty, setDraftDirty] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -83,7 +84,7 @@ export default function AssemblyWorkspace(props: Props) {
   };
   const handleDirtyChange = (dirty: boolean) => { setDraftDirty(dirty); props.onDirtyChange?.(dirty); };
   return <div className={props.embedded ? "assembly-workspace-host assembly-workspace-host--embedded" : "modal-shade assembly-workspace-shade"}><section className="assembly-workspace" role={props.embedded ? "region" : "dialog"} aria-modal={props.embedded ? undefined : true} aria-label="Multi-board workspace">
-    <header><div><small>ECAD–MCAD ASSEMBLY</small><h2>Multi-board assembly workspace</h2><p>Inspect the retained layout, place board occurrences and manage the focused board.</p>{props.embedded && <p className="assembly-workspace-window-hint">This movable native window renders the same retained board sources as the main viewport.</p>}</div><button type="button" className="spike-control--icon" aria-label="Close multi-board workspace" onClick={() => draftDirty ? setCloseWarning(true) : props.onClose()}><X size={18}/></button></header>
+    <header><div><small>ECAD–MCAD ASSEMBLY</small><h2>Multi-board assembly workspace</h2><p>Inspect the retained layout, place board occurrences and manage the focused board.</p>{props.embedded && props.nativeWindow && <p className="assembly-workspace-window-hint">This movable native window renders the same retained board sources as the main viewport.</p>}</div>{!props.nativeWindow && <button type="button" className="spike-control--icon" aria-label="Close multi-board workspace" onClick={() => draftDirty ? setCloseWarning(true) : props.onClose()}><X size={18}/></button>}</header>
     {closeWarning && <div className="assembly-workspace-warning" role="alert">Unsaved board/link edits are still in this editor.<button type="button" onClick={() => setCloseWarning(false)}>Keep editing</button><button type="button" onClick={props.onClose}>Discard draft and close</button></div>}
     <div className="assembly-workspace-summary"><b>{boards.length} board occurrences</b><span>{props.designs?.designs.length ?? 0} retained designs</span><span>{props.assembly?.parts.length ?? 0} mechanical parts</span><span>{props.assembly?.harnesses?.length ?? 0} harnesses</span><span>{props.assembly?.connector_mappings?.filter(item => item.kind === "connector-mate").length ?? 0} connector mates</span></div>
     <div className="assembly-workspace-commandbar" role="toolbar" aria-label="Assembly workspace commands">

@@ -6,6 +6,7 @@ export type ExtensionWorkspaceRoute = {
   setupContributionId: string; previewContributionId?: string; label: string; workspace: ExtensionWorkspace;
   operation: "mesh" | "solve"; modelStatus: string; meshKind?: string; compatibleSolverIds: string[];
   trusted: boolean; enabled: boolean; state: string; schema: Record<string, unknown> | null;
+  requiresBoard: boolean;
 };
 const object = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
 const identifier = (value: unknown): value is string => typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(value);
@@ -26,6 +27,7 @@ export function extensionWorkspaceRoutes(catalog: unknown, workspace: ExtensionW
         if (route.setup_contribution_id !== undefined && (!identifier(route.setup_contribution_id) || !byId.has(route.setup_contribution_id))) continue;
         if (route.preview_contribution_id !== undefined && (!identifier(route.preview_contribution_id) || !byId.has(route.preview_contribution_id))) continue;
         if (route.mesh_kind !== undefined && !text(route.mesh_kind)) continue;
+        if (route.requires_board !== undefined && typeof route.requires_board !== "boolean") continue;
         if (route.compatible_solver_ids !== undefined && (!Array.isArray(route.compatible_solver_ids) || !route.compatible_solver_ids.every(identifier))) continue;
         const key = `${extension.id}:${route.id}`;
         if (seen.has(key)) continue;
@@ -35,6 +37,7 @@ export function extensionWorkspaceRoutes(catalog: unknown, workspace: ExtensionW
           setupContributionId: setupId, previewContributionId: route.preview_contribution_id as string | undefined,
           label: route.label, workspace, operation: route.operation as "mesh" | "solve", modelStatus: route.model_status,
           meshKind: route.mesh_kind as string | undefined, compatibleSolverIds: route.compatible_solver_ids as string[] ?? [],
+          requiresBoard: route.requires_board !== false,
           trusted: extension.trusted === true, enabled: !["disabled", "failed", "blocked", "removed"].includes(String(extension.state)),
           state: typeof extension.state === "string" ? extension.state : "unknown", schema: Object.keys(object(byId.get(setupId)?.input_schema)).length ? object(byId.get(setupId)?.input_schema) : null });
       }

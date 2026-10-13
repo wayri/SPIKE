@@ -10,7 +10,7 @@ import type { AssemblyToolViewportData } from "./assemblyToolWindowModel";
 import "./AssemblyWorkspaceViewport.css";
 import AssemblyIconToolbar from "./AssemblyIconToolbar";
 import AssemblyViewportHelp from "./AssemblyViewportHelp";
-import { Boxes, CircuitBoard, Focus, Maximize, Orbit, Hand, Eye, Layers, PanelRight, CircleHelp, ZoomIn, ArrowDownToLine } from "./icons";
+import { Boxes, CircuitBoard, Focus, Maximize, Orbit, Hand, Eye, Layers, PanelRight, CircleHelp, Network, ZoomIn, ArrowDownToLine } from "./icons";
 
 type Props = {
   assembly: AssemblyIr;
@@ -41,6 +41,7 @@ export default function AssemblyWorkspaceViewport(props: Props) {
   const [navigationMode, setNavigationMode] = useState<"orbit" | "pan">("orbit");
   const [showModels, setShowModels] = useState(true);
   const [showVias, setShowVias] = useState(true);
+  const [showNetNames,setShowNetNames] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const virtualBoards = useMemo(() => buildVirtualBoardVisualization(props.assembly, props.designs).visuals, [props.assembly, props.designs]);
   const explodeOffsets = useMemo(() => assemblyExplodeOffsets(virtualBoards, props.explodedDistanceMm), [virtualBoards, props.explodedDistanceMm]);
@@ -85,6 +86,7 @@ export default function AssemblyWorkspaceViewport(props: Props) {
       <AssemblyIconToolbar label="Assembly viewport controls" actions={[
         {id:"2d",label:"2D separated layout",text:"2D",icon:CircuitBoard,pressed:viewMode === "2D",onClick:() => {setViewMode("2D");command("fit");}},
         {id:"3d",label:"3D physical assembly",text:"3D",icon:Boxes,pressed:viewMode === "3D",onClick:() => {setViewMode("3D");command("fit");}},
+        {id:"net-names",label:"Show net names",text:"Net names",icon:Network,pressed:showNetNames,onClick:()=>setShowNetNames(value=>!value)},
         {id:"fit",label:"Fit assembly",text:"Fit",icon:Maximize,onClick:() => command("fit")},
         {id:"focus",label:"Focus board",text:"Focus",icon:Focus,disabled:!selected,onClick:() => command("focus-selection")},
         {id:"top",label:"Top view",text:"Top",icon:ArrowDownToLine,onClick:() => command("view-top")},
@@ -107,7 +109,7 @@ export default function AssemblyWorkspaceViewport(props: Props) {
         visibleLayers={selected ? props.layerVisibility[selected.id] ?? EMPTY_LAYERS : EMPTY_LAYERS}
         layerOpacity={selected ? props.layerOpacity[selected.id] ?? EMPTY_OPACITY : EMPTY_OPACITY}
         layerSeparation={0}
-        showVias={showVias}
+        showVias={showVias} showNetNames={showNetNames}
         showModels={showModels}
         showSmdModels={showModels}
         showThtModels={showModels}

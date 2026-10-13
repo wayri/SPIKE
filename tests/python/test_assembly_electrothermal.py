@@ -104,7 +104,8 @@ class AssemblyElectrothermalTests(unittest.TestCase):
         from examples.assembly_field.run_electrothermal import run_examples
         summaries = run_examples()
         self.assertEqual([row['case'] for row in summaries],
-                         ['dc-conduction','temperature-feedback','switching-loss-table'])
+                         ['dc-conduction','temperature-feedback','switching-loss-table',
+                          'stored-energy-corrected-loss','operating-loss-table'])
         self.assertTrue(all(not row['production_qualified'] for row in summaries))
         self.assertGreater(summaries[2]['total_deposited_heat_w'],summaries[1]['total_deposited_heat_w'])
 

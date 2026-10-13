@@ -14,9 +14,14 @@ import math
 import numpy as np
 from scipy.spatial import cKDTree
 
-MAX_CELLS = 5000
-MAX_NODES = 10000
-MAX_COMPARISONS = 2000000
+from .tetra_aabb_candidates import overlapping_pairs
+
+MAX_CELLS = 100000
+MAX_NODES = 100000
+MAX_COMPARISONS = 4000000
+MAX_HIERARCHY_VISITS = 8000000
+MAX_MATRIX_ENTRIES = 4000000
+MAX_WORKSPACE_BYTES = 512 * 1024 * 1024
 
 
 class AssemblyTetraThermalError(ValueError):
@@ -57,31 +62,25 @@ def indices(value, size, count):
 
 
 def _overlap_audit(xyz, cells):
-    """SAT interior test with broad-phase sweep and explicit comparison budget."""
+    """SAT interior test with bounded spatial hierarchy and comparison budget."""
     points = [xyz[cell["vertices"]] for cell in cells]
     lows, highs = np.array([p.min(0) for p in points]), np.array([p.max(0) for p in points])
-    order = sorted(range(len(points)), key=lambda i: lows[i, 0])
     edges = [[p[j] - p[i] for i, j in itertools.combinations(range(4), 2)] for p in points]
     normals = [[np.cross(p[j] - p[i], p[k] - p[i])
                 for i, j, k in itertools.combinations(range(4), 3)] for p in points]
     comparisons = 0
-    for position, i in enumerate(order):
-        for j in order[position + 1:]:
-            if lows[j, 0] >= highs[i, 0]:
-                break
-            comparisons += 1
-            require(comparisons <= MAX_COMPARISONS, "Geometry comparison budget exceeded.")
-            if np.any(np.minimum(highs[i], highs[j]) <= np.maximum(lows[i], lows[j])):
-                continue
-            axes = np.concatenate((normals[i], normals[j],
-                                   np.cross(np.array(edges[i])[:, None], np.array(edges[j])).reshape(-1, 3)))
-            lengths = np.linalg.norm(axes, axis=1)
-            axes = axes[lengths > 0] / lengths[lengths > 0, None]
-            # Subtract local origin before projection to avoid translation loss.
-            a, b = (points[i] - points[i][0]) @ axes.T, (points[j] - points[i][0]) @ axes.T
-            overlap = np.minimum(a.max(0), b.max(0)) - np.maximum(a.min(0), b.min(0))
-            tolerance = 1e-11 * max(np.max(highs[i] - lows[i]), np.max(highs[j] - lows[j]))
-            require(np.any(overlap <= tolerance), "Overlapping tetrahedral solid interiors.")
+    for i, j in overlapping_pairs(lows, highs, MAX_HIERARCHY_VISITS, require):
+        comparisons += 1
+        require(comparisons <= MAX_COMPARISONS, "Geometry comparison budget exceeded.")
+        axes = np.concatenate((normals[i], normals[j],
+                               np.cross(np.array(edges[i])[:, None], np.array(edges[j])).reshape(-1, 3)))
+        lengths = np.linalg.norm(axes, axis=1)
+        axes = axes[lengths > 0] / lengths[lengths > 0, None]
+        # Subtract local origin before projection to avoid translation loss.
+        a, b = (points[i] - points[i][0]) @ axes.T, (points[j] - points[i][0]) @ axes.T
+        overlap = np.minimum(a.max(0), b.max(0)) - np.maximum(a.min(0), b.min(0))
+        tolerance = 1e-11 * max(np.max(highs[i] - lows[i]), np.max(highs[j] - lows[j]))
+        require(np.any(overlap <= tolerance), "Overlapping tetrahedral solid interiors.")
     return comparisons
 
 
@@ -94,9 +93,10 @@ def _hanging_node_audit(xyz, cells, geometry, cell_owners, node_owners):
         p = xyz[vertices]
         center = p.mean(0)
         radius = float(np.max(np.linalg.norm(p - center, axis=1))) * (1 + 1e-10)
-        candidates = tree.query_ball_point(center, radius)
-        comparisons += len(candidates)
+        count = int(tree.query_ball_point(center, radius, return_length=True))
+        comparisons += count
         require(comparisons <= MAX_COMPARISONS, "Hanging-node comparison budget exceeded.")
+        candidates = tree.query_ball_point(center, radius)
         candidates = [i for i in candidates if i not in vertices and node_owners[i] & owners]
         if candidates:
             weights = (xyz[candidates] - p[0]) @ gradients[1:].T
@@ -113,7 +113,7 @@ def validate_request(raw):
          ("mode", "heat_sources_w_m3", "contacts"))
     require(raw["contract"] == "spike/assembly-tetra-thermal-request/v1", "Invalid thermal request contract.")
     require(raw.get("mode", "steady_state") == "steady_state",
-            "Only steady_state solid conduction is supported; transient/radiation/airflow are unsupported.")
+            "Only steady_state solid conduction is supported; transient/airflow are unsupported.")
     mesh = raw["mesh"]
     keys(mesh, ("contract", "units", "coordinate_system", "vertices", "cells", "counts", "object_map"))
     require(mesh["contract"] == "spike/solver-mesh/v1" and mesh["units"] in ("m", "mm") and
@@ -154,6 +154,15 @@ def validate_request(raw):
         require(eigenvalues[0] > 0 and eigenvalues[-1] / eigenvalues[0] <= 1e12,
                 "Conductivity tensor must be positive definite and reasonably conditioned.")
         tensors[mid] = tensor
+    # Bound Python ownership sets/maps as well as numerical buffers before
+    # populating them; many source IDs per tetrahedron otherwise amplify RAM.
+    ownership_links = 0
+    for cell in cells:
+        require(isinstance(cell, dict) and isinstance(cell.get("source_object_ids"), list),
+                "Invalid source ownership.")
+        ownership_links += len(cell["source_object_ids"])
+    ownership_bytes = 1024 * ownership_links
+    require(ownership_bytes <= MAX_WORKSPACE_BYTES, "Thermal ownership workspace budget exceeded.")
     ids, used, seen, body_coordinates = set(), set(), set(), {}
     cell_owners, node_owners = [], [set() for _ in vertices]
     for cell in cells:
@@ -192,6 +201,12 @@ def validate_request(raw):
     boundaries, contacts = raw["boundaries"], raw.get("contacts", [])
     require(isinstance(boundaries, list) and len(boundaries) <= 4 * len(cells) and
             isinstance(contacts, list) and len(contacts) <= 2 * len(cells), "Surface resource budget exceeded.")
+    # Conservative admission estimate for topology, geometry, sparse copies,
+    # Krylov vectors and output. Caller-owned JSON and runtime RSS are separate.
+    entries = 16 * len(cells) + 9 * len(boundaries) + 36 * len(contacts)
+    workspace = 3072 * len(cells) + 1024 * len(vertices) + 96 * entries + ownership_bytes
+    require(entries <= MAX_MATRIX_ENTRIES, "Sparse matrix entry budget exceeded.")
+    require(workspace <= MAX_WORKSPACE_BYTES, "Thermal workspace estimate budget exceeded.")
     xyz = np.array(vertices, dtype=float) * (1e-3 if mesh["units"] == "mm" else 1)
     faces, geometry, max_condition = {}, [], 0.0
     for cell in cells:
@@ -221,6 +236,7 @@ def validate_request(raw):
             owners.append(record)
     exterior = {face: records[0] for face, records in faces.items() if len(records) == 1}
     assigned, surface_ids, fixed, convection, fluxes, matched = set(), set(), {}, [], [], []
+    radiation = []
 
     def surface(item, field):
         face = tuple(sorted(indices(item[field], 3, len(vertices))))
@@ -232,8 +248,11 @@ def validate_request(raw):
         require(isinstance(item, dict) and isinstance(item.get("type"), str), "Invalid boundary.")
         kind = item["type"]
         fields = {"temperature": ("temperature_k",), "heat_flux": ("heat_flux_w_m2",),
-                  "convection": ("heat_transfer_coefficient_w_m2k", "ambient_temperature_k"), "adiabatic": ()}
-        require(kind in fields, "Unsupported boundary type (radiation/airflow unavailable).")
+                  "convection": ("heat_transfer_coefficient_w_m2k", "ambient_temperature_k"), "adiabatic": (),
+                  "radiation": ("emissivity", "radiation_temperature_k"),
+                  "convection_radiation": ("heat_transfer_coefficient_w_m2k", "ambient_temperature_k",
+                                           "emissivity", "radiation_temperature_k")}
+        require(kind in fields, "Unsupported boundary type (airflow unavailable).")
         keys(item, ("id", "vertices", "type") + fields[kind])
         sid = identifier(item["id"])
         require(sid not in surface_ids, "Duplicate surface ID.")
@@ -247,9 +266,19 @@ def validate_request(raw):
                 fixed[node] = temp
         elif kind == "heat_flux":
             fluxes.append((face, area, number(item["heat_flux_w_m2"], "inward heat flux")))
-        elif kind == "convection":
+        elif kind in ("convection", "convection_radiation"):
             convection.append((face, area, number(item["heat_transfer_coefficient_w_m2k"], "convection h", positive=True),
                                number(item["ambient_temperature_k"], "ambient temperature K", nonnegative=True)))
+        if kind in ("radiation", "convection_radiation"):
+            emissivity = number(item["emissivity"], "emissivity", nonnegative=True)
+            require(emissivity <= 1, "Emissivity must be in [0, 1].")
+            ambient = number(item["radiation_temperature_k"], "radiation temperature K", positive=True)
+            require(ambient <= 10000, "Radiation temperature range must be (0, 10000] K.")
+            radiation.append((face, area, emissivity, ambient))
+    if radiation:
+        require(all(0 < t <= 10000 for t in fixed.values()) and
+                all(0 < entry[3] <= 10000 for entry in convection),
+                "Radiation temperature range must be (0, 10000] K.")
     for item in contacts:
         keys(item, ("id", "left_vertices", "right_vertices", "thermal_contact_conductance_w_m2k"))
         sid = identifier(item["id"])
@@ -269,7 +298,8 @@ def validate_request(raw):
     comparisons = _overlap_audit(xyz, cells)
     hanging_comparisons = _hanging_node_audit(xyz, cells, geometry, cell_owners, node_owners)
     return {"xyz": xyz, "cells": cells, "tensors": tensors, "geometry": geometry,
-            "sources": sources, "fixed": fixed, "convection": convection, "fluxes": fluxes,
+            "radiation": radiation, "sources": sources, "fixed": fixed, "convection": convection, "fluxes": fluxes,
             "contacts": matched, "exterior": exterior, "omitted": sorted(set(exterior) - assigned),
             "max_condition": max_condition, "comparisons": comparisons,
-            "hanging_comparisons": hanging_comparisons}
+            "hanging_comparisons": hanging_comparisons, "matrix_entry_budget": entries,
+            "estimated_workspace_bytes": workspace}

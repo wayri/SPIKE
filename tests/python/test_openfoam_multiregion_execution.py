@@ -69,6 +69,7 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
                 if fluid:
                     (folder / "U").write_text(_foam_field("vector", ["(0.2 0 0)"]), encoding="utf-8")
                     (folder / "p_rgh").write_text(_foam_field("scalar", ["101325"]), encoding="utf-8")
+                    (folder / "p").write_text(_foam_field("scalar", ["101330"]), encoding="utf-8")
             _write_native_field_export(root, manifest)
             result = import_multiregion_fields(root, manifest)
             schema_path = Path(__file__).resolve().parents[2] / "schemas" / "thermal-field-result-v1.schema.json"
@@ -76,7 +77,12 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
             self.assertEqual(set(result["fields"]), {"temperature_k", "heat_flux_w_m2", "velocity_m_s", "pressure_pa"})
             self.assertEqual(result["fields"]["temperature_k"]["total_samples"], 2)
             self.assertEqual(result["fields"]["velocity_m_s"]["total_samples"], 1)
+            self.assertEqual(result["fields"]["pressure_pa"]["samples"][0]["value"], 101330)
             self.assertEqual(result["fields"]["heat_flux_w_m2"]["samples"][0]["value"], [-0.7, 0.35, -0.175])
+            (latest / 'air' / 'p').unlink()
+            from python.spike_core.openfoam import OpenFoamAdapterError
+            with self.assertRaises(OpenFoamAdapterError):
+                _write_native_field_export(root, manifest)
 
     def test_wsl_command_uses_mounted_case_path_and_no_shell_tokens(self):
         runtime = {

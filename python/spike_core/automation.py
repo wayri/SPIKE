@@ -14,6 +14,10 @@ from typing import Any
 class SpikeAutomationError(RuntimeError):
     """A worker operation failed or returned an invalid response."""
 
+    def __init__(self, message: str, response: Mapping[str, Any] | None = None) -> None:
+        super().__init__(message)
+        self.response = dict(response) if response is not None else None
+
 
 def _json_object(value: Mapping[str, Any], label: str) -> dict[str, Any]:
     if not isinstance(value, Mapping):
@@ -46,6 +50,10 @@ class SpikeAutomation:
         self._dispatch = dispatch
 
     def call(self, method: str, params: Mapping[str, Any] | None = None) -> Any:
+        return self.call_response(method, params).get("result")
+
+    def call_response(self, method: str, params: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
+        """Retain worker metadata for transports that expose source bindings."""
         if not isinstance(method, str) or not method.strip():
             raise ValueError("Worker method must be a non-empty string.")
         request = {"method": method, "params": _json_object(params or {}, "params")}
@@ -53,8 +61,8 @@ class SpikeAutomation:
         if not isinstance(response, Mapping) or not isinstance(response.get("ok"), bool):
             raise SpikeAutomationError(f"{method}: worker returned an invalid response.")
         if not response["ok"]:
-            raise SpikeAutomationError(f"{method}: {response.get('error') or 'operation failed'}")
-        return response.get("result")
+            raise SpikeAutomationError(f"{method}: {response.get('error') or 'operation failed'}", response)
+        return dict(response)
 
     def extension_catalog(self) -> Mapping[str, Any]:
         return self.call("list_extensions")

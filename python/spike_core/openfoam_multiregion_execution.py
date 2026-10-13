@@ -277,7 +277,10 @@ def _write_native_field_export(root: Path, manifest: Mapping[str, Any]) -> Path:
             record["cell_volume_m3"] = volumes
         if record["kind"] == "fluid":
             record["velocity_m_s"] = _parse_internal_field(region_root / "U", vector=True, expected_count=len(centres))
-            record["pressure_pa"] = _parse_internal_field(region_root / "p_rgh", expected_count=len(centres))
+            # p_rgh omits the hydrostatic term and is not physical pressure.
+            # Read the thermodynamic pressure written by the native solver;
+            # absence must fail rather than silently relabel a different field.
+            record["pressure_pa"] = _parse_internal_field(region_root / "p", expected_count=len(centres))
             if len(record["velocity_m_s"]) != len(centres) or len(record["pressure_pa"]) != len(centres):
                 raise MultiRegionExecutionError(f"Fluid region {region_id} C/U/p fields are not aligned.")
         regions.append(record)

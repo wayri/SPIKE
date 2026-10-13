@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/magnetic-machine-study-result/v1",
+  "type": "object",
+  "required": ["contract", "model", "model_status", "production_qualified", "request_sha256", "summary", "field", "limitations", "validation"],
+  "properties": {
+    "contract": {"const": "spike/magnetic-machine-study-result/v1"},
+    "model": {"enum": ["pm_rotor", "solenoid"]},
+    "model_status": {"const": "experimental"},
+    "production_qualified": {"const": false},
+    "request_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "summary_state": {"enum": ["initial_position", "final_stationary_transient"]},
+    "field_time_s": {"type": "number", "minimum": 0},
+    "summary": {"type": "object", "required": ["max_b_t", "magnetic_energy_j", "force_x_n", "force_y_n", "torque_n_m"], "additionalProperties": {"type": "number"}},
+    "field": {"type": "object", "required": ["nodes_m", "triangles", "element_b_t", "element_h_a_per_m", "potential_a_wb_per_m"],
+      "properties": {
+        "nodes_m": {"type": "array", "minItems": 3, "maxItems": 100000, "items": {"$ref": "#/$defs/pair"}},
+        "triangles": {"type": "array", "minItems": 1, "maxItems": 200000, "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 0}}},
+        "element_b_t": {"type": "array", "items": {"$ref": "#/$defs/pair"}},
+        "element_h_a_per_m": {"type": "array", "items": {"$ref": "#/$defs/pair"}},
+        "potential_a_wb_per_m": {"type": "array", "items": {"type": "number"}}
+      }},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "validation": {"type": "object", "required": ["mesh_convergence", "force_torque_accuracy"],
+      "properties": {"force_torque_accuracy": {"const": "not_qualified"}}}
+  },
+  "$defs": {"pair": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}}
+}

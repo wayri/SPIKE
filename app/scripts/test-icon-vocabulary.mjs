@@ -40,13 +40,6 @@ for (const [group, labels] of Object.entries(groups)) {
 }
 
 const toolbarContracts = [
-  ["Part selection", "<Component size={14} /><span>Part</span>"],
-  ["Net selection", "<Route size={14} /><span>Net</span>"],
-  ["Absolute voltage", "<Zap size={14} /> Voltage"],
-  ["Voltage drop", "<TrendingDown size={14} /> Drop"],
-  ["Current", "<ArrowRightLeft size={14} /> Current"],
-  ["Current density", "<ChartNoAxesColumnIncreasing size={14} /> Density"],
-  ["Impedance", "<Omega size={14} /> Impedance"],
   ["RLC", "<Component size={14} /> RLC"],
   ["Translucency", "<Blend size={14} /> Translucent"],
   ["Net isolation", "<RouteOff size={14} /> Nets only"],

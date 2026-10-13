@@ -13,11 +13,21 @@ from .spider_v2 import AssemblyIRV1
 
 def prepare_electrothermal(request):
     bounded_json(request)
-    keys(request, ('contract','geometry','thermal_problem','electrical','heat_sources','iteration','loss_accounting'))
+    keys(request, ('contract','geometry','thermal_problem','electrical','heat_sources','iteration','loss_accounting'),
+         ('thermal_engine','thermal_engine_options'))
     if request['contract'] != 'spike/assembly-electrothermal-request/v1':
         raise ValueError('ELECTROTHERMAL_CONTRACT: unsupported coupled request')
     if request['loss_accounting'] != 'explicit_nonoverlapping_losses':
         raise ValueError('ELECTROTHERMAL_LOSSES: explicit nonoverlapping loss inventory required')
+    thermal_engine = request.get('thermal_engine', 'internal')
+    if thermal_engine not in ('internal', 'calculix'):
+        raise ValueError('ELECTROTHERMAL_ENGINE: thermal_engine must be internal or calculix')
+    engine_options = request.get('thermal_engine_options', {})
+    if thermal_engine == 'calculix':
+        from .calculix_runtime import validate_calculix_options
+        engine_options = validate_calculix_options(engine_options)
+    elif not isinstance(engine_options, dict) or engine_options:
+        raise ValueError('ELECTROTHERMAL_ENGINE: thermal_engine_options require the calculix engine')
     geometry = copy.deepcopy(request['geometry'])
     assembly = AssemblyIRV1.from_dict(geometry['assembly'])
     if geometry.get('domain') != 'thermal' or any(getattr(assembly,k) for k in ('harnesses','connector_mappings','rigid_flex_links')):
@@ -123,6 +133,11 @@ def prepare_electrothermal(request):
     for cell in mesh['cells']:
         xyz = np.array([mesh['vertices'][v] for v in cell['vertices']])
         volumes[cell['id']] = float(np.linalg.det((xyz[1:]-xyz[0]).T)/6)
+    # Check retained thermal face ownership, contact area and R=1/(h*A)
+    # before any electrical solve. No inferred package/contact resistance.
+    from .assembly_field_thermal import bind_assembly_field_thermal
+    bind_assembly_field_thermal(geometry, request['thermal_problem'])
     return {'geometry':geometry,'handoff':handoff,'mesh':mesh,'traces':traces,'laws':laws,'local_cells':local_cells,
             'terminals':terminals,'contacts':contacts,'volumes':volumes,'initial_temperature_k':initial,
-            'original_request_digest':canonical_json_digest(request)}
+            'original_request_digest':canonical_json_digest(request),
+            'thermal_engine':thermal_engine,'thermal_engine_options':engine_options}

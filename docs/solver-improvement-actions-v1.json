@@ -1,0 +1,334 @@
+{
+  "contract": "spike/solver-improvement-actions/v1",
+  "baseline_date": "2026-10-12",
+  "purpose": "Implementation feedback and proposed acceptance gates; does not enable or qualify runtime capabilities.",
+  "plan_document": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
+  "baseline_report": "output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf",
+  "all_solver_qualified": false,
+  "first_batch_validation": {
+    "date": "2026-10-13",
+    "full_python_tests": 3666,
+    "full_python_failures": 1,
+    "full_python_errors": 1,
+    "full_python_skipped": 65,
+    "full_suite_green": false,
+    "architecture_check": "passed",
+    "remaining_integration_issues": [
+      "Python-debug startup failure passed in isolated rerun; original broad-run failure is retained.",
+      "WF01-S01/S02 import receipts lack newly required source bindings; fresh actual s01/s02 corpus runs passed in output/first-batch-parity-replay-20261013 but concurrent receipts/backlog were not overwritten."
+    ]
+  },
+  "queue_reconciliation": {
+    "review_date": "2026-10-13",
+    "integrating_owner_role": "solver-suite engineering",
+    "adoption_status": "adopted; implementation gates unchanged",
+    "retained_manifest_entries_checked": 13,
+    "retained_manifest_hash_mismatches": 0,
+    "already_available_foundations": [
+      "Explicit linear PDN networks and retained-dielectric P1 capacitance; not arbitrary PCB extraction qualification (ACC10/ACC11).",
+      "Retained-volume thermal stepping, conservative device-energy maps and PWM rollback; not independent multi-axis coupling error closure (ACC02/ACC09).",
+      "Analytic sine-source ABI rebuilt and tested; not amplitude-floor or unit-aware LTE qualification (ACC01/ACC06).",
+      "PDN JSON authoring with stale-result/cancellation handling; not the ordinary-form multi-route wizard or native visual acceptance (ACC14)."
+    ],
+    "next_work": [
+      "ACC01: add signed/zero amplitude and independent voltage/current observables to the existing RC/RL timestep harness; retain every failed stratum.",
+      "ACC03: separate execution, decay stopping and sensitivity; correct duration-only labels while preserving historical evidence.",
+      "ACC04: inspect gmsh_occ_runtime.py and gmsh_extension_runtime.py admission, not only the injected OCC compiler; qualify a fresh declared environment without path overrides.",
+      "ACC02: preserve both capacity rules and establish manufactured continuum refinements before changing kernels.",
+      "ACC05: bind the refreshed native DLL and actual Python/SciPy runs independently; verify input/source identities before and after each new run before publishing claims."
+    ],
+    "completion_claim": "No ACC action completed by this adoption review; all action statuses and acceptance gates remain unchanged."
+  },
+  "first_batch": [
+    "ACC01",
+    "ACC03",
+    "ACC04"
+  ],
+  "parallel_analysis": [
+    "ACC02"
+  ],
+  "actions": [
+    {
+      "id": "ACC01",
+      "title": "Verify amplitude proportionality and numerical floors",
+      "stage": 1,
+      "priority": "P1",
+      "status": "in_progress",
+      "owner_role": "circuit numerics",
+      "depends_on": [],
+      "primary_paths": [
+        "scripts/benchmark_circuit_timestep_accuracy.py",
+        "python/spikes/transient_controls.py"
+      ],
+      "instructions_and_completion_gates": "Owner: circuit numerics. Extend\n`scripts/benchmark_circuit_timestep_accuracy.py` into an amplitude/timestep\nmatrix. Run original linear RC/RL cases at scales 1, 1e-3 and 1e-6 with steps\n1, 0.5 and 0.25 us. Retain volts and amperes as separate observables, raw\nwaveforms and unit-correct normalized errors. Include zero input and sign\nreversal. Do not subtract fitted delay or rescale output after execution.\n\nFor the finest linear fixture, propose\n`abs(error) <= atol + 5e-6*abs(reference)`, with declared initial floors\n`atol_V=1e-12 V` and `atol_I=1e-15 A`. These are tests of a proposed envelope,\nnot an assertion that SPIKE already meets it. Compare error divided by the\nexcitation scale; if it stops scaling, locate tolerances, conditioning,\nintegration, interpolation or serialization as separate causes. Change\nsolver tolerance handling only when the discriminating test identifies it.\nCompletion: publish the minimum verified amplitude and error floor per\nobservable; every failing stratum stays failed.",
+      "execution_evidence": ["output/acc01-20261013-rerun-1/report.json: conclusive actual owned-C++ 42-run sweep; 36 nonzero strata failed, six zero strata passed. Proposed floors/envelope are not qualified.", "output/acc01-20261013/report.json: original run retained with inconclusive source binding."]
+    },
+    {
+      "id": "ACC02",
+      "title": "Resolve thermal comparison semantics before kernel changes",
+      "stage": 1,
+      "priority": "P1",
+      "status": "planned",
+      "owner_role": "solid thermal",
+      "depends_on": [],
+      "primary_paths": [
+        "python/spike_core/assembly_tetra_transient.py",
+        "python/spike_core/calculix_transient.py",
+        "examples/converter/run_pwm_volume_validation.py"
+      ],
+      "instructions_and_completion_gates": "Owner: solid thermal. Record capacity matrix rule, integration rule, boundary\ndiscretization, timestep and material identity in both internal and external\nresults. Preserve the 0.351567 K fixture and its two independent discrete\noracles. Add a continuous manufactured thermal field and matched\ncoarse-to-fine studies: spatial subdivisions 2, 4, 8 and temporal steps\n0.04, 0.02, 0.01, 0.005 s, refining one axis while controlling the other.\n\nFirst decision: determine whether both formulations converge to the same\ncontinuum within the declared model. If yes, keep their native rules and\nreport discretization uncertainty; a comparison mode must not silently\nreplace production capacity. If no, isolate conservation, assembly,\nboundary or integration defects before editing a kernel. Completion:\npreserve the existing per-node cross-code gate, demonstrate decreasing\nindependent continuum error, and meet a proposed finest-field budget of\n0.01 K plus 1% of the local reference temperature rise for the new fixture.\nNo near-zero temperature-rise point may be judged by relative error alone.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC03",
+      "title": "Make EM stopping and refinement claims exact",
+      "stage": 1,
+      "priority": "P1",
+      "status": "in_progress",
+      "owner_role": "retained EM adapter",
+      "depends_on": [],
+      "primary_paths": [
+        "python/spike_core/assembly_em.py",
+        "extensions/openems_suite/retained_volume_driver.py",
+        "scripts/validate_retained_assembly_em.py"
+      ],
+      "instructions_and_completion_gates": "Owner: retained EM adapter. In `assembly_em.py` and the owned openEMS driver,\nreturn execution status, requested/observed decay, final timestep, cap hit,\nstopping reason and observable-sensitivity status independently. Use a\nsupported public runtime result when available; otherwise use a bounded,\ntested log parser with runtime identity and an explicit unknown state.\nAbsence of the cap warning must not become proof of decay success.\n\nRename the duration-only metric without deleting its historical key meaning.\nAdd synthetic log/parser cases for reached decay, cap hit, timeout, malformed\nand missing evidence. Re-run the retained plate study. Completion: the\n80000-step case remains stopping-failed unless an actual changed run reaches\n-90 dB; accepted S11 sensitivity remains a separate result. No automatic cap\nincrease, softened decay request or new production-qualified flag.",
+      "execution_evidence": ["output/retained-assembly-em-acc03-20261013/validation-summary.json: fresh stopping and sensitivity evidence; -90 dB/80000-step case remains stopping-failed.", "output/retained-assembly-em-acc03-20261013/stopping-reparse-v2.json: reviewed bounded parser corrections preserve all actual run statuses. Full integration checks pending."]
+    },
+    {
+      "id": "ACC04",
+      "title": "Make isolated numerical environments reproducible",
+      "stage": 1,
+      "priority": "P1",
+      "status": "in_progress",
+      "owner_role": "runtime orchestration",
+      "depends_on": [],
+      "primary_paths": [
+        "python/spike_core/gmsh_occ_mesher.py",
+        "scripts/validate_transient_thermal.py"
+      ],
+      "instructions_and_completion_gates": "Owner: runtime orchestration. Fix declared CAD/mesher environment selection\nand dependency preflight in the existing bounded child-process route. The\nisolated child must import its declared NumPy/native dependencies without\nad hoc injection from unrelated installations. Retain resolved interpreter,\ndependency versions and error diagnostics. Preserve the original failed run.\nCompletion: the retained STEP transient workflow passes in a fresh process\nwith no manual package-path override; a deliberately incomplete environment\nfails preflight with the missing dependency, while isolation and path admission\nchecks still pass.",
+      "execution_evidence": ["output/acc04-20261013/validation.json: actual unchanged qualification-venv retained STEP/transient/package workflow passed without path overrides; source identity unchanged.", "output/acc04-20261013/artifacts/mesh-execution/case-joint/environment.json: actual isolated interpreter and dependency identity retained. Global qualification checks remain open."]
+    },
+    {
+      "id": "ACC05",
+      "title": "Bind benchmarks to actual execution and immutable evidence",
+      "stage": 1,
+      "priority": "P1",
+      "status": "planned",
+      "owner_role": "qualification tooling",
+      "depends_on": [],
+      "primary_paths": [
+        "scripts/build_solver_accuracy_report.py",
+        "python/spikes/competitive_benchmark.py"
+      ],
+      "instructions_and_completion_gates": "Owner: qualification tooling. Record requested and executed backend, fallback\nreason, semantic engine version, binary/input/source hashes, capacity/integration\nsettings, host and exact command. Verify relevant input/source identity before\nand after a run; concurrent changes make its source binding inconclusive.\nSeparate original-run, rerun and historical results. Validate missing outputs,\nNaN, unit/reference-plane mismatch, skips and incomplete cases as failures or\nblocked states, never passes. Completion: replay the current report from its\nmanifest and detect tampering, version drift and backend substitution; every\ntable value can be traced to one observable in an accepted record.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC06",
+      "title": "Add unit aware transient error control",
+      "stage": 2,
+      "priority": "P2",
+      "status": "planned",
+      "owner_role": "SPIKES native transient",
+      "depends_on": [
+        "ACC01",
+        "ACC05"
+      ],
+      "primary_paths": [
+        "src/spikes/transient_solver.cpp",
+        "src/spikes/transient_solver.hpp",
+        "python/spikes/native_abi.py"
+      ],
+      "instructions_and_completion_gates": "Owner: SPIKES native transient. After ACC01, evaluate the current adaptive LTE\ncontroller across voltage and branch-current scales. Define tolerances for\neach physical quantity and state group, preserving existing ABI behavior or\nintroducing an explicitly versioned option. Do not compare volts, amperes and\ntemperature in an unscaled norm. Distinguish internal stepping from output\nsampling and keep event breakpoints exact.\n\nCompletion: independent RC/RL/RLC and supported diode/switch cases meet the\npredeclared absolute-plus-relative budgets; rejected steps restore all state;\nsource breakpoints, persistent/batch equivalence and failure recovery pass.\nThe small-amplitude sweep must be re-run. Choose an adaptive preset only after\nits achieved error and cost are measured; do not merely tighten all defaults.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC07",
+      "title": "Add solution based thermal mesh and time checks",
+      "stage": 2,
+      "priority": "P2",
+      "status": "planned",
+      "owner_role": "thermal accuracy",
+      "depends_on": [
+        "ACC02",
+        "ACC05"
+      ],
+      "primary_paths": [
+        "python/spike_core/thermal_accuracy.py",
+        "python/spike_core/assembly_tetra_transient.py"
+      ],
+      "instructions_and_completion_gates": "Owner: thermal accuracy. Use the actual solved temperature rise, heat flux and\ncontact heat flow to drive convergence reports. Refine contacts, thin materials\nand heated regions as well as bulk volume. Extend `thermal_accuracy.py` beyond\nsuccessive-value change when an independent oracle is available. Use\nRichardson/GCI only with admissible smooth/asymptotic data; otherwise report\nunresolved error. Completion: exact slab/contact and nonuniform transient\nfixtures meet their frozen budgets, conserved watts/energy remain unchanged,\nand unresolved contact/mesh error blocks accuracy-qualified presentation.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC08",
+      "title": "Establish EM field and loss accuracy with independent refinements",
+      "stage": 2,
+      "priority": "P2",
+      "status": "planned",
+      "owner_role": "field qualification",
+      "depends_on": [
+        "ACC03",
+        "ACC05"
+      ],
+      "primary_paths": [
+        "scripts/validate_retained_em_field_scaling.py",
+        "extensions/openems_suite/retained_volume_driver.py"
+      ],
+      "instructions_and_completion_gates": "Owner: field qualification. Hold geometry, port reference planes and PML\nlocation fixed while refining the interior grid. Change FDTD timestep\nindependently through a supported control, and test duration/PML separately.\nIf the installed runtime cannot support a controlled timestep study, record\nthat axis as blocked rather than relabel duration. Check complex fields at\nfixed physical coordinates, not nearest-grid peaks alone.\n\nCompletion: retain current 5% field and capacitance gates and establish\ndecreasing field/reference discrepancy on a preselected sequence. A proposed\nnext field target is <=2% maximum on the original admitted interior samples;\nfailure remains a failed target. Add an independent finite-conductivity loss\ncase before using small real impedance as resolved physical dissipation.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC09",
+      "title": "Control electrical thermal coupling error independently",
+      "stage": 2,
+      "priority": "P2",
+      "status": "planned",
+      "owner_role": "coupled orchestration",
+      "depends_on": [
+        "ACC02",
+        "ACC06",
+        "ACC07"
+      ],
+      "primary_paths": [
+        "python/spike_core/pwm_volume_electrothermal.py",
+        "python/spike_core/multiboard_volume_electrothermal.py"
+      ],
+      "instructions_and_completion_gates": "Owner: coupled orchestration. Extend PI/SI-volume and PWM-volume studies with\nstronger feedback, source/load changes and nonuniform heat maps. Retain\nunrelaxed temperature and per-device energy defects. Refine electrical step,\nthermal window, spatial mesh and coupling iteration separately. Compare\nagainst an independent monolithic ODE for a lumped case and a manufactured\nspatial case; an internal fine-run reference is labeled accordingly.\n\nCompletion: existing finest PWM gates (0.005 A, 0.002 V, 0.005 K) and energy\nledgers remain passed; a new refined target is half each error budget on the\nsame synthetic fixture. Rollback/cancellation publish only committed windows.\nExhausted iterations fail without hidden timestep or tolerance changes.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC10",
+      "title": "Improve geometry based PI extraction in a bounded envelope",
+      "stage": 2,
+      "priority": "P2",
+      "status": "planned",
+      "owner_role": "PEEC and geometry DC",
+      "depends_on": [
+        "ACC05"
+      ],
+      "primary_paths": [
+        "src/peec/peec_solver.cpp",
+        "python/spike_core/hybrid_dc_solver.py"
+      ],
+      "instructions_and_completion_gates": "Owner: PEEC and geometry DC. Re-run sheet/contact/trace/via refinement and\ncompare full self/mutual matrices with independently derived compatible\nconductor references. Diagnose geometry/terminal bias behind the 2.5% sheet\nresult before changing discretization. Add mesh-aware endpoint/area checks.\n\nCompletion: proposed <=1% resistance error for the existing sheet case within\na declared mesh/resource budget, while trace/via unit invariants remain passed.\nFor C/G, begin with homogeneous coaxial/plate/multiconductor limits and explicit\nreference definitions. Do not promote single-reference capacitance to arbitrary\nelectrostatic accuracy. Independent field evidence is required by ACC11.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC11",
+      "title": "Validate geometry derived SI and extraction against external fields",
+      "stage": 3,
+      "priority": "P3",
+      "status": "planned",
+      "owner_role": "SI and field qualification",
+      "depends_on": [
+        "ACC08",
+        "ACC10"
+      ],
+      "primary_paths": [
+        "python/spike_core/si_channel.py",
+        "python/spike_core/si_coupled_channel.py"
+      ],
+      "instructions_and_completion_gates": "Owner: SI and field qualification. Independently author a uniform two-port and\ncoupled four-port coupon with exact material/geometry/port data. Compare against\nan installed independent field solver and the analytical uniform limit.\nRecord reference impedance, calibration/de-embedding planes, wave convention\nand frequency grid. Compare Cartesian complex S, delay, Z0, crosstalk and loaded\nwaveforms; phase near nulls needs a separate mask.\n\nBefore execution, propose fixture budgets of <=0.02 maximum complex-S absolute\nerror and <=2% delay/Z0 error across the declared band. These are numerical\ntargets, not signal-integrity compliance. Completion: match geometry and\nreference planes, pass mesh/time convergence, and execute both coupons with\nall required ports. Admitted Cambridge wire measurements cannot supply absent\nfour-port entries or substitute for a matched PCB prediction.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC12",
+      "title": "Expand nonlinear and switching circuit qualification",
+      "stage": 3,
+      "priority": "P3",
+      "status": "planned",
+      "owner_role": "circuit models",
+      "depends_on": [
+        "ACC01",
+        "ACC06",
+        "ACC05"
+      ],
+      "primary_paths": [
+        "src/spikes/dc_solver.cpp",
+        "src/spikes/transient_solver.cpp",
+        "python/spikes/competitive_benchmark.py"
+      ],
+      "instructions_and_completion_gates": "Owner: circuit models. Add same-model diode/BJT/MOS DC sweeps, AC poles/phase,\ncharge/transient and switching waveforms across voltages, currents, temperature\nand stiffness. Use ngspice and LTspice where the admitted equations/dialect\nmatch; include Xyce only when installed and the comparison is equivalent.\nPublish max and RMS waveform error at common physical times, event timing,\nKCL, source energy, dissipated heat and stored energy. Keep edge/model\napproximation errors distinct from integration error.\n\nCompletion: all predeclared case-specific gates pass on the supported model\nenvelope, nonconvergence is explicit, and the small-signal floors from ACC01\nare preserved. Extend PWM feedback beyond the winding only after bounded,\nreviewed temperature-dependent switch/device loss laws are admitted and every\nloss is counted once. No vendor/hardware model claim from ideal switches.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC13",
+      "title": "Establish held out measurement correlation",
+      "stage": 3,
+      "priority": "P3",
+      "status": "planned",
+      "owner_role": "engineering validation",
+      "depends_on": [
+        "ACC11",
+        "ACC07",
+        "ACC12"
+      ],
+      "primary_paths": [
+        "docs/SOLVER_ACCURACY_PROGRAM.md",
+        "docs/CFD_PUBLIC_REFERENCE_CORPUS.md"
+      ],
+      "instructions_and_completion_gates": "Owner: engineering validation. Select one reproducible resistive/thermal coupon\nand one SI coupon with complete geometry, operating conditions, raw observations\nand uncertainty. Review acquisition, calibration, permitted use and material\nuncertainty before admission. Split parameter fitting from held-out validation;\nreport individual operating points and residual distributions.\n\nCompletion: predictions are executed without tuning to held-out data; acceptance\nis frozen from the intended engineering error budget and measurement uncertainty\nbefore seeing predictions. Budget-setting is a required acquisition milestone,\nnot a placeholder for a later pass. Unavailable physical data remain blocked;\nanalytical and external-code evidence cannot promote measurement maturity.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC14",
+      "title": "Provide a guided setup for supported coupling",
+      "stage": 4,
+      "priority": "P3",
+      "status": "planned",
+      "owner_role": "desktop and worker admission",
+      "depends_on": [
+        "ACC03",
+        "ACC04",
+        "ACC05"
+      ],
+      "primary_paths": [
+        "app/src/VolumeElectrothermalEditor.tsx",
+        "app/src/MagneticMachineWorkbench.tsx"
+      ],
+      "instructions_and_completion_gates": "Owner: desktop and worker admission. Offer supported physics selections for\nDC PI thermal, single-frequency SI thermal, bounded native PWM thermal and\nstationary planar magnetic thermal. Show one-way versus two-way feedback.\nRequire source/load, cooling/contact, material-law and reviewed loss mappings;\ngive ordinary forms for these instead of mandatory hand-edited JSON. Keep\nadvanced JSON as an explicit option. Do not expose arbitrary full-wave plus\nSPICE thermal feedback as runnable.\n\nCompletion: prepare/run/save/reopen works on one actual case for each supported\nroute; missing mappings, stale geometry, unavailable engines and incompatible\nmodels are actionable. Numerical results and qualification scope survive the\nwizard unchanged. Verify actual wide/narrow native layouts, cancellation and\nresult invalidation, following the UI skill and project checks.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC15",
+      "title": "Optimize runtime at the same accuracy",
+      "stage": 4,
+      "priority": "P3",
+      "status": "planned",
+      "owner_role": "numerical performance",
+      "depends_on": [
+        "ACC05",
+        "ACC06",
+        "ACC07"
+      ],
+      "primary_paths": [
+        "src/spikes/transient_solver.cpp",
+        "python/spike_core/retained_thermal_step.py"
+      ],
+      "instructions_and_completion_gates": "Owner: numerical performance. After each numerical envelope is established,\nmeasure matched cases with two warmups and at least seven runs, recording\nmedian/p95 wall time, peak process memory, threads, hardware and accuracy.\nUse small, medium and large declared problems and distinguish cold process\nstartup, assembly/factorization, stepping and postprocessing. Isolate benchmark\nprocesses; the concurrent exploratory timings are not speed rankings.\n\nProfile before optimizing. Reuse topology/sparsity and factorizations only when\ntemperature, nonlinear state, timestep and material dependencies permit it.\nProposed first optimization gate: >=20% median-time reduction on the explicitly\nprofiled bottleneck case, no weakened accuracy/conservation gate, no new memory\nlimit violation, and no >10% median regression on the frozen neighboring corpus.\nIf the target fails, retain the result instead of broadening the favorable case.",
+      "execution_evidence": []
+    },
+    {
+      "id": "ACC16",
+      "title": "Build full field thermal coupling in bounded steps",
+      "stage": 5,
+      "priority": "P3",
+      "status": "planned",
+      "owner_role": "coupling architecture and field adapters",
+      "depends_on": [
+        "ACC08",
+        "ACC09",
+        "ACC11"
+      ],
+      "primary_paths": [
+        "python/spike_core/assembly_em.py",
+        "python/spike_core/assembly_electrothermal.py"
+      ],
+      "instructions_and_completion_gates": "Owner: coupling architecture and field adapters. Start with one-way EM-to-thermal\ntransfer for an independently authored stationary lossy coupon. Define physical\ntime-averaged watts, peak/RMS normalization, occurrence/cell identity, conservative\nloss deposition and admissible materials. Require actually resolved conductor\nand dielectric losses from ACC08; rendered E/H magnitude is not heat.\n\nCompletion for the first step: integrated field loss matches transferred thermal\nwatts within a proposed 0.1% mapping budget and passes the independent loss oracle.\nOnly then add temperature-dependent conductivity/permittivity and bounded\ntwo-way iteration with rollback and mesh/field/thermal error checks. A general\nfull-wave plus nonlinear SPICE plus thermal route needs a separate reviewed\ncoupling contract and independent combined oracle before implementation.\nDo not equate stationary planar magnetic heating with this capability.",
+      "execution_evidence": []
+    }
+  ]
+}

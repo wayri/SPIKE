@@ -17,6 +17,7 @@ import numpy as np
 from scipy.sparse import lil_matrix, spmatrix
 
 from .acceleration import AccelerationUnavailableError, solve_sparse_system
+from .native_source_waveforms import source_value as _source_value
 
 
 REQUEST_CONTRACT = "spike/native-mna-request/v1"
@@ -36,7 +37,7 @@ SUPPORTED_ELEMENTS = {
 }
 BRANCH_ELEMENTS = {"inductor", "voltage_source", "vcvs", "ccvs"}
 SOURCE_ELEMENTS = {"voltage_source", "current_source"}
-SUPPORTED_WAVEFORMS = {"constant", "step", "pulse", "pwl"}
+SUPPORTED_WAVEFORMS = {"constant", "step", "pulse", "pwl", "sin", "exp", "sffm"}
 MAX_ELEMENTS = 100_000
 MAX_POINTS = 1_000_000
 MAX_DENSE_UNKNOWNS = 10_000
@@ -105,8 +106,27 @@ def _validate_waveform(element: Dict[str, Any], path: str, issues: List[Dict[str
     if kind not in SUPPORTED_WAVEFORMS:
         issues.append(_issue(
             "MNA_WAVEFORM_UNSUPPORTED",
-            f"Waveform type {kind or 'missing'} is unsupported; expected constant, step, pulse, or pwl.",
+            f"Waveform type {kind or 'missing'} is unsupported; expected constant, step, pulse, pwl, sin, exp, or sffm.",
             f"{path}.waveform.type",
+        ))
+        return
+    required_fields = {
+        "exp": (
+            "initial", "pulsed", "rise_delay_s", "rise_time_constant_s",
+            "fall_delay_s", "fall_time_constant_s",
+        ),
+        "sffm": (
+            "offset", "amplitude", "carrier_frequency_hz", "modulation_index",
+            "modulating_frequency_hz", "delay_s", "modulating_phase_deg",
+            "carrier_phase_deg",
+        ),
+    }
+    missing = tuple(key for key in required_fields.get(kind, ()) if key not in waveform)
+    if missing:
+        issues.append(_issue(
+            "MNA_WAVEFORM_FIELD_REQUIRED",
+            f"{kind.upper()} waveform is missing required fields: {', '.join(missing)}.",
+            f"{path}.waveform",
         ))
         return
     scalar_fields = {
@@ -115,6 +135,20 @@ def _validate_waveform(element: Dict[str, Any], path: str, issues: List[Dict[str
         "pulse": (
             ("low", False), ("high", False), ("delay_s", True), ("rise_time_s", True),
             ("fall_time_s", True), ("pulse_width_s", True), ("period_s", True),
+        ),
+        "sin": (
+            ("offset", False), ("amplitude", False), ("frequency_hz", True),
+            ("delay_s", True), ("damping_per_s", True), ("phase_deg", False),
+        ),
+        "exp": (
+            ("initial", False), ("pulsed", False), ("rise_delay_s", True),
+            ("rise_time_constant_s", True), ("fall_delay_s", True),
+            ("fall_time_constant_s", True),
+        ),
+        "sffm": (
+            ("offset", False), ("amplitude", False), ("carrier_frequency_hz", True),
+            ("modulation_index", True), ("modulating_frequency_hz", True),
+            ("delay_s", True), ("modulating_phase_deg", False), ("carrier_phase_deg", False),
         ),
     }
     for key, nonnegative in scalar_fields.get(kind, ()):
@@ -130,6 +164,40 @@ def _validate_waveform(element: Dict[str, Any], path: str, issues: List[Dict[str
             fall = float(waveform.get("fall_time_s", 0.0) or 0.0)
             if width is not None and rise + width + fall > period:
                 issues.append(_issue("MNA_PULSE_PERIOD_INVALID", "Pulse rise, width, and fall exceed its period.", f"{path}.waveform.period_s"))
+    if kind == "sin" and _finite(waveform.get("frequency_hz"), positive=True) is None:
+        issues.append(_issue(
+            "MNA_SIN_FREQUENCY_INVALID", "SIN frequency must be finite and positive.",
+            f"{path}.waveform.frequency_hz",
+        ))
+    if kind == "exp":
+        rise_tau = _finite(waveform.get("rise_time_constant_s"), positive=True)
+        fall_tau = _finite(waveform.get("fall_time_constant_s"), positive=True)
+        rise_delay = _finite(waveform.get("rise_delay_s"), nonnegative=True)
+        fall_delay = _finite(waveform.get("fall_delay_s"), nonnegative=True)
+        if rise_tau is None or fall_tau is None:
+            issues.append(_issue(
+                "MNA_EXP_TIME_CONSTANT_INVALID", "EXP time constants must be finite and positive.",
+                f"{path}.waveform",
+            ))
+        if rise_delay is not None and fall_delay is not None and fall_delay < rise_delay:
+            issues.append(_issue(
+                "MNA_EXP_DELAY_ORDER_INVALID", "EXP fall delay must not precede rise delay.",
+                f"{path}.waveform.fall_delay_s",
+            ))
+    if kind == "sffm":
+        carrier = _finite(waveform.get("carrier_frequency_hz"), positive=True)
+        modulating = _finite(waveform.get("modulating_frequency_hz"), positive=True)
+        modulation_index = _finite(waveform.get("modulation_index"), nonnegative=True)
+        if carrier is None or modulating is None:
+            issues.append(_issue(
+                "MNA_SFFM_FREQUENCY_INVALID", "SFFM frequencies must be finite and positive.",
+                f"{path}.waveform",
+            ))
+        elif modulation_index is not None and modulation_index > carrier / modulating:
+            issues.append(_issue(
+                "MNA_SFFM_MODULATION_INDEX_INVALID", "SFFM modulation index must satisfy 0 <= MDI <= FC/FM.",
+                f"{path}.waveform.modulation_index",
+            ))
     if kind == "pwl":
         points = waveform.get("points")
         if not isinstance(points, list) or not points:
@@ -298,58 +366,6 @@ def validate_native_mna_request(request: Dict[str, Any]) -> Dict[str, Any]:
             "estimated_nonzeros": estimated_nonzeros,
         },
     }
-
-
-def _source_value(element: Dict[str, Any], time_s: float) -> float:
-    waveform = element.get("waveform")
-    if not isinstance(waveform, dict):
-        return float(element.get("dc_value", element.get("value", 0.0)) or 0.0)
-    kind = str(waveform.get("type", "constant")).lower()
-    if kind == "constant":
-        return float(waveform.get("value", element.get("dc_value", 0.0)) or 0.0)
-    if kind == "step":
-        initial = float(waveform.get("initial", 0.0))
-        final = float(waveform.get("final", initial))
-        delay = max(0.0, float(waveform.get("delay_s", 0.0)))
-        rise = max(0.0, float(waveform.get("rise_time_s", 0.0)))
-        if time_s < delay:
-            return initial
-        if rise and time_s < delay + rise:
-            return initial + (final - initial) * (time_s - delay) / rise
-        return final
-    if kind == "pulse":
-        low = float(waveform.get("low", 0.0))
-        high = float(waveform.get("high", low))
-        delay = max(0.0, float(waveform.get("delay_s", 0.0)))
-        rise = max(0.0, float(waveform.get("rise_time_s", 0.0)))
-        fall = max(0.0, float(waveform.get("fall_time_s", 0.0)))
-        width = max(0.0, float(waveform.get("pulse_width_s", 0.0)))
-        period = max(0.0, float(waveform.get("period_s", 0.0)))
-        if time_s < delay:
-            return low
-        local = time_s - delay
-        if period:
-            local %= period
-        if rise and local < rise:
-            return low + (high - low) * local / rise
-        if local < rise + width:
-            return high
-        if fall and local < rise + width + fall:
-            return high + (low - high) * (local - rise - width) / fall
-        return low
-    if kind == "pwl":
-        points = waveform.get("points", [])
-        parsed = sorted((float(item[0]), float(item[1])) for item in points if isinstance(item, (list, tuple)) and len(item) == 2)
-        if not parsed:
-            return 0.0
-        if time_s <= parsed[0][0]:
-            return parsed[0][1]
-        for (left_t, left_v), (right_t, right_v) in zip(parsed, parsed[1:]):
-            if time_s <= right_t:
-                ratio = (time_s - left_t) / max(right_t - left_t, np.finfo(float).eps)
-                return left_v + ratio * (right_v - left_v)
-        return parsed[-1][1]
-    raise ValueError(f"Unsupported source waveform: {kind}")
 
 
 def _indices(request: Dict[str, Any]) -> Tuple[Dict[str, int], Dict[str, int], List[str]]:

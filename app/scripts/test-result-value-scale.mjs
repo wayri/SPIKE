@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {readFileSync} from 'node:fs';
+import React from 'react';
+import {renderToStaticMarkup} from 'react-dom/server';
+import ts from 'typescript';
+const require=createRequire(import.meta.url), module={exports:{}};
+const code=ts.transpileModule(readFileSync(new URL('../src/ResultValueScale.tsx',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+new Function('require','module','exports',code)(name=>name.endsWith('.css')?{}:require(name),module,module.exports);
+const render=props=>renderToStaticMarkup(React.createElement(module.exports.default,props));
+const html=render({label:'Temperature',unit:'°C',minimum:27.03,maximum:57.04,gradient:'linear-gradient(to right, blue, red)',scope:'Saved field'});
+assert.match(html,/Temperature value scale/); assert.match(html,/27.03 °C/); assert.match(html,/57.04 °C/); assert.match(html,/42.035 °C/);
+assert.equal(render({label:'Invalid',unit:'V',minimum:NaN,maximum:2}),'');
+assert.equal(render({label:'Reversed',unit:'V',minimum:3,maximum:2}),'');
+assert.match(render({label:'Constant',unit:'A',minimum:2,maximum:2}),/>2 A</);
+const viewport=readFileSync(new URL('../src/BoardViewport.tsx',import.meta.url),'utf8');
+assert.match(viewport,/className="viewport-result-scales"/);
+const scaleArea=viewport.slice(viewport.indexOf('className="viewport-result-scales"'));
+assert.doesNotMatch(scaleArea,/!thermalInfoHidden/,'hiding probe info does not hide persistent scales');
+console.log('scale quantities, units, ticks, invalid/constant ranges and popup independence passed');

@@ -25,7 +25,7 @@ def verify_browser(frame,destination):
         frame.validation_failure=True;write_json(destination/'error.json',{'error':str(exc),'traceback':traceback.format_exc(),'checks':checks});frame.timer.Stop();frame.Destroy()
     def run():
         try:
-            panel.circuit_ready();check(len(panel.visible)==650,'circuit-ready shortcut excludes bench-only presets')
+            panel.circuit_ready();check(len(panel.visible)==3558,'circuit-ready shortcut includes standard passives and excludes bench-only presets')
             def inspect_manufacturer():
                 dialogs=[w for w in wx.GetTopLevelWindows() if isinstance(w,wx.Dialog) and w.GetTitle()=='Manufacturer model qualification']
                 if not dialogs:return
@@ -122,6 +122,6 @@ def verify_browser(frame,destination):
             check(frame.pending_library_placement is not None and frame.pending_library_placement[0]['family']=='resistor','resistor shortcut opens reviewed placement workflow')
             event=wx.KeyEvent(wx.wxEVT_KEY_DOWN);event.SetKeyCode(wx.WXK_ESCAPE);frame.canvas.GetEventHandler().ProcessEvent(event)
             check(frame.doc.data==snapshot,'shortcut review and cancel leave document unchanged')
-            write_json(destination/'checks.json',{'checks':checks,'query_ms':timings,'cache_state':'mixed warm and cold queries','catalog_records':5000});frame.timer.Stop();frame.Destroy()
+            write_json(destination/'checks.json',{'checks':checks,'query_ms':timings,'cache_state':'mixed warm and cold queries','catalog_records':len(panel.catalog['records'])});frame.timer.Stop();frame.Destroy()
         except Exception as exc:fail(exc)
     wx.CallLater(150,run)

@@ -73,7 +73,8 @@ bend coupling and discontinuity physics are omitted.
 For one trace, the extractor computes a scalar per-unit-length model for the
 admitted uniform cross-section. Capacitance uses the existing bounded
 Hammerstad/Jensen planar estimate; propagation velocity determines inductance;
-conductor resistance is the DC rectangular-section value; and dielectric shunt
+conductor impedance uses isolated symmetric slab magnetic diffusion by default,
+with an explicit DC-only option; and dielectric shunt
 loss uses the declared loss tangent. The uniform telegrapher-equation solution
 is converted to a reciprocal two-port S sweep with one real positive reference
 impedance.
@@ -82,10 +83,13 @@ For the pair, an independently written sparse finite-difference 2-D
 cross-section solve produces the vacuum Maxwell capacitance matrix at three
 bounded refinement levels. The dielectric matrix is the homogeneous relative
 permittivity times that vacuum matrix. The quasi-TEM inductance matrix is
-derived from the inverse vacuum matrix and the vacuum speed of light; resistance
-is diagonal DC rectangular-section resistance; dielectric shunt loss uses the
+derived from the inverse vacuum matrix and the vacuum speed of light; internal
+conductor impedance is diagonal isolated-slab diffusion by default; dielectric shunt loss uses the
 declared loss tangent. The multiconductor telegrapher state transition produces
 a four-port S sweep with equal real positive reference impedances.
+See [High-frequency conductor loss](HIGH_FREQUENCY_LOSSES.md) for optional
+RMS roughness controls, independent checks and the omitted return-plane,
+proximity and broadband phase physics.
 
 The pair's cross-section boundary policy grounds the bottom reference boundary,
 sets the two conductor segments on the top boundary, and uses finite natural

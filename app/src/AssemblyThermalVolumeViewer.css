@@ -1,0 +1,15 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.assembly-thermal-volume { min-width: 0; width: 100%; }
+.assembly-thermal-volume__controls { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; margin-bottom: 8px; }
+.assembly-thermal-volume__controls label { display: flex; flex-direction: column; gap: 4px; min-width: 0; max-width: 100%; }
+.assembly-thermal-volume__controls select { width: 100%; max-width: min(320px, 70vw); min-width: 0; font: 12px/1.4 system-ui, sans-serif; min-height: 30px; padding: 4px 8px; }
+.assembly-thermal-volume p { overflow-wrap: anywhere; }
+.assembly-thermal-volume__scale { padding: 8px 0; }
+.assembly-thermal-volume__identity { overflow-wrap: anywhere; white-space: normal; max-width: 320px; }
+
+.assembly-transient-controls { display: flex; flex-wrap: wrap; gap: 8px 14px; min-width: 0; }
+.assembly-transient-controls > p, .assembly-transient-controls > details { flex-basis: 100%; }
+.assembly-transient-controls label { display: flex; flex-direction: column; min-width: 0; }
+.assembly-transient-controls input { width: 140px; max-width: 100%; }
+.assembly-transient-controls textarea { width: 100%; box-sizing: border-box; }
+.assembly-transient-controls > div { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

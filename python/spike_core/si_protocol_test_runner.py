@@ -3,7 +3,7 @@
 The runner is orchestration, not a second solver.  It validates one declarative
 suite, executes each admitted lane exactly once through ``si_channel``, and
 projects the resulting RLGC/network/time-domain/eye evidence into explicit
-per-analysis records.  It never evaluates licensed protocol limits or promotes
+per-analysis records.  It evaluates explicitly bound eye-opening masks, but never promotes
 the experimental channel model to compliance evidence.
 """
 
@@ -27,7 +27,7 @@ MAXIMUM_FREQUENCY_POINTS = 131_076
 MAXIMUM_ESTIMATED_NUMERIC_BYTES = 134_217_728
 
 _REQUEST_KEYS = {"contract", "suite", "lanes", "requested_tests", "resource_limits"}
-_LANE_KEYS = {"lane_id", "channel_request"}
+_LANE_KEYS = {"lane_id", "channel_request", "eye_mask", "eye_mask_id", "eye_voltage_mapping"}
 _RESOURCE_KEYS = {
     "maximum_lanes", "maximum_frequency_points", "maximum_estimated_numeric_bytes",
 }
@@ -83,8 +83,8 @@ def _validate_request(request: Mapping[str, Any]) -> tuple[dict[str, Any], list[
     lane_ids: set[str] = set()
     total_frequencies = 0
     for index, raw_lane in enumerate(raw_lanes):
-        if not isinstance(raw_lane, Mapping) or set(raw_lane) != _LANE_KEYS:
-            raise SiProtocolTestRunnerError(f"lanes[{index}] must contain only lane_id and channel_request.")
+        if not isinstance(raw_lane, Mapping) or set(raw_lane)-_LANE_KEYS or not {"lane_id", "channel_request"}.issubset(raw_lane):
+            raise SiProtocolTestRunnerError(f"lanes[{index}] has missing required or unknown lane fields.")
         lane_id = raw_lane.get("lane_id")
         if not isinstance(lane_id, str) or not lane_id.strip() or len(lane_id) > 128 or lane_id in lane_ids:
             raise SiProtocolTestRunnerError(f"lanes[{index}].lane_id is empty, too long, or duplicated.")
@@ -98,7 +98,12 @@ def _validate_request(request: Mapping[str, Any]) -> tuple[dict[str, Any], list[
             raise SiProtocolTestRunnerError(f"lanes[{index}].channel_request.frequencies_hz must be an array.")
         total_frequencies += len(frequencies)
         lane_ids.add(lane_id)
-        lanes.append({"lane_id": lane_id, "channel_request": dict(channel_request)})
+        from .si_protocol_eye_mask import validate_lane_mask
+        try:
+            validate_lane_mask(raw_lane, suite)
+        except ValueError as exc:
+            raise SiProtocolTestRunnerError(f"Lane {lane_id!r}: {exc}") from exc
+        lanes.append(dict(raw_lane))
     if total_frequencies > limits["maximum_frequency_points"]:
         raise SiProtocolTestRunnerError(
             f"The requested {total_frequencies} frequency points exceed maximum_frequency_points={limits['maximum_frequency_points']}."
@@ -279,7 +284,17 @@ def run_si_protocol_test_suite(
             raise SiProtocolTestRunnerError("Actual frequency-point use exceeded the admitted suite limit.")
         if total_numeric_bytes > limits["maximum_estimated_numeric_bytes"]:
             raise SiProtocolTestRunnerError("Estimated numeric output exceeded the admitted suite byte limit.")
+        from .si_protocol_eye_mask import run_lane_mask
+        try:
+            mask_result = run_lane_mask(lane, channel_result)
+        except ValueError as exc:
+            raise SiProtocolTestRunnerError(f"Lane {lane['lane_id']!r} mask: {exc}") from exc
         tests = [_lane_test(analysis_id, channel_result, lane["channel_request"]) for analysis_id in requested_tests]
+        if mask_result is not None:
+            for item in tests:
+                if item["analysis_id"] == "eye":
+                    item["mask_test"] = mask_result
+                    item["reason"] = "Eye opening mask evaluated on retained polylines; protocol compliance remains not evaluated."
         completed_tests += sum(item["status"] == "completed" for item in tests)
         blocked_tests += sum(item["status"] == "blocked" for item in tests)
         lane_results.append({
@@ -287,6 +302,7 @@ def run_si_protocol_test_suite(
             "status": "completed",
             "channel_request_digest": _canonical_digest(lane["channel_request"]),
             "channel_result": channel_result,
+            "eye_mask_result": mask_result,
             "tests": tests,
         })
 
@@ -331,6 +347,8 @@ def run_si_protocol_test_suite(
             "blocked_tests": blocked_tests,
             "all_requested_tests_completed": blocked_tests == 0,
             "protocol_pass_claimed": False,
+            "mask_pass_count": sum((lane.get("eye_mask_result") or {}).get("status") == "pass" for lane in lane_results),
+            "mask_fail_count": sum((lane.get("eye_mask_result") or {}).get("status") == "fail" for lane in lane_results),
         },
         "resource_admission": {
             "actual_lanes": len(lane_results),

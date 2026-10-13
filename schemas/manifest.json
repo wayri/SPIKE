@@ -1,6 +1,29 @@
 {
   "contract": "spike/schema-catalog/v1",
   "schemas": {
+    "spike/assembly-em-request/v1": "assembly-em-request-v1.schema.json",
+    "spike/assembly-em-result/v1": "assembly-em-result-v1.schema.json",
+    "spike/magnetic-machine-study/v1": "magnetic-machine-study-v1.schema.json",
+    "spike/magnetic-machine-study-result/v1": "magnetic-machine-study-result-v1.schema.json",
+    "spike/cosimulation-request/v1": "cosimulation-request-v1.schema.json",
+    "spike/cosimulation-result/v1": "cosimulation-result-v1.schema.json",
+    "spike/digital-twin-request/v1": "digital-twin-request-v1.schema.json",
+    "spike/digital-twin-result/v1": "digital-twin-result-v1.schema.json",
+    "spike/parallel-workspace/v1": "parallel-workspace-v1.schema.json",
+    "spike/parallel-batch/v1": "parallel-batch-v1.schema.json",
+    "spike/harness/v1": "harness-v1.schema.json",
+    "spike/harness-pi-request/v1": "harness-pi-request-v1.schema.json",
+    "spike/harness-pi-result/v1": "harness-pi-result-v1.schema.json",
+    "spike/harness-si-request/v1": "harness-si-request-v1.schema.json",
+    "spike/harness-si-result/v1": "harness-si-result-v1.schema.json",
+    "spike/harness-em-request/v1": "harness-em-request-v1.schema.json",
+    "spike/harness-em-handoff/v1": "harness-em-handoff-v1.schema.json",
+    "spike/smps-converter-request/v1": "smps-converter-request-v1.schema.json",
+    "spike/capacitor-placement-request/v1": "capacitor-placement-request-v1.schema.json",
+    "spike/pi-return-path-request/v1": "pi-return-path-request-v1.schema.json",
+    "spike/prism-request/v1": "prism-request-v1.schema.json",
+    "spike/prism-board/v1": "prism-board-v1.schema.json",
+    "spike/prism-result/v1": "prism-result-v1.schema.json",
     "spike/solver-plugin/v1": "solver-plugin-v1.schema.json",
     "spike/solver-plugin-probe/v1": "solver-plugin-probe-v1.schema.json",
     "spike/solver-plugin-probe-result/v1": "solver-plugin-probe-result-v1.schema.json",
@@ -62,6 +85,9 @@
     "spike/windows-notice-review-packet/v1": "windows-notice-review-packet-v1.schema.json",
     "spike/wave1-clean-machine-harness/v2": "wave1-clean-machine-harness-v2.schema.json",
     "spike/ac-pi-request/v1": "ac-pi-request-v1.schema.json",
-    "spike/ac-pi-result/v1": "ac-pi-result-v1.schema.json"
+    "spike/ac-pi-result/v1": "ac-pi-result-v1.schema.json",
+    "spike/si-eye-mask/v1": "si-eye-mask-v1.schema.json",
+    "spike/pdn-network-request/v1": "pdn-network-request-v1.schema.json",
+    "spike/series-capacitor-leg/v1": "series-capacitor-leg-v1.schema.json"
   }
 }

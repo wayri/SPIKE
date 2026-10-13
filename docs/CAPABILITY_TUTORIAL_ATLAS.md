@@ -3,6 +3,8 @@
 
 # SPIKE capability tutorial atlas
 
+**SI, PI, Thermal, EM**
+
 This is the entry point for the **currently executable** PI, SI, thermal and
 two bundled solver-extension families. Each linked lab identifies inputs,
 commands or desktop controls, returned JSON/plots and interpretation limits.

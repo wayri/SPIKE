@@ -237,13 +237,17 @@ export function normalizeSiChannelResult(value: unknown): SiChannelCharts {
       ? trace.values.map(finite).filter((sample): sample is number => sample !== null)
       : [];
     if (values.length < 2) return [];
+    const phases = Array.isArray(trace.phase_ui) && trace.phase_ui.length === values.length
+      ? trace.phase_ui.map(finite)
+      : [];
+    const retainedPhases = phases.length === values.length && phases.every((phase): phase is number => phase !== null) ? phases : null;
     const sourceBit = finite(trace.source_bit_index);
     return [{
       id: `eye-${sourceBit ?? traceIndex}`,
       label: `Bit ${sourceBit ?? traceIndex}`,
       // Each worker trace spans two unit intervals. Sample zero stays on the
       // left and the final sample stays on the right.
-      points: values.map((sample, index) => ({ x: 2 * index / (values.length - 1), y: sample })),
+      points: values.map((sample, index) => ({ x: retainedPhases?.[index] ?? 2 * index / (values.length - 1), y: sample })),
     }];
   });
   const pam4 = object(eyeResult.pam4);

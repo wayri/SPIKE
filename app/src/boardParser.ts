@@ -623,7 +623,8 @@ export function parseKicadBoard(source: string): ParsedBoard {
         const pad: ParsedPad = {
           id: nodeId(padNode, `pad-${reference}-${stringAt(padNode, 1, String(index + 1))}`),
           name: stringAt(padNode, 1, String(index + 1)),
-          at: transform(localAt),
+          // Saved board pad coordinates already encode back-side reflection.
+          at: transformPoint(localAt, origin, rotation, false),
           width,
           height,
           size: [width, height],
@@ -686,6 +687,7 @@ export function parseKicadBoard(source: string): ParsedBoard {
         modelScale: xyzAt(modelNode, "scale", [1, 1, 1]),
         modelRotation: xyzAt(modelNode, "rotate", [0, 0, 0]),
         models,
+        properties: children(item, "property").map(property => ({ name: stringAt(property, 1), values: [stringAt(property, 2)] })),
         bodyBounds: bodyPoints.length ? boundsOf(bodyPoints) : undefined,
         courtyardBounds: courtyardPoints.length ? boundsOf(courtyardPoints) : undefined,
       });

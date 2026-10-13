@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/harness-mtl-request/v1",
+  "title": "Explicit sampled multiconductor harness network",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "reference_node", "nodes", "segments", "ports", "frequency_hz", "contacts", "terminations", "provenance"],
+  "properties": {
+    "contract": {"const": "spike/harness-mtl-request/v1"},
+    "reference_node": {"$ref": "#/$defs/id"},
+    "nodes": {"type": "array", "minItems": 1, "maxItems": 128, "items": {"$ref": "#/$defs/node"}},
+    "segments": {"type": "array", "maxItems": 32, "items": {"$ref": "#/$defs/segment"}},
+    "ports": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/port"}},
+    "frequency_hz": {"$ref": "#/$defs/frequencies"},
+    "contacts": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/contact"}},
+    "terminations": {"type": "array", "maxItems": 128, "items": {"$ref": "#/$defs/termination"}},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "mixed_mode_pairs": {"type": "array", "maxItems": 16, "items": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "nonnegative": {"type": "number", "minimum": 0},
+    "positive": {"type": "number", "exclusiveMinimum": 0},
+    "provenance": {"type": "object", "minProperties": 1},
+    "frequencies": {"type": "array", "minItems": 1, "maxItems": 257, "items": {"$ref": "#/$defs/nonnegative"}},
+    "wireIds": {"type": "array", "minItems": 1, "maxItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "matrixSweep": {"type": "array", "minItems": 1, "maxItems": 257, "items": {"type": "array", "minItems": 1, "maxItems": 16, "items": {"type": "array", "minItems": 1, "maxItems": 16, "items": {"type": "number"}}}},
+    "node": {
+      "type": "object", "additionalProperties": false, "required": ["id"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "wire_id": {"$ref": "#/$defs/id"}, "occurrence_id": {"$ref": "#/$defs/id"}, "terminal_id": {"$ref": "#/$defs/id"}}
+    },
+    "port": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "positive_node", "negative_node", "reference_impedance_ohm"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "positive_node": {"$ref": "#/$defs/id"}, "negative_node": {"$ref": "#/$defs/id"}, "reference_impedance_ohm": {"$ref": "#/$defs/positive"}, "wire_id": {"$ref": "#/$defs/id"}, "occurrence_id": {"$ref": "#/$defs/id"}}
+    },
+    "model": {
+      "type": "object", "additionalProperties": false,
+      "required": ["wire_ids", "frequency_hz", "r_ohm_per_m", "l_h_per_m", "g_s_per_m", "c_f_per_m", "provenance"],
+      "properties": {"wire_ids": {"$ref": "#/$defs/wireIds"}, "frequency_hz": {"$ref": "#/$defs/frequencies"}, "r_ohm_per_m": {"$ref": "#/$defs/matrixSweep"}, "l_h_per_m": {"$ref": "#/$defs/matrixSweep"}, "g_s_per_m": {"$ref": "#/$defs/matrixSweep"}, "c_f_per_m": {"$ref": "#/$defs/matrixSweep"}, "provenance": {"$ref": "#/$defs/provenance"}}
+    },
+    "segment": {
+      "type": "object", "additionalProperties": false, "required": ["id", "wire_ids", "from_nodes", "to_nodes", "length_m", "model"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "wire_ids": {"$ref": "#/$defs/wireIds"}, "from_nodes": {"$ref": "#/$defs/wireIds"}, "to_nodes": {"$ref": "#/$defs/wireIds"}, "length_m": {"$ref": "#/$defs/positive"}, "model": {"$ref": "#/$defs/model"}}
+    },
+    "contact": {
+      "type": "object", "additionalProperties": false, "required": ["id", "positive_node", "negative_node", "resistance_ohm", "inductance_h", "provenance"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "positive_node": {"$ref": "#/$defs/id"}, "negative_node": {"$ref": "#/$defs/id"}, "resistance_ohm": {"$ref": "#/$defs/nonnegative"}, "inductance_h": {"$ref": "#/$defs/nonnegative"}, "provenance": {"$ref": "#/$defs/provenance"}, "wire_id": {"$ref": "#/$defs/id"}, "occurrence_id": {"$ref": "#/$defs/id"}}
+    },
+    "termination": {
+      "type": "object", "additionalProperties": false, "required": ["id", "positive_node", "negative_node", "conductance_s", "capacitance_f", "provenance"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "positive_node": {"$ref": "#/$defs/id"}, "negative_node": {"$ref": "#/$defs/id"}, "conductance_s": {"$ref": "#/$defs/nonnegative"}, "capacitance_f": {"$ref": "#/$defs/nonnegative"}, "provenance": {"$ref": "#/$defs/provenance"}, "wire_id": {"$ref": "#/$defs/id"}, "occurrence_id": {"$ref": "#/$defs/id"}}
+    }
+  }
+}

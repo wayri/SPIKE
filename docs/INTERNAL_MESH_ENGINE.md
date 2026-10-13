@@ -161,6 +161,15 @@ L2 interpolation error; this is not a FEM PDE convergence claim. See
 
 ## Remaining production work
 
+The [October 12 optimization and comparison](validation/INTERNAL_MESHER_OPTIMIZATION_20261012.md)
+records predicate allocation changes, unchanged exact certification, original
+before/after fixtures and black-box Gmsh/SciPy benchmarking. These performance
+measurements do not change the bounded experimental scope above.
+
+The [second allocation pass](validation/MESHER_ALLOCATION_PASS2_20261012.md)
+records further exact-output speed gains and the separate retained Marble
+completeness diagnostic.
+
 Constrained nonconvex CAD, holes/antipads/vias, conforming multi-material
 generation, terminal/port surface recovery, CAD projection, sliver topology
 optimization, coarsening, anisotropic metric refinement, boundary layers,
