@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/prism-result-v1.schema.json",
+  "title": "SPIKE Prism result v1",
+  "$comment": "Apache-2.0. Runtime recomputes source/design/spec bindings and requires production provenance before native result admission.",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "api_version", "request_id", "operation", "request_sha256", "status", "source_binding", "design_binding", "analysis_spec_binding", "analysis_spec", "design", "capabilities", "analysis", "error"],
+  "properties": {
+    "contract": {"const": "spike/prism-result/v1"},
+    "api_version": {"type": "integer", "const": 1},
+    "request_id": {"anyOf": [{"$ref": "prism-request-v1.schema.json#/$defs/request_id"}, {"type": "null"}]},
+    "operation": {"enum": ["capabilities", "inspect-board", "analyze", null]},
+    "request_sha256": {"$ref": "#/$defs/nullable_sha256"},
+    "status": {"enum": ["completed", "blocked", "error"]},
+    "source_binding": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/source_binding"}]},
+    "design_binding": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/design_binding"}]},
+    "analysis_spec_binding": {"anyOf": [{"type": "null"}, {"type": "object", "additionalProperties": false,
+      "required": ["sha256"], "properties": {"sha256": {"$ref": "prism-request-v1.schema.json#/$defs/sha256"}}}]},
+    "analysis_spec": {"anyOf": [{"type": "null"}, {"$ref": "prism-request-v1.schema.json#/$defs/analysis_spec"}]},
+    "design": {"anyOf": [{"type": "null"}, {"$ref": "design-ir-v1.schema.json"}]},
+    "capabilities": {"type": ["object", "null"]},
+    "analysis": {"anyOf": [{"type": "null"}, {"$ref": "#/$defs/analysis"}]},
+    "error": {"type": ["object", "null"]}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"enum": ["completed", "blocked"]}}}, "then": {
+      "properties": {"request_id": {"type": "string"}, "request_sha256": {"type": "string"},
+        "operation": {"type": "string"}, "error": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"const": "error"}}}, "then": {"properties": {"error": {"type": "object"}}}},
+    {"if": {"properties": {"status": {"enum": ["completed", "blocked"]}, "operation": {"const": "analyze"}}}, "then": {
+      "properties": {"source_binding": {"type": "object"}, "design_binding": {"type": "object"},
+        "analysis_spec_binding": {"type": "object"}, "analysis_spec": {"type": "object"},
+        "design": {"type": "object"}, "analysis": {"type": "object"}, "capabilities": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"const": "completed"}, "operation": {"const": "inspect-board"}}}, "then": {
+      "properties": {"source_binding": {"type": "object"}, "design_binding": {"type": "object"}, "design": {"type": "object"},
+        "analysis_spec_binding": {"type": "null"}, "analysis_spec": {"type": "null"}, "analysis": {"type": "null"}, "capabilities": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"const": "completed"}, "operation": {"const": "capabilities"}}}, "then": {
+      "properties": {"capabilities": {"type": "object"}, "source_binding": {"type": "null"}, "design_binding": {"type": "null"},
+        "design": {"type": "null"}, "analysis_spec_binding": {"type": "null"}, "analysis_spec": {"type": "null"}, "analysis": {"type": "null"}}}},
+    {"if": {"properties": {"status": {"const": "blocked"}}}, "then": {"properties": {"operation": {"const": "analyze"}}}}
+  ],
+  "$defs": {
+    "nullable_sha256": {"anyOf": [{"type": "null"}, {"$ref": "prism-request-v1.schema.json#/$defs/sha256"}]},
+    "source_binding": {
+      "type": "object", "additionalProperties": false, "required": ["file_name", "sha256", "byte_count"],
+      "properties": {"file_name": {"$ref": "prism-request-v1.schema.json#/$defs/file_name"},
+        "sha256": {"$ref": "prism-request-v1.schema.json#/$defs/sha256"}, "byte_count": {"type": "integer", "minimum": 1, "maximum": 33554432}}
+    },
+    "design_binding": {
+      "type": "object", "additionalProperties": false, "required": ["design_id", "digest_sha256"],
+      "properties": {"design_id": {"type": "string"}, "digest_sha256": {"$ref": "prism-request-v1.schema.json#/$defs/sha256"}}
+    },
+    "analysis": {
+      "type": "object", "additionalProperties": false, "required": ["contract", "status", "preflight", "analysis_result"],
+      "properties": {
+        "contract": {"const": "spike/preflighted-analysis/v1"}, "status": {"enum": ["completed", "blocked"]},
+        "preflight": {"type": "object"},
+        "analysis_result": {"anyOf": [{"type": "null"}, {
+          "allOf": [{"$ref": "analysis-result-v1.schema.json"}],
+          "properties": {"provenance": {
+            "required": ["design_id", "design_digest_sha256", "input_source_sha256", "input_analysis_spec_sha256"],
+            "properties": {"design_id": {"type": "string"},
+              "design_digest_sha256": {"$ref": "prism-request-v1.schema.json#/$defs/sha256"},
+              "input_source_sha256": {"$ref": "prism-request-v1.schema.json#/$defs/sha256"},
+              "input_analysis_spec_sha256": {"$ref": "prism-request-v1.schema.json#/$defs/sha256"}}}
+          }
+        }]}
+      }
+    }
+  }
+}

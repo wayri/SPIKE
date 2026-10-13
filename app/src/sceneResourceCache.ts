@@ -63,7 +63,7 @@ export function disposeScene(root: THREE.Object3D) {
   release.forEach(callback => callback());
 }
 
-type Entry = { loading: Promise<THREE.Object3D>; resources?: Resources; users: number };
+type Entry = { loading: Promise<THREE.Object3D>; resources?: Resources; users: number; releaseWhenIdle?: boolean };
 
 /** LRU retention budget. Active scenes are pinned and released when their last
  * occurrence leaves the viewport; eviction never invalidates another part.
@@ -86,15 +86,37 @@ export class SceneResourceCache {
     return { entries: this.entries.size, bytes: this.retainedBytes, users: this.activeUsers };
   }
 
+  /** Drop retained sources when a viewport closes. Active clones and pending
+   * loads remain pinned; their sources are released after the final user exits.
+   * New loads after this call use the normal retention budget.
+   */
+  releaseIdle() {
+    for (const [key, entry] of this.entries) {
+      entry.releaseWhenIdle = true;
+      if (!entry.users && entry.resources) this.evict(key, entry);
+    }
+  }
+
+  private evict(key: string, entry: Entry) {
+    if (entry.users || !entry.resources || this.entries.get(key) !== entry) return;
+    this.idle.delete(key);
+    this.entries.delete(key);
+    this.retainedBytes -= entry.resources.bytes;
+    disposeResources(entry.resources);
+  }
+
+  private retainOrRelease(key: string, entry: Entry) {
+    if (entry.users || !entry.resources) return;
+    if (entry.releaseWhenIdle) this.evict(key, entry);
+    else this.idle.set(key, entry);
+  }
+
   private trim() {
     // Only inspect evictable sources. Scanning every pinned part on each load
     // would turn an assembly with many unique models into quadratic work.
     while (this.idle.size && (this.retainedBytes > this.maximumBytes || this.entries.size > this.maximumEntries)) {
       const [key, entry] = this.idle.entries().next().value!;
-      this.idle.delete(key);
-      this.entries.delete(key);
-      this.retainedBytes -= entry.resources!.bytes;
-      disposeResources(entry.resources!);
+      this.evict(key, entry);
     }
   }
 
@@ -134,7 +156,7 @@ export class SceneResourceCache {
       releases.set(clone, () => {
         pinned.users -= 1;
         this.activeUsers -= 1;
-        if (!pinned.users) this.idle.set(url, pinned);
+        this.retainOrRelease(url, pinned);
         this.trim();
       });
       this.trim();
@@ -143,7 +165,7 @@ export class SceneResourceCache {
       pinned.users -= 1;
       this.activeUsers -= 1;
       if (this.entries.get(url) === pinned && !pinned.resources) this.entries.delete(url);
-      else if (!pinned.users && pinned.resources) this.idle.set(url, pinned);
+      else this.retainOrRelease(url, pinned);
       this.trim();
       throw error;
     }

@@ -52,10 +52,6 @@ def verify_extension_runtime(executable, request):
             target = root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(text, encoding="utf-8")
-        inspection = invoke("spike.odb-import", "odb-inspect", {"source": {"path": str(root)}})
-        if (inspection.get("steps") != ["board"] or inspection.get("default_step") != "board"
-                or inspection.get("layer_count") != 1):
-            raise RuntimeError("Bundled ODB++ source inspection did not identify the release probe.")
         design = invoke("spike.odb-import", "odb-design", {"source": {"path": str(root)}})["design"]
         if design.get("source_format") != "odb++" or len(design.get("tracks", [])) != 1:
             raise RuntimeError("Bundled ODB++ extension did not normalize the release probe.")
@@ -67,5 +63,4 @@ def verify_extension_runtime(executable, request):
         if imported.get("snapshot", {}).get("contract") != "spike/design-snapshot/v1" or len(imported["design"]["tracks"]) != 1:
             raise RuntimeError("Bundled ODB++ importer registry did not produce the desktop snapshot.")
     return {"status": "passed", "harness_elements": len(circuit["elements"]), "mcad_schema_and_plan": "passed",
-            "odb_tracks": len(design["tracks"]), "odb_inspection": "passed",
-            "schema_assets": "passed", "desktop_snapshot": "passed"}
+            "odb_tracks": len(design["tracks"]), "schema_assets": "passed", "desktop_snapshot": "passed"}

@@ -85,3 +85,10 @@ assert.match(effect,/zOffsetMm: boardThicknessMm\(activeBoard\) \/ 2/);
 assert.match(effect,/scene\.remove\(group\); clearGroup\(group\); extensionMeshGroupRef\.current = null/);
 assert.match(viewport,/const clearGroup = disposeScene/);
 console.log("Extension mesh viewport: actual topology/grid coordinates, top-copper offset, bounded display-only subsets, admission gates and cleanup passed.");
+
+const gmsh = {...tetra,contract:"spike/gmsh-mesh/v1",coordinate_frame:"normalized_board_local_mm",model_status:"experimental"};
+const gmshScene=buildExtensionMeshScene(gmsh,transform);
+assert.equal(gmshScene.children.length,1);
+assert.equal(gmshScene.children[0].geometry.attributes.position.array[2],0,"normalized solid datum must not acquire a legacy top-copper offset");
+assert.equal(buildExtensionMeshScene({...gmsh,coordinate_frame:"design_top_copper"},transform).children.length,0);
+disposeScene(gmshScene);

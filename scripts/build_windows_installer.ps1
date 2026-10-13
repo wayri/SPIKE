@@ -114,10 +114,6 @@ if (-not $SkipTests) {
     Invoke-Checked "npm.cmd" @("run", "build") $app
     Invoke-Checked "cargo" @("test", "--lib") (Join-Path $app "src-tauri")
 }
-if (-not $ResourceConfig) {
-    $ResourceConfig = Join-Path $root "build\tauri.release.json"
-    Invoke-Checked $python @("scripts/prepare_release_resources.py", "--config-output", $ResourceConfig) $root
-}
 if ($ResourceConfig) {
     $originalConfigBytes = [System.IO.File]::ReadAllBytes($config)
     Copy-Item -LiteralPath $ResourceConfig -Destination $config -Force -ErrorAction Stop

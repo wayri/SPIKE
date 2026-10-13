@@ -12,10 +12,15 @@
       "anyOf": [
         {"type": "null"},
         {
-          "type": "object", "required": ["origin_mm", "spacing_mm", "shape", "temperatures_c", "order"],
+          "type": "object", "required": ["origin_mm", "shape", "temperatures_c", "order"],
+          "oneOf": [{"required": ["spacing_mm"], "not": {"anyOf": [{"required": ["x_edges_mm"]}, {"required": ["y_edges_mm"]}]}},
+            {"required": ["x_edges_mm", "y_edges_mm"], "not": {"required": ["spacing_mm"]}}],
           "properties": {
             "origin_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+            "kind": {"const": "rectilinear"},
             "spacing_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "exclusiveMinimum": 0}},
+            "x_edges_mm": {"type": "array", "minItems": 2, "maxItems": 8193, "items": {"type": "number"}},
+            "y_edges_mm": {"type": "array", "minItems": 2, "maxItems": 8193, "items": {"type": "number"}},
             "shape": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}},
             "temperatures_c": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": -273.15}},
             "order": {"const": "x-fast"}
@@ -29,6 +34,11 @@
         "temperatures_c": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": -273.15}},
         "copper_coverage": {"type": "array", "maxItems": 8192, "items": {"type": "number", "minimum": 0, "maximum": 1}}}, "additionalProperties": false}},
     "components": {"type": "array", "maxItems": 256, "items": {"type": "object"}},
+    "board_heat_sources": {"type": "array", "maxItems": 256, "items": {"type": "object",
+      "required": ["id", "component_ref", "power_w", "board_temperature_c", "case_temperature_c", "junction_temperature_c", "temperature_status"],
+      "properties": {"id": {"type": "string"}, "component_ref": {"type": "string"}, "power_w": {"type": "number", "minimum": 0},
+        "board_temperature_c": {"type": "number", "minimum": -273.15}, "case_temperature_c": {"type": "null"}, "junction_temperature_c": {"type": "null"},
+        "temperature_status": {"const": "board_only_junction_unsolved"}}}},
     "virtual_heatsinks": {"type": "array", "maxItems": 16, "items": {"type": "object",
       "required": ["id", "face", "temperature_c", "board_contact_temperature_c", "heat_flow_w"],
       "properties": {"id": {"type": "string"}, "face": {"enum": ["top", "bottom"]},

@@ -6,7 +6,8 @@
  * variable-step BDF2 with backward-Euler discontinuity restarts, an embedded
  * BDF2/trapezoidal-versus-BE error controller for linear and diode/switch
  * nonlinear DAEs, and direct sparse assembly for sufficiently large linear
- * systems. Nonlinear Jacobians retain the dense correctness path. This is not
+ * systems and nonlinear Jacobians. Adaptive runs can reject failed Newton
+ * attempts without committing device history. This is not
  * a claim of complete SPICE compatibility.
  */
 
@@ -70,10 +71,12 @@ struct TransientDiagnostics {
   std::size_t trapezoidal_steps{0};
   std::size_t bdf2_steps{0};
   std::size_t rejected_lte_steps{0};
+  std::size_t rejected_newton_steps{0};
   std::size_t embedded_lte_solves{0};
   std::size_t sparse_assemblies{0};
   std::size_t sparse_symbolic_analyses{0};
   std::size_t sparse_numeric_factorizations{0};
+  /** Legacy name: full numeric LU with reused symbolic pattern, not local LU updates. */
   std::size_t partial_numeric_refactorizations{0};
   double last_lte_ratio{0.0};
   double minimum_accepted_step_s{0.0};
@@ -101,6 +104,12 @@ struct TransientIntegrationHistory {
   std::size_t history_depth{0};
   std::size_t solution_history_depth{0};
   bool valid{false};
+  /** Set only after session-validated topology-preserving parameter edits. */
+  bool parameter_discontinuity{false};
+  // Last accepted physical storage increments, before absolute-state rounding.
+  // Empty vectors admit older source checkpoints via rounded-history fallback.
+  std::vector<double> capacitor_voltage_changes;
+  std::vector<double> inductor_current_changes;
 };
 
 /**

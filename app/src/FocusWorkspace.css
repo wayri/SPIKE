@@ -1,0 +1,407 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/* A quiet, board-first shell. All interactive colors come from tableTheme.css. */
+
+.app-shell.focus-shell,
+.app-shell.focus-shell.bottom-closed,
+.app-shell.focus-shell.ribbon-hidden,
+.app-shell.focus-shell.ribbon-hidden.bottom-closed,
+.app-shell.focus-shell.board-first,
+.app-shell.focus-shell.board-first.bottom-closed,
+.app-shell.focus-shell.board-first.ribbon-hidden,
+.app-shell.focus-shell.board-first.ribbon-hidden.bottom-closed {
+  --ui-title-height: 40px;
+  --ui-canvas-toolbar-height: 32px;
+  --ui-status-height: 28px;
+  --focus-command-width: 300px;
+  color: var(--spike-table-text);
+  background: var(--spike-table-surface);
+  grid-template-rows: var(--ui-title-height) minmax(0, 1fr) var(--ui-dock-height) var(--ui-status-height);
+}
+
+.focus-shell :is(.titlebar, .topbar) {
+  min-width: 0;
+  height: var(--ui-title-height);
+  padding-inline: 10px;
+  gap: 8px;
+  color: var(--spike-table-text);
+  background: var(--spike-table-toolbar);
+  border-color: var(--spike-table-border);
+}
+
+.focus-shell :is(.ribbon, .ribbon-tabs, .ribbon-tools, .application-menu-bar, .workspace-taskbar) {
+  display: none;
+}
+
+.focus-shell .brand-mark .brand-logo {
+  width: 108px;
+  height: 30px;
+}
+
+.focus-shell .brand-mark small,
+.focus-shell .project-path > span {
+  display: none;
+}
+
+.focus-shell .project-path {
+  height: 28px;
+  max-width: min(460px, 42vw);
+  color: var(--spike-table-muted);
+  border-color: var(--spike-table-border);
+}
+
+.focus-shell .project-path b {
+  color: var(--spike-table-text);
+}
+
+.focus-shell .top-actions {
+  min-width: 0;
+  gap: 4px;
+}
+
+.focus-shell .viewport-toolbar,
+.focus-shell .canvas-toolbar {
+  box-sizing: border-box;
+  min-width: 0;
+  height: var(--ui-canvas-toolbar-height);
+  min-height: var(--ui-canvas-toolbar-height);
+  padding-inline: 6px;
+  color: var(--spike-table-muted);
+  background: var(--spike-table-surface);
+  border-color: var(--spike-table-border);
+}
+
+.app-shell.focus-shell .statusbar,
+.app-shell.focus-shell.board-first .statusbar {
+  box-sizing: border-box;
+  height: var(--ui-status-height);
+  min-height: var(--ui-status-height);
+  display: flex;
+  gap: 8px;
+  padding-inline: 8px;
+  color: var(--spike-table-muted);
+  background: var(--spike-table-surface);
+  border-color: var(--spike-table-border);
+}
+
+.focus-shell .workspace-statusline {
+  min-width: 0;
+  flex: 1 1 auto;
+  height: 100%;
+  padding: 0;
+}
+
+.focus-shell .workspace {
+  --workspace-left-track: min(var(--left-panel-width, 224px), 20vw);
+  --workspace-right-track: min(var(--right-panel-width, 272px), 24vw);
+  min-width: 0;
+}
+
+.focus-shell .workspace.left-closed { --workspace-left-track: 34px; }
+.focus-shell .workspace.right-closed { --workspace-right-track: 34px; }
+
+.focus-shell :is(.side-panel, .bottom-dock, .analysis-setup-dock-host) {
+  color: var(--spike-table-text);
+  background: var(--spike-table-toolbar);
+  border-color: var(--spike-table-border);
+}
+
+.focus-menu-toggle {
+  flex: 0 0 auto;
+  min-width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 4px 8px;
+  color: var(--spike-table-text);
+  background: var(--spike-table-surface);
+  border-color: var(--spike-table-border);
+}
+
+.focus-menu-toggle:hover:not(:disabled),
+.focus-menu-toggle[aria-expanded="true"] {
+  color: var(--spike-table-focus);
+  background: var(--spike-table-hover);
+  border-color: var(--spike-table-edit-border);
+}
+
+.focus-menu-toggle:focus-visible,
+.focus-command-panel :is(button, [role="button"]):focus-visible {
+  outline: 2px solid var(--spike-table-focus);
+  outline-offset: -2px;
+}
+
+.focus-command-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+  max-width: var(--focus-command-width);
+  min-height: 0;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--spike-table-text);
+  background: var(--spike-table-toolbar);
+  border-left: 1px solid var(--spike-table-border);
+}
+
+.focus-shell.focus-commands-open .focus-command-panel {
+  display: flex;
+}
+
+.focus-command-header {
+  min-width: 0;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  color: var(--spike-table-text-strong);
+  background: var(--spike-table-header);
+  border-bottom: 1px solid var(--spike-table-border);
+}
+
+.focus-command-header > :is(h2, h3, strong) {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-command-content {
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 6px;
+  overflow: auto;
+  scrollbar-color: var(--spike-table-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.focus-command-back,
+.focus-command-row {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  color: var(--spike-table-text);
+  background: transparent;
+  border-color: transparent;
+  text-align: left;
+  justify-content: flex-start;
+}
+.focus-command-row > span:first-of-type { flex: 1; text-align: left; overflow-wrap: anywhere; }
+.focus-command-row > svg { flex: none; width: 16px; height: 16px; }
+.focus-command-row > small { color: var(--spike-table-muted); font-size: 11px; max-width: 45%; overflow-wrap: anywhere; }
+.focus-command-panel > label { padding: 8px; flex: none; }
+.focus-command-panel > label > input { width: 100%; font-size: 12px; }
+.focus-command-header > strong { flex: 1; }
+.focus-shell .view-toggle button[aria-pressed="true"] { color: var(--spike-table-edit); background: var(--spike-table-hover); box-shadow: none; }
+.focus-tool-content :is(.layer-opacity,.scene-controls input[type="range"]) { accent-color: var(--spike-table-edit); }
+.focus-tool-content .layer-identity b { font-size: 12px; color: var(--spike-table-text); }
+.focus-tool-content .layer-identity span { font-size: 11px; color: var(--spike-table-muted); }
+.focus-tool-content .layer-row output { font-size: 11px; color: var(--spike-table-muted); }
+.focus-tool-content .layer-search input { font-size: 12px; }
+.focus-tool-content .resource-monitor > button { display: none; }
+.focus-tool-content .resource-popover { position: static; width: 100%; max-height: none; border: 0; box-shadow: none; background: var(--spike-table-toolbar); }
+
+.focus-command-back {
+  width: auto;
+  flex: 0 0 auto;
+  color: var(--spike-table-muted);
+}
+
+.focus-command-back:hover:not(:disabled),
+.focus-command-row:hover:not(:disabled),
+.focus-command-row[aria-current="true"],
+.focus-command-row[aria-pressed="true"] {
+  color: var(--spike-table-text-strong);
+  background: var(--spike-table-hover);
+  border-color: var(--spike-table-border);
+}
+
+.focus-command-row > :not(.focus-command-shortcut) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.focus-command-shortcut {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--spike-table-muted);
+  font: 10px/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .app-shell.focus-shell { --focus-command-width: clamp(240px, 28vw, 280px); }
+  .focus-shell .workspace {
+    --workspace-left-track: min(var(--left-panel-width, 224px), 18vw);
+    --workspace-right-track: min(var(--right-panel-width, 272px), 22vw);
+  }
+  .focus-shell .workspace.left-closed { --workspace-left-track: 34px; }
+  .focus-shell .workspace.right-closed { --workspace-right-track: 34px; }
+}
+
+@media (max-width: 760px) {
+  .app-shell.focus-shell { --focus-command-width: min(260px, 44vw); }
+  .focus-shell .project-path { max-width: 34vw; }
+  .focus-command-row { min-height: 32px; }
+}
+
+/* Focus owns one reserved panel slot. Hidden drafts stay mounted behind it. */
+.app-shell.focus-shell.board-first,
+.app-shell.focus-shell.board-first.ribbon-hidden,
+.app-shell.focus-shell.board-first.bottom-closed,
+.app-shell.focus-shell.board-first.ribbon-hidden.bottom-closed,
+.app-shell.focus-shell.board-first.dock-maximized,
+.app-shell.focus-shell.board-first.ribbon-hidden.dock-maximized {
+  --ui-dock-height: 0px;
+  grid-template-rows: 40px minmax(0, 1fr) 28px;
+}
+.app-shell.focus-shell .workspace.focus-workspace {
+  visibility: visible;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0px;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "viewport focus-tool";
+}
+.app-shell.focus-shell .workspace.focus-workspace.focus-panel-open {
+  grid-template-columns: minmax(0, 1fr) min(var(--focus-panel-width, 360px), 44vw);
+}
+.app-shell.focus-shell .workspace.focus-workspace.focus-panel-expanded {
+  grid-template-columns: 0px minmax(0, 1fr);
+}
+.app-shell.focus-shell .workspace.focus-panel-expanded > .canvas-area { visibility: hidden; }
+.focus-workspace > .focus-command-panel,
+.focus-workspace > .focus-tool-deck,
+.focus-workspace > .focus-panel-loading { grid-area: focus-tool; min-width: 0; min-height: 0; }
+.focus-workspace > .focus-command-panel { display: flex; max-width: none; }
+.focus-shell .brand-mark b { font-size: 14px; color: var(--spike-table-edit); font-weight: 500; }
+.focus-tool-deck { position: relative; display: flex; flex-direction: column; overflow: hidden; background: var(--spike-table-toolbar); border-left: 1px solid var(--spike-table-border); }
+.focus-tool-deck[hidden], .focus-tool-content[hidden] { display: none; }
+.focus-tool-heading { flex: none; display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--spike-table-border); }
+.focus-tool-heading h2 { flex: 1; min-width: 0; margin: 0; font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
+.focus-tool-heading button { display: inline-flex; align-items: center; gap: 4px; }
+.focus-tool-content { flex: 1; min-height: 0; min-width: 0; position: relative; overflow: auto; overscroll-behavior: contain; }
+.focus-tool-content :is(.modal-shade,.modal-backdrop,.modal-overlay,.thermal-setup-shade,.analysis-setup-dock-host) { position: static !important; inset: auto !important; transform: none !important; background: transparent !important; padding: 0 !important; width: 100% !important; height: auto !important; min-height: 0; max-height: none !important; display: block !important; pointer-events: auto; }
+.focus-tool-content :is(.floating-panel,.layer-manager,.model-library-panel,.settings-modal,.study-manager,.spice-workbench,.python-workspace,.result-visualization-panel,.pi-run-dialog,.assembly-tool-root,.study-navigator,.bottom-dock,.side-panel) { position: relative !important; inset: auto !important; transform: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; height: auto !important; max-height: none !important; box-shadow: none !important; }
+/* Modal shades are retained for focus and Escape handling; their dialog becomes deck content. */
+.focus-tool-content > :is(.modal-shade,.modal-backdrop,.modal-overlay,.settings-shade,.help-shade) {
+  box-sizing: border-box;
+  height: 100% !important;
+  min-height: 0;
+}
+.focus-tool-content > :is(.modal-shade,.modal-backdrop,.modal-overlay,.settings-shade,.help-shade) > :is(section,div),
+.focus-tool-content :is(.universal-settings,.help-center,.project-manager-modal,.benchmark-center,.revision-comparison-modal,.saved-thermal-results) {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+.focus-tool-content :is(.universal-settings,.help-center) {
+  height: 100% !important;
+  min-height: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.focus-tool-content :is(.universal-settings,.help-center) > header,
+.focus-tool-content :is(.universal-settings,.help-center) > footer {
+  min-width: 0;
+  height: auto;
+  flex-wrap: wrap;
+}
+.focus-tool-content .settings-layout {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+.focus-tool-content .settings-layout > nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-height: 112px;
+  padding: 6px;
+  overflow: auto;
+  border-right: 0;
+  border-bottom: 1px solid var(--spike-table-border);
+}
+.focus-tool-content .settings-layout > nav button {
+  width: auto;
+  min-width: 0;
+  min-height: 30px;
+  flex: 1 1 96px;
+  padding-inline: 7px;
+}
+.focus-tool-content .settings-layout > main { min-width: 0; padding: 12px; }
+.focus-tool-content .settings-row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 5px;
+  padding-block: 8px;
+}
+.focus-tool-content .settings-row > * { min-width: 0; justify-self: stretch; }
+.focus-tool-content .help-layout {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(190px, 38%) minmax(0, 1fr);
+  overflow: hidden;
+}
+.focus-tool-content .help-layout > aside {
+  min-width: 0;
+  border-right: 0;
+  border-bottom: 1px solid var(--spike-table-border);
+}
+.focus-tool-content .help-layout > :is(article,.help-reading) { min-width: 0; }
+.focus-tool-content .help-layout > article,
+.focus-tool-content .help-reading > article { padding: 14px 12px 40px; }
+.focus-tool-content .help-header-actions,
+.focus-tool-content .help-toolbar { min-width: 0; flex-wrap: wrap; }
+.focus-tool-content :is(.floating-panel,.layer-manager,.model-library-panel,.bottom-dock,.side-panel,.study-navigator) { border: 0; }
+.focus-tool-content :is(.side-panel,.bottom-dock,.study-navigator) { min-height: 100%; }
+.focus-tool-content > .side-panel > .panel-heading { display: none; }
+.focus-tool-content :is(.side-panel.left,.side-panel.right) { display: block !important; }
+.focus-tool-content .side-panel.collapsed { display: none !important; }
+.focus-tool-content .pi-panel-resizer,
+.focus-tool-content .dock-resizer,
+.focus-tool-content .panel-resizer { display: none !important; }
+.focus-tool-content :is(input,select,textarea) { max-width: 100%; }
+.focus-tool-content .dock-panel-content { min-height: 0; }
+.focus-tool-content .bottom-dock { display: flex; min-height: 400px; }
+.focus-tool-content .probe-results-overlay { position: static; height: auto; }
+.focus-tool-content .workspace-dock-actions { flex-wrap: wrap; }
+.focus-panel-resizer { position: absolute; top: 0; left: 0; bottom: 0; width: 5px; min-width: 0; padding: 0; border-radius: 0; touch-action: none; cursor: ew-resize; }
+.focus-shell .canvas-area { grid-template-rows: 32px minmax(0, 1fr) auto !important; }
+.focus-shell .top-actions > :not(.universal-search-trigger) { display: none; }
+.focus-shell .statusline, .focus-shell .workspace-statusline { min-width: 0; width: 100%; }
+.focus-shell .workspace-statusline > :is(.offline-status,.selection-layer,.viewport-quality-host,.status-export,.status-version) { display: none; }
+.focus-shell .brand-mark { max-width: 108px; }
+@media(max-width:720px) {
+  .focus-shell .brand-mark { display: none; }
+  .focus-shell .universal-search-trigger { width: 32px; }
+  .focus-shell .universal-search-trigger :is(span,kbd) { display: none; }
+}
+
+/* Primary actions and selected settings use the same accent as the shell. */
+.focus-shell .run-btn:not(:disabled) { color: var(--spike-table-surface); background: var(--spike-table-edit); border-color: var(--spike-table-edit-border); }
+.focus-tool-content .settings-layout > nav button.active { color: var(--spike-table-edit); border-left-color: var(--spike-table-edit); background: var(--spike-table-edit-hover); }
+.focus-tool-content :is(.universal-settings,.help-center) { color: var(--spike-table-text); background: var(--spike-table-surface); border-color: var(--spike-table-border); }
+.focus-tool-content :is(.universal-settings,.help-center) > :is(header,footer) { background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
+.focus-tool-content .settings-layout > nav { background: var(--spike-table-surface); }

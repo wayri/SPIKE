@@ -41,3 +41,13 @@ assert.deepEqual(calls, ["add", "pick", "selection"], "placement actions remain 
 slots = [];
 assert.match(renderToStaticMarkup(render({ ...props, rows: Array.from({length:7},(_,i)=>({...rows[0],id:String(i)})) })), /<table/, "larger initial terminal sets start in table view");
 console.log("PI terminal table/card switching shares records, callbacks, and placement actions.");
+slots = [];
+const changes = [];
+tree = render({ ...props, sourceCurrentLimits: true, onChange: (...args) => changes.push(args) });
+const capacityInput = visit(tree).find(n => n.props?.['aria-label'] === 'PI sources: VCC current limit (A)');
+assert.equal(capacityInput.props.placeholder, 'Unlimited');
+capacityInput.props.onChange({ target: { value: '2.5' } });
+assert.deepEqual(changes, [['source', { currentLimit: '2.5' }]]);
+visit(tree).find(n => n.type === 'button' && n.props.children === 'Table').props.onClick();
+tree = render({ ...props, sourceCurrentLimits: true });
+assert.equal(visit(tree).find(n => n.type === loadTableModule('TerminalTable').default).props.sourceCurrentLimits, true);

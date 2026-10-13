@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
+import { defaultParallelWorkspace, normalizeParallelWorkspace } from '../src/parallelWorkspace.ts';
 import { materializeVisualBundle } from '../src/boardVisualBundles.ts';
 
 const source = readFileSync(new URL('../src/projectPersistenceArtifacts.ts', import.meta.url), 'utf8');
@@ -44,3 +45,15 @@ await assert.rejects(() => fetch(scene.board.boardModelUrl), /fetch failed/);
 const bad = { ...saved, artifacts: [artifact('layer:F.Cu', Buffer.from('<svg><script>alert(1)</script></svg>'))] };
 await assert.rejects(() => restoreBoardVisuals({}, bad), /active or external/);
 console.log('deferred result hydration, 25 records, real GLB/SVG save/restore, copper policy and disposal passed');
+
+const parallelEnvelope = { contract: 'spike/parallel-batch-result/v1', status: 'completed', outcomes: [{ id: 'wire', result: { current_a: 2 } }], provenance: { executor: 'retained' } };
+const parallelState = defaultParallelWorkspace();
+parallelState.runs = [{ id: 'batch-1', request: { contract:'spike/parallel-batch/v1', jobs:[{id:'wire',method:'run_harness_pi',params:{request:{source_voltage_v:12}}}], concurrency:1,threads_per_job:1,timeout_s:30 }, status:'completed', result:reference }];
+let parallelReads = 0;
+const reopenedPool = await hydrateProjectArtifacts({ analysis: { parallel_execution: parallelState } }, async () => { parallelReads++; return parallelEnvelope; });
+const visiblePool = normalizeParallelWorkspace(reopenedPool.analysis.parallel_execution);
+assert.equal(parallelReads, 1);
+assert.deepEqual(visiblePool.runs[0].result, parallelEnvelope);
+assert.deepEqual(visiblePool.runs[0].request, parallelState.runs[0].request, 'artifact hydration must leave original inline requests intact');
+assert.deepEqual(normalizeParallelWorkspace(undefined), defaultParallelWorkspace(), 'old packages receive a UI default without modifying canonical metadata');
+assert.throws(() => normalizeParallelWorkspace({ contract:'spike/parallel-workspace/v2' }), /Unsupported/);

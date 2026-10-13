@@ -1,5 +1,81 @@
 """Quarter-turn component geometry shared by rendering and electrical routes."""
 from heapq import heappop, heappush
+import math
+
+
+def snap(point, grid=10):
+    """Return a stable world-grid point used by placement and wire tools."""
+    if grid <= 0:raise ValueError('Grid spacing must be positive')
+    return tuple(math.copysign(math.floor(abs(float(value))/grid+.5)*grid,value) for value in point)
+
+
+def orthogonal_path(start, targets, bend='horizontal'):
+    """Join targets with one orthogonal bend per leg and remove empty corners."""
+    if bend not in ('horizontal','vertical'):raise ValueError('Unknown wire bend posture')
+    result=[tuple(start)]
+    for target in map(tuple,targets):
+        current=result[-1]
+        if current[0]!=target[0] and current[1]!=target[1]:
+            corner=(target[0],current[1]) if bend=='horizontal' else (current[0],target[1])
+            result.append(corner)
+        if result[-1]!=target:result.append(target)
+    simplified=[]
+    for point in result:
+        if simplified and point==simplified[-1]:continue
+        while len(simplified)>1 and ((simplified[-2][0]==simplified[-1][0]==point[0]) or
+                                     (simplified[-2][1]==simplified[-1][1]==point[1])):
+            a,b=simplified[-2:]
+            if (b[0]-a[0])*(point[0]-b[0])+(b[1]-a[1])*(point[1]-b[1])<0:break
+            simplified.pop()
+        simplified.append(point)
+    return simplified
+
+
+def wire_preview(parts, start, corners, tip, bend='horizontal', target=None, junctions=None):
+    """Build the exact terminal route when latched, or a free-pointer preview."""
+    origin=endpoint_position(parts,junctions or {},start)
+    if target is None:return orthogonal_path(origin,[*corners,tip],bend)
+    return route(parts,{'a':list(start),'b':list(target),'waypoints':list(corners),
+                        'bend':bend,'manual':True},junctions)
+
+
+def endpoint_position(parts, junctions, endpoint):
+    """Resolve a persisted terminal or explicit junction endpoint."""
+    if len(endpoint)==2:return terminal(parts[endpoint[0]],endpoint[1])
+    if len(endpoint)==1:
+        item=junctions[endpoint[0]]
+        return (item['x'],item['y'])
+    raise ValueError('Invalid wire endpoint')
+
+
+def nearest_route_point(points, point):
+    """Project a point onto an orthogonal route, returning point, segment and distance."""
+    point=tuple(map(float,point));best=None
+    for index,(a,b) in enumerate(zip(points,points[1:])):
+        if a[0]==b[0]:candidate=(a[0],min(max(point[1],min(a[1],b[1])),max(a[1],b[1])))
+        elif a[1]==b[1]:candidate=(min(max(point[0],min(a[0],b[0])),max(a[0],b[0])),a[1])
+        else:raise ValueError('Wire route must be orthogonal')
+        distance=math.hypot(point[0]-candidate[0],point[1]-candidate[1])
+        if best is None or distance<best[2]:best=(candidate,index,distance)
+    if best is None:raise ValueError('Wire route has no segment')
+    return best
+
+
+def dragged_waypoints(parts, wire, deltas, junctions=None):
+    """Preserve a route's nearby bends while one or both endpoints are dragged."""
+    points=route(parts,wire,junctions)
+    waypoints=[list(point) for point in points[1:-1]]
+    da=deltas.get(wire['a'][0]);db=deltas.get(wire['b'][0])
+    if da is not None and db is not None and tuple(da)==tuple(db):
+        anchors=wire.get('waypoints') or waypoints
+        return [[point[0]+da[0],point[1]+da[1]] for point in anchors]
+    if waypoints and da is not None:
+        waypoints[0]=[waypoints[0][0]+da[0],waypoints[0][1]+da[1]]
+    if waypoints and db is not None:
+        waypoints[-1]=[waypoints[-1][0]+db[0],waypoints[-1][1]+db[1]]
+    return waypoints
+
+
 def transform(part,x,y):
     if part.get('mirror_x',False):x=-x
     if part.get('mirror_y',False):y=-y
@@ -33,23 +109,25 @@ def terminal(part,index):
     return transform(part,*pins(part)[index].anchor)
 
 
-def route(parts,wire):
+def route(parts,wire,junctions=None):
     """Route around endpoint symbol envelopes, preserving outward terminal leads.
 
     This is a small orthogonal visibility graph, not a complete schematic router:
     other components, labels and wires are not obstacles. Overlapping endpoint
     envelopes cannot always be routed without a collision.
     """
-    a,b=(parts[e[0]] for e in (wire['a'],wire['b']))
-    i,j=wire['a'][1],wire['b'][1];start=terminal(a,i);end=terminal(b,j)
+    junctions=junctions or {}
+    start=endpoint_position(parts,junctions,wire['a']);end=endpoint_position(parts,junctions,wire['b'])
     if wire.get('waypoints'):
-        points=[start]
-        for target in [*map(tuple,wire['waypoints']),end]:
-            if points[-1][0]!=target[0] and points[-1][1]!=target[1]:points.append((target[0],points[-1][1]))
-            if points[-1]!=target:points.append(target)
-        return points
+        return orthogonal_path(start,[*wire['waypoints'],end],wire.get('bend','horizontal'))
+    if len(wire['a'])==1 or len(wire['b'])==1:
+        return orthogonal_path(start,[end],wire.get('bend','horizontal'))
+    a,b=(parts[e[0]] for e in (wire['a'],wire['b']))
+    i,j=wire['a'][1],wire['b'][1]
     boxes=[]
-    for part in (a,b):
+    for endpoint in (wire['a'],wire['b']):
+        if len(endpoint)!=2:continue
+        part=parts[endpoint[0]]
         from .pin_geometry import pins
         anchors=[pin.anchor for pin in pins(part)]
         xs=[-55,55]+[p[0] for p in anchors];ys=[-30,30]+[p[1] for p in anchors]
@@ -78,6 +156,9 @@ def route(parts,wire):
             if p[0]==q[0] and left<p[0]<right and max(min(p[1],q[1]),top)<min(max(p[1],q[1]),bottom):return False
             if p[1]==q[1] and top<p[1]<bottom and max(min(p[0],q[0]),left)<min(max(p[0],q[0]),right):return False
         return True
+    if wire.get('manual',False):
+        authored=orthogonal_path(start,[sa,sb,end],wire.get('bend','horizontal'))
+        if all(clear(p,q) for p,q in zip(authored,authored[1:])):return authored
     xs=sorted({sa[0],sb[0]}|{x for l,t,r,d in boxes for x in (l-10,r+10)})
     ys=sorted({sa[1],sb[1]}|{y for l,t,r,d in boxes for y in (t-10,d+10)})
     origin=(xs.index(sa[0]),ys.index(sa[1]));target=(xs.index(sb[0]),ys.index(sb[1]))

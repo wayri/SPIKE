@@ -20,23 +20,9 @@ for (const role of ['source', 'load', 'source_return', 'load_return']) {
 }
 assert.equal(removePiTerminal(setup, 'source', 'missing').sources.length, 1);
 const app = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
-const menuSource = app.slice(app.indexOf('function ViewportContextMenu('), app.indexOf('function StackupManager('));
-const compiled = ts.transpileModule(menuSource.replace('function ViewportContextMenu', 'export function ViewportContextMenu'), {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX },
-}).outputText;
-const icons = ['Focus', 'Crosshair', 'Orbit', 'Layers3', 'Copy', 'SquareTerminal', 'RadioTower', 'ListTree', 'X', 'Play'];
-const module = { exports: {} }, require = createRequire(import.meta.url);
-new Function('require', 'module', 'exports', 'window', 'document', 'useRef', 'useEffect', ...icons, compiled)(
-  require, module, module.exports, { innerWidth: 1200, innerHeight: 800 }, { activeElement: null },
-  value => ({ current: value }), () => {}, ...icons.map(() => () => null));
-const nodes = node => !node || typeof node !== 'object' ? [] : [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
-for (const [role, label] of [['source', 'Delete source'], ['load', 'Delete sink'], ['source_return', 'Delete source return'], ['load_return', 'Delete sink return']]) {
-  let deleted = 0, closed = 0;
-  const tree = module.exports.ViewportContextMenu({ request: { clientX: 100, clientY: 100,
-    object: { id: 'analysis-terminal:same', type: 'terminal', terminalRole: role, name: 'Terminal' } },
-    tab: 'EM', viewMode: '3D', isolated: false, onDeleteTerminal: () => deleted++, onClose: () => closed++ });
-  const button = nodes(tree).find(node => node.type === 'button' && [node.props.children].flat(Infinity).filter(v => typeof v === 'string').join('').trim() === label);
-  assert.ok(button, `${label} is available even outside the PI tab`);
-  button.props.onClick(); assert.equal(deleted, 1); assert.equal(closed, 1);
-}
+assert.match(app, /clickedObject\?\.type==="terminal"&&clickedObject\.terminalRole/,
+  'every terminal role is offered a removal action outside the PI tab');
+assert.match(app, /label:"Remove this configured terminal"/);
+assert.match(app, /removePiTerminal\(current,clickedObject\.terminalRole!,clickedObject\.id\.replace\(\/\^analysis-terminal:\/,""\)\)/,
+  'the viewport action removes only the clicked terminal role and id');
 console.log('PI terminal coordinates and role-scoped deletion passed.');

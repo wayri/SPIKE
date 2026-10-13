@@ -54,11 +54,11 @@ function mountWorkflow({ desktop = true, setup = catalog.defaults, worker } = {}
       return [state[index], value => { state[index] = typeof value === "function" ? value(state[index]) : value; }];
     } };
     if (name.endsWith(".css")) return {};
-    if (name === "./icons") return new Proxy({}, { get: () => () => null });
     if (name === "./workerBridge") return { isDesktopShell: () => desktop, runLocalWorker: worker };
     if (name === "./siWorkflowCatalog.json") return { ...catalog, defaults: request };
     if (name === "./SiWorkflowPlots") return { __esModule: true, default: () => null, SiPlot: () => null };
     if (name === "./DataTable") return { default: loadDataTable(), __esModule: true };
+    if (name === "./icons") return new Proxy({}, { get: () => () => null });
     return require(name);
   }, module, module.exports);
   const render = () => { cursor = 0; return module.exports.default({ design: null, onStatus: s => statuses.push(s) }); };
@@ -115,8 +115,9 @@ function mountProtocol(props = {}) {
     };
     if (name === "./workerBridge") return { isDesktopShell: () => true, runSiProtocolTestSuite: async () => { throw new Error("fixture worker failure"); }, runSiUniformChannel: async (_design, request) => { capturedGeometryRequest = request; return { ok: false, error: "fixture channel stop" }; } };
     if (["./sparameters", "./numericRange"].includes(name)) return {};
+    if (["./SiChannelResultPanel", "./SiWorkflowWorkbench"].includes(name)) return { __esModule: true, default: () => null };
     if (name === "./icons") return new Proxy({}, { get: () => () => null });
-    if (["./SiChannelResultPanel", "./SiWorkflowWorkbench", "./PlotlyChart"].includes(name)) return { __esModule: true, default: () => null };
+    if (name === "./PlotlyChart") return { __esModule: true, default: () => null };
     return require(name);
   }, module, module.exports);
   const render = () => { cursor = 0; return module.exports.default({ assemblyDesigns: null, canonicalDesign: null, onClose() {}, onStatus() {}, ...props }); };

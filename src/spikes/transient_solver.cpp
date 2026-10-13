@@ -699,7 +699,8 @@ TransientResult solve_transient(const Circuit &circuit,
   const auto &saved_history = workspace.impl_->integration_history;
   const bool has_persistent_history =
       !options.initialize_from_operating_point && saved_history.valid &&
-      saved_history.structural_signature == structural_signature &&
+      (saved_history.structural_signature == structural_signature ||
+       saved_history.parameter_discontinuity) &&
       saved_history.capacitor_currents.size() == circuit.elements_.size() &&
       saved_history.inductor_voltages.size() == circuit.elements_.size() &&
       saved_history.capacitor_previous_voltages.size() ==
@@ -811,6 +812,8 @@ TransientResult solve_transient(const Circuit &circuit,
   std::vector<double> inductor_current(circuit.elements_.size(), 0.0);
   std::vector<double> inductor_previous_current(circuit.elements_.size(), 0.0);
   std::vector<double> inductor_voltage(circuit.elements_.size(), 0.0);
+  std::vector<double> capacitor_voltage_change(circuit.elements_.size(), 0.0);
+  std::vector<double> inductor_current_change(circuit.elements_.size(), 0.0);
   std::vector<double> dynamic_diode_stored_current(circuit.elements_.size(),
                                                    0.0);
   std::vector<double> dynamic_diode_previous_stored_current(
@@ -843,6 +846,25 @@ TransientResult solve_transient(const Circuit &circuit,
     history_depth = saved_history.history_depth;
     previous_solution = saved_history.previous_solution;
     solution_history_depth = saved_history.solution_history_depth;
+    if (saved_history.capacitor_voltage_changes.size() == circuit.elements_.size() &&
+        saved_history.inductor_current_changes.size() == circuit.elements_.size()) {
+      capacitor_voltage_change = saved_history.capacitor_voltage_changes;
+      inductor_current_change = saved_history.inductor_current_changes;
+    } else {
+      for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
+        const auto &element = circuit.elements_[index];
+        const auto voltage = [&](NodeId node) {
+          return node == ground_node ? 0.0 : saved_history.last_solution[node - 1];
+        };
+        capacitor_voltage_change[index] = voltage(element.positive_node) -
+            voltage(element.negative_node) - capacitor_previous_voltage[index];
+        if (element.type == Circuit::ElementType::inductor ||
+            element.type == Circuit::ElementType::saturating_inductor) {
+          inductor_current_change[index] = saved_history.last_solution[branch_index[index]] -
+              inductor_previous_current[index];
+        }
+      }
+    }
   }
   for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
     const auto &element = circuit.elements_[index];
@@ -852,7 +874,8 @@ TransientResult solve_transient(const Circuit &circuit,
                element.type == Circuit::ElementType::saturating_inductor) {
       inductor_current[index] = element.initial_condition;
       state[branch_index[index]] = element.initial_condition;
-    } else if (element.type == Circuit::ElementType::dynamic_diode) {
+    } else if (element.type == Circuit::ElementType::dynamic_diode &&
+               !has_persistent_history) {
       const double stored_current =
           element.dynamic_diode.initial_stored_charge_c /
           element.dynamic_diode.transit_time_s;
@@ -863,6 +886,18 @@ TransientResult solve_transient(const Circuit &circuit,
   }
   if (has_persistent_history) {
     state = saved_history.last_solution;
+    for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
+      const auto &element = circuit.elements_[index];
+      const auto voltage = [&](NodeId node) {
+        return node == ground_node ? 0.0 : state[node - 1];
+      };
+      if (element.type == Circuit::ElementType::capacitor) {
+        capacitor_voltage[index] = voltage(element.positive_node) - voltage(element.negative_node);
+      } else if (element.type == Circuit::ElementType::inductor ||
+                 element.type == Circuit::ElementType::saturating_inductor) {
+        inductor_current[index] = state[branch_index[index]];
+      }
+    }
   }
 
   if (options.initialize_from_operating_point) {
@@ -926,6 +961,9 @@ TransientResult solve_transient(const Circuit &circuit,
   double time = 0.0;
   double proposed_step_s = options.time_step_s;
   auto source_value = [](const Circuit::Element &element, double at_time) {
+    if (element.waveform_type == Circuit::WaveformType::sine) {
+      return sine_value_at(element.sine, at_time + element.waveform_time_offset_s);
+    }
     if (element.waveform_type == Circuit::WaveformType::pulse) {
       return pulse_value(element.pulse, at_time);
     }
@@ -940,6 +978,10 @@ TransientResult solve_transient(const Circuit &circuit,
         64.0 * std::numeric_limits<double>::epsilon() * std::abs(after),
         std::numeric_limits<double>::infinity());
     for (const auto &element : circuit.elements_) {
+      if (element.waveform_type == Circuit::WaveformType::sine) {
+        const double boundary = element.sine.delay_s - element.waveform_time_offset_s;
+        if (boundary >= strictly_after) next = std::min(next, boundary);
+      }
       if (element.waveform_type == Circuit::WaveformType::pwl) {
         const auto found = std::lower_bound(
             element.pwl.begin(), element.pwl.end(), strictly_after,
@@ -996,6 +1038,39 @@ TransientResult solve_transient(const Circuit &circuit,
         factorization_cache.size() + jacobian_cache.size();
   };
   update_cache_diagnostic();
+  // The BE error estimator has a separate matrix from the primary method.
+  // Retain its symbolic ordering across steps/iterations, but compare the
+  // complete compressed pattern and values before reusing anything numeric.
+  SparseTransientFactorization embedded_cache;
+  auto factor_embedded = [&](const SparseMatrix &matrix) {
+    if (!same_sparse_pattern(matrix, embedded_cache)) {
+      embedded_cache.solver.analyzePattern(matrix);
+      embedded_cache.rows = matrix.rows();
+      embedded_cache.columns = matrix.cols();
+      embedded_cache.outer_indices.assign(
+          matrix.outerIndexPtr(), matrix.outerIndexPtr() + matrix.outerSize() + 1);
+      embedded_cache.inner_indices.assign(
+          matrix.innerIndexPtr(), matrix.innerIndexPtr() + matrix.nonZeros());
+      embedded_cache.analyzed = true;
+      embedded_cache.factorized = false;
+      ++output.diagnostics_.sparse_symbolic_analyses;
+    }
+    if (same_sparse_values(matrix, embedded_cache)) {
+      ++output.diagnostics_.factorization_reuses;
+      return true;
+    }
+    embedded_cache.factorized = false;
+    embedded_cache.solver.factorize(matrix);
+    ++output.diagnostics_.sparse_numeric_factorizations;
+    ++output.diagnostics_.matrix_factorizations;
+    if (embedded_cache.solver.info() != Eigen::Success) {
+      return false;
+    }
+    embedded_cache.values.assign(matrix.valuePtr(),
+                                 matrix.valuePtr() + matrix.nonZeros());
+    embedded_cache.factorized = true;
+    return true;
+  };
   while (time < options.stop_time_s) {
     if (output.diagnostics_.completed_steps >= options.max_steps) {
       output.status_ = SolveStatus::numerical_failure;
@@ -1022,12 +1097,14 @@ TransientResult solve_transient(const Circuit &circuit,
     const bool trapezoidal_step =
         options.integration_method ==
             TransientIntegrationMethod::hybrid_trapezoidal &&
-        (output.diagnostics_.completed_steps > 0 || has_persistent_history) &&
+        (output.diagnostics_.completed_steps > 0 ||
+         (has_persistent_history && !saved_history.parameter_discontinuity)) &&
         !lands_on_breakpoint;
     const bool bdf2_step =
         options.integration_method == TransientIntegrationMethod::bdf2 &&
         history_depth >= 2 && previous_step_s > 0.0 &&
-        std::isfinite(previous_step_s) && !lands_on_breakpoint;
+        std::isfinite(previous_step_s) && !lands_on_breakpoint &&
+        (target_time - time) <= 2.0 * previous_step_s;
     if (use_breakpoint) {
       ++output.diagnostics_.source_breakpoint_steps;
     }
@@ -1045,8 +1122,41 @@ TransientResult solve_transient(const Circuit &circuit,
       sparse_triplets.reserve(base_sparse_triplets.size() +
                               circuit.elements_.size() * 4);
     }
-    std::vector<double> rhs = base_rhs;
+    std::vector<double> excitation_rhs = base_rhs;
+    for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
+      const auto &element = circuit.elements_[index];
+      if (element.type == Circuit::ElementType::current_source) {
+        const double value = source_value(element, target_time);
+        stamp_rhs(excitation_rhs, element.positive_node, -value);
+        stamp_rhs(excitation_rhs, element.negative_node, value);
+      } else if (element.type == Circuit::ElementType::voltage_source) {
+        excitation_rhs[branch_index[index]] += source_value(element, target_time);
+      }
+    }
+    std::vector<double> rhs = excitation_rhs;
     const std::vector<double> state_before = state;
+    std::vector<double> newton_anchor = state_before;
+    if (has_nonlinear_element && output.diagnostics_.completed_steps == 0 &&
+        !has_persistent_history && !options.initialize_from_operating_point) {
+      // UIC storage can differ from the zero algebraic guess. Shift the local
+      // coordinate origin toward that storage, not by adding a ~1-V increment
+      // then subtracting it again to resolve a tiny charge change.
+      for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
+        const auto &element = circuit.elements_[index];
+        if (element.type != Circuit::ElementType::capacitor) continue;
+        if (element.positive_node != ground_node) {
+          const double negative = element.negative_node == ground_node
+              ? 0.0 : newton_anchor[element.negative_node - 1];
+          newton_anchor[element.positive_node - 1] = negative + capacitor_voltage[index];
+        } else if (element.negative_node != ground_node) {
+          newton_anchor[element.negative_node - 1] = -capacitor_voltage[index];
+        }
+      }
+      state = newton_anchor;
+    }
+    // Newton coordinates relative to the accepted state. Do not recover these
+    // by subtracting rounded absolute voltages at picosecond storage steps.
+    std::vector<double> state_increment(order, 0.0);
     const double step_ratio = bdf2_step ? h / previous_step_s : 0.0;
     const double bdf_a0 =
         bdf2_step ? (1.0 + 2.0 * step_ratio) / (1.0 + step_ratio) : 1.0;
@@ -1071,13 +1181,7 @@ TransientResult solve_transient(const Circuit &circuit,
     };
     for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
       const auto &element = circuit.elements_[index];
-      if (element.type == Circuit::ElementType::current_source) {
-        const double value = source_value(element, target_time);
-        stamp_rhs(rhs, element.positive_node, -value);
-        stamp_rhs(rhs, element.negative_node, value);
-      } else if (element.type == Circuit::ElementType::voltage_source) {
-        rhs[branch_index[index]] += source_value(element, target_time);
-      } else if (element.type == Circuit::ElementType::capacitor) {
+      if (element.type == Circuit::ElementType::capacitor) {
         const double conductance = (trapezoidal_step ? 2.0 : bdf_a0) *
                                    element.value / h;
         stamp_step(element.positive_node, element.positive_node, conductance);
@@ -1118,10 +1222,11 @@ TransientResult solve_transient(const Circuit &circuit,
 
     auto evaluate = [&](const std::vector<double> &system_matrix,
                         const std::vector<SparseTriplet> *system_triplets,
-                        const std::vector<double> &system_rhs,
+                        [[maybe_unused]] const std::vector<double> &system_rhs,
                         const std::vector<double> &candidate,
                         double integration_a0, double integration_a1,
-                        double integration_a2) {
+                        double integration_a2, bool use_trapezoidal = false,
+                        const std::vector<double> *increment = nullptr) {
       NonlinearEvaluation evaluation;
       evaluation.residual.assign(order, 0.0);
       std::vector<SparseTriplet> jacobian_triplets;
@@ -1130,9 +1235,9 @@ TransientResult solve_transient(const Circuit &circuit,
         jacobian_triplets.reserve(system_triplets->size() +
                                   circuit.elements_.size() * 16);
         for (std::size_t row = 0; row < order; ++row) {
-          evaluation.residual[row] = -system_rhs[row];
+          evaluation.residual[row] = -excitation_rhs[row];
         }
-        for (const auto &entry : *system_triplets) {
+        for (const auto &entry : base_sparse_triplets) {
           evaluation.residual[static_cast<std::size_t>(entry.row())] +=
               entry.value() *
               candidate[static_cast<std::size_t>(entry.col())];
@@ -1140,10 +1245,10 @@ TransientResult solve_transient(const Circuit &circuit,
       } else {
         evaluation.dense_jacobian = system_matrix;
         for (std::size_t row = 0; row < order; ++row) {
-          evaluation.residual[row] = -system_rhs[row];
+          evaluation.residual[row] = -excitation_rhs[row];
           for (std::size_t column = 0; column < order; ++column) {
             evaluation.residual[row] +=
-                system_matrix[at(row, column, order)] * candidate[column];
+                base_matrix[at(row, column, order)] * candidate[column];
           }
         }
       }
@@ -1171,7 +1276,43 @@ TransientResult solve_transient(const Circuit &circuit,
       for (std::size_t element_index = 0;
            element_index < circuit.elements_.size(); ++element_index) {
         const auto &element = circuit.elements_[element_index];
-        if(element.behavioral) {
+        if (element.type == Circuit::ElementType::capacitor) {
+          const double across = voltage(element.positive_node) - voltage(element.negative_node);
+          const auto node_increment = [&](NodeId node) {
+            return node == ground_node ? 0.0 : (*increment)[node - 1];
+          };
+          const auto anchor_voltage = [&](NodeId node) {
+            return node == ground_node ? 0.0 : newton_anchor[node - 1];
+          };
+          const double delta = increment
+              ? (anchor_voltage(element.positive_node) -
+                 anchor_voltage(element.negative_node) -
+                 capacitor_voltage[element_index]) +
+                    (node_increment(element.positive_node) -
+                     node_increment(element.negative_node))
+              : across - capacitor_voltage[element_index];
+          // Equivalent companion equation without subtracting C/h*v from
+          // C/h*v_history. That subtraction loses low-current KCL at tiny h.
+          const double current = use_trapezoidal
+              ? 2.0 * element.value / h * delta - capacitor_current[element_index]
+              : element.value / h *
+                    (integration_a0 * delta - integration_a2 *
+                        capacitor_voltage_change[element_index]);
+          stamp_rhs(residual, element.positive_node, current);
+          stamp_rhs(residual, element.negative_node, -current);
+        } else if (element.type == Circuit::ElementType::inductor) {
+          const auto branch = branch_index[element_index];
+          const double delta = increment
+              ? (newton_anchor[branch] - inductor_current[element_index]) +
+                    (*increment)[branch]
+              : candidate[branch] - inductor_current[element_index];
+          residual[branch_index[element_index]] -= element.value / h *
+              ((use_trapezoidal ? 2.0 : integration_a0) * delta +
+               -integration_a2 * inductor_current_change[element_index]);
+          if (use_trapezoidal) {
+            residual[branch_index[element_index]] += inductor_voltage[element_index];
+          }
+        } else if(element.behavioral) {
           const auto [value,jacobian]=circuit.behavioral_point(element,candidate,target_time);
           if(element.type==Circuit::ElementType::voltage_source) {
             residual[branch_index[element_index]]-=value;
@@ -1534,16 +1675,104 @@ TransientResult solve_transient(const Circuit &circuit,
         state = std::move(solved.values);
         final_residual =
             inf_norm(evaluate(matrix, nullptr, rhs, state, bdf_a0, bdf_a1,
-                              bdf_a2).residual);
+                              bdf_a2, trapezoidal_step).residual);
       }
     } else {
-      auto current = evaluate(
-          matrix, use_sparse_nonlinear ? &sparse_triplets : nullptr, rhs,
-          state, bdf_a0, bdf_a1, bdf_a2);
+      // Grounded independent voltage sources prescribe their endpoint exactly.
+      // Seed those algebraic coordinates before Newton, so a stiff controlled
+      // switch does not cross its gate transition through line-search guesses.
+      // state_before and all capacitor/inductor/thermal histories remain intact;
+      // this is a predictor, not an extra equation or a relaxed residual test.
+      const auto unseeded_state = state;
+      std::vector<std::size_t> voltage_source_incidence(
+          circuit.node_names_.size(), 0);
+      std::vector<bool> switch_control_node(circuit.node_names_.size(), false);
+      for (const auto &element : circuit.elements_) {
+        if (element.type == Circuit::ElementType::voltage_source) {
+          ++voltage_source_incidence[element.positive_node];
+          ++voltage_source_incidence[element.negative_node];
+        }
+        if (element.type == Circuit::ElementType::voltage_controlled_switch) {
+          switch_control_node[element.control_positive_node] = true;
+          switch_control_node[element.control_negative_node] = true;
+        }
+      }
+      for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
+        const auto &element = circuit.elements_[index];
+        if (element.type != Circuit::ElementType::voltage_source ||
+            element.dependent || element.behavioral) {
+          continue;
+        }
+        if (element.negative_node == ground_node &&
+            element.positive_node != ground_node &&
+            voltage_source_incidence[element.positive_node] == 1 &&
+            switch_control_node[element.positive_node]) {
+          state[element.positive_node - 1] = source_value(element, target_time);
+        } else if (element.positive_node == ground_node &&
+                   element.negative_node != ground_node &&
+                   voltage_source_incidence[element.negative_node] == 1 &&
+                   switch_control_node[element.negative_node]) {
+          state[element.negative_node - 1] = -source_value(element, target_time);
+        }
+      }
+      NonlinearEvaluation current;
+      for (std::size_t index = 0; index < order; ++index) {
+        state_increment[index] = state[index] - newton_anchor[index];
+      }
+      try {
+        current = evaluate(
+            matrix, use_sparse_nonlinear ? &sparse_triplets : nullptr, rhs,
+            state, bdf_a0, bdf_a1, bdf_a2, trapezoidal_step, &state_increment);
+      } catch (const std::out_of_range &) {
+        // A partial algebraic predictor may cross a device envelope even when
+        // the fully coupled solution is admissible; retain the original path.
+        state = state_before;
+        newton_anchor = state_before;
+        std::fill(state_increment.begin(), state_increment.end(), 0.0);
+        current = evaluate(
+            matrix, use_sparse_nonlinear ? &sparse_triplets : nullptr, rhs,
+            state, bdf_a0, bdf_a1, bdf_a2, trapezoidal_step, &state_increment);
+      }
       double current_norm = inf_norm(current.residual);
       const double threshold = nonlinear.absolute_tolerance +
-          nonlinear.relative_tolerance * std::max(1.0, inf_norm(rhs));
+          nonlinear.relative_tolerance * std::max(
+              1.0, inf_norm(options.adaptive_time_step ? excitation_rhs : rhs));
+      if (state != unseeded_state && current_norm <= threshold) {
+        // Do not let a predictor-only zero residual bypass the original
+        // Jacobian/rank check (a disconnected singular subsystem may exist).
+        state = unseeded_state;
+        std::fill(state_increment.begin(), state_increment.end(), 0.0);
+        current = evaluate(
+            matrix, use_sparse_nonlinear ? &sparse_triplets : nullptr, rhs,
+            state, bdf_a0, bdf_a1, bdf_a2, trapezoidal_step, &state_increment);
+        current_norm = inf_norm(current.residual);
+      }
       bool converged = current_norm <= threshold;
+      if (converged && newton_anchor != state_before) {
+        // A UIC-origin predictor can satisfy the residual without any Newton
+        // iteration. Still verify rank; an unrelated floating subsystem must
+        // not be accepted merely because its residual happens to be zero.
+        bool rank_valid = false;
+        if (use_sparse_nonlinear) {
+          Eigen::SparseLU<SparseMatrix> rank_solver;
+          rank_solver.compute(current.sparse_jacobian);
+          rank_valid = rank_solver.info() == Eigen::Success;
+          ++output.diagnostics_.sparse_symbolic_analyses;
+          ++output.diagnostics_.sparse_numeric_factorizations;
+        } else {
+          const auto rank = factor_dense(current.dense_jacobian, order);
+          rank_valid = rank.status == SolveStatus::converged;
+          output.diagnostics_.pivot_swaps += rank.swaps;
+        }
+        ++output.diagnostics_.matrix_factorizations;
+        if (!rank_valid) {
+          output.status_ = SolveStatus::singular;
+          output.message_ = "UIC predictor transient Jacobian is singular";
+          output.diagnostics_.failed_time_s = target_time;
+          return output;
+        }
+      }
+      bool newton_failed = false;
       for (std::size_t iteration = 0;
            !converged && iteration < nonlinear.max_newton_iterations;
            ++iteration) {
@@ -1641,22 +1870,26 @@ TransientResult solve_transient(const Circuit &circuit,
         if (direction.status != SolveStatus::converged) {
           output.status_ = direction.status;
           output.message_ = direction.message;
-          output.diagnostics_.failed_time_s = time + h;
-          return output;
+          newton_failed = true;
+          break;
         }
         double damping = 1.0;
         bool accepted = false;
         std::vector<double> candidate(order, 0.0);
+        std::vector<double> candidate_increment(order, 0.0);
         for (std::size_t backtrack = 0;
              backtrack < nonlinear.max_backtracks; ++backtrack) {
           for (std::size_t index = 0; index < order; ++index) {
-            candidate[index] = state[index] + damping * direction.values[index];
+            candidate_increment[index] =
+                state_increment[index] + damping * direction.values[index];
+            candidate[index] = newton_anchor[index] + candidate_increment[index];
           }
           NonlinearEvaluation trial;
           try {
             trial = evaluate(
                 matrix, use_sparse_nonlinear ? &sparse_triplets : nullptr,
-                rhs, candidate, bdf_a0, bdf_a1, bdf_a2);
+                rhs, candidate, bdf_a0, bdf_a1, bdf_a2, trapezoidal_step,
+                &candidate_increment);
           } catch (const std::out_of_range &) {
             damping *= 0.5;
             ++output.diagnostics_.total_damping_steps;
@@ -1665,6 +1898,7 @@ TransientResult solve_transient(const Circuit &circuit,
           const double trial_norm = inf_norm(trial.residual);
           if (std::isfinite(trial_norm) && trial_norm < current_norm) {
             state = std::move(candidate);
+            state_increment = std::move(candidate_increment);
             current = std::move(trial);
             current_norm = trial_norm;
             accepted = true;
@@ -1677,18 +1911,46 @@ TransientResult solve_transient(const Circuit &circuit,
           output.status_ = SolveStatus::nonconverged;
           output.message_ =
               "transient Newton damping failed to reduce the residual";
-          output.diagnostics_.failed_time_s = time + h;
-          output.diagnostics_.residual_inf_norm = current_norm;
-          return output;
+          newton_failed = true;
+          break;
         }
         converged = current_norm <= threshold;
       }
       final_residual = current_norm;
       if (!converged) {
-        output.status_ = SolveStatus::nonconverged;
-        output.message_ = "maximum transient Newton iterations reached";
+        if (!newton_failed) {
+          output.status_ = SolveStatus::nonconverged;
+          output.message_ = "maximum transient Newton iterations reached";
+        }
         output.diagnostics_.failed_time_s = time + h;
         output.diagnostics_.residual_inf_norm = current_norm;
+        // Only adaptive, built-in-device runs may retry. OSDI is rejected by
+        // adaptive admission above; arbitrary callbacks need a rollback
+        // contract. Singular matrices still fail closed rather than concealing
+        // a disconnected circuit by endlessly shrinking the step.
+        if (options.adaptive_time_step &&
+            (output.status_ == SolveStatus::nonconverged ||
+             output.status_ == SolveStatus::numerical_failure)) {
+          state = state_before;
+          ++output.diagnostics_.rejected_newton_steps;
+          const auto rejected = output.diagnostics_.rejected_newton_steps +
+                                output.diagnostics_.rejected_lte_steps;
+          if (rejected > options.max_rejected_steps) {
+            output.message_ += "; adaptive rejection limit reached";
+            return output;
+          }
+          proposed_step_s = h * 0.5;
+          if (proposed_step_s < options.minimum_time_step_s ||
+              time + proposed_step_s == time) {
+            output.message_ += "; adaptive minimum timestep reached";
+            return output;
+          }
+          output.diagnostics_.failed_time_s = 0.0;
+          output.message_.clear();
+          // Companion histories and accepted solution history are updated only
+          // below the LTE test. Thus restoring state discards the entire trial.
+          continue;
+        }
         return output;
       }
     }
@@ -1702,7 +1964,7 @@ TransientResult solve_transient(const Circuit &circuit,
       // and BE share the accepted history and source evaluation, so their
       // scaled difference is a genuine order-2/order-1 local defect rather
       // than a state extrapolation heuristic.
-      std::vector<double> embedded_rhs = base_rhs;
+      std::vector<double> embedded_rhs = excitation_rhs;
       std::vector<double> embedded_matrix = base_matrix;
       std::vector<SparseTriplet> embedded_triplets;
       if (use_sparse_transient) {
@@ -1719,13 +1981,7 @@ TransientResult solve_transient(const Circuit &circuit,
       };
       for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
         const auto &element = circuit.elements_[index];
-        if (element.type == Circuit::ElementType::current_source) {
-          const double value = source_value(element, target_time);
-          stamp_rhs(embedded_rhs, element.positive_node, -value);
-          stamp_rhs(embedded_rhs, element.negative_node, value);
-        } else if (element.type == Circuit::ElementType::voltage_source) {
-          embedded_rhs[branch_index[index]] += source_value(element, target_time);
-        } else if (element.type == Circuit::ElementType::capacitor) {
+        if (element.type == Circuit::ElementType::capacitor) {
           const double conductance = element.value / h;
           embedded_stamp(element.positive_node, element.positive_node, conductance);
           embedded_stamp(element.negative_node, element.negative_node, conductance);
@@ -1748,20 +2004,23 @@ TransientResult solve_transient(const Circuit &circuit,
         }
       }
       std::vector<double> embedded_state;
+      std::vector<double> embedded_increment;
       bool embedded_converged = true;
       if (has_nonlinear_element) {
         // Solve the order-one BE companion with the converged order-two state
         // as its initial guess.  This is a true nonlinear embedded solve: both
         // states satisfy their respective discrete DAEs at the same endpoint.
         embedded_state = state;
+        embedded_increment = state_increment;
         auto current = evaluate(
             embedded_matrix,
             use_sparse_nonlinear ? &embedded_triplets : nullptr,
-            embedded_rhs, embedded_state, 1.0, -1.0, 0.0);
+            embedded_rhs, embedded_state, 1.0, -1.0, 0.0, false,
+            &embedded_increment);
         double current_norm = inf_norm(current.residual);
         const double threshold = nonlinear.absolute_tolerance +
             nonlinear.relative_tolerance *
-                std::max(1.0, inf_norm(embedded_rhs));
+                std::max(1.0, inf_norm(excitation_rhs));
         embedded_converged = current_norm <= threshold;
         for (std::size_t iteration = 0;
              !embedded_converged &&
@@ -1772,14 +2031,7 @@ TransientResult solve_transient(const Circuit &circuit,
           }
           DenseResult direction;
           if (use_sparse_nonlinear) {
-            Eigen::SparseLU<SparseMatrix, Eigen::COLAMDOrdering<int>>
-                embedded_solver;
-            embedded_solver.analyzePattern(current.sparse_jacobian);
-            embedded_solver.factorize(current.sparse_jacobian);
-            ++output.diagnostics_.sparse_symbolic_analyses;
-            ++output.diagnostics_.sparse_numeric_factorizations;
-            ++output.diagnostics_.matrix_factorizations;
-            if (embedded_solver.info() != Eigen::Success) {
+            if (!factor_embedded(current.sparse_jacobian)) {
               direction.status = SolveStatus::singular;
               direction.message =
                   "embedded sparse nonlinear Jacobian factorization failed";
@@ -1788,8 +2040,8 @@ TransientResult solve_transient(const Circuit &circuit,
                   current.residual.data(),
                   static_cast<Eigen::Index>(current.residual.size()));
               const Eigen::VectorXd embedded_direction =
-                  embedded_solver.solve(embedded_rhs_map);
-              if (embedded_solver.info() != Eigen::Success ||
+                  embedded_cache.solver.solve(embedded_rhs_map);
+              if (embedded_cache.solver.info() != Eigen::Success ||
                   !embedded_direction.allFinite()) {
                 direction.status = SolveStatus::numerical_failure;
                 direction.message =
@@ -1817,18 +2069,21 @@ TransientResult solve_transient(const Circuit &circuit,
           double damping = 1.0;
           bool accepted = false;
           std::vector<double> candidate(order, 0.0);
+          std::vector<double> candidate_increment(order, 0.0);
           for (std::size_t backtrack = 0;
                backtrack < nonlinear.max_backtracks; ++backtrack) {
             for (std::size_t index = 0; index < order; ++index) {
-              candidate[index] =
-                  embedded_state[index] + damping * direction.values[index];
+              candidate_increment[index] =
+                  embedded_increment[index] + damping * direction.values[index];
+              candidate[index] = newton_anchor[index] + candidate_increment[index];
             }
             NonlinearEvaluation trial;
             try {
               trial = evaluate(
                   embedded_matrix,
                   use_sparse_nonlinear ? &embedded_triplets : nullptr,
-                  embedded_rhs, candidate, 1.0, -1.0, 0.0);
+                  embedded_rhs, candidate, 1.0, -1.0, 0.0, false,
+                  &candidate_increment);
             } catch (const std::out_of_range &) {
               damping *= 0.5;
               ++output.diagnostics_.total_damping_steps;
@@ -1837,6 +2092,7 @@ TransientResult solve_transient(const Circuit &circuit,
             const double trial_norm = inf_norm(trial.residual);
             if (std::isfinite(trial_norm) && trial_norm < current_norm) {
               embedded_state = std::move(candidate);
+              embedded_increment = std::move(candidate_increment);
               current = std::move(trial);
               current_norm = trial_norm;
               accepted = true;
@@ -1857,10 +2113,7 @@ TransientResult solve_transient(const Circuit &circuit,
         embedded_sparse.setFromTriplets(embedded_triplets.begin(),
                                         embedded_triplets.end());
         embedded_sparse.makeCompressed();
-        Eigen::SparseLU<SparseMatrix, Eigen::COLAMDOrdering<int>> embedded_solver;
-        embedded_solver.analyzePattern(embedded_sparse);
-        embedded_solver.factorize(embedded_sparse);
-        if (embedded_solver.info() != Eigen::Success) {
+        if (!factor_embedded(embedded_sparse)) {
           output.status_ = SolveStatus::singular;
           output.message_ = "embedded LTE factorization failed";
           output.diagnostics_.failed_time_s = time;
@@ -1868,8 +2121,8 @@ TransientResult solve_transient(const Circuit &circuit,
         }
         const Eigen::Map<const Eigen::VectorXd> embedded_b(
             embedded_rhs.data(), static_cast<Eigen::Index>(embedded_rhs.size()));
-        const Eigen::VectorXd embedded_x = embedded_solver.solve(embedded_b);
-        if (embedded_solver.info() != Eigen::Success || !embedded_x.allFinite()) {
+        const Eigen::VectorXd embedded_x = embedded_cache.solver.solve(embedded_b);
+        if (embedded_cache.solver.info() != Eigen::Success || !embedded_x.allFinite()) {
           output.status_ = SolveStatus::numerical_failure;
           output.message_ = "embedded LTE solve failed";
           output.diagnostics_.failed_time_s = time;
@@ -1896,18 +2149,19 @@ TransientResult solve_transient(const Circuit &circuit,
           const double scale =
               options.lte_absolute_tolerance +
               options.lte_relative_tolerance *
-                  std::max(std::abs(state[index]),
-                           std::abs(state_before[index]));
-          lte_ratio = std::max(
-              lte_ratio,
-              std::abs(state[index] - embedded_state[index]) / scale);
+                  std::max(std::abs(state[index]), std::abs(state_before[index]));
+          lte_ratio = std::max(lte_ratio,
+              (has_nonlinear_element
+                   ? std::abs(state_increment[index] - embedded_increment[index])
+                   : std::abs(state[index] - embedded_state[index])) / scale);
         }
       }
       output.diagnostics_.last_lte_ratio = lte_ratio;
       if (!std::isfinite(lte_ratio) || lte_ratio > 1.0) {
         state = state_before;
         ++output.diagnostics_.rejected_lte_steps;
-        if (output.diagnostics_.rejected_lte_steps >
+        if (output.diagnostics_.rejected_lte_steps +
+                output.diagnostics_.rejected_newton_steps >
             options.max_rejected_steps) {
           output.status_ = SolveStatus::nonconverged;
           output.message_ = "adaptive transient LTE rejection limit reached";
@@ -1929,6 +2183,25 @@ TransientResult solve_transient(const Circuit &circuit,
       }
     }
 
+    const auto capacitor_step_current = [&](std::size_t index, double across) {
+      const auto &element = circuit.elements_[index];
+      const auto node_increment = [&](NodeId node) {
+        return node == ground_node ? 0.0 : state_increment[node - 1];
+      };
+      const auto anchor_voltage = [&](NodeId node) {
+        return node == ground_node ? 0.0 : newton_anchor[node - 1];
+      };
+      const double delta = has_nonlinear_element
+          ? (anchor_voltage(element.positive_node) -
+             anchor_voltage(element.negative_node) - capacitor_voltage[index]) +
+                (node_increment(element.positive_node) -
+                 node_increment(element.negative_node))
+          : across - capacitor_voltage[index];
+      return trapezoidal_step
+          ? 2.0 * element.value / h * delta - capacitor_current[index]
+          : element.value / h *
+                (bdf_a0 * delta - bdf_a2 * capacitor_voltage_change[index]);
+    };
     auto node_voltage = [&](NodeId node) {
       return node == ground_node ? 0.0 : state[node - 1];
     };
@@ -1957,14 +2230,7 @@ TransientResult solve_transient(const Circuit &circuit,
                  element.type == Circuit::ElementType::saturating_inductor) {
         current = state[branch_index[index]];
       } else if (element.type == Circuit::ElementType::capacitor) {
-        current = bdf2_step
-                      ? element.value / h *
-                            (bdf_a0 * across +
-                             bdf_a1 * capacitor_voltage[index] +
-                             bdf_a2 * capacitor_previous_voltage[index])
-                      : (trapezoidal_step ? 2.0 : 1.0) * element.value *
-                                (across - capacitor_voltage[index]) / h -
-                            (trapezoidal_step ? capacitor_current[index] : 0.0);
+        current = capacitor_step_current(index, across);
       } else if (element.type == Circuit::ElementType::diode) {
         current = diode(element.diode.saturation_current_a,
                         element.diode.emission_coefficient,
@@ -2066,18 +2332,26 @@ TransientResult solve_transient(const Circuit &circuit,
         const double across = node_voltage(element.positive_node) -
                               node_voltage(element.negative_node);
         const double previous_voltage = capacitor_voltage[index];
-        capacitor_current[index] =
-            bdf2_step
-                ? element.value / h *
-                      (bdf_a0 * across + bdf_a1 * previous_voltage +
-                       bdf_a2 * capacitor_previous_voltage[index])
-                : (trapezoidal_step ? 2.0 : 1.0) * element.value *
-                          (across - previous_voltage) / h -
-                      (trapezoidal_step ? capacitor_current[index] : 0.0);
+        capacitor_current[index] = capacitor_step_current(index, across);
+        const auto increment_voltage = [&](NodeId node) {
+          return node == ground_node ? 0.0 : state_increment[node - 1];
+        };
+        const auto anchor_voltage = [&](NodeId node) {
+          return node == ground_node ? 0.0 : newton_anchor[node - 1];
+        };
+        capacitor_voltage_change[index] = has_nonlinear_element
+            ? (anchor_voltage(element.positive_node) - anchor_voltage(element.negative_node) -
+               previous_voltage) + (increment_voltage(element.positive_node) -
+                                    increment_voltage(element.negative_node))
+            : across - previous_voltage;
         capacitor_previous_voltage[index] = previous_voltage;
         capacitor_voltage[index] = across;
       } else if (element.type == Circuit::ElementType::inductor ||
                  element.type == Circuit::ElementType::saturating_inductor) {
+        inductor_current_change[index] = has_nonlinear_element
+            ? (state_before[branch_index[index]] - inductor_current[index]) +
+                state_increment[branch_index[index]]
+            : state[branch_index[index]] - inductor_current[index];
         inductor_previous_current[index] = inductor_current[index];
         inductor_current[index] = state[branch_index[index]];
         inductor_voltage[index] = node_voltage(element.positive_node) -
@@ -2115,7 +2389,11 @@ TransientResult solve_transient(const Circuit &circuit,
     solution_history_depth =
         std::min<std::size_t>(2, solution_history_depth + 1);
     previous_step_s = h;
-    history_depth = std::min<std::size_t>(2, history_depth + 1);
+    // A source corner invalidates a smooth multistep history. Retain physical
+    // charge/flux, but rebuild order history on the new topology interval.
+    history_depth = lands_on_breakpoint
+                        ? 1
+                        : std::min<std::size_t>(2, history_depth + 1);
     ++output.diagnostics_.completed_steps;
     if (bdf2_step) {
       ++output.diagnostics_.bdf2_steps;
@@ -2138,6 +2416,12 @@ TransientResult solve_transient(const Circuit &circuit,
       const double factor = std::clamp(
           0.9 / std::sqrt(std::max(lte_ratio, 1.0e-12)), 0.5, 2.0);
       proposed_step_s = std::clamp(h * factor, options.minimum_time_step_s,
+                                   options.time_step_s);
+    } else if (options.adaptive_time_step) {
+      // Startup/corner BE steps have no embedded estimator. In particular, a
+      // short breakpoint-alignment step must not immediately jump back to the
+      // maximum h and create a huge BDF step ratio.
+      proposed_step_s = std::clamp(2.0 * h, options.minimum_time_step_s,
                                    options.time_step_s);
     } else {
       proposed_step_s = options.time_step_s;
@@ -2162,6 +2446,8 @@ TransientResult solve_transient(const Circuit &circuit,
       history_depth,
       solution_history_depth,
       true};
+  workspace.impl_->integration_history.capacitor_voltage_changes = capacitor_voltage_change;
+  workspace.impl_->integration_history.inductor_current_changes = inductor_current_change;
   output.message_ =
       options.integration_method == TransientIntegrationMethod::bdf2
           ? "breakpoint-aware variable-step BDF2 transient completed"

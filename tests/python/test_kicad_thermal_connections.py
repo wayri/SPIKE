@@ -1,6 +1,7 @@
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 from collections import Counter
 from pathlib import Path
 
@@ -13,6 +14,30 @@ from python.spike_core.kicad_importer import import_kicad_design
 
 
 class KicadThermalConnectionRetentionTests(unittest.TestCase):
+    def test_large_native_fill_is_retained_with_bounded_provenance(self):
+        # Original dense rectangle, beyond the former per-path resource cap.
+        count = 65_540
+        points = " ".join(f"(xy {i / count:.9f} 0)" for i in range(count))
+        path = self.write(f'''(kicad_pcb (version 20260101)
+          (layers (0 "F.Cu" signal))
+          (zone (net 1) (layer "F.Cu") (uuid "large-fill")
+            (fill yes)
+            (filled_polygon (layer "F.Cu")
+              (pts {points} (xy 1 1) (xy 0 1)))))''')
+        parsed = KicadParser(path)
+        zone = parsed.zones[0]
+        self.assertEqual(len(zone["points"]), count + 2)
+        self.assertTrue(zone["source_fill_provenance_complete"])
+        self.assertEqual(zone["source_fill_component_count"], 1)
+        with patch("python.core.board_parser.MAX_SOURCE_FILL_VERTICES_PER_COMPONENT", count):
+            rejected = KicadParser(path)
+        self.assertFalse(rejected.zones[0]["source_fill_provenance_complete"])
+        self.assertTrue(any("largest_path_vertices=65542/65540" in s for s in rejected.diagnostics))
+        with patch("python.core.board_parser.MAX_SOURCE_FILL_VERTICES_PER_GROUP", count):
+            aggregate_rejected = KicadParser(path)
+        self.assertFalse(aggregate_rejected.zones[0]["source_fill_provenance_complete"])
+        self.assertTrue(any("group_vertices=65542/65540" in s for s in aggregate_rejected.diagnostics))
+
     def write(self, body: str) -> Path:
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)

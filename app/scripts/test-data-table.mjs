@@ -44,7 +44,7 @@ assert.equal((full.match(/<tr\b/g) ?? []).length, 101, "large tables mount only 
 assert.match(full, /Page 1 of 3/);
 assert.match(full, /205/);
 assert.match(full, /aria-label="Find in Loads"/);
-assert.match(full, /aria-pressed="false"/);
+assert.match(full, /aria-pressed="true"/, "tables start with compact row spacing");
 assert.match(renderToStaticMarkup(h(Table, { label: "Empty", emptyMessage: "Add a load." }, h("tbody"))), /Add a load/);
 assert.ok(!renderToStaticMarkup(h(Table, { label: "Pre-filtered", searchable: false }, children)).includes('type="search"'));
 for (const theme of ["professional-dark", "light", "high-contrast", "system"]) {
@@ -54,3 +54,8 @@ for (const theme of ["professional-dark", "light", "high-contrast", "system"]) {
 }
 assert.ok(!full.includes("data-table-theme="), "tables inherit the application theme by default");
 console.log("Shared table filtering, identity, grouped details, bounded rendering, pagination recovery and empty states passed.");
+
+const integrated = renderToStaticMarkup(h(Table, { label: "Integrated", showTools: false, searchable: false }, children));
+assert.doesNotMatch(integrated, /Integrated table tools|Integrated field guide|showTools=/, "embedded table omits duplicate command bars without leaking presentation props");
+assert.match(integrated, /Page 1 of 3/, "pagination remains available without duplicate table tools");
+assert.equal((integrated.match(/<tr\b/g) ?? []).length, 101, "integrated tables retain bounded row rendering");

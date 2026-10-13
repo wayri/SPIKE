@@ -18,10 +18,13 @@ export type AssemblyToolSnapshot = {
   visibility: Record<string, boolean>; layerVisibility: Record<string, Record<string, boolean>>;
   layerOpacity: Record<string, Record<string, number>>; layerFocus: Record<string, string>; explodedDistanceMm: number;
   linkedNets: Record<string, string[]>;
+  showNetNames?: boolean;
   moveMode: "translate" | "rotate" | null; snapMode: "off" | "hole" | "edge"; snapGapMm: number;
   snapSourceLabel?: string; passThroughHighlight: boolean; overlayMessages: string[];
   managerTab: "layers" | "nets" | "links";
   draftOwner?: AssemblyToolKind | null;
+  /** Explicit user navigation request, independent of changing geometry snapshots. */
+  thermalStudyRequest?: string | null;
   /** Identifies the retained renderer inputs held by the parent session. */
   viewportRevision?: string | null;
 };
@@ -53,13 +56,13 @@ type AssemblyToolActionFields = {
   layerVisibility?: Record<string, boolean>; layerOpacity?: Record<string, number>;
 };
 type AssemblyToolActionType = "ready" | "closed" | "close" | "draft-dirty" | "save" | "reload" | "status" | "view" | "manager" | "select-board" |
-    "visibility" | "placement" | "move-mode" | "explode" | "snap-mode" | "snap-gap" | "pass-through" |
+    "visibility" | "placement" | "move-mode" | "explode" | "snap-mode" | "snap-gap" | "pass-through" | "net-names" |
     "export-diagram" | "load-overlay" | "layer-visibility" | "layer-opacity" | "layer-state" | "layer-focus" | "select-net" | "snap-target" | "update-assembly";
 export type AssemblyToolAction = AssemblyToolActionFields & (
   { type: AssemblyToolActionType; mode?: string } |
   { type: "collaboration"; mode: "freecad" | "attachments" }
 );
-const types = new Set(["ready", "closed", "close", "draft-dirty", "save", "reload", "status", "view", "manager", "select-board", "visibility", "placement", "move-mode", "explode", "snap-mode", "snap-gap", "pass-through", "export-diagram", "load-overlay", "layer-visibility", "layer-opacity", "layer-state", "layer-focus", "select-net", "snap-target", "update-assembly", "collaboration"]);
+const types = new Set(["ready", "closed", "close", "draft-dirty", "save", "reload", "status", "view", "manager", "select-board", "visibility", "placement", "move-mode", "explode", "snap-mode", "snap-gap", "pass-through", "net-names", "export-diagram", "load-overlay", "layer-visibility", "layer-opacity", "layer-state", "layer-focus", "select-net", "snap-target", "update-assembly", "collaboration"]);
 /** Reject malformed cross-window messages before workspace callbacks run. */
 export function validAssemblyToolAction(value: unknown): value is AssemblyToolAction {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -69,6 +72,7 @@ export function validAssemblyToolAction(value: unknown): value is AssemblyToolAc
   if (raw.value !== undefined && !["string", "number", "boolean"].includes(typeof raw.value)) return false;
   if (typeof raw.value === "number" && !Number.isFinite(raw.value)) return false;
   if (typeof raw.value === "string" && raw.value.length > 2000) return false;
+  if (raw.type === "net-names" && typeof raw.value !== "boolean") return false;
   if (raw.type === "layer-focus" && (typeof raw.boardId !== "string" || !raw.boardId || typeof raw.value !== "string" || !raw.value || raw.value.length > 256)) return false;
   if (raw.type === "snap-target" && (typeof raw.boardId !== "string" || !raw.boardId || typeof raw.value !== "string" || !raw.value || raw.value.length > 512)) return false;
   if (raw.type === "collaboration" && !["freecad", "attachments"].includes(String(raw.mode))) return false;

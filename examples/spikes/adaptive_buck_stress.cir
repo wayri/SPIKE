@@ -1,0 +1,22 @@
+SPIKES qualification stress fixture - generic asynchronous buck
+* Runs to 200 us with adaptive BDF2 and the default 1 fs minimum after
+* local-increment conditioning repair. A 1 ps floor still fails accuracy.
+* CLI: --method bdf2 --adaptive --minimum-time-step 1e-15
+* LTE controls: --lte-absolute-tolerance 1e-6 --lte-relative-tolerance 1e-4
+* No switch-node capacitance; L/Roff is 10 ps during diode extinction.
+* Do not use this as a qualified converter or manufacturer-model example.
+* Native inline smooth-switch syntax, not a manufacturer transistor model.
+* BDF2/adaptive run; reporting grid 5 us, maximum integration step 200 ns.
+Vs in 0 12
+Vgate gate 0 PULSE(0 5 1u 50n 50n 4u 10u)
+Smain in sw gate 0 20m 1meg 2.5 100m
+Dfree 0 sw DF
+.model DF D(IS=1n N=1)
+L1 sw out 10u
+Rload out 0 10
+Resr out cap 30m
+Cout cap 0 100u
+.tran 5u 200u 0 200n UIC
+.measure tran output_avg AVG V(out) FROM=100u TO=200u
+.measure tran inductor_peak MAX I(L1) FROM=100u TO=200u
+.end

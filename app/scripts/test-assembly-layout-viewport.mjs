@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { build } from "esbuild";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { importTestTypescript } from "./import-test-typescript.mjs";
 
 const api = await importTestTypescript("assemblyLayout2d");
@@ -103,12 +107,16 @@ if (existsSync(fixturePath)) {
 z=zipfile.ZipFile(sys.argv[1])
 a=json.loads(z.read('design/assembly-ir.json'))
 d=json.loads(z.read('design/assembly-designs.json'))
-print(json.dumps({'boards':a['boards'],'designs':[{'design_id':x['design_id'],'bounds':x['metadata']['board_bounds_mm']} for x in d['designs']]}))`, fixturePath], { encoding: "utf8" }));
+print(json.dumps({'active_design_id':d['active_design_id'],'boards':a['boards'],'designs':[{'design_id':x['design_id'],'bounds':x['metadata']['board_bounds_mm'],'tracks':len(x['tracks']),'pads':len(x['pads']),'zones':len(x['zones']),'components':len(x['components'])} for x in d['designs']]}))`, fixturePath], { encoding: "utf8" }));
   const fixtureDesigns = Object.fromEntries(fixtureRows.designs.map(row => [row.design_id, { bounds: { minX: row.bounds[0], minY: row.bounds[1], maxX: row.bounds[2], maxY: row.bounds[3] }, width: row.bounds[2] - row.bounds[0], height: row.bounds[3] - row.bounds[1] }]));
   const fixtureVisuals = fixtureRows.boards.map(row => { const bounds = fixtureDesigns[row.design_id].bounds; return { id: row.id, name: row.name, designId: row.design_id, active: true, widthMm: bounds.maxX - bounds.minX, heightMm: bounds.maxY - bounds.minY, localCenterMm: [(bounds.minX + bounds.maxX) / 2, (bounds.minY + bounds.maxY) / 2, 0], transform: row.frame.transform }; });
   const realPlacements = api.arrangeAssemblyBoards(fixtureVisuals, fixtureDesigns);
   const realFit = api.displayContentBounds(realPlacements);
   assert.deepEqual(realPlacements.map(row => row.visual.id).sort(), ["relay-shield", "uno-r4-minima"], "real retained fixture contributes both occurrence-scoped boards");
+  const fixtureCounts = Object.fromEntries(fixtureRows.designs.map(row => [row.design_id, [row.tracks, row.pads, row.zones, row.components]]));
+  assert.deepEqual(fixtureCounts[fixtureRows.active_design_id], [1319, 304, 24, 85], "the active UNO fixture retains its real manufacturing geometry");
+  const relayDesignId = fixtureRows.boards.find(row => row.id === "relay-shield").design_id;
+  assert.deepEqual(fixtureCounts[relayDesignId], [356, 167, 2, 47], "the relay fixture retains its real manufacturing geometry");
   const realZoom = interaction.zoomAssemblyViewBox(realFit, { left: 0, top: 0, width: 997, height: 563 }, 640, 281, .82);
   const realPan = interaction.panAssemblyViewBox(realZoom, { left: 0, top: 0, width: 997, height: 563 }, 73, -41);
   assert.ok(realPan.width < realFit.width && realPan.x !== realFit.x && realPan.y !== realFit.y, "real two-board fit supports combined anchored zoom and pan gestures");
@@ -116,15 +124,122 @@ print(json.dumps({'boards':a['boards'],'designs':[{'design_id':x['design_id'],'b
 const viewportSource = await readFile(new URL("../src/AssemblyLayoutViewport.tsx", import.meta.url), "utf8");
 assert.match(viewportSource, /onComponentSelect\?: \(boardId: string, componentId: string\)/, "component selection is an optional viewport API");
 assert.match(viewportSource, /event\.stopPropagation\(\);\s*onFocus\(visual\.id, event\.currentTarget\);\s*onBoardSelect\(visual\);\s*onComponentSelect\?\.\(visual\.id, item\.id\)/, "component hits retain focus, select their occurrence, and cannot fall through to a net target");
-assert.match(viewportSource, /<ComponentShapes[^>]+sourceLayers=\{!useFallback\}/, "component hit geometry covers retained source SVG boards without flashing fallback component art while alignment loads");
+assert.match(viewportSource, /const useFallback = !hasAlignedSource/, "retained vector geometry remains visible while source alignment is pending or unavailable");
+assert.match(viewportSource, /<ComponentShapes[^>]+sourceLayers=\{hasAlignedSource\}/, "component art switches to transparent hit geometry only after source SVG alignment succeeds");
 assert.match(viewportSource, /addEventListener\("wheel", onWheel, \{ passive: false \}\)/, "wheel cancellation is installed on a native non-passive listener");
 assert.match(viewportSource, /selectionFilter !== "net"/, "Net selection mode removes component hitboxes that would occlude pads and tracks");
 assert.match(viewportSource, /linked=\{linkedNets\[visual\.id\] \?\? \[\]\}/, "equal net IDs and names remain scoped to each board occurrence");
-assert.match(viewportSource, /useFallback && <BoardFallback/, "hiding every retained source layer does not draw a fallback ghost board");
+assert.match(viewportSource, /useFallback && <g[^>]*><BoardFallback/, "hiding every retained source layer does not draw a fallback ghost board");
 assert.match(viewportSource, /data-layout-source-frame[\s\S]*data-layout-board-frame/, "source SVG and normalized hit geometry use explicit inverse frames");
 assert.match(viewportSource, /stroke="#55e5d5"/, "selected assembly nets use the SPIKE teal highlight");
 assert.doesNotMatch(viewportSource, /drop-shadow\([^)]*#ffe25b|stroke=\{selected\(item\.net\) \? "#ffe25b"/, "legacy broad yellow net glow is removed");
 assert.match(viewportSource, /setLocalFocusedLayerByBoard\(current => \(\{ \.\.\.current, \[selected\.id\]: layer \}\)\); onLayerFocus\?\.\(selected\.id, layer\)/, "quick layer focus mutates and reports only the selected occurrence preference");
 assert.match(viewportSource, /data-layer-focus=\{layerFocus\}/, "each occurrence retains and renders its own quick layer preference");
 assert.match(viewportSource, /inferAssemblyLayoutBoardToSourceOffset\(board, await response\.text\(\)\)/, "retained Edge.Cuts establishes the actual source-page offset before source layers render");
+
+const instrumentedViewportSource = viewportSource.replace(
+  /useState<Record<string, \{ board: ParsedBoard; offset: AssemblyDisplayOffset \| null \}>>\(\{\}\)/,
+  "useState<Record<string, { board: ParsedBoard; offset: AssemblyDisplayOffset | null }>>((globalThis.__assemblyTestSourceAlignments ?? {}))",
+);
+assert.notEqual(instrumentedViewportSource, viewportSource, "the behavioral renderer controls only the initial alignment state");
+const viewportBundle = await build({
+  stdin: {
+    contents: instrumentedViewportSource,
+    loader: "tsx",
+    resolveDir: fileURLToPath(new URL("../src", import.meta.url)),
+    sourcefile: "AssemblyLayoutViewport.tsx",
+  },
+  bundle: true,
+  write: false,
+  format: "cjs",
+  platform: "node",
+  jsx: "automatic",
+  external: ["react"],
+  loader: { ".css": "empty" },
+});
+const viewportModule = { exports: {} };
+const require = createRequire(import.meta.url);
+new Function("require", "module", "exports", viewportBundle.outputFiles[0].text)(
+  name => name === "react" ? React : require(name),
+  viewportModule,
+  viewportModule.exports,
+);
+const AssemblyLayoutViewport = viewportModule.exports.default;
+let pendingBoard = {
+  bounds: { minX: 0, minY: 0, maxX: 20, maxY: 10 },
+  width: 20,
+  height: 10,
+  outlineLoops: [[[0, 0], [20, 0], [20, 10], [0, 10], [0, 0]]],
+  layers: ["F.Cu"],
+  layerDefinitions: [{ id: 0, name: "F.Cu", kind: "signal" }],
+  nets: { 1: "VCC" },
+  drawings: [],
+  tracks: [{ id: "pending-track", start: [1, 2], end: [9, 2], width: .25, layer: "F.Cu", net: "VCC" }],
+  zones: [],
+  vias: [],
+  pads: [],
+  components: [{ id: "pending-part", ref: "U1", at: [5, 5], width: 2, height: 2, rotation: 0 }],
+  layoutViewBox: [0, 0, 20, 10],
+  layoutLayerUrls: { "F.Cu": "blob:pending-layer", "Edge.Cuts": "blob:pending-outline" },
+};
+const pendingVisual = {
+  id: "pending-occurrence",
+  name: "Pending board",
+  designId: "pending-design",
+  active: true,
+  widthMm: 20,
+  heightMm: 10,
+  localCenterMm: [10, 5, 0],
+  transform: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+};
+const renderPending = (visibleLayers, options = {}) => renderToStaticMarkup(React.createElement(AssemblyLayoutViewport, {
+  designs: { "pending-design": pendingBoard },
+  boards: [pendingVisual],
+  harnesses: [],
+  selectedBoardId: "pending-occurrence",
+  linkedNets: options.linkedNets ?? {},
+  visibleLayers,
+  showNetNames:options.showNetNames ?? false,
+  layerOpacity: options.layerOpacity ?? {},
+  showVias: true,
+  onBoardSelect() {},
+  onNetSelect() {},
+}));
+const labeledMarkup=renderPending({}, {showNetNames:true});
+assert.match(labeledMarkup,/data-net-label="1" data-occurrence-id="pending-occurrence"/);
+assert.match(labeledMarkup,/>VCC<\/text>/);
+assert.doesNotMatch(renderPending({}, {showNetNames:false}),/data-net-label=/);
+assert.doesNotMatch(renderPending({"F.Cu":false}, {showNetNames:true}),/data-net-label=/,"hidden layer nets are not labeled");
+const pendingMarkup = renderPending({});
+assert.match(pendingMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "pending source alignment renders retained track geometry instead of a blank outline");
+assert.match(pendingMarkup, />U1<\/text>/, "pending source alignment renders retained component art");
+assert.doesNotMatch(pendingMarkup, /<image/, "pending source alignment does not render an unaligned source image");
+globalThis.__assemblyTestSourceAlignments = { "pending-design": { board: pendingBoard, offset: null } };
+const unavailableMarkup = renderPending({});
+assert.match(unavailableMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "failed source alignment keeps retained track geometry visible");
+assert.doesNotMatch(unavailableMarkup, /<image/, "failed source alignment does not render source images");
+globalThis.__assemblyTestSourceAlignments = { "pending-design": { board: pendingBoard, offset: [0, 0] } };
+const focusedMarkup = renderPending({}, {linkedNets:{"pending-occurrence":["1"]},layerOpacity:{"F.Cu":.5}});
+assert.match(focusedMarkup,/data-net-focus="active"/);
+assert.match(focusedMarkup,/opacity="0.16" style="filter:grayscale\(1\) brightness\(\.68\)"/);
+assert.match(focusedMarkup,/stroke="#55e5d5"/,"selected canonical net remains vivid above gray source geometry");
+const clearedFocus = renderPending({}, {layerOpacity:{"F.Cu":.5}});
+assert.doesNotMatch(clearedFocus,/grayscale\(1\)/,"clearing focus restores source colors");
+
+const alignedMarkup = renderPending({});
+assert.match(alignedMarkup, /<image[^>]+href="blob:pending-layer"/, "resolved source alignment renders the retained source image");
+assert.doesNotMatch(alignedMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "resolved source alignment replaces fallback tracks instead of drawing duplicate art");
+assert.doesNotMatch(alignedMarkup, />U1<\/text>/, "resolved source alignment keeps component hit geometry without duplicate fallback labels");
+globalThis.__assemblyTestSourceAlignments = { "pending-design": { board: pendingBoard, offset: [0, 0] } };
+const replacementBoard = { ...pendingBoard, tracks: [...pendingBoard.tracks] };
+const originalBoard = pendingBoard;
+pendingBoard = replacementBoard;
+const replacementMarkup = renderPending({});
+assert.match(replacementMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "an immutable active-board replacement falls back while its new identity awaits alignment");
+assert.doesNotMatch(replacementMarkup, /<image/, "a stale alignment from the prior active-board identity is never shared with its replacement");
+pendingBoard = originalBoard;
+globalThis.__assemblyTestSourceAlignments = {};
+const hiddenPendingMarkup = renderPending({ "F.Cu": false, "Edge.Cuts": false });
+assert.doesNotMatch(hiddenPendingMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "explicitly hidden retained layers remain hidden during pending alignment");
+delete globalThis.__assemblyTestSourceAlignments;
 console.log("Assembly 2D transforms, real-fixture gestures, picking, net mapping and Fit/Focus passed");

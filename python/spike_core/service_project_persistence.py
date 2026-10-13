@@ -11,19 +11,24 @@ from .project_package import ProjectPackageError, _sha256, read_project
 from .multiboard_identity import migrate_legacy_result_assembly_digest
 from .project_state_artifacts import externalize_result_state, hydrate_result_state, read_verified_artifacts
 from .project_visual_artifacts import prepare_visual_artifacts, read_saved_visual_stage
+from .project_parallel_state import admit_payload_parallel
 
 
-def project_for_desktop(payload: dict, projected: dict) -> dict:
+def project_for_desktop(payload: dict, projected: dict, *, copy_project: bool = True) -> dict:
     """A binary manufacturing source reopens through its canonical geometry."""
-    projected = copy.deepcopy(projected)
+    projected = copy.deepcopy(projected) if copy_project else dict(projected)
+    projected["analysis"] = dict(projected.get("analysis") or {})
+    if "parallel_execution" in payload.get("analyses", {}):
+        projected["analysis"]["parallel_execution"] = copy.deepcopy(payload["analyses"]["parallel_execution"])
     canonical = payload.get("design_ir") or {}
-    design = projected.setdefault("design", {})
+    design = dict(projected.get("design") or {})
+    projected["design"] = design
     design["canonical_design"] = canonical
     if not design.get("source_board") and canonical.get("contract") == "spike/design-ir/v2":
         source_format = str((canonical.get("source") or {}).get("source_format", ""))
         if source_format not in {"kicad", "kicad_pcb"}:
             snapshot = {"contract": "spike/design-snapshot/v1",
-                        "design": SpiDeRV2.from_dict(canonical).to_v1().to_dict(),
+                        "design": SpiDeRV2.from_dict(canonical).to_v1(allow_unprojected_arcs=True).to_dict(),
                         "canonical_design": canonical, "report": canonical.get("metadata", {}).get("import_report", {})}
             design.update(source_board=json.dumps(snapshot), source_format="spike-normalized",
                           source_file="saved-design.spike-design.json")
@@ -46,9 +51,15 @@ def without_saved_results(payload: dict) -> dict:
                     study.pop("result", None)
         analysis = snapshot.get("analysis")
         if isinstance(analysis, dict):
+            parallel = analysis.get("parallel_execution")
+            if isinstance(parallel, dict):
+                parallel["runs"] = []
             for key in ("latest_result", "active_result", "pdn_review"):
                 analysis.pop(key, None)
             analysis["result_history"] = []
+            retained_em = analysis.get("retained_assembly_em")
+            if isinstance(retained_em, dict):
+                retained_em["result"] = None
             si = analysis.get("si")
             if isinstance(si, dict):
                 si.pop("latest_channel_result", None)
@@ -64,6 +75,9 @@ def without_saved_results(payload: dict) -> dict:
     analyses = clean.get("analyses")
     if isinstance(analyses, dict):
         clear_desktop({"analysis": analyses})
+        volume_study = analyses.get("assembly_volume_electrothermal")
+        if isinstance(volume_study, dict):
+            volume_study["result"] = None
         field_study = analyses.get("assembly_field_study")
         if field_study is not None:
             from .assembly_field_study import import_assembly_field_study, export_assembly_field_study
@@ -85,6 +99,7 @@ def without_saved_results(payload: dict) -> dict:
 
 def prepare_persistent_state(payload: dict, visuals: Any, members: dict[str, bytes]) -> tuple[dict, dict[str, bytes]]:
     """Move full results out of metadata, retaining exact future result fields."""
+    admit_payload_parallel(payload, resolve=lambda name: members[name])
     payload, result_members = externalize_result_state(payload)
     members = {**members, **result_members}
     if visuals is not None:
@@ -148,6 +163,8 @@ def migrate_saved_assembly_results(value: Any, original_assembly: Any) -> Any:
         return [migrate_saved_assembly_results(item, original_assembly) for item in value]
     if not isinstance(value, dict):
         return value
+    if value.get("contract") in {"spike/parallel-workspace/v1", "spike/parallel-batch-result/v1", "spike/cluster-batch-result/v1"}:
+        return value  # Execution digests bind the original immutable results.
     if value.get("contract") in {
         "spike/multiboard-circuit-result/v1", "spike/multiboard-thermal-result/v1", "spike/multiboard-em-result/v1"
     }:

@@ -10,15 +10,16 @@ import { buildLayerManagerInventory } from "./layerInventory";
 import AssemblyConnectorLinks from "./AssemblyConnectorLinks";
 import "./assemblyBoardManagers.css";
 
-type Props = { embedded?: boolean; onDirtyChange?: (dirty: boolean) => void; assembly: AssemblyIr; designs: AssemblyDesigns; selectedBoardId?: string | null; initialTab?: "layers" | "nets" | "links"; assemblyLayerVisibility: Readonly<Record<string, Readonly<Record<string, boolean>>>>; assemblyLayerOpacity: Readonly<Record<string, Readonly<Record<string, number>>>>;
+type Props = { embedded?: boolean; nativeWindow?: boolean; onDirtyChange?: (dirty: boolean) => void; assembly: AssemblyIr; designs: AssemblyDesigns; selectedBoardId?: string | null; initialTab?: "layers" | "nets" | "links"; assemblyLayerVisibility: Readonly<Record<string, Readonly<Record<string, boolean>>>>; assemblyLayerOpacity: Readonly<Record<string, Readonly<Record<string, number>>>>;
   onAssemblyLayerVisibility: (boardId: string, layerName: string, visible: boolean) => void; onAssemblyLayerOpacity: (boardId: string, layerName: string, opacity: number) => void;
   onAssemblyLayersChange?: (boardId: string, visibility: Record<string, boolean>, opacity?: Record<string, number>) => void;
   onSelectNet: (occurrenceId: string, canonicalNetId: string) => void;
+  showNetNames?: boolean; onShowNetNames?: (visible: boolean) => void;
   onFocusBoard?: (boardId: string) => void;
   onUpdated: (assembly: AssemblyIr) => void; onStatus: (message: string) => void; onClose: () => void };
 const blank = (): ExplicitNetLinkRow => ({ id: `connector-mate-${crypto.randomUUID()}`, endpointA: "", pinA: "", endpointB: "", pinB: "", applied: false });
 
-export default function AssemblyBoardManagers({ embedded = false, onDirtyChange, assembly, designs, selectedBoardId, initialTab = "layers", assemblyLayerVisibility, assemblyLayerOpacity, onAssemblyLayerVisibility, onAssemblyLayerOpacity, onAssemblyLayersChange, onSelectNet, onFocusBoard, onUpdated, onStatus, onClose }: Props) {
+export default function AssemblyBoardManagers({ embedded = false, nativeWindow = false, onDirtyChange, assembly, designs, selectedBoardId, initialTab = "layers", assemblyLayerVisibility, assemblyLayerOpacity, onAssemblyLayerVisibility, onAssemblyLayerOpacity, onAssemblyLayersChange, onSelectNet, showNetNames = false, onShowNetNames, onFocusBoard, onUpdated, onStatus, onClose }: Props) {
   const [tab, setTab] = useState<"layers" | "nets" | "links">(initialTab);
   const [boardId, setBoardId] = useState(() => boardOccurrences(assembly, designs).find(board => board.id === selectedBoardId)?.id ?? boardOccurrences(assembly, designs)[0]?.id ?? "");
   const [drafts, setDrafts] = useState<ExplicitNetLinkRow[]>([]);
@@ -47,10 +48,11 @@ export default function AssemblyBoardManagers({ embedded = false, onDirtyChange,
   const apply = (row: ExplicitNetLinkRow) => { try { validateExplicitNetLink(assembly, designs, row); onUpdated(applyExplicitNetLink(assembly, row)); setDrafts(items => items.filter(item => item.id !== row.id)); onStatus("Applied one explicit connector pin link; matching net names elsewhere remain separate."); } catch (error) { onStatus(error instanceof Error ? error.message : "Could not apply connector link."); } };
   const save = (original: ExplicitNetLinkRow, row: ExplicitNetLinkRow) => { try { validateExplicitNetLink(assembly, designs, row); onUpdated(replaceExplicitNetLink(assembly, original, row)); setEdits(current => { const next = { ...current }; delete next[original.id]; return next; }); onStatus("Saved the explicit connector pin link."); } catch (error) { onStatus(error instanceof Error ? error.message : "Could not save connector link."); } };
   return <div className={embedded ? "assembly-manager-shade" : "modal-shade assembly-manager-shade"}><section className="assembly-board-managers" role={embedded ? "region" : "dialog"} aria-modal={embedded ? undefined : true} aria-label="Assembly board managers">
-    <header><div><b>ASSEMBLY BOARD MANAGERS</b><small>Board occurrence scoped layers, nets, and explicit connector links</small></div><button onClick={onClose} aria-label="Close assembly board managers"><X size={17}/></button></header>
+    <header><div><b>ASSEMBLY BOARD MANAGERS</b><small>Board occurrence scoped layers, nets, and explicit connector links</small></div>{!nativeWindow && <button onClick={onClose} aria-label="Close assembly board managers"><X size={17}/></button>}</header>
     <nav><button className={tab === "layers" ? "selected" : ""} onClick={() => setTab("layers")}><Layers3 size={14}/> Layers</button><button className={tab === "nets" ? "selected" : ""} onClick={() => setTab("nets")}><Network size={14}/> Nets</button><button className={tab === "links" ? "selected" : ""} onClick={() => setTab("links")}><Link2 size={14}/> Connector links</button></nav>
     {tab !== "links" && <label className="assembly-board-picker">Focused board<select value={boardId} onChange={event => { setBoardId(event.target.value); onFocusBoard?.(event.target.value); }}>{boards.map(board => <option key={board.id} value={board.id}>{board.name} · {board.id}</option>)}</select></label>}
     <div className="assembly-manager-content">
+      {onShowNetNames && tab !== "links" && <label className="assembly-net-name-toggle"><input type="checkbox" checked={showNetNames} onChange={event => onShowNetNames(event.target.checked)} /> Show net names on boards</label>}
       {tab === "layers" && <LayerManager embedded showSceneControls={false} definitions={presentation.definitions} stackup={presentation.stackup}
         layers={boardVisibility} opacity={assemblyLayerOpacity[boardId] ?? {}}
         toggleLayer={name => onAssemblyLayerVisibility(boardId, name, boardVisibility[name] === false)}

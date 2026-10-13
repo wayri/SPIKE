@@ -5,6 +5,17 @@ from python.spike_core.extension_workflows import validate_workspace_routes
 from python.spike_core.extension_mesh_results import admit_extension_mesh
 
 class ExtensionWorkspaceTests(unittest.TestCase):
+    def test_board_independence_is_explicit_boolean(self):
+        route = {'id':'reference', 'workspace':'thermal', 'operation':'solve',
+                 'label':'Reference', 'model_status':'experimental'}
+        def entry(value):
+            return {'applications':[{'id':'reference', 'workspace_routes':[value]}]}
+        with self.assertRaises(ValueError):
+            validate_workspace_routes(entry(route), [])
+        validate_workspace_routes(entry({**route, 'requires_board':False}), [])
+        for value in (None, 0, 'false', [], {}):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                validate_workspace_routes(entry({**route, 'requires_board':value}), [])
     def test_route_requires_declared_reference_and_cannot_qualify_physics(self):
         route={"id":"mesh", "workspace":"mesh", "operation":"mesh", "label":"Mesh", "model_status":"unvalidated", "preview_contribution_id":"preview"}
         contributes={"applications":[{"id":"mesh", "workspace_routes":[route]}, {"id":"preview"}]}

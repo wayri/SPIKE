@@ -1,5 +1,7 @@
 # Interactive analysis guide
 
+**SI, PI, Thermal, EM**
+
 Open **Help → Interactive analysis guide** to show a floating guide over the
 SPIKE workspace. Choose HF / SI EMerge S-parameters or radiation, or one of the internal
 SPIKE paths: copper DC/PI, PEEC AC/transient, SI channel, EMI screening, object

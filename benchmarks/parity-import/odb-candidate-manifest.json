@@ -1,0 +1,145 @@
+{
+  "boards": [
+    {
+      "path": "odb-candidate.zip",
+      "format": "odb++",
+      "sha256": "c09f8f7f28bcb19182592b6d302038bc23b06ec41eea694c94e9fbce71885681",
+      "source_url": "repository:benchmarks/parity-import/odb-candidate",
+      "license": "Apache-2.0",
+      "expected_counts": {
+        "tracks": 0,
+        "arcs": 1,
+        "pads": 1,
+        "components": 1,
+        "nets": 1,
+        "layers": 3
+      },
+      "expected_entities": [
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "start_mm",
+          "value": [
+            10,
+            0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "mid_mm",
+          "value": [
+            12,
+            2
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "end_mm",
+          "value": [
+            14,
+            0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "width_mm",
+          "value": 0.3,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "center_mm",
+          "value": [
+            21,
+            8
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "size_mm",
+          "value": [
+            1.2,
+            0.8
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "/extensions/spike.v1/rotation",
+          "value": 90,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "odb:comp_+_top:component:0",
+          "field": "position_mm",
+          "value": [
+            20,
+            10
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "odb:comp_+_top:component:0",
+          "field": "rotation_deg",
+          "value": 90,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "odb:comp_+_top:component:0",
+          "field": "reference",
+          "value": "J1",
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "name": "SIGNAL"
+          }
+        },
+        {
+          "collection": "arcs",
+          "source_id": "odb:f.cu:0",
+          "field": "layer_id",
+          "reference": {
+            "collection": "layers",
+            "name": "f.Cu"
+          }
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "name": "SIGNAL"
+          }
+        },
+        {
+          "collection": "pads",
+          "source_id": "odb:f.cu:1",
+          "field": "component_id",
+          "reference": {
+            "collection": "components",
+            "source_id": "odb:comp_+_top:component:0"
+          }
+        }
+      ]
+    }
+  ]
+}

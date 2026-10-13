@@ -135,7 +135,14 @@ def build_mesh_preview(design: SpiDeR, spec: AnalysisSpec) -> Dict[str, Any]:
 
 
 def preflight_analysis(design: SpiDeR, spec: AnalysisSpec, solver_catalog: List[Dict[str, Any]]) -> Dict[str, Any]:
-    issues: List[ValidationIssue] = []
+    from .source_current_limits import CAPABILITY, current_limit_issues
+    capacity_supported = any(
+        item.get("state") in {"available", "experimental"}
+        and (spec.solver_id == "auto" or item.get("id") == spec.solver_id)
+        and spec.mode in item.get("analyses", [])
+        and (spec.formulation == "auto" or spec.formulation in item.get("formulations", []))
+        and CAPABILITY in item.get("capabilities", []) for item in solver_catalog)
+    issues: List[ValidationIssue] = current_limit_issues(spec, capacity_supported)
     from .importers import import_analysis_blockers
     issues.extend(ValidationIssue("IMPORT_NOT_SOLVER_READY", "error", reason) for reason in import_analysis_blockers(design, spec.mode))
     configured_memory_gb = spec.mesh.get("solver_memory_limit_gb")

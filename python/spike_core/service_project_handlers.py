@@ -32,9 +32,12 @@ from .service_project import (
 from .service_project_topology import update_assembly_topology_setup
 from .service_project_assembly import handle_assembly_project_request
 from .service_project_assembly_field import handle_assembly_field_project_request
+from .service_project_volume_electrothermal import handle_volume_electrothermal_project_request
+from .service_project_thermal_mesh import handle_thermal_mesh_project_request
+from .service_project_airflow import handle_airflow_project_request
 from .service_project_mcad_placement import handle_mcad_placement_project_request
 from .service_project_selector_preview import generate_mcad_selector_preview_in_project, read_mcad_selector_previews
-from .normalized_source_codec import compact_normalized_source_for_open
+from .normalized_source_codec import compact_normalized_source_for_open, encode_normalized_source
 from .service_project_persistence import project_for_desktop, prepare_persistent_state, read_persistent_artifact, without_saved_results, migrate_saved_assembly_results
 from .project_state_artifacts import hydrate_result_state
 from .assembly_visuals import prepare_assembly_design_visual_bundle
@@ -44,6 +47,15 @@ def handle_project_request(
     method: Any, params: Dict[str, Any], *, request_id: Any, application_version: str,
 ) -> Dict[str, Any] | None:
     """Handle project persistence and import requests, or return ``None``."""
+    airflow_response = handle_airflow_project_request(method, params, request_id=request_id, application_version=application_version)
+    if airflow_response is not None:
+        return airflow_response
+    volume_response = handle_volume_electrothermal_project_request(method, params, request_id=request_id, application_version=application_version)
+    if volume_response is not None:
+        return volume_response
+    mesh_response = handle_thermal_mesh_project_request(method, params, request_id=request_id, application_version=application_version)
+    if mesh_response is not None:
+        return mesh_response
     field_response = handle_assembly_field_project_request(method, params, request_id=request_id, application_version=application_version)
     if field_response is not None:
         return field_response
@@ -94,17 +106,30 @@ def handle_project_request(
             if not path.is_file():
                 raise ProjectPackageError("The selected SPIKE project does not exist.")
             opened = read_project(path)
-            projected = project_for_desktop(opened.payload, frontend_project_payload(opened.payload))
+            defer_artifacts = bool(params.get("defer_artifacts"))
+            projected = project_for_desktop(
+                opened.payload,
+                frontend_project_payload(opened.payload),
+                # Deferred desktop opens serialize this projection immediately.
+                # Its nested package values are not mutated before transport, so
+                # cloning the complete multi-design tree only adds latency and
+                # peak memory without providing isolation to the client process.
+                copy_project=not defer_artifacts,
+            )
             canonical_payload = opened.payload
-            if not params.get("defer_artifacts") and not opened.migrated:
+            if not defer_artifacts and not opened.migrated:
                 digest = str(opened.manifest.get("manifest_payload_sha256", ""))
                 projected = hydrate_result_state(projected, path, digest)
                 canonical_payload = hydrate_result_state(canonical_payload, path, digest)
                 projected = migrate_saved_assembly_results(projected, opened.payload.get("assembly_ir"))
                 canonical_payload = migrate_saved_assembly_results(canonical_payload, opened.payload.get("assembly_ir"))
-            elif params.get("defer_artifacts"):
+            elif defer_artifacts:
                 canonical_payload = {"design_ir": opened.payload.get("design_ir")}
             projected_design = projected.get("design") if isinstance(projected.get("design"), dict) else {}
+            if defer_artifacts:
+                # canonical.design_ir is the one authoritative transport copy.
+                # The desktop supplies it explicitly to project hydration.
+                projected_design.pop("canonical_design", None)
             canonical_design = opened.payload.get("design_ir") if isinstance(opened.payload.get("design_ir"), dict) else {}
             if not str(projected_design.get("source_board", "")) and not opened.migrated:
                 source = canonical_design.get("source") if isinstance(canonical_design.get("source"), dict) else {}
@@ -138,6 +163,12 @@ def handle_project_request(
                     # result.canonical.design_ir.
                     projected_design.pop("canonical_design", None)
                     projected["design"] = projected_design
+            if params.get("compact_canonical_design") and isinstance(canonical_payload.get("design_ir"), dict):
+                canonical_payload = dict(canonical_payload)
+                canonical_payload["design_ir"] = encode_normalized_source(
+                    json.dumps(canonical_payload["design_ir"], ensure_ascii=False, separators=(",", ":")),
+                    compression_level=1,
+                )
             return {"ok": True, "result": {
                 "contract": "spike/project-open-result/v1",
                 "project": projected,
@@ -235,7 +266,7 @@ def handle_project_request(
             include_results = params.get("include_results", True)
             if not isinstance(include_results, bool):
                 raise ProjectPackageError("include_results must be a boolean.")
-            if not include_results:
+            if not include_results or params.get("profile") == "design_exchange":
                 payload = without_saved_results(payload)
                 payload.setdefault("audit", []).append({"event": "project_saved_without_results"})
             generate_geometry_tables = (
@@ -626,7 +657,7 @@ def handle_project_request(
             if method == "import_design_v2":
                 result = import_design(path, str(params.get("format_hint", "")), with_report=True, options=params.get("options"))
                 if params.get("include_snapshot"):
-                    legacy_design = SpiDeRV2.from_dict(result["design"]).to_v1().to_dict()
+                    legacy_design = SpiDeRV2.from_dict(result["design"]).to_v1(allow_unprojected_arcs=True).to_dict()
                     if params.get("snapshot_only"):
                         # Keep canonical v2 authoritative for persistence, but
                         # avoid serializing large ODB provenance/geometry three

@@ -63,6 +63,15 @@ def public_mesh():
 
 
 class EMergeGerberTests(unittest.TestCase):
+    def test_conductor_and_roughness_loss_requests_fail_closed(self):
+        design = design_from_source(gerber_source()).to_dict()
+        for request in ({"include_conductor_loss": True},
+                        {"surface_impedance_ohm": .01},
+                        {"roughness_rms_um": 1.0}):
+            with self.subTest(request=request):
+                with self.assertRaisesRegex(ValueError, "zero-thickness PEC copper"):
+                    compile_gerber(design, {**parameters(), **request})
+
     def test_project_save_open_retains_artwork_and_current_materials(self):
         from python.spike_core.normalized_source_codec import decode_normalized_source
         from python.spike_core.service_project_handlers import handle_project_request

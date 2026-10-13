@@ -1,0 +1,216 @@
+{
+  "contract": "spike/board-corpus-benchmark/v1",
+  "boards": [
+    {
+      "path": "coupon.kicad_pcb",
+      "sha256": "0d1722147daa4de7c63e64a7c2a2970c679dca42926efde6651328663eb8c05a",
+      "source_url": "repository:benchmarks/parity-import/coupon.kicad_pcb",
+      "license": "Apache-2.0",
+      "expected_counts": {
+        "layers": 4,
+        "nets": 1,
+        "tracks": 2,
+        "vias": 1,
+        "arcs": 0,
+        "zones": 0,
+        "pads": 0,
+        "components": 0
+      },
+      "expected_entities": [
+        {
+          "collection": "tracks",
+          "source_id": "11111111-1111-4111-8111-111111111111",
+          "field": "start_mm",
+          "value": [
+            2.5,
+            -3.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "tracks",
+          "source_id": "11111111-1111-4111-8111-111111111111",
+          "field": "end_mm",
+          "value": [
+            12.5,
+            -3.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "tracks",
+          "source_id": "11111111-1111-4111-8111-111111111111",
+          "field": "width_mm",
+          "value": 0.25,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "tracks",
+          "source_id": "11111111-1111-4111-8111-111111111111",
+          "field": "layer_id",
+          "reference": {
+            "collection": "layers",
+            "source_id": "0"
+          }
+        },
+        {
+          "collection": "tracks",
+          "source_id": "11111111-1111-4111-8111-111111111111",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "source_id": "1"
+          }
+        },
+        {
+          "collection": "tracks",
+          "source_id": "33333333-3333-4333-8333-333333333333",
+          "field": "start_mm",
+          "value": [
+            12.5,
+            -3.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "tracks",
+          "source_id": "33333333-3333-4333-8333-333333333333",
+          "field": "end_mm",
+          "value": [
+            12.5,
+            7.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "tracks",
+          "source_id": "33333333-3333-4333-8333-333333333333",
+          "field": "width_mm",
+          "value": 0.5,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "tracks",
+          "source_id": "33333333-3333-4333-8333-333333333333",
+          "field": "layer_id",
+          "reference": {
+            "collection": "layers",
+            "source_id": "31"
+          }
+        },
+        {
+          "collection": "tracks",
+          "source_id": "33333333-3333-4333-8333-333333333333",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "source_id": "1"
+          }
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "center_mm",
+          "value": [
+            12.5,
+            -3.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "diameter_mm",
+          "value": 0.8,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "drill_mm",
+          "value": 0.4,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "via_type",
+          "value": "through"
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "start_layer_id",
+          "reference": {
+            "collection": "layers",
+            "source_id": "0"
+          }
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "end_layer_id",
+          "reference": {
+            "collection": "layers",
+            "source_id": "31"
+          }
+        },
+        {
+          "collection": "vias",
+          "source_id": "22222222-2222-4222-8222-222222222222",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "source_id": "1"
+          }
+        },
+        {
+          "collection": "layers",
+          "source_id": "0",
+          "field": "name",
+          "value": "F.Cu"
+        },
+        {
+          "collection": "layers",
+          "source_id": "0",
+          "field": "z_mm",
+          "value": 0.0,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "layers",
+          "source_id": "0",
+          "field": "thickness_mm",
+          "value": 0.035,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "layers",
+          "source_id": "31",
+          "field": "name",
+          "value": "B.Cu"
+        },
+        {
+          "collection": "layers",
+          "source_id": "31",
+          "field": "z_mm",
+          "value": 1.565,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "layers",
+          "source_id": "31",
+          "field": "thickness_mm",
+          "value": 0.035,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "nets",
+          "source_id": "1",
+          "field": "name",
+          "value": "SIGNAL"
+        }
+      ]
+    }
+  ]
+}

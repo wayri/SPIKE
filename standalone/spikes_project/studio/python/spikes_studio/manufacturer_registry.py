@@ -47,6 +47,18 @@ LM358_INSPECTION = {
     'redistribution':'Archive inspected in memory only; no vendor source bundled.',
 }
 
+# Public acquisition references only. Private archive tests do not grant
+# redistribution rights or enable catalog placement/native solver execution.
+for part, archive in (('SN74HC10', 'sclm227'), ('SN74HC11', 'sclm226')):
+    SOURCES += ({**SOURCES[0], 'part_number':part,
+                 'description':'Single-gate vendor electrical model, not a complete package.',
+                 'product_url':'https://www.ti.com/product/'+part,
+                 'model_url':'https://www.ti.com/lit/zip/'+archive,
+                 'model_title':part+' Behavioral SPICE Model',
+                 'checked_on':'2026-10-12',
+                 'state':'source_identified_not_qualified',
+                 'compatibility':'16 combined DC truth-table cases passed on explicit ngspice PS compatibility at 5 V / 25 C / 10 kohm. Timing, temperature and native SPIKES execution remain unqualified.'},)
+
 
 def capability_summary(records):
     """Do not turn parameter-grid count or a vendor name into qualification."""

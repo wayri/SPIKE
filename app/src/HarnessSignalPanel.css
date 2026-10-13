@@ -1,0 +1,14 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.harness-signal-panel { min-width: 0; border-top: 1px solid var(--border); margin-top: 12px; padding-top: 10px; }
+.harness-signal-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 9px; }
+.harness-signal-fields label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.harness-signal-fields input,.harness-signal-fields select { width: 100%; min-width: 0; box-sizing: border-box; }
+.harness-signal-source { grid-column: 1 / -1; }
+.harness-signal-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-block: 10px; }
+.harness-em-readiness code { overflow-wrap: anywhere; }
+.harness-pi-conductors { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 6px; }
+.harness-pi-conductors label { display: flex; gap: 6px; align-items: center; min-width: 0; overflow-wrap: anywhere; }
+.harness-pi-conductors p { grid-column: 1 / -1; }
+.assembly-harness-wiring { margin-block: 12px; min-width: 0; }
+.assembly-harness-wiring > label { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.assembly-harness-wiring > label select { min-width: 0; max-width: 100%; }

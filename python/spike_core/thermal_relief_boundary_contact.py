@@ -144,7 +144,7 @@ def build_thermal_relief_boundary_contact_evidence(
 
     pads = {item.id: item for item in design.pads}
     zones = {item.id: item for item in design.zones}
-    legacy = design.to_v1()
+    legacy = design.to_v1(allow_unprojected_arcs=True)
     raw_pads = {str(item.get("id")): item for item in legacy.pads if isinstance(item, Mapping)}
     raw_zones = {str(item.get("id")): item for item in legacy.zones if isinstance(item, Mapping)}
     records = []

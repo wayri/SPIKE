@@ -24,7 +24,7 @@ assert.equal(thermalResultOccurrence([base, aliased, repeatedAlias], "native-bla
 assert.equal(thermalResultOccurrence([base, aliased, repeatedAlias], "native-blade-source", "blade-2"), repeatedAlias);
 assert.equal(thermalResultOccurrence([base, aliased], "native-blade-source", "base"), null);
 assert.deepEqual(thermalAssemblyPoint([50, 315, 1.6], blade.transform), [60, 33.4, 115]);
-const frame = thermalOverlayTransform(blade, [50, 35], 2, 0.8, 7);
+const frame = thermalOverlayTransform(blade, [50, 35], [50, 35], 2, 0.8, 7);
 // Cell source (50, 250) and saved native top 1.6 map to the same upright
 // occurrence; layer display offsets must advance along its normal, not world Z.
 const point = thermalAssemblyPoint([0, (35 - 250) * 2, 1.6], frame);
@@ -33,6 +33,18 @@ point.forEach((value, i) => assert.ok(Math.abs(value - expected[i]) < 1e-10));
 const above = thermalAssemblyPoint([0, (35 - 250) * 2, 3.6], frame);
 assert.ok(Math.abs(above[1] - point[1] - 2) < 1e-10);
 assert.ok(Math.abs(above[2] - point[2]) < 1e-10);
+// A solved source board can have a different native centre from the active
+// board that defines the viewport.  Its occurrence must still land at the
+// transformed source coordinate in the active viewport frame.
+const shiftedFrame = thermalOverlayTransform(blade, [50, 257.5], [50, 35], 2, 0.8, 0);
+const shiftedPoint = thermalAssemblyPoint([0, (257.5 - 250) * 2, 1.6], shiftedFrame);
+const shiftedExpectedNative = thermalAssemblyPoint([50, 250, 1.6], blade.transform);
+const shiftedExpected = [
+  (shiftedExpectedNative[0] - 50) * 2,
+  (35 - shiftedExpectedNative[1]) * 2,
+  shiftedExpectedNative[2] * 2,
+];
+shiftedPoint.forEach((value, index) => assert.ok(Math.abs(value - shiftedExpected[index]) < 1e-10));
 const fit = fitThermalAssemblyVolume([base, blade], [50, 35]);
 assert.deepEqual(fit.volume, { x: 130, y: 80, z: 120 });
 assert.equal(fit.extendsBelowDomain, false);

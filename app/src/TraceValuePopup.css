@@ -1,0 +1,22 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.trace-value-popup { position:absolute; z-index:13; width:196px; max-width:calc(100% - 16px); box-sizing:border-box; padding:8px 9px; pointer-events:none; border:1px solid #4f7b82; border-radius:5px; background:rgba(7,18,23,.96); color:#dce8eb; box-shadow:0 8px 24px #0008; font:9px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace; transform:translate(12px,12px); }
+.trace-value-popup::before { content:""; position:absolute; left:-7px; top:-7px; width:10px; height:10px; border:2px solid #ffc35b; border-radius:50%; background:#071217; }
+.trace-value-popup-heading,.trace-value-popup section>div { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; }
+.trace-value-popup-heading strong { overflow:hidden; color:#f3f7f8; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+.trace-value-popup-heading span { flex:none; color:#ffc35b; font-size:7px; letter-spacing:.7px; }
+.trace-value-popup>small { display:block; margin-top:2px; overflow:hidden; color:#829ca5; text-overflow:ellipsis; white-space:nowrap; }
+.trace-value-popup section { margin-top:6px; padding-top:5px; border-top:1px solid #203740; }
+.trace-value-popup section span { color:#7da0aa; }
+.trace-value-popup section b { color:#ffd477; font-size:9px; font-variant-numeric:tabular-nums; }
+.trace-value-popup-graph svg { display:block; width:100%; height:28px; margin-top:3px; background:#0b2028; }
+.trace-value-popup-graph polyline { stroke:#69dfd2; stroke-width:1.25; }
+.trace-value-popup-graph small,.trace-value-popup-no-history { display:block; margin-top:2px; color:#68838c; font-size:7px; }
+.trace-value-popup-range { display:flex; justify-content:space-between; }
+.trace-value-popup-source { display:block; color:#78929b; font-size:7px; }
+.trace-value-popup p { margin:5px 0 0; color:#91a3a9; }
+
+/* Compact cards keep their measurements readable alongside dense board artwork. */
+.trace-value-popup { font-size:11px; }
+.trace-value-popup-heading strong { font-size:12px; }
+.trace-value-popup section b { font-size:11px; }
+.trace-value-popup-graph small,.trace-value-popup-no-history { font-size:10px; }

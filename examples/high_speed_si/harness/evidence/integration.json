@@ -1,0 +1,56 @@
+{
+  "schemas": [
+    "schemas/harness-v1.schema.json",
+    "schemas/harness-pi-request-v1.schema.json",
+    "schemas/harness-pi-result-v1.schema.json",
+    "schemas/harness-si-request-v1.schema.json",
+    "schemas/harness-si-result-v1.schema.json",
+    "schemas/harness-round-wire-rlgc-request-v1.schema.json",
+    "schemas/harness-mtl-request-v1.schema.json"
+  ],
+  "source_coordinates": [
+    {
+      "purpose": "Harness PI desktop panel submits saved document/setup",
+      "path": "app/src/HarnessPiPanel.tsx",
+      "line": 50,
+      "anchor": "contract: \"spike/harness-pi-request/v1\""
+    },
+    {
+      "purpose": "Desktop worker bridge admits PI",
+      "path": "app/src/workerBridge.ts",
+      "line": 87,
+      "anchor": "\"run_harness_pi\""
+    },
+    {
+      "purpose": "Desktop worker bridge admits coupled MTL",
+      "path": "app/src/workerBridge.ts",
+      "line": 90,
+      "anchor": "\"run_harness_mtl\""
+    },
+    {
+      "purpose": "Harness signal panel submits public uniform SI",
+      "path": "app/src/HarnessSignalPanel.tsx",
+      "line": 22,
+      "anchor": "run_harness_si"
+    },
+    {
+      "purpose": "3D view resolves board and connector identities",
+      "path": "app/src/harnessVisualization.ts",
+      "line": 461,
+      "anchor": "Endpoint strings use `board-instance-id::connector-id`"
+    },
+    {
+      "purpose": "3D view consumes serialized route",
+      "path": "app/src/harnessVisualization.ts",
+      "line": 529,
+      "anchor": "Array.isArray(routing.route_mm)"
+    },
+    {
+      "purpose": "CLI exposes harness PI",
+      "path": "python/spike_core/cli.py",
+      "line": 1446,
+      "anchor": "harness-pi\", help="
+    }
+  ],
+  "gui_scope": "PI authoring/result and 3D conductor picking are integrated; coupled MTL is callable through the registered worker bridge but has no dedicated MTL report panel."
+}

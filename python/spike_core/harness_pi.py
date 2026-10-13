@@ -8,12 +8,13 @@ draw their specified amperes from positive to negative, including the return wir
 from __future__ import annotations
 
 import hashlib
+import copy
 import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from .harness import compile_harness, terminal_key, validate_harness
+from .harness import analyze_harness, compile_harness, terminal_key, validate_harness
 from .native_mna import run_native_mna
 
 REQUEST_CONTRACT = "spike/harness-pi-request/v1"
@@ -21,6 +22,34 @@ RESULT_CONTRACT = "spike/harness-pi-result/v1"
 MAX_ELEMENTS = 4096
 MAX_NODES = 1024
 MAX_BYTES = 8 * 1024 * 1024
+
+
+def _selected_harness(harness, selected_ids):
+    """Project explicit wire selection without inferring a role-based circuit."""
+    selected = set(selected_ids)
+    known = {wire["id"] for wire in harness["wires"]}
+    if selected - known:
+        raise ValueError("HARNESS_PI_SELECTION: wire_ids contains an unknown wire.")
+    subset = copy.deepcopy(harness)
+    subset["wires"] = [wire for wire in subset["wires"] if wire["id"] in selected]
+    for wire in subset["wires"]:
+        if "return_wire_id" in wire and wire["return_wire_id"] not in selected:
+            raise ValueError("HARNESS_PI_SELECTION: selected wire is missing its explicit return reference.")
+    subset["pairs"] = [pair for pair in subset.get("pairs", []) if set(pair["wire_ids"]) <= selected]
+    cables = []
+    for cable in subset["cables"]:
+        cable["wire_ids"] = [key for key in cable["wire_ids"] if key in selected]
+        if cable["wire_ids"]:
+            cables.append(cable)
+    subset["cables"] = cables
+    endpoints = {terminal_key(w[end]) for w in subset["wires"] for end in ("from", "to")}
+    references = {terminal_key(w["electrical"]["reference"]) for w in subset["wires"] if "reference" in w.get("electrical", {})}
+    subset["splices"] = [s for s in subset["splices"] if terminal_key({"splice": s["id"]}) in endpoints | references]
+    for connector in subset["connectors"]:
+        for pin in connector["pins"]:
+            if terminal_key({"connector": connector["id"], "pin": pin["id"]}) not in endpoints:
+                pin.pop("required", None)  # An excluded wire is not an open in the selected model.
+    return subset
 
 
 def compile_harness_pi(raw):
@@ -33,6 +62,10 @@ def compile_harness_pi(raw):
     if error:
         raise ValueError(f"Invalid harness PI request at {list(error.path)}: {error.message}")
     harness = validate_harness(raw["harness"])
+    harness_digest = analyze_harness(harness)["harness_digest"]
+    selected_ids = raw.get("wire_ids", [wire["id"] for wire in harness["wires"]])
+    selected_set = set(selected_ids)
+    excluded_ids = [wire["id"] for wire in harness["wires"] if wire["id"] not in selected_set]
     if sum(len(c["pins"]) for c in harness["connectors"]) + len(harness["splices"]) > MAX_NODES:
         raise ValueError("Harness PI terminal inventory exceeds node limit.")
     if len(harness["wires"]) > MAX_ELEMENTS:
@@ -48,7 +81,7 @@ def compile_harness_pi(raw):
         return key
 
     ground = bind(raw["ground"])
-    fragment = compile_harness(harness)
+    fragment = compile_harness(_selected_harness(harness, selected_ids) if "wire_ids" in raw else harness)
     elements = []
     for original in fragment["elements"]:
         element = dict(original)
@@ -99,7 +132,8 @@ def compile_harness_pi(raw):
             pending.extend(adjacent.get(node, set()) - seen)
     if ground not in nodes or nodes - seen:
         raise ValueError("Harness PI has a floating circuit or missing explicit conductive return to ground.")
-    return {"request_digest": hashlib.sha256(encoded).hexdigest(), "harness_digest": fragment["harness_digest"],
+    return {"request_digest": hashlib.sha256(encoded).hexdigest(), "harness_digest": harness_digest,
+            "selected_wire_ids": list(selected_ids), "excluded_wire_ids": excluded_ids,
             "bindings": bindings, "native_request": {"contract": "spike/native-mna-request/v1", "ground_node": ground,
             "analysis": {"mode": "operating_point"}, "elements": elements,
             "resource_limits": {"linear_backend": "scipy-superlu", "memory_limit_gb": 2}}}
@@ -118,6 +152,7 @@ def run_harness_pi(raw, *, cancel_check=None):
     result = {"contract": RESULT_CONTRACT, "status": native["status"], "model_status": "experimental",
               "production_qualified": False, "request_digest": compiled["request_digest"],
               "harness_digest": compiled["harness_digest"], "native_result": native,
+              "selected_wire_ids": compiled["selected_wire_ids"], "excluded_wire_ids": compiled["excluded_wire_ids"],
               "limitations": ["Lumped linear DC only; no PCB copper, board field coupling, connector heating or SI qualification.",
                               "Contact resistance is explicit per mated pin pair; dimensions do not determine contact resistance.",
                               "Capacitors are open and inductors have zero DC drop; SI metadata is retained in the input, not solved."]}

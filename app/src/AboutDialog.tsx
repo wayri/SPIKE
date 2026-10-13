@@ -21,7 +21,7 @@ export default function AboutDialog({ onClose, onOpenGuide, onOpenValidation }: 
   }, []);
 
   useEffect(() => {
-    const key = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
+    const key = (event: KeyboardEvent) => { if (document.querySelector(".about-shade")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
   }, [onClose]);

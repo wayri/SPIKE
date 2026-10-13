@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/pcb-electrothermal-geometry-request-v1.schema.json",
+  "title": "SPIKE generated PCB mesh electrothermal binding",
+  "description": "SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic. Binds an already generated mesh, not a CAD generator. Semantic admission checks complete material/source coverage, mesh geometry, topology and budgets. Digests are declared source references, not authenticated evidence.",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "occurrence_id", "reference_id", "source_sha256", "stack_binding", "material_map", "mesh"],
+  "properties": {
+    "contract": {"const": "spike/pcb-electrothermal-geometry-request/v1"},
+    "occurrence_id": {"$ref": "#/$defs/id"},
+    "reference_id": {"$ref": "#/$defs/id"},
+    "source_sha256": {"$ref": "#/$defs/digest"},
+    "stack_binding": {"type": "object", "additionalProperties": false, "required": ["id", "source_sha256"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "source_sha256": {"$ref": "#/$defs/digest"}}},
+    "material_map": {"type": "object", "minProperties": 1, "maxProperties": 1024,
+      "propertyNames": {"$ref": "#/$defs/id"}, "additionalProperties": {"$ref": "#/$defs/id"}},
+    "mesh": {"allOf": [{"$ref": "solver-mesh-v1.schema.json"}], "properties": {
+      "vertices": {"minItems": 4, "maxItems": 100000},
+      "cells": {"minItems": 1, "maxItems": 100000, "items": {
+        "required": ["material_id"], "properties": {
+          "kind": {"const": "tetrahedron"}, "vertices": {"minItems": 4, "maxItems": 4}
+        }
+      }}
+    }}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

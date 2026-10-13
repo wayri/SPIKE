@@ -1,3 +1,6 @@
+import type { StudioFeedbackFrame } from "./studioFeedback";
+import StudioFeedbackPanel from "./StudioFeedbackPanel";
+import StudioBoardCircuitView from "./BoardCircuitStudioPanel";
 import {
   AlertTriangle, Boxes, CircuitBoard, FileOutput, FolderOpen, Link2, ListChecks,
   Network, Play, Plus, Search, ShieldCheck, Trash2, X,
@@ -16,9 +19,8 @@ import {
 import { openNativeTextFile, runLocalWorker, saveNativeTextFile } from "./workerBridge";
 import type { AssemblyAnalysisScope, AssemblyWorkload } from "./assemblyAdmission";
 import DataTable from "./DataTable";
-import { useModalFocusScope } from "./modalFocusScope";
 
-type Page = "setup" | "models" | "assignments" | "parasitics" | "run";
+type Page = "feedback" | "board" | "setup" | "models" | "assignments" | "parasitics" | "run";
 type RunEngine = "native_mna" | "peec_mna" | "owned_spice" | "ngspice";
 const numberOrZero = (value: string) => Number.isFinite(Number(value)) ? Number(value) : 0;
 const humanize = (value: string | undefined) => value?.replace(/_/g, " ") ?? "";
@@ -36,7 +38,7 @@ const ownedLimits = {
 };
 
 export default function SpiceWorkbench({
-  design, board, selection, workspace, setWorkspace, analysisResult, onRequireAdmission, onResult, onStatus, onClose, initialEngine = "native_mna",
+  design, board, selection, workspace, setWorkspace, analysisResult, onRequireAdmission, onResult, onStatus, onClose, initialEngine = "native_mna", onBoardSelect, boardOccurrenceId,
 }: {
   design: Record<string, unknown> | null;
   board: ParsedBoard | null;
@@ -49,8 +51,10 @@ export default function SpiceWorkbench({
   onStatus: (message: string) => void;
   onClose: () => void;
   initialEngine?: RunEngine;
+  boardOccurrenceId?: string;
+  onBoardSelect?: (value:BoardObject)=>void;
 }) {
-  const [page, setPage] = useState<Page>("setup");
+  const [page, setPage] = useState<Page>(board ? "board" : "setup");
   const [query, setQuery] = useState("");
   const [selectedModelId, setSelectedModelId] = useState(workspace.models[0]?.id ?? "");
   const [selectedComponentRef, setSelectedComponentRef] = useState(selection?.ref ?? board?.components[0]?.ref ?? "");
@@ -64,7 +68,8 @@ export default function SpiceWorkbench({
   const [ownedProbeText, setOwnedProbeText] = useState("");
   const [ownedResult, setOwnedResult] = useState<OwnedCircuitResult | null>(null);
   const [running, setRunning] = useState(false);
-  const modal = useModalFocusScope(onClose, running);
+  const [feedbackBusy, setFeedbackBusy] = useState(false);
+  const [feedbackFrame, setFeedbackFrame] = useState<StudioFeedbackFrame|null>(null);
   const workspaceRef = useRef(workspace);
   const activeRunId = useRef<string | null>(null);
   const [diagnostic, setDiagnostic] = useState("Compose the workspace to validate models, pin mappings, parasitic endpoints, and analysis limits.");
@@ -77,7 +82,7 @@ export default function SpiceWorkbench({
   useEffect(() => { workspaceRef.current = workspace; }, [workspace]);
   useEffect(() => () => { activeRunId.current = null; }, []);
   const set = (patch: Partial<SpiceWorkspace>) => {
-    if (activeRunId.current) { setDiagnostic("Workspace editing is locked while a circuit run is active."); return; }
+    if (activeRunId.current || feedbackBusy) { setDiagnostic("Workspace editing is locked while a circuit run is active."); return; }
     setWorkspace({ ...workspace, ...patch }); setPreview(null); setOwnedResult(null);
   };
   const patchModel = (patch: Partial<SpiceModel>) => {
@@ -334,13 +339,13 @@ export default function SpiceWorkbench({
   };
 
   const pages: { id: Page; label: string; icon: typeof CircuitBoard }[] = [
-    { id: "setup", label: "Circuit", icon: Network }, { id: "models", label: "Models", icon: Boxes },
+    { id: "feedback", label: "Feedback", icon: Network }, { id: "board", label: "Board circuit", icon: CircuitBoard }, { id: "setup", label: "Circuit", icon: Network }, { id: "models", label: "Models", icon: Boxes },
     { id: "assignments", label: "Parts & pins", icon: Link2 }, { id: "parasitics", label: "Parasitics", icon: CircuitBoard },
     { id: "run", label: "Validate & run", icon: ListChecks },
   ];
   const analysis = workspace.analysis;
-  return <div className="modal-shade"><section ref={modal.scopeRef} onKeyDown={modal.onKeyDown} tabIndex={-1} className="spice-workbench spice-assistant" role="dialog" aria-modal="true" aria-label="SPICE model assistant" data-guide="circuit-workspace">
-    <header><div><CircuitBoard size={18} /><span><b>SPICE MODEL ASSISTANT</b><small>{workspace.contract} | shared PI / SI circuit co-simulation</small></span></div><button type="button" data-modal-initial-focus className="canvas-icon" disabled={running} onClick={onClose} aria-label="Close SPICE model assistant"><X size={16} /></button></header>
+  return <div className="modal-shade" role="dialog" aria-modal="true" aria-label="SPIKES Studio board simulation workbench"><section className="spice-workbench spice-assistant" data-guide="circuit-workspace">
+    <header><div><CircuitBoard size={18} /><span><b>SPIKES STUDIO · BOARD SIMULATION</b><small>{workspace.contract} | board circuit, model assignments and feedback</small></span></div><button className="canvas-icon" disabled={running || feedbackBusy} onClick={onClose}><X size={16} /></button></header>
     <div className="spice-toolbar">
       {pages.map(item => { const Icon = item.icon; return <button key={item.id} className={page === item.id ? "active" : ""} onClick={() => setPage(item.id)}><Icon size={13} />{item.label}</button>; })}
       <button onClick={() => void importSubcircuit()}><FolderOpen size={13} /> Import model</button>
@@ -349,6 +354,8 @@ export default function SpiceWorkbench({
     </div>
 
     <div className="spice-assistant-body">
+      <div className="studio-board-page" hidden={page !== "feedback"}><StudioFeedbackPanel board={board} design={design} workspace={workspace} onWorkspace={setWorkspace} onFrame={setFeedbackFrame} onBusy={setFeedbackBusy} onRequireAdmission={onRequireAdmission} onStatus={onStatus}/></div>
+      <div className="studio-board-page" hidden={page !== "board"}><StudioBoardCircuitView feedbackFrame={feedbackFrame} occurrenceId={boardOccurrenceId} board={board} design={design} workspace={workspace} onWorkspace={setWorkspace} onSelect={onBoardSelect} onStatus={onStatus} onEditPins={ref=>{setSelectedComponentRef(ref);const assignment=workspace.assignments.find(row=>row.component_ref===ref);if(assignment)setSelectedAssignmentId(assignment.id);setPage("assignments");}}/></div>
       {page === "setup" && <section className="spice-setup-page">
         <div className="spice-section-heading"><div><b>Circuit definition</b><small>Choose domain, reference node, and analysis. Models and pin maps remain shared between PI and SI.</small></div></div>
         <div className="spice-form-grid">
@@ -404,6 +411,6 @@ export default function SpiceWorkbench({
       {page === "run" && <section className="spice-run-page"><div className="spice-run-controls"><label>Engine<select value={runEngine} disabled={running} onChange={event => setRunEngine(event.target.value as RunEngine)}><option value="native_mna">SPIKE native MNA (linear)</option><option value="peec_mna">Iterative PEEC + native MNA (experimental)</option><option value="owned_spice">SPIKES backend (experimental)</option><option value="ngspice">External ngspice (nonlinear/subcircuits)</option></select></label><button disabled={running} onClick={() => void compose()}><ListChecks size={13} /> Compose & validate</button><button disabled={running || !ownedResult} onClick={() => void exportOwnedResult()}><FileOutput size={13} /> Export circuit result</button><label>Timeout <input type="number" min={1} max={3600} disabled={running || runEngine === "owned_spice"} value={timeout} onChange={event => setTimeoutValue(Math.max(1, Math.min(3600, Number(event.target.value))))} /> s</label><label><input type="checkbox" checked={overlayEnabled} disabled={running} onChange={event => setOverlayEnabled(event.target.checked)} /> Viewport vector</label><input value={overlayVector} disabled={!overlayEnabled || runEngine !== "ngspice" || running} onChange={event => setOverlayVector(event.target.value)} placeholder="v(out)" /><select value={overlayQuantity} disabled={!overlayEnabled || runEngine !== "ngspice" || running} onChange={event => setOverlayQuantity(event.target.value)}><option value="voltage_v">Voltage</option><option value="voltage_drop_v">Voltage drop</option><option value="current_a">Current</option><option value="current_density_a_mm2">Current density</option></select></div>{runEngine === "owned_spice" && <div className="spice-owned-controls"><label>Explicit probe descriptors (one per line, session-only)<textarea value={ownedProbeText} disabled={running} onChange={event => setOwnedProbeText(event.target.value)} placeholder={"V(out)\nV(vplus,vminus)\nI(V1)\nP(V1)"} /></label><small>Commas are retained inside differential descriptors. Probe text and results are session-only; the reviewed workspace itself persists with the project. The SPIKES backend accepts only this workspace, not raw netlists or caller-selected libraries. Up to 256 probes, 2 MiB netlist, and 64 MiB result; it has no caller timeout control. Results remain circuit data and are never mapped onto the board.</small></div>}{preview && <div className={`spice-validation-summary ${preview.status}`}><b>{preview.status === "ready" ? "NETLIST READY" : "NETLIST BLOCKED"}</b><span>{preview.validation.issues.length} errors | {preview.validation.warnings.length} warnings | {preview.validation.model_status}</span></div>}<div className="spice-run-layout"><textarea readOnly spellCheck={false} value={preview?.netlist ?? "Compose the workspace to generate the deterministic self-contained netlist."} aria-label="Generated SPICE netlist" /><aside>{runEngine === "native_mna" && <p>Native MNA supports reviewed linear R, L, C, independent sources, dependent sources, operating point, AC, and transient analyses.</p>}{runEngine === "peec_mna" && <p>Experimental fixed-point coupling requires reviewed PEEC RLCG records from one current extraction. Topology changes and inferred endpoints are blocked.</p>}{runEngine === "owned_spice" && <p>The SPIKES backend route is structured-workspace-only and experimental. It validates the exact probe set before execution, records the composed-netlist digest, and has no caller timeout control.</p>}{runEngine === "ngspice" && <p>External ngspice runs the composed netlist for nonlinear devices and reviewed subcircuits.</p>}{[...(preview?.validation.issues ?? []), ...(preview?.validation.warnings ?? [])].map((issue, index) => <div key={`${issue.code}-${index}`} className={issue.severity}><AlertTriangle size={13} /><span><b>{issue.code}</b>{issue.message}<small>{issue.path}</small></span></div>)}{preview && !preview.validation.issues.length && !preview.validation.warnings.length && <p>No workspace validation issues.</p>}<OwnedCircuitResultView result={ownedResult} /></aside></div></section>}
     </div>
     <div className="spice-diagnostic">{diagnostic}</div>
-    <footer><span>{selection?.position ? `Viewport binding: ${selection.name} at ${selection.position[0].toFixed(3)}, ${selection.position[1].toFixed(3)} mm` : "No viewport point selected. Model and pin assignments remain project data."}</span><button className="run-btn" onClick={() => void run()} disabled={running}><Play size={14} />{running ? "Running..." : `Run ${runEngineLabel[runEngine]}`}</button></footer>
+    <footer><span>{selection?.position ? `Viewport binding: ${selection.name} at ${selection.position[0].toFixed(3)}, ${selection.position[1].toFixed(3)} mm` : "No viewport point selected. Model and pin assignments remain project data."}</span><button className="run-btn" onClick={() => void run()} disabled={running || feedbackBusy}><Play size={14} />{running ? "Running..." : `Run ${runEngineLabel[runEngine]}`}</button></footer>
   </section></div>;
 }

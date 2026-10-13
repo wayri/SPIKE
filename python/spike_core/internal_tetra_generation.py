@@ -40,19 +40,44 @@ def _det3(rows):
 
 
 def _det4(rows):
-    return sum((-1 if j % 2 else 1) * rows[0][j] *
-               _det3([[row[k] for k in range(4) if k != j] for row in rows[1:]])
-               for j in range(4))
+    # Expand the same four cofactors without allocating their submatrices.
+    # Preserve each minor's arithmetic order and the outer sum (including
+    # compensated float summation on Python versions that provide it).
+    a, b, c, d = rows
+    return sum((
+        a[0] * (b[1]*(c[2]*d[3]-c[3]*d[2]) -
+                b[2]*(c[1]*d[3]-c[3]*d[1]) + b[3]*(c[1]*d[2]-c[2]*d[1])),
+        -a[1] * (b[0]*(c[2]*d[3]-c[3]*d[2]) -
+                 b[2]*(c[0]*d[3]-c[3]*d[0]) + b[3]*(c[0]*d[2]-c[2]*d[0])),
+        a[2] * (b[0]*(c[1]*d[3]-c[3]*d[1]) -
+                b[1]*(c[0]*d[3]-c[3]*d[0]) + b[3]*(c[0]*d[1]-c[1]*d[0])),
+        -a[3] * (b[0]*(c[1]*d[2]-c[2]*d[1]) -
+                 b[1]*(c[0]*d[2]-c[2]*d[0]) + b[2]*(c[0]*d[1]-c[1]*d[0])),
+    ))
 
 
 def _sign(value):
     return (value > 0) - (value < 0)
 
 
+def _sphere_determinant(points, cell, point):
+    """Lift differences with the original norm summation order."""
+    origin = points[point]
+    rows = []
+    for index in cell:
+        vertex = points[index]
+        x, y, z = vertex[0]-origin[0], vertex[1]-origin[1], vertex[2]-origin[2]
+        rows.append((x, y, z, sum((x*x, y*y, z*z))))
+    return _det4(rows)
+
+
 class _Predicates:
     def __init__(self, points, ranks):
         self.points = points
         self.exact = [tuple(Fraction(x) for x in p) for p in points]
+        # Coordinates are immutable throughout one generation. This O(n)
+        # metadata avoids repeatedly scanning every coordinate of each cell.
+        self.magnitudes = [max(1., *(abs(x) for x in p)) for p in points]
         self.ranks = ranks
         self.calls = self.fallbacks = self.ties = 0
 
@@ -72,7 +97,7 @@ class _Predicates:
     def orientation(self, ids):
         self._count()
         value = self._orientation_value(ids)
-        magnitude = max(1., *(abs(x) for i in ids for x in self.points[i]))
+        magnitude = max(self.magnitudes[i] for i in ids)
         # Six degree-three monomials have magnitude <= (2M)^3. A deliberately
         # loose gamma_32 arithmetic bound is below 4096 eps M^3; M >= 1 also
         # covers absolute subnormal rounding error. Never use an uncertain sign.
@@ -84,15 +109,10 @@ class _Predicates:
     def sphere(self, cell, point, symbolic=True):
         """Positive means inside the sphere of a positively oriented cell."""
         self._count()
-        ids = (*cell, point)
-
-        def determinant(points):
-            p = points[point]
-            rows = [[points[i][k]-p[k] for k in range(3)] for i in cell]
-            return _det4([row + [sum(x*x for x in row)] for row in rows])
-
-        value = determinant(self.points)
-        magnitude = max(1., *(abs(x) for i in ids for x in self.points[i]))
+        value = _sphere_determinant(self.points, cell, point)
+        magnitudes = self.magnitudes
+        magnitude = max(magnitudes[cell[0]], magnitudes[cell[1]], magnitudes[cell[2]],
+                        magnitudes[cell[3]], magnitudes[point])
         # Expansion has 72 degree-five monomials, each bounded by (2M)^5.
         # A loose gamma_128 bound on the expanded arithmetic is below
         # 2^20 eps M^5, including input subtraction error. M >= 1 also covers
@@ -101,10 +121,11 @@ class _Predicates:
         if abs(value) > 2**20 * sys.float_info.epsilon * magnitude**5:
             return -_sign(value)
         self._count(exact=True)
-        value = determinant(self.exact)
+        value = _sphere_determinant(self.exact, cell, point)
         if value or not symbolic:
             return -_sign(value)
         self.ties += 1
+        ids = (*cell, point)
         # Lift height h_i = |x_i|^2 - epsilon^(rank_i+1). The first nonzero
         # height-column cofactor is the exact lexicographic sign. Its minor
         # is minus the orientation of the remaining four ordered vertices.

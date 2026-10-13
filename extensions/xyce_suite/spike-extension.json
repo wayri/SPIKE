@@ -1,0 +1,394 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.xyce-suite",
+  "name": "Xyce Circuit Suite",
+  "version": "0.1.0",
+  "provider": "SPIKE",
+  "description": "Separately installed serial Xyce native netlists, syntax checks and bounded CSV waveforms. Experimental.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "experimental",
+  "license": "Apache-2.0",
+  "bundled": true,
+  "permissions": [
+    "results.write",
+    "design.read"
+  ],
+  "limits": {
+    "timeout_seconds": 360,
+    "max_result_bytes": 8388608
+  },
+  "ui": {
+    "menu_bar": true,
+    "title_bar": true,
+    "menu_items": [
+      "xyce-circuit"
+    ]
+  },
+  "contributes": {
+    "applications": [
+      {
+        "id": "xyce-circuit",
+        "name": "Xyce circuit setup",
+        "category": "Circuit",
+        "description": "Native Xyce circuit workflow; experimental and separately installed.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare",
+                "validate",
+                "run",
+                "inspect",
+                "cancel"
+              ]
+            },
+            "netlist": {
+              "type": "string"
+            },
+            "libraries": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "text"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "case_id": {
+              "type": "string"
+            },
+            "engine_options": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "executable": {
+                  "type": "string"
+                },
+                "timeout_seconds": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 300
+                },
+                "memory_limit_mib": {
+                  "type": "integer",
+                  "minimum": 64,
+                  "maximum": 8192
+                }
+              }
+            }
+          }
+        },
+        "workspace_routes": [
+          {
+            "id": "xyce-pi",
+            "workspace": "pi",
+            "operation": "solve",
+            "label": "Xyce native circuit",
+            "model_status": "experimental",
+            "setup_contribution_id": "xyce-circuit",
+            "compatible_solver_ids": []
+          },
+          {
+            "id": "xyce-si",
+            "workspace": "si",
+            "operation": "solve",
+            "label": "Xyce native circuit",
+            "model_status": "experimental",
+            "setup_contribution_id": "xyce-circuit",
+            "compatible_solver_ids": []
+          }
+        ]
+      },
+      {
+        "id": "xyce-validate",
+        "name": "Validate Xyce netlist",
+        "category": "Circuit",
+        "description": "Native Xyce circuit workflow; experimental and separately installed.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare",
+                "validate",
+                "run",
+                "inspect",
+                "cancel"
+              ]
+            },
+            "netlist": {
+              "type": "string"
+            },
+            "libraries": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "text"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "case_id": {
+              "type": "string"
+            },
+            "engine_options": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "executable": {
+                  "type": "string"
+                },
+                "timeout_seconds": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 300
+                },
+                "memory_limit_mib": {
+                  "type": "integer",
+                  "minimum": 64,
+                  "maximum": 8192
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "xyce-run",
+        "name": "Run Xyce circuit",
+        "category": "Circuit",
+        "description": "Native Xyce circuit workflow; experimental and separately installed.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare",
+                "validate",
+                "run",
+                "inspect",
+                "cancel"
+              ]
+            },
+            "netlist": {
+              "type": "string"
+            },
+            "libraries": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "text"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "case_id": {
+              "type": "string"
+            },
+            "engine_options": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "executable": {
+                  "type": "string"
+                },
+                "timeout_seconds": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 300
+                },
+                "memory_limit_mib": {
+                  "type": "integer",
+                  "minimum": 64,
+                  "maximum": 8192
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "xyce-inspect",
+        "name": "Inspect Xyce case",
+        "category": "Circuit",
+        "description": "Native Xyce circuit workflow; experimental and separately installed.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare",
+                "validate",
+                "run",
+                "inspect",
+                "cancel"
+              ]
+            },
+            "netlist": {
+              "type": "string"
+            },
+            "libraries": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "text"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "case_id": {
+              "type": "string"
+            },
+            "engine_options": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "executable": {
+                  "type": "string"
+                },
+                "timeout_seconds": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 300
+                },
+                "memory_limit_mib": {
+                  "type": "integer",
+                  "minimum": 64,
+                  "maximum": 8192
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "xyce-cancel",
+        "name": "Cancel Xyce case",
+        "category": "Circuit",
+        "description": "Native Xyce circuit workflow; experimental and separately installed.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare",
+                "validate",
+                "run",
+                "inspect",
+                "cancel"
+              ]
+            },
+            "netlist": {
+              "type": "string"
+            },
+            "libraries": {
+              "type": "array",
+              "maxItems": 32,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "text"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "case_id": {
+              "type": "string"
+            },
+            "engine_options": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "executable": {
+                  "type": "string"
+                },
+                "timeout_seconds": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 300
+                },
+                "memory_limit_mib": {
+                  "type": "integer",
+                  "minimum": 64,
+                  "maximum": 8192
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

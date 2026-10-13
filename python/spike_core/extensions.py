@@ -263,7 +263,7 @@ class ProcessExtension:
             # Standard OS locations allow installed optional runtimes and SPIKE
             # registrations to be discovered. Do not copy arbitrary environment
             # variables (tokens, Python paths, or application credentials).
-            for key in ("USERPROFILE", "LOCALAPPDATA", "APPDATA", "ProgramFiles", "ProgramFiles(x86)", "HOME", "XDG_STATE_HOME", "XDG_DATA_HOME", "SPIKE_STATE_HOME", "OPENEMS_INSTALL_PATH", "SPIKE_OPENEMS_PYTHON", "SPIKE_EMERGE_PYTHON", "SPIKE_OPTYCAL_PYTHON"):
+            for key in ("USERPROFILE", "LOCALAPPDATA", "APPDATA", "ProgramFiles", "ProgramFiles(x86)", "HOME", "XDG_STATE_HOME", "XDG_DATA_HOME", "SPIKE_STATE_HOME", "OPENEMS_INSTALL_PATH", "SPIKE_OPENEMS_PYTHON", "SPIKE_EMERGE_PYTHON", "SPIKE_OPTYCAL_PYTHON", "SPIKE_CALCULIX_EXECUTABLE", "SPIKE_XYCE_EXECUTABLE", "SPIKE_PALACE_EXECUTABLE", "SPIKE_SU2_CFD", "SU2_RUN"):
                 if os.environ.get(key):
                     environment[key] = os.environ[key]
             try:
@@ -306,6 +306,12 @@ class ProcessExtension:
                     expected_spec_digest=mesh_binding["analysis_spec_digest_sha256"] if mesh_binding else None)
                 payload = {**payload, "data": {**data, "analysis_result": admitted,
                                                 "input_design_sha256": binding["digest_sha256"]}}
+            if self.manifest.id == "spike.calculix-suite" and contribution_id == "calculix-thermal-run":
+                from .calculix_thermal import verify_calculix_thermal_result
+                parameters = filtered_context.get("parameters", {})
+                data = payload.get("data", {})
+                admitted = verify_calculix_thermal_result(parameters["request"], parameters["problem"], data.get("result"))
+                payload = {**payload, "data": {**data, "result": admitted}}
             return payload
 
 

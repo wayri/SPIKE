@@ -15,6 +15,8 @@ export const viewportResultField = (mode: string): ViewportResultField => {
     case "power_loss": return { key: "power_loss_w", label: "Copper power loss", unit: "W" };
     case "via_stress": return { key: "via_current_density_a_mm2", label: "Via current density", unit: "A/mm2" };
     case "impedance": return { key: "operating_point_impedance_ohm", label: "PI impedance |V/I|", unit: "ohm" };
+    case "electric_field": return { key:"electric_field", label:"Electric field magnitude", unit:"V/m" };
+    case "magnetic_field": return { key:"magnetic_field", label:"Magnetic field magnitude", unit:"A/m" };
     default: return { key: mode, label: mode, unit: "" };
   }
 };

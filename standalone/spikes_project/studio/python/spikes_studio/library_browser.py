@@ -6,6 +6,7 @@ import math
 import re
 import shlex
 from .component_catalog import native_recipe,FAMILIES
+from .fuzzy_search import score
 
 SORTS=('Name','Category','Family','Primary value','Execution')
 
@@ -18,7 +19,7 @@ def primary(record):
 class CatalogIndex:
     def __init__(self,records):
         self.records=records;self.by_id={r['id']:r for r in records};self.cache=OrderedDict()
-        self.text={r['id']:' '.join(str(r.get(k,'') or '') for k in ('id','name','category','family','status','parameter_unit','manufacturer','qualification','fidelity')).casefold() for r in records}
+        self.text={r['id']:' '.join(str(r.get(k,'') or '') for k in ('id','name','category','family','status','parameter_unit','manufacturer','qualification','fidelity','package_code','construction','passive_kind')).casefold() for r in records}
         self.values={r['id']:primary(r) for r in records}
 
     def query(self,text='',category=None,family=None,status=None,unit=None,minimum=None,maximum=None,sort='Name',descending=False,favorites=(),only_favorites=False,recent=()):
@@ -36,24 +37,30 @@ class CatalogIndex:
             field,value=term.split(':',1) if ':' in term else ('',term)
             if field and field not in ('family','category','status','unit','id','manufacturer','qualification','fidelity'):raise ValueError('Search fields: family:, category:, status:, unit:, id:, manufacturer:, qualification:, fidelity:')
             predicates.append((exclude,'parameter_unit' if field=='unit' else field,value))
+        costs={}
         def match(r):
             if category and r['category']!=category or family and r['family']!=family or status and r['status']!=status or unit and r['parameter_unit']!=unit:return False
             if only_favorites and r['id'] not in favorites or recent and r['id'] not in recent:return False
             value=self.values[r['id']]
             if minimum is not None and value<minimum or maximum is not None and value>maximum:return False
             for exclude,field,term in predicates:
-                contains=term in (str(r.get(field,'')).casefold() if field else self.text[r['id']])
+                candidate=str(r.get(field,'')).casefold() if field else self.text[r['id']]
+                fuzzy=not field and not exclude and ' ' not in term
+                cost=score(candidate,term) if fuzzy else None
+                contains=(cost is not None) if fuzzy else term in candidate
                 if contains==exclude:return False
+                if cost is not None:costs[r['id']]=costs.get(r['id'],0)+cost
             return True
         result=[r for r in self.records if match(r)]
         field={'Name':'name','Category':'category','Family':'family','Execution':'status'}.get(sort)
         result.sort(key=lambda r:((str(r[field]).casefold() if field else (r['parameter_unit'],self.values[r['id']])),r['id']),reverse=descending)
+        result.sort(key=lambda r:costs.get(r['id'],0))
         self.cache[key]=tuple(result)
         if len(self.cache)>32:self.cache.popitem(last=False)
         return result
 
 
-def insertion_plan(document,record,mapping,*,count=1,x=140,y=180,spacing=220):
+def insertion_plan(document,record,mapping,*,count=1,x=140,y=180,spacing=220,primitive=False):
     """{n} in a node name expands to its 1-based instance index.
 
     Nodes without {n} are intentionally shared. No guessed parallel wiring.
@@ -68,12 +75,15 @@ def insertion_plan(document,record,mapping,*,count=1,x=140,y=180,spacing=220):
         if not isinstance(node,str) or not re.fullmatch(r'[A-Za-z0-9_.$:/+-]{1,128}',node.replace('{n}','1')):raise ValueError('Invalid node name; only {n} is expanded for per-instance nets')
     source=document.data['source'];suffix=hashlib.sha256(model['source'].encode()).hexdigest()[:12];name=model['name']+'_'+suffix
     definitions=re.search(r'(?im)^\.subckt\s+'+re.escape(name)+r'\s',source)
-    insertion='' if definitions else model['source'].replace(model['name'],name)
-    occupied=set(re.findall(r'(?im)^\s*(X\S+)\s',source));occupied={s.upper() for s in occupied};refs=[];number=1
+    plain=primitive and not record.get('model_type') and record['family'] in ('resistor','capacitor','inductor','termination','cable')
+    insertion='' if plain or definitions else model['source'].replace(model['name'],name)
+    occupied=set(re.findall(r'(?im)^\s*([RXCL]\S+)\s',source));occupied={s.upper() for s in occupied};refs=[];number=1
     for i in range(count):
-        while f'XCAT{number}' in occupied:number+=1
-        ref=f'XCAT{number}';refs.append(ref);occupied.add(ref)
-        insertion+=ref+' '+' '.join(mapping[p].replace('{n}',str(i+1)) for p in model['pins'])+' '+name+'\n'
+        prefix={'capacitor':'C','inductor':'L'}.get(record['family'],'R')+'NEW' if plain else 'XCAT'
+        while f'{prefix}{number}' in occupied:number+=1
+        ref=f'{prefix}{number}';refs.append(ref);occupied.add(ref)
+        value=record['parameters'][{'capacitor':'c','inductor':'l'}.get(record['family'],'r')] if plain else None
+        insertion+=ref+' '+' '.join(mapping[p].replace('{n}',str(i+1)) for p in model['pins'])+' '+(f'{value:.17g}' if plain else name)+'\n'
     changed=re.sub(r'(?im)^\s*\.end\s*$',lambda m:insertion+'.end',source)
     if changed==source:changed=source.rstrip()+'\n'+insertion+'.end\n'
     candidate=Document(document.data);candidate.apply_source(changed)
@@ -88,7 +98,9 @@ def insertion_plan(document,record,mapping,*,count=1,x=140,y=180,spacing=220):
         group=groups[ref]
         for j,part in enumerate(group):
             part['x']=x+(index%columns)*group_width+(j%2)*140;part['y']=y+(index//columns)*(180+80*len(group))+(j//2)*130
-    return {'source':candidate.data['source'],'components':candidate.data['components'],'title':candidate.data['title'],'refs':refs,'model':name}
+    plan={'source':candidate.data['source'],'components':candidate.data['components'],'title':candidate.data['title'],'refs':refs,'model':name}
+    if record.get('model_type'):plan['passive_model']={'record':deepcopy(record),'compiled_source_sha256':hashlib.sha256(model['source'].encode()).hexdigest()}
+    return plan
 
 
 def apply_insertion(document,plan,record_id):
@@ -96,6 +108,7 @@ def apply_insertion(document,plan,record_id):
         for key in ('source','components','title'):data[key]=deepcopy(plan[key])
         preferences=data['metadata'].setdefault('library_browser',{})
         preferences['recent']=[record_id]+[i for i in preferences.get('recent',[]) if i!=record_id][:49]
+        if 'passive_model' in plan:data['metadata'].setdefault('passive_models',{})[plan['model']]=deepcopy(plan['passive_model'])
     document.commit(mutate)
 
 

@@ -120,12 +120,14 @@ class SimulationManager(wx.ScrolledWindow):
             else:control=wx.TextCtrl(self)
             self.fields[key]=(control,kind);config.Add(control,1,wx.EXPAND)
         self.fields['backend'][0].Bind(wx.EVT_CHOICE,lambda e:self.update_backend_controls())
+        self.fields['analysis'][0].Bind(wx.EVT_CHOICE,lambda e:self.update_backend_controls())
         box.Add(config,0,wx.EXPAND|wx.ALL,10)
         note=wx.StaticText(self,label='Native runs use the owned C++ engine. ngspice is an explicitly selected, self-contained batch compatibility backend; includes/libraries and continuous controls are not accepted. Timestep, stop and UIC override only when Transient is selected. Ambient setup does not set .TEMP.')
         note.Wrap(800);box.Add(note,0,wx.EXPAND|wx.ALL,8)
         self.thermal_summary=wx.StaticText(self,label='');box.Add(self.thermal_summary,0,wx.EXPAND|wx.ALL,8)
         row=wx.WrapSizer(wx.HORIZONTAL,flags=wx.WRAPSIZER_DEFAULT_FLAGS & ~wx.EXTEND_LAST_ON_EACH_LINE)
         button(self,'Board / thermal setup…',owner.thermal_setup,row)
+        button(self,'Analysis command / parameters…',lambda:owner.guarded(self.edit_analysis),row)
         button(self,'Apply profile',lambda:owner.guarded(self.apply_profile),row)
         from .fidelity_dialog import show as show_fidelity
         button(self,'Model fidelity / preflight…',lambda:owner.guarded(lambda:show_fidelity(owner)),row)
@@ -161,6 +163,15 @@ class SimulationManager(wx.ScrolledWindow):
         native=self.fields['backend'][0].GetSelection()==0
         for key in ('method','capture_samples','speed_ratio'):
             self.fields[key][0].Enable(native)
+        transient=self.fields['analysis'][0].GetSelection()==1
+        for key in ('time_step','stop_time','uic'):
+            self.fields[key][0].Enable(transient)
+            self.fields[key][0].SetToolTip('Run-only transient override. Use Analysis command / parameters to edit the saved SPICE directive.' if transient else 'Select Transient override to use this field; otherwise the saved analysis directive controls this value.')
+
+    def edit_analysis(self):
+        analyses={'.tran','.op','.ac','.dc','.noise','.tf','.pz','.sens','.disto'}
+        item=next((v for v in self.owner.doc.data['directives'] if v['enabled'] and v['text'].split()[0].casefold() in analyses),None)
+        self.owner.edit_directive(item['id'] if item else None)
 
     def reflect_document(self):
         if hasattr(self,'sequences'):self.sequences.refresh()

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import math
+from bisect import bisect_left
 from dataclasses import replace
 from typing import Any, Mapping
 
@@ -24,6 +25,11 @@ except ModuleNotFoundError as exc:
     )
 
 from .contracts import CircuitProject, CircuitResult, MeasureDirective, ProbeDescriptor
+from .transient_controls import (
+    effective_integration_step_s,
+    output_times_s,
+    retain_transient_outputs,
+)
 
 
 COMPILED_CONTRACT = "spikes/compiled-netlist/v1"
@@ -63,6 +69,42 @@ def _native_element(element: Any) -> dict[str, Any]:
         result["gain" if element.kind == "cccs" else "transresistance_ohm"] = element.value
     else:
         result["dc_value"] = element.value
+    if element.waveform is not None:
+        if element.waveform.kind == "pulse":
+            low, high, delay, rise, fall, width, period = element.waveform.pulse
+            result["waveform"] = {
+                "type": "pulse", "low": low, "high": high,
+                "delay_s": delay, "rise_time_s": rise, "fall_time_s": fall,
+                "pulse_width_s": width, "period_s": period,
+            }
+        elif element.waveform.kind == "pwl":
+            result["waveform"] = {
+                "type": "pwl", "points": [list(point) for point in element.waveform.points]
+            }
+        elif element.waveform.kind == "sin":
+            offset, amplitude, frequency, delay, damping, phase = element.waveform.sine
+            result["waveform"] = {
+                "type": "sin", "offset": offset, "amplitude": amplitude,
+                "frequency_hz": frequency, "delay_s": delay,
+                "damping_per_s": damping, "phase_deg": phase,
+            }
+        elif element.waveform.kind == "exp":
+            initial, pulsed, rise_delay, rise_tau, fall_delay, fall_tau = element.waveform.exponential
+            result["waveform"] = {
+                "type": "exp", "initial": initial, "pulsed": pulsed,
+                "rise_delay_s": rise_delay, "rise_time_constant_s": rise_tau,
+                "fall_delay_s": fall_delay, "fall_time_constant_s": fall_tau,
+            }
+        elif element.waveform.kind == "sffm":
+            offset, amplitude, carrier, modulation_index, modulating, delay, phase_m, phase_c = element.waveform.sffm
+            result["waveform"] = {
+                "type": "sffm", "offset": offset, "amplitude": amplitude,
+                "carrier_frequency_hz": carrier, "modulation_index": modulation_index,
+                "modulating_frequency_hz": modulating, "delay_s": delay,
+                "modulating_phase_deg": phase_m, "carrier_phase_deg": phase_c,
+            }
+        else:  # pragma: no cover - SourceWaveform rejects unknown kinds
+            raise ValueError(f"Unsupported source waveform {element.waveform.kind}.")
     return result
 
 
@@ -71,10 +113,21 @@ def native_request(project: CircuitProject) -> dict[str, Any]:
 
     analysis: dict[str, Any] = {"mode": "operating_point"}
     if project.analysis.mode == "transient":
+        assert project.analysis.time_step_s is not None
+        assert project.analysis.stop_time_s is not None
+        integration_step, integration_points = effective_integration_step_s(
+            project.analysis.time_step_s,
+            project.analysis.stop_time_s,
+            project.analysis.maximum_time_step_s,
+        )
         analysis = {
             "mode": "transient",
-            "time_step_s": project.analysis.time_step_s,
+            "time_step_s": integration_step,
             "stop_time_s": project.analysis.stop_time_s,
+            "output_time_step_s": project.analysis.time_step_s,
+            "output_start_time_s": project.analysis.start_time_s,
+            "maximum_time_step_s": project.analysis.maximum_time_step_s,
+            "integration_points": integration_points,
         }
     return {
         "contract": NATIVE_REQUEST_CONTRACT,
@@ -106,8 +159,8 @@ def compile_project(project: CircuitProject) -> dict[str, Any]:
             "This parser accepts bounded R, C, L, V, I, diode, E/G/F/H, and affine single-control B syntax plus positional X/.subckt hierarchy; this reference adapter remains linear-only and rejects its diode elements.",
             "Bounded arithmetic parameters, subcircuit overrides, global nodes, and root-confined include/library expansion elaborate before adapter validation.",
             "Scoped model cards and primitives outside the declared subset are rejected.",
-            "Operating-point, single-source DC, single-excitation linear AC, and strict fixed-step .tran TSTEP TSTOP analyses are accepted.",
-            "Linear parameter STEP and scalar MEASURE directives are orchestrated by ordinary run; native-run rejects them rather than ignoring them.",
+            "Operating-point, single-source DC, single-excitation linear AC, and bounded .tran TSTEP TSTOP [TSTART [TMAX]] [UIC] analyses are accepted.",
+            "Bounded parameter STEP and scalar MEASURE directives are orchestrated by ordinary run and native-run; their numerical backends remain distinct.",
             "Transient integration uses the existing Python native-MNA reference adapter and fixed-step backward Euler; it is not the owned C++ transient solver.",
             "Results inherit the experimental validation status of spike.native.linear_mna.",
         ],
@@ -185,7 +238,12 @@ def _measure_probe_values(probe: ProbeDescriptor, data: Mapping[str, Any]) -> fl
     ]
 
 
-def _one_measurement(measure: MeasureDirective, data: Mapping[str, Any]) -> dict[str, Any]:
+def _one_measurement(
+    measure: MeasureDirective,
+    data: Mapping[str, Any],
+    *,
+    transient_weighting: str = "time",
+) -> dict[str, Any]:
     values = _measure_probe_values(measure.probe, data)
     base: dict[str, Any] = {
         "status": "completed", "operation": measure.operation,
@@ -225,6 +283,39 @@ def _one_measurement(measure: MeasureDirective, data: Mapping[str, Any]) -> dict
             if measure.from_value <= coordinate <= measure.to_value
         ]
         base["window"] = {"from": measure.from_value, "to": measure.to_value}
+    if measure.analysis == "tran" and transient_weighting == "time":
+        if len(axis) < 2 or any(right <= left for left, right in zip(axis, axis[1:])):
+            raise ValueError("Transient measurement requires a strictly increasing time axis.")
+        start = axis[0] if measure.from_value is None else measure.from_value
+        stop = axis[-1] if measure.to_value is None else measure.to_value
+        if start < axis[0] or stop > axis[-1] or start >= stop:
+            raise ValueError("Measurement window must have positive duration within the simulated axis.")
+        def interpolate(time: float) -> float:
+            upper = bisect_left(axis, time)
+            if upper < len(axis) and axis[upper] == time:
+                return values[upper]
+            lower = upper - 1
+            fraction = (time-axis[lower]) / (axis[upper]-axis[lower])
+            return values[lower] + fraction * (values[upper]-values[lower])
+        times = [start] + [time for time in axis if start < time < stop] + [stop]
+        samples = [interpolate(time) for time in times]
+        if measure.operation == "max":
+            value = max(samples)
+        elif measure.operation == "min":
+            value = min(samples)
+        else:
+            # Exact moments of the piecewise-linear sample interpolant. A
+            # sample-count average biases adaptive/event-dense time grids.
+            moments = []
+            for t0, t1, a, b in zip(times, times[1:], samples, samples[1:]):
+                moment = (a+b)/2 if measure.operation == "avg" else (a*a+a*b+b*b)/3
+                moments.append((t1-t0)*moment)
+            value = math.fsum(moments)/(stop-start)
+            if measure.operation == "rms":
+                value = math.sqrt(value)
+        return base | {"value": value, "sample_count": len(selected),
+                       "interpolation": "piecewise_linear", "weighting": "time",
+                       "integration_points": len(times)}
     if not selected:
         raise ValueError("Measurement window contains no simulated samples.")
     samples = [values[index] for index in selected]
@@ -239,11 +330,25 @@ def _one_measurement(measure: MeasureDirective, data: Mapping[str, Any]) -> dict
     return base | {"value": value, "sample_count": len(samples)}
 
 
-def _measurements(project: CircuitProject, data: Mapping[str, Any]) -> dict[str, Any]:
+def _measurements(
+    project: CircuitProject,
+    data: Mapping[str, Any],
+    *,
+    transient_weighting: str | None = None,
+) -> dict[str, Any]:
+    if transient_weighting is None:
+        # Studio historically reduces native recorded samples by sample count.
+        # Native result data identifies that route with its integration field;
+        # owned core runners pass the newer time-domain policy explicitly.
+        transient_weighting = "sample" if "integration" in data else "time"
+    if transient_weighting not in {"sample", "time"}:
+        raise ValueError("transient_weighting must be sample or time")
     result: dict[str, Any] = {}
     for measure in project.measurements:
         try:
-            result[measure.name] = _one_measurement(measure, data)
+            result[measure.name] = _one_measurement(
+                measure, data, transient_weighting=transient_weighting
+            )
         except (KeyError, ValueError, ArithmeticError) as exc:
             result[measure.name] = {
                 "status": "failed", "operation": measure.operation,
@@ -365,7 +470,7 @@ def run_project(project: CircuitProject) -> CircuitResult:
             analysis=project.analysis.to_dict(),
             data=data,
             probes=_probe_payload(project.probes, data),
-            measurements=_measurements(project, data),
+            measurements=_measurements(project, data, transient_weighting="time"),
             diagnostics=dict(native.get("diagnostics", {})),
             issues=tuple(native.get("issues", ())),
             provenance={
@@ -421,16 +526,30 @@ def run_project(project: CircuitProject) -> CircuitResult:
         native = run_native_mna(request)
         if native.get("status") != "completed":
             return _failed_result(project, native)
-        data = dict(native["data"])
+        assert project.analysis.time_step_s is not None
+        assert project.analysis.stop_time_s is not None
+        target_times = output_times_s(
+            project.analysis.time_step_s,
+            project.analysis.start_time_s,
+            project.analysis.stop_time_s,
+        )
+        data = retain_transient_outputs(dict(native["data"]), target_times)
         times = data.get("time_s", ())
+        native_diagnostics = dict(native.get("diagnostics", {}))
+        integration_points = int(native_diagnostics.get("points", 0))
+        integration_step = float(request["analysis"]["time_step_s"])
         return CircuitResult(
             status="completed",
             model_status=str(native.get("model_status", "experimental")),
             analysis=project.analysis.to_dict(),
             data=data,
             probes=_series_probe_payload(project.probes, data, len(times)),
-            measurements=_measurements(project, data),
-            diagnostics=dict(native.get("diagnostics", {})),
+            measurements=_measurements(project, data, transient_weighting="time"),
+            diagnostics=native_diagnostics | {
+                "points": len(times),
+                "integration_points": integration_points,
+                "effective_integration_step_s": integration_step,
+            },
             issues=tuple(native.get("issues", ())),
             provenance={
                 "adapter": "python.spikes.runner",
@@ -440,6 +559,15 @@ def run_project(project: CircuitProject) -> CircuitResult:
                     "implementation": "python.spike_core.native_mna",
                     "integration": "fixed_step_backward_euler",
                     "owned_cpp_transient": False,
+                },
+                "transient_controls": {
+                    "integration_origin_s": 0.0,
+                    "output_start_time_s": project.analysis.start_time_s,
+                    "output_time_step_s": project.analysis.time_step_s,
+                    "requested_maximum_time_step_s": project.analysis.maximum_time_step_s,
+                    "effective_integration_step_s": integration_step,
+                    "output_sampling": "linear_from_fixed_integration_grid",
+                    "final_stop_included": True,
                 },
                 "native": dict(native.get("provenance", {})),
             },
@@ -498,7 +626,7 @@ def run_project(project: CircuitProject) -> CircuitResult:
         analysis=project.analysis.to_dict(),
         data=data,
         probes=probe_values,
-        measurements=_measurements(project, data),
+        measurements=_measurements(project, data, transient_weighting="time"),
         diagnostics={
             "points": len(axis),
             "relative_residual_max": max(residuals, default=0.0),

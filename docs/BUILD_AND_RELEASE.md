@@ -15,7 +15,7 @@ their SHA-256 files appear under that run's artifacts and are retained for
 From the command line:
 
 ```sh
-gh workflow run release.yml --repo wayri/SPIKE --ref main
+gh workflow run release.yml --repo wayri/SPIKE-Main --ref main
 ```
 
 ## Publish a new version
@@ -26,8 +26,8 @@ Set the new version in `app/package.json`, `app/package-lock.json`,
 push a matching tag, for example:
 
 ```sh
-git tag v0.3.5
-git push origin main v0.3.5
+git tag v0.3.2
+git push origin main v0.3.2
 ```
 
 Pushing a `v*` tag starts the complete build and publication chain. The tag must
@@ -37,33 +37,11 @@ the release visible. A failed upload leaves the draft unpublished, so the job
 can be rerun. Published releases are not overwritten; use a new version for
 different binaries.
 
-For 0.3.5, the maintainer explicitly held Intel macOS. The pending Intel job
-and automatic publication chain were canceled. The three successful platform
-artifacts from the tagged commit were downloaded, checked against their SHA-256
-files, and published separately. The release notes record this exception; the
-default automated chain still requires all four platforms.
-
 For a manual release, use **Run workflow**, check **Publish**, and enter the
 matching version tag. A new tag is created at the selected commit if necessary.
 An existing tag must point to that commit.
 
 ## What the chain checks
-
-Version 0.3.7 is a Windows-only release. Run the standalone **Windows x64 package**
-workflow at the release commit, then verify its installer and SHA-256 artifact
-before publishing that exact commit as a prerelease. The all-platform helper
-continues to require four packages; do not describe a Windows-only artifact set
-as a complete all-platform build. Retain the 0.3.5 Linux and macOS downloads.
-
-To publish a previously successful Windows package run, dispatch **Windows x64
-package** with `verified_run_id`, its full `release_commit`, and
-`human_review_complete=true` after completing the required review. This mode
-downloads that run's artifact, verifies the successful workflow/source identity
-and exact installer/checksum pair, uploads a draft, verifies its assets and then
-publishes an unsigned preview. It can resume only a draft for that exact commit;
-it never overwrites a published release. Draft releases are looked up by release
-ID because they may not yet have a tag ref. A missing artifact, checksum mismatch
-or source mismatch blocks publication.
 
 - Version consistency across the desktop, CLI, and native build.
 - Frozen-worker health and existing numerical runtime checks.
@@ -91,8 +69,6 @@ The GitHub workflows call the same checked-in scripts used for local builds:
 - Linux/macOS: `scripts/build_unix_release.sh`, then `scripts/package_unix_release.py`.
 
 These scripts install build dependencies and prepare resources in a disposable
-checkout. Staging emits a separate Tauri build configuration; bundling temporarily
-installs it as the base configuration and restores the source afterward. Tauri's
-`--config` merges resource maps and must not reintroduce the unstaged directories.
+checkout. Use a clean checkout; resource staging updates its Tauri configuration.
 See [platform installation and CLI commands](PLATFORM_PACKAGES.md) for running
 the finished packages.

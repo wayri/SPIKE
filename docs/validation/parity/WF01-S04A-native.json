@@ -1,0 +1,73 @@
+{
+  "contract": "spike/native-kicad-model-facts/v1",
+  "source_sha256": "84cccc5d0b59a17dfdf35ffd162c5a50574d5520eb386a91c4dc2f3bbf5a2211",
+  "kicad_version": "10.0.6",
+  "models": [
+    {
+      "component_source_id": "55555555-5555-4555-8555-555555555555",
+      "ordinal": 0,
+      "uri": "models/body.step",
+      "vectors": {
+        "offset": [
+          1.25,
+          -2.5,
+          3.0
+        ],
+        "scale": [
+          2.0,
+          1.0,
+          0.5
+        ],
+        "rotate": [
+          15.0,
+          30.0,
+          45.0
+        ]
+      }
+    },
+    {
+      "component_source_id": "55555555-5555-4555-8555-555555555555",
+      "ordinal": 1,
+      "uri": "models/lid.step",
+      "vectors": {
+        "offset": [
+          -1.0,
+          0.0,
+          4.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "rotate": [
+          0.0,
+          0.0,
+          90.0
+        ]
+      }
+    },
+    {
+      "component_source_id": "55555555-5555-4555-8555-555555555555",
+      "ordinal": 2,
+      "uri": "models/body.step",
+      "vectors": {
+        "offset": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "rotate": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    }
+  ]
+}

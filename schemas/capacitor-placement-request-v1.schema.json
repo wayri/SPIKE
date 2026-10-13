@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "$id": "https://spike.local/schemas/capacitor-placement-request-v1.schema.json",
+  "title": "SPIKE sampled-network capacitor placement comparison",
+  "description": "Original Apache-2.0 contract. Runtime additionally checks finite values, increasing frequencies, matrix alignment and sampled passivity, same-board identities, candidate work budgets and rating/conditioning admissibility. All quantities are SI except explicit x_mm/y_mm.",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "board_occurrence_id", "reference_return", "frequencies_hz", "ports", "z_ohm", "loads", "candidates", "dc_voltage_v", "target_impedance_ohm", "frequency_band_hz", "provenance"],
+  "properties": {
+    "contract": {"const": "spike/capacitor-placement-request/v1"},
+    "board_occurrence_id": {"$ref": "#/$defs/id"},
+    "reference_return": {
+      "type": "object", "additionalProperties": false, "required": ["occurrence_id", "net"],
+      "properties": {"occurrence_id": {"$ref": "#/$defs/id"}, "net": {"$ref": "#/$defs/id"}}
+    },
+    "frequencies_hz": {"type": "array", "minItems": 2, "maxItems": 1024, "items": {"type": "number", "minimum": 0.000001, "maximum": 1000000000000}},
+    "ports": {"type": "array", "minItems": 1, "maxItems": 32, "items": {
+      "type": "object", "additionalProperties": false, "required": ["id", "occurrence_id"],
+      "properties": {"id": {"$ref": "#/$defs/id"}, "occurrence_id": {"$ref": "#/$defs/id"}}
+    }},
+    "z_ohm": {"type": "array", "minItems": 2, "maxItems": 1024, "items": {
+      "type": "array", "minItems": 1, "maxItems": 32, "items": {
+        "type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/complexPair"}
+      }
+    }},
+    "loads": {"type": "array", "minItems": 1, "maxItems": 32, "items": {
+      "type": "object", "additionalProperties": false, "required": ["port_id", "current_a_rms"],
+      "properties": {"port_id": {"$ref": "#/$defs/id"}, "current_a_rms": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000000}}
+    }},
+    "candidates": {"type": "array", "minItems": 1, "maxItems": 256, "items": {"$ref": "#/$defs/candidate"}},
+    "dc_voltage_v": {"type": "number", "minimum": -1000000, "maximum": 1000000},
+    "target_impedance_ohm": {"type": "number", "minimum": 0.000000000000001, "maximum": 1000000000000},
+    "frequency_band_hz": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/positive"}},
+    "provenance": {
+      "type": "object", "additionalProperties": false, "required": ["source_id", "conditions"],
+      "properties": {"source_id": {"$ref": "#/$defs/id"}, "conditions": {"$ref": "#/$defs/id"}}
+    }
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^\\S(?:[\\s\\S]*\\S)?$"},
+    "positive": {"type": "number", "exclusiveMinimum": 0},
+    "coordinate": {"type": "number", "minimum": -1000000, "maximum": 1000000},
+    "complexPair": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "minimum": -1000000000000, "maximum": 1000000000000}},
+    "candidate": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "port_id", "occurrence_id", "x_mm", "y_mm", "capacitor"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "port_id": {"$ref": "#/$defs/id"}, "occurrence_id": {"$ref": "#/$defs/id"},
+        "x_mm": {"$ref": "#/$defs/coordinate"}, "y_mm": {"$ref": "#/$defs/coordinate"},
+        "capacitor": {
+          "type": "object", "additionalProperties": false,
+          "required": ["capacitance_f", "esr_ohm", "esl_h", "voltage_rating_v", "ripple_current_rating_a_rms"],
+          "properties": {
+            "capacitance_f": {"type": "number", "minimum": 0.000000000000000001, "maximum": 1000},
+            "esr_ohm": {"type": "number", "minimum": 0, "maximum": 1000000000000},
+            "esl_h": {"type": "number", "minimum": 0, "maximum": 1000},
+            "voltage_rating_v": {"$ref": "#/$defs/positive"},
+            "ripple_current_rating_a_rms": {"$ref": "#/$defs/positive"}
+          }
+        }
+      }
+    }
+  }
+}

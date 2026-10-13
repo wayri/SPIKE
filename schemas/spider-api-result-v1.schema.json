@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/spider-api-result-v1.schema.json",
+  "title": "SPIKE SpiDeR interoperability API result",
+  "type": "object",
+  "required": ["contract", "method", "ok", "validation_is_not_solver_admission"],
+  "properties": {
+    "contract": { "const": "spider/api-result/v1" },
+    "method": { "enum": ["spider_capabilities", "validate_spider", "normalize_spider", "query_spider", "compare_spider"] },
+    "ok": { "type": "boolean" },
+    "validation_is_not_solver_admission": { "const": true },
+    "document_contract": { "enum": ["spike/v1", "spike/design-ir/v2", null] },
+    "document_revision": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+    "normalized_revision": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+    "source_revision": { "type": ["string", "null"], "minLength": 1 },
+    "source_revision_kind": { "enum": ["declared", "derived_document_revision"] },
+    "normalized_document": { "type": ["object", "null"] },
+    "issues": { "type": "array", "maxItems": 500, "items": { "$ref": "#/$defs/issue" } },
+    "issues_truncated": { "type": "boolean" },
+    "page": { "$ref": "#/$defs/page" },
+    "entities": { "type": "array", "maxItems": 500 },
+    "changes": { "type": "array", "maxItems": 500 }
+  },
+  "$defs": {
+    "issue": {
+      "type": "object", "required": ["code", "severity", "message", "path"],
+      "properties": { "code": { "type": "string" }, "severity": { "enum": ["info", "warning", "error"] }, "message": { "type": "string" }, "path": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object", "required": ["offset", "limit", "total", "next_offset"],
+      "properties": { "offset": { "type": "integer", "minimum": 0 }, "limit": { "type": "integer", "minimum": 1, "maximum": 500 }, "total": { "type": "integer", "minimum": 0 }, "next_offset": { "type": ["integer", "null"], "minimum": 0 } },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

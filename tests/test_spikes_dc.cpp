@@ -614,7 +614,7 @@ void osdi_0_4_traversal_transient_and_noise_callbacks_are_executed() {
 
 } // namespace
 
-int main() {
+int main() try {
   voltage_divider_reports_operating_point_and_power();
   current_source_sign_follows_declared_terminals();
   floating_network_fails_closed();
@@ -646,4 +646,8 @@ int main() {
 #endif
   std::cout << "SPIKES Phase-1 DC solver tests passed\n";
   return 0;
+}
+catch (const std::exception &error) {
+  std::cerr << "SPIKES native regression failed: " << error.what() << '\n';
+  return 1;
 }

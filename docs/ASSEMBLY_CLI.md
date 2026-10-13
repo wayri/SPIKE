@@ -11,11 +11,11 @@ validates the complete replacement arrays, checks rigid transforms and retained
 design references, writes the package atomically, records an audit event, and
 invalidates affected saved results.
 
-Presentation controls have a different boundary. Board visibility and exploded
-distance are saved display state under
+Presentation controls have a different boundary. Board visibility, exploded
+distance, and section planes are display state under
 `analysis.assembly_display`; they do not change `assembly_ir` and never alter
 solver coordinates. There is currently no narrow headless mutation command for
-that display state. Set visibility and explode controls in the Assembly viewport and save the
+that display state. Set those controls in the Assembly viewport and save the
 project. Do not use `write_project_package` merely to imitate a visibility,
 explode, or section action: it is a complete project-save operation, not a
 presentation-state patch.
@@ -112,7 +112,7 @@ The Assembly viewport provides these presentation operations:
 | --- | --- | --- |
 | Hide or show a board | `analysis.assembly_display.visibility[occurrence_id]` | Filters that occurrence and its harness endpoints from the view. |
 | Explode | `analysis.assembly_display.exploded_distance_mm` | Applies display-only occurrence offsets, including aligned overlays and harness endpoints. |
-| Section | Temporary current-view state | Clips displayed board, component, harness and result geometry with one axis plane or a box; it is not saved in this release. |
+| Section | `analysis.assembly_display.section` | Clips displayed board, component, harness, and result geometry with one plane, up to six arbitrary planes, or a box. |
 
 These operations do not modify occurrence frames, harness definitions, source
 geometry, or solver inputs. Use a placement edit when the physical assembly

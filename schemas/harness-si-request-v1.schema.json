@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-si-request-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "harness",
+    "selection",
+    "model",
+    "provenance"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/harness-si-request/v1"
+    },
+    "harness": {
+      "type": "object"
+    },
+    "selection": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pair_id"
+          ],
+          "properties": {
+            "pair_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "signal_wire_id",
+            "return_wire_id"
+          ],
+          "properties": {
+            "signal_wire_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "return_wire_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          }
+        }
+      ]
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "coupled",
+        "length_m",
+        "resistance_ohm_per_m",
+        "inductance_h_per_m",
+        "capacitance_f_per_m",
+        "loss_tangent",
+        "inductive_coupling",
+        "capacitive_coupling",
+        "reference_impedance_ohm",
+        "frequency_stop_hz",
+        "frequency_points"
+      ],
+      "properties": {
+        "kind": {
+          "const": "rlgc"
+        },
+        "coupled": {
+          "const": false
+        },
+        "length_m": {
+          "type": "number",
+          "minimum": 1e-09,
+          "maximum": 100
+        },
+        "resistance_ohm_per_m": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000.0
+        },
+        "inductance_h_per_m": {
+          "type": "number",
+          "minimum": 1e-15,
+          "maximum": 1
+        },
+        "capacitance_f_per_m": {
+          "type": "number",
+          "minimum": 1e-18,
+          "maximum": 1
+        },
+        "loss_tangent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "inductive_coupling": {
+          "const": 0
+        },
+        "capacitive_coupling": {
+          "const": 0
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 1000000.0
+        },
+        "frequency_stop_hz": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100000000000000.0
+        },
+        "frequency_points": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 2049
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      }
+    }
+  }
+}

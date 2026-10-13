@@ -1,0 +1,402 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/pwm-electrothermal-result/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "status",
+    "model_status",
+    "checkpoint",
+    "restart",
+    "issue_codes",
+    "parameters",
+    "windows",
+    "energy",
+    "request_sha256",
+    "configuration_sha256",
+    "runtime",
+    "quality",
+    "limits"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/pwm-electrothermal-result/v1"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "cancelled"
+      ]
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "completed_cycles",
+        "configuration_sha256",
+        "library_sha256",
+        "state_sha256"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/pwm-electrothermal-checkpoint/v1"
+        },
+        "completed_cycles": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "configuration_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "library_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "state_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "restart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method",
+        "verified",
+        "no_replay_speedup_claim"
+      ],
+      "properties": {
+        "method": {
+          "const": "deterministic_replay"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "no_replay_speedup_claim": {
+          "const": true
+        }
+      }
+    },
+    "issue_codes": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "const": "PWM_CANCELLED"
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_voltage_v",
+        "target_voltage_v",
+        "inductance_h",
+        "capacitance_f",
+        "load_resistance_ohm",
+        "winding_resistance_ohm",
+        "temperature_coefficient_per_k",
+        "ambient_temperature_k",
+        "thermal_resistance_k_per_w",
+        "thermal_capacitance_j_per_k",
+        "switch_on_resistance_ohm",
+        "switch_off_resistance_ohm",
+        "switching_frequency_hz",
+        "maximum_step_s",
+        "controller_kp_per_v",
+        "controller_ki_per_v_s",
+        "cycles"
+      ],
+      "properties": {
+        "input_voltage_v": {
+          "type": "number"
+        },
+        "target_voltage_v": {
+          "type": "number"
+        },
+        "inductance_h": {
+          "type": "number"
+        },
+        "capacitance_f": {
+          "type": "number"
+        },
+        "load_resistance_ohm": {
+          "type": "number"
+        },
+        "winding_resistance_ohm": {
+          "type": "number"
+        },
+        "temperature_coefficient_per_k": {
+          "type": "number"
+        },
+        "ambient_temperature_k": {
+          "type": "number"
+        },
+        "thermal_resistance_k_per_w": {
+          "type": "number"
+        },
+        "thermal_capacitance_j_per_k": {
+          "type": "number"
+        },
+        "switch_on_resistance_ohm": {
+          "type": "number"
+        },
+        "switch_off_resistance_ohm": {
+          "type": "number"
+        },
+        "switching_frequency_hz": {
+          "type": "number"
+        },
+        "maximum_step_s": {
+          "type": "number"
+        },
+        "controller_kp_per_v": {
+          "type": "number"
+        },
+        "controller_ki_per_v_s": {
+          "type": "number"
+        },
+        "cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      }
+    },
+    "windows": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cycle",
+          "time_s",
+          "duty",
+          "output_voltage_v",
+          "inductor_current_a",
+          "winding_temperature_k",
+          "on_start_s",
+          "off_start_s",
+          "minimum_output_voltage_v",
+          "maximum_output_voltage_v",
+          "minimum_inductor_current_a",
+          "maximum_inductor_current_a",
+          "energy"
+        ],
+        "properties": {
+          "cycle": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 2000
+          },
+          "time_s": {
+            "type": "number"
+          },
+          "duty": {
+            "type": "number"
+          },
+          "output_voltage_v": {
+            "type": "number"
+          },
+          "inductor_current_a": {
+            "type": "number"
+          },
+          "winding_temperature_k": {
+            "type": "number"
+          },
+          "on_start_s": { "type": "number" },
+          "off_start_s": { "type": "number" },
+          "minimum_output_voltage_v": { "type": "number" },
+          "maximum_output_voltage_v": { "type": "number" },
+          "minimum_inductor_current_a": { "type": "number" },
+          "maximum_inductor_current_a": { "type": "number" },
+          "energy": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_j",
+              "switch_j",
+              "load_j",
+              "winding_j",
+              "ambient_j",
+              "be_numerical_dissipation_j"
+            ],
+            "properties": {
+              "source_j": {
+                "type": "number"
+              },
+              "switch_j": {
+                "type": "number"
+              },
+              "load_j": {
+                "type": "number"
+              },
+              "winding_j": {
+                "type": "number"
+              },
+              "ambient_j": {
+                "type": "number"
+              },
+              "be_numerical_dissipation_j": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "energy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_j",
+        "switch_j",
+        "load_j",
+        "winding_j",
+        "ambient_j",
+        "be_numerical_dissipation_j",
+        "electrical_stored_j",
+        "thermal_stored_j",
+        "electrical_balance_j",
+        "thermal_balance_j"
+      ],
+      "properties": {
+        "source_j": {
+          "type": "number"
+        },
+        "switch_j": {
+          "type": "number"
+        },
+        "load_j": {
+          "type": "number"
+        },
+        "winding_j": {
+          "type": "number"
+        },
+        "ambient_j": {
+          "type": "number"
+        },
+        "be_numerical_dissipation_j": {
+          "type": "number"
+        },
+        "electrical_stored_j": {
+          "type": "number"
+        },
+        "thermal_stored_j": {
+          "type": "number"
+        },
+        "electrical_balance_j": {
+          "type": "number"
+        },
+        "thermal_balance_j": {
+          "type": "number"
+        }
+      }
+    },
+    "request_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "configuration_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "integration",
+        "diagnostics",
+        "library_sha256"
+      ],
+      "properties": {
+        "engine": {
+          "const": "native_spikes_persistent_mna"
+        },
+        "integration": {
+          "const": "backward_euler"
+        },
+        "diagnostics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "completed_steps": {
+              "type": "number"
+            },
+            "matrix_factorizations": {
+              "type": "number"
+            },
+            "total_newton_iterations": {
+              "type": "number"
+            },
+            "residual_inf_norm": {
+              "type": "number"
+            },
+            "factorization_reuses": {
+              "type": "number"
+            },
+            "factorization_cache_entries": {
+              "type": "number"
+            },
+            "backward_euler_steps": {
+              "type": "number"
+            },
+            "trapezoidal_steps": {
+              "type": "number"
+            },
+            "bdf2_steps": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "completed_steps",
+            "matrix_factorizations",
+            "total_newton_iterations",
+            "residual_inf_norm"
+          ]
+        },
+        "library_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maximum_step_electrical_balance_j",
+        "maximum_step_thermal_balance_j",
+        "maximum_element_power_balance_w"
+      ],
+      "properties": {
+        "maximum_step_electrical_balance_j": {
+          "type": "number"
+        },
+        "maximum_step_thermal_balance_j": {
+          "type": "number"
+        },
+        "maximum_element_power_balance_w": {
+          "type": "number"
+        }
+      }
+    },
+    "limits": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "maxLength": 256
+      }
+    }
+  }
+}

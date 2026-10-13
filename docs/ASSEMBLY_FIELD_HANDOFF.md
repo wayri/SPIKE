@@ -80,7 +80,15 @@ Call `run_assembly_field_thermal(request, problem)`. The problem contract is
 - `boundaries`: each entry names `face: {occurrence_id, face_id}` and a `type`.
   `temperature` uses `temperature_k`; `heat_flux` uses `heat_flux_w_m2`
   positive inward; `convection` uses `heat_transfer_coefficient_w_m2k` and
-  `ambient_temperature_k`; `adiabatic` has no parameters.
+  `ambient_temperature_k`; `adiabatic` has no parameters. `radiation` uses
+  `emissivity` in [0,1] and `radiation_temperature_k`. `convection_radiation`
+  requires all four convection/radiation parameters and applies both on one
+  face. Radiation is exchange with prescribed infinite isothermal surroundings,
+  with outward flux `epsilon*sigma*(T^4-Tr^4)`, not enclosure radiosity. A face
+  cannot be reused for another boundary or contact. Radiation temperatures,
+  all fixed temperatures and convection ambient temperatures in a radiation
+  solve must be in (0,10000] K; every computed node has the same bound.
+  This numerical envelope does not establish material validity.
 - `heat_sources`: `{occurrence_id, cell_id, heat_source_w_m3}` entries are
   constant over each named local cell. Unlisted cells have zero source.
 - `contacts`: each names a retained `contact_id`, positive
@@ -94,7 +102,7 @@ Thermal materials require `id`, `provenance` and
 `thermal_conductivity_w_mk`, either a positive scalar or a symmetric positive
 definite `3x3` tensor with condition ratio at most `1e12`. Tensors are expressed
 in occurrence-local axes and rotated into world axes exactly once. Each
-disconnected thermal component needs a temperature/convection anchor or a
+disconnected thermal component needs a temperature/convection/positive-emissivity radiation anchor or a
 contact path to one. Unspecified exterior faces are explicitly reported
 adiabatic; this is not a guessed ambient boundary.
 
@@ -102,10 +110,48 @@ The independently authored P1 formulation solves `-div(k grad T) = q`.
 Its element matrix is `V B k B^T`, volume load is `V q / 4`, and exact triangle
 mass is `A (I + 11^T) / 12`. A contact adds the reciprocal positive energy
 `h [M,-M;-M,M]`. Diagonally scaled sparse CG solves the constrained system.
+Ambient radiation adds the exact P1 triangular weak load
+`integral(N_i*epsilon*sigma*(T^4-Tr^4))` and consistent Jacobian
+`integral(4*N_i*N_j*epsilon*sigma*T^3)`. Both degree-five polynomial
+integrals use a positive 4x4 Gauss rule after the Duffy triangle map, including
+its Jacobian. This preserves symmetry and nonnegative tangent energy at
+positive Kelvin. Original derivation and fixtures were independently authored;
+no external implementation was consulted. `sigma=5.670374419e-8 W/(m2 K4)`.
+Damped Newton uses at most 80 steps, each with at most 30 backtracks and a
+bounded diagonally scaled CG tangent solve. Acceptance uses the full nonlinear
+free-node residual, not the size of a damped update. Singular, out-of-range or
+nonconverged states raise an error rather than returning a field.
+
 Results include nodal kelvin temperatures, cell Fourier flux `-k grad T`
 in W/m2, contact transfer, boundary reactions, heat balance, residual,
 reciprocity, element conditioning, iteration count and resource usage.
-The status is always `experimental`, never production-qualified.
+Heat balance now includes `radiation_outward_w`; diagnostics include
+`newton_iterations`. Saved v1 results lacking these additive fields remain
+admissible, treating missing radiation heat as zero. New saved results must
+include radiation in conservation; changes to boundary values invalidate the
+problem digest. The status is always `experimental`, never production-qualified.
+
+Saved results from the earlier intersection audit used an x-sweep diagnostic
+count that included pairs belonging to the same occurrence. Admission can
+reconstruct that exact old count in O(N log N), subject to its original 250,000
+comparison limit. Only the exact reconstructed legacy handoff digest is
+accepted, after the original result/file integrity and all physical-input and
+problem fingerprints pass. Admission returns a copy rebound to the current
+handoff/result digests; snapshot import updates its file digest. Field values
+and source ownership remain unchanged. Arbitrary diagnostic counters or other
+metadata changes remain stale; an unavailable legacy match requires preparing
+and rerunning the saved study. The historical handoff limitation string that
+mentions nonlinear radiation is retained for metadata compatibility; the
+thermal boundary contract above defines the supported ambient radiation law.
+
+`tests/python/test_assembly_tetra_radiation.py` checks an exact combined-loss
+slab on three meshes, pure radiation anchoring, zero emissivity, nonuniform
+face fourth-power integration and its tangent, and a quadratic manufactured
+source. The latter has centroid RMS errors 48.45, 12.88 and 3.273 K on 1, 2 and
+4 subdivisions (more than threefold reduction per refinement). Invalid input,
+bounded nonconvergence, saved roundtrip, legacy admission and corrupted heat
+accounting are regression gates. Ambient values and convection coefficients
+are prescribed inputs; no air momentum or energy PDE is solved.
 
 Limits are 8 MiB per control/result record; handoff at most 100,000 cells and
 vertices; thermal execution at most 5,000 cells and 10,000 nodes; bounded

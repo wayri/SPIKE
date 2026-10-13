@@ -35,7 +35,7 @@ def validate_harness(raw):
     """Return an independent canonical document, rejecting dangling references."""
     if not isinstance(raw, dict) or raw.get("contract") != CONTRACT:
         raise ValueError(f"Harness contract must be {CONTRACT}.")
-    allowed = {"contract", "id", "name", "connectors", "splices", "wires", "cables", "routes", "properties", "provenance", "extensions"}
+    allowed = {"contract", "id", "name", "connectors", "splices", "wires", "cables", "routes", "pairs", "properties", "provenance", "extensions"}
     if set(raw) - allowed:
         raise ValueError("Unknown harness fields; retain vendor data under properties or extensions.")
     data = copy.deepcopy(raw)
@@ -50,8 +50,8 @@ def validate_harness(raw):
         raise ValueError(f"Invalid harness at {list(errors[0].path)}: {errors[0].message}")
     json.dumps(data, allow_nan=False)
     tables = {}
-    for kind in ("connectors", "splices", "wires", "cables", "routes"):
-        rows = data.setdefault(kind, [])
+    for kind in ("connectors", "splices", "wires", "cables", "routes", "pairs"):
+        rows = data.get(kind, []) if kind == "pairs" else data.setdefault(kind, [])
         if len(rows) > MAX_OBJECTS:
             raise ValueError("Harness object count limit exceeded.")
         table = {}
@@ -100,6 +100,8 @@ def validate_harness(raw):
         for point in route["points_mm"]:
             for coordinate in point:
                 _finite(coordinate, "route coordinate", minimum=-1e9)
+    from .harness_intent import validate_conductor_intent
+    validate_conductor_intent(data)
     return data
 
 
@@ -255,7 +257,7 @@ def import_harness(path, *, column_map=None, delimiter=None):
                 value = float(row[key])
                 if key in {"resistance_ohm", "inductance_h"}: wire.setdefault("electrical", {})[key] = value
                 else: wire[key] = value
-        for key in ("net", "color", "part_number"):
+        for key in ("net", "color", "part_number", "role", "return_wire_id"):
             if row.get(key): wire[key] = row[key]
         wires.append(wire)
     if not wires: raise ValueError("Connection list has no wires.")

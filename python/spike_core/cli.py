@@ -322,6 +322,8 @@ def _result_exit(result: Any, fail_on_warning: bool = False) -> int:
         return EXIT_VALIDATION
     if result.get("contract") == "spike/pi-release-qualification/v1" and result.get("status") != "passed":
         return EXIT_VALIDATION
+    if result.get("contract") == "spider/api-result/v1" and result.get("ok") is False:
+        return EXIT_VALIDATION
     if result.get("valid") is False:
         return EXIT_VALIDATION
     if result.get("can_supply_solver_inputs") is False:
@@ -1092,9 +1094,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--quiet", action="store_true", help="Do not write the result to stdout")
     parser.add_argument("--fail-on-warning", action="store_true", help=f"Return exit code {EXIT_WARNING} when warnings exist")
     sub = parser.add_subparsers(dest="command", required=True)
+    from .cluster_cli import register_commands
+    register_commands(sub)
+
+    for name, help_text in (
+        ("worker-call", "Run any registered worker operation without the GUI; explicit writes retain worker admission"),
+        ("workflow", "Run a bounded JSON workflow with prior-step references; stop on failure, no rollback"),
+    ):
+        headless = sub.add_parser(name, help=help_text)
+        headless.add_argument("request", type=Path)
+        headless.add_argument("--timeout-seconds", type=float, default=120,
+                              help="Wall-time limit per worker operation, 0 < seconds <= 86400")
 
     sub.add_parser("capabilities", help="Show worker and analysis capabilities")
     sub.add_parser("capability-ledger", help="Show native ownership, validation, and release gates for every workflow")
+    sub.add_parser(
+        "assistant-tools",
+        help="Emit the exact allowlisted MCP tool catalog and input schemas for local assistants",
+    )
     project_inspect = sub.add_parser("project-inspect", help="Inspect a SPIKE v3 package or supported legacy project without extracting it")
     project_inspect.add_argument("project", type=Path)
     project_migrate = sub.add_parser("project-migrate", help="Migrate a legacy SPIKE JSON project into a secure v3 package")
@@ -1366,6 +1383,20 @@ def build_parser() -> argparse.ArgumentParser:
     native_workspace_run.add_argument("design", type=Path)
     native_workspace_run.add_argument("workspace", type=Path)
 
+    machine = sub.add_parser("em-machine", help="Run a bounded PM motor, generator or single-gap electromagnet model")
+    machine.add_argument("--request", type=Path, required=True)
+    magnetic_machine = sub.add_parser("magnetic-machine", help="Run experimental planar machine/actuator magnetic FEM")
+    magnetic_machine.add_argument("--request", type=Path, required=True)
+    assembly_em = sub.add_parser("assembly-em", help="Execute explicit retained-volume assembly EM with OpenEMS")
+    assembly_em.add_argument("--request", type=Path, required=True)
+    assembly_em.add_argument("--run-dir", type=Path, required=True)
+    assembly_em.add_argument("--prepare-only", action="store_true")
+    for name in ("engineering-review", "quick-tool"):
+        sub.add_parser(name, help="Run a read-only engineering review or explicit SI-unit calculator").add_argument("--request", type=Path, required=True)
+    sub.add_parser("cosimulation-catalog", help="Describe experimental co-simulation and recorded twin support")
+    for command in ("cosimulation-run", "digital-twin-compare"):
+        sub.add_parser(command, help="Run an offline versioned request").add_argument("request", type=Path)
+
     field_circuit_validate = sub.add_parser(
         "field-circuit-validate",
         help="Fail-closed validation for a reviewed SpiDeR, SPICE workspace, and PEEC field-circuit package",
@@ -1430,15 +1461,66 @@ def build_parser() -> argparse.ArgumentParser:
     si_workflow.add_argument("--touchstone-output", type=Path, help="Export the edited channel (without endpoint loading)")
     harness_pi = sub.add_parser("harness-pi", help="Run explicit-pin lumped DC harness PI (experimental)")
     harness_pi.add_argument("--request", required=True, type=Path, help="spike/harness-pi-request/v1 JSON")
+    for name, help_text in (("harness-si", "Run supplied uniform harness RLGC SI (experimental)"), ("harness-em", "Inspect harness EM requirements (field execution unsupported)")):
+        harness_parser = sub.add_parser(name, help=help_text)
+        harness_parser.add_argument("--request", required=True, type=Path, help=f"spike/{name}-request/v1 JSON")
     tetra = sub.add_parser("tetra-mesh", help="Generate first-order tetrahedra from typed solids using the admitted local OCC runtime")
     tetra.add_argument("--request", required=True, type=Path)
     tetra.add_argument("--timeout-s", type=int, default=180)
     tetra.add_argument("--memory-limit-mb", type=int, default=2048)
+    for name, method in (("spider-capabilities", "spider_capabilities"), ("spider-validate", "validate_spider"),
+                         ("spider-normalize", "normalize_spider"), ("spider-query", "query_spider"),
+                         ("spider-compare", "compare_spider")):
+        spider = sub.add_parser(name, help="Bounded, read-only SpiDeR interoperability")
+        spider.set_defaults(spider_method=method)
+        if name != "spider-capabilities":
+            spider.add_argument("--request", type=Path, required=True, help="Inline operation arguments in a JSON object")
     return parser
 
 
 def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
-    if args.command == "capabilities":
+    from .cluster_cli import COMMANDS, dispatch_cluster
+    if args.command in COMMANDS:
+        result = dispatch_cluster(args)
+        failed = any(job.get("state") in {"failed", "cancelled", "unknown"} or job.get("ok") is False
+                     for job in result.get("jobs", result.get("outcomes", [])))
+        failed = failed or any(node.get("state") != "ready" for node in result.get("nodes", []))
+        return result, EXIT_ANALYSIS if failed else EXIT_OK
+    if args.command in {"worker-call", "workflow"}:
+        from .headless import load_document, run_request, run_workflow
+        document = load_document(args.request)
+        runner = run_request if args.command == "worker-call" else run_workflow
+        result = runner(document, args.timeout_seconds)
+        if not result["ok"]:
+            return result, EXIT_ANALYSIS
+        def contains_warning(value):
+            if isinstance(value, dict):
+                return value.get("severity") == "warning" or any(contains_warning(item) for item in value.values())
+            return isinstance(value, list) and any(contains_warning(item) for item in value)
+        return result, EXIT_WARNING if args.fail_on_warning and contains_warning(result) else EXIT_OK
+    if args.command == "assistant-tools":
+        from .mcp_server import McpServer, PROTOCOL_VERSION
+
+        result = {
+            "contract": "spike/assistant-tool-catalog/v1",
+            "cli_version": CLI_VERSION,
+            "mcp_protocol_version": PROTOCOL_VERSION,
+            "transport": "stdio-json-rpc",
+            "tools": McpServer().tools(),
+            "policy": {
+                "allowlisted_only": True,
+                "arbitrary_worker_dispatch": False,
+                "arbitrary_shell_execution": False,
+                "tool_catalog_is_capability_status": False,
+                "solver_results_retain_reported_model_status": True,
+            },
+        }
+        return result, EXIT_OK
+    if hasattr(args, "spider_method"):
+        if hasattr(args, "request") and args.request.stat().st_size > 16 * 1024 * 1024:
+            raise CliError("SpiDeR operation request exceeds the 16 MiB CLI file limit")
+        result = _response(args.spider_method, _read_json(args.request) if hasattr(args, "request") else {})["result"]
+    elif args.command == "capabilities":
         result = _response("capabilities")["result"]
     elif args.command == "capability-ledger":
         result = _response("capability_ledger")["result"]
@@ -1905,6 +1987,32 @@ def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
             "design": load_design(args.design),
             "workspace": _read_json(args.workspace),
         })["result"]
+    elif args.command in {"engineering-review", "quick-tool"}:
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Engineering request exceeds 8 MiB.")
+        result = _response("review_engineering" if args.command == "engineering-review" else "quick_engineering_tool",
+                           {"request": _read_json(args.request)})["result"]
+    elif args.command == "assembly-em":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Assembly EM request exceeds 8 MiB.")
+        from .assembly_em import prepare_assembly_em, run_assembly_em
+        request = _read_json(args.request)
+        result = prepare_assembly_em(request) if args.prepare_only else run_assembly_em(request, args.run_dir)
+    elif args.command == "magnetic-machine":
+        if args.request.stat().st_size > 64 * 1024:
+            raise CliError("Magnetic machine request exceeds 64 KiB.")
+        result = _response("run_magnetic_machine", {"request": _read_json(args.request)})["result"]
+    elif args.command == "em-machine":
+        if args.request.stat().st_size > 64 * 1024:
+            raise CliError("Machine request exceeds 64 KiB.")
+        result = _response("run_em_machine", {"request": _read_json(args.request)})["result"]
+    elif args.command == "cosimulation-catalog":
+        result = _response("cosimulation_catalog", {})["result"]
+    elif args.command in {"cosimulation-run", "digital-twin-compare"}:
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Co-simulation request exceeds 8 MiB.")
+        method = "run_cosimulation" if args.command == "cosimulation-run" else "compare_digital_twin"
+        result = _response(method, {"request": _read_json(args.request)})["result"]
     elif args.command in {"field-circuit-validate", "field-circuit-run"}:
         package, structural_validation = _field_circuit_package(args.package)
         validation = _validate_field_circuit_package(package, structural_validation)
@@ -1986,6 +2094,10 @@ def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
         if args.request.stat().st_size > 8 * 1024 * 1024:
             raise CliError("Harness PI request exceeds 8 MiB.")
         result = _response("run_harness_pi", {"request": _read_json(args.request)})["result"]
+    elif args.command in {"harness-si", "harness-em"}:
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Harness analysis request exceeds 8 MiB.")
+        result = _response("run_harness_si" if args.command == "harness-si" else "prepare_harness_em", {"request": _read_json(args.request)})["result"]
     elif args.command == "si-workflow":
         design_data = _read_json(args.design) if args.design else None
         if design_data and isinstance(design_data.get("design_ir"), dict):
@@ -2021,7 +2133,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         result, exit_code = dispatch(args)
         _write_output(result, args)
         return exit_code
-    except (CliError, OSError, ValueError, TypeError, KeyError) as exc:
+    except (CliError, OSError, ValueError, TypeError, KeyError, RecursionError, RuntimeError) as exc:
         error = {"ok": False, "error": str(exc), "type": type(exc).__name__}
         _write_output(error, args)
         return EXIT_USAGE

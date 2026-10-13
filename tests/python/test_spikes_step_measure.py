@@ -64,6 +64,25 @@ R2 out 0 1k
 
 
 class MeasurementTests(unittest.TestCase):
+    def test_nonuniform_transient_moments_use_time_and_interpolated_bounds(self):
+        from python.spikes.runner import _measurements
+        project = parse_netlist(
+            "V1 out 0 0\nR1 out 0 1k\n"
+            ".measure tran average AVG V(out) FROM=.2 TO=.8\n"
+            ".measure tran rms RMS V(out) FROM=.2 TO=.8\n"
+            ".measure tran peak MAX V(out) FROM=.2 TO=.8\n"
+            ".tran .1 1\n"
+        )
+        data = {"time_s": [0., .01, .1, 1.],
+                "node_voltage_v": {"out": [0., .01, .1, 1.]},
+                "element_current_a": {}, "element_power_w": {}}
+        results = _measurements(project, data)
+        self.assertAlmostEqual(results["average"]["value"], .5)
+        self.assertAlmostEqual(results["rms"]["value"], math.sqrt((.8**3-.2**3)/(3*.6)))
+        self.assertAlmostEqual(results["peak"]["value"], .8)
+        self.assertEqual(results["average"]["weighting"], "time")
+        self.assertEqual(results["average"]["sample_count"], 0)
+
     def test_dc_reductions_window_and_find_interpolation(self):
         result = run_project(parse_netlist("""V1 in 0 0
 R1 in out 1k

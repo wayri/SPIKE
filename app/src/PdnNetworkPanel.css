@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.pdn-network-dialog { width: min(1200px, 95vw); min-width: 0; max-height: 90vh; overflow: auto; background: var(--panel); }
+.pdn-network-panel { padding: 14px; overflow: auto; min-width: 0; max-height: 80vh; font: 13px/1.4 var(--font-ui, sans-serif); color: var(--text); background: var(--panel); }
+.pdn-network-panel header, .pdn-network-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.pdn-network-panel header h2 { flex: 1; margin: 0; font-size: 17px; }
+.pdn-network-panel label { display: grid; gap: 4px; min-width: 0; }
+.pdn-network-panel textarea { width: 100%; box-sizing: border-box; min-height: 250px; font: 12px/1.4 monospace; resize: vertical; }
+.pdn-network-panel input[type=file] { max-width: 190px; }
+.pdn-network-panel p { overflow-wrap: anywhere; }
+.pdn-network-panel pre { max-width: 100%; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -126,6 +126,10 @@
           },
           "voltage_rise_above_sending": {
             "type": "boolean"
+          },
+          "internal_reactance_ohm_per_m": {
+            "type": "number",
+            "minimum": 0
           }
         },
         "additionalProperties": false

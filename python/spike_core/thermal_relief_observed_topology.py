@@ -143,7 +143,7 @@ def build_thermal_relief_observed_topology(
     pads = {item.id: item for item in design.pads}
     components = {item.id: item for item in design.components}
     zones = {item.id: item for item in design.zones}
-    legacy = design.to_v1()
+    legacy = design.to_v1(allow_unprojected_arcs=True)
     raw_pads = {str(item.get("id")): item for item in legacy.pads if isinstance(item, Mapping)}
     raw_zones = {str(item.get("id")): item for item in legacy.zones if isinstance(item, Mapping)}
     connection_by_id = {item["record_id"]: item for item in connection["records"]}

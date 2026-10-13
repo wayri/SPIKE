@@ -21,6 +21,7 @@
 .app-shell .topbar { min-width: 0; gap: 12px; padding-inline: 12px; color: var(--spike-table-text); background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
 .app-shell .brand-mark { flex: 0 0 auto; min-width: 0; gap: 7px; }
 .app-shell .brand-mark img { width: 24px; height: 24px; border-radius: 5px; }
+.app-shell .brand-mark .brand-logo { width: 125px; height: 36px; border-radius: 0; object-fit: contain; }
 .app-shell .brand-mark b { color: var(--spike-table-text-strong); font-size: 13px; letter-spacing: 1.6px; }
 .app-shell .brand-mark small { color: var(--spike-table-muted); font-size: 7px; letter-spacing: .4px; }
 .app-shell .project-path { min-width: 0; flex: 1 1 0; max-width: 520px; height: var(--ui-control-height); gap: 6px; padding: 0 8px; font-size: 11px; color: var(--spike-table-muted); border-left: 1px solid var(--spike-table-border); }
@@ -168,5 +169,113 @@
 .app-shell .bottom-dock > .issue-list, .app-shell .bottom-dock > .power-tree-dock { height: calc(100% - var(--ui-dock-tabs-height)); overflow: auto; }
 .net-manager { grid-template-rows: 40px auto minmax(0, 1fr) 42px; }
 .extension-manager { grid-template-rows: 40px auto minmax(0, 1fr) 40px; }
-.app-shell .canvas-area:has(> .simulation-workspace) { grid-template-rows: var(--ui-canvas-toolbar-height) var(--ui-context-toolbar-height) auto minmax(0, 1fr) auto; }
-.app-shell .simulation-workspace { max-height: min(180px, 25dvh); overflow: auto; scrollbar-width: thin; }
+.app-shell .canvas-area:has(> .simulation-workspace) { grid-template-rows: var(--ui-canvas-toolbar-height) var(--ui-context-toolbar-height) minmax(0, auto) minmax(96px, 1fr) auto; }
+/* Let setup controls use their natural height; scroll only when the canvas is constrained. */
+.app-shell .simulation-workspace { min-height: 0; max-height: none; overflow: auto; scrollbar-width: thin; }
+.app-shell .simulation-workspace > header { flex-wrap: wrap; }
+@container workbench-viewport (max-width: 600px) {
+  .app-shell .simulation-workspace-grid { grid-template-columns: minmax(0, 1fr); }
+  .app-shell .simulation-workspace-grid article { border-right: 0; border-bottom: 1px solid #2d434d; }
+}
+
+
+.app-shell .shared-mesh-inspector .setup-block { display: grid; gap: 8px; }
+.app-shell .shared-mesh-inspector .setup-block > small { line-height: 1.5; }
+
+/* Compact command surface: expanded ribbon remains an explicit user choice. */
+.app-shell .canvas-toolbar .selection-filter { width: 94px; min-height: 28px; padding: 2px 5px; font-size: 11px; }
+.app-shell .canvas-toolbar .toolbar-menu-trigger { display: inline-flex; align-items: center; gap: 5px; }
+.app-shell .canvas-area:has(> .context-empty) { grid-template-rows: var(--ui-canvas-toolbar-height) minmax(0, 1fr) auto; }
+.app-shell .context-empty { display: none; }
+.app-shell .canvas-toolbar .coordinate { display: none; }
+@container workbench-viewport (max-width: 700px) {
+  .app-shell .canvas-toolbar .plain-btn { padding-inline: 5px; }
+  .app-shell .canvas-toolbar .divider { display: none; }
+}
+
+/* Board-first shell: one workspace selector replaces the permanent tab row. */
+.app-shell.board-first {
+  grid-template-rows: var(--ui-title-height) auto var(--ui-ribbon-height) minmax(0, 1fr) var(--ui-dock-height) var(--ui-status-height);
+}
+.app-shell.board-first.ribbon-hidden {
+  grid-template-rows: var(--ui-title-height) auto minmax(0, 1fr) var(--ui-dock-height) var(--ui-status-height);
+}
+.app-shell.board-first.bottom-closed { --ui-dock-height: 0px; }
+.app-shell.board-first.bottom-closed.ribbon-hidden {
+  grid-template-rows: var(--ui-title-height) auto minmax(0, 1fr) 0px var(--ui-status-height);
+}
+.app-shell.board-first.bottom-closed .bottom-dock { visibility: hidden; border: 0; }
+.app-shell.board-first .results-strip--summary { display: none; }
+.app-shell.board-first .workspace-selector { width: 108px; min-height: 28px; padding: 2px 6px; font-size: 11px; }
+.app-shell.board-first .canvas-toolbar .camera-view-select { width: 74px; }
+
+/* Readable labels with thin separators; avoid tall nested menu bars. */
+.app-shell .menu-item { min-height: 28px; padding: 4px 8px; font-size: 12px; }
+.app-shell .menu-item small { font-size: 11px; }
+.app-shell .dock-tabs .command-strip-viewport > button { font-size: 12px; padding-inline: 8px; }
+.app-shell.board-first .layer-manager.dock-right,
+.app-shell.board-first .layer-manager.dock-left { top: calc(var(--ui-title-height) + 26px + var(--ui-canvas-toolbar-height) + var(--ui-ribbon-height) + 8px); }
+.app-shell.board-first.ribbon-hidden .layer-manager.dock-right,
+.app-shell.board-first.ribbon-hidden .layer-manager.dock-left { top: calc(var(--ui-title-height) + 26px + var(--ui-canvas-toolbar-height) + 8px); }
+
+/* Independent panels and a persistent restore taskbar, outside collapsible content. */
+.app-shell.board-first { --ui-status-height: 58px; --ui-dock-height: min(var(--bottom-panel-height, 178px), 55dvh); }
+.app-shell.board-first.bottom-closed { --ui-dock-height: 0px; }
+.app-shell.board-first .statusbar { display: grid; grid-template-rows: 32px 24px; gap: 0; padding: 0; overflow: hidden; }
+.workspace-statusline { min-width: 0; display: flex; align-items: center; gap: 10px; padding-inline: 8px; overflow: hidden; }
+.workspace-taskbar { min-width: 0; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--spike-table-border); border-bottom: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); overflow: hidden; }
+.workspace-dock-tabs { min-width: 0; display: flex; flex: 0 1 auto; align-items: center; overflow-x: auto; scrollbar-width: thin; }
+.workspace-dock-tabs button { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 2px 8px; font-size: 11px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; }
+.workspace-dock-tabs button.selected { border-bottom-color: var(--spike-table-focus); background: var(--spike-table-row-focus); }
+.workspace-dock-tabs b { font-size: 10px; }
+.workspace-taskbar-tools { min-width: 0; flex: 1 1 160px; display: flex; align-items: center; gap: 6px; border-left: 1px solid var(--spike-table-border); padding-left: 8px; }
+.workspace-taskbar-tools > span { flex: 0 0 auto; font-size: 10px; color: var(--spike-table-muted); }
+.workspace-taskbar-tools .tool-restore-shelf { flex: 1; max-width: none; border: 0; }
+.app-shell .bottom-dock { display: flex; flex-direction: column; }
+.workspace-dock-header { flex: 0 0 32px; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 10px; border-bottom: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); }
+.workspace-dock-header strong { font-size: 12px; color: var(--spike-table-text-strong); }
+.workspace-dock-actions { display: flex; gap: 4px; }
+.workspace-dock-actions button { display: inline-flex; align-items: center; gap: 5px; }
+.dock-panel-content { flex: 1; min-height: 0; min-width: 0; overflow: auto; position: relative; }
+.app-shell .probe-results-overlay { position: static; height: 100%; min-height: 0; border: 0; }
+.dock-panel-content:has(> .probe-results-overlay) > .empty-dock { display: none; }
+.app-shell .dock-resizer.bottom { bottom: calc(var(--ui-dock-height) + var(--ui-status-height)); }
+.app-shell.board-first.dock-maximized { grid-template-rows: var(--ui-title-height) auto var(--ui-ribbon-height) 0px minmax(0, 1fr) var(--ui-status-height); }
+.app-shell.board-first.ribbon-hidden.dock-maximized { grid-template-rows: var(--ui-title-height) auto 0px minmax(0, 1fr) var(--ui-status-height); }
+.app-shell.dock-maximized .workspace { visibility: hidden; overflow: hidden; }
+@media(max-width: 800px) {
+  .workspace-taskbar-tools > span { display: none; }
+  .workspace-taskbar-tools { flex-basis: 120px; padding-left: 4px; }
+  .workspace-dock-tabs { flex: 1 1 50%; }
+  .workspace-dock-tabs button { padding-inline: 5px; }
+}
+
+.app-shell .probe-results-overlay { max-height: none; }
+
+.workspace-statusline .viewport-quality-host { min-width: 0; display: flex; flex: 0 1 180px; }
+.workspace-statusline .view-quality { position: static; margin: 0; max-width: 180px; padding: 2px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-shell .dock-panel-content .notification-dock-content { height: 100%; }
+
+/* Studies reserves its own track; scene navigation never covers or resizes it. */
+.app-shell .workspace.studies-docked { grid-template-columns: var(--workspace-left-track) clamp(220px, 22vw, 300px) minmax(0, 1fr) var(--workspace-right-track); }
+.study-dock-host { min-width: 0; min-height: 0; overflow: hidden; display: flex; border-right: 1px solid var(--spike-table-border); }
+.study-dock-host > .study-tree-panel { flex: 1; min-height: 0; box-sizing: border-box; }
+
+.workspace-ribbon-tools { margin-left: auto; flex: 0 0 auto; display: flex; align-items: center; gap: 14px; padding-inline: 8px; }
+.workspace-switcher { flex: 0 0 auto; display: flex; }
+.app-shell .workspace-switcher .toolbar-menu-trigger { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 4px 9px; font-size: 12px; border: 1px solid var(--spike-table-border-strong); background: var(--spike-table-surface); }
+.workspace-switcher .toolbar-menu-trigger > svg:first-child { color: var(--workspace-accent, var(--spike-table-choice)); }
+.workspace-switcher[data-workspace="PI"], svg[data-workspace="PI"] { --workspace-accent: #f4c45b; }
+.workspace-switcher[data-workspace="HF / SI"], svg[data-workspace="HF / SI"] { --workspace-accent: #53d9dc; }
+.workspace-switcher[data-workspace="EM"], svg[data-workspace="EM"] { --workspace-accent: #c995ff; }
+.workspace-switcher[data-workspace="Thermal"], svg[data-workspace="Thermal"] { --workspace-accent: #ff9970; }
+.workspace-switcher[data-workspace="Solve"], svg[data-workspace="Solve"] { --workspace-accent: #6cdd9b; }
+.workspace-switcher[data-workspace="Mesh"], svg[data-workspace="Mesh"] { --workspace-accent: #88baff; }
+.spike-action-context-menu svg[data-workspace] { color: var(--workspace-accent, var(--spike-table-choice)); }
+:root[data-theme="light"] .workspace-switcher, :root[data-theme="light"] svg[data-workspace] { --workspace-accent: var(--spike-table-choice); }
+:root[data-theme="high-contrast"] .workspace-switcher, :root[data-theme="high-contrast"] svg[data-workspace] { --workspace-accent: var(--spike-table-focus); }
+
+.app-shell .workspace.studies-docked > .side-panel.left { grid-column: 1; grid-row: 1; }
+.app-shell .workspace.studies-docked > .study-dock-host { grid-column: 2; grid-row: 1; }
+.app-shell .workspace.studies-docked > .canvas-area { grid-column: 3; grid-row: 1; }
+.app-shell .workspace.studies-docked > .side-panel.right { grid-column: 4; grid-row: 1; }

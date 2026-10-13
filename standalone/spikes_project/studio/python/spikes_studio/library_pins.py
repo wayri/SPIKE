@@ -6,6 +6,10 @@ import math
 
 
 def pin_contract(record):
+    if record.get('passive_kind')=='kelvin_shunt':
+        return {'pins':[{'number':str(i+1),'name':name,'role':'force' if name.startswith('F') else 'sense','side':'west' if name.endswith('P') else 'east'} for i,name in enumerate(('FP','FN','SP','SN'))],
+                'numbering':'Generic Kelvin force/sense terminals; NOT a vendor package pinout',
+                'execution':record['status'],'power_behavior':'Linear body resistance and explicit force-contact branches; no self-heating'}
     family=record['family'];p=record['parameters']
     inputs=[];outputs=[];power=['VDD','GND']
     if family in ('and','or','nand','nor','xor','xnor'):inputs=['A','B'];outputs=['Y']

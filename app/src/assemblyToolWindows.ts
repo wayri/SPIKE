@@ -94,7 +94,7 @@ export async function openAssemblyToolWindow(kind: AssemblyToolKind, snapshot: A
       const { WebviewWindow } = await import("@tauri-apps/api/webviewWindow");
       const stale = await WebviewWindow.getByLabel(assemblyToolLabels[kind]); await stale?.destroy();
       const title = kind === "workspace" ? "Multi-board workspace" : kind === "placement" ? "Board placement" : "Board layers, nets & links";
-      const child = new WebviewWindow(assemblyToolLabels[kind], { url: urlFor(kind, token), title: `SPIKE | ${title}`, width: kind === "workspace" ? 1320 : 860, height: kind === "workspace" ? 900 : kind === "placement" ? 530 : 760, minWidth: kind === "workspace" ? 720 : 520, minHeight: kind === "workspace" ? 560 : 360, resizable: true, decorations: true, backgroundColor: "#101820", dragDropEnabled: false });
+      const child = new WebviewWindow(assemblyToolLabels[kind], { url: urlFor(kind, token), title: `SPIKE | ${title}`, width: kind === "workspace" ? 1320 : kind === "placement" ? 860 : 600, height: kind === "workspace" ? 900 : kind === "placement" ? 530 : 720, minWidth: kind === "workspace" ? 720 : kind === "placement" ? 520 : 600, maxWidth: kind === "managers" ? 600 : undefined, maximizable: kind !== "managers", minHeight: kind === "workspace" ? 560 : 360, resizable: true, decorations: true, skipTaskbar: false, backgroundColor: "#101820", dragDropEnabled: false });
       await child.once("tauri://destroyed", () => {
         if (sessions.get(kind) === session) { sessions.delete(kind); session.stop(); void session.handle({ type: "closed" }); }
       });
@@ -105,7 +105,7 @@ export async function openAssemblyToolWindow(kind: AssemblyToolKind, snapshot: A
         if (event.data?.event === ACTION) void receive(event.data.envelope);
         if (event.data?.event === VIEWPORT_REQUEST) void receiveViewportRequest(event.data.envelope);
       });
-      session.child = window.open(urlFor(kind, token), `${assemblyToolLabels[kind]}-${token}`, kind === "workspace" ? "popup=yes,width=1320,height=900,resizable=yes,scrollbars=yes" : "popup=yes,width=1000,height=700,resizable=yes,scrollbars=yes") ?? undefined;
+      session.child = window.open(urlFor(kind, token), `${assemblyToolLabels[kind]}-${token}`, kind === "workspace" ? "popup=yes,width=1320,height=900,resizable=yes,scrollbars=yes" : kind === "managers" ? "popup=yes,width=600,height=720,resizable=no,scrollbars=yes" : "popup=yes,width=860,height=530,resizable=yes,scrollbars=yes") ?? undefined;
       if (!session.child) throw new Error("Allow local SPIKE popup windows, then retry.");
     }
     await updateAssemblyToolWindow(kind, snapshot);

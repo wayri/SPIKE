@@ -73,6 +73,10 @@ REQUIRED_DOCUMENTS = (
 )
 
 CONTRACT_SCHEMAS = (
+    "schemas/cosimulation-request-v1.schema.json",
+    "schemas/cosimulation-result-v1.schema.json",
+    "schemas/digital-twin-request-v1.schema.json",
+    "schemas/digital-twin-result-v1.schema.json",
     "schemas/design-ir-v1.schema.json",
     "schemas/analysis-spec-v1.schema.json",
     "schemas/analysis-result-v1.schema.json",
@@ -122,6 +126,8 @@ def main() -> int:
         "app/src/detachedToolWindows.tsx",
         "app/src/assemblyToolWindows.ts",
         "app/src/reportPreviewWindow.ts",
+        "app/src/schematicWindow.ts",
+        "app/src/assistantWindow.ts",
     }
     for path in typescript:
         name = relative(path)
@@ -141,6 +147,7 @@ def main() -> int:
         text = path.read_text(encoding="utf-8")
         parser_adapters = {
             "python/spike_core/kicad_importer.py",
+            "python/spike_core/kicad_schematic_importer.py",
             "python/spike_core/model_resolver_staging.py",
         }
         if re.search(r"(?:from|import)\s+python\.core\..*parser", text) and name not in parser_adapters:

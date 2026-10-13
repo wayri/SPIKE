@@ -185,8 +185,8 @@ class LibraryStore:
 
     def search(self,query,*,scope=None,limit=100):
         if not isinstance(query,str) or len(query)>512 or type(limit) is not int or not 1<=limit<=1000:raise ValueError('Invalid library search')
-        query=query.casefold()
-        return [item for item in self.list_packages(scope=scope) if query in item['package_id'].casefold()][:limit]
+        from .fuzzy_search import ranked
+        return ranked(self.list_packages(scope=scope),query,text=lambda item:item['package_id'])[:limit]
 
 
 def merge(existing,incoming):

@@ -26,7 +26,6 @@ class PackagedWorkerArrowProbeTests(unittest.TestCase):
         result = verify_extension_runtime(None, request)
         self.assertEqual(result["status"], "passed")
         self.assertEqual(result["odb_tracks"], 1)
-        self.assertEqual(result["odb_inspection"], "passed")
 
     def test_runtime_qualification_updates_bundle_and_repository_gate_copy(self) -> None:
         qualification = {

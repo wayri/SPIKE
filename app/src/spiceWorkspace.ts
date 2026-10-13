@@ -1,3 +1,4 @@
+import type { StudioFeedbackSetup } from "./studioFeedback";
 import type { SolverResultBundle } from "./analysisResults";
 import type { ParsedBoard, ParsedComponent, ParsedPad } from "./boardParser";
 
@@ -55,6 +56,7 @@ export type SpiceAnalysis =
   | { mode: "ac"; start_hz: number; stop_hz: number; points_per_decade: number }
   | { mode: "transient"; time_step_s: number; stop_time_s: number };
 export type SpiceWorkspace = {
+  studio_feedback?: StudioFeedbackSetup;
   contract: typeof SPICE_WORKSPACE_CONTRACT;
   name: string;
   domain: "pi" | "si";
@@ -80,6 +82,7 @@ export type SpiceNetlistPreview = {
   netlist: string;
   validation: SpiceWorkspaceValidation;
   node_aliases: Record<string, string>;
+  element_aliases?: Record<string,string>;
   provenance?: Record<string, unknown>;
 };
 

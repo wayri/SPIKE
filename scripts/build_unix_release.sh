@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 set -euo pipefail
 cd "$(dirname "$0")/.."
-release_root="$PWD"
 export PYTHONDONTWRITEBYTECODE=1
 export RUSTFLAGS="--remap-path-prefix=$PWD=/build/spike --remap-path-prefix=$HOME=/build/user"
 export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
@@ -27,12 +26,9 @@ npm ci
 npm run build
 cd ..
 python scripts/prepare_release_resources.py --config-output build/tauri.release.json
-cp app/src-tauri/tauri.conf.json build/tauri.source.json
-trap 'cp "$release_root/build/tauri.source.json" "$release_root/app/src-tauri/tauri.conf.json"' EXIT
-cp build/tauri.release.json app/src-tauri/tauri.conf.json
 cd app
 if [[ "$(uname)" == Darwin ]]; then
-  npm run tauri build -- --bundles app
+  npm run tauri build -- --bundles app --config ../build/tauri.release.json
 else
-  npm run tauri build -- --bundles deb
+  npm run tauri build -- --bundles deb --config ../build/tauri.release.json
 fi

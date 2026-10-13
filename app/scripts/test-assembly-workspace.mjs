@@ -109,5 +109,27 @@ assert.deepEqual(chosen.at(-1),['A','2D'],'a separate workspace can update the m
 assert.ok(nodes(embedded).some(n=>n.props?.role==='region'));
 assert.ok(!nodes(embedded).some(n=>n.props?.role==='dialog'),'the separate window is not a viewport modal');
 const embeddedHtml=renderToStaticMarkup(React.createElement(Workspace,{...props,embedded:true}));
-assert.match(embeddedHtml,/movable native window renders the same retained board sources/);
+assert.doesNotMatch(embeddedHtml,/movable native window renders the same retained board sources/, "Focus embedded tools do not claim to be native windows");
+const nativeHtml=renderToStaticMarkup(React.createElement(Workspace,{...props,embedded:true,nativeWindow:true}));
+assert.match(nativeHtml,/movable native window renders the same retained board sources/);
 console.log('Multi-board workspace actions, save gate, model diagnostics, draft protection and selected-board manager scope passed');
+
+// Thermal navigation changes the section once; ordinary snapshot updates must not override user navigation.
+let navSlots = [], navCursor = 0, navEffects = [];
+const navHooks = {
+ useState(initial) { const i=navCursor++; navSlots[i] ??= {value:typeof initial==='function'?initial():initial}; return [navSlots[i].value, value=>navSlots[i].value=typeof value==='function'?value(navSlots[i].value):value]; },
+ useRef(initial) { const i=navCursor++; navSlots[i] ??= {current:initial}; return navSlots[i]; },
+ useEffect(fn,deps) { const i=navCursor++; if (!navSlots[i] || deps.some((v,j)=>v!==navSlots[i].deps[j])) { const old=navSlots[i]; navSlots[i]={deps}; navEffects.push(()=>{old?.cleanup?.(); navSlots[i].cleanup=fn();}); } },
+};
+const NavWorkspace=load('AssemblyWorkspace',navHooks);
+const navRender=request=>{ navCursor=0; const tree=NavWorkspace({...props,thermalStudyRequest:request}); const effects=navEffects;navEffects=[];effects.forEach(fn=>fn());return tree; };
+navRender('thermal-request-a');
+let navTree=navRender('thermal-request-a');
+const navText=n=>typeof n==='string'?n:React.Children.toArray(n?.props?.children).map(navText).join('');
+const navButton=(tree,label)=>nodes(tree).find(n=>n.type==='button' && navText(n).trim()===label);
+assert.equal(navButton(navTree,'Coupled studies').props['aria-pressed'],true);
+navButton(navTree,'Mechanics').props.onClick();navTree=navRender('thermal-request-a');
+assert.equal(navButton(navTree,'Mechanics').props['aria-pressed'],true,'same snapshot request does not override manual navigation');
+navRender('thermal-request-b');navTree=navRender('thermal-request-b');
+assert.equal(navButton(navTree,'Coupled studies').props['aria-pressed'],true,'a new explicit request opens studies again');
+console.log('Thermal study navigation targets coupled studies and preserves later manual navigation.');

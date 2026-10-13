@@ -2,6 +2,8 @@
 
 # SPIKE thermal simulation: a practical user guide
 
+**SI, PI, Thermal, EM**
+
 This guide takes a KiCad board from import to a saved temperature map and a
 component junction-temperature review. The first exercise uses the public,
 open-source [Berkeley Lab Marble v1.4.4](https://github.com/BerkeleyLab/Marble/tree/v1.4.4)

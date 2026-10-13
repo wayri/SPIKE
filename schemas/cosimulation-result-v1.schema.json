@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "$id": "spike/cosimulation-result/v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "status", "model_status", "issues", "frames", "completed_steps", "limitations"],
+  "properties": {
+    "contract": {"const": "spike/cosimulation-result/v1"},
+    "status": {"enum": ["completed", "rejected", "failed", "cancelled", "timed_out"]},
+    "model_status": {"const": "experimental"},
+    "model_id": {"type": "string"}, "model_revision": {"type": "string"},
+    "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "completed_steps": {"type": "integer", "minimum": 0, "maximum": 10000},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "issues": {"type": "array", "items": {
+      "type": "object", "additionalProperties": false, "required": ["code", "severity", "message"],
+      "properties": {"code": {"type": "string"}, "severity": {"const": "error"}, "message": {"type": "string"}, "participant_id": {"type": "string"}}
+    }},
+    "participant_provenance": {"type": "array", "maxItems": 64, "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "model_revision", "model_status", "adapter", "adapter_version", "inputs", "outputs"],
+      "properties": {"id": {"type": "string"}, "model_revision": {"type": "string"},
+        "model_status": {"enum": ["experimental", "approximate", "validated"]}, "adapter": {"type": "string"}, "adapter_version": {"type": "string"},
+        "inputs": {"type": "object", "additionalProperties": {"type": "string"}},
+        "outputs": {"type": "object", "additionalProperties": {"type": "string"}}}
+    }},
+    "frames": {"type": "array", "maxItems": 10001, "items": {
+      "type": "object", "additionalProperties": false, "required": ["time_s", "outputs"],
+      "properties": {"time_s": {"type": "number", "minimum": 0}, "outputs": {
+        "type": "object", "maxProperties": 64, "additionalProperties": {
+          "type": "object", "maxProperties": 32, "additionalProperties": {"type": "number"}
+        }
+      }}
+    }}
+  },
+  "allOf": [{"if": {"properties": {"status": {"const": "completed"}}},
+             "then": {"required": ["model_id", "model_revision", "request_sha256", "participant_provenance"], "properties": {"frames": {"minItems": 2}}}}]
+}

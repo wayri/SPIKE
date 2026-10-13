@@ -1,11 +1,11 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "SPIKE",
-  "version": "0.3.10",
+  "version": "0.3.11-gamma.1",
   "identifier": "org.spike.integrity",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://127.0.0.1:1420",
     "frontendDist": "../dist"
   },
   "app": {
@@ -73,7 +73,8 @@
       "../../docs/ERROR_CODE_CATALOG.md": "docs/ERROR_CODE_CATALOG.md",
       "../../TROUBLESHOOTING.md": "docs/TROUBLESHOOTING.md",
       "resources/worker": "bundled",
-      "resources/README.md": "README.md"
+      "resources/README.md": "README.md",
+      "../../licenses/runtime-notices": "legal/licenses/runtime-notices"
     },
     "windows": {
       "allowDowngrades": false,
@@ -89,6 +90,9 @@
         "displayLanguageSelector": false,
         "installerIcon": "icons/icon.ico",
         "startMenuFolder": "SPIKE"
+      },
+      "wix": {
+        "version": "0.3.11.1"
       }
     }
   }

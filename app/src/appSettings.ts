@@ -14,6 +14,7 @@ export type AppSettings = {
   navigationInertia: boolean;
   selectionBlink: boolean;
   ribbonVisible: boolean;
+  chromeVersion: 2;
   extensionUiVisibility: Record<string, { menuBar: boolean; titleBar: boolean }>;
   solverMemoryFraction: number;
   solverMemoryLimitGb: number;
@@ -35,7 +36,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   antialiasing: true,
   navigationInertia: false,
   selectionBlink: true,
-  ribbonVisible: true,
+  ribbonVisible: false,
+  chromeVersion: 2,
   extensionUiVisibility: {},
   solverMemoryFraction: 0.65,
   solverMemoryLimitGb: 2,
@@ -65,6 +67,9 @@ export function loadAppSettings(): AppSettings {
     return {
       ...DEFAULT_SETTINGS,
       ...known,
+      // Migrate the old always-expanded ribbon once; retain subsequent user choices.
+      chromeVersion: 2,
+      ribbonVisible: saved.chromeVersion === 2 && typeof saved.ribbonVisible === "boolean" ? saved.ribbonVisible : false,
       solverMemoryLimitGb,
       profile: {
         displayName: typeof saved.profile?.displayName === "string" ? saved.profile.displayName : DEFAULT_SETTINGS.profile.displayName,

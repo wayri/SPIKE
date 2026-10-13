@@ -33,7 +33,7 @@ def _design_snapshot(design: Mapping[str, Any]) -> Dict[str, Any]:
     canonical_payload = canonical.to_dict()
     return {
         "contract": "spike/design-snapshot/v1",
-        "design": canonical.to_v1().to_dict(),
+        "design": canonical.to_v1(allow_unprojected_arcs=True).to_dict(),
         "canonical_design": canonical_payload,
         "report": {"issues": canonical_payload["issues"]},
     }

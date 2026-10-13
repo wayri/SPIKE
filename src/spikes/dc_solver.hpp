@@ -197,6 +197,18 @@ struct PwlPoint {
   double value{0.0};
 };
 
+/** Analytic SIN source; Hz, seconds, inverse seconds, and degrees. */
+struct SineWaveform {
+  double offset{0.0};
+  double amplitude{1.0};
+  double frequency_hz{1.0};
+  double delay_s{0.0};
+  double damping_per_s{0.0};
+  double phase_deg{0.0};
+};
+
+[[nodiscard]] double sine_value_at(const SineWaveform &, double time_s);
+
 struct VoltageControlledSwitchModel {
   double on_resistance_ohm{1.0e-3};
   double off_resistance_ohm{1.0e9};
@@ -315,6 +327,12 @@ public:
                                 std::string negative_node,
                                 PulseWaveform waveform);
 
+  /** Add analytic SIN sources with an exact delay breakpoint. */
+  void add_sine_current_source(std::string id, std::string positive_node,
+                               std::string negative_node, SineWaveform waveform);
+  void add_sine_voltage_source(std::string id, std::string positive_node,
+                               std::string negative_node, SineWaveform waveform);
+
   /** Add a piecewise-linear current source. Point times must increase. */
   void add_pwl_current_source(std::string id, std::string positive_node,
                               std::string negative_node,
@@ -404,7 +422,7 @@ private:
     saturating_inductor,
     voltage_controlled_switch
   };
-  enum class WaveformType { constant, pulse, pwl };
+  enum class WaveformType { constant, pulse, pwl, sine };
   struct Element {
     ElementType type;
     std::string id;
@@ -423,6 +441,8 @@ private:
     std::vector<NodeId> osdi_nodes;
     WaveformType waveform_type{WaveformType::constant};
     PulseWaveform pulse{};
+    SineWaveform sine{};
+    double waveform_time_offset_s{0.0};
     std::vector<PwlPoint> pwl;
     NodeId control_positive_node{ground_node};
     NodeId control_negative_node{ground_node};

@@ -68,11 +68,15 @@ def run_capability_audit():
         (root/'cell.inc').write_text('.subckt cell a b\nR1 a b 1k\n.ends\n',encoding='utf-8')
         (root/'cell.lib').write_text('.lib typical\n.subckt cell a b\nR1 a b 1k\n.ends\n.endl typical\n',encoding='utf-8')
         for ident,text in CASES+REJECTION_CASES:
+            # Include admission binds relative paths to an actual top-level file.
+            # Keep its bytes identical to the submitted deck for every probe.
+            source_path=root/'probe.cir'
+            source_path.write_text(text,encoding='utf-8')
             row={'id':ident,'deck_sha256':hashlib.sha256(text.encode()).hexdigest(),
                  'deck':text,'parser':'rejected','native_implementation':'not_established_by_this_probe',
                  'numerical_verification':'not_tested','cross_engine_qualification':'not_tested'}
             try:
-                project=parse_netlist(text,source_name=str(root/'probe.cir'),native_extensions=True)
+                project=parse_netlist(text,source_name=str(source_path),native_extensions=True)
                 row.update(parser='accepted',elements=len(project.elements))
             except ValueError as error:row['diagnostic']=str(error)
             rows.append(row)

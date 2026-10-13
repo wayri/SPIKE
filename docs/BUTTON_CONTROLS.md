@@ -41,6 +41,19 @@ visible `:focus-visible` state, disabled behavior, and theme-readable text.
 
 ## Guard and boundaries
 
+Assembly view tools use `AssemblyIconToolbar.tsx`: a 17 px icon, a short visible
+label, and a full accessible name and tooltip. Keep toggle state in
+`aria-pressed` and use native disabled buttons when an occurrence is required.
+Camera actions belong in the top toolbar. Placement, visibility and section
+fields belong in a reserved inspector, with help beside the view rather than
+overlapping its controls. The assembly preview also uses a left panel rail;
+at narrow widths its inspector stacks below the canvas. See
+[assembly CLI workflows](ASSEMBLY_CLI.md) for saved structure edits.
+
+Run `node scripts/test-assembly-icon-toolbar.mjs` from `app` when changing this
+shared toolbar. It checks names, tooltips, visible mini labels, action routing,
+toggle semantics and disabled controls.
+
 Run `npm run test:button-standard` from `app`. The guard verifies application
 entrypoint coverage, checks every first party `scripts/*preview.tsx` containing
 a button for the shared import, and validates the required states and token-only
@@ -51,3 +64,31 @@ self-contained report CSS. Third party web content is outside the SPIKE style
 boundary. Neither may be rewritten to import application CSS. Canvas and SVG
 gesture targets are checked by their owning interaction tests; when they expose
 `role="button"`, their component remains responsible for keyboard activation.
+
+## Focus workspace
+
+The main shell uses the Graphite + Teal professional-dark tokens. Menu opens a
+reserved, keyboard-accessible command panel. Submenus replace its current list;
+Back and Escape move to the parent. All existing menu and toolbar handlers are
+discovered from their React descriptors rather than copied into another command
+registry. Dynamic extension visibility and disabled states remain authoritative.
+
+The viewport keeps only 2D/3D, Layers, Fit and View. Camera, selection filters,
+model toggles, result display and advanced workspace commands open on demand.
+The navigator, studies, setup, managers and results share one reserved tool slot.
+Hide keeps inputs mounted; a tool closes through its existing Close/Apply/Discard
+flow. Expand/Restore and a bounded resize handle support large tools. Native
+secondary windows remain explicit actions. See WORKSPACE_PANELS.md.
+
+## Table and menu density
+
+Shared tables start with compact row spacing while retaining 12 px text and
+28 px column headers. Compact toggles expanded row spacing. Keyboard Help
+reveals the editable/dropdown/locked field guide on demand. Embedded tables
+can omit duplicate tools with showTools=false while retaining bounded rows,
+pagination and keyboard cell navigation.
+
+The probe dock combines formula, export, detach and close commands into one
+header. It shows one empty-state instruction, instead of stacked empty panels.
+Layers on the viewport toolbar opens the floating layer manager. Its docking
+controls and close button remain available; View > Layer manager also reopens it.

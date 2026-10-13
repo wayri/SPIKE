@@ -7,16 +7,16 @@ export function buildExtensionMeshScene(mesh: ExtensionMesh, transform: { center
   group.name = "Extension mesh preview";
   if (!mesh || typeof mesh !== "object" || Array.isArray(mesh) || !transform || typeof transform !== "object") return group;
   const admission = mesh.admission as Record<string, unknown> | undefined;
-  if (mesh.status !== "completed" || mesh.solved !== false || mesh.units !== "mm" || mesh.coordinate_frame !== "design_top_copper"
+  if (mesh.status !== "completed" || mesh.solved !== false || mesh.units !== "mm" || !(mesh.contract === "spike/gmsh-mesh/v1" ? mesh.coordinate_frame === "normalized_board_local_mm" : mesh.coordinate_frame === "design_top_copper")
       || !["unvalidated", "experimental"].includes(String(mesh.model_status))
       || admission?.contract !== "spike/extension-mesh-admission/v1" || admission.design_bound !== true
       || admission.complete_connectivity !== true || admission.physics_validated !== false || admission.cross_engine_reuse !== false
       || ![transform.centerX, transform.centerY, transform.scale, transform.zOffsetMm].every(Number.isFinite) || transform.scale <= 0) return group;
-  const point = (p: number[]) => [(p[0]-transform.centerX)*transform.scale, (transform.centerY-p[1])*transform.scale, (p[2]+transform.zOffsetMm)*transform.scale];
+  const point = (p: number[]) => [(p[0]-transform.centerX)*transform.scale, (transform.centerY-p[1])*transform.scale, (p[2]+(mesh.contract === "spike/gmsh-mesh/v1" ? 0 : transform.zOffsetMm))*transform.scale];
   const representable = (p: number[]) => point(p).every(value => Number.isFinite(value) && Math.abs(value) <= 3.4e38);
   const vertices: number[] = [];
   let total = 0, shown = 0;
-  if (mesh.contract === "spike/emerge-mesh/v1") {
+  if (["spike/emerge-mesh/v1", "spike/gmsh-mesh/v1"].includes(String(mesh.contract))) {
     const nodes = mesh.nodes_mm as number[][], tets = mesh.tetrahedra as number[][];
     if (!Array.isArray(nodes) || !Array.isArray(tets) || nodes.length < 4 || !tets.length || nodes.length > 100000 || tets.length > 200000
         || nodes.some(node => !Array.isArray(node) || node.length !== 3 || !node.every(Number.isFinite) || !representable(node))

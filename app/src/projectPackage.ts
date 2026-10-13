@@ -52,8 +52,10 @@ export function createProjectPackage(payload: Record<string, any>): SpikeProject
   };
 }
 
-export function parseProjectPackage(text: string): { project: SpikeProjectPackage; migrated: boolean } {
-  const raw = JSON.parse(text) as Record<string, any>;
+export function parseProjectPackage(text: string | Record<string, any>): { project: SpikeProjectPackage; migrated: boolean } {
+  // Native IPC already decoded and authenticated the package envelope. Apply
+  // exactly the same checks without another large stringify/parse allocation.
+  const raw = (typeof text === "string" ? JSON.parse(text) : text) as Record<string, any>;
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Project package must contain a JSON object.");
   const supported = [SPIKE_PROJECT_FORMAT, "spike-project-package/v1"];
   if (!supported.includes(String(raw.format ?? ""))) throw new Error(`Unsupported SPIKE project format: ${String(raw.format ?? "missing")}`);

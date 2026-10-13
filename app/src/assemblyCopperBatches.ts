@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import * as THREE from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { mergeTransformedGeometries } from "./mergedGeometryTransforms";
 
 /** Batch display triangles by scoped net/layer while retaining exact object picks.
  * Original meshes stay in the hierarchy with non-rendering materials: their
@@ -20,12 +20,11 @@ export function batchAssemblyCopper(group: THREE.Group) {
   for (const meshes of buckets.values()) {
     before += meshes.length;
     if (meshes.length < 2) { after++; continue; }
-    const transformed = meshes.map(mesh => {
+    const entries = meshes.map(mesh => {
       mesh.updateMatrix();
-      return mesh.geometry.clone().applyMatrix4(mesh.matrix);
+      return { geometry: mesh.geometry, matrix: mesh.matrix };
     });
-    const geometry = mergeGeometries(transformed, false);
-    transformed.forEach(item => item.dispose());
+    const geometry = mergeTransformedGeometries(entries);
     if (!geometry) { after += meshes.length; continue; }
     const first = meshes[0];
     const material = (first.material as THREE.Material).clone();

@@ -2,7 +2,7 @@
 import type { AssemblyIr } from "./mcadAssembly";
 
 export type FieldObject = Record<string, any>;
-export type FieldRecord = { contract: string; request: FieldObject; problem: FieldObject; result: FieldObject | null; file_digest: string };
+export type FieldRecord = { contract: string; request: FieldObject; problem: FieldObject; result: FieldObject | null; file_digest: string; transient_settings?: FieldObject };
 export type FieldSnapshot = { requestText: string; problemText: string; result: FieldObject | null };
 const stable = (value: any): any => Array.isArray(value) ? value.map(stable)
   : value && typeof value === "object" ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;
@@ -25,7 +25,7 @@ export function fieldOwnerName(assembly: AssemblyIr, id: string): string {
   return String(owner?.name || (assembly.boards.some(item => item.id === id) ? "Board" : "Mechanical structure"));
 }
 export function fieldTemperatureRows(result: FieldObject | null, assembly: AssemblyIr): Array<{ name: string; minimum: number; maximum: number }> {
-  if (!result || result.contract !== "spike/assembly-field-thermal-result/v1" || result.production_qualified !== false) return [];
+  if (!result || !["spike/assembly-field-thermal-result/v1", "spike/calculix-thermal-result/v1", "spike/assembly-field-transient-result/v1", "spike/calculix-field-transient-result/v1"].includes(result.contract) || result.production_qualified !== false) return [];
   return Object.entries(result.occurrence_temperatures ?? {}).flatMap(([id, raw]) => {
     const value = raw as FieldObject;
     return Number.isFinite(value.minimum_k) && Number.isFinite(value.maximum_k)

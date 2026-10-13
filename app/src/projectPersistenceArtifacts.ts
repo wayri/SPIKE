@@ -7,31 +7,43 @@ export type SavedBoardVisuals = { contract: 'spike/saved-board-visuals/v1'; arti
   view_box: number[]; board_includes_copper: boolean; quality: Record<string, any> };
 
 export async function hydrateProjectArtifacts(project: Record<string, any>, read: (reference: StateReference) => Promise<unknown>,
-  progress: (done: number, total: number) => void = () => {}): Promise<Record<string, any>> {
+  progress: (done: number, total: number, bytes: number, totalBytes: number) => void = () => {},
+  signal?: AbortSignal): Promise<Record<string, any>> {
   const references = new Map<string, StateReference>();
+  const changed = new WeakSet<object>();
   const collect = (value: any) => {
-    if (!value || typeof value !== 'object') return;
+    if (!value || typeof value !== 'object') return false;
     if (value.contract === 'spike/state-artifact-reference/v1') {
       if (!/^state\/artifacts\/[a-f0-9]{64}\.json$/.test(value.path) || !/^[a-f0-9]{64}$/.test(value.sha256)
         || !Number.isInteger(value.bytes) || value.bytes <= 0) throw new Error('Invalid saved result artifact reference.');
       const previous = references.get(value.path);
       if (previous && (previous.sha256 !== value.sha256 || previous.bytes !== value.bytes)) throw new Error('Conflicting saved result identities.');
-      references.set(value.path, value); return;
+      references.set(value.path, value); changed.add(value); return true;
     }
-    Object.values(value).forEach(collect);
+    let hasReference = false;
+    for (const child of Object.values(value)) if (collect(child)) hasReference = true;
+    if (hasReference) changed.add(value);
+    return hasReference;
   };
   collect(project);
+  if (signal?.aborted) throw new DOMException('Project loading cancelled.', 'AbortError');
+  if (!references.size) { progress(0, 0, 0, 0); return project; }
   const values = new Map<string, unknown>();
+  const totalBytes = [...references.values()].reduce((sum, reference) => sum + reference.bytes, 0);
+  let bytes = 0;
   for (const reference of references.values()) {
-    progress(values.size, references.size);
-    values.set(reference.path, await read(reference));
+    if (signal?.aborted) throw new DOMException('Project loading cancelled.', 'AbortError');
+    progress(values.size, references.size, bytes, totalBytes);
+    const value = await read(reference);
+    if (signal?.aborted) throw new DOMException('Project loading cancelled.', 'AbortError');
+    values.set(reference.path, value); bytes += reference.bytes;
   }
   const hydrate = (value: any): any => {
-    if (!value || typeof value !== 'object') return value;
+    if (!value || typeof value !== 'object' || !changed.has(value)) return value;
     if (value.contract === 'spike/state-artifact-reference/v1') return values.get(value.path);
     return Array.isArray(value) ? value.map(hydrate) : Object.fromEntries(Object.entries(value).map(([key, item]) => [key, hydrate(item)]));
   };
-  progress(values.size, references.size);
+  progress(values.size, references.size, bytes, totalBytes);
   return hydrate(project);
 }
 

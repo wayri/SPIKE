@@ -8,6 +8,12 @@ from __future__ import annotations
 
 
 PI_ERROR_SPECS = (
+    ("SPIKE-BE-PI-E-0120", "PI engineering request invalid", "A PI engineering operation received invalid transport fields.", True, True, "Supply only the documented request and, for copper routing, design fields."),
+    ("SPIKE-BE-PI-E-0121", "PI engineering model admission failed", "Converter or capacitor model inputs are malformed or outside the supported numerical envelope.", True, True, "Review the kernel diagnostic and correct explicit model values, topology, ratings and resource bounds."),
+    ("SPIKE-BE-PI-E-0110", "Invalid source current limit", "Source capacity must be finite and positive in amperes.", True, True, "Enter a positive number or omit current_limit_a for an unlimited ideal source."),
+    ("SPIKE-BE-PI-E-0111", "Source capacity unsupported", "The solver or mode cannot enforce source capacity feasibility.", True, True, "Select DC resistive-network analysis or explicitly remove the capacity requirement."),
+    ("SPIKE-BE-PI-E-0112", "Source capacity exceeded", "The prescribed-voltage operating point exceeds source capacity.", True, True, "Reduce demand or increase reviewed source capacity; a CV/CC operating point is not computed."),
+    ("SPIKE-BE-PI-E-0113", "Source current allocation unsupported", "Shared ideal source boundaries or reverse current prevent capacity admission.", True, True, "Provide distinct resistive source contacts for sharing or a qualified reverse-flow model."),
     (
         "SPIKE-BE-PI-E-0100",
         "PDN candidate invalid",

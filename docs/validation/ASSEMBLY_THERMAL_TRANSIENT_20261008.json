@@ -1,0 +1,413 @@
+{
+  "contract": "spike/transient-thermal-validation/v1",
+  "model_status": "experimental",
+  "production_qualified": false,
+  "reference": "https://www.dhondt.de/ccx_2.20.pdf",
+  "capacity_difference": "SPIKE integrates P1 capacity exactly; CCX DC3D4 centroid capacity independently reproduced.",
+  "limitations": [
+    "No measured hardware calibration or Fang parity; synthetic independent fixtures.",
+    "Prescribed material properties, losses, boundaries and contacts; no airflow."
+  ],
+  "cases": {
+    "uniform_insulated_heating": {
+      "analytic_equation": "T(t)=300+12*t/(2*3) K",
+      "maximum_analytic_error_k": 0.0,
+      "comparison": {
+        "contract": "spike/thermal-transient-comparison/v1",
+        "passed": true,
+        "nodes": 8,
+        "frames": 5,
+        "maximum_absolute_error_k": 0.0,
+        "rms_error_k": 0.0,
+        "worst_time_s": 0.0,
+        "worst_node_index": 0,
+        "absolute_tolerance_k": 6e-05,
+        "relative_tolerance": 0.0,
+        "relative_basis": "per-node absolute temperature change from initial state in CalculiX",
+        "limitation": "Cross-engine agreement is numerical evidence, not measured physical accuracy or Fang parity."
+      },
+      "execution": {
+        "runtime": {
+          "available": true,
+          "status": "detected",
+          "solver_id": "external.calculix",
+          "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+          "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+          "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+        },
+        "solver_version": "2.23",
+        "input_sha256": "9c7676f8db28cd3cbbacf3703b1932a4e7bd504589ac370d9525360feeb66707",
+        "output_sha256": "10b42fc7bcda25de615db348c583ca22fa4b341cc101b6e35dcb71f48d6d405b",
+        "log_sha256": "36b23e224b3da43e47402d4dde4f6de0a3699b3fc27156454dec306bd9d5bf7e",
+        "exit_code": 0,
+        "elapsed_seconds": 1.047000000020489,
+        "threads": 1,
+        "completed_step_time": 1.0,
+        "solver_reported_finished": true
+      }
+    },
+    "timestep_refinement": [
+      {
+        "time_step_s": 0.04,
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "31c236f8d991e50a8b8b260956228d8214de2ee5ddd0f9224ebfcea172cded64",
+          "output_sha256": "dfe67f15a23a34f8a075b6c074a7209c368021d889ce6f2114527619839c2d7f",
+          "log_sha256": "8962e8232e0ff6d061da3640d07538408dd3c6a2f74b814c23e4f93a3303b6ee",
+          "exit_code": 0,
+          "elapsed_seconds": 0.5459999999729916,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        },
+        "spike_semidiscrete_error_k": 0.26915606235849054,
+        "calculix_semidiscrete_error_k": 0.3141104399808796
+      },
+      {
+        "time_step_s": 0.02,
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "e3b90840a7bba6281dee20a441608ba8df55359a6a2977cc9cbc5cb56c189bf3",
+          "output_sha256": "bd7ca0244892d7b937215215c34f2c2b018c13ee325b0c1b2871e3e85eaeb712",
+          "log_sha256": "66e37aecb1721c470d9824c079e93cd6fdf864603bc0fd1bc1499391630ff49b",
+          "exit_code": 0,
+          "elapsed_seconds": 0.3130000000237487,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        },
+        "spike_semidiscrete_error_k": 0.13912976507225494,
+        "calculix_semidiscrete_error_k": 0.1633104399808758
+      },
+      {
+        "time_step_s": 0.01,
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "8dfe1ef201c1b5e81e757242cee8769c5a6efbf95c119f9c35be8b710d316fe6",
+          "output_sha256": "3710ab84e0dc4562c61195f60c29fb4f1a7ec0278302ce7755e60a1d97b895ef",
+          "log_sha256": "8f9b71764d66b09fac7e356e20dfe11b911d5769c48848a1b6872a80b8e06511",
+          "exit_code": 0,
+          "elapsed_seconds": 1.7189999999827705,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        },
+        "spike_semidiscrete_error_k": 0.07076519490271949,
+        "calculix_semidiscrete_error_k": 0.08341043998086661
+      },
+      {
+        "time_step_s": 0.005,
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "71a67ad42a2a45d07fcfba291f062ca9d4ed694d7fd265492f189338bda8293a",
+          "output_sha256": "40ff52dbbe595c615f154a93f0a9b250d6dd1ec6a47a62d1a73016ac9c743e82",
+          "log_sha256": "a5c8dccf92947d4edfa8dddbd33ae84a61b39c030822d293d1d56519a6e92180",
+          "exit_code": 0,
+          "elapsed_seconds": 1.4059999999590218,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        },
+        "spike_semidiscrete_error_k": 0.03569929248885728,
+        "calculix_semidiscrete_error_k": 0.04211043998088826
+      }
+    ],
+    "spatial_refinement": [
+      {
+        "subdivisions": 2,
+        "nodes": 27,
+        "tetrahedra": 48,
+        "spike_analytic_rms_error_k": 0.38491703217705764,
+        "calculix_analytic_rms_error_k": 0.6626950889496531,
+        "comparison": {
+          "contract": "spike/thermal-transient-comparison/v1",
+          "passed": false,
+          "nodes": 27,
+          "frames": 2,
+          "maximum_absolute_error_k": 0.4949312822946581,
+          "rms_error_k": 0.1965117697549005,
+          "worst_time_s": 0.2,
+          "worst_node_index": 17,
+          "absolute_tolerance_k": 0.05,
+          "relative_tolerance": 0.05,
+          "relative_basis": "per-node absolute temperature change from initial state in CalculiX",
+          "limitation": "Cross-engine agreement is numerical evidence, not measured physical accuracy or Fang parity."
+        },
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "2195507298354dcdecdb2e669b64782234cf260fd293a9f0ebf768bbcd8e75b6",
+          "output_sha256": "f4df0b27bfeb23a433a18211459dbf60b51427dd4fac9c73d6b9bb000b563d4e",
+          "log_sha256": "8de883d8f04988d1e4284669b167f53ff5f7ac423a0f2c828c45d27a84443575",
+          "exit_code": 0,
+          "elapsed_seconds": 9.594000000040978,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        }
+      },
+      {
+        "subdivisions": 4,
+        "nodes": 125,
+        "tetrahedra": 384,
+        "spike_analytic_rms_error_k": 0.11497005871754946,
+        "calculix_analytic_rms_error_k": 0.17550902513191896,
+        "comparison": {
+          "contract": "spike/thermal-transient-comparison/v1",
+          "passed": true,
+          "nodes": 125,
+          "frames": 2,
+          "maximum_absolute_error_k": 0.10690778541675172,
+          "rms_error_k": 0.04363998447906169,
+          "worst_time_s": 0.2,
+          "worst_node_index": 75,
+          "absolute_tolerance_k": 0.05,
+          "relative_tolerance": 0.05,
+          "relative_basis": "per-node absolute temperature change from initial state in CalculiX",
+          "limitation": "Cross-engine agreement is numerical evidence, not measured physical accuracy or Fang parity."
+        },
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "dbd1644e6196e78325b27df5932af11506b6feb717cd1be2d0813ebba900268c",
+          "output_sha256": "cb026b5f59161ccbf720843b3f8d999c300b827909fd2bae7c209415665d51a3",
+          "log_sha256": "a2248addb34b2359287cd35b93afc3478fa95797af77e24fc8420c0e4923efb8",
+          "exit_code": 0,
+          "elapsed_seconds": 4.625,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        }
+      },
+      {
+        "subdivisions": 6,
+        "nodes": 343,
+        "tetrahedra": 1296,
+        "spike_analytic_rms_error_k": 0.05018045316362268,
+        "calculix_analytic_rms_error_k": 0.07669647825928715,
+        "comparison": {
+          "contract": "spike/thermal-transient-comparison/v1",
+          "passed": true,
+          "nodes": 343,
+          "frames": 2,
+          "maximum_absolute_error_k": 0.052075298420220406,
+          "rms_error_k": 0.01925076429608763,
+          "worst_time_s": 0.2,
+          "worst_node_index": 146,
+          "absolute_tolerance_k": 0.05,
+          "relative_tolerance": 0.05,
+          "relative_basis": "per-node absolute temperature change from initial state in CalculiX",
+          "limitation": "Cross-engine agreement is numerical evidence, not measured physical accuracy or Fang parity."
+        },
+        "execution": {
+          "runtime": {
+            "available": true,
+            "status": "detected",
+            "solver_id": "external.calculix",
+            "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+            "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+            "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+          },
+          "solver_version": "2.23",
+          "input_sha256": "31a813bc86f56ea16c99c2febb18b8a2cf1838bd8ba1bcb820ed485e44cca608",
+          "output_sha256": "b356cb4737d9299d5ddec3305936de85630b413162590ea855d95ffa8b0e6520",
+          "log_sha256": "23de33cabe869483c3685a5106fdca17374c05502ba98b69a61cad9fd89981dc",
+          "exit_code": 0,
+          "elapsed_seconds": 13.827999999979511,
+          "threads": 1,
+          "completed_step_time": 0.2,
+          "solver_reported_finished": true
+        }
+      }
+    ]
+  },
+  "retained_multiboard_step": {
+    "occurrences": [
+      "board-a",
+      "board-b",
+      "thermal-component-6134c5b6dd6a72e28c40a28bfc700ef3"
+    ],
+    "comparison": {
+      "contract": "spike/thermal-transient-comparison/v1",
+      "passed": true,
+      "nodes": 288,
+      "frames": 5,
+      "maximum_absolute_error_k": 0.01142584483329756,
+      "rms_error_k": 0.004094736509846971,
+      "worst_time_s": 1.0,
+      "worst_node_index": 270,
+      "absolute_tolerance_k": 0.05,
+      "relative_tolerance": 0.05,
+      "relative_basis": "per-node absolute temperature change from initial state in CalculiX",
+      "limitation": "Cross-engine agreement is numerical evidence, not measured physical accuracy or Fang parity."
+    },
+    "spike_occurrence_temperatures": {
+      "board-a": {
+        "minimum_k": 300.0,
+        "maximum_k": 301.8277047596036,
+        "vertex_range": [
+          0,
+          97
+        ]
+      },
+      "board-b": {
+        "minimum_k": 299.9999999999999,
+        "maximum_k": 300.0000000000001,
+        "vertex_range": [
+          97,
+          191
+        ]
+      },
+      "thermal-component-6134c5b6dd6a72e28c40a28bfc700ef3": {
+        "minimum_k": 302.71709629083676,
+        "maximum_k": 303.9141741551667,
+        "vertex_range": [
+          191,
+          288
+        ]
+      }
+    },
+    "calculix_occurrence_temperatures": {
+      "board-a": {
+        "minimum_k": 300.0,
+        "maximum_k": 301.8345,
+        "vertex_range": [
+          0,
+          97
+        ]
+      },
+      "board-b": {
+        "minimum_k": 300.0,
+        "maximum_k": 300.0,
+        "vertex_range": [
+          97,
+          191
+        ]
+      },
+      "thermal-component-6134c5b6dd6a72e28c40a28bfc700ef3": {
+        "minimum_k": 302.7234,
+        "maximum_k": 303.9256,
+        "vertex_range": [
+          191,
+          288
+        ]
+      }
+    },
+    "execution": {
+      "runtime": {
+        "available": true,
+        "status": "detected",
+        "solver_id": "external.calculix",
+        "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+        "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+        "message": "Separately installed executable detected; a completed solve is required for execution evidence."
+      },
+      "solver_version": "2.23",
+      "input_sha256": "bc18e18655ec58d4f621c9ecaee9a53698931ad6339c045457eaa20fb97da740",
+      "output_sha256": "312eb1181a479a37197aa12d7b561c5deeb47edc49960828a3c6e04b0b787c0e",
+      "log_sha256": "c96519422db7dac2665c78a95c71a4379729f1d982c2411d7272a73aa5aa9eee",
+      "exit_code": 0,
+      "elapsed_seconds": 0.75,
+      "threads": 1,
+      "completed_step_time": 1.0,
+      "solver_reported_finished": true
+    },
+    "meshing_mode": "joint_conformal",
+    "mesh_evidence": [
+      {
+        "occurrence_id": "board-a",
+        "representation": "explicit_effective_layers",
+        "approximations": [
+          "Patterned copper and drill/via details are homogenized into reviewed layer properties."
+        ],
+        "meshing_mode": "joint_conformal",
+        "metrics": {
+          "cad_volume_mm3": 3.999999999999999,
+          "tetrahedron_volume_mm3": 4.000000000000001,
+          "source_cad_volumes_mm3": {
+            "layer:dielectric": 3.999999999999999
+          },
+          "minimum_mean_ratio_quality": 0.540960485246751
+        }
+      },
+      {
+        "occurrence_id": "board-b",
+        "representation": "explicit_effective_layers",
+        "approximations": [
+          "Patterned copper and drill/via details are homogenized into reviewed layer properties."
+        ],
+        "meshing_mode": "joint_conformal",
+        "metrics": {
+          "cad_volume_mm3": 3.999999999999999,
+          "tetrahedron_volume_mm3": 3.999999999999999,
+          "source_cad_volumes_mm3": {
+            "layer:dielectric": 3.999999999999999
+          },
+          "minimum_mean_ratio_quality": 0.540960485246751
+        }
+      },
+      {
+        "occurrence_id": "thermal-component-6134c5b6dd6a72e28c40a28bfc700ef3",
+        "representation": "exact_step_solid",
+        "approximations": [],
+        "meshing_mode": "joint_conformal",
+        "metrics": {
+          "cad_volume_mm3": 3.999999999999999,
+          "tetrahedron_volume_mm3": 4.000000000000002,
+          "source_cad_volumes_mm3": {
+            "component-step": 3.999999999999999
+          },
+          "minimum_mean_ratio_quality": 0.540960485246751
+        }
+      }
+    ],
+    "geometry_digest": "28396042bd7592befc36e3e54f25a9e293c98e94799cdf342fcf148044dadcfc",
+    "retained_artifacts_directory": ".local\\transient-thermal-validation"
+  }
+}

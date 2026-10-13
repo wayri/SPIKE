@@ -1,0 +1,220 @@
+{
+  "contract": "spikes/manufacturer-parts/v1",
+  "version": "1.0.0",
+  "generated_on": "2026-10-12",
+  "scope": "Focused reproducible seed of selected real exact manufacturer part numbers from official product pages and datasheets; it is not a complete manufacturer library.",
+  "limitations": "Selected ratings are discovery metadata, not solver-enforced limits. Only sourced nominal resistors and capacitors have an insertable SPIKES-generated ideal R/C recipe. No manufacturer SPICE is redistributed; user-supplied models retain source, license and hash and remain review-only until separately qualified.",
+  "records": [
+    {
+      "id": "murata.grm21br61a106ke19l", "manufacturer": "Murata", "mpn": "GRM21BR61A106KE19L", "category": "capacitor",
+      "description": "10 uF, X5R chip multilayer ceramic capacitor", "nominal": {"value": 0.00001, "unit": "F", "label": "10 uF"},
+      "tolerance": {"kind": "symmetric", "value": 10, "unit": "percent", "display": "+/-10%"},
+      "ratings": [{"name": "rated_voltage", "value": 10, "unit": "VDC"}], "package": "0805 (2012 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_capacitor", "readiness": "placeable_ideal_nominal", "limitations": "No DC-bias capacitance loss, frequency dependence, ESR, ESL, leakage, temperature characteristic or tolerance sweep."},
+      "source": {"url": "https://www.murata.com/en-global/api/pdfdownloadapi?cate=luCeramicCapacitorsSMD&partno=GRM21BR61A106KE19%23", "accessed_on": "2026-10-12", "document": "Murata Product Search Data Sheet GRM21BR61A106KE19#", "fields": ["exact package-code MPN", "capacitance", "tolerance", "rated voltage", "temperature characteristic", "case size"]}
+    },
+    {
+      "id": "murata.grm1885c1h100ja01d", "manufacturer": "Murata", "mpn": "GRM1885C1H100JA01D", "category": "capacitor",
+      "description": "10 pF, C0G chip multilayer ceramic capacitor", "nominal": {"value": 1e-11, "unit": "F", "label": "10 pF"},
+      "tolerance": {"kind": "symmetric", "value": 5, "unit": "percent", "display": "+/-5%"},
+      "ratings": [{"name": "rated_voltage", "value": 50, "unit": "VDC"}], "package": "0603 (1608 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_capacitor", "readiness": "placeable_ideal_nominal", "limitations": "No frequency dependence, ESR, ESL, leakage, temperature characteristic or tolerance sweep."},
+      "source": {"url": "https://www.murata.com/en-global/api/pdfdownloadapi?cate=luCeramicCapacitorsSMD&partno=GRM1885C1H100JA01%23", "accessed_on": "2026-10-12", "document": "Murata Product Search Data Sheet GRM1885C1H100JA01#", "fields": ["exact package-code MPN", "capacitance", "tolerance", "rated voltage", "temperature characteristic", "case size"]}
+    },
+    {
+      "id": "murata.ncp18xh103f03rb", "manufacturer": "Murata", "mpn": "NCP18XH103F03RB", "category": "ntc_thermistor",
+      "description": "10 kohm NTC temperature-sensor thermistor, B25/50 3380 K", "nominal": {"value": 10000, "unit": "ohm", "label": "10 kohm at 25 degree C"},
+      "tolerance": {"kind": "symmetric", "value": 1, "unit": "percent", "display": "+/-1% at 25 degree C"},
+      "ratings": [{"name": "b_constant_25_50", "value": 3380, "unit": "K"}, {"name": "max_voltage", "value": 5, "unit": "V"}, {"name": "operating_temperature", "value": [-40, 125], "unit": "degree C"}], "package": "0603 (1.6 x 0.8 mm) SMD",
+      "pins": [{"number": "1", "name": "T1", "role": "thermistor_terminal"}, {"number": "2", "name": "T2", "role": "thermistor_terminal"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "The sourced resistance and B constant are insufficient to qualify self-heating, dissipation, full R/T curve or dynamic thermal behavior; no constant-resistor substitute is offered."},
+      "source": {"url": "https://www.murata.com/en-global/products/productdetail?cate=luNTCforTempeSenso&partno=NCP18XH103F03RB", "accessed_on": "2026-10-12", "document": "Murata product detail NCP18XH103F03RB", "fields": ["MPN", "R25", "R25 tolerance", "B25/50", "maximum voltage", "operating temperature", "size"]}
+    },
+    {
+      "id": "murata.prg18bb471mb1rb", "manufacturer": "Murata", "mpn": "PRG18BB471MB1RB", "category": "ptc_resettable",
+      "description": "470 ohm PTC thermistor for overcurrent protection", "nominal": {"value": 470, "unit": "ohm", "label": "470 ohm at 25 degree C"},
+      "tolerance": {"kind": "symmetric", "value": 20, "unit": "percent", "display": "+/-20% at 25 degree C"},
+      "ratings": [{"name": "maximum_voltage", "value": 24, "unit": "VDC"}, {"name": "maximum_current", "value": 0.06, "unit": "A"}, {"name": "hold_current", "value": 0.01, "unit": "A", "condition": "25 degree C"}], "package": "0603 (1.6 x 0.8 mm) SMD",
+      "pins": [{"number": "1", "name": "T1", "role": "ptc_terminal"}, {"number": "2", "name": "T2", "role": "ptc_terminal"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "Trip/hold current is temperature- and board-dependent; no fixed resistor or threshold switch substitute is offered."},
+      "source": {"url": "https://www.murata.com/-/media/webrenewal/products/thermistor/ptc/prg/bc-e0160j-prg18bbmb1rb-e.ashx?la=en", "accessed_on": "2026-10-12", "document": "Murata PRG18 series Posistor specification JEWA01BC-3100B", "fields": ["MPN", "R25", "tolerance", "maximum voltage", "maximum current", "hold current", "trip current", "case size"]}
+    },
+
+    {
+      "id": "yageo.rc0075fr-07100rl", "manufacturer": "Yageo", "mpn": "RC0075FR-07100RL", "category": "resistor",
+      "description": "100 ohm thick-film general-purpose chip resistor", "nominal": {"value": 100, "unit": "ohm", "label": "100 ohm"},
+      "tolerance": {"kind": "symmetric", "value": 1, "unit": "percent", "display": "+/-1%"},
+      "ratings": [{"name": "rated_power", "value": 0.02, "unit": "W"}], "package": "0075 (03015 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_resistor", "readiness": "placeable_ideal_nominal", "limitations": "No voltage coefficient, pulse behavior, temperature coefficient, noise, parasitics, failure or tolerance sweep."},
+      "source": {"url": "https://www.yageo.com/en/ProductSearch?apply_filter=1&category=rchip&series=rc&subcategory=thick_film_general_purpose&target=target_pn", "accessed_on": "2026-10-12", "document": "Yageo official RC product search", "fields": ["MPN", "resistance", "tolerance", "rated power", "size"]}
+    },
+    {
+      "id": "yageo.rc0075fr-0710kl", "manufacturer": "Yageo", "mpn": "RC0075FR-0710KL", "category": "resistor",
+      "description": "10 kohm thick-film general-purpose chip resistor", "nominal": {"value": 10000, "unit": "ohm", "label": "10 kohm"},
+      "tolerance": {"kind": "symmetric", "value": 1, "unit": "percent", "display": "+/-1%"},
+      "ratings": [{"name": "rated_power", "value": 0.02, "unit": "W"}], "package": "0075 (03015 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_resistor", "readiness": "placeable_ideal_nominal", "limitations": "No voltage coefficient, pulse behavior, temperature coefficient, noise, parasitics, failure or tolerance sweep."},
+      "source": {"url": "https://www.yageo.com/en/ProductSearch?apply_filter=1&category=rchip&series=rc&subcategory=thick_film_general_purpose&target=target_pn", "accessed_on": "2026-10-12", "document": "Yageo official RC product search", "fields": ["MPN", "resistance", "tolerance", "rated power", "size"]}
+    },
+    {
+      "id": "yageo.rc0075fr-0710rl", "manufacturer": "Yageo", "mpn": "RC0075FR-0710RL", "category": "resistor",
+      "description": "10 ohm thick-film general-purpose chip resistor", "nominal": {"value": 10, "unit": "ohm", "label": "10 ohm"},
+      "tolerance": {"kind": "symmetric", "value": 1, "unit": "percent", "display": "+/-1%"},
+      "ratings": [{"name": "rated_power", "value": 0.02, "unit": "W"}], "package": "0075 (03015 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_resistor", "readiness": "placeable_ideal_nominal", "limitations": "No voltage coefficient, pulse behavior, temperature coefficient, noise, parasitics, failure or tolerance sweep."},
+      "source": {"url": "https://www.yageo.com/en/ProductSearch?apply_filter=1&category=rchip&series=rc&subcategory=thick_film_general_purpose&target=target_pn", "accessed_on": "2026-10-12", "document": "Yageo official RC product search", "fields": ["MPN", "resistance", "tolerance", "rated power", "size"]}
+    },
+    {
+      "id": "yageo.rc0075fr-071kl", "manufacturer": "Yageo", "mpn": "RC0075FR-071KL", "category": "resistor",
+      "description": "1 kohm thick-film general-purpose chip resistor", "nominal": {"value": 1000, "unit": "ohm", "label": "1 kohm"},
+      "tolerance": {"kind": "symmetric", "value": 1, "unit": "percent", "display": "+/-1%"},
+      "ratings": [{"name": "rated_power", "value": 0.02, "unit": "W"}], "package": "0075 (03015 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_resistor", "readiness": "placeable_ideal_nominal", "limitations": "No voltage coefficient, pulse behavior, temperature coefficient, noise, parasitics, failure or tolerance sweep."},
+      "source": {"url": "https://www.yageo.com/en/ProductSearch?apply_filter=1&category=rchip&series=rc&subcategory=thick_film_general_purpose&target=target_pn", "accessed_on": "2026-10-12", "document": "Yageo official RC product search", "fields": ["MPN", "resistance", "tolerance", "rated power", "size"]}
+    },
+    {
+      "id": "yageo.cc0201krx6s4bb104", "manufacturer": "Yageo", "mpn": "CC0201KRX6S4BB104", "category": "capacitor",
+      "description": "100 nF X6S surface-mount multilayer ceramic capacitor", "nominal": {"value": 1e-7, "unit": "F", "label": "100 nF"},
+      "tolerance": {"kind": "symmetric", "value": 10, "unit": "percent", "display": "+/-10%"},
+      "ratings": [{"name": "rated_voltage", "value": 4, "unit": "VDC"}], "package": "0201 (0603 metric)",
+      "pins": [{"number": "1", "name": "P", "role": "passive_terminal"}, {"number": "2", "name": "N", "role": "passive_terminal"}],
+      "model": {"kind": "ideal_nominal_capacitor", "readiness": "placeable_ideal_nominal", "limitations": "No DC-bias capacitance loss, frequency dependence, ESR, ESL, leakage, temperature characteristic or tolerance sweep."},
+      "source": {"url": "https://www.yageo.com/en/Chart/Download/pdf/CC0201KRX6S4BB104", "accessed_on": "2026-10-12", "document": "Yageo exact-PN specification sheet CC0201KRX6S4BB104", "fields": ["MPN", "capacitance", "tolerance", "rated voltage", "temperature characteristic", "case size"]}
+    },
+
+    {
+      "id": "ti.lm358p", "manufacturer": "Texas Instruments", "mpn": "LM358P", "category": "operational_amplifier",
+      "description": "Dual 30 V, 700 kHz operational amplifier", "nominal": {"value": 2, "unit": "count", "label": "2 amplifier channels"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "total_supply_voltage", "value": [3, 30], "unit": "V"}, {"name": "typical_gain_bandwidth", "value": 700000, "unit": "Hz", "qualifier": "typical"}, {"name": "operating_temperature", "value": [0, 70], "unit": "degree C"}], "package": "PDIP-8 (P)",
+      "pins": [{"number": "1", "name": "1OUT", "role": "output"}, {"number": "2", "name": "1IN-", "role": "input_inverting"}, {"number": "3", "name": "1IN+", "role": "input_noninverting"}, {"number": "4", "name": "V-", "role": "negative_supply"}, {"number": "5", "name": "2IN+", "role": "input_noninverting"}, {"number": "6", "name": "2IN-", "role": "input_inverting"}, {"number": "7", "name": "2OUT", "role": "output"}, {"number": "8", "name": "V+", "role": "positive_supply"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No generic op-amp is relabeled as LM358P. Acquire and qualify the exact applicable TI model/version and map its subcircuit pins to this package."},
+      "source": {"url": "https://www.ti.com/product/LM358/part-details/LM358P", "accessed_on": "2026-10-12", "document": "TI LM358 product and LM358P orderable-part page", "fields": ["exact orderable MPN", "channels", "supply range", "gain bandwidth", "package", "pin count", "operating temperature", "pinout"]}
+    },
+    {
+      "id": "ti.lm741cn-nopb", "manufacturer": "Texas Instruments", "mpn": "LM741CN/NOPB", "category": "operational_amplifier",
+      "description": "Single general-purpose operational amplifier", "nominal": {"value": 1, "unit": "count", "label": "1 amplifier channel"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "package_pin_count", "value": 8, "unit": "count"}, {"name": "operating_temperature", "value": [0, 70], "unit": "degree C"}], "package": "PDIP-8 (P)",
+      "pins": [{"number": "1", "name": "OFFSET NULL", "role": "offset_trim"}, {"number": "2", "name": "IN-", "role": "input_inverting"}, {"number": "3", "name": "IN+", "role": "input_noninverting"}, {"number": "4", "name": "V-", "role": "negative_supply"}, {"number": "5", "name": "OFFSET NULL", "role": "offset_trim"}, {"number": "6", "name": "OUT", "role": "output"}, {"number": "7", "name": "V+", "role": "positive_supply"}, {"number": "8", "name": "NC", "role": "no_connect"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No generic op-amp substitute is installed. Exact-package offset-null pins and model pin order require review."},
+      "source": {"url": "https://www.ti.com/lit/gpn/lm741", "accessed_on": "2026-10-12", "document": "TI LM741 Operational Amplifier datasheet Rev. D", "fields": ["exact orderable MPN", "package", "pin count", "operating temperature", "pinout"]}
+    },
+    {
+      "id": "ti.lm393p", "manufacturer": "Texas Instruments", "mpn": "LM393P", "category": "comparator",
+      "description": "Dual differential comparator, commercial grade", "nominal": {"value": 2, "unit": "count", "label": "2 comparator channels"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "package_pin_count", "value": 8, "unit": "count"}, {"name": "operating_temperature", "value": [0, 70], "unit": "degree C"}], "package": "PDIP-8 (P)",
+      "pins": [{"number": "1", "name": "1OUT", "role": "open_collector_output"}, {"number": "2", "name": "1IN-", "role": "input_inverting"}, {"number": "3", "name": "1IN+", "role": "input_noninverting"}, {"number": "4", "name": "GND", "role": "negative_supply"}, {"number": "5", "name": "2IN+", "role": "input_noninverting"}, {"number": "6", "name": "2IN-", "role": "input_inverting"}, {"number": "7", "name": "2OUT", "role": "open_collector_output"}, {"number": "8", "name": "VCC", "role": "positive_supply"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No threshold block or generic comparator is relabeled as LM393P. Open-collector behavior and exact model version require vendor-model review."},
+      "source": {"url": "https://www.ti.com/product/LM393/part-details/LM393P", "accessed_on": "2026-10-12", "document": "TI LM393P orderable-part page and LM393 family datasheet", "fields": ["exact orderable MPN", "channels", "package", "pin count", "operating temperature", "pinout"]}
+    },
+
+    {
+      "id": "adi.ad8605artz-reel7", "manufacturer": "Analog Devices", "mpn": "AD8605ARTZ-REEL7", "category": "operational_amplifier",
+      "description": "Single precision CMOS rail-to-rail input/output operational amplifier", "nominal": {"value": 1, "unit": "count", "label": "1 amplifier channel"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "supply_voltage", "value": [2.7, 5.5], "unit": "V"}, {"name": "package_pin_count", "value": 5, "unit": "count"}], "package": "SOT-23-5 (RT)",
+      "pins": [{"number": "1", "name": "OUT", "role": "output"}, {"number": "2", "name": "V-", "role": "negative_supply"}, {"number": "3", "name": "IN+", "role": "input_noninverting"}, {"number": "4", "name": "IN-", "role": "input_inverting"}, {"number": "5", "name": "V+", "role": "positive_supply"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "A product-family macro-model may cover multiple grades; exact applicability, pin order and limits must be reviewed before execution."},
+      "source": {"url": "https://www.analog.com/en/products/ad8605.html", "accessed_on": "2026-10-12", "document": "Analog Devices AD8605 product page and AD8605/AD8606/AD8608 datasheet Rev. O", "fields": ["exact part model", "channels", "supply range", "package", "pinout"]}
+    },
+    {
+      "id": "adi.op27gpz", "manufacturer": "Analog Devices", "mpn": "OP27GPZ", "category": "operational_amplifier",
+      "description": "Low-noise precision operational amplifier", "nominal": {"value": 1, "unit": "count", "label": "1 amplifier channel"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "package_pin_count", "value": 8, "unit": "count"}], "package": "PDIP-8 (P)",
+      "pins": [{"number": "1", "name": "VOS TRIM", "role": "offset_trim"}, {"number": "2", "name": "IN-", "role": "input_inverting"}, {"number": "3", "name": "IN+", "role": "input_noninverting"}, {"number": "4", "name": "V-", "role": "negative_supply"}, {"number": "5", "name": "VOS TRIM", "role": "offset_trim"}, {"number": "6", "name": "OUT", "role": "output"}, {"number": "7", "name": "V+", "role": "positive_supply"}, {"number": "8", "name": "NC", "role": "no_connect"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No generic precision amplifier substitute is installed; acquire the applicable ADI model and verify trim pins and package mapping."},
+      "source": {"url": "https://www.analog.com/en/products/op27.html", "accessed_on": "2026-10-12", "document": "Analog Devices OP27 product page", "fields": ["exact part model", "channel count", "package", "pin count", "pinout"]}
+    },
+    {
+      "id": "adi.lt1013cn8-pbf", "manufacturer": "Analog Devices", "mpn": "LT1013CN8#PBF", "category": "operational_amplifier",
+      "description": "Dual precision operational amplifier", "nominal": {"value": 2, "unit": "count", "label": "2 amplifier channels"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "package_pin_count", "value": 8, "unit": "count"}, {"name": "operating_temperature", "value": [0, 70], "unit": "degree C"}], "package": "8-lead narrow PDIP (N8)",
+      "pins": [{"number": "1", "name": "OUT A", "role": "output"}, {"number": "2", "name": "IN- A", "role": "input_inverting"}, {"number": "3", "name": "IN+ A", "role": "input_noninverting"}, {"number": "4", "name": "V-", "role": "negative_supply"}, {"number": "5", "name": "IN+ B", "role": "input_noninverting"}, {"number": "6", "name": "IN- B", "role": "input_inverting"}, {"number": "7", "name": "OUT B", "role": "output"}, {"number": "8", "name": "V+", "role": "positive_supply"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "ADI publishes LT1013/LT1014 model material, but this catalog does not redistribute or auto-approve it; package and model pin order require review."},
+      "source": {"url": "https://www.analog.com/en/products/lt1013.html", "accessed_on": "2026-10-12", "document": "Analog Devices LT1013 product page and LT1013/LT1014 datasheet", "fields": ["exact part model", "channels", "package", "pin count", "operating temperature", "pinout", "model availability"]}
+    },
+    {
+      "id": "adi.ad822anz", "manufacturer": "Analog Devices", "mpn": "AD822ANZ", "category": "operational_amplifier",
+      "description": "Dual rail-to-rail low-power FET-input operational amplifier", "nominal": {"value": 2, "unit": "count", "label": "2 amplifier channels"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "single_supply_voltage", "value": [5, 30], "unit": "V"}, {"name": "package_pin_count", "value": 8, "unit": "count"}], "package": "8-lead PDIP",
+      "pins": [{"number": "1", "name": "OUT A", "role": "output"}, {"number": "2", "name": "IN- A", "role": "input_inverting"}, {"number": "3", "name": "IN+ A", "role": "input_noninverting"}, {"number": "4", "name": "V-", "role": "negative_supply"}, {"number": "5", "name": "IN+ B", "role": "input_noninverting"}, {"number": "6", "name": "IN- B", "role": "input_inverting"}, {"number": "7", "name": "OUT B", "role": "output"}, {"number": "8", "name": "V+", "role": "positive_supply"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "ADI lists family SPICE macro-models; this catalog does not redistribute or claim qualification for AD822ANZ."},
+      "source": {"url": "https://www.analog.com/en/products/ad822.html", "accessed_on": "2026-10-12", "document": "Analog Devices AD822 product page", "fields": ["exact part model", "channels", "supply range", "package", "pinout", "model availability"]}
+    },
+
+    {
+      "id": "infineon.irlz44npbf", "manufacturer": "Infineon", "mpn": "IRLZ44NPBF", "category": "mosfet",
+      "description": "55 V logic-level N-channel power MOSFET", "nominal": {"value": 55, "unit": "V", "label": "55 V VDS maximum"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "vds_max", "value": 55, "unit": "V"}, {"name": "id_max_at_25c", "value": 47, "unit": "A"}, {"name": "power_dissipation_max", "value": 83, "unit": "W"}], "package": "TO-220",
+      "pins": [{"number": "1", "name": "G", "role": "gate"}, {"number": "2", "name": "D", "role": "drain"}, {"number": "3", "name": "S", "role": "source"}, {"number": "TAB", "name": "D", "role": "drain_tab"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No threshold or on-resistance surrogate is offered; switching charge, capacitance, temperature and safe-operating-area behavior require a reviewed exact model."},
+      "source": {"url": "https://www.infineon.com/part/IRLZ44N", "accessed_on": "2026-10-12", "document": "Infineon IRLZ44N product page, OPN IRLZ44NPBF", "fields": ["exact OPN", "VDS max", "ID max", "power dissipation", "package", "pinout"]}
+    },
+    {
+      "id": "infineon.bss138nh6327xtsa2", "manufacturer": "Infineon", "mpn": "BSS138NH6327XTSA2", "category": "mosfet",
+      "description": "60 V N-channel small-signal MOSFET", "nominal": {"value": 60, "unit": "V", "label": "60 V VDS maximum"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "vds_max", "value": 60, "unit": "V"}, {"name": "id_max_at_25c", "value": 0.23, "unit": "A"}, {"name": "power_dissipation_max", "value": 0.36, "unit": "W"}], "package": "PG-SOT23-3",
+      "pins": [{"number": "1", "name": "G", "role": "gate"}, {"number": "2", "name": "S", "role": "source"}, {"number": "3", "name": "D", "role": "drain"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No threshold/on-resistance surrogate is offered; exact temperature, capacitance and switching behavior require a reviewed manufacturer model."},
+      "source": {"url": "https://www.infineon.com/part/BSS138N", "accessed_on": "2026-10-12", "document": "Infineon BSS138N product page and datasheet Rev. 2.86", "fields": ["exact OPN", "VDS max", "ID max", "power dissipation", "package", "pinout"]}
+    },
+    {
+      "id": "st.stp55nf06", "manufacturer": "STMicroelectronics", "mpn": "STP55NF06", "category": "mosfet",
+      "description": "60 V N-channel STripFET II power MOSFET", "nominal": {"value": 60, "unit": "V", "label": "60 V VDS"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "vds", "value": 60, "unit": "V"}, {"name": "drain_current", "value": 50, "unit": "A"}, {"name": "rds_on", "value": 0.015, "unit": "ohm"}], "package": "TO-220",
+      "pins": [{"number": "1", "name": "G", "role": "gate"}, {"number": "2", "name": "D", "role": "drain"}, {"number": "3", "name": "S", "role": "source"}, {"number": "TAB", "name": "D", "role": "drain_tab"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "ST publishes a SPICE download, but it is not bundled or auto-approved. Exact archive license, hash, dependencies, model pins and applicability require user review."},
+      "source": {"url": "https://www.st.com/en/power-transistors/stp55nf06.html", "accessed_on": "2026-10-12", "document": "STMicroelectronics STP55NF06 product page", "fields": ["exact MPN", "VDS", "ID", "RDS(on)", "package", "pinout", "SPICE resource availability"]}
+    },
+    {
+      "id": "vishay.2n7002k-t1-ge3", "manufacturer": "Vishay", "mpn": "2N7002K-T1-GE3", "category": "mosfet",
+      "description": "60 V N-channel MOSFET, lead-free and halogen-free ordering code", "nominal": {"value": 60, "unit": "V", "label": "60 V VDS maximum"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "vds_max", "value": 60, "unit": "V"}, {"name": "continuous_drain_current_at_25c", "value": 0.3, "unit": "A"}, {"name": "power_dissipation_at_25c", "value": 0.35, "unit": "W"}], "package": "SOT-23",
+      "pins": [{"number": "1", "name": "G", "role": "gate"}, {"number": "2", "name": "S", "role": "source"}, {"number": "3", "name": "D", "role": "drain"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "No generic MOSFET model is relabeled with this ordering code; a reviewed exact/applicable vendor model is required."},
+      "source": {"url": "https://www.vishay.com/en/product/71333/tab/quality/", "accessed_on": "2026-10-12", "document": "Vishay 2N7002K product quality page and datasheet 71333", "fields": ["exact ordering code", "VDS max", "ID max", "power dissipation", "package", "pinout"]}
+    },
+    {
+      "id": "vishay.tsal6200", "manufacturer": "Vishay", "mpn": "TSAL6200", "category": "led",
+      "description": "940 nm high-power infrared emitting diode", "nominal": {"value": 940, "unit": "nm", "label": "940 nm peak wavelength"},
+      "tolerance": {"kind": "not_applicable", "display": "No single component tolerance"},
+      "ratings": [{"name": "forward_current_max", "value": 0.1, "unit": "A"}, {"name": "reverse_voltage_max", "value": 5, "unit": "V"}, {"name": "power_dissipation_max", "value": 0.16, "unit": "W"}], "package": "T-1 3/4, 5 mm leaded",
+      "pins": [{"number": "A", "name": "ANODE", "role": "anode"}, {"number": "K", "name": "CATHODE", "role": "cathode"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "Optical output and electrical IV behavior are not represented by a generic LED substitute. Lead designation is shown; confirm physical orientation from the package drawing."},
+      "source": {"url": "https://www.vishay.com/en/product/81010/", "accessed_on": "2026-10-12", "document": "Vishay TSAL6200 product page and datasheet 81010", "fields": ["exact ordering code", "peak wavelength", "forward current", "reverse voltage", "power dissipation", "package", "lead designation"]}
+    },
+    {
+      "id": "tdk.b57237s0259m000", "manufacturer": "TDK", "mpn": "B57237S0259M000", "category": "inrush_limiter",
+      "description": "2.5 ohm NTC inrush-current limiter", "nominal": {"value": 2.5, "unit": "ohm", "label": "2.5 ohm at 25 degree C"},
+      "tolerance": {"kind": "symmetric", "value": 20, "unit": "percent", "display": "+/-20% at 25 degree C"},
+      "ratings": [{"name": "maximum_current", "value": 6.5, "unit": "A"}, {"name": "operating_temperature", "value": [-55, 170], "unit": "degree C"}], "package": "S237 radial, 15 mm maximum body diameter",
+      "pins": [{"number": "1", "name": "T1", "role": "thermistor_terminal"}, {"number": "2", "name": "T2", "role": "thermistor_terminal"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "Cold R25 is not a qualified inrush model. Self-heating, cooling, repeat-start energy and R/T behavior require a reviewed dynamic model."},
+      "source": {"url": "https://product.tdk.com/en/search/protection/current/ntc-limiter/info?part_no=B57237S0259M000", "accessed_on": "2026-10-12", "document": "TDK Product Center exact-part detail B57237S0259M000", "fields": ["exact MPN", "R25", "tolerance", "maximum current", "operating temperature", "dimensions"]}
+    },
+    {
+      "id": "littelfuse.0218002-mxp", "manufacturer": "Littelfuse", "mpn": "0218002.MXP", "category": "fuse",
+      "description": "2 A, 250 VAC, 5 x 20 mm time-lag glass cartridge fuse", "nominal": {"value": 2, "unit": "A", "label": "2 A rated current"},
+      "tolerance": {"kind": "not_applicable", "display": "Fuse time-current behavior is not a scalar tolerance"},
+      "ratings": [{"name": "maximum_ac_voltage", "value": 250, "unit": "VAC"}, {"name": "nominal_melting_i2t", "value": 14.45, "unit": "A2 s"}, {"name": "nominal_cold_resistance", "value": 0.0293, "unit": "ohm"}], "package": "5 x 20 mm cartridge (MXP packaging code)",
+      "pins": [{"number": "1", "name": "T1", "role": "fuse_terminal"}, {"number": "2", "name": "T2", "role": "fuse_terminal"}],
+      "model": {"kind": "none", "readiness": "vendor_model_required", "limitations": "Cold resistance and nominal melting I2t do not define a qualified time-current or thermal fuse model; no fixed resistor/threshold substitute is offered."},
+      "source": {"url": "https://www.littelfuse.com/products/fuses-overcurrent-protection/fuses/cartridge-fuses/5x20mm-fuses-cartridge-fuses/218/0218002", "accessed_on": "2026-10-12", "document": "Littelfuse 218 series exact-part page and 218 datasheet", "fields": ["ordering variants including MXP", "rated current", "maximum AC voltage", "nominal melting I2t", "cold resistance", "package"]}
+    }
+  ]
+}

@@ -1,22 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import ts from "typescript";
+import { importTestTypescript } from "./import-test-typescript.mjs";
 
-const projectPackageSource = readFileSync(new URL("../src/projectPackage.ts", import.meta.url), "utf8");
-const version = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
-assert.ok(version, "the application version must be declared");
-const source = projectPackageSource.replace(
-  /import \{ APP_VERSION \} from "\.\/appVersion";\s*/,
-  `const APP_VERSION = ${JSON.stringify(version)};\n`,
-);
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const bridgeSource = readFileSync(new URL("../src/workerBridge.ts", import.meta.url), "utf8");
-const transpiled = ts.transpileModule(source, {
-  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
-}).outputText;
-const projectPackage = await import(
-  `data:text/javascript;base64,${Buffer.from(transpiled).toString("base64")}`
-);
+const projectPackage = await importTestTypescript("projectPackage");
 
 const payload = {
   emi: { setup: { contract: "spike/emi-setup/v1", chamber: { distance_m: 3, table_height_m: .8, antenna_height_m: 2, orientation: "upright", azimuth_deg: 45, polarization: "vertical", floor: "absorber", cutaway: true } } },

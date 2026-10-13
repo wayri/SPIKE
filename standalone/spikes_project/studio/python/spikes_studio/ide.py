@@ -18,7 +18,9 @@ def find_tool(name):
         candidates=sorted(root.glob("*/*/VC/Tools/MSVC/*/bin/Hostx64/x64/cl.exe"),reverse=True)
         if candidates:return str(candidates[0])
     for parent in Path(__file__).resolve().parents:
-        for root in (parent / "tools/hdl/oss-cad-suite/oss-cad-suite/bin", parent / "tools/hdl/iverilog-standalone/bin"):
+        for root in (parent / "tools/hdl/oss-cad-suite/oss-cad-suite/bin",
+                     parent / "tools/hdl/iverilog-standalone/bin",
+                     parent / "tools/hdl/ghdl/installed/ucrt64/bin"):
             candidate = root / (name + (".exe" if os.name == "nt" else ""))
             if candidate.is_file(): return str(candidate)
     return None
@@ -26,10 +28,11 @@ def find_tool(name):
 
 def analyze(source, language, mode="check", top="top"):
     if mode not in ("check", "synthesize", "simulate"):raise ValueError("Unknown build mode")
-    if mode=="simulate" and language!="Verilog":raise ValueError("Digital simulation currently requires a Verilog testbench")
+    if mode=="simulate" and language not in ("Verilog", "VHDL"):raise ValueError("Digital simulation requires a Verilog or VHDL testbench")
     if len(source.encode()) > 2 * 1024 * 1024: raise ValueError("Source exceeds 2 MiB")
     if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", top): raise ValueError("Invalid module identifier")
-    tool = "yosys" if mode == "synthesize" and language == "Verilog" else "iverilog" if language == "Verilog" else "clang++" if language == "C++" else "clang"
+    tool = "yosys" if mode == "synthesize" and language == "Verilog" else "iverilog" if language == "Verilog" else "ghdl" if language == "VHDL" else "clang++" if language == "C++" else "clang"
+    if mode == "synthesize" and language == "VHDL": raise ValueError("VHDL synthesis is not supported; GHDL is connected only for analysis and simulation")
     if mode == "synthesize" and language != "Verilog": raise ValueError("Synthesis currently supports Verilog; C/C++ high-level synthesis requires a separate backend")
     executable = find_tool(tool)
     if not executable and tool in ("clang", "clang++"):
@@ -38,11 +41,12 @@ def analyze(source, language, mode="check", top="top"):
     if not executable: raise ValueError(f"{tool} is not installed/configured")
     with tempfile.TemporaryDirectory(prefix="spikes-ide-") as directory:
         work = Path(directory)
-        file = work / ("design.v" if language == "Verilog" else "design.cpp" if language == "C++" else "design.c")
+        file = work / ("design.v" if language == "Verilog" else "design.vhd" if language == "VHDL" else "design.cpp" if language == "C++" else "design.c")
         file.write_text(source, encoding="utf-8")
         if tool == "yosys":
             argv = [executable, "-p", f"read_verilog design.v; hierarchy -check -top {top}; synth -top {top}; stat; write_json netlist.json"]
         elif tool == "iverilog": argv = [executable, "-g2012", "-Wall", "-s", top, "-o", "design.vvp", file.name]
+        elif tool == "ghdl": argv = [executable, "-a", "--std=08", file.name]
         elif tool=="cl":argv=[executable,"/nologo","/Zs","/W4","/TP" if language=="C++" else "/TC","/std:c++20" if language=="C++" else "/std:c17",file.name]
         else: argv = [executable, "-fsyntax-only", "-Wall", "-Wextra", "-std=c++20" if language == "C++" else "-std=c17", file.name]
         environment = dict(os.environ)
@@ -65,17 +69,35 @@ def analyze(source, language, mode="check", top="top"):
             if len(output) > 2 * 1024 * 1024: raise ValueError("Build log exceeded 2 MiB")
         report = {"tool": executable, "argv": argv, "exit_code": process.returncode, "output": output.decode(errors="replace"), "mode": mode}
         report["output"]=report["output"].replace("\r\r\n","\n").replace("\r\n","\n")
+        if tool == "ghdl" and mode == "simulate" and process.returncode == 0:
+            commands = [[executable, "-e", "--std=08", top],
+                        [executable, "-r", "--std=08", top, "--vcd=wave.vcd", "--stop-time=1ms"]]
+            report["commands"] = [argv] + commands
+            for command in commands:
+                with tempfile.TemporaryFile() as simulation_log:
+                    process = subprocess.Popen(command, cwd=work, env=environment, stdout=simulation_log,
+                                               stderr=subprocess.STDOUT, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+                    try: process.wait(timeout=15)
+                    except subprocess.TimeoutExpired:
+                        process.kill(); process.wait()
+                        raise ValueError("VHDL simulation exceeded 15 seconds; the run is also limited to 1 ms of model time")
+                    simulation_log.seek(0); stage_output = simulation_log.read(2 * 1024 * 1024 + 1)
+                    if len(stage_output) > 2 * 1024 * 1024: raise ValueError("VHDL build log exceeded 2 MiB")
+                report["output"] += stage_output.decode(errors="replace")
+                report["exit_code"] = process.returncode
+                if process.returncode != 0: break
         if mode=="simulate" and process.returncode==0:
-            runtime=find_tool("vvp")
-            if not runtime:raise ValueError("vvp is not installed/configured")
-            with tempfile.TemporaryFile() as simulation_log:
-                process=subprocess.Popen([runtime,"design.vvp"],cwd=work,env=environment,stdout=simulation_log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,"CREATE_NO_WINDOW",0))
-                try:process.wait(timeout=15)
-                except subprocess.TimeoutExpired:
-                    process.kill();process.wait();raise ValueError("Digital simulation exceeded 15 seconds; use a bounded testbench")
-                simulation_log.seek(0);output=simulation_log.read(2*1024*1024+1)
-                if len(output)>2*1024*1024:raise ValueError("Digital simulation log exceeded 2 MiB")
-            report["exit_code"]=process.returncode;report["output"]+=output.decode(errors="replace")
+            if tool == "iverilog":
+                runtime=find_tool("vvp")
+                if not runtime:raise ValueError("vvp is not installed/configured")
+                with tempfile.TemporaryFile() as simulation_log:
+                    process=subprocess.Popen([runtime,"design.vvp"],cwd=work,env=environment,stdout=simulation_log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,"CREATE_NO_WINDOW",0))
+                    try:process.wait(timeout=15)
+                    except subprocess.TimeoutExpired:
+                        process.kill();process.wait();raise ValueError("Digital simulation exceeded 15 seconds; use a bounded testbench")
+                    simulation_log.seek(0);output=simulation_log.read(2*1024*1024+1)
+                    if len(output)>2*1024*1024:raise ValueError("Digital simulation log exceeded 2 MiB")
+                report["exit_code"]=process.returncode;report["output"]+=output.decode(errors="replace")
             wavefiles=list(work.glob("*.vcd"))
             if wavefiles:
                 if wavefiles[0].stat().st_size>16*1024*1024:raise ValueError("VCD exceeded 16 MiB")

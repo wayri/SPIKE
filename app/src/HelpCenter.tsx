@@ -102,11 +102,17 @@ export default function HelpCenter({ onClose, diagnosticCode, context }: { onClo
   useEffect(() => { const previous = document.activeElement as HTMLElement | null; search.current?.focus(); return () => previous?.focus(); }, []);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
-      event.stopImmediatePropagation(); // Modal shortcuts cannot edit the project behind help.
+      if (modal.current?.closest("[hidden]")) return;
+      const embedded = Boolean(modal.current?.closest(".focus-tool-content"));
+      if (embedded && !lightbox) {
+        if (!modal.current?.contains(event.target as Node)) return;
+        if (event.key === "F10" || event.altKey || ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k")) return;
+      }
+      event.stopImmediatePropagation(); // Keep article shortcuts scoped to help.
       if (event.key === "Escape") { event.preventDefault(); if (lightbox) setLightbox(null); else onClose(); }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") { event.preventDefault(); search.current?.focus(); }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") event.preventDefault();
-      if (event.key === "Tab") {
+      if (event.key === "Tab" && (!embedded || lightbox)) {
         const scope = lightbox ? modal.current?.querySelector(".help-lightbox") : modal.current;
         const focusable = Array.from(scope?.querySelectorAll<HTMLElement>('button:not(:disabled), input, select, a[href], summary, [tabindex="0"]') ?? []).filter(element => element.getClientRects().length > 0);
         const first = focusable[0], last = focusable[focusable.length - 1];

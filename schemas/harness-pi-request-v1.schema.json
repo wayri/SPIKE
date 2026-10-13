@@ -7,6 +7,7 @@
   "properties": {
     "contract": {"const": "spike/harness-pi-request/v1"},
     "harness": {"type": "object", "description": "Validated independently against spike/harness/v1."},
+    "wire_ids": {"type": "array", "minItems": 1, "maxItems": 4096, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}, "description": "Explicit conductor selection; omitted means all wires. No role-based filtering."},
     "ground": {"$ref": "#/$defs/endpoint"},
     "terminals": {"type": "array", "minItems": 1, "maxItems": 4096, "items": {
       "type": "object", "additionalProperties": false, "required": ["id", "type", "positive", "negative", "value"],

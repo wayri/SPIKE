@@ -8,17 +8,21 @@ for contracts, solver admission, capability status, and numerical results.
 from __future__ import annotations
 
 import contextlib
+from copy import deepcopy
 import json
 import math
 import os
 import socket
 import sys
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, BinaryIO
 
 from .automation import SpikeAutomation
+from .mcp_protocol import McpProtocol, ProtocolError, decode_request, encode_response
+from .mcp_protocol_catalog import CatalogPager
+from .mcp_resources import SchemaResources
 
 
 PROTOCOL_VERSION = "2025-11-25"
@@ -37,10 +41,16 @@ class Tool:
     enums: tuple[tuple[str, tuple[str, ...]], ...] = ()
 
     integer_keys: tuple[str, ...] = ()
+    number_keys: tuple[str, ...] = ()
+    array_keys: tuple[str, ...] = ()
+    property_schemas: dict[str, Any] = field(default_factory=dict)
+    read_only: bool = False
+    output_schema: dict[str, Any] | None = None
 
     def schema(self) -> dict[str, Any]:
-        properties = {key: {"type": "string" if key in self.path_keys + self.string_keys else "integer" if key in self.integer_keys else "object"}
+        properties = {key: {"type": "string" if key in self.path_keys + self.string_keys else "integer" if key in self.integer_keys else "number" if key in self.number_keys else "array" if key in self.array_keys else "object"}
                       for key in self.required + self.optional}
+        properties.update(deepcopy(self.property_schemas))
         for key, values in self.enums:
             properties[key]["enum"] = list(values)
         return {"type": "object", "properties": properties,
@@ -50,10 +60,47 @@ class Tool:
 # No arbitrary method dispatch, shell command, script, extension trust, or
 # file-writing worker operation is reachable through this registry.
 TOOLS: dict[str, Tool] = {
+    "spike_run_harness_pi": Tool("run_harness_pi", "Solve explicit harness DC wires, returns, sources, loads and contact resistances; does not solve board fields.", ("request",)),
+    "spike_run_harness_si": Tool("run_harness_si", "Compute a two-port harness signal/return or differential-mode network using explicit supplied RLGC; no automatic twist or crosstalk extraction.", ("request",)),
+    "spike_run_harness_mtl": Tool("run_harness_mtl", "Solve a bounded branched multiconductor network with supplied sampled reciprocal RLGC and explicit ports; no radiation solve.", ("request",)),
+    "spike_extract_harness_round_wire_rlgc": Tool("extract_harness_round_wire_rlgc", "Extract approximate straight round-wire RLGC above an explicit ideal plane in a homogeneous dielectric; no shields, bends or twist extraction.", ("request",)),
+    "spike_prepare_harness_em": Tool("prepare_harness_em", "Inspect explicit harness geometry and EM requirements; readiness diagnostics do not execute a full-wave solve.", ("request",)),
+    "spike_run_smps_converter": Tool("run_smps_converter", "Estimate supplied CCM converter power balance and component losses; steady average model, no control-loop transient solve.", ("request",)),
+    "spike_validate_pwm_electrothermal": Tool("validate_pwm_electrothermal", "Preflight a bounded behavioral PWM buck with winding electrothermal feedback; admission is not qualification.", ("request",)),
+    "spike_run_pwm_electrothermal": Tool("run_pwm_electrothermal", "Run the owned native closed-loop PWM buck reference with winding-only thermal feedback and energy accounting; no vendor switching-loss or EMI claim.", ("request",)),
+    "spike_evaluate_capacitor_placement": Tool("evaluate_capacitor_placement", "Compare supplied capacitor candidates on a passive sampled impedance network; ranking is limited to supplied locations and frequencies.", ("request",)),
+    "spike_plan_pi_return_path": Tool("plan_pi_return_path", "Find approximate resistance routes through admitted copper between explicitly selected return pads; does not route new copper.", ("design", "request")),
+    "spike_discover_thermal_links": Tool("discover_assembly_thermal_links", "Discover exact conforming thermal interfaces; resistance is not inferred and review precedes linking.", ("request", "problem")),
+    "spike_read_project": Tool("read_project_package", "Read a saved .spike package and embedded results without opening the GUI; large packages may exceed response limits.", ("path",), path_keys=("path",)),
+    "spike_linked_assembly_nets": Tool("linked_assembly_nets", "Resolve occurrence-scoped assembly nets using retained explicit links.", ("request",)),
+    "spike_prepare_multiboard_study": Tool("prepare_multiboard_study", "Admit an explicit reduced assembly study request; planning is not a completed solve.", ("request",)),
+    "spike_run_multiboard_circuit": Tool("run_multiboard_circuit", "Run supplied reduced PI/SI circuit models; preserves approximate or unsupported status.", ("request",)),
+    "spike_run_multiboard_thermal": Tool("run_multiboard_thermal", "Run supplied reduced multiboard thermal network, not an inferred spatial temperature field.", ("request",)),
+    "spike_run_multiboard_em": Tool("run_multiboard_em", "Run supplied reduced assembly EM model; this does not establish full-wave validation.", ("request",)),
+    "spike_prepare_assembly_field": Tool("prepare_assembly_field_handoff", "Prepare retained mechanical/board field handoff without inventing material or boundary data.", ("request",)),
+    "spike_run_assembly_field_thermal": Tool("run_assembly_field_thermal", "Run explicitly supplied assembly thermal field inputs subject to worker admission.", ("request", "problem")),
+    "spike_validate_thermal_time_refinement": Tool("validate_assembly_thermal_time_refinement", "Run three internal transient histories with halved steps; report solution-specific changes without production qualification.", ("request", "problem", "transient_settings", "tolerances")),
+    "spike_prepare_volume_electrothermal": Tool("prepare_multiboard_volume_electrothermal", "Admit explicit native PI/SI resistor-to-volume thermal bindings; preparation is not a solve.", ("request",)),
+    "spike_run_volume_electrothermal": Tool("run_multiboard_volume_electrothermal", "Run experimental steady native PI/SI and internal or CalculiX volume thermal feedback.", ("request",)),
+    "spike_verify_volume_electrothermal": Tool("verify_multiboard_volume_electrothermal_result", "Offline saved co-simulation identity, circuit residual and loss admission; no solver rerun.", ("request", "result")),
+    "spike_prepare_thermal_contact": Tool("prepare_assembly_thermal_contact_model", "Bind a retained contact total K/W resistance to conforming occurrence interface triangles.", ("request", "problem", "contact_id", "thermal_resistance_k_per_w"), string_keys=("contact_id",), number_keys=("thermal_resistance_k_per_w",)),
+    "spike_run_assembly_electrothermal": Tool("run_assembly_electrothermal", "Run explicitly supplied coupled electrical/thermal assembly model, preserving experimental status.", ("request",)),
+    "spike_import_assembly_field_study": Tool("import_assembly_field_study", "Validate a supplied saved field study record; no file write.", ("record",), ("current_request", "current_problem")),
     "spike_capabilities": Tool("capabilities", "SPIKE capability and qualification status."),
+    "spike_parallel_pool": Tool("parallel_pool_catalog", "Report bounded local multicore pool and detected acceleration; no remote enrollment."),
+    "spike_parallel_run": Tool("run_parallel_batch", "Run reviewed independent inline jobs in bounded fresh processes; no scripts, file paths or remote trust changes.", ("request",)),
     "spike_list_solvers": Tool("list_solvers", "Solver catalog and availability."),
     "spike_list_importers": Tool("list_importers", "Supported design importers."),
     "spike_thermal_capabilities": Tool("thermal_capabilities", "Thermal runtime availability and qualified or unsupported physics."),
+    "spike_run_internal_airflow": Tool("run_internal_airflow", "Run experimental laminar heated-channel screening; no general geometry CFD or solved turbulence.", ("request",)),
+    "spike_cfd_capabilities": Tool("cfd_capabilities", "Inspect configured native SPIKE and SU2 cavity CFD runtimes; excludes assembly CHT.", ()),
+    "spike_run_native_cfd": Tool("run_native_cfd", "Run original experimental laminar cavity CFD in a bounded native worker.", ("request",)),
+    "spike_run_su2_cfd": Tool("run_su2_cfd", "Run separately installed SU2 on an independently generated cavity benchmark.", ("request",)),
+    "spike_run_su2_cht": Tool("run_su2_cht", "Run separately installed SU2 on a bounded fluid-solid conjugate heat-transfer case.", ("request",)),
+    "spike_run_assembly_airflow": Tool("run_assembly_airflow", "Run experimental retained-solid assembly conjugate heat transfer with explicit air domain, materials and boundary conditions; requires an available OpenFOAM runtime.", ("request",)),
+    "spike_read_assembly_airflow_setup": Tool("read_assembly_airflow_setup_in_project", "Read manifest-bound retained assembly solids for an airflow study.", ("project_path", "expected_manifest_payload_sha256", "assignments", "mesh_options"), path_keys=("project_path",), string_keys=("expected_manifest_payload_sha256",)),
+    "spike_read_assembly_airflow_study": Tool("read_assembly_airflow_study_in_project", "Load saved assembly airflow fields only when their request and retained geometry still match.", ("project_path", "expected_manifest_payload_sha256"), path_keys=("project_path",), string_keys=("expected_manifest_payload_sha256",)),
+    "spike_run_assembly_airflow_in_project": Tool("run_assembly_airflow_in_project", "Run and save manifest-bound assembly airflow fields with reviewed physical inputs.", ("project_path", "expected_manifest_payload_sha256", "assignments", "mesh_options", "request"), path_keys=("project_path",), string_keys=("expected_manifest_payload_sha256",)),
     "spike_extension_catalog": Tool("list_extensions", "Installed extension analysis contributions, input schemas, permissions and trust state; this does not grant trust."),
     "spike_load_design": Tool("load_design", "Load a local supported design file as SpiDeR.", ("path",), path_keys=("path",)),
     "spike_validate_design": Tool("validate_design", "Validate a SpiDeR design.", ("design",)),
@@ -66,7 +113,7 @@ TOOLS: dict[str, Tool] = {
     "spike_emi_preflight": Tool("emi_preflight", "Validate an EMI setup without claiming field solve or compliance.", ("design", "setup")),
     "spike_emi_screen": Tool("emi_screen", "Run an EMI screening estimate, subject to worker qualification status.", ("design", "setup")),
     "spike_contract_schema": Tool("schema:read", "List installed SPIKE contract schemas, or read one by its catalog filename. No arbitrary file read.", optional=("name",), string_keys=("name",)),
-    "spike_validate_contract": Tool("schema:validate", "Validate supplied analysis inputs against an installed contract schema; validation does not establish solver readiness.", ("name", "document"), string_keys=("name",)),
+    "spike_validate_contract": Tool("schema:validate", "Validate supplied analysis inputs against an installed contract schema; validation does not establish solver readiness.", ("name", "document"), optional=("max_issues",), string_keys=("name",), integer_keys=("max_issues",), property_schemas={"max_issues":{"type":"integer","minimum":1,"maximum":500}}),
     "spike_gui_status": Tool("gui:status", "Inspect the running desktop state; requires the opt-in desktop bridge."),
     "spike_gui_select_workspace": Tool("gui:select_workspace", "Select a desktop workspace.", ("workspace",), string_keys=("workspace",), enums=(("workspace", ("PI", "SI", "EM", "Thermal", "Results", "Reports")),)),
     "spike_gui_set_view_mode": Tool("gui:set_view_mode", "Select the desktop 2D or 3D view.", ("mode",), string_keys=("mode",), enums=(("mode", ("2D", "3D")),)),
@@ -88,48 +135,9 @@ TOOLS: dict[str, Tool] = {
 }
 
 
-def _schema_operation(operation: str, arguments: dict[str, Any]) -> dict[str, Any]:
-    """Read only installed contract files and resolve their references offline."""
-    roots = [Path(getattr(sys, "_MEIPASS", "")) / "schemas"] if getattr(sys, "frozen", False) else []
-    roots.append(Path(__file__).resolve().parents[2] / "schemas")
-    directory = next((root.resolve() for root in roots if root.is_dir()), None)
-    if directory is None:
-        raise RuntimeError("Installed SPIKE contract schemas are unavailable")
-    catalog = {path.name: path for path in directory.glob("*.schema.json") if path.is_file() and not path.is_symlink()}
-    name = arguments.get("name")
-    if operation == "read" and name is None:
-        return {"schemas": sorted(catalog), "validation_is_not_solver_admission": True}
-    if name not in catalog:
-        raise ValueError("Choose a schema filename from spike_contract_schema; arbitrary paths are not accepted")
-    schema = json.loads(catalog[name].read_text(encoding="utf-8"))
-    if operation == "read":
-        return {"name": name, "schema": schema, "validation_is_not_solver_admission": True}
-    import jsonschema
-    from referencing import Registry, Resource
-    from referencing.jsonschema import DRAFT202012
-
-    document = arguments["document"]
-    json.dumps(document, allow_nan=False)
-    resources = []
-    for path in catalog.values():
-        contents = json.loads(path.read_text(encoding="utf-8"))
-        resource = Resource.from_contents(contents, default_specification=DRAFT202012)
-        resources.extend([(path.resolve().as_uri(), resource),
-                          (str(contents.get("$id") or path.name), resource),
-                          ("https://spike.local/schemas/" + path.name, resource)])
-    def retrieve_local(uri: str) -> Resource:
-        filename = uri.rsplit("/", 1)[-1]
-        if filename not in catalog:
-            raise ValueError("Schema reference is not in the installed SPIKE catalog")
-        return Resource.from_contents(json.loads(catalog[filename].read_text(encoding="utf-8")),
-                                      default_specification=DRAFT202012)
-
-    registry = Registry(retrieve=retrieve_local).with_resources(resources)
-    validator = jsonschema.validators.validator_for(schema)(schema, registry=registry)
-    errors = sorted(validator.iter_errors(document), key=lambda item: str(list(item.path)))
-    return {"name": name, "valid": not errors, "issues": [
-        {"path": ".".join(map(str, error.path)), "message": error.message} for error in errors[:50]],
-        "issue_count": len(errors), "validation_is_not_solver_admission": True}
+from .contract_catalog import schema_operation as _schema_operation
+from .mcp_spider_tools import descriptors as _spider_descriptors
+TOOLS.update({name: Tool(**descriptor) for name, descriptor in _spider_descriptors().items()})
 
 
 def _call_gui(command: str, arguments: dict[str, Any]) -> Any:
@@ -205,23 +213,55 @@ def _validate_arguments(tool: Tool, value: Any) -> dict[str, Any]:
         elif key in tool.integer_keys:
             if isinstance(item, bool) or not isinstance(item, int) or item < 0 or item > 10_000_000:
                 raise ValueError(key + " must be a bounded nonnegative integer")
+        elif key in tool.number_keys:
+            if type(item) not in (int, float) or not math.isfinite(item):
+                raise ValueError(key + " must be a finite number")
+        elif key in tool.array_keys:
+            if not isinstance(item, list):
+                raise ValueError(key + " must be an array")
         elif not isinstance(item, dict):
             raise ValueError(key + " must be an object")
         for enum_key, values in tool.enums:
             if key == enum_key and item not in values:
                 raise ValueError(key + " must be one of: " + ", ".join(values))
+    if tool.property_schemas:
+        import jsonschema
+        try:
+            jsonschema.Draft202012Validator(tool.schema()).validate(value)
+        except jsonschema.ValidationError as exc:
+            raise ValueError(f"Invalid tool argument at {list(exc.path)}: {exc.message}") from exc
     return value
 
 
 class McpServer:
     def __init__(self, automation: SpikeAutomation | None = None) -> None:
         self.automation = automation
-        self.initialized = False
+        self.protocol = McpProtocol()
+        self.pager = CatalogPager()
+        self.resources = SchemaResources(self.pager)
+
+    @property
+    def initialized(self) -> bool:
+        return self.protocol.initialized
 
     def tools(self) -> list[dict[str, Any]]:
-        """Return the public MCP tool catalog for local clients."""
-        return [{"name": name, "description": tool.description, "inputSchema": tool.schema()}
-                for name, tool in TOOLS.items()]
+        """Deterministic, typed public catalog with honest operation hints."""
+        read_methods = {"capabilities", "list_solvers", "list_importers", "thermal_capabilities", "list_extensions",
+                        "parallel_pool_catalog", "cfd_capabilities", "si_workflow_catalog", "gui:status",
+                        "gui:list_studies", "gui:analysis_context", "gui:analysis_describe", "gui:analysis_job", "gui:analysis_evidence"}
+        result = []
+        for name, tool in sorted(TOOLS.items()):
+            descriptor = {"name": name, "title": name.removeprefix("spike_").replace("_", " ").title(),
+                "description": tool.description, "inputSchema": tool.schema(),
+                "annotations": {"readOnlyHint": tool.read_only or tool.method in read_methods or tool.method.startswith("schema:"),
+                    "destructiveHint": False, "openWorldHint": False},
+                "_meta": {"io.wayri.spike/workerMethod": tool.method,
+                          "io.wayri.spike/transport": "desktop" if tool.method.startswith("gui:") else "schema" if tool.method.startswith("schema:") else "worker",
+                          "io.wayri.spike/validationIsNotSolverAdmission": True}}
+            if tool.output_schema is not None:
+                descriptor["outputSchema"] = deepcopy(tool.output_schema)
+            result.append(descriptor)
+        return result
 
     def call_tool(self, name: str, arguments: Any = None) -> dict[str, Any]:
         """Invoke one allowlisted tool, returning an MCP CallToolResult."""
@@ -229,6 +269,7 @@ class McpServer:
         if tool is None:
             raise ValueError("Unknown tool")
         args = _validate_arguments(tool, {} if arguments is None else arguments)
+        worker_meta = None
         try:
             if tool.method.startswith("schema:"):
                 value = _schema_operation(tool.method.removeprefix("schema:"), args)
@@ -237,53 +278,60 @@ class McpServer:
             else:
                 with contextlib.redirect_stdout(sys.stderr):
                     if self.automation is None:
-                        self.automation = SpikeAutomation()
-                    value = self.automation.call(tool.method, args)
+                        from .headless import run_request
+                        timeout = float(os.environ.get("SPIKE_HEADLESS_TIMEOUT_SECONDS", "120"))
+                        self.automation = SpikeAutomation(lambda request: run_request(request, timeout))
+                    response = self.automation.call_response(tool.method, args)
+                    value = response.get("result")
+                    worker_meta = response.get("meta")
             serialized = json.dumps(value, allow_nan=False, ensure_ascii=False, separators=(",", ":"))
             if len(serialized.encode("utf-8")) > MAX_RESPONSE_BYTES:
                 raise ValueError("Worker result exceeds MCP response limit")
-            return {"content": [{"type": "text", "text": serialized}], "isError": False}
+            result = {"content": [{"type": "text", "text": serialized}], "isError": False}
+            if isinstance(value, dict):
+                if tool.output_schema is not None:
+                    import jsonschema
+                    jsonschema.Draft202012Validator(tool.output_schema).validate(value)
+                result["structuredContent"] = value
+            if isinstance(worker_meta, dict):
+                result["_meta"] = {"io.wayri.spike/workerMetadata": worker_meta}
+                if isinstance(worker_meta.get("spider"), dict):
+                    result["content"].append({"type":"text", "text":json.dumps({"input_spider_binding":worker_meta["spider"]}, allow_nan=False)})
+            if len(json.dumps(result, allow_nan=False, ensure_ascii=False).encode("utf-8")) > MAX_RESPONSE_BYTES:
+                raise ValueError("Complete tool result exceeds MCP response limit; request a smaller page")
+            return result
         except Exception as exc:  # A tool error does not terminate the client session.
-            return {"content": [{"type": "text", "text": str(exc)}], "isError": True}
+            response = getattr(exc, "response", None)
+            detail = response if isinstance(response, dict) else {"ok": False, "error": str(exc)}
+            return {"content": [{"type": "text", "text": str(exc)}],
+                    "structuredContent": detail, "isError": True}
 
     def handle(self, request: Any) -> dict[str, Any] | None:
-        if not isinstance(request, dict) or request.get("jsonrpc") != "2.0":
-            return _error(None, -32600, "Invalid JSON-RPC request")
-        method = request.get("method")
-        identifier = request.get("id")
-        if not isinstance(method, str) or ("id" in request and (isinstance(identifier, bool) or not isinstance(identifier, (str, int, float)) or (isinstance(identifier, float) and not math.isfinite(identifier)))):
-            return _error(None, -32600, "Invalid JSON-RPC request")
-        if "id" not in request:
-            if method == "notifications/initialized" and self.initialized:
-                return None
-            return None  # Notifications never receive responses.
-        if method == "initialize":
-            params = request.get("params")
-            if self.initialized or not isinstance(params, dict) or not isinstance(params.get("protocolVersion"), str):
-                return _error(identifier, -32602, "Invalid initialize parameters")
-            self.initialized = True
-            return _result(identifier, {"protocolVersion": PROTOCOL_VERSION,
-                                        "capabilities": {"tools": {"listChanged": False}},
-                                        "serverInfo": {"name": "spike-local", "version": "1.0.0"}})
-        if method == "ping":
-            return _result(identifier, {})
-        if not self.initialized:
-            return _error(identifier, -32002, "Initialize first")
-        if method == "tools/list":
-            params = request.get("params", {})
-            if not isinstance(params, dict) or params.get("cursor") is not None:
-                return _error(identifier, -32602, "Invalid tools/list parameters")
-            return _result(identifier, {"tools": self.tools()})
-        if method == "tools/call":
-            params = request.get("params")
-            if not isinstance(params, dict) or not isinstance(params.get("name"), str):
-                return _error(identifier, -32602, "Invalid tools/call parameters")
-            try:
-                result = self.call_tool(params["name"], params.get("arguments", {}))
-            except ValueError as exc:
-                return _error(identifier, -32602, str(exc))
-            return _result(identifier, result)
-        return _error(identifier, -32601, "Method not found")
+        consumed, response = self.protocol.gate(request)
+        if consumed:
+            return response
+        method = request["method"]
+        params = request.get("params", {})
+        try:
+            if method == "tools/list":
+                value = self.pager.page(self.tools(), params, "tools", "name")
+            elif method == "resources/list":
+                value = self.resources.list(params)
+            elif method == "resources/read":
+                value = self.resources.read(params)
+            elif method == "tools/call":
+                if set(params) - {"name", "arguments", "_meta"} or not isinstance(params.get("name"), str):
+                    raise ValueError("Invalid tools/call parameters")
+                value = self.call_tool(params["name"], params.get("arguments", {}))
+            else:
+                return self.protocol.error(request, -32601, "Method not found")
+            return self.protocol.result(request, value)
+        except ProtocolError as exc:
+            return self.protocol.error(request, exc.code, str(exc))
+        except (ValueError, KeyError, TypeError) as exc:
+            return self.protocol.error(request, -32602, str(exc))
+        except (OSError, RuntimeError) as exc:
+            return self.protocol.error(request, -32603, str(exc))
 
 
 def serve(input_stream: BinaryIO | None = None, output_stream: BinaryIO | None = None,
@@ -295,22 +343,21 @@ def serve(input_stream: BinaryIO | None = None, output_stream: BinaryIO | None =
         line = source.readline(MAX_REQUEST_BYTES + 1)
         if not line:
             return
-        if len(line) > MAX_REQUEST_BYTES:
-            response = _error(None, -32700, "Request exceeds size limit")
-            # A partial line cannot be framed safely; terminate after error.
-            target.write((json.dumps(response, separators=(",", ":")) + "\n").encode("utf-8"))
-            target.flush()
-            return
+        oversized = len(line) > MAX_REQUEST_BYTES
         try:
-            request = json.loads(line, parse_constant=lambda value: (_ for _ in ()).throw(ValueError(value)))
-        except (UnicodeDecodeError, json.JSONDecodeError, ValueError, RecursionError):
-            response = _error(None, -32700, "Invalid JSON")
-        else:
+            request = decode_request(line, MAX_REQUEST_BYTES)
             response = server.handle(request)
+        except ProtocolError as exc:
+            response = server.protocol.error(None, exc.code, str(exc))
         if response is not None:
-            encoded = (json.dumps(response, allow_nan=False, ensure_ascii=False, separators=(",", ":")) + "\n").encode("utf-8")
+            try:
+                encoded = encode_response(response, MAX_RESPONSE_BYTES)
+            except ProtocolError as exc:
+                encoded = encode_response(server.protocol.error(response, exc.code, str(exc)), MAX_RESPONSE_BYTES)
             target.write(encoded)
             target.flush()
+        if oversized:
+            return  # Oversized partial lines cannot be resynchronized safely.
 
 
 if __name__ == "__main__":

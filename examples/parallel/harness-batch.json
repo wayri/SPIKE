@@ -1,0 +1,282 @@
+{
+  "contract": "spike/parallel-batch/v1",
+  "jobs": [
+    {
+      "id": "load-2A",
+      "method": "run_harness_pi",
+      "params": {
+        "request": {
+          "contract": "spike/harness-pi-request/v1",
+          "harness": {
+            "contract": "spike/harness/v1",
+            "id": "loop",
+            "name": "Analytical two-wire loop",
+            "connectors": [
+              {
+                "id": "source",
+                "pins": [
+                  {
+                    "id": "1"
+                  },
+                  {
+                    "id": "2"
+                  }
+                ]
+              },
+              {
+                "id": "plug",
+                "pins": [
+                  {
+                    "id": "1"
+                  },
+                  {
+                    "id": "2"
+                  }
+                ]
+              },
+              {
+                "id": "load",
+                "pins": [
+                  {
+                    "id": "1"
+                  },
+                  {
+                    "id": "2"
+                  }
+                ]
+              }
+            ],
+            "wires": [
+              {
+                "id": "feed",
+                "from": {
+                  "connector": "plug",
+                  "pin": "1"
+                },
+                "to": {
+                  "connector": "load",
+                  "pin": "1"
+                },
+                "electrical": {
+                  "resistance_ohm": 0.1
+                }
+              },
+              {
+                "id": "return",
+                "from": {
+                  "connector": "load",
+                  "pin": "2"
+                },
+                "to": {
+                  "connector": "plug",
+                  "pin": "2"
+                },
+                "electrical": {
+                  "resistance_ohm": 0.2
+                }
+              }
+            ]
+          },
+          "ground": {
+            "connector": "source",
+            "pin": "2"
+          },
+          "contacts": [
+            {
+              "id": "feed-contact",
+              "from": {
+                "connector": "source",
+                "pin": "1"
+              },
+              "to": {
+                "connector": "plug",
+                "pin": "1"
+              },
+              "resistance_ohm": 0.01
+            },
+            {
+              "id": "return-contact",
+              "from": {
+                "connector": "plug",
+                "pin": "2"
+              },
+              "to": {
+                "connector": "source",
+                "pin": "2"
+              },
+              "resistance_ohm": 0.02
+            }
+          ],
+          "terminals": [
+            {
+              "id": "supply",
+              "type": "voltage_source",
+              "positive": {
+                "connector": "source",
+                "pin": "1"
+              },
+              "negative": {
+                "connector": "source",
+                "pin": "2"
+              },
+              "value": 12
+            },
+            {
+              "id": "sink",
+              "type": "current_load",
+              "positive": {
+                "connector": "load",
+                "pin": "1"
+              },
+              "negative": {
+                "connector": "load",
+                "pin": "2"
+              },
+              "value": 2
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "load-3A",
+      "method": "run_harness_pi",
+      "params": {
+        "request": {
+          "contract": "spike/harness-pi-request/v1",
+          "harness": {
+            "contract": "spike/harness/v1",
+            "id": "loop",
+            "name": "Analytical two-wire loop",
+            "connectors": [
+              {
+                "id": "source",
+                "pins": [
+                  {
+                    "id": "1"
+                  },
+                  {
+                    "id": "2"
+                  }
+                ]
+              },
+              {
+                "id": "plug",
+                "pins": [
+                  {
+                    "id": "1"
+                  },
+                  {
+                    "id": "2"
+                  }
+                ]
+              },
+              {
+                "id": "load",
+                "pins": [
+                  {
+                    "id": "1"
+                  },
+                  {
+                    "id": "2"
+                  }
+                ]
+              }
+            ],
+            "wires": [
+              {
+                "id": "feed",
+                "from": {
+                  "connector": "plug",
+                  "pin": "1"
+                },
+                "to": {
+                  "connector": "load",
+                  "pin": "1"
+                },
+                "electrical": {
+                  "resistance_ohm": 0.1
+                }
+              },
+              {
+                "id": "return",
+                "from": {
+                  "connector": "load",
+                  "pin": "2"
+                },
+                "to": {
+                  "connector": "plug",
+                  "pin": "2"
+                },
+                "electrical": {
+                  "resistance_ohm": 0.2
+                }
+              }
+            ]
+          },
+          "ground": {
+            "connector": "source",
+            "pin": "2"
+          },
+          "contacts": [
+            {
+              "id": "feed-contact",
+              "from": {
+                "connector": "source",
+                "pin": "1"
+              },
+              "to": {
+                "connector": "plug",
+                "pin": "1"
+              },
+              "resistance_ohm": 0.01
+            },
+            {
+              "id": "return-contact",
+              "from": {
+                "connector": "plug",
+                "pin": "2"
+              },
+              "to": {
+                "connector": "source",
+                "pin": "2"
+              },
+              "resistance_ohm": 0.02
+            }
+          ],
+          "terminals": [
+            {
+              "id": "supply",
+              "type": "voltage_source",
+              "positive": {
+                "connector": "source",
+                "pin": "1"
+              },
+              "negative": {
+                "connector": "source",
+                "pin": "2"
+              },
+              "value": 12
+            },
+            {
+              "id": "sink",
+              "type": "current_load",
+              "positive": {
+                "connector": "load",
+                "pin": "1"
+              },
+              "negative": {
+                "connector": "load",
+                "pin": "2"
+              },
+              "value": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "concurrency": 2,
+  "threads_per_job": 1,
+  "timeout_s": 30
+}

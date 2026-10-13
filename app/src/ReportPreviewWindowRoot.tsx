@@ -37,6 +37,7 @@ export default function ReportPreviewWindowRoot() {
   if (!snapshot) return <main className="report-preview-window"><p role="status">Connecting to SPIKE workspace...</p></main>;
   return <ReportPreview
     mode="window"
+    nativeWindow={"__TAURI_INTERNALS__" in window}
     fileName={snapshot.fileName}
     html={snapshot.html}
     onExport={() => { void actRef.current({ type: "export" }); }}

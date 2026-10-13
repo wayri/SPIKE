@@ -23,6 +23,7 @@ def run_assembly_electrothermal(request, *, cancel_check=None):
     from .electrical_heat_sources import evaluate_electrical_heat_source
     data = prepare_electrothermal(request)
     options = request['iteration']
+    thermal_engine = data['thermal_engine']
     mesh = data['mesh']
     temperature = np.full(len(mesh['vertices']),data['initial_temperature_k'])
     cells = {cell['id']:cell for cell in mesh['cells']}
@@ -92,7 +93,11 @@ def run_assembly_electrothermal(request, *, cancel_check=None):
                                     'heat_source_w_m3':background.get(cid,0.)+powers[cid]/data['volumes'][cid]}
                                    for (oid,local),cid in data['local_cells'].items()]
         cancel()
-        thermal = run_assembly_field_thermal(data['geometry'],problem)
+        if thermal_engine == 'calculix':
+            from .calculix_thermal import run_calculix_thermal
+            thermal = run_calculix_thermal(data['geometry'],problem,data['thermal_engine_options'],cancel_check=cancel_check)
+        else:
+            thermal = run_assembly_field_thermal(data['geometry'],problem)
         target = np.array(thermal['field_result']['node_temperatures_k'])
         final_electrical,final_powers,final_sources = evaluate(target)
         defect = float(np.max(np.abs(target-temperature)))
@@ -100,16 +105,20 @@ def run_assembly_electrothermal(request, *, cancel_check=None):
         scale = max(math.fsum(powers.values()),math.fsum(final_powers.values()),1e-30)
         relative = power_defect_w/scale
         history.append({'iteration':iteration+1,'unrelaxed_temperature_defect_k':defect,
-                        'power_relative_defect':relative,'deposited_heat_w':math.fsum(powers.values())})
+                        'power_relative_defect':relative,'deposited_heat_w':math.fsum(powers.values()),
+                        'thermal_result_digest':thermal['result_digest']})
         if defect <= options['temperature_tolerance_k'] and relative <= options['power_relative_tolerance']:
+            thermal_balance = thermal['field_result'].get('heat_balance')
             result = {'contract':'spike/assembly-electrothermal-result/v1','status':'completed','model_status':'experimental',
                       'production_qualified':False,'request_digest':data['original_request_digest'],
+                      'thermal_engine':thermal_engine,
                       'assembly_digest':assembly_physics_digest(request['geometry']['assembly']),
-                      'electrical':final_electrical,'thermal':thermal,'heat_source_results':final_sources,
+                      'electrical':final_electrical,'thermal':thermal,'thermal_problem':problem,'heat_source_results':final_sources,
                       'cell_deposited_power_w':final_powers,'history':history,
                       'coupled_power_defect_w':power_defect_w,
                       'conservation':{'electrical_residual_w':final_electrical['conservation_residual_w'],
-                                      'thermal_imbalance_w':thermal['field_result']['heat_balance']['imbalance_w'],
+                                      'thermal_imbalance_w':thermal_balance['imbalance_w'] if thermal_balance else None,
+                                      'thermal_balance_status':'reported' if thermal_balance else 'not_reported',
                                       'thermal_load_feedback_difference_w':math.fsum(final_powers.values())-math.fsum(powers.values())},
                       'limitations':['supplied conforming tetra volumes, not automatic arbitrary PCB CAD extraction',
                                      'steady DC scalar conductivity; no AC/full-wave current extraction',
@@ -117,6 +126,9 @@ def run_assembly_electrothermal(request, *, cancel_check=None):
                                      'caller-declared nonoverlapping loss data, not arbitrary SPICE/IBIS semiconductor coverage',
                                      'exact matched bonds/thermal contacts only; no unrepresented connector/harness/flex links',
                                      'experimental, no measured/production qualification']}
+            if thermal_engine == 'calculix':
+                result['limitations'] += ['CalculiX thermal balance is not reported; no synthetic conservation claim',
+                    'thermal fixed-point defects use finite-precision CalculiX NT output; tolerances are not field accuracy bounds']
             result['result_digest'] = canonical_json_digest(result)
             bounded_json(result)
             return result

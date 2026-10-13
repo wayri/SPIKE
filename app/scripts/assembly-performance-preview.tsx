@@ -26,7 +26,7 @@ function Preview() {
   const [sectionMode, setSectionMode] = useState("off"), [exploded, setExploded] = useState(false);
   const [sidePanel, setSidePanel] = useState<"inspector" | "help" | null>("inspector");
   const explodeOffsets = useMemo(() => exploded ? { A: 0, B: 25 } : {}, [exploded]);
-  const section = useMemo((): AssemblySection => ({ ...DEFAULT_ASSEMBLY_SECTION, enabled: sectionMode !== "off", mode: sectionMode === "box" ? "box" : "plane", axis: "x", offsetMm: 0, minXMm: -40, maxXMm: 45, minYMm: -40, maxYMm: 40, minZMm: -10, maxZMm: 40 }), [sectionMode]);
+  const section = useMemo((): AssemblySection => ({ ...DEFAULT_ASSEMBLY_SECTION, enabled: sectionMode !== "off", mode: sectionMode === "box" ? "box" : "planes", minXMm: -40, maxXMm: 45, minYMm: -40, maxYMm: 40, minZMm: -10, maxZMm: 40, planes: [{ id: "angled", enabled: true, normal: [1, 0.25, 0], offsetMm: 0, flipped: false }, ...(sectionMode === "multi" ? [{ id: "y", enabled: true, normal: [0, 1, 0] as const, offsetMm: -15, flipped: false }] : [])] }), [sectionMode]);
   const [harnessShown, setHarnessShown] = useState(() => new URLSearchParams(location.search).has("harness")), [wireSelection, setWireSelection] = useState<VirtualHarnessVisual | null>(null);
   useEffect(() => { let disposed = false;
     void (async () => {
@@ -119,9 +119,9 @@ function Preview() {
           </section>
           <section className="assembly-preview-control-group" aria-labelledby="preview-section-heading">
             <h3 id="preview-section-heading"><ScanLine size={15} aria-hidden="true"/>Section</h3>
-            <label>Section<select value={sectionMode} onChange={event=>setSectionMode(event.target.value)}><option value="off">Off</option><option value="angle">X plane</option><option value="box">Box</option></select></label>
+            <label>Section<select value={sectionMode} onChange={event=>setSectionMode(event.target.value)}><option value="off">Off</option><option value="angle">User plane</option><option value="multi">Two planes</option><option value="box">Box</option></select></label>
             <div className="assembly-preview-button-grid">
-              <button onClick={()=>setSectionMode("angle")}>X cut plane</button>
+              <button onClick={()=>setSectionMode("multi")}>Two cut planes</button>
               <button onClick={()=>setSectionMode("box")}>Cut box</button>
               <button onClick={()=>setSectionMode("off")}>Clear cuts</button>
             </div>

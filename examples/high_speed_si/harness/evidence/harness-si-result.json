@@ -1,0 +1,1154 @@
+{
+  "contract": "spike/harness-si-result/v1",
+  "status": "completed",
+  "model_status": "experimental",
+  "production_qualified": false,
+  "field_coupling_executed": false,
+  "harness_digest": "6cbecdb94044f45f9a9e727c8f4fe6b72700571239ce35fd7463a68364a33f8e",
+  "request_digest": "82bda6666a3b4e222d3fd19d6ab516d34785a7129083bfa18392af53d45ef7a8",
+  "mode": "differential",
+  "wire_ids": [
+    "agg-p",
+    "agg-n"
+  ],
+  "port_bindings": [
+    {
+      "positive": {
+        "connector": "harness-board-A::JH1",
+        "pin": "AGG_P"
+      },
+      "negative": {
+        "connector": "harness-board-A::JH1",
+        "pin": "AGG_N"
+      }
+    },
+    {
+      "positive": {
+        "connector": "harness-board-B::JH1",
+        "pin": "AGG_P"
+      },
+      "negative": {
+        "connector": "harness-board-B::JH1",
+        "pin": "AGG_N"
+      }
+    }
+  ],
+  "frequency_hz": [
+    0.0,
+    7812500.0,
+    15625000.0,
+    23437500.0,
+    31250000.0,
+    39062500.0,
+    46875000.0,
+    54687500.0,
+    62500000.0,
+    70312500.0,
+    78125000.0,
+    85937500.0,
+    93750000.0,
+    101562500.0,
+    109375000.0,
+    117187500.0,
+    125000000.0,
+    132812500.0,
+    140625000.0,
+    148437500.0,
+    156250000.0,
+    164062500.0,
+    171875000.0,
+    179687500.0,
+    187500000.0,
+    195312500.0,
+    203125000.0,
+    210937500.0,
+    218750000.0,
+    226562500.0,
+    234375000.0,
+    242187500.0,
+    250000000.0
+  ],
+  "s_real": [
+    [
+      [
+        0.0005615051958406965,
+        0.999438494804159
+      ],
+      [
+        0.999438494804159,
+        0.0005615051958408755
+      ]
+    ],
+    [
+      [
+        -7.062327561554553e-05,
+        0.9862961389637463
+      ],
+      [
+        0.9862961389637465,
+        -7.062327561553696e-05
+      ]
+    ],
+    [
+      [
+        -0.0006581749699749842,
+        0.9484813110522253
+      ],
+      [
+        0.9484813110522256,
+        -0.0006581749699752658
+      ]
+    ],
+    [
+      [
+        -0.0011439777333544358,
+        0.8869716949311939
+      ],
+      [
+        0.8869716949311938,
+        -0.0011439777333541812
+      ]
+    ],
+    [
+      [
+        -0.0014817955920872162,
+        0.8033367669485932
+      ],
+      [
+        0.8033367669485928,
+        -0.001481795592086484
+      ]
+    ],
+    [
+      [
+        -0.0016408215988296402,
+        0.6996978280615642
+      ],
+      [
+        0.6996978280615649,
+        -0.00164082159883027
+      ]
+    ],
+    [
+      [
+        -0.001608601744541367,
+        0.5786742819887647
+      ],
+      [
+        0.5786742819887645,
+        -0.0016086017445411176
+      ]
+    ],
+    [
+      [
+        -0.001392108557542921,
+        0.44331750384771795
+      ],
+      [
+        0.44331750384771795,
+        -0.0013921085575430113
+      ]
+    ],
+    [
+      [
+        -0.001016868522577163,
+        0.297033954843398
+      ],
+      [
+        0.2970339548433981,
+        -0.001016868522577166
+      ]
+    ],
+    [
+      [
+        -0.0005242417041612026,
+        0.14349947128127502
+      ],
+      [
+        0.143499471281275,
+        -0.0005242417041613073
+      ]
+    ],
+    [
+      [
+        3.2864408956732644e-05,
+        -0.013433117574990635
+      ],
+      [
+        -0.013433117574990638,
+        3.2864408956796774e-05
+      ]
+    ],
+    [
+      [
+        0.0005954100636616325,
+        -0.16983071584318435
+      ],
+      [
+        -0.1698307158431843,
+        0.0005954100636613209
+      ]
+    ],
+    [
+      [
+        0.0011042200793258676,
+        -0.32177859204079773
+      ],
+      [
+        -0.3217785920407976,
+        0.0011042200793258516
+      ]
+    ],
+    [
+      [
+        0.001505959559133538,
+        -0.4654784268119214
+      ],
+      [
+        -0.4654784268119215,
+        0.0015059595591338207
+      ]
+    ],
+    [
+      [
+        0.0017584906062826395,
+        -0.5973433070154618
+      ],
+      [
+        -0.5973433070154615,
+        0.0017584906062826362
+      ]
+    ],
+    [
+      [
+        0.0018350767832239114,
+        -0.7140872789947375
+      ],
+      [
+        -0.7140872789947376,
+        0.0018350767832239726
+      ]
+    ],
+    [
+      [
+        0.0017270196320296422,
+        -0.8128072195611576
+      ],
+      [
+        -0.8128072195611575,
+        0.001727019632029689
+      ]
+    ],
+    [
+      [
+        0.001444470153760792,
+        -0.8910549862836709
+      ],
+      [
+        -0.8910549862836709,
+        0.001444470153760892
+      ]
+    ],
+    [
+      [
+        0.0010153417110267697,
+        -0.9468980621476626
+      ],
+      [
+        -0.9468980621476627,
+        0.0010153417110267094
+      ]
+    ],
+    [
+      [
+        0.0004824409432778585,
+        -0.9789672054380489
+      ],
+      [
+        -0.9789672054380492,
+        0.00048244094327765027
+      ]
+    ],
+    [
+      [
+        -0.00010088901833824081,
+        -0.9864899451356279
+      ],
+      [
+        -0.9864899451356279,
+        -0.0001008890183382966
+      ]
+    ],
+    [
+      [
+        -0.0006761711341649885,
+        -0.9693091164211609
+      ],
+      [
+        -0.9693091164211612,
+        -0.0006761711341655918
+      ]
+    ],
+    [
+      [
+        -0.0011856979781810194,
+        -0.9278860015123296
+      ],
+      [
+        -0.9278860015123289,
+        -0.00118569797818058
+      ]
+    ],
+    [
+      [
+        -0.0015783431181873727,
+        -0.8632880198243935
+      ],
+      [
+        -0.8632880198243932,
+        -0.0015783431181874941
+      ]
+    ],
+    [
+      [
+        -0.001814698388974841,
+        -0.777161290464936
+      ],
+      [
+        -0.7771612904649358,
+        -0.001814698388975194
+      ]
+    ],
+    [
+      [
+        -0.0018710242452197727,
+        -0.6716887616099316
+      ],
+      [
+        -0.6716887616099315,
+        -0.00187102424521971
+      ]
+    ],
+    [
+      [
+        -0.001741620510281265,
+        -0.5495349575735092
+      ],
+      [
+        -0.5495349575735092,
+        -0.0017416205102811916
+      ]
+    ],
+    [
+      [
+        -0.0014393838387859602,
+        -0.4137787273970764
+      ],
+      [
+        -0.4137787273970762,
+        -0.0014393838387859565
+      ]
+    ],
+    [
+      [
+        -0.00099450013785152,
+        -0.26783568037214345
+      ],
+      [
+        -0.26783568037214345,
+        -0.0009945001378512397
+      ]
+    ],
+    [
+      [
+        -0.0004514068400374819,
+        -0.11537225588724268
+      ],
+      [
+        -0.11537225588724256,
+        -0.00045140684003733625
+      ]
+    ],
+    [
+      [
+        0.00013566735760442642,
+        0.03978641049069775
+      ],
+      [
+        0.03978641049069771,
+        0.0001356673576043884
+      ]
+    ],
+    [
+      [
+        0.0007081361099784128,
+        0.19375250272992206
+      ],
+      [
+        0.19375250272992214,
+        0.0007081361099784627
+      ]
+    ],
+    [
+      [
+        0.0012089168971692508,
+        0.34267299988173194
+      ],
+      [
+        0.3426729998817317,
+        0.0012089168971694637
+      ]
+    ]
+  ],
+  "s_imag": [
+    [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    [
+      [
+        1.1278916684575059e-05,
+        -0.1575807623747022
+      ],
+      [
+        -0.15758076237470223,
+        1.127891668453914e-05
+      ]
+    ],
+    [
+      [
+        0.0002156809949920503,
+        -0.3110174033449008
+      ],
+      [
+        -0.31101740334490086,
+        0.0002156809949921317
+      ]
+    ],
+    [
+      [
+        0.0005881678902923588,
+        -0.45647451916604764
+      ],
+      [
+        -0.45647451916604764,
+        0.0005881678902922078
+      ]
+    ],
+    [
+      [
+        0.0010873439649014072,
+        -0.5903211923659746
+      ],
+      [
+        -0.5903211923659744,
+        0.0010873439649008395
+      ]
+    ],
+    [
+      [
+        0.0016597361449844686,
+        -0.7092215863626985
+      ],
+      [
+        -0.7092215863626992,
+        0.0016597361449851146
+      ]
+    ],
+    [
+      [
+        0.0022452434553765664,
+        -0.8102180752434319
+      ],
+      [
+        -0.8102180752434317,
+        0.002245243455376181
+      ]
+    ],
+    [
+      [
+        0.002783206919823192,
+        -0.8908048370082087
+      ],
+      [
+        -0.8908048370082088,
+        0.0027832069198235935
+      ]
+    ],
+    [
+      [
+        0.0032184915996766573,
+        -0.9489900718489884
+      ],
+      [
+        -0.9489900718489888,
+        0.0032184915996766755
+      ]
+    ],
+    [
+      [
+        0.003506974389106602,
+        -0.9833452879587913
+      ],
+      [
+        -0.9833452879587912,
+        0.0035069743891066553
+      ]
+    ],
+    [
+      [
+        0.0036198933958981757,
+        -0.9930404201960036
+      ],
+      [
+        -0.9930404201960038,
+        0.0036198933958983934
+      ]
+    ],
+    [
+      [
+        0.0035466309088160474,
+        -0.9778639041368782
+      ],
+      [
+        -0.977863904136878,
+        0.0035466309088159065
+      ]
+    ],
+    [
+      [
+        0.003295660312454994,
+        -0.9382272103876834
+      ],
+      [
+        -0.9382272103876832,
+        0.003295660312455104
+      ]
+    ],
+    [
+      [
+        0.0028935719018489364,
+        -0.8751537408315032
+      ],
+      [
+        -0.8751537408315033,
+        0.002893571901849353
+      ]
+    ],
+    [
+      [
+        0.0023822848401854287,
+        -0.7902523881805854
+      ],
+      [
+        -0.7902523881805851,
+        0.0023822848401854543
+      ]
+    ],
+    [
+      [
+        0.0018147332559874992,
+        -0.6856764509688466
+      ],
+      [
+        -0.6856764509688467,
+        0.001814733255987489
+      ]
+    ],
+    [
+      [
+        0.0012494656836851753,
+        -0.5640689665760859
+      ],
+      [
+        -0.5640689665760859,
+        0.0012494656836851573
+      ]
+    ],
+    [
+      [
+        0.0007447037405724813,
+        -0.42849586474014983
+      ],
+      [
+        -0.42849586474014983,
+        0.0007447037405725552
+      ]
+    ],
+    [
+      [
+        0.00035245765114396994,
+        -0.28236864457255645
+      ],
+      [
+        -0.2823686445725565,
+        0.00035245765114395156
+      ]
+    ],
+    [
+      [
+        0.00011328806381479556,
+        -0.12935853247018778
+      ],
+      [
+        -0.12935853247018783,
+        0.00011328806381474565
+      ]
+    ],
+    [
+      [
+        5.2236636844112485e-05,
+        0.026695718498436986
+      ],
+      [
+        0.026695718498436986,
+        5.2236636844112e-05
+      ]
+    ],
+    [
+      [
+        0.00017632902950835447,
+        0.18188407847203936
+      ],
+      [
+        0.18188407847203944,
+        0.00017632902950849626
+      ]
+    ],
+    [
+      [
+        0.00047389527390970254,
+        0.3323231384216139
+      ],
+      [
+        0.33232313842161365,
+        0.00047389527390956376
+      ]
+    ],
+    [
+      [
+        0.0009157699748981109,
+        0.47425321903196743
+      ],
+      [
+        0.47425321903196727,
+        0.0009157699748981073
+      ]
+    ],
+    [
+      [
+        0.001458246646974001,
+        0.6041322767616332
+      ],
+      [
+        0.604132276761633,
+        0.0014582466469743674
+      ]
+    ],
+    [
+      [
+        0.002047485496389357,
+        0.7187242722730208
+      ],
+      [
+        0.7187242722730207,
+        0.002047485496389343
+      ]
+    ],
+    [
+      [
+        0.0026249294826822685,
+        0.8151798013966414
+      ],
+      [
+        0.8151798013966413,
+        0.0026249294826823236
+      ]
+    ],
+    [
+      [
+        0.003133183860136117,
+        0.8911069775038806
+      ],
+      [
+        0.8911069775038801,
+        0.0031331838601361176
+      ]
+    ],
+    [
+      [
+        0.00352176943141558,
+        0.9446307935583284
+      ],
+      [
+        0.9446307935583285,
+        0.00352176943141499
+      ]
+    ],
+    [
+      [
+        0.003752173807387273,
+        0.9744394777419847
+      ],
+      [
+        0.9744394777419839,
+        0.003752173807386642
+      ]
+    ],
+    [
+      [
+        0.0038016965281965688,
+        0.9798166823115095
+      ],
+      [
+        0.9798166823115088,
+        0.003801696528196355
+      ]
+    ],
+    [
+      [
+        0.003665705688017561,
+        0.9606587033981777
+      ],
+      [
+        0.9606587033981779,
+        0.0036657056880179265
+      ]
+    ],
+    [
+      [
+        0.0033580834327083266,
+        0.9174763103732693
+      ],
+      [
+        0.9174763103732688,
+        0.003358083432708243
+      ]
+    ]
+  ],
+  "reference_impedance_ohm": [
+    260.4912618942215,
+    260.4912618942215
+  ],
+  "provenance": {
+    "source": "Scalar aggressor differential mode derived from the DC L/R and static C of rlgc-result.json; no victim/crosstalk or common-mode content"
+  },
+  "request_snapshot": {
+    "contract": "spike/harness-si-request/v1",
+    "harness": {
+      "contract": "spike/harness/v1",
+      "id": "synthetic-interboard-harness",
+      "name": "Synthetic board A to board B power and coupled signal harness",
+      "connectors": [
+        {
+          "id": "harness-board-A::JH1",
+          "name": "Board A reviewed harness connector",
+          "board_binding": {
+            "board_id": "harness-board-A",
+            "connector_id": "JH1"
+          },
+          "pins": [
+            {
+              "id": "PWR",
+              "net": "SYNTH_PWR"
+            },
+            {
+              "id": "RET",
+              "net": "SYNTH_RET"
+            },
+            {
+              "id": "AGG_P",
+              "net": "SYNTH_AGG_P"
+            },
+            {
+              "id": "AGG_N",
+              "net": "SYNTH_AGG_N"
+            },
+            {
+              "id": "VIC_P",
+              "net": "SYNTH_VIC_P"
+            },
+            {
+              "id": "VIC_N",
+              "net": "SYNTH_VIC_N"
+            }
+          ]
+        },
+        {
+          "id": "harness-board-B::JH1",
+          "name": "Board B reviewed harness connector",
+          "board_binding": {
+            "board_id": "harness-board-B",
+            "connector_id": "JH1"
+          },
+          "pins": [
+            {
+              "id": "PWR",
+              "net": "SYNTH_PWR"
+            },
+            {
+              "id": "RET",
+              "net": "SYNTH_RET"
+            },
+            {
+              "id": "AGG_P",
+              "net": "SYNTH_AGG_P"
+            },
+            {
+              "id": "AGG_N",
+              "net": "SYNTH_AGG_N"
+            },
+            {
+              "id": "VIC_P",
+              "net": "SYNTH_VIC_P"
+            },
+            {
+              "id": "VIC_N",
+              "net": "SYNTH_VIC_N"
+            }
+          ]
+        }
+      ],
+      "wires": [
+        {
+          "id": "pwr",
+          "from": {
+            "connector": "harness-board-A::JH1",
+            "pin": "PWR"
+          },
+          "to": {
+            "connector": "harness-board-B::JH1",
+            "pin": "PWR"
+          },
+          "role": "power",
+          "return_wire_id": "return",
+          "length_mm": 600.0,
+          "area_mm2": 0.5,
+          "route_id": "interboard-route",
+          "color": "#e36f4f",
+          "material": {
+            "name": "assumed copper",
+            "resistivity_ohm_m": 1.724137931034483e-08,
+            "reference_temperature_c": 20.0
+          },
+          "electrical": {
+            "resistance_ohm": 0.020689655172413793,
+            "provenance": {
+              "source": "R=L/(sigma*A) from explicit synthetic inputs"
+            }
+          },
+          "properties": {
+            "cross_section_position_mm": [
+              -12.0,
+              8.0
+            ],
+            "radius_mm": 0.39894228040143265
+          }
+        },
+        {
+          "id": "return",
+          "from": {
+            "connector": "harness-board-B::JH1",
+            "pin": "RET"
+          },
+          "to": {
+            "connector": "harness-board-A::JH1",
+            "pin": "RET"
+          },
+          "role": "return",
+          "length_mm": 600.0,
+          "area_mm2": 0.5,
+          "route_id": "interboard-route",
+          "color": "#8090aa",
+          "material": {
+            "name": "assumed copper",
+            "resistivity_ohm_m": 1.724137931034483e-08,
+            "reference_temperature_c": 20.0
+          },
+          "electrical": {
+            "resistance_ohm": 0.020689655172413793,
+            "provenance": {
+              "source": "R=L/(sigma*A) from explicit synthetic inputs"
+            }
+          },
+          "properties": {
+            "cross_section_position_mm": [
+              12.0,
+              8.0
+            ],
+            "radius_mm": 0.39894228040143265
+          }
+        },
+        {
+          "id": "agg-p",
+          "from": {
+            "connector": "harness-board-A::JH1",
+            "pin": "AGG_P"
+          },
+          "to": {
+            "connector": "harness-board-B::JH1",
+            "pin": "AGG_P"
+          },
+          "role": "signal",
+          "length_mm": 600.0,
+          "area_mm2": 0.07068583470577035,
+          "route_id": "interboard-route",
+          "color": "#55c7dc",
+          "material": {
+            "name": "assumed copper",
+            "resistivity_ohm_m": 1.724137931034483e-08,
+            "reference_temperature_c": 20.0
+          },
+          "electrical": {
+            "resistance_ohm": 0.1463493729580647,
+            "provenance": {
+              "source": "DC metadata from the same solid round-wire geometry"
+            }
+          },
+          "properties": {
+            "cross_section_position_mm": [
+              -7.0,
+              8.0
+            ],
+            "radius_mm": 0.15
+          }
+        },
+        {
+          "id": "agg-n",
+          "from": {
+            "connector": "harness-board-A::JH1",
+            "pin": "AGG_N"
+          },
+          "to": {
+            "connector": "harness-board-B::JH1",
+            "pin": "AGG_N"
+          },
+          "role": "signal",
+          "length_mm": 600.0,
+          "area_mm2": 0.07068583470577035,
+          "route_id": "interboard-route",
+          "color": "#55c7dc",
+          "material": {
+            "name": "assumed copper",
+            "resistivity_ohm_m": 1.724137931034483e-08,
+            "reference_temperature_c": 20.0
+          },
+          "electrical": {
+            "resistance_ohm": 0.1463493729580647,
+            "provenance": {
+              "source": "DC metadata from the same solid round-wire geometry"
+            }
+          },
+          "properties": {
+            "cross_section_position_mm": [
+              -3.0,
+              8.0
+            ],
+            "radius_mm": 0.15
+          }
+        },
+        {
+          "id": "vic-p",
+          "from": {
+            "connector": "harness-board-A::JH1",
+            "pin": "VIC_P"
+          },
+          "to": {
+            "connector": "harness-board-B::JH1",
+            "pin": "VIC_P"
+          },
+          "role": "signal",
+          "length_mm": 600.0,
+          "area_mm2": 0.07068583470577035,
+          "route_id": "interboard-route",
+          "color": "#55c7dc",
+          "material": {
+            "name": "assumed copper",
+            "resistivity_ohm_m": 1.724137931034483e-08,
+            "reference_temperature_c": 20.0
+          },
+          "electrical": {
+            "resistance_ohm": 0.1463493729580647,
+            "provenance": {
+              "source": "DC metadata from the same solid round-wire geometry"
+            }
+          },
+          "properties": {
+            "cross_section_position_mm": [
+              3.0,
+              8.0
+            ],
+            "radius_mm": 0.15
+          }
+        },
+        {
+          "id": "vic-n",
+          "from": {
+            "connector": "harness-board-A::JH1",
+            "pin": "VIC_N"
+          },
+          "to": {
+            "connector": "harness-board-B::JH1",
+            "pin": "VIC_N"
+          },
+          "role": "signal",
+          "length_mm": 600.0,
+          "area_mm2": 0.07068583470577035,
+          "route_id": "interboard-route",
+          "color": "#55c7dc",
+          "material": {
+            "name": "assumed copper",
+            "resistivity_ohm_m": 1.724137931034483e-08,
+            "reference_temperature_c": 20.0
+          },
+          "electrical": {
+            "resistance_ohm": 0.1463493729580647,
+            "provenance": {
+              "source": "DC metadata from the same solid round-wire geometry"
+            }
+          },
+          "properties": {
+            "cross_section_position_mm": [
+              7.0,
+              8.0
+            ],
+            "radius_mm": 0.15
+          }
+        }
+      ],
+      "pairs": [
+        {
+          "id": "aggressor-pair",
+          "wire_ids": [
+            "agg-p",
+            "agg-n"
+          ],
+          "kind": "differential",
+          "twisted": false
+        },
+        {
+          "id": "victim-pair",
+          "wire_ids": [
+            "vic-p",
+            "vic-n"
+          ],
+          "kind": "differential",
+          "twisted": false
+        }
+      ],
+      "cables": [
+        {
+          "id": "six-conductor-bundle",
+          "wire_ids": [
+            "pwr",
+            "return",
+            "agg-p",
+            "agg-n",
+            "vic-p",
+            "vic-n"
+          ],
+          "twisted": false
+        }
+      ],
+      "routes": [
+        {
+          "id": "interboard-route",
+          "frame_id": "assembly",
+          "points_mm": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              600,
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "extensions": {
+        "spike.harness-pi": {
+          "wire_ids": [
+            "pwr",
+            "return"
+          ],
+          "ground": {
+            "connector": "harness-board-A::JH1",
+            "pin": "RET"
+          },
+          "contacts": [],
+          "terminals": [
+            {
+              "id": "board-A-source",
+              "type": "voltage_source",
+              "positive": {
+                "connector": "harness-board-A::JH1",
+                "pin": "PWR"
+              },
+              "negative": {
+                "connector": "harness-board-A::JH1",
+                "pin": "RET"
+              },
+              "value": 12.0
+            },
+            {
+              "id": "board-B-load",
+              "type": "current_load",
+              "positive": {
+                "connector": "harness-board-B::JH1",
+                "pin": "PWR"
+              },
+              "negative": {
+                "connector": "harness-board-B::JH1",
+                "pin": "RET"
+              },
+              "value": 4.0
+            }
+          ]
+        },
+        "spike.harness-mtl-evidence": {
+          "status": "external-example-artifact",
+          "request": "mtl-request.json",
+          "result": "mtl-result.json"
+        }
+      },
+      "provenance": {
+        "source": "Original synthetic SPIKE interboard harness; no imported board pinout or measured cable data"
+      }
+    },
+    "selection": {
+      "pair_id": "aggressor-pair"
+    },
+    "model": {
+      "kind": "rlgc",
+      "coupled": false,
+      "length_m": 0.6,
+      "resistance_ohm_per_m": 0.48783124319354904,
+      "inductance_h_per_m": 1.4012408140390222e-06,
+      "capacitance_f_per_m": 2.0650304472355158e-11,
+      "loss_tangent": 0.008,
+      "inductive_coupling": 0.0,
+      "capacitive_coupling": 0.0,
+      "reference_impedance_ohm": 260.4912618942215,
+      "frequency_stop_hz": 250000000.0,
+      "frequency_points": 33
+    },
+    "provenance": {
+      "source": "Scalar aggressor differential mode derived from the DC L/R and static C of rlgc-result.json; no victim/crosstalk or common-mode content"
+    }
+  },
+  "limitations": [
+    "Explicit uniform two-port loop/modal RLGC only; differential mode has no common-mode conversion or crosstalk.",
+    "Both conductors and their return loss/coupling must already be included in the supplied model.",
+    "Twist pitch, shield, route geometry and connector contacts are not extracted or added to the supplied model.",
+    "No full-wave radiation or EMI compliance result."
+  ]
+}

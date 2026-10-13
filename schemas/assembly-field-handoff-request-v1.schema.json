@@ -9,11 +9,13 @@
     "contract": {"const": "spike/assembly-field-handoff-request/v1"},
     "assembly": {"$ref": "assembly-ir-v1.schema.json"},
     "domain": {"enum": ["thermal", "em", "si"]},
+    "resource_profile": {"const": "routed_pcb_em_v1"},
     "bodies": {"type": "array", "minItems": 1, "maxItems": 130, "items": {"$ref": "#/$defs/body"}},
     "materials": {"type": "array", "minItems": 1, "maxItems": 1024, "items": {"oneOf": [{"$ref": "#/$defs/thermalMaterial"}, {"$ref": "#/$defs/emMaterial"}]}},
     "ports": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/port"}}
   },
   "allOf": [
+    {"if": {"required": ["resource_profile"]}, "then": {"properties": {"domain": {"const": "em"}}}, "else": {"properties": {"bodies": {"items": {"properties": {"mesh": {"properties": {"vertices": {"maxItems": 100000}, "cells": {"maxItems": 100000}}}, "boundary_faces": {"maxItems": 400000}}}}}}},
     {"if": {"properties": {"domain": {"const": "thermal"}}}, "then": {"properties": {"materials": {"items": {"$ref": "#/$defs/thermalMaterial"}}, "ports": {"maxItems": 0}}}, "else": {"properties": {"materials": {"items": {"$ref": "#/$defs/emMaterial"}}}}}
   ],
   "$defs": {
@@ -26,8 +28,8 @@
       "required": ["occurrence_id", "reference_id", "source_sha256", "mesh", "boundary_faces", "material_map"],
       "properties": {
         "occurrence_id": {"$ref": "#/$defs/id"}, "reference_id": {"$ref": "#/$defs/id"}, "source_sha256": {"$ref": "#/$defs/digest"},
-        "mesh": {"allOf": [{"$ref": "solver-mesh-v1.schema.json"}, {"properties": {"vertices": {"minItems": 4, "maxItems": 100000}, "cells": {"minItems": 1, "maxItems": 100000, "items": {"required": ["material_id"], "properties": {"kind": {"const": "tetrahedron"}, "vertices": {"minItems": 4, "maxItems": 4}}}}}}]},
-        "boundary_faces": {"type": "array", "maxItems": 400000, "items": {"$ref": "#/$defs/face"}},
+        "mesh": {"allOf": [{"$ref": "solver-mesh-v1.schema.json"}, {"properties": {"vertices": {"minItems": 4, "maxItems": 200000}, "cells": {"minItems": 1, "maxItems": 600000, "items": {"required": ["material_id"], "properties": {"kind": {"const": "tetrahedron"}, "vertices": {"minItems": 4, "maxItems": 4}}}}}}]},
+        "boundary_faces": {"type": "array", "maxItems": 2400000, "items": {"$ref": "#/$defs/face"}},
         "material_map": {"type": "object", "minProperties": 1, "maxProperties": 1024, "additionalProperties": {"$ref": "#/$defs/id"}},
         "stack_binding": {"type": "object", "additionalProperties": false, "required": ["id", "source_sha256"], "properties": {"id": {"$ref": "#/$defs/id"}, "source_sha256": {"$ref": "#/$defs/digest"}}}
       }

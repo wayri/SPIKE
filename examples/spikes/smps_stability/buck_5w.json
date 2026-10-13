@@ -1,0 +1,9 @@
+{
+  "topology": "buck",
+  "input_voltage_v": 24,
+  "duty_cycle": 0.5,
+  "load_resistance_ohm": 28.8,
+  "inductance_h": 0.00048,
+  "capacitance_f": 0.00009791666666666667,
+  "controller_gain": 5
+}

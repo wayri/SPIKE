@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.studio-board-circuit { display:flex;flex-direction:column;min-height:0;height:100%;font:12px/1.4 system-ui,sans-serif;color:var(--spike-table-text); }
+.studio-circuit-toolbar { display:flex;flex-wrap:wrap;gap:5px;flex:none;padding:6px; }
+.studio-circuit-toolbar button,.studio-part-inspector button { display:inline-flex;align-items:center;gap:5px;min-height:28px;font:inherit;padding:3px 7px; }
+.studio-circuit-notice { margin:0;padding:6px 9px;flex:none;border-bottom:1px solid var(--spike-table-border);overflow-wrap:anywhere; }
+.studio-circuit-grid { flex:1;min-height:260px;display:grid;grid-template-columns:180px minmax(0,1fr) 240px;overflow:hidden; }
+.studio-circuit-grid>aside { min-height:0;min-width:0;display:flex;flex-direction:column;overflow:auto;border-right:1px solid var(--spike-table-border);padding:6px;gap:6px; }
+.studio-part-search { display:flex;align-items:center;gap:4px; }.studio-part-search input { min-width:0;width:100%;font:inherit; }
+.studio-part-list { min-height:0;overflow:auto;display:flex;flex-direction:column;gap:3px; }.studio-part-list button { display:grid;grid-template-columns:45px minmax(0,1fr);gap:2px 5px;text-align:left;font:inherit;min-height:34px;padding:3px 6px; }.studio-part-list small { grid-column:1/-1;font-size:10px; }.studio-part-list span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }.studio-part-list [aria-pressed=true] { background:var(--spike-table-choice-bg); }
+.studio-circuit-drawing { min-width:0;min-height:0;overflow:hidden;background:var(--spike-table-surface); }.studio-circuit-drawing svg { width:100%;height:100%; }.studio-circuit-drawing [role=button] { cursor:pointer; }.studio-circuit-drawing [role=button]:focus-visible { outline:1px solid var(--spike-table-focus); }
+.studio-part-inspector label { display:flex;flex-wrap:wrap;gap:5px;align-items:center; }.studio-part-inspector select { width:100%;min-width:0;font:inherit; }.studio-part-inspector table { width:100%;font:inherit;border-collapse:collapse; }.studio-part-inspector td,.studio-part-inspector th { padding:3px;border-bottom:1px solid var(--spike-table-border);text-align:left;overflow-wrap:anywhere; }
+.studio-board-circuit footer { flex:none;padding:6px;color:var(--spike-table-muted);font-size:11px; }
+@media(max-width:1050px){.studio-circuit-grid{grid-template-columns:150px minmax(0,1fr) 190px;}}
+
+.studio-board-page { height:100%;min-height:0; }.studio-board-page[hidden] { display:none; }
+
+.spice-assistant-body .studio-board-page input,.spice-assistant-body .studio-board-page select{font-size:12px;}.spice-assistant-body .studio-board-page input[type=checkbox]{width:14px;height:14px;flex:none;}
+.studio-circuit-drawing svg{touch-action:none;user-select:none;}

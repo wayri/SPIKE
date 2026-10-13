@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.engineering-shade { padding: 16px; }
+.engineering-review { width: min(1150px,96vw); max-height: 94vh; display: flex; flex-direction: column; min-width: 0; color: var(--spike-table-text); background: var(--spike-table-surface); border: 1px solid var(--spike-table-border-strong); padding: 14px; gap: 10px; font: 12px/1.5 system-ui,sans-serif; }
+.engineering-review header, .engineering-review nav, .engineering-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.engineering-review header { justify-content: space-between; }
+.engineering-review h2 { margin: 0; font-size: 17px; }
+.engineering-body { overflow: auto; min-height: 0; }
+.engineering-summary { display: grid; grid-template-columns: repeat(auto-fit,minmax(190px,1fr)); gap: 10px; padding: 8px; background: var(--spike-table-toolbar); }
+.engineering-table { overflow: auto; max-height: 45vh; }
+.engineering-review table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.engineering-review th { position: sticky; top: 0; background: var(--spike-table-header); text-align: left; }
+.engineering-review td,.engineering-review th { padding: 6px 8px; border-bottom: 1px solid var(--spike-table-border); overflow-wrap: anywhere; min-width: 80px; }
+.engineering-review tbody tr:nth-child(even) { background: var(--spike-table-stripe); }
+.engineering-review label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.engineering-review input,.engineering-review select { font: var(--spike-control-font); min-height: var(--spike-control-height); }
+.engineering-fields { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 10px; margin-bottom: 10px; }
+.engineering-review fieldset { margin-top: 10px; border: 1px solid var(--spike-table-border); }
+.engineering-review dl>div { display: flex; gap: 12px; flex-wrap: wrap; }
+.engineering-review dd { margin-left: 0; overflow-wrap: anywhere; }
+
+.assembly-em-workbench textarea { box-sizing: border-box; max-height: 35vh; resize: vertical; }

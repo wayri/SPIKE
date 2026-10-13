@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import ts from 'typescript';
+import {importTestTypescript} from './import-test-typescript.mjs';
 const compile=s=>ts.transpileModule(s,{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022}}).outputText;
 const load=async s=>import(`data:text/javascript;base64,${Buffer.from(compile(s)).toString('base64')}`);
 const source=await readFile(new URL('../src/LayoutViewport.tsx',import.meta.url),'utf8');
@@ -34,12 +35,7 @@ const many={...board,pads:Array.from({length:10000},(_,i)=>pad(`P${i}`,4+(i%100)
 const bounded=annotate(many,{...view,maxX:510,maxY:510},{},'All',null,false,[]);assert.equal(bounded.labels.length,600);assert.equal(bounded.pinOne.length,10000,'Pin markers must not silently truncate components to text budget');
 assert.match(source,/return layoutFeatureAnnotations\(board/);assert.match(source,/data-pin-one-count=/);
 console.log('Actual2D annotation function: pad numbers/nets, trace/zone labels, pin1/A1, visible-layer/isolated-net filters, zoom, collisions and600text budget passed');
-const numeric=await readFile(new URL('../src/numericRange.ts',import.meta.url),'utf8');
-const parser=(await readFile(new URL('../src/boardParser.ts',import.meta.url),'utf8'))
- .replace('import { numericExtent } from "./numericRange";','')
- .replace('import { parseKikakukaBends } from "./kikakukaFlex";','');
-const kikakuka=await readFile(new URL('../src/kikakukaFlex.ts',import.meta.url),'utf8');
-const {parseKicadBoard}=await load(numeric+'\n'+kikakuka+'\n'+parser);
+const {parseKicadBoard}=await importTestTypescript('boardParser');
 for(const path of process.argv.slice(2)){
  const real=parseKicadBoard(await readFile(path,'utf8'));
  const padIds=new Set();let repeatedPadIds=0;

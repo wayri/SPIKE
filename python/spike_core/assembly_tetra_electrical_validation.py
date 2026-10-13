@@ -39,6 +39,8 @@ def _validate(raw):
             isinstance(mesh.get("object_map"), dict), "Invalid electrical mesh.")
     cells, objects = mesh["cells"], mesh["object_map"]
     require(1 <= len(cells) <= 5000 and len(objects) <= 5000, "Mesh resource budget exceeded.")
+    require(isinstance(mesh.get("vertices"), list) and 4 <= len(mesh["vertices"]) <= 10000,
+            "Mesh resource budget exceeded.")
     # Preserve both levels of identity. Thermal's single owner key is replaced
     # only in this private audit copy, never in the retained source mesh.
     audit_objects, owners = {}, {}

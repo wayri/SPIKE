@@ -128,3 +128,10 @@ const strippedStudy = withoutSavedResults(assemblyStudy);
 assert.deepEqual(strippedStudy.assembly_ir.extensions['spike.multiboard-studies'].pi.request, { source: 12 });
 assert.equal(strippedStudy.assembly_ir.extensions['spike.multiboard-studies'].pi.result, undefined);
 assert.equal(assemblyStudy.assembly_ir.extensions['spike.multiboard-studies'].pi.result.status, 'completed');
+
+const parallelState = { contract: 'spike/parallel-workspace/v1', draft: { jobs_json: '[]', concurrency: '2', threads_per_job: '3', timeout_s: '120' }, runs: [{ id:'past', result:{outputs:[1]}, status:'completed' }] };
+const parallelProject = { analysis: { parallel_execution: parallelState } };
+const setupOnly = withoutSavedResults(parallelProject);
+assert.deepEqual(setupOnly.analysis.parallel_execution.draft, parallelState.draft);
+assert.deepEqual(setupOnly.analysis.parallel_execution.runs, []);
+assert.equal(parallelProject.analysis.parallel_execution.runs.length, 1, 'omitting results must not mutate the open history');

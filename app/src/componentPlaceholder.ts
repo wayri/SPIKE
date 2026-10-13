@@ -17,7 +17,9 @@ type PlaceholderComponent = {
   rotation?: number;
   bodyBounds?: ComponentPlaceholderBounds;
   courtyardBounds?: ComponentPlaceholderBounds;
-  properties?: readonly { name?: unknown; values?: readonly unknown[] }[] | Record<string, unknown>;
+  fields?: readonly { name?: unknown; value?: unknown; values?: readonly unknown[] }[] | Record<string, unknown>;
+  vendor_properties?: Record<string, unknown>;
+  properties?: readonly { name?: unknown; value?: unknown; values?: readonly unknown[] }[] | Record<string, unknown>;
 };
 
 type PlaceholderPad = {
@@ -38,8 +40,8 @@ export type ComponentPlaceholderDimensions = {
 
 const MIN_PLANAR_MM = 0.2;
 const MAX_PLANAR_MM = 200;
-const MIN_HEIGHT_MM = 0.1;
-const MAX_HEIGHT_MM = 50;
+const MIN_HEIGHT_MM = 0.001;
+const MAX_HEIGHT_MM = 1000;
 
 function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(Math.max(value, minimum), maximum);
@@ -108,21 +110,27 @@ function padEnvelope(component: PlaceholderComponent, pads: readonly Placeholder
   return usableBounds({ minX, minY, maxX, maxY });
 }
 
-function explicitHeight(component: PlaceholderComponent) {
-  const rawProperties = component.properties;
-  const properties = Array.isArray(rawProperties) ? rawProperties
-    : rawProperties && typeof rawProperties === "object" ? Object.entries(rawProperties).map(([name, value]) => ({ name, values: Array.isArray(value) ? value : [value] })) : [];
-  for (const property of properties) {
-    if (!property || typeof property !== "object") continue;
-    if (!/height/i.test(String(property.name ?? ""))) continue;
-    for (const raw of Array.isArray(property.values) ? property.values : []) {
-      const match = String(raw).trim().match(/^([0-9]+(?:\.[0-9]+)?)\s*(mm|mil|in|inch|inches)?$/i);
-      if (!match) continue;
-      let value = Number(match[1]);
-      const unit = match[2]?.toLowerCase();
-      if (unit === "mil") value *= 0.0254;
-      else if (unit === "in" || unit === "inch" || unit === "inches") value *= 25.4;
-      if (Number.isFinite(value) && value >= MIN_HEIGHT_MM && value <= MAX_HEIGHT_MM) return value;
+/** Optional physical height metadata in mm; planar footprint height is unrelated. */
+export function explicitComponentHeightMm(component: PlaceholderComponent) {
+  for (const rawProperties of [component.properties,component.fields,component.vendor_properties]) {
+    const properties = Array.isArray(rawProperties) ? rawProperties
+      : rawProperties && typeof rawProperties === "object" ? Object.entries(rawProperties).map(([name,value]) => ({name,values:Array.isArray(value)?value:[value]})) : [];
+    for (const property of properties) {
+      if (!property || typeof property !== "object" || !/height/i.test(String(property.name ?? ""))) continue;
+      const hint = String(property.name ?? "").match(/(?:[_\s(\[])(mm|cm|um|µm|μm|mil|mils|in|inch|inches)(?:[)\]]|$)/i)?.[1];
+      const values = Array.isArray(property.values) ? property.values : property.value !== undefined ? [property.value] : [];
+      for (const raw of values) {
+        if (typeof raw !== "string" && typeof raw !== "number") continue;
+        const match = String(raw).trim().match(/^([+]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:e[+-]?[0-9]+)?)\s*(mm|cm|um|µm|μm|mil|mils|in|inch|inches)?$/i);
+        if (!match) continue;
+        let value = Number(match[1]);
+        const unit = (match[2] ?? hint ?? "mm").toLowerCase();
+        if (unit === "mil" || unit === "mils") value *= .0254;
+        else if (["in","inch","inches"].includes(unit)) value *= 25.4;
+        else if (unit === "cm") value *= 10;
+        else if (["um","µm","μm"].includes(unit)) value /= 1000;
+        if (Number.isFinite(value) && value >= MIN_HEIGHT_MM && value <= MAX_HEIGHT_MM) return value;
+      }
     }
   }
   return null;
@@ -169,7 +177,7 @@ export function deriveComponentPlaceholder(
       : bodyBounds ? "body" : courtyardBounds ? "courtyard" : legacyBounds ? "component" : "generic";
   const width = selected?.width ?? 2;
   const depth = selected?.depth ?? 2;
-  const metadataHeight = explicitHeight(component);
+  const metadataHeight = explicitComponentHeightMm(component);
   return {
     widthMm: clamp(width, MIN_PLANAR_MM, MAX_PLANAR_MM),
     depthMm: clamp(depth, MIN_PLANAR_MM, MAX_PLANAR_MM),

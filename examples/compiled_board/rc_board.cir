@@ -1,0 +1,7 @@
+* Original SPIKE RC data-acquisition fixture, SPDX-License-Identifier: Apache-2.0
+* A 1 kohm driver resistance is added at dac by the explicit pin configuration.
+R1 dac adc 1k
+R2 adc 0 2k
+C1 adc 0 1u
+.tran 10u 20m uic
+.end

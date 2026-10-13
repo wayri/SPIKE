@@ -1,5 +1,7 @@
 # EM Test Workbench
 
+**SI, PI, Thermal, EM**
+
 ## Purpose
 
 The EM tab owns electromagnetic-interference setup, deterministic pre-pass

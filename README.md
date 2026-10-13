@@ -1,12 +1,12 @@
-<img src="app/public/spike-logo.png" alt="SPIKE logo" width="420">
+<img src="app/public/spike-logo-tagline.png" alt="SPIKE — SI, PI, Thermal, EM" width="420">
 
 # SPIKE - PCB Simulation for KiCad
 
-[![Latest release: v0.3.10](https://img.shields.io/badge/latest_release-v0.3.10-blue)](https://github.com/wayri/SPIKE/releases/tag/v0.3.10)
-[![Community preview](https://img.shields.io/badge/status-early_community_preview-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.10)
-[![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.10/SPIKE_0.3.10_x64-setup.exe)
+[![Latest release: v0.3.11-gamma.1](https://img.shields.io/badge/latest_release-v0.3.11-gamma.1-blue)](https://github.com/wayri/SPIKE/releases/tag/v0.3.11-gamma.1)
+[![Gamma preview](https://img.shields.io/badge/status-Gamma_unreviewed_preview-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.11-gamma.1)
+[![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.11-gamma.1/SPIKE_0.3.11-gamma.1_x64-setup.exe)
 [![Linux Flatpak download](https://img.shields.io/badge/download-Linux_Flatpak-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak)
-[![macOS download](https://img.shields.io/badge/download-macOS_DMG-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.5)
+[![macOS Apple Silicon download](https://img.shields.io/badge/download-macOS_Apple_Silicon-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_macos-arm64_EXPERIMENTAL.dmg)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)](LICENSE)
 
 [![Power integrity](https://img.shields.io/badge/analysis-power_integrity-476582)](#pcb-analysis-capabilities)
@@ -14,6 +14,8 @@
 [![Thermal analysis](https://img.shields.io/badge/analysis-thermal-476582)](#pcb-analysis-capabilities)
 [![EM and RF](https://img.shields.io/badge/analysis-EM_%26_RF-476582)](#pcb-analysis-capabilities)
 [![Circuit simulation](https://img.shields.io/badge/analysis-circuits-476582)](#circuit-simulation-choices)
+
+**Gamma: numerical and engineering reviews are pending.** Published with the owner's explicit authorization for community testing. This preview includes unreviewed, experimental and approximate work; automated checks do not establish physical accuracy, compliance or design sign-off. Back up projects and independently verify results before relying on them. See [Gamma release notes](docs/releases/v0.3.11-gamma.1.md).
 
 SPIKE is an open-source PCB analysis and simulation workbench for KiCad boards.
 Explore **power integrity (PI), signal integrity (SI), board thermal analysis,
@@ -23,16 +25,15 @@ board viewport. Optional **[EMerge](https://github.com/FennisRobert/EMerge)** an
 **[openEMS](https://openems.de/)** extensions add electromagnetic
 simulation workflows.
 
-SPIKE runs locally and includes a command-line interface. Version 0.3.10 is an
-early community preview for Windows x64. Its installer is unsigned. The
-experimental Linux Flatpak and Apple Silicon macOS DMG remain available in
-[version 0.3.5](https://github.com/wayri/SPIKE/releases/tag/v0.3.5). Intel macOS
-remains held pending completion of its platform checks.
+SPIKE runs locally and includes a command-line interface. The current Windows
+x64 Gamma preview is version 0.3.11-gamma.1. Experimental Linux x86-64 Flatpak and macOS Apple
+Silicon packages remain at version 0.3.5. Intel macOS packaging is held, with no
+current package claimed as verified.
 
-[Windows downloads and release notes](https://github.com/wayri/SPIKE/releases/tag/v0.3.10)
-Ã‚Â| [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
-Ã‚Â| [User guides](docs/README.md)
-Ã‚Â| [Build from source](docs/DEVELOPER_GUIDE.md)
+[Downloads and release notes](https://github.com/wayri/SPIKE/releases/tag/v0.3.11-gamma.1)
+· [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
+· [User guides](docs/README.md)
+· [Build from source](docs/DEVELOPER_GUIDE.md)
 
 See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md).
 
@@ -212,5 +213,3 @@ see [third-party notices](THIRD_PARTY_NOTICES.md).
 If we have missed a credit, please open an issue or pull request. License and
 source details for included examples and integrations are in the
 [third-party notices](THIRD_PARTY_NOTICES.md).
-
-See [Python workspace and aligned EMerge model results](docs/SPIKE_EM_UI_BACKPORT.md) for Load model, floating editing and solver-result visualization.

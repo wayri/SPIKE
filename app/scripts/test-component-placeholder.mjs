@@ -112,3 +112,15 @@ for (const filename of process.argv.slice(2)) {
 
 console.log(JSON.stringify({ marble0201: tiny, connector, bottom, body, courtyard }, null, 2));
 console.log("component placeholder sizing: all assertions passed");
+
+for (const [metadata,expected] of [
+ [{properties:{Height:"7.5 mm"}},7.5],
+ [{properties:{"Height (in)":.25}},6.35],
+ [{fields:[{name:"Body Height",value:".5cm"}]},5],
+ [{vendor_properties:{ComponentHeight:"1250um"}},1.25],
+ [{properties:{Height:"4e-1 mm"}},.4],
+]) { const result=deriveComponentPlaceholder({...marble0201,properties:undefined,...metadata},marble0201Pads,"smd"); assert.equal(result.heightMm,expected); assert.equal(result.heightSource,"metadata"); }
+for (const value of ["-1mm","0","Infinity","3 bananas","1e99mm"]) assert.equal(deriveComponentPlaceholder({...marble0201,properties:{Height:value}},marble0201Pads,"smd").heightSource,"default");
+
+assert.equal(deriveComponentPlaceholder({...marble0201,properties:{Height:"65mm"}},marble0201Pads,"smd").heightMm,65,"tall explicit components are not replaced by generic defaults");
+assert.equal(deriveComponentPlaceholder({...marble0201,properties:{Height:"0.05mm"}},marble0201Pads,"smd").heightMm,.05);

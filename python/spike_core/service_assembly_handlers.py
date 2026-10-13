@@ -23,6 +23,7 @@ from .multiboard_study import prepare_multiboard_study, validate_study_result
 
 
 ASSEMBLY_SCOPED_METHODS = {
+    "validate_studio_board_cosimulation", "run_studio_board_cosimulation",
     "preview_mesh", "preflight_analysis", "mesh_convergence", "run_analysis", "run_preflighted_analysis", "emi_preflight", "emi_screen",
     "validate_spice_workspace", "compose_spice_workspace", "compile_spice_workspace_native_mna",
     "run_spice_workspace_native_mna", "run_field_circuit_cosimulation", "validate_converter_study",
@@ -70,6 +71,8 @@ def handle_assembly_request(
         "bind_multiboard_coupled_reduced_network",
         "plan_assembly_harnesses",
         "run_harness_pi",
+        "run_harness_si", "prepare_harness_em",
+        "run_harness_mtl", "extract_harness_round_wire_rlgc",
         "generate_tetrahedral_mesh",
         "prepare_multiboard_study", "validate_multiboard_study_result",
         "run_multiboard_circuit", "run_multiboard_thermal", "run_multiboard_em",
@@ -114,6 +117,20 @@ def handle_assembly_request(
                     raise RuntimeError("Tetrahedral generation failed. " + (detail or str(exc))) from exc
         elif method == "run_harness_pi":
             result = run_harness_pi(params.get("request") or {})
+        elif method in {"run_harness_si", "prepare_harness_em"}:
+            if set(params) != {"request"}:
+                raise ValueError("Harness SI/EM operations require exactly one request field.")
+            from .harness_signal import run_harness_si, prepare_harness_em
+            result = (run_harness_si if method == "run_harness_si" else prepare_harness_em)(params["request"])
+        elif method in {"run_harness_mtl", "extract_harness_round_wire_rlgc"}:
+            if set(params) != {"request"}:
+                raise ValueError("Harness network operations require exactly one request field.")
+            if method == "run_harness_mtl":
+                from .harness_mtl import run_harness_mtl
+                result = run_harness_mtl(params["request"])
+            else:
+                from .harness_rlgc_geometry import extract_parallel_round_rlgc
+                result = extract_parallel_round_rlgc(params["request"])
         elif method == "plan_assembly_harnesses":
             result = plan_harnesses(params.get("request") or {})
         elif method == "plan_multiboard_analysis":

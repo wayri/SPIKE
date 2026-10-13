@@ -34,11 +34,11 @@ def _sha256(path: Path) -> str:
 
 
 def _library() -> Path:
-    name = "spikes_c_api.dll" if os.name == "nt" else "libspikes_c_api.so"
-    path = ROOT / "build-spikes-hybrid" / name
-    if not path.is_file():
-        raise RuntimeError(f"the release-owned circuit library is missing: {path}")
-    return path
+    # Use the same fixed, first-party native payload selected by development.
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from python.spike_core.spikes_runtime import owned_library_path
+    return owned_library_path()
 
 
 def _require_builder() -> str:

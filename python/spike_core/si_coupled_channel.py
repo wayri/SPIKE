@@ -20,6 +20,7 @@ from scipy.sparse import lil_matrix
 from scipy.sparse.linalg import spsolve
 
 from .spider_v2 import SpiDeRV2
+from .si_frequency_loss import validate_loss_model, trace_impedance
 from .sparameters import NetworkData, analyze_network, single_ended_to_mixed_mode
 from .si_channel import (
     MAX_EYE_BITS,
@@ -442,6 +443,9 @@ def extract_coupled_path_rlgc(
         "geometry_digest": _canonical_digest(geometry),
         "rlgc_per_m": {
             "resistance_ohm_per_m": resistance.tolist(),
+            "conductivity_s_per_m": conductivity,
+            "conductor_thickness_m": thickness_m,
+            "conductor_loss": validate_loss_model(request.get("loss_model")),
             "inductance_h_per_m": inductance.tolist(),
             "capacitance_f_per_m": capacitance.tolist(),
             "vacuum_capacitance_f_per_m": vacuum_capacitance.tolist(),
@@ -466,7 +470,8 @@ def extract_coupled_path_rlgc(
             "two straight parallel coextensive planar traces only" if path_mode == "strict_uniform" else "piecewise planar paired traces with bounded separation/skew variation only",
             "single homogeneous dielectric and simple continuous reference polygon",
             "finite cross-section truncation with natural outer boundaries",
-            "DC conductor resistance; no skin, proximity, roughness, dispersion, via, launch, connector, package, or radiation model",
+            "Isolated per-trace slab skin impedance and optional empirical RMS roughness resistance correction; no return-plane loss, geometry-derived proximity, dispersion, via, launch, connector, package, or radiation model",
+            "Roughness corrects resistance only, not causal broadband phase; roughened TDR/eye results are exploratory",
             *([] if path_mode == "strict_uniform" else ["bend discontinuities and bend-local coupling are omitted; minimum observed separation is used over the longer path as an approximation, not a guaranteed NEXT/FEXT upper bound"]),
         ],
     }
@@ -486,7 +491,27 @@ def multiconductor_rlgc_network(
     if any(matrix.shape != (2, 2) for matrix in (resistance, inductance, capacitance)):
         raise SiChannelError("Coupled RLGC matrices must be 2 x 2.")
     loss_tangent = float(rlgc.get("loss_tangent", 0.0))
-    length_m = float(extraction["geometry"]["length_m"])
+    try:
+        length_m = float(extraction["geometry"]["length_m"])
+    except (KeyError, TypeError, ValueError, OverflowError) as exc:
+        raise SiChannelError(f"Coupled RLGC requires explicit geometry.length_m: {exc}") from exc
+    # Generic supplied matrices and older extraction records declare constant
+    # R. Do not dereference geometry before deciding whether skin loss was
+    # explicitly selected: those valid records need no inferred trace widths.
+    skin_widths = None
+    if "conductor_loss" in rlgc:
+        try:
+            loss_model = validate_loss_model(rlgc["conductor_loss"])
+            if loss_model["conductor"] == "slab_skin":
+                geometry = extraction["geometry"]
+                values = [geometry[key] for key in ("signal_width_m", "victim_width_m")]
+                values.extend(rlgc[key] for key in ("conductor_thickness_m", "conductivity_s_per_m"))
+                if any(isinstance(value, bool) or not isinstance(value, (int, float))
+                       or not isfinite(value) or value <= 0 for value in values):
+                    raise ValueError("Slab skin requires positive finite SI widths, thickness and conductivity.")
+                skin_widths = values[:2]
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            raise SiChannelError(f"Invalid coupled conductor-loss model or geometry: {exc}") from exc
     matrices = np.empty((len(frequencies), 4, 4), dtype=complex)
     identity2 = np.eye(2, dtype=complex)
     identity4 = np.eye(4, dtype=complex)
@@ -495,7 +520,15 @@ def multiconductor_rlgc_network(
         if cancel_check is not None and cancel_check():
             raise SiChannelError("Coupled SI network analysis was cancelled.")
         omega = 2.0 * pi * float(frequency)
-        z_per_m = resistance.astype(complex) + 1j * omega * inductance
+        internal_z = resistance.astype(complex).copy()
+        if skin_widths is not None:
+            try:
+                for trace_index, width in enumerate(skin_widths):
+                    internal_z[trace_index, trace_index] = trace_impedance(
+                        extraction, float(frequency), width, float(resistance[trace_index, trace_index]))
+            except (KeyError, TypeError, ValueError, OverflowError) as exc:
+                raise SiChannelError(f"Coupled conductor-loss evaluation failed: {exc}") from exc
+        z_per_m = internal_z + 1j * omega * inductance
         y_per_m = (omega * loss_tangent + 1j * omega) * capacitance
         state = np.block([
             [np.zeros((2, 2), dtype=complex), -z_per_m],
@@ -526,7 +559,9 @@ def multiconductor_rlgc_network(
         parameter_kind="S",
         data_format="RI",
         source=f"SpiDeR:{extraction['geometry']['design_id']}:{extraction['geometry_digest']}",
-        warnings=["Bounded coupled geometry output is experimental and not protocol-compliance evidence."],
+        warnings=[("Bounded coupled geometry output is experimental and not protocol-compliance evidence."
+                   if skin_widths is not None else
+                   "Supplied/legacy constant-R RLGC network; no geometry-derived conductor loss is inferred.")],
     )
 
 

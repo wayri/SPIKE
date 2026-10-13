@@ -54,13 +54,13 @@ def validate_thermal_result_shape(result, handoff):
     if result['source_traceability'] != handoff['source_traceability']:
         raise ValueError('ASSEMBLY_FIELD_RESULT: changed source traceability')
     keys(field['heat_balance'], ('source_w', 'prescribed_flux_inward_w', 'temperature_reaction_inward_w',
-                                'convection_outward_w', 'imbalance_w', 'acceptance_tolerance_w'))
+                                'convection_outward_w', 'imbalance_w', 'acceptance_tolerance_w'), ('radiation_outward_w',))
     for value in field['heat_balance'].values():
         number(value)
     balance = field['heat_balance']
     if balance['acceptance_tolerance_w'] < 0 or abs(balance['imbalance_w']) > balance['acceptance_tolerance_w']:
         raise ValueError('ASSEMBLY_FIELD_RESULT: reported heat conservation failed')
-    calculated = balance['source_w']+balance['prescribed_flux_inward_w']+balance['temperature_reaction_inward_w']-balance['convection_outward_w']
+    calculated = balance['source_w']+balance['prescribed_flux_inward_w']+balance['temperature_reaction_inward_w']-balance['convection_outward_w']-balance.get('radiation_outward_w', 0)
     if abs(calculated-balance['imbalance_w']) > balance['acceptance_tolerance_w']:
         raise ValueError('ASSEMBLY_FIELD_RESULT: inconsistent heat balance')
     if not isinstance(field['resources'], dict) or any(type(field['resources'].get(k)) is not int or field['resources'][k] != v
@@ -69,12 +69,14 @@ def validate_thermal_result_shape(result, handoff):
     diagnostics = field['diagnostics']
     keys(diagnostics, ('free_relative_residual', 'free_max_residual_w', 'reciprocity_max_error_w_k',
                        'positive_energy_check', 'volume_gradient_energy_w_k', 'contact_jump_energy_w_k',
-                       'cg_iterations', 'max_element_jacobian_condition'))
+                       'cg_iterations', 'max_element_jacobian_condition'), ('newton_iterations',))
     if diagnostics['positive_energy_check'] is not True or type(diagnostics['cg_iterations']) is not int or diagnostics['cg_iterations'] < 0:
         raise ValueError('ASSEMBLY_FIELD_RESULT: invalid numerical diagnostics')
     for key, value in diagnostics.items():
         if key not in ('positive_energy_check', 'cg_iterations') and number(value) < 0:
             raise ValueError('ASSEMBLY_FIELD_RESULT: negative numerical diagnostic')
+    if 'newton_iterations' in diagnostics and (type(diagnostics['newton_iterations']) is not int or not 0 <= diagnostics['newton_iterations'] <= 80):
+        raise ValueError('ASSEMBLY_FIELD_RESULT: invalid Newton diagnostics')
     if diagnostics['free_relative_residual'] > 1e-8:
         raise ValueError('ASSEMBLY_FIELD_RESULT: excessive reported residual')
     if not isinstance(field['contacts'], list) or len(field['contacts']) > 10000:

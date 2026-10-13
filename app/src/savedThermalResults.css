@@ -1,0 +1,17 @@
+.saved-thermal-results { width: min(1140px, calc(100vw - 32px)); height: min(850px, calc(100vh - 48px)); display: flex; flex-direction: column; }
+.saved-thermal-results > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.saved-thermal-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 0; flex: 1; overflow: hidden; }
+.saved-thermal-layout aside { display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow: auto; border-right: 1px solid var(--spike-table-border); }
+.saved-thermal-layout aside label { display: grid; gap: 6px; }
+.saved-thermal-layout aside select { width: 100%; min-width: 0; }
+.saved-thermal-layout aside button { text-align: left; }
+.saved-thermal-layout main { min-width: 0; overflow: auto; padding: 16px; }
+.saved-thermal-status, .saved-thermal-warning { display: grid; gap: 6px; padding: 12px; margin: 10px 0; border: 1px solid var(--spike-table-border); overflow-wrap: anywhere; }
+.saved-thermal-warning { border-left: 4px solid var(--spike-table-warning-text); }
+.saved-thermal-warning p { margin: 0; }
+.saved-thermal-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.saved-thermal-controls label { display: grid; gap: 5px; }
+.saved-thermal-results dl > div { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; }
+.saved-thermal-results dd { margin: 0; }
+.saved-thermal-results pre { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 760px) { .saved-thermal-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); } .saved-thermal-layout aside { max-height: 180px; border-right: 0; border-bottom: 1px solid var(--spike-table-border); } }

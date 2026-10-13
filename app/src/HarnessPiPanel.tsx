@@ -6,7 +6,7 @@ import { cancelLocalWorker, cancelLocalWorkerCleanup, runLocalWorker } from "./w
 type Endpoint = { connector: string; pin: string } | { splice: string };
 type Terminal = { id: string; type: "voltage_source" | "current_load"; positive: Endpoint; negative: Endpoint; value: number };
 type Contact = { id: string; from: Endpoint; to: Endpoint; resistance_ohm: number };
-type Setup = { ground?: Endpoint; terminals: Terminal[]; contacts: Contact[] };
+type Setup = { ground?: Endpoint; terminals: Terminal[]; contacts: Contact[]; wire_ids?: string[] };
 type Props = { value: Record<string, any>; onChange: (value: Record<string, any>) => void };
 const emptyEndpoint = (): Endpoint => ({ connector: "", pin: "" });
 const endpointKey = (endpoint?: Endpoint) => endpoint && "splice" in endpoint ? JSON.stringify(["splice", endpoint.splice]) : endpoint ? JSON.stringify(["connector", endpoint.connector, endpoint.pin]) : "";
@@ -16,7 +16,7 @@ const numericInput = (raw: string) => raw.trim() === "" ? Number.NaN : Number(ra
 export default function HarnessPiPanel({ value, onChange }: Props) {
   const rawSetup = value.extensions?.["spike.harness-pi"];
   const setupMalformed = rawSetup !== undefined && (!rawSetup || typeof rawSetup !== "object" || Array.isArray(rawSetup) || !Array.isArray(rawSetup.terminals) || !Array.isArray(rawSetup.contacts));
-  const setup: Setup = setupMalformed ? { terminals: [], contacts: [] } : { ground: rawSetup?.ground, terminals: rawSetup?.terminals ?? [], contacts: rawSetup?.contacts ?? [] };
+  const setup: Setup = setupMalformed ? { terminals: [], contacts: [] } : { ground: rawSetup?.ground, terminals: rawSetup?.terminals ?? [], contacts: rawSetup?.contacts ?? [], ...(rawSetup?.wire_ids !== undefined ? { wire_ids: rawSetup.wire_ids } : {}) };
   const [busy, setBusy] = useState(false); const [error, setError] = useState(""); const [result, setResult] = useState<Record<string, any> | null>(null);
   const [resultInput, setResultInput] = useState(""); const requestId = useRef<string | null>(null);
   const inputIdentity = JSON.stringify(value);
@@ -29,6 +29,9 @@ export default function HarnessPiPanel({ value, onChange }: Props) {
   const chooseEndpoint = (key: string) => endpoints.find(item => endpointKey(item.value) === key)?.value ?? emptyEndpoint();
   const endpointSelect = (label: string, endpoint: Endpoint | undefined, change: (next: Endpoint) => void) => <select aria-label={label} value={endpointKey(endpoint)} onChange={event => change(chooseEndpoint(event.target.value))}><option value="">Select terminal…</option>{endpoints.map(item => <option key={endpointKey(item.value)} value={endpointKey(item.value)}>{item.label}</option>)}</select>;
   const validate = () => {
+    if (setup.wire_ids !== undefined && (!Array.isArray(setup.wire_ids) || !setup.wire_ids.length
+      || setup.wire_ids.some(id => !(value.wires ?? []).some((wire: any) => wire.id === id))
+      || new Set(setup.wire_ids).size !== setup.wire_ids.length)) throw new Error("Select a nonempty set of existing PI conductors, including the explicit return.");
     if (!setup.ground || !endpointKey(setup.ground)) throw new Error("Select an explicit ground terminal.");
     if (!setup.terminals.length || !setup.terminals.some(item => item.type === "voltage_source")) throw new Error("Add at least one voltage source.");
     const ids = new Set<string>();
@@ -44,7 +47,7 @@ export default function HarnessPiPanel({ value, onChange }: Props) {
   const run = async () => {
     try {
       validate(); setBusy(true); setError(""); setResult(null);
-      const frozen = structuredClone({ contract: "spike/harness-pi-request/v1", harness: value, ground: setup.ground, terminals: setup.terminals, contacts: setup.contacts });
+      const frozen = structuredClone({ contract: "spike/harness-pi-request/v1", harness: value, ground: setup.ground, terminals: setup.terminals, contacts: setup.contacts, ...(setup.wire_ids !== undefined ? { wire_ids: setup.wire_ids } : {}) });
       const frozenIdentity = inputIdentity; const id = globalThis.crypto?.randomUUID?.() ?? `harness-pi-${Date.now()}`; requestId.current = id;
       const response = await runLocalWorker({ id, method: "run_harness_pi", params: { request: frozen } });
       if (requestId.current !== id) return;
@@ -57,6 +60,13 @@ export default function HarnessPiPanel({ value, onChange }: Props) {
   const patchContact = (index: number, update: Partial<Contact>) => persist({ ...setup, contacts: setup.contacts.map((item, i) => i === index ? { ...item, ...update } : item) });
   const stale = Boolean(result && resultInput !== inputIdentity);
   return <section className="harness-pi-panel" aria-label="Harness PI DC screening"><h4>Harness PI DC screening</h4>
+    <label>PI conductor scope<select value={setup.wire_ids === undefined ? "all" : "selected"} disabled={busy || setupMalformed} onChange={event => {
+      const next = { ...setup }; if (event.target.value === "all") delete next.wire_ids; else next.wire_ids = []; persist(next);
+    }}><option value="all">All harness wires (legacy)</option><option value="selected">Explicit selected conductors</option></select></label>
+    {setup.wire_ids !== undefined && <fieldset className="harness-pi-conductors" disabled={busy || setupMalformed}><legend>Included in this DC solve</legend>
+      {(value.wires ?? []).slice(0,4096).map((wire: any) => <label key={wire.id}><input type="checkbox" checked={Array.isArray(setup.wire_ids) && setup.wire_ids.includes(wire.id)} onChange={event => persist({ ...setup, wire_ids: event.target.checked ? [...(Array.isArray(setup.wire_ids) ? setup.wire_ids : []), wire.id] : (Array.isArray(setup.wire_ids) ? setup.wire_ids : []).filter(id => id !== wire.id) })} />{wire.id} · {wire.role ?? "unspecified"}</label>)}
+      <p>Select power and return paths explicitly. Excluded data wires remain in the document and SI view; they are not simulated by this DC job.</p>
+    </fieldset>}
     <p>This experimental lumped linear DC screen solves explicit wires, sources, loads, returns, and mated-contact resistances. It is not a PCB/board field solve, connector thermal model, or SI qualification. Connector preset resistance is metadata only; add each resistance below to include it in this run.</p>
     {setupMalformed ? <button className="secondary-btn" onClick={() => persist({ terminals: [], contacts: [] })}>Reset malformed Harness PI setup</button> : <label>Ground {endpointSelect("Harness PI ground", setup.ground, ground => persist({ ...setup, ground }))}</label>}
     <h5>Sources and loads</h5><DataTable label="Harness sources and loads" className="data-table"><thead><tr><th>ID</th><th>Type</th><th>Positive</th><th>Negative / return</th><th>Value</th><th /></tr></thead><tbody>{setup.terminals.map((row, index) => <tr key={`${row.id}-${index}`}>

@@ -62,7 +62,9 @@ class StagedVisualImportTests(unittest.TestCase):
             replacement.write_text("#VRML V2.0 utf8")
             replacement.with_suffix(".step").write_text("another file that was not selected")
             resolution = {}
-            with patch("python.spike_core.models.model_library_roots", return_value=[]):
+            with patch("python.spike_core.models.model_library_roots", return_value=[]), patch.dict(
+                "os.environ", {"SPIKE_MODEL_INDEX_PATH": str(root / "model-index.sqlite3")}
+            ):
                 staged, substitutions = _stage_resolved_model_references(board, root / "out", {reference: str(replacement)}, resolution)
             self.assertEqual(len(substitutions), 8)
             self.assertEqual(staged.read_text().count(replacement.as_posix()), 8)

@@ -1,5 +1,29 @@
 # SPIKE Architecture
 
+The IC/ASIC target has two visible applications, SPIKES and external KLayout,
+with explicitly approved managed backends. Revision-bound project preflight
+and read-only KLayout batch inspection are implemented; physical closure and
+PEX execution remain separate pending gates. See
+[ADR 0074](docs/adr/0074-two-application-asic-flow-and-klayout-handoff.md).
+
+Open-PDK discovery and selected-corner preparation are inert Python application
+services; the explicit ngspice C backend owns PDK circuit numerical execution.
+Run digests retain model dependencies and configuration. See
+[ADR 0072](docs/adr/0072-inert-open-pdk-circuit-workflows.md). This does not imply
+owned C++ compact-model parity or device/process TCAD.
+
+The SPIKES C++ transient engine owns adaptive stepping, accepted-state recovery
+and sparse companion-factorization reuse. Python exposes validated controls and
+reporting-grid interpolation without owning numerical state. See
+[ADR 0065](docs/adr/0065-adaptive-native-transient-recovery.md) for additive ABI
+and result semantics.
+
+The experimental fixed-grid scalar co-simulation master and recorded digital
+twin comparison are Python application services exposed through the existing
+worker, CLI and desktop script workspace. They use versioned neutral contracts
+and a trusted adapter registry; specialized solver coupling remains separate.
+See [ADR 0063](docs/adr/0063-offline-cosimulation-and-digital-twins.md).
+
 This document is the canonical description of the current SPIKE runtime. It
 describes implemented boundaries and names known debt explicitly. Product
 plans and unimplemented solver modes are documented elsewhere and are not

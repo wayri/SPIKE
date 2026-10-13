@@ -7,3 +7,5 @@ numpy==2.4.6
 plotly==6.9.0
 narwhals==2.26.0
 packaging==26.3
+# Offline curve fitting; no Qt backend or cloud service.
+scipy>=1.11,<2

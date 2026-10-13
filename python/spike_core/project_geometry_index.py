@@ -19,6 +19,7 @@ def validate_geometry_index(
     member_digests: Mapping[str, str],
     design_ir: Mapping[str, Any],
     *,
+    validated_design: SpiDeRV2 | None = None,
     safe_member_path: Callable[[str], str],
     error_type: Type[ValueError] = ValueError,
 ) -> Dict[str, Any]:
@@ -28,10 +29,14 @@ def validate_geometry_index(
     if not isinstance(tables, list) or len(tables) > 256:
         raise error_type("The geometry index tables must be a bounded array.")
     try:
-        design = SpiDeRV2.from_dict(design_ir)
+        design = validated_design or SpiDeRV2.from_dict(design_ir)
     except (TypeError, ValueError) as exc:
         raise error_type(f"The geometry index SpiDeR binding is invalid: {exc}") from exc
-    expected_design_digest = canonical_design_digest(design)
+    # Computing the canonical SpiDeR digest materializes and sorts the complete
+    # design.  An empty index has no design-bound table record to compare, so
+    # doing that work cannot strengthen admission.  Keep the full digest check
+    # for every non-empty index.
+    expected_design_digest = canonical_design_digest(design) if tables else ""
     normalized: list[Dict[str, Any]] = []
     paths: set[str] = set()
     for raw in tables:

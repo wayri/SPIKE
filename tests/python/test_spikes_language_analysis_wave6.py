@@ -1,3 +1,6 @@
+import math
+import os
+from pathlib import Path
 import unittest
 
 from python.spikes import (
@@ -8,6 +11,23 @@ from python.spikes import (
 
 
 class BehavioralGrammarWave6Tests(unittest.TestCase):
+    def test_tan_atanh_values_and_derivatives(self):
+        for function, oracle, slope in (
+            ("TAN", math.tan, lambda x: 1 + math.tan(x)**2),
+            ("ATANH", math.atanh, lambda x: 1 / (1-x*x)),
+        ):
+            expression = compile_behavioral_expression(f"{function}(V(x))")
+            for x in (-.75, -.25, 0., .25, .75):
+                with self.subTest(function=function, x=x):
+                    result = expression.evaluate((x,))
+                    self.assertAlmostEqual(result.value, oracle(x), places=13)
+                    self.assertAlmostEqual(result.gradient[0], slope(x), places=13)
+                    numerical = (oracle(x+1e-6)-oracle(x-1e-6))/2e-6
+                    self.assertAlmostEqual(result.gradient[0], numerical, places=8)
+        for x in (-2., -1., 1., 2.):
+            with self.assertRaisesRegex(ValueError, "atanh"):
+                compile_behavioral_expression("atanh(V(x))").evaluate((x,))
+
     def test_table_interpolates_and_propagates_analytic_gradient(self):
         expression = compile_behavioral_expression(
             "TABLE(V(x), -2, V(y), 0, 1, 4, 9)"
@@ -45,6 +65,28 @@ class BehavioralGrammarWave6Tests(unittest.TestCase):
             ).evaluate((0.5, 0.0))
         with self.assertRaisesRegex(ValueError, "increase strictly"):
             compile_behavioral_expression("TABLE(V(x),1,0,0,1)").evaluate((0.5,))
+
+
+@unittest.skipUnless(os.environ.get("SPIKES_TEST_NATIVE_LIBRARY"), "explicit native DLL required")
+class NativeBehavioralParityTests(unittest.TestCase):
+    def test_smooth_sources_against_native_and_ngspice(self):
+        from python.spikes.competitive_benchmark import shared_behavioral_cases, _ngspice_observer
+        from python.spike_core.ngspice_plugin import NgspicePlugin
+        from python.spikes.native_runner import run_native_project
+        from python.spikes.netlist import parse_netlist
+        plugin = NgspicePlugin()
+        self.assertTrue(plugin.executable, "ngspice must be installed for this opt-in parity test")
+        observer = _ngspice_observer(plugin)
+        library = Path(os.environ["SPIKES_TEST_NATIVE_LIBRARY"])
+        for case in shared_behavioral_cases():
+            with self.subTest(case=case.case_id):
+                result = run_native_project(parse_netlist(case.netlist), library)
+                self.assertEqual(result.status, "completed")
+                native = result.data["node_voltage_v"]["out"]
+                external = observer(case)
+                self.assertAlmostEqual(native, case.expected, delta=case.absolute_tolerance)
+                self.assertAlmostEqual(external, case.expected, delta=case.absolute_tolerance)
+                self.assertAlmostEqual(native, external, delta=case.absolute_tolerance)
 
 
 class SemiconductorNoiseWave6Tests(unittest.TestCase):

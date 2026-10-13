@@ -12,7 +12,7 @@ def validate_workspace_routes(contributes: dict, permissions: list[str]) -> None
     identities = {entry["id"] for entry in entries}
     routes = set()
     allowed = {"id", "workspace", "operation", "label", "setup_contribution_id",
-               "preview_contribution_id", "mesh_kind", "model_status", "compatible_solver_ids"}
+               "preview_contribution_id", "mesh_kind", "model_status", "compatible_solver_ids", "requires_board"}
     for entry in entries:
         values = entry.get("workspace_routes", [])
         if not isinstance(values, list) or len(values) > 20:
@@ -34,7 +34,9 @@ def validate_workspace_routes(contributes: dict, permissions: list[str]) -> None
             for key in ("setup_contribution_id", "preview_contribution_id"):
                 if key in route and (not isinstance(route[key], str) or route[key] not in identities):
                     raise ValueError("Workspace route references an undeclared contribution.")
-            if "design.read" not in permissions:
+            if 'requires_board' in route and type(route['requires_board']) is not bool:
+                raise ValueError('requires_board must be boolean.')
+            if route.get('requires_board', True) and "design.read" not in permissions:
                 raise ValueError("Board workspace routes require design.read.")
             compatible = route.get("compatible_solver_ids", [])
             if not isinstance(compatible, list) or len(compatible) > 32 or any(not isinstance(v, str) or not 1 <= len(v) <= 256 for v in compatible):

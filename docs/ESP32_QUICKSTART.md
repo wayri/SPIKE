@@ -1,5 +1,7 @@
 # Your first five minutes with SPIKE
 
+**SI, PI, Thermal, EM**
+
 Import an ESP32 board, open saved thermal and antenna results, and inspect
 them in SPIKE's board viewport. Allow about five minutes after downloading
 and installing. This walkthrough displays existing results; no external solver

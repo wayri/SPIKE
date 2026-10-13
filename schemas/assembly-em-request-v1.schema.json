@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/assembly-em-request/v1",
+  "title": "Explicit retained-volume assembly EM request",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "geometry", "ports", "settings"],
+  "$defs": {"vector": {"type":"array","minItems":3,"maxItems":3,"items":{"type":"number"}}},
+  "properties": {
+    "contract": {"const":"spike/assembly-em-request/v1"},
+    "geometry": {"$ref":"assembly-field-handoff-request-v1.schema.json"},
+    "ports": {"type":"array","minItems":1,"maxItems":64,"items":{
+      "type":"object","additionalProperties":false,
+      "required":["id","start_m","stop_m","direction","excite"],
+      "properties":{"id":{"type":"string","minLength":1},"start_m":{"$ref":"#/$defs/vector"},
+        "stop_m":{"$ref":"#/$defs/vector"},"direction":{"enum":["x","y","z"]},"excite":{"type":"boolean"}}
+    }},
+    "settings":{"type":"object","additionalProperties":false,
+      "required":["frequency_hz","mesh_resolution_m","air_margin_m","max_timesteps","end_criteria","timeout_s","threads"],
+      "properties":{
+        "frequency_hz":{"type":"array","minItems":2,"maxItems":1024,"items":{"type":"number","minimum":1000,"maximum":1e12}},
+        "mesh_resolution_m":{"type":"number","minimum":1e-6,"maximum":1},
+        "air_margin_m":{"type":"number","minimum":1e-5,"maximum":10},
+        "max_timesteps":{"type":"integer","minimum":1000,"maximum":2000000},
+        "end_criteria":{"type":"number","minimum":1e-9,"maximum":1e-3},
+        "timeout_s":{"type":"integer","minimum":10,"maximum":1800},
+        "threads":{"type":"integer","minimum":1,"maximum":64}
+      }
+    }
+  }
+}

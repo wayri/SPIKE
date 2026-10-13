@@ -1,0 +1,58 @@
+{
+  "name": "fault_board",
+  "inputs": [],
+  "outputs": [
+    {"name": "drain_v", "quantity": "voltage", "target": "drain"},
+    {"name": "gate_v", "quantity": "voltage", "target": "gate"},
+    {"name": "load_a", "quantity": "current", "target": "RLOAD"}
+  ],
+  "faults": [
+    {
+      "site": {
+        "name": "gate_source_shunt",
+        "element_id": "FGS",
+        "parameter": "resistance_ohm",
+        "healthy_value": 1000000000000.0,
+        "minimum": 0.001,
+        "maximum": 1000000000000.0,
+        "mechanism": "externally driven finite gate-source short shunt; short demonstration uses 0.01 ohm"
+      },
+      "positive_node": "gate",
+      "negative_node": "0"
+    },
+    {
+      "site": {
+        "name": "drain_source_shunt",
+        "element_id": "FDS",
+        "parameter": "resistance_ohm",
+        "healthy_value": 1000000000000.0,
+        "minimum": 0.001,
+        "maximum": 1000000000000.0,
+        "mechanism": "externally driven finite drain-source or body-diode short shunt; short demonstration uses 0.01 ohm"
+      },
+      "positive_node": "drain",
+      "negative_node": "0"
+    },
+    {
+      "site": {
+        "name": "shifted_vto",
+        "element_id": "M1",
+        "parameter": "threshold_voltage_v",
+        "healthy_value": 1.0,
+        "minimum": -10.0,
+        "maximum": 10.0,
+        "mechanism": "externally driven static NMOS Level-1 threshold shift; off demonstration uses 6 V"
+      }
+    }
+  ],
+  "limits": {
+    "min_step_s": 1e-9,
+    "max_step_s": 1e-6,
+    "stop_time_s": 0.0001,
+    "max_steps": 1000,
+    "absolute_tolerance": 1e-12,
+    "relative_tolerance": 1e-9,
+    "max_newton_iterations": 100,
+    "max_backtracks": 20
+  }
+}

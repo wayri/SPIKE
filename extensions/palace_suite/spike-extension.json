@@ -1,0 +1,296 @@
+{
+  "contributes": {
+    "applications": [
+      {
+        "output_contract": "spike/extension-result/v1",
+        "name": "Palace discover",
+        "id": "palace-discover",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "mesh_path": {
+              "type": "string"
+            },
+            "timeout_s": {
+              "minimum": 1,
+              "maximum": 3300,
+              "type": "integer"
+            },
+            "config": {
+              "type": "object"
+            },
+            "runtime_path": {
+              "type": "string"
+            },
+            "expected_mesh_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "threads": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            },
+            "job_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "memory_limit_mb": {
+              "minimum": 256,
+              "maximum": 32768,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "category": "EM"
+      },
+      {
+        "output_contract": "spike/extension-result/v1",
+        "name": "Palace validate",
+        "id": "palace-validate",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "mesh_path": {
+              "type": "string"
+            },
+            "timeout_s": {
+              "minimum": 1,
+              "maximum": 3300,
+              "type": "integer"
+            },
+            "config": {
+              "type": "object"
+            },
+            "runtime_path": {
+              "type": "string"
+            },
+            "expected_mesh_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "threads": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            },
+            "job_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "memory_limit_mb": {
+              "minimum": 256,
+              "maximum": 32768,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "category": "EM"
+      },
+      {
+        "output_contract": "spike/extension-result/v1",
+        "name": "Palace prepare",
+        "id": "palace-prepare",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "mesh_path": {
+              "type": "string"
+            },
+            "timeout_s": {
+              "minimum": 1,
+              "maximum": 3300,
+              "type": "integer"
+            },
+            "config": {
+              "type": "object"
+            },
+            "runtime_path": {
+              "type": "string"
+            },
+            "expected_mesh_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "threads": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            },
+            "job_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "memory_limit_mb": {
+              "minimum": 256,
+              "maximum": 32768,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "category": "EM"
+      },
+      {
+        "id": "palace-run",
+        "name": "Palace run",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "mesh_path": {
+              "type": "string"
+            },
+            "timeout_s": {
+              "minimum": 1,
+              "maximum": 3300,
+              "type": "integer"
+            },
+            "config": {
+              "type": "object"
+            },
+            "runtime_path": {
+              "type": "string"
+            },
+            "expected_mesh_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "threads": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            },
+            "job_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "memory_limit_mb": {
+              "minimum": 256,
+              "maximum": 32768,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "category": "EM",
+        "workspace_routes": [
+          {
+            "setup_contribution_id": "palace-prepare",
+            "label": "Palace native configuration",
+            "workspace": "em",
+            "id": "palace-native-em",
+            "operation": "solve",
+            "compatible_solver_ids": [],
+            "model_status": "experimental",
+            "preview_contribution_id": "palace-validate"
+          },
+          {
+            "setup_contribution_id": "palace-prepare",
+            "label": "Palace native configuration",
+            "workspace": "si",
+            "id": "palace-native-si",
+            "operation": "solve",
+            "compatible_solver_ids": [],
+            "model_status": "experimental",
+            "preview_contribution_id": "palace-validate"
+          },
+          {
+            "setup_contribution_id": "palace-prepare",
+            "label": "Palace native configuration",
+            "workspace": "pi",
+            "id": "palace-native-pi",
+            "operation": "solve",
+            "compatible_solver_ids": [],
+            "model_status": "experimental",
+            "preview_contribution_id": "palace-validate"
+          }
+        ],
+        "output_contract": "spike/extension-result/v1"
+      },
+      {
+        "output_contract": "spike/extension-result/v1",
+        "name": "Palace import",
+        "id": "palace-import",
+        "input_schema": {
+          "additionalProperties": false,
+          "properties": {
+            "mesh_path": {
+              "type": "string"
+            },
+            "timeout_s": {
+              "minimum": 1,
+              "maximum": 3300,
+              "type": "integer"
+            },
+            "config": {
+              "type": "object"
+            },
+            "runtime_path": {
+              "type": "string"
+            },
+            "expected_mesh_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "threads": {
+              "type": "integer",
+              "enum": [
+                1
+              ]
+            },
+            "job_id": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
+            },
+            "memory_limit_mb": {
+              "minimum": 256,
+              "maximum": 32768,
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "category": "EM"
+      }
+    ]
+  },
+  "api_version": 1,
+  "state": "experimental",
+  "limits": {
+    "max_result_bytes": 8388608,
+    "timeout_seconds": 3600
+  },
+  "description": "Reviewed native configuration and mesh workflow for separately installed Palace; experimental, unqualified physics.",
+  "contract": "spike/extension/v1",
+  "runtime": "python",
+  "bundled": true,
+  "version": "0.1.0",
+  "permissions": [
+    "design.read",
+    "project.read",
+    "results.write",
+    "filesystem.workspace"
+  ],
+  "provider": "SPIKE",
+  "execution": "process",
+  "name": "Palace Native EM",
+  "id": "spike.palace-suite",
+  "entrypoint": "extension.py",
+  "ui": {
+    "menu_items": [
+      "palace-discover",
+      "palace-prepare",
+      "palace-run",
+      "palace-import"
+    ],
+    "title_bar": true,
+    "menu_bar": true
+  },
+  "license": "Apache-2.0"
+}

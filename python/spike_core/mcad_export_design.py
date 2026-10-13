@@ -13,6 +13,10 @@ from .mcad_export_contract import CONTRACT, IDENTITY, validate_assembly
 
 
 def _rings_from_drawings(drawings):
+    selected = [row for row in drawings if row.get('layer') == 'Edge.Cuts']
+    if all(row.get('type') in {'line', 'rect'} for row in selected):
+        from .board_outline_geometry import straight_outline_rings
+        return straight_outline_rings(selected)
     edges = []
     for d in drawings:
         if d.get("layer") != "Edge.Cuts":
@@ -72,7 +76,7 @@ def _design_views(raw):
     if raw.get("contract") == "spike/design-ir/v2":
         from .spider_v2 import SpiDeRV2
         canonical = SpiDeRV2.from_dict(raw)
-        return canonical.to_v1().to_dict(), canonical.to_dict()
+        return canonical.to_v1(allow_unprojected_arcs=True).to_dict(), canonical.to_dict()
     if raw.get("contract") == "spike/v1":
         return copy.deepcopy(raw), copy.deepcopy(raw)
     raise ValueError("Mechanical projection requires SpiDeR v1/v2 or an explicit assembly.")
@@ -140,6 +144,8 @@ def _append_board_projection(assembly, design, *, object_id, name, transform, pa
         for model in (canonical_design or {}).get("models", []) if isinstance(model, dict)
     }
     properties = assembly.setdefault("properties", {})
+    from .mcad_component_models import retained_design_digest
+    properties.setdefault("retained_design_digests", {})[design_id] = retained_design_digest(canonical_design or design)
     if canonical_models:
         properties.setdefault("retained_design_models", {}).setdefault(
             design_id, list(canonical_models.values()))
@@ -329,6 +335,8 @@ def assembly_from_context(context):
     if harness and not any(o.get("parent_id") == "harness" for o in objects):
         objects[:] = [o for o in objects if o["id"] != "harness"]
     assembly["materials"].extend(copy.deepcopy(parameters.get("materials", [])))
+    from .mcad_component_models import bind_component_models
+    bind_component_models(assembly, parameters.get("component_models"))
     if diagnostics and not parameters.get("allow_partial", False):
         raise ValueError("MCAD projection is incomplete: " + "; ".join(sorted({i["code"] for i in diagnostics})) + ". Review with mcad-plan; explicit allow_partial exports only the stated geometry.")
     return validate_assembly(assembly)

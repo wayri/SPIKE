@@ -1,0 +1,150 @@
+{
+  "contract": "spike/harness-pi-result/v1",
+  "status": "completed",
+  "model_status": "experimental",
+  "production_qualified": false,
+  "request_digest": "ca2b752c23d2825988ba946f2946db8b672fa7dd12c28b34bac30d21026a2830",
+  "harness_digest": "ce5db23f84fcbb781d6d3655f0daef5c6328f7bfb87f941d3e6ccb5d2ffa5ada",
+  "native_result": {
+    "contract": "spike/native-mna-result/v1",
+    "status": "completed",
+    "model_status": "experimental",
+    "mode": "operating_point",
+    "data": {
+      "node_voltage_v": {
+        "[\"connector\",\"harness-board-A::JH1\",\"PWR\"]": 12.000000000000002,
+        "[\"connector\",\"harness-board-B::JH1\",\"PWR\"]": 11.917241379310346,
+        "[\"connector\",\"harness-board-B::JH1\",\"RET\"]": 0.08275862068965517
+      },
+      "branch_current_a": {
+        "[\"terminal\",\"board-A-source\"]": -4.0
+      },
+      "element_current_a": {
+        "[\"wire\",\"pwr\"]:R": 4.000000000000051,
+        "[\"wire\",\"return\"]:R": 4.0,
+        "[\"terminal\",\"board-A-source\"]": -4.0,
+        "[\"terminal\",\"board-B-load\"]": 4.0
+      },
+      "element_power_w": {
+        "[\"wire\",\"pwr\"]:R": 0.33103448275862907,
+        "[\"wire\",\"return\"]:R": 0.3310344827586207,
+        "[\"terminal\",\"board-A-source\"]": -48.00000000000001,
+        "[\"terminal\",\"board-B-load\"]": 47.337931034482764
+      }
+    },
+    "diagnostics": {
+      "condition_number_max": null,
+      "relative_residual_max": 1.33897934774369e-16,
+      "points": 1,
+      "linear_backend": {
+        "requested": "scipy-superlu",
+        "selected": "scipy-superlu",
+        "selection_reason": "scipy-superlu was selected explicitly.",
+        "unknowns": 4,
+        "nnz": 7,
+        "complex_values": false,
+        "estimated_csr_bytes": 152,
+        "fallback": "",
+        "fallback_used": false
+      },
+      "linear_backend_runs": 1
+    },
+    "validation": {
+      "contract": "spike/native-mna-validation/v1",
+      "valid": true,
+      "issues": [],
+      "counts": {
+        "elements": 4,
+        "nodes": 4,
+        "branches": 1,
+        "unknowns": 4,
+        "selected_linear_backend": "scipy-superlu",
+        "estimated_matrix_bytes": 640,
+        "estimated_dense_matrix_bytes": 256,
+        "estimated_sparse_matrix_bytes": 640,
+        "estimated_nonzeros": 16
+      }
+    },
+    "issues": [],
+    "provenance": {
+      "solver": "spike.native.linear_mna",
+      "solver_version": "0.2.0",
+      "formulation": "modified_nodal_analysis",
+      "acceleration": {
+        "requested": "scipy-superlu",
+        "selected": "scipy-superlu",
+        "selection_reason": "scipy-superlu was selected explicitly.",
+        "unknowns": 4,
+        "nnz": 7,
+        "complex_values": false,
+        "estimated_csr_bytes": 152,
+        "fallback": "",
+        "fallback_used": false
+      },
+      "limitations": [
+        "Only linear R, L, C and explicit independent/dependent sources are supported.",
+        "Transient integration uses fixed-step backward Euler; nonlinear semiconductor and behavioral models are unsupported.",
+        "This experimental engine is not yet release-validated for closed-loop PCB field/circuit co-simulation."
+      ]
+    }
+  },
+  "selected_wire_ids": [
+    "pwr",
+    "return"
+  ],
+  "excluded_wire_ids": [
+    "agg-p",
+    "agg-n",
+    "vic-p",
+    "vic-n"
+  ],
+  "limitations": [
+    "Lumped linear DC only; no PCB copper, board field coupling, connector heating or SI qualification.",
+    "Contact resistance is explicit per mated pin pair; dimensions do not determine contact resistance.",
+    "Capacitors are open and inductors have zero DC drop; SI metadata is retained in the input, not solved."
+  ],
+  "node_voltages_v": {
+    "[\"connector\",\"harness-board-A::JH1\",\"PWR\"]": 12.000000000000002,
+    "[\"connector\",\"harness-board-B::JH1\",\"PWR\"]": 11.917241379310346,
+    "[\"connector\",\"harness-board-B::JH1\",\"RET\"]": 0.08275862068965517,
+    "[\"connector\",\"harness-board-A::JH1\",\"RET\"]": 0.0
+  },
+  "connections": [
+    {
+      "kind": "terminal",
+      "id": "board-A-source",
+      "element_id": "[\"terminal\",\"board-A-source\"]",
+      "positive_node": "[\"connector\",\"harness-board-A::JH1\",\"PWR\"]",
+      "negative_node": "[\"connector\",\"harness-board-A::JH1\",\"RET\"]",
+      "voltage_v": 12.000000000000002,
+      "current_a": -4.0,
+      "power_w": -48.00000000000001
+    },
+    {
+      "kind": "terminal",
+      "id": "board-B-load",
+      "element_id": "[\"terminal\",\"board-B-load\"]",
+      "positive_node": "[\"connector\",\"harness-board-B::JH1\",\"PWR\"]",
+      "negative_node": "[\"connector\",\"harness-board-B::JH1\",\"RET\"]",
+      "voltage_v": 11.834482758620691,
+      "current_a": 4.0,
+      "power_w": 47.337931034482764
+    }
+  ],
+  "wires": [
+    {
+      "wire_id": "pwr",
+      "resistance_ohm": 0.020689655172413793,
+      "current_a": 4.000000000000051,
+      "loss_w": 0.33103448275862907
+    },
+    {
+      "wire_id": "return",
+      "resistance_ohm": 0.020689655172413793,
+      "current_a": 4.0,
+      "loss_w": 0.3310344827586207
+    }
+  ],
+  "total_wire_loss_w": 0.6620689655172498,
+  "total_contact_loss_w": 0
+}

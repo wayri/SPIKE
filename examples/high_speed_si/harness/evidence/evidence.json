@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "production_qualified": false,
+  "artifact_sha256": {
+    "assembly-view.json": "8fec7a2562cdf58dabda041dd2335344cf09d1b61ee83d8e6cb5702411265c1d",
+    "harness-document.json": "5646a82cf28dfba1bb1eeef2dac6c318d0d3426d1461cb52ee08de378064d444",
+    "pi-request.json": "6ec6c3ec70834beb8c19661d8aff898eff589dfdc8100c82f3f5d7d3da1eee25",
+    "pi-result.json": "cb26281fc9aba8dbf8efbabf9f19bf9a02d84b4dc15207c3e76199e689d87d16",
+    "harness-si-request.json": "36414a4d149403ffcf8371d50701222a4a9321e33a8238772c838b422bb1baeb",
+    "harness-si-result.json": "626e2aa1b58806fe00af2f3902348937b7328b638f0772eec4b31afcfd683b51",
+    "rlgc-request.json": "843d363a3065fd235e36114b7947f86540264e1dd6c721133ef34ec280c56690",
+    "rlgc-result.json": "900e265b13c62da37c489f75d5389ac201e9475124663358b76359d81217fa01",
+    "mtl-request.json": "ccd8d94fd175d1fb86e4e76afdc41871c954b98191257c2b9399fb75fc2088b6",
+    "mtl-result.json": "174210499b5c189be8d6afde6579693bf01ae62201d4be1f0d7ee63ce324ecbe",
+    "mtl-diagonal-control-result.json": "06b904a11587d8dde4a3c50f5289ecd720e336920e950c7d83b4b0da4107baf7",
+    "validation.json": "c57d186c3dff656d92d99de1943cff76050d98ca5fd074c2c010a42155058fae",
+    "integration.json": "f1b7126aa80680036cb8982603a4c3c09a357220be57b507d3a3a67870399b3a",
+    "report.json": "8001c636156980fd0d10c26bf6720e40ed19dabf4554b8c94018020bc46104ca"
+  },
+  "source_sha256": {
+    "examples/high_speed_si/harness/run_interboard_harness.py": "e1045d1eeb3d637d6924f0d4dd26501be42f7b390a8ad084b709deb878b5496e",
+    "python/spike_core/harness_pi.py": "f0ec054df567acedf04c6bcccf3b76e80038243cb5fbc06f4d043067ddd6b93e",
+    "python/spike_core/harness_rlgc_geometry.py": "56b056ce9855f4c37d45a3d64731f6e15169449e1263eda873a9e7e567114ac9",
+    "python/spike_core/harness_mtl.py": "bca2ee6766ca5599c67ee1e231a371dfb5e9aebd7a5e44502c45d5010c79ed03"
+  },
+  "runtime": {
+    "python": "3.12.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.4.2",
+    "scipy": "1.17.0"
+  }
+}

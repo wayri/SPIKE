@@ -45,7 +45,7 @@ export type AssemblyDesigns = {
   designs: Array<Record<string, unknown> & { design_id: string; name?: string }>;
 };
 
-export function normalizeAssemblyDesigns(value: unknown): AssemblyDesigns | null {
+export function normalizeAssemblyDesigns(value: unknown, options: { copyDesigns?: boolean } = {}): AssemblyDesigns | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
   if (raw.contract !== "spike/assembly-designs/v1" || typeof raw.active_design_id !== "string" || !raw.active_design_id) return null;
@@ -57,7 +57,7 @@ export function normalizeAssemblyDesigns(value: unknown): AssemblyDesigns | null
     const design = value as Record<string, unknown>;
     if (design.contract !== "spike/design-ir/v2" || typeof design.design_id !== "string" || !design.design_id || identities.has(design.design_id)) return null;
     identities.add(design.design_id);
-    designs.push(structuredClone(design) as AssemblyDesigns["designs"][number]);
+    designs.push((options.copyDesigns === false ? design : structuredClone(design)) as AssemblyDesigns["designs"][number]);
   }
   if (!identities.has(raw.active_design_id)) return null;
   return { contract: "spike/assembly-designs/v1", active_design_id: raw.active_design_id, designs };
@@ -117,9 +117,22 @@ export type AssemblyPartViewportLoadState =
   | "unavailable";
 export type AssemblyPartViewportStates = Readonly<Record<string, AssemblyPartViewportLoadState>>;
 /** Temporary viewport-only clipping controls. These values are never serialized into AssemblyIR. */
+export type AssemblySectionPlane = {
+  id: string;
+  enabled: boolean;
+  /** Assembly-space unitless normal. It is normalized before reaching the renderer. */
+  normal: readonly [number, number, number];
+  /** Signed distance from the assembly origin along the normalized normal, in mm. */
+  offsetMm: number;
+  /** Reverses the retained half-space without changing the geometric plane. */
+  flipped: boolean;
+};
+
+export const MAX_ASSEMBLY_SECTION_PLANES = 6;
+
 export type AssemblySection = {
   enabled: boolean;
-  mode: "plane" | "box";
+  mode: "plane" | "planes" | "box";
   axis: "x" | "y" | "z";
   offsetMm: number;
   minXMm: number;
@@ -128,6 +141,7 @@ export type AssemblySection = {
   maxYMm: number;
   minZMm: number;
   maxZMm: number;
+  planes: AssemblySectionPlane[];
 };
 
 export const DEFAULT_ASSEMBLY_SECTION: AssemblySection = {
@@ -141,6 +155,7 @@ export const DEFAULT_ASSEMBLY_SECTION: AssemblySection = {
   maxYMm: 100,
   minZMm: -100,
   maxZMm: 100,
+  planes: [],
 };
 
 export type AssemblySectionClippingPlane = {
@@ -150,9 +165,88 @@ export type AssemblySectionClippingPlane = {
 
 export type AssemblySectionViewportTransform = { centerX: number; centerY: number; scale: number };
 
+const sectionNumber = (value: unknown, fallback: number): number => typeof value === "number" && Number.isFinite(value) ? value : fallback;
+
+/** Accepts saved presentation state while keeping malformed inputs from hiding the scene. */
+export function normalizeAssemblySection(value: unknown): AssemblySection {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return { ...DEFAULT_ASSEMBLY_SECTION, planes: [] };
+  const raw = value as Record<string, unknown>;
+  const mode = raw.mode === "box" || raw.mode === "planes" ? raw.mode : "plane";
+  const axis = raw.axis === "y" || raw.axis === "z" ? raw.axis : "x";
+  const ids = new Set<string>();
+  const planes: AssemblySectionPlane[] = [];
+  if (Array.isArray(raw.planes)) for (const candidate of raw.planes) {
+    if (planes.length >= MAX_ASSEMBLY_SECTION_PLANES) break;
+    if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) continue;
+    const plane = candidate as Record<string, unknown>;
+    const normal = Array.isArray(plane.normal) ? plane.normal : [];
+    const x = sectionNumber(normal[0], Number.NaN), y = sectionNumber(normal[1], Number.NaN), z = sectionNumber(normal[2], Number.NaN);
+    const offsetMm = sectionNumber(plane.offsetMm, Number.NaN);
+    if (![x, y, z, offsetMm].every(Number.isFinite) || Math.hypot(x, y, z) <= 1e-12) continue;
+    const requestedId = typeof plane.id === "string" && plane.id.trim() ? plane.id.trim().slice(0, 80) : `section-plane-${planes.length + 1}`;
+    let id = requestedId;
+    for (let suffix = 2; ids.has(id); suffix += 1) id = `${requestedId}-${suffix}`;
+    ids.add(id);
+    planes.push({ id, enabled: plane.enabled !== false, normal: [x, y, z], offsetMm, flipped: plane.flipped === true });
+  }
+  return {
+    enabled: raw.enabled === true,
+    mode,
+    axis,
+    offsetMm: sectionNumber(raw.offsetMm, DEFAULT_ASSEMBLY_SECTION.offsetMm),
+    minXMm: sectionNumber(raw.minXMm, DEFAULT_ASSEMBLY_SECTION.minXMm),
+    maxXMm: sectionNumber(raw.maxXMm, DEFAULT_ASSEMBLY_SECTION.maxXMm),
+    minYMm: sectionNumber(raw.minYMm, DEFAULT_ASSEMBLY_SECTION.minYMm),
+    maxYMm: sectionNumber(raw.maxYMm, DEFAULT_ASSEMBLY_SECTION.maxYMm),
+    minZMm: sectionNumber(raw.minZMm, DEFAULT_ASSEMBLY_SECTION.minZMm),
+    maxZMm: sectionNumber(raw.maxZMm, DEFAULT_ASSEMBLY_SECTION.maxZMm),
+    planes,
+  };
+}
+
+export function nextAssemblySectionPlane(section: Pick<AssemblySection, "planes">): AssemblySectionPlane {
+  const used = new Set(section.planes.map(plane => plane.id));
+  let index = 1;
+  while (used.has(`section-plane-${index}`)) index += 1;
+  return { id: `section-plane-${index}`, enabled: true, normal: [1, 0, 0], offsetMm: 0, flipped: false };
+}
+
+function viewportSectionPlane(
+  normal: readonly [number, number, number],
+  offsetMm: number,
+  flipped: boolean,
+  transform: AssemblySectionViewportTransform,
+): AssemblySectionClippingPlane | null {
+  const length = Math.hypot(...normal);
+  if (!Number.isFinite(length) || length <= 1e-12 || !Number.isFinite(offsetMm)) return null;
+  const assemblyNormal: readonly [number, number, number] = [normal[0] / length, normal[1] / length, normal[2] / length];
+  const direction = flipped ? -1 : 1;
+  const viewportNormal: readonly [number, number, number] = [
+    assemblyNormal[0] * direction,
+    -assemblyNormal[1] * direction,
+    assemblyNormal[2] * direction,
+  ];
+  const assemblyPoint: readonly [number, number, number] = [
+    assemblyNormal[0] * offsetMm,
+    assemblyNormal[1] * offsetMm,
+    assemblyNormal[2] * offsetMm,
+  ];
+  const viewportPoint: readonly [number, number, number] = [
+    (assemblyPoint[0] - transform.centerX) * transform.scale,
+    (transform.centerY - assemblyPoint[1]) * transform.scale,
+    assemblyPoint[2] * transform.scale,
+  ];
+  if (![...viewportNormal, ...viewportPoint].every(Number.isFinite)) return null;
+  const clean = (value: number) => Math.abs(value) <= 1e-15 ? 0 : value;
+  return {
+    normal: [clean(viewportNormal[0]), clean(viewportNormal[1]), clean(viewportNormal[2])],
+    point: [clean(viewportPoint[0]), clean(viewportPoint[1]), clean(viewportPoint[2])],
+  };
+}
+
 /**
  * Produces renderer-local clipping planes from temporary assembly-mm controls.
- * Invalid values deliberately produce no planes so a malformed box cannot hide a model.
+ * Invalid values deliberately produce no planes so malformed presentation state cannot hide a model.
  */
 export function buildAssemblySectionClippingPlanes(
   section: AssemblySection,
@@ -160,26 +254,66 @@ export function buildAssemblySectionClippingPlanes(
 ): AssemblySectionClippingPlane[] {
   if (!section.enabled || !Number.isFinite(transform.centerX) || !Number.isFinite(transform.centerY)
     || !Number.isFinite(transform.scale) || transform.scale <= 0) return [];
-  const pointForAxis = (axis: AssemblySection["axis"], offsetMm: number): readonly [number, number, number] => axis === "x"
-    ? [(offsetMm - transform.centerX) * transform.scale, 0, 0]
-    : axis === "y" ? [0, (transform.centerY - offsetMm) * transform.scale, 0] : [0, 0, offsetMm * transform.scale];
   if (section.mode === "plane") {
-    if (!Number.isFinite(section.offsetMm)) return [];
     const normal: readonly [number, number, number] = section.axis === "x" ? [1, 0, 0]
-      : section.axis === "y" ? [0, -1, 0] : [0, 0, 1];
-    return [{ normal, point: pointForAxis(section.axis, section.offsetMm) }];
+      : section.axis === "y" ? [0, 1, 0] : [0, 0, 1];
+    const plane = viewportSectionPlane(normal, section.offsetMm, false, transform);
+    return plane ? [plane] : [];
+  }
+  if (section.mode === "planes") {
+    return section.planes.slice(0, MAX_ASSEMBLY_SECTION_PLANES).flatMap(plane => {
+      if (!plane.enabled) return [];
+      const built = viewportSectionPlane(plane.normal, plane.offsetMm, plane.flipped, transform);
+      return built ? [built] : [];
+    });
   }
   const bounds = [section.minXMm, section.maxXMm, section.minYMm, section.maxYMm, section.minZMm, section.maxZMm];
   if (section.mode !== "box" || !bounds.every(Number.isFinite)
     || section.minXMm > section.maxXMm || section.minYMm > section.maxYMm || section.minZMm > section.maxZMm) return [];
   return [
-    { normal: [1, 0, 0], point: pointForAxis("x", section.minXMm) },
-    { normal: [-1, 0, 0], point: pointForAxis("x", section.maxXMm) },
-    { normal: [0, -1, 0], point: pointForAxis("y", section.minYMm) },
-    { normal: [0, 1, 0], point: pointForAxis("y", section.maxYMm) },
-    { normal: [0, 0, 1], point: pointForAxis("z", section.minZMm) },
-    { normal: [0, 0, -1], point: pointForAxis("z", section.maxZMm) },
-  ];
+    viewportSectionPlane([1, 0, 0], section.minXMm, false, transform),
+    viewportSectionPlane([-1, 0, 0], -section.maxXMm, false, transform),
+    viewportSectionPlane([0, 1, 0], section.minYMm, false, transform),
+    viewportSectionPlane([0, -1, 0], -section.maxYMm, false, transform),
+    viewportSectionPlane([0, 0, 1], section.minZMm, false, transform),
+    viewportSectionPlane([0, 0, -1], -section.maxZMm, false, transform),
+  ].filter((plane): plane is AssemblySectionClippingPlane => plane !== null);
+}
+
+/** Mirrors Three.js clipping: negative Plane.distanceToPoint values are clipped. */
+export function assemblySectionPointVisible(
+  point: readonly [number, number, number],
+  planes: readonly AssemblySectionClippingPlane[],
+  tolerance = 1e-7,
+): boolean {
+  return planes.every(plane => plane.normal[0] * (point[0] - plane.point[0])
+    + plane.normal[1] * (point[1] - plane.point[1])
+    + plane.normal[2] * (point[2] - plane.point[2]) >= -tolerance);
+}
+
+/** True when any part of a line segment survives all active clip half-spaces. */
+export function assemblySectionSegmentVisible(
+  start: readonly [number, number, number],
+  end: readonly [number, number, number],
+  planes: readonly AssemblySectionClippingPlane[],
+  tolerance = 1e-7,
+): boolean {
+  let lower = 0, upper = 1;
+  for (const plane of planes) {
+    const startDistance = plane.normal[0] * (start[0] - plane.point[0])
+      + plane.normal[1] * (start[1] - plane.point[1])
+      + plane.normal[2] * (start[2] - plane.point[2]) + tolerance;
+    const endDistance = plane.normal[0] * (end[0] - plane.point[0])
+      + plane.normal[1] * (end[1] - plane.point[1])
+      + plane.normal[2] * (end[2] - plane.point[2]) + tolerance;
+    if (startDistance >= 0 && endDistance >= 0) continue;
+    if (startDistance < 0 && endDistance < 0) return false;
+    const crossing = startDistance / (startDistance - endDistance);
+    if (startDistance < 0) lower = Math.max(lower, crossing);
+    else upper = Math.min(upper, crossing);
+    if (lower > upper) return false;
+  }
+  return true;
 }
 const DEFAULT_PART_VISUAL: AssemblyPartVisual = { visible: true, opacity: 1 };
 

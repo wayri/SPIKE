@@ -87,6 +87,20 @@ class SpikeCliTests(unittest.TestCase):
         self.assertEqual(result["contract"], "spike/native-capability-ledger/v1")
         self.assertTrue(result["policy"]["released_ui_requires_native_owner"])
 
+    def test_assistant_tools_exports_exact_allowlisted_mcp_catalog(self):
+        from python.spike_core.mcp_server import PROTOCOL_VERSION, TOOLS
+
+        code, result = self.invoke("assistant-tools")
+        self.assertEqual(code, EXIT_OK)
+        self.assertEqual(result["contract"], "spike/assistant-tool-catalog/v1")
+        self.assertEqual(result["mcp_protocol_version"], PROTOCOL_VERSION)
+        self.assertEqual({item["name"] for item in result["tools"]}, set(TOOLS))
+        load_design = next(item for item in result["tools"] if item["name"] == "spike_load_design")
+        self.assertEqual(load_design["inputSchema"]["required"], ["path"])
+        self.assertTrue(result["policy"]["allowlisted_only"])
+        self.assertFalse(result["policy"]["arbitrary_worker_dispatch"])
+        self.assertFalse(result["policy"]["arbitrary_shell_execution"])
+
     def test_native_mna_validate_and_run_commands(self):
         request_path = self.root / "native-mna.json"
         request_path.write_text(json.dumps({

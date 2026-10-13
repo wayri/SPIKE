@@ -431,6 +431,66 @@
       "classification": "E"
     },
     {
+      "code": "SPIKE-BE-PI-E-0110",
+      "title": "Invalid source current limit",
+      "message": "Source capacity must be finite and positive in amperes.",
+      "action": "Enter a positive number or omit current_limit_a for an unlimited ideal source.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0111",
+      "title": "Source capacity unsupported",
+      "message": "The solver or mode cannot enforce source capacity feasibility.",
+      "action": "Select DC resistive-network analysis or explicitly remove the capacity requirement.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0112",
+      "title": "Source capacity exceeded",
+      "message": "The prescribed-voltage operating point exceeds source capacity.",
+      "action": "Reduce demand or increase reviewed source capacity; a CV/CC operating point is not computed.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0113",
+      "title": "Source current allocation unsupported",
+      "message": "Shared ideal source boundaries or reverse current prevent capacity admission.",
+      "action": "Provide distinct resistive source contacts for sharing or a qualified reverse-flow model.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0120",
+      "title": "PI engineering request invalid",
+      "message": "A PI engineering operation received invalid transport fields.",
+      "action": "Supply only the documented request and, for copper routing, design fields.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
+      "code": "SPIKE-BE-PI-E-0121",
+      "title": "PI engineering model admission failed",
+      "message": "Converter or capacitor model inputs are malformed or outside the supported numerical envelope.",
+      "action": "Review the kernel diagnostic and correct explicit model values, topology, ratings and resource bounds.",
+      "recoverable": true,
+      "retryable": true,
+      "domain": "PI",
+      "classification": "E"
+    },
+    {
       "code": "SPIKE-BE-PI-I-0001",
       "title": "Explicit return path solved",
       "message": "The PI solve includes explicit supply and return conductors in the paired current loop.",
@@ -835,7 +895,52 @@
     {
       "command": "spike",
       "summary": "SPIKE local-first PI/SI automation CLI",
-      "usage": "usage: spike [-h] [--version] [--output OUTPUT] [--output-format {json,text}]\n             [--compact] [--quiet] [--fail-on-warning]\n             {capabilities,capability-ledger,project-inspect,project-migrate,solvers,extensions,accelerators,external-engines,solver-manager,sparselizard-runtime-status,sparselizard-validation-status,solver-recommend,solver-register,solver-unregister,solver-tune,dependencies,benchmark,pi-release-qualification,openems-benchmark,environment-list,environment-materialize,environment-validate,import,import-design,validate,inspect,extract-net,analyze-dc,dc,setup-dc,analyze-ac,ac,setup-ac,analyze-transient,transient,setup-transient,preflight,mesh-preview,converge,run,emi-preflight,emi-screen,openems-prepare,openems-run,sparselizard-prepare,sparselizard-run,report,compare,pdn-review,pdn-optimize,external-pi-import,peec-spice-import,hybrid-run,native-mna-validate,native-mna-run,native-workspace-compile,native-workspace-run,field-circuit-validate,field-circuit-run,converter-study,thermal-estimate,sparam-inspect,touchstone,sparam-renormalize,si-geometry-channel,si-workflow,harness-pi,tetra-mesh}\n             ...\n\nSPIKE local-first PI/SI automation CLI\n\npositional arguments:\n  {capabilities,capability-ledger,project-inspect,project-migrate,solvers,extensions,accelerators,external-engines,solver-manager,sparselizard-runtime-status,sparselizard-validation-status,solver-recommend,solver-register,solver-unregister,solver-tune,dependencies,benchmark,pi-release-qualification,openems-benchmark,environment-list,environment-materialize,environment-validate,import,import-design,validate,inspect,extract-net,analyze-dc,dc,setup-dc,analyze-ac,ac,setup-ac,analyze-transient,transient,setup-transient,preflight,mesh-preview,converge,run,emi-preflight,emi-screen,openems-prepare,openems-run,sparselizard-prepare,sparselizard-run,report,compare,pdn-review,pdn-optimize,external-pi-import,peec-spice-import,hybrid-run,native-mna-validate,native-mna-run,native-workspace-compile,native-workspace-run,field-circuit-validate,field-circuit-run,converter-study,thermal-estimate,sparam-inspect,touchstone,sparam-renormalize,si-geometry-channel,si-workflow,harness-pi,tetra-mesh}\n    capabilities        Show worker and analysis capabilities\n    capability-ledger   Show native ownership, validation, and release gates\n                        for every workflow\n    project-inspect     Inspect a SPIKE v3 package or supported legacy project\n                        without extracting it\n    project-migrate     Migrate a legacy SPIKE JSON project into a secure v3\n                        package\n    solvers             List solver plugins and validity limits\n    extensions          List installed extension modules\n    accelerators        List optional numerical acceleration backends and\n                        selection policy\n    external-engines    List optional external engineering engines and adapter\n                        readiness\n    solver-manager      Show workload recommendations, registrations, tuning,\n                        and execution gates\n    sparselizard-runtime-status\n                        Verify the integrity-bound native sparseLizard runtime\n                        without enabling PCB solver capabilities\n    sparselizard-validation-status\n                        Evaluate signed-runtime, PETSc/MUMPS, convergence, and\n                        PCB fixture release gates\n    solver-recommend    Recommend the best currently runnable solver for a\n                        workload\n    solver-register     Register an explicit local external-engine path\n                        without installing it\n    solver-unregister   Forget an external-engine registration without\n                        deleting its files\n    solver-tune         Save allowlisted, range-checked solver tuning values\n    dependencies        Verify the bundled dependency lock\n    benchmark           Run analytical, convergence, and native solver\n                        benchmarks\n    pi-release-qualification\n                        Fail closed unless the packaged runtime and all stable\n                        PI workflow gates pass\n    openems-benchmark   Run the real openEMS simple-patch reference and mesh-\n                        convergence gate\n    environment-list    List built-in cross-domain environment profiles\n    environment-materialize\n                        Materialize a built-in preset or a user-owned\n                        environment profile\n    environment-validate\n                        Validate environment input readiness for one or more\n                        solver domains\n    import (import-design)\n                        Normalize an EDA design into SpiDeR\n    validate            Validate a design or SPIKE project\n    inspect             Inspect normalized design content\n    extract-net         Export complete geometry for one net\n    analyze-dc (dc)     Build and run a DC PI request\n    setup-dc            Build a reproducible DC PI request without running it\n    analyze-ac (ac)     Build and run a hybrid PEEC R/L/C/G request\n    setup-ac            Build a reproducible AC PEEC request without running\n                        it\n    analyze-transient (transient)\n                        Run a geometry-derived quasi-static PEEC RLC transient\n    setup-transient     Build a reproducible quasi-static PEEC RLC transient\n                        request without running it\n    preflight           Validate an analysis request and generate its pre-\n                        solve mesh\n    mesh-preview        Generate a pre-solve mesh from an analysis request\n    converge            Run coarse-to-fine PI mesh convergence from an\n                        analysis request\n    run                 Execute an analysis request, batch manifest, or SPIKE\n                        project\n    emi-preflight       Validate a versioned EMI setup without running field\n                        physics\n    emi-screen          Rank EMI review nets from supplied pre-pass metrics\n    openems-prepare     Prepare an inspectable openEMS case from an analysis\n                        request\n    openems-run         Build or execute a prepared SPIKE openEMS case\n    sparselizard-prepare\n                        Prepare a reviewed differential-port PI multiport case\n                        for sparseLizard\n    sparselizard-run    Execute a prepared case through an exact spike-\n                        sparselizard-adapter executable\n    report              Generate a report from an AnalysisResult JSON file\n    compare             Compare two AnalysisResult files\n    pdn-review          Check an AC result against a PDN target and screen\n                        lumped decoupling candidates\n    pdn-optimize        Search explicit capacitor ports and a finite component\n                        library using a PDN multiport result\n    external-pi-import  Validate and normalize an external PI multiport result\n                        for PDN analysis\n    peec-spice-import   Import reviewed PEEC RLCG networks into a visual SPICE\n                        workspace\n    hybrid-run          Run reviewed PEEC RLCG plus explicit component models\n                        through ngspice\n    native-mna-validate\n                        Validate a versioned native linear MNA circuit request\n                        without solving it\n    native-mna-run      Run a versioned native linear MNA DC, AC, or transient\n                        circuit request\n    native-workspace-compile\n                        Compile a reviewed visual SPICE workspace into the\n                        native linear MNA contract\n    native-workspace-run\n                        Compile and run a reviewed visual SPICE workspace with\n                        the native linear MNA engine\n    field-circuit-validate\n                        Fail-closed validation for a reviewed SpiDeR, SPICE\n                        workspace, and PEEC field-circuit package\n    field-circuit-run   Run a reviewed field-circuit co-simulation through the\n                        native PEEC reduction provider\n    converter-study     Run a reviewed PWM converter study through ngspice,\n                        optional PEEC, analytics, and thermal handoff\n    thermal-estimate    Run the explicit first-order compact thermal RC\n                        estimator\n    sparam-inspect (touchstone)\n                        Inspect Touchstone data, network traces, and validity\n                        checks\n    sparam-renormalize  Convert a Touchstone network to a new real reference\n                        impedance\n    si-geometry-channel\n                        Run the bounded straight SpiDeR v2 geometry-to-\n                        RLGC/S/TDR/TDT/NRZ-eye channel\n    si-workflow         Run an experimental source/receiver/passive loaded SI\n                        study\n    harness-pi          Run explicit-pin lumped DC harness PI (experimental)\n    tetra-mesh          Generate first-order tetrahedra from typed solids\n                        using the admitted local OCC runtime\n\noptions:\n  -h, --help            show this help message and exit\n  --version             show program's version number and exit\n  --output OUTPUT, -o OUTPUT\n                        Write the command result to a file\n  --output-format {json,text}\n  --compact             Emit compact JSON\n  --quiet               Do not write the result to stdout\n  --fail-on-warning     Return exit code 4 when warnings exist\n"
+      "usage": "usage: spike [-h] [--version] [--output OUTPUT] [--output-format {json,text}]\n             [--compact] [--quiet] [--fail-on-warning]\n             {parallel-pool,parallel-run,cluster-probe,cluster-run,cluster-serve,cluster-discover,cluster-fingerprint,worker-call,workflow,capabilities,capability-ledger,assistant-tools,project-inspect,project-migrate,solvers,extensions,accelerators,external-engines,solver-manager,sparselizard-runtime-status,sparselizard-validation-status,solver-recommend,solver-register,solver-unregister,solver-tune,dependencies,benchmark,pi-release-qualification,openems-benchmark,environment-list,environment-materialize,environment-validate,import,import-design,validate,inspect,extract-net,analyze-dc,dc,setup-dc,analyze-ac,ac,setup-ac,analyze-transient,transient,setup-transient,preflight,mesh-preview,converge,run,emi-preflight,emi-screen,openems-prepare,openems-run,sparselizard-prepare,sparselizard-run,report,compare,pdn-review,pdn-optimize,external-pi-import,peec-spice-import,hybrid-run,native-mna-validate,native-mna-run,native-workspace-compile,native-workspace-run,em-machine,magnetic-machine,assembly-em,engineering-review,quick-tool,cosimulation-catalog,cosimulation-run,digital-twin-compare,field-circuit-validate,field-circuit-run,converter-study,thermal-estimate,sparam-inspect,touchstone,sparam-renormalize,si-geometry-channel,si-workflow,harness-pi,harness-si,harness-em,tetra-mesh,spider-capabilities,spider-validate,spider-normalize,spider-query,spider-compare}\n             ...\n\nSPIKE local-first PI/SI automation CLI\n\npositional arguments:\n  {parallel-pool,parallel-run,cluster-probe,cluster-run,cluster-serve,cluster-discover,cluster-fingerprint,worker-call,workflow,capabilities,capability-ledger,assistant-tools,project-inspect,project-migrate,solvers,extensions,accelerators,external-engines,solver-manager,sparselizard-runtime-status,sparselizard-validation-status,solver-recommend,solver-register,solver-unregister,solver-tune,dependencies,benchmark,pi-release-qualification,openems-benchmark,environment-list,environment-materialize,environment-validate,import,import-design,validate,inspect,extract-net,analyze-dc,dc,setup-dc,analyze-ac,ac,setup-ac,analyze-transient,transient,setup-transient,preflight,mesh-preview,converge,run,emi-preflight,emi-screen,openems-prepare,openems-run,sparselizard-prepare,sparselizard-run,report,compare,pdn-review,pdn-optimize,external-pi-import,peec-spice-import,hybrid-run,native-mna-validate,native-mna-run,native-workspace-compile,native-workspace-run,em-machine,magnetic-machine,assembly-em,engineering-review,quick-tool,cosimulation-catalog,cosimulation-run,digital-twin-compare,field-circuit-validate,field-circuit-run,converter-study,thermal-estimate,sparam-inspect,touchstone,sparam-renormalize,si-geometry-channel,si-workflow,harness-pi,harness-si,harness-em,tetra-mesh,spider-capabilities,spider-validate,spider-normalize,spider-query,spider-compare}\n    parallel-pool       Report bounded CPU pool and actual accelerator\n                        backends\n    parallel-run        Run reviewed inline independent analysis jobs\n                        concurrently\n    cluster-probe       Contact only explicitly enrolled mutual-TLS worker\n                        nodes\n    cluster-run         Contact only explicitly enrolled mutual-TLS worker\n                        nodes\n    cluster-serve       Serve an explicitly trusted node; binds loopback\n                        unless configured\n    cluster-discover    List inert LAN hints; never enroll or execute\n    cluster-fingerprint\n                        Print a public certificate SHA256 fingerprint for\n                        enrollment\n    worker-call         Run any registered worker operation without the GUI;\n                        explicit writes retain worker admission\n    workflow            Run a bounded JSON workflow with prior-step\n                        references; stop on failure, no rollback\n    capabilities        Show worker and analysis capabilities\n    capability-ledger   Show native ownership, validation, and release gates\n                        for every workflow\n    assistant-tools     Emit the exact allowlisted MCP tool catalog and input\n                        schemas for local assistants\n    project-inspect     Inspect a SPIKE v3 package or supported legacy project\n                        without extracting it\n    project-migrate     Migrate a legacy SPIKE JSON project into a secure v3\n                        package\n    solvers             List solver plugins and validity limits\n    extensions          List installed extension modules\n    accelerators        List optional numerical acceleration backends and\n                        selection policy\n    external-engines    List optional external engineering engines and adapter\n                        readiness\n    solver-manager      Show workload recommendations, registrations, tuning,\n                        and execution gates\n    sparselizard-runtime-status\n                        Verify the integrity-bound native sparseLizard runtime\n                        without enabling PCB solver capabilities\n    sparselizard-validation-status\n                        Evaluate signed-runtime, PETSc/MUMPS, convergence, and\n                        PCB fixture release gates\n    solver-recommend    Recommend the best currently runnable solver for a\n                        workload\n    solver-register     Register an explicit local external-engine path\n                        without installing it\n    solver-unregister   Forget an external-engine registration without\n                        deleting its files\n    solver-tune         Save allowlisted, range-checked solver tuning values\n    dependencies        Verify the bundled dependency lock\n    benchmark           Run analytical, convergence, and native solver\n                        benchmarks\n    pi-release-qualification\n                        Fail closed unless the packaged runtime and all stable\n                        PI workflow gates pass\n    openems-benchmark   Run the real openEMS simple-patch reference and mesh-\n                        convergence gate\n    environment-list    List built-in cross-domain environment profiles\n    environment-materialize\n                        Materialize a built-in preset or a user-owned\n                        environment profile\n    environment-validate\n                        Validate environment input readiness for one or more\n                        solver domains\n    import (import-design)\n                        Normalize an EDA design into SpiDeR\n    validate            Validate a design or SPIKE project\n    inspect             Inspect normalized design content\n    extract-net         Export complete geometry for one net\n    analyze-dc (dc)     Build and run a DC PI request\n    setup-dc            Build a reproducible DC PI request without running it\n    analyze-ac (ac)     Build and run a hybrid PEEC R/L/C/G request\n    setup-ac            Build a reproducible AC PEEC request without running\n                        it\n    analyze-transient (transient)\n                        Run a geometry-derived quasi-static PEEC RLC transient\n    setup-transient     Build a reproducible quasi-static PEEC RLC transient\n                        request without running it\n    preflight           Validate an analysis request and generate its pre-\n                        solve mesh\n    mesh-preview        Generate a pre-solve mesh from an analysis request\n    converge            Run coarse-to-fine PI mesh convergence from an\n                        analysis request\n    run                 Execute an analysis request, batch manifest, or SPIKE\n                        project\n    emi-preflight       Validate a versioned EMI setup without running field\n                        physics\n    emi-screen          Rank EMI review nets from supplied pre-pass metrics\n    openems-prepare     Prepare an inspectable openEMS case from an analysis\n                        request\n    openems-run         Build or execute a prepared SPIKE openEMS case\n    sparselizard-prepare\n                        Prepare a reviewed differential-port PI multiport case\n                        for sparseLizard\n    sparselizard-run    Execute a prepared case through an exact spike-\n                        sparselizard-adapter executable\n    report              Generate a report from an AnalysisResult JSON file\n    compare             Compare two AnalysisResult files\n    pdn-review          Check an AC result against a PDN target and screen\n                        lumped decoupling candidates\n    pdn-optimize        Search explicit capacitor ports and a finite component\n                        library using a PDN multiport result\n    external-pi-import  Validate and normalize an external PI multiport result\n                        for PDN analysis\n    peec-spice-import   Import reviewed PEEC RLCG networks into a visual SPICE\n                        workspace\n    hybrid-run          Run reviewed PEEC RLCG plus explicit component models\n                        through ngspice\n    native-mna-validate\n                        Validate a versioned native linear MNA circuit request\n                        without solving it\n    native-mna-run      Run a versioned native linear MNA DC, AC, or transient\n                        circuit request\n    native-workspace-compile\n                        Compile a reviewed visual SPICE workspace into the\n                        native linear MNA contract\n    native-workspace-run\n                        Compile and run a reviewed visual SPICE workspace with\n                        the native linear MNA engine\n    em-machine          Run a bounded PM motor, generator or single-gap\n                        electromagnet model\n    magnetic-machine    Run experimental planar machine/actuator magnetic FEM\n    assembly-em         Execute explicit retained-volume assembly EM with\n                        OpenEMS\n    engineering-review  Run a read-only engineering review or explicit SI-unit\n                        calculator\n    quick-tool          Run a read-only engineering review or explicit SI-unit\n                        calculator\n    cosimulation-catalog\n                        Describe experimental co-simulation and recorded twin\n                        support\n    cosimulation-run    Run an offline versioned request\n    digital-twin-compare\n                        Run an offline versioned request\n    field-circuit-validate\n                        Fail-closed validation for a reviewed SpiDeR, SPICE\n                        workspace, and PEEC field-circuit package\n    field-circuit-run   Run a reviewed field-circuit co-simulation through the\n                        native PEEC reduction provider\n    converter-study     Run a reviewed PWM converter study through ngspice,\n                        optional PEEC, analytics, and thermal handoff\n    thermal-estimate    Run the explicit first-order compact thermal RC\n                        estimator\n    sparam-inspect (touchstone)\n                        Inspect Touchstone data, network traces, and validity\n                        checks\n    sparam-renormalize  Convert a Touchstone network to a new real reference\n                        impedance\n    si-geometry-channel\n                        Run the bounded straight SpiDeR v2 geometry-to-\n                        RLGC/S/TDR/TDT/NRZ-eye channel\n    si-workflow         Run an experimental source/receiver/passive loaded SI\n                        study\n    harness-pi          Run explicit-pin lumped DC harness PI (experimental)\n    harness-si          Run supplied uniform harness RLGC SI (experimental)\n    harness-em          Inspect harness EM requirements (field execution\n                        unsupported)\n    tetra-mesh          Generate first-order tetrahedra from typed solids\n                        using the admitted local OCC runtime\n    spider-capabilities\n                        Bounded, read-only SpiDeR interoperability\n    spider-validate     Bounded, read-only SpiDeR interoperability\n    spider-normalize    Bounded, read-only SpiDeR interoperability\n    spider-query        Bounded, read-only SpiDeR interoperability\n    spider-compare      Bounded, read-only SpiDeR interoperability\n\noptions:\n  -h, --help            show this help message and exit\n  --version             show program's version number and exit\n  --output OUTPUT, -o OUTPUT\n                        Write the command result to a file\n  --output-format {json,text}\n  --compact             Emit compact JSON\n  --quiet               Do not write the result to stdout\n  --fail-on-warning     Return exit code 4 when warnings exist\n"
+    },
+    {
+      "command": "spike parallel-pool",
+      "summary": "Report bounded CPU pool and actual accelerator backends",
+      "usage": "usage: spike parallel-pool [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike parallel-run",
+      "summary": "Run reviewed inline independent analysis jobs concurrently",
+      "usage": "usage: spike parallel-run [-h] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike cluster-probe",
+      "summary": "Contact only explicitly enrolled mutual-TLS worker nodes",
+      "usage": "usage: spike cluster-probe [-h] enrollment\n\npositional arguments:\n  enrollment\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike cluster-run",
+      "summary": "Contact only explicitly enrolled mutual-TLS worker nodes",
+      "usage": "usage: spike cluster-run [-h] enrollment request\n\npositional arguments:\n  enrollment\n  request\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike cluster-serve",
+      "summary": "Serve an explicitly trusted node; binds loopback unless configured",
+      "usage": "usage: spike cluster-serve [-h] [--discoverable] configuration\n\npositional arguments:\n  configuration\n\noptions:\n  -h, --help      show this help message and exit\n  --discoverable  Explicitly expose inert UDP LAN hints on port 41039\n"
+    },
+    {
+      "command": "spike cluster-discover",
+      "summary": "List inert LAN hints; never enroll or execute",
+      "usage": "usage: spike cluster-discover [-h] [--broadcast BROADCAST]\n\noptions:\n  -h, --help            show this help message and exit\n  --broadcast BROADCAST\n"
+    },
+    {
+      "command": "spike cluster-fingerprint",
+      "summary": "Print a public certificate SHA256 fingerprint for enrollment",
+      "usage": "usage: spike cluster-fingerprint [-h] certificate\n\npositional arguments:\n  certificate\n\noptions:\n  -h, --help   show this help message and exit\n"
+    },
+    {
+      "command": "spike worker-call",
+      "summary": "Run any registered worker operation without the GUI; explicit writes retain worker admission",
+      "usage": "usage: spike worker-call [-h] [--timeout-seconds TIMEOUT_SECONDS] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help            show this help message and exit\n  --timeout-seconds TIMEOUT_SECONDS\n                        Wall-time limit per worker operation, 0 < seconds <=\n                        86400\n"
+    },
+    {
+      "command": "spike workflow",
+      "summary": "Run a bounded JSON workflow with prior-step references; stop on failure, no rollback",
+      "usage": "usage: spike workflow [-h] [--timeout-seconds TIMEOUT_SECONDS] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help            show this help message and exit\n  --timeout-seconds TIMEOUT_SECONDS\n                        Wall-time limit per worker operation, 0 < seconds <=\n                        86400\n"
     },
     {
       "command": "spike capabilities",
@@ -846,6 +951,11 @@
       "command": "spike capability-ledger",
       "summary": "Show native ownership, validation, and release gates for every workflow",
       "usage": "usage: spike capability-ledger [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike assistant-tools",
+      "summary": "Emit the exact allowlisted MCP tool catalog and input schemas for local assistants",
+      "usage": "usage: spike assistant-tools [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
     },
     {
       "command": "spike project-inspect",
@@ -1133,6 +1243,46 @@
       "usage": "usage: spike native-workspace-run [-h] design workspace\n\npositional arguments:\n  design\n  workspace\n\noptions:\n  -h, --help  show this help message and exit\n"
     },
     {
+      "command": "spike em-machine",
+      "summary": "Run a bounded PM motor, generator or single-gap electromagnet model",
+      "usage": "usage: spike em-machine [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST\n"
+    },
+    {
+      "command": "spike magnetic-machine",
+      "summary": "Run experimental planar machine/actuator magnetic FEM",
+      "usage": "usage: spike magnetic-machine [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST\n"
+    },
+    {
+      "command": "spike assembly-em",
+      "summary": "Execute explicit retained-volume assembly EM with OpenEMS",
+      "usage": "usage: spike assembly-em [-h] --request REQUEST --run-dir RUN_DIR\n                         [--prepare-only]\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST\n  --run-dir RUN_DIR\n  --prepare-only\n"
+    },
+    {
+      "command": "spike engineering-review",
+      "summary": "Run a read-only engineering review or explicit SI-unit calculator",
+      "usage": "usage: spike engineering-review [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST\n"
+    },
+    {
+      "command": "spike quick-tool",
+      "summary": "Run a read-only engineering review or explicit SI-unit calculator",
+      "usage": "usage: spike quick-tool [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST\n"
+    },
+    {
+      "command": "spike cosimulation-catalog",
+      "summary": "Describe experimental co-simulation and recorded twin support",
+      "usage": "usage: spike cosimulation-catalog [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike cosimulation-run",
+      "summary": "Run an offline versioned request",
+      "usage": "usage: spike cosimulation-run [-h] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike digital-twin-compare",
+      "summary": "Run an offline versioned request",
+      "usage": "usage: spike digital-twin-compare [-h] request\n\npositional arguments:\n  request\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
       "command": "spike field-circuit-validate",
       "summary": "Fail-closed validation for a reviewed SpiDeR, SPICE workspace, and PEEC field-circuit package",
       "usage": "usage: spike field-circuit-validate [-h] package\n\npositional arguments:\n  package     spike/field-circuit-cosimulation-package/v1 JSON input\n\noptions:\n  -h, --help  show this help message and exit\n"
@@ -1183,9 +1333,44 @@
       "usage": "usage: spike harness-pi [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  spike/harness-pi-request/v1 JSON\n"
     },
     {
+      "command": "spike harness-si",
+      "summary": "Run supplied uniform harness RLGC SI (experimental)",
+      "usage": "usage: spike harness-si [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  spike/harness-si-request/v1 JSON\n"
+    },
+    {
+      "command": "spike harness-em",
+      "summary": "Inspect harness EM requirements (field execution unsupported)",
+      "usage": "usage: spike harness-em [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  spike/harness-em-request/v1 JSON\n"
+    },
+    {
       "command": "spike tetra-mesh",
       "summary": "Generate first-order tetrahedra from typed solids using the admitted local OCC runtime",
       "usage": "usage: spike tetra-mesh [-h] --request REQUEST [--timeout-s TIMEOUT_S]\n                        [--memory-limit-mb MEMORY_LIMIT_MB]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --timeout-s TIMEOUT_S\n  --memory-limit-mb MEMORY_LIMIT_MB\n"
+    },
+    {
+      "command": "spike spider-capabilities",
+      "summary": "Bounded, read-only SpiDeR interoperability",
+      "usage": "usage: spike spider-capabilities [-h]\n\noptions:\n  -h, --help  show this help message and exit\n"
+    },
+    {
+      "command": "spike spider-validate",
+      "summary": "Bounded, read-only SpiDeR interoperability",
+      "usage": "usage: spike spider-validate [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  Inline operation arguments in a JSON object\n"
+    },
+    {
+      "command": "spike spider-normalize",
+      "summary": "Bounded, read-only SpiDeR interoperability",
+      "usage": "usage: spike spider-normalize [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  Inline operation arguments in a JSON object\n"
+    },
+    {
+      "command": "spike spider-query",
+      "summary": "Bounded, read-only SpiDeR interoperability",
+      "usage": "usage: spike spider-query [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  Inline operation arguments in a JSON object\n"
+    },
+    {
+      "command": "spike spider-compare",
+      "summary": "Bounded, read-only SpiDeR interoperability",
+      "usage": "usage: spike spider-compare [-h] --request REQUEST\n\noptions:\n  -h, --help         show this help message and exit\n  --request REQUEST  Inline operation arguments in a JSON object\n"
     }
   ]
 }
