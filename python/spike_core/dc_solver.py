@@ -150,6 +150,10 @@ def _resolve_terminal(item: Dict[str, Any], nodes: Dict[Tuple[int, int, str], in
 
 
 def _solve_dc_legacy(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
+    from .source_current_limits import current_limit_issues, capacity_failure
+    limit_issues = current_limit_issues(spec, supported=False)
+    if limit_issues:
+        return capacity_failure(spec, limit_issues)
     issues: List[ValidationIssue] = []
     if spec.mode != "dc":
         return AnalysisResult(analysis_id=spec.analysis_id, mode=spec.mode, status="failed", model_status="unsupported", issues=[ValidationIssue(code="SPIKE-BE-PI-E-0002", severity="error", message="The routed-copper solver supports DC mode only.", path="analysis.mode", suggestion="Select the DC PI formulation or choose a solver that supports the requested mode.")])
@@ -507,6 +511,8 @@ def _solve_dc_legacy(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
 
 def solve_dc(design: SpiDeR, spec: AnalysisSpec) -> AnalysisResult:
     """Run production DCIR on the same hybrid topology used by preflight."""
+    from .arc_legacy_projection import require_legacy_arc_geometry
+    require_legacy_arc_geometry(design)
 
     from .hybrid_dc_solver import solve_hybrid_dc
 

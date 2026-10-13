@@ -26,6 +26,10 @@ const COMMANDS: &[&str] = &[
     "add_study_case",
     "activate_study_case",
     "open_run_controls",
+    "studio_board_context",
+    "spider_context",
+    "spider_query",
+    "spider_compare",
     "analysis_context",
     "analysis_describe",
     "analysis_prepare",
@@ -525,6 +529,10 @@ mod tests {
 
     #[test]
     fn analysis_commands_are_explicitly_allowlisted() {
+        for command in ["spider_context", "spider_query", "spider_compare", "studio_board_context"] {
+            let request = json!({"token":"secret", "requestId":"spider", "command":command, "args":{}});
+            assert!(parse_request(&serde_json::to_vec(&request).unwrap(), "secret").is_ok());
+        }
         for command in COMMANDS
             .iter()
             .filter(|command| command.starts_with("analysis_"))

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/prism-board-v1.schema.json",
+  "title": "SPIKE Prism board snapshot v1",
+  "$comment": "Apache-2.0. Source-only .prism-board.json importer input; runtime enforces exact UTF-8 hash and bounds.",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "api_version", "source"],
+  "properties": {
+    "contract": {"const": "spike/prism-board/v1"},
+    "api_version": {"type": "integer", "const": 1},
+    "source": {"$ref": "prism-request-v1.schema.json#/$defs/source"}
+  }
+}

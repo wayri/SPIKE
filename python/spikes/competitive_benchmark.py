@@ -380,7 +380,8 @@ def find_ltspice() -> Path | None:
 
 
 _MEASURE = re.compile(
-    r"(?im)^\s*bench_value\s*[:=].*?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)"
+    r"(?im)^\s*bench_value\s*[:=]\s*(?:[^=\r\n]*=\s*)?"
+    r"([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)(?=\s|$)"
 )
 
 
@@ -500,13 +501,39 @@ def _run_engine(
     }
 
 
+def shared_behavioral_cases() -> tuple[CompetitiveCase, ...]:
+    """Independently authored smooth B-source cases with analytic DC oracles."""
+    cases = []
+    for name, expression, expected in (
+        ("tangent", "tan(V(in))", math.tan(0.25)),
+        ("inverse_hyperbolic", "atanh(V(in))", math.atanh(0.25)),
+        ("composed", "exp(V(in))+sin(V(in))*cos(V(in))", math.exp(0.25)+math.sin(0.25)*math.cos(0.25)),
+        ("current_feedback", "I(V1)*1000+pow(V(in),2)", -0.25+0.25**2),
+    ):
+        cases.append(CompetitiveCase(
+            f"behavioral.{name}", f"Nonlinear behavioral {name}",
+            f"Behavioral reference\nV1 in 0 .25\nR1 in 0 1k\nB1 out 0 V={expression}\nR2 out 0 1k\n.op\n.end\n",
+            "V(out)", expected, absolute_tolerance=1e-8,
+            classes=("small", "operating_point", "behavioral_sources"),
+        ))
+    current = .001 * (math.tan(.25) + .25)
+    cases.append(CompetitiveCase(
+        "behavioral.nonlinear_kcl", "Newton tangent current balance",
+        f"Nonlinear KCL reference\nI1 0 out {current:.17g}\nR1 out 0 1k\nB1 out 0 I=.001*tan(V(out))\n.op\n.end\n",
+        "V(out)", .25, absolute_tolerance=1e-7,
+        classes=("small", "operating_point", "behavioral_sources", "convergence"),
+    ))
+    return tuple(cases)
+
+
 def run_competitive_benchmarks(
     library_path: str | Path, *, repetitions: int = 5,
+    include_behavioral: bool = False,
 ) -> dict[str, Any]:
     if isinstance(repetitions, bool) or not 1 <= int(repetitions) <= MAX_REPETITIONS:
         raise ValueError(f"repetitions must be from 1 through {MAX_REPETITIONS}")
     library = Path(library_path).resolve(strict=True)
-    cases = shared_first_release_cases()
+    cases = shared_first_release_cases() + (shared_behavioral_cases() if include_behavioral else ())
     ngspice = NgspicePlugin()
     ngspice_path = Path(ngspice.executable).resolve() if ngspice.executable else None
     ltspice_path = find_ltspice()
@@ -561,11 +588,12 @@ def run_competitive_benchmarks(
             "The motor case is an armature R-L electrical surrogate, not a mechanical, magnetic, torque, saturation, or back-EMF co-simulation.",
             "Peak memory, warm solves, thread scaling, and large public decks are not measured.",
             "No parity or superiority claim is permitted from this report.",
+            "Optional behavioral cases check five smooth DC expressions including nonlinear KCL, not arbitrary expression/dialect coverage or behavioral AC/transient qualification.",
         ],
     }
 
 
 __all__ = [
     "CompetitiveCase", "REPORT_CONTRACT", "find_ltspice",
-    "run_competitive_benchmarks", "shared_dc_cases", "shared_first_release_cases",
+    "run_competitive_benchmarks", "shared_dc_cases", "shared_first_release_cases", "shared_behavioral_cases",
 ]

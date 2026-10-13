@@ -76,3 +76,15 @@
   .spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input, textarea):not([readonly]):not(:disabled) { border-bottom: 2px solid LinkText; }
   .spike-data-table table.spike-table > tbody > tr > :is(td, th) :is(input[readonly], textarea[readonly], input:disabled:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), textarea:disabled, select:disabled) { border-bottom: 1px dashed GrayText; }
 }
+
+/* Dense by default, with readable type and explicit expanded-row toggle. */
+.spike-data-table { border-radius: 4px; }
+.spike-data-table > .spike-table-toolbar { min-height: 34px; padding: 3px 8px; gap: 8px; border-radius: 4px 4px 0 0; }
+.spike-data-table > .spike-table-toolbar > strong { font-size: 12px; }
+.spike-data-table > .spike-table-toolbar > .spike-table-search { height: 28px; padding: 3px 6px; }
+.spike-data-table .spike-table-help > summary { padding: 3px 2px; }
+.spike-data-table > .spike-table-field-guide { display: none; }
+.spike-data-table:has(.spike-table-help[open]) > .spike-table-field-guide { display: flex; padding: 4px 8px; }
+.spike-data-table table.spike-table > thead > tr > th { height: 28px; padding: 4px 8px; border-bottom-width: 1px; font-size: 12px; letter-spacing: 0; }
+.spike-data-table table.spike-table > caption { padding: 3px 8px; }
+.spike-data-table .spike-table-empty { margin: 0; padding: 8px; font-size: 12px; }

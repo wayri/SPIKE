@@ -1,0 +1,13 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.em-machine { min-width: 0; font-size: 12px; }
+.main-machine-workspace { position: absolute; inset: 0; overflow: auto; box-sizing: border-box; padding: 16px; background: var(--spike-surface, #11212a); scrollbar-width: thin; }
+.em-machine p { line-height: 1.5; }
+.em-machine fieldset { min-width: 0; border: 1px solid var(--spike-control-border); padding: 10px; }
+.em-machine label { display: grid; gap: 5px; min-width: 0; }
+.em-machine-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(175px, 100%), 1fr)); gap: 10px; margin-top: 12px; }
+.em-machine input, .em-machine select { width: 100%; min-width: 0; box-sizing: border-box; }
+.em-machine-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.em-machine table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.em-machine th, .em-machine td { padding: 5px; text-align: left; overflow-wrap: anywhere; border-bottom: 1px solid var(--spike-control-border); }
+.em-machine small { display: block; overflow-wrap: anywhere; }
+.em-machine [role="alert"] { color: var(--spike-table-text-danger, #ffad9b); }

@@ -1,0 +1,237 @@
+{
+  "contract": "spike/parity-stage-progress/v1",
+  "stage_id": "WF01-S04B",
+  "status": "historical_progress",
+  "manifest": "benchmarks/parity-import/odb-candidate-manifest.json",
+  "summary": {
+    "contract": "spike/board-corpus-benchmark/v1",
+    "status": "passed",
+    "runner_sources": {
+      "scripts/benchmark_board_corpus.py": "d517581391d7ac036113d3ba0b549f4af9b81231713dc006e3d64af88ba02d48",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/kicad_importer.py": "19a3e3ff0639ed7eb848137670700b72019efe6c22d6057b74cb96e4e9820b14",
+      "python/core/board_parser.py": "28f6c2b641b1cb5061aef7c05f710d1f9942a0b8708799bfbc5c79c0eaaec0bb",
+      "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+      "python/spike_core/arc_legacy_projection.py": "ac80beed70089e90ff3184ec5482c7d778a95f64c9d26c488dd50f0b0b8ea047",
+      "python/spike_core/board_outline_geometry.py": "9ab3703d6906ca758c993b34c7d86972e5dea31e3e56242d0328f5d524af9634",
+      "python/spike_core/mcad_export_design.py": "b9fb4eb20ed0f16ef0c9f93e4e8d294f3b592730fd3165702c6ce2a11340ff02",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/pcb_volume_compiler.py": "41c939afc72275a87208a52f900c084794daeca40936f87bdb82a6331eb67cba",
+      "python/spike_core/geometry_arrow.py": "cf34e0c6e2259104317ef9b748d63589703f787d6f39523946ecf52917e854f6",
+      "python/spike_core/spikes_layout_geometry_handoff.py": "220fc2b515f16aaf792404c4cf0df487085a54dfe33652a9b1c74fe01691e537",
+      "scripts/parity_geometry_gate.py": "f3cf39867826203adf1459a4a8ec7e6a31e9a3761fede23a5b15aaeb7b7d9f8e",
+      "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+      "python/spike_core/odb_importer.py": "09fe71f2732eb95f5006f9dacdad9b094e14fd20f2fe91d3d6f0c9d7ea30cf1b",
+      "python/spike_core/odb_features.py": "393bbb3a4a2b027d8b291ad74863e5a12ea23ed242103f7d9ad28e2894c14edd",
+      "python/spike_core/odb_stackup.py": "7c51d02e64965435c7b700be24ef1b09501bbda59ce9932974daf9a7a0b7fba1",
+      "python/spike_core/source_package.py": "c57670b2882c30cd18b5963decfa51ee139a2b0aba20804fc0b22aaeb11f2cf9",
+      "python/spike_core/importers.py": "248d48b2d8cf72fb11aedc360bdc860ef62967d3c5983baf6251078eddc17146",
+      "extensions/odb-import/extension.py": "22a8549d79bce15286c0c6d739892e0c70d3b66894cdfbc564e60aaeca6dde46"
+    },
+    "python_version": "3.12.9 (main, Feb  8 2026, 03:56:09) [MSC v.1950 64 bit (AMD64)]",
+    "manifest_sha256": "17a7c4a6141945e4d7aba0a1883ddff3cac8403d36a3bc2fa864b6fa9b07260a",
+    "production_qualified": false,
+    "scope": "CLI import status, canonical units/identity, pinned source and optional independent counts/entity values; no viewport or physics validation",
+    "boards": [
+      {
+        "fixture": "odb-candidate.zip",
+        "source_url": "repository:benchmarks/parity-import/odb-candidate",
+        "license": "Apache-2.0",
+        "sha256": "c09f8f7f28bcb19182592b6d302038bc23b06ec41eea694c94e9fbce71885681",
+        "exit_code": 0,
+        "stderr": "",
+        "counts": {
+          "materials": 2,
+          "layers": 3,
+          "nets": 1,
+          "tracks": 0,
+          "arcs": 1,
+          "zones": 0,
+          "pads": 1,
+          "vias": 0,
+          "drills": 0,
+          "castellations": 0,
+          "pins": 1,
+          "components": 1,
+          "regions": 0,
+          "models": 0
+        },
+        "mismatches": {},
+        "import_status": "completed_with_warnings",
+        "errors": [],
+        "diagnostics": [],
+        "source_issues": [
+          {
+            "code": "ODB_STACKUP_MISSING",
+            "severity": "warning",
+            "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          },
+          {
+            "code": "ODB_MODELS_MISSING",
+            "severity": "warning",
+            "message": "No explicit component 3D model assignments were supplied.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          }
+        ],
+        "inferred": [
+          {
+            "code": "ODB_STACKUP_MISSING",
+            "severity": "warning",
+            "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          },
+          {
+            "code": "ODB_MODELS_MISSING",
+            "severity": "warning",
+            "message": "No explicit component 3D model assignments were supplied.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          }
+        ],
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving."
+            ]
+          },
+          "pi_ac": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          },
+          "si": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          },
+          "thermal": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving."
+            ]
+          },
+          "emi": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          }
+        },
+        "geometry_mismatches": [],
+        "entity_assertions_checked": 14,
+        "source_digest_checked": true,
+        "passed": true,
+        "elapsed_s": 2.937
+      }
+    ]
+  },
+  "candidate_import": {
+    "path": "docs/validation/parity/WF01-S04B-candidate-import.json",
+    "sha256": "49ce9b44424fac6b11775d12ae9d30d7d2902ba33a9d1fad6c59e0572f69e541"
+  },
+  "source_kind": "Original hand-authored ODB records, not a native export.",
+  "native_attempts": [
+    {
+      "tool": "KiCad 10.0.6 CLI",
+      "operation": "pcb export odb --help",
+      "result": "subprocess.TimeoutExpired",
+      "timeout_s": 30,
+      "scope": "normal host settings"
+    },
+    {
+      "tool": "KiCad CLI",
+      "operation": "pcb export odb --help",
+      "exit_code": 3221225477,
+      "windows_status": "0xC0000005",
+      "scope": "isolated workspace-local KICAD_CONFIG_HOME"
+    },
+    {
+      "tool": "KiCad CLI",
+      "operation": "--version",
+      "result": "subprocess.TimeoutExpired",
+      "timeout_s": 20,
+      "scope": "normal host settings"
+    },
+    {
+      "tool": "KiCad 10.0.6 pcbnew.PCB_IO_MGR.Save(ODBPP)",
+      "source": "benchmarks/parity-import/geometry.kicad_pcb",
+      "source_sha256": "d4eb7b96fd703216f1c57266f0a6be8b471482773cd2d7e0248578f68b230395",
+      "exit_code": 3221225477,
+      "windows_status": "0xC0000005"
+    }
+  ],
+  "remaining_acceptance": [
+    "Produce and retain a native-export fixture with independent source facts.",
+    "Qualify native-export geometry, topology and format omissions against the real CLI importer."
+  ],
+  "limitation": "Native pcbnew version/API inspection succeeded; no native export was produced. The startup/writer failure causes are not established. Candidate import is not physics or exporter qualification.",
+  "checked_on": "2026-10-14",
+  "native_crash_records": [
+    {
+      "source": "Windows Application event 1000",
+      "application": "kicad-cli.exe",
+      "module": "kicommon.dll",
+      "version": "10.0.6.50883",
+      "exception_code": "0xC0000005"
+    },
+    {
+      "source": "Windows Application event 1000",
+      "application": "python.exe (KiCad bundled interpreter)",
+      "module": "_pcbnew.pyd",
+      "version": "10.0.6.50883",
+      "exception_code": "0xC0000005"
+    }
+  ],
+  "verification": {
+    "focused_tests": 68,
+    "focused_elapsed_s": 31.171,
+    "focused_log": "build/parity-stage04b-focused-final.log",
+    "architecture": "passed",
+    "backlog": "passed",
+    "documentation_files": 4,
+    "earlier_done_stages": "All four actual CLI receipts replayed; source-bound gates pass.",
+    "full_python_suite": {
+      "status": "failed",
+      "tests": 3729,
+      "failures": 2,
+      "errors": 1,
+      "skipped": 69,
+      "elapsed_s": 1592.032,
+      "log": "build/parity-stage04b-full-python.log",
+      "reported_failures": [
+        "test_python_debug.PythonDebugTest.test_break_step_into_out_locals_and_output: did not reach paused within the 4-second deadline.",
+        "test_python_debug.PythonDebugTest.test_exception_and_nonfinite_publication_fail_cleanly: did not reach failed within the 4-second deadline.",
+        "test_emerge_gerber.EMergeGerberTests.test_real_filebasedpcb_loads_units_clear_region_and_native_mesh: native subprocess exceeded its 60-second limit."
+      ]
+    },
+    "unchanged_runtime_rerun": {
+      "status": "failed",
+      "tests": 9,
+      "failures": 1,
+      "errors": 1,
+      "elapsed_s": 93.018,
+      "log": "build/parity-stage04b-runtime-rerun.log",
+      "reported_failures": [
+        "test_python_debug.PythonDebugTest.test_break_step_into_out_locals_and_output: running did not reach paused within the 4-second deadline.",
+        "test_emerge_gerber.EMergeGerberTests.test_real_filebasedpcb_loads_units_clear_region_and_native_mesh: native subprocess exceeded its 60-second limit."
+      ],
+      "scope": "Unchanged runtime tests reproduced the debugger deadline and native Gerber timeout. Root causes remain unestablished; no acceptance deadlines were weakened."
+    }
+  },
+  "resolved_by": "docs/validation/parity/WF01-S04B.json",
+  "native_export_resolution": "Native Save succeeds with absolute output path and pcbnew.str_utf8_Map(); Python dict is rejected and the default/null call failed. No generalized root-cause claim."
+}

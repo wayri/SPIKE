@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-si-result-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "status",
+    "model_status",
+    "production_qualified",
+    "field_coupling_executed",
+    "harness_digest",
+    "request_digest",
+    "mode",
+    "wire_ids",
+    "port_bindings",
+    "frequency_hz",
+    "s_real",
+    "s_imag",
+    "reference_impedance_ohm",
+    "provenance",
+    "request_snapshot",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/harness-si-result/v1"
+    },
+    "status": {
+      "const": "completed"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "field_coupling_executed": {
+      "const": false
+    },
+    "harness_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "request_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "mode": {
+      "enum": [
+        "differential",
+        "single_ended"
+      ]
+    },
+    "wire_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string"
+      }
+    },
+    "port_bindings": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "positive",
+          "negative"
+        ],
+        "properties": {
+          "positive": {
+            "$ref": "#/$defs/endpoint"
+          },
+          "negative": {
+            "$ref": "#/$defs/endpoint"
+          }
+        }
+      }
+    },
+    "frequency_hz": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 2049,
+      "items": {
+        "type": "number"
+      }
+    },
+    "s_real": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 2049,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "s_imag": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 2049,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "reference_impedance_ohm": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "request_snapshot": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 4096,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "endpoint": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "connector",
+            "pin"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "connector": {
+              "$ref": "#/$defs/id"
+            },
+            "pin": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "splice"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "splice": {
+              "$ref": "#/$defs/id"
+            }
+          }
+        }
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[^\\u0000-\\u001f]+$"
+    }
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.calculix-suite",
+  "name": "CalculiX Thermal Suite",
+  "version": "0.1.0",
+  "provider": "SPIKE",
+  "description": "Separately installed CalculiX steady solid conduction, prescribed convection/radiation and matched thermal contact. Experimental.",
+  "execution": "process",
+  "runtime": "python",
+  "entrypoint": "extension.py",
+  "state": "experimental",
+  "license": "Apache-2.0",
+  "bundled": true,
+  "permissions": [
+    "design.read",
+    "results.write"
+  ],
+  "limits": {
+    "timeout_seconds": 3600,
+    "max_result_bytes": 8388608
+  },
+  "ui": {
+    "menu_bar": true,
+    "title_bar": true,
+    "menu_items": [
+      "calculix-thermal"
+    ]
+  },
+  "contributes": {
+    "applications": [
+      {
+        "id": "calculix-thermal",
+        "name": "CalculiX thermal setup",
+        "category": "Thermal",
+        "description": "Separately installed CalculiX steady solid conduction, prescribed convection/radiation and matched thermal contact. Experimental.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "required": [
+            "request",
+            "problem"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "request": {
+              "type": "object"
+            },
+            "problem": {
+              "type": "object"
+            },
+            "engine_options": {
+              "type": "object"
+            },
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "calculix-thermal-prepare",
+        "name": "Prepare CalculiX thermal deck",
+        "category": "Thermal",
+        "description": "Separately installed CalculiX steady solid conduction, prescribed convection/radiation and matched thermal contact. Experimental.",
+        "output_contract": "spike/extension-result/v1",
+        "input_schema": {
+          "type": "object",
+          "required": [
+            "request",
+            "problem"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "request": {
+              "type": "object"
+            },
+            "problem": {
+              "type": "object"
+            },
+            "engine_options": {
+              "type": "object"
+            },
+            "operation": {
+              "enum": [
+                "preflight",
+                "prepare"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "calculix-thermal-run",
+        "name": "Run CalculiX thermal",
+        "category": "Thermal",
+        "description": "Separately installed CalculiX steady solid conduction, prescribed convection/radiation and matched thermal contact. Experimental.",
+        "output_contract": "spike/calculix-thermal-result/v1",
+        "input_schema": {
+          "type": "object",
+          "required": [
+            "request",
+            "problem"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "request": {
+              "type": "object"
+            },
+            "problem": {
+              "type": "object"
+            },
+            "engine_options": {
+              "type": "object"
+            },
+            "operation": {
+              "enum": [
+                "run"
+              ]
+            }
+          }
+        },
+        "workspace_routes": [
+          {
+            "id": "calculix-thermal-workspace",
+            "workspace": "thermal",
+            "operation": "solve",
+            "label": "CalculiX retained assembly thermal",
+            "setup_contribution_id": "calculix-thermal",
+            "model_status": "experimental"
+          }
+        ]
+      }
+    ]
+  }
+}

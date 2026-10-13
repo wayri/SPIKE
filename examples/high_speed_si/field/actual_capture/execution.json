@@ -1,0 +1,49 @@
+{
+  "contract": "spike/openems-spatial-eh-field-execution/v1",
+  "status": "executed",
+  "execution": {
+    "command": [
+      "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\runtime\\envs\\openems-py311\\Scripts\\python.exe",
+      "-I",
+      "-"
+    ],
+    "returncode": 0,
+    "timed_out": false,
+    "quota_exceeded": false,
+    "log_bytes_seen": 5114,
+    "log_truncated": false
+  },
+  "elapsed_s": 141.81105909997132,
+  "machine": "Windows-10-10.0.26200-SP0",
+  "runtime_python": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\runtime\\envs\\openems-py311\\Scripts\\python.exe",
+  "runtime_root": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\runtime\\external\\openems-0.0.36\\openEMS",
+  "runtime_openems_sha256": "9a42132177a247144da5bbae20162c0f6cf19d9c6e70cb9b3dec5f7f3daf6e29",
+  "source_sha256": {
+    "extensions\\openems_suite\\openems_assembly_geometry.py": "64e14d6db0a84c704388ca995896bdd1a5e2c68a92ff8a43ee161e9bf37f55f1",
+    "python\\spike_core\\crossboard_mesh.py": "c1556a238563974c6b2023a7ac0c2e908fd510622c1cf6e7b2e9abcad218aac2",
+    "scripts\\run_crossboard_openems.py": "54825a34b7725d121e4c294c86b68831a1c32d71b3b64a85df0a592753068183",
+    "examples\\high_speed_si\\field\\run_interboard_field_capture.py": "c06cfe2ef96970e894934dd66813c25204ed1e1a4b542bc6be6a6271eec66b33"
+  },
+  "sources_unchanged": true,
+  "worker_sha256": "a95b1d915381e4da0e8282f97f2909aea3ba54b0b1dc178dee102ab2376c7d4e",
+  "artifact_sha256": {
+    "dump-schema.json": "e9e04f73f9c57947875247ecde29072d4d38c35e255c08f851d7276e5239d646",
+    "field-samples.json": "c640b6f81cd7a41e12cf84cd4848304065ffeb6455af1d86cfa0d41502eede31",
+    "geometry.xml": "338d058425a3a68a494e67e608c059bfd0e20328dab6d7897876c12a94c5410f",
+    "input.json": "60bfdd5a8173cc6b8a11e4e06b8e879ef4ec9e757cff62337bc2325340a21fd0",
+    "solver.log": "f89cb147943cef2ec0240df18a756aef4e70a5cc95375e8f0fc2e5ccd0dfeb6a",
+    "simulation\\et": "4b7db0b3424edf4e7c6f23ffcde597186f10b5de3501f36cb4d4ffa9f5792768",
+    "simulation\\ht": "2a58fcaa13cabc632b833d2cf90cf8f24d52ea44a456bc51d09d2f86289feee8",
+    "simulation\\interboard_Ef.h5": "0b61f4b9ca72b47da1b3b228a326b4f5da4f3c11a15fdc57e56ea670c70c682e",
+    "simulation\\interboard_Hf.h5": "bdeefc6865f5703ad3ad1e21846f5a203c41b64e4fa7adacd35c760ca21dd91c",
+    "simulation\\port_it_1": "60949b540cb00fa7790a4433e453d7c9d11d7ba5af247a9df7f167c3f4bc966c",
+    "simulation\\port_it_2": "99acaefc867b81af937ba8d6c6dbb9249d41718149c0d79328751ff3733bdd89",
+    "simulation\\port_it_3": "4eb6497ffd10b030d51c7a288af6894f1fba2afd51c7b2d3afd7775a63025803",
+    "simulation\\port_it_4": "513fed413ae3e1f82dcd62bf65292d0718164dfdb196b780b1f5acbdff5894e2",
+    "simulation\\port_ut_1": "f67af6b9ea3d6ce8d914ca8d91526359105d6d8362406fd5bdb1dc102e51173d",
+    "simulation\\port_ut_2": "b6f532d8ba98be783e08532f83a79c9a23fddc3aa4f2006cf022ddde6bc05b8c",
+    "simulation\\port_ut_3": "3454861bfe5092d0df7c0c31022dd8d7c77b55f646d6119f053bdb441711471b",
+    "simulation\\port_ut_4": "077410478698710fe0537527e41b4df18c82a6959f83a9f6749c4cd71120bc2a"
+  },
+  "production_qualified": false
+}

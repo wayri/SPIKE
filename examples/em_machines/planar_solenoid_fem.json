@@ -1,0 +1,32 @@
+{
+  "contract": "spike/magnetic-machine-study/v1",
+  "model": "solenoid",
+  "geometry": {},
+  "mesh_edge_m": 0.001,
+  "stack_depth_m": 0.02,
+  "relative_permeability": 1000,
+  "remanence_t": 0,
+  "current_density_a_m2": 1000000,
+  "position": 0,
+  "bh_curve": [[0,0], [0.5,400], [1,1000], [1.5,4000], [2,20000], [4,2000000]],
+  "transient": {
+    "time_step_s": 0.001,
+    "steps": 2,
+    "initial_temperature_k": 293.15,
+    "ambient_temperature_k": 293.15,
+    "convection_h_w_m2_k": 10,
+    "initial_field": "zero",
+    "thermal_materials": {
+      "air": {"k_w_m_k": 0.026, "rho_kg_m3": 1.2, "cp_j_kg_k": 1005},
+      "stationary_steel": {"k_w_m_k": 20, "rho_kg_m3": 7800, "cp_j_kg_k": 450},
+      "armature_steel": {"k_w_m_k": 20, "rho_kg_m3": 7800, "cp_j_kg_k": 450},
+      "winding_pos": {"k_w_m_k": 200, "rho_kg_m3": 8900, "cp_j_kg_k": 380},
+      "winding_neg": {"k_w_m_k": 200, "rho_kg_m3": 8900, "cp_j_kg_k": 380}
+    },
+    "conductivity_temperature_coefficients": {
+      "winding_pos": {"alpha_per_k": 0.0039, "reference_temperature_k": 293.15},
+      "winding_neg": {"alpha_per_k": 0.0039, "reference_temperature_k": 293.15}
+    },
+    "region_loss_density_w_m3": {"winding_pos": 17241.379310344826, "winding_neg": 17241.379310344826}
+  }
+}

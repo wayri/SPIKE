@@ -7,14 +7,18 @@ import CommandStrip from "./CommandStrip";
 import { copyPlotData, isCartesianPlot, pastePlotTraces, plotAxisLabel, type PlotTrace } from "./plotClipboard";
 import { plotPanChanges, plotResetChanges, plotWheelTarget, plotZoomChanges, wheelPlotFactor, type FullPlotLayout, type PlotAxis, type WheelPreference, type WheelTarget } from "./plotInteraction";
 import { preparePlotLayout } from "./plotLayout";
+import { sampleProbe, probeDelta, probeTable, probeMarkers, type PlotProbe } from "./plotProbes";
 import PlotAxisEditor from "./PlotAxisEditor";
 import { buildPlotAxes, type AxisDraft, type AxisSettings } from "./plotAxisSettings";
 import { openContextScript, plotScriptContext } from "./contextScript";
+import ResultValueScale from "./ResultValueScale";
+import { plotColorScales, type PlotColorScale } from "./plotColorScales";
 import "./PlotlyChart.css";
 
 type Point = { x: number; y: number; curveNumber: number; pointNumber: number; pointIndex?: number; customdata?: unknown };
-type Props = { data: PlotTrace[]; layout: Record<string, unknown>; revision: string; title?: string; onPointClick?: (point: Point) => void; onSelectSamples?: (indices: number[]) => void };
-type Graph = HTMLDivElement & { _fullLayout?: FullPlotLayout;
+type PlotContextAction = { label: string; onSelect: () => void; disabled?: boolean };
+type Props = { contextActions?: PlotContextAction[]; data: PlotTrace[]; layout: Record<string, unknown>; revision: string; title?: string; onPointClick?: (point: Point) => void; onSelectSamples?: (indices: number[]) => void };
+type Graph = HTMLDivElement & { _fullLayout?: FullPlotLayout; _fullData?: PlotTrace[];
   on?: (event: string, callback: (value: { points?: Point[] }) => void) => void; removeListener?: (event: string, callback: (value: { points?: Point[] }) => void) => void };
 async function clipboardAccess<T>(task: Promise<T>): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -22,10 +26,12 @@ async function clipboardAccess<T>(task: Promise<T>): Promise<T> {
   finally { clearTimeout(timer); }
 }
 
-export default function InteractivePlot({ data, layout, revision, title = "Interactive result plot", onPointClick, onSelectSamples }: Props) {
+export default function InteractivePlot({ data, layout, revision, title = "Interactive result plot", onPointClick, onSelectSamples, contextActions = [] }: Props) {
   const host = useRef<Graph>(null), plotlyRef = useRef<typeof Plotly | null>(null), renderRevision = useRef(0);
   const renderQueue = useRef<Promise<void>>(Promise.resolve());
-  const controls = useRef({ wheelZoom: true, wheelTarget: "auto" as WheelPreference, data, onPointClick, onSelectSamples });
+  const controls = useRef({ wheelZoom: true, wheelTarget: "auto" as WheelPreference, data, layout, comparisons: [] as PlotTrace[], onPointClick, onSelectSamples });
+  const [probes, setProbes] = useState<PlotProbe[]>([]);
+  const [colorScales, setColorScales] = useState<PlotColorScale[]>([]);
   const [ready, setReady] = useState(0), [retry, setRetry] = useState(0);
   const [state, setState] = useState({ loading: true, error: "" });
   const [notice, setNotice] = useState(""), [busy, setBusy] = useState(false), [mode, setMode] = useState("pan"), [wheelZoom, setWheelZoom] = useState(true);
@@ -37,7 +43,7 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
   const menuRef = useRef<HTMLDivElement>(null), pasteRef = useRef<HTMLTextAreaElement>(null);
   const cartesian = isCartesianPlot(data), scene = data.some(trace => ["scatter3d", "mesh3d", "surface", "cone", "volume", "isosurface", "streamtube"].includes(String(trace.type))), polar = data.some(trace => ["scatterpolar", "scatterpolargl", "barpolar"].includes(String(trace.type))), usable = !state.loading && !state.error && Boolean(ready);
   const canPaste = cartesian && data.every(trace => ["scatter", "scattergl", "bar"].includes(String(trace.type ?? "scatter")));
-  controls.current = { wheelZoom, wheelTarget, data, onPointClick, onSelectSamples };
+  controls.current = { wheelZoom, wheelTarget, data, layout, comparisons, onPointClick, onSelectSamples };
   useEffect(() => {
     let alive = true; const element = host.current;
     setState({ loading: true, error: "" });
@@ -45,7 +51,8 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       reason => { if (alive) setState({ loading: false, error: String(reason instanceof Error ? reason.message : reason) }); });
     return () => { alive = false; renderRevision.current += 1; if (element && plotlyRef.current) plotlyRef.current.purge(element); plotlyRef.current = null; };
   }, [retry]);
-  useEffect(() => { setComparisons([]); setNotice(""); setAxisOverrides({}); setAxisEditor(null); }, [revision]);
+  useEffect(() => { setComparisons([]); setProbes([]); setNotice(""); setAxisOverrides({}); setAxisEditor(null); }, [revision, data]);
+  useEffect(() => { setColorScales([]); }, [data, layout, revision]);
   useEffect(() => {
     const plotly = plotlyRef.current, element = host.current;
     if (!plotly || !element) return;
@@ -57,11 +64,20 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       for (const [key, value] of Object.entries(axisOverrides)) merged[key] = { ...(layout[key] as object ?? {}), ...value };
       if (axisOverrides.xaxis?.showspikes) merged.hovermode = "closest";
       const figure = { data: structuredClone([...data, ...comparisons]), layout: preparePlotLayout(merged, { text: themed.getPropertyValue("--spike-table-text").trim(), line: themed.getPropertyValue("--spike-table-muted").trim(), grid: themed.getPropertyValue("--spike-table-border").trim(), surface: themed.getPropertyValue("--spike-table-surface").trim() }) };
-      await plotly.react(element, figure.data, { ...figure.layout, autosize: true, dragmode: scene ? mode === "pan" ? "orbit" : "pan" : mode, uirevision: `${revision}:${axisRevision}` },
+      await plotly.react(element, [...figure.data, ...probeMarkers(probes, themed.getPropertyValue("--spike-table-text").trim() || "#8397a6")], { ...figure.layout, autosize: true, dragmode: scene ? mode === "pan" ? "orbit" : "pan" : mode, uirevision: `${revision}:${axisRevision}` },
         { responsive: true, displaylogo: false, displayModeBar: false, scrollZoom: false, doubleClick: "reset+autosize" });
-      if (token === renderRevision.current) setState({ loading: false, error: "" });
+      if (token === renderRevision.current) {
+        setColorScales(plotColorScales(element._fullData ?? figure.data, (element._fullLayout ?? figure.layout) as Record<string, unknown>));
+        setState({ loading: false, error: "" });
+      }
     }).catch(reason => { if (token === renderRevision.current) setState({ loading: false, error: String(reason instanceof Error ? reason.message : reason) }); });
-  }, [data, layout, revision, ready, comparisons, mode, axisOverrides, axisRevision]);
+  }, [data, layout, revision, ready, comparisons, mode, axisOverrides, axisRevision, probes]);
+  useEffect(() => {
+    const element = host.current; if (!element || !ready || state.loading) return;
+    const refresh = () => setColorScales(plotColorScales(element._fullData ?? [], (element._fullLayout ?? {}) as Record<string, unknown>));
+    element.on?.("plotly_restyle", refresh);
+    return () => { element.removeListener?.("plotly_restyle", refresh); };
+  }, [ready, state.loading]);
   const update = (changes: Record<string, unknown>) => {
     if (host.current && plotlyRef.current && Object.keys(changes).length) void plotlyRef.current.relayout(host.current, changes).catch(reason => setNotice(`Plot interaction failed: ${String(reason instanceof Error ? reason.message : reason)}`));
   };
@@ -113,6 +129,11 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
   useEffect(() => {
     const element = host.current; if (!element || !ready || state.loading) return;
     const click = (event: { points?: Point[] }) => { const point = event.points?.[0];
+      if (point) {
+        const current = controls.current;
+        const probe = sampleProbe([...current.data, ...current.comparisons], current.layout, point, current.data.length);
+        if (probe) setProbes(old => old.length === 1 ? [...old, probe] : [probe]);
+      }
       if (point && point.curveNumber < controls.current.data.length && Number.isFinite(point.x) && Number.isFinite(point.y)) controls.current.onPointClick?.(point);
       select(event); };
     const select = (event: { points?: Point[] }) => { const indices = [...new Set((event.points ?? []).filter(point => point.curveNumber < controls.current.data.length).map(point => typeof point.customdata === "number" ? point.customdata : point.pointIndex ?? point.pointNumber).filter(index => Number.isInteger(index) && index >= 0))];
@@ -167,6 +188,8 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       {onSelectSamples && cartesian && button("Select samples", () => setMode("select"), <MousePointer2 size={14}/>, !usable || busy, mode === "select")}
       {button("Zoom in", () => zoom(.8), <ZoomIn size={14}/>)}{button("Zoom out", () => zoom(1.25), <ZoomOut size={14}/>)}{button("Fit", reset, <RotateCcw size={14}/>)}
       {button("Axes", editAxes, <SlidersHorizontal size={14}/>, !usable || busy || !cartesian)}
+      {probes.length > 0 && button("Clear probes", () => setProbes([]), <X size={14}/>)}
+      {probes.length > 0 && button("Copy probes", () => void action(async () => { await clipboardAccess(navigator.clipboard.writeText(probeTable(probes))); setNotice("Exact probe samples copied with axis labels."); }), <Copy size={14}/>)}
       <button type="button" aria-pressed={wheelZoom} disabled={!usable} title="Wheel zoom is enabled by default. Turn off to scroll the panel; Ctrl+wheel still zooms." onClick={() => setWheelZoom(value => !value)}>Wheel zoom: {wheelZoom ? "on" : "off"}</button>
       <label className="spike-plot-wheel-target">Wheel target<select aria-label="Wheel zoom target" title="Pointer: zoom the hovered axis, or both axes inside the plot. Choose an axis to lock wheel zoom to it." value={wheelTarget} onChange={event => setWheelTarget(event.target.value as WheelPreference)}>
         <option value="auto">Pointer</option>{cartesian && <><option value="both">Both axes</option><option value="x">X axis</option><option value="y">Y axis</option></>}{polar && <><option value="radial">Radius</option><option value="angular">Angle</option></>}{scene && <><option value="x">X axis</option><option value="y">Y axis</option><option value="z">Z axis</option></>}
@@ -175,6 +198,10 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       {button("Paste traces", () => void paste(), <ClipboardPaste size={14}/>, !usable || busy || !canPaste)}
       {comparisons.length > 0 && button("Clear pasted", () => { setComparisons([]); setNotice("Clipboard comparisons removed."); }, <X size={14}/>)}
     </CommandStrip>
+    {!!probes.length && <div className="spike-plot-probes" aria-label="Pinned exact samples" aria-live="polite">
+      {probes.map((probe, index) => <div key={index}><strong>{index ? "B" : "A"} · {probe.trace}{probe.comparison ? " · comparison" : ""}</strong><span>Sample {probe.index} · {probe.xLabel}: {probe.x.toPrecision(7)} · {probe.yLabel}: {probe.y.toPrecision(7)}</span></div>)}
+      {probeDelta(probes) && <div><strong>B − A</strong><span>Δ {probes[0].xLabel}: {probeDelta(probes)!.x.toPrecision(7)} · Δ {probes[0].yLabel}: {probeDelta(probes)!.y.toPrecision(7)}</span></div>}
+    </div>}
     <div className="spike-plot-surface" onContextMenu={event => { event.preventDefault(); event.stopPropagation(); openMenu(event.clientX, event.clientY); }}>
       <div ref={host} className="trace-plot-canvas" tabIndex={0} role="group" aria-label={`${title}. Wheel zooms; hover an axis to zoom only it, or choose Wheel target. Shift+wheel pans; right-click for plot actions.`}
         onPointerDownCapture={() => host.current?.focus({ preventScroll: true })}
@@ -192,6 +219,7 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       {state.loading && <div className="trace-plot-loading" role="status">Loading interactive graph…</div>}
       {state.error && <div className="trace-plot-error" role="alert"><b>Graph rendering failed</b><span>{state.error}</span><button onClick={() => setRetry(value => value + 1)}>Retry</button></div>}
     </div>
+    {!!colorScales.length && <div className="spike-plot-value-scales" aria-label="Result color scales">{colorScales.map((scale, index) => <ResultValueScale key={index} {...scale}/>)}</div>}
     <div className="spike-plot-hint">{scene && <span className="spike-plot-scene-labels">{["xaxis", "yaxis", "zaxis"].map(key => plotAxisLabel((layout.scene as Record<string, unknown> | undefined)?.[key])).filter(Boolean).join(" · ")}</span>}{wheelZoom ? "Wheel: zoom · Axis hover / Wheel target: one axis · " : "Wheel: scroll panel · Ctrl+wheel: zoom · "}{cartesian ? "Shift+wheel: pan · " : scene ? "Drag: orbit · " : "Rim: angle zoom · "}Ctrl+C: image · Ctrl+Shift+C: data{canPaste ? " · Ctrl+V: paste" : ""}</div>
     {notice && <div className="spike-plot-notice" role="status">{notice}</div>}
     {pasteOpen && <div className="spike-plot-paste" role="group" aria-label="Paste plot comparison" onKeyDown={event => { event.stopPropagation(); if (event.key === "Escape") setPasteOpen(false); }}>
@@ -209,6 +237,8 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) { event.preventDefault(); items[event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (index + (event.key === "ArrowUp" ? -1 : 1) + items.length) % items.length]?.focus(); }
       if (event.key === "Tab") { event.preventDefault(); setMenu(null); host.current?.focus(); }
     }}>
+      {contextActions.map(item => <button key={item.label} role="menuitem" disabled={!usable || item.disabled}
+        onClick={() => { setMenu(null); item.onSelect(); }}>{item.label}</button>)}
       {[{ name: "Fit plot", run: reset }, { name: "Axes and grid…", run: editAxes, disabled: !cartesian }, { name: "Zoom in", run: () => zoom(.8) }, { name: "Zoom out", run: () => zoom(1.25) },
         { name: "Open plot data in script", run: openScript }, { name: "Copy image · Ctrl+C", run: () => void copyImage() }, { name: "Copy data · Ctrl+Shift+C", run: () => void copyData() },
         { name: "Paste traces · Ctrl+V", run: () => void paste(), disabled: !canPaste },

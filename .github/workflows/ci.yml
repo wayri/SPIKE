@@ -35,14 +35,25 @@ jobs:
           python scripts/check_architecture.py
           python scripts/release_automation.py check
           python -m unittest discover -s tests/python -p test_worker_cli_entry.py -v
+          python -m unittest tests.python.test_headless tests.python.test_mcp_server tests.python.test_automation -v
           python -m unittest discover -s tests/python -p test_release_automation.py -v
           python -m unittest discover -s tests/python -p test_errors.py -v
           python -m unittest discover -s tests/python -p test_schema_catalog.py -v
-          python -m unittest tests.python.test_prepare_release_resources tests.python.test_script_external_interpreter tests.python.test_installed_python_runtime tests.python.test_windows_installer_script -v
+          python -m unittest tests.python.test_smps_converter tests.python.test_capacitor_placement tests.python.test_pi_return_path tests.python.test_pi_engineering_worker -v
+          python -m unittest tests.python.test_harness_signal tests.python.test_harness_analysis_worker tests.python.test_harness_pi -v
           python -m unittest tests.python.test_pcb_volume_mesh tests.python.test_pcb_volume_compiler tests.python.test_pcb_focus_sizing tests.python.test_internal_meshing_engine tests.python.test_dynamic_tetra_adaptation tests.python.test_mom_far_field tests.python.test_multiboard_circuit tests.python.test_multiboard_thermal tests.python.test_multiboard_em -v
       - name: Frontend build and parser checks
         working-directory: app
+        env:
+          SPIKE_TEST_PYTHON: python
+          OPENBLAS_NUM_THREADS: '1'
+          OMP_NUM_THREADS: '1'
         run: |
           npm ci
           npm run build
-          npm run test:ui-stability
+          npm run test:parser
+          npm run test:pi-engineering-tools
+          npm run test:harness-engineering
+          npm run test:tetra-mesh-panel
+          npm run test:em-viewport
+          npm run test:mcp-analysis

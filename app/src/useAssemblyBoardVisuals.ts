@@ -5,6 +5,8 @@ import type { AssemblyDesigns } from "./mcadAssembly";
 import { parseDesignSourceOffThread } from "./boardImport";
 import { materializeVisualBundle } from "./boardVisualBundles";
 import { cancelLocalWorkerCleanup, runNativeProjectWorker } from "./workerBridge";
+import { projectAssemblyCanonicalBoard } from "./assemblyCanonicalBoard";
+import { restoreAssemblyBoardVisual } from "./assemblyBoardVisualRestoration";
 
 type ReadyPayload = {
   contract: "spike/assembly-visual-ready/v1";
@@ -124,22 +126,43 @@ function acquireVisual(path: string, manifestDigest: string, designId: string, e
 
 /** Export once per retained source identity, then share verified GLB/SVG assets across occurrences and rerenders. */
 export function useAssemblyBoardVisuals(retained: AssemblyDesigns | null, active: ParsedBoard | null,
-  path: string | null, manifestDigest: string | null, whenActiveReady?: () => Promise<ParsedBoard | null>, componentOverridesByDesign?: Record<string, Record<string, string>>) {
+  path: string | null, manifestDigest: string | null, whenActiveReady?: () => Promise<ParsedBoard | null>, componentOverridesByDesign?: Record<string, Record<string, string>>, signal?: AbortSignal) {
   const [prepared, setPrepared] = useState<Record<string, ParsedBoard>>({});
   const [diagnostics, setDiagnostics] = useState<Record<string, string>>({});
+  const total = retained?.designs.filter(design => design.design_id !== retained.active_design_id).length ?? 0;
+  const [progress, setProgress] = useState<{ owner: AssemblyDesigns | null; completed: number; pending: boolean }>({ owner: null, completed: 0, pending: false });
+  const fallback = useMemo(() => {
+    const boards: Record<string, ParsedBoard> = {}, errors: Record<string, string> = {};
+    for (const design of retained?.designs ?? []) {
+      try { boards[design.design_id] = projectAssemblyCanonicalBoard(design); }
+      catch (cause) { errors[design.design_id] = `Retained geometry unavailable: ${cause instanceof Error ? cause.message : String(cause)}`; }
+    }
+    return { boards, errors };
+  }, [retained]);
   useEffect(() => {
     let cancelled = false;
     const releases: Array<() => void> = [];
+    const releaseAll = () => releases.splice(0).forEach(release => release());
+    const abort = () => {
+      cancelled = true; releaseAll();
+      setProgress({ owner: retained, completed: 0, pending: false });
+      if (retained) setDiagnostics(rows => ({ ...rows, [retained.active_design_id]: "Visual preparation cancelled; retained source geometry remains available." }));
+    };
     setPrepared({}); setDiagnostics({});
+    setProgress({ owner: retained, completed: 0, pending: Boolean(retained && path && manifestDigest && total) });
+    if (signal?.aborted) { abort(); return; }
     if (!retained || !path || !manifestDigest || retained.designs.length < 1) return;
+    signal?.addEventListener("abort", abort, { once: true });
     void (async () => {
       await whenActiveReady?.();
+      let completed = 0;
       for (const design of retained.designs) {
         if (cancelled) return;
         if (design.design_id === retained.active_design_id) continue;
         const digest = sourceDigest(design);
         if (!/^[0-9a-f]{64}$/.test(digest)) {
           setDiagnostics(rows => ({ ...rows, [design.design_id]: "Retained board source identity is missing or malformed." }));
+          setProgress({ owner: retained, completed: ++completed, pending: completed < total });
           continue;
         }
         const acquired = acquireVisual(path, manifestDigest, design.design_id, digest, componentOverridesByDesign?.[design.design_id] ?? {});
@@ -160,10 +183,27 @@ export function useAssemblyBoardVisuals(retained: AssemblyDesigns | null, active
         } catch (cause) {
           if (!cancelled) setDiagnostics(rows => ({ ...rows, [design.design_id]: cause instanceof Error ? cause.message : String(cause) }));
         }
+        if (!cancelled) setProgress({ owner: retained, completed: ++completed, pending: completed < total });
       }
-    })();
-    return () => { cancelled = true; releases.forEach(release => release()); };
-  }, [retained, path, manifestDigest, whenActiveReady, componentOverridesByDesign]);
-  const boards = useMemo(() => ({ ...prepared, ...(retained && active ? { [retained.active_design_id]: active } : {}) }), [prepared, retained, active]);
-  return { boards, diagnostics };
+    })().catch(cause => {
+      if (cancelled) return;
+      setDiagnostics(rows => ({ ...rows, [retained.active_design_id]: `Visual preparation failed: ${cause instanceof Error ? cause.message : String(cause)}` }));
+      setProgress({ owner: retained, completed: total, pending: false });
+    });
+    return () => { cancelled = true; signal?.removeEventListener("abort", abort); releaseAll(); };
+  }, [retained, path, manifestDigest, whenActiveReady, componentOverridesByDesign, signal]);
+  const boards = useMemo(() => {
+    const restored = { ...fallback.boards, ...prepared };
+    if (retained && active) {
+      const retainedBoard = fallback.boards[retained.active_design_id];
+      const preparedBoard = prepared[retained.active_design_id];
+      const canonical = retainedBoard && preparedBoard
+        ? restoreAssemblyBoardVisual(retainedBoard, preparedBoard) : preparedBoard ?? retainedBoard;
+      restored[retained.active_design_id] = canonical ? restoreAssemblyBoardVisual(canonical, active) : active;
+    }
+    return restored;
+  }, [fallback, prepared, retained, active]);
+  return { boards, diagnostics: { ...fallback.errors, ...diagnostics }, total,
+    completed: progress.owner === retained ? progress.completed : 0,
+    pending: progress.owner === retained ? progress.pending : Boolean(retained && path && manifestDigest && total) };
 }

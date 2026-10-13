@@ -41,11 +41,14 @@ class SourceWaveform:
     kind: str
     pulse: tuple[float, ...] = ()
     points: tuple[tuple[float, float], ...] = ()
+    sine: tuple[float, ...] = ()
+    exponential: tuple[float, ...] = ()
+    sffm: tuple[float, ...] = ()
 
     def __post_init__(self) -> None:
         kind = str(self.kind).strip().lower()
         if kind == "pulse":
-            if len(self.pulse) != 7 or self.points:
+            if len(self.pulse) != 7 or self.points or self.sine or self.exponential or self.sffm:
                 raise ValueError("PULSE waveform requires exactly seven values.")
             values = tuple(_finite(item, "PULSE value") for item in self.pulse)
             initial, pulsed, delay, rise, fall, width, period = values
@@ -56,7 +59,7 @@ class SourceWaveform:
                 raise ValueError("PULSE rise + width + fall must not exceed period.")
             object.__setattr__(self, "pulse", values)
         elif kind == "pwl":
-            if self.pulse or not self.points or len(self.points) > 1_000_000:
+            if self.pulse or self.sine or self.exponential or self.sffm or not self.points or len(self.points) > 1_000_000:
                 raise ValueError("PWL waveform requires 1 to 1,000,000 points.")
             normalized = tuple(
                 (_finite(time, "PWL time"), _finite(value, "PWL value"))
@@ -68,15 +71,87 @@ class SourceWaveform:
             ):
                 raise ValueError("PWL times must be nonnegative and strictly increasing.")
             object.__setattr__(self, "points", normalized)
+        elif kind == "sin":
+            if self.pulse or self.points or self.exponential or self.sffm or len(self.sine) != 6:
+                raise ValueError("SIN waveform requires VO VA FREQ TD THETA PHASE.")
+            values = tuple(_finite(item, "SIN value") for item in self.sine)
+            _offset, _amplitude, frequency, delay, damping, _phase = values
+            if frequency <= 0.0 or delay < 0.0 or damping < 0.0:
+                raise ValueError(
+                    "SIN frequency must be positive; delay and damping must be nonnegative."
+                )
+            object.__setattr__(self, "sine", values)
+        elif kind == "exp":
+            if self.pulse or self.points or self.sine or self.sffm or len(self.exponential) != 6:
+                raise ValueError("EXP waveform requires V1 V2 TD1 TAU1 TD2 TAU2.")
+            values = tuple(_finite(item, "EXP value") for item in self.exponential)
+            _initial, _pulsed, rise_delay, rise_tau, fall_delay, fall_tau = values
+            if rise_delay < 0.0 or rise_tau <= 0.0 or fall_delay < rise_delay or fall_tau <= 0.0:
+                raise ValueError(
+                    "EXP delays must be nonnegative and ordered; time constants must be positive."
+                )
+            object.__setattr__(self, "exponential", values)
+        elif kind == "sffm":
+            if self.pulse or self.points or self.sine or self.exponential or len(self.sffm) != 8:
+                raise ValueError("SFFM waveform requires VO VA FC MDI FM TD PHASEM PHASEC.")
+            values = tuple(_finite(item, "SFFM value") for item in self.sffm)
+            _offset, _amplitude, carrier, modulation_index, modulating, delay, _phase_m, _phase_c = values
+            if carrier <= 0.0 or modulating <= 0.0 or delay < 0.0:
+                raise ValueError(
+                    "SFFM frequencies must be positive and delay must be nonnegative."
+                )
+            if modulation_index < 0.0 or modulation_index > carrier / modulating:
+                raise ValueError("SFFM modulation index must satisfy 0 <= MDI <= FC/FM.")
+            object.__setattr__(self, "sffm", values)
         else:
-            raise ValueError("Source waveform kind must be pulse or pwl.")
+            raise ValueError("Source waveform kind must be pulse, pwl, sin, exp, or sffm.")
         object.__setattr__(self, "kind", kind)
+
+    def value_at(self, time_s: float) -> float:
+        """Evaluate a waveform at one finite, nonnegative transient time."""
+
+        time = _finite(time_s, "waveform time")
+        if time < 0.0:
+            raise ValueError("Waveform time must be nonnegative.")
+        if self.kind == "sin":
+            offset, amplitude, frequency, delay, damping, phase_deg = self.sine
+            # ngspice holds the phase-dependent time-zero value before TD.
+            elapsed = max(0.0, time - delay)
+            return offset + amplitude * math.exp(-damping * elapsed) * math.sin(
+                2.0 * math.pi * frequency * elapsed + math.radians(phase_deg)
+            )
+        if self.kind == "exp":
+            initial, pulsed, rise_delay, rise_tau, fall_delay, fall_tau = self.exponential
+            if time < rise_delay:
+                return initial
+            rise = (pulsed - initial) * -math.expm1(-(time - rise_delay) / rise_tau)
+            if time < fall_delay:
+                return initial + rise
+            fall = (initial - pulsed) * -math.expm1(-(time - fall_delay) / fall_tau)
+            return initial + rise + fall
+        if self.kind == "sffm":
+            offset, amplitude, carrier, modulation_index, modulating, delay, phase_m, phase_c = self.sffm
+            boundary_tolerance = 16.0 * math.ulp(max(time, delay, 1.0e-300))
+            if time <= delay + boundary_tolerance:
+                return 0.0
+            elapsed = time - delay
+            modulation_phase = 2.0 * math.pi * modulating * elapsed + math.radians(phase_m)
+            carrier_phase = (
+                2.0 * math.pi * carrier * elapsed
+                + modulation_index * math.sin(modulation_phase)
+                + math.radians(phase_c)
+            )
+            return offset + amplitude * math.sin(carrier_phase)
+        raise ValueError(f"Point evaluation is not implemented for {self.kind.upper()} here.")
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "kind": self.kind,
             **({"pulse": list(self.pulse)} if self.kind == "pulse" else {}),
             **({"points": [list(point) for point in self.points]} if self.kind == "pwl" else {}),
+            **({"sine": list(self.sine)} if self.kind == "sin" else {}),
+            **({"exponential": list(self.exponential)} if self.kind == "exp" else {}),
+            **({"sffm": list(self.sffm)} if self.kind == "sffm" else {}),
         }
 
     @classmethod
@@ -85,6 +160,9 @@ class SourceWaveform:
             kind=value.get("kind", ""),
             pulse=tuple(value.get("pulse", ())),
             points=tuple(tuple(point) for point in value.get("points", ())),
+            sine=tuple(value.get("sine", ())),
+            exponential=tuple(value.get("exponential", ())),
+            sffm=tuple(value.get("sffm", ())),
         )
 
 
@@ -400,7 +478,7 @@ class CircuitElement:
 
 @dataclass(frozen=True, slots=True)
 class AnalysisDirective:
-    """Operating point, DC/AC sweep, or bounded fixed-output-step transient."""
+    """Operating point, DC/AC sweep, or bounded transient controls."""
 
     mode: str
     source: str = ""
@@ -409,6 +487,8 @@ class AnalysisDirective:
     step: float | None = None
     time_step_s: float | None = None
     stop_time_s: float | None = None
+    start_time_s: float = 0.0
+    maximum_time_step_s: float | None = None
     frequency_scale: str = ""
     frequency_points: int | None = None
     start_frequency_hz: float | None = None
@@ -427,10 +507,10 @@ class AnalysisDirective:
                 item is not None
                 for item in (
                     self.start, self.stop, self.step, self.time_step_s,
-                    self.stop_time_s, self.frequency_points,
+                    self.stop_time_s, self.maximum_time_step_s, self.frequency_points,
                     self.start_frequency_hz, self.stop_frequency_hz,
                 )
-            ):
+            ) or self.start_time_s != 0.0:
                 raise ValueError("Operating-point analysis cannot carry sweep or transient fields.")
             return
         if mode == "transient":
@@ -441,18 +521,34 @@ class AnalysisDirective:
                 raise ValueError("Transient analysis cannot carry DC sweep fields.")
             time_step = _finite(self.time_step_s, "transient time step", positive=True)
             stop_time = _finite(self.stop_time_s, "transient stop time", positive=True)
+            start_time = _finite(self.start_time_s, "transient start time")
+            maximum_time_step = (
+                None
+                if self.maximum_time_step_s is None
+                else _finite(
+                    self.maximum_time_step_s,
+                    "transient maximum time step",
+                    positive=True,
+                )
+            )
             if time_step > stop_time:
                 raise ValueError("Transient time step must not exceed stop time.")
+            if start_time < 0.0 or start_time >= stop_time:
+                raise ValueError(
+                    "Transient start time must be nonnegative and below stop time."
+                )
             object.__setattr__(self, "time_step_s", time_step)
             object.__setattr__(self, "stop_time_s", stop_time)
+            object.__setattr__(self, "start_time_s", start_time)
+            object.__setattr__(self, "maximum_time_step_s", maximum_time_step)
             return
         if mode == "ac":
             if self.use_initial_conditions:
                 raise ValueError("AC analysis cannot request transient UIC semantics.")
             if any(item is not None for item in (
                 self.start, self.stop, self.step, self.time_step_s,
-                self.stop_time_s,
-            )):
+                self.stop_time_s, self.maximum_time_step_s,
+            )) or self.start_time_s != 0.0:
                 raise ValueError("AC analysis cannot carry DC or transient fields.")
             source = _name(self.source, "AC source").upper()
             if not source.rsplit(":", 1)[-1].startswith(("V", "I")):
@@ -479,7 +575,7 @@ class AnalysisDirective:
             object.__setattr__(self, "start_frequency_hz", start_frequency)
             object.__setattr__(self, "stop_frequency_hz", stop_frequency)
             return
-        if self.use_initial_conditions or self.time_step_s is not None or self.stop_time_s is not None or self.frequency_scale or any(
+        if self.use_initial_conditions or self.time_step_s is not None or self.stop_time_s is not None or self.start_time_s != 0.0 or self.maximum_time_step_s is not None or self.frequency_scale or any(
             item is not None for item in (
                 self.frequency_points, self.start_frequency_hz,
                 self.stop_frequency_hz,
@@ -507,6 +603,8 @@ class AnalysisDirective:
             result.update(
                 time_step_s=self.time_step_s,
                 stop_time_s=self.stop_time_s,
+                start_time_s=self.start_time_s,
+                maximum_time_step_s=self.maximum_time_step_s,
                 use_initial_conditions=self.use_initial_conditions,
             )
         elif self.mode == "ac":
@@ -529,6 +627,8 @@ class AnalysisDirective:
             step=value.get("step"),
             time_step_s=value.get("time_step_s"),
             stop_time_s=value.get("stop_time_s"),
+            start_time_s=value.get("start_time_s", 0.0),
+            maximum_time_step_s=value.get("maximum_time_step_s"),
             frequency_scale=value.get("frequency_scale", ""),
             frequency_points=value.get("frequency_points"),
             start_frequency_hz=value.get("start_frequency_hz"),

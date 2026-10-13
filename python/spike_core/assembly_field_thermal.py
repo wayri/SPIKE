@@ -2,17 +2,19 @@
 # Copyright (c) 2026 SigHarmonic
 """Bind retained occurrence faces/cells to the experimental 3D thermal kernel."""
 import copy
+import heapq
 import math
 import numpy as np
 
 from .assembly_field_geometry import identity, keys, number
 from .assembly_field_handoff import bounded_json, prepare_assembly_field_handoff, text
 from .assembly_tetra_thermal import run_assembly_tetra_thermal
+from .assembly_tetra_thermal_validation import MAX_CELLS
 from .multiboard_identity import canonical_json_digest
 from .spider_v2 import AssemblyIRV1
 
 
-def run_assembly_field_thermal(request, problem):
+def bind_assembly_field_thermal(request, problem):
     """All unspecified exterior faces are explicitly reported as adiabatic.
 
     Contacts require caller-bound matching triangles. Assemblies with thermal
@@ -38,11 +40,15 @@ def run_assembly_field_thermal(request, problem):
 
     if any(not isinstance(problem[k], list) for k in ('boundaries', 'heat_sources', 'contacts')):
         raise ValueError('ASSEMBLY_FIELD_THERMAL_FIELDS: lists required')
-    if len(problem['boundaries']) > 20000 or len(problem['heat_sources']) > 5000 or len(problem['contacts']) > 5000:
+    if (len(problem['boundaries']) > 4 * MAX_CELLS or len(problem['heat_sources']) > MAX_CELLS or
+            len(problem['contacts']) > MAX_CELLS):
         raise ValueError('ASSEMBLY_FIELD_RESOURCE: thermal problem budget exceeded')
     boundaries, assigned = [], set()
     allowed = {'temperature': ('temperature_k',), 'heat_flux': ('heat_flux_w_m2',),
-               'convection': ('heat_transfer_coefficient_w_m2k', 'ambient_temperature_k'), 'adiabatic': ()}
+               'convection': ('heat_transfer_coefficient_w_m2k', 'ambient_temperature_k'), 'adiabatic': (),
+               'radiation': ('emissivity', 'radiation_temperature_k'),
+               'convection_radiation': ('heat_transfer_coefficient_w_m2k', 'ambient_temperature_k',
+                                        'emissivity', 'radiation_temperature_k')}
     for entry in problem['boundaries']:
         if not isinstance(entry, dict) or entry.get('type') not in allowed:
             raise ValueError('ASSEMBLY_FIELD_BOUNDARY: unsupported thermal boundary')
@@ -102,9 +108,17 @@ def run_assembly_field_thermal(request, problem):
     for trace in handoff['source_traceability']:
         for sid in trace['source_map'].values():
             thermal_mesh['object_map'][sid]['occurrence_id'] = trace['occurrence_id']
-    result = run_assembly_tetra_thermal({'contract': 'spike/assembly-tetra-thermal-request/v1',
-               'mesh': thermal_mesh, 'materials': materials, 'boundaries': boundaries,
-               'heat_sources_w_m3': sources, 'contacts': contacts})
+    tetra_request = {'contract': 'spike/assembly-tetra-thermal-request/v1',
+                     'mesh': thermal_mesh, 'materials': materials, 'boundaries': boundaries,
+                     'heat_sources_w_m3': sources, 'contacts': contacts}
+    return handoff, tetra_request, assigned, contact_faces
+
+
+def run_assembly_field_thermal(request, problem):
+    """Execute the internal reference after shared occurrence-bound admission."""
+    handoff, tetra_request, assigned, contact_faces = bind_assembly_field_thermal(request, problem)
+    traces = {t['occurrence_id']: t for t in handoff['source_traceability']}
+    result = run_assembly_tetra_thermal(tetra_request)
     occurrence_temperatures = {}
     for oid, trace in traces.items():
         start, stop = trace['vertex_range']
@@ -118,13 +132,24 @@ def run_assembly_field_thermal(request, problem):
               'occurrence_temperatures': occurrence_temperatures,
               'source_traceability': handoff['source_traceability'],
               'adiabatic_face_ids': [f['id'] for f in handoff['boundary_faces'] if f['id'] not in assigned | contact_faces],
-              'limitations': handoff['limitations']}
+              'limitations': [item.replace('No automatic airflow, nonlinear radiation, transient or full-wave execution.',
+                                           'Prescribed ambient radiation only; no automatic airflow, enclosure radiosity, transient or full-wave execution.')
+                              for item in handoff['limitations']]}
     output['result_digest'] = canonical_json_digest(output)
     bounded_json(output)
     return copy.deepcopy(output)
 
 
 def verify_assembly_field_result(request, problem, result):
+    if isinstance(result, dict) and result.get('contract') == 'spike/assembly-field-transient-result/v1':
+        from .assembly_field_transient import verify_assembly_field_transient_result
+        return verify_assembly_field_transient_result(request, problem, result)
+    if isinstance(result, dict) and result.get('contract') == 'spike/calculix-field-transient-result/v1':
+        from .calculix_transient import verify_calculix_field_transient_result
+        return verify_calculix_field_transient_result(request, problem, result)
+    if isinstance(result, dict) and result.get("contract") == "spike/calculix-thermal-result/v1":
+        from .calculix_thermal import verify_calculix_thermal_result
+        return verify_calculix_thermal_result(request, problem, result)
     """Integrity/staleness admission only, not proof that computation is correct."""
     bounded_json(result)
     if not isinstance(result, dict) or result.get('contract') != 'spike/assembly-field-thermal-result/v1':
@@ -133,13 +158,44 @@ def verify_assembly_field_result(request, problem, result):
     if result.get('result_digest') != canonical_json_digest(content):
         raise ValueError('ASSEMBLY_FIELD_RESULT_DIGEST: changed result payload')
     current = prepare_assembly_field_handoff(request)
-    for key in ('assembly_digest', 'request_digest', 'handoff_digest'):
+    for key in ('assembly_digest', 'request_digest'):
         if result.get(key) != current[key]:
             raise ValueError('ASSEMBLY_FIELD_STALE: geometry, material or placement changed')
+    if result.get('handoff_digest') != current['handoff_digest'] and result.get('handoff_digest') != _legacy_handoff_digest(current):
+        raise ValueError('ASSEMBLY_FIELD_STALE: handoff changed; prepare and rerun the saved thermal study')
     if result.get('problem_digest') != canonical_json_digest(problem):
         raise ValueError('ASSEMBLY_FIELD_STALE: thermal study changed')
     if result.get('model_status') != 'experimental' or result.get('production_qualified') is not False:
         raise ValueError('ASSEMBLY_FIELD_RESULT: unsupported qualification claim')
     from .assembly_field_result import validate_thermal_result_shape
     validate_thermal_result_shape(result, current)
-    return copy.deepcopy(result)
+    admitted = copy.deepcopy(result)
+    if admitted['handoff_digest'] != current['handoff_digest']:
+        admitted['handoff_digest'] = current['handoff_digest']
+        admitted['result_digest'] = canonical_json_digest({k: v for k, v in admitted.items() if k != 'result_digest'})
+    return admitted
+
+
+def _legacy_handoff_digest(current):
+    """Reconstruct only the pre-owner-pruning audit counter, never physics.
+
+    The original sweep counted every pair with strictly overlapping x ranges
+    before testing occurrence identity or y/z boxes. Counting active intervals
+    is exactly equivalent without materializing the quadratic pair list. Old
+    handoffs exceeding 250000 comparisons could never have been admitted.
+    """
+    points = current['mesh']['vertices']
+    intervals = sorted((min(points[i][0] for i in cell['vertices']),
+                        max(points[i][0] for i in cell['vertices']))
+                       for cell in current['mesh']['cells'])
+    active, comparisons = [], 0
+    for low, high in intervals:
+        while active and active[0] <= low:
+            heapq.heappop(active)
+        comparisons += len(active)
+        if comparisons > 250000:
+            raise ValueError('ASSEMBLY_FIELD_STALE: legacy handoff exceeded its audit budget; prepare and rerun the saved thermal study')
+        heapq.heappush(active, high)
+    legacy = {k: v for k, v in current.items() if k != 'handoff_digest'}
+    legacy['geometry_audit'] = {**current['geometry_audit'], 'inter_occurrence_comparisons': comparisons}
+    return canonical_json_digest(legacy)

@@ -1,0 +1,10 @@
+{
+  "contract": "spikes/asic-project/v1",
+  "name": "my_asic",
+  "kind": "digital",
+  "top": "top",
+  "pdk_revision": "REPLACE_WITH_EXACT_INSTALLED_PDK_REVISION",
+  "artifacts": [],
+  "engines": {},
+  "runsets": {}
+}

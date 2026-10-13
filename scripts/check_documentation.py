@@ -47,13 +47,24 @@ def _line_number(text: str, offset: int) -> int:
 
 def _parse_document(text: str) -> tuple[str, list[tuple[int, int, str]], list[str]]:
     """Return searchable text, headings, and fence errors."""
+    lines = text.splitlines()
+    front_matter_end = 0
+    if lines and lines[0] == "---":
+        front_matter_end = next(
+            (line_number for line_number, line in enumerate(lines[1:], 2) if line == "---"),
+            0,
+        )
     visible_lines: list[str] = []
     headings: list[tuple[int, int, str]] = []
     errors: list[str] = []
     open_fence: tuple[str, int, int] | None = None
     previous_visible = ""
 
-    for line_number, line in enumerate(text.splitlines(), 1):
+    for line_number, line in enumerate(lines, 1):
+        if front_matter_end and line_number <= front_matter_end:
+            visible_lines.append("")
+            previous_visible = ""
+            continue
         fence_match = FENCE.match(line)
         if open_fence is not None:
             marker, length, start_line = open_fence

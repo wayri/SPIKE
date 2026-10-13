@@ -19,7 +19,9 @@ function load(file){
 }
 const {helpTopics,helpFeatureCoverage}=load(path.join(root,'src/HelpTopics.tsx'));
 const topics=helpTopics();const ids=new Set(topics.map(t=>t.id));
-assert.equal(ids.size,topics.length);assert.equal(helpFeatureCoverage.length,18);assert.ok(ids.has('local-llm-mcp'));
+assert.equal(ids.size,topics.length);assert.equal(helpFeatureCoverage.length,19);assert.ok(ids.has('local-llm-mcp'));assert.ok(ids.has('volume-engines'));
+const volumeHelp=renderToStaticMarkup(React.createElement(React.Fragment,null,topics.find(t=>t.id==='volume-engines').body));
+for(const term of ['CalculiX','Gmsh','Embedded results','not production qualified']) assert.ok(volumeHelp.includes(term));
 for(const row of helpFeatureCoverage){assert.ok(row.pictured&&row.gap);assert.ok(ids.has(row.topic)||row.topic.startsWith('doc:')&&fs.existsSync(path.resolve(root,'..',row.topic.slice(4))));}
 for(const id of ['picture-guide','recorded-pic-dc','feature-coverage']){
  const topic=topics.find(t=>t.id===id);assert.ok(topic);
@@ -42,4 +44,4 @@ assert.match(guide,/destination: "emerge-em-result"/);
 assert.match(guide,/data-guide="emerge-em-result"/);
 assert.match(app,/destination === "emerge-em-result"/);
 assert.match(app,/data-guide="emerge-em-result"/);
-console.log('Help picture workflows: 4 unchanged captures, 18 linked feature families, HF/SI selector targets, honest recordedDC provenance/status, existing assets and destinations passed');
+console.log('Help picture workflows: 4 unchanged captures, 19 linked feature families, HF/SI selector targets, honest recordedDC provenance/status, existing assets and destinations passed');

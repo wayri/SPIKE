@@ -10,11 +10,32 @@ globalThis.CustomEvent = class CustomEvent {
 };
 
 const bridge = await import("../src/workerBridge.ts");
+for (const method of ['review_engineering', 'quick_engineering_tool', 'run_em_machine', 'run_magnetic_machine', 'prepare_assembly_em', 'run_assembly_em', 'run_assembly_field_transient', 'run_assembly_electrothermal', 'evaluate_electrical_heat_source', 'prepare_pcb_electrothermal_geometry', 'solve_fan_system_operating_point']) {
+  assert.equal(bridge.isHeavyWorkerMethod(method), true, `${method} must receive heavy-worker supervision`);
+}
 const deferred = () => {
   let resolve;
   const promise = new Promise(done => { resolve = done; });
   return { promise, resolve };
 };
+
+// Native progress frames preserve operation correlation and malformed frames
+// never reach the active study listener.
+{
+  let nativeListener;
+  const received = [];
+  globalThis.__spikeWorkerListen = (event, listener) => {
+    assert.equal(event, "spike-worker-progress");
+    nativeListener = listener;
+    return () => undefined;
+  };
+  const unlisten = await bridge.subscribeWorkerProgress(progress => received.push(progress));
+  nativeListener({ payload: { operationId: "transient-1", method: "run_assembly_field_transient", frame: { step: 2 } } });
+  nativeListener({ payload: { operationId: "", method: "run_assembly_field_transient", frame: { step: 3 } } });
+  nativeListener({ payload: { operationId: "transient-1", method: "run_assembly_field_transient", frame: [] } });
+  assert.deepEqual(received, [{ operationId: "transient-1", method: "run_assembly_field_transient", frame: { step: 2 } }]);
+  unlisten();
+}
 
 // Cancellation wins over a late successful result and duplicate dispatch is rejected.
 {
@@ -71,3 +92,19 @@ const deferred = () => {
 }
 
 console.log("Worker bridge cancellation races are bounded and stale results are suppressed");
+
+// Initial package reads own a cancellable slot, including native project dispatch.
+{
+  const run = deferred();
+  globalThis.__spikeWorkerInvoke = command => {
+    if (command === "run_project_worker") return run.promise;
+    if (command === "cancel_worker") return true;
+    throw new Error(command);
+  };
+  const pending = bridge.runNativeProjectWorker({id:"package-open",method:"read_project_package",params:{path:"example.spike"}});
+  const duplicate = await bridge.runNativeProjectWorker({id:"package-duplicate",method:"read_project_package"});
+  assert.equal(duplicate.type,"WorkerBusyError");
+  assert.equal(await bridge.cancelLocalWorker("package-open"),true);
+  run.resolve({ok:true});
+  assert.equal((await pending).type,"WorkerCancelledError");
+}

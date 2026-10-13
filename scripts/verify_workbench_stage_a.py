@@ -30,10 +30,11 @@ def main():
     frame.Show()
     frame.autosave_timer.Stop()
 
-    def capture(name):
+    def capture(name, window=None):
         # Capture the actual client window after paint, not a generated mockup.
-        frame.Update();size=frame.GetClientSize();bitmap=wx.Bitmap(size.width,size.height)
-        target=wx.MemoryDC(bitmap);target.Blit(0,0,size.width,size.height,wx.ClientDC(frame),0,0)
+        window=window or frame
+        window.Update();size=window.GetClientSize();bitmap=wx.Bitmap(size.width,size.height)
+        target=wx.MemoryDC(bitmap);target.Blit(0,0,size.width,size.height,wx.ClientDC(window),0,0)
         target.SelectObject(wx.NullBitmap);bitmap.SaveFile(str(out/name),wx.BITMAP_TYPE_PNG)
 
     def finish(error=None):
@@ -84,6 +85,26 @@ def main():
                 assert frame.commands.reason('edit.rotate')
                 assert frame.commands.search('continuous')[0]['id']=='run.interactive'
                 checks['workspace presets and shared command availability']=True
+                from spikes_studio.designer_workspace import NetNavigator
+                before_revision=frame.doc.data['revision']
+                navigator=NetNavigator(frame)
+                navigator.Show();navigator.search.SetValue('out');navigator.filter()
+                assert navigator.active['normalized_name']=='out'
+                assert navigator.pins.GetItemCount()==2
+                navigator.pins.Select(0);navigator.locate()
+                assert len(frame.canvas.selected)==1
+                assert frame.canvas.highlighted_net=='out'
+                assert frame.doc.data['revision']==before_revision,'Viewing connectivity mutated the document'
+                navigator.add_probe()
+                assert frame.doc.data['probes'][-1]['expression']=='V(out)'
+                frame.doc.undo();frame.refresh_document()
+                assert frame.doc.data['revision']==before_revision,'Probe insertion did not undo atomically'
+                frame.canvas.Update();capture('net-cross-probe.png')
+                navigator.SetSize((640,420));navigator.Layout();navigator.Update()
+                capture('net-navigator.png',navigator)
+                navigator.close(type('CloseEvent',(),{'Skip':lambda self:None})());navigator.Destroy()
+                assert frame.canvas.highlighted_net is None
+                checks['real net search, terminal cross-probing and read-only highlight']=True
                 frame.run();state='native run'
             elif state=='native run' and not frame.job_running:
                 assert frame.math is not None,'C++ run did not produce acquired data'

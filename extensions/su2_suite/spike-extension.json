@@ -1,0 +1,37 @@
+{
+  "contract": "spike/extension/v1",
+  "api_version": 1,
+  "id": "spike.su2-suite",
+  "name": "SU2 CFD and CHT",
+  "version": "0.1.0",
+  "provider": "SPIKE",
+  "description": "Native SU2 airflow and fluid-solid heat-transfer reference cases. Separately installed engine; experimental, bounded geometry.",
+  "execution": "process", "runtime": "python", "entrypoint": "extension.py",
+  "state": "experimental", "license": "Apache-2.0", "bundled": true,
+  "permissions": ["results.write"],
+  "limits": {"timeout_seconds": 1900, "max_result_bytes": 33554432},
+  "ui": {"menu_bar": true, "title_bar": true, "menu_items": ["su2-cfd", "su2-cht"]},
+  "contributes": {"applications": [
+    {"id": "su2-probe", "name": "Check SU2 runtime", "category": "Thermal", "output_contract": "spike/extension-result/v1"},
+    {"id": "su2-cfd-preview", "name": "Review SU2 CFD case", "category": "Thermal", "output_contract": "spike/extension-result/v1"},
+    {"id": "su2-cht-preview", "name": "Review SU2 CHT case", "category": "Thermal", "output_contract": "spike/extension-result/v1"},
+    {"id": "su2-cfd", "name": "SU2 laminar CFD", "category": "Thermal", "output_contract": "spike/extension-result/v1",
+      "description": "Solve a square laminar cavity; this reference does not use the loaded PCB.",
+      "workspace_routes": [{"id": "su2-cfd", "workspace": "thermal", "operation": "solve", "label": "CFD: laminar cavity", "model_status": "experimental", "requires_board": false, "preview_contribution_id": "su2-cfd-preview"}],
+      "input_schema": {"type": "object", "additionalProperties": false, "properties": {
+        "cells": {"type": "integer", "title": "Cells per side (even)", "minimum": 8, "maximum": 128},
+        "reynolds": {"type": "number", "title": "Reynolds number", "minimum": 1, "maximum": 400},
+        "iterations": {"type": "integer", "title": "Maximum iterations", "minimum": 10, "maximum": 100000},
+        "timeout_s": {"type": "integer", "title": "Timeout (s)", "minimum": 1, "maximum": 1800}
+      }}},
+    {"id": "su2-cht", "name": "SU2 conjugate heat transfer", "category": "Thermal", "output_contract": "spike/extension-result/v1",
+      "description": "Solve a fluid cavity coupled to hot and cold solid slabs; this reference does not use the loaded PCB.",
+      "workspace_routes": [{"id": "su2-cht", "workspace": "thermal", "operation": "solve", "label": "CHT: coupled fluid and solid", "model_status": "experimental", "requires_board": false, "preview_contribution_id": "su2-cht-preview"}],
+      "input_schema": {"type": "object", "additionalProperties": false, "properties": {
+        "cells": {"type": "integer", "title": "Cells per fluid side (multiple of 4)", "minimum": 8, "maximum": 64},
+        "lid_speed": {"type": "number", "title": "Moving lid speed (m/s)", "minimum": 0, "maximum": 1},
+        "outer_iterations": {"type": "integer", "title": "Maximum coupling iterations", "minimum": 10, "maximum": 20000},
+        "timeout_s": {"type": "integer", "title": "Timeout (s)", "minimum": 1, "maximum": 1800}
+      }}}
+  ]}
+}

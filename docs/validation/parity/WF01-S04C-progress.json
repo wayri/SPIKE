@@ -1,0 +1,43 @@
+{
+  "contract": "spike/parity-stage-progress/v1",
+  "stage_id": "WF01-S04C",
+  "status": "in_progress",
+  "native_version": "10.0.6",
+  "native_composition_attempts": [
+    {
+      "tool": "Standalone public pcbnew EXPORTER_VRML",
+      "result": "assert process failed in Pgm(); timeout; no output",
+      "timeout_s": 30
+    },
+    {
+      "tool": "kicad-cli pcb export vrml in sandbox",
+      "result": "registry access denied; timeout; no output",
+      "timeout_s": 30
+    },
+    {
+      "tool": "kicad-cli pcb export vrml outside sandbox",
+      "result": "timeout; no output",
+      "timeout_s": 30,
+      "observation": {
+        "command": [
+          "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe",
+          "pcb",
+          "export",
+          "vrml",
+          "--output",
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-model-placement-review\\cli-probe.wrl",
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-model-placement-review\\probe.kicad_pcb"
+        ],
+        "timeout_s": 30,
+        "stdout": "",
+        "stderr": ""
+      }
+    }
+  ],
+  "remaining_acceptance": [
+    "Healthy initialized native composed-placement reference for front/back, rotation order and nonuniform scale.",
+    "Body/material assignments with applicable thermal/electrical evidence."
+  ],
+  "limitation": "Public model APIs prove declared vectors only. Causes of native export timeouts are not established. Source projection remains forbidden.",
+  "bounded_increment": "WF01-S04C1: explicit source-bound neutral STEP handoff; does not apply source KiCad model vectors."
+}

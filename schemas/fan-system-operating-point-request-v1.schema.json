@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/fan-system-operating-point-request-v1.schema.json",
+  "title": "SPIKE reduced fan/system and parallel passage request",
+  "description": "SPDX-License-Identifier: Apache-2.0; Copyright (c) 2026 SigHarmonic. Supplied pressure-flow curve and explicit quadratic passage resistance only; not CFD or board convection. Runtime checks finite values, source/curve digest binding, coverage, numerical ranges and total heat-load budget.",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "fan", "system", "air", "air_limits"],
+  "properties": {
+    "contract": {"const": "spike/fan-system-operating-point-request/v1"},
+    "fan": {"type": "object", "additionalProperties": false,
+      "required": ["model_id", "configuration", "installed_count", "active_count", "curve", "curve_sha256", "source"],
+      "properties": {
+        "model_id": {"$ref": "#/$defs/id"}, "configuration": {"enum": ["series", "parallel"]},
+        "installed_count": {"type": "integer", "minimum": 1, "maximum": 1024},
+        "active_count": {"type": "integer", "minimum": 0, "maximum": 1024},
+        "curve_sha256": {"$ref": "#/$defs/digest"}, "source": {"$ref": "#/$defs/source"},
+        "curve": {"type": "array", "minItems": 2, "maxItems": 4096, "items": {
+          "type": "object", "additionalProperties": false, "required": ["flow_m3_s", "pressure_pa"],
+          "properties": {"flow_m3_s": {"type": "number", "minimum": 0, "maximum": 1000000}, "pressure_pa": {"type": "number", "minimum": 0, "maximum": 1000000000000}}
+        }}
+      }
+    },
+    "system": {"type": "object", "additionalProperties": false,
+      "required": ["common_resistance_pa_s2_m6", "source", "passages"],
+      "properties": {
+        "common_resistance_pa_s2_m6": {"type": "number", "minimum": 0, "maximum": 1e24}, "source": {"$ref": "#/$defs/source"},
+        "passages": {"type": "array", "minItems": 1, "maxItems": 128, "items": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "resistance_pa_s2_m6", "min_flow_m3_s", "source", "heat_loads"],
+          "properties": {
+            "id": {"$ref": "#/$defs/id"}, "resistance_pa_s2_m6": {"type": "number", "minimum": 1e-12, "maximum": 1e24},
+            "min_flow_m3_s": {"type": "number", "minimum": 0, "maximum": 1e9}, "source": {"$ref": "#/$defs/source"},
+            "heat_loads": {"type": "array", "maxItems": 1024, "items": {
+              "type": "object", "additionalProperties": false, "required": ["occurrence_id", "site_id", "heat_w", "source"],
+              "properties": {"occurrence_id": {"$ref": "#/$defs/id"}, "site_id": {"$ref": "#/$defs/id"}, "heat_w": {"type": "number", "minimum": 0, "maximum": 1e12}, "source": {"$ref": "#/$defs/source"}}
+            }}
+          }
+        }}
+      }
+    },
+    "air": {"type": "object", "additionalProperties": false,
+      "required": ["density_kg_m3", "specific_heat_j_kg_k", "inlet_temperature_k"],
+      "properties": {"density_kg_m3": {"type": "number", "minimum": 1e-9, "maximum": 1e6}, "specific_heat_j_kg_k": {"type": "number", "minimum": 1e-6, "maximum": 1e9}, "inlet_temperature_k": {"type": "number", "minimum": 1e-6, "maximum": 1e6}}},
+    "air_limits": {"type": "object", "additionalProperties": false, "required": ["min_total_flow_m3_s", "max_outlet_temperature_k"],
+      "properties": {"min_total_flow_m3_s": {"type": "number", "minimum": 0, "maximum": 1e9}, "max_outlet_temperature_k": {"type": "number", "minimum": 1e-6, "maximum": 1e6}}}
+  },
+  "$defs": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"},
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source": {"type": "object", "additionalProperties": false, "required": ["reference", "sha256", "review_status"],
+      "properties": {"reference": {"$ref": "#/$defs/id"}, "sha256": {"$ref": "#/$defs/digest"}, "review_status": {"enum": ["reviewed", "assumed"]}}}
+  }
+}

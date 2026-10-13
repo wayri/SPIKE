@@ -108,6 +108,7 @@ class ReleaseAutomationTests(unittest.TestCase):
     def test_version_drift_is_rejected(self):
         paths = {
             'app/package.json': json.dumps({'version': '0.3.0'}),
+            'app/src/appVersion.ts': 'export const APP_VERSION = "0.3.0";\n',
             'app/package-lock.json': json.dumps({'version': '0.3.0', 'packages': {'': {'version': '0.3.0'}}}),
             'app/src-tauri/tauri.conf.json': json.dumps({'version': '0.3.1'}),
             'app/src-tauri/Cargo.toml': '[package]\nversion = "0.3.0"\n',
@@ -118,6 +119,10 @@ class ReleaseAutomationTests(unittest.TestCase):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
         with self.assertRaisesRegex(ValueError, 'Tauri version'):
+            release.version(self.root)
+        (self.root / 'app/src-tauri/tauri.conf.json').write_text(json.dumps({'version': '0.3.0'}))
+        (self.root / 'app/src/appVersion.ts').write_text('export const APP_VERSION = "0.2.9";\n')
+        with self.assertRaisesRegex(ValueError, 'UI version'):
             release.version(self.root)
 
 

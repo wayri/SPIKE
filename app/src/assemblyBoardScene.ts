@@ -1,3 +1,4 @@
+import { explicitComponentHeightMm } from "./componentPlaceholder";
 // SPDX-License-Identifier: Apache-2.0
 import * as THREE from "three";
 import type { ParsedBoard, ParsedPad, Point } from "./boardParser";
@@ -141,6 +142,15 @@ export function mountKiCadScenes(result: BoardInstanceSceneResult, board: Virtua
 
 function procedural(board: VirtualBoardVisual, source: ParsedBoard, selected: boolean, linked: Set<string>, omitCopper: boolean) {
   const group = new THREE.Group(), pickables: THREE.Object3D[] = [], center = board.localCenterMm;
+  // Display edits act on kind/layer/net buckets. Share only within that scope
+  // and this occurrence so independent layers, nets and boards stay isolated.
+  const materials = new Map<string, THREE.MeshStandardMaterial>();
+  const copperMaterial = (kind: string, layer: string, net: string | undefined, highlighted: boolean) => {
+    const key = JSON.stringify([kind, layer, net, highlighted]);
+    let material = materials.get(key);
+    if (!material) { material = copper(highlighted); materials.set(key, material); }
+    return material;
+  };
   // The occurrence transform is expressed in the native board frame. Keep
   // imported solids at their exact source Z and place centered fallback shapes
   // around the same laminate midplane, including when no CAD solid resolves.
@@ -150,11 +160,27 @@ function procedural(board: VirtualBoardVisual, source: ParsedBoard, selected: bo
   const substrate = new THREE.Mesh(new THREE.ExtrudeGeometry(outline(source, center), { depth: thickness, bevelEnabled: false, curveSegments: 8 }), new THREE.MeshStandardMaterial({ color: selected ? 0x6c913a : 0x315f45, roughness: .82 }));
   substrate.position.z = -thickness / 2; tag(substrate, board, "substrate", "board-substrate", "Edge.Cuts"); group.add(substrate); pickables.push(substrate);
   if (!omitCopper) {
-    for (const zone of source.zones) { if (zone.points.length < 3) continue; const s = shape(zone.points, center); for (const hole of zone.holes ?? []) if (hole.length >= 3) s.holes.push(shape(hole, center)); const net = netId(board, source, zone.net); const mesh = new THREE.Mesh(new THREE.ShapeGeometry(s, 4), copper(Boolean(net && linked.has(net)))); mesh.position.z = layerZ(zone.layer, ordered, thickness); tag(mesh, board, "copper-zone", zone.id, zone.layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
+    for (const zone of source.zones) { if (zone.points.length < 3) continue; const s = shape(zone.points, center); for (const hole of zone.holes ?? []) if (hole.length >= 3) s.holes.push(shape(hole, center)); const net = netId(board, source, zone.net); const mesh = new THREE.Mesh(new THREE.ShapeGeometry(s, 4), copperMaterial("copper-zone", zone.layer, net, Boolean(net && linked.has(net)))); mesh.position.z = layerZ(zone.layer, ordered, thickness); tag(mesh, board, "copper-zone", zone.id, zone.layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
     // Render all retained tracks at imported width; assembly detail has no density truncation.
-    for (const track of source.tracks) { const sx = track.start[0] - center[0], sy = track.start[1] - center[1], ex = track.end[0] - center[0], ey = track.end[1] - center[1], net = netId(board, source, track.net); const mesh = new THREE.Mesh(new THREE.ShapeGeometry(capsule(Math.hypot(ex - sx, ey - sy), track.width), 8), copper(Boolean(net && linked.has(net)))); mesh.position.set((sx + ex) / 2, (sy + ey) / 2, layerZ(track.layer, ordered, thickness)); mesh.rotation.z = Math.atan2(ey - sy, ex - sx); tag(mesh, board, "copper-track", track.id, track.layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
-    for (const pad of source.pads) for (const layer of ordered.filter(x => pad.layers.includes(x) || pad.layers.includes("*.Cu") || pad.layers.includes("F&B.Cu") && (x === "F.Cu" || x === "B.Cu"))) { const net = netId(board, source, pad.net), mesh = new THREE.Mesh(new THREE.ShapeGeometry(padShape(pad), 8), copper(Boolean(net && linked.has(net)))); mesh.position.set(pad.at[0] - center[0], pad.at[1] - center[1], layerZ(layer, ordered, thickness)); mesh.rotation.z = -pad.rotation * Math.PI / 180; tag(mesh, board, "copper-pad", `${pad.id}:${layer}`, layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
-    for (const via of source.vias) { const outer = Math.max(via.size / 2, .001), inner = Math.min(Math.max(via.drill / 2, 0), outer), net = netId(board, source, via.net); const ring = new THREE.Mesh(new THREE.RingGeometry(inner, outer, 24), copper(Boolean(net && linked.has(net)))); ring.position.set(via.at[0] - center[0], via.at[1] - center[1], thickness / 2 + GAP); tag(ring, board, "via-face", via.id, "through", net); ring.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(ring); pickables.push(ring); if (inner > 0) { const barrel = new THREE.Mesh(new THREE.CylinderGeometry(inner, inner, thickness + .035, 20, 1, true), copper(false)); barrel.rotation.x = Math.PI / 2; barrel.position.set(ring.position.x, ring.position.y, 0); tag(barrel, board, "via-barrel", `${via.id}:barrel`, "through", net); barrel.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(barrel); } }
+    for (const track of source.tracks) { const sx = track.start[0] - center[0], sy = track.start[1] - center[1], ex = track.end[0] - center[0], ey = track.end[1] - center[1], net = netId(board, source, track.net); const mesh = new THREE.Mesh(new THREE.ShapeGeometry(capsule(Math.hypot(ex - sx, ey - sy), track.width), 8), copperMaterial("copper-track", track.layer, net, Boolean(net && linked.has(net)))); mesh.position.set((sx + ex) / 2, (sy + ey) / 2, layerZ(track.layer, ordered, thickness)); mesh.rotation.z = Math.atan2(ey - sy, ex - sx); tag(mesh, board, "copper-track", track.id, track.layer, net); mesh.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(mesh); pickables.push(mesh); }
+    for (const pad of source.pads) {
+      const padLayers = ordered.filter(x => pad.layers.includes(x) || pad.layers.includes("*.Cu")
+        || pad.layers.includes("F&B.Cu") && (x === "F.Cu" || x === "B.Cu"));
+      if (!padLayers.length) continue;
+      // A pad's local shape is identical on all copper layers. Keep a separate
+      // mesh/identity/transform per layer, but tessellate its geometry once.
+      const geometry = new THREE.ShapeGeometry(padShape(pad), 8);
+      const net = netId(board, source, pad.net), highlighted = Boolean(net && linked.has(net));
+      for (const layer of padLayers) {
+        const mesh = new THREE.Mesh(geometry, copperMaterial("copper-pad", layer, net, highlighted));
+        mesh.position.set(pad.at[0] - center[0], pad.at[1] - center[1], layerZ(layer, ordered, thickness));
+        mesh.rotation.z = -pad.rotation * Math.PI / 180;
+        tag(mesh, board, "copper-pad", `${pad.id}:${layer}`, layer, net);
+        mesh.userData.linkedAssemblyNet = highlighted;
+        group.add(mesh); pickables.push(mesh);
+      }
+    }
+    for (const via of source.vias) { const outer = Math.max(via.size / 2, .001), inner = Math.min(Math.max(via.drill / 2, 0), outer), net = netId(board, source, via.net); const ring = new THREE.Mesh(new THREE.RingGeometry(inner, outer, 24), copperMaterial("via-face", "through", net, Boolean(net && linked.has(net)))); ring.position.set(via.at[0] - center[0], via.at[1] - center[1], thickness / 2 + GAP); tag(ring, board, "via-face", via.id, "through", net); ring.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(ring); pickables.push(ring); if (inner > 0) { const barrel = new THREE.Mesh(new THREE.CylinderGeometry(inner, inner, thickness + .035, 20, 1, true), copperMaterial("via-barrel", "through", net, false)); barrel.rotation.x = Math.PI / 2; barrel.position.set(ring.position.x, ring.position.y, 0); tag(barrel, board, "via-barrel", `${via.id}:barrel`, "through", net); barrel.userData.linkedAssemblyNet = Boolean(net && linked.has(net)); group.add(barrel); } }
   }
   const lines = new Map<string, number[]>();
   for (const drawing of source.drawings.filter(x => x.layer !== "Edge.Cuts")) { const z = drawing.layer.startsWith("B.") ? -thickness / 2 - GAP : thickness / 2 + GAP; if (drawing.filled && drawing.points.length >= 3) { const mesh = new THREE.Mesh(new THREE.ShapeGeometry(shape(drawing.points, center), 4), new THREE.MeshBasicMaterial({ color: drawing.layer.endsWith("SilkS") ? 0xf2eee1 : 0x7896a0, side: THREE.DoubleSide })); mesh.position.z = z; tag(mesh, board, "drawing", drawing.id, drawing.layer); group.add(mesh); continue; } const values = lines.get(drawing.layer) ?? []; for (let i = 0; i + 1 < drawing.points.length; i++) values.push(drawing.points[i][0] - center[0], drawing.points[i][1] - center[1], z, drawing.points[i + 1][0] - center[0], drawing.points[i + 1][1] - center[1], z); lines.set(drawing.layer, values); }
@@ -178,7 +204,7 @@ export function boardInstanceScene(board: VirtualBoardVisual, selected: boolean,
     if (kind === "smd" && options.showSmd === false || kind === "tht" && options.showTht === false) continue;
     const bounds = component.bodyBounds ?? component.courtyardBounds;
     const width = Math.max(bounds ? bounds.maxX - bounds.minX : component.width, .4);
-    const height = Math.max(bounds ? bounds.maxY - bounds.minY : component.height, .4), bodyHeight = kind === "tht" ? 3.2 : 1.25;
+    const height = Math.max(bounds ? bounds.maxY - bounds.minY : component.height, .4), bodyHeight = explicitComponentHeightMm(component) ?? (kind === "tht" ? 3.2 : 1.25);
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, bodyHeight), new THREE.MeshStandardMaterial({ color: 0x343940, roughness: .58 }));
     const bottom = component.layer.startsWith("B.");
     mesh.position.set(component.at[0] - board.localCenterMm[0], component.at[1] - board.localCenterMm[1],
@@ -187,6 +213,8 @@ export function boardInstanceScene(board: VirtualBoardVisual, selected: boolean,
     mesh.rotation.z = -component.rotation * Math.PI / 180;
     mesh.userData.componentMount = kind; mesh.userData.componentRef = component.ref;
     mesh.userData.geometryStatus = "fallback-not-cad";
+    mesh.userData.placeholderHeightMm = bodyHeight;
+    mesh.userData.placeholderHeightSource = explicitComponentHeightMm(component) === null ? "default" : "metadata";
     tag(mesh, board, "component-placeholder", component.id, component.layer); group.add(mesh); pickables.push(mesh);
   }
   pickables.push(...generated.pickables);

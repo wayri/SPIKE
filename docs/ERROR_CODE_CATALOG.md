@@ -7,6 +7,22 @@ in the envelope message and safe context.
 
 ## Use the catalog
 
+Source capacity recovery is documented in [source current limits](SOURCE_CURRENT_LIMITS.md).
+
+The experimental PI engineering operations also return kernel-local symbolic
+diagnostics (`PI_RETURN_*`, converter/capacitor admission codes and transport
+`PI_ENGINEERING_FIELDS`). These are not issued `spike/error/v1` catalog codes.
+Their recovery and applicability are documented in [PI engineering tools](PI_ENGINEERING_TOOLS.md).
+
+| Code | Meaning | Recovery |
+|---|---|---|
+| `SPIKE-BE-PI-E-0120` | PI engineering transport request invalid | Supply the documented request/design fields without extra parameters. |
+| `SPIKE-BE-PI-E-0121` | Converter or capacitor model admission failed | Follow the kernel diagnostic; correct explicit inputs or reduce resource bounds. |
+| `SPIKE-BE-PI-E-0110` | Invalid source current limit | Enter finite positive amperes or leave the optional limit unset. |
+| `SPIKE-BE-PI-E-0111` | Source capacity unsupported | Use the DC resistive-network solver or explicitly remove the limit. |
+| `SPIKE-BE-PI-E-0112` | Source capacity exceeded | Reduce sink demand or increase the reviewed source capacity. |
+| `SPIKE-BE-PI-E-0113` | Source current allocation unsupported | Use distinct resistive source contacts; reverse flow requires an absorption model. |
+
 1. Search this page for the complete code, including its four-digit sequence.
 2. Read the issued title and recovery action from the matching row.
 3. Use the domain index below for the longer symptom-first task sequence.
@@ -58,7 +74,7 @@ entries remain the stable public interface and source line numbers may change.
 | `SPIKE-BE-VIEW-*` | [`python/spike_core/assembly_visuals.py`](../python/spike_core/assembly_visuals.py) and [`python/spike_core/models.py`](../python/spike_core/models.py) |
 | `SPIKE-BE-PI-*` | [`python/spike_core/dc_solver.py`](../python/spike_core/dc_solver.py) and [`python/spike_core/hybrid_dc_solver.py`](../python/spike_core/hybrid_dc_solver.py) |
 | `SPIKE-BE-MESH-*` | [`python/spike_core/preflight.py`](../python/spike_core/preflight.py) and [`python/spike_core/hybrid_mesh.py`](../python/spike_core/hybrid_mesh.py) |
-| `SPIKE-BE-SOLVER-*` | The selected solver module under [`python/spike_core`](../python/spike_core) plus the process boundary in [`python/spike_worker.py`](../python/spike_worker.py) |
+| `SPIKE-BE-SOLVER-*` | The selected solver module under [`python/spike_core`](../python/spike_core) plus the process boundary in [`service.py`](../python/spike_core/service.py) |
 | `SPIKE-BE-SPICE-*` | SPICE request, model, and coupling modules under [`python/spike_core`](../python/spike_core) |
 | `SPIKE-BE-EXT-*` | External-engine adapters under [`python/spike_core`](../python/spike_core) and native launch policy in [`app/src-tauri/src/lib.rs`](../app/src-tauri/src/lib.rs) |
 

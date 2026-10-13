@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 import ctypes
-from math import atan2, ceil, cos, hypot, pi, radians, sin, sqrt
+from math import atan2, ceil, cos, hypot, isfinite, pi, radians, sin, sqrt
 import os
 import platform
 from typing import Any, Callable, Dict, Iterable, List, Tuple
@@ -13,6 +13,9 @@ from .contracts import AnalysisSpec, SpiDeR, ValidationIssue
 from .dc_result_utils import stratified_sample_records
 from .layers import copper_stack_profile
 from .local_mesh_controls import LocalTrackControls
+from .planar_polygon_topology import first_non_simple_edge_pair
+from .filled_copper_path import FilledCopperPath, FilledPathBudgetError, FilledPathError, prepare_filled_path
+from .source_filled_boundary import SourceFilledBoundary
 
 
 COPPER_CONDUCTIVITY_S_M = 5.8e7
@@ -149,7 +152,36 @@ def _copper_stack(design: SpiDeR) -> Tuple[List[str], Dict[str, float], Dict[str
     return copper_stack_profile(design, DEFAULT_COPPER_THICKNESS_MM)
 
 
+def _edge_may_be_within_tolerance(
+    point: Point2D,
+    start: Point2D,
+    end: Point2D,
+    tolerance: float,
+) -> bool:
+    """Conservatively admit an edge to the established distance calculation."""
+
+    x_delta = end[0] - start[0]
+    x_offset = point[0] - start[0]
+    if isfinite(x_delta) and isfinite(x_offset):
+        if x_delta >= 0.0:
+            if (-x_offset if x_offset < 0.0 else x_offset - x_delta if x_offset > x_delta else 0.0) > tolerance:
+                return False
+        elif (x_offset if x_offset > 0.0 else x_delta - x_offset if x_offset < x_delta else 0.0) > tolerance:
+            return False
+    y_delta = end[1] - start[1]
+    y_offset = point[1] - start[1]
+    if isfinite(y_delta) and isfinite(y_offset):
+        if y_delta >= 0.0:
+            if (-y_offset if y_offset < 0.0 else y_offset - y_delta if y_offset > y_delta else 0.0) > tolerance:
+                return False
+        elif (y_offset if y_offset > 0.0 else y_delta - y_offset if y_offset < y_delta else 0.0) > tolerance:
+            return False
+    return True
+
+
 def _point_in_polygon(point: Point2D, polygon: List[Point2D], tolerance: float = 0.0) -> bool:
+    if isinstance(polygon, (FilledCopperPath, SourceFilledBoundary)):
+        return polygon.contains(point, tolerance)
     inside = False
     x, y = point
     previous = polygon[-1]
@@ -163,13 +195,21 @@ def _point_in_polygon(point: Point2D, polygon: List[Point2D], tolerance: float =
         previous = current
     if inside:
         return True
+
     return bool(
         tolerance
-        and any(_distance_to_segment(point, a, b) <= tolerance for a, b in _segments(polygon))
+        and any(
+            _edge_may_be_within_tolerance(point, a, b, tolerance)
+            and _distance_to_segment(point, a, b) <= tolerance
+            for a, b in _segments(polygon)
+        )
     )
 
 
 def _segments(polygon: List[Point2D]) -> Iterable[Tuple[Point2D, Point2D]]:
+    if isinstance(polygon, (FilledCopperPath, SourceFilledBoundary)):
+        yield from polygon.edges
+        return
     for index, point in enumerate(polygon):
         yield point, polygon[(index + 1) % len(polygon)]
 
@@ -359,6 +399,17 @@ def _normalize_filled_zone_polygon(polygon: List[Point2D]) -> List[Point2D]:
     being bridged or filled by a simplifier.
     """
 
+    # A source fill may encode genuine holes with exactly retraced bridges.
+    # Preserve the original path and remove bridges only from physical edges;
+    # never try to repair those holes into one simple polygon.
+    try:
+        domain = prepare_filled_path(polygon)
+    except FilledPathBudgetError:
+        raise
+    except FilledPathError:
+        return polygon
+    if domain is not None:
+        return domain
     baseline = _clean_polygon(polygon, tolerance=1e-9)
     if _polygon_is_simple(baseline, ZONE_BOUNDARY_VALIDATION_TOLERANCE_MM):
         return baseline
@@ -1077,23 +1128,9 @@ def _polygon_is_simple(polygon: List[Point2D], tolerance: float = 1e-9) -> bool:
 
     if len(polygon) < 3 or _polygon_area(polygon) <= tolerance * tolerance:
         return False
-    edges = list(_segments(polygon))
-    edge_count = len(edges)
-    for left_index, (left_start, left_end) in enumerate(edges):
-        for right_index in range(left_index + 1, edge_count):
-            if right_index in {left_index - 1, left_index, left_index + 1}:
-                continue
-            if left_index == 0 and right_index == edge_count - 1:
-                continue
-            if _segment_intersection_points(
-                left_start,
-                left_end,
-                edges[right_index][0],
-                edges[right_index][1],
-                tolerance,
-            ):
-                return False
-    return True
+    # Proximity is not an intersection. The area gate retains its mm^2
+    # threshold; segment incidence uses exact represented coordinates.
+    return first_non_simple_edge_pair(polygon) is None
 
 
 def _pad_polygon_overlap_points(
@@ -1689,16 +1726,24 @@ class _Builder:
             # Preserve the filled-zone perimeter supplied by the importer.
             # The mesher may simplify only numerical duplicates, never a
             # shallow clearance or curved boundary feature.
-            polygon = _normalize_filled_zone_polygon(
-                [_point(value) for value in zone.get("points", [])]
-            )
+            try:
+                polygon = _normalize_filled_zone_polygon(
+                    [_point(value) for value in zone.get("points", [])]
+                )
+            except FilledPathBudgetError as error:
+                self.mesh.issues.append(ValidationIssue(
+                    "FILLED_COPPER_PATH_BUDGET", "error", f"{source_id}: {error}",
+                    path=f"design.zones[{source_id}]", status="failed",
+                ))
+                self.mesh.branches.clear()
+                return
             if (
                 len(polygon) < 3
                 or _polygon_area(polygon) <= 1e-12
-                or not _polygon_is_simple(
+                or not (isinstance(polygon, FilledCopperPath) or _polygon_is_simple(
                     polygon,
                     ZONE_BOUNDARY_VALIDATION_TOLERANCE_MM,
-                )
+                ))
             ):
                 self.mesh.issues.append(ValidationIssue(
                     "SPIKE-BE-MESH-W-0002",
@@ -1716,7 +1761,7 @@ class _Builder:
             columns = max(1, int(ceil((max_x - min_x) / cell)))
             rows = max(1, int(ceil((max_y - min_y) / cell)))
             existing = list(self.nodes_by_layer_net.get((layer, net), []))
-            triangles = _triangulate_polygon(polygon)
+            triangles = [] if isinstance(polygon, FilledCopperPath) else _triangulate_polygon(polygon)
             triangle_bounds = [
                 (
                     min(x for x, _ in triangle),
@@ -1728,37 +1773,61 @@ class _Builder:
             ]
             containment_cache = _PolygonContainmentCache(
                 polygon,
-                self.containment_tolerance,
+                min(self.containment_tolerance, 1e-10)
+                if isinstance(polygon, FilledCopperPath) else self.containment_tolerance,
             )
             grid: Dict[Tuple[int, int], List[int]] = {}
             fragment_polygons: Dict[Tuple[int, int], List[List[Point2D]]] = {}
+            retained_fragments = 0
+            filled_path_input_area = 0.0
+            filled_path_retained_area = 0.0
             z = self.layer_z.get(layer, 0.0)
             for row in range(rows):
                 for column in range(columns):
                     x0, y0 = min_x + column * cell, min_y + row * cell
                     x1, y1 = min(x0 + cell, max_x), min(y0 + cell, max_y)
-                    fragments = _clip_polygon_to_rect_fragments(
-                        polygon,
-                        triangles,
-                        x0,
-                        y0,
-                        x1,
-                        y1,
-                        self.containment_tolerance,
-                        containment_cache,
-                        triangle_bounds,
-                    )
+                    try:
+                        if isinstance(polygon, FilledCopperPath):
+                            fragments = polygon.cell_fragments(x0, y0, x1, y1)
+                        else:
+                            fragments = _clip_polygon_to_rect_fragments(
+                                polygon, triangles, x0, y0, x1, y1,
+                                self.containment_tolerance, containment_cache, triangle_bounds,
+                            )
+                    except FilledPathError as error:
+                        self.mesh.issues.append(ValidationIssue(
+                            "FILLED_COPPER_PATH_MESH_FAILED", "error", f"{source_id}: {error}",
+                            path=f"design.zones[{source_id}]", status="failed",
+                        ))
+                        self.mesh.branches.clear()
+                        return
+                    if isinstance(polygon, FilledCopperPath):
+                        retained_fragments += len(fragments)
+                        filled_path_input_area += sum(_polygon_area(fragment) for fragment in fragments)
+                        if retained_fragments > min(self.max_zone_cells, self.max_branches):
+                            self.mesh.issues.append(ValidationIssue(
+                                "FILLED_COPPER_PATH_BUDGET", "error",
+                                f"{source_id} exceeds the admitted retained-fragment budget.",
+                                path=f"design.zones[{source_id}]", status="failed",
+                            ))
+                            self.mesh.branches.clear()
+                            return
                     if self.owned_shared_faces:
                         from .hybrid_owned_copper import subtract
                         fragments = subtract(self, fragments, layer, net)
                     for fragment_index, clipped in enumerate(fragments):
                         if _polygon_area(clipped) <= max(1e-12, cell * cell * 1e-10):
                             continue
-                        center = self.cell_center(clipped)
+                        if isinstance(polygon, FilledCopperPath):
+                            from .hybrid_owned_copper import centroid
+                            center = centroid(clipped)
+                        else:
+                            center = self.cell_center(clipped)
                         if center is None:
                             continue
                         key = (column, row)
-                        grid.setdefault(key, []).append(self.zone_node(center, layer, net))
+                        owning_node = self.zone_node(center, layer, net)
+                        grid.setdefault(key, []).append(owning_node)
                         fragment_polygons.setdefault(key, []).append(clipped)
                         self.add_cell(
                             f"{source_id}:cell:{column}:{row}:fragment:{fragment_index}",
@@ -1767,7 +1836,34 @@ class _Builder:
                             layer,
                             net,
                             [(x, y, z) for x, y in clipped],
+                            metadata={"node_id": owning_node} if isinstance(polygon, FilledCopperPath) else None,
                         )
+                        if isinstance(polygon, FilledCopperPath):
+                            filled_path_retained_area += _polygon_area(clipped)
+            if isinstance(polygon, FilledCopperPath):
+                source_area = _polygon_area(polygon)
+                tolerance_area = max(1e-8, source_area * 1e-9)
+                input_error = abs(filled_path_input_area-source_area)
+                retained_error = abs(filled_path_retained_area-source_area)
+                self.mesh.branch_admission.setdefault("filled_source_domains", []).append({
+                    "source_id": source_id, "hole_count": len(polygon.holes),
+                    "source_area_mm2": source_area, "input_cell_area_mm2": filled_path_input_area,
+                    "retained_cell_area_mm2": filled_path_retained_area,
+                    "input_area_error_mm2": input_error,
+                    "retained_area_error_mm2": retained_error,
+                    "area_tolerance_mm2": tolerance_area,
+                    "retained_fragments": retained_fragments,
+                    "physical_boundary_edges": len(polygon.edges),
+                    "retraced_bridges_are_conductors": False,
+                })
+                if input_error > tolerance_area or (not self.owned_shared_faces and retained_error > tolerance_area):
+                    self.mesh.issues.append(ValidationIssue(
+                        "FILLED_COPPER_PATH_AREA_FAILED", "error",
+                        f"{source_id} cell partition did not conserve its retained source copper area.",
+                        path=f"design.zones[{source_id}]", status="failed",
+                    ))
+                    self.mesh.branches.clear()
+                    return
             if not grid:
                 if self.owned_shared_faces:
                     from .hybrid_owned_copper import fail
@@ -1794,7 +1890,7 @@ class _Builder:
                         face_width = _shared_polygon_face_length(
                             current_polygons[left_index],
                             current_polygons[right_index],
-                            self.containment_tolerance,
+                            containment_cache.tolerance,
                         )
                         if face_width <= 1e-7:
                             continue
@@ -1804,11 +1900,12 @@ class _Builder:
                             (left_point.x_mm, left_point.y_mm),
                             (right_point.x_mm, right_point.y_mm),
                         ):
-                            if self.owned_shared_faces:
+                            if self.owned_shared_faces or isinstance(polygon, FilledCopperPath):
                                 from .hybrid_owned_copper import bent_zone_link
                                 bent_zone_link(self,f"{source_id}:fragment-link:{column}:{row}:{left_index}:{right_index}",
                                     left_node,current_nodes[right_index],face_width,thickness,layer,net,source_id,
-                                    current_polygons[left_index],current_polygons[right_index])
+                                    current_polygons[left_index],current_polygons[right_index],
+                                    face_tolerance=containment_cache.tolerance)
                             continue
                         self.add_branch(
                             f"{source_id}:fragment-link:{column}:{row}:{left_index}:{right_index}",
@@ -1829,7 +1926,7 @@ class _Builder:
                             face_width = _shared_polygon_face_length(
                                 current_polygons[current_index],
                                 neighbor_polygons[neighbor_index],
-                                self.containment_tolerance,
+                                containment_cache.tolerance,
                             )
                             if face_width <= 1e-7:
                                 continue
@@ -1839,11 +1936,12 @@ class _Builder:
                                 (current_point.x_mm, current_point.y_mm),
                                 (neighbor_point.x_mm, neighbor_point.y_mm),
                             ):
-                                if self.owned_shared_faces:
+                                if self.owned_shared_faces or isinstance(polygon, FilledCopperPath):
                                     from .hybrid_owned_copper import bent_zone_link
                                     bent_zone_link(self,f"{source_id}:link:{column}:{row}:{current_index}:{neighbor_key[0]}:{neighbor_key[1]}:{neighbor_index}",
                                         current,neighbor,face_width,thickness,layer,net,source_id,
-                                        current_polygons[current_index],neighbor_polygons[neighbor_index])
+                                        current_polygons[current_index],neighbor_polygons[neighbor_index],
+                                        face_tolerance=containment_cache.tolerance)
                                 continue
                             self.add_branch(
                                 f"{source_id}:link:{column}:{row}:{current_index}:{neighbor_key[0]}:{neighbor_key[1]}:{neighbor_index}",
@@ -2486,6 +2584,10 @@ class _Builder:
         self.tracks()
         self.vias()
         self.zones()
+        if any(issue.code in {"FILLED_COPPER_PATH_BUDGET", "FILLED_COPPER_PATH_MESH_FAILED",
+                              "FILLED_COPPER_PATH_AREA_FAILED"}
+               and issue.severity == "error" for issue in self.mesh.issues):
+            return self.mesh
         self.pads()
         if self.mesh.truncated:
             memory_limited = bool(self.branch_admission.get("limited_by_memory"))
@@ -2511,6 +2613,8 @@ class _Builder:
 
 def build_hybrid_mesh(design: SpiDeR, spec: AnalysisSpec) -> HybridMesh:
     """Build one connected conductor topology for preview and solver adapters."""
+    from .arc_legacy_projection import require_legacy_arc_geometry
+    require_legacy_arc_geometry(design)
 
     return _Builder(design, spec).build()
 

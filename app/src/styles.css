@@ -808,9 +808,11 @@ button.net-name { width: 100%; border: 0; background: transparent; padding: 0; t
 .dock-table b { color: #cbd9dd; }
 .dock-table button { border: 0; color: #79909a; background: transparent; }
 .dock-table button:hover { color: #ed776b; }
-.power-tree-dock { height: 120px; display: flex; align-items: center; gap: 14px; padding: 0 22px; color: #8399a2; font-size: 11px; }
-.power-tree-dock b { color: #f0bb60; }
-.power-tree-dock .secondary-btn { width: auto; margin: 0 0 0 auto; }
+.power-tree-dock { height: 120px; display: flex; flex-wrap: wrap; align-items: center; align-content: flex-start; gap: 8px; padding: 10px 13px; color: var(--spike-text-secondary, #8399a2); font-size: 12px; }
+.power-tree-summary { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.power-tree-summary b { max-width: min(320px, 100%); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #f0bb60; }
+.power-tree-summary > span, .power-tree-summary > svg { flex-shrink: 0; }
+.power-tree-dock .secondary-btn { flex: 0 0 auto; width: auto; margin: 0; }
 .thermal-setup-shade { background: transparent; pointer-events: none; }
 .thermal-wizard { top: 118px; right: 8px; bottom: 38px; left: auto; transform: none; width: min(920px, calc(72vw - 12px)); max-height: none; overflow: auto; padding-bottom: 15px; pointer-events: auto; }
 .thermal-wizard .floating-heading > div { display: grid; gap: 3px; }
@@ -2183,6 +2185,24 @@ button.net-name { width: 100%; border: 0; background: transparent; padding: 0; t
   font-size: 12px;
 }
 
+.si-eye-mask-input { margin: 12px 0; border: 1px solid #38515c; padding: 10px; background: #10212a; }
+.si-eye-mask-input legend { padding: 0 5px; color: #d5e3e7; font-size: 11px; font-weight: 700; }
+.si-eye-mask-input > label { display: grid; gap: 5px; color: #b3c5cc; font-size: 11px; }
+.si-eye-mask-input select { box-sizing: border-box; width: 100%; min-height: 32px; border: 1px solid #38515c; padding: 0 8px; color: #d0dfe4; background: #08171e; font: inherit; }
+.si-eye-mask-input textarea { box-sizing: border-box; width: 100%; min-height: 112px; resize: vertical; border: 1px solid #38515c; padding: 8px; color: #d0dfe4; background: #08171e; font: 11px/1.45 ui-monospace, monospace; }
+.si-eye-mask-input textarea:disabled { opacity: .5; cursor: not-allowed; }
+.si-eye-mask-input textarea:focus, .si-eye-voltage-mapping input:focus { outline: 2px solid #d39d43; outline-offset: 1px; }
+.si-eye-mask-input > small, .si-eye-voltage-mapping small { display: block; margin-top: 6px; color: #8fa6af; font-size: 10px; line-height: 1.4; }
+.si-eye-voltage-mapping { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 9px; }
+.si-eye-voltage-mapping label { display: grid; gap: 4px; color: #b3c5cc; font-size: 10px; }
+.si-eye-voltage-mapping input { min-width: 0; height: 30px; border: 1px solid #38515c; padding: 0 7px; color: #d0dfe4; background: #08171e; font: inherit; }
+.si-eye-voltage-mapping small { grid-column: 1 / -1; margin: 0; }
+.si-eye-mask-ready, .si-eye-mask-invalid { display: block; margin-top: 7px; font-size: 10px; }
+.si-eye-mask-ready { color: #64d49c; }
+.si-eye-mask-invalid { color: #ff9b8d; }
+.si-eye-mask-scope { display: grid; gap: 3px; margin: 8px 0; border-left: 3px solid #d39d43; padding: 8px 10px; color: #b9cbd1; background: #262318; font-size: 10px; line-height: 1.4; }
+.si-eye-mask-scope b { color: #efc477; font-size: 11px; }
+
 @media (max-width: 820px) {
   .sparam-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3005,6 +3025,12 @@ button.net-name { width: 100%; border: 0; background: transparent; padding: 0; t
 .mcad-section-controls label:first-of-type { display: flex; align-items: center; min-height: 31px; }
 .mcad-section-controls select, .mcad-section-controls input[type="number"] { height: 31px; border: 1px solid #344d58; padding: 0 7px; color: #d0dce0; background: #0d1920; }
 .mcad-section-controls .secondary-btn { width: auto; min-height: 31px; margin: 0; padding: 0 10px; }
+.mcad-section-plane-editor { width: 100%; display: grid; gap: 8px; }
+.mcad-section-plane-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #9aafb6; font-size: 9px; }
+.mcad-section-plane { min-width: 0; display: grid; grid-template-columns: auto repeat(4, minmax(82px, 1fr)) auto auto; align-items: end; gap: 8px; margin: 0; border: 1px solid #30454f; padding: 8px; background: #0b171d; }
+.mcad-section-plane legend { padding: 0 4px; color: #b5c5ca; font-size: 8px; letter-spacing: .45px; text-transform: uppercase; }
+.mcad-section-plane .mcad-section-plane-toggle { display: flex; align-items: center; min-height: 31px; gap: 5px; white-space: nowrap; }
+.mcad-section-plane input[type="number"] { width: 100%; min-width: 0; }
 .mcad-attachment-panel > footer { min-height: 46px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #2d424b; padding: 8px 13px; background: #14242c; }
 .mcad-attachment-panel > footer span { min-width: 0; flex: 1; display: flex; align-items: center; gap: 5px; color: #78919a; font-size: 8px; }
 .mcad-attachment-panel > footer .secondary-btn, .mcad-attachment-panel > footer .run-btn { width: auto; min-height: 30px; margin: 0; padding: 0 11px; }
@@ -3015,6 +3041,7 @@ button.net-name { width: 100%; border: 0; background: transparent; padding: 0; t
   .mcad-fields { grid-template-columns: 1fr; }
   .mcad-transform-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mcad-gizmo-controls { grid-template-columns: 1fr 1fr; }
+  .mcad-section-plane { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mcad-attachment-panel > footer span { display: none; }
 }
 
@@ -3138,6 +3165,11 @@ button.net-name { width: 100%; border: 0; background: transparent; padding: 0; t
 .si-channel-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 5px; }
 .si-channel-legend span { font-size: 11px; }
 .si-channel-empty { margin: 9px 10px; padding: 12px; color: #b0c3ca; background: #101e25; font-size: 11px; }
+.si-eye-mask-result { display: grid; gap: 3px; margin: 10px; border-left: 3px solid #fb7185; padding: 9px 11px; color: #e7c5ca; background: #291c22; }
+.si-eye-mask-result.pass { border-left-color: #4ade80; color: #bde5cb; background: #16251f; }
+.si-eye-mask-result.blocked { border-left-color: #d39d43; color: #e3c58d; background: #29251b; }
+.si-eye-mask-result b { font-size: 12px; }
+.si-eye-mask-result small { color: #9eb2ba; }
 .si-channel-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1px; margin: 10px; background: #2d444e; }
 .si-channel-metrics > div { display: grid; gap: 4px; padding: 9px; background: #101e25; }
 .si-channel-metrics span { color: #a8bec6; font-size: 11px; text-transform: uppercase; }
@@ -3200,3 +3232,18 @@ button.net-name { width: 100%; border: 0; background: transparent; padding: 0; t
 .tetra-mesh-panel select[multiple] { min-width: 220px; min-height: 100px; }
 .tetra-mesh-panel dl { display: grid; grid-template-columns: minmax(140px, 1fr) 2fr; gap: 6px 12px; }
 .tetra-mesh-panel dd { margin: 0; overflow-wrap: anywhere; }
+
+.assistant-chat-host { position: fixed; inset: 0 0 0 auto; width: min(680px, 100vw); z-index: 2200; box-shadow: -8px 0 30px #0006; }
+
+.thermal-info-heading { display: flex; align-items: flex-start; gap: 8px; }
+.thermal-info-heading strong { flex: 1; min-width: 0; }
+.thermal-info-heading button { flex: none; }
+.thermal-info-restore { position: absolute; z-index: 12; right: 10px; bottom: 78px; }
+
+.workspace > .side-panel.left:not(.collapsed) { grid-template-rows: 39px auto minmax(0, 1fr); }
+
+/* Brief, pointer-transparent fallback notice; navigation remains usable. */
+.viewport-navigation-status { position: absolute; top: 8px; left: 8px; max-width: min(460px, calc(100% - 16px)); padding: 6px 9px; z-index: 5; pointer-events: none; background: var(--spike-table-field); color: var(--spike-table-text); border: 1px solid var(--spike-table-border-strong); font: var(--spike-control-font); }
+
+/* Single-board layer controls retain their established compact width. */
+.floating-panel.layer-manager:not(.embedded) { width: min(390px, calc(100vw - 16px)); min-width: min(390px, calc(100vw - 16px)); max-width: min(390px, calc(100vw - 16px)); resize: vertical; }

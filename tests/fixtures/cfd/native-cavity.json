@@ -1,0 +1,9 @@
+{
+  "n": 16,
+  "reynolds": 100,
+  "max_steps": 100000,
+  "steady_tolerance": 1e-7,
+  "length_m": 1,
+  "lid_velocity_m_s": 1,
+  "density_kg_m3": 1
+}

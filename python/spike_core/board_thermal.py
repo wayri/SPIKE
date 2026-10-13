@@ -25,12 +25,42 @@ MAX_CELLS = 8192
 MAX_COMPONENTS = 256
 
 
+def _contact_pad_numbers(value: Any, ref: str) -> list[str]:
+    """Admit explicit imported pad numbers without normalizing their identity."""
+    if not isinstance(value, list) or not 1 <= len(value) <= 256:
+        raise ValueError(f"{ref} contact_pad_numbers must be a nonempty list of at most 256 strings.")
+    if any(not isinstance(number, str) or not 1 <= len(number) <= 128
+           or number.strip() != number or not number.strip() for number in value):
+        raise ValueError(f"{ref} contact_pad_numbers needs nonblank exact strings of at most 128 characters.")
+    if len(value) != len(set(value)):
+        raise ValueError(f"{ref} contact_pad_numbers must be unique.")
+    return list(value)
+
+
+def _require_selected_contacts(contacts: list[dict[str, Any]], selected: list[str] | None, ref: str) -> None:
+    if selected is not None:
+        missing = set(selected) - {contact["pad_name"] for contact in contacts}
+        if missing:
+            raise ValueError(f"{ref} selected thermal pads have no admitted physical copper land: {sorted(missing)}.")
+
+
 def _pad_contacts(design: SpiDeR, ref: str, bounds: tuple[float, float, float, float],
-                  shape: tuple[int, int], spacing: tuple[float, float]) -> list[dict[str, Any]]:
+                  shape: tuple[int, int], spacing: tuple[float, float], *,
+                  x_edges_mm: np.ndarray | None = None,
+                  y_edges_mm: np.ndarray | None = None,
+                  contact_pad_numbers: list[str] | None = None,
+                  require_all_selected: bool = True,
+                  max_contact_weights: int | None = None) -> list[dict[str, Any]]:
     """Rasterize imported copper lands; omit unplated holes and copper voids."""
     xmin, ymin, xmax, ymax = bounds
     nx, ny = shape
     dx, dy = spacing
+    x_edges = np.asarray(x_edges_mm) if x_edges_mm is not None else xmin + np.arange(nx + 1) * dx
+    y_edges = np.asarray(y_edges_mm) if y_edges_mm is not None else ymin + np.arange(ny + 1) * dy
+    selected = _contact_pad_numbers(contact_pad_numbers, ref) if contact_pad_numbers is not None else None
+    if max_contact_weights is not None and (type(max_contact_weights) is not int or max_contact_weights < 0):
+        raise ValueError("Contact weight budget must be a nonnegative integer.")
+    remaining_weights = max_contact_weights
     contacts: list[dict[str, Any]] = []
     for pad in design.pads:
         if not isinstance(pad, Mapping) or str(pad.get("component") or pad.get("ref") or "") != ref:
@@ -39,6 +69,12 @@ def _pad_contacts(design: SpiDeR, ref: str, bounds: tuple[float, float, float, f
         layers = pad.get("layers") or [pad.get("layer", "")]
         if kind == "np_thru_hole" or not isinstance(layers, (list, tuple)) or not any(str(layer).endswith(".Cu") for layer in layers):
             continue
+        if selected is not None:
+            number = pad.get("name")
+            if not isinstance(number, str) or not number.strip():
+                raise ValueError(f"{ref} physical copper pad is missing its exact imported pad number.")
+            if number not in selected:
+                continue
         polygon = _pad_boundary_polygon(dict(pad), curve_segments=64)
         if len(polygon) < 3 or _polygon_area(polygon) <= 0:
             raise ValueError(f"{ref} has a copper pad with unsupported or empty geometry.")
@@ -62,22 +98,28 @@ def _pad_contacts(design: SpiDeR, ref: str, bounds: tuple[float, float, float, f
         py0, py1 = min(p[1] for p in polygon), max(p[1] for p in polygon)
         if px0 < xmin - 1e-7 or px1 > xmax + 1e-7 or py0 < ymin - 1e-7 or py1 > ymax + 1e-7:
             raise ValueError(f"{ref} copper pad extends outside board bounds.")
-        ix0, ix1 = max(0, int((px0 - xmin) / dx)), min(nx - 1, int((px1 - xmin) / dx))
-        iy0, iy1 = max(0, int((py0 - ymin) / dy)), min(ny - 1, int((py1 - ymin) / dy))
+        ix0, ix1 = max(0, int(np.searchsorted(x_edges, px0, side="right")) - 1), min(nx - 1, int(np.searchsorted(x_edges, px1)) - 1)
+        iy0, iy1 = max(0, int(np.searchsorted(y_edges, py0, side="right")) - 1), min(ny - 1, int(np.searchsorted(y_edges, py1)) - 1)
         overlaps: list[tuple[int, float]] = []
         for iy in range(iy0, iy1 + 1):
             for ix in range(ix0, ix1 + 1):
-                rect = (xmin + ix * dx, ymin + iy * dy, xmin + (ix + 1) * dx, ymin + (iy + 1) * dy)
+                rect = (x_edges[ix], y_edges[iy], x_edges[ix + 1], y_edges[iy + 1])
                 area = _polygon_area(_clip_polygon_to_rect(polygon, *rect))
                 if hole:
                     area -= _polygon_area(_clip_polygon_to_rect(hole, *rect))
                 if area > 1e-12:
+                    if remaining_weights is not None:
+                        if remaining_weights == 0:
+                            raise ValueError("Direct board contact overlap-weight budget exceeded; coarsen contacts or reduce physical lands.")
+                        remaining_weights -= 1
                     overlaps.append((iy * nx + ix, area))
         area = sum(value for _, value in overlaps)
         if area <= 1e-12:
             continue
         contacts.append({"pad_name": str(pad.get("name", "")), "position_mm": list(center),
                          "area_mm2": area, "_weights": [(index, value / area) for index, value in overlaps]})
+    if require_all_selected:
+        _require_selected_contacts(contacts, selected, ref)
     return contacts
 
 
@@ -103,14 +145,20 @@ def _point(component: Mapping[str, Any], ref: str) -> tuple[float, float]:
 def _solve(design: SpiDeR, request: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(request, Mapping):
         raise ValueError("Board thermal request must be an object.")
+    if "study_scope" in request and (not isinstance(request["study_scope"], str) or not 1 <= len(request["study_scope"]) <= 2048):
+        raise ValueError("study_scope must be a nonempty description of at most 2048 characters.")
     raw_board = request.get("board")
     raw_parts = request.get("components")
-    if not isinstance(raw_board, Mapping) or not isinstance(raw_parts, list) or not 1 <= len(raw_parts) <= MAX_COMPONENTS:
+    if not isinstance(raw_board, Mapping) or not isinstance(raw_parts, list) or len(raw_parts) > MAX_COMPONENTS:
         raise ValueError("Provide board properties and 1..256 powered component rows.")
     model = raw_board.get("model", "plate")
     if model == "layered":
         from .layered_board_thermal import solve_layered_board_thermal
         return solve_layered_board_thermal(design, request)
+    if "board_heat_sources" in request:
+        raise ValueError("Direct board heat sources require the layered model.")
+    if not raw_parts:
+        raise ValueError("Provide 1..256 powered component rows for the plate model.")
     if request.get("virtual_heatsinks"):
         raise ValueError("Virtual board heatsinks require the layered model and a physical stackup.")
     if request.get("transient") is not None:
@@ -187,8 +235,12 @@ def _solve(design: SpiDeR, request: Mapping[str, Any]) -> dict[str, Any]:
         ix = min(nx - 1, int((x - xmin) / dx_mm))
         iy = min(ny - 1, int((y - ymin) / dy_mm))
         mode = raw.get("contact_mode", "square")
+        selected = _contact_pad_numbers(raw["contact_pad_numbers"], ref) if "contact_pad_numbers" in raw else None
+        if selected is not None and mode != "pads":
+            raise ValueError(f"{ref} contact_pad_numbers requires contact_mode pads.")
         if mode == "pads":
-            contacts = _pad_contacts(design, ref, (xmin, ymin, xmax, ymax), (nx, ny), (dx_mm, dy_mm))
+            contacts = _pad_contacts(design, ref, (xmin, ymin, xmax, ymax), (nx, ny), (dx_mm, dy_mm),
+                                     contact_pad_numbers=selected)
             if not contacts:
                 raise ValueError(f"{ref} has no admitted copper pad land; choose an explicit square fallback or fix the import.")
             total_area = sum(contact["area_mm2"] for contact in contacts)
@@ -211,6 +263,8 @@ def _solve(design: SpiDeR, request: Mapping[str, Any]) -> dict[str, Any]:
                              "r_junction_case_k_w": r_jc, "r_case_board_k_w": r_cb,
                              "_case_node": case_node, "_contacts": contacts,
                              "_conductances": conductances})
+            if selected is not None:
+                admitted[-1]["contact_pad_numbers"] = selected
         elif mode == "square":
             contact_size = _number(raw.get("contact_size_mm"), f"{ref} contact_size_mm", positive=True)
             half = contact_size / 2

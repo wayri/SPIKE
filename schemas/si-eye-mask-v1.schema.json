@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/si-eye-mask/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "name",
+    "protocol",
+    "revision",
+    "source",
+    "voltage_unit",
+    "polygons"
+  ],
+  "properties": {
+    "schema": {
+      "const": "spike/si-eye-mask/v1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "protocol": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "locator",
+        "clause"
+      ],
+      "properties": {
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "clause": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "voltage_unit": {
+      "enum": [
+        "V",
+        "normalized"
+      ]
+    },
+    "polygons": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 64,
+        "items": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}

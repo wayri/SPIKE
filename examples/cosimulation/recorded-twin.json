@@ -1,0 +1,85 @@
+{
+  "contract": "spike/digital-twin-request/v1",
+  "model_id": "synthetic-gain-loop",
+  "model_revision": "example-v1",
+  "model_status": "experimental",
+  "channels": [
+    {
+      "id": "voltage",
+      "unit": "V",
+      "tolerance": 0.25
+    }
+  ],
+  "prediction": {
+    "model_id": "synthetic-gain-loop",
+    "model_revision": "example-v1",
+    "channels": [
+      {
+        "id": "voltage",
+        "unit": "V"
+      }
+    ],
+    "samples": [
+      {
+        "time_s": 0,
+        "values": {
+          "voltage": 0
+        }
+      },
+      {
+        "time_s": 1,
+        "values": {
+          "voltage": 2
+        }
+      },
+      {
+        "time_s": 2,
+        "values": {
+          "voltage": 4
+        }
+      },
+      {
+        "time_s": 3,
+        "values": {
+          "voltage": 6
+        }
+      }
+    ]
+  },
+  "telemetry": {
+    "model_id": "synthetic-gain-loop",
+    "model_revision": "example-v1",
+    "channels": [
+      {
+        "id": "voltage",
+        "unit": "V"
+      }
+    ],
+    "samples": [
+      {
+        "time_s": 0,
+        "values": {
+          "voltage": 0
+        }
+      },
+      {
+        "time_s": 1,
+        "values": {
+          "voltage": 2.1
+        }
+      },
+      {
+        "time_s": 2,
+        "values": {
+          "voltage": 3.7
+        }
+      },
+      {
+        "time_s": 3,
+        "values": {
+          "voltage": 6
+        }
+      }
+    ]
+  }
+}

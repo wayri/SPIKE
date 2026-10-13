@@ -1,0 +1,24 @@
+{
+  "contract": "spike/harness/v1",
+  "id": "flight-control-harness",
+  "name": "Flight control harness",
+  "connectors": [
+    { "id": "J_PWR", "name": "Power module", "pins": [{ "id": "1", "net": "+12V" }, { "id": "2", "net": "RETURN" }, { "id": "3", "net": "CAN_H" }, { "id": "4", "net": "CAN_L" }] },
+    { "id": "J_CTRL", "name": "Controller", "pins": [{ "id": "A", "net": "+12V" }, { "id": "B", "net": "RETURN" }, { "id": "C", "net": "CAN_H" }, { "id": "D", "net": "CAN_L" }] },
+    { "id": "J_SENSOR_WITH_A_LONG_NAME", "name": "Remote environmental sensor", "pins": [{ "id": "VCC" }, { "id": "GND" }, { "id": "DATA" }] }
+  ],
+  "splices": [{ "id": "S_SENSOR_POWER", "part_number": "SPLICE-3" }],
+  "wires": [
+    { "id": "W_POWER", "from": { "connector": "J_PWR", "pin": "1" }, "to": { "connector": "J_CTRL", "pin": "A" }, "role": "power", "return_wire_id": "W_RETURN", "length_mm": 420, "electrical": { "resistance_ohm": 0.028 } },
+    { "id": "W_RETURN", "from": { "connector": "J_PWR", "pin": "2" }, "to": { "connector": "J_CTRL", "pin": "B" }, "role": "return", "length_mm": 420, "electrical": { "resistance_ohm": 0.028 } },
+    { "id": "W_CAN_P", "from": { "connector": "J_PWR", "pin": "3" }, "to": { "connector": "J_CTRL", "pin": "C" }, "role": "signal", "length_mm": 430 },
+    { "id": "W_CAN_N", "from": { "connector": "J_PWR", "pin": "4" }, "to": { "connector": "J_CTRL", "pin": "D" }, "role": "signal", "length_mm": 430 },
+    { "id": "W_SENSOR_FEED", "from": { "connector": "J_CTRL", "pin": "A" }, "to": { "splice": "S_SENSOR_POWER" }, "role": "power", "length_mm": 120 },
+    { "id": "W_SENSOR_POWER", "from": { "splice": "S_SENSOR_POWER" }, "to": { "connector": "J_SENSOR_WITH_A_LONG_NAME", "pin": "VCC" }, "role": "power", "length_mm": 140 },
+    { "id": "W_SENSOR_AUX", "from": { "splice": "S_SENSOR_POWER" }, "to": { "connector": "J_SENSOR_WITH_A_LONG_NAME", "pin": "DATA" }, "role": "other", "length_mm": 150 },
+    { "id": "W_SENSOR_RETURN", "from": { "connector": "J_CTRL", "pin": "B" }, "to": { "connector": "J_SENSOR_WITH_A_LONG_NAME", "pin": "GND" }, "role": "return", "length_mm": 260 }
+  ],
+  "pairs": [{ "id": "PAIR_CAN", "wire_ids": ["W_CAN_P", "W_CAN_N"], "kind": "differential", "twisted": true, "twist_pitch_mm": 18 }],
+  "cables": [{ "id": "C_MAIN", "wire_ids": ["W_POWER", "W_RETURN", "W_CAN_P", "W_CAN_N"] }],
+  "extensions": { "spike.harness-pi": { "terminals": [], "contacts": [] } }
+}

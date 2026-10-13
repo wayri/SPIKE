@@ -10,6 +10,10 @@
     "geometry":{"allOf":[{"$ref":"assembly-field-handoff-request-v1.schema.json"},{"properties":{"domain":{"const":"thermal"}}}]},
     "thermal_problem":{"$ref":"assembly-field-thermal-problem-v1.schema.json"},
     "loss_accounting":{"const":"explicit_nonoverlapping_losses"},
+    "thermal_engine":{"enum":["internal","calculix"],"default":"internal"},
+    "thermal_engine_options":{"type":"object","additionalProperties":false,"properties":{
+      "timeout_seconds":{"type":"number","minimum":1,"maximum":3300},
+      "threads":{"type":"integer","minimum":1,"maximum":32}}},
     "heat_sources":{"type":"array","maxItems":128,"items":{"$ref":"electrical-heat-source-v1.schema.json"}},
     "electrical":{"type":"object","additionalProperties":false,"required":["materials","terminals","contacts"],"properties":{
       "materials":{"type":"array","minItems":1,"maxItems":1024,"items":{"type":"object","additionalProperties":false,"required":["id","conductivity_s_m","temperature_coefficient_per_k","reference_temperature_k","temperature_range_k"],"properties":{

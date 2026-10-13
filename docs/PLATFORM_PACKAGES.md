@@ -1,20 +1,17 @@
 # Linux and macOS
 
-The newest Windows package is the [0.3.7 community preview](https://github.com/wayri/SPIKE/releases/tag/v0.3.7).
-This is a Windows-only release; the Linux and macOS instructions below use 0.3.5.
-
 The experimental platform packages include the desktop app, Python runtime,
 native kernels, and command-line interface. A separate Python installation is
 not needed.
 
 ## Linux: Flatpak
 
-Download the `.flatpak` file from the [0.3.5 release](https://github.com/wayri/SPIKE/releases/tag/v0.3.5).
+Download the `.flatpak` file from the [0.3.2 release](https://github.com/wayri/SPIKE-Main/releases/tag/v0.3.2).
 With Flatpak installed, run:
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install --user ./SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak
+flatpak install --user ./SPIKE_0.3.2_linux-x86_64_EXPERIMENTAL.flatpak
 flatpak run org.spike.integrity
 ```
 
@@ -25,9 +22,8 @@ for configured local model services and extensions.
 
 ## macOS: DMG
 
-The 0.3.5 release provides `macos-arm64` for Apple Silicon. Intel macOS is held
-pending completion of its platform checks; there is no Intel DMG in this release.
-Open the DMG and drag SPIKE into Applications. The package is tested on macOS 15;
+Choose `macos-arm64` for Apple Silicon or `macos-x86_64` for an Intel Mac.
+Open the DMG and drag SPIKE into Applications. The packages are tested on macOS 15;
 earlier versions have not been tested.
 
 These experimental builds are ad-hoc signed, without Apple notarization.

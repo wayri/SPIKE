@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/series-capacitor-leg/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "voltage_v",
+    "capacitors"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/series-capacitor-leg/v1"
+    },
+    "voltage_v": {
+      "type": "number",
+      "minimum": 0
+    },
+    "capacitors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "capacitance_f",
+          "tolerance_fraction",
+          "rated_voltage_v",
+          "leakage_resistance_ohm",
+          "balancing_resistance_ohm"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "capacitance_f": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "tolerance_fraction": {
+            "type": "number",
+            "minimum": 0,
+            "exclusiveMaximum": 1
+          },
+          "rated_voltage_v": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "leakage_resistance_ohm": {
+            "oneOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "balancing_resistance_ohm": {
+            "oneOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "minItems": 2,
+      "maxItems": 32
+    }
+  }
+}

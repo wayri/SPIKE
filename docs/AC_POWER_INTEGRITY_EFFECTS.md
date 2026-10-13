@@ -51,8 +51,10 @@ computed Joule resistance, avoiding double counting. It does not infer that
 ratio from spacing, PCB return paths or nearby currents. The slab is infinite
 in lateral extent; width scales total current and power but does not model
 edge crowding. It represents one conductor; return-conductor loss is not added
-automatically. Explicit line L remains unchanged: internal reactive energy is
-not added implicitly.
+automatically. Explicit line L remains unchanged by default. Opt-in internal
+reactance and RMS roughness controls are described in
+[High-frequency conductor loss](HIGH_FREQUENCY_LOSSES.md); enabling internal
+reactance requires external-only L and zero imposed field bias.
 
 Let half thickness be `a`, `k²=jωμσ`, and signed tangential surface fields be
 `Hleft`, `Hright`. Define `Havg=(Hright+Hleft)/2`,

@@ -1,8 +1,44 @@
 # SPDX-License-Identifier: MIT
 # Preserve exact bytes for hash-bound evidence across Git checkouts.
 examples/correlation/uniform_sheet/analytical.json -text
-# Mirrored FreeCAD contracts must compare byte-for-byte on Windows and Unix.
-python/spike_core/mcad_session_contract.py text eol=lf
-integrations/freecad/SPIKEWorkbench/spike_freecad/session_contract.py text eol=lf
-schemas/*.json text eol=lf
-integrations/freecad/SPIKEWorkbench/Resources/schemas/*.json text eol=lf
+benchmarks/parity-import/coupon.kicad_pcb -text
+benchmarks/parity-import/geometry.kicad_pcb -text
+# Development-stage receipts bind exact manifest and runner bytes.
+benchmarks/parity-import/*manifest.json text eol=lf
+scripts/benchmark_board_corpus.py text eol=lf
+scripts/board_corpus_assertions.py text eol=lf
+python/spike_core/kicad_importer.py text eol=lf
+python/core/board_parser.py text eol=lf
+python/spike_core/spider_v2.py text eol=lf
+python/spike_core/arc_legacy_projection.py text eol=lf
+python/spike_core/board_outline_geometry.py text eol=lf
+python/spike_core/mcad_export_design.py text eol=lf
+python/spike_core/assembly_thermal_meshing.py text eol=lf
+python/spike_core/pcb_volume_compiler.py text eol=lf
+python/spike_core/geometry_arrow.py text eol=lf
+python/spike_core/spikes_layout_geometry_handoff.py text eol=lf
+scripts/parity_geometry_gate.py text eol=lf
+docs/validation/parity/*-import.json text eol=lf
+python/core/kicad_model_sources.py text eol=lf
+benchmarks/parity-import/models.kicad_pcb -text
+scripts/parity_model_gate.py text eol=lf
+docs/validation/parity/*-native.json text eol=lf
+benchmarks/parity-import/odb-candidate/** text eol=lf
+benchmarks/parity-import/odb-candidate.zip -text
+scripts/pack_parity_odb_candidate.py text eol=lf
+python/spike_core/odb_importer.py text eol=lf
+python/spike_core/odb_features.py text eol=lf
+python/spike_core/odb_stackup.py text eol=lf
+python/spike_core/source_package.py text eol=lf
+python/spike_core/importers.py text eol=lf
+extensions/odb-import/extension.py text eol=lf
+scripts/capture_parity_native_geometry.py text eol=lf
+scripts/parity_native_geometry_gate.py text eol=lf
+app/src/boardParser.ts text eol=lf
+app/src/normalizedBoard.ts text eol=lf
+benchmarks/parity-import/geometry-native-odb-qualified.zip -text
+docs/validation/parity/*-geometry.json text eol=lf
+python/spike_core/mcad_component_models.py text eol=lf
+scripts/parity_component_model_gate.py text eol=lf
+benchmarks/parity-import/*.step -text
+docs/validation/parity/*-native-solids.json text eol=lf

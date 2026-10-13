@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::ffi::{OsStr, OsString};
 use std::fs;
@@ -10,15 +10,20 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 use sysinfo::{get_current_pid, Pid, ProcessRefreshKind, ProcessesToUpdate, System};
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
-mod desktop_lifecycle;
 mod extension_artifacts;
 mod gpu_metrics;
 mod mcp_bridge;
 mod package_trust;
 mod project_trust_binding;
+mod resident_worker_lifecycle;
+mod close_recovery;
+mod desktop_lifecycle;
+mod app_updates;
 mod webview_policy;
+#[cfg(not(feature = "custom-protocol"))]
+mod dev_server;
 
 #[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
@@ -46,6 +51,24 @@ const MAX_MCAD_FILE_BYTES: u64 = 2 * 1024 * 1024 * 1024;
 const MAX_WORKER_REQUEST_BYTES: usize = 256 * 1024 * 1024;
 const MAX_WORKER_STDOUT_BYTES: usize = 256 * 1024 * 1024;
 const MAX_WORKER_STDERR_BYTES: usize = 4 * 1024 * 1024;
+const MAX_WORKER_PROGRESS_LINE_BYTES: usize = 512 * 1024;
+const MAX_WORKER_PROGRESS_FRAMES: usize = 100_000;
+const WORKER_PROGRESS_PREFIX: &[u8] = b"SPIKE_PROGRESS:";
+
+#[derive(Clone, Debug, PartialEq, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct WorkerProgressEvent {
+    operation_id: String,
+    method: String,
+    frame: serde_json::Value,
+}
+
+#[derive(Deserialize)]
+struct WorkerProgressWire {
+    operation_id: String,
+    method: String,
+    frame: serde_json::Value,
+}
 
 const WORKBENCH_FILE_FILTERS: [(&str, &[&str]); 5] = [
     (
@@ -110,6 +133,7 @@ struct ActiveWorkerGuard {
 
 struct ResidentWorker {
     child: Child,
+    sessions: resident_worker_lifecycle::ResidentSessions,
     stdin: Option<ChildStdin>,
     responses: mpsc::Receiver<Result<Vec<u8>, String>>,
     stderr: mpsc::Receiver<(Vec<u8>, bool)>,
@@ -118,7 +142,7 @@ struct ResidentWorker {
 impl Drop for ResidentWorker {
     fn drop(&mut self) {
         terminate_worker_tree(&mut self.child);
-        let _ = desktop_lifecycle::wait_for_child(&mut self.child, Duration::from_millis(250));
+        let _ = desktop_lifecycle::wait_for_child(&mut self.child, Duration::from_millis(500));
     }
 }
 
@@ -206,6 +230,7 @@ fn is_heavy_worker_method(method: &str) -> bool {
     matches!(
         method,
         "benchmarks"
+            | "read_project_package"
             | "bind_multiboard_coupled_reduced_network"
             | "execute_thermal_field_job"
             | "import_into_assembly_project"
@@ -222,6 +247,8 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "prepare_3d_scene"
             | "prepare_thermal_case"
             | "prepare_visual_bundle"
+            | "import_kicad_schematic_view"
+            | "import_connectivity_view"
             | "read_project_model_artifacts"
             | "read_project_state_artifact"
             | "read_project_visual_bundle"
@@ -232,20 +259,60 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "run_analysis"
             | "run_converter_study"
             | "run_field_circuit_cosimulation"
+            | "run_cosimulation"
+            | "run_studio_board_cosimulation"
+            | "run_em_machine"
+            | "review_engineering"
+            | "quick_engineering_tool"
+            | "run_magnetic_machine"
+            | "run_native_cfd"
+            | "run_su2_cfd"
+            | "run_su2_cht"
+            | "compare_digital_twin"
             | "run_multiboard_si_independent_batch"
             | "run_openems_case"
             | "run_python_script"
             | "run_pi_path_native_mna"
             | "run_harness_pi"
+            | "run_harness_si"
+            | "prepare_harness_em"
+            | "run_harness_mtl"
+            | "evaluate_pdn_network"
+            | "extract_pdn_electrostatic"
+            | "run_pwm_electrothermal"
+            | "run_parallel_batch"
+            | "assistant_turn"
+            | "assistant_models"
+            | "extract_harness_round_wire_rlgc"
             | "run_multiboard_circuit"
             | "run_multiboard_thermal"
             | "run_multiboard_em"
             | "prepare_assembly_field_handoff"
             | "run_assembly_field_thermal"
+            | "prepare_assembly_em"
+            | "run_assembly_em"
+            | "assign_assembly_thermal_body_power"
+            | "run_assembly_field_transient"
+            | "run_assembly_electrothermal"
+            | "prepare_multiboard_volume_electrothermal"
+            | "describe_volume_electrothermal_bindings"
+            | "run_multiboard_volume_electrothermal"
+            | "verify_multiboard_volume_electrothermal_result"
+            | "prepare_assembly_thermal_contact_model"
+            | "discover_assembly_thermal_links"
+            | "autolink_assembly_thermal_contacts"
+            | "promote_thermal_components_in_project"
+            | "evaluate_electrical_heat_source"
+            | "prepare_pcb_electrothermal_geometry"
+            | "solve_fan_system_operating_point"
             | "derive_assembly_view_factors"
             | "import_assembly_field_study"
             | "export_assembly_field_study"
+            | "read_assembly_thermal_mesh_setup"
+            | "run_assembly_thermal_mesh_in_project"
             | "read_assembly_field_study_in_project"
+            | "read_volume_electrothermal_in_project"
+            | "save_volume_electrothermal_in_project"
             | "save_assembly_field_study_in_project"
             | "generate_tetrahedral_mesh"
             | "prepare_pcb_volume_mesh"
@@ -292,7 +359,10 @@ fn worker_timeout(request: &serde_json::Value) -> Duration {
         .into_iter()
         .filter_map(|path| nested_positive_seconds(request, path))
         .collect::<Vec<_>>();
-    let fallback = if is_heavy_worker_method(worker_method(request)) {
+    let fallback = if worker_method(request) == "read_project_package" {
+        // Package opens remain bounded even though they now support cancellation.
+        180
+    } else if is_heavy_worker_method(worker_method(request)) {
         1_800
     } else {
         180
@@ -331,6 +401,173 @@ fn read_capped_async<R: Read + Send + 'static>(
     let (sender, receiver) = mpsc::channel();
     thread::spawn(move || {
         let _ = sender.send(read_capped(reader, limit));
+    });
+    receiver
+}
+
+fn parse_worker_progress_line(
+    line: &[u8],
+    expected_operation_id: &str,
+    expected_method: &str,
+) -> Result<Option<WorkerProgressEvent>, String> {
+    let Some(payload) = line.strip_prefix(WORKER_PROGRESS_PREFIX) else {
+        return Ok(None);
+    };
+    if payload.len() > MAX_WORKER_PROGRESS_LINE_BYTES {
+        return Err("Worker progress frame exceeded the desktop safety limit".to_string());
+    }
+    let wire: WorkerProgressWire = serde_json::from_slice(payload)
+        .map_err(|error| format!("Invalid worker progress frame: {error}"))?;
+    if wire.operation_id.is_empty()
+        || wire.operation_id != expected_operation_id
+        || wire.method != expected_method
+    {
+        return Err("Worker progress frame did not match the active operation".to_string());
+    }
+    if !wire.frame.is_object() {
+        return Err("Worker progress frame payload must be an object".to_string());
+    }
+    Ok(Some(WorkerProgressEvent {
+        operation_id: wire.operation_id,
+        method: wire.method,
+        frame: wire.frame,
+    }))
+}
+
+fn append_capped_diagnostic(diagnostics: &mut Vec<u8>, value: &[u8], truncated: &mut bool) {
+    let remaining = MAX_WORKER_STDERR_BYTES.saturating_sub(diagnostics.len());
+    let accepted = remaining.min(value.len());
+    diagnostics.extend_from_slice(&value[..accepted]);
+    *truncated |= accepted < value.len();
+}
+
+fn read_worker_stderr<R, F>(
+    reader: R,
+    expected_operation_id: &str,
+    expected_method: &str,
+    cancellation: Option<Arc<AtomicBool>>,
+    mut emit_progress: F,
+) -> (Vec<u8>, bool)
+where
+    R: Read,
+    F: FnMut(&WorkerProgressEvent) -> Result<(), String>,
+{
+    let mut reader = BufReader::new(reader);
+    let mut diagnostics = Vec::with_capacity(MAX_WORKER_STDERR_BYTES.min(1024 * 1024));
+    let mut line = Vec::with_capacity(64 * 1024);
+    let mut line_overflow = false;
+    let mut diagnostics_truncated = false;
+    let mut emitted_frames = 0_usize;
+    let mut frame_cap_reported = false;
+
+    let mut finish_line = |line: &mut Vec<u8>, line_overflow: &mut bool| {
+        if *line_overflow {
+            append_capped_diagnostic(
+                &mut diagnostics,
+                b"Worker stderr line exceeded the desktop safety limit\n",
+                &mut diagnostics_truncated,
+            );
+            diagnostics_truncated = true;
+        } else {
+            if line.last() == Some(&b'\r') {
+                line.pop();
+            }
+            match parse_worker_progress_line(line, expected_operation_id, expected_method) {
+                Ok(Some(progress)) => {
+                    let cancelled = cancellation
+                        .as_ref()
+                        .is_some_and(|flag| flag.load(Ordering::SeqCst));
+                    if !cancelled && emitted_frames < MAX_WORKER_PROGRESS_FRAMES {
+                        if let Err(error) = emit_progress(&progress) {
+                            append_capped_diagnostic(
+                                &mut diagnostics,
+                                format!("Unable to emit worker progress: {error}\n").as_bytes(),
+                                &mut diagnostics_truncated,
+                            );
+                        }
+                        emitted_frames += 1;
+                    } else if !cancelled && !frame_cap_reported {
+                        append_capped_diagnostic(
+                            &mut diagnostics,
+                            b"Worker progress frame count exceeded the desktop safety limit\n",
+                            &mut diagnostics_truncated,
+                        );
+                        frame_cap_reported = true;
+                    }
+                }
+                Ok(None) => {
+                    append_capped_diagnostic(&mut diagnostics, line, &mut diagnostics_truncated);
+                    append_capped_diagnostic(&mut diagnostics, b"\n", &mut diagnostics_truncated);
+                }
+                Err(error) => {
+                    append_capped_diagnostic(
+                        &mut diagnostics,
+                        format!("{error}\n").as_bytes(),
+                        &mut diagnostics_truncated,
+                    );
+                }
+            }
+        }
+        line.clear();
+        *line_overflow = false;
+    };
+
+    loop {
+        let available = match reader.fill_buf() {
+            Ok(bytes) => bytes,
+            Err(error) => {
+                append_capped_diagnostic(
+                    &mut diagnostics,
+                    format!("Unable to read worker stderr: {error}\n").as_bytes(),
+                    &mut diagnostics_truncated,
+                );
+                break;
+            }
+        };
+        if available.is_empty() {
+            if !line.is_empty() || line_overflow {
+                finish_line(&mut line, &mut line_overflow);
+            }
+            break;
+        }
+        let newline = available.iter().position(|byte| *byte == b'\n');
+        let segment_len = newline.unwrap_or(available.len());
+        if !line_overflow {
+            let remaining = MAX_WORKER_STDERR_BYTES.saturating_sub(line.len());
+            let accepted = remaining.min(segment_len);
+            line.extend_from_slice(&available[..accepted]);
+            line_overflow = accepted < segment_len;
+        }
+        let consumed = segment_len + usize::from(newline.is_some());
+        reader.consume(consumed);
+        if newline.is_some() {
+            finish_line(&mut line, &mut line_overflow);
+        }
+    }
+    (diagnostics, diagnostics_truncated)
+}
+
+fn read_worker_stderr_async<R: Read + Send + 'static>(
+    reader: R,
+    app: tauri::AppHandle,
+    expected_operation_id: String,
+    expected_method: String,
+    cancellation: Option<Arc<AtomicBool>>,
+) -> mpsc::Receiver<(Vec<u8>, bool)> {
+    let (sender, receiver) = mpsc::channel();
+    thread::spawn(move || {
+        let result = read_worker_stderr(
+            reader,
+            &expected_operation_id,
+            &expected_method,
+            cancellation,
+            |progress| {
+                app_updates::progress(&app, &progress.method, &progress.frame);
+                app.emit("spike-worker-progress", progress)
+                    .map_err(|error| error.to_string())
+            },
+        );
+        let _ = sender.send(result);
     });
     receiver
 }
@@ -655,7 +892,12 @@ fn project_worker_paths(request: &serde_json::Value) -> Result<Vec<PathBuf>, Str
                 | "apply_assembly_geometric_constraint_in_project"
                 | "update_assembly_structure_in_project"
                 | "save_multiboard_study_in_project"
+                | "read_assembly_thermal_mesh_setup"
+                | "run_assembly_thermal_mesh_in_project"
+                | "promote_thermal_components_in_project"
                 | "read_assembly_field_study_in_project"
+                | "read_volume_electrothermal_in_project"
+                | "save_volume_electrothermal_in_project"
                 | "save_assembly_field_study_in_project"
                 | "prepare_assembly_design_visual_bundle"
         ) {
@@ -804,6 +1046,23 @@ fn read_approved_source_path(
         path: canonical.to_string_lossy().into_owned(),
         contents,
     })
+}
+
+#[tauri::command]
+fn select_schematic_file(kind: Option<String>, state: tauri::State<'_, ApprovedFileState>) -> Result<Option<SelectedFile>, String> {
+    let kind = kind.as_deref().unwrap_or("schematic");
+    let dialog = rfd::FileDialog::new().set_title("Import schematic or connectivity");
+    let dialog = match kind {
+        "schematic" => dialog.add_filter("KiCad schematic", &["kicad_sch"]),
+        "netlist" => dialog.add_filter("KiCad netlist", &["xml", "net"]),
+        "odb++" => dialog.add_filter("ODB++ archive", &["zip", "tgz", "tar", "gz"]),
+        _ => return Err("Unsupported schematic import format".into()),
+    };
+    let Some(path) = dialog.pick_file() else { return Ok(None); };
+    let metadata = fs::metadata(&path).map_err(|error| error.to_string())?;
+    if !metadata.is_file() || metadata.len() == 0 || metadata.len() > if kind == "odb++" { 256 * 1024 * 1024 } else { 32 * 1024 * 1024 } { return Err("Selected connectivity source is empty or exceeds its import size limit".into()); }
+    let approved = register_approved_path(&state, &path)?;
+    Ok(Some(SelectedFile { file_name: approved.file_name().and_then(OsStr::to_str).unwrap_or("schematic.kicad_sch").to_string(), path: approved.to_string_lossy().into_owned() }))
 }
 
 #[tauri::command]
@@ -1429,6 +1688,7 @@ fn spawn_resident_worker(workspace: &Path) -> Result<ResidentWorker, String> {
 
     Ok(ResidentWorker {
         child,
+        sessions: resident_worker_lifecycle::ResidentSessions::default(),
         stdin: Some(stdin),
         responses,
         stderr: stderr_receiver,
@@ -1455,10 +1715,9 @@ fn run_resident_worker_request(
     cancellation: Option<Arc<AtomicBool>>,
     lifecycle: &desktop_lifecycle::Lifecycle,
 ) -> Result<serde_json::Value, String> {
-    if lifecycle.is_closing()
-        || cancellation
-            .as_ref()
-            .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing() || cancellation
+        .as_ref()
+        .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         return Err("SPIKE worker operation was cancelled".to_string());
     }
@@ -1475,16 +1734,11 @@ fn run_resident_worker_request(
         .lock()
         .map_err(|_| "Resident SPIKE worker state is unavailable".to_string())?;
     if resident.is_none() {
-        // A queued request may acquire this mutex after close was committed.
-        if lifecycle.is_closing() {
-            return Err("SPIKE worker operation was cancelled".to_string());
-        }
         *resident = Some(spawn_resident_worker(workspace)?);
     }
-    if lifecycle.is_closing()
-        || cancellation
-            .as_ref()
-            .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing() || cancellation
+        .as_ref()
+        .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         *resident = None;
         return Err("SPIKE worker operation was cancelled".to_string());
@@ -1512,10 +1766,9 @@ fn run_resident_worker_request(
     let write_receiver = write_stdin_async(stdin, input);
     let mut write_pending = true;
     let line = loop {
-        if lifecycle.is_closing()
-            || cancellation
-                .as_ref()
-                .is_some_and(|flag| flag.load(Ordering::SeqCst))
+        if lifecycle.is_closing() || cancellation
+            .as_ref()
+            .is_some_and(|flag| flag.load(Ordering::SeqCst))
         {
             *resident = None;
             return Err("SPIKE worker operation was cancelled".to_string());
@@ -1594,14 +1847,14 @@ fn run_resident_worker_request(
         *resident = None;
         return Err("Resident SPIKE worker response ID does not match the request".to_string());
     }
+    if worker.sessions.observe(&request, &response) {
+        // Release the resident runtime only after its final admitted session closes.
+        *resident = None;
+    }
     Ok(response)
 }
 
 fn terminate_worker_tree(child: &mut Child) {
-    // Never target a PID after this child has already been observed/reaped.
-    if matches!(child.try_wait(), Ok(Some(_))) {
-        return;
-    }
     #[cfg(target_os = "windows")]
     {
         // Preserve descendant cleanup without allowing taskkill itself to make
@@ -1622,10 +1875,7 @@ fn terminate_worker_tree(child: &mut Child) {
                     }
                     _ => {
                         let _ = killer.kill();
-                        let _ = desktop_lifecycle::wait_for_child(
-                            &mut killer,
-                            Duration::from_millis(100),
-                        );
+                        let _ = killer.wait();
                         break;
                     }
                 }
@@ -1639,14 +1889,13 @@ fn run_worker_process(
     app: tauri::AppHandle,
     request: serde_json::Value,
     cancellation: Option<Arc<AtomicBool>>,
-    lifecycle: &desktop_lifecycle::Lifecycle,
 ) -> Result<serde_json::Value, String> {
+    let lifecycle = app.state::<desktop_lifecycle::Lifecycle>();
     // Stop pressed during capability checks / blocking-task scheduling must not
     // start a process that the user has already cancelled.
-    if lifecycle.is_closing()
-        || cancellation
-            .as_ref()
-            .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing() || cancellation
+        .as_ref()
+        .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         return Err("SPIKE worker operation was cancelled".to_string());
     }
@@ -1658,23 +1907,31 @@ fn run_worker_process(
     if input.len() > MAX_WORKER_REQUEST_BYTES {
         return Err("SPIKE worker request exceeds the 256 MiB safety limit".to_string());
     }
-    if lifecycle.is_closing() {
-        return Err("SPIKE worker operation was cancelled".to_string());
-    }
     let mut child = spawn_worker_process(&workspace)?;
-    if lifecycle.is_closing()
-        || cancellation
-            .as_ref()
-            .is_some_and(|flag| flag.load(Ordering::SeqCst))
+    if lifecycle.is_closing() || cancellation
+        .as_ref()
+        .is_some_and(|flag| flag.load(Ordering::SeqCst))
     {
         terminate_worker_tree(&mut child);
-        let _ = desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
+        let _ = child.wait();
         return Err("SPIKE worker operation was cancelled".to_string());
     }
     let stdout = child.stdout.take().ok_or("Worker stdout is unavailable")?;
     let stderr = child.stderr.take().ok_or("Worker stderr is unavailable")?;
     let stdout_reader = read_capped_async(stdout, MAX_WORKER_STDOUT_BYTES);
-    let stderr_reader = read_capped_async(stderr, MAX_WORKER_STDERR_BYTES);
+    let expected_operation_id = request
+        .get("id")
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or("")
+        .to_string();
+    let expected_method = worker_method(&request).to_string();
+    let stderr_reader = read_worker_stderr_async(
+        stderr,
+        app.clone(),
+        expected_operation_id,
+        expected_method,
+        cancellation.clone(),
+    );
     let stdin = child.stdin.take().ok_or("Worker stdin is unavailable")?;
     let write_receiver = write_stdin_async(stdin, input);
 
@@ -1687,14 +1944,12 @@ fn run_worker_process(
                 Ok((_stdin, Ok(()))) => write_pending = false,
                 Ok((_stdin, Err(error))) => {
                     terminate_worker_tree(&mut child);
-                    let _ =
-                        desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
+                    let _ = child.wait();
                     return Err(format!("Unable to write SPIKE worker request: {error}"));
                 }
                 Err(mpsc::TryRecvError::Disconnected) => {
                     terminate_worker_tree(&mut child);
-                    let _ =
-                        desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
+                    let _ = child.wait();
                     return Err("SPIKE worker stdin writer stopped unexpectedly".to_string());
                 }
                 Err(mpsc::TryRecvError::Empty) => {}
@@ -1702,20 +1957,17 @@ fn run_worker_process(
         }
         match child.try_wait().map_err(|error| error.to_string())? {
             Some(status) => break (status, false),
-            None if lifecycle.is_closing()
-                || cancellation
-                    .as_ref()
-                    .is_some_and(|flag| flag.load(Ordering::SeqCst)) =>
+            None if lifecycle.is_closing() || cancellation
+                .as_ref()
+                .is_some_and(|flag| flag.load(Ordering::SeqCst)) =>
             {
                 terminate_worker_tree(&mut child);
-                let _ = desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
+                let _ = child.wait();
                 return Err("SPIKE worker operation was cancelled".to_string());
             }
             None if started.elapsed() >= timeout => {
                 terminate_worker_tree(&mut child);
-                let status =
-                    desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250))
-                        .ok_or("SPIKE worker did not terminate after its watchdog")?;
+                let status = child.wait().map_err(|error| error.to_string())?;
                 break (status, true);
             }
             None => thread::sleep(Duration::from_millis(50)),
@@ -1757,28 +2009,23 @@ async fn run_worker(
     request: serde_json::Value,
     state: tauri::State<'_, WorkerExecutionState>,
     resident: tauri::State<'_, ResidentWorkerState>,
-    lifecycle: tauri::State<'_, desktop_lifecycle::Lifecycle>,
 ) -> Result<serde_json::Value, String> {
-    let request_guard = lifecycle.enter()?;
-    let lifecycle = lifecycle.inner().clone();
+    let lifecycle = app.state::<desktop_lifecycle::Lifecycle>().inner().clone();
+    let admission = lifecycle.enter()?;
+    let update_admission = app_updates::admit_work(&app, worker_method(&request))?;
     let guard = claim_heavy_worker(state.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
     let resident_state = resident.0.clone();
     let use_resident = is_resident_worker_method(worker_method(&request));
     tauri::async_runtime::spawn_blocking(move || {
-        let _request_guard = request_guard;
         let _guard = guard;
+        let _update_admission = update_admission;
+        let _admission = admission;
         if use_resident {
             let workspace = resolve_worker_root(&app)?;
-            run_resident_worker_request(
-                &workspace,
-                &resident_state,
-                request,
-                cancellation,
-                &lifecycle,
-            )
+            run_resident_worker_request(&workspace, &resident_state, request, cancellation, &lifecycle)
         } else {
-            run_worker_process(app, request, cancellation, &lifecycle)
+            run_worker_process(app, request, cancellation)
         }
     })
     .await
@@ -1792,10 +2039,10 @@ async fn run_project_worker(
     files: tauri::State<'_, ApprovedFileState>,
     workers: tauri::State<'_, WorkerExecutionState>,
     trust: tauri::State<'_, project_trust_binding::ProjectManifestState>,
-    lifecycle: tauri::State<'_, desktop_lifecycle::Lifecycle>,
 ) -> Result<serde_json::Value, String> {
-    let request_guard = lifecycle.enter()?;
-    let lifecycle = lifecycle.inner().clone();
+    let lifecycle = app.state::<desktop_lifecycle::Lifecycle>().inner().clone();
+    let admission = lifecycle.enter()?;
+    let update_admission = app_updates::admit_work(&app, worker_method(&request))?;
     let method = worker_method(&request).to_string();
     let requested_paths = project_worker_paths(&request)?;
     let all_approved = {
@@ -1819,9 +2066,10 @@ async fn run_project_worker(
     let guard = claim_heavy_worker(workers.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
     let response = tauri::async_runtime::spawn_blocking(move || {
-        let _request_guard = request_guard;
         let _guard = guard;
-        run_worker_process(app, request, cancellation, &lifecycle)
+        let _update_admission = update_admission;
+        let _admission = admission;
+        run_worker_process(app, request, cancellation)
     })
     .await
     .map_err(|error| format!("SPIKE project worker task failed: {error}"))??;
@@ -1839,6 +2087,12 @@ fn verify_project_manifest_signature(
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    if app_updates::helper_entry() { return; }
+    let context = tauri::generate_context!();
+    #[cfg(not(feature = "custom-protocol"))]
+    if !dev_server::ensure_ready(context.config().build.dev_url.as_ref()) {
+        return;
+    }
     let startup_project =
         startup_project_from_args(std::env::args_os().skip(1), MAX_PROJECT_FILE_BYTES);
     let mut approved_paths = HashSet::new();
@@ -1848,16 +2102,6 @@ pub fn run() {
     let pending_project = startup_project.map(|(_, selected)| selected);
     tauri::Builder::default()
         .on_page_load(|webview, _| webview_policy::apply(webview))
-        .on_window_event(|window, event| {
-            if window.label() == "main" {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    // Also protect startup and a crashed renderer without a JS listener.
-                    // Tauri still delivers its standard close event to any listeners.
-                    api.prevent_close();
-                    desktop_lifecycle::on_main_close_requested(window);
-                }
-            }
-        })
         .plugin(tauri_plugin_opener::init())
         .manage(ResourceState(Mutex::new(ResourceSampler {
             system: System::new(),
@@ -1866,18 +2110,29 @@ pub fn run() {
         })))
         .manage(ApprovedFileState(Mutex::new(approved_paths)))
         .manage(PendingOpenState(Mutex::new(pending_project)))
-        .manage(desktop_lifecycle::Lifecycle::default())
         .manage(WorkerExecutionState(Arc::new(Mutex::new(None))))
         .manage(ResidentWorkerState(Arc::new(Mutex::new(None))))
+        .manage(desktop_lifecycle::Lifecycle::default())
+        .manage(close_recovery::CloseRecoveryState::default())
+        .manage(app_updates::UpdateState::default())
+        .on_window_event(close_recovery::on_window_event)
         .manage(project_trust_binding::ProjectManifestState::new())
         .manage(mcp_bridge::BridgeState::default())
         .invoke_handler(tauri::generate_handler![
+            app_updates::app_update_status,
+            app_updates::app_update_check,
+            app_updates::app_update_download,
+            app_updates::app_update_cancel,
+            app_updates::app_update_install,
+            desktop_lifecycle::acknowledge_desktop_close,
+            desktop_lifecycle::close_desktop_app,
+            close_recovery::main_close_recovery_supported,
+            close_recovery::respond_main_close,
+            close_recovery::close_main_application,
             mcp_bridge::mcp_bridge_start,
             mcp_bridge::mcp_bridge_stop,
             mcp_bridge::mcp_bridge_status,
             mcp_bridge::mcp_bridge_respond,
-            desktop_lifecycle::close_desktop_app,
-            desktop_lifecycle::acknowledge_desktop_close,
             run_worker,
             run_project_worker,
             worker_status,
@@ -1885,6 +2140,7 @@ pub fn run() {
             resource_snapshot,
             open_text_file,
             select_workbench_file,
+            select_schematic_file,
             read_approved_source_file,
             select_project_file,
             read_approved_result_file,
@@ -1898,16 +2154,17 @@ pub fn run() {
             write_approved_text_file,
             verify_project_manifest_signature
         ])
-        .build(tauri::generate_context!())
+        .build(context)
         .expect("error while building SPIKE desktop application")
         .run(|app, event| {
-            if let tauri::RunEvent::ExitRequested { api, .. } = event {
-                // Cover OS/runtime exit as well as the renderer's committed close.
-                // Reissue the request only after bounded off-thread cleanup.
+            if let tauri::RunEvent::ExitRequested { api, .. } = &event {
                 if !app.state::<desktop_lifecycle::Lifecycle>().exit_ready() {
                     api.prevent_exit();
                     desktop_lifecycle::begin_shutdown(app.clone());
                 }
+            }
+            if matches!(event, tauri::RunEvent::Exit) {
+                app.state::<mcp_bridge::BridgeState>().stop();
             }
         });
 }
@@ -1925,6 +2182,96 @@ mod tests {
         assert_eq!(normalized_cpu(f32::NAN, 8), None);
         assert_eq!(normalized_cpu(f32::INFINITY, 8), None);
         assert_eq!(normalized_cpu(-1.0, 8), None);
+    }
+
+    #[test]
+    fn worker_progress_requires_matching_operation_and_object_frame() {
+        let valid = br#"SPIKE_PROGRESS:{"operation_id":"thermal-1","method":"run_assembly_field_transient","frame":{"step":4}}"#;
+        let progress =
+            parse_worker_progress_line(valid, "thermal-1", "run_assembly_field_transient")
+                .unwrap()
+                .unwrap();
+        assert_eq!(progress.operation_id, "thermal-1");
+        assert_eq!(progress.method, "run_assembly_field_transient");
+        assert_eq!(progress.frame["step"], 4);
+
+        assert!(parse_worker_progress_line(
+            valid,
+            "stale-operation",
+            "run_assembly_field_transient"
+        )
+        .unwrap_err()
+        .contains("active operation"));
+        let scalar = br#"SPIKE_PROGRESS:{"operation_id":"thermal-1","method":"run_assembly_field_transient","frame":4}"#;
+        assert!(
+            parse_worker_progress_line(scalar, "thermal-1", "run_assembly_field_transient")
+                .unwrap_err()
+                .contains("must be an object")
+        );
+    }
+
+    #[test]
+    fn worker_json_preserves_float_bits_across_native_decode() {
+        // This value is a shortest decimal emitted by standard JSON encoders.
+        // Losing one ULP here invalidates Python's canonical geometry digests.
+        let expected = 51.248178375505404_f64;
+        let response = format!(r#"{{"coordinate":{expected}}}"#);
+        let decoded: serde_json::Value = serde_json::from_str(&response).unwrap();
+        let actual = decoded["coordinate"].as_f64().unwrap();
+        assert_eq!(actual.to_bits(), expected.to_bits());
+        assert_eq!(serde_json::to_string(&decoded).unwrap(), response);
+    }
+
+    #[test]
+    fn worker_stderr_streams_progress_and_retains_only_bounded_diagnostics() {
+        let stderr = concat!(
+            "solver diagnostic\n",
+            "SPIKE_PROGRESS:{\"operation_id\":\"thermal-1\",\"method\":\"run_assembly_field_transient\",\"frame\":{\"step\":1}}\n",
+        );
+        let mut progress = Vec::new();
+        let (diagnostics, truncated) = read_worker_stderr(
+            stderr.as_bytes(),
+            "thermal-1",
+            "run_assembly_field_transient",
+            None,
+            |event| {
+                progress.push(event.clone());
+                Ok(())
+            },
+        );
+        assert!(!truncated);
+        assert_eq!(
+            String::from_utf8(diagnostics).unwrap(),
+            "solver diagnostic\n"
+        );
+        assert_eq!(progress.len(), 1);
+        assert_eq!(progress[0].frame["step"], 1);
+
+        let cancelled = Arc::new(AtomicBool::new(true));
+        let mut cancelled_progress = Vec::new();
+        let _ = read_worker_stderr(
+            stderr.as_bytes(),
+            "thermal-1",
+            "run_assembly_field_transient",
+            Some(cancelled),
+            |event| {
+                cancelled_progress.push(event.clone());
+                Ok(())
+            },
+        );
+        assert!(cancelled_progress.is_empty());
+
+        let mut oversized = WORKER_PROGRESS_PREFIX.to_vec();
+        oversized.extend(vec![b'x'; MAX_WORKER_PROGRESS_LINE_BYTES + 1]);
+        let (diagnostics, truncated) = read_worker_stderr(
+            oversized.as_slice(),
+            "thermal-1",
+            "run_assembly_field_transient",
+            None,
+            |_| Ok(()),
+        );
+        assert!(!truncated);
+        assert!(diagnostics.len() < 256);
     }
 
     fn temporary_startup_project(name: &str, contents: &[u8]) -> PathBuf {
@@ -2072,6 +2419,31 @@ mod tests {
 
     #[test]
     fn heavy_worker_methods_are_explicit() {
+        assert!(is_heavy_worker_method("run_native_cfd"));
+        assert!(is_heavy_worker_method("run_su2_cfd"));
+        assert!(is_heavy_worker_method("run_su2_cht"));
+        assert!(is_heavy_worker_method("run_assembly_field_transient"));
+        assert!(is_heavy_worker_method("run_assembly_electrothermal"));
+        for method in [
+            "prepare_multiboard_volume_electrothermal",
+            "run_multiboard_volume_electrothermal",
+            "verify_multiboard_volume_electrothermal_result",
+            "describe_volume_electrothermal_bindings",
+            "prepare_assembly_thermal_contact_model",
+            "read_volume_electrothermal_in_project",
+            "save_volume_electrothermal_in_project",
+        ] {
+            assert!(is_heavy_worker_method(method));
+        }
+        assert!(is_heavy_worker_method("evaluate_electrical_heat_source"));
+        assert!(is_heavy_worker_method("discover_assembly_thermal_links"));
+        assert!(is_heavy_worker_method("autolink_assembly_thermal_contacts"));
+        assert!(is_heavy_worker_method(
+            "promote_thermal_components_in_project"
+        ));
+        assert!(is_heavy_worker_method(
+            "prepare_pcb_electrothermal_geometry"
+        ));
         assert!(is_heavy_worker_method("run_analysis"));
         assert!(is_heavy_worker_method("preview_mesh"));
         assert!(is_heavy_worker_method("prepare_openems_case"));
@@ -2084,6 +2456,13 @@ mod tests {
         assert!(is_heavy_worker_method("run_component_thermal"));
         assert!(is_heavy_worker_method("run_board_thermal"));
         assert!(is_heavy_worker_method("run_field_circuit_cosimulation"));
+        assert!(is_heavy_worker_method("run_cosimulation"));
+        assert!(is_heavy_worker_method("run_studio_board_cosimulation"));
+        assert!(is_heavy_worker_method("run_em_machine"));
+        assert!(is_heavy_worker_method("review_engineering"));
+        assert!(is_heavy_worker_method("quick_engineering_tool"));
+        assert!(is_heavy_worker_method("run_magnetic_machine"));
+        assert!(is_heavy_worker_method("compare_digital_twin"));
         assert!(is_heavy_worker_method(
             "run_multiboard_si_independent_batch"
         ));
@@ -2107,6 +2486,9 @@ mod tests {
             "generate_mcad_selector_preview_in_project"
         ));
         assert!(!is_heavy_worker_method("dependencies"));
+        assert!(is_heavy_worker_method("read_project_package"));
+        assert_eq!(worker_timeout(&serde_json::json!({"method":"read_project_package"})), Duration::from_secs(210));
+        assert!(is_heavy_worker_method("solve_fan_system_operating_point"));
     }
 
     #[test]
@@ -2128,6 +2510,18 @@ mod tests {
                 .store(true, Ordering::SeqCst);
         }
         assert!(cancellation.load(Ordering::SeqCst));
+        drop(guard);
+        assert!(state.lock().unwrap().is_none());
+    }
+
+    #[test]
+    fn package_open_claim_is_exclusive_and_cancellable() {
+        let state = Arc::new(Mutex::new(None));
+        let request = json!({"id":"package-open", "method":"read_project_package"});
+        let guard = claim_heavy_worker(state.clone(), &request).unwrap().unwrap();
+        assert!(claim_heavy_worker(state.clone(), &request).is_err());
+        state.lock().unwrap().as_ref().unwrap().cancellation.store(true, Ordering::SeqCst);
+        assert!(guard.cancellation().load(Ordering::SeqCst));
         drop(guard);
         assert!(state.lock().unwrap().is_none());
     }
@@ -2198,7 +2592,7 @@ mod tests {
         let writer = write_stdin_async(stdin, "x".repeat(16 * 1024 * 1024));
         thread::sleep(Duration::from_millis(50));
         terminate_worker_tree(&mut child);
-        let _ = desktop_lifecycle::wait_for_child(&mut child, Duration::from_millis(250));
+        let _ = child.wait();
         assert!(writer.recv_timeout(Duration::from_secs(2)).is_ok());
     }
 
@@ -2289,6 +2683,9 @@ mod tests {
         for method in [
             "read_assembly_field_study_in_project",
             "save_assembly_field_study_in_project",
+            "read_volume_electrothermal_in_project",
+            "save_volume_electrothermal_in_project",
+            "promote_thermal_components_in_project",
         ] {
             let request = json!({"method": method, "params": {"project_path": "fixture.spike"}});
             assert_eq!(project_worker_paths(&request).unwrap().len(), 1);
@@ -2492,6 +2889,6 @@ mod tests {
         )
         .expect("close resident session");
         assert_eq!(closed["result"]["status"], "closed");
-        *state.lock().unwrap() = None;
+        assert!(state.lock().unwrap().is_none());
     }
 }

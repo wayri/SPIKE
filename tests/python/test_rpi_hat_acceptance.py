@@ -1,10 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 """Independent numerical checks used by the curated Raspberry Pi assembly."""
 import copy
+import hashlib
 import math
+import tempfile
 import unittest
+from pathlib import Path
 
-from scripts.build_rpi_hat_acceptance import _acceptance
+from python.spike_core.contracts import SpiDeR
+from python.spike_core.project_package import write_spike_package
+from python.spike_core.spider_v2 import SpiDeRV2
+from scripts.build_rpi_hat_acceptance import _acceptance, _verify_packaged_board_sources
 
 
 def fixture():
@@ -31,6 +37,42 @@ def fixture():
 
 
 class RaspberryPiHatAcceptanceTests(unittest.TestCase):
+    def test_each_occurrence_reads_exact_packaged_source_through_worker(self):
+        with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parents[2] / "build") as directory:
+            root = Path(directory)
+            sources = {
+                "base": b'(kicad_pcb (version 20240108) (net 0 "BASE"))',
+                "hat": b'(kicad_pcb\r\n (version 20240108) (net 0 "HAT"))',
+            }
+            designs = []
+            board_sources = {}
+            design_ids = {}
+            for board_id, source_bytes in sources.items():
+                path = root / f"{board_id}.kicad_pcb"
+                path.write_bytes(source_bytes)
+                board_sources[board_id] = path
+                design = SpiDeRV2.from_v1(SpiDeR(
+                    design_id=board_id, name=board_id, source_format="kicad_pcb",
+                    layers=[{"id": 0, "name": "F.Cu"}],
+                    metadata={"source_sha256": hashlib.sha256(source_bytes).hexdigest()},
+                )).to_dict()
+                design["source"]["artifact_path"] = (
+                    f"package:sources/{hashlib.sha256(source_bytes).hexdigest()}.kicad_pcb"
+                )
+                design_ids[board_id] = design["design_id"]
+                designs.append(design)
+            boards = [{"id": board_id, "design_id": design_ids[board_id],
+                       "frame": {"frame_id": f"{board_id}-frame"}} for board_id in sources]
+            project = root / "assembly.spike"
+            write_spike_package(project, {
+                "project": {"id": "rpi-source-fixture"}, "design_ir": designs[0],
+                "assembly_ir": {"contract": "spike/assembly-ir/v1", "assembly_id": "assembly",
+                                "name": "Assembly", "boards": boards},
+                "assembly_designs": {"contract": "spike/assembly-designs/v1",
+                                     "active_design_id": designs[0]["design_id"], "designs": designs},
+            }, source_artifacts={path.name: path.read_bytes() for path in board_sources.values()})
+            _verify_packaged_board_sources(project, board_sources)
+
     def test_independent_pi_si_thermal_oracles_pass(self):
         evidence = _acceptance(fixture())
         self.assertTrue(evidence["passed"])

@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
+const require = createRequire(import.meta.url);
+const source = readFileSync(new URL("../src/AssemblyAirflowPanel.tsx", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX } }).outputText;
+function load(hooks, worker) {
+  const module = { exports: {} };
+  new Function("require", "module", "exports", compiled)(name => {
+    if (name === "react") return hooks;
+    if (name.endsWith(".css")) return {};
+    if (name === "./workerBridge") return { runNativeProjectWorker: worker, cancelLocalWorker: async () => true };
+    if (name === "./automaticWorkerQueue") return { runSerializedAutomaticWorker: async fn => fn() };
+    return require(name);
+  }, module, module.exports);
+  return module.exports;
+}
+const mod = load(React, async () => { throw Error("unexpected worker"); });
+const setup = { solids: [{ id: "board", material_id: "fr4" }], mesh: {}, materials: [{ id: "fr4", phase: "solid", conductivity_w_mk: .35, density_kg_m3: null, specific_heat_j_kgk: null }] };
+const draft = mod.makeAirflowDraft(setup);
+assert.match(mod.airflowDraftError(draft), /bounds/);
+draft.geometry.air_domain = { kind: "polygon_prism", outer_mm: [[0,0],[10,0],[10,10],[0,10]], holes_mm: [], z_min_mm: 0, z_max_mm: 10 };
+assert.match(mod.airflowDraftError(draft), /material/);
+Object.assign(draft.materials[0], { density_kg_m3: 1850, specific_heat_j_kgk: 900 });
+assert.equal(mod.airflowDraftError(draft), "");
+draft.region_properties.board.power_w = NaN;
+assert.match(mod.airflowDraftError(draft), /watts/);
+draft.region_properties.board.power_w = 1;
+draft.mode = "forced";
+assert.match(mod.airflowDraftError(draft), /Forced/);
+draft.mode = "static";
+const props = { projectPath: "a.spike", manifestDigest: "a", meshSetup: { assignments: {}, mesh_options: {} }, disabled: false, onUpdated: async () => {} };
+let html = renderToStaticMarkup(React.createElement(mod.default, props));
+assert.match(html, /Load current assembly sources/);
+assert.match(html, /Load saved airflow results/);
+assert.doesNotMatch(html, /Run and save airflow/);
+const actual = { status: "completed", fields: { temperature_k: { unit: "K", total_samples: 2, samples: [{point_mm:[0,0,0],value:299,region:"air"},{point_mm:[1,1,1],value:301,region:"board"}] } } };
+html = renderToStaticMarkup(React.createElement(mod.AirflowFieldView, { result: actual }));
+assert.equal((html.match(/<circle /g)||[]).length, 2);
+assert.match(html, /299\.00/); assert.match(html, /301\.00/); assert.match(html, /coordinates in mm/);
+html = renderToStaticMarkup(React.createElement(mod.AirflowFieldView, { result: { fields: {} } }));
+assert.doesNotMatch(html, /<circle /); assert.match(html, /No computed samples/);
+const states=[], refs=[], pending=[]; let sc=0,rc=0;
+const hooks={...React,useEffect:()=>{},useRef:initial=>{const i=rc++;return refs[i]??=( {current:initial});},useState:initial=>{const i=sc++;if(!(i in states))states[i]=initial;return[states[i],v=>{states[i]=typeof v==="function"?v(states[i]):v;}];}};
+const panel=load(hooks, request=>new Promise(resolve=>pending.push({request,resolve}))).default;
+const mount=p=>{sc=0;rc=0;return panel(p);};
+function find(node,label){if(!node||typeof node!=="object")return null;if(node.type==="button"&&node.props.children===label)return node;for(const child of [node.props?.children].flat(Infinity)){const found=find(child,label);if(found)return found;}return null;}
+find(mount(props),"Load current assembly sources").props.onClick();
+assert.equal(pending.length,1);assert.equal(pending[0].request.method,"read_assembly_airflow_setup_in_project");
+assert.equal(find(mount(props),"Load current assembly sources").props.disabled,true);
+mount({...props,projectPath:"b.spike"});
+pending[0].resolve({ok:false,error:"obsolete source failure"});
+await new Promise(resolve=>setImmediate(resolve));
+html=renderToStaticMarkup(mount({...props,projectPath:"b.spike"}));
+assert.doesNotMatch(html,/obsolete source failure/);
+console.log("assembly airflow input admission, static rendering, actual sample view, busy and stale callback checks passed");

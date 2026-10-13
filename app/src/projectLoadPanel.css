@@ -1,0 +1,19 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.project-load-shade { position: fixed; inset: 0; z-index: 1300; display: grid; place-items: center; background: color-mix(in srgb, var(--spike-table-surface) 70%, transparent); padding: 16px; }
+.project-load-panel { width: min(470px, 100%); min-width: 0; max-height: calc(100dvh - 32px); overflow-y: auto; box-sizing: border-box; padding: 20px; border: 1px solid var(--spike-table-border); border-radius: 8px; background: var(--spike-table-surface); color: var(--spike-table-text); }
+.project-load-panel h2 { margin: 0 0 8px; font-size: 18px; }
+.project-load-file { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-load-stage { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.project-load-stage span:nth-child(2) { flex: 1; overflow-wrap: anywhere; }
+.project-load-panel progress { width: 100%; margin-top: 12px; }
+.project-load-estimate-note { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.project-load-panel dl > div { min-width: 0; }
+.project-load-basis { font-size: 12px; opacity: .8; }
+.project-load-panel dl { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.project-load-panel dt { font-size: 12px; }
+.project-load-panel dd { margin: 4px 0 0; font-variant-numeric: tabular-nums; }
+.project-load-panel footer { display: flex; justify-content: flex-end; margin-top: 16px; }
+.project-load-error { overflow-wrap: anywhere; }
+.project-load-spinner { width: 12px; height: 12px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: project-load-turn .9s linear infinite; }
+@keyframes project-load-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .project-load-spinner { animation: none; } }

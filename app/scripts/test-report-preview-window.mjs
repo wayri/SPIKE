@@ -163,6 +163,7 @@ assert.ok(nativeWindow, "native report window is created with the stable label")
 assert.equal(nativeWindow.options.title, "SPIKE | Engineering report | board-report.html");
 assert.equal(nativeWindow.options.resizable, true);
 assert.equal(nativeWindow.options.decorations, true);
+assert.equal(nativeWindow.options.skipTaskbar, false, "native report previews retain independent Windows taskbar entries");
 assert.match(nativeWindow.options.url, /reportToken=[a-f0-9]{48}/);
 
 window.location.search = new URL(nativeWindow.options.url, window.location.href).search;
@@ -204,6 +205,9 @@ assert.equal(await api.focusReportPreviewWindow(), false, "OS destruction clears
 delete window.__TAURI_INTERNALS__;
 
 const previewSource = readFileSync(new URL("../src/ReportPreview.tsx", import.meta.url), "utf8");
+const previewRootSource = readFileSync(new URL("../src/ReportPreviewWindowRoot.tsx", import.meta.url), "utf8");
+assert.match(previewRootSource, /nativeWindow=\{"__TAURI_INTERNALS__" in window\}/, "report root marks native presentation explicitly");
+assert.match(previewSource, /!nativeWindow && <button[^>]*aria-label="Close report preview"/, "native report preview relies on the OS close control");
 assert.match(previewSource, /sandbox="allow-scripts allow-downloads allow-modals"/);
 assert.doesNotMatch(previewSource, /allow-same-origin/);
 assert.match(previewSource, /contentWindow\?\.postMessage\(PRINT_MESSAGE, "\*"\)/);

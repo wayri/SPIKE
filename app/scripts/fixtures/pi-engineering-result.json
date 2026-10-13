@@ -1,0 +1,936 @@
+{
+  "smps": {
+    "request": {
+      "contract": "spike/smps-converter-request/v1",
+      "block_id": "supply-1",
+      "topology": "synchronous_buck",
+      "input_voltage_v": 12.0,
+      "output_voltage_v": 5.0,
+      "output_current_a": 3.0,
+      "switching_frequency_hz": 100000.0,
+      "switches": [
+        {
+          "role": "on",
+          "devices": [
+            {
+              "occurrence_id": "board-A",
+              "component_ref": "Q1"
+            }
+          ],
+          "series_count": 1,
+          "parallel_count": 1,
+          "rds_on_ohm": 0.02,
+          "rise_time_s": 1e-08,
+          "fall_time_s": 2e-08,
+          "gate_charge_c": 2e-08,
+          "gate_drive_v": 10.0,
+          "voltage_rating_v": 100.0,
+          "current_rating_a": 100.0
+        },
+        {
+          "role": "off",
+          "devices": [
+            {
+              "occurrence_id": "board-A",
+              "component_ref": "Q2"
+            }
+          ],
+          "series_count": 1,
+          "parallel_count": 1,
+          "rds_on_ohm": 0.02,
+          "rise_time_s": 1e-08,
+          "fall_time_s": 2e-08,
+          "gate_charge_c": 2e-08,
+          "gate_drive_v": 10.0,
+          "voltage_rating_v": 100.0,
+          "current_rating_a": 100.0
+        }
+      ],
+      "inductor": {
+        "occurrence_id": "board-A",
+        "component_ref": "L1",
+        "inductance_h": 0.0001,
+        "dcr_ohm": 0.03,
+        "current_rating_a": 100.0
+      }
+    },
+    "result": {
+      "contract": "spike/smps-converter-result/v1",
+      "block_id": "supply-1",
+      "topology": "synchronous_buck",
+      "request_snapshot": {
+        "contract": "spike/smps-converter-request/v1",
+        "block_id": "supply-1",
+        "topology": "synchronous_buck",
+        "input_voltage_v": 12.0,
+        "output_voltage_v": 5.0,
+        "output_current_a": 3.0,
+        "switching_frequency_hz": 100000.0,
+        "switches": [
+          {
+            "role": "on",
+            "devices": [
+              {
+                "occurrence_id": "board-A",
+                "component_ref": "Q1"
+              }
+            ],
+            "series_count": 1,
+            "parallel_count": 1,
+            "rds_on_ohm": 0.02,
+            "rise_time_s": 1e-08,
+            "fall_time_s": 2e-08,
+            "gate_charge_c": 2e-08,
+            "gate_drive_v": 10.0,
+            "voltage_rating_v": 100.0,
+            "current_rating_a": 100.0
+          },
+          {
+            "role": "off",
+            "devices": [
+              {
+                "occurrence_id": "board-A",
+                "component_ref": "Q2"
+              }
+            ],
+            "series_count": 1,
+            "parallel_count": 1,
+            "rds_on_ohm": 0.02,
+            "rise_time_s": 1e-08,
+            "fall_time_s": 2e-08,
+            "gate_charge_c": 2e-08,
+            "gate_drive_v": 10.0,
+            "voltage_rating_v": 100.0,
+            "current_rating_a": 100.0
+          }
+        ],
+        "inductor": {
+          "occurrence_id": "board-A",
+          "component_ref": "L1",
+          "inductance_h": 0.0001,
+          "dcr_ohm": 0.03,
+          "current_rating_a": 100.0
+        }
+      },
+      "model_status": "approximate",
+      "temporal_scope": "steady_average_only",
+      "duty_cycle": 0.42916666666666614,
+      "input_current_a": 1.2998633936201536,
+      "input_power_w": 15.598360723441843,
+      "output_power_w": 15.0,
+      "total_loss_w": 0.5983607234418633,
+      "efficiency": 0.9616395123788487,
+      "inductor_average_current_a": 3.0,
+      "inductor_rms_current_a": 3.0012000890863164,
+      "inductor_peak_current_a": 3.14700686123714,
+      "inductor_minimum_current_a": 2.8530278446116135,
+      "inductor_ripple_current_a": 0.2939790166255265,
+      "losses": [
+        {
+          "occurrence_id": "board-A",
+          "component_ref": "Q1",
+          "role": "on",
+          "conduction_power_w": 0.07731541794964385,
+          "switching_power_w": 0.05488224940251536,
+          "total_power_w": 0.1321976673521592
+        },
+        {
+          "occurrence_id": "board-A",
+          "component_ref": "Q2",
+          "role": "off",
+          "conduction_power_w": 0.10282862154499042,
+          "switching_power_w": 0.05311837530276221,
+          "total_power_w": 0.15594699684775262
+        },
+        {
+          "occurrence_id": "board-A",
+          "component_ref": "L1",
+          "role": "inductor",
+          "conduction_power_w": 0.2702160592419514,
+          "switching_power_w": 0.0,
+          "total_power_w": 0.2702160592419514
+        }
+      ],
+      "auxiliary_loss_w": 0.04,
+      "auxiliary_loss_location": "unassigned_gate_drive",
+      "solver": {
+        "iterations": 41,
+        "duty_bracket_width": 1.7763568394002505e-15,
+        "periodic_current_residual_a": -6.661338147750939e-16,
+        "energy_balance_residual_w": -2.042810365310288e-14
+      },
+      "limitations": [
+        "Approximate steady CCM estimate; no switching waveforms, control-loop stability or transient response.",
+        "Switch overlap and gate drive are input-supplied overhead; commutation does not alter the duty/current solution.",
+        "Identical devices share series voltage and parallel current equally; sharing is a caller assumption.",
+        "No dead time, reverse recovery, Coss, magnetic core loss, capacitor ESR, driver quiescent power or PCB loss.",
+        "Rds(on) and DCR are supplied operating values; no temperature or thermal parameters are inferred.",
+        "Gate-drive dissipation is unlocated; component losses require explicit thermal mapping before deposition.",
+        "Ratings are caller inputs; no SOA, avalanche, saturation curve, topology wiring or hardware qualification.",
+        "The bounded root scan selects the first negative-to-positive bracket and may miss near-limit narrow roots."
+      ]
+    }
+  },
+  "capacitor": {
+    "request": {
+      "contract": "spike/capacitor-placement-request/v1",
+      "board_occurrence_id": "pcb-1",
+      "reference_return": {
+        "occurrence_id": "pcb-1",
+        "net": "PGND"
+      },
+      "frequencies_hz": [
+        100.0,
+        1000.0,
+        10000.0
+      ],
+      "ports": [
+        {
+          "id": "source",
+          "occurrence_id": "pcb-1"
+        },
+        {
+          "id": "load",
+          "occurrence_id": "pcb-1"
+        }
+      ],
+      "z_ohm": [
+        [
+          [
+            [
+              0.1,
+              0
+            ],
+            [
+              0.1,
+              0
+            ]
+          ],
+          [
+            [
+              0.1,
+              0
+            ],
+            [
+              0.15,
+              0
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              0.1,
+              0
+            ],
+            [
+              0.1,
+              0
+            ]
+          ],
+          [
+            [
+              0.1,
+              0
+            ],
+            [
+              0.15,
+              0
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              0.1,
+              0
+            ],
+            [
+              0.1,
+              0
+            ]
+          ],
+          [
+            [
+              0.1,
+              0
+            ],
+            [
+              0.15,
+              0
+            ]
+          ]
+        ]
+      ],
+      "loads": [
+        {
+          "port_id": "load",
+          "current_a_rms": 1.0
+        }
+      ],
+      "candidates": [
+        {
+          "id": "source",
+          "port_id": "source",
+          "occurrence_id": "pcb-1",
+          "x_mm": 0,
+          "y_mm": 5.0,
+          "capacitor": {
+            "capacitance_f": 0.001,
+            "esr_ohm": 0.01,
+            "esl_h": 1e-09,
+            "voltage_rating_v": 25.0,
+            "ripple_current_rating_a_rms": 10.0
+          }
+        },
+        {
+          "id": "load",
+          "port_id": "load",
+          "occurrence_id": "pcb-1",
+          "x_mm": 10,
+          "y_mm": 5.0,
+          "capacitor": {
+            "capacitance_f": 0.001,
+            "esr_ohm": 0.01,
+            "esl_h": 1e-09,
+            "voltage_rating_v": 25.0,
+            "ripple_current_rating_a_rms": 10.0
+          }
+        }
+      ],
+      "dc_voltage_v": 5.0,
+      "target_impedance_ohm": 0.1,
+      "frequency_band_hz": [
+        100.0,
+        10000.0
+      ],
+      "provenance": {
+        "source_id": "original-two-node-resistor-network",
+        "conditions": "Rground=.1 ohm, Rlink=.05 ohm; synthetic."
+      }
+    },
+    "result": {
+      "contract": "spike/capacitor-placement-result/v1",
+      "model_status": "approximate",
+      "status": "completed",
+      "board_occurrence_id": "pcb-1",
+      "reference_return": {
+        "occurrence_id": "pcb-1",
+        "net": "PGND"
+      },
+      "load_port_ids": [
+        "load"
+      ],
+      "frequency_band_hz": [
+        100.0,
+        10000.0
+      ],
+      "target_impedance_ohm": 0.1,
+      "baseline": {
+        "samples": [
+          {
+            "frequency_hz": 100.0,
+            "status": "computed",
+            "load_impedance_ohm": [
+              [
+                0.15,
+                0.0
+              ]
+            ],
+            "load_impedance_magnitude_ohm": [
+              0.15
+            ],
+            "maximum_impedance_ohm": 0.15,
+            "maximum_target_ratio": 1.4999999999999998
+          },
+          {
+            "frequency_hz": 1000.0,
+            "status": "computed",
+            "load_impedance_ohm": [
+              [
+                0.15,
+                0.0
+              ]
+            ],
+            "load_impedance_magnitude_ohm": [
+              0.15
+            ],
+            "maximum_impedance_ohm": 0.15,
+            "maximum_target_ratio": 1.4999999999999998
+          },
+          {
+            "frequency_hz": 10000.0,
+            "status": "computed",
+            "load_impedance_ohm": [
+              [
+                0.15,
+                0.0
+              ]
+            ],
+            "load_impedance_magnitude_ohm": [
+              0.15
+            ],
+            "maximum_impedance_ohm": 0.15,
+            "maximum_target_ratio": 1.4999999999999998
+          }
+        ],
+        "worst_target_ratio": 1.4999999999999998,
+        "peak_impedance_ohm": 0.15,
+        "peak_frequency_hz": 100.0,
+        "meets_sampled_target": false
+      },
+      "candidates": [
+        {
+          "id": "source",
+          "port_id": "source",
+          "occurrence_id": "pcb-1",
+          "x_mm": 0.0,
+          "y_mm": 5.0,
+          "capacitor": {
+            "capacitance_f": 0.001,
+            "esr_ohm": 0.01,
+            "esl_h": 1e-09,
+            "voltage_rating_v": 25.0,
+            "ripple_current_rating_a_rms": 10.0
+          },
+          "status": "computed",
+          "eligible": true,
+          "issues": [],
+          "samples": [
+            {
+              "frequency_hz": 100.0,
+              "status": "computed",
+              "load_impedance_ohm": [
+                [
+                  0.14956780162854533,
+                  -0.006253316368859516
+                ]
+              ],
+              "load_impedance_magnitude_ohm": [
+                0.14969846775971
+              ],
+              "maximum_impedance_ohm": 0.14969846775971,
+              "maximum_target_ratio": 1.4969846775970999,
+              "capacitor_current_a_rms": [
+                0.06268234284177199
+              ],
+              "capacitor_terminal_voltage_v_rms": [
+                0.09976397689923151
+              ],
+              "capacitor_dielectric_voltage_v_rms": [
+                0.09976204707848894
+              ],
+              "denominator_relative_margin": 1.0023658148773167
+            },
+            {
+              "frequency_hz": 1000.0,
+              "status": "computed",
+              "load_impedance_ohm": [
+                [
+                  0.12061047071264935,
+                  -0.042520947285157096
+                ]
+              ],
+              "load_impedance_magnitude_ohm": [
+                0.12788634252160766
+              ],
+              "maximum_impedance_ohm": 0.12788634252160766,
+              "maximum_target_ratio": 1.2788634252160764,
+              "capacitor_current_a_rms": [
+                0.5168921927983773
+              ],
+              "capacitor_terminal_voltage_v_rms": [
+                0.08242493271024867
+              ],
+              "capacitor_dielectric_voltage_v_rms": [
+                0.08226594752947074
+              ],
+              "denominator_relative_margin": 1.2132251336077349
+            },
+            {
+              "frequency_hz": 10000.0,
+              "status": "computed",
+              "load_impedance_ohm": [
+                [
+                  0.06094059857088882,
+                  -0.012834805721814446
+                ]
+              ],
+              "load_impedance_magnitude_ohm": [
+                0.06227751433780043
+              ],
+              "maximum_impedance_ohm": 0.06227751433780043,
+              "maximum_target_ratio": 0.6227751433780043,
+              "capacitor_current_a_rms": [
+                0.8997949333502765
+              ],
+              "capacitor_terminal_voltage_v_rms": [
+                0.01686502104967722
+              ],
+              "capacitor_dielectric_voltage_v_rms": [
+                0.014320681141173902
+              ],
+              "denominator_relative_margin": 1.111364337512573
+            }
+          ],
+          "worst_target_ratio": 1.4969846775970999,
+          "peak_impedance_ohm": 0.14969846775971,
+          "peak_frequency_hz": 100.0,
+          "meets_sampled_target": false,
+          "color_metric": 1.4969846775970999,
+          "color_metric_name": "worst_sampled_target_ratio_lower_is_better",
+          "improvement_fraction": 0.002010214935266652,
+          "maximum_capacitor_current_a_rms": 0.8997949333502765,
+          "required_voltage_rating_v": 5.141087569167169,
+          "maximum_capacitor_esr_loss_w": 0.008096309220828286
+        },
+        {
+          "id": "load",
+          "port_id": "load",
+          "occurrence_id": "pcb-1",
+          "x_mm": 10.0,
+          "y_mm": 5.0,
+          "capacitor": {
+            "capacitance_f": 0.001,
+            "esr_ohm": 0.01,
+            "esl_h": 1e-09,
+            "voltage_rating_v": 25.0,
+            "ripple_current_rating_a_rms": 10.0
+          },
+          "status": "computed",
+          "eligible": true,
+          "issues": [],
+          "samples": [
+            {
+              "frequency_hz": 100.0,
+              "status": "computed",
+              "load_impedance_ohm": [
+                [
+                  0.14859299570887916,
+                  -0.01399572496741907
+                ]
+              ],
+              "load_impedance_magnitude_ohm": [
+                0.149250657255178
+              ],
+              "maximum_impedance_ohm": 0.149250657255178,
+              "maximum_target_ratio": 1.4925065725517799,
+              "capacitor_current_a_rms": [
+                0.09377513966667997
+              ],
+              "capacitor_terminal_voltage_v_rms": [
+                0.149250657255178
+              ],
+              "capacitor_dielectric_voltage_v_rms": [
+                0.1492477701708499
+              ],
+              "denominator_relative_margin": 1.0050206997986002
+            },
+            {
+              "frequency_hz": 1000.0,
+              "status": "computed",
+              "load_impedance_ohm": [
+                [
+                  0.07931238061587732,
+                  -0.07031149935606305
+                ]
+              ],
+              "load_impedance_magnitude_ohm": [
+                0.10599132351591543
+              ],
+              "maximum_impedance_ohm": 0.10599132351591543,
+              "maximum_target_ratio": 1.0599132351591543,
+              "capacitor_current_a_rms": [
+                0.6646785848444093
+              ],
+              "capacitor_terminal_voltage_v_rms": [
+                0.10599132351591543
+              ],
+              "capacitor_dielectric_voltage_v_rms": [
+                0.1057868823453135
+              ],
+              "denominator_relative_margin": 1.4152101797037784
+            },
+            {
+              "frequency_hz": 10000.0,
+              "status": "computed",
+              "load_impedance_ohm": [
+                [
+                  0.01074205018112679,
+                  -0.013797557955059872
+                ]
+              ],
+              "load_impedance_magnitude_ohm": [
+                0.017486115852786806
+              ],
+              "maximum_impedance_ohm": 0.017486115852786806,
+              "maximum_target_ratio": 0.17486115852786804,
+              "capacitor_current_a_rms": [
+                0.9329320373789067
+              ],
+              "capacitor_terminal_voltage_v_rms": [
+                0.017486115852786803
+              ],
+              "capacitor_dielectric_voltage_v_rms": [
+                0.014848074531764588
+              ],
+              "denominator_relative_margin": 1.071889440960268
+            }
+          ],
+          "worst_target_ratio": 1.4925065725517799,
+          "peak_impedance_ohm": 0.149250657255178,
+          "peak_frequency_hz": 100.0,
+          "meets_sampled_target": false,
+          "color_metric": 1.4925065725517799,
+          "color_metric_name": "worst_sampled_target_ratio_lower_is_better",
+          "improvement_fraction": 0.004995618298813231,
+          "maximum_capacitor_current_a_rms": 0.9329320373789067,
+          "required_voltage_rating_v": 5.2110723036833715,
+          "maximum_capacitor_esr_loss_w": 0.00870362186367958
+        }
+      ],
+      "ranked_candidate_ids": [
+        "load",
+        "source"
+      ],
+      "best_candidate_id": "load",
+      "recommended_candidate_id": "load",
+      "network_diagnostics": {
+        "sampled_passivity": "within_tolerance",
+        "normalized_minimum_eigenvalue": 0.1461490623970566,
+        "passivity_tolerance": 1e-10,
+        "maximum_reciprocity_residual": 0.0,
+        "causality": "not_evaluated"
+      },
+      "provenance": {
+        "source_id": "original-two-node-resistor-network",
+        "conditions": "Rground=.1 ohm, Rlink=.05 ohm; synthetic."
+      },
+      "request_snapshot": {
+        "contract": "spike/capacitor-placement-request/v1",
+        "board_occurrence_id": "pcb-1",
+        "reference_return": {
+          "occurrence_id": "pcb-1",
+          "net": "PGND"
+        },
+        "frequencies_hz": [
+          100.0,
+          1000.0,
+          10000.0
+        ],
+        "ports": [
+          {
+            "id": "source",
+            "occurrence_id": "pcb-1"
+          },
+          {
+            "id": "load",
+            "occurrence_id": "pcb-1"
+          }
+        ],
+        "z_ohm": [
+          [
+            [
+              [
+                0.1,
+                0
+              ],
+              [
+                0.1,
+                0
+              ]
+            ],
+            [
+              [
+                0.1,
+                0
+              ],
+              [
+                0.15,
+                0
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                0.1,
+                0
+              ],
+              [
+                0.1,
+                0
+              ]
+            ],
+            [
+              [
+                0.1,
+                0
+              ],
+              [
+                0.15,
+                0
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                0.1,
+                0
+              ],
+              [
+                0.1,
+                0
+              ]
+            ],
+            [
+              [
+                0.1,
+                0
+              ],
+              [
+                0.15,
+                0
+              ]
+            ]
+          ]
+        ],
+        "loads": [
+          {
+            "port_id": "load",
+            "current_a_rms": 1.0
+          }
+        ],
+        "candidates": [
+          {
+            "id": "source",
+            "port_id": "source",
+            "occurrence_id": "pcb-1",
+            "x_mm": 0,
+            "y_mm": 5.0,
+            "capacitor": {
+              "capacitance_f": 0.001,
+              "esr_ohm": 0.01,
+              "esl_h": 1e-09,
+              "voltage_rating_v": 25.0,
+              "ripple_current_rating_a_rms": 10.0
+            }
+          },
+          {
+            "id": "load",
+            "port_id": "load",
+            "occurrence_id": "pcb-1",
+            "x_mm": 10,
+            "y_mm": 5.0,
+            "capacitor": {
+              "capacitance_f": 0.001,
+              "esr_ohm": 0.01,
+              "esl_h": 1e-09,
+              "voltage_rating_v": 25.0,
+              "ripple_current_rating_a_rms": 10.0
+            }
+          }
+        ],
+        "dc_voltage_v": 5.0,
+        "target_impedance_ohm": 0.1,
+        "frequency_band_hz": [
+          100.0,
+          10000.0
+        ],
+        "provenance": {
+          "source_id": "original-two-node-resistor-network",
+          "conditions": "Rground=.1 ohm, Rlink=.05 ohm; synthetic."
+        }
+      },
+      "limitations": [
+        "Best means best eligible supplied single-capacitor candidate at supplied frequencies, not a global spatial optimum.",
+        "XY locations label supplied network ports; geometry, mounting/return inductance and board membership are not extracted.",
+        "All ports share the declared return. Existing sources/loads must already have their intended small-signal boundary conditions.",
+        "Sampled passivity does not prove broadband passivity, causality, mesh convergence or hardware accuracy.",
+        "No interpolation or unsampled resonance search; refine the supplied network sweep before trusting peak or target coverage.",
+        "Each load is a separate single-tone RMS scenario, not simultaneous loads or a summed harmonic spectrum.",
+        "C/ESR/ESL and ratings are supplied operating values; DC bias, temperature, tolerance and aging are not inferred.",
+        "Voltage screening uses DC plus the larger terminal/dielectric sinusoidal peak; ripple rating uses the worst supplied tone.",
+        "No converter control stability, large-signal switching, insulation/clearance, busbar current capacity or high-power qualification."
+      ]
+    }
+  },
+  "return": {
+    "request": {
+      "contract": "spike/pi-return-path-request/v1",
+      "occurrence_id": "board-1",
+      "forward_net": "VCC",
+      "return_net": "GND",
+      "source_pad_id": "source",
+      "load_pad_ids": [
+        "load"
+      ],
+      "mesh_target_mm": 1.0
+    },
+    "design": {
+      "contract": "spike/v1",
+      "units": "mm",
+      "layers": [
+        {
+          "name": "F.Cu"
+        }
+      ],
+      "nets": [
+        {
+          "id": "1",
+          "name": "VCC"
+        },
+        {
+          "id": "2",
+          "name": "GND"
+        }
+      ],
+      "stackup": [
+        {
+          "name": "F.Cu",
+          "type": "copper",
+          "thickness": 0.035
+        }
+      ],
+      "pads": [
+        {
+          "id": "source",
+          "net_id": "2",
+          "at": [
+            0,
+            0
+          ],
+          "size": [
+            1,
+            1
+          ],
+          "shape": "rect",
+          "layers": [
+            "F.Cu"
+          ]
+        },
+        {
+          "id": "load",
+          "net_id": "2",
+          "at": [
+            10,
+            0
+          ],
+          "size": [
+            1,
+            1
+          ],
+          "shape": "rect",
+          "layers": [
+            "F.Cu"
+          ]
+        }
+      ],
+      "tracks": [
+        {
+          "id": "track",
+          "net_id": "2",
+          "start": [
+            0,
+            0
+          ],
+          "end": [
+            10,
+            0
+          ],
+          "width": 1,
+          "layer": "F.Cu"
+        }
+      ]
+    },
+    "result": {
+      "contract": "spike/pi-return-path-result/v1",
+      "status": "connected",
+      "paths": [
+        {
+          "load_pad_id": "load",
+          "connected": true,
+          "resistance_ohm": 0.004926108374384235,
+          "length_mm": 10.0,
+          "points_mm": [
+            [
+              0.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              1.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              2.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              3.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              4.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              5.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              6.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              7.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              8.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              9.0,
+              0.0,
+              -0.0175
+            ],
+            [
+              10.0,
+              0.0,
+              -0.0175
+            ]
+          ]
+        }
+      ],
+      "issues": [
+        {
+          "code": "PI_RETURN_APPROXIMATE",
+          "severity": "warning",
+          "message": "Minimum series-resistance route on the admitted copper mesh, including modeled attachment resistance. It is not equivalent terminal resistance, current distribution, loop inductance or a high-frequency optimum. Pad anchoring, source geometry, copper material defaults and mesh resolution limit accuracy."
+        }
+      ],
+      "model_status": "approximate",
+      "request": {
+        "contract": "spike/pi-return-path-request/v1",
+        "occurrence_id": "board-1",
+        "forward_net": "VCC",
+        "return_net": "GND",
+        "source_pad_id": "source",
+        "load_pad_ids": [
+          "load"
+        ],
+        "mesh_target_mm": 1.0
+      }
+    }
+  }
+}

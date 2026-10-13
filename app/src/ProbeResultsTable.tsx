@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import type { ReactNode } from "react";
 import type { BoardObject } from "./BoardViewport";
 import DataTable from "./DataTable";
 import type { SolverResultBundle } from "./analysisResults";
@@ -6,6 +7,7 @@ import { buildProbeRows, evaluateProbeFormulas, probeResultsCsv, type ProbeFormu
 import "./ProbeResultsTable.css";
 
 export type ProbeResultsTableProps = {
+  windowActions?: ReactNode;
   probes: readonly BoardObject[];
   result: SolverResultBundle | null;
   calculatedRows: readonly ProbeFormulaRow[];
@@ -18,7 +20,7 @@ export type ProbeResultsTableProps = {
 
 const shown = (item?: ProbeQuantity) => item ? `${item.value.toPrecision(5)} ${item.unit === "1" ? "" : item.unit}`.trim() : "-";
 
-export default function ProbeResultsTable({ probes, result, calculatedRows, onCalculatedRowsChange, onRemoveProbe, onRenameProbe, onExportCsv, probeReferenceIds = {} }: ProbeResultsTableProps) {
+export default function ProbeResultsTable({ probes, result, calculatedRows, onCalculatedRowsChange, onRemoveProbe, onRenameProbe, onExportCsv, probeReferenceIds = {}, windowActions }: ProbeResultsTableProps) {
   const rows = buildProbeRows(probes, result, probeReferenceIds);
   const references: ProbeReferenceValues = Object.fromEntries(rows.map(row => [row.id, row.values]));
   const calculations = evaluateProbeFormulas(calculatedRows, references);
@@ -31,12 +33,10 @@ export default function ProbeResultsTable({ probes, result, calculatedRows, onCa
     link.download = "spike-probe-results.csv"; link.click(); URL.revokeObjectURL(link.href);
   };
   const nextId = () => { let index = calculatedRows.length + 1; while (calculatedRows.some(row => row.id === `C${index}`)) index++; return `C${index}`; };
-  return <section className="probe-table" aria-labelledby="probe-table-title">
-    <header><div><h3 id="probe-table-title">Probe results</h3><p>Use stable IDs such as <code>{rows[0]?.id ?? "P1"}.voltage</code> in formulas.</p></div>
-      <div className="probe-table-actions"><button type="button" onClick={() => { const id = nextId(); onCalculatedRowsChange([...calculatedRows, { id, name: `Calculation ${id}`, formula: "" }]); }}>Add formula</button>
-        <button type="button" onClick={exportCsv} disabled={!rows.length && !calculatedRows.length}>Export CSV</button></div></header>
+  return <section className="probe-table" aria-label="Probe results">
     <div className="probe-table-scroll" role="region" aria-label="Probe measurements and calculated rows" tabIndex={0}>
-      <DataTable label="Probe results"><caption>{probes.length} measurement point{probes.length === 1 ? "" : "s"}; {calculatedRows.length} calculated row{calculatedRows.length === 1 ? "" : "s"}</caption>
+      <DataTable label="Probe results" toolbarActions={<div className="probe-table-actions"><button type="button" onClick={() => { const id = nextId(); onCalculatedRowsChange([...calculatedRows, { id, name: `Calculation ${id}`, formula: "" }]); }}>Add formula</button>
+        <button type="button" onClick={exportCsv} disabled={!rows.length && !calculatedRows.length}>Export CSV</button>{windowActions}</div>} emptyMessage="No probes placed. Place a probe on a conductor to begin."><caption>{probes.length} measurement point{probes.length === 1 ? "" : "s"}; {calculatedRows.length} calculated row{calculatedRows.length === 1 ? "" : "s"}</caption>
         <thead><tr><th scope="col">ID / name</th><th scope="col">Status</th><th scope="col">Net / layer</th><th scope="col">Voltage</th><th scope="col">Drop</th><th scope="col">Current</th><th scope="col">Power</th><th scope="col">Density</th><th scope="col">Local Z / R</th><th scope="col">Actions</th></tr></thead>
         <tbody>{rows.map(row => <tr key={row.sourceId} title={row.message}>
           <th scope="row"><code>{row.id}</code>{onRenameProbe ? <input aria-label={`Name for probe ${row.id}`} value={row.name} onChange={event => onRenameProbe(row.sourceId, event.target.value)} /> : <span>{row.name}</span>}<small>{row.kind}</small></th>
@@ -49,7 +49,7 @@ export default function ProbeResultsTable({ probes, result, calculatedRows, onCa
             <td colSpan={6} className="probe-formula-value">{row.result ? shown(row.result) : "-"}</td>
             <td><button type="button" aria-label={`Delete calculated row ${row.name}`} onClick={() => onCalculatedRowsChange(calculatedRows.filter(item => item.id !== row.id))}>Delete</button></td></tr>)}
         </tbody></DataTable>
-      {!rows.length && !calculatedRows.length && <p className="probe-table-empty">No probes placed. Place a probe on a conductor to begin.</p>}
+
     </div>
   </section>;
 }

@@ -1,0 +1,218 @@
+{
+  "contract": "spike/thermal-cooling-environment-validation/v1",
+  "established_solver_comparisons": {
+    "cooling_environment": {
+      "analytical_equation": "T(x)=350 + q/(2 W/m/K)*(1-x), q=10*(350-300)+0.8*sigma*(350^4-300^4) W/m2",
+      "calculix_execution": {
+        "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+        "exit_code": 0,
+        "input_sha256": "7d99a1046e1e82381bb83e8b0c2cd58ac70e8f36e52fa41687b6db87be7774bd",
+        "log_sha256": "4edcd0bc55a831ecc5320a560e6f01d9c97c00aa2d1402d9c660dc448901bd13",
+        "output_sha256": "e23685275a6abac5936ef429548378e9e3b0be57257f20faa9cc2424cf6dd2d6",
+        "solver_reported_finished": true,
+        "solver_version": "2.23"
+      },
+      "calculix_maximum_absolute_error_k": 4.666243751216825e-05,
+      "energy_relative_tolerance": 1e-08,
+      "fixture": "original combined convection/diffuse-gray-radiation slab",
+      "nodes": 27,
+      "passed": true,
+      "spike_calculix_maximum_absolute_difference_k": 4.666243808060244e-05,
+      "spike_heat_balance": {
+        "acceptance_tolerance_w": 3.813560360806559e-05,
+        "convection_outward_w": 500.00000000000125,
+        "imbalance_w": -1.9895196601282805e-12,
+        "prescribed_flux_inward_w": 813.2881866497501,
+        "radiation_outward_w": 313.2881866497508,
+        "source_w": 0.0,
+        "temperature_reaction_inward_w": 0.0
+      },
+      "spike_heat_balance_relative_residual": 2.4462665175598884e-15,
+      "spike_maximum_absolute_error_k": 5.684341886080801e-13,
+      "temperature_absolute_tolerance_k": 0.001
+    },
+    "passed": true,
+    "runtime": {
+      "available": true,
+      "executable": "C:\\msys64\\ucrt64\\bin\\ccx.exe",
+      "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+      "message": "Separately installed executable detected; a completed solve is required for execution evidence.",
+      "solver_id": "external.calculix",
+      "status": "detected"
+    },
+    "solid_interface": {
+      "calculix_execution": {
+        "executable_sha256": "913abf828a2d706f3e8c9da89d7a0eddd68ce817f8dabf1098cb013dfe3f94f6",
+        "exit_code": 0,
+        "input_sha256": "f31c70c0d71442c4c9117373113bddf1d5dfa88a6364eabf9859f739384cbc89",
+        "log_sha256": "3b41b8d7eb7abb4a4d4ba8e08d4eab555a894e338d5b6f7108b50ba8a5917c41",
+        "output_sha256": "28e3bb3767e683a2a665d0164266aae633aa86a9724c1e0ab5a8a653e75fc75c",
+        "solver_reported_finished": true,
+        "solver_version": "2.23"
+      },
+      "calculix_interface_heat_flow": [
+        {
+          "id": "contact-0",
+          "left_to_right_heat_w": -40.0
+        },
+        {
+          "id": "contact-1",
+          "left_to_right_heat_w": -40.0
+        }
+      ],
+      "fixture": "original retained two-solid contact slab",
+      "interface_heat_flow_relative_tolerance": 1e-06,
+      "maximum_relative_interface_heat_flow_difference": 2.842170943040401e-15,
+      "passed": true,
+      "spike_calculix_maximum_absolute_difference_k": 1.1368683772161603e-13,
+      "spike_interface_heat_flow": [
+        {
+          "id": "contact-0",
+          "left_to_right_heat_w": -39.999999999999886,
+          "mean_temperature_jump_k": -19.999999999999943
+        },
+        {
+          "id": "contact-1",
+          "left_to_right_heat_w": -39.999999999999886,
+          "mean_temperature_jump_k": -19.999999999999943
+        }
+      ],
+      "temperature_absolute_tolerance_k": 0.001
+    },
+    "status": "passed"
+  },
+  "model_status": "experimental_candidate_evidence",
+  "openfoam_conjugate_airflow": {
+    "conjugate_interface_heat_flow": {
+      "passed": false,
+      "reason": "The current field export contains cell-centred molecular conductive heat-flux vectors, but no signed patch-integrated heat-flow history on both sides of the conjugate interface.",
+      "required_next_evidence": "Hash-bound paired patch heat-flow histories with sign and closure checks.",
+      "status": "not_evaluated"
+    },
+    "energy_balance": {
+      "boundary_energy_j": -4.3906560769929685e-08,
+      "diagnostic_sha256": {
+        "postProcessing/air/spikeEnergyAdvection_air_exhaust/0/surfaceFieldValue.dat": "52852f22c9724c718f3be44fcb8b789eff98efc59e15d402eec752bd1437a552",
+        "postProcessing/air/spikeEnergyAdvection_air_fan_in/0/surfaceFieldValue.dat": "5d70eb51f9bc115a7fad2859d4dc8d7203fa793a9886d2edcb52d8b892fe2dac",
+        "postProcessing/air/spikeEnergyConduction_air_exhaust/0/surfaceFieldValue.dat": "f2243dc2d265cd7c245b0d8059ab2fbc65063589df9b6bc920efdfcf445ee80b",
+        "postProcessing/air/spikeEnergyConduction_air_fan_in/0/surfaceFieldValue.dat": "d82a49f033dff19d61e601c4d1248d5c7655539176f36ca20e0dd09cefcbe770",
+        "postProcessing/air/spikeEnergyVolume_air/0/volFieldValue.dat": "96c3b8570d892f9ee59752bd7f5b4f003427c533bb2d6d11c95aef4b21505bdc",
+        "postProcessing/board/spikeEnergyVolume_board/0/volFieldValue.dat": "e4f15f33dbb89b87794b663c71f699a4600b9a73b517e5f7105bdf91d171ac02"
+      },
+      "dpdt_enabled": true,
+      "energy_defect_j": -8.221591810131379e-14,
+      "first_step_audit": null,
+      "initial_state": [],
+      "input_energy_j": 0.0009000000000000002,
+      "integration": "Euler_right_endpoint",
+      "interval_end_s": 0.01,
+      "interval_start_s": 0.001,
+      "intervals": 9,
+      "manifest_digest": "6c6728ee90644a69466416f8a2a403e11141d1f9785a2dc7ef8990b549cdf014",
+      "maximum_step_defect_j": 9.509625346296874e-14,
+      "maximum_step_relative_residual": 9.509200573920961e-10,
+      "passed": true,
+      "production_qualified": false,
+      "relative_residual": 9.13465637559455e-11,
+      "relative_tolerance": 0.01,
+      "scope": "orthogonal_constant_density_adiabatic_wall_open_flow",
+      "startup_evidence": null,
+      "startup_included": false,
+      "status": "evaluated",
+      "stored_energy_change_j": 0.0009000439066429861
+    },
+    "execution": {
+      "field_export_sha256": "6e9a85c4d37592f4be6b96e1d86476c7e95498d918a9f0ef31f34c4ebfcdac73",
+      "manifest_digest": "6c6728ee90644a69466416f8a2a403e11141d1f9785a2dc7ef8990b549cdf014",
+      "runtime_commands": {
+        "checkMesh": {
+          "available": true,
+          "return_code": 0
+        },
+        "chtMultiRegionFoam": {
+          "available": true,
+          "return_code": 0
+        },
+        "postProcess": {
+          "available": true,
+          "return_code": 0
+        }
+      },
+      "status": "completed",
+      "summary": {
+        "fluid_samples": 8,
+        "maximum_temperature_k": 298.1537538,
+        "minimum_temperature_k": 298.1492967,
+        "total_samples": 16
+      }
+    },
+    "fixture": {
+      "cells_per_region": 8,
+      "contract": "spike/openfoam-fan-heated-fixture/v1",
+      "divisions": 2,
+      "end_time_s": 0.01,
+      "fan_volume_flow_m3_s": 1e-05,
+      "source_power_w": 0.1,
+      "time_step_s": 0.001
+    },
+    "mass_balance": {
+      "expected_inlet_mass_flow_kg_s": 1.2e-05,
+      "final_relative_mass_mismatch": 1.0887493276906811e-10,
+      "final_relative_tolerance": 1e-08,
+      "history_sha256": {
+        "postProcessing/air/spikeMassFlux_air_exhaust/0/surfaceFieldValue.dat": "bac2ff8236b1fe80afb9fde60798d14fb0cb8ac4cc15d1b08aa3fc01f2836292",
+        "postProcessing/air/spikeMassFlux_air_fan_in/0/surfaceFieldValue.dat": "c84d524be2dfb30361f0d70d54b0c38c3d04c6fc3c479dae1fb0fa0b8f125f35"
+      },
+      "maximum_relative_mass_mismatch": 1.2359202434849316e-08,
+      "maximum_relative_prescribed_inlet_error": 1.4117215787571671e-16,
+      "passed": true,
+      "relative_tolerance": 2e-07,
+      "samples": 10,
+      "status": "evaluated"
+    },
+    "passed": true,
+    "runtime": {
+      "available": true,
+      "command_prefix": [
+        "C:\\Windows\\System32\\wsl.exe",
+        "-d",
+        "Ubuntu",
+        "--",
+        "/usr/bin/openfoam2606"
+      ],
+      "distribution": "Ubuntu",
+      "executable": "wsl://Ubuntu/usr/bin/openfoam2606",
+      "launcher": "C:\\Windows\\System32\\wsl.exe",
+      "transport": "wsl_process",
+      "version": "2606"
+    },
+    "scope": "Short deterministic laminar CHT execution smoke check; no mesh/time convergence or measured airflow correlation.",
+    "status": "passed"
+  },
+  "production_qualified": false,
+  "qualification": {
+    "production_qualified": false,
+    "reason": "Authored numerical checks cannot grant qualification; independent review, representative geometry, convergence, and measured correlation remain required."
+  },
+  "source_identity": {
+    "python/spike_core/assembly_tetra_thermal.py": "211da97908bd5bf644adfd1fe3d8b419358685020393b8261686187b92000179",
+    "python/spike_core/calculix_deck.py": "28fd4446b08bd97cf2028183cd978980ea10e69d8aaf7375c0c1f5b51814a42c",
+    "python/spike_core/calculix_runtime.py": "65241db6fe3b54ec049865db095c1ca457e9e813f4c4f84275acb303657b7849",
+    "python/spike_core/openfoam_fan_fixture.py": "2b98c12bf9237759272901ed59d14c3d93d6e15f3fa6de13fbaaa4b15ec4f0c2",
+    "python/spike_core/openfoam_flow_energy_validation.py": "a5d954203c755fa77e2d06721fe042bf3d34632cda8fff5198621b0469f94bb1",
+    "python/spike_core/openfoam_multiregion_execution.py": "67164214980384644264da067f7ada92878c2f01eff40ae27fc2adcea4694e0b",
+    "scripts/validate_thermal_cooling_environments.py": "0b08e52c95432eaf0c59d7401cb341f5b87aa7a48e7963436225a4612c7da723",
+    "tests/python/test_assembly_tetra_radiation.py": "4ce80f3ddaf4cc106fb6be168dbb88d4f4922f8e24a88af9ec9cb9fde6ecaf96",
+    "tests/python/test_assembly_tetra_thermal.py": "27f6fad65ae1e92eb87ff25251be6ee15414b66b7e548efc0c1d29896ac93347"
+  },
+  "sources_unchanged_during_run": true,
+  "status": "passed",
+  "tolerances": {
+    "cfd_energy_relative": 0.01,
+    "cfd_final_mass_relative": 1e-08,
+    "cfd_mass_relative": 2e-07,
+    "solid_energy_relative": 1e-08,
+    "solid_interface_heat_flow_relative": 1e-06,
+    "temperature_absolute_k": 0.001
+  }
+}

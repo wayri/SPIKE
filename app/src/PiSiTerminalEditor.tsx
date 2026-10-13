@@ -10,6 +10,7 @@ export type PiSiTerminalRow = {
   y: string;
   layer: string;
   value: string;
+  currentLimit?: string;
   contactResistance: string;
   packageResistance: string;
 };
@@ -20,6 +21,7 @@ export type PiSiTerminalEditorProps<T extends PiSiTerminalRow> = {
   layers: string[];
   valueLabel: string;
   transient?: boolean;
+  sourceCurrentLimits?: boolean;
   readOnlyValue?: (item: T, index: number) => string;
   onChange: (id: string, patch: Partial<PiSiTerminalRow>) => void;
   onRemove: (id: string) => void;
@@ -38,7 +40,7 @@ export type PiSiTerminalEditorProps<T extends PiSiTerminalRow> = {
 
 /** Table or responsive cards over the same terminal records and placement actions. */
 export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
-  rows, label, layers, valueLabel, transient = false, readOnlyValue,
+  rows, label, layers, valueLabel, transient = false, sourceCurrentLimits = false, readOnlyValue,
   onChange, onRemove, renderDetails, addLabel, pickLabel = "Pick exact point",
   activePickLabel = "Click exact copper point", pickActive = false,
   selectionAvailable = false, selectionLabel = "Use current selection",
@@ -62,7 +64,7 @@ export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
       </div>
     </header>
     {tableView ? <TerminalTable rows={rows} label={label} layers={layers} valueLabel={valueLabel}
-      transient={transient} readOnlyValue={readOnlyValue} onChange={onChange} onRemove={onRemove}
+      transient={transient} sourceCurrentLimits={sourceCurrentLimits} readOnlyValue={readOnlyValue} onChange={onChange} onRemove={onRemove}
       renderDetails={renderDetails} emptyMessage={emptyMessage} embedded /> : <div className="pisi-terminal-editor__cards">
       {rows.map((item, index) => {
         const detailsOpen = expanded === item.id;
@@ -102,12 +104,17 @@ export default function PiSiTerminalEditor<T extends PiSiTerminalRow>({
             </div>
             <label className="pisi-terminal-editor__field"><span>Contact R (ohm)</span>{edit(item, "contactResistance", "contact resistance")}</label>
             <label className="pisi-terminal-editor__field"><span>Package R (ohm)</span>{edit(item, "packageResistance", "package resistance")}</label>
+            {sourceCurrentLimits && <label className="pisi-terminal-editor__field"><span>Current limit (A)</span>
+              <input aria-label={`${label}: ${item.name} current limit (A)`} value={item.currentLimit ?? ""} placeholder="Unlimited"
+                onChange={event => onChange(item.id, { currentLimit: event.target.value })} />
+            </label>}
           </div>
           {detailsOpen && <div className="pisi-terminal-editor__details" id={detailsId}>{renderDetails(item, index)}</div>}
         </article>;
       })}
     </div>}
     {!tableView && !rows.length && <p className="pisi-terminal-editor__empty">{emptyMessage}</p>}
+    {sourceCurrentLimits && <p className="mesh-scope-note">Blank means unlimited. DC checks each source's capacity against the solved multi-sink demand. This does not model constant-current regulation or foldback.</p>}
     <footer className="pisi-terminal-editor__toolbar" aria-label={`${label} actions`}>
       <button type="button" onClick={onAdd}><Plus size={14} aria-hidden="true" /> {addLabel}</button>
       <button type="button" className={pickActive ? "selected" : ""} aria-pressed={pickActive} onClick={onTogglePick}>

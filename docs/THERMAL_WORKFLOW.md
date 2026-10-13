@@ -11,7 +11,7 @@ reports approximate temperatures keyed by part reference. See
 [Component thermal calculations](COMPONENT_THERMAL.md) for equations, limits,
 worker contract, and numerical checks.
 
-### Air environment scenarios
+## Air environment scenarios
 
 The Thermal setup provides three boundary presets for comparing a board in
 still room air, in a sealed box, and under forced air. Each preset states its

@@ -126,6 +126,40 @@ typedef enum spikes_error_code {
   SPIKES_INTERNAL_ERROR = 4
 } spikes_error_code;
 
+/* Additive SMPS API v1. Analysis is the ideal CCM rational model, not TCAD or
+ * switched-loop qualification. Arrays remain owned by the opaque result. */
+typedef struct spikes_smps_result spikes_smps_result;
+typedef struct spikes_smps_config {
+  uint32_t api_version, struct_size, topology, controller_type, points;
+  double input_voltage_v, duty_cycle, inductance_h, capacitance_f;
+  double load_resistance_ohm, switching_frequency_hz, turns_ratio;
+  double start_hz, stop_hz, controller_gain, zero1_hz, zero2_hz;
+  double pole1_hz, pole2_hz, feedback_gain, pwm_gain;
+} spikes_smps_config;
+/* Fields 1,2,7,8,9 contain interleaved re,im pairs. Fields 10/11 contain
+ * seven doubles per crossing: Hz,in_sweep,below_averaging_limit,phase_deg,
+ * phase_margin_deg,gain_db,gain_margin_db. Field 12 is documented summary:
+ * Vout,Iout,Pout,polarity,Iind,Vref,ripple,valley,peak,Vripple,Gdc,omega,
+ * A00,A01,A10,A11,B0,B1. Fields 13..17 are ascending polynomial coefficients. */
+typedef enum spikes_smps_field {
+  SPIKES_SMPS_FREQUENCY=0, SPIKES_SMPS_PLANT=1, SPIKES_SMPS_LOOP=2,
+  SPIKES_SMPS_PLANT_DB=3, SPIKES_SMPS_PLANT_PHASE=4,
+  SPIKES_SMPS_LOOP_DB=5, SPIKES_SMPS_LOOP_PHASE=6,
+  SPIKES_SMPS_PLANT_POLES=7, SPIKES_SMPS_PLANT_ZEROS=8,
+  SPIKES_SMPS_CLOSED_POLES=9, SPIKES_SMPS_GAIN_CROSSINGS=10,
+  SPIKES_SMPS_PHASE_CROSSINGS=11, SPIKES_SMPS_SUMMARY=12,
+  SPIKES_SMPS_PLANT_NUM=13, SPIKES_SMPS_PLANT_DEN=14,
+  SPIKES_SMPS_LOOP_NUM=15, SPIKES_SMPS_LOOP_DEN=16,
+  SPIKES_SMPS_CLOSED_DEN=17
+} spikes_smps_field;
+SPIKES_API spikes_error_code spikes_smps_analyze(const spikes_smps_config*,spikes_smps_result**);
+SPIKES_API size_t spikes_smps_result_size(const spikes_smps_result*,uint32_t field);
+SPIKES_API const double* spikes_smps_result_data(const spikes_smps_result*,uint32_t field);
+SPIKES_API const char* spikes_smps_result_stability(const spikes_smps_result*);
+SPIKES_API size_t spikes_smps_result_warning_count(const spikes_smps_result*);
+SPIKES_API const char* spikes_smps_result_warning(const spikes_smps_result*,size_t index);
+SPIKES_API void spikes_smps_result_destroy(spikes_smps_result*);
+
 /** Linear E/G/F/H source. Empty control_source selects voltage control. */
 SPIKES_API spikes_error_code spikes_circuit_add_dependent_source(
     spikes_circuit*, const char*, const char*, const char*, int,
@@ -162,6 +196,15 @@ SPIKES_API spikes_error_code spikes_circuit_add_pulse_current_source(
     const char *negative_node, double initial_value, double pulsed_value,
     double delay_s, double rise_time_s, double fall_time_s,
     double pulse_width_s, double period_s);
+/* Additive analytic SIN API. Missing symbols in older ABI-v1 builds mean unavailable. */
+SPIKES_API spikes_error_code spikes_circuit_add_sine_current_source(
+    spikes_circuit *circuit, const char *id, const char *positive_node,
+    const char *negative_node, double offset, double amplitude,
+    double frequency_hz, double delay_s, double damping_per_s, double phase_deg);
+SPIKES_API spikes_error_code spikes_circuit_add_sine_voltage_source(
+    spikes_circuit *circuit, const char *id, const char *positive_node,
+    const char *negative_node, double offset, double amplitude,
+    double frequency_hz, double delay_s, double damping_per_s, double phase_deg);
 SPIKES_API spikes_error_code spikes_circuit_add_pulse_voltage_source(
     spikes_circuit *circuit, const char *id, const char *positive_node,
     const char *negative_node, double initial_value, double pulsed_value,
@@ -328,6 +371,10 @@ SPIKES_API spikes_error_code spikes_transient_result_sparse_lte_diagnostics(
     size_t *out_sparse_numeric_factorizations,
     size_t *out_partial_numeric_refactorizations);
 
+/** Number of failed Newton trial steps discarded by adaptive recovery. */
+SPIKES_API spikes_error_code spikes_transient_result_recovery_diagnostics(
+    const spikes_transient_result *result, size_t *out_rejected_newton_steps);
+
 /**
  * Create a persistent backward-Euler session from a copied circuit snapshot.
  * Session v1 advances constant/PULSE/PWL independent sources on a persistent
@@ -344,6 +391,11 @@ SPIKES_API void
 spikes_transient_session_destroy(spikes_transient_session *session);
 SPIKES_API spikes_error_code spikes_transient_session_set_source_value(
     spikes_transient_session *session, const char *element_id, double value);
+/** Additive ABI-1 fault setters; reject unsupported devices without mutation. */
+SPIKES_API spikes_error_code spikes_transient_session_set_resistance(
+    spikes_transient_session *session, const char *element_id, double resistance_ohm);
+SPIKES_API spikes_error_code spikes_transient_session_set_mosfet_threshold(
+    spikes_transient_session *session, const char *element_id, double threshold_voltage_v);
 SPIKES_API spikes_error_code spikes_transient_session_step(
     spikes_transient_session *session, double step_s, uint8_t *out_accepted);
 SPIKES_API spikes_solve_status spikes_transient_session_status(

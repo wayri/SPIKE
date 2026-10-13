@@ -1,6 +1,6 @@
 [package]
 name = "spike-desktop"
-version = "0.3.10"
+version = "0.3.11-gamma.1"
 description = "SPIKE Electronic Systems Integrity Workbench"
 license = "Apache-2.0"
 authors = ["SPIKE contributors"]
@@ -18,7 +18,7 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["float_roundtrip"] }
 sysinfo = { version = "=0.39.6", default-features = false, features = ["system"] }
 rfd = "0.15"
 base64 = "0.22"

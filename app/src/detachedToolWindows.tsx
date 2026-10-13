@@ -164,7 +164,7 @@ export async function openDetachedToolWindow(
       }
       const child = new WebviewWindow(labels[kind], {
         url: queryUrl(kind, token), title: `SPIKE | ${snapshot.title}`, width: kind === "probes" ? 1120 : 980,
-        height: 680, minWidth: 520, minHeight: 360, resizable: true, decorations: true,
+        height: 680, minWidth: 520, minHeight: 360, resizable: true, decorations: true, skipTaskbar: false,
         backgroundColor: "#101820", dragDropEnabled: false,
       });
       const stopDestroyed = await child.once("tauri://destroyed", () => {

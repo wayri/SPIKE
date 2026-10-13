@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: Apache-2.0
+import { useState } from "react";
+import { createRoot } from "react-dom/client";
+import { PalaceExtension } from "../src/PalaceExtension";
+import { XyceExtension } from "../src/XyceExtension";
+import { defaultPalaceParameters, defaultXyceParameters, type SolverParameters } from "../src/solverExtensionModel";
+import "../src/buttonStandard.css";
+function Preview() {
+  const [engine, setEngine] = useState("palace"), [busy, setBusy] = useState(false), [result, setResult] = useState<unknown>({});
+  const [palace, setPalace] = useState<SolverParameters>(defaultPalaceParameters()), [xyce, setXyce] = useState<SolverParameters>(defaultXyceParameters());
+  const props = { parameters: engine === "palace" ? palace : xyce, onParameters: engine === "palace" ? setPalace : setXyce, result, busy, onCancel: () => setBusy(false), onExecute: async () => { throw new Error("UI fixture: worker execution is unavailable in this preview."); } };
+  return <main style={{ padding: 20, maxWidth: 1100, margin: "0 auto", font: "13px system-ui", color: "var(--spike-table-text)", background: "var(--spike-table-surface)" }}><h2>Native solver UI fixtures</h2><p>This page tests presentation and controls using synthetic UI fixtures. No engine runs or numerical validation are performed.</p><div className="solver-actions"><button type="button" onClick={() => { setEngine("palace"); setResult({}); }}>PALACE setup</button><button type="button" onClick={() => { setEngine("xyce"); setResult({}); }}>Xyce setup</button><button type="button" onClick={() => setBusy(value => !value)}>Toggle busy state</button><button type="button" onClick={() => setResult({ data: { status: "failed", solved: false, model_status: "experimental", diagnostics: [{ code: "fixture_runtime_missing", severity: "error", message: "UI fixture: runtime is unavailable. Set the executable path and retry." }] } })}>Show failure fixture</button><button type="button" onClick={() => setResult({ data: { status: "fixture_only", solved: false, model_status: "unvalidated UI fixture", tables: [{ name: "Synthetic UI fixture (no solver result)", headers: ["sample index", "synthetic value"], rows: [["0", "1"], ["1", "2"], ["2", "1"]] }], artifacts: [{ name: "very-long-synthetic-artifact-name-for-layout-testing-only-with-no-file-on-disk.vtu", bytes: 0, sha256: "a".repeat(64) }], field_previews: [{ name: "Synthetic display fixture (no solver field)", status: "available", points: [[0, 0, 0], [1, 0, 0], [0, 1, 0]], source_point_count: 3, coordinate_units_m: 1, arrays: [{ name: "synthetic array", components: 1, values: [[0], [1], [2]], units: null }] }] } })}>Show results layout fixture</button></div><hr />{engine === "palace" ? <PalaceExtension {...props} /> : <XyceExtension {...props} />}</main>;
+}
+createRoot(document.getElementById("root")!).render(<Preview />);

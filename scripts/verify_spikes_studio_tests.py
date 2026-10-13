@@ -7,7 +7,10 @@ import sys
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
-sys.path[:0]=[str(ROOT),str(ROOT/'standalone/spikes_project/studio/python'),str(ROOT/'.tmp/studio-deps')]
+sys.path[:0]=[str(ROOT),str(ROOT/'standalone/spikes_project/studio/python')]
+cache=ROOT/'.tmp/studio-deps'
+if any((cache/'numpy'/'_core').glob(f'*.cp{sys.version_info.major}{sys.version_info.minor}-*.pyd')):
+    sys.path.insert(0,str(cache))
 
 
 def main():
@@ -21,6 +24,13 @@ def main():
     os.environ['SPIKES_TEST_LIBRARY']=str(library);os.environ['SPIKES_TEST_NATIVE_LIBRARY']=str(library)
     if args.ngspice:os.environ['SPIKES_TEST_NGSPICE']=str(args.ngspice.resolve(strict=True))
     if args.wx:os.environ['SPIKES_TEST_WX']='1'
+    # Some older test modules prepend a historical cp311 cache. Bind the chosen
+    # runtime's packages before discovery so those modules cannot substitute
+    # incompatible extension modules into an already valid wx environment.
+    if args.wx:
+        import numpy
+        import matplotlib
+        import wx
     suite=unittest.defaultTestLoader.discover(str(ROOT/'standalone/spikes_project/tests/python'))
     output=io.StringIO();result=unittest.TextTestRunner(stream=output,verbosity=1).run(suite)
     from spikes_studio.document import write_json

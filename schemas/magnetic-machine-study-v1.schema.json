@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/magnetic-machine-study/v1",
+  "title": "Experimental planar magnetic machine study",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "model"],
+  "properties": {
+    "contract": {"const": "spike/magnetic-machine-study/v1"},
+    "model": {"enum": ["pm_rotor", "solenoid"]},
+    "geometry": {"type": "object", "description": "Model-specific SI builder parameters; duplicate top-level controls are rejected by the worker."},
+    "mesh_edge_m": {"type": "number", "exclusiveMinimum": 0},
+    "stack_depth_m": {"type": "number", "exclusiveMinimum": 0},
+    "relative_permeability": {"type": "number", "exclusiveMinimum": 0},
+    "remanence_t": {"type": "number"},
+    "current_density_a_m2": {"type": "number"},
+    "position": {"type": "number", "description": "Rotor radians or solenoid gap-increasing displacement metres."},
+    "bh_curve": {"type": "array", "minItems": 2, "maxItems": 4096, "items": {"$ref": "#/$defs/pair"}},
+    "motion": {"type": "object", "additionalProperties": false,
+      "required": ["duration_s", "time_step_s", "mass_or_inertia", "damping", "external_load", "initial_velocity"],
+      "properties": {
+        "duration_s": {"type": "number", "exclusiveMinimum": 0},
+        "time_step_s": {"type": "number", "exclusiveMinimum": 0},
+        "mass_or_inertia": {"type": "number", "exclusiveMinimum": 0},
+        "damping": {"type": "number", "minimum": 0},
+        "external_load": {"type": "number"},
+        "initial_velocity": {"type": "number"}
+      }},
+    "transient": {"type": "object", "additionalProperties": false,
+      "required": ["time_step_s", "steps", "thermal_materials", "initial_temperature_k", "ambient_temperature_k", "convection_h_w_m2_k", "initial_field"],
+      "properties": {
+        "time_step_s": {"type": "number", "exclusiveMinimum": 0},
+        "steps": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "snapshot_stride": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "initial_temperature_k": {"type": "number", "exclusiveMinimum": 0, "maximum": 10000},
+        "ambient_temperature_k": {"type": "number", "exclusiveMinimum": 0},
+        "convection_h_w_m2_k": {"type": "number", "minimum": 0},
+        "initial_field": {"enum": ["zero", "steady"]},
+        "thermal_materials": {"type": "object", "additionalProperties": {"$ref": "#/$defs/thermalMaterial"}},
+        "region_loss_density_w_m3": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+        "conductivity_temperature_coefficients": {"type": "object", "additionalProperties": {
+          "type": "object", "additionalProperties": false,
+          "required": ["alpha_per_k", "reference_temperature_k"],
+          "properties": {"alpha_per_k": {"type": "number"}, "reference_temperature_k": {"type": "number", "exclusiveMinimum": 0}}
+        }}
+      }}
+  },
+  "not": {"required": ["motion", "transient"]},
+  "$defs": {
+    "pair": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+    "thermalMaterial": {"type": "object", "additionalProperties": false,
+      "required": ["k_w_m_k", "rho_kg_m3", "cp_j_kg_k"],
+      "properties": {
+        "k_w_m_k": {"type": "number", "exclusiveMinimum": 0},
+        "rho_kg_m3": {"type": "number", "exclusiveMinimum": 0},
+        "cp_j_kg_k": {"type": "number", "exclusiveMinimum": 0}
+      }}
+  }
+}

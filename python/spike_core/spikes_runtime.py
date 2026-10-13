@@ -52,7 +52,11 @@ def owned_library_path() -> Path:
         candidate = Path(frozen_root) / "spikes" / _library_name()
     else:
         root = Path(__file__).resolve().parents[2]
-        candidate = root / "build-spikes-hybrid" / _library_name()
+        candidates = (
+            root / "build-spikes-native-analysis-20261013" / "Release" / _library_name(),
+            root / "build-spikes-hybrid" / _library_name(),
+        )
+        candidate = next((path for path in candidates if path.is_file()), candidates[-1])
     return candidate.resolve(strict=True)
 
 

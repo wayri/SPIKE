@@ -1,0 +1,88 @@
+{
+  "manifest": "benchmarks/parity-import/arc-fidelity-manifest.json",
+  "summary": {
+    "contract": "spike/board-corpus-benchmark/v1",
+    "status": "failed",
+    "runner_sources": {
+      "scripts/benchmark_board_corpus.py": "f0644a6942d92b70b9b37a3308530828742ecc7dd905b2aa6478ff8e992e4f0e",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/kicad_importer.py": "ba1b129a08417c94c2c06e33c30ffb74e1b9c72b7b6515c2c9b0e0f777a9e629",
+      "python/core/board_parser.py": "d71039d5de4acabdf60aba04cd2fd6a9e0aa6c94e32fabbcf199860c9901ae61"
+    },
+    "python_version": "3.12.9 (main, Feb  8 2026, 03:56:09) [MSC v.1950 64 bit (AMD64)]",
+    "manifest_sha256": "e9d445a5100cb50e82fe7933170cd184c40c2ba9eebbef4e6f08e923813c0c76",
+    "production_qualified": false,
+    "scope": "CLI import status, canonical units/identity, pinned source and optional independent counts/entity values; no viewport or physics validation",
+    "boards": [
+      {
+        "fixture": "geometry.kicad_pcb",
+        "source_url": "repository:benchmarks/parity-import/geometry.kicad_pcb",
+        "license": "Apache-2.0",
+        "sha256": "d4eb7b96fd703216f1c57266f0a6be8b471482773cd2d7e0248578f68b230395",
+        "exit_code": 0,
+        "stderr": "",
+        "counts": {
+          "materials": 3,
+          "layers": 4,
+          "nets": 1,
+          "tracks": 8,
+          "arcs": 0,
+          "zones": 0,
+          "pads": 1,
+          "vias": 0,
+          "drills": 0,
+          "castellations": 0,
+          "pins": 1,
+          "components": 1,
+          "regions": 0,
+          "models": 0
+        },
+        "mismatches": {
+          "arcs": {
+            "expected": 1,
+            "actual": 0
+          }
+        },
+        "import_status": "completed_with_warnings",
+        "errors": [],
+        "diagnostics": [
+          {
+            "code": "KICAD_ARC_LINEARIZED",
+            "severity": "warning",
+            "source_id": "77777777-7777-4777-8777-777777777777",
+            "segment_count": 8,
+            "message": "Copper arc is represented by straight chords; exact curvature is not admitted."
+          }
+        ],
+        "inferred": [],
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": true,
+            "reasons": []
+          },
+          "pi_ac": {
+            "ready": true,
+            "reasons": []
+          },
+          "si": {
+            "ready": true,
+            "reasons": []
+          },
+          "thermal": {
+            "ready": true,
+            "reasons": []
+          },
+          "emi": {
+            "ready": true,
+            "reasons": []
+          }
+        },
+        "geometry_mismatches": [],
+        "entity_assertions_checked": 12,
+        "source_digest_checked": true,
+        "passed": false,
+        "elapsed_s": 2.265
+      }
+    ]
+  }
+}

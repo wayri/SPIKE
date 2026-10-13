@@ -1,0 +1,19 @@
+{
+  "contract": "spike/extension/v1", "api_version": 1,
+  "id": "spike.prism-bridge", "name": "Prism snapshot bridge", "version": "0.1.0",
+  "provider": "SPIKE", "description": "Opt-in source-only exchange of saved KiCad snapshots and exactly bound SPIKE worker results. No Prism host or new solver.",
+  "execution": "process", "runtime": "python", "entrypoint": "extension.py",
+  "state": "experimental", "license": "Apache-2.0", "bundled": false,
+  "permissions": ["filesystem.workspace", "design.read", "results.write"],
+  "limits": {"timeout_seconds": 300, "max_result_bytes": 67108864},
+  "contributes": {
+    "commands": [{"id": "prism-capabilities", "name": "Prism bridge capabilities", "output_contract": "spike/prism-result/v1",
+      "input_schema": {"type": "object", "properties": {}, "additionalProperties": false}}],
+    "importers": [{"id": "prism-import-board", "name": "Prism board snapshot", "source_formats": ["prism-board"],
+      "extensions": [".prism-board.json"], "accepts_directories": false, "output_contract": "spike/v1",
+      "input_schema": {"type": "object", "properties": {}, "additionalProperties": false}}],
+    "analyses": [{"id": "prism-import-result", "name": "Import bound Prism analysis result", "output_contract": "spike/v1",
+      "input_schema": {"type": "object", "required": ["exchange", "expected_analysis_spec_sha256"],
+        "properties": {"exchange": {"type": "object"}, "expected_analysis_spec_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}, "additionalProperties": false}}]
+  }
+}

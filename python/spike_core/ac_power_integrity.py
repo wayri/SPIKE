@@ -106,12 +106,15 @@ def analyze_ac_power_integrity(request: Mapping[str, Any]) -> dict[str, Any]:
     if conductor is not None and not isinstance(conductor, Mapping):
         raise ValueError("conductor must be an explicit slab object.")
     if conductor is not None and (not {"width_m", "thickness_m", "conductivity_s_m"}.issubset(conductor)
-            or set(conductor)-{"width_m", "thickness_m", "conductivity_s_m", "relative_permeability", "field_bias_ratio"}):
+            or set(conductor)-{"width_m", "thickness_m", "conductivity_s_m", "relative_permeability", "field_bias_ratio", "roughness_rms_um", "include_internal_reactance"}):
         raise ValueError("Slab needs explicit width, thickness, conductivity and no unknown fields.")
+    if conductor is not None and not isinstance(conductor.get("include_internal_reactance", False), bool):
+        raise ValueError("include_internal_reactance must be boolean; L must be external when enabled.")
     samples = []
     for f in frequencies:
         slab = None
         resistance = r
+        internal_reactance = 0.0
         if conductor is not None:
             width = _number(conductor.get("width_m"), "width_m", positive=True)
             bias = _complex(conductor.get("field_bias_ratio", [0, 0]), "field_bias_ratio")
@@ -120,8 +123,19 @@ def analyze_ac_power_integrity(request: Mapping[str, Any]) -> dict[str, Any]:
             slab = slab_field_loss(f, width, conductor.get("thickness_m"),
                 conductor.get("conductivity_s_m"), complex(avg-diff), complex(avg+diff),
                 conductor.get("relative_permeability", 1))
-            resistance = slab["effective_resistance_ohm_per_m"]
-        z, y = complex(resistance, 2*math.pi*f*l)*length, complex(g, 2*math.pi*f*c)*length
+            from .conductor_ac_loss import slab_internal_impedance_per_m
+            diffusion = slab_internal_impedance_per_m(frequency_hz=f, width_m=width,
+                thickness_m=conductor.get("thickness_m"), conductivity_s_per_m=conductor.get("conductivity_s_m"),
+                relative_permeability=conductor.get("relative_permeability", 1),
+                roughness_rms_m=_number(conductor.get("roughness_rms_um", 0), "roughness_rms_um")*1e-6)
+            resistance = slab["effective_resistance_ohm_per_m"] * diffusion["roughness_correction"]
+            slab["roughness_correction"] = diffusion["roughness_correction"]
+            slab["roughness_corrected_loss_w_per_m"] = slab["joule_loss_w_per_m"] * diffusion["roughness_correction"]
+            if conductor.get("include_internal_reactance", False):
+                if abs(bias) > 0:
+                    raise ValueError("Internal reactance currently requires zero imposed field bias.")
+                internal_reactance = diffusion["reactance_ohm_per_m"]
+        z, y = complex(resistance, 2*math.pi*f*l+internal_reactance)*length, complex(g, 2*math.pi*f*c)*length
         q = cmath.sqrt(z*y)
         if not math.isfinite(abs(q)) or q.real > 300:
             raise ValueError("Uniform-line electrical length exceeds bounded numerical range.")
@@ -144,6 +158,7 @@ def analyze_ac_power_integrity(request: Mapping[str, Any]) -> dict[str, Any]:
             _number(gain, "load-to-sending voltage gain")
         _number(abs(vload), "load-to-source voltage gain")
         samples.append({"frequency_hz": f, "status": "computed", "R_ohm_per_m": resistance,
+            "internal_reactance_ohm_per_m": internal_reactance,
             "input_impedance_ohm": _pair(sending/input_current) if input_current != 0 else None,
             "input_impedance_state": "finite" if input_current != 0 else "open",
             "load_voltage_v_rms": _pair(vload), "sending_voltage_v_rms": _pair(vsend),
@@ -157,6 +172,7 @@ def analyze_ac_power_integrity(request: Mapping[str, Any]) -> dict[str, Any]:
                 "Slab replaces R; imposed surface field bias is not extracted from nearby PCB conductors.",
                 "Slab resistance describes this conductor; return-conductor loss is not included automatically.",
                 "No radiation, geometry-derived proximity, material dispersion, nonlinear loads, vias or full-board qualification.",
-                "Internal reactive slab energy is not added to L; user-supplied line L remains explicit."],
+                "Internal reactance is opt-in; when enabled L is external only, avoiding double-counted internal energy.",
+                "Optional RMS roughness scales resistance only; it is not a causal broadband phase model."],
             "provenance": {"solver": "spike.explicit_uniform_ac_pi", "production_qualified": False,
                            "request": dict(request)}}

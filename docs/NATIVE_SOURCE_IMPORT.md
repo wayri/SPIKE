@@ -80,3 +80,35 @@ the existing App and Rust host ownership boundaries.
 
 See [the validation checkpoint](validation/NATIVE_IMPORT_UI_20261004.md) for
 checks performed and native acceptance work that remains after the active merge.
+
+## KiCad copper arc approximation
+
+KiCad import now retains nondegenerate copper arcs as exact three-point canonical
+Arc records. Their legacy chord surrogates are excluded from canonical tracks,
+validated against source net/layer/width and circle/sweep, and retained only for
+an explicit approximate solver projection. `KICAD_ARC_LINEARIZED` records that
+legacy approximation, source identity and segment count, including anonymous
+occurrences. Edited or forged surrogates cannot silently replace source copper.
+
+Straight Edge.Cuts loops now retain one outer ring and strictly contained
+disjoint cutouts in `board_outline_rings`; bounds follow that outer ring.
+Unsupported, open, branched, touching or nested topology is not replaced by a
+bounding box. The [parity import evidence](../benchmarks/parity-import/README.md)
+separates exact import/transport from unqualified curved-conductor physics.
+Curved board outlines and degenerate/unresolved tiny arcs remain outside this
+bounded increment. The existing parser degeneracy threshold is unchanged.
+
+## Native pad frames
+
+Native pad angles in board files are absolute board angles; footprint rotation
+is applied to pad position, without adding it to pad angle. Stored back-side
+coordinates/primitives already encode reflection. The backend now normalizes
+angles to mathematical numeric XY and retains `native_pad_rotation_deg`.
+Normalized snapshot display converts back to the `ParsedPad` convention.
+Native pose and physical-perimeter references cover front/back, omitted angles,
+non-cardinal placement, supported asymmetric pads and centered slots.
+
+Older saved geometry produced with the incorrect angle/reflection interpretation
+needs the original board reimported. The importer revision is
+`kicad-pad-frame-v3`. Model composition and unsupported custom unions remain
+unqualified. See [the frame decision](adr/0077-native-pad-angle-and-reflection-boundary.md).

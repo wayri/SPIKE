@@ -56,14 +56,16 @@ def _fields(raw: Any, allowed: set[str], name: str) -> dict:
 
 def compile_multiboard_circuit(raw: dict) -> dict:
     """Compile exact retained link coverage into one bounded native circuit."""
-    _fields(raw, {"contract", "assembly", "domain", "board_models", "part_models", "electrical_bond_models", "link_models", "ground", "analysis"}, "request")
+    _fields(raw, {"contract", "assembly", "domain", "board_models", "part_models", "electrical_bond_models", "link_models", "ground", "analysis", "thermal_only_part_ids"}, "request")
     if raw.get("contract") != REQUEST_CONTRACT or raw.get("domain") not in {"pi", "si"}:
         raise MultiboardCircuitError(f"Expected {REQUEST_CONTRACT} and domain pi or si.")
     assembly = AssemblyIRV1.from_dict(raw.get("assembly") or {})
     validate_harness_connections(assembly)
     board_ids = {board.id for board in assembly.boards}
     excluded_parts = [part.id for part in assembly.parts if part.part_type == "subassembly" and not part.model_id]
-    part_ids = {part.id for part in assembly.parts} - set(excluded_parts)
+    from .multiboard_thermal_parts import thermal_only_parts
+    thermal_parts = thermal_only_parts(raw, assembly, MultiboardCircuitError)
+    part_ids = {part.id for part in assembly.parts} - set(excluded_parts) - set(thermal_parts)
     if not board_ids or len(board_ids) + len(part_ids) < 2:
         raise MultiboardCircuitError("Coupled circuit requires at least two board/part occurrences, including a board.")
     if assembly.rigid_flex_links:
@@ -73,7 +75,7 @@ def compile_multiboard_circuit(raw: dict) -> dict:
         raise MultiboardCircuitError("board_models must cover every retained board occurrence exactly once.")
     part_models = raw.get("part_models", [])
     if not isinstance(part_models, list) or len(part_models) != len(part_ids):
-        raise MultiboardCircuitError("part_models must cover every retained physical part exactly once.")
+        raise MultiboardCircuitError("part_models must cover every electrically participating retained physical part exactly once.")
     models = [("board_id", model) for model in models] + [("part_id", model) for model in part_models]
     if sum(len(model.get("elements", [])) for _, model in models if isinstance(model, dict) and isinstance(model.get("elements"), list)) > MAX_ELEMENTS:
         raise MultiboardCircuitError("Reduced circuit exceeds element budget.")
@@ -229,7 +231,8 @@ def compile_multiboard_circuit(raw: dict) -> dict:
             "element_map": {key: element_map[key] for key in element_map if key in board_ids}, "links": link_map,
             "part_node_map": {key: node_map[key] for key in node_map if key in part_ids},
             "part_element_map": {key: element_map[key] for key in element_map if key in part_ids},
-            "electrical_bonds": bond_map, "excluded_hierarchy_part_ids": excluded_parts}
+            "electrical_bonds": bond_map, "excluded_hierarchy_part_ids": excluded_parts,
+            **({"excluded_thermal_part_ids": list(thermal_parts)} if thermal_parts else {})}
 
 
 def run_multiboard_circuit(raw: dict) -> dict:

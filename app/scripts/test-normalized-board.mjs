@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import ts from "typescript";
 import { createHash } from "node:crypto";
 import { deflateSync } from "node:zlib";
-import { hydrateNormalizedSnapshot, compressNormalizedSnapshot } from "../src/normalizedSnapshotTransport.ts";
+import { hydrateNormalizedSnapshot, compressNormalizedSnapshot, hydrateCanonicalDesignTransport } from "../src/normalizedSnapshotTransport.ts";
 
 const source = readFileSync(new URL("../src/normalizedBoard.ts", import.meta.url), "utf8");
 const module = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
@@ -44,6 +44,11 @@ assert.equal(kicadBoard.outlineLoops.length,1,"canonical KiCad outline drawings 
 assert.deepEqual(kicadBoard.outlineLoops[0][0],[10,5]);
 assert.deepEqual(kicadBoard.pads[0].at,[12,7]);
 assert.equal(kicadBoard.pads[0].name,"1");
+const angleDesign = {...design, pads:[{id:"angle", at:[2,3], size:[2,1], rotation:23, layers:["top"]}]};
+const angleBoard = parseNormalizedBoard(JSON.stringify({contract:"spike/design-snapshot/v1",design:angleDesign}));
+assert.equal(angleBoard.pads[0].rotation,-23,"neutral mathematical XY angle converts to ParsedPad display convention");
+const nativeAngleDesign = {...angleDesign,pads:[{...angleDesign.pads[0],rotation:-90,native_pad_rotation_deg:90}]};
+assert.equal(parseNormalizedBoard(JSON.stringify({contract:"spike/design-snapshot/v1",design:nativeAngleDesign})).pads[0].rotation,90);
 assert.equal(kicadBoard.components[0].library,"Package_QFP:LQFP-48");
 assert.equal(kicadBoard.components[0].layer,"B.Cu","legacy normalized KiCad components must retain their source side");
 assert.deepEqual(kicadBoard.components[0].at,[12,7]);
@@ -126,7 +131,7 @@ assert.throws(()=>parseNormalizedBoard(JSON.stringify(compact)), /missing its ca
 for (const filename of process.argv.slice(2)) {
   const input = readFileSync(filename,"utf8");
   const envelope = JSON.parse(input);
-  const source = await hydrateNormalizedSnapshot(envelope.result?.project?.design?.source_board ?? input, envelope.result?.canonical?.design_ir);
+  const source = await hydrateNormalizedSnapshot(envelope.result?.project?.design?.source_board ?? input, await hydrateCanonicalDesignTransport(envelope.result?.canonical?.design_ir));
   const parsed = parseNormalizedBoard(source);
   const solver = normalizedSolverDesign(source);
   assert.ok(Array.isArray(solver.zones));
@@ -135,3 +140,20 @@ for (const filename of process.argv.slice(2)) {
   for (const t of parsed.tracks) assert.ok([...t.start,...t.end,t.width].every(Number.isFinite));
   console.log(JSON.stringify({file:filename,tracks:parsed.tracks.length,pads:parsed.pads.length,vias:parsed.vias.length,components:parsed.components.length,zones:parsed.zones.length,solverZones:solver.zones.length,copper:parsed.layers.length,drawable:parsed.layerDefinitions.length}));
 }
+
+const dielectricDesign = {...kicadDesign, layers:[{name:"FR4",type:"dielectric"}], components:[
+  {id:"upper",reference:"U1",position_mm:[12,7],side:"top"},
+  {id:"lower",reference:"U2",position_mm:[12,7],side:"bottom"}], tracks:[],pads:[]};
+const dielectricProjection = parseNormalizedBoard(JSON.stringify({contract:"spike/design-snapshot/v1",design:dielectricDesign}));
+assert.deepEqual(dielectricProjection.components.map(c=>c.layer),["F.Cu","B.Cu"]);
+assert.deepEqual(dielectricProjection.layers,[],"display mounting names cannot create physical copper layers");
+
+// Lossless canonical transport preserves nested solver values and rejects corruption.
+const transportDesign = {contract:"spike/design-ir/v2",design_id:"unicode-é",tracks:[{at:[1.234567890123, -0.000000001],net:"電源"}]};
+const packedCanonical = JSON.parse(await compressNormalizedSnapshot(JSON.stringify(transportDesign)));
+assert.deepEqual(await hydrateCanonicalDesignTransport(packedCanonical), transportDesign);
+assert.equal(await hydrateCanonicalDesignTransport(transportDesign), transportDesign);
+await assert.rejects(hydrateCanonicalDesignTransport({...packedCanonical,sha256:"0".repeat(64)}), /checksum/);
+await assert.rejects(hydrateCanonicalDesignTransport({...packedCanonical,bytes:513*1024*1024}), /Invalid/);
+await assert.rejects(hydrateCanonicalDesignTransport({...packedCanonical,encoding:"other"}), /encoding/);
+await assert.rejects(hydrateCanonicalDesignTransport(JSON.parse(await compressNormalizedSnapshot(JSON.stringify({contract:"other"})))), /Invalid canonical/);

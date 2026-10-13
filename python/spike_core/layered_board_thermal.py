@@ -18,9 +18,64 @@ import numpy as np
 from scipy.sparse import diags, lil_matrix
 from scipy.sparse.linalg import splu, spsolve
 
-from .board_thermal import CONTRACT, MAX_CELLS, MAX_COMPONENTS, _number, _pad_contacts, _point
+from .board_thermal import (CONTRACT, MAX_COMPONENTS, _contact_pad_numbers, _number,
+                            _pad_contacts, _point, _require_selected_contacts)
 from .contracts import SpiDeR
 from .thermal_copper_geometry import rasterize_copper
+from .thermal_grid import cell_index, grid_edges, rectangle_weights, transfer_coverage
+
+MAX_DIRECT_CONTACT_WEIGHTS = 1_000_000
+
+
+def _boundary_grid(board: Mapping[str, Any], key: str, fallback: float,
+                   shape: tuple[int, int], minimum: float) -> np.ndarray:
+    """Admit a prescribed x-fast surface boundary, never infer an air field."""
+    if key not in board:
+        return np.full(shape, fallback)
+    raw = board[key]
+    if not isinstance(raw, (list, tuple)) or len(raw) != shape[0] * shape[1]:
+        raise ValueError(f"{key} must contain one x-fast value per planar grid cell.")
+    if any(isinstance(value, bool) or not isinstance(value, (int, float)) for value in raw):
+        raise ValueError(f"{key} values must be finite numbers.")
+    values = np.array([_number(value, key) for value in raw], dtype=float).reshape(shape)
+    if np.any(values < minimum):
+        raise ValueError(f"{key} values must be at least {minimum}.")
+    return values
+
+
+def _surface_pad_contacts(design: SpiDeR, ref: str, names: list[str], bottom_z: int,
+                          bounds: tuple[float, float, float, float], x_edges: np.ndarray,
+                          y_edges: np.ndarray, selected: list[str] | None, *,
+                          max_contact_weights: int | None = None) -> list[dict[str, Any]]:
+    """Use imported surface lands only; the unfiltered design retains all copper."""
+    nx, ny = len(x_edges) - 1, len(y_edges) - 1
+    spacing = ((bounds[2] - bounds[0]) / nx, (bounds[3] - bounds[1]) / ny)
+    contacts = []
+    remaining_weights = max_contact_weights
+    for face, z in ((names[0], 0), (names[-1], bottom_z)):
+        face_pads = []
+        for pad in design.pads:
+            if not isinstance(pad, Mapping):
+                continue
+            layers = pad.get("layers", [pad.get("layer")])
+            if isinstance(layers, str):
+                layers = [layers]
+            if not isinstance(layers, (list, tuple)):
+                raise ValueError(f"{ref} pad has invalid layer membership.")
+            if face in layers or "*.Cu" in layers or "F&B.Cu" in layers:
+                face_pads.append(pad)
+        for contact in _pad_contacts(replace(design, pads=face_pads), ref, bounds, (nx, ny), spacing,
+                                     x_edges_mm=x_edges, y_edges_mm=y_edges,
+                                     contact_pad_numbers=selected, require_all_selected=False,
+                                     max_contact_weights=remaining_weights):
+            contact.update(layer=face, _z=z)
+            contacts.append(contact)
+            if remaining_weights is not None:
+                remaining_weights -= len(contact["_weights"])
+    _require_selected_contacts(contacts, selected, ref)
+    if not contacts:
+        raise ValueError(f"{ref} has no admitted surface copper pad land.")
+    return contacts
 
 
 def _stackup(design: SpiDeR, thickness: float) -> tuple[list[dict[str, Any]], list[str]]:
@@ -119,10 +174,15 @@ def _barrel_paths(design: SpiDeR, names: list[str], plating: float) -> list[tupl
 
 def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> dict[str, Any]:
     """Solve a bounded layered board; caller converts input errors to blocked results."""
+    if "study_scope" in request and (not isinstance(request["study_scope"], str) or not 1 <= len(request["study_scope"]) <= 2048):
+        raise ValueError("study_scope must be a nonempty description of at most 2048 characters.")
     board = request.get("board")
     parts = request.get("components")
-    if not isinstance(board, Mapping) or not isinstance(parts, list) or not 1 <= len(parts) <= MAX_COMPONENTS:
-        raise ValueError("Provide board properties and 1..256 powered component rows.")
+    raw_board_sources = request.get("board_heat_sources", [])
+    if (not isinstance(board, Mapping) or not isinstance(parts, list) or not isinstance(raw_board_sources, list)
+            or not 1 <= len(parts) + len(raw_board_sources) <= MAX_COMPONENTS
+            or ("board_heat_sources" in request and not raw_board_sources)):
+        raise ValueError("Provide board properties and 1..256 total component/direct-board source rows.")
     bounds = design.metadata.get("board_bounds_mm") if isinstance(design.metadata, Mapping) else None
     if design.units != "mm" or not isinstance(bounds, (list, tuple)) or len(bounds) != 4:
         raise ValueError("Layered board needs millimetre units and finite board bounds.")
@@ -131,13 +191,12 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
         raise ValueError("Board bounds must have positive width and height.")
     thickness = _number(board.get("thickness_mm"), "board thickness_mm", positive=True)
     rows, names = _stackup(design, thickness)
-    step = _number(board.get("grid_step_mm"), "board grid_step_mm", positive=True)
-    nx, ny = math.ceil((xmax - xmin) / step), math.ceil((ymax - ymin) / step)
+    x_edges, y_edges, explicit_grid = grid_edges(board, (xmin, ymin, xmax, ymax), len(rows))
+    nx, ny = len(x_edges) - 1, len(y_edges) - 1
     cells = nx * ny
-    if cells > MAX_CELLS or cells * len(rows) > 131072:
-        raise ValueError("Layered grid exceeds the bounded cell limit; increase grid_step_mm.")
     dx, dy = (xmax - xmin) / nx, (ymax - ymin) / ny
-    area_m2 = dx * dy * 1e-6
+    widths_x, widths_y = np.diff(x_edges) * 1e-3, np.diff(y_edges) * 1e-3
+    area_m2 = np.outer(widths_y, widths_x)
     ambient = _number(request.get("ambient_temperature_c"), "ambient_temperature_c")
     if ambient < -273.15:
         raise ValueError("Ambient temperature is below absolute zero.")
@@ -145,7 +204,15 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
     kc = _number(board.get("copper_conductivity_w_mk"), "copper conductivity", positive=True)
     htop = _number(board.get("convection_top_w_m2k"), "top convection")
     hbottom = _number(board.get("convection_bottom_w_m2k"), "bottom convection")
-    if htop < 0 or hbottom < 0 or htop + hbottom <= 0:
+    if htop < 0 or hbottom < 0:
+        raise ValueError("Convection coefficients must be nonnegative.")
+    htop_grid = _boundary_grid(board, "convection_top_grid_w_m2k", htop, (ny, nx), 0)
+    hbottom_grid = _boundary_grid(board, "convection_bottom_grid_w_m2k", hbottom, (ny, nx), 0)
+    air_top = _boundary_grid(board, "ambient_top_grid_c", ambient, (ny, nx), -273.15)
+    air_bottom = _boundary_grid(board, "ambient_bottom_grid_c", ambient, (ny, nx), -273.15)
+    boundary_keys = [key for key in ("convection_top_grid_w_m2k", "convection_bottom_grid_w_m2k",
+                                    "ambient_top_grid_c", "ambient_bottom_grid_c") if key in board]
+    if not np.any(htop_grid > 0) and not np.any(hbottom_grid > 0):
         raise ValueError("At least one nonnegative convection coefficient must be positive.")
     include_copper = board.get("include_copper", True)
     include_vias = board.get("include_vias", True)
@@ -155,14 +222,30 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
     sigma = _number(board.get("fuzzy_sigma_mm", 0), "fuzzy_sigma_mm")
     if sigma < 0:
         raise ValueError("fuzzy_sigma_mm cannot be negative.")
+    raster_metadata: dict[str, Any] = {}
     if include_copper:
-        coverage, diagnostics = rasterize_copper(design, (xmin, ymin, xmax, ymax), (nx, ny), (dx, dy), names,
+        raster_x, raster_y = x_edges, y_edges
+        if explicit_grid or "copper_raster_step_mm" in board:
+            raster_step = _number(board.get("copper_raster_step_mm"), "copper_raster_step_mm", positive=True)
+            raster_x, raster_y, _ = grid_edges({"grid_step_mm": raster_step}, (xmin, ymin, xmax, ymax), 1)
+        rx, ry = len(raster_x) - 1, len(raster_y) - 1
+        rdx, rdy = (xmax - xmin) / rx, (ymax - ymin) / ry
+        coverage, diagnostics = rasterize_copper(design, (xmin, ymin, xmax, ymax), (rx, ry), (rdx, rdy), names,
             fuzzy_sigma_mm=sigma, include_tracks=toggles["include_tracks"],
             include_pads=toggles["include_pads"], include_zones=toggles["include_zones"],
             include_via_lands=include_vias)
+        if explicit_grid or "copper_raster_step_mm" in board:
+            coverage = transfer_coverage(coverage, raster_x, raster_y, x_edges, y_edges)
+            raster_metadata = {"copper_raster_shape": [rx, ry], "copper_raster_spacing_mm": [rdx, rdy],
+                               "copper_transfer": "exact_area_overlap_of_fixed_piecewise_constant_raster"}
+            diagnostics.append({"code": "THERMAL_COPPER_FIXED_RASTER", "severity": "warning",
+                "message": "Fixed physical copper raster transferred conservatively; thermal refinement does not resolve geometry below its sampling/coverage resolution."})
     else:
         coverage = {name: np.zeros((ny, nx)) for name in names}
         diagnostics = []
+    if boundary_keys:
+        diagnostics.append({"code": "THERMAL_PRESCRIBED_SURFACE_BOUNDARY", "severity": "warning",
+            "message": "Per-cell convection and air temperatures are prescribed, not inferred from fans or coupled CFD. Transient initial temperature and virtual-heatsink ambient retain the scalar ambient_temperature_c."})
     raw_heatsinks = request.get("virtual_heatsinks", [])
     if not isinstance(raw_heatsinks, list) or len(raw_heatsinks) > 16:
         raise ValueError("Provide at most 16 virtual board heatsinks.")
@@ -196,9 +279,11 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
     matrix = lil_matrix((node_count, node_count), dtype=float)
     rhs = np.zeros(node_count)
     sink = np.zeros(n)
+    sink_ambient = np.full(n, ambient)
+    sink_ambient[:cells] = air_top.ravel()
+    sink_ambient[-cells:] = air_bottom.ravel()
     depth_m = np.array([row["thickness_mm"] * 1e-3 for row in rows])
     k = np.empty((len(rows), ny, nx))
-    copper_index = {name: i for i, name in enumerate(names)}
     for z, row in enumerate(rows):
         k[z] = kd + (kc - kd) * coverage[row["name"]] if row["copper"] and include_copper else kd
     if np.any(k <= 0) or not np.all(np.isfinite(k)):
@@ -219,27 +304,27 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
                 ka = k[z, iy, ix]
                 if ix + 1 < nx:
                     kb = k[z, iy, ix + 1]
-                    edge(a, a + 1, 2 * ka * kb / (ka + kb) * depth_m[z] * dy / dx)
+                    edge(a, a + 1, depth_m[z] * widths_y[iy] / (widths_x[ix] / (2 * ka) + widths_x[ix + 1] / (2 * kb)))
                 if iy + 1 < ny:
                     kb = k[z, iy + 1, ix]
-                    edge(a, a + nx, 2 * ka * kb / (ka + kb) * depth_m[z] * dx / dy)
+                    edge(a, a + nx, depth_m[z] * widths_x[ix] / (widths_y[iy] / (2 * ka) + widths_y[iy + 1] / (2 * kb)))
                 if z + 1 < len(rows):
                     kb = k[z + 1, iy, ix]
-                    edge(a, a + cells, area_m2 / (depth_m[z] / (2 * ka) + depth_m[z + 1] / (2 * kb)))
-                if z == 0 and htop > 0:
-                    sink[a] = area_m2 / (depth_m[z] / (2 * ka) + 1 / htop)
-                if z == len(rows) - 1 and hbottom > 0:
-                    sink[a] = area_m2 / (depth_m[z] / (2 * ka) + 1 / hbottom)
+                    edge(a, a + cells, area_m2[iy, ix] / (depth_m[z] / (2 * ka) + depth_m[z + 1] / (2 * kb)))
+                if z == 0 and htop_grid[iy, ix] > 0:
+                    sink[a] = area_m2[iy, ix] / (depth_m[z] / (2 * ka) + 1 / htop_grid[iy, ix])
+                if z == len(rows) - 1 and hbottom_grid[iy, ix] > 0:
+                    sink[a] = area_m2[iy, ix] / (depth_m[z] / (2 * ka) + 1 / hbottom_grid[iy, ix])
     for a in range(n):
         matrix[a, a] += sink[a]
-        rhs[a] += sink[a] * ambient
+        rhs[a] += sink[a] * sink_ambient[a]
 
     if include_vias:
         plating = _number(board.get("via_plating_thickness_mm"), "via plating thickness", positive=True)
         for x, y, lo, hi, barrel_area in _barrel_paths(design, names, plating):
             if not xmin <= x <= xmax or not ymin <= y <= ymax:
                 raise ValueError("Plated barrel is outside board bounds.")
-            cell = min(ny - 1, int((y - ymin) / dy)) * nx + min(nx - 1, int((x - xmin) / dx))
+            cell = cell_index(y_edges, y) * nx + cell_index(x_edges, x)
             za = next(i for i, row in enumerate(rows) if row["name"] == names[lo])
             zb = next(i for i, row in enumerate(rows) if row["name"] == names[hi])
             for z in range(za, zb):
@@ -253,11 +338,11 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
         y0, y1 = item["y_mm"] - item["height_mm"] / 2, item["y_mm"] + item["height_mm"] / 2
         contacts = []
         for iy in range(ny):
-            overlap_y = max(0.0, min(ymin + (iy + 1) * dy, y1) - max(ymin + iy * dy, y0))
+            overlap_y = max(0.0, min(y_edges[iy + 1], y1) - max(y_edges[iy], y0))
             if overlap_y == 0:
                 continue
             for ix in range(nx):
-                overlap_x = max(0.0, min(xmin + (ix + 1) * dx, x1) - max(xmin + ix * dx, x0))
+                overlap_x = max(0.0, min(x_edges[ix + 1], x1) - max(x_edges[ix], x0))
                 area = overlap_x * overlap_y
                 if area == 0:
                     continue
@@ -281,6 +366,7 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
     seen: set[str] = set()
     total_power = 0.0
     next_case = n
+    contact_matrix_terms = 0
     for raw in parts:
         if not isinstance(raw, Mapping):
             raise ValueError("Each component assignment must be an object.")
@@ -296,33 +382,23 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
         rcb = _number(raw.get("r_case_board_k_w"), f"{ref} r_case_board_k_w", positive=True)
         if power < 0:
             raise ValueError(f"{ref} power_w cannot be negative.")
-        ix, iy = min(nx - 1, int((x - xmin) / dx)), min(ny - 1, int((y - ymin) / dy))
+        ix, iy = cell_index(x_edges, x), cell_index(y_edges, y)
         mode = raw.get("contact_mode", "square")
+        selected = _contact_pad_numbers(raw["contact_pad_numbers"], ref) if "contact_pad_numbers" in raw else None
+        if selected is not None and mode != "pads":
+            raise ValueError(f"{ref} contact_pad_numbers requires contact_mode pads.")
         item = {"component_ref": ref, "position_mm": [x, y], "cell": [ix, iy], "power_w": power,
                 "contact_mode": mode, "r_junction_case_k_w": rjc, "r_case_board_k_w": rcb}
+        if selected is not None:
+            item["contact_pad_numbers"] = selected
         if mode == "pads":
             if not toggles["include_pads"]:
                 raise ValueError("Pad contact mode requires include_pads.")
-            contacts: list[dict[str, Any]] = []
-            for face, z in ((names[0], 0), (names[-1], len(rows) - 1)):
-                face_pads = []
-                for pad in design.pads:
-                    if not isinstance(pad, Mapping):
-                        continue
-                    layers = pad.get("layers", [pad.get("layer")])
-                    if isinstance(layers, str):
-                        layers = [layers]
-                    if not isinstance(layers, (list, tuple)):
-                        raise ValueError(f"{ref} pad has invalid layer membership.")
-                    if face in layers or "*.Cu" in layers or "F&B.Cu" in layers:
-                        face_pads.append(pad)
-                for contact in _pad_contacts(replace(design, pads=face_pads), ref, (xmin, ymin, xmax, ymax),
-                                             (nx, ny), (dx, dy)):
-                    contact["layer"] = face
-                    contact["_z"] = z
-                    contacts.append(contact)
-            if not contacts:
-                raise ValueError(f"{ref} has no admitted surface copper pad land.")
+            contacts = _surface_pad_contacts(design, ref, names, len(rows) - 1,
+                (xmin, ymin, xmax, ymax), x_edges, y_edges, selected)
+            contact_matrix_terms += sum(len(c["_weights"]) ** 2 for c in contacts)
+            if contact_matrix_terms > 1_000_000:
+                raise ValueError("Pad contact coupling exceeds one million matrix terms; coarsen the contact grid.")
             area = sum(c["area_mm2"] for c in contacts)
             case = next_case
             next_case += 1
@@ -344,15 +420,7 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
             half = size / 2
             if x - half < xmin or x + half > xmax or y - half < ymin or y + half > ymax:
                 raise ValueError(f"{ref} contact area extends outside board bounds.")
-            weights = []
-            for cy in range(ny):
-                oy = max(0.0, min(ymin + (cy + 1) * dy, y + half) - max(ymin + cy * dy, y - half))
-                for cx in range(nx):
-                    ox = max(0.0, min(xmin + (cx + 1) * dx, x + half) - max(xmin + cx * dx, x - half))
-                    if ox * oy > 0:
-                        weights.append((cy * nx + cx, ox * oy / (size * size)))
-            if not weights or abs(sum(w for _, w in weights) - 1) > 1e-10:
-                raise ValueError(f"{ref} square contact area was not conserved.")
+            weights = rectangle_weights(x_edges, y_edges, (x - half, y - half, x + half, y + half))
             for j, weight in weights:
                 rhs[j] += power * weight
             item.update(contact_size_mm=size, _weights=weights)
@@ -360,6 +428,69 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
             raise ValueError(f"{ref} contact_mode must be pads or square.")
         admitted.append(item)
         total_power += power
+    board_sources: list[dict[str, Any]] = []
+    remaining_direct_weights = MAX_DIRECT_CONTACT_WEIGHTS
+    source_ids: set[str] = set()
+    required_source_keys = {"id", "component_ref", "power_w", "contact_mode"}
+    for raw in raw_board_sources:
+        if (not isinstance(raw, Mapping) or not required_source_keys <= raw.keys()
+                or raw.keys() - required_source_keys - {"contact_pad_numbers", "contact_size_mm"}):
+            raise ValueError("Direct board sources require id, component_ref, power_w and contact_mode; no package parameters.")
+        identifier, ref, mode = raw["id"], raw["component_ref"], raw["contact_mode"]
+        if (not isinstance(identifier, str) or not identifier.strip() or identifier.strip() != identifier
+                or len(identifier) > 128 or identifier in source_ids):
+            raise ValueError("Direct board sources need unique nonblank IDs of at most 128 characters.")
+        if not isinstance(ref, str) or ref not in available or ref.casefold() in seen:
+            raise ValueError("Direct board source component is absent, duplicated, or already has a component heat assignment.")
+        source_ids.add(identifier)
+        seen.add(ref.casefold())
+        x, y = _point(available[ref], ref)
+        if not xmin <= x <= xmax or not ymin <= y <= ymax:
+            raise ValueError(f"{ref} lies outside board bounds.")
+        power = _number(raw["power_w"], f"{ref} direct board power_w")
+        if power < 0:
+            raise ValueError("Direct board power_w cannot be negative.")
+        selected = _contact_pad_numbers(raw["contact_pad_numbers"], ref) if "contact_pad_numbers" in raw else None
+        item = {"id": identifier, "component_ref": ref, "position_mm": [x, y], "power_w": power,
+                "contact_mode": mode, "case_temperature_c": None, "junction_temperature_c": None,
+                "temperature_status": "board_only_junction_unsolved"}
+        if mode == "pads":
+            if not toggles["include_pads"] or "contact_size_mm" in raw:
+                raise ValueError("Direct pad heating needs include_pads and no square contact size.")
+            contacts = _surface_pad_contacts(design, ref, names, len(rows) - 1,
+                (xmin, ymin, xmax, ymax), x_edges, y_edges, selected,
+                max_contact_weights=remaining_direct_weights)
+            total_area = sum(contact["area_mm2"] for contact in contacts)
+            weights = [(contact["_z"] * cells + index, weight * contact["area_mm2"] / total_area)
+                       for contact in contacts for index, weight in contact["_weights"]]
+            for contact in contacts:
+                contact["heat_w"] = power * contact["area_mm2"] / total_area
+            item.update(pad_count=len(contacts), _contacts=contacts)
+            if selected is not None:
+                item["contact_pad_numbers"] = selected
+        elif mode == "square":
+            if selected is not None:
+                raise ValueError("Direct square heating cannot select pad numbers.")
+            size = _number(raw.get("contact_size_mm"), f"{ref} contact_size_mm", positive=True)
+            count_x = int(np.count_nonzero((x_edges[:-1] < x + size / 2) & (x_edges[1:] > x - size / 2)))
+            count_y = int(np.count_nonzero((y_edges[:-1] < y + size / 2) & (y_edges[1:] > y - size / 2)))
+            if count_x * count_y > remaining_direct_weights:
+                raise ValueError("Direct board contact overlap-weight budget exceeded; coarsen contacts or reduce physical lands.")
+            weights = rectangle_weights(x_edges, y_edges, (x - size / 2, y - size / 2, x + size / 2, y + size / 2))
+            item.update(contact_size_mm=size, face="top", layer=names[0])
+        else:
+            raise ValueError("Direct board contact_mode must be pads or square.")
+        remaining_direct_weights -= len(weights)
+        if abs(sum(weight for _, weight in weights) - 1) > 1e-10:
+            raise ValueError("Direct board heat-source contact was not conserved.")
+        for index, weight in weights:
+            rhs[index] += power * weight
+        item["_weights"] = weights
+        board_sources.append(item)
+        total_power += power
+    if board_sources:
+        diagnostics.append({"code": "THERMAL_DIRECT_BOARD_HEAT", "severity": "warning",
+            "message": "Direct sources prescribe all supplied loss into board surface contacts. No package resistance, case temperature, junction temperature, or heat split to other paths is inferred."})
     if not math.isfinite(total_power):
         raise ValueError("Total power exceeds finite numerical range.")
     coefficients = matrix.tocsc()
@@ -367,7 +498,7 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
     if values.shape != (node_count,) or not np.all(np.isfinite(values)) or np.min(values) < -273.15:
         raise ValueError("Layered thermal system returned invalid temperatures.")
     relative = float(np.linalg.norm(coefficients @ values - rhs) / max(np.linalg.norm(rhs), 1e-30))
-    convection_outward = float(np.dot(sink, values[:n] - ambient))
+    convection_outward = float(np.dot(sink, values[:n] - sink_ambient))
     heatsink_outward = sum((float(values[item["_node"]]) - ambient) / item["sink_to_ambient_k_w"] for item in heatsinks)
     outward = convection_outward + heatsink_outward
     energy_error = outward - total_power
@@ -399,7 +530,7 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
         for z, row in enumerate(rows):
             fraction = coverage[row["name"]] if row["copper"] and include_copper else 0.0
             volumetric = dielectric_capacity + (copper_capacity - dielectric_capacity) * fraction
-            capacity[z * cells:(z + 1) * cells] = (area_m2 * depth_m[z] * volumetric).ravel() if isinstance(volumetric, np.ndarray) else area_m2 * depth_m[z] * volumetric
+            capacity[z * cells:(z + 1) * cells] = (area_m2 * depth_m[z] * volumetric).ravel()
         inertia = capacity / dt
         factor = splu(coefficients + diags(inertia, format="csc"))
         prior = np.full(node_count, ambient)
@@ -419,7 +550,7 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
                 raise ValueError("Transient board solve returned invalid temperatures.")
             step_residual = float(np.linalg.norm((coefficients @ current) + inertia * (current - prior) - rhs) / max(np.linalg.norm(transient_rhs), 1e-30))
             max_step_residual = max(max_step_residual, step_residual)
-            outward_step = float(np.dot(sink, current[:n] - ambient)) + sum(
+            outward_step = float(np.dot(sink, current[:n] - sink_ambient)) + sum(
                 (float(current[item["_node"]]) - ambient) / item["sink_to_ambient_k_w"] for item in heatsinks)
             storage_rate = float(np.dot(capacity, (current - prior) / dt))
             balance_error = total_power - outward_step - storage_rate
@@ -456,29 +587,48 @@ def solve_layered_board_thermal(design: SpiDeR, request: Mapping[str, Any]) -> d
             case_temp = board_temp + item["power_w"] * item["r_case_board_k_w"]
         item.update(board_temperature_c=board_temp, case_temperature_c=case_temp,
                     junction_temperature_c=case_temp + item["power_w"] * item["r_junction_case_k_w"])
+    for item in board_sources:
+        item["board_temperature_c"] = float(sum(values[index] * weight for index, weight in item.pop("_weights")))
+        if item["contact_mode"] == "pads":
+            contacts = item.pop("_contacts")
+            for contact in contacts:
+                z = contact.pop("_z")
+                contact["board_temperature_c"] = float(sum(values[z * cells + index] * weight
+                    for index, weight in contact.pop("_weights")))
+            item["pad_contacts"] = contacts
     layers = []
     for z, row in enumerate(rows):
         layers.append({"name": row["name"], "thickness_mm": row["thickness_mm"],
                        "temperatures_c": values[z * cells:(z + 1) * cells].tolist(),
                        "copper_coverage": coverage[row["name"]].ravel().tolist() if row["copper"] and include_copper else [0.0] * cells})
+    coordinates = ({"x_edges_mm": x_edges.tolist(), "y_edges_mm": y_edges.tolist(), "kind": "rectilinear"}
+                   if explicit_grid else {"spacing_mm": [dx, dy]})
     return {"contract": CONTRACT, "status": "completed", "model_status": "approximate",
-            "grid": {"origin_mm": [xmin, ymin], "spacing_mm": [dx, dy], "shape": [nx, ny],
+            "grid": {"origin_mm": [xmin, ymin], **coordinates, "shape": [nx, ny],
                      "temperatures_c": layers[0]["temperatures_c"], "order": "x-fast"},
             "layer_grids": layers, "components": admitted, "virtual_heatsinks": heatsinks,
+            "board_heat_sources": board_sources,
             "transient": transient_frames,
             "summary": {"minimum_board_temperature_c": float(np.min(values[:n])),
                         "maximum_board_temperature_c": float(np.max(values[:n])),
-                        "maximum_junction_temperature_c": max(c["junction_temperature_c"] for c in admitted),
+                        "maximum_junction_temperature_c": max((c["junction_temperature_c"] for c in admitted), default=None),
                         "total_power_w": total_power, "outward_heat_w": outward,
                         "convection_outward_heat_w": convection_outward,
                         "heatsink_outward_heat_w": heatsink_outward,
                         "energy_balance_error_w": energy_error, "linear_relative_residual": relative,
                         **transient_summary},
             "provenance": {"solver_id": "spike.layered_board_thermal", "design_id": design.design_id,
+                           **raster_metadata,
                            "fuzzy_sigma_mm": sigma if include_copper else 0.0,
                            "board_model": "layered_axis_aligned_finite_volume",
-                           "boundary_model": "adiabatic_edges_and_top_bottom_convection",
+                           "in_plane_grid": "explicit_rectilinear" if explicit_grid else "uniform",
+                           "via_deposition": "full_barrel_conductance_in_containing_cell",
+                           "boundary_model": ("adiabatic_edges_and_prescribed_cellwise_top_bottom_convection"
+                                              if boundary_keys else "adiabatic_edges_and_top_bottom_convection"),
+                           "prescribed_surface_boundary_grids": boundary_keys,
+                           "board_convection_inferred": False,
                            "component_model": "surface_pad_case_coupling_or_square_contact",
+                           "direct_board_heat_model": "all_supplied_power_to_board_surface_no_package_resistance_or_junction_solution",
                            "heatsink_model": "isothermal_virtual_node_with_explicit_interface_and_sink_to_ambient_resistance",
                            "transient_model": "backward_euler_constant_power_volumetric_capacity" if transient_input is not None else "not_requested",
                            "production_qualified": False, "request": dict(request)},

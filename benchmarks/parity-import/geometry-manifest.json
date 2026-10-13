@@ -1,0 +1,118 @@
+{
+  "boards": [
+    {
+      "path": "geometry.kicad_pcb",
+      "sha256": "d4eb7b96fd703216f1c57266f0a6be8b471482773cd2d7e0248578f68b230395",
+      "source_url": "repository:benchmarks/parity-import/geometry.kicad_pcb",
+      "license": "Apache-2.0",
+      "expected_counts": {
+        "pads": 1,
+        "components": 1,
+        "nets": 1,
+        "layers": 4
+      },
+      "expected_entities": [
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "center_mm",
+          "value": [
+            21.0,
+            8.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "size_mm",
+          "value": [
+            1.2,
+            0.8
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "shape",
+          "value": "rect"
+        },
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "/extensions/spike.v1/rotation",
+          "value": 0.0,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "55555555-5555-4555-8555-555555555555",
+          "field": "rotation_deg",
+          "value": 90.0,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "components",
+          "source_id": "55555555-5555-4555-8555-555555555555",
+          "field": "/extensions/spike.v1/native_footprint_at_mm",
+          "value": [
+            20.0,
+            10.0
+          ],
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "component_id",
+          "reference": {
+            "collection": "components",
+            "source_id": "55555555-5555-4555-8555-555555555555"
+          }
+        },
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "net_id",
+          "reference": {
+            "collection": "nets",
+            "source_id": "1"
+          }
+        },
+        {
+          "collection": "pads",
+          "source_id": "66666666-6666-4666-8666-666666666666",
+          "field": "layer_ids.0",
+          "reference": {
+            "collection": "layers",
+            "source_id": "0"
+          }
+        },
+        {
+          "collection": "materials",
+          "name": "FR4",
+          "field": "relative_permittivity",
+          "value": 4.2,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "materials",
+          "name": "FR4",
+          "field": "loss_tangent",
+          "value": 0.02,
+          "tolerance": 1e-09
+        },
+        {
+          "collection": "layers",
+          "source_id": "31",
+          "field": "material_id",
+          "reference": {
+            "collection": "materials",
+            "name": "copper"
+          }
+        }
+      ]
+    }
+  ]
+}

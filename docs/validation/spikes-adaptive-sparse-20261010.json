@@ -1,0 +1,318 @@
+{
+  "schema": "spikes/adaptive-sparse-microbenchmark/v1",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.9 (main, Feb  8 2026, 03:56:09) [MSC v.1950 64 bit (AMD64)]",
+  "processor": "Intel64 Family 6 Model 197 Stepping 2, GenuineIntel",
+  "logical_cpus": 16,
+  "controls": {
+    "time_step_s": 2e-05,
+    "stop_time_s": 0.0002,
+    "initialize_from_operating_point": false,
+    "integration_method": "bdf2",
+    "adaptive_time_step": true,
+    "minimum_time_step_s": 1e-10,
+    "lte_absolute_tolerance": 1e-06,
+    "lte_relative_tolerance": 0.0001
+  },
+  "repeats": 9,
+  "baseline_description": "Same MSVC Release/Eigen build; embedded BE cache invalidated on every solve; all other source identical",
+  "source_sha256": {
+    "baseline": "08a3c0bb8bdc4be1ca40b688a26b1375bc163fb9ae31dbc989a849e55c7b69fd",
+    "candidate": "831dd813e9d7774655767a0946f6e3b14bdd2faf38f54525b4e5743eb556fb06"
+  },
+  "scope": "solve-call time only; DLL load, assembly and extraction excluded; no memory/thread/cross-engine qualification",
+  "libraries": {
+    "baseline": {
+      "path": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-adaptive-control-20261010\\Release\\spikes_c_api.dll",
+      "sha256": "a36bc23a79138cee51dfc5f8297c0a0629b7293596e33b748c9debc7ccb9c132"
+    },
+    "candidate": {
+      "path": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build-spikes-adaptive-20261010\\Release\\spikes_c_api.dll",
+      "sha256": "a5aec82d10f83b5ebd2bc1feb6e98d40951d33e3b93caba943865a3d73337d5b"
+    }
+  },
+  "cases": [
+    {
+      "branches": 16,
+      "smooth_switch": false,
+      "max_time_difference_s": 0.0,
+      "max_voltage_difference_v": 0.0,
+      "runs": {
+        "baseline": {
+          "first_solve_s": 0.0019353999523445964,
+          "warm_solve_s": [
+            0.0016540999058634043,
+            0.0015772999031469226,
+            0.001627399935387075,
+            0.0016487999819219112,
+            0.0016339999856427312,
+            0.0016770000802353024,
+            0.0015904000028967857,
+            0.0016472999705001712,
+            0.0016038999892771244
+          ],
+          "median_warm_s": 0.0016339999856427312,
+          "diagnostics": {
+            "matrix_order": 18,
+            "completed_steps": 157,
+            "total_newton_iterations": 420,
+            "total_damping_steps": 0,
+            "pivot_swaps": 420,
+            "failed_time_s": 0.0,
+            "residual_inf_norm": 3.267625970151955e-13,
+            "source_breakpoint_steps": 0,
+            "matrix_factorizations": 420,
+            "factorization_reuses": 0,
+            "factorization_cache_entries": 16,
+            "backward_euler_steps": 1,
+            "trapezoidal_steps": 0,
+            "bdf2_steps": 156,
+            "rejected_lte_steps": 4,
+            "last_lte_ratio": 1.0131391496137665e-06,
+            "last_lte_estimate_finite": true,
+            "minimum_accepted_step_s": 1.5637410322785067e-09,
+            "maximum_accepted_step_s": 2e-05,
+            "embedded_lte_solves": 160,
+            "sparse_assemblies": 0,
+            "sparse_symbolic_analyses": 0,
+            "sparse_numeric_factorizations": 0,
+            "partial_numeric_refactorizations": 0,
+            "symbolic_pattern_numeric_refactorizations": 0,
+            "rejected_newton_steps": 0
+          }
+        },
+        "candidate": {
+          "first_solve_s": 0.001732699922285974,
+          "warm_solve_s": [
+            0.0016251999186351895,
+            0.0016026000957936049,
+            0.0016254999209195375,
+            0.0016164000844582915,
+            0.0015931000234559178,
+            0.001641899929381907,
+            0.0015925000188872218,
+            0.001612700056284666,
+            0.0016784999752417207
+          ],
+          "median_warm_s": 0.0016164000844582915,
+          "diagnostics": {
+            "matrix_order": 18,
+            "completed_steps": 157,
+            "total_newton_iterations": 420,
+            "total_damping_steps": 0,
+            "pivot_swaps": 420,
+            "failed_time_s": 0.0,
+            "residual_inf_norm": 3.267625970151955e-13,
+            "source_breakpoint_steps": 0,
+            "matrix_factorizations": 420,
+            "factorization_reuses": 0,
+            "factorization_cache_entries": 16,
+            "backward_euler_steps": 1,
+            "trapezoidal_steps": 0,
+            "bdf2_steps": 156,
+            "rejected_lte_steps": 4,
+            "last_lte_ratio": 1.0131391496137665e-06,
+            "last_lte_estimate_finite": true,
+            "minimum_accepted_step_s": 1.5637410322785067e-09,
+            "maximum_accepted_step_s": 2e-05,
+            "embedded_lte_solves": 160,
+            "sparse_assemblies": 0,
+            "sparse_symbolic_analyses": 0,
+            "sparse_numeric_factorizations": 0,
+            "partial_numeric_refactorizations": 0,
+            "symbolic_pattern_numeric_refactorizations": 0,
+            "rejected_newton_steps": 0
+          }
+        }
+      }
+    },
+    {
+      "branches": 128,
+      "smooth_switch": false,
+      "max_time_difference_s": 0.0,
+      "max_voltage_difference_v": 0.0,
+      "runs": {
+        "baseline": {
+          "first_solve_s": 0.01724730001296848,
+          "warm_solve_s": [
+            0.0169717000098899,
+            0.016618499998003244,
+            0.017236200044862926,
+            0.01700740004889667,
+            0.017477400018833578,
+            0.016872400068677962,
+            0.016889600083231926,
+            0.01775840006303042,
+            0.01659250003285706
+          ],
+          "median_warm_s": 0.0169717000098899,
+          "diagnostics": {
+            "matrix_order": 130,
+            "completed_steps": 168,
+            "total_newton_iterations": 454,
+            "total_damping_steps": 0,
+            "pivot_swaps": 0,
+            "failed_time_s": 0.0,
+            "residual_inf_norm": 1.6653345369377348e-16,
+            "source_breakpoint_steps": 0,
+            "matrix_factorizations": 454,
+            "factorization_reuses": 0,
+            "factorization_cache_entries": 0,
+            "backward_euler_steps": 1,
+            "trapezoidal_steps": 0,
+            "bdf2_steps": 167,
+            "rejected_lte_steps": 4,
+            "last_lte_ratio": 0.10376466357324039,
+            "last_lte_estimate_finite": true,
+            "minimum_accepted_step_s": 3.996137195300985e-07,
+            "maximum_accepted_step_s": 2e-05,
+            "embedded_lte_solves": 171,
+            "sparse_assemblies": 969,
+            "sparse_symbolic_analyses": 172,
+            "sparse_numeric_factorizations": 454,
+            "partial_numeric_refactorizations": 282,
+            "symbolic_pattern_numeric_refactorizations": 282,
+            "rejected_newton_steps": 0
+          }
+        },
+        "candidate": {
+          "first_solve_s": 0.016663899994455278,
+          "warm_solve_s": [
+            0.01637600001413375,
+            0.01619100000243634,
+            0.01643089996650815,
+            0.016426100046373904,
+            0.016470399918034673,
+            0.01571529998909682,
+            0.016222400008700788,
+            0.015502399997785687,
+            0.015662199934013188
+          ],
+          "median_warm_s": 0.016222400008700788,
+          "diagnostics": {
+            "matrix_order": 130,
+            "completed_steps": 168,
+            "total_newton_iterations": 454,
+            "total_damping_steps": 0,
+            "pivot_swaps": 0,
+            "failed_time_s": 0.0,
+            "residual_inf_norm": 1.6653345369377348e-16,
+            "source_breakpoint_steps": 0,
+            "matrix_factorizations": 454,
+            "factorization_reuses": 0,
+            "factorization_cache_entries": 0,
+            "backward_euler_steps": 1,
+            "trapezoidal_steps": 0,
+            "bdf2_steps": 167,
+            "rejected_lte_steps": 4,
+            "last_lte_ratio": 0.10376466357324039,
+            "last_lte_estimate_finite": true,
+            "minimum_accepted_step_s": 3.996137195300985e-07,
+            "maximum_accepted_step_s": 2e-05,
+            "embedded_lte_solves": 171,
+            "sparse_assemblies": 969,
+            "sparse_symbolic_analyses": 2,
+            "sparse_numeric_factorizations": 454,
+            "partial_numeric_refactorizations": 282,
+            "symbolic_pattern_numeric_refactorizations": 282,
+            "rejected_newton_steps": 0
+          }
+        }
+      }
+    },
+    {
+      "branches": 128,
+      "smooth_switch": true,
+      "max_time_difference_s": 0.0,
+      "max_voltage_difference_v": 0.0,
+      "runs": {
+        "baseline": {
+          "first_solve_s": 0.011408900027163327,
+          "warm_solve_s": [
+            0.01152389997150749,
+            0.012112400028854609,
+            0.01129290007520467,
+            0.01138040004298091,
+            0.011923099984414876,
+            0.011309999972581863,
+            0.011279699974693358,
+            0.01186610001605004,
+            0.012113899923861027
+          ],
+          "median_warm_s": 0.01152389997150749,
+          "diagnostics": {
+            "matrix_order": 133,
+            "completed_steps": 127,
+            "total_newton_iterations": 255,
+            "total_damping_steps": 0,
+            "pivot_swaps": 0,
+            "failed_time_s": 0.0,
+            "residual_inf_norm": 3.2503713903410536e-13,
+            "source_breakpoint_steps": 7,
+            "matrix_factorizations": 255,
+            "factorization_reuses": 0,
+            "factorization_cache_entries": 0,
+            "backward_euler_steps": 13,
+            "trapezoidal_steps": 0,
+            "bdf2_steps": 114,
+            "rejected_lte_steps": 7,
+            "last_lte_ratio": 0.01596678095604609,
+            "last_lte_estimate_finite": true,
+            "minimum_accepted_step_s": 5.044336545505495e-08,
+            "maximum_accepted_step_s": 2e-05,
+            "embedded_lte_solves": 121,
+            "sparse_assemblies": 644,
+            "sparse_symbolic_analyses": 122,
+            "sparse_numeric_factorizations": 255,
+            "partial_numeric_refactorizations": 133,
+            "symbolic_pattern_numeric_refactorizations": 133,
+            "rejected_newton_steps": 0
+          }
+        },
+        "candidate": {
+          "first_solve_s": 0.010819699964486063,
+          "warm_solve_s": [
+            0.011581099941395223,
+            0.01089549995958805,
+            0.010685699991881847,
+            0.010785000049509108,
+            0.010572899947874248,
+            0.010345599963329732,
+            0.010675399913452566,
+            0.01112110004760325,
+            0.011061899946071208
+          ],
+          "median_warm_s": 0.010785000049509108,
+          "diagnostics": {
+            "matrix_order": 133,
+            "completed_steps": 127,
+            "total_newton_iterations": 255,
+            "total_damping_steps": 0,
+            "pivot_swaps": 0,
+            "failed_time_s": 0.0,
+            "residual_inf_norm": 3.2503713903410536e-13,
+            "source_breakpoint_steps": 7,
+            "matrix_factorizations": 255,
+            "factorization_reuses": 0,
+            "factorization_cache_entries": 0,
+            "backward_euler_steps": 13,
+            "trapezoidal_steps": 0,
+            "bdf2_steps": 114,
+            "rejected_lte_steps": 7,
+            "last_lte_ratio": 0.01596678095604609,
+            "last_lte_estimate_finite": true,
+            "minimum_accepted_step_s": 5.044336545505495e-08,
+            "maximum_accepted_step_s": 2e-05,
+            "embedded_lte_solves": 121,
+            "sparse_assemblies": 644,
+            "sparse_symbolic_analyses": 2,
+            "sparse_numeric_factorizations": 255,
+            "partial_numeric_refactorizations": 133,
+            "symbolic_pattern_numeric_refactorizations": 133,
+            "rejected_newton_steps": 0
+          }
+        }
+      }
+    }
+  ]
+}

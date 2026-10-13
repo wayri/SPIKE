@@ -5,15 +5,17 @@ import "./TerminalTable.css";
 export type TerminalTableRow = {
   id: string; name: string; x: string; y: string; layer: string;
   value: string; contactResistance: string; packageResistance: string;
+  currentLimit?: string;
 };
 
 /** One authoritative terminal record per row; expensive pad/waveform editors are lazy. */
 export default function TerminalTable<T extends TerminalTableRow>({
-  rows, label, layers, valueLabel, transient = false, readOnlyValue,
+  rows, label, layers, valueLabel, transient = false, sourceCurrentLimits = false, readOnlyValue,
   onChange, onRemove, renderDetails, embedded = false, emptyMessage = "No terminals. Add one below or use the board selection.",
 }: {
   rows: T[]; label: string; layers: string[]; valueLabel: string;
   transient?: boolean; readOnlyValue?: (item: T, index: number) => string;
+  sourceCurrentLimits?: boolean;
   onChange: (id: string, patch: Partial<TerminalTableRow>) => void;
   onRemove: (id: string) => void; renderDetails: (item: T, index: number) => ReactNode;
   emptyMessage?: string;
@@ -27,7 +29,7 @@ export default function TerminalTable<T extends TerminalTableRow>({
     <DataTable label={label} showLabel={!embedded} className="terminal-table" emptyMessage={emptyMessage}>
       <thead><tr><th scope="col">Name</th><th scope="col">X (mm)</th><th scope="col">Y (mm)</th>
         <th scope="col">Connection</th><th scope="col">{transient ? "Waveform" : valueLabel}</th>
-        <th scope="col">Contact R (Ω)</th><th scope="col">Package R (Ω)</th><th scope="col">Actions</th></tr></thead>
+        <th scope="col">Contact R (Ω)</th><th scope="col">Package R (Ω)</th>{sourceCurrentLimits && <th scope="col">Current limit (A)</th>}<th scope="col">Actions</th></tr></thead>
       <tbody>{rows.map((item, index) => <Fragment key={item.id}>
         <tr><td>{field(item, "name", "name")}</td><td>{field(item, "x", "X (mm)")}</td>
           <td>{field(item, "y", "Y (mm)")}</td>
@@ -41,12 +43,14 @@ export default function TerminalTable<T extends TerminalTableRow>({
             : field(item, "value", valueLabel)}</td>
           <td>{field(item, "contactResistance", "contact resistance")}</td>
           <td>{field(item, "packageResistance", "package resistance")}</td>
+          {sourceCurrentLimits && <td><input aria-label={`${label}: ${item.name} current limit (A)`} value={item.currentLimit ?? ""} placeholder="Unlimited"
+            onChange={event => onChange(item.id, { currentLimit: event.target.value } as Partial<TerminalTableRow>)} /></td>}
           <td><div className="terminal-table-actions"><button type="button" aria-expanded={expanded === item.id}
             aria-label={`Edit pads and details for ${item.name}`} onClick={() => setExpanded(expanded === item.id ? null : item.id)}>
             {expanded === item.id ? "Close details" : "Pads / details"}</button>
             <button className="spike-table-remove" type="button" title={`Remove ${item.name}`} aria-label={`Remove ${item.name}`} onClick={() => onRemove(item.id)}>×</button></div></td>
         </tr>
-        {expanded === item.id && <tr className="terminal-table-detail"><td colSpan={8}>{renderDetails(item, index)}</td></tr>}
+        {expanded === item.id && <tr className="terminal-table-detail"><td colSpan={sourceCurrentLimits ? 9 : 8}>{renderDetails(item, index)}</td></tr>}
       </Fragment>)}</tbody>
     </DataTable>
   </div>;

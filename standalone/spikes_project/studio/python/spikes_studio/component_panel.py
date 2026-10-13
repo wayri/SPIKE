@@ -2,8 +2,10 @@
 from copy import deepcopy
 import json
 import time
+import uuid
 import wx
 import wx.aui
+import wx.adv
 from .component_catalog import catalog,evaluate,native_recipe,validate_record,materialize
 from .document import write_json
 from .library_browser import CatalogIndex,SORTS,insertion_plan,apply_insertion
@@ -12,15 +14,28 @@ from .manufacturer_registry import capability_summary,source_report
 from .library_pins import pin_contract,preview_height
 
 
+def context_row(position,default_position,row_count,selected,screen_to_client,hit_test):
+    """Resolve pointer context to its row; preserve focus for keyboard invocation."""
+    if position==default_position:return selected
+    row,_flags=hit_test(screen_to_client(position))
+    return row if 0<=row<row_count else -1
+
+
 class ResultsList(wx.ListCtrl):
     def __init__(self,parent):
         super().__init__(parent,style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_SINGLE_SEL)
         self.browser=parent;self.rows=[]
+        self.refresh_symbols(parent.owner.palette)
         for i,(label,width) in enumerate([('Preset',245),('Family',120),('Value',95),('Unit',65),('Execution',105)]):self.InsertColumn(i,label,width=width)
     def OnGetItemText(self,item,column):
         if not 0<=item<len(self.rows):return ''
         r=self.rows[item]
         return [('* ' if r['id'] in self.browser.preferences().get('favorites',[]) else '')+r['name'],r['family'],f"{self.browser.index.values[r['id']]:.7g}",r['parameter_unit'],'Native' if r['status']=='native_subcircuit' else 'Bench only'][column]
+    def refresh_symbols(self,palette):
+        from .symbol_icons import SymbolImages
+        self.images=SymbolImages(None,palette);self.AssignImageList(self.images.image_list,wx.IMAGE_LIST_SMALL);self.Refresh()
+    def OnGetItemImage(self,item):return self.images.index(self.rows[item]['family']) if 0<=item<len(self.rows) else -1
+    def OnGetItemColumnImage(self,item,column):return self.OnGetItemImage(item) if column==0 else -1
     def set_rows(self,rows):
         self.SetSelection(-1);self.rows=rows;self.SetItemCount(len(rows));self.Refresh()
     def GetSelection(self):return self.GetFirstSelected()
@@ -82,21 +97,137 @@ class SymbolPreview(wx.Panel):
 
 class InsertDialog(wx.Dialog):
     def __init__(self,browser,record):
-        super().__init__(browser,title='Insert native model · explicit connections',size=(540,470),style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER)
+        parent=browser.owner if isinstance(browser.owner,wx.Window) else browser
+        super().__init__(parent,title='Add component',size=(620,540),style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER)
+        self.SetMinSize((580,480))
         self.browser=browser;self.record=record;model=native_recipe(record);box=wx.BoxSizer(wx.VERTICAL)
-        box.Add(wx.StaticText(self,label=record['name']),0,wx.ALL,10);grid=wx.FlexGridSizer(cols=2,hgap=8,vgap=8);grid.AddGrowableCol(1);self.pins={}
+        self.base_record=deepcopy(record);self.library_record=None
+        box.Add(wx.StaticText(self,label=record['family'].replace('_',' ').title()),0,wx.ALL,12)
+        self.book=wx.Notebook(self);box.Add(self.book,1,wx.EXPAND|wx.LEFT|wx.RIGHT,12)
+        values=wx.ScrolledWindow(self.book);values.SetScrollRate(0,12);value_box=wx.BoxSizer(wx.VERTICAL);values.SetSizer(value_box)
+        value_box.Add(wx.StaticText(values,label='Component / library model'),0,wx.LEFT|wx.RIGHT|wx.TOP,12)
+        self.part_search=wx.SearchCtrl(values);self.part_search.SetDescriptiveText('Filter matching library parts by MPN or manufacturer');value_box.Add(self.part_search,0,wx.EXPAND|wx.ALL,8)
+        self.part_choice=wx.adv.BitmapComboBox(values,style=wx.CB_READONLY);self.part_choice.SetName('Component library model');value_box.Add(self.part_choice,0,wx.EXPAND|wx.LEFT|wx.RIGHT,12)
+        self.library_status=wx.StaticText(values,label='Custom generic model');value_box.Add(self.library_status,0,wx.EXPAND|wx.ALL,10)
+        self.part_search.Bind(wx.EVT_TEXT,self.filter_library);self.part_choice.Bind(wx.EVT_COMBOBOX,self.select_library)
+        fields=wx.FlexGridSizer(cols=2,hgap=12,vgap=12);fields.AddGrowableCol(1);self.parameter_fields={}
+        labels={'r':'Resistance [Ω]','c':'Capacitance [F]','l':'Inductance [H]','is':'Saturation current [A]','voltage':'Voltage [V]','frequency':'Frequency [Hz]','delay':'Delay [s]','loss_db':'Attenuation [dB]',
+                'series_resistance_ohm':'Series R / ESR / DCR [Ω]','series_inductance_h':'Series L / ESL [H]',
+                'parallel_capacitance_f':'Parallel capacitance [F]','leakage_resistance_ohm':'Leakage R [Ω; 0 = omitted]',
+                'contact_resistance_ohm':'Each force contact R [Ω]', 'tolerance_percent':'Tolerance [%]',
+                'corner':'Tolerance corner [-1 to +1]','temperature_c':'Model temperature [°C]',
+                'reference_temperature_c':'Reference temperature [°C]','tc1_per_k':'Linear TC [1/K]','tc2_per_k2':'Quadratic TC [1/K²]'}
+        detailed=record.get('model_type')=='lumped_passive_rlc_v1'
+        if detailed:
+            from .passive_catalog import PACKAGES,CONSTRUCTIONS
+            self.package_choice=wx.Choice(values,choices=list(PACKAGES));self.package_choice.SetStringSelection(record['package_code'])
+            self.construction_choice=wx.Choice(values,choices=list(CONSTRUCTIONS[record['passive_kind']]));self.construction_choice.SetStringSelection(record['construction'])
+            for label,control in [('Package (inch code)',self.package_choice),('Construction label',self.construction_choice)]:
+                fields.Add(wx.StaticText(values,label=label),0,wx.ALIGN_CENTER_VERTICAL);fields.Add(control,1,wx.EXPAND)
+            self.standard_series=wx.Choice(values,choices=['E3','E6','E12','E24','E48','E96','E192']);self.standard_series.SetStringSelection('E192' if record['family']=='resistor' else 'E24')
+            fields.Add(wx.StaticText(values,label='Preferred-value series'),0,wx.ALIGN_CENTER_VERTICAL);fields.Add(self.standard_series,1,wx.EXPAND)
+            model_page=wx.ScrolledWindow(self.book);model_page.SetScrollRate(0,12);model_box=wx.BoxSizer(wx.VERTICAL);model_page.SetSizer(model_box)
+            model_box.Add(wx.StaticText(model_page,label='Explicit user coefficients; package size does not guess these.\nZero parasitics are omitted. Temperature is static, not self-heating.'),0,wx.ALL,10)
+            model_fields=wx.FlexGridSizer(cols=2,hgap=12,vgap=10);model_fields.AddGrowableCol(1);model_box.Add(model_fields,0,wx.EXPAND|wx.ALL,10)
+        for key,value in record['parameters'].items():
+            main=not detailed or key in ('r','c','l','tolerance_percent')
+            target=values if main else model_page;grid=fields if main else model_fields
+            grid.Add(wx.StaticText(target,label=labels.get(key,key)),0,wx.ALIGN_CENTER_VERTICAL)
+            control=wx.TextCtrl(target,value=f'{value:.12g}');control.SetName('Component parameter '+key);self.parameter_fields[key]=control;grid.Add(control,1,wx.EXPAND)
+        fields.Add(wx.StaticText(values,label='Instances'),0,wx.ALIGN_CENTER_VERTICAL);self.count=wx.SpinCtrl(values,min=1,max=100,initial=1);fields.Add(self.count,0)
+        value_box.Add(fields,0,wx.EXPAND|wx.ALL,12)
+        hint=wx.StaticText(values,label='Engineering values accepted: 4.7k, 100n, 2.2u. SPICE M means milli; use MEG for mega.\nPins retain their standard order. Wire the component after placing it.')
+        hint.Wrap(510);value_box.Add(hint,0,wx.ALL,12);self.book.AddPage(values,'Value & parameters',True)
+        if detailed:
+            def recommend(event):
+                from .passive_catalog import nearest
+                from python.spikes.netlist import parse_spice_number
+                key=next(iter(self.base_record['parameters']))
+                try:
+                    answer=nearest(parse_spice_number(self.parameter_fields[key].GetValue(),{'r':'resistor','c':'capacitor','l':'inductor'}[key]),self.standard_series.GetStringSelection())
+                    self.parameter_fields[key].SetValue(f"{answer['value']:.12g}");self.error.SetLabel(f"Selected {answer['series']} value; change {answer['relative_error_percent']:+.5g}%. No manufacturer availability implied.")
+                except ValueError as error:self.error.SetLabel(str(error))
+            control=wx.Button(values,label='Use nearest preferred value');control.Bind(wx.EVT_BUTTON,recommend);value_box.Add(control,0,wx.ALL,10)
+            self.book.AddPage(model_page,'Parasitics & temperature')
+        connections=wx.Panel(self.book);connection_box=wx.BoxSizer(wx.VERTICAL);connections.SetSizer(connection_box)
+        grid=wx.FlexGridSizer(cols=2,hgap=8,vgap=8);grid.AddGrowableCol(1);self.pins={}
+        prefix='part_'+uuid.uuid4().hex[:8]+'_{n}_'
         for pin in model['pins']:
-            grid.Add(wx.StaticText(self,label=pin),0,wx.ALIGN_CENTER_VERTICAL)
-            control=wx.TextCtrl(self,value='0' if pin in ('N','REF') else 'part_{n}_'+pin.lower());grid.Add(control,1,wx.EXPAND);self.pins[pin]=control
-        grid.Add(wx.StaticText(self,label='Instances'),0,wx.ALIGN_CENTER_VERTICAL);self.count=wx.SpinCtrl(self,min=1,max=100,initial=1);grid.Add(self.count,1,wx.EXPAND);box.Add(grid,0,wx.EXPAND|wx.ALL,10)
-        note=wx.StaticText(self,label='Use {n} for per-instance nodes: out_{n} becomes out_1, out_2…\nNames without {n} are shared intentionally. Ground is 0.\nInternal primitives are inserted; no compact hierarchy symbol yet.\nAll copies form one undoable transaction.');note.Wrap(490);box.Add(note,0,wx.ALL,10)
+            grid.Add(wx.StaticText(connections,label=pin+' → net'),0,wx.ALIGN_CENTER_VERTICAL)
+            control=wx.TextCtrl(connections,value=prefix+pin.lower());grid.Add(control,1,wx.EXPAND);self.pins[pin]=control
+        connection_box.Add(grid,0,wx.EXPAND|wx.ALL,12)
+        note=wx.StaticText(connections,label='Optional net mapping; this does not change the model pin order.\nDefaults isolate every pin and each instance. No pin is automatically grounded.\nUse {n} for per-instance nodes; names without {n} intentionally share a net. Ground is 0.');note.Wrap(510);connection_box.Add(note,0,wx.ALL,12);self.book.AddPage(connections,'Pins & connections')
         self.place=wx.CheckBox(self,label='Click on schematic to choose placement (Escape cancels)');self.place.SetValue(True);box.Add(self.place,0,wx.ALL,10)
-        buttons=self.CreateButtonSizer(wx.OK|wx.CANCEL);self.FindWindow(wx.ID_OK).SetLabel('Place / insert');box.Add(buttons,0,wx.ALIGN_RIGHT|wx.ALL,10);self.SetSizer(box);apply_window(self,browser.owner.palette)
+        self.error=wx.StaticText(self,label='');box.Add(self.error,0,wx.EXPAND|wx.LEFT|wx.RIGHT,12)
+        buttons=self.CreateButtonSizer(wx.OK|wx.CANCEL);self.FindWindow(wx.ID_OK).SetLabel('Place / insert')
+        self.FindWindow(wx.ID_OK).Bind(wx.EVT_BUTTON,self.accept)
+        box.Add(buttons,0,wx.ALIGN_RIGHT|wx.ALL,10);self.SetSizer(box);apply_window(self,browser.owner.palette)
+        self.filter_library()
+        values.FitInside()
+        self.CentreOnParent()
+
+    def filter_library(self,event=None):
+        from .component_library_choices import matching_parts,label
+        previous=self.library_record['id'] if self.library_record else None
+        self.library_rows=[None,*matching_parts(self.base_record['family'],self.part_search.GetValue())]
+        if self.base_record.get('passive_kind')=='kelvin_shunt':self.library_rows=[None,*[r for r in self.library_rows[1:] if len(r['pins'])==4]]
+        from .symbol_icons import bitmap
+        self.part_choice.Clear()
+        for record in self.library_rows:
+            key=record['category'] if record else self.base_record['family']
+            self.part_choice.Append(label(record) if record else 'Custom / generic',bitmap(key,self.browser.owner.palette))
+        self.part_choice.SetSelection(next((i for i,r in enumerate(self.library_rows) if r and r['id']==previous),0))
+        self.select_library()
+
+    def select_library(self,event=None):
+        from .manufacturer_parts import as_component_record,is_placeable
+        if self.library_record is None:self.custom_draft={key:control.GetValue() for key,control in self.parameter_fields.items()}
+        self.library_record=self.library_rows[self.part_choice.GetSelection()]
+        ready=self.library_record is None or is_placeable(self.library_record)
+        if self.library_record is None:
+            self.record=deepcopy(self.base_record);message='Editable generic model; not a qualified manufacturer part.'
+        elif ready:
+            self.record=as_component_record(self.library_record);self.record['_manufacturer_record']=deepcopy(self.library_record)
+            message='Sourced nominal value · ideal approximation only. Select Custom / generic to enter arbitrary values.'
+        else:message='No runnable model is installed for this part. Review its vendor model in the manufacturer library before placement.'
+        for key,control in self.parameter_fields.items():
+            unsupported=(self.base_record.get('passive_kind')=='kelvin_shunt' and key in ('series_resistance_ohm','series_inductance_h','parallel_capacitance_f','leakage_resistance_ohm')) or (self.base_record.get('model_type') and self.base_record.get('passive_kind')!='kelvin_shunt' and key=='contact_resistance_ohm')
+            control.Enable(self.library_record is None and not unsupported)
+            if unsupported:control.SetToolTip('Unsupported for this terminal/model type; retained at zero, not silently approximated')
+            if self.library_record is None:control.ChangeValue(self.custom_draft[key])
+            elif ready and key in self.record['parameters']:control.ChangeValue(f"{self.record['parameters'][key]:.12g}")
+            elif not ready:control.ChangeValue('')
+        self.library_status.SetLabel(message);self.library_status.Wrap(510);self.FindWindow(wx.ID_OK).Enable(ready);self.Layout()
+        if hasattr(self,'package_choice'):
+            self.package_choice.Enable(self.library_record is None);self.construction_choice.Enable(self.library_record is None)
+
+    def accept(self,event=None):
+        try:
+            record=self.edited_record()
+            insertion_plan(self.browser.owner.doc,record,{pin:control.GetValue() for pin,control in self.pins.items()},count=self.count.GetValue())
+            self.EndModal(wx.ID_OK)
+        except (ValueError,KeyError) as error:self.error.SetLabel(str(error));self.error.Wrap(510);self.Layout()
+
+    def edited_record(self):
+        from python.spikes.netlist import parse_spice_number
+        if self.library_record is not None:
+            from .manufacturer_parts import source_pins
+            source_pins(self.library_record)
+            return deepcopy(self.record)
+        quantities={'r':'resistor','c':'capacitor','l':'inductor','is':'current_source','voltage':'voltage_source','frequency':'scalar','delay':'time',
+                    'series_resistance_ohm':'resistor','leakage_resistance_ohm':'resistor','contact_resistance_ohm':'resistor',
+                    'series_inductance_h':'inductor','parallel_capacitance_f':'capacitor'}
+        record=deepcopy(self.record)
+        record['parameters']={key:parse_spice_number(control.GetValue(),quantities.get(key,'scalar')) for key,control in self.parameter_fields.items()}
+        primary=next(iter(record['parameters']));record['name']=record['family'].replace('_',' ').title()+f" · {record['parameters'][primary]:.7g} {record['parameter_unit']}"
+        if hasattr(self,'package_choice'):
+            record['package_code']=self.package_choice.GetStringSelection();record['construction']=self.construction_choice.GetStringSelection()
+        validate_record(record);native_recipe(record);return record
 
 
 class ComponentPanel(wx.Panel):
     def __init__(self,owner,parent):
-        super().__init__(parent);self.owner=owner;self.catalog=catalog();self.index=CatalogIndex(self.catalog['records']);self.visible=[];self.record=None;self.state={};self.drafts={};self.pending=None;self.family_filter=None;self.filtering=False
+        super().__init__(parent);self.owner=owner;self.catalog=catalog(include_passives=True);self.index=CatalogIndex(self.catalog['records']);self.visible=[];self.record=None;self.state={};self.drafts={};self.pending=None;self.family_filter=None;self.filtering=False
         box=wx.BoxSizer(wx.VERTICAL)
         self.pin_button=wx.Button(self,label='Pin browser to side');self.pin_button.Bind(wx.EVT_BUTTON,lambda e:owner.pin_browser());box.Add(self.pin_button,0,wx.ALL,3)
         counts=capability_summary(self.catalog['records'])
@@ -116,7 +247,7 @@ class ComponentPanel(wx.Panel):
         self.split=wx.SplitterWindow(self);self.split.SetMinimumPaneSize(120)
         self.tree=wx.TreeCtrl(self.split,style=wx.TR_HIDE_ROOT|wx.TR_HAS_BUTTONS|wx.TR_LINES_AT_ROOT);root=self.tree.AddRoot('Catalog');all_item=self.tree.AppendItem(root,'All categories');self.tree.SetItemData(all_item,(None,None))
         for category in self.catalog['counts']:
-            item=self.tree.AppendItem(root,category+' (500)');self.tree.SetItemData(item,(category,None))
+            item=self.tree.AppendItem(root,category+f" ({self.catalog['counts'][category]:,})");self.tree.SetItemData(item,(category,None))
             for family in sorted({r['family'] for r in self.catalog['records'] if r['category']==category}):
                 child=self.tree.AppendItem(item,family.replace('_',' '));self.tree.SetItemData(child,(category,family))
         self.right=wx.SplitterWindow(self.split);self.right.SetMinimumPaneSize(200);self.list=ResultsList(self);self.list.Reparent(self.right)
@@ -133,7 +264,7 @@ class ComponentPanel(wx.Panel):
         self.right.SplitVertically(self.list,inspector,400);self.right.SetSashGravity(.5);self.split.SplitVertically(self.tree,self.right,160);self.split.SetSashGravity(0);box.Add(self.split,1,wx.EXPAND)
         self.match_label=wx.StaticText(self);box.Add(self.match_label,0,wx.ALL,5)
         row=wx.WrapSizer(wx.HORIZONTAL);self.insert_button=self.add_button(row,'Insert / multiple…',self.insert);self.favorite_button=self.add_button(row,'Favorite',self.toggle_favorite)
-        self.add_button(row,'Reset parameter draft',self.reset_draft);self.add_button(row,'Export model…',self.export);self.add_button(row,'Generate catalog…',self.generate);self.add_button(row,'Vendor intake…',self.vendor);box.Add(row,0,wx.EXPAND);self.SetSizer(box)
+        self.add_button(row,'Reset parameter draft',self.reset_draft);self.add_button(row,'Export model…',self.export);self.add_button(row,'Physics models…',lambda:owner.open_physics_models());self.add_button(row,'Generate catalog…',self.generate);self.add_button(row,'Vendor intake…',self.vendor);box.Add(row,0,wx.EXPAND);self.SetSizer(box)
         self.search.Bind(wx.EVT_TEXT,self.debounce)
         self.parameters.Bind(wx.EVT_TEXT,lambda e:self.update_recipe())
         for c in (self.minimum,self.maximum):c.Bind(wx.EVT_TEXT,self.debounce)
@@ -143,6 +274,18 @@ class ComponentPanel(wx.Panel):
         self.tree.Bind(wx.EVT_TREE_SEL_CHANGED,self.tree_select);self.list.Bind(wx.EVT_LIST_ITEM_SELECTED,self.select);self.list.Bind(wx.EVT_LIST_ITEM_ACTIVATED,lambda e:owner.guarded(self.insert))
         self.list.Bind(wx.EVT_LIST_COL_CLICK,self.column_sort);self.list.Bind(wx.EVT_CONTEXT_MENU,self.context);self.Bind(wx.EVT_WINDOW_DESTROY,self.destroyed)
         self.initial_layout=False;self.Bind(wx.EVT_SHOW,self.first_show);self.filter()
+        self.refresh_symbols(owner.palette)
+
+    def refresh_symbols(self,palette):
+        from .symbol_icons import SymbolImages
+        self.list.refresh_symbols(palette);self.tree_images=SymbolImages(None,palette);self.tree.AssignImageList(self.tree_images.image_list)
+        def visit(parent):
+            child,cookie=self.tree.GetFirstChild(parent)
+            while child.IsOk():
+                data=self.tree.GetItemData(child)
+                self.tree.SetItemImage(child,self.tree_images.index(data[1] if data and data[1] else 'library'))
+                visit(child);child,cookie=self.tree.GetNextChild(parent,cookie)
+        visit(self.tree.GetRootItem())
 
     def set_compact(self,compact):
         self.pin_button.SetLabel('Unpin / full browser tab' if compact else 'Pin browser to side')
@@ -199,7 +342,7 @@ class ComponentPanel(wx.Panel):
             note=wx.StaticText(dialog,label='Use Vendor intake to inspect a model you have obtained. Intake is a review report, not installation or solver approval.');note.Wrap(730);box.Add(note,0,wx.ALL,12)
             box.Add(dialog.CreateButtonSizer(wx.OK),0,wx.ALIGN_RIGHT|wx.ALL,12);dialog.SetSizer(box);apply_window(dialog,self.owner.palette);dialog.ShowModal()
     def search_help(self):
-        wx.MessageBox('Words are ANDed; quoted phrases and -excluded terms work.\nFields: family:, category:, status:, unit:, id:, manufacturer:, qualification:, fidelity:.\nExample: family:resistor -cable\nManufacturer search currently returns no parts: no vendor model is qualified. Use Manufacturer model sources for the separate intake directory.\nMin/max use primary-parameter SI values; select a family/unit first.\nValue sorting groups unlike units.\nFavorites/recent inserts save with the project. Parameter edits are session drafts until exported or inserted.','Catalog search',parent=self)
+        wx.MessageBox('Words are ANDed; ordinary words tolerate small typos, with literal matches first.\nQuoted phrases, -excluded terms and field values remain literal.\nFields: family:, category:, status:, unit:, id:, manufacturer:, qualification:, fidelity:.\nExample: family:resistor -cable\nThe generic catalog does not establish vendor-model qualification. Use the manufacturer browser for sourced part records and review.\nMin/max use primary-parameter SI values; select a family/unit first.\nValue sorting groups unlike units within match-quality tiers.\nFavorites/recent inserts save with the project. Parameter edits are session drafts until exported or inserted.','Catalog search',parent=self)
     def stash(self):
         if self.record:self.drafts[self.record['id']]=self.parameters.GetValue()
     def update_recipe(self):
@@ -247,11 +390,31 @@ class ComponentPanel(wx.Panel):
             p=d['metadata'].setdefault('library_browser',{});favorites=set(p.get('favorites',[]));favorites.symmetric_difference_update({ident});p['favorites']=sorted(favorites)
         self.owner.doc.commit(mutate);self.owner.update_title();self.filter()
     def context(self,event):
-        menu=wx.Menu()
-        for label,fn in [('Insert / multiple…',self.insert),('Assign placement shortcut…',self.assign_shortcut),('Toggle favorite',self.toggle_favorite),('Export model…',self.export),('Copy preset ID',self.copy_id)]:
-            item=menu.Append(wx.ID_ANY,label);self.Bind(wx.EVT_MENU,lambda e,f=fn:self.owner.guarded(f),item)
-            if label.startswith('Insert'):item.Enable(bool(self.record and self.record['status']=='native_subcircuit'))
-        self.PopupMenu(menu);menu.Destroy()
+        self._select_context_row(event)
+        from .context_menus import ContextMenu
+        menu=ContextMenu(self.owner);record=self.record
+        selected=record is not None
+        native=bool(selected and record['status']=='native_subcircuit')
+        actions=menu.submenu('Use preset')
+        actions.add('Insert / multiple…',self.insert,native,'This preset is equation-bench-only' if selected else 'Select a preset')
+        actions.add('Assign placement shortcut…',self.assign_shortcut,native,'Only native insertable presets support placement shortcuts')
+        menu.add('Unfavorite' if selected and record['id'] in self.preferences().get('favorites',[]) else 'Favorite',self.toggle_favorite,selected,'Select a preset')
+        share=menu.submenu('Copy and export')
+        share.add('Copy preset ID',self.copy_id,selected,'Select a preset')
+        share.add('Export generic model…',self.export,selected,'Select a preset')
+        menu.popup(self.list)
+
+    def _select_context_row(self,event):
+        """Target the pointer row; keyboard context menus retain focused selection."""
+        position=event.GetPosition() if event is not None and hasattr(event,'GetPosition') else wx.DefaultPosition
+        row=context_row(position,wx.DefaultPosition,len(self.visible),self.list.GetSelection(),self.list.ScreenToClient,self.list.HitTest)
+        if row<0:
+            self.list.SetSelection(-1);self.stash();self.record=None;self.state={}
+            self.insert_button.Disable();self.favorite_button.Disable();self.preview.Refresh()
+            return -1
+        if row!=self.list.GetSelection():
+            self.list.SetSelection(row);self.select()
+        return row
     def assign_shortcut(self):
         if not self.record or self.record['status']!='native_subcircuit':raise ValueError('Only native insertable presets can have placement shortcuts')
         self.owner.assign_part_shortcut(self.record['id'])
@@ -269,37 +432,43 @@ class ComponentPanel(wx.Panel):
         if self.owner.job_running:raise ValueError('Stop simulation before inserting a model')
         if self.owner.source.GetText()!=self.owner.doc.data['source']:raise ValueError('Apply circuit text edits before inserting; the draft has been retained')
         if position is None:position=(140,180+160*((len(self.owner.doc.data['components'])+3)//4))
-        plan=insertion_plan(self.owner.doc,record,mapping,count=count,x=float(position[0]),y=float(position[1]));apply_insertion(self.owner.doc,plan,record['id'])
-        self.owner.refresh_document();self.owner.book.SetSelection(0);self.owner.SetStatusText(f"Inserted {count} instance(s): {', '.join(plan['refs'][:8])} · Ctrl+Z undoes the entire insertion");return plan
+        if record.get('_manufacturer_record'):
+            from .manufacturer_parts import install
+            plan=install(self.owner.doc,record['_manufacturer_record'],mapping,count=count,x=float(position[0]),y=float(position[1]),primitive=True)
+        else:
+            plan=insertion_plan(self.owner.doc,record,mapping,count=count,x=float(position[0]),y=float(position[1]),primitive=True);apply_insertion(self.owner.doc,plan,record['id'])
+        self.owner.refresh_document();self.owner.book.SetSelection(self.owner.editor_page());self.owner.SetStatusText(f"Inserted {count} instance(s): {', '.join(plan['refs'][:8])} · Ctrl+Z undoes the entire insertion");return plan
     def insert(self):
         record=self.edited();native_recipe(record)
         if self.owner.job_running:raise ValueError('Stop simulation before placing components')
         if self.owner.source.GetText()!=self.owner.doc.data['source']:raise ValueError('Apply circuit text edits before placing components')
         with InsertDialog(self,record) as dlg:
             if dlg.ShowModal()!=wx.ID_OK:return
+            record=dlg.edited_record()
             mapping={p:c.GetValue() for p,c in dlg.pins.items()};count=dlg.count.GetValue();insertion_plan(self.owner.doc,record,mapping,count=count)
             if dlg.place.GetValue():
-                self.owner.pending_library_placement=(deepcopy(record),mapping,count);self.owner.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.owner.book.SetSelection(0);self.owner.canvas.SetFocus();self.owner.canvas.Refresh();self.owner.SetStatusText(f'Click schematic to place {count} instance(s); Escape cancels')
+                self.owner.pending_library_placement=(deepcopy(record),mapping,count);self.owner.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.owner.book.SetSelection(self.owner.editor_page());self.owner.canvas.SetFocus();self.owner.canvas.Refresh();self.owner.SetStatusText(f'Click schematic to place {count} instance(s); Escape cancels')
             else:self.insert_recipe(record,mapping,count=count)
     def export(self):
         record=self.edited();path=self.owner.choose_path('Export generic model','SPIKES component (*.spkpart)|*.spkpart',True)
         if path:write_json(path,{'contract':'spikes/generic-component/v1','record':record})
     def generate(self):
         path=self.owner.choose_path('Generate local catalog','SPIKES catalog (*.json)|*.json',True)
-        if path:materialize(path);self.output.SetValue(f'Wrote 5,000 presets to {path}. Counts are presets, not qualified models.');self.notebook.SetSelection(2)
+        if path:
+            payload=materialize(path);self.output.SetValue(f"Wrote {len(payload['records']):,} configurable presets to {path}; not qualified manufacturer models.");self.notebook.SetSelection(2)
     def manufacturer_library(self):
         """Separate real imported source from generic recipe catalog."""
         with wx.Dialog(self,title='Manufacturer library · project-local review shelf',size=(860,650),style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER) as dlg:
             box=wx.BoxSizer(wx.VERTICAL)
             note=wx.StaticText(dlg,label='Real source files with provenance and pin inventories. Review is NOT simulation qualification.\nStored with this project; do not redistribute without manufacturer permission.');box.Add(note,0,wx.ALL,10)
             query=wx.SearchCtrl(dlg);query.SetDescriptiveText('Search manufacturer, exact part number or model name');box.Add(query,0,wx.EXPAND|wx.ALL,6)
-            listing=wx.ListBox(dlg);box.Add(listing,0,wx.EXPAND|wx.ALL,6)
+            from .symbol_text_list import SymbolTextList
+            listing=SymbolTextList(dlg,self.owner.palette,resolver=lambda index,text:'ic',size=(-1,130));box.Add(listing,0,wx.EXPAND|wx.ALL,6)
             detail=wx.TextCtrl(dlg,style=wx.TE_READONLY|wx.TE_MULTILINE);box.Add(detail,1,wx.EXPAND|wx.ALL,6)
             rows=[]
             def refresh(event=None):
-                rows.clear();needle=query.GetValue().lower()
-                for value in self.owner.doc.data['metadata'].get('manufacturer_models',{}).values():
-                    if needle in json.dumps(value.get('provenance',{})).lower() or needle in str(value['subcircuits']).lower():rows.append(value)
+                from .fuzzy_search import ranked
+                rows[:]=ranked(self.owner.doc.data['metadata'].get('manufacturer_models',{}).values(),query.GetValue(),text=lambda value:json.dumps(value.get('provenance',{}))+' '+str(value['subcircuits']))
                 listing.Set([r['provenance']['manufacturer']+' · '+r['provenance']['part_number']+' · review only' for r in rows]);detail.SetValue('Import a manufacturer SPICE file to begin.' if not rows else 'Select a model to inspect pins, dependencies and source.')
             def select(event):
                 if listing.GetSelection()>=0:detail.SetValue(json.dumps(rows[listing.GetSelection()],indent=2))

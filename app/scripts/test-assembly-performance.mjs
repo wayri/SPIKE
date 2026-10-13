@@ -5,7 +5,8 @@ import { boardSceneComplexity, retainAssemblySceneInputs } from "../src/assembly
 import { componentMountIndex, componentReferenceLookup } from "../src/componentSceneIndex.ts";
 import { configureImportedMaterial } from "../src/boardSurfaceMaterials.ts";
 import { installWebGLRecovery } from "../src/webGLRecovery.ts";
-import { batchAssemblyImported } from "../src/assemblyImportedBatches.ts";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const { batchAssemblyImported } = await importTestTypescript("assemblyImportedBatches");
 
 const board = { id: "A", designId: "retained", active: true, name: "Original", widthMm: 80, heightMm: 50,
   thicknessMm: 1.6, localCenterMm: [40, 25, 0], transform: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], netIdsByName: { GND: "ground" } };

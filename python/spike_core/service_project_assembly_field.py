@@ -71,6 +71,7 @@ def _admit_against_assembly(record: Any, assembly: Any) -> tuple[Dict[str, Any],
             admitted["problem"],
             admitted["result"],
             include_results=admitted["result"] is not None,
+            transient_settings=admitted.get("transient_settings"),
         )
         admitted = import_assembly_field_study(
             canonical,

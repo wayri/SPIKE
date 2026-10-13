@@ -29,6 +29,15 @@ async function decodeVerifiedText(archive: any, maximumBytes: number): Promise<s
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
 
+/** Decode the opt-in canonical IPC envelope without changing solver geometry. */
+export async function hydrateCanonicalDesignTransport(input: any): Promise<any> {
+  if (input?.contract !== "spike/normalized-source-zlib/v1") return input;
+  if (input.encoding !== "zlib+base64+utf8") throw new Error("Unsupported canonical design encoding.");
+  const design = JSON.parse(await decodeVerifiedText(input, MAX_SOURCE_BYTES));
+  if (design?.contract !== "spike/design-ir/v2" || typeof design.design_id !== "string" || !design.design_id) throw new Error("Invalid canonical design transport.");
+  return design;
+}
+
 /** Restore exact compressed source/legacy rows; never tessellate solver data. */
 export async function hydrateNormalizedSnapshot(input: string | Record<string, unknown>, canonicalDesign?: Record<string, unknown> | null): Promise<string> {
   let source = typeof input === "string" ? input : JSON.stringify(input);

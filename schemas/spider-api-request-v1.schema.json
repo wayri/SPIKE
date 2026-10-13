@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/spider-api-request-v1.schema.json",
+  "title": "SPIKE SpiDeR interoperability API request",
+  "oneOf": [
+    { "$ref": "#/$defs/capabilities" },
+    { "$ref": "#/$defs/validate" },
+    { "$ref": "#/$defs/normalize" },
+    { "$ref": "#/$defs/query" },
+    { "$ref": "#/$defs/compare" }
+  ],
+  "$defs": {
+    "document": { "type": "object" },
+    "contract": { "enum": ["spike/v1", "spike/design-ir/v2"] },
+    "entityType": {
+      "enum": ["materials", "layers", "nets", "tracks", "arcs", "zones", "pads", "vias", "drills", "castellations", "pins", "components", "component_bonds", "connectors", "regions", "bends", "models", "constraints", "variants", "simulation_models"]
+    },
+    "entityTypes": { "type": "array", "minItems": 1, "maxItems": 21, "uniqueItems": true, "items": { "$ref": "#/$defs/entityType" } },
+    "identities": { "type": "array", "maxItems": 256, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 1024 } },
+    "page": {
+      "properties": { "offset": { "type": "integer", "minimum": 0, "default": 0 }, "limit": { "type": "integer", "minimum": 1, "maximum": 500, "default": 100 } }
+    },
+    "capabilities": {
+      "type": "object", "required": ["method", "params"],
+      "properties": { "method": { "const": "spider_capabilities" }, "params": { "type": "object", "maxProperties": 0 } },
+      "additionalProperties": false
+    },
+    "validate": {
+      "type": "object", "required": ["method", "params"],
+      "properties": { "method": { "const": "validate_spider" }, "params": { "type": "object", "required": ["document"], "properties": { "document": { "$ref": "#/$defs/document" }, "max_issues": { "type": "integer", "minimum": 1, "maximum": 500, "default": 200 } }, "additionalProperties": false } },
+      "additionalProperties": false
+    },
+    "normalize": {
+      "type": "object", "required": ["method", "params"],
+      "properties": { "method": { "const": "normalize_spider" }, "params": { "type": "object", "required": ["document"], "properties": { "document": { "$ref": "#/$defs/document" }, "target_contract": { "$ref": "#/$defs/contract" }, "max_issues": { "type": "integer", "minimum": 1, "maximum": 500, "default": 200 } }, "additionalProperties": false } },
+      "additionalProperties": false
+    },
+    "query": {
+      "type": "object", "required": ["method", "params"],
+      "properties": { "method": { "const": "query_spider" }, "params": { "type": "object", "required": ["document"], "properties": { "document": { "$ref": "#/$defs/document" }, "entity_types": { "$ref": "#/$defs/entityTypes" }, "ids": { "$ref": "#/$defs/identities" }, "source_ids": { "$ref": "#/$defs/identities" }, "name_contains": { "type": "string", "maxLength": 256 }, "expected_revision": { "type": "string", "pattern": "^[0-9a-f]{64}$" }, "offset": { "type": "integer", "minimum": 0 }, "limit": { "type": "integer", "minimum": 1, "maximum": 500 } }, "additionalProperties": false } },
+      "additionalProperties": false
+    },
+    "compare": {
+      "type": "object", "required": ["method", "params"],
+      "properties": { "method": { "const": "compare_spider" }, "params": { "type": "object", "required": ["before", "after"], "properties": { "before": { "$ref": "#/$defs/document" }, "after": { "$ref": "#/$defs/document" }, "entity_types": { "$ref": "#/$defs/entityTypes" }, "offset": { "type": "integer", "minimum": 0 }, "limit": { "type": "integer", "minimum": 1, "maximum": 500 } }, "additionalProperties": false } },
+      "additionalProperties": false
+    }
+  }
+}

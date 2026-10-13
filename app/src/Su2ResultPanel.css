@@ -1,0 +1,23 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.su2-result-panel { display: grid; gap: 10px; min-width: 0; padding: 12px; margin: 8px; box-sizing: border-box; border: 1px solid var(--spike-table-border); border-radius: 8px; background: var(--spike-table-surface); color: var(--spike-table-text); }
+.su2-result-panel > *, .su2-result-plots > * { min-width: 0; max-width: 100%; }
+.su2-result-panel h3, .su2-result-panel h4, .su2-result-panel p { margin: 0; }
+.su2-result-panel p, .su2-result-panel li, .su2-result-panel dd { overflow-wrap: anywhere; }
+.su2-result-panel dl { display: grid; gap: 6px; margin: 10px 0; }
+.su2-result-panel dl > div { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(0, 2fr); gap: 8px; }
+.su2-result-panel dd { margin: 0; font-variant-numeric: tabular-nums; }
+.su2-result-plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); gap: 16px; }
+.su2-result-plots article { display: grid; grid-template-rows: auto minmax(320px, auto); gap: 6px; }
+.su2-result-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.su2-result-heading h3 { flex: 1 1 140px; }
+.su2-results-dialog { width: min(1440px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); padding: 0; box-sizing: border-box; border: 1px solid var(--spike-table-border); border-radius: 10px; color: var(--spike-table-text); background: var(--spike-table-surface); overflow: hidden; }
+.su2-results-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.su2-results-dialog::backdrop { background: color-mix(in srgb, var(--spike-table-surface) 72%, transparent); }
+.su2-results-dialog > header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--spike-table-border); }
+.su2-results-dialog > header h2 { min-width: 0; margin: 0; font-size: 18px; overflow-wrap: anywhere; }
+.su2-results-dialog > header button { flex-shrink: 0; }
+.su2-results-dialog-content { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.su2-results-dialog-content > .su2-result-panel { margin: 0; padding: 16px; border: 0; }
+.su2-results-dialog .su2-result-plots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.su2-results-dialog .su2-result-plots article { grid-template-rows: auto minmax(380px, auto); }
+@media (max-width: 900px) { .su2-results-dialog .su2-result-plots { grid-template-columns: minmax(0, 1fr); } }

@@ -2,6 +2,7 @@
 """Deterministic area and rejection checks for thermal copper rasterization."""
 
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -18,6 +19,22 @@ def raster(design, *, sigma=0, **options):
 
 
 class CopperGeometryTests(unittest.TestCase):
+    def test_authoritative_source_path_avoids_simple_polygon_repair(self):
+        # Square cutout reached along an exactly retraced bridge.
+        points = [[0, 0], [4, 0], [4, 4], [0, 4], [0, 0],
+                  [1, 1], [1, 3], [3, 3], [3, 1], [1, 1], [0, 0]]
+        zone = {"layer": "F.Cu", "points": points,
+                "filled_copper_state": "source_filled", "source_fill_provenance_complete": True,
+                "source_fill_representation": "flat_polygon_path"}
+        with patch("python.spike_core.thermal_copper_geometry._normalize_filled_zone_polygon",
+                   side_effect=AssertionError("source path must not use simple-polygon repair")):
+            fields, _ = raster(SpiDeR(zones=[zone]))
+            zone["points"] = list(reversed(points))
+            reversed_fields, _ = raster(SpiDeR(zones=[zone]))
+        self.assertAlmostEqual(float(fields["F.Cu"].sum()), 12, places=12)
+        self.assertEqual(float(fields["F.Cu"][1, 1]), 0)
+        np.testing.assert_array_equal(fields["F.Cu"], reversed_fields["F.Cu"])
+
     def test_filled_zone_with_cutout_and_rejection_of_outline(self):
         zone = {"layer": "F.Cu", "points": [[0, 0], [4, 0], [4, 4], [0, 4]],
                 "holes": [[[1, 1], [3, 1], [3, 3], [1, 3]]],

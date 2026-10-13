@@ -1,0 +1,48 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.harness-editor-workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 320px); gap: 12px; align-items: start; }
+.harness-editor-workspace > * { min-width: 0; }
+.harness-diagram { border: 1px solid var(--spike-table-border, #3a4e5d); border-radius: 8px; background: var(--spike-table-surface, #111f29); overflow: hidden; }
+.harness-diagram > header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; padding: 10px 12px; background: var(--spike-table-toolbar, #192b36); border-bottom: 1px solid var(--spike-table-border, #3a4e5d); }
+.harness-diagram h4, .harness-diagram p { margin: 0; }
+.harness-diagram header p { margin-top: 3px; color: var(--spike-table-muted, #adbfcc); }
+.harness-diagram-legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; font-size: 10px; }
+.harness-diagram-legend span::before { content: ""; display: inline-block; width: 18px; height: 3px; margin-right: 5px; vertical-align: middle; background: var(--harness-wire-color); }
+.harness-diagram-legend [data-role="power"] { --harness-wire-color: #ff746c; }
+.harness-diagram-legend [data-role="return"] { --harness-wire-color: #78bce5; }
+.harness-diagram-legend [data-role="signal"] { --harness-wire-color: #76d7a2; }
+.harness-diagram-legend [data-role="other"] { --harness-wire-color: #cab4ea; }
+.harness-diagram-scroll { overflow: auto; max-height: 470px; }
+.harness-diagram svg { display: block; min-width: 720px; width: 100%; height: auto; color: var(--spike-table-text, #dce7ee); }
+.harness-node { cursor: pointer; outline: none; }
+.harness-node rect { fill: var(--spike-table-stripe, #1c303f); stroke: var(--spike-table-border-strong, #668497); stroke-width: 1.5; }
+.harness-node:hover rect, .harness-node:focus-visible rect { stroke: var(--spike-table-focus, #f0c36b); stroke-width: 2.5; }
+.harness-node.is-selected rect { fill: var(--spike-table-row-focus, #294452); stroke: var(--spike-table-edit, #7bd4c5); stroke-width: 3; }
+.harness-node--splice rect { fill: var(--spike-table-warning-bg, #352f25); stroke-dasharray: 4 3; }
+.harness-node text { fill: currentColor; font-size: 11px; pointer-events: none; }
+.harness-node .harness-node-title { font-size: 13px; font-weight: 700; }
+.harness-node .harness-node-id { fill: var(--spike-table-muted, #adbfcc); font-size: 9px; }
+.harness-node circle { fill: var(--spike-table-edit, #7bd4c5); stroke: var(--spike-table-surface, #111f29); }
+.harness-wire-hit { fill: none; stroke: transparent; stroke-width: 16; cursor: pointer; outline: none; }
+.harness-wire-hit:focus-visible + .harness-wire, .harness-wire-hit:hover + .harness-wire { stroke-width: 5; }
+.harness-wire { fill: none; stroke: #a9bac5; stroke-width: 2.5; pointer-events: none; }
+.harness-wire--power { stroke: #ff746c; }.harness-wire--return { stroke: #78bce5; }.harness-wire--signal { stroke: #76d7a2; }.harness-wire--other, .harness-wire--shield { stroke: #cab4ea; stroke-dasharray: 7 4; }
+.harness-wire.is-selected { stroke: var(--spike-table-focus, #f0c36b); stroke-width: 5; }
+.harness-diagram-wires text { fill: var(--spike-table-text-strong, #f0f5f8); font-size: 9px; paint-order: stroke; stroke: var(--spike-table-surface, #111f29); stroke-width: 4px; pointer-events: none; }
+.harness-diagram-empty, .harness-diagram-diagnostics { padding: 16px; }
+.harness-diagram-diagnostics { border-top: 1px solid var(--spike-table-danger-border, #ff9182); color: var(--spike-table-danger-text, #ffc0be); }
+.harness-diagram-diagnostics ul { margin: 6px 0 0; padding-left: 18px; }
+.harness-inspector { position: sticky; top: 0; border: 1px solid var(--spike-table-border, #3a4e5d); border-radius: 8px; padding: 12px; background: var(--spike-table-toolbar, #192b36); }
+.harness-inspector h4 { margin: 0 0 8px; }.harness-inspector p { overflow-wrap: anywhere; }
+.harness-inspector label { display: grid; gap: 4px; margin-top: 9px; }
+.harness-inspector-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.harness-inspector-actions > button { flex: 1 1 120px; }
+.harness-wire-creator { display: grid; grid-template-columns: repeat(5, minmax(110px, 1fr)); gap: 8px; align-items: end; margin: 12px 0; }
+.harness-wire-creator label { display: grid; gap: 4px; min-width: 0; }
+.harness-wire-creator button { align-self: end; }
+@media (max-width: 920px) {
+  .harness-editor-workspace { grid-template-columns: 1fr; }
+  .harness-inspector { position: static; }
+  .harness-wire-creator { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .harness-diagram > header { flex-direction: column; }
+  .harness-diagram-legend { justify-content: flex-start; }
+}

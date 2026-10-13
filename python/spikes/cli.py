@@ -20,6 +20,18 @@ EXIT_INPUT = 2
 EXIT_SOLVE = 3
 
 
+def _pdk_output_is_model(report, output):
+    if output is None:return False
+    root=report.get('root',report.get('config',{}).get('root'))
+    if not root:return False
+    records=report.get('files',report.get('dependencies',[]))+report.get('licenses',report.get('license_files',[]))
+    for record in records:
+        path=Path(root)/record['path']
+        if output.resolve()==path.resolve() or (output.exists() and path.exists() and output.samefile(path)):
+            return True
+    return False
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="spikes",
@@ -27,6 +39,24 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--version", action="version", version=f"SPIKES {CLI_VERSION}")
     commands = parser.add_subparsers(dest="command", required=True)
+    asic=commands.add_parser('asic-plan',help='Preflight a revision-bound two-application IC/ASIC flow; no tool execution.')
+    asic.add_argument('project',type=Path);asic.add_argument('--root',type=Path);asic.add_argument('-o','--output',type=Path)
+    layout=commands.add_parser('layout-inspect',help='Inspect actual layout geometry using explicitly selected KLayout.')
+    layout.add_argument('layout',type=Path);layout.add_argument('--klayout',type=Path,required=True);layout.add_argument('-o','--output',type=Path)
+    pdk=commands.add_parser('pdk',help='Inspect local open PDKs and explicitly prepare/run compact-model circuit studies.')
+    pdk.add_argument('action',choices=('catalog','inspect','prepare','run'))
+    pdk.add_argument('--id');pdk.add_argument('--root',type=Path);pdk.add_argument('--entry')
+    pdk.add_argument('--config',type=Path);pdk.add_argument('--deck',type=Path,help='Export new self-contained deck; refuses overwrites.')
+    pdk.add_argument('--approve-models-sha256',help='Exact prepared run digest; mandatory for execution.')
+    pdk.add_argument('-o','--output',type=Path)
+    equation=commands.add_parser('device-build',help='Build inert user-defined native current/charge library model.')
+    equation.add_argument('definition',type=Path)
+    equation.add_argument('--spice-output',type=Path,help='Write a new .lib file; refuses overwrites.')
+    equation.add_argument('-o','--output',type=Path)
+    smps=commands.add_parser('smps-stability',help='Explicit ideal CCM averaged converter/control-loop analysis, not a circuit solve.')
+    smps.add_argument('--config',type=Path);smps.add_argument('--default-config',action='store_true')
+    smps.add_argument('--topology',choices=('buck','boost','buck_boost','flyback'));smps.add_argument('-o','--output',type=Path)
+    smps.add_argument('--backend',choices=('native','reference'),default='native');smps.add_argument('--library',type=Path)
     loop=commands.add_parser('loop-gain',help='Linear voltage-injection return ratio for an explicitly chosen unilateral loop fixture.')
     loop.add_argument('netlist',type=Path);loop.add_argument('--injection',required=True);loop.add_argument('--assume-unilateral',action='store_true')
     loop.add_argument('--start-hz',type=float,default=1.);loop.add_argument('--stop-hz',type=float,default=1e6);loop.add_argument('--points',type=int,default=301);loop.add_argument('-o','--output',type=Path)
@@ -71,6 +101,35 @@ def _parser() -> argparse.ArgumentParser:
             "Transient integration: event-aware hybrid trapezoidal (trap, "
             "default), backward Euler (be), or variable-step BDF2 (bdf2)."
         ),
+    )
+    native_run.add_argument(
+        "--adaptive",
+        action="store_true",
+        help="Enable adaptive LTE-controlled stepping for trap or BDF2 transient runs.",
+    )
+    native_run.add_argument(
+        "--lte-absolute-tolerance",
+        type=float,
+        default=1.0e-6,
+        metavar="VALUE",
+    )
+    native_run.add_argument(
+        "--lte-relative-tolerance",
+        type=float,
+        default=1.0e-3,
+        metavar="VALUE",
+    )
+    native_run.add_argument(
+        "--minimum-time-step",
+        type=float,
+        default=1.0e-15,
+        metavar="SECONDS",
+    )
+    native_run.add_argument(
+        "--max-rejected-steps",
+        type=int,
+        default=10_000,
+        metavar="COUNT",
     )
     native_run.add_argument("--probe", action="append", default=[], metavar="EXPR")
     native_run.add_argument("-o", "--output", type=Path)
@@ -276,6 +335,121 @@ def main(argv: Iterable[str] | None = None) -> int:
     arguments = _parser().parse_args(list(argv) if argv is not None else None)
     error_output = arguments.output
     try:
+        if arguments.command=='asic-plan':
+            from .asic_project import plan
+            if arguments.output and (arguments.output.resolve()==arguments.project.resolve() or
+                    (arguments.output.exists() and arguments.output.samefile(arguments.project))):
+                error_output=None;raise ValueError('Output cannot overwrite ASIC project')
+            if arguments.project.stat().st_size>1024*1024:raise ValueError('ASIC project exceeds 1 MiB')
+            def unique_asic_fields(pairs):
+                result={}
+                for key,value in pairs:
+                    if key in result:raise ValueError('Duplicate ASIC project field: '+key)
+                    result[key]=value
+                return result
+            result=plan(json.loads(arguments.project.read_text(encoding='utf-8'),object_pairs_hook=unique_asic_fields),
+                        arguments.root or arguments.project.parent)
+            protected=[Path(record['path']) for record in result['artifacts']]
+            protected.extend(Path(record['path']) for record in result['engines'].values())
+            protected.extend(Path(record['license_record']) for record in result['engines'].values())
+            protected.extend(Path(record['path']) for record in result['runsets'].values())
+            if arguments.output and any(arguments.output.resolve()==path.resolve() or
+                    (arguments.output.exists() and path.exists() and arguments.output.samefile(path)) for path in protected):
+                error_output=None;raise ValueError('Output cannot overwrite ASIC inputs/engines/runsets')
+            _emit(result,arguments.output);return EXIT_OK
+        if arguments.command=='layout-inspect':
+            from .klayout_bridge import inspect_layout,KLayoutExecutionError
+            protected=(arguments.layout,arguments.klayout)
+            if arguments.output and any(arguments.output.resolve()==path.resolve() or
+                    (arguments.output.exists() and path.exists() and arguments.output.samefile(path)) for path in protected):
+                error_output=None;raise ValueError('Output cannot overwrite layout or KLayout executable')
+            try:result=inspect_layout(arguments.klayout,arguments.layout)
+            except KLayoutExecutionError as exc:
+                _emit_error({'contract':'spikes/cli-error/v1','status':'error','issues':[
+                    {'code':exc.code,'severity':'error','message':str(exc),'path':str(arguments.layout)}]},arguments.output)
+                return EXIT_SOLVE
+            _emit(result,arguments.output);return EXIT_OK
+        if arguments.command=='pdk':
+            from .pdk_inventory import catalog,inspect
+            if arguments.action=='catalog':result={'contract':'spikes/open-pdk-catalog/v1','pdks':catalog()}
+            elif arguments.action=='inspect':
+                if not arguments.id or not arguments.root:raise ValueError('PDK inspection requires --id and --root')
+                result=inspect(arguments.id,arguments.root,entry=arguments.entry)
+            else:
+                from .pdk_workflow import prepare,run
+                if not arguments.config:raise ValueError('PDK prepare/run requires --config')
+                if arguments.output and (arguments.output.resolve()==arguments.config.resolve() or
+                        (arguments.output.exists() and arguments.output.samefile(arguments.config))):
+                    error_output=None;raise ValueError('Output cannot overwrite PDK config')
+                if arguments.deck and arguments.output and arguments.deck.resolve()==arguments.output.resolve():
+                    error_output=None;raise ValueError('Deck and report must use different paths')
+                if arguments.config.stat().st_size>1024*1024:raise ValueError('PDK config exceeds 1 MiB')
+                def unique_pdk_fields(pairs):
+                    result={}
+                    for key,value in pairs:
+                        if key in result:raise ValueError('Duplicate PDK config field: '+key)
+                        result[key]=value
+                    return result
+                prepared=prepare(json.loads(arguments.config.read_text(encoding='utf-8'),object_pairs_hook=unique_pdk_fields))
+                if _pdk_output_is_model(prepared,arguments.output):
+                    error_output=None;raise ValueError('Output cannot overwrite PDK models or licence files')
+                if arguments.action=='run':
+                    if not arguments.approve_models_sha256:raise ValueError('PDK execution needs explicit exact --approve-models-sha256')
+                    result=run(prepared,approval_sha256=arguments.approve_models_sha256)
+                else:result=prepared
+                if arguments.deck:
+                    with arguments.deck.open('x',encoding='utf-8') as stream:stream.write(prepared['source'])
+            if _pdk_output_is_model(result,arguments.output):
+                error_output=None;raise ValueError('Output cannot overwrite PDK models or licence files')
+            _emit(result,arguments.output)
+            return EXIT_OK if result.get('status') not in {'failed','blocked'} else EXIT_SOLVE
+        if arguments.command=='device-build':
+            from .equation_device import build
+            if arguments.output and (arguments.output.resolve()==arguments.definition.resolve() or
+                    (arguments.output.exists() and arguments.output.samefile(arguments.definition))):
+                error_output=None;raise ValueError('Output cannot overwrite the definition')
+            if arguments.output and arguments.spice_output and arguments.output.resolve()==arguments.spice_output.resolve():
+                error_output=None;raise ValueError('Report and SPICE output paths must differ')
+            if arguments.definition.stat().st_size>262144:raise ValueError('Device definition exceeds 256 KiB')
+            def unique_fields(pairs):
+                result={}
+                for key,value in pairs:
+                    if key in result:raise ValueError('Duplicate device field: '+key)
+                    result[key]=value
+                return result
+            definition=json.loads(arguments.definition.read_text(encoding='utf-8'),object_pairs_hook=unique_fields)
+            result=build(definition)
+            if arguments.spice_output:
+                with arguments.spice_output.open('x',encoding='utf-8') as stream:stream.write(result['source'])
+            _emit(result,arguments.output);return EXIT_OK
+        if arguments.command=='smps-stability':
+            from .smps_stability import default_config,analyze,validate
+            config=default_config()
+            if arguments.config:
+                if arguments.output and (arguments.output.resolve()==arguments.config.resolve() or
+                    (arguments.output.exists() and arguments.config.exists() and arguments.output.samefile(arguments.config))):
+                    error_output=None
+                    raise ValueError('Output path must not overwrite the input SMPS setup.')
+                if arguments.config.stat().st_size>65536:raise ValueError('SMPS setup exceeds 64 KiB')
+                def pairs(items):
+                    value={}
+                    for key,item in items:
+                        if key in value:raise ValueError('Duplicate SMPS setup key: '+key)
+                        value[key]=item
+                    return value
+                config=json.loads(arguments.config.read_text(encoding='utf-8'),object_pairs_hook=pairs)
+                if not isinstance(config,dict):raise ValueError('SMPS setup must be an object')
+            if arguments.topology:config['topology']=arguments.topology
+            if arguments.default_config:result=validate(config)
+            elif arguments.backend=='native':
+                if not arguments.library:raise ValueError('Native SMPS requires --library; reference mode must be explicitly selected')
+                if arguments.output and arguments.output.resolve()==arguments.library.resolve():
+                    error_output=None;raise ValueError('Output path must not overwrite the native library')
+                from .native_smps import analyze as native_analyze
+                result=native_analyze(config,arguments.library)
+            else:result=analyze(config)
+            _emit(result,arguments.output)
+            return EXIT_OK
         if arguments.command=='loop-gain':
             from .loop_gain import analyze
             result=analyze(arguments.netlist.read_text(encoding='utf-8'),arguments.injection,arguments.start_hz,arguments.stop_hz,arguments.points,assume_unilateral=arguments.assume_unilateral)
@@ -426,7 +600,14 @@ def main(argv: Iterable[str] | None = None) -> int:
                 "bdf2": "bdf2",
             }[arguments.method]
             result = run_native_project(
-                project, arguments.library, integration_method=method
+                project,
+                arguments.library,
+                integration_method=method,
+                adaptive_time_step=arguments.adaptive,
+                lte_absolute_tolerance=arguments.lte_absolute_tolerance,
+                lte_relative_tolerance=arguments.lte_relative_tolerance,
+                minimum_time_step_s=arguments.minimum_time_step,
+                max_rejected_steps=arguments.max_rejected_steps,
             ).to_dict()
             _emit(result, arguments.output)
             return EXIT_OK if result["status"] == "completed" else EXIT_SOLVE

@@ -31,6 +31,11 @@ def version(root: Path) -> str:
     for label, value in values.items():
         if value != app:
             raise ValueError(f'{label} version {value} differs from app version {app}.')
+    ui = (root / 'app/src/appVersion.ts').read_text()
+    if 'export const APP_VERSION = packageMetadata.version;' not in ui:
+        literal = re.search(r"APP_VERSION\s*=\s*['\"]([^'\"]+)", ui)
+        if literal is None or literal[1] != app:
+            raise ValueError('UI version differs from app version.')
     native = re.search(r'project\(SPIKE VERSION ([^ ]+)', (root / 'CMakeLists.txt').read_text())[1]
     if native != app.split('-')[0]:
         raise ValueError('CMake version differs from the application version.')

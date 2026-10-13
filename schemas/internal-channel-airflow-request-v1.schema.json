@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/internal-channel-airflow-request/v1",
+  "title": "Experimental internal laminar parallel-plate channel request",
+  "description": "SI inputs for prescribed fully developed laminar velocity and an advected thermal field. No turbulence, buoyancy or solid CHT. Runtime admission also requires Re_Dh <= 1000, Pe_length >= 10 and axial_cells * transverse_cells <= 100000.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "geometry", "fluid", "operating", "mesh"],
+  "properties": {
+    "contract": {"const": "spike/internal-channel-airflow-request/v1"},
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["length_m", "gap_m", "span_m"],
+      "properties": {
+        "length_m": {"$ref": "#/$defs/positive"},
+        "gap_m": {"$ref": "#/$defs/positive"},
+        "span_m": {"$ref": "#/$defs/positive", "description": "Ideal extrusion extent; sidewall effects are omitted."}
+      }
+    },
+    "fluid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["density_kg_m3", "specific_heat_j_kgk", "thermal_conductivity_w_mk", "dynamic_viscosity_pa_s"],
+      "properties": {
+        "density_kg_m3": {"$ref": "#/$defs/positive"},
+        "specific_heat_j_kgk": {"$ref": "#/$defs/positive"},
+        "thermal_conductivity_w_mk": {"$ref": "#/$defs/positive"},
+        "dynamic_viscosity_pa_s": {"$ref": "#/$defs/positive"}
+      }
+    },
+    "operating": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mean_velocity_m_s", "inlet_temperature_k", "lower_wall_heat_flux_w_m2", "upper_wall_heat_flux_w_m2"],
+      "properties": {
+        "mean_velocity_m_s": {"$ref": "#/$defs/positive"},
+        "inlet_temperature_k": {"$ref": "#/$defs/positive"},
+        "lower_wall_heat_flux_w_m2": {"type": "number", "description": "Positive into fluid, negative for cooling."},
+        "upper_wall_heat_flux_w_m2": {"type": "number", "description": "Positive into fluid, negative for cooling."}
+      }
+    },
+    "mesh": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["axial_cells", "transverse_cells"],
+      "properties": {
+        "axial_cells": {"type": "integer", "minimum": 2, "maximum": 1000},
+        "transverse_cells": {"type": "integer", "minimum": 3, "maximum": 200}
+      }
+    }
+  },
+  "$defs": {
+    "positive": {"type": "number", "exclusiveMinimum": 0}
+  }
+}

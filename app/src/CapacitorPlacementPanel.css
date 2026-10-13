@@ -1,0 +1,22 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.cap-placement-panel { display: grid; gap: 10px; min-width: 0; width: 100%; max-width: 1440px; box-sizing: border-box; margin: auto; padding: 14px; color: var(--spike-table-text); }
+.cap-placement-panel h3, .cap-placement-panel h4, .cap-placement-panel p { margin: 0; }
+.cap-placement-panel p, .cap-placement-panel small, .cap-placement-panel li { line-height: 1.5; overflow-wrap: anywhere; }
+.cap-placement-panel label { display: grid; min-width: 0; gap: 6px; font: 12px/1.4 var(--font-family, sans-serif); }
+.cap-placement-panel textarea { box-sizing: border-box; width: 100%; min-width: 0; min-height: 190px; max-height: 440px; resize: vertical; padding: 9px; font: 12px/1.5 monospace; }
+.cap-placement-panel textarea:focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: 2px; }
+.cap-placement-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cap-placement-results { display: grid; gap: 12px; min-width: 0; }
+.cap-placement-notice { border: 1px solid var(--spike-table-border); background: var(--spike-table-warning-bg); padding: 10px; border-radius: 5px; }
+.cap-placement-panel [role="alert"] { color: var(--spike-table-danger-text); border-left: 3px solid var(--spike-table-danger-border); padding: 8px; }
+.cap-placement-plots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 12px; min-width: 0; }
+.cap-placement-plots figure { min-width: 0; margin: 0; padding: 10px; border: 1px solid var(--spike-table-border); border-radius: 5px; }
+.cap-placement-plots figcaption { font-weight: 600; margin-bottom: 6px; }
+.cap-placement-table { width: 100%; max-height: 370px; overflow: auto; }
+.cap-placement-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cap-placement-table th, .cap-placement-table td { text-align: left; padding: 7px; border-bottom: 1px solid var(--spike-table-border); overflow-wrap: anywhere; }
+.cap-placement-table tr[aria-selected="true"] { background: var(--spike-table-row-focus); }
+.cap-placement-table td button { max-width: 240px; white-space: normal; overflow-wrap: anywhere; }
+.cap-placement-panel details { min-width: 0; border: 1px solid var(--spike-table-border); border-radius: 5px; padding: 9px; }
+.cap-placement-panel summary { cursor: pointer; font-weight: 600; }
+@media (max-width: 620px) { .cap-placement-panel { padding: 8px; } .cap-placement-table th, .cap-placement-table td { padding: 5px; } }

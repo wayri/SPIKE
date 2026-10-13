@@ -18,9 +18,10 @@ type ReportPreviewProps = {
   onClose: () => void;
   onExport: () => void;
   mode?: "modal" | "window";
+  nativeWindow?: boolean;
 };
 
-export default function ReportPreview({ fileName, html, onClose, onExport, mode = "modal" }: ReportPreviewProps) {
+export default function ReportPreview({ fileName, html, onClose, onExport, mode = "modal", nativeWindow = false }: ReportPreviewProps) {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const previewDocument = useMemo(() => printableReportDocument(html), [html]);
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function ReportPreview({ fileName, html, onClose, onExport, mode 
         <div className="report-preview-actions">
           <button type="button" className="secondary-btn" onClick={() => frameRef.current?.contentWindow?.postMessage(PRINT_MESSAGE, "*")} title="Prints every analyzed net in one sequential document"><Printer size={15} /> Print all nets</button>
           <button type="button" className="secondary-btn" onClick={onExport}><FileOutput size={15} /> Export HTML</button>
-          <button type="button" className="canvas-icon" onClick={onClose} title="Close report preview" aria-label="Close report preview"><X size={16} /></button>
+          {!nativeWindow && <button type="button" className="canvas-icon" onClick={onClose} title="Close report preview" aria-label="Close report preview"><X size={16} /></button>}
         </div>
       </header>
       <iframe

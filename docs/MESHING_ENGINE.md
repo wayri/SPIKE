@@ -44,6 +44,18 @@ The result also contains per-net, per-layer, per-topology, and per-material
 counts, mesh quality statistics, memory estimates, truncation state, and
 generation provenance.
 
+Exact predicate acceleration and real-board benchmarks are recorded in
+[mesher optimization and comparison](validation/INTERNAL_MESHER_OPTIMIZATION_20261012.md).
+Performance evidence does not change the mesh or solver qualification limits.
+
+Source-filled paths with exactly retraced connectors retain physical cutouts
+through validated rings and clipped conductor cells. Connector traversals are
+excluded from physical boundary contact. Indexed contact observation preserves
+the existing source-evidence qualification and all records. See the
+[retained Marble correction](validation/MARBLE_FILLED_ZONE_FIX_20261013.md) and
+[filled-path invariants](validation/FILLED_COPPER_PATH_20261013.md) for area
+checks, numerical limits and verification.
+
 Renderers must use the declared topology when constructing wire edges. A
 `prismN` stores the lower face followed by the upper face; valid wires are the
 two face perimeters plus matching vertical edges. Walking all `2N` vertices as

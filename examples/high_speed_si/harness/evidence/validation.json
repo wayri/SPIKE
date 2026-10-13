@@ -1,0 +1,323 @@
+{
+  "status": "passed",
+  "pi": {
+    "load_voltage_v": 11.834482758620691,
+    "analytical_load_voltage_v": 11.83448275862069,
+    "load_voltage_abs_error_v": 1.7763568394002505e-15,
+    "wire_loss_w": 0.6620689655172498,
+    "analytical_wire_loss_w": 0.6620689655172414,
+    "wire_loss_abs_error_w": 8.43769498715119e-15,
+    "native_element_power_sum_w": 7.049916206369744e-15,
+    "all_selected_wire_currents_abs_a": [
+      4.000000000000051,
+      4.0
+    ]
+  },
+  "uniform_gui_si": {
+    "status": "completed",
+    "mode": "differential",
+    "frequency_points": 33,
+    "reference_impedance_ohm": 260.4912618942215,
+    "maximum_reciprocity_error": 9.420554752102651e-16,
+    "minimum_through_magnitude": 0.9793812153314418,
+    "maximum_input_reflection_magnitude": 0.003804116470932667
+  },
+  "si": {
+    "mixed_mode_order": "D1..Dn,C1..Cn",
+    "differential_pair_order": [
+      "A aggressor",
+      "A victim",
+      "B aggressor",
+      "B victim"
+    ],
+    "maximum_relative_residual": 2.9588908424784393e-16,
+    "maximum_condition_number": 9.532696511975374,
+    "maximum_sampled_singular_value": 0.9999999999999998,
+    "reciprocity_max_abs": 1.2008898127460164e-15,
+    "peak_differential_next": {
+      "frequency_hz": 117187500.0,
+      "magnitude_v_per_v": 0.017287505951519632,
+      "transfer_db": -35.24535314738606
+    },
+    "peak_differential_fext": {
+      "frequency_hz": 78125000.0,
+      "magnitude_v_per_v": 0.014835415579565551,
+      "transfer_db": -36.574005668595404
+    },
+    "minimum_differential_aggressor_through_magnitude": 0.6732368973250851,
+    "diagonal_control_maximum_victim_transfer": 0.0,
+    "frequency_response": [
+      {
+        "frequency_hz": 0.0,
+        "aggressor_through_magnitude": 0.9985386449543651,
+        "differential_next_magnitude": 0.0,
+        "differential_next_db": -6000.0,
+        "differential_fext_magnitude": 0.0,
+        "differential_fext_db": -6000.0
+      },
+      {
+        "frequency_hz": 7812500.0,
+        "aggressor_through_magnitude": 0.9813137507931581,
+        "differential_next_magnitude": 0.006367432736895263,
+        "differential_next_db": -43.92071268119197,
+        "differential_fext_magnitude": 0.0045600132944279455,
+        "differential_fext_db": -46.82067782351709
+      },
+      {
+        "frequency_hz": 15625000.0,
+        "aggressor_through_magnitude": 0.944418014271438,
+        "differential_next_magnitude": 0.011463753340894918,
+        "differential_next_db": -38.8134633395846,
+        "differential_fext_magnitude": 0.008327031298825246,
+        "differential_fext_db": -41.59019605910605
+      },
+      {
+        "frequency_hz": 23437500.0,
+        "aggressor_through_magnitude": 0.8962862077023607,
+        "differential_next_magnitude": 0.014854179516254548,
+        "differential_next_db": -36.56302663675411,
+        "differential_fext_magnitude": 0.01107816127034193,
+        "differential_fext_db": -39.110646338020686
+      },
+      {
+        "frequency_hz": 31250000.0,
+        "aggressor_through_magnitude": 0.8456417658048833,
+        "differential_next_magnitude": 0.01663193771271484,
+        "differential_next_db": -35.58114300248183,
+        "differential_fext_magnitude": 0.012874364539321918,
+        "differential_fext_db": -37.80548395855371
+      },
+      {
+        "frequency_hz": 39062500.0,
+        "aggressor_through_magnitude": 0.7985294216554597,
+        "differential_next_magnitude": 0.017183015335740418,
+        "differential_next_db": -35.298012445992185,
+        "differential_fext_magnitude": 0.013925251995920302,
+        "differential_fext_db": -37.123938738959126
+      },
+      {
+        "frequency_hz": 46875000.0,
+        "aggressor_through_magnitude": 0.7582393405429706,
+        "differential_next_magnitude": 0.016965773450247995,
+        "differential_next_db": -35.40852673155576,
+        "differential_fext_magnitude": 0.014474127087597197,
+        "differential_fext_db": -36.78815236889618
+      },
+      {
+        "frequency_hz": 54687500.0,
+        "aggressor_through_magnitude": 0.7261625844483488,
+        "differential_next_magnitude": 0.016377708863532858,
+        "differential_next_db": -35.71493706679984,
+        "differential_fext_magnitude": 0.014723171006597284,
+        "differential_fext_db": -36.639972872858245
+      },
+      {
+        "frequency_hz": 62500000.0,
+        "aggressor_through_magnitude": 0.7026561689925436,
+        "differential_next_magnitude": 0.015720711905224567,
+        "differential_next_db": -36.070555820499514,
+        "differential_fext_magnitude": 0.014813919247433327,
+        "differential_fext_db": -36.58660054145369
+      },
+      {
+        "frequency_hz": 70312500.0,
+        "aggressor_through_magnitude": 0.6876346696889581,
+        "differential_next_magnitude": 0.015208488694030086,
+        "differential_next_db": -36.358278814868754,
+        "differential_fext_magnitude": 0.014835013326490775,
+        "differential_fext_db": -36.57424118428851
+      },
+      {
+        "frequency_hz": 78125000.0,
+        "aggressor_through_magnitude": 0.6809063242517805,
+        "differential_next_magnitude": 0.01497632766590528,
+        "differential_next_db": -36.49189333213832,
+        "differential_fext_magnitude": 0.014835415579565551,
+        "differential_fext_db": -36.574005668595404
+      },
+      {
+        "frequency_hz": 85937500.0,
+        "aggressor_through_magnitude": 0.6823372461898826,
+        "differential_next_magnitude": 0.015081947972415409,
+        "differential_next_db": -36.43085123426572,
+        "differential_fext_magnitude": 0.014834345436752772,
+        "differential_fext_db": -36.574632242052985
+      },
+      {
+        "frequency_hz": 93750000.0,
+        "aggressor_through_magnitude": 0.6919074661413731,
+        "differential_next_magnitude": 0.015503378687584451,
+        "differential_next_db": -36.19147289405045,
+        "differential_fext_magnitude": 0.014825753329102829,
+        "differential_fext_db": -36.5796645989229
+      },
+      {
+        "frequency_hz": 101562500.0,
+        "aggressor_through_magnitude": 0.7096863515154695,
+        "differential_next_magnitude": 0.016140936027714412,
+        "differential_next_db": -35.84142567495052,
+        "differential_fext_magnitude": 0.014777136534465853,
+        "differential_fext_db": -36.60819427925955
+      },
+      {
+        "frequency_hz": 109375000.0,
+        "aggressor_through_magnitude": 0.7357196945565053,
+        "differential_next_magnitude": 0.016820169845682485,
+        "differential_next_db": -35.48339246247407,
+        "differential_fext_magnitude": 0.014622897075660205,
+        "differential_fext_db": -36.699331536168515
+      },
+      {
+        "frequency_hz": 117187500.0,
+        "aggressor_through_magnitude": 0.7697870017719423,
+        "differential_next_magnitude": 0.017287505951519632,
+        "differential_next_db": -35.24535314738606,
+        "differential_fext_magnitude": 0.014253357803259198,
+        "differential_fext_db": -36.921656251855836
+      },
+      {
+        "frequency_hz": 125000000.0,
+        "aggressor_through_magnitude": 0.8109616761265241,
+        "differential_next_magnitude": 0.017200423541529366,
+        "differential_next_db": -35.289217178727675,
+        "differential_fext_magnitude": 0.013504309341568838,
+        "differential_fext_db": -37.390552445473794
+      },
+      {
+        "frequency_hz": 132812500.0,
+        "aggressor_through_magnitude": 0.8569261047502768,
+        "differential_next_magnitude": 0.016136960446071096,
+        "differential_next_db": -35.84356531026434,
+        "differential_fext_magnitude": 0.012161258936535519,
+        "differential_fext_db": -38.3004292892761
+      },
+      {
+        "frequency_hz": 140625000.0,
+        "aggressor_through_magnitude": 0.9031559839374333,
+        "differential_next_magnitude": 0.013674790170240505,
+        "differential_next_db": -37.28158657755912,
+        "differential_fext_magnitude": 0.010004324803159242,
+        "differential_fext_db": -39.99624433577215
+      },
+      {
+        "frequency_hz": 148437500.0,
+        "aggressor_through_magnitude": 0.94250865739227,
+        "differential_next_magnitude": 0.009573808468514366,
+        "differential_next_db": -40.378305303321994,
+        "differential_fext_magnitude": 0.006906586969410132,
+        "differential_fext_db": -43.21473030153484
+      },
+      {
+        "frequency_hz": 156250000.0,
+        "aggressor_through_magnitude": 0.9662553096481771,
+        "differential_next_magnitude": 0.0040028644678862055,
+        "differential_next_db": -47.95258228655945,
+        "differential_fext_magnitude": 0.0029451320152454508,
+        "differential_fext_db": -50.61790466468446
+      },
+      {
+        "frequency_hz": 164062500.0,
+        "aggressor_through_magnitude": 0.9674562450150191,
+        "differential_next_magnitude": 0.002469913742149494,
+        "differential_next_db": -52.14636427053645,
+        "differential_fext_magnitude": 0.0015085752067454771,
+        "differential_fext_db": -56.42866068279403
+      },
+      {
+        "frequency_hz": 171875000.0,
+        "aggressor_through_magnitude": 0.9455792287222584,
+        "differential_next_magnitude": 0.008223267368148149,
+        "differential_next_db": -41.69911178055514,
+        "differential_fext_magnitude": 0.0055983366787036234,
+        "differential_fext_db": -45.03881974045403
+      },
+      {
+        "frequency_hz": 179687500.0,
+        "aggressor_through_magnitude": 0.9070083173260081,
+        "differential_next_magnitude": 0.012616001366810334,
+        "differential_next_db": -37.981565452558726,
+        "differential_fext_magnitude": 0.008880101951344652,
+        "differential_fext_db": -41.03164096223826
+      },
+      {
+        "frequency_hz": 187500000.0,
+        "aggressor_through_magnitude": 0.8605455226719066,
+        "differential_next_magnitude": 0.01538210853642081,
+        "differential_next_db": -36.25968257161891,
+        "differential_fext_magnitude": 0.011224843280633232,
+        "differential_fext_db": -38.996394276570875
+      },
+      {
+        "frequency_hz": 195312500.0,
+        "aggressor_through_magnitude": 0.8136434437320429,
+        "differential_next_magnitude": 0.016714760699906392,
+        "differential_next_db": -35.53799673375145,
+        "differential_fext_magnitude": 0.012733527873984874,
+        "differential_fext_db": -37.901025133615505
+      },
+      {
+        "frequency_hz": 203125000.0,
+        "aggressor_through_magnitude": 0.7711270220817702,
+        "differential_next_magnitude": 0.01701572716999894,
+        "differential_next_db": -35.38298973045854,
+        "differential_fext_magnitude": 0.01361324526084439,
+        "differential_fext_db": -37.32076662029709
+      },
+      {
+        "frequency_hz": 210937500.0,
+        "aggressor_through_magnitude": 0.7355099144146654,
+        "differential_next_magnitude": 0.016707414406192025,
+        "differential_next_db": -35.541815102680275,
+        "differential_fext_magnitude": 0.01407838134354267,
+        "differential_fext_db": -37.028945503278734
+      },
+      {
+        "frequency_hz": 218750000.0,
+        "aggressor_through_magnitude": 0.7078094051855276,
+        "differential_next_magnitude": 0.016140573644301996,
+        "differential_next_db": -35.84162068580095,
+        "differential_fext_magnitude": 0.01429885416512038,
+        "differential_fext_db": -36.893975264270196
+      },
+      {
+        "frequency_hz": 226562500.0,
+        "aggressor_through_magnitude": 0.6882606376691228,
+        "differential_next_magnitude": 0.01557665215921797,
+        "differential_next_db": -36.15051756358109,
+        "differential_fext_magnitude": 0.01439097982589605,
+        "differential_fext_db": -36.83819271266038
+      },
+      {
+        "frequency_hz": 234375000.0,
+        "aggressor_through_magnitude": 0.67678272593187,
+        "differential_next_magnitude": 0.015195401518023774,
+        "differential_next_db": -36.36575639571071,
+        "differential_fext_magnitude": 0.014426083815339325,
+        "differential_fext_db": -36.81703097787868
+      },
+      {
+        "frequency_hz": 242187500.0,
+        "aggressor_through_magnitude": 0.6732368973250851,
+        "differential_next_magnitude": 0.015100457315230133,
+        "differential_next_db": -36.42019799920485,
+        "differential_fext_magnitude": 0.014441318033351648,
+        "differential_fext_db": -36.80786335348665
+      },
+      {
+        "frequency_hz": 250000000.0,
+        "aggressor_through_magnitude": 0.6775459167211642,
+        "differential_next_magnitude": 0.015318701777302405,
+        "differential_next_db": -36.29556077088811,
+        "differential_fext_magnitude": 0.014446869116896048,
+        "differential_fext_db": -36.80452523473375
+      }
+    ]
+  },
+  "assertions": [
+    "DC load voltage agrees with explicit two-wire KVL within 1e-10 V.",
+    "DC wire loss agrees with I^2R within 1e-10 W and native power closes within 1e-10 W.",
+    "Coupled MTL residual, sampled passivity and reciprocity meet solver admission thresholds.",
+    "Public GUI uniform differential harness SI completes with finite reciprocal two-port output.",
+    "Differential victim transfer is nonzero with mutual RLGC and <=1e-12 when mutual terms are removed."
+  ]
+}

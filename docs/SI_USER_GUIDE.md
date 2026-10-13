@@ -2,6 +2,8 @@
 
 # Signal integrity in SPIKE: board context and a reproducible four-port study
 
+**SI, PI, Thermal, EM**
+
 This tutorial starts with the open-source [Marble v1.4.4 board](https://github.com/BerkeleyLab/Marble) as physical design context, then runs the complete **implemented** SI workflow on an independently authored analytical coupled line. The two inputs must not be confused: the plots below are **not Marble S-parameters or Marble eye measurements**. Current board extraction and full-wave admission do not support a validated four-port Marble channel. The [SI capability record](validation/SI_CAPABILITY_VOLUME_PEEC_20260928.md) and [solver status](SOLVER_STATUS.md) record the evidence and remaining gates.
 
 ## 1. Get the board and inspect the physical path

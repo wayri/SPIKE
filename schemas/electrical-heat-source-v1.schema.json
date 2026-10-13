@@ -9,7 +9,7 @@
   "properties": {
     "contract": {"const": "spike/electrical-heat-source/v1"},
     "id": {"$ref": "#/$defs/id"},
-    "model": {"oneOf": [{"$ref": "#/$defs/waveform"}, {"$ref": "#/$defs/spectral"}, {"$ref": "#/$defs/semiconductor"}]},
+    "model": {"oneOf": [{"$ref": "#/$defs/waveform"}, {"$ref": "#/$defs/energyBalanced"}, {"$ref": "#/$defs/spectral"}, {"$ref": "#/$defs/semiconductor"}, {"$ref": "#/$defs/operatingSemiconductor"}]},
     "distribution": {"type": "array", "minItems": 1, "maxItems": 5000, "items": {
       "type": "object", "additionalProperties": false, "required": ["occurrence_id", "cell_id", "weight"],
       "properties": {"occurrence_id": {"$ref": "#/$defs/id"}, "cell_id": {"$ref": "#/$defs/id"}, "weight": {"type": "number", "minimum": 0}}
@@ -37,6 +37,22 @@
         "energy_policy": {"const": "dissipative_terminal_power"}
       }
     },
+    "energyBalanced": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "time_s", "ports", "stored_energy_j", "energy_policy"],
+      "description": "Resolved passive-sign multi-terminal samples: dissipated heat is exactly integrated sum of piecewise-linear voltage times current minus piecewise-linear stored energy change. Runtime checks nonnegative heat throughout each interval and a total 100000 port-sample budget. Not arbitrary device equations or transient thermal solving.",
+      "properties": {
+        "kind": {"const": "energy_balanced_terminal_waveform"},
+        "time_s": {"$ref": "#/$defs/tableColumn"},
+        "stored_energy_j": {"$ref": "#/$defs/tableColumn"},
+        "energy_policy": {"const": "passive_ports_minus_stored_energy"},
+        "ports": {"type": "array", "minItems": 1, "maxItems": 64, "items": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "voltage_v", "current_a"],
+          "properties": {"id": {"$ref": "#/$defs/id"}, "voltage_v": {"$ref": "#/$defs/signedWaveform"}, "current_a": {"$ref": "#/$defs/signedWaveform"}}
+        }}
+      }
+    },
     "spectral": {
       "type": "object", "additionalProperties": false,
       "required": ["kind", "frequency_hz", "rms_current_a", "resistance_ohm"],
@@ -46,6 +62,32 @@
         "frequency_hz": {"$ref": "#/$defs/nonnegativeArray"},
         "rms_current_a": {"$ref": "#/$defs/nonnegativeArray"},
         "resistance_ohm": {"$ref": "#/$defs/nonnegativeArray"}
+      }
+    },
+    "operatingAxis": {"type": "array", "minItems": 2, "maxItems": 64, "items": {"type": "number", "minimum": 0}},
+    "lossTensor": {"type": "array", "minItems": 2, "maxItems": 64, "items": {
+      "type": "array", "minItems": 2, "maxItems": 64, "items": {
+        "type": "array", "minItems": 2, "maxItems": 64, "items": {"type": "number", "minimum": 0}
+      }
+    }},
+    "operatingSemiconductor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "temperature_k", "voltage_v", "current_a", "conduction_power_w", "turn_on_energy_j", "turn_off_energy_j", "reverse_recovery_energy_j", "operating_voltage_v", "operating_current_a", "switching_frequency_hz", "conditions", "energy_terms_nonoverlapping"],
+      "description": "Trilinear interpolation of supplied SI loss tensors indexed [temperature][voltage][current]. Runtime enforces aligned tensors, strictly increasing axes, positive kelvin, at most 32768 Cartesian points and no extrapolation. Fixed drive/duty/topology remain caller declarations.",
+      "properties": {
+        "kind": {"const": "semiconductor_operating_loss_table"},
+        "temperature_k": {"allOf": [{"$ref": "#/$defs/operatingAxis"}], "items": {"type": "number", "exclusiveMinimum": 0}},
+        "voltage_v": {"$ref": "#/$defs/operatingAxis"},
+        "current_a": {"$ref": "#/$defs/operatingAxis"},
+        "conduction_power_w": {"$ref": "#/$defs/lossTensor"},
+        "turn_on_energy_j": {"$ref": "#/$defs/lossTensor"},
+        "turn_off_energy_j": {"$ref": "#/$defs/lossTensor"},
+        "reverse_recovery_energy_j": {"$ref": "#/$defs/lossTensor"},
+        "operating_voltage_v": {"type": "number", "minimum": 0},
+        "operating_current_a": {"type": "number", "minimum": 0},
+        "switching_frequency_hz": {"type": "number", "minimum": 0},
+        "conditions": {"$ref": "#/$defs/description"},
+        "energy_terms_nonoverlapping": {"const": true}
       }
     },
     "semiconductor": {

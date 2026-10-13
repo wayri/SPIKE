@@ -6,6 +6,7 @@ import { placementFromTransform, transformFromPlacement, type AssemblyDesigns, t
 import { runLocalWorker, runNativeProjectWorker, selectNativeAssemblySources } from "./workerBridge";
 import HarnessAutoPlanner from "./HarnessAutoPlanner";
 import ConnectorGraphEditor from "./ConnectorGraphEditor";
+import AssemblyHarnessWiring from "./AssemblyHarnessWiring";
 import type { GraphConnector } from "./connectorGraphModel";
 import AssemblySiBatch from "./AssemblySiBatch";
 import MultiboardStudyEditor from "./MultiboardStudyEditor";
@@ -318,7 +319,7 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
     }} onStatus={onStatus} />}
     <details className="assembly-link-details"><summary>Review and edit all link records</summary>
     <h4><Cable size={14} /> Harnesses</h4>
-    <p className="mcad-gate">These rows place compact AssemblyIR board-to-board links. Author detailed connectors, wires, sources, loads, and explicit contact resistance in the project harness document.{onOpenHarnessEditor && <> <button className="secondary-btn" onClick={onOpenHarnessEditor}>Open Harness PI editor</button></>}</p>
+    <p className="mcad-gate">Define explicit board-to-board pin pairs, then open the wiring diagram below to assign conductor roles, returns and pairs. Detailed electrical values remain explicit.{onOpenHarnessEditor && <> <button className="secondary-btn" onClick={onOpenHarnessEditor}>Open project harness editor</button></>}</p>
     <DataTable label="Assembly harnesses" className="data-table"><thead><tr><th>ID / name</th><th>Endpoint A</th><th>Endpoint B</th><th>Length (mm)</th><th>Connector-to-connector pin map</th><th /></tr></thead><tbody>{harnesses.map(row => <tr key={row.id}>
       <td><input value={row.name ?? row.id} onChange={event => patchHarness(row.id, { name: event.target.value })} /><small>{row.id}</small></td>
       <td><input value={row.endpoint_a} onChange={event => patchHarness(row.id, { endpoint_a: event.target.value })} /></td>
@@ -328,6 +329,7 @@ export default function AssemblyStructureEditor({ projectPath, projectManifestDi
       <td><button className="secondary-btn" onClick={() => setHarnesses(current => current.filter(item => item.id !== row.id))}>Remove</button></td>
     </tr>)}</tbody></DataTable>
     <button className="secondary-btn" onClick={() => { const id = identity("harness"); setHarnesses(current => [...current, { id, name: "Harness", endpoint_a: "", endpoint_b: "", length_mm: 0, pin_map: {} }]); setPinMapDrafts(current => ({ ...current, [id]: "{}" })); }}><Plus size={13} /> Add harness</button>
+    <AssemblyHarnessWiring rows={harnesses.map(row => { try { return { ...row, pin_map: JSON.parse(pinMapDrafts[row.id] ?? "{}") }; } catch { return { ...row, pin_map: {} }; } })} onChange={row => patchHarness(row.id, row)} />
     <h4>Stacked board connector mates</h4>
     <p className="mcad-gate">Declare direct mated connectors separately from cable harnesses. Enter both board::connector identities and an explicit pin map; placement alone does not establish a connection or contact impedance.</p>
     <DataTable label="Assembly connector mates" className="data-table"><thead><tr><th>Name</th><th>Connector A</th><th>Connector B</th><th>Pin map JSON</th><th /></tr></thead><tbody>{connectorMappings.filter(row => row.kind === "connector-mate").map(row => {

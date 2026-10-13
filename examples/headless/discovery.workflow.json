@@ -1,0 +1,20 @@
+{
+  "contract": "spike/headless-workflow/v1",
+  "steps": [
+    {
+      "name": "capabilities",
+      "method": "capabilities",
+      "params": {}
+    },
+    {
+      "name": "importers",
+      "method": "list_importers",
+      "params": {}
+    },
+    {
+      "name": "solvers",
+      "method": "list_solvers",
+      "params": {}
+    }
+  ]
+}

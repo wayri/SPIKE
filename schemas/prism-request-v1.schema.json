@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/prism-request-v1.schema.json",
+  "title": "SPIKE Prism request v1",
+  "$comment": "Apache-2.0. Runtime also enforces finite numbers, duplicate-key rejection, depth 32, exact UTF-8 hashes and byte bounds.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "api_version", "request_id", "operation"],
+  "properties": {
+    "contract": {"const": "spike/prism-request/v1"},
+    "api_version": {"type": "integer", "const": 1},
+    "request_id": {"$ref": "#/$defs/request_id"},
+    "operation": {"enum": ["capabilities", "inspect-board", "analyze"]},
+    "source": {"$ref": "#/$defs/source"},
+    "analysis_spec": {"$ref": "#/$defs/analysis_spec"}
+  },
+  "allOf": [
+    {"if": {"properties": {"operation": {"const": "capabilities"}}},
+     "then": {"not": {"anyOf": [{"required": ["source"]}, {"required": ["analysis_spec"]}]}}},
+    {"if": {"properties": {"operation": {"const": "inspect-board"}}},
+     "then": {"required": ["source"], "not": {"required": ["analysis_spec"]}}},
+    {"if": {"properties": {"operation": {"const": "analyze"}}},
+     "then": {"required": ["source", "analysis_spec"]}}
+  ],
+  "$defs": {
+    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9._:-]{1,128}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file_name": {
+      "type": "string", "maxLength": 255,
+      "pattern": "^[^/\\\\:\u0000-\u001f<>|?*]+\\.kicad_pcb$",
+      "not": {"pattern": "^([Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])\\."}
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["file_name", "encoding", "data", "sha256"],
+      "properties": {
+        "file_name": {"$ref": "#/$defs/file_name"},
+        "encoding": {"const": "utf-8"},
+        "data": {"type": "string", "minLength": 1, "maxLength": 33554432,
+          "description": "Exact saved PCB text; runtime bounds UTF-8 bytes to 32 MiB and checks sha256 without newline normalization."},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "analysis_spec": {
+      "allOf": [{"$ref": "analysis-spec-v1.schema.json"}],
+      "required": ["contract", "mode", "net_names", "sources", "loads", "return_path", "probes", "mesh", "limits", "options"],
+      "propertyNames": {"enum": ["contract", "analysis_id", "mode", "solver_id", "formulation", "required_capabilities", "net_names", "sources", "loads", "return_path", "probes", "frequency_start_hz", "frequency_stop_hz", "frequency_points", "transient", "mesh", "limits", "options"]},
+      "properties": {"mode": {"type": "string", "pattern": "\\S"},
+        "sources": {"items": {"$ref": "#/$defs/terminal_record"}},
+        "loads": {"items": {"$ref": "#/$defs/terminal_record"}},
+        "probes": {"items": {"$ref": "#/$defs/terminal_record"}}}
+    },
+    "terminal_record": {
+      "type": "object", "properties": {"position_mm": {"$ref": "#/$defs/point"}, "at": {"$ref": "#/$defs/point"}}
+    },
+    "point": {
+      "oneOf": [
+        {"type": "array", "minItems": 2, "maxItems": 3, "items": {"type": "number"}},
+        {"type": "object", "additionalProperties": false, "required": ["x", "y"],
+         "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "z": {"type": "number"}}}
+      ]
+    }
+  }
+}

@@ -1,0 +1,72 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.spike-focus-assembly {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--spike-table-text, #dce8ed);
+  background: var(--spike-table-surface, #111f29);
+  font: 12px/1.4 Inter, system-ui, sans-serif;
+}
+.spike-focus-assembly--managers { width: min(380px, 100%); }
+.spike-focus-assembly > .assembly-workspace-host,
+.spike-focus-assembly-edit-scope { min-width: 0; min-height: 0; flex: 1 1 auto; }
+.spike-focus-assembly .assembly-workspace-window-hint { display: none; }
+.spike-focus-assembly .assembly-manager-shade {
+  position: static;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  padding: 0;
+  background: none;
+}
+.spike-focus-assembly .assembly-board-managers {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  flex: 1 1 auto;
+  border: 0;
+}
+.spike-focus-assembly-heading,
+.spike-focus-assembly-alert,
+.spike-focus-assembly-status { flex: 0 0 auto; }
+.spike-focus-assembly-heading {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--spike-table-border, #334c58);
+  background: var(--spike-table-toolbar, #172833);
+}
+.spike-focus-assembly-heading h2 { margin: 2px 0 0; font-size: 15px; }
+.spike-focus-assembly-heading small { color: var(--spike-table-muted, #9eb5bf); letter-spacing: 1px; }
+.spike-focus-assembly-edit-scope {
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  overflow: auto;
+  border: 0;
+}
+.spike-focus-assembly-edit-scope:disabled { opacity: .58; }
+.spike-focus-assembly-options,
+.spike-focus-assembly-close-warning { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.spike-focus-assembly-options label { display: flex; align-items: center; gap: 6px; }
+.spike-focus-assembly-hint { margin: 0; color: var(--spike-table-muted, #a9bdc7); overflow-wrap: anywhere; }
+.spike-focus-assembly-alert { padding: 8px 10px; color: var(--spike-table-danger-text, #edc27b); background: var(--spike-table-warning-bg, #342c21); overflow-wrap: anywhere; }
+.spike-focus-assembly-close-warning span { min-width: 160px; flex: 1 1 auto; }
+.spike-focus-assembly-status { padding: 7px 10px; color: var(--spike-table-muted, #a9bdc7); background: var(--spike-table-toolbar, #172833); border-top: 1px solid var(--spike-table-border, #334c58); overflow-wrap: anywhere; }
+@media (max-width: 720px) {
+  .spike-focus-assembly--managers { width: 100%; }
+  .spike-focus-assembly-edit-scope { padding: 8px; }
+}

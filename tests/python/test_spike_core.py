@@ -453,7 +453,8 @@ class SpikeCoreContractTests(unittest.TestCase):
             (root / "Connectors").mkdir()
             model = root / "Connectors" / "SpikeFixtureHeader_2x5.step"
             model.write_text("fixture", encoding="utf-8")
-            result = search_model_library("spikefixtureheader", additional_roots=[root])
+            with patch.dict("os.environ", {"SPIKE_MODEL_INDEX_PATH": str(root / "model-index.sqlite3")}):
+                result = search_model_library("spikefixtureheader", additional_roots=[root])
             self.assertTrue(result["offline"])
             self.assertEqual(result["count"], 1)
             self.assertEqual(result["models"][0]["path"], str(model))

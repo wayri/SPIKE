@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "assistant-window",
+  "description": "The assistant communicates only with its owning workspace and may minimize or close its own window.",
+  "windows": ["spike-assistant"],
+  "permissions": ["core:event:default", "core:window:allow-minimize", "core:window:allow-destroy"]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "SPDX-License-Identifier: Apache-2.0",
+  "$id": "https://spike.local/schemas/pi-return-path-request-v1.schema.json",
+  "title": "SPIKE explicit copper return-path request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "occurrence_id", "forward_net", "return_net", "source_pad_id", "load_pad_ids", "mesh_target_mm"],
+  "properties": {
+    "contract": {"const": "spike/pi-return-path-request/v1"},
+    "occurrence_id": {"type": "string", "minLength": 1},
+    "forward_net": {"type": "string", "minLength": 1},
+    "return_net": {"type": "string", "minLength": 1},
+    "source_pad_id": {"type": "string", "minLength": 1},
+    "load_pad_ids": {"type": "array", "minItems": 1, "maxItems": 32, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "mesh_target_mm": {"type": "number", "minimum": 0.05, "maximum": 1000}
+  }
+}

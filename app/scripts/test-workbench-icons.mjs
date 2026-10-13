@@ -2,7 +2,6 @@
 import assert from "node:assert/strict";
 import { readdir, readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { basename } from "node:path";
 import { pathToFileURL } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -48,10 +47,11 @@ const appSource = await readFile(new URL("../src/App.tsx", import.meta.url), "ut
 assert.match(appSource, /<Tool icon=\{GalleryVertical\} label="Icon gallery"/);
 assert.match(appSource, /iconGalleryOpen && <IconGallery/);
 const sourceFiles = (await readdir(sourceRoot, { recursive: true, withFileTypes: true }))
-  .filter(entry => entry.isFile() && /\.(?:ts|tsx)$/.test(entry.name) && basename(entry.parentPath) !== "icons");
+  .filter(entry => entry.isFile() && /\.(?:ts|tsx)$/.test(entry.name) && !entry.parentPath.endsWith("\\icons"));
 for (const entry of sourceFiles) {
   const text = await readFile(pathToFileURL(`${entry.parentPath}/${entry.name}`), "utf8");
-  assert.ok(!text.includes('from "lucide-react"'), `${entry.name} bypasses the local icon barrel`);
+  const runtimeImports = text.replace(/^import\s+type\b[^;]*from\s+["']lucide-react["'];?\s*$/gm, "");
+  assert.ok(!runtimeImports.includes('from "lucide-react"'), `${entry.name} bypasses the local icon barrel`);
 }
 
 console.log(`Workbench icon pack: ${icons.workbenchIconInventory.length} native icons rendered and verified`);

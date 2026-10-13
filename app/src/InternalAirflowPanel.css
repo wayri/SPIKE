@@ -1,0 +1,95 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+@import "./buttonStandard.css";
+
+.internal-airflow-panel {
+  --airflow-border: var(--spike-table-border-strong, #3c4652);
+  --airflow-surface: var(--spike-table-field, #151b22);
+  --airflow-muted: var(--spike-table-muted, #a8b1bc);
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--airflow-border);
+  border-radius: 8px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--airflow-surface) 88%, #183348), var(--airflow-surface));
+}
+
+.internal-airflow-panel > header,
+.internal-airflow-result-heading,
+.internal-airflow-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.internal-airflow-panel h4,
+.internal-airflow-panel p { margin: 0; }
+.internal-airflow-panel h4 { font-size: 16px; }
+.internal-airflow-eyebrow { color: #62c9ff; font-size: 10px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.internal-airflow-badge { flex: 0 0 auto; padding: 3px 7px; border: 1px solid #9b7832; border-radius: 999px; color: #ffd88a; background: #4c381b; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.internal-airflow-intro,
+.internal-airflow-boundary-note,
+.internal-airflow-actions span { color: var(--airflow-muted); font-size: 11px; line-height: 1.55; }
+
+.internal-airflow-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 9px 12px;
+  min-width: 0;
+}
+.internal-airflow-controls label { display: grid; gap: 5px; min-width: 0; color: var(--airflow-muted); font-size: 10px; }
+.internal-airflow-controls label > span { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.internal-airflow-controls small { color: #72bdda; font-size: 9px; white-space: nowrap; }
+.internal-airflow-controls input { width: 100%; }
+.internal-airflow-boundary-note { padding: 8px 10px; border-left: 3px solid #4b9abb; background: color-mix(in srgb, var(--airflow-surface) 80%, #204b63); }
+.internal-airflow-actions { justify-content: flex-start; flex-wrap: wrap; }
+.internal-airflow-error { padding: 9px 11px; border: 1px solid #a44848; border-radius: 4px; color: #ffd0d0; background: #401e22; font-size: 11px; }
+.internal-airflow-stale { padding: 8px 10px; border: 1px solid var(--spike-control-primary-border); border-radius: 4px; color: var(--spike-control-primary-text); background: var(--spike-control-primary-surface); font-size: 11px; }
+.internal-airflow-empty { min-height: 90px; display: grid; place-items: center; padding: 18px; border: 1px dashed var(--airflow-border); border-radius: 6px; color: var(--airflow-muted); font-size: 11px; text-align: center; }
+
+.internal-airflow-results { display: grid; gap: 12px; min-width: 0; }
+.internal-airflow-result-heading > div:first-child { display: grid; gap: 2px; }
+.internal-airflow-result-heading strong { color: #ffd88a; font-size: 11px; letter-spacing: .08em; }
+.internal-airflow-result-heading span { color: var(--airflow-muted); font-size: 10px; }
+.internal-airflow-view-toggle { display: inline-flex; gap: 4px; }
+.internal-airflow-view-toggle button[aria-pressed="true"] { border-color: var(--spike-control-primary-border); color: var(--spike-control-primary-text); background: var(--spike-control-primary-surface); }
+.internal-airflow-figure { min-width: 0; margin: 0; border: 1px solid var(--airflow-border); border-radius: 6px; overflow: hidden; background: #0b1118; }
+.internal-airflow-figure svg { display: block; width: 100%; height: auto; min-height: 190px; max-height: 330px; }
+.internal-airflow-figure figcaption { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; min-height: 29px; padding: 5px 10px; border-top: 1px solid var(--airflow-border); color: #d6dee7; font-size: 10px; text-align: center; }
+.internal-airflow-channel { fill: #111b25; stroke: #506070; stroke-width: 1; }
+.internal-airflow-wall { stroke: #a5b3c2; stroke-width: 4; }
+.internal-airflow-wall.lower { stroke: #ffad55; }
+.internal-airflow-axis-label,
+.internal-airflow-boundary-label { fill: #b9c5d0; font: 11px Inter, ui-sans-serif, system-ui, sans-serif; }
+.internal-airflow-boundary-label { fill: #84cfee; font-size: 10px; }
+.internal-airflow-velocity-arrow { stroke: #62c9ff; stroke-width: 1.7; opacity: .9; }
+#internal-airflow-arrow path { fill: #62c9ff; }
+.internal-airflow-swatch { display: inline-block; width: 11px; height: 11px; border-radius: 2px; }
+.internal-airflow-swatch.cool { background: hsl(220 82% 55%); }
+.internal-airflow-swatch.hot { background: hsl(10 82% 55%); }
+.internal-airflow-gradient { width: 58px; height: 8px; border-radius: 3px; background: linear-gradient(90deg, hsl(220 82% 55%), hsl(115 82% 55%), hsl(10 82% 55%)); }
+.internal-airflow-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 1px; margin: 0; overflow: hidden; border: 1px solid var(--airflow-border); border-radius: 6px; background: var(--airflow-border); }
+.internal-airflow-metrics > div { display: grid; gap: 4px; min-width: 0; padding: 9px 10px; background: var(--airflow-surface); }
+.internal-airflow-metrics dt { color: var(--airflow-muted); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+.internal-airflow-metrics dd { margin: 0; color: #eef5fb; font-size: 11px; overflow-wrap: anywhere; }
+.internal-airflow-results details { font-size: 11px; }
+.internal-airflow-results details summary { color: #bfe9fb; cursor: pointer; }
+.internal-airflow-results details ul { margin: 8px 0 0; padding-left: 18px; color: var(--airflow-muted); line-height: 1.5; }
+
+@media (max-width: 620px) {
+  .internal-airflow-panel { padding: 12px; }
+  .internal-airflow-controls { grid-template-columns: 1fr; }
+  .internal-airflow-result-heading { align-items: flex-start; flex-direction: column; }
+  .internal-airflow-view-toggle { width: 100%; }
+  .internal-airflow-view-toggle button { flex: 1 1 0; }
+  .internal-airflow-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .internal-airflow-figure svg { min-height: 150px; }
+}
+
+@media (forced-colors: active) {
+  .internal-airflow-badge,
+  .internal-airflow-boundary-note,
+  .internal-airflow-figure { forced-color-adjust: auto; }
+}

@@ -56,6 +56,30 @@ class ProjectPersistenceWorkflowTests(unittest.TestCase):
             for key, value in canonical["metadata"].items():
                 self.assertEqual(reopened["canonical"]["design_ir"]["metadata"][key], json.loads(json.dumps(value)))
 
+    def test_engineering_review_evidence_survives_native_package_roundtrip(self):
+        from python.spike_core.engineering_review import review_engineering
+        from tests.python.test_engineering_review import request
+        with tempfile.TemporaryDirectory() as directory:
+            canonical = SpiDeRV2.from_v1(import_odb_design(str(write_board(directory)))).to_dict()
+            canonical["source"]["artifact_path"] = ""
+            review_request = request()
+            evidence = {"contract": "spike/engineering-review-workspace/v1", "scope_sha256": "a" * 64,
+                        "overrides": review_request["overrides"], "result": review_engineering(review_request)}
+            snapshot = {"format": "spike-project-package/v2", "project": {"name": "Review persistence"},
+                        "design": {"canonical_design": canonical, "source_format": "spike-normalized",
+                                   "source_file": "review.spike-design.json",
+                                   "source_board": json.dumps({"contract": "spike/design-snapshot/v1",
+                                       "canonical_design": canonical, "design": SpiDeRV2.from_dict(canonical).to_v1().to_dict()})},
+                        "analysis": {"engineering_review": evidence}}
+            path = Path(directory) / "review.spike"
+            self.request("write_project_package", path=str(path), snapshot=snapshot)
+            loaded = self.request("read_project_package", path=str(path))["project"]
+            self.assertEqual(loaded["analysis"]["engineering_review"], evidence)
+            # Re-saving preserves complete review evidence, decimal strings and scoped identities.
+            second = Path(directory) / "review-again.spike"
+            self.request("write_project_package", path=str(second), snapshot=loaded, base_package_path=str(path))
+            self.assertEqual(self.request("read_project_package", path=str(second))["project"]["analysis"]["engineering_review"], evidence)
+
     def test_binary_odb_projects_project_complete_canonical_geometry(self):
         with tempfile.TemporaryDirectory() as directory:
             canonical = SpiDeRV2.from_v1(import_odb_design(str(write_board(directory)))).to_dict()
@@ -67,6 +91,33 @@ class ProjectPersistenceWorkflowTests(unittest.TestCase):
         self.assertEqual(snapshot["canonical_design"], json.loads(json.dumps(canonical)))
         self.assertTrue(snapshot["design"]["pads"])
         self.assertTrue(snapshot["design"]["zones"])
+
+    def test_deferred_open_uses_single_authoritative_canonical_transport_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            canonical = SpiDeRV2.from_v1(import_odb_design(str(write_board(directory)))).to_dict()
+            canonical["source"]["artifact_path"] = ""
+            snapshot = {"format": "spike-project-package/v2", "project": {"name": "deferred"},
+                        "design": {"source_file": "job.spike-design.json", "source_format": "spike-normalized",
+                                   "source_board": json.dumps({"contract": "spike/design-snapshot/v1",
+                                                               "canonical_design": canonical,
+                                                               "design": SpiDeRV2.from_dict(canonical).to_v1().to_dict()}),
+                                   "canonical_design": canonical},
+                        "analysis": {}}
+            project = Path(directory) / "deferred.spike"
+            self.request("write_project_package", path=str(project), snapshot=snapshot)
+            opened = self.request("read_project_package", path=str(project), defer_artifacts=True,
+                                  compact_normalized_source=True)
+        self.assertNotIn("canonical_design", opened["project"]["design"])
+        self.assertEqual(opened["canonical"]["design_ir"]["design_id"], canonical["design_id"])
+
+    def test_transport_projection_can_skip_deep_copy_without_mutating_input(self):
+        canonical = {"contract": "spike/design-ir/v2", "source": {"source_format": "kicad"}}
+        projected = {"design": {"source_board": "board"}, "assembly_designs": {"designs": [{"id": "shared"}]}}
+        result = project_for_desktop({"design_ir": canonical}, projected, copy_project=False)
+        self.assertIs(result["assembly_designs"], projected["assembly_designs"])
+        self.assertIsNot(result["design"], projected["design"])
+        self.assertNotIn("canonical_design", projected["design"])
+        self.assertIs(result["design"]["canonical_design"], canonical)
 
     def test_compact_normalized_source_save_and_open_roundtrip(self):
         with tempfile.TemporaryDirectory() as directory:

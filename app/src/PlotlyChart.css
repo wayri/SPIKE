@@ -18,6 +18,10 @@
 .spike-plot.trace-plot-host .trace-plot-loading { pointer-events: none; }
 .spike-plot-hint { padding: 4px 8px; color: var(--spike-table-muted); font-size: 10px; border-top: 1px solid var(--spike-table-border); }
 .spike-plot-notice { padding: 5px 8px; color: var(--spike-table-focus); background: var(--spike-table-toolbar); overflow-wrap: anywhere; }
+.spike-plot.trace-plot-host:has(.spike-plot-probes) { grid-template-rows: auto auto minmax(160px, 1fr) auto; }
+.spike-plot-probes { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 6px 10px; border-bottom: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); }
+.spike-plot-probes > div { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.spike-plot-probes span { font-variant-numeric: tabular-nums; color: var(--spike-table-muted); }
 .spike-plot-paste { min-width: 0; display: grid; gap: 7px; padding: 8px; max-height: 180px; overflow: auto; border-top: 1px solid var(--spike-table-border); }
 .spike-plot-paste label { display: grid; gap: 4px; color: var(--spike-table-muted); }
 .spike-plot-paste textarea { width: 100%; min-height: 60px; max-height: 100px; resize: vertical; border: 1px solid var(--spike-table-choice-border); color: var(--spike-table-text); background: var(--spike-table-surface); padding: 6px; font: 11px/1.4 ui-monospace, monospace; }

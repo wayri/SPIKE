@@ -14,11 +14,11 @@ NORMALIZED_SOURCE_WRAPPER = "spike/normalized-source-zlib/v1"
 MAX_NORMALIZED_SOURCE_BYTES = 512 * 1024 * 1024
 
 
-def encode_normalized_source(source_text: str, *, canonical_design_omitted: bool = False) -> dict:
+def encode_normalized_source(source_text: str, *, canonical_design_omitted: bool = False, compression_level: int = 9) -> dict:
     raw = source_text.encode("utf-8")
     return {"contract": NORMALIZED_SOURCE_WRAPPER, "encoding": "zlib+base64+utf8",
             "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
-            "data": base64.b64encode(zlib.compress(raw, level=9)).decode("ascii"),
+            "data": base64.b64encode(zlib.compress(raw, level=compression_level)).decode("ascii"),
             **({"canonical_design_omitted": True} if canonical_design_omitted else {})}
 
 

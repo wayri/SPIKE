@@ -1,0 +1,24 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"spike/assembly-em-result/v1",
+  "title":"Unvalidated retained-volume FDTD execution result",
+  "type":"object",
+  "required":["contract","status","solver_executed","model_status","production_qualified","request_digest","run_id",
+    "compiled_digest","frequency_hz","excited_port_id","s_parameter_column","mesh","field_capture","limitations"],
+  "properties":{
+    "contract":{"const":"spike/assembly-em-result/v1"},"status":{"const":"completed"},
+    "solver_executed":{"const":true},"model_status":{"const":"unvalidated"},"production_qualified":{"const":false},
+    "request_digest":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "compiled_digest":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "run_id":{"type":"string","pattern":"^[0-9a-f]{32}$"},
+    "excited_port_id":{"type":"string","minLength":1},
+    "frequency_hz":{"type":"array","minItems":2,"maxItems":1024,"items":{"type":"number","exclusiveMinimum":0}},
+    "s_parameter_column":{"type":"array","minItems":1,"maxItems":64,"items":{
+      "type":"object","required":["port_id","real","imag"],"additionalProperties":false,
+      "properties":{"port_id":{"type":"string"},"real":{"type":"array","items":{"type":"number"}},
+        "imag":{"type":"array","items":{"type":"number"}}}
+    }},
+    "mesh":{"type":"object"},"field_capture":{"type":"object"},
+    "limitations":{"type":"array","items":{"type":"string"}}
+  }
+}

@@ -18,11 +18,12 @@ const module = { exports: {} };
 const require = createRequire(import.meta.url);
 const dependencies = {
   react: { useState(initial) { const position = cursor++; if (!(position in states)) states[position] = initial;
-    return [states[position], value => { states[position] = typeof value === "function" ? value(states[position]) : value; }]; }, useEffect() {} },
+    return [states[position], value => { states[position] = typeof value === "function" ? value(states[position]) : value; }]; }, useMemo(fn) { return fn(); } },
   "react/jsx-runtime": require("react/jsx-runtime"),
   "./numericRange": { numericExtent: values => ({ minimum: Math.min(...values), maximum: Math.max(...values) }) },
   "./thermalResultFields": { thermalFieldColor: (value, minimum, maximum) => value === minimum ? [0, 0, 1] : value === maximum ? [1, 0, 0] : [0.5, 0.5, 0.5] },
   "./DataTable": { default: loadDataTable(), __esModule: true },
+  "./SavedFramePlaybackControls": { default: "saved-frame-playback", __esModule: true },
 };
 new Function("require", "module", "exports", compiled)(name => dependencies[name] ?? require(name), module, module.exports);
 const Overlay = module.exports.default;
@@ -49,9 +50,12 @@ const initial = mount();
 assert.match(renderToStaticMarkup(initial), /TRANSIENT PART OVERLAY/);
 assert.match(renderToStaticMarkup(initial), /not reached/);
 assert.match(renderToStaticMarkup(initial), /Board outline with transient component temperature markers/);
-assert.equal(findNode(initial, node => node.type === "input" && node.props["aria-label"] === "Thermal part animation time frame").props.value, 0);
-findNode(initial, node => node.type === "input" && node.props["aria-label"] === "Thermal part animation time frame").props.onChange({ target: { value: "1" } });
+const playback = findNode(initial, node => node.type === "saved-frame-playback");
+assert.deepEqual(playback.props.timesS, [0, 10]);
+assert.equal(playback.props.frameIndex, 0);
+assert.equal(playback.props.onExport, undefined, "lumped thermal overlay must not advertise an unsupported capture export");
+playback.props.onFrame(1);
 const later = renderToStaticMarkup(mount());
 assert.match(later, /10\.00 s · hottest U1 32\.00 °C/);
 assert.match(later, /U1: 32\.00 °C at 10\.00 s/);
-console.log("thermal transient marker overlay, analytics, and seek passed");
+console.log("thermal transient marker overlay, timestamp playback adapter, analytics, and seek passed");

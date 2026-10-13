@@ -68,7 +68,7 @@ Xtank in 0 energy
             "V1 a 0 1\nR1 a 0 1k\n.tran 0 1m\n",
             "V1 a 0 1\nR1 a 0 1k\n.tran -1u 1m\n",
             "V1 a 0 1\nR1 a 0 1k\n.tran 2m 1m\n",
-            "V1 a 0 1\nR1 a 0 1k\n.tran 1u 1m 0\n",
+            "V1 a 0 1\nR1 a 0 1k\n.tran 1u 1m 1m\n",
             f"V1 a 0 1\nR1 a 0 1k\n.tran 1p {MAX_TRANSIENT_POINTS + 1}p\n",
         )
         for source in invalid:
@@ -129,7 +129,7 @@ class TransientCliTests(unittest.TestCase):
             good = root / "rc.cir"
             bad = root / "bad.cir"
             good.write_text(RC, encoding="utf-8")
-            bad.write_text("V1 a 0 1\nC1 a 0 1u\n.tran 1u 10u 0\n", encoding="utf-8")
+            bad.write_text("V1 a 0 1\nC1 a 0 1u\n.tran 1u 10u 10u\n", encoding="utf-8")
             output = StringIO()
             with contextlib.redirect_stdout(output):
                 code = main(("run", str(good), "--probe", "V(out)"))
@@ -141,7 +141,7 @@ class TransientCliTests(unittest.TestCase):
                 code = main(("run", str(bad)))
             payload = json.loads(output.getvalue())
             self.assertEqual(code, EXIT_INPUT)
-            self.assertEqual(payload["issues"][0]["code"], "SPIKES_NETLIST_TRAN_ARITY")
+            self.assertEqual(payload["issues"][0]["code"], "SPIKES_NETLIST_TRAN_INVALID")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,6 @@
+interface:
+  display_name: "SPIKE Headless"
+  short_description: "Automate and verify SPIKE studies without the desktop UI"
+  default_prompt: "Use $spike-headless to run and verify this SPIKE automation request."
+policy:
+  allow_implicit_invocation: true

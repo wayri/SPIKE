@@ -1,0 +1,15 @@
+{
+  "contract": "spikes/equation-device/v1",
+  "name": "USER_NEW_MATERIAL",
+  "material": "Future semiconductor placeholder: equations supplied by the user, not inferred from the material name",
+  "pins": ["P", "N"],
+  "parameters": {
+    "conductance": {"value": 0.001, "unit": "S"},
+    "cubic": {"value": 0.0001, "unit": "A/V^3"},
+    "capacitance": {"value": 1e-9, "unit": "F"}
+  },
+  "branches": [
+    {"name": "transport", "positive": "P", "negative": "N", "current_a": "conductance*V(P,N)+cubic*V(P,N)^3", "charge_c": "capacitance*V(P,N)"}
+  ],
+  "notes": "Generic demonstrator for material-independent extension. Not measured diamond, ZnO or any other material."
+}

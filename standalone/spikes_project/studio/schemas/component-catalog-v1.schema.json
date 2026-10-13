@@ -7,6 +7,8 @@
     "archetype_count":{"type":"integer","minimum":1},"counts":{"type":"object"},"notice":{"type":"string"},
     "records":{"type":"array","items":{"type":"object","required":["id","category","family","name","parameters","status","fidelity","limitations","qualification"],"properties":{
       "id":{"type":"string"},"category":{"type":"string"},"family":{"type":"string"},"name":{"type":"string"},"parameters":{"type":"object"},
+      "model_type":{"const":"lumped_passive_rlc_v1"},"passive_kind":{"enum":["resistor","capacitor","inductor","kelvin_shunt"]},
+      "package_code":{"type":"string"},"construction":{"type":"string"},
       "status":{"enum":["native_subcircuit","equation_bench_only"]},"fidelity":{"const":"generic_reduced_order"},"qualification":{"const":"unqualified_presets"},"limitations":{"type":"string"}
     }}}
   }

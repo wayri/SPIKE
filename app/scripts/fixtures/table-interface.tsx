@@ -1,4 +1,3 @@
-import "../../src/buttonStandard.css";
 // SPDX-License-Identifier: Apache-2.0
 // Browser-only fixture. No project or solver data is loaded or saved.
 import { useState } from "react";

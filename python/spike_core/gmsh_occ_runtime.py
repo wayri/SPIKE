@@ -65,10 +65,26 @@ def _worker_interpreter():
     their .pth files are never executed by this bootstrap.
     """
     executable = Path(sys.executable).resolve()
-    packages = sorted({str(Path(sysconfig.get_path(kind)).resolve())
-                       for kind in ('purelib', 'platlib')})
+    packages = list(dict.fromkeys(str(Path(sysconfig.get_path(kind)).resolve())
+                                 for kind in ('purelib', 'platlib')))
     if sys.platform == 'win32' and sys.prefix != sys.base_prefix:
         executable = Path(sys._base_executable).resolve()
+        configuration = Path(sys.prefix)/'pyvenv.cfg'
+        if configuration.is_symlink():
+            raise ValueError('GMSH_RUNTIME: linked virtual environment configuration is not admitted')
+        if configuration.is_file():
+            if configuration.stat().st_size > 8192:
+                raise ValueError('GMSH_RUNTIME: oversized virtual environment configuration')
+            flags = [line.split('=', 1)[1].strip().lower()
+                     for line in configuration.read_text(encoding='utf-8').splitlines()
+                     if '=' in line and line.split('=', 1)[0].strip().lower() == 'include-system-site-packages']
+            if len(flags) > 1 or any(flag not in ('true', 'false') for flag in flags):
+                raise ValueError('GMSH_RUNTIME: ambiguous package inheritance declaration')
+            if flags == ['true']:
+                packages = list(dict.fromkeys(packages + [
+                    str(Path(sysconfig.get_path(kind, vars={'base': sys.base_prefix,
+                                                          'platbase': sys.base_exec_prefix})).resolve())
+                    for kind in ('purelib', 'platlib')]))
     if not executable.is_file() or any(not Path(path).is_dir() for path in packages):
         raise ValueError('GMSH_RUNTIME: trusted interpreter or package directories unavailable')
     return executable, packages
@@ -134,8 +150,9 @@ def run_occ_case(request, output_dir, *, timeout_s=180, memory_limit_mb=2048, ca
     (output/"request.json").write_bytes(payload)
     digest = hashlib.sha256(payload).hexdigest()
     root = Path(__file__).resolve().parents[2]
-    source = ("import sys; sys.path.insert(0," + repr(str(root)) + "); sys.path.extend(" + repr(packages) + "); "
-              "from python.spike_core.gmsh_occ_runtime import worker; worker(" + repr(digest) + ")")
+    from .gmsh_environment import isolated_preflight_source
+    source = isolated_preflight_source(root, packages) + (
+              "\nfrom python.spike_core.gmsh_occ_runtime import worker\nworker(" + repr(digest) + ")\n")
     process = run_adapter_process([str(executable), "-I", "-S", "-"], cwd=output,
         timeout_s=timeout_s, memory_limit_mb=memory_limit_mb, output_limit_bytes=512*1024**2,
         stream_limit_bytes=4*1024**2, cancellation_event=cancellation_event,
@@ -149,15 +166,24 @@ def run_occ_case(request, output_dir, *, timeout_s=180, memory_limit_mb=2048, ca
         "filesystem_sandbox": False, "redistribution_approved": False,
         "worker_interpreter": str(executable), "worker_interpreter_sha256": _sha(executable),
         "configured_package_directories": packages,
+        "dependency_preflight": json.loads((output/'environment.json').read_text(encoding='utf-8'))
+            if (output/'environment.json').is_file() else {'status': 'missing'},
     }, indent=2), encoding="utf-8")
     if process["return_code"] != 0:
         raise RuntimeError("GMSH_EXECUTION: mesher failed; inspect " + str(output/"worker.log"))
+    environment_path = output/'environment.json'
+    if not environment_path.is_file() or environment_path.is_symlink() or environment_path.stat().st_size > 65536:
+        raise ValueError('GMSH_DEPENDENCY: missing or invalid isolated environment evidence')
+    environment = json.loads(environment_path.read_text(encoding='utf-8'), object_pairs_hook=_unique)
+    if environment.get('status') != 'passed' or environment.get('isolated') is not True or environment.get('site_disabled') is not True:
+        raise ValueError('GMSH_DEPENDENCY: isolated dependency preflight did not pass')
     result_path = output/"result.json"
     if result_path.is_symlink() or not result_path.is_file() or result_path.stat().st_size > MAX_RESULT:
         raise ValueError("GMSH_RESULT: invalid result artifact")
     result = json.loads(result_path.read_bytes(), object_pairs_hook=_unique)
     if result.get("request_sha256") != digest or result.get("runtime_provenance") != provenance:
         raise ValueError("GMSH_RESULT: provenance binding mismatch")
+    result['runtime_environment'] = environment
     manifest = {p.name: _sha(p) for p in output.iterdir() if p.is_file()}
     (output/"SHA256.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     return result

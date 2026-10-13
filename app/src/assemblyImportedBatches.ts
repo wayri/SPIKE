@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import * as THREE from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { mergeTransformedGeometries } from "./mergedGeometryTransforms";
 
 /** Reduce occurrence draw calls while keeping exact source meshes for picking.
  * Immutable cached geometry stays shared; new merged geometry and materials
@@ -51,8 +51,9 @@ export function batchAssemblyImported(frame: THREE.Group) {
     }
     const remaining = meshes.filter(mesh => !batched.has(mesh));
     if (remaining.length >= 2) {
-      const parts = remaining.map(mesh => mesh.geometry.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld)));
-      const geometry = mergeGeometries(parts, false); parts.forEach(part => part.dispose());
+      const geometry = mergeTransformedGeometries(remaining.map(mesh => ({
+        geometry: mesh.geometry, matrix: new THREE.Matrix4().multiplyMatrices(inverse, mesh.matrixWorld),
+      })));
       if (geometry) { display(new THREE.Mesh(geometry, first.material)); remaining.forEach(mesh => batched.add(mesh)); }
     }
     for (const mesh of batched) { mesh.material = hidden; mesh.layers.set(31); mesh.userData.pickingProxy = true; after--; }

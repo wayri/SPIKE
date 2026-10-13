@@ -95,6 +95,22 @@ health = spike.call("health")
 print("Worker contract:", health.get("contract", "unknown"))
 print("Worker version:", health.get("worker_version", "unknown"))
 `),
+  entry("run-cosimulation-request", "Co-simulation", "Co-simulation and twins",
+    "Run experimental fixed-grid coupling with explicit scalar ports and one-step lag.",
+    ["Reviewed co-simulation worker parameter JSON"], requestRunner("run_cosimulation", { requiredKey: "request" }) + `
+if params is not None:
+    print("Accepted communication steps:", result.get("completed_steps", 0))
+    print("Request SHA-256:", result.get("request_sha256"))
+`),
+  entry("compare-digital-twin-request", "Recorded digital twin comparison", "Co-simulation and twins",
+    "Compare model predictions with supplied telemetry at exactly matching timestamps; inspect residuals and unmatched counts.",
+    ["Reviewed model identity, units and telemetry worker parameter JSON"], requestRunner("compare_digital_twin", { requiredKey: "request" }) + `
+if params is not None:
+    for key in ("matched_sample_count", "unmatched_prediction_sample_count", "unmatched_telemetry_sample_count", "threshold_violation_count"):
+        print(key, result.get(key))
+    for channel in result.get("channels", []):
+        print({key: channel.get(key) for key in ("id", "unit", "max_abs_error", "rmse", "threshold_violation_count", "trace_truncated")})
+`),
   entry("design-summary", "Design summary", "Design inspection", "Count normalized board objects and report identity and units.", ["Loaded design"], `# Summarize the normalized spike/v1 design supplied by the desktop.
 design = spike.design
 if design is None:

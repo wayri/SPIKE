@@ -111,6 +111,7 @@ export async function openReportPreviewWindow(
         minHeight: 420,
         resizable: true,
         decorations: true,
+        skipTaskbar: false,
         backgroundColor: "#101820",
         dragDropEnabled: false,
       });

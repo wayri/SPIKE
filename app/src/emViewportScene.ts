@@ -20,6 +20,10 @@ function colour(value: number, range: readonly number[]): THREE.Color {
   const ratio = range[1] > range[0] ? THREE.MathUtils.clamp((value-range[0])/(range[1]-range[0]), 0, 1) : .5;
   return new THREE.Color().setHSL((1-ratio)*.65, .88, .52);
 }
+export function emViewportScaleGradient(range: readonly number[]): string {
+  const stops = Array.from({length:17}, (_,i) => `${colour(range[0]+i/16*(range[1]-range[0]),range).getStyle()} ${i/16*100}%`);
+  return `linear-gradient(to right, ${stops.join(',')})`;
+}
 
 function isSample(data: EMViewportData, index: number): boolean {
   const value = data.values[index];
@@ -210,7 +214,7 @@ export function buildEMViewportScene(data: EMViewportData, settings: EMViewportS
   const sampleTransform = data.domain === "angular" && data.angularNeedsBoardAnchor
     ? { ...transform, centerX: transform.centerX - anchor[0], centerY: transform.centerY - anchor[1] } : transform;
   const opacity = Number.isFinite(settings.opacity) ? THREE.MathUtils.clamp(settings.opacity, 0, 1) : .65;
-  const main = settings.style === "surface" ? surface(data, sampleTransform, opacity)
+  const main = data.assemblyFrame && ["surface", "contours"].includes(settings.style) ? samplePoints(data, sampleTransform, opacity) : settings.style === "surface" ? surface(data, sampleTransform, opacity)
     : settings.style === "vectors" ? vectorLines(data, sampleTransform, opacity)
       : settings.style === "contours" ? contourLines(data, sampleTransform, opacity) : samplePoints(data, sampleTransform, opacity);
   if (main) group.add(main);

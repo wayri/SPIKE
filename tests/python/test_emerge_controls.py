@@ -12,6 +12,34 @@ from tests.python.test_emerge_suite_extension import board, parameters
 
 
 class EMergeControlsTests(unittest.TestCase):
+    def test_conductor_and_roughness_loss_requests_fail_closed(self):
+        unsupported = (
+            {"include_conductor_loss": True},
+            {"enable_skin_effect": True},
+            {"include_proximity_loss": True},
+            {"loss_model": {"conductor": "slab_skin"}},
+            {"conductor_loss_model": "surface_impedance"},
+            {"include_internal_reactance": True},
+            {"copper_conductivity_s_per_m": 5.8e7},
+            {"surface_impedance_ohm": .01},
+            {"copper_thickness_um": 35},
+            {"conductivity_s_m": 5.8e7},
+            {"thickness_m": 35e-6},
+            {"roughness_model": "rms"},
+            {"surface_roughness_model": "rms"},
+            {"surface_roughness_um": 1.5},
+            {"rms_roughness_um": 1.5},
+        )
+        for request in unsupported:
+            with self.subTest(request=request):
+                with self.assertRaisesRegex(ValueError, "zero-thickness PEC copper"):
+                    compile_board(board(), dict(parameters(), **request))
+
+        case = compile_board(board(), dict(parameters(), include_conductor_loss=False,
+                                            conductor_loss_model="pec",
+                                            roughness_model="smooth"))
+        self.assertIn("surface_pec", case["geometry_status"])
+
     def test_controls_preserve_material_loss_and_port_impedance(self):
         params = dict(parameters(), include_dielectric_loss=True, reference_impedance_ohm=75,
                       air_margin_mm=40, parallel=True, n_workers=3, sparse_solver="superlu")

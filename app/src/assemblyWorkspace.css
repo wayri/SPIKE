@@ -23,6 +23,13 @@
 .assembly-workspace-editor-heading nav button { display: flex; align-items: center; gap: 5px; min-height: 29px; }
 .assembly-workspace-editor-heading nav button.selected { border-color: var(--spike-table-edit-border,#55bcaa); background: var(--spike-table-edit,#255950); color: var(--spike-table-text-strong,#edf5f7); }
 .assembly-workspace-layer-action { border-color: var(--spike-table-edit-border,#55bcaa) !important; background: color-mix(in srgb,var(--spike-table-edit,#255950) 70%,var(--spike-table-field,#0b1820)) !important; }
+@media (max-width: 900px) {
+  .assembly-workspace-commandbar { align-items: stretch; flex-wrap: wrap; overflow: visible; }
+  .assembly-command-group { border-right: 0; padding-right: 0; flex-wrap: wrap; }
+  .assembly-command-board { order: 3; flex-basis: 100%; flex-wrap: wrap; }
+  .assembly-command-board label { max-width: none; flex-basis: 100%; }
+  .assembly-command-board select { min-width: 0; }
+}
 @media (max-width: 700px) {
   .assembly-workspace-shade { padding: 0; }
   .assembly-workspace { width: 100vw; height: 100dvh; border: 0; border-radius: 0; }

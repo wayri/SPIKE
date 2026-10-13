@@ -5,6 +5,7 @@ from python.spikes.competitive_benchmark import (
     CompetitiveCase,
     REPORT_CONTRACT,
     _ltspice_deck,
+    _MEASURE,
     _reduce_transient,
     find_ltspice,
     run_competitive_benchmarks,
@@ -18,6 +19,12 @@ LIBRARY = ROOT / "build-spikes-hybrid" / "spikes_c_api.dll"
 
 
 class CompetitiveBenchmarkTests(unittest.TestCase):
+    def test_failed_ltspice_measurement_never_becomes_a_number_from_a_signal_name(self):
+        self.assertIsNone(_MEASURE.search("bench_value: I(V1) measurement failed"))
+        self.assertIsNone(_MEASURE.search("bench_value: V(out)=FAILED at 1e-3"))
+        for line in ("bench_value: V(out)=-0.1875", "bench_value = -0.1875"):
+            self.assertEqual(float(_MEASURE.search(line).group(1)), -.1875)
+
     def test_shared_cases_are_bounded_and_digestable(self):
         cases = shared_dc_cases()
         self.assertEqual(len(cases), 3)

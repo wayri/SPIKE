@@ -32,10 +32,11 @@ from .frequency_panel import FrequencyPanel
 from .themes import PALETTES,load_theme,native_appearance,apply_window,figure_theme,toolbar_icon
 from .power_panel import PowerPanel
 from .analytics_panel import AnalyticsPanel
+from .flat_controls import ActionButton
 
 
 def button(parent, title, handler, sizer):
-    widget = wx.Button(parent, label=title)
+    widget = ActionButton(parent, label=title)
     widget.Bind(wx.EVT_BUTTON, handler)
     sizer.Add(widget, 0, wx.ALL, 3)
     return widget
@@ -51,6 +52,8 @@ def text_editor(parent, text=""):
     editor.SetTabWidth(4)
     editor.SetIndent(4)
     editor.SetWrapMode(wx.stc.STC_WRAP_WORD)
+    from .context_menus import bind_editor
+    bind_editor(editor)
     return editor
 
 
@@ -229,13 +232,15 @@ class SchematicCanvas(wx.Panel):
     def __init__(self, owner, parent):
         super().__init__(parent)
         self.owner, self.selected, self.zoom = owner, set(), 1.0
+        self.highlighted_net = None
         self.offset = np.array([20., 15.]); self.probe_mode = None; self.first_node = None
         self.drag_start = None; self.drag_part = None; self.hits = []; self.pins = []
         self.move_origin = None; self.move_positions = {}; self.move_delta = np.zeros(2)
         self.directive_hits=[];self.selected_directive=None;self.moving_directive=None
-        self.instrument_hits=[];self.moving_instrument=None
+        self.instrument_hits=[];self.moving_instrument=None;self.plot_drop=None
         self.controller_hit=None
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
+        self.SetToolTip('W: wire · M: move · G: drag · Space: rotate · E: properties · wheel: zoom · middle-drag: pan. Equal named terminals are electrically connected.')
         self.Bind(wx.EVT_PAINT, self.paint)
         self.Bind(wx.EVT_LEFT_DOWN, self.click)
         self.Bind(wx.EVT_LEFT_UP, self.move_end)
@@ -246,20 +251,36 @@ class SchematicCanvas(wx.Panel):
         self.Bind(wx.EVT_MOTION, self.motion)
         self.Bind(wx.EVT_MOUSEWHEEL, self.wheel)
         self.Bind(wx.EVT_RIGHT_UP, self.context)
+        self.Bind(wx.EVT_CONTEXT_MENU,self.keyboard_context)
         self.Bind(wx.EVT_KEY_DOWN,self.placement_key)
-        self.wire_start=None;self.wire_mode=False;self.wire_pins=[]
+        self.wire_start=None;self.wire_mode=False;self.wire_pins=[];self.wire_corners=[];self.wire_bend='horizontal';self.wire_hover=None
+        self.keyboard_move_mode=None
         self.selection_path=[];self.selection_tool='box';self.selection_add=False
         self.designer_tool=None;self.annotation_hits=[];self.selected_annotation=None;self.moving_annotation=None
         from .designer_workspace import SchematicDropTarget
         self.SetDropTarget(SchematicDropTarget(self))
 
     def placement_key(self,event):
+        if event.GetKeyCode()==wx.WXK_ESCAPE:wx.CallAfter(self.owner.context_tools)
+        if event.GetKeyCode()==wx.WXK_ESCAPE and getattr(self,'label_mode',False):
+            self.label_mode=False;self.SetCursor(wx.NullCursor);self.owner.SetStatusText('Label placement cancelled');return
+        if event.GetKeyCode()==wx.WXK_ESCAPE and self.plot_drop is not None:
+            self.plot_drop=None;self.SetCursor(wx.NullCursor);self.Refresh();self.owner.SetStatusText('Mini plot placement cancelled');return
+        if event.GetKeyCode()==wx.WXK_ESCAPE and self.keyboard_move_mode:
+            self.keyboard_move_mode=None;self.capture_lost();self.owner.SetStatusText('Move cancelled');return
         if event.GetKeyCode()==wx.WXK_ESCAPE and (self.selection_path or self.designer_tool):
             self.selection_path=[];self.designer_tool=None
             if self.HasCapture():self.ReleaseMouse()
             self.SetCursor(wx.NullCursor);self.Refresh();return
         if event.GetKeyCode()==wx.WXK_ESCAPE and self.wire_mode:
-            self.wire_mode=False;self.wire_start=None;self.SetCursor(wx.NullCursor);self.owner.SetStatusText('Wire cancelled');return
+            if self.wire_start is not None:
+                self.wire_start=None;self.wire_corners=[];self.wire_hover=None;self.Refresh()
+                self.owner.SetStatusText('Wire segment cancelled. Click a terminal to start another; Escape exits Wire.');return
+            self.wire_mode=False;self.SetCursor(wx.NullCursor);self.owner.SetStatusText('Wire tool closed');return
+        if event.GetKeyCode()==wx.WXK_BACK and self.wire_mode and self.wire_start is not None:
+            if self.wire_corners:self.wire_corners.pop();self.owner.SetStatusText('Last wire corner removed')
+            else:self.wire_start=None;self.wire_hover=None;self.owner.SetStatusText('Wire segment cancelled; Wire remains active')
+            self.Refresh();return
         if event.GetKeyCode()==wx.WXK_ESCAPE and self.owner.pending_library_placement:
             self.owner.pending_library_placement=None;self.SetCursor(wx.NullCursor);self.Refresh();self.owner.SetStatusText('Library placement cancelled')
         else:event.Skip()
@@ -267,16 +288,38 @@ class SchematicCanvas(wx.Panel):
     def point(self, x, y): return wx.Point(round(x*self.zoom+self.offset[0]), round(y*self.zoom+self.offset[1]))
     def world(self, point): return (np.array([point.x, point.y]) - self.offset) / self.zoom
 
+    def visible_parts(self):
+        from .hierarchy_views import members
+        return members(self.owner.doc.data['components'],getattr(self,'sheet_scope',None))
+
+    def visible_wires(self):
+        if not getattr(self,'sheet_scope',None):return self.owner.doc.data['wires']
+        ids={p['id'] for p in self.visible_parts()};junctions={j['id']:j for j in self.owner.doc.data['junctions']}
+        def visible(end):return end[0] in ids if len(end)==2 else junctions[end[0]]['source_terminal'][0] in ids
+        return [w for w in self.owner.doc.data['wires'] if visible(w['a']) and visible(w['b'])]
+
     def double_click(self,event):
         from .subsheet import enter
+        label=next((item for rect,item in getattr(self,'label_hits',[]) if rect.Contains(event.GetPosition())),None)
+        if label:
+            from .net_labels import show
+            self.owner.guarded(lambda:show(self.owner,None,label['id']));return
         part=next((part for rect,part in reversed(self.hits) if rect.Contains(event.GetPosition())),None)
         if part and enter(self.owner,part['ref']):return
         annotation=next((item for rect,item in self.annotation_hits if rect.Contains(event.GetPosition())),None)
         if annotation:self.owner.guarded(lambda:self.owner.edit_canvas_annotation(annotation));return
-        if self.controller_hit and self.controller_hit.Contains(event.GetPosition()):self.owner.book.SetSelection(12)
+        directive=next((item for rect,item in self.directive_hits if rect.Contains(event.GetPosition())),None)
+        if directive:self.owner.guarded(lambda:self.owner.edit_directive(directive['id']));return
+        if self.controller_hit and self.controller_hit.Contains(event.GetPosition()):self.owner.open_controller_code()
         elif any(rect.Contains(event.GetPosition()) for rect,item in self.instrument_hits):
             self.owner.guarded(self.owner.manage_instruments)
-        else:self.owner.guarded(lambda:self.owner.edit_directive(self.selected_directive) if self.selected_directive else self.owner.properties())
+        elif part:self.owner.guarded(self.owner.properties)
+        else:
+            from .editor_geometry import nearest_route_point,route
+            parts={p['id']:p for p in self.owner.doc.data['components']};junctions={j['id']:j for j in self.owner.doc.data['junctions']}
+            if any(nearest_route_point(route(parts,w,junctions),self.world(event.GetPosition()))[2]<=10/self.zoom for w in self.visible_wires()):return
+            from .quick_insert_popup import show
+            self.owner.guarded(lambda:show(self.owner,self.world(event.GetPosition()),self.ClientToScreen(event.GetPosition())))
 
     def paint(self, event):
         colors=self.owner.palette
@@ -290,28 +333,49 @@ class SchematicCanvas(wx.Panel):
         for x in range(round(self.offset[0])%spacing, width if self.owner.canvas_grid else 0, spacing):
             for y in range(round(self.offset[1])%spacing, height, spacing): dc.DrawPoint(x, y)
         dc.SetTextForeground(colors['muted'])
-        dc.DrawText("Click: select  |  E: properties  |  Space: rotate  |  W: wire  |  Wheel: zoom  |  Middle-drag: pan", 12, 10)
         if self.owner.pending_library_placement:
             record,mapping,count=self.owner.pending_library_placement
             dc.SetTextForeground(colors['accent']);dc.DrawText(f"PLACE {count} × {record['name']} — click canvas; Escape cancels",12,32)
-        from .editor_geometry import transform,route
+        from .editor_geometry import dragged_waypoints,transform,route
         from .pin_geometry import pins as component_pins, bounds as pin_bounds
+        original={part['id']:part for part in self.owner.doc.data['components']}
+        junctions={item['id']:item for item in self.owner.doc.data['junctions']}
         positions={part['id']:dict(part,x=part['x']+(self.move_delta[0] if part['id'] in self.move_positions else 0),y=part['y']+(self.move_delta[1] if part['id'] in self.move_positions else 0)) for part in self.owner.doc.data['components']}
+        moving_deltas={ident:tuple(self.move_delta) for ident in self.move_positions}
+        labelled_terminals={tuple(v['terminal']) for v in self.owner.doc.data.get('labels',[]) if not v.get('wire_id')}
+        visible_ids={p['id'] for p in self.visible_parts()}
+        referenced={n.casefold() for n in getattr(self,'highlighted_nets',set())}
+        if self.highlighted_net is not None:referenced.add(self.highlighted_net.casefold())
+        from .plot_workspace import attachment_node,signal_color
+        plotted_nodes={attachment_node(self.owner.doc,item).casefold() for item in self.owner.doc.data['instruments'] if item['kind']=='Mini plot' and attachment_node(self.owner.doc,item)}
+        net_color=lambda node:signal_color(self.owner.doc,node,colors) if node.casefold() in plotted_nodes else colors['accent']
         dc.SetPen(wx.Pen(colors['accent'],2))
-        for wire in self.owner.doc.data['wires']:
+        visual_routes=[]
+        for wire in self.visible_wires():
+            endpoint=wire['a']
+            node=original[endpoint[0]]['nodes'][endpoint[1]] if len(endpoint)==2 else junctions[endpoint[0]]['source_node']
+            dc.SetPen(wx.Pen(net_color(node),4 if node.casefold() in referenced else 2))
             display=wire
             if getattr(self,'moving_wire',None)==wire['id']:
-                display=dict(wire,waypoints=[[x+float(self.move_delta[0]),y+float(self.move_delta[1])] for x,y in route(positions,wire)])
-            dc.DrawLines([self.point(*at) for at in route(positions,display)])
+                display=dict(wire,waypoints=[[x+float(self.move_delta[0]),y+float(self.move_delta[1])] for x,y in route(positions,wire,junctions)])
+            elif moving_deltas and (wire['a'][0] in moving_deltas or wire['b'][0] in moving_deltas):
+                waypoints=[] if self.keyboard_move_mode=='move' else dragged_waypoints(original,wire,moving_deltas,junctions)
+                display=dict(wire,waypoints=waypoints)
+            points=route(positions,display,junctions);visual_routes.append(dict(id=wire['id'],node=node,points=points,draw_order=wire.get('draw_order',len(visual_routes))))
+            dc.DrawLines([self.point(*at) for at in points])
+        from .wire_visuals import paint_markers
+        try:
+            cache_key=(self.owner.doc.data['id'],self.owner.doc.data['revision'],tuple(self.move_positions),tuple(self.move_delta),getattr(self,'moving_wire',None),self.keyboard_move_mode)
+            self.auto_junctions=paint_markers(self,dc,visual_routes,colors,net_color,referenced,self.owner.doc.data['metadata'].get('wire_hops',False),cache_key)
+        except ValueError as error:self.owner.SetStatusText(str(error));self.auto_junctions=[]
         if self.wire_mode and self.wire_start:
-            from .editor_geometry import terminal
-            points=[terminal(positions[self.wire_start[0]],self.wire_start[1])]
-            for target in getattr(self,'wire_corners',[])+[getattr(self,'wire_tip',points[0])]:
-                points.extend([(target[0],points[-1][1]),tuple(target)])
+            from .editor_geometry import endpoint_position,wire_preview
+            start=endpoint_position(positions,junctions,self.wire_start)
+            points=wire_preview(positions,self.wire_start,self.wire_corners,getattr(self,'wire_tip',start),self.wire_bend,self.wire_hover,junctions)
             dc.SetPen(wx.Pen(colors['accent'],2,wx.PENSTYLE_SHORT_DASH))
             if len(points)>1:dc.DrawLines([self.point(*at) for at in points])
         self.wire_pins=[]
-        for part in self.owner.doc.data["components"]:
+        for part in self.visible_parts():
             x, y = np.array([part["x"], part["y"]]) + (self.move_delta if part['id'] in self.move_positions else 0)
             geometry=dict(part,x=x,y=y)
             p = lambda a, b: self.point(*transform(geometry,a,b))
@@ -320,13 +384,25 @@ class SchematicCanvas(wx.Panel):
             corners=[p(a,b) for a,b in ((lo,top),(hi,top),(hi,bottom),(lo,bottom))]
             rect=wx.Rect(min(v.x for v in corners),min(v.y for v in corners),max(v.x for v in corners)-min(v.x for v in corners),max(v.y for v in corners)-min(v.y for v in corners))
             self.hits.append((rect, part))
+            if part['id'] in getattr(self,'highlighted_components',set()):
+                dc.SetPen(wx.Pen(colors['accent'],2,wx.PENSTYLE_SHORT_DASH));dc.SetBrush(wx.Brush(colors['selected']));dc.DrawRectangle(rect)
             if part["id"] in self.selected:
                 dc.SetPen(wx.Pen(colors['accent'], 1, wx.PENSTYLE_SHORT_DASH)); dc.SetBrush(wx.Brush(colors['selected'])); dc.DrawRectangle(rect)
-            dc.SetPen(wx.Pen(colors['fg'], 2)); dc.SetBrush(wx.TRANSPARENT_BRUSH)
+            from .schematic_feedback import badge
+            result_binding=self.owner.result_source or {}
+            current_binding=(result_binding.get('id')==self.owner.doc.data['id'] and
+                             result_binding.get('revision')==self.owner.doc.data['revision'])
+            findings=self.owner.part_alerts.get(part['id'],{}).get('findings',[]) if current_binding and self.owner.limit_indicators else []
+            indication=badge(findings)
+            symbol_color=colors['danger'] if indication and indication['severity']=='exceeded' else colors['accent'] if indication else colors['fg']
+            dc.SetPen(wx.Pen(symbol_color, 2)); dc.SetBrush(wx.TRANSPARENT_BRUSH)
             dc.DrawLine(left, p(-28,0)); dc.DrawLine(p(28,0), right)
             for pin in component_pins(part)[2:]:dc.DrawLine(p(*pin.body),p(*pin.anchor))
             kind = part["kind"]
-            if kind == "capacitor":
+            from .device_glyphs import paint as paint_device_body
+            if paint_device_body(dc,p,part,symbol_color):
+                pass
+            elif kind == "capacitor":
                 dc.DrawLine(p(-28,0),p(-7,0)); dc.DrawLine(p(7,0),p(28,0))
                 dc.DrawLine(p(-7,-22),p(-7,22)); dc.DrawLine(p(7,-22),p(7,22))
             elif kind == "inductor":
@@ -349,22 +425,35 @@ class SchematicCanvas(wx.Panel):
             dc.SetTextForeground(colors['fg'])
             dc.DrawText(part['ref'],self.point(x+15,y-40) if part.get('rotation',0)%180 else self.point(x-28,y-43))
             dc.DrawText(part['value'],self.point(x+15,y+12) if part.get('rotation',0)%180 else self.point(x-28,y+24))
-            findings=self.owner.part_alerts.get(part['id'],{}).get('findings',[])
+            identity=part.get('parameters',{}).get('manufacturer_part',{})
+            if identity:
+                mpn=identity.get('mpn','');dc.SetTextForeground(colors['muted'])
+                dc.DrawText(mpn if len(mpn)<=30 else mpn[:27]+'…',self.point(x-28,y+44))
             levels={v['severity'] for v in findings}
             if 'exceeded' in levels or 'warning' in levels:
                 color=colors['danger'] if 'exceeded' in levels else colors['accent']
                 dc.SetPen(wx.Pen(color,2));dc.SetBrush(wx.Brush(colors['canvas']));dc.DrawCircle(p(40,-30),10)
                 dc.SetTextForeground(color);dc.DrawText('!',p(37,-39));dc.SetBrush(wx.TRANSPARENT_BRUSH);dc.DrawLines([p(-33,-22),p(33,-22),p(33,22),p(-33,22),p(-33,-22)])
+                if indication['text']:dc.DrawText(indication['text'],p(54,-39))
+                if indication['temperature']:
+                    dc.DrawCircle(p(55,-9),4);dc.DrawLine(p(55,-13),p(55,-30));dc.DrawLine(p(50,-30),p(60,-30))
+                    dc.DrawText('T!',p(64,-25))
             dc.SetPen(wx.Pen(colors['accent'],2)); dc.SetBrush(wx.Brush(colors['canvas']))
             for pin,node in zip(component_pins(part),part['nodes']):
                 position=p(*pin.anchor)
+                dc.SetPen(wx.Pen(net_color(node),2))
                 self.wire_pins.append((position,part['id'],pin.index))
                 dc.DrawCircle(position,4); self.pins.append((position,node,part["id"]))
-                dc.DrawText((pin.label+': ' if len(part['nodes'])>2 else '')+node,position.x+8,position.y+8)
+                if node.casefold() in referenced:
+                    dc.DrawCircle(position,8)
+                if (part['id'],pin.index) not in labelled_terminals:
+                    dc.DrawText((pin.label+': ' if len(part['nodes'])>2 else '')+node,position.x+8,position.y+8)
             for probe in self.owner.doc.data["probes"]:
                 if probe.get("anchor") == part["id"]:
                     dc.SetTextForeground(colors['accent']); dc.DrawText(probe["expression"],p(-45,60))
         self.controller_hit=None
+        from .power_symbols import draw as draw_power_symbols
+        draw_power_symbols(self,dc,colors)
         controller=self.owner.doc.data.get('controller_setup')
         if controller:
             at=self.point(850,330);width=round(250*self.zoom);height=round((80+22*len(controller['pins']))*self.zoom)
@@ -376,15 +465,20 @@ class SchematicCanvas(wx.Panel):
                 input_pin=pin['mode'].endswith('I');y=at.y+round((65+22*index)*self.zoom);x=at.x if input_pin else at.x+width
                 terminal=x-round(20*self.zoom) if input_pin else x+round(20*self.zoom)
                 dc.SetPen(wx.Pen(colors['accent'],1));dc.DrawLine(x,y,terminal,y);dc.SetBrush(wx.Brush(colors['canvas']));dc.DrawCircle(terminal,y,3)
+                if pin['name'] in getattr(self,'highlighted_controller_pins',set()):dc.DrawCircle(terminal,y,8)
                 label=pin['mode']+' '+pin['name']+' → '+(pin['node'] if input_pin else pin['source'])
                 dc.SetTextForeground(colors['fg']);dc.DrawText(label,at.x+8,y-8)
+            code_window=getattr(self.owner,'controller_code_window',None)
+            if code_window and code_window.IsShown():
+                dc.SetPen(wx.Pen(colors['accent'],1,wx.PENSTYLE_SHORT_DASH));dc.DrawLine(wx.Point(rect.GetRight(),rect.y+20),self.ScreenToClient(code_window.GetPosition()))
         for item in self.owner.doc.data['directives']:
             if not item['visible']:continue
             dc.SetFont(wx.Font(max(6,round(10*self.zoom)),wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_NORMAL))
             delta=self.move_delta if self.moving_directive==item['id'] else np.zeros(2)
             pos=self.point(item['x']+delta[0],item['y']+delta[1])
             lines=item['text'].splitlines();text='\n'.join(line[:90] for line in lines[:3])+('\n… double-click for full directive' if len(lines)>3 or any(len(line)>90 for line in lines[:3]) else '')
-            heading=item['group']+(' · '+item['title'] if item['title'] else '')+(' [disabled]' if not item['enabled'] else '')
+            heading=item['group']+(' · '+item['title'] if item['title'] else '')+(' [COMMENTED OUT]' if not item['enabled'] else '')
+            if not item['enabled']:text='\n'.join('* '+line for line in text.splitlines())
             heading=heading[:90]
             width=max(dc.GetTextExtent(heading)[0],dc.GetMultiLineTextExtent(text)[0])+20
             body_y=dc.GetTextExtent(heading)[1]+12
@@ -401,19 +495,17 @@ class SchematicCanvas(wx.Panel):
         for item in self.owner.doc.data['instruments']:
             delta=self.move_delta if self.moving_instrument==item['id'] else np.zeros(2)
             pos=self.point(item['x']+delta[0],item['y']+delta[1]);w=max(170,round(275*self.zoom));h=round((160 if item['kind']=='Mini plot' else 75)*self.zoom)
-            h=max(75,h);rect=wx.Rect(pos.x,pos.y,w,h);self.instrument_hits.append((rect,item))
+            h=max(105 if item['kind']=='Mini plot' else 75,h);rect=wx.Rect(pos.x,pos.y,w,h);self.instrument_hits.append((rect,item))
             part=next((p for p in self.owner.doc.data['components'] if p['id']==item['anchor']),None)
-            dc.SetPen(wx.Pen(colors['accent'],1,wx.PENSTYLE_SHORT_DASH))
-            if part:
-                import re
-                match=re.match(r'\s*v\(\s*([^,)]+)',item['expression'],re.I)
-                node=match[1].strip() if match else None
-                terminal=part['nodes'].index(node) if node in part['nodes'][:2] else None
-                at=self.point(*transform(part,-55 if terminal==0 else 55 if terminal==1 else 0,0))
-                dc.DrawLine(at,pos);dc.DrawCircle(at,3)
+            from .plot_workspace import attachment_point
+            color=signal_color(self.owner.doc,attachment_node(self.owner.doc,item),colors)
+            dc.SetPen(wx.Pen(color,1,wx.PENSTYLE_SHORT_DASH))
+            anchor=attachment_point(self.owner.doc,item)
+            if anchor is not None:
+                at=self.point(*anchor);dc.DrawLine(at,pos);dc.DrawCircle(at,4)
             dc.SetBrush(wx.Brush(colors['panel']));dc.DrawRoundedRectangle(rect,5)
             dc.SetClippingRegion(rect)
-            dc.SetTextForeground(colors['accent']);dc.DrawText(item['expression']+' · '+item['kind'],pos.x+7,pos.y+5)
+            dc.SetTextForeground(color);dc.DrawText(item['expression']+' · '+item['kind'],pos.x+7,pos.y+5)
             try:
                 if part is None:raise ValueError('Detached component')
                 label,value,curve=instrument_data(self.owner,item)
@@ -422,11 +514,23 @@ class SchematicCanvas(wx.Panel):
                 if curve is not None and h>95:
                     tx,values=curve;indices=extrema_indices(values,budget=200)
                     low,high=float(np.min(values)),float(np.max(values));span=high-low or max(abs(low)*.01,1e-12)
-                    points=[wx.Point(pos.x+8+round((tx[i]-tx[0])/(tx[-1]-tx[0])*(w-16)),pos.y+h-30-round((values[i]-low)/span*(h-82))) for i in indices]
-                    dc.SetPen(wx.Pen(colors['accent'],1));dc.DrawLines(points)
+                    duration=float(tx[-1]-tx[0]) or 1.0
+                    points=[wx.Point(pos.x+8+round((tx[i]-tx[0])/duration*(w-16)),pos.y+h-30-round((values[i]-low)/span*(h-82))) for i in indices]
+                    dc.SetPen(wx.Pen(colors['grid'],1));dc.DrawLine(pos.x+8,pos.y+h-30,pos.x+w-8,pos.y+h-30)
+                    dc.SetPen(wx.Pen(color,2))
+                    if len(points)>1:dc.DrawLines(points)
+                    elif points:dc.DrawCircle(points[0],2)
             except Exception as exc:
                 dc.SetTextForeground(colors['muted']);dc.DrawText('Unavailable: '+str(exc),pos.x+7,pos.y+28)
             dc.DestroyClippingRegion()
+        if self.plot_drop and 'preview' in self.plot_drop:
+            binding=self.plot_drop
+            part=positions[binding['part_id']]
+            from .editor_geometry import terminal
+            anchor=binding.get('attach_point',terminal(part,binding['pin_index']))
+            at=self.point(*binding['preview']);color=net_color(part['nodes'][binding['pin_index']])
+            dc.SetPen(wx.Pen(color,1,wx.PENSTYLE_SHORT_DASH));dc.SetBrush(wx.TRANSPARENT_BRUSH)
+            dc.DrawLine(self.point(*anchor),at);dc.DrawRectangle(at.x,at.y,max(170,round(275*self.zoom)),max(75,round(160*self.zoom)))
         self.annotation_hits=[]
         for item in self.owner.doc.data.get('annotations',[]):
             delta=self.move_delta if self.moving_annotation==item['id'] else np.zeros(2)
@@ -440,37 +544,93 @@ class SchematicCanvas(wx.Panel):
         endpoints=Counter(tuple(w[key]) for w in self.owner.doc.data['wires'] for key in ('a','b'))
         dc.SetPen(wx.Pen(colors['accent'],1));dc.SetBrush(wx.Brush(colors['accent']))
         for endpoint,count in endpoints.items():
-            if count>=2:dc.DrawCircle(self.point(*terminal(positions[endpoint[0]],endpoint[1])),max(4,round(5*self.zoom)))
+            if count>=2 and len(endpoint)==2:
+                color=net_color(positions[endpoint[0]]['nodes'][endpoint[1]])
+                dc.SetPen(wx.Pen(color,1));dc.SetBrush(wx.Brush(color));dc.DrawCircle(self.point(*terminal(positions[endpoint[0]],endpoint[1])),max(4,round(5*self.zoom)))
+        for junction in junctions.values():
+            if getattr(self,'sheet_scope',None) and junction['source_terminal'][0] not in visible_ids:continue
+            color=net_color(junction['source_node']);dc.SetPen(wx.Pen(color,1));dc.SetBrush(wx.Brush(color))
+            dc.DrawCircle(self.point(junction['x'],junction['y']),max(4,round(5*self.zoom)))
+            self.wire_pins.append((self.point(junction['x'],junction['y']),junction['id'],None))
+            hover=getattr(self,'junction_hover',None)
+            if junction['source_node'].casefold() in referenced or hover is not None and np.hypot(hover[0]-junction['x'],hover[1]-junction['y'])<8/self.zoom:
+                dc.SetBrush(wx.TRANSPARENT_BRUSH);dc.SetPen(wx.Pen(colors['accent'],2));dc.DrawCircle(self.point(junction['x'],junction['y']),max(8,round(9*self.zoom)))
+        from .net_labels import draw as draw_labels
+        draw_labels(self,dc,colors)
+        if getattr(self,'sheet_scope',None):
+            dc.SetTextForeground(colors['fg']);dc.DrawText('Subsheet: '+self.sheet_scope+' | View > Schematic hierarchy / Parent sheet',12,10)
         if len(self.selection_path)>1:
             dc.SetPen(wx.Pen(colors['accent'],1,wx.PENSTYLE_SHORT_DASH));dc.SetBrush(wx.TRANSPARENT_BRUSH)
             points=[self.point(*p) for p in self.selection_path]
             if self.selection_tool=='lasso':dc.DrawLines([*points,points[0]])
             else:dc.DrawRectangle(min(points[0].x,points[-1].x),min(points[0].y,points[-1].y),abs(points[-1].x-points[0].x),abs(points[-1].y-points[0].y))
         dc.SetTextForeground(colors['muted'])
-        dc.DrawText("Named terminals with the same label are electrically connected.",12,max(30,self.GetClientSize().height-28))
 
     def click(self, event):
         self.SetFocus(); position = event.GetPosition()
+        if getattr(self,'label_mode',False):
+            binding=self.plot_attachment(position)
+            if binding is None:self.owner.SetStatusText('Click an existing pin or wire for a scoped net label.');return
+            self.label_mode=False;self.SetCursor(wx.NullCursor)
+            from .net_labels import show
+            self.owner.guarded(lambda:show(self.owner,binding));return
+        if self.plot_drop is not None:
+            if not self.plot_drop:
+                binding=self.plot_attachment(position)
+                if binding is None:self.owner.SetStatusText('Click a terminal circle or a wire to attach the mini plot.');return
+                self.plot_drop=binding;self.owner.SetStatusText('Attachment selected. Click to drop the mini plot; Escape cancels.');self.Refresh();return
+            from .plot_workspace import add_attached_plot
+            binding=self.plot_drop
+            def drop():
+                add_attached_plot(self.owner.doc,binding['part_id'],binding['pin_index'],list(self.world(position)),attach_point=binding.get('attach_point'))
+                self.plot_drop=None;self.SetCursor(wx.NullCursor);self.owner.refresh_document()
+            self.owner.guarded(drop);return
+        if self.owner.interaction_mode:
+            part=next((part for rect,part in reversed(self.hits) if rect.Contains(position)),None)
+            if part:
+                from .schematic_feedback import send_symbol_control
+                self.owner.guarded(lambda:send_symbol_control(self.owner,part))
+            return
+        if self.keyboard_move_mode:
+            self.commit_keyboard_move(position);return
         if self.designer_tool:
             payload=self.designer_tool;self.designer_tool=None;self.SetCursor(wx.NullCursor)
             self.owner.guarded(lambda:self.owner.place_designer_tool(payload,self.world(position)));return
         if self.wire_mode:
-            candidates=[(np.hypot(position.x-p.x,position.y-p.y),(pid,index)) for p,pid,index in self.wire_pins]
+            candidates=[(np.hypot(position.x-p.x,position.y-p.y),(pid,) if index is None else (pid,index)) for p,pid,index in self.wire_pins]
             if not candidates or min(candidates)[0]>18:
                 if self.wire_start:
-                    point=np.round(self.world(position)/10)*10
-                    self.wire_corners.append(point.tolist());self.Refresh()
-                    self.owner.SetStatusText('Corner placed. Click another corner or destination terminal; Escape cancels.')
+                    from .editor_geometry import nearest_route_point,route
+                    parts={p['id']:p for p in self.owner.doc.data['components']};junctions={j['id']:j for j in self.owner.doc.data['junctions']}
+                    branch=None
+                    for wire in reversed(self.visible_wires()):
+                        point,segment,distance=nearest_route_point(route(parts,wire,junctions),self.world(position))
+                        if distance<=12/self.zoom:branch=(wire['id'],point);break
+                    if branch:
+                        def connect_branch():
+                            self.owner.require_clean_directive_source()
+                            if self.owner.job_running:raise ValueError('Stop simulation before changing wiring')
+                            self.owner.doc.branch(branch[0],branch[1],self.wire_start,self.wire_corners,self.wire_bend,tolerance=0)
+                            self.wire_start=None;self.wire_corners=[];self.wire_hover=None;self.owner.refresh_document()
+                            self.owner.SetStatusText('Branch and explicit junction committed. Click a terminal to continue wiring; Escape exits Wire.')
+                        self.owner.guarded(connect_branch);return
+                    from .editor_geometry import snap
+                    point=list(snap(self.world(position)))
+                    if not self.wire_corners or point!=self.wire_corners[-1]:self.wire_corners.append(point)
+                    self.Refresh()
+                    self.owner.SetStatusText('Corner placed. Backspace removes it; / flips preview posture; Escape cancels this wire.')
                 else:self.owner.SetStatusText('Start at a terminal circle; then click corners and destination. Escape cancels.')
                 return
             endpoint=min(candidates)[1]
             if self.wire_start is None:
-                self.wire_start=endpoint;self.wire_tip=self.world(position).tolist();self.Refresh()
+                self.wire_start=endpoint;self.wire_hover=None;self.wire_tip=self.world(position).tolist();self.Refresh()
                 self.owner.SetStatusText('Wire started: move to preview, click corners, then destination terminal. Escape cancels.');return
             def connect():
                 self.owner.require_clean_directive_source()
                 if self.owner.job_running:raise ValueError('Stop simulation before changing wiring')
-                self.owner.doc.connect(self.wire_start,endpoint,getattr(self,'wire_corners',[]));self.wire_mode=False;self.wire_start=None;self.SetCursor(wx.NullCursor);self.owner.refresh_document()
+                self.owner.doc.connect_endpoints(self.wire_start,endpoint,self.wire_corners,self.wire_bend)
+                self.wire_start=None;self.wire_corners=[];self.wire_hover=None;self.owner.refresh_document()
+                self.owner.SetStatusText('Wire committed. Click a terminal to continue wiring; Escape exits Wire.')
             self.owner.guarded(connect);return
         if self.owner.pending_library_placement:
             record,mapping,count=self.owner.pending_library_placement;point=self.world(position)
@@ -521,8 +681,9 @@ class SchematicCanvas(wx.Panel):
                 self.owner.refresh_inspector(); self.Refresh(); return
         from .editor_geometry import route
         parts={p['id']:p for p in self.owner.doc.data['components']}
-        for wire in reversed(self.owner.doc.data['wires']):
-            points=[np.array(tuple(self.point(*p)),dtype=float) for p in route(parts,wire)]
+        junctions={j['id']:j for j in self.owner.doc.data['junctions']}
+        for wire in reversed(self.visible_wires()):
+            points=[np.array(tuple(self.point(*p)),dtype=float) for p in route(parts,wire,junctions)]
             for a,b in zip(points,points[1:]):
                 delta=b-a;length=float(delta@delta)
                 closest=a+np.clip((np.array(tuple(position))-a)@delta/length,0,1)*delta if length else a
@@ -540,7 +701,7 @@ class SchematicCanvas(wx.Panel):
         if self.selection_path:
             from .editor_geometry import select_box,select_lasso
             end=self.world(event.GetPosition())
-            chosen=select_lasso(self.owner.doc.data['components'],[*self.selection_path,end]) if self.selection_tool=='lasso' else select_box(self.owner.doc.data['components'],self.selection_path[0],end)
+            chosen=select_lasso(self.visible_parts(),[*self.selection_path,end]) if self.selection_tool=='lasso' else select_box(self.visible_parts(),self.selection_path[0],end)
             self.selected=(self.selected|set(chosen)) if self.selection_add else set(chosen)
             self.selection_path=[]
             if self.HasCapture():self.ReleaseMouse()
@@ -562,16 +723,44 @@ class SchematicCanvas(wx.Panel):
                 self.owner.guarded(lambda:self.owner.doc.organize_directives([item['id']],x=float(item['x']+self.move_delta[0]),y=float(item['y']+self.move_delta[1])))
             else:
                 positions={ident:np.array(at)+self.move_delta for ident,at in self.move_positions.items()}
-                self.owner.guarded(lambda:self.owner.doc.move(positions))
+                self.owner.guarded(lambda:self.owner.doc.move(positions,preserve_routes=True))
         self.capture_lost()
         if self.HasCapture():self.ReleaseMouse()
         self.owner.refresh_document()
 
     def capture_lost(self,event=None):
         self.moving_wire=None
+        self.keyboard_move_mode=None
         if not self.wire_mode:self.SetCursor(wx.NullCursor)
         self.moving_annotation=None;self.selection_path=[]
         self.move_origin=None;self.move_positions={};self.move_delta=np.zeros(2);self.drag_start=None;self.moving_directive=None;self.moving_instrument=None;self.Refresh()
+
+    def begin_keyboard_move(self,mode):
+        if mode not in ('move','drag'):raise ValueError('Unknown move mode')
+        if not self.selected:raise ValueError('Select components first')
+        self.wire_mode=False;self.wire_start=None;self.wire_corners=[];self.wire_hover=None
+        self.move_positions={p['id']:(p['x'],p['y']) for p in self.owner.doc.data['components'] if p['id'] in self.selected}
+        point=self.ScreenToClient(wx.GetMousePosition())
+        self.move_origin=self.world(point) if self.GetClientRect().Contains(point) else np.mean(list(self.move_positions.values()),axis=0)
+        self.move_delta=np.zeros(2);self.keyboard_move_mode=mode
+        self.SetCursor(wx.Cursor(wx.CURSOR_SIZING));self.SetFocus();self.Refresh()
+        detail='preserve nearby wire bends' if mode=='drag' else 're-route attached wires'
+        self.owner.SetStatusText(f'{mode.title()}: move pointer and click to place; attached wires {detail}. Escape cancels.')
+
+    def commit_keyboard_move(self,point=None):
+        mode=self.keyboard_move_mode
+        if mode is None:return
+        if point is not None:
+            from .editor_geometry import snap
+            self.move_delta=np.array(snap(self.world(point)-self.move_origin))
+        changed=bool(np.any(self.move_delta))
+        positions={ident:np.array(at)+self.move_delta for ident,at in self.move_positions.items()}
+        self.keyboard_move_mode=None
+        completed=True
+        if changed:
+            completed=bool(self.owner.guarded(lambda:(self.owner.doc.move(positions,preserve_routes=mode=='drag'),True)[1]))
+        self.capture_lost();self.SetCursor(wx.NullCursor);self.owner.refresh_document()
+        if completed:self.owner.SetStatusText(f'{mode.title()} complete' if changed else f'{mode.title()} cancelled: position unchanged')
 
     def wheel(self,event):
         at=self.world(event.GetPosition()); self.zoom=max(.25,min(4,self.zoom*(1.2 if event.GetWheelRotation()>0 else 1/1.2)))
@@ -582,84 +771,143 @@ class SchematicCanvas(wx.Panel):
         self.drag_start=None
         if self.HasCapture(): self.ReleaseMouse()
     def motion(self,event):
+        old=getattr(self,'junction_hover',None);self.junction_hover=tuple(self.world(event.GetPosition()))
+        marker_points=[v['point'] for v in getattr(self,'auto_junctions',[]) if v['kind']=='junction']+[(j['x'],j['y']) for j in self.owner.doc.data['junctions']]
+        near=lambda at:at is not None and any(np.hypot(at[0]-p[0],at[1]-p[1])<10/self.zoom for p in marker_points)
+        if near(old) or near(self.junction_hover):self.Refresh()
+        if self.plot_drop:
+            self.plot_drop['preview']=list(self.world(event.GetPosition()));self.Refresh()
         if self.wire_mode and self.wire_start:
-            self.wire_tip=(np.round(self.world(event.GetPosition())/10)*10).tolist();self.Refresh()
+            from .editor_geometry import snap
+            position=event.GetPosition()
+            candidates=[(np.hypot(position.x-p.x,position.y-p.y),(pid,) if index is None else (pid,index)) for p,pid,index in self.wire_pins]
+            self.wire_hover=min(candidates)[1] if candidates and min(candidates)[0]<=18 else None
+            self.wire_tip=list(snap(self.world(position)));self.Refresh()
         if self.selection_path and event.LeftIsDown():
             point=self.world(event.GetPosition())
             if self.selection_tool=='lasso':self.selection_path.append(point)
             elif len(self.selection_path)==1:self.selection_path.append(point)
             else:self.selection_path[-1]=point
             self.Refresh()
-        elif self.move_origin is not None and event.LeftIsDown():
-            self.move_delta=np.round((self.world(event.GetPosition())-self.move_origin)/10)*10;self.Refresh()
+        elif self.move_origin is not None and (event.LeftIsDown() or self.keyboard_move_mode):
+            from .editor_geometry import snap
+            self.move_delta=np.array(snap(self.world(event.GetPosition())-self.move_origin));self.Refresh()
         elif self.drag_start is not None:
             point=event.GetPosition(); self.offset+=np.array([point.x-self.drag_start.x,point.y-self.drag_start.y]); self.drag_start=point; self.Refresh()
+    def keyboard_context(self,event):
+        if event.GetPosition()!=wx.DefaultPosition:event.Skip();return
+        hit=next((rect for rect,part in self.hits if part['id'] in self.selected),None)
+        position=wx.Point(hit.x+hit.width//2,hit.y+hit.height//2) if hit else wx.Point(self.GetClientSize().width//2,self.GetClientSize().height//2)
+        mouse=wx.MouseEvent(wx.wxEVT_RIGHT_UP);mouse.SetPosition(position);self.context(mouse)
+
     def context(self,event):
         point=self.world(event.GetPosition())
+        label=next((item for rect,item in getattr(self,'label_hits',[]) if rect.Contains(event.GetPosition())),None)
+        if label:
+            from .context_menus import ContextMenu
+            from .net_labels import show,remove
+            menu=ContextMenu(self.owner)
+            menu.add('Edit '+label['kind']+' label…',lambda:show(self.owner,None,label['id']))
+            menu.add('Remove label marker (keep net)',lambda:(remove(self.owner.doc,label['id']),self.owner.refresh_document()))
+            menu.popup(self);return
+        if self.controller_hit and self.controller_hit.Contains(event.GetPosition()):
+            menu=wx.Menu()
+            for label,action in [('Open attached controller code…',self.owner.open_controller_code),('Code beside schematic',lambda:self.owner.show_code_split(12)),('Controller setup / pins…',lambda:self.owner.tool_windows.open(12))]:
+                item=menu.Append(wx.ID_ANY,label);menu.Bind(wx.EVT_MENU,lambda e,fn=action:self.owner.guarded(fn),item)
+            self.PopupMenu(menu);menu.Destroy();return
+        instrument=next((item for rect,item in reversed(self.instrument_hits) if rect.Contains(event.GetPosition())),None)
+        if instrument:
+            menu=wx.Menu()
+            for label,action in [('Edit schematic instruments…',self.owner.manage_instruments),
+                                 ('Remove this plot / readout',lambda:(self.owner.doc.commit(lambda d:d['instruments'].remove(next(v for v in d['instruments'] if v['id']==instrument['id']))),self.owner.refresh_document()))]:
+                item=menu.Append(wx.ID_ANY,label);menu.Bind(wx.EVT_MENU,lambda e,f=action:self.owner.guarded(f),item)
+            self.PopupMenu(menu);menu.Destroy();return
+        marker=next((item for rect,item in getattr(self,'power_hits',[]) if rect.Contains(event.GetPosition())),None)
+        if marker:
+            from .power_symbols import remove
+            menu=wx.Menu();item=menu.Append(wx.ID_ANY,'Remove '+marker['kind'].replace('_',' '))
+            menu.Bind(wx.EVT_MENU,lambda e:self.owner.guarded(lambda:(remove(self.owner.doc,marker['id']),self.owner.refresh_document())),item)
+            self.PopupMenu(menu);menu.Destroy();return
         annotation=next((item for rect,item in self.annotation_hits if rect.Contains(event.GetPosition())),None)
         if annotation:
             menu=wx.Menu()
             for label,action in [('Edit annotation…',lambda:self.owner.edit_canvas_annotation(annotation)),('Delete annotation',lambda:(self.owner.doc.remove_annotations([annotation['id']]),self.owner.refresh_document()))]:
-                item=menu.Append(wx.ID_ANY,label);self.Bind(wx.EVT_MENU,lambda e,f=action:self.owner.guarded(f),item)
+                item=menu.Append(wx.ID_ANY,label);menu.Bind(wx.EVT_MENU,lambda e,f=action:self.owner.guarded(f),item)
             self.PopupMenu(menu);menu.Destroy();return
         directive=next((item for rect,item in reversed(self.directive_hits) if rect.Contains(event.GetPosition())),None)
         if directive:
             self.selected_directive=directive['id'];self.selected.clear();self.Refresh()
             menu=wx.Menu()
             for label,fn in [('Edit directive…',lambda:self.owner.edit_directive(directive['id'])),('Directive manager',lambda:self.owner.book.SetSelection(7))]:
-                item=menu.Append(wx.ID_ANY,label);self.Bind(wx.EVT_MENU,lambda e,f=fn:self.owner.guarded(f),item)
+                item=menu.Append(wx.ID_ANY,label);menu.Bind(wx.EVT_MENU,lambda e,f=fn:self.owner.guarded(f),item)
+            item=menu.Append(wx.ID_ANY,'Enable directive' if not directive['enabled'] else 'Comment out directive')
+            menu.Bind(wx.EVT_MENU,lambda e:self.owner.guarded(lambda:self.owner.toggle_directive(directive['id'])),item)
             self.PopupMenu(menu);menu.Destroy();return
         if not any(rect.Contains(event.GetPosition()) and part['id'] in self.selected for rect,part in self.hits):
             self.selected={part['id'] for rect,part in self.hits if rect.Contains(event.GetPosition())}
             self.owner.refresh_inspector();self.Refresh()
-        menu=wx.Menu()
-        for command in ('edit.box_select','edit.lasso_select','edit.mirror_horizontal','edit.mirror_vertical'):
-            self.owner.append_command_item(menu,command)
-        for label,action in [('Add note…',lambda:self.owner.place_designer_tool({'annotation':'note'},point)),('Add rectangle',lambda:self.owner.place_designer_tool({'annotation':'rect'},point)),('Add ellipse',lambda:self.owner.place_designer_tool({'annotation':'ellipse'},point))]:
-            item=menu.Append(wx.ID_ANY,label);self.Bind(wx.EVT_MENU,lambda e,f=action:self.owner.guarded(f),item)
-        for command in ('edit.rotate','edit.wire'):self.owner.append_command_item(menu,command)
-        menu.AppendSeparator()
-        item=menu.Append(wx.ID_ANY,'Schematic readouts / mini plots…');self.Bind(wx.EVT_MENU,lambda e:self.owner.guarded(self.owner.manage_instruments),item)
-        item=menu.Append(wx.ID_ANY,'Add SPICE directive here…');self.Bind(wx.EVT_MENU,lambda e:self.owner.guarded(lambda:self.owner.edit_directive(position=point)),item)
-        item=menu.Append(wx.ID_ANY,'SPICE directive manager');self.Bind(wx.EVT_MENU,lambda e:self.owner.book.SetSelection(7),item)
-        for command in ('edit.properties','probe.voltage','probe.differential','probe.current'):
-            self.owner.append_command_item(menu,command)
-        self.PopupMenu(menu); menu.Destroy()
+        from .schematic_context import build
+        build(self,event,point).popup(self)
+
+    def plot_attachment(self,position):
+        """Resolve a click to a semantic pin or an exact point on a net route."""
+        from .editor_geometry import terminal,route,nearest_route_point
+        parts={p['id']:p for p in self.visible_parts()}
+        candidates=[(np.linalg.norm(np.array(tuple(self.point(*terminal(p,i))))-np.array(tuple(position))),p['id'],i)
+                    for p in parts.values() for i in range(len(p['nodes']))]
+        if candidates and min(candidates)[0]<=14:
+            _,ident,index=min(candidates);return dict(part_id=ident,pin_index=index)
+        junctions={j['id']:j for j in self.owner.doc.data['junctions']}
+        for wire in reversed(self.visible_wires()):
+            point,segment,distance=nearest_route_point(route(parts,wire,junctions),self.world(position))
+            if distance>10/self.zoom:continue
+            endpoint=next((wire[key] for key in ('a','b') if len(wire[key])==2),None)
+            if endpoint:return dict(part_id=endpoint[0],pin_index=endpoint[1],attach_point=list(point),wire_id=wire['id'])
+            node=junctions[wire['a'][0]]['source_node']
+            match=next(((p['id'],i) for p in parts.values() for i,n in enumerate(p['nodes']) if n.casefold()==node.casefold()),None)
+            if match:return dict(part_id=match[0],pin_index=match[1],attach_point=list(point),wire_id=wire['id'])
+        return None
 
 
 class Studio(wx.Frame):
     def __init__(self, library=None):
         super().__init__(None,title="SPIKES Studio — RC startup",size=(1320,880))
-        from .resources import resource_dir
-        icon=resource_dir('library')/'spikes-studio.png'
-        if icon.is_file():self.SetIcon(wx.Icon(str(icon),wx.BITMAP_TYPE_PNG))
+        from .app_identity import set_window_icons
+        set_window_icons(self)
         self.SetMinSize((900,650)); self.CreateStatusBar()
         self.theme_name=load_theme();self.palette=PALETTES[self.theme_name]
-        self.doc=Document.from_netlist(RC_DECK); self.path=None; self.math=None; self.result=None
+        self.doc=Document.from_netlist(RC_DECK)
+        from .schematic_layout import startup_layout
+        startup_layout(self.doc);self.doc.saved_data=deepcopy(self.doc.data)
+        self.path=None; self.math=None; self.result=None
         self.library=library; self.keymap=Keymap(); self.job_running=False; self.cursors=[]; self.traces=[]
         self.active_run=None;self.source_baseline=RC_DECK;self.result_source=None;self.run_expressions=[]
         self.run_snapshot=None;self.live_samples=-1;self.closing=False
         self.hidden_traces=set()
         self.part_alerts={}
+        self.interaction_mode=False;self.symbol_controls={};self.limit_indicators=True
         self.pending_library_placement=None
         self.plot_grid=True;self.canvas_grid=True;self.split_view=False;self.run_results=[];self.run_engines=[];self.selected_run=0;self.cursor_bindings=[];self.visible_runs=None
         self.run_history=RunHistory();self.active_record_id=None;self.capture_record_id=None
         from .designer_workspace import WorkspaceStack,DesignerPalette
         self.workspace=wx.SplitterWindow(self); left=wx.Panel(self.workspace);self.project_sidebar=left; self.book=WorkspaceStack(self.workspace)
         left_box=wx.BoxSizer(wx.VERTICAL)
-        left_box.Add(wx.StaticText(left,label="DESIGNER · drag tools onto schematic"),0,wx.ALL,8)
-        from .designer_icons import tool
-        tools=wx.GridSizer(cols=6,hgap=3,vgap=3)
-        for label,handler in [('Select',lambda:self.selection_tool('box')),('Lasso',lambda:self.selection_tool('lasso')),('Wire',self.start_wire),('Rotate',self.rotate_parts),('Mirror X',lambda:self.mirror_parts('horizontal')),('Mirror Y',lambda:self.mirror_parts('vertical'))]:
-            control=tool(left,self,label+(' · W' if label=='Wire' else ''),handler);tools.Add(control,0,wx.EXPAND)
-        left_box.Add(tools,0,wx.EXPAND|wx.ALL,6)
+        heading=wx.StaticText(left,label='Components')
+        heading.SetFont(wx.Font(11,wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL,wx.FONTWEIGHT_BOLD))
+        left_box.Add(heading,0,wx.ALL,12)
+        self.browse_manufacturer_button=button(left,'Browse manufacturer library…',lambda e:self.show_manufacturer_parts(),left_box)
+        from .symbol_icons import bitmap
+        self.browse_manufacturer_button.SetBitmap(bitmap('library',self.palette))
         self.designer_palette=DesignerPalette(left,self);left_box.Add(self.designer_palette,1,wx.EXPAND|wx.ALL,6)
-        self.parts=wx.ListBox(left); left_box.Add(self.parts,1,wx.EXPAND|wx.ALL,6)
+        left_box.Add(wx.StaticText(left,label='Circuit components'),0,wx.LEFT|wx.TOP,10)
+        from .symbol_text_list import SymbolTextList
+        self.parts=SymbolTextList(left,self.palette,resolver=lambda index,text:next((p['kind'] for p in self.doc.data['components'] if p['ref']==text.split()[0]),'component'),size=(-1,100)); left_box.Add(self.parts,0,wx.EXPAND|wx.ALL,6)
         self.parts.Bind(wx.EVT_LISTBOX,self.select_list)
-        self.inspector=wx.TextCtrl(left,style=wx.TE_MULTILINE|wx.TE_READONLY); left_box.Add(self.inspector,1,wx.EXPAND|wx.ALL,6)
-        button(left,"Edit selected properties…",lambda e:self.properties(),left_box)
-        button(left,"Pin / hide properties panel",lambda e:self.pin_properties(),left_box)
-        self.probes=wx.ListBox(left); left_box.Add(self.probes,1,wx.EXPAND|wx.ALL,6)
+        self.inspector=wx.TextCtrl(left,size=(-1,85),style=wx.TE_MULTILINE|wx.TE_READONLY); left_box.Add(self.inspector,0,wx.EXPAND|wx.ALL,6)
+        self.selection_properties_button=button(left,"Edit properties",lambda e:self.properties(),left_box)
+        self.selection_pin_button=button(left,"Dock properties",lambda e:self.pin_properties(),left_box)
+        self.probes_heading=wx.StaticText(left,label='Probes · double-click to plot');left_box.Add(self.probes_heading,0,wx.LEFT|wx.TOP,10)
+        self.probes=wx.ListBox(left,size=(-1,60)); left_box.Add(self.probes,0,wx.EXPAND|wx.ALL,6)
         self.probes.Bind(wx.EVT_LISTBOX_DCLICK,lambda e:self.add_trace(self.probes.GetStringSelection()))
         left.SetSizer(left_box)
         self.schematic_host=wx.Panel(self.book);self.schematic_host.SetSizer(wx.BoxSizer(wx.VERTICAL))
@@ -685,12 +933,26 @@ class Studio(wx.Frame):
         self.symbol_designer=SymbolDesignerPanel(self.book,self);self.book.AddPage(self.symbol_designer,'Visual symbols')
         from .offline_report_panel import OfflineReportPanel
         self.offline_report=OfflineReportPanel(self,self.book);self.book.AddPage(self.offline_report,'Interactive report')
+        from .manufacturer_parts_panel import ManufacturerPartsPanel
+        self.manufacturer_panel=ManufacturerPartsPanel(self.book,self)
+        self.book.AddPage(self.manufacturer_panel,'Manufacturer library')
+        from .battery_panel import BatteryPanel
+        self.battery_panel=BatteryPanel(self.book,self);self.book.AddPage(self.battery_panel,'Battery laboratory')
+        from .monte_carlo_panel import page_constructor
+        self.monte_carlo_panel=page_constructor(self.book,self);self.book.AddPage(self.monte_carlo_panel,'Monte Carlo')
         for index,title in enumerate(('Schematic','Plots','Netlist','Blocks / IDE','Parts','Help','Runs','Directives','Frequency','Power tree','Analytics')):self.book.SetPageText(index,title)
         self.workspace.SplitVertically(left,self.book,250); self.workspace.SetMinimumPaneSize(200)
         self.info=wx.InfoBar(self);layout=wx.BoxSizer(wx.VERTICAL)
         self.initialize_docking()
         layout.Add(self.info,0,wx.EXPAND);layout.Add(self.dock_root,1,wx.EXPAND);self.SetSizer(layout)
         self.build_menu();self.build_toolbar();self.build_workflow_bar(layout); self.install_keys(); self.refresh_document()
+        from .editor_canvas_split import EditorCanvasSplit
+        from .code_crossprobe import bind_crossprobe
+        self.editor_split=EditorCanvasSplit(self);self.controller_code_window=None
+        self.source_binding=bind_crossprobe(self.source,self,'SPICE')
+        self.code_binding=bind_crossprobe(self.code,self,self.language.GetStringSelection(),lambda:self.doc.data.get('controller_setup'))
+        self.controller_binding=bind_crossprobe(self.controller_panel.code,self,'C',self.controller_panel.config)
+        self.code_bindings=[self.source_binding,self.code_binding,self.controller_binding]
         self.set_theme(self.theme_name,save=False)
         self.Bind(wx.EVT_WINDOW_CREATE,self.theme_new_window)
         self.Bind(wx.EVT_CLOSE,self.close)
@@ -742,8 +1004,7 @@ class Studio(wx.Frame):
             self.book.SetSelection(11);self.catalog_panel.initial_layout=False;wx.CallAfter(self.catalog_panel.fit_initial_layout)
 
     def show_browser(self):
-        if self.browser_pinned:self.docks.GetPane('browser').Show();self.docks.Update()
-        else:self.book.SetSelection(11)
+        self.tool_windows.open(11)
         self.catalog_panel.search.SetFocus()
 
     def pin_properties(self,pinned=None):
@@ -771,7 +1032,7 @@ class Studio(wx.Frame):
         self.properties_side.Layout();apply_window(self.properties_side,self.palette)
 
     def focus_shortcuts(self,event):
-        self.install_keys(text_focus=isinstance(event.GetWindow(),(wx.TextCtrl,wx.ComboBox,wx.SearchCtrl,wx.stc.StyledTextCtrl)))
+        self.install_keys(text_focus=isinstance(event.GetWindow(),(wx.TextCtrl,wx.ComboBox,wx.SearchCtrl,wx.stc.StyledTextCtrl,ActionButton,wx.Button,wx.ToggleButton,wx.Choice)))
         event.Skip()
 
     def theme_new_window(self,event):
@@ -789,8 +1050,24 @@ class Studio(wx.Frame):
     def set_theme(self,name,save=True):
         if name not in PALETTES:raise ValueError('Unknown theme')
         self.theme_name=name;self.palette=PALETTES[name];native_appearance(name);apply_window(self,self.palette)
+        self.designer_palette.refresh_symbols(self.palette)
+        self.catalog_panel.refresh_symbols(self.palette)
+        self.manufacturer_panel.listing.refresh_symbols(self.palette)
+        self.parts.refresh_symbols(self.palette);self.library_list.refresh_symbols(self.palette)
+        if hasattr(self,'battery_panel'):self.battery_panel.parts.refresh_symbols(self.palette)
+        from .symbol_icons import bitmap
+        self.browse_manufacturer_button.SetBitmap(bitmap('library',self.palette))
         from .designer_icons import icon
-        for control,label in getattr(self,'designer_icon_controls',[]):control.SetBitmap(icon(label,self.palette))
+        for control,label in getattr(self,'designer_icon_controls',[]):
+            bitmap=icon(label,self.palette)
+            if control.GetLabel():bitmap=wx.Bitmap(bitmap.ConvertToImage().Scale(20,20,wx.IMAGE_QUALITY_HIGH))
+            control.SetBitmap(bitmap)
+        if hasattr(self,'dashboard_panel'):
+            from .dashboard_panel import _instrument_icon
+            for kind,control in self.dashboard_panel.palette_buttons.items():
+                control.SetBitmap(_instrument_icon(kind,self.palette))
+            self.dashboard_panel.starter_button.SetBitmap(_instrument_icon('Scope',self.palette))
+            self.dashboard_panel.canvas.Refresh()
         art=self.docks.GetArtProvider()
         for metric,key in [(wx.aui.AUI_DOCKART_BACKGROUND_COLOUR,'panel'),(wx.aui.AUI_DOCKART_BORDER_COLOUR,'grid'),(wx.aui.AUI_DOCKART_SASH_COLOUR,'grid'),(wx.aui.AUI_DOCKART_ACTIVE_CAPTION_COLOUR,'selected'),(wx.aui.AUI_DOCKART_INACTIVE_CAPTION_COLOUR,'panel'),(wx.aui.AUI_DOCKART_ACTIVE_CAPTION_TEXT_COLOUR,'fg'),(wx.aui.AUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR,'fg')]:art.SetColour(metric,wx.Colour(self.palette[key]))
         art.SetMetric(wx.aui.AUI_DOCKART_GRADIENT_TYPE,wx.aui.AUI_GRADIENT_NONE);self.docks.Update()
@@ -799,6 +1076,7 @@ class Studio(wx.Frame):
                 self.run_bar.SetToolNormalBitmap(self.ids[command],toolbar_icon(command,self.palette))
                 self.run_bar.SetToolDisabledBitmap(self.ids[command],toolbar_icon(command,self.palette|{'fg':self.palette['muted'],'accent':self.palette['muted'],'danger':self.palette['muted']}))
         self.run_bar.Realize();self.refresh_figures_theme();self.canvas.Refresh()
+        if hasattr(self,'code_bindings'):self.configure_code_editors()
         self.preview_symbol()
         self.theme_picker.SetStringSelection(name)
         if save:
@@ -808,6 +1086,10 @@ class Studio(wx.Frame):
     def refresh_figures_theme(self):
         for figure,canvas in [(self.figure,self.plot),(self.frequency.figure,self.frequency.plot),(self.timing_figure,self.timing_canvas),(self.symbol_figure,self.symbol_canvas),(self.analytics.figure,self.analytics.plot)]:
             figure_theme(figure,self.palette,self.theme_name);canvas.draw_idle()
+        if hasattr(self,'battery_panel'):
+            figure_theme(self.battery_panel.figure,self.palette,self.theme_name);self.battery_panel.plot.draw_idle()
+        if hasattr(self,'monte_carlo_panel'):
+            figure_theme(self.monte_carlo_panel.figure,self.palette,self.theme_name);self.monte_carlo_panel.canvas.draw_idle()
 
     def close(self,event):
         if self.active_run:
@@ -843,46 +1125,32 @@ class Studio(wx.Frame):
 
     def new_document(self):
         if self.confirm_replace():
-            self.doc=Document.from_netlist(RC_DECK);self.path=None;self.canvas.selected.clear();self.refresh_document(force_source=True)
+            self.doc=Document.from_netlist(RC_DECK)
+            from .schematic_layout import startup_layout
+            startup_layout(self.doc);self.doc.saved_data=deepcopy(self.doc.data)
+            self.path=None;self.canvas.selected.clear();self.refresh_document(force_source=True)
 
     def build_toolbar(self):
-        bar=self.CreateToolBar(wx.TB_HORIZONTAL|wx.TB_TEXT|wx.TB_FLAT)
+        from .workbench_header import RunCommandBar
+        bar=RunCommandBar(self);self.GetSizer().Insert(0,bar,0,wx.EXPAND)
         self.run_bar=bar
         for command,label,art in [('file.new','New RC',wx.ART_NEW),('file.open','Open',wx.ART_FILE_OPEN),
             ('file.save','Save',wx.ART_FILE_SAVE),('run.start','Run batch',wx.ART_GO_FORWARD),
             ('run.interactive','Continuous',wx.ART_REDO),('run.pause','Pause / Resume',wx.ART_CROSS_MARK),
             ('run.stop','Stop',wx.ART_QUIT),('run.manager','Runs',wx.ART_REPORT_VIEW)]:
             bar.AddTool(self.ids[command],label,wx.ArtProvider.GetBitmap(art,wx.ART_TOOLBAR,(20,20)),shortHelp=label)
-        bar.AddSeparator();self.theme_picker=wx.Choice(bar,choices=list(PALETTES));self.theme_picker.SetStringSelection(self.theme_name)
-        self.theme_picker.Bind(wx.EVT_CHOICE,lambda e:self.guarded(lambda:self.set_theme(self.theme_picker.GetStringSelection())));bar.AddControl(self.theme_picker)
+        self.theme_picker=wx.Choice(bar,choices=list(PALETTES));self.theme_picker.SetStringSelection(self.theme_name)
+        self.theme_picker.Bind(wx.EVT_CHOICE,lambda e:self.guarded(lambda:self.set_theme(self.theme_picker.GetStringSelection())));self.theme_picker.Hide()
         bar.Realize();self.update_run_controls()
 
     def build_workflow_bar(self,layout):
-        from .designer_icons import tool
-        panel=wx.Panel(self);row=wx.WrapSizer(wx.HORIZONTAL,flags=wx.WRAPSIZER_DEFAULT_FLAGS & ~wx.EXTEND_LAST_ON_EACH_LINE)
-        self.workspace_choice=wx.Choice(panel,choices=[self.book.GetPageText(i) for i in range(self.book.GetPageCount())]);self.workspace_choice.SetSelection(self.book.GetSelection())
-        self.workspace_choice.Bind(wx.EVT_CHOICE,lambda e:self.book.SetSelection(self.workspace_choice.GetSelection()));row.Add(self.workspace_choice,0,wx.ALL,3)
-        def changed(index):
-            self.workspace_choice.SetSelection(index);self.context_tools()
-        self.book.on_selection=changed
-        groups=[('Library',[('Manufacturer parts','view.manufacturer_parts'),('Primitives','view.component_catalog'),('Design symbol','view.symbol_designer')]),
-                ('Draw / edit',[('Select','edit.box_select'),('Wire · W','edit.wire'),('Rotate · Space','edit.rotate'),('Properties · E','edit.properties')]),
-                ('Measure',[('Probe V · P','probe.voltage'),('Differential','probe.differential')]),
-                ('Workspace',[('Fit view','view.fit'),('Plots','view.plots'),('Split view','view.split_canvas_plots'),('Dashboard','view.dashboard')])]
-        self.command_controls=[]
-        for title,actions in groups:
-            group=wx.Panel(panel);column=wx.BoxSizer(wx.VERTICAL);buttons=wx.BoxSizer(wx.HORIZONTAL)
-            for label,command in actions:
-                cell=wx.BoxSizer(wx.VERTICAL);control=tool(group,self,label,lambda c=command:self.execute_command(c));cell.Add(control,0,wx.ALIGN_CENTER|wx.ALL,2)
-                self.command_controls.append((control,command))
-                caption=label.split(' · ')[0].replace('Manufacturer parts','Vendor parts').replace('Fit schematic','Fit')
-                cell.Add(wx.StaticText(group,label=caption),0,wx.ALIGN_CENTER|wx.LEFT|wx.RIGHT,4);buttons.Add(cell,0,wx.ALL,2)
-            column.Add(buttons);column.Add(wx.StaticLine(group),0,wx.EXPAND|wx.TOP,3)
-            column.Add(wx.StaticText(group,label=title),0,wx.ALIGN_CENTER|wx.ALL,2);group.SetSizer(column);row.Add(group,0,wx.ALL,3)
-        panel.SetSizer(row);layout.Insert(1,panel,0,wx.EXPAND);self.workflow_bar=panel
+        from .workbench_header import WorkbenchHeader
+        self.workflow_bar=WorkbenchHeader(self);self.workspace_choice=self.workflow_bar.choice
+        self.book.on_selection=self.workflow_bar.changed
+        layout.Insert(0,self.workflow_bar,0,wx.EXPAND)
 
     def context_tools(self):
-        schematic=self.book.GetSelection()==0 or self.book.GetSelection()==1 and self.split_view
+        schematic=self.canvas_available(self.book.GetSelection())
         for control,label in getattr(self,'designer_icon_controls',[]):
             if label.split(' · ')[0] in ('Select','Lasso','Wire','Rotate','Mirror X','Mirror Y','Properties','Probe V','Differential'):
                 control.Enable(schematic)
@@ -890,11 +1158,27 @@ class Studio(wx.Frame):
             reason=self.commands.reason(command);control.Enable(not reason)
             spec=self.commands.commands[command];key=self.keymap.bindings.get(command,'')
             control.SetToolTip(reason or spec.label+(' · '+key if key else '')+'\n'+spec.description)
+            active=(command=='edit.wire' and self.canvas.wire_mode or command=='probe.voltage' and self.canvas.probe_mode=='voltage' or
+                    command=='edit.box_select' and not self.canvas.wire_mode and self.canvas.probe_mode is None and self.canvas.keyboard_move_mode is None and self.canvas.plot_drop is None or
+                    command=='edit.move' and self.canvas.keyboard_move_mode=='move')
+            control.SetValue(bool(active))
 
     def context_fit(self):
         if self.book.GetSelection()==1:self.draw_plot()
-        elif self.book.GetSelection()==0:self.fit()
+        elif self.canvas_available(self.book.GetSelection()):self.fit()
         else:self.SetStatusText('Fit view is available in Schematic or Plots.')
+
+    def start_net_label(self):
+        self.require_clean_directive_source()
+        if self.job_running:raise ValueError('Stop simulation before placing a net label')
+        self.canvas.capture_lost();self.canvas.wire_mode=False;self.canvas.wire_start=None;self.canvas.probe_mode=None
+        self.canvas.plot_drop=None;self.canvas.designer_tool=None;self.canvas.label_mode=True
+        self.book.SetSelection(self.editor_page());self.canvas.SetFocus();self.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS))
+        self.SetStatusText('Label: click a pin or wire, choose local/global/hierarchical scope. Escape cancels.')
+
+    def toggle_wire_hops(self):
+        self.doc.commit(lambda d:d['metadata'].update(wire_hops=not d['metadata'].get('wire_hops',False)))
+        self.update_title();self.canvas.Refresh()
 
     def update_run_controls(self):
         from .run_control import InteractiveRun
@@ -921,9 +1205,25 @@ class Studio(wx.Frame):
             "view.split_canvas_plots":self.toggle_split,"view.schematic_instruments":self.manage_instruments,"view.linked_cursors":lambda:self.plot_interactions.show_cursors(),
             "view.component_catalog":self.show_browser,"view.pin_parts_browser":self.pin_browser,"view.pin_properties":self.pin_properties,"view.controller":lambda:self.book.SetSelection(12),"view.part_alerts":self.show_part_alerts,
             "view.canvas_grid":self.toggle_canvas_grid,
+            "view.net_navigator":self.show_net_navigator,
             "view.parts":lambda:self.book.SetSelection(4),"view.math":lambda:self.book.SetSelection(1),"view.ide":lambda:self.book.SetSelection(3),"help.open":lambda:self.book.SetSelection(5)}
         menubar=wx.MenuBar(); self.ids={}
-        self.actions.update({'edit.rotate':self.rotate_parts,'edit.wire':self.start_wire})
+        self.actions.update({'edit.rotate':self.rotate_parts,'edit.wire':self.start_wire,
+                             'view.code_canvas':lambda:self.show_code_split(2),
+                             'view.code_canvas_top_bottom':lambda:self.show_code_split(2,'top_bottom'),
+                             'view.ide_canvas':lambda:self.show_code_split(3),
+                             'view.controller_canvas':lambda:self.show_code_split(12),
+                             'view.controller_code_window':self.open_controller_code,
+                             'view.code_only':self.close_code_split,
+                             'view.back':lambda:self.workflow_bar.back(),'view.forward':lambda:self.workflow_bar.forward(),'view.home':lambda:self.workflow_bar.home(),
+                             'edit.canvas_text':self.canvas_text,
+                             'view.fit_schematic':self.fit,
+                             'view.split_side_by_side':lambda:self.set_split('side_by_side'),
+                             'view.split_top_bottom':lambda:self.set_split('top_bottom'),
+                             'view.insert_attached_plot':self.start_mini_plot,
+                             'edit.move':lambda:self.canvas.begin_keyboard_move('move'),
+                             'edit.drag':lambda:self.canvas.begin_keyboard_move('drag'),
+                             'edit.wire_bend':self.toggle_wire_bend})
         from .sensor_dialog import import_sensor
         self.actions['file.import_audio_sensor']=lambda:import_sensor(self)
         self.actions['file.recover_autosave']=self.recover_document
@@ -943,9 +1243,23 @@ class Studio(wx.Frame):
             'view.circuit_text':lambda:self.book.SetSelection(2)})
         self.actions.update({'edit.mirror_horizontal':lambda:self.mirror_parts('horizontal'),'edit.mirror_vertical':lambda:self.mirror_parts('vertical'),'edit.box_select':lambda:self.selection_tool('box'),'edit.lasso_select':lambda:self.selection_tool('lasso'),'view.solver_log':self.show_solver_log})
         self.actions.update({'view.dashboard':lambda:self.book.SetSelection(13),'view.symbol_designer':lambda:self.book.SetSelection(14)})
+        self.actions['run.canvas_interaction']=self.toggle_canvas_interaction
+        self.actions['view.limit_indicators']=self.toggle_limit_indicators
+        from .mosfet_fit_panel import show as fit_mosfet
+        self.actions['view.fit_mosfet_curves']=lambda:fit_mosfet(self)
+        from .wire_models import exchange as wire_exchange
+        self.actions['file.export_wire_extraction']=lambda:wire_exchange(self,True)
+        self.actions['file.import_wire_extraction']=lambda:wire_exchange(self)
         from .command_palette import show as command_search
         self.actions['view.command_search']=lambda:command_search(self)
-        self.actions['view.manufacturer_parts']=self.catalog_panel.manufacturer_library
+        self.actions['view.manufacturer_parts']=self.show_manufacturer_parts
+        self.actions['edit.net_label']=self.start_net_label
+        self.actions['view.wire_hops']=self.toggle_wire_hops
+        from .hierarchy_views import choose,open_sheet,parent as parent_sheet
+        self.actions['view.hierarchy']=lambda:choose(self)
+        self.actions['view.flat_schematic']=lambda:open_sheet(self)
+        self.actions['view.parent_sheet']=lambda:parent_sheet(self)
+        self.actions['view.vendor_review_shelf']=self.catalog_panel.manufacturer_library
         self.actions['view.offline_report']=lambda:self.book.SetSelection(self.book.FindPage(self.offline_report))
         from .workbench_layout import PRESETS
         for name in PRESETS:
@@ -953,12 +1267,20 @@ class Studio(wx.Frame):
             self.actions[ident]=lambda n=name:self.apply_workspace_preset(n)
         self.actions['file.export_workspace']=self.export_workspace
         self.actions['file.import_workspace']=self.import_workspace
+        from .tool_windows import ToolWindows,TOOL_COMMANDS
+        self.tool_windows=ToolWindows(self)
+        for commands in TOOL_COMMANDS.values():
+            for ident,index in commands.items():
+                self.actions[ident]=lambda page=index:self.tool_windows.open(page)
         from .command_registry import CommandRegistry
         self.commands=CommandRegistry.from_actions(self.actions,self.command_context)
-        for title,prefixes in (("File",("file.",)),("Edit",("edit.",)),("Probes",("probe.",)),("View",("view.",)),("Simulation",("run.",)),("Help",("help.",))):
+        grouped={command:group for group,commands in TOOL_COMMANDS.items() for command in commands}
+        for title,prefixes in (("File",("file.",)),("Edit",("edit.",)),("Probes",("probe.",)),("View",("view.",)),('Libraries',()),('Analysis',()),('Tools',()),("Simulation",("run.",)),("Help",("help.",))):
             menu=wx.Menu()
             for command,handler in self.actions.items():
-                if not command.startswith(prefixes):continue
+                if command in grouped:
+                    if grouped[command]!=title:continue
+                elif not command.startswith(prefixes):continue
                 item=menu.Append(wx.ID_ANY,self.commands.commands[command].label)
                 self.ids[command]=item.GetId(); self.Bind(wx.EVT_MENU,lambda e,c=command:self.execute_command(c),item)
                 self.Bind(wx.EVT_UPDATE_UI,lambda e,c=command:e.Enable(not self.commands.reason(c)),id=item.GetId())
@@ -980,13 +1302,17 @@ class Studio(wx.Frame):
         from .command_registry import Context
         from .run_control import InteractiveRun
         index=self.book.GetSelection()
-        return Context(page=self.book.GetPageText(index),schematic=index==0 or index==1 and self.split_view,
+        return Context(page=self.book.GetPageText(index),schematic=self.canvas_available(index),
             selected=len(self.canvas.selected),undo=bool(self.doc.undo_stack),redo=bool(self.doc.redo_stack),
             busy=self.job_running,run_state=getattr(self.active_run,'state','idle'),
-            interactive=isinstance(self.active_run,InteractiveRun),has_results=self.math is not None)
+            interactive=isinstance(self.active_run,InteractiveRun),has_results=self.math is not None,
+            wire_active=self.canvas.wire_mode,
+            history_back=hasattr(self,'workflow_bar') and self.workflow_bar.history.can_back,
+            history_forward=hasattr(self,'workflow_bar') and self.workflow_bar.history.can_forward)
 
     def execute_command(self,ident):
-        return self.guarded(lambda:self.commands.execute(ident))
+        result=self.guarded(lambda:self.commands.execute(ident))
+        self.context_tools();return result
 
     def append_command_item(self,menu,ident):
         spec=self.commands.commands[ident];key=self.keymap.bindings.get(ident,'')
@@ -1003,7 +1329,8 @@ class Studio(wx.Frame):
         pages=[self.book.GetPageText(i) for i in range(self.book.GetPageCount())]
         data=validate(data,pages)
         # Validate first: malformed imports cannot partially rearrange the UI.
-        if self.split_view!=data['split']:self.toggle_split()
+        if data['split']:self.set_split(data.get('split_orientation','top_bottom'))
+        elif self.split_view:self.toggle_split()
         self.pin_browser(data['browser']);self.pin_properties(data['properties'])
         target='Plots' if data['split'] and data['page']=='Schematic' else data['page']
         self.book.SetSelection(pages.index(target));self.context_tools()
@@ -1012,7 +1339,7 @@ class Studio(wx.Frame):
     def export_workspace(self):
         from .workbench_layout import CONTRACT
         data=dict(contract=CONTRACT,name='Custom workspace',page=self.book.GetPageText(self.book.GetSelection()),
-                  split=self.split_view,browser=self.browser_pinned,properties=self.properties_pinned)
+                  split=self.split_view,split_orientation=getattr(self,'split_orientation','top_bottom'),browser=self.browser_pinned,properties=self.properties_pinned)
         path=self.choose_path('Export workspace layout','SPIKES workspace (*.spkworkspace)|*.spkworkspace',True)
         if path:write_json(path,data)
 
@@ -1023,19 +1350,50 @@ class Studio(wx.Frame):
             self.apply_workspace(json.loads(Path(path).read_text(encoding='utf-8')))
 
     def rotate_parts(self):
+        if self.canvas.keyboard_move_mode:self.canvas.capture_lost();self.canvas.SetCursor(wx.NullCursor)
         self.doc.rotate(self.canvas.selected);self.canvas.Refresh();self.refresh_inspector();self.update_title()
 
     def start_wire(self):
+        self.canvas.label_mode=False
+        self.canvas.plot_drop=None
+        self.canvas.keyboard_move_mode=None;self.canvas.capture_lost()
         self.canvas.wire_corners=[]
+        self.canvas.wire_hover=None
+        self.canvas.wire_bend='horizontal'
         self.canvas.designer_tool=None;self.canvas.selection_path=[]
         self.pending_library_placement=None;self.canvas.probe_mode=None;self.canvas.wire_mode=True;self.canvas.wire_start=None
-        self.book.SetSelection(0);self.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.canvas.SetFocus();self.SetStatusText('Wire: click source terminal, then destination terminal; Escape cancels')
+        self.book.SetSelection(self.editor_page());self.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.canvas.SetFocus();self.SetStatusText('Wire: click source terminal; / flips bend, Backspace removes a corner, Escape cancels/exits')
+        self.context_tools()
+
+    def show_net_navigator(self):
+        from .designer_workspace import NetNavigator
+        with NetNavigator(self) as dialog:
+            dialog.ShowModal()
+        self.canvas.highlighted_net=None;self.canvas.highlighted_nets=set();self.canvas.highlighted_components=set();self.canvas.highlighted_controller_pins=set();self.canvas.Refresh()
+
+    def toggle_wire_bend(self):
+        if not self.canvas.wire_mode:raise ValueError('Start Wire before changing its bend posture')
+        self.canvas.wire_bend='vertical' if self.canvas.wire_bend=='horizontal' else 'horizontal'
+        self.canvas.Refresh();self.SetStatusText('Wire bend posture: '+self.canvas.wire_bend+' first')
 
     def arm_designer_tool(self,payload):
+        self.canvas.capture_lost()
+        self.canvas.wire_mode=False;self.canvas.wire_start=None;self.canvas.wire_corners=[];self.canvas.wire_hover=None
         if 'part' in payload:return self.place_shortcut(payload['part'],explicit=True)
-        self.canvas.designer_tool=payload;self.book.SetSelection(1 if self.split_view else 0);self.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.SetStatusText('Click schematic to place; Escape cancels')
+        self.canvas.designer_tool=payload;self.book.SetSelection(self.editor_page());self.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.SetStatusText('Click schematic to place; Escape cancels')
 
     def place_designer_tool(self,payload,position):
+        if 'canvas_text' in payload:
+            from .canvas_text import place
+            self.require_clean_directive_source();place(self.doc,payload['canvas_text'],position,payload['enabled']);self.refresh_document();return
+        if 'power_symbol' in payload:
+            from .pin_geometry import pins as component_pins
+            from .editor_geometry import transform
+            from .power_symbols import attach
+            terminals=[(np.linalg.norm(np.asarray(transform(part,*pin.anchor))-np.asarray(position)),part['id'],pin.index) for part in self.doc.data['components'] for pin in component_pins(part)]
+            if not terminals or min(terminals)[0]>14/self.canvas.zoom:raise ValueError('Place the power/ground symbol directly on an existing component terminal')
+            _,ident,index=min(terminals)
+            attach(self.doc,payload['power_symbol'],(ident,index));self.refresh_document();return
         if 'part' in payload:
             self.place_shortcut(payload['part'],explicit=True)
             if self.pending_library_placement:
@@ -1055,11 +1413,17 @@ class Studio(wx.Frame):
         self.doc.edit_annotation(kind=kind,x=float(position[0]),y=float(position[1]),text=text);self.refresh_document()
 
     def mirror_parts(self,axis):
+        if self.canvas.keyboard_move_mode:self.canvas.capture_lost();self.canvas.SetCursor(wx.NullCursor)
         self.doc.mirror(self.canvas.selected,axis);self.refresh_document()
 
     def selection_tool(self,kind):
-        self.canvas.selection_tool=kind;self.canvas.probe_mode=None;self.canvas.wire_mode=False;self.canvas.designer_tool=None;self.pending_library_placement=None
+        self.canvas.plot_drop=None
+        self.canvas.capture_lost()
+        self.canvas.selection_tool=kind;self.canvas.probe_mode=None;self.canvas.wire_mode=False;self.canvas.wire_start=None;self.canvas.wire_corners=[];self.canvas.wire_hover=None;self.canvas.designer_tool=None;self.pending_library_placement=None
+        self.canvas.SetCursor(wx.NullCursor)
+        self.canvas.SetFocus()
         self.SetStatusText(f'{kind.title()} select: drag empty canvas; Ctrl adds to selection. Drag a selected part to move it.')
+        self.context_tools()
 
     def edit_canvas_annotation(self,item):
         with wx.TextEntryDialog(self,'Annotation text (not executable SPICE)','Edit annotation',item['text']) as dialog:
@@ -1098,11 +1462,12 @@ class Studio(wx.Frame):
 
     def toggle_part_shortcuts(self,enabled):
         self.keymap.part_shortcuts=bool(enabled);self.part_keys_item.Check(bool(enabled))
-        self.install_keys(text_focus=isinstance(wx.Window.FindFocus(),(wx.TextCtrl,wx.ComboBox,wx.SearchCtrl,wx.stc.StyledTextCtrl)))
+        self.install_keys(text_focus=isinstance(wx.Window.FindFocus(),(wx.TextCtrl,wx.ComboBox,wx.SearchCtrl,wx.stc.StyledTextCtrl,ActionButton,wx.Button,wx.ToggleButton,wx.Choice)))
 
     def place_shortcut(self,command,explicit=False):
         if not explicit and not self.keymap.part_shortcuts:return
         if not explicit and isinstance(wx.Window.FindFocus(),(wx.TextCtrl,wx.ComboBox,wx.SearchCtrl,wx.stc.StyledTextCtrl)):return
+        self.canvas.capture_lost();self.canvas.wire_mode=False;self.canvas.wire_start=None;self.canvas.wire_corners=[];self.canvas.wire_hover=None
         ident=command[5:] if command.startswith('part:') else 'generic.'+command.split('.')[1]+'.001'
         panel=self.catalog_panel
         record=panel.index.by_id.get(ident)
@@ -1130,6 +1495,8 @@ class Studio(wx.Frame):
         self.measurements.SetValue(message);self.SetStatusText('Action rejected — circuit and previous results retained');self.Layout()
 
     def refresh_document(self,force_source=False):
+        if getattr(self.canvas,'sheet_scope',None) and (getattr(self.canvas,'sheet_document_id',None)!=self.doc.data['id'] or not self.canvas.visible_parts()):self.canvas.sheet_scope=None
+        if hasattr(self,'battery_panel'):self.battery_panel.restore()
         if getattr(self,'_browser_document_id',None)!=self.doc.data['id']:
             self._browser_document_id=self.doc.data['id'];self.pending_library_placement=None;self.canvas.SetCursor(wx.NullCursor)
             if hasattr(self,'catalog_panel'):self.catalog_panel.filter()
@@ -1137,6 +1504,7 @@ class Studio(wx.Frame):
         if force_source or self.source.GetText()==self.source_baseline:
             self.source.SetText(self.doc.data["source"]);self.source_baseline=self.doc.data['source']
         self.probes.Set([p["expression"] for p in self.doc.data["probes"]])
+        self.probes.Show(bool(self.doc.data['probes']));self.probes_heading.Show(bool(self.doc.data['probes']))
         self.canvas.Refresh();self.refresh_inspector()
         self.SetStatusText(f"Revision {self.doc.data['revision']} · {len(self.doc.data['components'])} parts · {len(self.doc.data['probes'])} probes")
         self.update_title()
@@ -1153,9 +1521,31 @@ class Studio(wx.Frame):
     def require_clean_directive_source(self):
         if self.source.GetText()!=self.doc.data['source']:raise ValueError('Circuit text has unapplied edits. Validate and apply them before editing directives; your draft has been retained.')
 
+    def toggle_canvas_interaction(self):
+        self.interaction_mode=not self.interaction_mode
+        self.canvas.capture_lost();self.canvas.wire_mode=False;self.canvas.wire_start=None
+        self.SetStatusText('INTERACT: click configured DC source symbols; commands queue at native steps' if self.interaction_mode else 'EDIT: schematic selection and wiring restored')
+
+    def show_manufacturer_parts(self):
+        self.tool_windows.open(self.book.FindPage(self.manufacturer_panel))
+        self.manufacturer_panel.search.SetFocus()
+
+    def toggle_limit_indicators(self):
+        self.limit_indicators=not self.limit_indicators;self.canvas.Refresh()
+        self.SetStatusText('Captured-limit symbol indicators enabled' if self.limit_indicators else 'Captured-limit symbol indicators hidden')
+
     def edit_directive(self,ident=None,position=None):
         self.require_clean_directive_source()
         with DirectiveEditor(self,ident,position) as dialog:dialog.ShowModal()
+
+    def canvas_text(self,position=None):
+        from .canvas_text import show
+        show(self,position)
+
+    def toggle_directive(self,ident):
+        self.require_clean_directive_source()
+        item=next(v for v in self.doc.data['directives'] if v['id']==ident)
+        self.doc.enable_directives([ident],not item['enabled']);self.refresh_document()
 
     def thermal_setup(self):
         with ThermalSetup(self) as dialog:dialog.ShowModal()
@@ -1171,9 +1561,11 @@ class Studio(wx.Frame):
 
     def refresh_inspector(self):
         selected=[p for p in self.doc.data["components"] if p["id"] in self.canvas.selected]
+        for control in (self.inspector,self.selection_properties_button,self.selection_pin_button):control.Show(bool(selected))
         self.inspector.SetValue("\n\n".join(f"{p['ref']} · {p['kind']}\nValue: {p['value']}\nNodes: {', '.join(p['nodes'])}\nPackage: {p['package'] or 'unspecified'}\nDeclared limits: {json.dumps(p['limits'])}" for p in selected))
         if getattr(self,'properties_pinned',False):wx.CallAfter(self.sync_properties)
         if hasattr(self,'commands'):self.context_tools()
+        self.project_sidebar.Layout()
 
     def properties(self):
         if self.canvas.selected_directive:self.edit_directive(self.canvas.selected_directive);return
@@ -1183,15 +1575,20 @@ class Studio(wx.Frame):
         with Properties(self) as dialog:dialog.ShowModal()
 
     def probe(self,mode):
-        self.book.SetSelection(0);self.canvas.probe_mode=mode;self.canvas.first_node=None
+        self.canvas.plot_drop=None
+        self.canvas.capture_lost();self.canvas.wire_mode=False;self.canvas.wire_start=None;self.canvas.wire_corners=[];self.canvas.wire_hover=None
+        self.canvas.SetCursor(wx.NullCursor)
+        self.book.SetSelection(self.editor_page());self.canvas.probe_mode=mode;self.canvas.first_node=None
         self.SetStatusText("Click positive then negative terminal" if mode=="differential" else f"Click {'a terminal' if mode=='voltage' else 'a component'} for a {mode} probe")
+        self.context_tools()
 
     def fit(self):
-        parts=self.doc.data['components']
+        parts=self.canvas.visible_parts()
         directives=[v for v in self.doc.data['directives'] if v['visible']]
-        if not parts and not directives:return
-        lows=[(p['x']-90,p['y']-70) for p in parts]+[(v['x'],v['y']) for v in directives]
-        highs=[(p['x']+90,p['y']+90) for p in parts]+[(v['x']+max(240,min(90,max(map(len,v['text'].splitlines())))*9+30),v['y']+125) for v in directives]
+        instruments=self.doc.data['instruments']
+        if not parts and not directives and not instruments:return
+        lows=[(p['x']-90,p['y']-70) for p in parts]+[(v['x'],v['y']) for v in directives]+[(v['x'],v['y']) for v in instruments]
+        highs=[(p['x']+90,p['y']+90) for p in parts]+[(v['x']+max(240,min(90,max(map(len,v['text'].splitlines())))*9+30),v['y']+125) for v in directives]+[(v['x']+275,v['y']+(160 if v['kind']=='Mini plot' else 75)) for v in instruments]
         low=np.min(lows,axis=0);high=np.max(highs,axis=0)
         size=np.maximum(np.array(self.canvas.GetClientSize())-80,1)
         self.canvas.zoom=float(np.clip(np.min(size/(high-low)),.25,4))
@@ -1213,7 +1610,7 @@ class Studio(wx.Frame):
         if path:self.doc.save(path);self.path=path;self.update_title();self.SetStatusText(f"Saved {path}");return True
         return False
 
-    def accept_import(self,text):
+    def accept_import(self,text,report=None):
         from .model_placement import is_model_card,prepare,insert
         if is_model_card(text):
             plan=prepare(self.doc,text)
@@ -1225,10 +1622,16 @@ class Studio(wx.Frame):
                 self.canvas.selected={part_id};self.refresh_document(force_source=True);self.canvas.SetFocus()
                 self.SetStatusText('Model part inserted and selected. E: properties; Space: rotate; Ctrl+Z: undo. Connect its isolated pins before running.')
             return
-        report=import_text(text)
+        report=report or import_text(text)
         if report.document:
-            if wx.MessageBox(f"Detected {report.format}. Replace the current sheet with {len(report.document.data['components'])} imported parts?","Import review",wx.YES_NO|wx.NO_DEFAULT,self)==wx.YES:
-                if self.confirm_replace():self.doc=report.document;self.path=None;self.canvas.selected.clear();self.refresh_document(force_source=True)
+            notice=f"Detected {report.format}. Replace the current sheet with {len(report.document.data['components'])} imported parts?"
+            if report.warnings:notice+='\n\n'+'\n'.join(report.warnings)
+            if wx.MessageBox(notice,"Import review",wx.YES_NO|wx.NO_DEFAULT,self)==wx.YES:
+                if self.confirm_replace():
+                    from .schematic_layout import source_routes
+                    source_routes(report.document)
+                    self.doc=report.document;self.path=None;self.canvas.selected.clear();self.refresh_document(force_source=True)
+                    self.book.SetSelection(0);wx.CallAfter(self.fit)
         else:
             self.last_import=report
             with wx.Dialog(self,title=f"{report.format} import review",size=(700,500),style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER) as dlg:
@@ -1241,7 +1644,12 @@ class Studio(wx.Frame):
 
     def import_file(self):
         path=self.choose_path("Import circuit / model","Circuit files|*.cir;*.net;*.sp;*.asc;*.qsch;*.kicad_sch;*.spksch|All files|*.*")
-        if path:self.accept_import(path.read_text(encoding="utf-8-sig"))
+        if path:
+            if path.suffix.lower()=='.kicad_sch':
+                from .kicad_import import import_schematic
+                self.background(lambda:import_schematic(path),lambda report:self.accept_import(report.source,report),
+                                'Exporting KiCad connectivity…')
+            else:self.accept_import(path.read_text(encoding="utf-8-sig"))
 
     def paste(self):
         focus=wx.Window.FindFocus()
@@ -1253,7 +1661,7 @@ class Studio(wx.Frame):
     def select_all_parts(self):
         focus=wx.Window.FindFocus()
         if isinstance(focus,(wx.TextCtrl,wx.ComboBox,wx.stc.StyledTextCtrl)):focus.SelectAll();return
-        self.canvas.selected={p['id'] for p in self.doc.data['components']}
+        self.canvas.selected={p['id'] for p in self.canvas.visible_parts()}
         self.canvas.Refresh();self.refresh_inspector()
 
     def copy_circuit(self):
@@ -1273,10 +1681,13 @@ class Studio(wx.Frame):
         if path:path.write_text(export_netlist(self.doc),encoding="utf-8")
 
     def make_source(self):
-        panel=wx.Panel(self.book);box=wx.BoxSizer(wx.VERTICAL);tools=wx.BoxSizer(wx.HORIZONTAL)
+        panel=wx.Panel(self.book);box=wx.BoxSizer(wx.VERTICAL);tools=wx.WrapSizer(wx.HORIZONTAL)
         button(panel,"Validate and apply netlist",lambda e:self.guarded(self.apply_source),tools)
         button(panel,'SPICE directive manager',lambda e:self.book.SetSelection(7),tools)
-        box.Add(tools);self.source=text_editor(panel,RC_DECK);box.Add(self.source,1,wx.EXPAND);panel.SetSizer(box);self.book.AddPage(panel,"Circuit text")
+        button(panel,'Beside schematic',lambda e:self.show_code_split(2),tools)
+        button(panel,'Above / below schematic',lambda e:self.show_code_split(2,'top_bottom'),tools)
+        button(panel,'Code only',lambda e:self.close_code_split(),tools)
+        box.Add(tools,0,wx.EXPAND);self.source=text_editor(panel,RC_DECK);box.Add(self.source,1,wx.EXPAND);panel.SetSizer(box);self.book.AddPage(panel,"Circuit text")
         self.source.Bind(wx.stc.EVT_STC_CHANGE,lambda e:self.update_title())
 
     def apply_source(self):
@@ -1294,12 +1705,19 @@ class Studio(wx.Frame):
         button(panel,"Add expression",lambda e:self.guarded(lambda:self.add_trace(self.expression.GetValue())),controls)
         button(panel,"Measure",lambda e:self.guarded(self.measure),controls)
         self.measure_window=wx.Choice(panel,choices=["Whole capture","A/B window"]);self.measure_window.SetSelection(0);controls.Add(self.measure_window,0,wx.ALL,4)
-        button(panel,"Run circuit",lambda e:self.guarded(self.run),controls)
         box.Add(controls,0,wx.EXPAND)
         self.figure=Figure(figsize=(9,5),layout="constrained");self.plot=FigureCanvasWxAgg(panel,-1,self.figure)
         self.plot.SetMinSize((100,100))
         self.plot.SetToolTip('Wheel: zoom time around pointer. Shift+wheel: zoom Y. Toolbar: pan or box zoom. Fit Y in view: scale visible signals. Click: place measurement cursor.')
-        self.toolbar=NavigationToolbar2WxAgg(self.plot);box.Add(self.toolbar,0,wx.EXPAND);box.Add(self.plot,1,wx.EXPAND)
+        self.toolbar=NavigationToolbar2WxAgg(self.plot)
+        # Keep Matplotlib's navigation controller, not a second visible toolbar.
+        self.toolbar.Hide()
+        from .plot_interactions import PlotInteractions
+        self.plot_interactions=PlotInteractions(self);self.plot_interactions.connect()
+        from .plot_workspace import PlotWorkbench
+        self.plot_workbench=PlotWorkbench(self,panel)
+        box.Add(self.plot_workbench.command_bar,0,wx.EXPAND)
+        box.Add(self.plot_workbench.canvas_row(self.plot),1,wx.EXPAND)
         self.measurements=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY,size=(-1,105));box.Add(self.measurements,0,wx.EXPAND|wx.ALL,4)
         row=wx.WrapSizer(wx.HORIZONTAL,flags=wx.WRAPSIZER_DEFAULT_FLAGS & ~wx.EXTEND_LAST_ON_EACH_LINE)
         button(panel,"Fit all",lambda e:self.draw_plot(),row)
@@ -1324,7 +1742,7 @@ class Studio(wx.Frame):
         self.overlay_runs.Bind(wx.EVT_CHECKBOX,lambda e:self.guarded(self.draw_plot))
         button(panel,'Select overlays…',lambda e:self.guarded(self.select_overlays),row)
         self.grid_control=wx.CheckBox(panel,label='Plot grid');self.grid_control.SetValue(True);row.Add(self.grid_control,0,wx.ALL|wx.ALIGN_CENTER_VERTICAL,4)
-        self.grid_control.Bind(wx.EVT_CHECKBOX,lambda e:(setattr(self,'plot_grid',self.grid_control.GetValue()),self.draw_plot(preserve_view=True)))
+        self.grid_control.Bind(wx.EVT_CHECKBOX,lambda e:self.plot_interactions.set_grid(self.grid_control.GetValue()))
         button(panel,'Cursor window…',lambda e:self.guarded(self.plot_interactions.show_cursors),row)
         button(panel,'Schematic instruments…',lambda e:self.guarded(self.manage_instruments),row)
         box.Insert(1,row,0,wx.EXPAND)
@@ -1335,11 +1753,9 @@ class Studio(wx.Frame):
         self.live_apply=button(panel,'Apply SI value',lambda e:self.guarded(self.apply_live_source),live)
         self.live_label=wx.StaticText(panel,label='Continuous: best-effort pacing, 20,000-sample rolling capture. Not HIL qualified.')
         box.Add(live,0,wx.EXPAND);box.Add(self.live_label,0,wx.LEFT|wx.BOTTOM,5)
-        self.plot_detail_items=[self.measurements,self.plot_tools,live,self.live_label];self.plot_details=True
-        from .plot_interactions import PlotInteractions
-        self.plot_interactions=PlotInteractions(self);self.plot_interactions.connect()
+        self.plot_detail_items=[self.measurements,self.plot_tools,row,live,self.live_label];self.plot_details=True
         self.plot.mpl_connect("motion_notify_event",self.hover)
-        self.plot.mpl_connect("pick_event",self.pick_trace)
+        self.set_plot_details(False)
         self.draw_plot()
 
     def toggle_split(self):
@@ -1349,11 +1765,57 @@ class Studio(wx.Frame):
             self.plot_splitter.Unsplit(self.canvas);self.canvas.Reparent(self.schematic_host)
             self.schematic_host.GetSizer().Add(self.canvas,1,wx.EXPAND);self.canvas.Show();self.schematic_host.Layout()
         else:
-            self.split_return.Show()
-            self.schematic_host.GetSizer().Detach(self.canvas);self.canvas.Reparent(self.plot_splitter)
-            self.plot_splitter.SplitHorizontally(self.canvas,self.plot_panel,max(150,self.plot_splitter.GetClientSize().height//3));self.canvas.Show()
+            self.set_split(getattr(self,'split_orientation','top_bottom'));return
         self.split_view=not self.split_view;self.book.SetSelection(1);self.plot_splitter.Layout();self.canvas.Refresh()
         self.set_plot_details(not self.split_view)
+        if hasattr(self.plot_workbench,'layout_choice'):self.plot_workbench.layout_choice.SetSelection(0)
+        if hasattr(self,'header'):self.header.changed(1)
+
+    def set_split(self,orientation):
+        if getattr(self,'editor_split',None) and self.editor_split.active:self.editor_split.close()
+        if orientation not in ('top_bottom','side_by_side'):raise ValueError('Unknown split orientation')
+        if self.split_view:self.plot_splitter.Unsplit(self.canvas)
+        else:
+            self.split_return.Show();self.schematic_host.GetSizer().Detach(self.canvas);self.canvas.Reparent(self.plot_splitter)
+        self.split_orientation=orientation;self.split_view=True
+        self.book.SetSelection(1)
+        if orientation=='side_by_side':
+            self.plot_splitter.SplitVertically(self.canvas,self.plot_panel,max(150,self.plot_splitter.GetClientSize().width//2))
+        else:self.plot_splitter.SplitHorizontally(self.canvas,self.plot_panel,max(150,self.plot_splitter.GetClientSize().height//2))
+        self.plot_splitter.SetSashGravity(.5);self.canvas.Show();self.plot_splitter.Layout();self.canvas.Refresh()
+        self.set_plot_details(False)
+        self.plot_workbench.show_sidebar(False)
+        if hasattr(self.plot_workbench,'layout_choice'):self.plot_workbench.layout_choice.SetSelection(1 if orientation=='side_by_side' else 2)
+        if hasattr(self,'header'):self.header.changed(1)
+
+    def start_mini_plot(self):
+        self.canvas.plot_drop={};self.canvas.wire_mode=False;self.canvas.probe_mode=None
+        self.book.SetSelection(self.editor_page());self.canvas.SetCursor(wx.Cursor(wx.CURSOR_CROSS));self.canvas.SetFocus()
+        self.SetStatusText('Mini plot: click a pin or wire to attach, then click where the plot should appear. Escape cancels.')
+
+    def canvas_available(self,index):
+        paired=getattr(self,'editor_split',None)
+        return index==0 or index==1 and self.split_view or bool(paired and paired.active and index==paired.page_index)
+
+    def editor_page(self):
+        paired=getattr(self,'editor_split',None)
+        return paired.page_index if paired and paired.active else 1 if self.split_view else 0
+
+    def show_code_split(self,index=2,orientation='side_by_side'):
+        self.editor_split.show(index,orientation)
+
+    def close_code_split(self):
+        if self.editor_split.active:self.editor_split.close()
+
+    def open_controller_code(self):
+        from .controller_code_window import show
+        return show(self)
+
+    def configure_code_editors(self):
+        self.code_binding.language=self.language.GetStringSelection()
+        try:self.controller_binding.language=self.controller_panel.config()['language']
+        except (ValueError,TypeError):self.controller_binding.language='C'
+        for binding in self.code_bindings:binding.refresh(self.palette)
 
     def set_plot_details(self,visible):
         self.plot_details=visible
@@ -1448,6 +1910,9 @@ class Studio(wx.Frame):
         if backend=='ngspice':preflight_compatibility(snapshot)
         else:
             preflight(snapshot)
+        from .wire_models import lower
+        lower(snapshot)
+        if backend=='native':
             from python.spikes.netlist import parse_netlist
             parse_netlist(snapshot['source'],native_extensions=True,transient_capture='rolling' if interactive else 'full')
         if backend=='native' and not self.library:
@@ -1510,6 +1975,7 @@ class Studio(wx.Frame):
     def display_run_result(self,result,live=False):
         self.result=result;self.result_source=self.collection_snapshot
         result.setdefault('provenance',{})['resolved_models']=deepcopy(self.collection_snapshot.get('resolved_models'))
+        result['provenance']['wire_models']=deepcopy(self.collection_snapshot.get('wire_models',[]))
         self.capture_record_id=self.collection_record_id
         from .part_alerts import evaluate_limits
         self.part_alerts=evaluate_limits(self.collection_snapshot,result)
@@ -1614,23 +2080,28 @@ class Studio(wx.Frame):
             unit=items[0][2]
             ax=self.figure.add_subplot(grid[i],sharex=self.axes[0] if self.axes else None);self.axes.append(ax)
             for name,values,u in items:
-                add_waveform(ax,self.math.time,values,label=name,linewidth=1.3,visible=name not in self.hidden_traces)
+                line=add_waveform(ax,self.math.time,values,label=name,linewidth=1.3,visible=name not in self.hidden_traces)
+                line._spikes_expression=name;line._spikes_run=self.selected_run
                 if self.overlay_runs.GetValue():
                     for run_index,engine in enumerate(self.run_engines):
                         if run_index==self.selected_run or engine is None or (self.visible_runs is not None and run_index not in self.visible_runs):continue
                         answer=engine.evaluate(name);other=np.broadcast_to(answer.values,engine.time.shape)
                         if np.iscomplexobj(other) or str(answer.unit)!=u:continue
                         label=f'{name} · run {run_index+1}'
-                        add_waveform(ax,engine.time,other,label=label,linewidth=1,linestyle='--',visible=label not in self.hidden_traces)
+                        line=add_waveform(ax,engine.time,other,label=label,linewidth=1,linestyle='--',visible=label not in self.hidden_traces)
+                        line._spikes_expression=name;line._spikes_run=run_index
             if i<len(panes)-1:ax.tick_params(labelbottom=False)
             ax.set_ylabel(f"[{unit}]");ax.xaxis.set_major_formatter(EngFormatter(unit="s"));ax.grid(True,alpha=.25)
             if not self.plot_grid:ax.grid(False)
-            legend=ax.legend(loc="best")
-            for label in legend.get_texts():label.set_picker(True);label.set_alpha(.35 if label.get_text() in self.hidden_traces else 1)
+            legend=ax.legend(loc="upper right",fontsize=9,frameon=False)
+            waveforms=[line for line in ax.lines if hasattr(line,'_spikes_expression')]
+            for label,line in zip(legend.get_texts(),waveforms):
+                label._spikes_expression=line._spikes_expression;label._spikes_run=line._spikes_run
+                label.set_alpha(.35 if label.get_text() in self.hidden_traces else 1)
             for j,time in enumerate(self.cursors):ax.axvline(time,color="tab:red",linestyle="--",linewidth=.8);ax.text(time,.98,chr(65+j),transform=ax.get_xaxis_transform(),va="top")
             if i<len(previous):ax.set_xlim(previous[i][0]);ax.set_ylim(previous[i][1])
-        self.axes[-1].set_xlabel("Simulation time");self.figure.suptitle("SPIKES · "+self.run_choice.GetStringSelection())
-        self.figure.set_layout_engine('constrained',h_pad=.1,w_pad=.08,rect=(0,.045,1,.955))
+        self.axes[-1].set_xlabel("Simulation time",labelpad=10)
+        self.figure.set_layout_engine('constrained',h_pad=.08,w_pad=.08,rect=(0,.015,1,.985))
         figure_theme(self.figure,self.palette,self.theme_name)
         install_navigation(self.plot,self.axes)
         self.plot_interactions.after_draw()
@@ -1726,63 +2197,62 @@ class Studio(wx.Frame):
             self.cursors.clear();self.cursor_bindings.clear();self.traces.clear();self.add_trace(next(iter(self.math.signals)));self.canvas.Refresh()
 
     def make_ide(self):
-        panel=wx.Panel(self.book);box=wx.BoxSizer(wx.VERTICAL);row=wx.BoxSizer(wx.HORIZONTAL)
-        self.language=wx.Choice(panel,choices=["Verilog","C++","C"]);self.language.SetSelection(0);row.Add(self.language,0,wx.ALL,4)
+        panel=wx.Panel(self.book);box=wx.BoxSizer(wx.VERTICAL);row=wx.WrapSizer(wx.HORIZONTAL)
+        self.language=wx.Choice(panel,choices=["Verilog","VHDL","C++","C"]);self.language.SetSelection(0);row.Add(self.language,0,wx.ALL,4)
         self.top=wx.TextCtrl(panel,value="top");row.Add(self.top,0,wx.ALL,4)
         button(panel,"Open source",lambda e:self.guarded(self.open_code),row);button(panel,"Save source",lambda e:self.guarded(self.save_code),row)
         button(panel,"Check / compile",lambda e:self.guarded(lambda:self.build_code("check")),row)
         button(panel,"Synthesize",lambda e:self.guarded(lambda:self.build_code("synthesize")),row)
         button(panel,"Simulate testbench",lambda e:self.guarded(lambda:self.build_code("simulate")),row)
         button(panel,"Open VCD timing",lambda e:self.guarded(self.timing),row);box.Add(row,0,wx.EXPAND)
-        self.code=text_editor(panel,"module top(input a, input b, output y);\n  assign y = a & b;\nendmodule\n")
+        button(panel,'Beside schematic',lambda e:self.show_code_split(3),row)
+        self.ide_split=wx.SplitterWindow(panel,style=wx.SP_LIVE_UPDATE|wx.SP_3D)
+        self.ide_split.SetMinimumPaneSize(90)
+        self.code=text_editor(self.ide_split,"module top(input a, input b, output y);\n  assign y = a & b;\nendmodule\n")
         self.code.SetLexer(wx.stc.STC_LEX_VERILOG);self.code.SetKeyWords(0,"module endmodule input output wire reg always assign begin end if else")
         self.code.StyleSetForeground(wx.stc.STC_V_WORD,wx.Colour("#0758a0"));self.code.StyleSetForeground(wx.stc.STC_V_COMMENT,wx.Colour("#4b775b"))
-        self.language.Bind(wx.EVT_CHOICE,lambda e:self.code.SetLexer(wx.stc.STC_LEX_VERILOG if self.language.GetStringSelection()=="Verilog" else wx.stc.STC_LEX_CPP))
-        box.Add(self.code,2,wx.EXPAND)
-        self.build_log=wx.TextCtrl(panel,style=wx.TE_MULTILINE|wx.TE_READONLY);box.Add(self.build_log,1,wx.EXPAND|wx.ALL,4)
-        self.timing_figure=Figure(figsize=(8,2),layout="constrained");self.timing_canvas=FigureCanvasWxAgg(panel,-1,self.timing_figure)
-        box.Add(NavigationToolbar2WxAgg(self.timing_canvas),0,wx.EXPAND);box.Add(self.timing_canvas,1,wx.EXPAND)
-        panel.SetSizer(box);self.book.AddPage(panel,"C / C++ / Verilog IDE")
+        self.language.Bind(wx.EVT_CHOICE,lambda e:self.configure_code_editors())
+        from .hdl_suite import HDLSuitePanel
+        self.hdl_suite=HDLSuitePanel(self.ide_split,self)
+        self.build_log=self.hdl_suite.build_log
+        self.timing_figure=self.hdl_suite.timing_figure;self.timing_canvas=self.hdl_suite.timing_canvas
+        self.ide_split.SplitHorizontally(self.code,self.hdl_suite,180);self.ide_split.SetSashGravity(.25)
+        box.Add(self.ide_split,1,wx.EXPAND)
+        wx.CallAfter(lambda:self.ide_split.SetSashPosition(max(90,int(self.ide_split.GetClientSize().height*.3))))
+        panel.SetSizer(box);self.book.AddPage(panel,"C / HDL IDE")
 
     def open_code(self):
-        path=self.choose_path("Open code","Source|*.v;*.sv;*.c;*.cpp;*.h;*.hpp|All files|*.*")
+        path=self.choose_path("Open code","Source|*.v;*.sv;*.vhd;*.vhdl;*.c;*.cpp;*.h;*.hpp|All files|*.*")
         if path:self.code.SetText(path.read_text(encoding="utf-8"))
     def save_code(self):
-        path=self.choose_path("Save code","Source|*.v;*.sv;*.c;*.cpp",True)
+        path=self.choose_path("Save code","Source|*.v;*.sv;*.vhd;*.vhdl;*.c;*.cpp",True)
         if path:path.write_text(self.code.GetText(),encoding="utf-8")
     def build_code(self,mode):
         source,language,top=self.code.GetText(),self.language.GetStringSelection(),self.top.GetValue()
         def done(report):
-            self.build_log.SetValue(f"Tool: {report['tool']}\nExit: {report['exit_code']}\n"+report["output"])
+            self.hdl_suite.accept_report(report)
             self.SetStatusText(f"{mode} finished with exit code {report['exit_code']}")
             self.last_build=report
-            if "timing" in report:self.draw_timing(report["timing"])
+            if "timing" in report:
+                figure_theme(self.timing_figure,self.palette,self.theme_name);self.timing_canvas.draw_idle()
         self.background(lambda:analyze(source,language,mode,top),done,"Running compiler…")
 
     def timing(self):
         path=self.choose_path("Open real digital simulation timing","VCD (*.vcd)|*.vcd")
         if path:self.draw_timing(read_vcd(path.read_text(encoding="utf-8")))
     def draw_timing(self,data):
-        self.timing_figure.clear();ax=self.timing_figure.add_subplot()
-        names=[]
-        for i,(name,signal) in enumerate(data["signals"].items()):
-            names.append(name);trans=signal["transitions"]
-            if not trans:continue
-            times=[t for t,v in trans]+[data["end_time_s"]];values=[]
-            for t,value in trans:
-                values.append(i+(.65 if "x" not in value and "z" not in value and int(value,2)!=0 else .1))
-                if signal["width"]>1 or "x" in value or "z" in value:ax.text(t,i+.3,value,fontsize=8)
-            ax.step(times,values+[values[-1]],where="post")
-        ax.set_yticks(range(len(names)),names);ax.set_xlabel("Time");ax.xaxis.set_major_formatter(EngFormatter(unit="s"));ax.set_title("VCD transitions · vector values annotated");self.timing_canvas.draw()
+        self.hdl_suite.load_timing(data)
         figure_theme(self.timing_figure,self.palette,self.theme_name);self.timing_canvas.draw_idle()
 
     def make_parts(self):
         panel=wx.Panel(self.book);box=wx.BoxSizer(wx.VERTICAL);row=wx.BoxSizer(wx.HORIZONTAL)
         self.search=wx.SearchCtrl(panel);row.Add(self.search,1,wx.ALL|wx.EXPAND,4)
         button(panel,"Open library",lambda e:self.guarded(self.open_library),row);button(panel,"Save library",lambda e:self.guarded(self.save_library),row)
+        button(panel,"Physics models…",lambda e:self.guarded(self.open_physics_models),row)
         button(panel,"Save symbol edits",lambda e:self.guarded(self.apply_symbol),row);button(panel,"New symbol",lambda e:self.new_symbol(),row)
         box.Add(row,0,wx.EXPAND)
-        self.library_list=wx.ListBox(panel,size=(-1,130));box.Add(self.library_list,0,wx.EXPAND|wx.ALL,4)
+        from .symbol_text_list import SymbolTextList
+        self.library_list=SymbolTextList(panel,self.palette,resolver=lambda index,text:self.symbols.get(text,{}).get('family','component'),size=(-1,130));box.Add(self.library_list,0,wx.EXPAND|wx.ALL,4)
         design=wx.BoxSizer(wx.HORIZONTAL)
         self.symbol_editor=text_editor(panel);design.Add(self.symbol_editor,1,wx.EXPAND)
         self.symbol_figure=Figure(figsize=(4,4),layout="constrained");self.symbol_canvas=FigureCanvasWxAgg(panel,-1,self.symbol_figure);design.Add(self.symbol_canvas,1,wx.EXPAND)
@@ -1793,6 +2263,8 @@ class Studio(wx.Frame):
         from .resources import resource_dir
         default_library=resource_dir('library')/'core-symbols-v1.json'
         self.symbols={s['id']:s for s in json.loads(default_library.read_text(encoding='utf-8'))['symbols']} if default_library.is_file() else {}
+        from .device_symbols import symbols as device_symbols
+        self.symbols.update({item['id']:item for item in device_symbols()})
         self.new_symbol();panel.SetSizer(box);self.book.AddPage(panel,"Parts browser & designer")
 
     def new_symbol(self):
@@ -1803,7 +2275,13 @@ class Studio(wx.Frame):
             "primitives":[{"kind":"polygon","points":[[-20,-20],[20,-20],[20,20],[-20,20],[-20,-20]]}]}
         self.filter_library();self.symbol_editor.SetText(json.dumps(self.symbols[ident],indent=2))
 
-    def filter_library(self):self.library_list.Set([n for n in self.symbols if self.search.GetValue().lower() in (n+" "+self.symbols[n].get("name","")).lower()])
+    def open_physics_models(self):
+        from .physics_model_window import PhysicsModelWindow
+        return PhysicsModelWindow(self)
+
+    def filter_library(self):
+        from .fuzzy_search import ranked
+        self.library_list.Set(ranked(self.symbols,self.search.GetValue(),text=lambda n:n+' '+self.symbols[n].get('name','')))
     def preview_symbol(self):
         try:symbol=json.loads(self.symbol_editor.GetText())
         except (ValueError,AttributeError):return
@@ -1912,6 +2390,7 @@ class Studio(wx.Frame):
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("--library",type=Path);parser.add_argument("--capture-dir",type=Path)
     parser.add_argument('--verify-controls-dir',type=Path)
+    parser.add_argument('--verify-workbench-upgrade-dir',type=Path)
     parser.add_argument('--verify-model-editor-dir',type=Path)
     parser.add_argument('--verify-setup-dir',type=Path)
     parser.add_argument('--verify-directives-dir',type=Path)
@@ -1926,13 +2405,110 @@ def main(argv=None):
     parser.add_argument('--verify-symbol-dir',type=Path)
     parser.add_argument('--verify-dashboard-dir',type=Path)
     parser.add_argument('--verify-collection-dir',type=Path)
+    parser.add_argument('--verify-battery-dir',type=Path)
+    parser.add_argument('--verify-shell-dir',type=Path)
+    parser.add_argument('--verify-waveform-edit-dir',type=Path)
+    parser.add_argument('--verify-sweep-annotations-dir',type=Path)
+    parser.add_argument('--verify-insert-values-dir',type=Path)
+    parser.add_argument('--verify-library-selector-dir',type=Path)
+    parser.add_argument('--verify-split-plot-dir',type=Path)
+    parser.add_argument('--verify-tool-windows-dir',type=Path)
+    parser.add_argument('--verify-core-toolbar-dir',type=Path)
+    parser.add_argument('--verify-canvas-text-dir',type=Path)
+    parser.add_argument('--verify-directive-forms-dir',type=Path)
+    parser.add_argument('--verify-symbol-browsers-dir',type=Path)
+    parser.add_argument('--verify-navigation-dir',type=Path)
+    parser.add_argument('--verify-code-canvas-dir',type=Path)
+    parser.add_argument('--verify-hdl-suite-dir',type=Path)
+    parser.add_argument('--verify-dashboard-diagrams-dir',type=Path)
+    parser.add_argument('--verify-context-dir',type=Path)
+    parser.add_argument('--verify-wiring-labels-dir',type=Path)
+    parser.add_argument('--verify-quick-insert-dir',type=Path)
+    parser.add_argument('--verify-analysis-plots-dir',type=Path)
+    parser.add_argument('--verify-passive-library-dir',type=Path)
+    parser.add_argument('--theme',choices=list(PALETTES),help='Appearance for this launch only; does not overwrite saved preferences')
+    parser.add_argument('--board-circuit-handoff',type=Path,help='Open one validated local SPIKE board-circuit handoff')
     args=parser.parse_args(argv)
+    from .app_identity import configure_process_identity
+    configure_process_identity()
     app=wx.App(False)
     if args.verify_browser_dir:app.SetAssertMode(wx.APP_ASSERT_EXCEPTION)
-    native_appearance(load_theme());frame=Studio(str(args.library) if args.library else None);frame.Show()
+    native_appearance(args.theme or load_theme());frame=Studio(str(args.library) if args.library else None)
+    if args.board_circuit_handoff:
+        from .studio_handoff import import_handoff_file
+        frame.doc=import_handoff_file(args.board_circuit_handoff);frame.path=None
+        frame.canvas.selected.clear();frame.refresh_document(force_source=True);wx.CallAfter(frame.fit)
+    if args.verify_analysis_plots_dir:
+        from .ui_analysis_plot_evidence import verify
+        wx.CallLater(150,verify,frame,args.verify_analysis_plots_dir)
+    if args.verify_passive_library_dir:
+        from .ui_passive_library import verify
+        wx.CallLater(150,verify,frame,args.verify_passive_library_dir)
+    if args.theme:frame.set_theme(args.theme,save=False)
+    frame.Show()
+    if args.verify_library_selector_dir:
+        from .ui_library_selector_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_library_selector_dir)
+    if args.verify_split_plot_dir:
+        from .ui_split_plot_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_split_plot_dir)
+    if args.verify_tool_windows_dir:
+        from .ui_tool_windows_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_tool_windows_dir)
+    if args.verify_core_toolbar_dir:
+        from .ui_core_toolbar_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_core_toolbar_dir)
+    if args.verify_canvas_text_dir:
+        from .ui_canvas_text_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_canvas_text_dir)
+    if args.verify_directive_forms_dir:
+        from .ui_directive_forms_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_directive_forms_dir)
+    if args.verify_symbol_browsers_dir:
+        from .ui_symbol_browsers_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_symbol_browsers_dir)
+    if args.verify_navigation_dir:
+        from .ui_navigation_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_navigation_dir)
+    if args.verify_code_canvas_dir:
+        from .ui_code_canvas_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_code_canvas_dir)
+    if args.verify_hdl_suite_dir:
+        from .ui_hdl_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_hdl_suite_dir)
+    if args.verify_dashboard_diagrams_dir:
+        from .ui_dashboard_diagrams import verify
+        wx.CallLater(500,verify,frame,args.verify_dashboard_diagrams_dir)
+    if args.verify_context_dir:
+        from .ui_context_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_context_dir)
+    if args.verify_wiring_labels_dir:
+        from .ui_wiring_labels import verify
+        wx.CallLater(500,verify,frame,args.verify_wiring_labels_dir)
+    if args.verify_quick_insert_dir:
+        from .ui_quick_insert import verify
+        wx.CallLater(500,verify,frame,args.verify_quick_insert_dir)
+    if args.verify_insert_values_dir:
+        from .ui_insert_values_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_insert_values_dir)
+    if args.verify_sweep_annotations_dir:
+        from .ui_sweep_annotation_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_sweep_annotations_dir)
+    if args.verify_waveform_edit_dir:
+        from .ui_waveform_edit_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_waveform_edit_dir)
+    if args.verify_shell_dir:
+        from .ui_shell_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_shell_dir)
+    if args.verify_battery_dir:
+        from .ui_battery_evidence import verify
+        wx.CallLater(500,verify,frame,args.verify_battery_dir)
     if args.capture_dir:
         from .ui_evidence import capture_session
         wx.CallLater(500,capture_session,frame,args.capture_dir)
+    if args.verify_workbench_upgrade_dir:
+        from .ui_workbench_upgrade import verify
+        wx.CallLater(500,verify,frame,args.verify_workbench_upgrade_dir)
     if args.verify_controls_dir:
         from .ui_regression import verify_controls
         wx.CallLater(500,verify_controls,frame,args.verify_controls_dir)

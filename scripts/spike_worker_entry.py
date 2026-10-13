@@ -11,6 +11,12 @@ def main(argv: list[str] | None = None) -> int:
     """Dispatch a frozen worker mode while retaining service mode by default."""
 
     arguments = list(sys.argv[1:] if argv is None else argv)
+    if arguments and arguments[0] == "--cluster":
+        from python.spike_core.cluster_cli import main as cluster_main
+        return cluster_main(arguments[1:])
+    if arguments == ["--parallel-child"]:
+        from python.spike_core.parallel_child import main as parallel_main
+        return parallel_main()
     if arguments and arguments[0] == "--cli":
         from python.spike_cli import main as cli_main
         return cli_main(arguments[1:])

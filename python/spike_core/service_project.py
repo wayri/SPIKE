@@ -73,7 +73,8 @@ def canonicalize_project_payload(raw: Dict[str, Any]) -> tuple[Dict[str, Any], D
         return dict(raw), {}
     if str(raw.get("format", "")) not in LEGACY_FORMATS:
         raise ProjectPackageError("A project save requires a supported SPIKE snapshot or v3 payload.")
-    payload = migrate_legacy_payload(raw)
+    # Artifact references are admitted after the Save As base is loaded.
+    payload = migrate_legacy_payload(raw, validate_parallel=False)
     design = raw.get("design") if isinstance(raw.get("design"), dict) else {}
     source_text = decode_normalized_source(design.get("source_board", ""))
     source_name = Path(str(design.get("source_file") or "embedded.kicad_pcb")).name
@@ -181,7 +182,7 @@ def frontend_project_payload(package_payload: Dict[str, Any]) -> Dict[str, Any]:
         if isinstance(package_payload.get("assembly_designs"), dict):
             projected["assembly_designs"] = package_payload["assembly_designs"]
         return projected
-    design = SpiDeRV2.from_dict(package_payload.get("design_ir") or {}).to_v1().to_dict()
+    design = SpiDeRV2.from_dict(package_payload.get("design_ir") or {}).to_v1(allow_unprojected_arcs=True).to_dict()
     projected = {
         "format": "spike-project-package/v2",
         "contract": "spike/project/v2",

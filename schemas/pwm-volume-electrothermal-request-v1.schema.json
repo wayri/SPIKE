@@ -1,0 +1,755 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/pwm-volume-electrothermal-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; semantic admission checks topology, SI tensors, capacities, mappings and work budgets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "parameters",
+    "coupling",
+    "thermal"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/pwm-volume-electrothermal-request/v1"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "input_voltage_v": {
+          "type": "number"
+        },
+        "target_voltage_v": {
+          "type": "number"
+        },
+        "inductance_h": {
+          "type": "number"
+        },
+        "capacitance_f": {
+          "type": "number"
+        },
+        "load_resistance_ohm": {
+          "type": "number"
+        },
+        "winding_resistance_ohm": {
+          "type": "number"
+        },
+        "temperature_coefficient_per_k": {
+          "type": "number"
+        },
+        "ambient_temperature_k": {
+          "type": "number"
+        },
+        "switch_on_resistance_ohm": {
+          "type": "number"
+        },
+        "switch_off_resistance_ohm": {
+          "type": "number"
+        },
+        "switching_frequency_hz": {
+          "type": "number"
+        },
+        "maximum_step_s": {
+          "type": "number"
+        },
+        "controller_kp_per_v": {
+          "type": "number"
+        },
+        "controller_ki_per_v_s": {
+          "type": "number"
+        },
+        "cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        }
+      }
+    },
+    "coupling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "cycles_per_window": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "maximum_iterations": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 100
+        },
+        "temperature_tolerance_k": {
+          "type": "number",
+          "minimum": 1e-10,
+          "maximum": 0.1
+        },
+        "relative_energy_tolerance": {
+          "type": "number",
+          "minimum": 1e-10,
+          "maximum": 0.01
+        },
+        "relaxation": {
+          "type": "number",
+          "minimum": 0.05,
+          "maximum": 1
+        }
+      }
+    },
+    "thermal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request",
+        "material_heat_capacity",
+        "initial_temperature_k",
+        "device_cell_fractions"
+      ],
+      "properties": {
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contract",
+            "mesh",
+            "materials",
+            "boundaries"
+          ],
+          "properties": {
+            "contract": {
+              "const": "spike/assembly-tetra-thermal-request/v1"
+            },
+            "mesh": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contract",
+                "units",
+                "coordinate_system",
+                "vertices",
+                "cells",
+                "counts",
+                "object_map"
+              ],
+              "properties": {
+                "contract": {
+                  "const": "spike/solver-mesh/v1"
+                },
+                "units": {
+                  "enum": [
+                    "m",
+                    "mm"
+                  ]
+                },
+                "coordinate_system": {
+                  "const": "right_handed_xyz"
+                },
+                "vertices": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "minItems": 4,
+                  "maxItems": 10000
+                },
+                "cells": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "kind",
+                      "vertices",
+                      "material_id",
+                      "source_object_ids"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "kind": {
+                        "const": "tetrahedron"
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 4,
+                        "maxItems": 4
+                      },
+                      "material_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "source_object_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        },
+                        "minItems": 1,
+                        "maxItems": 64
+                      }
+                    }
+                  },
+                  "minItems": 1,
+                  "maxItems": 5000
+                },
+                "counts": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "vertices",
+                    "cells"
+                  ],
+                  "properties": {
+                    "vertices": {
+                      "type": "integer",
+                      "minimum": 4,
+                      "maximum": 10000
+                    },
+                    "cells": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5000
+                    }
+                  }
+                },
+                "object_map": {
+                  "type": "object",
+                  "maxProperties": 5000,
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "net": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "layer": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "occurrence_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "body_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "materials": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "thermal_conductivity_w_mk"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "thermal_conductivity_w_mk": {
+                    "oneOf": [
+                      {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 3,
+                          "maxItems": 3
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      }
+                    ]
+                  }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 5000
+            },
+            "boundaries": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "vertices",
+                      "type",
+                      "temperature_k"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "type": {
+                        "const": "temperature"
+                      },
+                      "temperature_k": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "vertices",
+                      "type",
+                      "heat_flux_w_m2"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "type": {
+                        "const": "heat_flux"
+                      },
+                      "heat_flux_w_m2": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "vertices",
+                      "type"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "type": {
+                        "const": "adiabatic"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "vertices",
+                      "type",
+                      "heat_transfer_coefficient_w_m2k",
+                      "ambient_temperature_k"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "type": {
+                        "const": "convection"
+                      },
+                      "heat_transfer_coefficient_w_m2k": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "ambient_temperature_k": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "vertices",
+                      "type",
+                      "emissivity",
+                      "radiation_temperature_k"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "type": {
+                        "const": "radiation"
+                      },
+                      "emissivity": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "radiation_temperature_k": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "vertices",
+                      "type",
+                      "heat_transfer_coefficient_w_m2k",
+                      "ambient_temperature_k",
+                      "emissivity",
+                      "radiation_temperature_k"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 128
+                      },
+                      "vertices": {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "type": {
+                        "const": "convection_radiation"
+                      },
+                      "heat_transfer_coefficient_w_m2k": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "ambient_temperature_k": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "emissivity": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "radiation_temperature_k": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 20000
+            },
+            "mode": {
+              "const": "steady_state"
+            },
+            "heat_sources_w_m3": {
+              "type": "object",
+              "additionalProperties": {
+                "const": 0
+              }
+            },
+            "contacts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "left_vertices",
+                  "right_vertices",
+                  "thermal_contact_conductance_w_m2k"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "left_vertices": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "right_vertices": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "thermal_contact_conductance_w_m2k": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "minItems": 0,
+              "maxItems": 10000
+            }
+          }
+        },
+        "material_heat_capacity": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "material_id",
+              "density_kg_m3",
+              "specific_heat_j_kgk"
+            ],
+            "properties": {
+              "material_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "density_kg_m3": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "specific_heat_j_kgk": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "minItems": 1,
+          "maxItems": 5000
+        },
+        "initial_temperature_k": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 4,
+              "maxItems": 10000
+            }
+          ]
+        },
+        "device_cell_fractions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "Rw",
+            "SH",
+            "SL",
+            "Load"
+          ],
+          "properties": {
+            "Rw": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cell_id",
+                  "weight"
+                ],
+                "properties": {
+                  "cell_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 5000
+            },
+            "SH": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cell_id",
+                  "weight"
+                ],
+                "properties": {
+                  "cell_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 5000
+            },
+            "SL": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cell_id",
+                  "weight"
+                ],
+                "properties": {
+                  "cell_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 5000
+            },
+            "Load": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cell_id",
+                  "weight"
+                ],
+                "properties": {
+                  "cell_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "weight": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "minItems": 1,
+              "maxItems": 5000
+            }
+          }
+        }
+      }
+    }
+  }
+}

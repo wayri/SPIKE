@@ -1,0 +1,4 @@
+{
+  "build": {"beforeDevCommand": "", "devUrl": "http://127.0.0.1:1420"},
+  "app": {"windows": [{"label": "main", "title": "SPIKE | Harness verification", "url": "scripts/fixtures/harness-editor.html", "width": 1320, "height": 900, "minWidth": 700, "minHeight": 600, "resizable": true, "center": true}]}
+}

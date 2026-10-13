@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/thermal-component-promotion-v1.schema.json",
+  "$comment": "SPDX-License-Identifier: Apache-2.0. Manifest-bound worker parameters; semantic source, matrix, material and duplicate checks are also mandatory.",
+  "title": "Explicit promotion of retained component STEP models into thermal parts",
+  "type": "object", "additionalProperties": false,
+  "required": ["project_path", "expected_manifest_payload_sha256", "selections", "materials"],
+  "properties": {
+    "project_path": {"type": "string", "minLength": 1},
+    "expected_manifest_payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "materials": {"$ref": "assembly-thermal-mesh-assignments-v1.schema.json#/properties/materials"},
+    "selections": {"type": "array", "minItems": 1, "maxItems": 100, "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["board_occurrence_id", "component_id", "model_id", "material_id", "component_to_board_transform_mm", "placement_reviewed"],
+      "properties": {
+        "board_occurrence_id": {"$ref": "#/$defs/id"},
+        "component_id": {"$ref": "#/$defs/id"},
+        "model_id": {"$ref": "#/$defs/id"},
+        "material_id": {"$ref": "#/$defs/id"},
+        "component_to_board_transform_mm": {"type": "array", "minItems": 16, "maxItems": 16, "items": {"type": "number"}},
+        "placement_reviewed": {"const": true}
+      }
+    }}
+  },
+  "$defs": {"id": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "\\S"}}
+}

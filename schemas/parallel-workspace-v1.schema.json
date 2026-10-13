@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/parallel-workspace/v1",
+  "title": "Portable parallel execution workspace",
+  "description": "Offline saved draft and at most 32 execution records. Python admission additionally enforces finite bounded JSON, excludes credential metadata, resolves verified artifacts and checks request/response digests.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "draft", "runs"],
+  "properties": {
+    "contract": {"const": "spike/parallel-workspace/v1"},
+    "draft": {
+      "type": "object", "additionalProperties": false,
+      "required": ["jobs_json", "concurrency", "threads_per_job", "timeout_s"],
+      "properties": {
+        "jobs_json": {"type": "string", "maxLength": 4194304},
+        "concurrency": {"type": "string", "maxLength": 128},
+        "threads_per_job": {"type": "string", "maxLength": 128},
+        "timeout_s": {"type": "string", "maxLength": 128}
+      }
+    },
+    "runs": {
+      "type": "array", "maxItems": 32,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "request", "result", "status"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$"},
+          "request": {"$ref": "parallel-batch-v1.schema.json"},
+          "result": {"oneOf": [
+            {"type": "null"},
+            {"type": "object", "required": ["contract"], "properties": {"contract": {"enum": ["spike/parallel-batch-result/v1", "spike/cluster-batch-result/v1"]}}},
+            {"type": "object", "additionalProperties": false, "required": ["contract", "path", "sha256", "bytes"], "properties": {
+              "contract": {"const": "spike/state-artifact-reference/v1"},
+              "path": {"type": "string", "pattern": "^state/artifacts/[a-f0-9]{64}\\.json$"},
+              "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+              "bytes": {"type": "integer", "minimum": 1, "maximum": 100663296}
+            }}
+          ]},
+          "status": {"enum": ["completed", "completed_with_errors", "cancelled", "failed", "interrupted"]},
+          "error": {"type": "string", "maxLength": 4096}
+        }
+      }
+    }
+  }
+}

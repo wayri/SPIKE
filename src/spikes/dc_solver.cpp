@@ -1366,6 +1366,20 @@ void Circuit::add_voltage_source(std::string id, std::string positive_node,
 
 namespace {
 
+void validate_sine(const SineWaveform &waveform) {
+  const double values[] = {waveform.offset, waveform.amplitude,
+      waveform.frequency_hz, waveform.delay_s, waveform.damping_per_s,
+      waveform.phase_deg};
+  if (!std::all_of(std::begin(values), std::end(values),
+                   [](double value) { return std::isfinite(value); }) ||
+      waveform.frequency_hz <= 0.0 || waveform.delay_s < 0.0 ||
+      waveform.damping_per_s < 0.0 ||
+      !std::isfinite(std::abs(waveform.offset) + std::abs(waveform.amplitude))) {
+    throw std::invalid_argument("SIN parameters must be finite, frequency positive, "
+                                "delay/damping nonnegative, and amplitude bounded");
+  }
+}
+
 void validate_pulse(const PulseWaveform &waveform) {
   const double values[] = {
       waveform.initial_value, waveform.pulsed_value, waveform.delay_s,
@@ -1402,6 +1416,34 @@ void validate_pwl(const std::vector<PwlPoint> &points) {
 }
 
 } // namespace
+
+double sine_value_at(const SineWaveform &waveform, double time_s) {
+  // Hold the phase-dependent time-zero value until delay, as in ngspice.
+  const double elapsed = std::max(0.0, time_s - waveform.delay_s);
+  constexpr double pi = 3.141592653589793238462643383279502884;
+  const double phase = std::remainder(waveform.phase_deg, 360.0) * pi / 180.0;
+  return waveform.offset + waveform.amplitude *
+      std::exp(-waveform.damping_per_s * elapsed) *
+      std::sin(2.0 * pi * std::remainder(waveform.frequency_hz * elapsed, 1.0) + phase);
+}
+
+void Circuit::add_sine_current_source(std::string id, std::string positive_node,
+                                      std::string negative_node, SineWaveform waveform) {
+  validate_sine(waveform);
+  add_element(ElementType::current_source, std::move(id), std::move(positive_node),
+              std::move(negative_node), sine_value_at(waveform, 0.0));
+  elements_.back().waveform_type = WaveformType::sine;
+  elements_.back().sine = waveform;
+}
+
+void Circuit::add_sine_voltage_source(std::string id, std::string positive_node,
+                                      std::string negative_node, SineWaveform waveform) {
+  validate_sine(waveform);
+  add_element(ElementType::voltage_source, std::move(id), std::move(positive_node),
+              std::move(negative_node), sine_value_at(waveform, 0.0));
+  elements_.back().waveform_type = WaveformType::sine;
+  elements_.back().sine = waveform;
+}
 
 void Circuit::add_pulse_current_source(std::string id,
                                        std::string positive_node,

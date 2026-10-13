@@ -197,9 +197,10 @@ def subtract(builder, fragments, layer, net):
     return result
 
 
-def bent_zone_link(builder, branch_id, a, b, width, thickness, layer, net, source_id, left, right):
+def bent_zone_link(builder, branch_id, a, b, width, thickness, layer, net, source_id, left, right, *, face_tolerance=None):
     """Route an otherwise exterior centroid chord through its real shared face."""
     from .hybrid_mesh import _segments, _point_in_polygon
+    admitted_tolerance = builder.containment_tolerance if face_tolerance is None else face_tolerance
     weighted=[]
     for start,end in _segments(left):
         dx,dy=end[0]-start[0],end[1]-start[1]
@@ -208,7 +209,7 @@ def bent_zone_link(builder, branch_id, a, b, width, thickness, layer, net, sourc
         for p,q in _segments(right):
             other_length=hypot(q[0]-p[0],q[1]-p[1])
             if other_length<=1e-12:continue
-            tolerance=min(builder.containment_tolerance,1e-10) if min(length,other_length)<=builder.containment_tolerance else builder.containment_tolerance
+            tolerance=min(admitted_tolerance,1e-10) if min(length,other_length)<=admitted_tolerance else admitted_tolerance
             if any(abs(cross(start,end,v))/length>tolerance for v in (p,q)):continue
             low,high=sorted(((v[0]-start[0])*dx+(v[1]-start[1])*dy)/length for v in (p,q))
             low,high=max(0,low),min(length,high)
@@ -218,7 +219,7 @@ def bent_zone_link(builder, branch_id, a, b, width, thickness, layer, net, sourc
     total=sum(w for w,p in weighted)
     if total<=1e-7:raise ValueError("Missing positive face for an owned zone link")
     point=tuple(sum(w*p[i] for w,p in weighted)/total for i in (0,1))
-    if not all(_point_in_polygon(point,poly,builder.containment_tolerance) for poly in (left,right)):
+    if not all(_point_in_polygon(point,poly,admitted_tolerance) for poly in (left,right)):
         raise ValueError("Shared face midpoint is outside its admitted convex cells")
     node=builder.zone_node(point,layer,net)
     builder.owned_face_nodes[node]=(a,b)

@@ -458,6 +458,8 @@ def prepare_native_jobs(document: Any, design: SpiDeR) -> list[Dict[str, Any]]:
     request = validate_layout_request(document)
     if not isinstance(design, SpiDeR):
         _fail("SPIKE-LAYOUT-CONTRACT-0001", "design must be a SpiDeR instance")
+    from .arc_legacy_projection import require_legacy_arc_geometry
+    require_legacy_arc_geometry(design)
     jobs: list[Dict[str, Any]] = []
     for evaluation in request["physics_evaluations"]:
         request_id = _derived_request_id(request, evaluation["id"])

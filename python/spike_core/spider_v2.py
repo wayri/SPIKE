@@ -6,6 +6,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 from .contracts import SpiDeR, ValidationIssue
 from .assembly_contract_validation import validate_optional_physical
 from .assembly_placement_policy import AssemblyPlacementPolicy
+from .arc_legacy_projection import hydrate_conductors, restore_tracks
 from .custom_pad_geometry import validate_custom_pad_geometries
 from .spider_v2_schema import (
     ASSEMBLY_IR_V1_CONTRACT, SPIDER_V2_CONTRACT, Arc, Bend, CanonicalEntity, Castellation,
@@ -288,30 +289,9 @@ class SpiDeRV2:
         def layer_id(raw: Mapping[str, Any]) -> str:
             value = str(raw.get("layer_id") or raw.get("layer") or "")
             return layer_ids.get(value, value)
-        tracks = [Track(
-            id=_entity_id(source_format, digest, "track", raw, index),
-            source_id=str(raw.get("id", index)),
-            name=str(raw.get("name", "")),
-            net_id=net_id(raw),
-            layer_id=layer_id(raw),
-            start_mm=_point(raw.get("start")),
-            end_mm=_point(raw.get("end")),
-            width_mm=float(raw.get("width", raw.get("width_mm", 0.0)) or 0.0),
-            path=track_path_from_v1(raw),
-            extensions={"spike.v1": dict(raw)},
-        ) for index, raw in enumerate(records("tracks"))]
-        arcs = [Arc(
-            id=_entity_id(source_format, digest, "arc", raw, index),
-            source_id=_source_id(raw, index),
-            name=_text(raw.get("name")),
-            net_id=net_id(raw),
-            layer_id=layer_id(raw),
-            start_mm=_point(raw.get("start")),
-            mid_mm=_point(raw.get("mid", raw.get("middle"))),
-            end_mm=_point(raw.get("end")),
-            width_mm=_number(raw.get("width", raw.get("width_mm"))),
-            extensions={"spike.v1": dict(raw)},
-        ) for index, raw in enumerate(records("arcs", "arcs", "geometry_arcs"))]
+        tracks, arcs = hydrate_conductors(
+            records("tracks"), records("arcs", "arcs", "geometry_arcs"), source_format=source_format,
+            source_digest=digest, net_id=net_id, layer_id=layer_id)
         vias = [Via(
             id=_entity_id(source_format, digest, "via", raw, index),
             source_id=_source_id(raw, index),
@@ -461,7 +441,7 @@ class SpiDeRV2:
         for component in components:
             raw = component.extensions["spike.v1"]
             path = _text(raw.get("model_resolved") or raw.get("model_path") or raw.get("model_uri"))
-            if path:
+            if path and not raw.get("model_sources"):
                 model_records.append({"component": component.source_id, "uri": path, "transform": raw.get("model_transform", [])})
         for index, raw in enumerate(model_records):
             uri = _text(raw.get("uri") or raw.get("path") or raw.get("model_path") or raw.get("model_resolved"))
@@ -555,7 +535,7 @@ class SpiDeRV2:
                 "spike.v1.stackup": [dict(row) for row in stackup_rows],
             },
         )
-    def to_v1(self) -> SpiDeR:
+    def to_v1(self, *, allow_unprojected_arcs: bool = False) -> SpiDeR:
         """Project a v2 design into the established solver-facing v1 model."""
         def legacy(entity: CanonicalEntity, fallback: Dict[str, Any]) -> Dict[str, Any]:
             raw = entity.extensions.get("spike.v1")
@@ -593,7 +573,9 @@ class SpiDeRV2:
             source_path=self.source.artifact_path,
             layers=[legacy(item, {"id": item.source_id or item.id, "name": item.name, "type": item.layer_type, "thickness_mm": item.thickness_mm}) for item in self.layers],
             nets=[legacy(item, {"id": item.source_id or item.id, "name": item.name}) for item in self.nets],
-            tracks=[project_track_to_v1(item, net_names, layer_names) for item in self.tracks],
+            tracks=restore_tracks(self.tracks, self.arcs,
+                                  lambda item: project_track_to_v1(item, net_names, layer_names),
+                                  allow_unprojected_arcs=allow_unprojected_arcs, nets=self.nets, layers=self.layers),
             vias=[project_via_to_v1(item, net_names, layer_names) for item in self.vias],
             pads=[project_pad_to_v1(item, net_names, layer_names) for item in self.pads],
             zones=[project_zone_to_v1(item, net_names, layer_names) for item in self.zones],

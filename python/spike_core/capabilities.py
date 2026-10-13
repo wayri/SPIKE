@@ -66,7 +66,7 @@ def capabilities() -> Dict[str, Any]:
                     "One straight path or two parallel coextensive paths over one proven reference polygon can produce "
                     "a quasi-TEM RLGC model, two/four-port S sweep, explicit unwindowed Hermitian TDR/TDT, bounded "
                     "NEXT/FEXT, and normalized ideal-source NRZ eye. The coupled path uses a sparse cross-section "
-                    "reference solve with convergence evidence. Bends, vias, launches, connectors, skin/proximity/roughness, "
+                    "reference solve with convergence evidence, isolated slab skin impedance and optional empirical RMS roughness loss. Return-plane loss, proximity, dispersion, bends, vias, launches, connectors, "
                     "protocol limits, independent correlation, and measured "
                     "qualification remain unavailable."
                 ),

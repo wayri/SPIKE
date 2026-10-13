@@ -26,7 +26,7 @@ class FrequencyPanel(wx.Panel):
             control=wx.TextCtrl(self,value=value,size=(95 if key!='output' else 125,-1));self.fields[key]=control;row.Add(control,0,wx.ALL,3)
         self.scale=wx.Choice(self,choices=['log','linear']);self.scale.SetSelection(0);row.Add(self.scale,0,wx.ALL,3)
         self.pz=wx.CheckBox(self,label='Calculate poles / zeros');self.pz.SetValue(True);row.Add(self.pz,0,wx.ALL,3)
-        button(self,'Run AC / PZ',self.run,row);button(self,'Stop',owner.stop_run,row);box.Add(row,0,wx.EXPAND)
+        button(self,'Run AC / PZ',self.run,row);button(self,'SMPS stability…',self.smps_stability,row);button(self,'Stop',owner.stop_run,row);box.Add(row,0,wx.EXPAND)
         row=wx.WrapSizer(wx.HORIZONTAL,flags=wx.WRAPSIZER_DEFAULT_FLAGS & ~wx.EXTEND_LAST_ON_EACH_LINE)
         self.view=wx.Choice(self,choices=list(VIEWS));self.view.SetSelection(0);row.Add(self.view,0,wx.ALL,3)
         self.expression=wx.TextCtrl(self,value='V(out)/V(in)',size=(265,-1),style=wx.TE_PROCESS_ENTER);row.Add(self.expression,1,wx.ALL,3)
@@ -58,6 +58,10 @@ class FrequencyPanel(wx.Panel):
             'points':int(self.fields['points'].GetValue()),'scale':self.scale.GetStringSelection(),'pole_zero':self.pz.GetValue()}
 
     def run(self):self.owner.start_frequency(self.settings())
+
+    def smps_stability(self):
+        from .smps_stability_window import SMPSStabilityWindow
+        return SMPSStabilityWindow(self.owner)
 
     def save_fra(self):
         settings=self.settings()

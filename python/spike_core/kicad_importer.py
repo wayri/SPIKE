@@ -8,6 +8,7 @@ import sys
 import hashlib
 import json
 from collections import Counter
+from collections.abc import Mapping
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
@@ -115,7 +116,19 @@ def import_kicad_design(path: str) -> SpiDeR:
             suggestion="Review importer diagnostics before relying on geometry completeness.",
         ))
 
+    # The legacy parser replaces copper arcs with straight chords. Preserve
+    # that bounded behavior, but do not report it as exact curved geometry.
+    arc_diagnostics = [item for item in parser.diagnostics
+                       if isinstance(item, Mapping) and item.get("code") == "KICAD_ARC_LINEARIZED"]
+    if arc_diagnostics:
+        issues.append(ValidationIssue(
+            code="KICAD_ARC_LINEARIZED", severity="warning",
+            message=f"{len(arc_diagnostics)} source copper arcs use straight chords in the legacy solver projection.",
+            suggestion="Use retained canonical arcs for exact geometry; qualify chord error before relying on legacy curved-source accuracy.",
+        ))
+
     components = []
+    model_references = []
     footprints = {item.get("reference"): item for item in getattr(parser, "footprints", [])}
     grouped_components = {}
     for pad in parser.pads:
@@ -147,8 +160,26 @@ def import_kicad_design(path: str) -> SpiDeR:
         match["model_resolved"] = _resolve_model_reference(
             footprint.get("model_path", ""), Path(path).resolve().parent
         )
+        match["model_sources"] = list(footprint.get("model_sources", []))
+        for model in match["model_sources"]:
+            if model['uri']:
+                model_references.append({
+                    'source_id': f"{footprint.get('id') or match['reference']}:model:{model['ordinal']}",
+                    'component': footprint.get('id') or match['reference'],
+                    'uri': model['uri'],
+                    'resolved_uri': _resolve_model_reference(model['uri'], Path(path).resolve().parent),
+                    'source_placement': model,
+                })
+            if model['errors']:
+                issues.append(ValidationIssue('KICAD_MODEL_SOURCE_INVALID', 'warning',
+                    f"{match['reference']} model {model['ordinal']}: {'; '.join(model['errors'])}"))
+        if match["model_sources"]:
+            issues.append(ValidationIssue('KICAD_MODEL_PLACEMENT_UNAPPLIED', 'warning',
+                f"{match['reference']}: all model declarations retained; local placement composition and solid geometry remain unqualified."))
         match["layer"] = footprint.get("layer", "")
         match.setdefault("at", list(footprint.get("at", (0, 0))))
+        # Preserve native placement separately from the legacy pad-centroid at.
+        match["native_footprint_at_mm"] = list(footprint.get("at", (0, 0)))
         match["rotation"] = footprint.get("rotation", 0)
         for key in (
             "zone_connection_override", "zone_connection_declared",
@@ -193,6 +224,18 @@ def import_kicad_design(path: str) -> SpiDeR:
             issues.append(ValidationIssue("KICAD_DUPLICATE_ANONYMOUS_OBJECT", "warning",
                 f"Identical anonymous {kind} records were retained with separate occurrence identities."))
     board_bbox = parser.board_bbox
+    outline_drawings = [dict(d) for d in parser.drawings if d.get("layer") == "Edge.Cuts"]
+    outline_rings = []
+    if outline_drawings and all(row.get("type") in {"line", "rect"} for row in outline_drawings):
+        from .board_outline_geometry import straight_outline_rings
+        try:
+            outline_rings = straight_outline_rings(outline_drawings)
+            outer = [outline_rings[0]["start_mm"], *[s["end_mm"] for s in outline_rings[0]["segments"]]]
+            board_bbox = {"min_x": min(p[0] for p in outer), "max_x": max(p[0] for p in outer),
+                          "min_y": min(p[1] for p in outer), "max_y": max(p[1] for p in outer)}
+        except (ValueError, ImportError) as error:
+            issues.append(ValidationIssue("KICAD_OUTLINE_UNRESOLVED", "warning", str(error),
+                                          suggestion="Repair the source edge topology before volume meshing."))
     board_bounds_mm = [
         float(board_bbox["min_x"]), float(board_bbox["min_y"]),
         float(board_bbox["max_x"]), float(board_bbox["max_y"]),
@@ -218,11 +261,14 @@ def import_kicad_design(path: str) -> SpiDeR:
         bends=list(getattr(parser, "bends", [])),
         issues=issues,
         metadata={
-            "board_outline_drawings": [dict(d) for d in parser.drawings if d.get("layer") == "Edge.Cuts"],
+            "board_outline_drawings": outline_drawings,
+            "arcs": list(getattr(parser, "arcs", [])),
+            "model_references": model_references,
+            **({"board_outline_rings": outline_rings} if outline_rings else {}),
             "board_bbox": board_bbox,
             "board_bounds_mm": board_bounds_mm,
             "parser": "KicadParser",
-            "parser_revision": "kicad-zone-fill-v2",
+            "parser_revision": "kicad-pad-frame-v3",
             "parser_log": parser_log.getvalue().splitlines(),
             "parser_diagnostics": list(parser.diagnostics),
             "footprint_models": sum(bool(item.get("model_path")) for item in components),

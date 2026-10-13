@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/harness-em-request-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "harness",
+    "wire_ids"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/harness-em-request/v1"
+    },
+    "harness": {
+      "type": "object"
+    },
+    "wire_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1024
+      }
+    }
+  }
+}

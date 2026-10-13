@@ -78,6 +78,7 @@ const footprintMetadata = parser.parseKicadBoard(`(kicad_pcb
   (footprint "Package_SO:TSSOP-8" (layer "F.Cu") (at 20 30 90)
     (property "Reference" "U1")
     (property "Value" "TEST_IC")
+    (property "Height" "6.5mm")
     (fp_rect (start -2 -1.5) (end 2 1.5) (stroke (width 0.1) (type default)) (fill none) (layer "F.Fab"))
     (fp_rect (start -2.4 -1.9) (end 2.4 1.9) (stroke (width 0.05) (type default)) (fill none) (layer "F.CrtYd"))
     (pad "1" smd rect (at -2.7 -1) (size 1.4 0.6) (layers "F.Cu" "F.Paste" "F.Mask"))
@@ -86,6 +87,7 @@ const footprintMetadata = parser.parseKicadBoard(`(kicad_pcb
       (offset (xyz 1 2 3)) (scale (xyz 1 1.5 2)) (rotate (xyz 10 20 30)))
     (model "local/marker.step"
       (offset (xyz -4 -5 -6)) (scale (xyz .5 .5 .5)) (rotate (xyz 0 90 0)))))`);
+assert.deepEqual(footprintMetadata.components[0].properties.find(row=>row.name==="Height").values,["6.5mm"],"KiCad custom height fields survive parsing");
 assert.deepEqual(footprintMetadata.components[0].bodyBounds, { minX: -2, minY: -1.5, maxX: 2, maxY: 1.5 });
 assert.deepEqual(footprintMetadata.components[0].courtyardBounds, { minX: -2.4, minY: -1.9, maxX: 2.4, maxY: 1.9 });
 assert.deepEqual(footprintMetadata.components[0].models, [
@@ -206,3 +208,19 @@ for (const boardWithBadThickness of [spanOnlyBoard(""), spanOnlyBoard('(setup (s
   assert.ok(boardWithBadThickness.bendLines[0].issues.some(issue => issue.code === "KIKAKUKA_BEND_SPAN_NEEDS_THICKNESS"));
 }
 console.log(`boardParser high-layer and duplicate-outline regressions passed: ${parsed.layers.length} copper / ${parsed.layerDefinitions.length} total layers`);
+
+for (const token of ["footprint", "module"]) {
+  for (const side of ["F.Cu", "B.Cu"]) {
+    for (const angle of [undefined, 0, 23, 90]) {
+      const board = parser.parseKicadBoard(`(kicad_pcb (version 20240108)
+        (layers (0 "F.Cu" signal) (31 "B.Cu" signal))
+        (${token} "Fixture:PadFrame" (layer "${side}") (at 20 10 90)
+          (property "Reference" "J1")
+          (pad "1" smd rect (at 2 1${angle === undefined ? "" : ` ${angle}`})
+            (size 1.2 .8) (layers "${side}"))))`);
+      assert.ok(Math.abs(board.pads[0].at[0] - 21) < 1e-9);
+      assert.ok(Math.abs(board.pads[0].at[1] - 8) < 1e-9);
+      assert.equal(board.pads[0].rotation, angle ?? 0, "native pad angle is absolute on both sides");
+    }
+  }
+}

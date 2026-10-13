@@ -4,9 +4,9 @@ import os
 from pathlib import Path
 
 PALETTES={
- 'Dark':dict(bg='#090b0e',panel='#12171d',field='#1a222b',fg='#edf3fa',muted='#a4b3c4',grid='#263442',accent='#65d5ed',selected='#153c4a',danger='#ff8294',canvas='#000000'),
- 'Light':dict(bg='#edf1f5',panel='#f9fbfe',field='#ffffff',fg='#172638',muted='#4a6077',grid='#d7e1eb',accent='#006783',selected='#d7edf6',danger='#a71937',canvas='#ffffff'),
- 'Midnight':dict(bg='#0b1020',panel='#141d35',field='#1d2945',fg='#ecf0ff',muted='#aabbdc',grid='#2a3d5e',accent='#a9b9ff',selected='#30406c',danger='#ff94c2',canvas='#0b1020'),
+ 'Dark':dict(bg='#17191c',panel='#222529',field='#2a2d32',fg='#e5e7eb',muted='#9ba2ad',grid='#373c43',accent='#75a8de',selected='#333d4b',danger='#e88585',canvas='#191c20'),
+ 'Light':dict(bg='#edf0f3',panel='#f5f6f8',field='#ffffff',fg='#27313d',muted='#606b79',grid='#dfe4e9',accent='#2863a2',selected='#e1eaf4',danger='#b44040',canvas='#ffffff'),
+ 'Midnight':dict(bg='#17191c',panel='#222529',field='#2a2d32',fg='#e5e7eb',muted='#9ba2ad',grid='#373c43',accent='#75a8de',selected='#333d4b',danger='#e88585',canvas='#191c20'),
  'High contrast':dict(bg='#000000',panel='#000000',field='#101010',fg='#ffffff',muted='#e1e1e1',grid='#5c5c5c',accent='#fff36b',selected='#353500',danger='#ffaaaa',canvas='#000000'),
 }
 TRACE_DARK=['#69d8ff','#ffd166','#b8e986','#f19ed2','#c7b2ff','#ff9c72','#80e5d1','#f4f6fb']
@@ -18,10 +18,10 @@ def preferences_path():return Path(os.environ.get('LOCALAPPDATA',Path.home()))/'
 def load_theme():
     path=preferences_path()
     try:
-        if path.stat().st_size>65536:return 'Dark'
+        if path.stat().st_size>65536:return 'Light'
         name=json.loads(path.read_text(encoding='utf-8'))['theme']
-        return name if name in PALETTES else 'Dark'
-    except (OSError,ValueError,KeyError):return 'Dark'
+        return name if name in PALETTES else 'Light'
+    except (OSError,ValueError,KeyError):return 'Light'
 
 def native_appearance(name):
     import wx
@@ -68,8 +68,11 @@ def figure_theme(figure,palette,name):
         ax.set_facecolor(palette['canvas']);ax.tick_params(colors=palette['muted'],labelsize=9)
         ax.title.set_color(palette['fg']);ax.xaxis.label.set_color(palette['muted']);ax.yaxis.label.set_color(palette['muted'])
         ax.xaxis.offsetText.set_color(palette['muted']);ax.yaxis.offsetText.set_color(palette['muted'])
-        for spine in ax.spines.values():spine.set_color(palette['grid'])
-        for line in ax.get_xgridlines()+ax.get_ygridlines():line.set_color(palette['grid']);line.set_alpha(.7)
+        for key,spine in ax.spines.items():
+            spine.set_color(palette['grid']);spine.set_linewidth(.7)
+            spine.set_visible(key in ('left','bottom') or ax.name=='polar')
+        ax.tick_params(length=3, width=.6, pad=6)
+        for line in ax.get_xgridlines()+ax.get_ygridlines():line.set_color(palette['grid']);line.set_alpha(.5);line.set_linewidth(.6)
         for i,line in enumerate(ax.lines):
             if line.get_label() and not line.get_label().startswith('_'):
                 label=line.get_label();trace_colors.setdefault(label,colors[len(trace_colors)%len(colors)]);line.set_color(trace_colors[label])
@@ -78,6 +81,7 @@ def figure_theme(figure,palette,name):
         for text in ax.texts:text.set_color(palette['muted'])
         legend=ax.get_legend()
         if legend:
+            legend.set_frame_on(False)
             legend.get_frame().set_facecolor(palette['panel']);legend.get_frame().set_edgecolor(palette['grid'])
             for text in legend.get_texts():text.set_color(palette['fg'])
             for handle,text in zip(legend.get_lines(),legend.get_texts()):

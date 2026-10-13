@@ -10,6 +10,8 @@
     "model_status": {"const": "experimental"}, "production_qualified": {"const": false},
     "request_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "harness_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "selected_wire_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "excluded_wire_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
     "native_result": {"type": "object", "description": "Original spike/native-mna-result/v1, retaining diagnostics and failure details."},
     "limitations": {"type": "array", "items": {"type": "string"}},
     "node_voltages_v": {"type": "object", "additionalProperties": {"type": "number"}},

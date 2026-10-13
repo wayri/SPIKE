@@ -1,0 +1,10 @@
+UNITS=MM
+LYR f.cu b.cu
+NET SIGNAL
+SNT TRC
+FID C 0 0
+SNT TOP T 0 0
+FID C 0 1
+PKG RotatedPad 1 -0.6 -0.4 0.6 0.4
+RC -0.6 -0.4 0.6 0.4
+PIN 1 S 2 1 0 E

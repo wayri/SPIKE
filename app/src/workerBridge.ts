@@ -1,3 +1,4 @@
+import type { AppUpdateSnapshot } from "./appUpdateModel";
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import { diagnosticMessage, frontendError, isSpikeErrorEnvelope } from "./errorCatalog";
@@ -39,7 +40,21 @@ export type WorkerActivity = {
   errorCode?: string;
 };
 
+export type WorkerProgress = {
+  operationId: string;
+  method: string;
+  frame: Record<string, unknown>;
+};
+
 const HEAVY_METHODS = new Set([
+  "run_studio_board_cosimulation",
+  "review_engineering", "quick_engineering_tool",
+  "run_cosimulation", "run_em_machine", "run_magnetic_machine",
+  "compare_digital_twin",
+  "read_project_package",
+  "run_parallel_batch",
+  "assistant_turn",
+  "assistant_models",
   "model_library",
   "model_library_status",
   "model_library_add_root",
@@ -61,6 +76,8 @@ const HEAVY_METHODS = new Set([
   "prepare_3d_scene",
   "prepare_thermal_case",
   "prepare_visual_bundle",
+  "import_kicad_schematic_view",
+  "import_connectivity_view",
   "prepare_assembly_design_visual_bundle",
   "plan_thermal_field_job",
   "read_project_model_artifacts",
@@ -76,14 +93,54 @@ const HEAVY_METHODS = new Set([
   "run_multiboard_si_independent_batch",
   "run_pi_path_native_mna",
   "run_harness_pi",
+  "run_harness_si",
+  "prepare_harness_em",
+  "run_harness_mtl",
+  "evaluate_pdn_network",
+  "extract_pdn_electrostatic",
+  "extract_harness_round_wire_rlgc",
   "run_multiboard_circuit",
   "run_multiboard_thermal",
   "run_multiboard_em",
   "prepare_assembly_field_handoff",
   "run_assembly_field_thermal",
+  "prepare_assembly_em",
+  "admit_assembly_em_study",
+  "run_assembly_em",
+  "assign_assembly_thermal_body_power",
+  "run_assembly_field_transient",
+  "validate_assembly_thermal_time_refinement",
+  "run_internal_airflow",
+  "run_native_cfd",
+  "run_su2_cfd",
+  "run_su2_cht",
+  "run_assembly_airflow",
+  "read_assembly_airflow_setup_in_project",
+  "read_assembly_airflow_study_in_project",
+  "run_assembly_airflow_in_project",
+  "run_smps_converter",
+  "run_pwm_electrothermal",
+  "evaluate_capacitor_placement",
+  "plan_pi_return_path",
+  "run_assembly_electrothermal",
+  "prepare_multiboard_volume_electrothermal",
+  "describe_volume_electrothermal_bindings",
+  "run_multiboard_volume_electrothermal",
+  "verify_multiboard_volume_electrothermal_result",
+  "prepare_assembly_thermal_contact_model",
+  "discover_assembly_thermal_links",
+  "autolink_assembly_thermal_contacts",
+  "promote_thermal_components_in_project",
+  "read_volume_electrothermal_in_project",
+  "save_volume_electrothermal_in_project",
+  "evaluate_electrical_heat_source",
+  "prepare_pcb_electrothermal_geometry",
+  "solve_fan_system_operating_point",
   "derive_assembly_view_factors",
   "import_assembly_field_study",
   "export_assembly_field_study",
+  "read_assembly_thermal_mesh_setup",
+  "run_assembly_thermal_mesh_in_project",
   "read_assembly_field_study_in_project",
   "save_assembly_field_study_in_project",
   "generate_tetrahedral_mesh",
@@ -137,6 +194,26 @@ export function isDesktopShell(): boolean {
   return "__TAURI_INTERNALS__" in window;
 }
 
+function workerProgressPayload(value: unknown): WorkerProgress | null {
+  if (!value || typeof value !== "object") return null;
+  const candidate = value as Partial<WorkerProgress>;
+  if (typeof candidate.operationId !== "string" || !candidate.operationId) return null;
+  if (typeof candidate.method !== "string" || !candidate.method) return null;
+  if (!candidate.frame || typeof candidate.frame !== "object" || Array.isArray(candidate.frame)) return null;
+  return candidate as WorkerProgress;
+}
+
+export async function subscribeWorkerProgress(
+  listener: (progress: WorkerProgress) => void,
+): Promise<UnlistenFn> {
+  if (typeof window === "undefined" || !isDesktopShell()) return () => undefined;
+  return listen<WorkerProgress>("spike-worker-progress", event => {
+    const progress = workerProgressPayload(event.payload);
+    if (!progress || cancelledOperations.has(progress.operationId)) return;
+    listener(progress);
+  });
+}
+
 export type McpBridgeStatus = { enabled: boolean; rendezvousPath: string | null; port: number | null };
 export type McpBridgeRequest = { requestId: string; command: string; args: Record<string, unknown> };
 
@@ -160,7 +237,7 @@ export async function subscribeDesktopCloseRequested(
   if (!isDesktopShell()) return () => undefined;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
   return getCurrentWindow().listen<{ generation: number }>("spike://desktop-close-requested", event => {
-    const generation = event.payload.generation;
+    const generation = event.payload?.generation;
     if (Number.isSafeInteger(generation) && generation > 0) onRequested(() => undefined, generation);
   });
 }
@@ -169,10 +246,24 @@ export async function acknowledgeDesktopClose(generation: number): Promise<boole
   return isDesktopShell() ? invoke<boolean>("acknowledge_desktop_close", { generation }) : false;
 }
 
-export async function closeDesktopWindow(): Promise<void> {
+export async function closeDesktopWindow(closeChild?: () => Promise<void>): Promise<void> {
   if (!isDesktopShell()) return;
-  // The main workspace has already admitted save/discard. The host closes
-  // every native tool and cancels owned workers; destroying one window is not exit.
+  if (closeChild) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        Promise.resolve().then(closeChild),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => reject(new Error("Assistant shutdown exceeded 1 second")), 1000);
+        }),
+      ]);
+    } catch (error) {
+      console.warn("SPIKE assistant shutdown failed; continuing main application close", error);
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+    }
+  }
+  // Called only after the main workspace's save/discard close decision.
   await invoke<void>("close_desktop_app");
 }
 
@@ -338,6 +429,17 @@ export async function selectNativeProjectFile(): Promise<NativeSelectedFile | nu
   return invoke<NativeSelectedFile | null>("select_project_file");
 }
 
+export async function selectNativeSchematicFile(kind: "schematic" | "netlist" | "odb++" = "schematic", directory = false): Promise<NativeSelectedFile | null> {
+  if (!isDesktopShell()) return null;
+  if (directory) return selectNativeImportFile("board", true);
+  try { return await invoke<NativeSelectedFile | null>("select_schematic_file", { kind }); }
+  catch (error) {
+    // Development frontends can update before the native shell is rebuilt.
+    if (/command\s+select_schematic_file\s+not\s+found/i.test(String(error))) return selectNativeWorkbenchFile();
+    throw error;
+  }
+}
+
 export async function selectNativeWorkbenchFile(): Promise<NativeSelectedFile | null> {
   if (!isDesktopShell()) return null;
   return invoke<NativeSelectedFile | null>("select_workbench_file");
@@ -426,3 +528,10 @@ export async function verifyNativeProjectManifestSignature(
     signature,
   });
 }
+
+// Official updater commands take no renderer-supplied URLs, versions or paths.
+export const appUpdateStatus = () => invoke<AppUpdateSnapshot>("app_update_status");
+export const appUpdateCheck = () => invoke<AppUpdateSnapshot>("app_update_check");
+export const appUpdateDownload = () => invoke<AppUpdateSnapshot>("app_update_download");
+export const appUpdateCancel = () => invoke<void>("app_update_cancel");
+export const appUpdateInstall = (acknowledged: boolean, unattended = false) => invoke<AppUpdateSnapshot>("app_update_install", { acknowledged, unattended });

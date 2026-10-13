@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
+import * as THREE from "three";
 
 const root = new URL("../", import.meta.url);
 const assemblySource = readFileSync(new URL("src/mcadAssembly.ts", root), "utf8");
@@ -28,27 +29,74 @@ assert.match(assembly.modelDisplayStatus({ model_type: "glb" }), /visualizable f
 assert.equal(assembly.normalizeAssemblyIr({ contract: "wrong", boards: [], parts: [] }), null);
 const retainedDesigns = assembly.normalizeAssemblyDesigns({ contract: "spike/assembly-designs/v1", active_design_id: "design-a", designs: [{ contract: "spike/design-ir/v2", design_id: "design-a", name: "Main board" }, { contract: "spike/design-ir/v2", design_id: "design-b", name: "Control board" }] });
 assert.deepEqual(retainedDesigns.designs.map(design => design.design_id), ["design-a", "design-b"]);
+const twentySourceDesigns = Array.from({ length: 20 }, (_, index) => ({ contract: "spike/design-ir/v2", design_id: `large-${index}`, future: { exact: index }, tracks: [{ id: `track-${index}` }] }));
+const twentySourceSet = { contract: "spike/assembly-designs/v1", active_design_id: "large-0", designs: twentySourceDesigns };
+const authenticatedDesigns = assembly.normalizeAssemblyDesigns(twentySourceSet, { copyDesigns: false });
+assert.ok(authenticatedDesigns);
+assert.ok(authenticatedDesigns.designs.every((design, index) => design === twentySourceDesigns[index]), "authenticated project open must retain all 20 immutable design identities");
+assert.deepEqual(authenticatedDesigns.designs[19].future, { exact: 19 }, "no-copy admission preserves unknown nested fields");
+const defensiveDesigns = assembly.normalizeAssemblyDesigns(twentySourceSet);
+assert.ok(defensiveDesigns);
+assert.ok(defensiveDesigns.designs.every((design, index) => design !== twentySourceDesigns[index]), "default admission remains detached from caller-owned records");
+twentySourceDesigns[0].future.exact = 99;
+assert.equal(defensiveDesigns.designs[0].future.exact, 0, "default defensive admission cannot be mutated through its input");
+assert.equal(authenticatedDesigns.designs[0].future.exact, 99, "opt-in admission explicitly shares the authenticated payload");
+for (const malformed of [
+  { ...twentySourceSet, active_design_id: "missing" },
+  { ...twentySourceSet, designs: [...twentySourceDesigns, twentySourceDesigns[0]] },
+  { ...twentySourceSet, designs: [...twentySourceDesigns.slice(0, 19), { contract: "wrong", design_id: "bad" }] },
+]) assert.equal(assembly.normalizeAssemblyDesigns(malformed, { copyDesigns: false }), null, "no-copy admission must retain all normal contract and identity checks");
 assert.equal(assembly.normalizeAssemblyDesigns({ ...retainedDesigns, active_design_id: "missing" }), null);
 assert.equal(assembly.normalizeAssemblyDesigns({ ...retainedDesigns, designs: [...retainedDesigns.designs, retainedDesigns.designs[0]] }), null);
 assert.equal(assembly.normalizeModelIndex(null).contract, "spike/model-index/v1");
 assert.deepEqual(assembly.DEFAULT_ASSEMBLY_SECTION, {
   enabled: false, mode: "plane", axis: "x", offsetMm: 0,
   minXMm: -100, maxXMm: 100, minYMm: -100, maxYMm: 100, minZMm: -100, maxZMm: 100,
+  planes: [],
 });
 const sectionTransform = { centerX: 10, centerY: 20, scale: 2 };
 const planeSection = { ...assembly.DEFAULT_ASSEMBLY_SECTION, enabled: true, axis: "y", offsetMm: 7 };
 assert.deepEqual(assembly.buildAssemblySectionClippingPlanes(planeSection, sectionTransform), [
-  { normal: [0, -1, 0], point: [0, 26, 0] },
+  { normal: [0, -1, 0], point: [-20, 26, 0] },
 ]);
 const boxSection = { ...assembly.DEFAULT_ASSEMBLY_SECTION, enabled: true, mode: "box", minXMm: 1, maxXMm: 5, minYMm: 3, maxYMm: 9, minZMm: -2, maxZMm: 4 };
-assert.deepEqual(assembly.buildAssemblySectionClippingPlanes(boxSection, sectionTransform), [
-  { normal: [1, 0, 0], point: [-18, 0, 0] }, { normal: [-1, 0, 0], point: [-10, 0, 0] },
-  { normal: [0, -1, 0], point: [0, 34, 0] }, { normal: [0, 1, 0], point: [0, 22, 0] },
-  { normal: [0, 0, 1], point: [0, 0, -4] }, { normal: [0, 0, -1], point: [0, 0, 8] },
-]);
-assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...boxSection, minXMm: 6, maxXMm: 5 }, sectionTransform), [], "inverted boxes must fail closed");
-assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...boxSection, maxZMm: Number.NaN }, sectionTransform), [], "nonfinite boxes must fail closed");
-assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...planeSection, offsetMm: Number.NaN }, sectionTransform), [], "nonfinite planes must fail closed");
+const boxPlanes = assembly.buildAssemblySectionClippingPlanes(boxSection, sectionTransform);
+assert.deepEqual(boxPlanes, [
+  { normal: [1, 0, 0], point: [-18, 40, 0] }, { normal: [-1, 0, 0], point: [-10, 40, 0] },
+  { normal: [0, -1, 0], point: [-20, 34, 0] }, { normal: [0, 1, 0], point: [-20, 22, 0] },
+  { normal: [0, 0, 1], point: [-20, 40, -4] }, { normal: [0, 0, -1], point: [-20, 40, 8] },
+], "box plane normals must retain the requested interior under Three.js clipping");
+const threeBoxPlanes = boxPlanes.map(({ normal, point }) => new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(...normal), new THREE.Vector3(...point)));
+assert.ok(threeBoxPlanes.every(plane => plane.distanceToPoint(new THREE.Vector3(-14, 28, 2)) >= 0), "Three.js must retain the box center on every plane");
+assert.ok(threeBoxPlanes.some(plane => plane.distanceToPoint(new THREE.Vector3(-20, 28, 2)) < 0), "Three.js must clip a point below min X");
+assert.equal(assembly.assemblySectionPointVisible([-14, 28, 2], boxPlanes), true, "a point inside all six bounds must survive");
+assert.equal(assembly.assemblySectionPointVisible([-20, 28, 2], boxPlanes), false, "a point below min X must be clipped");
+assert.equal(assembly.assemblySectionSegmentVisible([-20, 28, 2], [-8, 28, 2], boxPlanes), true, "a segment crossing the box must remain pickable");
+assert.equal(assembly.assemblySectionSegmentVisible([-30, 28, 2], [-20, 28, 2], boxPlanes), false, "a segment fully outside one half-space must not be pickable");
+const arbitrarySection = { ...assembly.DEFAULT_ASSEMBLY_SECTION, enabled: true, mode: "planes", planes: [
+  { id: "z-cut", enabled: true, normal: [0, 0, 2], offsetMm: 3, flipped: false },
+  { id: "x-cut", enabled: true, normal: [1, 0, 0], offsetMm: 5, flipped: true },
+  { id: "disabled", enabled: false, normal: [0, 1, 0], offsetMm: 7, flipped: false },
+] };
+assert.deepEqual(assembly.buildAssemblySectionClippingPlanes(arbitrarySection, sectionTransform), [
+  { normal: [0, 0, 1], point: [-20, 40, 6] },
+  { normal: [-1, 0, 0], point: [-10, 40, 0] },
+], "arbitrary normals must normalize, transform from assembly coordinates, honor flip, and skip disabled planes");
+const normalizedSection = assembly.normalizeAssemblySection({ enabled: true, mode: "planes", planes: [
+  { id: "cut", normal: [1, 0, 0], offsetMm: 4 },
+  { id: "cut", normal: [0, 0, 0], offsetMm: 2 },
+  { id: "cut", normal: [0, 1, 0], offsetMm: 6, flipped: true },
+] });
+assert.deepEqual(normalizedSection.planes.map(plane => plane.id), ["cut", "cut-2"]);
+assert.equal(normalizedSection.planes[1].flipped, true);
+assert.equal(assembly.normalizeAssemblySection({ enabled: true, mode: "unknown" }).mode, "plane", "unknown saved modes must recover to the legacy plane");
+const cappedSection = assembly.normalizeAssemblySection({ enabled: true, mode: "planes", planes: Array.from({ length: 9 }, (_, index) => ({ id: `p-${index}`, normal: [1, 0, 0], offsetMm: index })) });
+assert.equal(cappedSection.planes.length, assembly.MAX_ASSEMBLY_SECTION_PLANES, "saved user planes must stay within the renderer bound");
+assert.equal(assembly.nextAssemblySectionPlane({ planes: [{ id: "section-plane-1" }] }).id, "section-plane-2");
+assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...boxSection, minXMm: 6, maxXMm: 5 }, sectionTransform), [], "inverted boxes must apply no clipping");
+assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...boxSection, maxZMm: Number.NaN }, sectionTransform), [], "nonfinite boxes must apply no clipping");
+assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...planeSection, offsetMm: Number.NaN }, sectionTransform), [], "nonfinite planes must apply no clipping");
+assert.deepEqual(assembly.buildAssemblySectionClippingPlanes({ ...planeSection, offsetMm: Number.MAX_VALUE }, { ...sectionTransform, scale: Number.MAX_VALUE }), [], "overflowing viewport coordinates must apply no clipping");
 const exactIndex = {
   contract: "spike/assembly-package-shapes/v1", assembly_id: "assembly",
   shapes: [{
@@ -206,7 +254,7 @@ assert.ok(panel.includes("expected_manifest_payload_sha256"), "MCAD edits must b
 for (const control of ["Visible after reopen", "Isolate temporarily", "Visual cross-section", "Save part and placement", "Save placement policy", "Reparent without moving", "Tessellate STEP for viewport", "Extract exact STEP topology", "3D transform gizmo", "GRID SNAP (mm)", "ANGLE SNAP (deg)", "Face/edge/axis/concentric/coincident/distance constraint resolution remains topology-gated"]) {
   assert.ok(panel.includes(control), `MCAD assembly controls are missing ${control}`);
 }
-for (const control of ["Bounded box", "MIN X (mm)", "MAX X (mm)", "MIN Y (mm)", "MAX Y (mm)", "MIN Z (mm)", "MAX Z (mm)", "Temporary visual-only viewport clipping"]) {
+for (const control of ["Bounded box", "Multiple planes", "Add plane", "Flip retained side", "NORMAL X", "NORMAL Y", "NORMAL Z", "MIN X (mm)", "MAX X (mm)", "MIN Y (mm)", "MAX Y (mm)", "MIN Z (mm)", "MAX Z (mm)", "Saved presentation-only clipping"]) {
   assert.ok(panel.includes(control), `MCAD visual-only section-box controls are missing ${control}`);
 }
 assert.ok(semanticsEditor.includes('method: "update_assembly_semantics_in_project"'), "assembly semantics must persist through a transactional worker");
@@ -217,7 +265,7 @@ assert.ok(panel.includes("STEP tessellation is still required"), "STEP display l
 assert.ok(panel.includes("no material properties, contact, bond, boundary, or solver semantics are inferred"), "solver non-claim is missing");
 assert.ok(panel.includes("visual-only and not solver-qualified"), "derived STEP visualization must not imply solver geometry");
 assert.ok(app.includes("assembly_ir: assemblyIr, assembly_designs: assemblyDesigns, assembly_package_shapes: assemblyPackageShapes, models: modelIndex"), "frontend snapshots must preserve AssemblyIR, retained designs, exact package shapes, and model index");
-assert.ok(app.includes("setAssemblyDesigns(normalizeAssemblyDesigns(data.assembly_designs))"), "frontend open must retain the complete multi-design projection");
+assert.ok(app.includes("setAssemblyDesigns(normalizeAssemblyDesigns(data.assembly_designs, { copyDesigns: !(path && manifestDigest) }))"), "only authenticated native frontend open may retain the complete multi-design projection without copying it");
 assert.ok(app.includes("setAssemblyPackageShapes(normalizeAssemblyPackageShapes(data.assembly_package_shapes))"), "frontend open must retain the exact package-shape projection");
 assert.ok(app.includes("onAssemblyPart={partId =>"), "scene hierarchy part rows must focus the existing MCAD editor");
 assert.ok(app.includes("focusedPartId={mcadFocusedPartId}"), "focused hierarchy identity must reach the MCAD editor");

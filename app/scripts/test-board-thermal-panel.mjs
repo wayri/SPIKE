@@ -7,6 +7,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import loadDataTable from "./load-data-table.mjs";
+import { importTestTypescript } from "./import-test-typescript.mjs";
 
 const appRoot = resolve(import.meta.dirname, "..");
 const source = readFileSync(resolve(appRoot, "src", "BoardThermalPanel.tsx"), "utf8");
@@ -25,7 +26,7 @@ const dependencies = {
   react: React,
   "react/jsx-runtime": require("react/jsx-runtime"),
   "./thermalResultFields": { thermalFieldColor: value => value < 35 ? [0, 0, 1] : [1, 0, 0] },
-  "./boardThermalViewport": { boardThermalCuts: (grid, position, layers) => ({
+  "./boardThermalViewport": { ...await importTestTypescript('boardThermalViewport'), boardThermalCuts: (grid, position, layers) => ({
     horizontal: [[5, grid.temperatures_c[0]], [15, grid.temperatures_c[1]]],
     vertical: [[5, grid.temperatures_c[0]]],
     throughStack: layers?.map(layer => [layer.thickness_mm / 2, layer.temperatures_c[0]]) ?? [],
@@ -66,15 +67,15 @@ function render(savedRequest, savedResult) {
 }
 const complete = render(request, result);
 assert.match(complete, /data-plot-title="Board temperature grid"/);
-assert.match(complete, /&quot;x&quot;:\[0,10\]/);
-assert.match(complete, /&quot;y&quot;:\[0\]/);
+assert.match(complete, /&quot;x&quot;:\[0,10,20\]/);
+assert.match(complete, /&quot;y&quot;:\[0,10\]/);
 assert.match(complete, /&quot;z&quot;:\[\[30,40\]\]/, "heatmap retains every returned x-fast temperature sample");
 assert.match(complete, /Junction °C/);
 assert.match(complete, /30\.30/);
 assert.match(complete, /30\.50/);
 assert.match(complete, /uniform 2D sheet/);
 assert.match(complete, /Smooth displayed temperature colors/);
-assert.match(complete, /&quot;zsmooth&quot;:&quot;best&quot;/);
+assert.match(complete, /&quot;zsmooth&quot;:false/, "unresolved grids are not visually smoothed by default");
 assert.match(complete, /Temperature layer/);
 assert.match(complete, /Horizontal X temperature profile/);
 assert.match(complete, /Through stack Z temperature profile/);
@@ -87,6 +88,21 @@ assert.doesNotMatch(complete, /U1 contact_size_mm" type="number"[^>]*value="2"/)
 const invalid = render(request, { ...result, grid: { ...result.grid, temperatures_c: [30] } });
 assert.doesNotMatch(invalid, /data-plot-title="Board temperature grid"/);
 assert.doesNotMatch(invalid, /Junction °C/);
+const directRequest = { ...request, board: { ...request.board, model: 'layered', conductivity_w_mk: undefined,
+  dielectric_conductivity_w_mk: .3, copper_conductivity_w_mk: 385, include_copper: false, include_vias: false,
+  include_tracks: true, include_pads: true, include_zones: true, fuzzy_sigma_mm: 0 },
+  components: [], board_heat_sources: [{ id: 'board-U1', component_ref: 'U1', power_w: .1, contact_mode: 'square', contact_size_mm: 2 }] };
+const directResult = { ...result, components: [], summary: { ...result.summary, maximum_junction_temperature_c: null },
+  board_heat_sources: [{ ...directRequest.board_heat_sources[0], board_temperature_c: 30, case_temperature_c: null,
+    junction_temperature_c: null, temperature_status: 'board_only_junction_unsolved' }] };
+assert.match(render(directRequest, directResult), /Case \/ junction unsolved/);
+assert.doesNotMatch(render(directRequest, { ...directResult, board_heat_sources: [{ ...directResult.board_heat_sources[0], junction_temperature_c: 40 }] }), /Direct board heating results/);
+const refined = render(request, { ...result, grid: {
+  origin_mm: [0, 0], x_edges_mm: [0, 1, 20], y_edges_mm: [0, 10],
+  shape: [2, 1], temperatures_c: [30, 40], order: "x-fast", kind: "rectilinear",
+} });
+assert.match(refined, /&quot;x&quot;:\[0,1,20\]/, "local cells retain physical edges, not uniform interpolation");
+assert.match(refined, /&quot;z&quot;:\[\[30,40\]\]/);
 const fresh = render(undefined, undefined);
 assert.doesNotMatch(fresh, /Board temperature grid/);
 assert.match(fresh, /Effective board conductivity<span><input aria-label="Board conductivity" type="number"[^>]*value=""/);
@@ -111,10 +127,10 @@ new Function("require", "module", "exports", compiled)(name => name === "react" 
     return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
   },
 } : name === "./workerBridge" ? { runLocalWorker: async value => { workerRequest = value; return { ok: true, result }; } } : dependencies[name] ?? require(name), interactive, interactive.exports);
-const mount = (activeBoard = board, activeDesign = design, activeRequest = request, sourceText = null) => {
+const mount = (activeBoard = board, activeDesign = design, activeRequest = request, sourceText = null, onOpenSolidStudy) => {
   cursor = 0;
   return interactive.exports.default({ board: activeBoard, design: activeDesign, sourceText,
-    ambientC: 25, workerAvailable: true, savedRequest: activeRequest, onRequireAdmission: async () => null, onSave() {}, onStatus() {} });
+    ambientC: 25, workerAvailable: true, savedRequest: activeRequest, onOpenSolidStudy, onRequireAdmission: async () => null, onSave() {}, onStatus() {} });
 };
 function findNode(node, predicate) {
   if (!node || typeof node !== "object") return null;
@@ -165,6 +181,21 @@ assert.equal(workerRequest.params.source_kicad_pcb, "(kicad_pcb fixture)");
 assert.equal(workerRequest.params.request.board.dielectric_conductivity_w_mk, 0.3);
 assert.equal(workerRequest.params.request.board.fuzzy_sigma_mm, 0.4);
 assert.equal("conductivity_w_mk" in workerRequest.params.request.board, false);
+states.length = 0;
+const localRequest = { ...layeredRequest, board: { ...layeredRequest.board, grid_step_mm: undefined,
+  x_edges_mm: [0, 1, 20], y_edges_mm: [0, 10], copper_raster_step_mm: 10,
+  ambient_top_grid_c: [25, 30] }, components: [{ ...layeredRequest.components[0], contact_pad_numbers: ['1'] }] };
+findNode(mount(layeredBoard, design, localRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await new Promise(resolve => setImmediate(resolve));
+assert.deepEqual(workerRequest.params.request.board.x_edges_mm, [0, 1, 20]);
+assert.deepEqual(workerRequest.params.request.board.ambient_top_grid_c, [25, 30]);
+assert.equal('grid_step_mm' in workerRequest.params.request.board, false);
+assert.deepEqual(workerRequest.params.request.components[0].contact_pad_numbers, ['1']);
+assert.match(findNode(mount(layeredBoard, design, localRequest), node => node.props?.role === 'alert').props.children,
+  /invalid result/, 'the mock returns unselected pad2 and must be rejected');
+states.length = 0;
+findNode(mount(layeredBoard, design, layeredRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await new Promise(resolve => setImmediate(resolve));
 const layer = findNode(mount(layeredBoard, design, layeredRequest), node => node.type === "select" && node.props["aria-label"] === "Temperature layer");
 layer.props.onChange({ target: { value: "0" } });
 const layeredMarkup = renderToStaticMarkup(mount(layeredBoard, design, layeredRequest));
@@ -226,3 +257,17 @@ const alert = findNode(mount(noPads, noPadDesign), node => node.props?.role === 
 assert.match(alert.props.children, /U1 has no eligible imported copper pads/);
 assert.equal(workerRequest, undefined, "invalid pad mode must not reach the worker");
 console.log("board thermal panel render and saved result validation passed");
+
+states.length = 0;
+workerRequest = undefined;
+let solidStudyOpens = 0;
+const isSolidStudyButton = node => node.type === "button" && node.props.children === "3D parts and volume thermal study";
+assert.equal(findNode(mount(), isSolidStudyButton), null, "omit navigation when the host supplies no volume workspace action");
+const volumeNavigation = mount(board, design, request, null, () => { solidStudyOpens++; });
+assert.match(renderToStaticMarkup(volumeNavigation), /this board-grid solve has no meshed package solids/);
+const openSolidStudy = findNode(volumeNavigation, isSolidStudyButton);
+assert.ok(openSolidStudy);
+openSolidStudy.props.onClick();
+assert.equal(solidStudyOpens, 1, "volume study action must invoke the host navigation callback");
+assert.equal(workerRequest, undefined, "navigation must not implicitly solve or alter the board thermal case");
+console.log("Board thermal model coverage and explicit solid study navigation passed.");

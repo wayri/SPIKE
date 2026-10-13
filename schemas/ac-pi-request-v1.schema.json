@@ -103,6 +103,14 @@
           "items": {
             "type": "number"
           }
+        },
+        "roughness_rms_um": {
+          "type": "number",
+          "minimum": 0
+        },
+        "include_internal_reactance": {
+          "type": "boolean",
+          "description": "When true L_h_per_m must exclude conductor internal inductance; zero field bias required."
         }
       }
     }

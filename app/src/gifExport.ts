@@ -1,13 +1,11 @@
-const bytes = (...values: number[]) => values.map(value => value & 0xff);
+const bytes = (...values: number[]) => Uint8Array.from(values, value => value & 0xff);
 
 function palette332() {
-  const output: number[] = [];
+  const output = new Uint8Array(256 * 3);
   for (let index = 0; index < 256; index += 1) {
-    output.push(
-      Math.round(((index >> 5) & 7) * 255 / 7),
-      Math.round(((index >> 2) & 7) * 255 / 7),
-      Math.round((index & 3) * 255 / 3),
-    );
+    output[index * 3] = Math.round(((index >> 5) & 7) * 255 / 7);
+    output[index * 3 + 1] = Math.round(((index >> 2) & 7) * 255 / 7);
+    output[index * 3 + 2] = Math.round((index & 3) * 255 / 3);
   }
   return output;
 }
@@ -28,14 +26,19 @@ function lzwEncode(indices: Uint8Array) {
   let codeSize = 9;
   let nextCode = 258;
   let dictionary = new Map<string, number>();
-  const packed: number[] = [];
+  let packed = new Uint8Array(Math.max(16, indices.length * 2 + 16));
+  let packedLength = 0;
   let bitBuffer = 0;
   let bitCount = 0;
   const emit = (code: number) => {
     bitBuffer |= code << bitCount;
     bitCount += codeSize;
     while (bitCount >= 8) {
-      packed.push(bitBuffer & 0xff);
+      if (packedLength >= packed.length) {
+        const grown = new Uint8Array(packed.length * 2);
+        grown.set(packed); packed = grown;
+      }
+      packed[packedLength++] = bitBuffer & 0xff;
       bitBuffer >>>= 8;
       bitCount -= 8;
     }
@@ -72,32 +75,41 @@ function lzwEncode(indices: Uint8Array) {
     emit(prefix);
     emit(end);
   }
-  if (bitCount > 0) packed.push(bitBuffer & 0xff);
-  return packed;
+  if (bitCount > 0) packed[packedLength++] = bitBuffer & 0xff;
+  return packed.slice(0, packedLength);
 }
 
-export function encodeGif(frames: ImageData[], delayCentiseconds: number) {
+export function encodeGif(frames: ImageData[], delayCentiseconds: number | readonly number[]) {
   if (!frames.length) throw new Error("No viewport frames were captured.");
+  if (Array.isArray(delayCentiseconds) && delayCentiseconds.length !== frames.length) {
+    throw new Error("GIF frame delays must match the captured frame count.");
+  }
   const { width, height } = frames[0];
-  const output: number[] = [
-    ...new TextEncoder().encode("GIF89a"),
-    ...bytes(width, width >> 8, height, height >> 8, 0xf7, 0, 0),
-    ...palette332(),
-    0x21, 0xff, 0x0b, ...new TextEncoder().encode("NETSCAPE2.0"), 0x03, 0x01, 0, 0, 0,
-  ];
-  frames.forEach(frame => {
+  const rawBytes = width * height * 4 * frames.length;
+  if (!Number.isFinite(rawBytes) || rawBytes > 256 * 1024 * 1024) throw new Error("GIF input exceeds the 256 MiB raw-frame limit.");
+  const output: BlobPart[] = [new TextEncoder().encode("GIF89a"), bytes(width, width >> 8, height, height >> 8, 0xf7, 0, 0),
+    palette332(), bytes(0x21, 0xff, 0x0b), new TextEncoder().encode("NETSCAPE2.0"), bytes(0x03, 0x01, 0, 0, 0)];
+  frames.forEach((frame, frameIndex) => {
     if (frame.width !== width || frame.height !== height) throw new Error("Captured GIF frames have inconsistent dimensions.");
+    const requestedDelay = Array.isArray(delayCentiseconds) ? delayCentiseconds[frameIndex] : delayCentiseconds;
+    const frameDelay = Math.max(1, Math.min(65535, Math.round(Number(requestedDelay))));
+    if (!Number.isFinite(frameDelay)) throw new Error(`GIF frame ${frameIndex + 1} has an invalid delay.`);
     const compressed = lzwEncode(indexedPixels(frame));
-    output.push(0x21, 0xf9, 0x04, 0x00, ...bytes(delayCentiseconds, delayCentiseconds >> 8), 0x00, 0x00);
-    output.push(0x2c, 0, 0, 0, 0, ...bytes(width, width >> 8, height, height >> 8), 0x00, 0x08);
+    output.push(bytes(0x21, 0xf9, 0x04, 0x00, frameDelay, frameDelay >> 8, 0x00, 0x00));
+    output.push(bytes(0x2c, 0, 0, 0, 0, width, width >> 8, height, height >> 8, 0x00, 0x08));
+    const blocks = new Uint8Array(compressed.length + Math.ceil(compressed.length / 255) + 1);
+    let target = 0;
     for (let offset = 0; offset < compressed.length; offset += 255) {
-      const block = compressed.slice(offset, offset + 255);
-      output.push(block.length, ...block);
+      const length = Math.min(255, compressed.length - offset);
+      blocks[target++] = length;
+      blocks.set(compressed.subarray(offset, offset + length), target);
+      target += length;
     }
-    output.push(0x00);
+    blocks[target] = 0;
+    output.push(blocks);
   });
-  output.push(0x3b);
-  return new Blob([new Uint8Array(output)], { type: "image/gif" });
+  output.push(bytes(0x3b));
+  return new Blob(output, { type: "image/gif" });
 }
 
 function drawContained(context: CanvasRenderingContext2D, source: CanvasImageSource, sourceWidth: number, sourceHeight: number, width: number, height: number) {

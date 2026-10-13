@@ -234,6 +234,7 @@ export type ComponentStress = {
 };
 
 export type SolverResultBundle = {
+  source_current_results?: Record<string, unknown>[];
   em_fields?: Record<string, unknown>;
   em_networks?: Record<string, unknown>;
   contract: string;
@@ -331,6 +332,7 @@ export type ResultVisualization = {
   animationPlaying: boolean;
   animationFrame: number;
   animationFps: number;
+  animationPlaybackSpeed: number;
   impedanceFrequencyHz: number | null;
   visibleResultLayers: string[];
 };
@@ -354,6 +356,7 @@ export const defaultResultVisualization = (): ResultVisualization => ({
   animationPlaying: false,
   animationFrame: 0,
   animationFps: 12,
+  animationPlaybackSpeed: 1,
   impedanceFrequencyHz: null,
   visibleResultLayers: [],
 });
@@ -513,6 +516,7 @@ export function normalizeSolverResult(raw: unknown): SolverResultBundle | null {
     mode: String(result.mode ?? "unknown"),
     model_status: String(result.model_status ?? "unsupported"),
     summary: (result.summary as Record<string, unknown>) ?? {},
+    source_current_results: Array.isArray(fields.source_current_results) ? fields.source_current_results as Record<string, unknown>[] : [],
     scalar_fields: {
       voltage_v: readScalars("voltage_v").length ? readScalars("voltage_v") : voltageSamples,
       voltage_drop_v: readScalars("voltage_drop_v").length

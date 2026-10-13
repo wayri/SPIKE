@@ -29,8 +29,8 @@ CloseApplications=no
 [Files]
 Source: "{#Payload}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 [Icons]
-Name: "{autoprograms}\SPIKES Studio"; Filename: "{app}\SPIKES-Studio.exe"
-Name: "{autodesktop}\SPIKES Studio"; Filename: "{app}\SPIKES-Studio.exe"; Tasks: desktopicon
+Name: "{autoprograms}\SPIKES Studio"; Filename: "{app}\SPIKES-Studio.exe"; IconFilename: "{app}\SPIKES-Studio.exe"; AppUserModelID: "SPIKES.Studio"
+Name: "{autodesktop}\SPIKES Studio"; Filename: "{app}\SPIKES-Studio.exe"; IconFilename: "{app}\SPIKES-Studio.exe"; AppUserModelID: "SPIKES.Studio"; Tasks: desktopicon
 [Tasks]
 Name: desktopicon; Description: "Create a desktop shortcut"; Flags: unchecked
 [Run]

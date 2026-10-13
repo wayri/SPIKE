@@ -34,6 +34,12 @@ class Document:
     def __init__(self, data):
         self.data = deepcopy(data)
         self.data.setdefault('wires',[])
+        self.data.setdefault('junctions',[])
+        self.data.setdefault('labels',[])
+        if isinstance(self.data['wires'],list):
+            for index,wire in enumerate(self.data['wires']):
+                if isinstance(wire,dict):wire.setdefault('draw_order',index)
+        self.data.setdefault('power_symbols',[])
         from .model_fidelity import default_policy
         self.data.setdefault('model_policy', default_policy())
         self.data.setdefault('simulation_sequences',[])
@@ -109,7 +115,20 @@ class Document:
             data.update(source=source, title=replacement.data['title'],
                         components=replacement.data['components'])
             parts={p['id']:p for p in data['components']}
-            data['wires']=[w for w in data['wires'] if all(e[0] in parts and 0<=e[1]<len(parts[e[0]]['nodes']) for e in (w['a'],w['b'])) and parts[w['a'][0]]['nodes'][w['a'][1]].lower()==parts[w['b'][0]]['nodes'][w['b'][1]].lower()]
+            data['power_symbols']=[m for m in data['power_symbols'] if m['terminal'][0] in parts and m['terminal'][1]<len(parts[m['terminal'][0]]['nodes']) and (m['kind']!='reference_ground' or parts[m['terminal'][0]]['nodes'][m['terminal'][1]]=='0')]
+            retained=[]
+            for junction in data['junctions']:
+                endpoint=junction.get('source_terminal',[])
+                if len(endpoint)==2 and endpoint[0] in parts and type(endpoint[1]) is int and 0<=endpoint[1]<len(parts[endpoint[0]]['nodes']):
+                    junction['source_node']=parts[endpoint[0]]['nodes'][endpoint[1]];retained.append(junction)
+            data['junctions']=retained;junctions={j['id']:j for j in retained}
+            def node(endpoint):
+                if len(endpoint)==2 and endpoint[0] in parts and type(endpoint[1]) is int and 0<=endpoint[1]<len(parts[endpoint[0]]['nodes']):return parts[endpoint[0]]['nodes'][endpoint[1]]
+                if len(endpoint)==1 and endpoint[0] in junctions:return junctions[endpoint[0]]['source_node']
+                return None
+            data['wires']=[w for w in data['wires'] if node(w.get('a',[])) is not None and node(w.get('b',[])) is not None and node(w['a']).lower()==node(w['b']).lower()]
+            from .net_labels import reconcile as reconcile_labels
+            if len(reconcile_labels(data))!=len(data['labels']):raise ValueError('Source edit invalidates existing net labels. Remove or review those markers before applying this source change; saved source is unchanged.')
         self.commit(mutate)
 
     def rotate(self,ids):
@@ -119,7 +138,7 @@ class Document:
                 if p['id'] in ids:p['rotation']=(p['rotation']+90)%360
         self.commit(mutate)
 
-    def connect(self,a,b,waypoints=None):
+    def connect(self,a,b,waypoints=None,bend='horizontal'):
         """Merge complete named nets, never substitute a decorative line for wiring."""
         import re
         from .part_properties import rewrite
@@ -130,6 +149,7 @@ class Document:
         if any({tuple(w['a']),tuple(w['b'])}=={tuple(a),tuple(b)} for w in self.data['wires']):raise ValueError('These terminals already have a route')
         keep=parts[a[0]]['nodes'][a[1]];old=parts[b[0]]['nodes'][b[1]]
         if old=='0':keep,old=old,keep
+        if bend not in ('horizontal','vertical'):raise ValueError('Unknown wire bend posture')
         candidate=Document(self.data)
         if keep.lower()!=old.lower():
             if self.data['controller_setup'] is not None:raise ValueError('Detach the controller setup before merging named nets; its pin bindings need explicit review')
@@ -139,6 +159,8 @@ class Document:
             for p in parts.values():
                 nodes=[keep if n.lower()==old.lower() else n for n in p['nodes']]
                 if nodes!=p['nodes']:source=rewrite(source,p['ref'],{'nodes':nodes},None)
+            for label in candidate.data['labels']:
+                if label['net'].casefold()==old.casefold():label.update(net=keep.lower(),name=keep.lower())
             candidate.apply_source(source)
             def rename(expression):
                 return re.sub(r'(?i)\bv\(([^)]*)\)',lambda m:'V('+','.join(keep if n.strip().lower()==old.lower() else n.strip() for n in m[1].split(','))+')',expression)
@@ -148,9 +170,64 @@ class Document:
             for instrument in candidate.data['instruments']:instrument['expression']=rename(instrument['expression'])
             for instrument in candidate.data['dashboard']['widgets']:instrument['expression']=rename(instrument['expression'])
             candidate.data['expressions']=[rename(e) for e in candidate.data['expressions']]
-        candidate.data['wires'].append({'id':uuid.uuid4().hex,'a':list(a),'b':list(b),'waypoints':list(waypoints or [])})
+        candidate.data['wires'].append({'id':uuid.uuid4().hex,'a':list(a),'b':list(b),'waypoints':list(waypoints or []),'bend':bend,'manual':True,'draw_order':max([0]+[w['draw_order'] for w in candidate.data['wires']])+1})
         candidate.data['revision']=self.data['revision']
         candidate.validate();self.commit(lambda d:d.update(deepcopy(candidate.data)))
+
+    def connect_endpoints(self,a,b,waypoints=None,bend='horizontal'):
+        """Join terminals and/or explicit junctions using source-authoritative nets."""
+        if len(a)==len(b)==2:return self.connect(a,b,waypoints,bend)
+        if tuple(a)==tuple(b):raise ValueError('Choose different connection points')
+        if bend not in ('horizontal','vertical'):raise ValueError('Unknown wire bend posture')
+        parts={p['id']:p for p in self.data['components']};junctions={j['id']:j for j in self.data['junctions']}
+        def anchor(endpoint):
+            if len(endpoint)==1 and endpoint[0] in junctions:return junctions[endpoint[0]]['source_terminal']
+            if len(endpoint)==2 and endpoint[0] in parts and type(endpoint[1]) is int and 0<=endpoint[1]<len(parts[endpoint[0]]['nodes']):return endpoint
+            raise ValueError('Choose an existing terminal or junction')
+        aa,bb=anchor(a),anchor(b)
+        if any({tuple(w['a']),tuple(w['b'])}=={tuple(a),tuple(b)} for w in self.data['wires']):raise ValueError('These points already have a route')
+        candidate=Document(self.data)
+        if parts[aa[0]]['nodes'][aa[1]].casefold()!=parts[bb[0]]['nodes'][bb[1]].casefold():
+            candidate.connect(aa,bb);candidate.data['wires'].pop()
+        candidate.data['wires'].append(dict(id=uuid.uuid4().hex,a=list(a),b=list(b),waypoints=list(waypoints or []),bend=bend,manual=True,draw_order=max([0]+[w['draw_order'] for w in candidate.data['wires']])+1))
+        candidate.data['revision']=self.data['revision'];candidate.validate();self.commit(lambda d:d.update(deepcopy(candidate.data)))
+
+    def branch(self,wire_id,at,terminal_endpoint,waypoints=None,bend='horizontal',tolerance=12):
+        """Split one drawn wire and join a terminal through an explicit junction."""
+        from .editor_geometry import nearest_route_point,route
+        if bend not in ('horizontal','vertical'):raise ValueError('Unknown wire bend posture')
+        if type(tolerance) not in (int,float) or not math.isfinite(tolerance) or tolerance<0:raise ValueError('Invalid branch hit tolerance')
+        selected=next((w for w in self.data['wires'] if w['id']==wire_id),None)
+        if selected is None:raise ValueError('Choose an existing wire')
+        parts={p['id']:p for p in self.data['components']};junctions={j['id']:j for j in self.data['junctions']}
+        if len(terminal_endpoint)==1 and terminal_endpoint[0] in junctions:pass
+        elif len(terminal_endpoint)!=2 or terminal_endpoint[0] not in parts or type(terminal_endpoint[1]) is not int or not 0<=terminal_endpoint[1]<len(parts[terminal_endpoint[0]]['nodes']):raise ValueError('Choose an existing terminal or junction')
+        points=route(parts,selected,junctions);point,segment,distance=nearest_route_point(points,at)
+        if distance>tolerance:raise ValueError('Click the wire route to create a branch')
+        if point==tuple(points[0]) or point==tuple(points[-1]):raise ValueError('Branch on the wire interior; connect directly at its endpoint')
+        anchor=selected['a'] if len(selected['a'])==2 else junctions[selected['a'][0]]['source_terminal']
+        candidate=Document(self.data)
+        # Reuse terminal connection admission to perform the source rewrite and
+        # reject unsupported hierarchy/controller/expression cases atomically.
+        target_anchor=terminal_endpoint if len(terminal_endpoint)==2 else junctions[terminal_endpoint[0]]['source_terminal']
+        if parts[anchor[0]]['nodes'][anchor[1]].casefold()!=parts[target_anchor[0]]['nodes'][target_anchor[1]].casefold():
+            candidate.connect_endpoints(tuple(anchor),tuple(terminal_endpoint),[],bend)
+            candidate.data['wires'].pop()
+        selected=next(w for w in candidate.data['wires'] if w['id']==wire_id)
+        parts={p['id']:p for p in candidate.data['components']};junctions={j['id']:j for j in candidate.data['junctions']}
+        anchor_node=parts[anchor[0]]['nodes'][anchor[1]]
+        ident=uuid.uuid4().hex
+        candidate.data['junctions'].append({'id':ident,'x':point[0],'y':point[1],
+                                             'source_terminal':list(anchor),'source_node':anchor_node})
+        left=list(map(list,points[1:segment+1]));right=list(map(list,points[segment+1:-1]))
+        original_b=deepcopy(selected['b']);selected.update(b=[ident],waypoints=left,manual=True)
+        candidate.data['wires'].append({'id':uuid.uuid4().hex,'a':[ident],'b':original_b,
+                                        'waypoints':right,'bend':selected.get('bend','horizontal'),'manual':True,'draw_order':selected['draw_order']})
+        candidate.data['wires'].append({'id':uuid.uuid4().hex,'a':list(terminal_endpoint),'b':[ident],
+                                        'waypoints':list(waypoints or []),'bend':bend,'manual':True,'draw_order':max([0]+[w['draw_order'] for w in candidate.data['wires']])+1})
+        candidate.data['revision']=self.data['revision'];candidate.validate()
+        self.commit(lambda data:data.update(deepcopy(candidate.data)))
+        return ident
 
     def mirror(self,ids,axis='horizontal'):
         """Reflect each selected symbol in world coordinates, retaining pin identity."""
@@ -166,7 +243,7 @@ class Document:
     def move_wire_route(self,ident,dx,dy):
         from .editor_geometry import route
         wire=next(w for w in self.data['wires'] if w['id']==ident)
-        points=route({p['id']:p for p in self.data['components']},wire)
+        points=route({p['id']:p for p in self.data['components']},wire,{j['id']:j for j in self.data['junctions']})
         # Endpoint identities stay fixed; offset the route, with orthogonal leads.
         anchors=[[x+dx,y+dy] for x,y in points]
         def mutate(data):
@@ -189,14 +266,23 @@ class Document:
         if not ids or set(ids)-{a['id'] for a in self.data['annotations']}:raise ValueError('Select existing annotations')
         self.commit(lambda d:d.__setitem__('annotations',[a for a in d['annotations'] if a['id'] not in ids]))
 
-    def move(self, positions):
+    def move(self, positions, preserve_routes=True):
         by_id = {p['id']: p for p in self.data['components']}
         if not positions or set(positions) - set(by_id):
             raise ValueError('Selection is empty or stale')
+        if type(preserve_routes) is not bool:raise ValueError('preserve_routes must be boolean')
+        deltas={ident:(float(at[0])-by_id[ident]['x'],float(at[1])-by_id[ident]['y']) for ident,at in positions.items()}
+        from .editor_geometry import dragged_waypoints
+        routed={}
+        for wire in self.data['wires']:
+            if wire['a'][0] in deltas or wire['b'][0] in deltas:
+                routed[wire['id']]=dragged_waypoints(by_id,wire,deltas,{j['id']:j for j in self.data['junctions']}) if preserve_routes else []
         def mutate(data):
             for part in data['components']:
                 if part['id'] in positions:
                     part['x'], part['y'] = map(float, positions[part['id']])
+            for wire in data['wires']:
+                if wire['id'] in routed:wire['waypoints']=routed[wire['id']]
         self.commit(mutate)
 
     def validate(self):
@@ -209,6 +295,9 @@ class Document:
         from .library_browser import validate_preferences
         if not isinstance(self.data.get('metadata',{}),dict):raise ValueError('Project metadata must be an object')
         validate_preferences(self.data.get('metadata',{}).get('library_browser',{}))
+        if type(self.data['metadata'].get('wire_hops',False)) is not bool:raise ValueError('Wire hop visibility must be boolean')
+        from .net_labels import validate as validate_labels
+        validate_labels(self.data)
         if self.data['controller_setup'] is not None:
             from .controller_block import validate as validate_controller
             validate_controller(self.data['controller_setup'])
@@ -232,6 +321,9 @@ class Document:
             if name not in self.data:raise ValueError(f'Missing schematic field: {name}')
         if not isinstance(self.data.get("source"), str): raise ValueError("Missing source netlist")
         parts = self.data["components"]
+        if 'plot_annotations' in self.data['metadata']:
+            from .plot_annotations import validate as validate_plot_annotations
+            validate_plot_annotations(self.data['metadata']['plot_annotations'])
         if len(parts) > 100_000: raise ValueError("Too many components")
         for key in ("id", "ref"):
             ids = [p[key] for p in parts]
@@ -258,14 +350,43 @@ class Document:
             if not isinstance(a.get('text'),str) or len(a['text'])>16384:raise ValueError('Annotation text exceeds 16384 characters')
             if a.get('color') not in ('accent','text','warning','danger'):raise ValueError('Unknown annotation theme color')
         by_id={p['id']:p for p in parts}
+        from .power_symbols import validate as validate_power_symbols
+        validate_power_symbols(self.data['power_symbols'],parts)
+        junctions=self.data['junctions']
+        if not isinstance(junctions,list) or len(junctions)>100000:raise ValueError('Invalid junction list')
+        junction_by_id={}
+        for junction in junctions:
+            if not isinstance(junction,dict) or not isinstance(junction.get('id'),str) or not junction['id'] or junction['id'] in junction_by_id:raise ValueError('Invalid or duplicate junction ID')
+            if any(type(junction.get(k)) not in (int,float) or not math.isfinite(junction[k]) or abs(junction[k])>1e6 for k in ('x','y')):raise ValueError('Junction geometry must be finite and bounded')
+            endpoint=junction.get('source_terminal',[])
+            if len(endpoint)!=2 or endpoint[0] not in by_id or type(endpoint[1]) is not int or not 0<=endpoint[1]<len(by_id[endpoint[0]]['nodes']):raise ValueError('Invalid junction source terminal')
+            node=junction.get('source_node')
+            if not isinstance(node,str) or not node or node.lower()!=by_id[endpoint[0]]['nodes'][endpoint[1]].lower():raise ValueError('Junction source node is stale')
+            junction_by_id[junction['id']]=junction
+        def endpoint_node(endpoint):
+            if not isinstance(endpoint,(list,tuple)):raise ValueError('Invalid wire endpoint')
+            if len(endpoint)==2 and endpoint[0] in by_id and type(endpoint[1]) is int and 0<=endpoint[1]<len(by_id[endpoint[0]]['nodes']):return by_id[endpoint[0]]['nodes'][endpoint[1]]
+            if len(endpoint)==1 and endpoint[0] in junction_by_id:return junction_by_id[endpoint[0]]['source_node']
+            raise ValueError('Invalid wire endpoint')
         if not isinstance(self.data['wires'],list) or len(self.data['wires'])>100000:raise ValueError('Invalid wire list')
+        wire_ids=set();junction_uses={ident:0 for ident in junction_by_id}
         for wire in self.data['wires']:
+            if not isinstance(wire,dict) or not isinstance(wire.get('id'),str) or not wire['id'] or wire['id'] in wire_ids:raise ValueError('Invalid or duplicate wire ID')
+            if 'draw_order' in wire and (type(wire['draw_order']) is not int or not 0<=wire['draw_order']<=1000000000):raise ValueError('Invalid wire creation order')
+            wire_ids.add(wire['id'])
+            if 'parasitics' in wire:
+                from .wire_models import validate as validate_wire_model
+                validate_wire_model(wire['parasitics'])
             points=wire.get('waypoints',[])
+            if type(wire.get('manual',False)) is not bool:raise ValueError('Wire manual-routing flag must be boolean')
+            if wire.get('bend','horizontal') not in ('horizontal','vertical'):raise ValueError('Unknown wire bend posture')
             if not isinstance(points,list) or len(points)>2048:raise ValueError('Wire route exceeds 2048 corners')
             if any(not isinstance(p,(list,tuple)) or len(p)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) or abs(v)>1e6 for v in p) for p in points):raise ValueError('Invalid wire corner coordinates')
+            if wire['a']==wire['b']:raise ValueError('Wire endpoints must differ')
+            if endpoint_node(wire['a']).lower()!=endpoint_node(wire['b']).lower():raise ValueError('Wired endpoints must share a net; use Undo or edit the circuit text to change connectivity')
             for endpoint in (wire['a'],wire['b']):
-                if len(endpoint)!=2 or endpoint[0] not in by_id or type(endpoint[1]) is not int or not 0<=endpoint[1]<len(by_id[endpoint[0]]['nodes']):raise ValueError('Invalid wire terminal')
-            if by_id[wire['a'][0]]['nodes'][wire['a'][1]].lower()!=by_id[wire['b'][0]]['nodes'][wire['b'][1]].lower():raise ValueError('Wired terminals must share a net; use Undo or edit the circuit text to change connectivity')
+                if len(endpoint)==1:junction_uses[endpoint[0]]+=1
+        if any(count<2 for count in junction_uses.values()):raise ValueError('Junction must split or join at least two wire segments')
 
     def update_setup(self,key,value):
         if key not in ('thermal_setup','run_profile'):raise ValueError('Unknown project setup section')
@@ -363,6 +484,69 @@ class Document:
             if ref not in {p["ref"].upper() for p in self.data["components"]}: raise ValueError("Unknown probe component")
         self.commit(lambda d: d["probes"].append({"id": uuid.uuid4().hex, "expression": expression, "anchor": anchor, "descriptor": probe.to_dict()}))
 
+    def connectivity(self):
+        """Return a deterministic source-authoritative net navigation index.
+
+        Drawn routes are presentation metadata.  Their endpoint-connected
+        groups are counted for navigation, but never used to infer that a
+        named net is electrically split or that two named nets are joined.
+        """
+        nets = {}
+        parts = {part['id']: part for part in self.data['components']}
+        junctions = {junction['id']: junction for junction in self.data['junctions']}
+
+        for part in self.data['components']:
+            for pin_index, node in enumerate(part['nodes']):
+                normalized = node.casefold()
+                net = nets.setdefault(normalized, {'names': set(), 'pins': [], 'wires': []})
+                net['names'].add(node)
+                net['pins'].append({'component_id': part['id'], 'ref': part['ref'],
+                                    'pin_index': pin_index, 'node': node})
+
+        def endpoint_node(endpoint):
+            if len(endpoint) == 2:
+                return parts[endpoint[0]]['nodes'][endpoint[1]]
+            return junctions[endpoint[0]]['source_node']
+
+        for wire in self.data['wires']:
+            # Validation guarantees both endpoints resolve to the same named
+            # source net.  Geometry and waypoint crossings are intentionally
+            # absent from this index.
+            normalized = endpoint_node(wire['a']).casefold()
+            nets[normalized]['wires'].append(wire)
+
+        result = []
+        for normalized, net in nets.items():
+            parent = {}
+
+            def find(endpoint):
+                endpoint = tuple(endpoint)
+                parent.setdefault(endpoint, endpoint)
+                while parent[endpoint] != endpoint:
+                    parent[endpoint] = parent[parent[endpoint]]
+                    endpoint = parent[endpoint]
+                return endpoint
+
+            def union(a, b):
+                root_a, root_b = find(a), find(b)
+                if root_a != root_b:
+                    parent[max(root_a, root_b)] = min(root_a, root_b)
+
+            for wire in net['wires']:
+                union(wire['a'], wire['b'])
+            drawing_groups = len({find(endpoint) for endpoint in parent})
+            pins = sorted(net['pins'], key=lambda pin: (
+                pin['ref'].casefold(), pin['ref'], pin['pin_index'], pin['component_id']))
+            result.append({
+                'name': min(net['names'], key=lambda name: (name.casefold(), name)),
+                'normalized_name': normalized,
+                'pins': pins,
+                'wire_ids': sorted(wire['id'] for wire in net['wires']),
+                'drawing_groups': drawing_groups,
+                'terminal_count': len(pins),
+            })
+        return sorted(result, key=lambda net: (net['normalized_name'], net['name']))
+
     def bom(self):
         groups = {}
         for part in self.data["components"]:
@@ -379,11 +563,15 @@ COMMANDS.update({'file.new': 'Ctrl+N', 'run.interactive': 'Ctrl+F5',
                  'run.pause': 'F6', 'run.stop': 'Shift+F5'})
 COMMANDS.update({'run.manager':'Ctrl+J','run.thermal_setup':'Ctrl+Shift+T'})
 COMMANDS.update({'view.directives':'Ctrl+D','edit.directive':'S'})
+COMMANDS.update({'edit.canvas_text':'T'})
+COMMANDS.update({'edit.net_label':'Ctrl+L'})
+COMMANDS.update({'view.back':'Alt+Left','view.forward':'Alt+Right','view.home':'Alt+Home'})
 COMMANDS.update({'view.frequency':'Ctrl+Shift+F'})
 COMMANDS.update({'view.power_tree':'Ctrl+Shift+P','view.analytics':'Ctrl+Shift+A'})
 COMMANDS.update({'part.resistor':'R','part.capacitor':'C','part.inductor':'L','part.diode':'D'})
-COMMANDS.update({'edit.rotate':'Space','edit.wire':'W'})
+COMMANDS.update({'edit.rotate':'Space','edit.wire':'W','edit.move':'M','edit.drag':'G','edit.wire_bend':'/'})
 COMMANDS.update({'view.command_search':'Ctrl+Shift+K'})
+COMMANDS.update({'view.net_navigator':'Ctrl+Shift+N'})
 COMMANDS.update({'edit.copy':'Ctrl+C','edit.select_all':'Ctrl+A',
                  'edit.properties_standard':'Ctrl+E','edit.rotate_standard':'Ctrl+R',
                  'edit.redo_alternative':'Ctrl+Shift+Z','view.schematic':'Ctrl+1',

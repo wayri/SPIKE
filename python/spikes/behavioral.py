@@ -37,7 +37,7 @@ _SIGNAL_RE = re.compile(
 _UNARY_FUNCTIONS = {
     "abs", "acos", "acosh", "asin", "asinh", "atan", "cos", "cosh",
     "ceil", "exp", "floor", "int", "log", "log10", "sgn", "sin",
-    "sinh", "sqrt", "tanh", "u", "uramp",
+    "sinh", "sqrt", "tan", "tanh", "atanh", "u", "uramp",
 }
 _BINARY_FUNCTIONS = {"atan2", "hypot", "max", "min", "pow"}
 _TERNARY_FUNCTIONS = {"limit", "spice_if"}
@@ -181,6 +181,13 @@ class CompiledBehavioralExpression:
                     value, slope = math.sin(argument), math.cos(argument)
                 elif name == "cos":
                     value, slope = math.cos(argument), -math.sin(argument)
+                elif name == "tan":
+                    value = math.tan(argument)
+                    slope = 1.0 + value * value
+                elif name == "atanh":
+                    if abs(argument) >= 1.0:
+                        raise ValueError("Behavioral atanh requires abs(argument) < 1.")
+                    value, slope = math.atanh(argument), 1.0 / (1.0 - argument * argument)
                 elif name == "tanh":
                     value, slope = math.tanh(argument), 1.0 - math.tanh(argument) ** 2
                 elif name == "abs":

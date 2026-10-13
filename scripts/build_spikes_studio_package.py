@@ -38,7 +38,7 @@ def main():
     copy_tree(TEMPLATE/'python',stage/'python') if TEMPLATE!=ROOT else copy_tree(ROOT/'python',stage/'python')
     copy_tree(ROOT/'python/spikes',stage/'python/spikes')
     shutil.copy2(ROOT/'python/__init__.py',stage/'python/__init__.py')
-    for name in ('acceleration.py','compute_policy.py','gpu_acceleration.py','native_mna.py','contracts.py','ngspice_plugin.py','spice_netlist_safety.py','sparselizard_process.py'):
+    for name in ('acceleration.py','compute_policy.py','gpu_acceleration.py','native_mna.py','native_source_waveforms.py','contracts.py','ngspice_plugin.py','spice_netlist_safety.py','sparselizard_process.py'):
         shutil.copy2(ROOT/'python/spike_core'/name,stage/'python/spike_core'/name)
     copy_tree(TEMPLATE/'studio/python/spikes_studio',stage/'spikes_studio')
     for folder in ('docs','schemas','library'):

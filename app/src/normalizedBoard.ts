@@ -100,7 +100,12 @@ function drawingLoops(drawings: ParsedDrawing[]): Point[][] {
 }
 
 export function parseNormalizedBoard(source: string): ParsedBoard {
-  const { design: d, canonical_design: canonical } = normalizedDesignSnapshot(source);
+  return projectNormalizedBoard(normalizedDesignSnapshot(source));
+}
+
+/** Display-only projection of an already admitted snapshot; avoids stringify/parse copies. */
+export function projectNormalizedBoard(snapshot: Record<string, any>): ParsedBoard {
+  const { design: d, canonical_design: canonical } = snapshot;
   const nets: Record<string, string> = Object.fromEntries(d.nets.map((n: any) => [String(n.id), n.name]));
   const net = (row: any) => nets[String(row.net_id)] ?? row.net_name ?? "";
   const layerDefinitions = d.layers.map((l: any, index: number) => ({ id: index, name: l.name, kind: l.type === "power_ground" ? "power" : l.type }));
@@ -152,11 +157,13 @@ export function parseNormalizedBoard(source: string): ParsedBoard {
     width: bounds[2] - bounds[0], height: bounds[3] - bounds[1], bounds: { minX: bounds[0], minY: bounds[1], maxX: bounds[2], maxY: bounds[3] }, outlineLoops,
     tracks, layers, layerDefinitions, nets,
     vias: d.vias.map((v: any) => ({ ...v, size: v.diameter, net: net(v) })),
-    pads: [...d.pads, ...artwork.filter((r: any) => r.kind === "pad")].map((p: any) => { const size = p.size ?? p.size_mm ?? [1, 1]; return ({ ...p, customPolygon: p.custom_geometry?.status === "supported" ? p.custom_geometry.positive_filled_polygon : undefined, at: p.at ?? p.center_mm, name: p.number ?? p.name ?? "", width: size[0], height: size[1], drill: p.drill ?? p.drill_size_mm?.[0] ?? 0, rotation: p.rotation ?? p.rotation_deg ?? 0, net: net(p), ref: p.component ?? p.component_id }); }),
+    pads: [...d.pads, ...artwork.filter((r: any) => r.kind === "pad")].map((p: any) => { const size = p.size ?? p.size_mm ?? [1, 1]; return ({ ...p, customPolygon: p.custom_geometry?.status === "supported" ? p.custom_geometry.positive_filled_polygon : undefined, at: p.at ?? p.center_mm, name: p.number ?? p.name ?? "", width: size[0], height: size[1], drill: p.drill ?? p.drill_size_mm?.[0] ?? 0, rotation: -(p.rotation ?? p.rotation_deg ?? 0), net: net(p), ref: p.component ?? p.component_id }); }),
     components: d.components.map((c: any) => { const retained = canonicalComponents.get(c.id) ?? c; const models = (retained.model_ids ?? c.model_ids ?? []).map((id: string) => canonicalModels.get(id)).filter(Boolean).map((model: any) => ({ path: model.uri ?? "", offset: [0,0,0] as [number,number,number], scale: [1,1,1] as [number,number,number], rotation: [0,0,0] as [number,number,number], transform: Array.isArray(model.transform) ? [...model.transform] : [] })); return ({ ...c, ref: c.reference, at: c.at ?? c.position_mm, rotation: c.rotation ?? c.rotation_deg ?? 0, library: c.footprint ?? c.library ?? "",
       width: (c.odb_package_ref ?? c.odb_package)?.bounds_mm ? (c.odb_package_ref ?? c.odb_package).bounds_mm[2] - (c.odb_package_ref ?? c.odb_package).bounds_mm[0] : 2,
       height: (c.odb_package_ref ?? c.odb_package)?.bounds_mm ? (c.odb_package_ref ?? c.odb_package).bounds_mm[3] - (c.odb_package_ref ?? c.odb_package).bounds_mm[1] : 2,
-      layer: c.side === "bottom" ? layers[layers.length - 1] : c.side === "top" ? layers[0] : c.layer ?? layers[0], model: models.length > 0, modelPath: models[0]?.path, modelPaths: models.map((model: { path: string }) => model.path), models, modelOffset: models[0]?.offset ?? [0,0,0], modelScale: models[0]?.scale ?? [1,1,1], modelRotation: models[0]?.rotation ?? [0,0,0] }); }),
+      // A dielectric-only retained solid still has a component mounting side.
+      // These display side names do not add copper to the physical design.
+      layer: c.side === "bottom" ? (layers[layers.length - 1] ?? "B.Cu") : c.side === "top" ? (layers[0] ?? "F.Cu") : c.layer ?? layers[0] ?? "F.Cu", model: models.length > 0, modelPath: models[0]?.path, modelPaths: models.map((model: { path: string }) => model.path), models, modelOffset: models[0]?.offset ?? [0,0,0], modelScale: models[0]?.scale ?? [1,1,1], modelRotation: models[0]?.rotation ?? [0,0,0] }); }),
     zones: [...zoneRows, ...artwork.filter((r: any) => r.kind === "zone")].map((z: any) => ({ id: z.id, layer: z.layer, net: net(z), points: z.boundary_rings?.length ? ringPoints(z.boundary_rings[0]) : z.points ?? z.outlines_mm?.[0] ?? [], holes: z.boundary_rings?.length ? z.boundary_rings.slice(1).map(ringPoints) : z.holes_mm ?? [],
       ...(z.source_kind ? { source_kind: z.source_kind } : {}),
       ...(z.filled_copper_state ? { filled_copper_state: z.filled_copper_state } : {}),

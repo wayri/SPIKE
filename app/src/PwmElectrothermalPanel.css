@@ -1,0 +1,99 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+@import "./buttonStandard.css";
+
+.pwm-electrothermal-panel {
+  --pwm-border: var(--spike-table-border-strong, #3c4652);
+  --pwm-surface: var(--spike-table-field, #151b22);
+  --pwm-muted: var(--spike-table-muted, #a8b1bc);
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--pwm-border);
+  border-radius: 8px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--pwm-surface) 88%, #352747), var(--pwm-surface));
+}
+
+.pwm-electrothermal-panel > header,
+.pwm-electrothermal-result-heading,
+.pwm-electrothermal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pwm-electrothermal-panel h4,
+.pwm-electrothermal-panel p,
+.pwm-electrothermal-panel figure { margin: 0; }
+.pwm-electrothermal-panel h4 { font-size: 16px; }
+.pwm-electrothermal-eyebrow { color: #bf91ff; font-size: 10px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.pwm-electrothermal-badge { flex: 0 0 auto; padding: 3px 7px; border: 1px solid #9b7832; border-radius: 999px; color: #ffd88a; background: #4c381b; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pwm-electrothermal-intro,
+.pwm-electrothermal-boundary-note,
+.pwm-electrothermal-actions span { color: var(--pwm-muted); font-size: 11px; line-height: 1.55; }
+
+.pwm-electrothermal-panel fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 11px;
+  border: 1px solid var(--pwm-border);
+  border-radius: 6px;
+}
+.pwm-electrothermal-panel legend { padding: 0 6px; color: #d9c6f5; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pwm-electrothermal-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 9px 12px; min-width: 0; }
+.pwm-electrothermal-fields label { display: grid; gap: 5px; min-width: 0; color: var(--pwm-muted); font-size: 10px; }
+.pwm-electrothermal-fields label > span { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.pwm-electrothermal-fields small { color: #b89be0; font-size: 9px; white-space: nowrap; }
+.pwm-electrothermal-fields input { width: 100%; }
+.pwm-electrothermal-boundary-note { padding: 8px 10px; border-left: 3px solid #9871ca; background: color-mix(in srgb, var(--pwm-surface) 80%, #402e56); }
+.pwm-electrothermal-actions { justify-content: flex-start; flex-wrap: wrap; }
+.pwm-electrothermal-actions span { flex: 1 1 250px; min-width: 0; }
+.pwm-electrothermal-error { padding: 9px 11px; border: 1px solid #a44848; border-radius: 4px; color: #ffd0d0; background: #401e22; font-size: 11px; }
+.pwm-electrothermal-stale { padding: 8px 10px; border: 1px solid var(--spike-control-primary-border); border-radius: 4px; color: var(--spike-control-primary-text); background: var(--spike-control-primary-surface); font-size: 11px; }
+.pwm-electrothermal-empty { min-height: 90px; display: grid; place-items: center; padding: 18px; border: 1px dashed var(--pwm-border); border-radius: 6px; color: var(--pwm-muted); font-size: 11px; text-align: center; }
+
+.pwm-electrothermal-results { display: grid; gap: 12px; min-width: 0; }
+.pwm-electrothermal-result-heading > div { display: grid; gap: 2px; }
+.pwm-electrothermal-result-heading strong { color: #ffd88a; font-size: 11px; letter-spacing: .08em; }
+.pwm-electrothermal-result-heading span { color: var(--pwm-muted); font-size: 10px; }
+.pwm-electrothermal-single-frame { padding: 8px 12px; border: 1px solid var(--pwm-border); border-radius: 6px; color: var(--pwm-muted); font-size: 10px; }
+.pwm-electrothermal-plots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; min-width: 0; }
+.pwm-electrothermal-plot { min-width: 0; border: 1px solid var(--pwm-border); border-radius: 6px; overflow: hidden; background: #0b1118; }
+.pwm-electrothermal-plot svg { display: block; width: 100%; height: auto; min-height: 120px; }
+.pwm-electrothermal-plot svg text { fill: #9fadb9; font: 9px Inter, ui-sans-serif, system-ui, sans-serif; }
+.pwm-electrothermal-axis { stroke: #647383; stroke-width: 1; }
+.pwm-electrothermal-band { fill: #76529f; opacity: .25; }
+.pwm-electrothermal-trace { fill: none; stroke: #c094fb; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.pwm-electrothermal-cursor { stroke: #f8c66a; stroke-width: 1; stroke-dasharray: 3 2; }
+.pwm-electrothermal-point { fill: #ffe0a6; stroke: #5d4316; stroke-width: 1; }
+.pwm-electrothermal-plot figcaption { display: grid; gap: 2px; min-height: 37px; padding: 6px 9px; border-top: 1px solid var(--pwm-border); color: #e5edf5; font-size: 10px; }
+.pwm-electrothermal-plot figcaption span { color: var(--pwm-muted); overflow-wrap: anywhere; }
+.pwm-electrothermal-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; margin: 0; overflow: hidden; border: 1px solid var(--pwm-border); border-radius: 6px; background: var(--pwm-border); }
+.pwm-electrothermal-metrics > div { display: grid; gap: 4px; min-width: 0; padding: 9px 10px; background: var(--pwm-surface); }
+.pwm-electrothermal-metrics dt { color: var(--pwm-muted); font-size: 9px; letter-spacing: .04em; text-transform: uppercase; }
+.pwm-electrothermal-metrics dd { margin: 0; color: #eef5fb; font-size: 11px; overflow-wrap: anywhere; }
+.pwm-electrothermal-results details { min-width: 0; font-size: 11px; }
+.pwm-electrothermal-results summary { color: #dac0ff; cursor: pointer; }
+.pwm-electrothermal-results pre { max-height: 240px; margin: 8px 0 0; padding: 10px; overflow: auto; border: 1px solid var(--pwm-border); border-radius: 4px; background: #0b1118; color: #d7e0e9; font-size: 10px; }
+.pwm-electrothermal-results ul { margin: 8px 0 0; padding-left: 18px; color: var(--pwm-muted); line-height: 1.5; }
+
+@media (max-width: 900px) {
+  .pwm-electrothermal-plots { grid-template-columns: 1fr; }
+  .pwm-electrothermal-plot svg { max-height: 220px; }
+}
+
+@media (max-width: 620px) {
+  .pwm-electrothermal-panel { padding: 12px; }
+  .pwm-electrothermal-fields { grid-template-columns: 1fr; }
+  .pwm-electrothermal-actions { align-items: stretch; }
+  .pwm-electrothermal-actions button { flex: 1 1 140px; }
+  .pwm-electrothermal-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (forced-colors: active) {
+  .pwm-electrothermal-badge,
+  .pwm-electrothermal-boundary-note,
+  .pwm-electrothermal-plot { forced-color-adjust: auto; }
+}

@@ -1,0 +1,11 @@
+SPIKES adaptive switching foundation - switched RC load
+* Illustrative smooth-switch values, not manufacturer-qualified models.
+Vs in 0 10
+Vgate gate 0 PULSE(0 5 10u 1u 1u 40u 100u)
+Smain in out gate 0 1 1meg 2.5 100m
+Rload out 0 9
+Cout out 0 1u
+.tran 5u 200u 0 200n UIC
+.measure tran output_avg AVG V(out) FROM=100u TO=200u
+.measure tran output_peak MAX V(out) FROM=100u TO=200u
+.end

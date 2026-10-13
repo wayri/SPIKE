@@ -3,29 +3,45 @@ import * as THREE from "three";
 import type { ParsedBoard } from "./boardParser";
 import { importedBoardLayerVisible } from "./importedBoardLayers";
 
-const selectionState = new WeakMap<THREE.Object3D, { selected: boolean; linked: readonly string[]; children: number }>();
+const selectionState = new WeakMap<THREE.Object3D, { selected: boolean; focusActive: boolean; linked: readonly string[]; children: number }>();
 const visibilityState = new WeakMap<THREE.Object3D, { source: ParsedBoard; layers: Record<string, boolean>; opacity: Record<string, number>; showVias: boolean; children: number; revision: number }>();
 const sameSettings = (a: Record<string, unknown>, b: Record<string, unknown>) => Object.keys(a).length === Object.keys(b).length && Object.keys(a).every(key => a[key] === b[key]);
 
-export function updateAssemblySceneSelection(group: THREE.Object3D, selected: boolean, linked: readonly string[]) {
+export function updateAssemblySceneSelection(group: THREE.Object3D, selected: boolean, linked: readonly string[], focusActive = linked.length > 0) {
   const previous = selectionState.get(group);
-  if (previous && previous.children === group.children.length && previous.selected === selected
+  if (previous && previous.children === group.children.length && previous.selected === selected && previous.focusActive === focusActive
     && previous.linked.length === linked.length && previous.linked.every((net, i) => net === linked[i])) return 0;
-  selectionState.set(group, { selected, linked: [...linked], children: group.children.length });
+  selectionState.set(group, { selected, focusActive, linked: [...linked], children: group.children.length });
   group.userData.assemblySelectionRevision = (group.userData.assemblySelectionRevision ?? 0) + 1;
+  group.userData.assemblyNetFocusActive = focusActive;
   const nets = new Set(linked);
   let visited = 0;
   group.traverse(object => {
     visited++;
     const kind = String(object.userData.sceneKind ?? "");
-    const copper = kind.startsWith("copper-") || kind.startsWith("via-");
+    const copper = kind.startsWith("copper-") || kind.startsWith("via-") || Boolean(object.userData.importedBoardLayer?.endsWith(".Cu") || object.userData.importedBoardLayer === "through");
     if (copper) object.userData.linkedAssemblyNet = nets.has(object.userData.canonicalNetId);
     if (!(object instanceof THREE.Mesh) || (!copper && kind !== "substrate")) return;
     for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
       if (!(material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshBasicMaterial)) continue;
       material.userData.assemblyBaseColor ??= material.color.getHex();
+      material.userData.assemblySelectionDepthTest ??= material.depthTest;
+      material.userData.assemblySelectionToneMapped ??= material.toneMapped;
+      if(copper) {
+        const linkedNet=Boolean(object.userData.linkedAssemblyNet);
+        object.userData.assemblySelectionRenderOrder ??= object.renderOrder;
+        object.renderOrder=linkedNet?390:object.userData.assemblySelectionRenderOrder;
+        material.depthTest=linkedNet?false:material.userData.assemblySelectionDepthTest;
+        material.toneMapped=linkedNet?false:material.userData.assemblySelectionToneMapped;
+        if(material instanceof THREE.MeshStandardMaterial) {
+          material.userData.assemblySelectionEmissive ??= material.emissive.getHex();
+          material.userData.assemblySelectionIntensity ??= material.emissiveIntensity;
+          material.emissive.setHex(linkedNet?0x55e5d5:material.userData.assemblySelectionEmissive);
+          material.emissiveIntensity=linkedNet?.65:material.userData.assemblySelectionIntensity;
+        }
+      }
       material.color.setHex(copper && object.userData.linkedAssemblyNet ? 0x55e5d5
-        : kind === "substrate" && selected ? 0x6c913a : material.userData.assemblyBaseColor);
+        : copper && focusActive ? 0x667076 : kind === "substrate" && selected ? 0x6c913a : material.userData.assemblyBaseColor);
     }
   });
   return visited;
@@ -70,7 +86,9 @@ export function applyAssemblySceneVisibility(group: THREE.Object3D, source: Pars
       const component = kind === "component-placeholder" || kind === "component-model";
       const value = component ? 1 : opacity[data.importedBoardLayer ?? (kind === "substrate" ? "Board body" : data.layer)] ?? 1;
       const layerOpacity = Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 1;
-      material.opacity = hiddenCopper || hiddenDrawing ? 0 : material.userData.assemblyBaseOpacity * layerOpacity;
+      const focusCopper = logicalCopper || Boolean(data.importedBoardLayer?.endsWith(".Cu") || data.importedBoardLayer === "through");
+      const netFocusOpacity = group.userData.assemblyNetFocusActive && focusCopper && !data.linkedAssemblyNet ? .28 : 1;
+      material.opacity = hiddenCopper || hiddenDrawing ? 0 : material.userData.assemblyBaseOpacity * layerOpacity * netFocusOpacity;
       const wasTransparent = material.transparent;
       material.transparent = material.opacity < 1;
       material.depthWrite = material.userData.assemblyBaseDepthWrite && material.opacity >= .999;

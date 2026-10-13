@@ -1,4 +1,6 @@
+import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { navigationPanFraction, zoomViewBoxAt } from "./viewportKeyboardCamera";
 import { ParsedBoard, Point } from "./boardParser";
 import type { AnalysisTerminalMarker, BoardObject, HoverProbeTarget, SelectionFilter, ViewportContextRequest, ViewportHoverTarget } from "./BoardViewport";
 import type { ResultViewMode, ResultVisualization, ScalarSample, SolverResultBundle } from "./analysisResults";
@@ -176,6 +178,8 @@ type Props = {
   showProbes?: boolean;
   hoverProbeEnabled?: boolean;
   onHoverProbe?: (target: HoverProbeTarget | null) => void;
+  onValueScale?: (scale: {minimum:number; maximum:number; mode:string} | null) => void;
+  onNetTune?: ViewportNetTuneHandler;
   terminalMarkers?: AnalysisTerminalMarker[];
   thermalScenario?: ThermalScenarioView | null;
   thermalVisibility?: ThermalSceneVisibility;
@@ -249,7 +253,7 @@ function trackCoveredByZones(track: ParsedBoard["tracks"][number], zones: Parsed
   return coverage >= 5;
 }
 
-function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, showNetNames = false, selectedId, selectedPosition, selectedNet = null, highlightedNets = [], hoverPreview = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, onHoverProbe, terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true }, translucentScene = false, showAxes = true, cameraCommand, viewportRestore = null, onViewChange, selectionBlink = true, selectionFilter, onSelect, onContextMenu }: Props) {
+function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, showNetNames = false, selectedId, selectedPosition, selectedNet = null, highlightedNets = [], hoverPreview = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, onHoverProbe, onValueScale, onNetTune, terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true }, translucentScene = false, showAxes = true, cameraCommand, viewportRestore = null, onViewChange, selectionBlink = true, selectionFilter, onSelect, onContextMenu }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const dragRef = useRef({ x: 0, y: 0, moved: false });
   const draggingRef = useRef(false);
@@ -264,6 +268,9 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     height: sourceViewBox[3],
   }), [sourceViewBox.join(":")]);
   const [view, setView] = useState(initialView);
+  const navigationPointerRef = useRef<{clientX: number; clientY: number} | null>(null);
+  const [navigationStatus, setNavigationStatus] = useState("");
+  useEffect(()=>{if(!navigationStatus)return;const timer=window.setTimeout(()=>setNavigationStatus(""),4000);return()=>window.clearTimeout(timer);},[navigationStatus]);
   const [pixelSize, setPixelSize] = useState({ width: 1000, height: 700 });
   useEffect(() => {
     const element = svgRef.current;
@@ -317,9 +324,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       const factor = zoomIn ? 0.82 : 1.22;
       const width = Math.max(Math.max(0.05, sourceViewBox[2] * 0.0005), Math.min(sourceViewBox[2] * 4, current.width * factor));
       const height = width * sourceViewBox[3] / sourceViewBox[2];
-      const ratioX = (cursorX - current.x) / current.width;
-      const ratioY = (cursorY - current.y) / current.height;
-      return { x: cursorX - ratioX * width, y: cursorY - ratioY * height, width, height };
+      return zoomViewBoxAt(current, [cursorX, cursorY], width, height);
     });
   };
   const beginPan = (event: React.PointerEvent<SVGSVGElement | HTMLDivElement>) => {
@@ -375,14 +380,36 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
   useEffect(() => () => cancelAnimationFrame(dragPanFrameRef.current), []);
   useEffect(() => {
     if (!cameraCommand) return;
+    setNavigationStatus("");
+    const pointer = navigationPointerRef.current;
+    const svg = svgRef.current;
+    if (cameraCommand.startsWith("center-cursor") || cameraCommand.startsWith("pivot-cursor")) {
+      const matrix = svg?.getScreenCTM();
+      if (pointer && matrix) {
+        const point = new DOMPoint(pointer.clientX, pointer.clientY).matrixTransform(matrix.inverse());
+        setView(current => ({...current, x: point.x - current.width / 2, y: point.y - current.height / 2}));
+      } else {
+        setView(current => ({...current, x: initialView.x + (initialView.width - current.width) / 2,
+          y: initialView.y + (initialView.height - current.height) / 2}));
+        setNavigationStatus("Pointer unavailable; centered the board.");
+      }
+      return;
+    }
+    if (cameraCommand.startsWith("zoom-in-cursor") || cameraCommand.startsWith("zoom-out-cursor")) {
+      if (pointer && svg) {
+        zoomAt(pointer.clientX, pointer.clientY, svg.getBoundingClientRect(), cameraCommand.startsWith("zoom-in"));
+        return;
+      }
+      setNavigationStatus("Pointer unavailable; zoomed around the view center.");
+    }
     if (cameraCommand.startsWith("fit")) {
       setView(initialView);
       return;
     }
     if (cameraCommand.startsWith("pan-")) {
       setView(current => {
-        const xStep = current.width * 0.08;
-        const yStep = current.height * 0.08;
+        const xStep = current.width * navigationPanFraction(cameraCommand);
+        const yStep = current.height * navigationPanFraction(cameraCommand);
         return {
           ...current,
           x: current.x + (cameraCommand.startsWith("pan-left") ? -xStep : cameraCommand.startsWith("pan-right") ? xStep : 0),
@@ -614,6 +641,24 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       .sort((a, b) => a.distance - b.distance || b.priority - a.priority)[0];
     return hit ? { ...hit.object, position: toBoard(point) } : null;
   };
+  const netTuneWheelRef = useRef<(event: WheelEvent) => boolean>(() => false);
+  netTuneWheelRef.current = event => {
+    if (!event.shiftKey || !onNetTune || !svgRef.current) return false;
+    const object = objectAt(clientToLayout(event.clientX, event.clientY, svgRef.current.getBoundingClientRect()), true);
+    return Boolean(object?.net && onNetTune({ net: object.net,
+      terminalId: object.terminalRole === "load" ? object.id.replace("analysis-terminal:", "") : undefined,
+      deltaY: event.deltaY, altKey: event.altKey }));
+  };
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const tune = (event: WheelEvent) => {
+      if (netTuneWheelRef.current(event)) { event.preventDefault(); event.stopImmediatePropagation(); }
+    };
+    // Nonpassive capture prevents both canvas zoom and parent scrolling.
+    svg.addEventListener("wheel", tune, { capture: true, passive: false });
+    return () => svg.removeEventListener("wheel", tune, true);
+  }, []);
   const selectAt = (layoutPoint: Point) => {
     const object = objectAt(layoutPoint);
     if (object) onSelect(object);
@@ -874,6 +919,10 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
   }, [analysisResult, board, resultAnalysisOnly, analysisNetsKey, activeCopperLayer, isolatedNet, visibleLayersKey, resultVisualization, resultModeKey]);
   const resultVectors = vectorPipeline.vectors;
   const resultVectorMaximum = vectorPipeline.vectorMaximum;
+  useEffect(() => {
+    const vector = ['electric_field','magnetic_field'].includes(resultModeKey);
+    onValueScale?.(!resultVisualization?.visible ? null : vector && resultVisualization.showVectors && resultVectors.length ? {minimum:0,maximum:resultVectorMaximum,mode:resultModeKey} : resultSamples.length ? {minimum:resultMinimum,maximum:resultMaximum,mode:resultModeKey} : null);
+  }, [onValueScale,resultModeKey,resultVectorMaximum,resultVectors.length,resultMinimum,resultMaximum,resultSamples.length,analysisResult,resultVisualization?.visible,resultVisualization?.showVectors]);
   const sampleLayers = (layer?: string) => resultDatumLayers(layer, board.layers);
   const sampleLayerVisible = (layer?: string) => {
     const selectedLayers = resultVisualization?.visibleResultLayers ?? [];
@@ -1091,6 +1140,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
   })), [resultVisualization?.showVectors, resultVisualization?.vectorScale, resultVectors, resultVectorMaximum, resultCellSize, view.width, projectionKey]);
 
   return <div className={`layout-viewport ${dragging ? "dragging" : ""} ${isolatedNet ? "net-isolated" : ""} ${netFocusActive ? "net-focused" : ""} ${activeCopperLayer === "Overview" ? "overview-active" : ""}`} data-highlighted-net={highlightedNetNames.join(" ")}>
+    {navigationStatus && <div role="status" className="viewport-navigation-status">{navigationStatus}</div>}
     <svg
       ref={svgRef}
       viewBox={`${view.x} ${view.y} ${view.width} ${view.height}`}
@@ -1100,8 +1150,9 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         event.preventDefault();
         zoomAt(event.clientX, event.clientY, event.currentTarget.getBoundingClientRect(), event.deltaY < 0);
       }}
-      onPointerDown={beginPan}
+      onPointerDown={event => { navigationPointerRef.current = {clientX: event.clientX, clientY: event.clientY}; beginPan(event); }}
       onPointerMove={event => {
+        navigationPointerRef.current = {clientX: event.clientX, clientY: event.clientY};
         continuePan(event);
         updateHoverProbe(event);
       }}
@@ -1109,13 +1160,15 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         if (!endPan(event)) selectAt(pointerInLayout(event));
       }}
       onPointerCancel={event => endPan(event)}
-      onPointerLeave={() => onHoverProbe?.(null)}
+      onPointerLeave={() => { navigationPointerRef.current = null; onHoverProbe?.(null); }}
       onContextMenu={event => {
         event.preventDefault();
         event.stopPropagation();
         const point = clientToLayout(event.clientX, event.clientY, event.currentTarget.getBoundingClientRect());
         const object = selectAt(point);
-        onContextMenu?.({ clientX: event.clientX, clientY: event.clientY, object });
+        onContextMenu?.({ clientX: event.clientX, clientY: event.clientY, object,
+          thermalTarget: thermalScenario ? { pointMm: point, componentRef: object?.type === "component" ? object.ref : undefined,
+            occurrenceId: thermalScenario.board_thermal_occurrence_id } : undefined });
       }}
     >
       <defs>

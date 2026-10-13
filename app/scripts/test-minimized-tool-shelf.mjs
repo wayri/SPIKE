@@ -78,7 +78,7 @@ assert.match(app, /detachedToolLabels/);
 assert.match(app, /assembly-workspace-window/);
 assert.match(app, /report-preview-window/);
 assert.match(app, /workspace-tool-minimized/);
-assert.match(app, /if \(panelCollapsed\) return null;/, "minimized PI setup no longer occupies a viewport edge");
+assert.match(app, /if \((?:quickRun \|\| )?panelCollapsed\) return null;/, "minimized PI setup no longer occupies a viewport edge");
 assert.doesNotMatch(app, /classList\.toggle\("panel-collapsed"\)/, "generic panels no longer leave collapsed floating pills");
 const emManager = readFileSync(new URL("../src/EMViewportResultManager.tsx", import.meta.url), "utf8");
 assert.match(emManager, /if \(minimized\) return null;/);

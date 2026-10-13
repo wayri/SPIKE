@@ -1,11 +1,9 @@
 """JSON-line local worker API.
-
 The protocol is deliberately transport-neutral: Tauri can spawn this process,
 while a future cloud worker can expose the same request/response shapes over HTTP.
 """
 
 from __future__ import annotations
-
 import json
 import os
 import subprocess
@@ -14,6 +12,8 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict
 
+from .kicad_schematic_importer import handle_kicad_schematic_request, KicadSchematicViewError
+from .connectivity_view_importer import handle_connectivity_view_request, ConnectivityViewError
 from .acceleration import acceleration_catalog
 from .capabilities import capabilities
 from .capability_ledger import native_capability_ledger
@@ -60,6 +60,10 @@ from .solver_manager import (
     unregister_external_solver,
 )
 from .spice_workspace import compose_spice_workspace, validate_spice_workspace
+from .spider_api import handle_spider_request
+from .service_spider import dispatch_spider_request
+from .service_studio_board_coupling import handle_studio_board_cosimulation_request
+from .studio_bridge import handle_studio_bridge_request
 from .spikes_runtime import handle_worker_method as handle_spikes_worker_method
 from .native_mna import run_native_mna, validate_native_mna_request
 from .native_circuit_compiler import (
@@ -115,6 +119,7 @@ from .service_extension_packages import handle_extension_package_request
 from .service_simulation_handlers import handle_simulation_request
 from .service_meshing import handle_meshing_request
 from .service_assembly_field import handle_assembly_field_request
+from .service_engineering_review import validate_design
 from .kicad_importer import import_kicad_design as _design_from_kicad
 from .external_pi_result_validation import validate_external_pi_multiport
 from . import __version__
@@ -144,51 +149,29 @@ _error_response = error_response
 _export_step = export_step
 
 
-def validate_design(design: SpiDeR) -> Dict[str, Any]:
-    issues = [item if isinstance(item, ValidationIssue) else ValidationIssue(**item) for item in design.issues]
-    if (not design.source_path or not Path(design.source_path).exists()) and not design.metadata.get("source_embedded"):
-        issues.append(ValidationIssue(
-            code="SOURCE_NOT_FOUND",
-            severity="error",
-            message="The source design file is not available.",
-            suggestion="Re-import the board or restore the source path.",
-        ))
-    placeholders = [item.get("reference") for item in design.components if item.get("reference") in {"REF**", "U?", "?"}]
-    if placeholders:
-        issues.append(ValidationIssue(
-            code="COMPONENT_REFERENCE_AMBIGUOUS",
-            severity="warning",
-            message=f"{len(placeholders)} component references are ambiguous.",
-            suggestion="Resolve placeholder references before component-level PI attribution.",
-        ))
-    if not design.tracks and not design.zones:
-        issues.append(ValidationIssue(
-            code="NO_CONDUCTIVE_GEOMETRY",
-            severity="error",
-            message="No tracks or copper zones are available for PI analysis.",
-            suggestion="Import a routed board or provide an interchange export.",
-        ))
-    if len(design.layers) < 2:
-        issues.append(ValidationIssue(
-            code="LAYER_MODEL_INCOMPLETE",
-            severity="warning",
-            message="The layer model is incomplete for return-path and HF analysis.",
-            suggestion="Provide a complete board stackup.",
-        ))
-    return {
-        "contract": design.contract,
-        "valid": not any(i.severity == "error" for i in issues),
-        "issues": [asdict(i) for i in issues],
-        "counts": {
-            "errors": sum(i.severity == "error" for i in issues),
-            "warnings": sum(i.severity == "warning" for i in issues),
-        },
-    }
-
-
 def handle(request: Dict[str, Any]) -> Dict[str, Any]:
+    return dispatch_spider_request(request, _dispatch)
+
+
+def _dispatch(request: Dict[str, Any]) -> Dict[str, Any]:
     method = request.get("method")
     params = request.get("params", {})
+    spider_result = handle_spider_request(method, params)
+    if spider_result is not None:
+        return {"ok": True, "result": spider_result}
+    if method in {"app_update_check", "app_update_download"}:
+        from .app_updates import handle_app_update
+        return handle_app_update(method, params, request.get("id"))
+    if method in {"review_engineering", "quick_engineering_tool"}:
+        from .service_engineering_review import handle_engineering_review
+        return handle_engineering_review(method, params)
+    if method in {"parallel_pool_catalog", "run_parallel_batch"}:
+        from .service_parallel_pool import handle_parallel_request
+        return handle_parallel_request(method, params, request_id=request.get("id"))
+    if isinstance(method, str) and method.startswith("assistant_"):
+        from .service_assistant import handle_assistant_request
+        response = handle_assistant_request(method, params, request.get("id"))
+        if response is not None: return response
     emerge_update_result = handle_emerge_update_request(method, params)
     if emerge_update_result is not None:
         return emerge_update_result
@@ -433,6 +416,16 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
     assembly_scope, scope_error = prepare_analysis_scope(method, params, request.get("id"))
     if scope_error is not None:
         return scope_error
+    studio_bridge_response = handle_studio_bridge_request(method, params, Path(__file__).resolve().parents[2])
+    if studio_bridge_response is not None:
+        return studio_bridge_response
+    studio_feedback_response = handle_studio_board_cosimulation_request(
+        method, {key: value for key, value in params.items() if key != "assembly_scope"}, request_id=request.get("id"),
+    )
+    if studio_feedback_response is not None:
+        if studio_feedback_response.get("ok") and "result" in studio_feedback_response:
+            studio_feedback_response["result"] = attach_scope_provenance(studio_feedback_response["result"], assembly_scope)
+        return studio_feedback_response
     if method in {"emi_preflight", "emi_screen"}:
         try:
             design = SpiDeR(**params["design"])
@@ -777,6 +770,14 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
     # public service symbol without reaching into the split handler module.
     if method == "prepare_visual_bundle":
         return {"ok": True, "result": prepare_visual_bundle(params)}
+    try:
+        schematic = handle_kicad_schematic_request(method, params)
+        if schematic is None:
+            schematic = handle_connectivity_view_request(method, params)
+        if schematic is not None:
+            return {"ok": True, "result": schematic}
+    except (KicadSchematicViewError, ConnectivityViewError, OSError, ValueError, TimeoutError, subprocess.TimeoutExpired, UnicodeError) as exc:
+        return _error_response("SPIKE-BE-IPC-E-0001", str(exc), context={"method": method}, error_type=type(exc).__name__)
     simulation_response = handle_simulation_request(
         method, params, assembly_scope=assembly_scope, solver_registry=_solver_registry,
     )
@@ -789,8 +790,6 @@ def handle(request: Dict[str, Any]) -> Dict[str, Any]:
         context={"method": method},
         error_type="UnknownWorkerMethod",
     )
-
-
 def main() -> int:
     return serve_json_lines(handle, __version__)
 

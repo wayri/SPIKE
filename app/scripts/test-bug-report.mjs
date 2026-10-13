@@ -1,15 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import ts from "typescript";
+import { importTestTypescript } from "./import-test-typescript.mjs";
 
-const options = { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 };
-const packageVersion = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).version;
-const versionUrl = `data:text/javascript;base64,${Buffer.from(`export const APP_VERSION = ${JSON.stringify(packageVersion)}; export const RELEASE_CHANNEL = "engineering-preview";`).toString("base64")}`;
-const { APP_VERSION } = await import(versionUrl);
-const source = ts.transpileModule(readFileSync(new URL("../src/bugReport.ts", import.meta.url), "utf8"), { compilerOptions: options }).outputText;
-const moduleUrl = `data:text/javascript;base64,${Buffer.from(source.replace('from "./appVersion";', `from "${versionUrl}";`)).toString("base64")}`;
-const { bugReportUrl } = await import(moduleUrl);
+const { APP_VERSION } = await importTestTypescript("appVersion");
+const { bugReportUrl } = await importTestTypescript("bugReport");
 
 const url = new URL(bugReportUrl("PI", "Windows NT 10.0 private-host /Users/alice", true));
 assert.equal(url.origin, "https://github.com");

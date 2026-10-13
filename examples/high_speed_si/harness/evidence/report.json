@@ -1,0 +1,143 @@
+{
+  "contract": "spike/example-interboard-harness-report/v1",
+  "status": "completed",
+  "title": "Synthetic interboard harness PI and coupled SI report",
+  "assembly_id": "synthetic-interboard-harness-assembly",
+  "board_occurrences": [
+    "harness-board-A",
+    "harness-board-B"
+  ],
+  "model_scope": {
+    "pi": "Actual SPIKE lumped linear DC operating point on explicit power and return conductors.",
+    "si": "Actual SPIKE sampled four-conductor MTL using geometry-derived approximate RLGC above an ideal plane.",
+    "loads": "12 V source and 4 A board-B DC load; SI ports are explicit 50 ohm single-ended references (100 ohm differential normalization)."
+  },
+  "result_summary": {
+    "pi": {
+      "load_voltage_v": 11.834482758620691,
+      "analytical_load_voltage_v": 11.83448275862069,
+      "load_voltage_abs_error_v": 1.7763568394002505e-15,
+      "wire_loss_w": 0.6620689655172498,
+      "analytical_wire_loss_w": 0.6620689655172414,
+      "wire_loss_abs_error_w": 8.43769498715119e-15,
+      "native_element_power_sum_w": 7.049916206369744e-15,
+      "all_selected_wire_currents_abs_a": [
+        4.000000000000051,
+        4.0
+      ]
+    },
+    "uniform_gui_si": {
+      "status": "completed",
+      "mode": "differential",
+      "frequency_points": 33,
+      "reference_impedance_ohm": 260.4912618942215,
+      "maximum_reciprocity_error": 9.420554752102651e-16,
+      "minimum_through_magnitude": 0.9793812153314418,
+      "maximum_input_reflection_magnitude": 0.003804116470932667
+    },
+    "si": {
+      "mixed_mode_order": "D1..Dn,C1..Cn",
+      "differential_pair_order": [
+        "A aggressor",
+        "A victim",
+        "B aggressor",
+        "B victim"
+      ],
+      "maximum_relative_residual": 2.9588908424784393e-16,
+      "maximum_condition_number": 9.532696511975374,
+      "maximum_sampled_singular_value": 0.9999999999999998,
+      "reciprocity_max_abs": 1.2008898127460164e-15,
+      "peak_differential_next": {
+        "frequency_hz": 117187500.0,
+        "magnitude_v_per_v": 0.017287505951519632,
+        "transfer_db": -35.24535314738606
+      },
+      "peak_differential_fext": {
+        "frequency_hz": 78125000.0,
+        "magnitude_v_per_v": 0.014835415579565551,
+        "transfer_db": -36.574005668595404
+      },
+      "minimum_differential_aggressor_through_magnitude": 0.6732368973250851,
+      "diagonal_control_maximum_victim_transfer": 0.0
+    }
+  },
+  "limitations": [
+    "Original synthetic connector/pin identities; no actual board pinout was supplied or inferred.",
+    "DC excludes board copper, connector/contact resistance and temperature feedback.",
+    "Signal reference is an ideal infinite ground plane; power/return wires are not silently used as that reference.",
+    "Thin straight round-wire quasi-TEM approximation only; no launch, bend, shield, radiation, full-wave, BER or compliance claim.",
+    "Sampled passivity and reciprocity are checked; broadband causality and measured correlation remain unqualified."
+  ],
+  "integration": {
+    "schemas": [
+      "schemas/harness-v1.schema.json",
+      "schemas/harness-pi-request-v1.schema.json",
+      "schemas/harness-pi-result-v1.schema.json",
+      "schemas/harness-si-request-v1.schema.json",
+      "schemas/harness-si-result-v1.schema.json",
+      "schemas/harness-round-wire-rlgc-request-v1.schema.json",
+      "schemas/harness-mtl-request-v1.schema.json"
+    ],
+    "source_coordinates": [
+      {
+        "purpose": "Harness PI desktop panel submits saved document/setup",
+        "path": "app/src/HarnessPiPanel.tsx",
+        "line": 50,
+        "anchor": "contract: \"spike/harness-pi-request/v1\""
+      },
+      {
+        "purpose": "Desktop worker bridge admits PI",
+        "path": "app/src/workerBridge.ts",
+        "line": 87,
+        "anchor": "\"run_harness_pi\""
+      },
+      {
+        "purpose": "Desktop worker bridge admits coupled MTL",
+        "path": "app/src/workerBridge.ts",
+        "line": 90,
+        "anchor": "\"run_harness_mtl\""
+      },
+      {
+        "purpose": "Harness signal panel submits public uniform SI",
+        "path": "app/src/HarnessSignalPanel.tsx",
+        "line": 22,
+        "anchor": "run_harness_si"
+      },
+      {
+        "purpose": "3D view resolves board and connector identities",
+        "path": "app/src/harnessVisualization.ts",
+        "line": 461,
+        "anchor": "Endpoint strings use `board-instance-id::connector-id`"
+      },
+      {
+        "purpose": "3D view consumes serialized route",
+        "path": "app/src/harnessVisualization.ts",
+        "line": 529,
+        "anchor": "Array.isArray(routing.route_mm)"
+      },
+      {
+        "purpose": "CLI exposes harness PI",
+        "path": "python/spike_core/cli.py",
+        "line": 1446,
+        "anchor": "harness-pi\", help="
+      }
+    ],
+    "gui_scope": "PI authoring/result and 3D conductor picking are integrated; coupled MTL is callable through the registered worker bridge but has no dedicated MTL report panel."
+  },
+  "artifacts": [
+    "assembly-view.json",
+    "harness-document.json",
+    "pi-request.json",
+    "pi-result.json",
+    "harness-si-request.json",
+    "harness-si-result.json",
+    "rlgc-request.json",
+    "rlgc-result.json",
+    "mtl-request.json",
+    "mtl-result.json",
+    "mtl-diagonal-control-result.json",
+    "validation.json",
+    "integration.json",
+    "evidence.json"
+  ]
+}

@@ -96,6 +96,18 @@ def ngspice_batch(source):
 
 def _batch_worker(connection, source, library,method,kind,settings):
     try:
+        # Spawn inherits sys.path, including historical development/test caches.
+        # Discard a cache with an explicitly different NumPy extension ABI
+        # before importing native_runner; do not substitute an engine or data.
+        import sys
+        from pathlib import Path
+        expected=f'cp{sys.version_info.major}{sys.version_info.minor}-'
+        compatible=[]
+        for entry in sys.path:
+            extensions=list((Path(entry)/'numpy'/'_core').glob('_multiarray_umath.cp*-*.pyd'))
+            if extensions and not any(expected in item.name for item in extensions):continue
+            compatible.append(entry)
+        sys.path[:]=compatible
         if kind=='frequency':
             from .frequency import analyze
             connection.send(('result',analyze(source,settings)));return

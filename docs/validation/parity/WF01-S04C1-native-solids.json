@@ -1,0 +1,1011 @@
+{
+  "contract": "spike/mcad-export-manifest/v1",
+  "assembly_id": "mcad:kicad-84cccc5d0b59a17dfdf35ffd",
+  "name": "models",
+  "units": "mm",
+  "step_schema": "AP214IS",
+  "freecad_version": "1.1.3",
+  "objects": [
+    {
+      "id": "board",
+      "name": "models",
+      "token": "SPIKE_859169b38185780daa549798",
+      "step_label": "models [SPIKE_859169b38185780daa549798]",
+      "kind": "assembly",
+      "parent_id": "",
+      "material_id": "",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "color_rgb": null,
+      "properties": {},
+      "source": {
+        "occurrence_id": "board",
+        "design_id": "kicad-84cccc5d0b59a17dfdf35ffd"
+      },
+      "brep_file": null
+    },
+    {
+      "id": "layer:1",
+      "name": "dielectric 1",
+      "token": "SPIKE_10ce644c59178a60c65b2e8a",
+      "step_label": "dielectric 1 [SPIKE_10ce644c59178a60c65b2e8a]",
+      "kind": "dielectric",
+      "parent_id": "board",
+      "material_id": "layer-material:1",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "color_rgb": null,
+      "properties": {},
+      "source": {
+        "layer": "dielectric 1",
+        "stackup_index": 1,
+        "occurrence_id": "board",
+        "design_id": "kicad-84cccc5d0b59a17dfdf35ffd"
+      },
+      "brep_file": "SPIKE_10ce644c59178a60c65b2e8a.brep",
+      "solid_count": 1,
+      "volume_mm3": 989.91,
+      "bounds_mm": [
+        -1.0,
+        -1.0,
+        0.035,
+        30.0,
+        20.0,
+        1.565
+      ],
+      "step_roundtrip": "passed"
+    },
+    {
+      "id": "board/component:19523123-8aa7-5219-b974-3022d9579167/model:83745fc5-4c59-5c1c-ace6-6a03447abf0e",
+      "name": "J1 / 83745fc5-4c59-5c1c-ace6-6a03447abf0e",
+      "token": "SPIKE_7fc2eba37df7e439df152c27",
+      "step_label": "J1 / 83745fc5-4c59-5c1c-ace6-6a03447abf0e [SPIKE_7fc2eba37df7e439df152c27]",
+      "kind": "component",
+      "parent_id": "board",
+      "material_id": "",
+      "transform": [
+        0.0,
+        -1.0,
+        0.0,
+        10.0,
+        1.0,
+        0.0,
+        0.0,
+        20.0,
+        0.0,
+        0.0,
+        1.0,
+        2.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "color_rgb": null,
+      "properties": {
+        "placement_reference": "Owned 2x3x4 mm cuboid; explicit neutral fixture placement, not inferred source vectors.",
+        "placement_state": "explicit_board_local",
+        "solver_ready": false,
+        "material_qualified": false
+      },
+      "source": {
+        "component_occurrence_id": "board/component:19523123-8aa7-5219-b974-3022d9579167",
+        "model_id": "83745fc5-4c59-5c1c-ace6-6a03447abf0e",
+        "design_digest": "2b027e1bd01fc8ba715a3c733364f35d8f64d4cbb5eaa5257109d2a3b9a65d01",
+        "uri": "models/body.step",
+        "supplied_step_sha256": "9144054f0ec8ae87e131c88f9383815d4ffaf6605557c891cd95c9451e29bdfc"
+      },
+      "brep_file": "SPIKE_7fc2eba37df7e439df152c27.brep",
+      "solid_count": 1,
+      "volume_mm3": 23.999999999999996,
+      "bounds_mm": [
+        7.0,
+        20.0,
+        2.0,
+        10.0,
+        22.0,
+        6.0
+      ],
+      "step_roundtrip": "passed"
+    },
+    {
+      "id": "board/component:19523123-8aa7-5219-b974-3022d9579167/model:756b3e47-f8b0-5b77-b533-d28d4f4cc6b9",
+      "name": "J1 / 756b3e47-f8b0-5b77-b533-d28d4f4cc6b9",
+      "token": "SPIKE_fa924b132e3479d4ec895727",
+      "step_label": "J1 / 756b3e47-f8b0-5b77-b533-d28d4f4cc6b9 [SPIKE_fa924b132e3479d4ec895727]",
+      "kind": "component",
+      "parent_id": "board",
+      "material_id": "",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        15.0,
+        0.0,
+        1.0,
+        0.0,
+        8.0,
+        0.0,
+        0.0,
+        1.0,
+        3.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "color_rgb": null,
+      "properties": {
+        "placement_reference": "Owned 2x3x4 mm cuboid; explicit neutral fixture placement, not inferred source vectors.",
+        "placement_state": "explicit_board_local",
+        "solver_ready": false,
+        "material_qualified": false
+      },
+      "source": {
+        "component_occurrence_id": "board/component:19523123-8aa7-5219-b974-3022d9579167",
+        "model_id": "756b3e47-f8b0-5b77-b533-d28d4f4cc6b9",
+        "design_digest": "2b027e1bd01fc8ba715a3c733364f35d8f64d4cbb5eaa5257109d2a3b9a65d01",
+        "uri": "models/lid.step",
+        "supplied_step_sha256": "9144054f0ec8ae87e131c88f9383815d4ffaf6605557c891cd95c9451e29bdfc"
+      },
+      "brep_file": "SPIKE_fa924b132e3479d4ec895727.brep",
+      "solid_count": 1,
+      "volume_mm3": 23.999999999999996,
+      "bounds_mm": [
+        15.0,
+        8.0,
+        3.0,
+        17.0,
+        11.0,
+        7.0
+      ],
+      "step_roundtrip": "passed"
+    },
+    {
+      "id": "board/component:19523123-8aa7-5219-b974-3022d9579167/model:b39414b6-0bfa-5172-ba94-50e3f4856044",
+      "name": "J1 / b39414b6-0bfa-5172-ba94-50e3f4856044",
+      "token": "SPIKE_04729e31534b46ec020045b4",
+      "step_label": "J1 / b39414b6-0bfa-5172-ba94-50e3f4856044 [SPIKE_04729e31534b46ec020045b4]",
+      "kind": "component",
+      "parent_id": "board",
+      "material_id": "",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        25.0,
+        0.0,
+        -1.0,
+        0.0,
+        10.0,
+        0.0,
+        0.0,
+        -1.0,
+        -1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "color_rgb": null,
+      "properties": {
+        "placement_reference": "Owned 2x3x4 mm cuboid; explicit neutral fixture placement, not inferred source vectors.",
+        "placement_state": "explicit_board_local",
+        "solver_ready": false,
+        "material_qualified": false
+      },
+      "source": {
+        "component_occurrence_id": "board/component:19523123-8aa7-5219-b974-3022d9579167",
+        "model_id": "b39414b6-0bfa-5172-ba94-50e3f4856044",
+        "design_digest": "2b027e1bd01fc8ba715a3c733364f35d8f64d4cbb5eaa5257109d2a3b9a65d01",
+        "uri": "models/body.step",
+        "supplied_step_sha256": "9144054f0ec8ae87e131c88f9383815d4ffaf6605557c891cd95c9451e29bdfc"
+      },
+      "brep_file": "SPIKE_04729e31534b46ec020045b4.brep",
+      "solid_count": 1,
+      "volume_mm3": 23.999999999999996,
+      "bounds_mm": [
+        25.0,
+        7.0,
+        -5.0,
+        27.0,
+        10.0,
+        -1.0
+      ],
+      "step_roundtrip": "passed"
+    }
+  ],
+  "materials": [
+    {
+      "id": "layer-material:1",
+      "name": "FR4",
+      "properties": {
+        "name": "dielectric 1",
+        "type": "core",
+        "thickness": 1.53,
+        "material": "FR4",
+        "epsilon_r": 4.2,
+        "loss_tangent": 0.02
+      }
+    }
+  ],
+  "properties": {
+    "retained_design_digests": {
+      "kicad-84cccc5d0b59a17dfdf35ffd": "2b027e1bd01fc8ba715a3c733364f35d8f64d4cbb5eaa5257109d2a3b9a65d01"
+    },
+    "retained_design_models": {
+      "kicad-84cccc5d0b59a17dfdf35ffd": [
+        {
+          "id": "83745fc5-4c59-5c1c-ace6-6a03447abf0e",
+          "source_id": "55555555-5555-4555-8555-555555555555:model:0",
+          "name": "models/body.step",
+          "extensions": {
+            "spike.v1": {
+              "source_id": "55555555-5555-4555-8555-555555555555:model:0",
+              "component": "55555555-5555-4555-8555-555555555555",
+              "uri": "models/body.step",
+              "resolved_uri": "",
+              "source_placement": {
+                "source_node": [
+                  "model",
+                  "\"models/body.step\"",
+                  [
+                    "offset",
+                    [
+                      "xyz",
+                      "1.25",
+                      "-2.5",
+                      "3"
+                    ]
+                  ],
+                  [
+                    "scale",
+                    [
+                      "xyz",
+                      "2",
+                      "1",
+                      "0.5"
+                    ]
+                  ],
+                  [
+                    "rotate",
+                    [
+                      "xyz",
+                      "15",
+                      "30",
+                      "45"
+                    ]
+                  ]
+                ],
+                "ordinal": 0,
+                "uri": "models/body.step",
+                "semantic_state": "source_placement_unapplied",
+                "projection": "forbidden",
+                "declared_vectors": {
+                  "offset": [
+                    1.25,
+                    -2.5,
+                    3.0
+                  ],
+                  "scale": [
+                    2.0,
+                    1.0,
+                    0.5
+                  ],
+                  "rotate": [
+                    15.0,
+                    30.0,
+                    45.0
+                  ]
+                },
+                "errors": [],
+                "valid_source_vectors": true
+              }
+            }
+          },
+          "model_type": "3d",
+          "uri": "models/body.step",
+          "digest": "",
+          "transform": []
+        },
+        {
+          "id": "756b3e47-f8b0-5b77-b533-d28d4f4cc6b9",
+          "source_id": "55555555-5555-4555-8555-555555555555:model:1",
+          "name": "models/lid.step",
+          "extensions": {
+            "spike.v1": {
+              "source_id": "55555555-5555-4555-8555-555555555555:model:1",
+              "component": "55555555-5555-4555-8555-555555555555",
+              "uri": "models/lid.step",
+              "resolved_uri": "",
+              "source_placement": {
+                "source_node": [
+                  "model",
+                  "\"models/lid.step\"",
+                  [
+                    "offset",
+                    [
+                      "xyz",
+                      "-1",
+                      "0",
+                      "4"
+                    ]
+                  ],
+                  [
+                    "scale",
+                    [
+                      "xyz",
+                      "1",
+                      "1",
+                      "1"
+                    ]
+                  ],
+                  [
+                    "rotate",
+                    [
+                      "xyz",
+                      "0",
+                      "0",
+                      "90"
+                    ]
+                  ]
+                ],
+                "ordinal": 1,
+                "uri": "models/lid.step",
+                "semantic_state": "source_placement_unapplied",
+                "projection": "forbidden",
+                "declared_vectors": {
+                  "offset": [
+                    -1.0,
+                    0.0,
+                    4.0
+                  ],
+                  "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "rotate": [
+                    0.0,
+                    0.0,
+                    90.0
+                  ]
+                },
+                "errors": [],
+                "valid_source_vectors": true
+              }
+            }
+          },
+          "model_type": "3d",
+          "uri": "models/lid.step",
+          "digest": "",
+          "transform": []
+        },
+        {
+          "id": "b39414b6-0bfa-5172-ba94-50e3f4856044",
+          "source_id": "55555555-5555-4555-8555-555555555555:model:2",
+          "name": "models/body.step",
+          "extensions": {
+            "spike.v1": {
+              "source_id": "55555555-5555-4555-8555-555555555555:model:2",
+              "component": "55555555-5555-4555-8555-555555555555",
+              "uri": "models/body.step",
+              "resolved_uri": "",
+              "source_placement": {
+                "source_node": [
+                  "model",
+                  "\"models/body.step\"",
+                  [
+                    "offset",
+                    [
+                      "xyz",
+                      "0",
+                      "0",
+                      "0"
+                    ]
+                  ],
+                  [
+                    "scale",
+                    [
+                      "xyz",
+                      "1",
+                      "1",
+                      "1"
+                    ]
+                  ],
+                  [
+                    "rotate",
+                    [
+                      "xyz",
+                      "0",
+                      "0",
+                      "0"
+                    ]
+                  ]
+                ],
+                "ordinal": 2,
+                "uri": "models/body.step",
+                "semantic_state": "source_placement_unapplied",
+                "projection": "forbidden",
+                "declared_vectors": {
+                  "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ],
+                  "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                  ],
+                  "rotate": [
+                    0.0,
+                    0.0,
+                    0.0
+                  ]
+                },
+                "errors": [],
+                "valid_source_vectors": true
+              }
+            }
+          },
+          "model_type": "3d",
+          "uri": "models/body.step",
+          "digest": "",
+          "transform": []
+        }
+      ]
+    },
+    "component_occurrences": [
+      {
+        "id": "board/component:19523123-8aa7-5219-b974-3022d9579167",
+        "name": "J1",
+        "board_occurrence_id": "board",
+        "design_id": "kicad-84cccc5d0b59a17dfdf35ffd",
+        "component_id": "19523123-8aa7-5219-b974-3022d9579167",
+        "placement": {
+          "position_mm": [
+            21.0,
+            8.0
+          ],
+          "rotation_deg": 90.0,
+          "side": "top"
+        },
+        "model_ids": [
+          "83745fc5-4c59-5c1c-ace6-6a03447abf0e",
+          "756b3e47-f8b0-5b77-b533-d28d4f4cc6b9",
+          "b39414b6-0bfa-5172-ba94-50e3f4856044"
+        ]
+      }
+    ],
+    "retained_design_components": {
+      "kicad-84cccc5d0b59a17dfdf35ffd": [
+        {
+          "id": "19523123-8aa7-5219-b974-3022d9579167",
+          "source_id": "55555555-5555-4555-8555-555555555555",
+          "name": "J1",
+          "extensions": {
+            "spike.v1": {
+              "reference": "J1",
+              "pad_count": 1,
+              "nets": [
+                "SIGNAL"
+              ],
+              "at": [
+                21.0,
+                8.0
+              ],
+              "library": "Parity:RotatedPad",
+              "value": "RotationFixture",
+              "properties": {
+                "Reference": "J1",
+                "Value": "RotationFixture"
+              },
+              "model_path": "models/body.step",
+              "model_resolved": "",
+              "model_sources": [
+                {
+                  "source_node": [
+                    "model",
+                    "\"models/body.step\"",
+                    [
+                      "offset",
+                      [
+                        "xyz",
+                        "1.25",
+                        "-2.5",
+                        "3"
+                      ]
+                    ],
+                    [
+                      "scale",
+                      [
+                        "xyz",
+                        "2",
+                        "1",
+                        "0.5"
+                      ]
+                    ],
+                    [
+                      "rotate",
+                      [
+                        "xyz",
+                        "15",
+                        "30",
+                        "45"
+                      ]
+                    ]
+                  ],
+                  "ordinal": 0,
+                  "uri": "models/body.step",
+                  "semantic_state": "source_placement_unapplied",
+                  "projection": "forbidden",
+                  "declared_vectors": {
+                    "offset": [
+                      1.25,
+                      -2.5,
+                      3.0
+                    ],
+                    "scale": [
+                      2.0,
+                      1.0,
+                      0.5
+                    ],
+                    "rotate": [
+                      15.0,
+                      30.0,
+                      45.0
+                    ]
+                  },
+                  "errors": [],
+                  "valid_source_vectors": true
+                },
+                {
+                  "source_node": [
+                    "model",
+                    "\"models/lid.step\"",
+                    [
+                      "offset",
+                      [
+                        "xyz",
+                        "-1",
+                        "0",
+                        "4"
+                      ]
+                    ],
+                    [
+                      "scale",
+                      [
+                        "xyz",
+                        "1",
+                        "1",
+                        "1"
+                      ]
+                    ],
+                    [
+                      "rotate",
+                      [
+                        "xyz",
+                        "0",
+                        "0",
+                        "90"
+                      ]
+                    ]
+                  ],
+                  "ordinal": 1,
+                  "uri": "models/lid.step",
+                  "semantic_state": "source_placement_unapplied",
+                  "projection": "forbidden",
+                  "declared_vectors": {
+                    "offset": [
+                      -1.0,
+                      0.0,
+                      4.0
+                    ],
+                    "scale": [
+                      1.0,
+                      1.0,
+                      1.0
+                    ],
+                    "rotate": [
+                      0.0,
+                      0.0,
+                      90.0
+                    ]
+                  },
+                  "errors": [],
+                  "valid_source_vectors": true
+                },
+                {
+                  "source_node": [
+                    "model",
+                    "\"models/body.step\"",
+                    [
+                      "offset",
+                      [
+                        "xyz",
+                        "0",
+                        "0",
+                        "0"
+                      ]
+                    ],
+                    [
+                      "scale",
+                      [
+                        "xyz",
+                        "1",
+                        "1",
+                        "1"
+                      ]
+                    ],
+                    [
+                      "rotate",
+                      [
+                        "xyz",
+                        "0",
+                        "0",
+                        "0"
+                      ]
+                    ]
+                  ],
+                  "ordinal": 2,
+                  "uri": "models/body.step",
+                  "semantic_state": "source_placement_unapplied",
+                  "projection": "forbidden",
+                  "declared_vectors": {
+                    "offset": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ],
+                    "scale": [
+                      1.0,
+                      1.0,
+                      1.0
+                    ],
+                    "rotate": [
+                      0.0,
+                      0.0,
+                      0.0
+                    ]
+                  },
+                  "errors": [],
+                  "valid_source_vectors": true
+                }
+              ],
+              "layer": "F.Cu",
+              "native_footprint_at_mm": [
+                20.0,
+                10.0
+              ],
+              "rotation": 90.0,
+              "zone_connection_override": "inherit",
+              "zone_connection_declared": false,
+              "thermal_gap_override_mm": null,
+              "thermal_spoke_width_override_mm": null,
+              "thermal_settings_valid": true,
+              "id": "55555555-5555-4555-8555-555555555555",
+              "source_id": "55555555-5555-4555-8555-555555555555"
+            }
+          },
+          "reference": "J1",
+          "value": "RotationFixture",
+          "footprint": "Parity:RotatedPad",
+          "side": "top",
+          "position_mm": [
+            21.0,
+            8.0
+          ],
+          "rotation_deg": 90.0,
+          "pin_ids": [
+            "c568ac56-4ef3-53d6-892b-d8b05b01608f"
+          ],
+          "model_ids": [
+            "83745fc5-4c59-5c1c-ace6-6a03447abf0e",
+            "756b3e47-f8b0-5b77-b533-d28d4f4cc6b9",
+            "b39414b6-0bfa-5172-ba94-50e3f4856044"
+          ],
+          "zone_connection_override": "inherit",
+          "zone_connection_declared": false,
+          "thermal_gap_override_mm": null,
+          "thermal_spoke_width_override_mm": null,
+          "thermal_settings_valid": true
+        }
+      ]
+    },
+    "component_inventory": [
+      {
+        "reference": "J1",
+        "pad_count": 1,
+        "nets": [
+          "SIGNAL"
+        ],
+        "at": [
+          21.0,
+          8.0
+        ],
+        "library": "Parity:RotatedPad",
+        "value": "RotationFixture",
+        "properties": {
+          "Reference": "J1",
+          "Value": "RotationFixture"
+        },
+        "model_path": "models/body.step",
+        "model_resolved": "",
+        "model_sources": [
+          {
+            "source_node": [
+              "model",
+              "\"models/body.step\"",
+              [
+                "offset",
+                [
+                  "xyz",
+                  "1.25",
+                  "-2.5",
+                  "3"
+                ]
+              ],
+              [
+                "scale",
+                [
+                  "xyz",
+                  "2",
+                  "1",
+                  "0.5"
+                ]
+              ],
+              [
+                "rotate",
+                [
+                  "xyz",
+                  "15",
+                  "30",
+                  "45"
+                ]
+              ]
+            ],
+            "ordinal": 0,
+            "uri": "models/body.step",
+            "semantic_state": "source_placement_unapplied",
+            "projection": "forbidden",
+            "declared_vectors": {
+              "offset": [
+                1.25,
+                -2.5,
+                3.0
+              ],
+              "scale": [
+                2.0,
+                1.0,
+                0.5
+              ],
+              "rotate": [
+                15.0,
+                30.0,
+                45.0
+              ]
+            },
+            "errors": [],
+            "valid_source_vectors": true
+          },
+          {
+            "source_node": [
+              "model",
+              "\"models/lid.step\"",
+              [
+                "offset",
+                [
+                  "xyz",
+                  "-1",
+                  "0",
+                  "4"
+                ]
+              ],
+              [
+                "scale",
+                [
+                  "xyz",
+                  "1",
+                  "1",
+                  "1"
+                ]
+              ],
+              [
+                "rotate",
+                [
+                  "xyz",
+                  "0",
+                  "0",
+                  "90"
+                ]
+              ]
+            ],
+            "ordinal": 1,
+            "uri": "models/lid.step",
+            "semantic_state": "source_placement_unapplied",
+            "projection": "forbidden",
+            "declared_vectors": {
+              "offset": [
+                -1.0,
+                0.0,
+                4.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rotate": [
+                0.0,
+                0.0,
+                90.0
+              ]
+            },
+            "errors": [],
+            "valid_source_vectors": true
+          },
+          {
+            "source_node": [
+              "model",
+              "\"models/body.step\"",
+              [
+                "offset",
+                [
+                  "xyz",
+                  "0",
+                  "0",
+                  "0"
+                ]
+              ],
+              [
+                "scale",
+                [
+                  "xyz",
+                  "1",
+                  "1",
+                  "1"
+                ]
+              ],
+              [
+                "rotate",
+                [
+                  "xyz",
+                  "0",
+                  "0",
+                  "0"
+                ]
+              ]
+            ],
+            "ordinal": 2,
+            "uri": "models/body.step",
+            "semantic_state": "source_placement_unapplied",
+            "projection": "forbidden",
+            "declared_vectors": {
+              "offset": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "scale": [
+                1.0,
+                1.0,
+                1.0
+              ],
+              "rotate": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "errors": [],
+            "valid_source_vectors": true
+          }
+        ],
+        "layer": "F.Cu",
+        "native_footprint_at_mm": [
+          20.0,
+          10.0
+        ],
+        "rotation": 90.0,
+        "zone_connection_override": "inherit",
+        "zone_connection_declared": false,
+        "thermal_gap_override_mm": null,
+        "thermal_spoke_width_override_mm": null,
+        "thermal_settings_valid": true,
+        "id": "55555555-5555-4555-8555-555555555555",
+        "source_id": "55555555-5555-4555-8555-555555555555"
+      }
+    ]
+  },
+  "provenance": {
+    "design_id": "kicad-84cccc5d0b59a17dfdf35ffd",
+    "source_format": "kicad",
+    "coordinate_convention": "source XY, physical stackup top-to-bottom in positive Z"
+  },
+  "diagnostics": [
+    {
+      "code": "LAYER_GEOMETRY_OMITTED",
+      "message": "Patterned copper/process layer needs explicit solid geometry; no full-board slab was invented.",
+      "source_id": "F.Cu"
+    },
+    {
+      "code": "LAYER_GEOMETRY_OMITTED",
+      "message": "Patterned copper/process layer needs explicit solid geometry; no full-board slab was invented.",
+      "source_id": "B.Cu"
+    },
+    {
+      "code": "BOARD_DRILLS_OMITTED",
+      "message": "Automatic board projection currently retains only outline cutouts; pad/via drills require explicit geometry.",
+      "source_id": "board"
+    }
+  ],
+  "roundtrip": "named solids, volume and world bounds checked",
+  "solver_qualified": false,
+  "metadata_carrier": "companion JSON; custom FreeCAD properties are not assumed to survive STEP",
+  "input_sha256": "5a47c333a02ef89cf2b1f84e742195bbffd26a02e421824650012397629537f9",
+  "artifacts": [
+    {
+      "file": "assembly.step",
+      "sha256": "bc89a90009ca7ee1cfacb62abc2a4386afd6396bca15f7e49f8f5dd0bda165f6",
+      "bytes": 36627
+    },
+    {
+      "file": "assembly.FCStd",
+      "sha256": "3f770caa2f80c1cced06c853abc71172f016333bebb4dcb880ca23ebfde3e5f4",
+      "bytes": 8258
+    },
+    {
+      "file": "SPIKE_10ce644c59178a60c65b2e8a.brep",
+      "sha256": "137fe120ebddb913b4cf02d37a806f16c4e5a91cbba6306d67875bd7f726f76a",
+      "bytes": 3311
+    },
+    {
+      "file": "SPIKE_7fc2eba37df7e439df152c27.brep",
+      "sha256": "ffb0255848cbc5eb320f3716c3e4873709f4d3e296ecbfff38e7a718d6559f73",
+      "bytes": 2270
+    },
+    {
+      "file": "SPIKE_fa924b132e3479d4ec895727.brep",
+      "sha256": "ffb0255848cbc5eb320f3716c3e4873709f4d3e296ecbfff38e7a718d6559f73",
+      "bytes": 2270
+    },
+    {
+      "file": "SPIKE_04729e31534b46ec020045b4.brep",
+      "sha256": "ffb0255848cbc5eb320f3716c3e4873709f4d3e296ecbfff38e7a718d6559f73",
+      "bytes": 2270
+    }
+  ]
+}

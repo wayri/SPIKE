@@ -9,8 +9,10 @@ export function preparePlotLayout(layout: Record<string, unknown>, palette: { te
     if (!value || typeof value !== "object") return;
     const item = value as Record<string, unknown>;
     title(item); item.automargin ??= true;
-    item.showline ??= true; item.linewidth ??= 1.5; item.linecolor ??= palette.line;
-    item.ticks ??= "outside"; item.ticklen ??= 5; item.tickwidth ??= 1;
+    item.showline ??= true; item.linewidth ??= 1; item.linecolor ??= palette.line;
+    item.ticks ??= "outside"; item.ticklen ??= 4; item.tickwidth ??= 1;
+    item.gridwidth ??= .5; item.zeroline ??= false;
+    item.showspikes ??= true; item.spikemode ??= "across"; item.spikesnap ??= "data"; item.spikethickness ??= 1; item.spikedash ??= "dot";
     item.tickcolor ??= palette.line; item.gridcolor ??= palette.grid;
     if (palette.surface) { item.gridcolor = palette.grid; item.zerolinecolor = palette.line; }
     item.exponentformat ??= "SI"; item.separatethousands ??= true;
@@ -21,6 +23,8 @@ export function preparePlotLayout(layout: Record<string, unknown>, palette: { te
     }
   };
   title(output);
+  output.font = { family: 'Inter, Segoe UI, Arial, sans-serif', size: 12, ...(output.font as object ?? {}) };
+  output.hoverlabel = { font: { family: 'Segoe UI, Arial, sans-serif', size: 12 }, ...(output.hoverlabel as object ?? {}) };
   output.legend = { orientation: "h", x: 0, y: 1.04, yanchor: "bottom", maxheight: .2, ...(output.legend as object ?? {}) };
   if (palette.surface) {
     output.paper_bgcolor = palette.surface; output.plot_bgcolor = palette.surface;

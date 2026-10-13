@@ -1,0 +1,11 @@
+{
+  "name": "rc_board",
+  "inputs": [{"name": "dac", "node": "dac", "resistance_ohm": 1000, "minimum_v": 0, "maximum_v": 3.3, "initial_v": 0}],
+  "outputs": [
+    {"name": "adc", "quantity": "voltage", "target": "adc"},
+    {"name": "pin_voltage", "quantity": "voltage", "target": "dac"},
+    {"name": "load_current", "quantity": "current", "target": "R2"},
+    {"name": "drive_current", "quantity": "current", "target": "R1"}
+  ],
+  "limits": {"max_step_s": 0.00001, "stop_time_s": 0.02, "max_steps": 10000}
+}

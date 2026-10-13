@@ -3,6 +3,7 @@ import json
 import re
 import math
 from pathlib import Path
+from .kicad_model_sources import model_sources
 from .filled_polygon_offset import inflate_filled_simple_polygon_round_inside_v1
 from .simple_polygon_union import (
     is_simple_polygon, polygon_contains_polygon, union_simple_polygons,
@@ -10,7 +11,10 @@ from .simple_polygon_union import (
 )
 
 MAX_SOURCE_FILL_COMPONENTS_PER_GROUP = 65_536
-MAX_SOURCE_FILL_VERTICES_PER_COMPONENT = 65_536
+# Preserve large native filled paths without simplifying copper topology.
+# Aggregate per-group bounds remain unchanged; this is a resource limit, not
+# permission to admit missing, malformed, or outline-only copper.
+MAX_SOURCE_FILL_VERTICES_PER_COMPONENT = 131_072
 MAX_SOURCE_FILL_VERTICES_PER_GROUP = 1_048_576
 MAX_SOURCE_ZONE_OUTLINE_PATHS = 256
 MAX_SOURCE_ZONE_OUTLINE_VERTICES_PER_PATH = 65_536
@@ -36,7 +40,9 @@ class KicadParser:
         # Data Structures
         self.layers = {}   
         self.nets = {}     
-        self.tracks = []   
+        self.tracks = []
+        self.arcs = []
+        self.arc_occurrences = {}
         self.vias = []     
         self.pads = []     
         self.footprints = []
@@ -580,6 +586,17 @@ class KicadParser:
                 
                 # Calculate circumcenter (Ux, Uy)
                 D = 2 * (x1 * (ym - y2) + xm * (y2 - y1) + x2 * (y1 - ym))
+                if abs(D) >= 1e-6:
+                    if not source_id:
+                        fingerprint = hashlib.sha256(json.dumps(
+                            [x1, y1, xm, ym, x2, y2, width, layer, nid], separators=(',', ':')
+                        ).encode()).hexdigest()
+                        ordinal = self.arc_occurrences.get(fingerprint, 0) + 1
+                        self.arc_occurrences[fingerprint] = ordinal
+                        source_id = f'anonymous-arc:{fingerprint}:occurrence:{ordinal}'
+                    self.arcs.append({'id': source_id, 'source_id': source_id,
+                                      'start': (x1, y1), 'mid': (xm, ym), 'end': (x2, y2),
+                                      'width': width, 'layer': layer, 'net_id': nid, 'net_name': net_name})
                 if abs(D) < 1e-6:
                     # Collinear or extremely small, just use a straight line
                     track = {'start': (x1, y1), 'end': (x2, y2), 'width': width, 'layer': layer, 'net_id': nid, 'net_name': net_name}
@@ -632,6 +649,12 @@ class KicadParser:
                             track.update({'id': segment_id, 'uuid': segment_id, 'source_parent_id': source_id})
                         self.tracks.append(track)
                         prev_x, prev_y = cur_x, cur_y
+                self.diagnostics.append({
+                    'code': 'KICAD_ARC_LINEARIZED', 'severity': 'warning',
+                    'source_id': source_id, 'segment_count': 1 if abs(D) < 1e-6 else steps,
+                    'exact_source_retained': abs(D) >= 1e-6,
+                    'message': 'Legacy solver projection uses straight chords; nondegenerate exact source arcs are retained separately.',
+                })
         except: pass
 
     def _parse_via(self, node):
@@ -1003,7 +1026,11 @@ class KicadParser:
                 layer_group_admitted[polygon_layer] = admitted
                 if not admitted:
                     self.diagnostics.append(
-                        f"KiCad zone {source_zone_id} layer {polygon_layer} source-fill provenance exceeds bounds or is incomplete."
+                        f"KiCad zone {source_zone_id} layer {polygon_layer} source-fill provenance exceeds bounds or is incomplete. "
+                        f"components={len(digests)}/{MAX_SOURCE_FILL_COMPONENTS_PER_GROUP}, "
+                        f"largest_path_vertices={max(map(len, members), default=0)}/{MAX_SOURCE_FILL_VERTICES_PER_COMPONENT}, "
+                        f"group_vertices={sum(map(len, members))}/{MAX_SOURCE_FILL_VERTICES_PER_GROUP}, "
+                        f"incomplete_layer={polygon_layer in incomplete_fill_layers}."
                     )
             layer_ordinals = {polygon_layer: 0 for polygon_layer in layer_component_digests}
 
@@ -1192,6 +1219,7 @@ class KicadParser:
                 'rotation': mod_rot,
                 'layer': layer,
                 'model_path': model_path,
+                'model_sources': model_sources(node),
                 'properties': properties,
                 'value': properties.get('Value', legacy_value),
                 'zone_connection_override': footprint_thermal['mode'],
@@ -1495,8 +1523,10 @@ class KicadParser:
                 py = float(at[2])
                 if len(at) > 3: prot = float(at[3])
                 
-            final_pos = self._apply_transform((px, py), mod_pos, mod_rot, mirrored)
-            final_rot = prot + mod_rot
+            # Board files already encode back-side reflection in their local
+            # coordinates; pad angles are absolute board angles, not local.
+            final_pos = self._apply_transform((px, py), mod_pos, mod_rot, False)
+            final_rot = -prot  # Neutral numeric XY uses mathematical CCW.
             
             size_n = self._get_node(node, 'size')
             size = (float(size_n[1]), float(size_n[2])) if size_n else (1, 1)
@@ -1549,6 +1579,7 @@ class KicadParser:
                 'component_pad': full_name,
                 'type': ptype, 'shape': shape,
                 'at': final_pos, 'rotation': final_rot,
+                'native_pad_rotation_deg': prot,
                 'size': size, 'layers': layers, 
                 'layer': layers[0], # Primary layer
                 'net_id': net_id, 'net_name': net_name,
@@ -1584,7 +1615,7 @@ class KicadParser:
                 pad['chamfer'] = [str(value) for value in chamfer[1:]]
             if str(shape).lower() == 'custom':
                 custom_geometry = self._parse_custom_pad_geometry(
-                    node, mirrored, size, drill_shape != "none", ptype,
+                    node, False, size, drill_shape != "none", ptype,
                 )
                 pad['custom_geometry'] = custom_geometry
                 if custom_geometry.get('status') != 'supported':

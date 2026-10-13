@@ -27,7 +27,7 @@ def _identity(payload, assembly):
 
 
 def _board_geometry(design):
-    design = SpiDeRV2.from_dict(design).to_v1().to_dict()
+    design = SpiDeRV2.from_dict(design).to_v1(allow_unprojected_arcs=True).to_dict()
     meta = design.get("metadata", {})
     rings = _convert_rings(meta["board_outline_rings"]) if meta.get("board_outline_rings") else _rings_from_drawings(meta.get("board_outline_drawings", []))
     heights = [layer.get("thickness_mm", layer.get("thickness")) for layer in design.get("stackup", [])]
