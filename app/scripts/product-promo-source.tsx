@@ -10,7 +10,7 @@ import type {ViewportRestoreCommand,Viewport3DCameraState} from '../src/workspac
 import '../src/styles.css';
 import '../src/buttonStandard.css';
 const noop=()=>{}, empty={};
-const base='/@fs/C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/';
+const base=import.meta.env.BASE_URL;
 const thermal=new URLSearchParams(location.search).has('thermal');
 const marble=new URLSearchParams(location.search).has('marble');
 function Capture(){
@@ -21,15 +21,15 @@ function Capture(){
  useEffect(()=>{void(async()=>{
   let next:ParsedBoard;
   if(marble){
-   const root=base+'app/.tmp/product-promo-capture/marble/';
+   const root=base+'.tmp/product-promo-capture/marble/';
    next=await parseDesignSourceOffThread('Marble.kicad_pcb',await(await fetch(root+'Marble.kicad_pcb')).text());
    if(thermal)setResult(await(await fetch(root+'thermal-result.json')).json());
    else next={...next,boardModelUrl:root+'board.glb',componentModelUrl:root+'components.glb',boardModelIncludesCopper:false};
   }else if(thermal){
-   next=await parseDesignSourceOffThread('iot-esp-eth-ind.kicad_pcb',await(await fetch(base+'app/.tmp/product-promo-capture/thermal-source.kicad_pcb')).text());
-   setResult(await(await fetch(base+'app/.tmp/product-promo-capture/thermal-result.json')).json());
+   next=await parseDesignSourceOffThread('iot-esp-eth-ind.kicad_pcb',await(await fetch(base+'.tmp/product-promo-capture/thermal-source.kicad_pcb')).text());
+   setResult(await(await fetch(base+'.tmp/product-promo-capture/thermal-result.json')).json());
   }else{
-   const root=base+'app/.tmp/assembly-performance/';
+   const root=base+'.tmp/assembly-performance/';
    next=await parseDesignSourceOffThread('retained.spike-design.json',await(await fetch(root+'source.json')).text(),'spike-normalized');
    next={...next,boardModelUrl:root+'board.glb',componentModelUrl:root+'components.glb',boardModelIncludesCopper:true};
   }

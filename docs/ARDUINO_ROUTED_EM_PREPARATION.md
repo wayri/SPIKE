@@ -9,7 +9,7 @@ substitutes a mechanical board box for routed copper.
 Run the native OCC option with the supported installed CPython 3.11 runtime:
 
 ```powershell
-& C:/Users/yawar/AppData/Local/Programs/Python/Python311/python.exe scripts/prepare_arduino_assembly_em.py --output output/new-arduino-em --mesh
+& "$env:LOCALAPPDATA/Programs/Python/Python311/python.exe" scripts/prepare_arduino_assembly_em.py --output output/new-arduino-em --mesh
 ```
 
 Without `--mesh`, Python 3.12 can prepare the neutral jobs. KiCad 10.0.6 Python
