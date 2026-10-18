@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+.gitattributes text eol=lf
 # Preserve exact bytes for hash-bound evidence across Git checkouts.
 licenses/runtime-notices/** -text
 examples/correlation/uniform_sheet/analytical.json -text
@@ -190,3 +191,42 @@ schemas/capacitive-network-transient-request-v1.schema.json text eol=lf
 schemas/capacitive-network-transient-result-v1.schema.json text eol=lf
 docs/CAPACITIVE_NETWORK_TRANSIENT.md text eol=lf
 docs/validation/parity/SI07-S04*.json text eol=lf
+
+# All source files bound by parity receipts use canonical LF bytes on Windows.
+examples/assembly_field/run_examples.py text eol=lf
+python/spike_core/assembly_field_handoff.py text eol=lf
+python/spike_core/assembly_thermal_components.py text eol=lf
+python/spike_core/assembly_thermomechanical.py text eol=lf
+python/spike_core/gmsh_occ_runtime.py text eol=lf
+python/spike_core/mcad_export_contract.py text eol=lf
+python/spike_core/mcad_tessellation.py text eol=lf
+python/spike_core/pdn_network.py text eol=lf
+python/spike_core/project_package.py text eol=lf
+python/spike_core/service_assembly_field.py text eol=lf
+python/spike_core/service_helpers.py text eol=lf
+python/spike_core/service_pdn_network.py text eol=lf
+python/spike_core/service_project_thermal_mesh.py text eol=lf
+python/spike_core/service_sparameter_processing.py text eol=lf
+python/spike_core/sparameters.py text eol=lf
+python/spike_core/sparselizard_process.py text eol=lf
+python/spike_core/tetra_aabb_candidates.py text eol=lf
+schemas/pdn-network-request-v1.schema.json text eol=lf
+schemas/thermal-component-promotion-v1.schema.json text eol=lf
+scripts/parity_component_admission_gate.py text eol=lf
+scripts/parity_pisi_gate.py text eol=lf
+tests/python/test_assembly_tetra_thermal.py text eol=lf
+tests/python/test_assembly_thermal_meshing.py text eol=lf
+tests/python/test_assembly_thermomechanical.py text eol=lf
+tests/python/test_component_placement_review.py text eol=lf
+tests/python/test_component_step_scale.py text eol=lf
+tests/python/test_pdn_electrostatic.py text eol=lf
+tests/python/test_project_assembly_field.py text eol=lf
+tests/python/test_thermal_component_promotion.py text eol=lf
+
+# Portable MCAD contract sources and FreeCAD mirrors must be byte-identical.
+python/spike_core/mcad_session_contract.py text eol=lf
+integrations/freecad/SPIKEWorkbench/spike_freecad/session_contract.py text eol=lf
+schemas/mcad-session-v1.schema.json text eol=lf
+schemas/mcad-feedback-v1.schema.json text eol=lf
+integrations/freecad/SPIKEWorkbench/Resources/schemas/mcad-session-v1.schema.json text eol=lf
+integrations/freecad/SPIKEWorkbench/Resources/schemas/mcad-feedback-v1.schema.json text eol=lf
