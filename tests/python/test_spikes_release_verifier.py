@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -14,19 +15,43 @@ from python.spikes.release_verifier import (
 )
 
 
-ROOT = Path(__file__).resolve().parents[2]
-REPORT = (
-    ROOT / "artifacts" / "releases" / "beta-0.3.0-beta.1-coherent"
-    / "SPIKES-0.3.0-beta.1-release.json"
-)
-
-
 class SpikesReleaseVerifierTests(unittest.TestCase):
     def test_current_coherent_bundle_passes_offline_staging_smoke(self) -> None:
-        # The retained beta.1 artifact predates standalone-source admission.
-        # Its integrity remains verifiable, but a new package must pass the
-        # launch smoke before it can be considered for public distribution.
-        result = verify_engine_release(REPORT, launch_smoke=False)
+        version = "unit-fixture"
+        package_name = f"SPIKES-{version}-windows-x64-engineering-preview"
+        payload = b"self-contained verifier fixture\n"
+        manifest = {
+            "contract": "spikes/engine-release-manifest/v1",
+            "version": version,
+            "files": [{
+                "path": "payload.txt", "size": len(payload),
+                "sha256": hashlib.sha256(payload).hexdigest(),
+            }],
+            "claims": {name: False for name in (
+                "complete_spice3_parity", "competitive_superiority", "hard_realtime",
+                "physical_hil", "hostile_code_safe", "production_signed",
+            )},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            archive = root / "fixture.zip"
+            with zipfile.ZipFile(archive, "w") as bundle:
+                bundle.writestr(f"{package_name}/payload.txt", payload)
+                bundle.writestr(
+                    f"{package_name}/release.manifest.json",
+                    json.dumps(manifest).encode("utf-8"),
+                )
+            report_payload = {
+                **manifest,
+                "archive": {
+                    "path": archive.name,
+                    "size": archive.stat().st_size,
+                    "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
+                },
+            }
+            report = root / "release.json"
+            report.write_text(json.dumps(report_payload), encoding="utf-8")
+            result = verify_engine_release(report, launch_smoke=False)
         self.assertEqual(result["status"], "passed")
         self.assertEqual(result["cli_launch_smoke"], "skipped")
         self.assertEqual(result["cli_functional_smoke"], "skipped")
@@ -44,7 +69,6 @@ class SpikesReleaseVerifierTests(unittest.TestCase):
             archive = root / "bad.zip"
             with zipfile.ZipFile(archive, "w") as bundle:
                 bundle.writestr("../escape", b"bad")
-            import hashlib
             source["archive"] = {
                 "path": archive.name, "size": archive.stat().st_size,
                 "sha256": hashlib.sha256(archive.read_bytes()).hexdigest(),
