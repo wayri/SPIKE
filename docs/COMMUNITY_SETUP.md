@@ -6,6 +6,10 @@ external approvals.
 
 ## Applied state (2026-10-18)
 
+- Public welcome-channel invite: [Join SPIKE](https://discord.gg/EvGh3cXtk).
+  Discord reports a 30-day expiration and unlimited uses. A permanent invite
+  remains pending owner approval; do not imply this link never expires.
+
 - GitHub's public repository description and Discord's saved server description
   now use the PCB-focused, board-to-complete-assembly positioning. The welcome
   topic carries the same scope and retains the existing community rules.
@@ -41,7 +45,7 @@ external approvals.
     proposal`, and `Validation`.
 - Existing text channels `general`, `updates`, `bugs`, `help`, and `show-case`,
   and the existing `General` voice channel, were preserved. No messages were
-  posted and no invite, role, bot, token, or administrator grant was created.
+  posted. The public invite is recorded above; no role, bot, token, or administrator grant was created.
 - Optional AutoMod, Onboarding, moderator roles, and the remaining channel plan
   below were not configured and remain proposals.
 - GitHub ruleset `25144029` is now **Protect main**, active on the default
