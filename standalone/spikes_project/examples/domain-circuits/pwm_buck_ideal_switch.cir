@@ -1,0 +1,19 @@
+* SPDX-License-Identifier: Apache-2.0
+* Idealized 100-kHz, 40%-duty asynchronous buck; not a device model.
+Vin input 0 12
+Vgate gate 0 PULSE(0 5 0 20n 20n 4u 10u)
+Smain input switch gate 0 SWIDEAL
+Dfree 0 switch DIDEAL
+Lout switch output 100u IC=0
+Cout output 0 100u IC=0
+Rload output 0 10
+.model SWIDEAL SW(Ron=1m Roff=100Meg Vt=2.5 Vh=0.1)
+.model DIDEAL D(Is=1m Rs=1m N=1)
+.tran 50n 3m uic
+.control
+run
+set wr_singlescale
+set wr_vecnames
+wrdata pwm_buck_ideal_switch.csv v(output) i(Lout)
+.endc
+.end

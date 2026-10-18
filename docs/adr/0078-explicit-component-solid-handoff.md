@@ -48,6 +48,10 @@ and the isolated extension boundary have regression coverage. See
 
 This verifies explicit mechanical exchange. It does not authenticate a model
 publisher or substitute supplied solids for qualified original URI contents.
-KiCad source rotation order, nonuniform scale, offsets and front/back composition
-remain unqualified. Native export attempts and missing evidence are retained in
+The subsequent [native STEP reference](../validation/parity/WF01-S04C3.md) checks
+source rotation order, nonuniform positive scale and front/back composition for
+one cuboid/stackup at two footprint angles. It also establishes an explicit
+datum mapping and retains an observed exporter mounting clearance. This bounded
+reference does not enable automatic source projection or qualify general models
+and materials. Native export attempts and remaining evidence are retained in
 [S04C progress](../validation/parity/WF01-S04C-progress.json).

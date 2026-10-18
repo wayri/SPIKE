@@ -44,4 +44,6 @@ assert.match(guide,/destination: "emerge-em-result"/);
 assert.match(guide,/data-guide="emerge-em-result"/);
 assert.match(app,/destination === "emerge-em-result"/);
 assert.match(app,/data-guide="emerge-em-result"/);
+assert.match(guide,/disabled=\{detached\}/, "detached guides must not highlight controls using coordinates from another window");
+assert.match(guide,/Dock the guide to highlight controls/, "detached guide explains how to restore control highlighting");
 console.log('Help picture workflows: 4 unchanged captures, 19 linked feature families, HF/SI selector targets, honest recordedDC provenance/status, existing assets and destinations passed');

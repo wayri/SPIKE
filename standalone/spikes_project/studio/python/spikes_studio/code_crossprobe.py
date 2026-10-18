@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Bounded source-editor styling and schematic cross-probing helpers."""
 from __future__ import annotations
 

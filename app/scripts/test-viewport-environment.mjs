@@ -1,0 +1,23 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const { viewportBackgroundColor, worldGridSize } = await importTestTypescript("viewportEnvironment");
+const { loadAppSettings, saveAppSettings, APP_SETTINGS_STORAGE_KEY } = await importTestTypescript("appSettings");
+const stored = new Map();
+globalThis.localStorage = { getItem: key => stored.get(key) ?? null, setItem: (key, value) => stored.set(key, value) };
+assert.equal(viewportBackgroundColor("amoled"), "#000000");
+assert.notEqual(viewportBackgroundColor("dark"), "#000000");
+assert.ok(worldGridSize(100, 300) > 300, "Ground extends beyond all assembly boards");
+assert.ok(Number.isFinite(worldGridSize(NaN, Infinity)), "Empty/invalid geometry still has a finite world");
+assert.ok(worldGridSize(0, 0) > 0);
+const initial = loadAppSettings();
+assert.equal(initial.viewportGrid, true);
+assert.equal(initial.viewportBackground, "dark");
+saveAppSettings({ ...initial, viewportBackground: "amoled", viewportGrid: false });
+assert.equal(loadAppSettings().viewportBackground, "amoled");
+assert.equal(loadAppSettings().viewportGrid, false, "Grid off survives restart independently of black mode");
+stored.set(APP_SETTINGS_STORAGE_KEY, JSON.stringify({ theme: "high-contrast", viewportBackground: "invalid", viewportGrid: "false" }));
+assert.equal(loadAppSettings().viewportBackground, "dark");
+assert.equal(loadAppSettings().viewportGrid, true);
+assert.equal(loadAppSettings().theme, "high-contrast", "Viewport mode does not replace application theme");
+console.log("Viewport background, orientation extent and preference persistence passed.");

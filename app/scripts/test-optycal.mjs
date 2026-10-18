@@ -25,7 +25,7 @@ assert.throws(() => optycalParameters({ ...setup, frequency_hz: "2e9" }, source)
 assert.throws(() => optycalParameters({ ...setup, antenna_aperture_mm: "" }, source), /Largest antenna/);
 assert.throws(() => optycalParameters({ ...setup, theta_step_deg: "7" }, source), /Angular steps/);
 assert.throws(() => optycalParameters({ ...setup, structure_rotation_deg: ["0", "0", "Infinity"] }, source), /rotation Z/);
-const uiBundle = await build({ entryPoints: [fileURLToPath(new URL("../src/OptycalExtension.tsx", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node", loader: { ".css": "empty" }, external: ["react", "plotly.js-dist-min"] });
+const uiBundle = await build({ entryPoints: [fileURLToPath(new URL("../src/OptycalExtension.tsx", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node", loader: { ".css": "empty" }, external: ["react", "react-dom", "react-dom/server", "lucide-react", "plotly.js-dist-min"] });
 // A local file module keeps React resolution bound to this package.
 const { writeFileSync, unlinkSync } = await import("node:fs");
 const uiFile = new URL("../.optycal-test-ui.mjs", import.meta.url);

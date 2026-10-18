@@ -179,6 +179,12 @@ class RealPromotedStepTests(unittest.TestCase):
             result = run_assembly_thermal_mesh(promoted['payload'], a, o, Path(directory)/'mesh', artifact_reader=artifacts)
             self.assertEqual(result['status'], 'completed', result.get('blockers'))
             self.assertEqual(len(result['request']['bodies']), 4)
+            self.assertEqual(result['request']['materials'], a['materials'])
+            self.assertEqual(len(result['handoff']['materials']), 4)
+            for material in result['handoff']['materials']:
+                self.assertEqual(material['provenance'], a['materials'][0]['provenance'])
+                self.assertEqual(material['thermal_conductivity_w_mk'],
+                                 [[2., 0., 0.], [0., 2., 0.], [0., 0., 2.]])
             points = result['handoff']['mesh']['vertices']
             for index, part in enumerate(promoted['promoted_parts']):
                 trace = next(t for t in result['handoff']['source_traceability'] if t['occurrence_id'] == part['id'])

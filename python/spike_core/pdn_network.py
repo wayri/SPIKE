@@ -133,26 +133,44 @@ def _solve_linear(system: np.ndarray, rhs: np.ndarray, where: str) -> tuple[np.n
     return solution, residual, condition
 
 
-def _transient_setup(raw: Any, port_ids: list[str]) -> tuple | None:
+def _transient_setup(raw: Any, port_ids: list[str]) -> dict | None:
     if raw is None:
         return None
-    _record(raw, {"port_id", "points", "output_times_s", "max_step_s"}, "load_transient")
-    if raw["port_id"] not in port_ids:
-        _fail("invalid_request", "Transient load port is unknown")
-    port_col = port_ids.index(raw["port_id"])
-    points = _array(raw["points"], "load_transient.points", 2, 1024)
-    for point in points:
-        _record(point, {"time_s", "current_a"}, "PWL point")
-    times = [_number(p["time_s"], "PWL time_s") for p in points]
-    currents = [_number(p["current_a"], "PWL current_a", signed=True) for p in points]
-    if times[0] != 0 or currents[0] != 0 or any(b <= a for a, b in zip(times, times[1:])):
-        _fail("invalid_request", "PWL must start at (0,0) and have strictly increasing time")
+    legacy = not isinstance(raw, dict) or "loads" not in raw
+    fields = {"port_id", "points", "output_times_s", "max_step_s"} if legacy else {
+        "loads", "output_times_s", "max_step_s"}
+    _record(raw, fields, "load_transient")
+    raw_loads = [{"port_id": raw["port_id"], "points": raw["points"]}] if legacy else _array(
+        raw["loads"], "load_transient.loads", 1, _MAX_PORTS)
+    loads = []
+    seen = set()
+    for item in raw_loads:
+        _record(item, {"port_id", "points"}, "transient load")
+        port_id = _name(item["port_id"], "transient load port_id")
+        if port_id not in port_ids or port_id in seen:
+            _fail("invalid_request", "Transient load ports must be known and unique")
+        seen.add(port_id)
+        points = _array(item["points"], "load_transient.points", 2, 1024)
+        for point in points:
+            _record(point, {"time_s", "current_a"}, "PWL point")
+        times = [_number(p["time_s"], "PWL time_s") for p in points]
+        currents = [_number(p["current_a"], "PWL current_a", signed=True) for p in points]
+        if times[0] != 0 or currents[0] != 0 or any(b <= a for a, b in zip(times, times[1:])):
+            _fail("invalid_request", "PWL must start at (0,0) and have strictly increasing time")
+        slopes = [(b - a) / (stop - start) for a, b, start, stop in
+                  zip(currents, currents[1:], times, times[1:])]
+        if not all(math.isfinite(slope) for slope in slopes):
+            _fail("invalid_request", "PWL current slopes must be finite")
+        if loads and times[-1] != loads[0]["times"][-1]:
+            _fail("invalid_request", "All transient waveforms must have the same final time")
+        loads.append({"port_id": port_id, "port_col": port_ids.index(port_id),
+                      "times": times, "currents": currents, "slopes": slopes})
     output_times = _array(raw["output_times_s"], "output_times_s", 2, 2048)
     output_times = [_number(t, "output time_s") for t in output_times]
-    if output_times[0] != 0 or output_times[-1] > times[-1] or any(b <= a for a, b in zip(output_times, output_times[1:])):
+    if output_times[0] != 0 or output_times[-1] > loads[0]["times"][-1] or any(b <= a for a, b in zip(output_times, output_times[1:])):
         _fail("invalid_request", "Output times must start at zero, increase, and end within PWL")
     max_step = _number(raw["max_step_s"], "max_step_s", positive=True)
-    events = sorted(set(times + output_times))
+    events = sorted(set(output_times).union(*(load["times"] for load in loads)))
     steps = 0
     for start, stop in zip(events, events[1:]):
         ratio = (stop - start) / max_step
@@ -161,7 +179,58 @@ def _transient_setup(raw: Any, port_ids: list[str]) -> tuple | None:
         steps += math.ceil(ratio)
         if steps > _MAX_STEPS:
             _fail("resource_limit", "Transient exceeds 20000 integration steps")
-    return port_col, times, currents, output_times, max_step, events, steps
+    return {"legacy": legacy, "loads": loads, "output_times": output_times,
+            "max_step": max_step, "events": events, "steps": steps}
+
+
+def _inductive_slope_response(A: np.ndarray, E: np.ndarray, load: np.ndarray,
+                             voltage_count: int, conductances: list,
+                             capacitances: list) -> np.ndarray:
+    """Return the algebraic state jump per A/s change of sink-current slope.
+
+    K contains constant voltage shifts on each R/C-connected island without
+    an R/C path to reference. These are exactly the common nullspace of the
+    nodal C and G matrices, found from topology without an SI-dependent rank
+    tolerance. Let F be coil incidence and L the positive-definite coil block.
+    Differentiating island KCL, K.T F i = -K.T B u, gives
+    K.T F L^-1 F.T K dv = -K.T B du/dt. Thus a slope change alters only
+    island voltages: capacitor voltages, coil currents, energy and resistor
+    dissipation are continuous. No pseudoinverse or artificial loss is added.
+    """
+    parent = list(range(voltage_count + 1))
+    reference = voltage_count
+
+    def root(index: int) -> int:
+        while parent[index] != index:
+            parent[index] = parent[parent[index]]
+            index = parent[index]
+        return index
+
+    for a, b, _ in conductances + capacitances:
+        parent[root(reference if a is None else a)] = root(reference if b is None else b)
+    groups: dict[int, list[int]] = {}
+    reference_root = root(reference)
+    for index in range(voltage_count):
+        component = root(index)
+        if component != reference_root:
+            groups.setdefault(component, []).append(index)
+    response = np.zeros_like(load)
+    if not groups:
+        return response
+    K = np.zeros((voltage_count, len(groups)))
+    for column, indices in enumerate(groups.values()):
+        K[indices, column] = 1 / math.sqrt(len(indices))
+    if voltage_count == len(load):
+        _fail("singular_network", "Transient has an unreferenced R/C island without inductors")
+    incidence = A[:voltage_count, voltage_count:]
+    island_incidence = K.T @ incidence
+    derivative, _, _ = _solve_linear(E[voltage_count:, voltage_count:],
+                                     island_incidence.T, "transient coil consistency")
+    shifts, _, _ = _solve_linear(island_incidence @ derivative,
+                                 -(K.T @ load[:voltage_count]),
+                                 "transient island consistency")
+    response[:voltage_count] = K @ shifts
+    return response
 
 
 def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | None = None,
@@ -171,7 +240,8 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
     Required top-level keys: contract, reference, nodes, elements, ports,
     frequencies_hz, load_transient. ``load_transient`` may be null. A load
     transient has ``port_id``, ``points`` (time_s/current_a), ``output_times_s``,
-    and ``max_step_s``. Positive current_a is a sink at the positive port.
+    and ``max_step_s``. Alternatively ``loads`` supplies unique port_id/points
+    records sharing one final time. Positive current_a sinks at each port.
     All values are SI; all supplied elements require explicit provenance.
     """
     if cancel_check is not None and not callable(cancel_check):
@@ -384,14 +454,16 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
     if any(not math.isfinite(2 * math.pi * f) for f in frequencies):
         _fail("invalid_request", "Frequency produces nonfinite angular frequency")
     transient_setup = _transient_setup(request["load_transient"], port_ids)
-    transient_steps = transient_setup[-1] if transient_setup is not None else 0
-    if (len(frequencies) + transient_steps) * size**3 > _MAX_DENSE_WORK:
+    transient_steps = transient_setup["steps"] if transient_setup is not None else 0
+    if (len(frequencies) + transient_steps + (2 if transient_setup else 0)) * size**3 > _MAX_DENSE_WORK:
         _fail("resource_limit", "Estimated dense factorization work exceeds 100 million unknown-cubed units")
     # Conservative JSON-envelope estimate, before allocating every response.
-    output_count = len(transient_setup[3]) if transient_setup is not None else 0
+    output_count = len(transient_setup["output_times"]) if transient_setup is not None else 0
     response_bytes = (len(frequencies) * (len(port_ids)**2 + n * len(port_ids)) * 96
                       + output_count * (n + len(port_ids)) * 64
                       + (len(frequencies) + output_count) * 256)
+    if transient_setup is not None and not transient_setup["legacy"]:
+        response_bytes += (output_count + 1) * len(transient_setup["loads"]) * 384
     if response_bytes > _MAX_RESULT_BYTES:
         _fail("resource_limit", "Estimated PDN response exceeds 16 MiB")
     # The native SPIKES public ABI has PWL and L/C but no coupled-inductor
@@ -416,26 +488,39 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
                    "relative_residual": residual, "condition_number": condition})
 
     transient = None
-    raw_transient = request["load_transient"]
     if transient_setup is not None:
-        port_col, times, currents, output_times, max_step, events, steps = transient_setup
+        legacy, loads = transient_setup["legacy"], transient_setup["loads"]
+        output_times, max_step = transient_setup["output_times"], transient_setup["max_step"]
+        events, steps = transient_setup["events"], transient_setup["steps"]
+        load_ids = [load["port_id"] for load in loads]
+        load_matrix = B[:, [load["port_col"] for load in loads]]
         if _admission_only:
             poll_cancel()
             return {"contract": RESULT_CONTRACT, "status": "structurally_admitted",
                     "model_status": "approximate", "unknowns": size,
                     "frequency_count": len(frequencies), "transient_steps": steps,
                     "provenance_counts": provenance_counts}
-        state = np.zeros(size)
+        slope_response = _inductive_slope_response(A, E, load_matrix, n + internal,
+                                                   conductances, capacitances)
+        slope_indices = [0] * len(loads)
+        state = slope_response @ np.array([load["slopes"][0] for load in loads])
+        if not np.all(np.isfinite(state)):
+            _fail("numerical_failure", "Nonfinite consistent initial transient voltage")
         previous_time = 0.
-        previous_input = 0.
+        previous_input = np.zeros(len(loads))
         work_sum = work_correction = 0.
         dissipation_sum = dissipation_correction = 0.
         absolute_energy_flow = 0.
         max_stored_energy = 0.
         worst_step_residual = 0.
         worst_step_condition = 0.
-        observations = [{"time_s": 0., "load_current_a": 0., "port_voltage_v": {pid: 0. for pid in port_ids},
-                         "node_voltage_v": {name: 0. for name in nodes},
+        def current_observation(values: np.ndarray) -> dict:
+            return {"load_current_a": float(values[0])} if legacy else {
+                "load_current_a_by_port": {pid: float(value) for pid, value in zip(load_ids, values)}}
+
+        observations = [{"time_s": 0., **current_observation(previous_input),
+                         "port_voltage_v": {pid: float(B[:, j] @ state) for j, pid in enumerate(port_ids)},
+                         "node_voltage_v": {name: float(state[index]) for name, index in node_index.items()},
                          "stored_energy_j": 0.}]
         output_set = set(output_times[1:])
         for start, stop in zip(events, events[1:]):
@@ -444,20 +529,31 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
                 poll_cancel()
                 next_time = stop if step == count - 1 else start + (step + 1) * (stop-start) / count
                 dt = next_time - previous_time
-                next_input = float(np.interp(next_time, times, currents))
+                next_input = np.array([float(np.interp(next_time, load["times"], load["currents"]))
+                                       for load in loads])
                 left = E + .5 * dt * A
-                right = (E - .5 * dt * A) @ state - .5 * dt * (previous_input + next_input) * B[:, port_col]
+                summed_input = previous_input + next_input
+                forcing = (.5 * dt * float(summed_input[0]) * load_matrix[:, 0] if legacy else
+                           .5 * dt * (load_matrix @ summed_input))
+                right = (E - .5 * dt * A) @ state - forcing
                 next_state, residual, condition = _solve_linear(left, right[:, None], f"transient {next_time} s")
                 next_state = next_state[:, 0]
                 midpoint = .5 * (state + next_state)
                 dissipation = dt * float(midpoint @ ((A + A.T) * .5) @ midpoint)
-                work = -.5 * dt * (previous_input + next_input) * float(B[:, port_col] @ midpoint)
+                source_work = -.5 * dt * summed_input * (load_matrix.T @ midpoint)
+                if not np.all(np.isfinite(source_work)):
+                    _fail("numerical_failure", f"Nonfinite source work at {next_time} s")
+                try:
+                    work = float(source_work[0]) if legacy else math.fsum(source_work)
+                except OverflowError:
+                    _fail("numerical_failure", f"Nonfinite total source work at {next_time} s")
+                source_flow = float(np.sum(np.abs(source_work)))
                 energy_before = .5 * float(state @ E @ state)
                 energy_after = .5 * float(next_state @ E @ next_state)
                 if not all(math.isfinite(value) for value in
                            (work, dissipation, energy_before, energy_after)):
                     _fail("numerical_failure", f"Nonfinite energy terms at {next_time} s")
-                balance_scale = max(abs(energy_before), abs(energy_after), abs(work), abs(dissipation),
+                balance_scale = max(abs(energy_before), abs(energy_after), source_flow, abs(dissipation),
                                     np.finfo(float).tiny)
                 if energy_after < -1e-10 * balance_scale or abs((energy_after - energy_before) -
                                                                 (work - dissipation)) > 1e-7 * balance_scale:
@@ -465,7 +561,7 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
                 work_sum, work_correction = _compensated_add(work_sum, work_correction, work)
                 dissipation_sum, dissipation_correction = _compensated_add(
                     dissipation_sum, dissipation_correction, dissipation)
-                absolute_energy_flow += abs(work) + abs(dissipation)
+                absolute_energy_flow += source_flow + abs(dissipation)
                 max_stored_energy = max(max_stored_energy, abs(energy_after))
                 if not all(math.isfinite(value) for value in
                            (work_sum, dissipation_sum, absolute_energy_flow)):
@@ -474,6 +570,20 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
                 previous_time, previous_input = next_time, next_input
                 worst_step_residual = max(worst_step_residual, residual)
                 worst_step_condition = max(worst_step_condition, condition)
+            # PWL samples use the right derivative at interior corners and
+            # the left derivative at the final endpoint (no extrapolation).
+            changes = np.zeros(len(loads))
+            for index, load in enumerate(loads):
+                slope_index = slope_indices[index]
+                if slope_index + 1 < len(load["slopes"]) and stop == load["times"][slope_index + 1]:
+                    changes[index] = load["slopes"][slope_index + 1] - load["slopes"][slope_index]
+                    slope_indices[index] += 1
+            if not np.all(np.isfinite(changes)):
+                _fail("numerical_failure", "Nonfinite PWL slope change")
+            if np.any(changes):
+                state = state + slope_response @ changes
+                if not np.all(np.isfinite(state)):
+                    _fail("numerical_failure", "Nonfinite algebraic voltage at PWL corner")
             if stop in output_set:
                 stored_energy = .5 * float(state @ E @ state)
                 energy_scale = max(absolute_energy_flow, max_stored_energy, np.finfo(float).tiny)
@@ -481,7 +591,7 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
                 roundoff = 64 * np.finfo(float).eps * max(1, steps) * energy_scale
                 if stored_energy < -1e-10 * energy_scale or balance_error > 1e-10 * energy_scale + roundoff:
                     _fail("energy_failure", "Transient passive energy balance failed")
-                observations.append({"time_s": stop, "load_current_a": previous_input,
+                observations.append({"time_s": stop, **current_observation(previous_input),
                                      "port_voltage_v": {pid: float(B[:, j] @ state) for j, pid in enumerate(port_ids)},
                                      "node_voltage_v": {name: float(state[index]) for name, index in node_index.items()},
                                      "stored_energy_j": stored_energy})
@@ -491,7 +601,8 @@ def evaluate_pdn_network(request: dict, *, cancel_check: Callable[[], bool] | No
         final_roundoff = 64 * np.finfo(float).eps * max(1, steps) * energy_scale
         if not math.isfinite(final_energy_error) or final_energy_error > 1e-10 * energy_scale + final_roundoff:
             _fail("energy_failure", "Final transient passive energy balance failed")
-        transient = {"load_port_id": raw_transient["port_id"], "points": observations,
+        load_identity = {"load_port_id": load_ids[0]} if legacy else {"load_port_ids": load_ids}
+        transient = {**load_identity, "points": observations,
                      "steps": steps, "max_relative_residual": worst_step_residual,
                      "max_condition_number": worst_step_condition,
                      "energy_balance_error_j": final_energy_error,

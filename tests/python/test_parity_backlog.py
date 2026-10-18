@@ -17,9 +17,14 @@ class ParityBacklogTests(unittest.TestCase):
 
     def test_current_coverage_and_pinned_fixture(self):
         result = validate_backlog(self.payload, self.roadmap)
-        self.assertEqual(result['items'], 34)
+        self.assertEqual(result['items'], 68)
         self.assertNotIn('WF01', result['benchmark_definitions_pending'])
-        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1'])
+        self.assertTrue({'RF01', 'RF02', 'PW01', 'PW02', 'PW03', 'PW04', 'PW05'}.issubset(
+                            result['benchmark_definitions_pending']))
+        self.assertTrue({'GP01', 'GP04', 'OP01', 'OP02', 'OP03', 'OP04', 'OP05',
+                         'VF01', 'VF02', 'AX01', 'AX02', 'LB01', 'LB02'}.issubset(
+                             result['benchmark_definitions_pending']))
+        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04'])
 
     def test_duplicate_missing_and_unknown_capabilities_fail(self):
         for mutation in ('duplicate', 'missing', 'unknown'):
@@ -32,6 +37,89 @@ class ParityBacklogTests(unittest.TestCase):
                 payload['items'][0]['id'] = 'SI99'
             with self.assertRaisesRegex(ValueError, 'match roadmap'):
                 validate_backlog(payload, self.roadmap)
+
+    def test_post_parity_work_cannot_start_before_parity(self):
+        for mutation in ('item', 'radio', 'hvdc', 'stage', 'phase', 'scope'):
+            payload = copy.deepcopy(self.payload)
+            if mutation == 'item':
+                next(x for x in payload['items'] if x['id'] == 'OP02')['status'] = 'in_progress'
+            elif mutation == 'radio':
+                next(x for x in payload['items'] if x['id'] == 'RF01')['status'] = 'in_progress'
+            elif mutation == 'hvdc':
+                next(x for x in payload['items'] if x['id'] == 'PW01')['status'] = 'in_progress'
+            elif mutation == 'stage':
+                payload['stages'].append({'id': 'OP02-S99', 'capability_id': 'OP02', 'status': 'in_progress'})
+            elif mutation == 'phase':
+                payload['execution_policy']['active_phase'] = 'post_parity'
+            else:
+                payload['execution_policy']['parity_capabilities'].append('GP01')
+            with self.assertRaisesRegex(ValueError, 'post.parity'):
+                validate_backlog(payload, self.roadmap)
+
+    def test_explicit_parallel_scope_preserves_other_deferrals(self):
+        payload = copy.deepcopy(self.payload)
+        next(x for x in payload['items'] if x['id'] == 'GP10')['status'] = 'in_progress'
+        self.assertIn('GP10', validate_backlog(payload, self.roadmap)['parallel_expansion'])
+        for mutation in ('disabled', 'smuggled', 'missing', 'duplicate'):
+            other = copy.deepcopy(payload)
+            if mutation == 'disabled': other['execution_policy']['parallel_expansion']['enabled'] = False
+            if mutation == 'smuggled': other['execution_policy']['parallel_expansion']['capability_ids'].append('OP02')
+            if mutation == 'missing': other['execution_policy'].pop('parallel_expansion')
+            if mutation == 'duplicate': other['execution_policy']['parallel_expansion']['capability_ids'].append('GP10')
+            with self.assertRaises(ValueError): validate_backlog(other, self.roadmap)
+
+    def test_pi_si_priority_cannot_omit_a_family(self):
+        payload=copy.deepcopy(self.payload)
+        payload['execution_policy']['priority_capabilities'].remove('PI06')
+        with self.assertRaisesRegex(ValueError, 'PI/SI priority'):
+            validate_backlog(payload,self.roadmap)
+
+    def test_requested_vehicle_and_mechanism_scope_is_tracked_without_false_completion(self):
+        requested = {'GP12', 'GP13', 'GP14', 'GP15', 'GP16'}
+        self.assertTrue(requested <= set(self.payload['execution_policy']['parallel_expansion']['capability_ids']))
+        for item in self.payload['items']:
+            if item['id'] in requested:
+                self.assertEqual(item['status'], 'planned')
+                self.assertTrue(item['open_gaps'])
+        expected_stages = {'GP12-S01', 'GP12-S02', 'GP12-S03', 'GP13-S01', 'GP13-S02',
+                           'GP14-S01', 'GP14-S02', 'GP14-S03', 'GP15-S01', 'GP15-S02',
+                           'GP15-S03', 'GP15-S04', 'GP15-S05', 'GP16-S01', 'GP16-S02', 'GP16-S03'}
+        by_id = {s['id']: s for s in self.payload['stages']}
+        self.assertTrue(expected_stages <= set(by_id))
+        self.assertTrue(all(by_id[name]['status'] == 'planned' for name in expected_stages))
+        self.assertIn('GP15-S03', by_id['GP15-S05']['depends_on'])
+        self.assertIn('GP13-S02', by_id['GP15-S05']['depends_on'])
+
+    def test_vehicle_aerodynamics_permission_does_not_open_general_cfd(self):
+        payload = copy.deepcopy(self.payload)
+        stage = next(s for s in payload['stages'] if s['id'] == 'GP05-S01')
+        stage['status'] = 'in_progress'
+        result = validate_backlog(payload, self.roadmap)
+        self.assertEqual(result['restricted_expansion_scopes'], {'GP05': 'vehicle_aerodynamics'})
+        for mutation in ('stage', 'missing', 'expanded'):
+            other = copy.deepcopy(payload)
+            if mutation == 'stage': next(s for s in other['stages'] if s['id'] == 'GP05-S01')['scope'] = 'building_cfd'
+            if mutation == 'missing': other['execution_policy']['parallel_expansion'].pop('restricted_scopes')
+            if mutation == 'expanded': other['execution_policy']['parallel_expansion']['restricted_scopes']['GP05'] = 'all_cfd'
+            with self.assertRaises(ValueError): validate_backlog(other, self.roadmap)
+
+    def test_structural_done_rejects_failed_skipped_stale_or_overclaimed_receipt(self):
+        stage = {'id': 'GP07-S01', 'evidence': 'docs/validation/parity/GP07-S01.json'}
+        original = json.loads((ROOT/stage['evidence']).read_text(encoding='utf-8'))
+        validate_done_import_stage(stage, ROOT)
+        with tempfile.TemporaryDirectory(dir=ROOT/'build/parity-test-temp') as directory:
+            path = Path(directory)/'receipt.json'
+            stage['evidence'] = path.relative_to(ROOT).as_posix()
+            for mutation in ('failed', 'skipped', 'stale', 'overclaimed', 'count', 'log'):
+                receipt = copy.deepcopy(original)
+                if mutation == 'failed': receipt['status'] = 'failed'
+                if mutation == 'skipped': receipt['tests']['skipped'] = [receipt['tests']['names'][0]]
+                if mutation == 'stale': receipt['sources']['python/spike_core/assembly_tetra_structural.py'] = '0'*64
+                if mutation == 'overclaimed': receipt['production_qualified'] = True
+                if mutation == 'count': receipt['tests']['run'] -= 1
+                if mutation == 'log': receipt['log_sha256'] = '0'*64
+                path.write_text(json.dumps(receipt), encoding='utf-8')
+                with self.assertRaises(ValueError, msg=mutation): validate_done_import_stage(stage, ROOT)
 
     def test_completion_requires_closed_gaps_and_benchmark(self):
         payload = copy.deepcopy(self.payload)

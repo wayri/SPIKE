@@ -16,7 +16,7 @@ and reference-tool availability are known.
 
 Evidence: [accuracy program](SOLVER_ACCURACY_PROGRAM.md),
 [initial baseline](validation/SOLVER_ACCURACY_BASELINE_20261012.md), and the
-comprehensive report (`output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf`; local evidence, not included in the release).
+[comprehensive report](../output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf).
 The [action backlog](solver-improvement-actions-v1.json) is the execution
 register. Its IDs are engineering task references, not capability flags.
 

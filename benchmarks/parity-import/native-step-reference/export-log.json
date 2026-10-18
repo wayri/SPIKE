@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Users\\yawar\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-step-reference\\export.py",
+    "--cli",
+    "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe",
+    "--output-root",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-step-reference"
+  ],
+  "timeout_s": 260,
+  "returncode": 0,
+  "stdout": "front-90 0 3.259377999995195\nfront-37 0 3.329657499998575\nback-90 0 3.4489895000006072\nback-37 0 4.232076899999811\nfront-90-no-extra 0 4.944840700001805\nfront-90-copper 0 6.2454789000039455\nback-90-no-extra 0 5.574652600000263\nback-90-copper 0 4.730278900002304\n",
+  "stderr": "Failed to find real location of C:\\Users\\yawar\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe\n",
+  "elapsed_s": 35.92659879999701
+}

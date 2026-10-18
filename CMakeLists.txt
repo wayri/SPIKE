@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(SPIKE VERSION 0.3.11 LANGUAGES CXX)
+project(SPIKE VERSION 0.3.12 LANGUAGES CXX)
 
 set(SPIKES_ENGINE_PRERELEASE "beta.1" CACHE STRING
     "SPIKES engine prerelease identifier")
@@ -401,6 +401,12 @@ if(BUILD_TESTING)
     # SPIKES Phase-1 deterministic DC operating-point tests
     add_executable(test_spikes_core tests/test_spikes_dc.cpp)
     target_link_libraries(test_spikes_core PRIVATE spikes_core)
+    target_compile_definitions(test_spikes_core PRIVATE
+        SPIKES_TEST_OSDI_ARTIFACT="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave4-current/spikes_linear_resistor.osdi"
+        SPIKES_TEST_OSDI04_CAPACITOR="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave5-capacitor.osdi"
+        SPIKES_TEST_OSDI04_NOISE="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave5-noise.osdi"
+        SPIKES_TEST_BSIM_BULK_OSDI="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/models/bsimbulk-107.2.1-windows-x64.osdi"
+        SPIKES_TEST_BSIM_CMG_OSDI="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/models/bsimcmg-112.1.0-windows-x64.osdi")
     add_test(NAME test_spikes_core COMMAND test_spikes_core)
 
     add_executable(test_spikes_c_api tests/test_spikes_c_api.cpp)
@@ -409,34 +415,9 @@ if(BUILD_TESTING)
 
     add_executable(test_spikes_transient tests/test_spikes_transient.cpp)
     target_link_libraries(test_spikes_transient PRIVATE spikes_core)
+    target_compile_definitions(test_spikes_transient PRIVATE
+        SPIKES_TEST_OSDI04_CAPACITOR="${CMAKE_CURRENT_SOURCE_DIR}/artifacts/hdl-qualification-wave5-capacitor.osdi")
     add_test(NAME test_spikes_transient COMMAND test_spikes_transient)
-
-    # Optional trusted callback fixtures are generated outside source control.
-    # Match the standalone native harness: report unavailable fixtures explicitly.
-    # A separate root lets isolated release checkouts use the qualified artifacts.
-    set(SPIKES_TEST_FIXTURE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}" CACHE PATH
-        "Root containing artifacts/ for native OSDI regression fixtures")
-    foreach(binding IN ITEMS
-        "SPIKES_TEST_OSDI_ARTIFACT|artifacts/hdl-qualification-wave4-current/spikes_linear_resistor.osdi"
-        "SPIKES_TEST_OSDI04_CAPACITOR|artifacts/hdl-qualification-wave5-capacitor.osdi"
-        "SPIKES_TEST_OSDI04_NOISE|artifacts/hdl-qualification-wave5-noise.osdi"
-        "SPIKES_TEST_BSIM_BULK_OSDI|artifacts/models/bsimbulk-107.2.1-windows-x64.osdi"
-        "SPIKES_TEST_BSIM_CMG_OSDI|artifacts/models/bsimcmg-112.1.0-windows-x64.osdi")
-        string(REPLACE "|" ";" fields "${binding}")
-        list(GET fields 0 macro)
-        list(GET fields 1 relative_path)
-        if(EXISTS "${SPIKES_TEST_FIXTURE_ROOT}/${relative_path}")
-            target_compile_definitions(test_spikes_core PRIVATE
-                ${macro}="${SPIKES_TEST_FIXTURE_ROOT}/${relative_path}")
-            if(macro STREQUAL "SPIKES_TEST_OSDI04_CAPACITOR")
-                target_compile_definitions(test_spikes_transient PRIVATE
-                    ${macro}="${SPIKES_TEST_FIXTURE_ROOT}/${relative_path}")
-            endif()
-            message(STATUS "Native callback fixture enabled: ${relative_path}")
-        else()
-            message(STATUS "Native callback fixture unavailable: ${relative_path}")
-        endif()
-    endforeach()
 
     add_executable(test_spikes_transient_c_api
         tests/test_spikes_transient_c_api.cpp)

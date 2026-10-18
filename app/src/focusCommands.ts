@@ -5,6 +5,8 @@ export type FocusCommand = {
   id: string;
   label: string;
   icon?: ElementType;
+  iconNode?: ReactNode;
+  description?: string;
   shortcut?: string;
   disabled?: boolean;
   checked?: boolean;
@@ -17,8 +19,23 @@ export type FocusCommand = {
 
 export type FocusCommandMatch = { command: FocusCommand; path: readonly string[]; ancestors: readonly FocusCommand[] };
 
+export type SearchableFocusCommand = {
+  id: string;
+  label: string;
+  category: string;
+  description?: string;
+  keywords: string;
+  shortcut?: string;
+  icon?: ElementType;
+  disabled: boolean;
+  run: () => Promise<void>;
+};
+
 type ElementProps = {
   "aria-label"?: unknown;
+  "aria-pressed"?: unknown;
+  "aria-checked"?: unknown;
+  role?: unknown;
   children?: ReactNode;
   className?: unknown;
   disabled?: unknown;
@@ -68,11 +85,25 @@ function safeContent(element: ReactElement<ElementProps>): FocusCommand | null {
   return label ? { id: "", label, disabled: element.props.disabled === true, content: element } : null;
 }
 
+/** Preserve an already-created icon without invoking component functions. */
+function iconFromChildren(children: ReactNode): ReactNode | undefined {
+  let icon: ReactNode | undefined;
+  Children.forEach(children, child => {
+    if (icon || !isValidElement<{ size?: unknown; children?: ReactNode }>(child)) return;
+    if (child.type === "svg" || typeof child.props.size === "number") icon = child;
+    else if (typeof child.type === "string" || child.type === Fragment) icon = iconFromChildren(child.props.children);
+  });
+  return icon;
+}
+
 function nativeAction(element: ReactElement<ElementProps>): Omit<FocusCommand, "id"> | null {
   if (element.type !== "button" || typeof element.props.onClick !== "function") return null;
   const label = typeof element.props["aria-label"] === "string" ? element.props["aria-label"]
-    : typeof element.props.title === "string" ? element.props.title : textBeforeControl(element.props.children);
-  return label ? { label, disabled: element.props.disabled === true, run: element.props.onClick as FocusCommand["run"] } : null;
+    : textBeforeControl(element.props.children) || (typeof element.props.title === "string" ? element.props.title : "");
+  const checked = element.props["aria-checked"] ?? element.props["aria-pressed"];
+  return label ? { label, description: typeof element.props.title === "string" ? element.props.title : undefined,
+    iconNode: iconFromChildren(element.props.children), checked: typeof checked === "boolean" ? checked : undefined,
+    radio: element.props.role === "radio", disabled: element.props.disabled === true, run: element.props.onClick as FocusCommand["run"] } : null;
 }
 
 /**
@@ -145,11 +176,55 @@ export function searchFocusCommands(commands: readonly FocusCommand[], query: st
       const next = [...path, command.label];
       if (command.children?.length) visit(command.children, next, [...ancestors, command]);
       else {
-        const searchable = next.join(" ").toLocaleLowerCase();
+        const searchable = `${next.join(" ")} ${command.description ?? ""}`.toLocaleLowerCase();
         if (terms.every(term => searchable.includes(term))) result.push({ command, path: next, ancestors });
       }
     }
   };
   visit(commands, [], []);
+  return result;
+}
+
+/**
+ * Projects the live menu tree into executable universal-search rows. Group
+ * entries with onEnter (notably workspaces) remain directly discoverable;
+ * leaves retain their complete menu path and inherited availability.
+ */
+export function searchableFocusCommands(commands: readonly FocusCommand[]): SearchableFocusCommand[] {
+  const result: SearchableFocusCommand[] = [];
+  const visit = (items: readonly FocusCommand[], path: readonly string[], ancestors: readonly FocusCommand[], unavailable: boolean) => {
+    for (const command of items) {
+      const nextPath = [...path, command.label];
+      const disabled = unavailable || command.disabled === true;
+      if (command.onEnter) {
+        result.push({
+          id: `command:${command.id}`,
+          label: command.label,
+          category: path.length ? path.join(" / ") : "Workspace",
+          description: command.description ?? `Open ${nextPath.join(" / ")}`,
+          keywords: `${nextPath.join(" ")} workspace tab ribbon ${command.shortcut ?? ""}`,
+          shortcut: command.shortcut,
+          icon: command.icon,
+          disabled,
+          run: async () => { for (const ancestor of ancestors) await ancestor.onEnter?.(); await command.onEnter?.(); },
+        });
+      }
+      if (command.run) {
+        result.push({
+          id: `command:${command.id}`,
+          label: command.label,
+          category: path.length ? path.join(" / ") : "Command",
+          description: command.description ?? nextPath.join(" / "),
+          keywords: `${nextPath.join(" ")} ${command.shortcut ?? ""}`,
+          shortcut: command.shortcut,
+          icon: command.icon,
+          disabled,
+          run: async () => { for (const ancestor of ancestors) await ancestor.onEnter?.(); await command.run?.(); },
+        });
+      }
+      if (command.children?.length) visit(command.children, nextPath, [...ancestors, command], disabled);
+    }
+  };
+  visit(commands, [], [], false);
   return result;
 }

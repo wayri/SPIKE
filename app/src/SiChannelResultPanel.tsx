@@ -5,13 +5,15 @@ import { AlertTriangle, Download, Maximize2, Minimize2 } from "./icons";
 import PlotlyChart from "./PlotlyChart";
 import { numericExtent } from "./numericRange";
 import { buildSiChannelHtmlReport, buildSiCrosstalkCsv, buildSiImpedanceCsv, floorSiDb, normalizeSiChannelResult, SiChartSeries } from "./siChannelResults";
+import { usePanelPresentation } from "./panelPresentation";
 
 type Props = { result: Record<string, unknown>; eyeMaskResult?: Record<string, unknown> | null; onStatus: (message: string) => void };
 type Tab = "s" | "reflection" | "tdr" | "xtalk" | "z" | "eye" | "mixed";
 
-const download = (name: string, body: string, type: string) => {
+const download = (ownerDocument: Document | undefined, name: string, body: string, type: string) => {
+  if (!ownerDocument) return;
   const url = URL.createObjectURL(new Blob([body], { type }));
-  const anchor = document.createElement("a");
+  const anchor = ownerDocument.createElement("a");
   anchor.href = url; anchor.download = name; anchor.click(); URL.revokeObjectURL(url);
 };
 
@@ -66,6 +68,7 @@ function Chart({ title, xLabel, yLabel, series, defaultCompareAll = false, defau
 }
 
 export default function SiChannelResultPanel({ result, eyeMaskResult, onStatus }: Props) {
+  const { ownerDocument } = usePanelPresentation();
   const [tab, setTab] = useState<Tab>("s");
   const charts = useMemo(() => normalizeSiChannelResult(result), [result]);
   const crosstalk = [charts.nextDb, charts.fextDb].filter((item): item is SiChartSeries => item !== null && item.points.length > 0);
@@ -81,8 +84,8 @@ export default function SiChannelResultPanel({ result, eyeMaskResult, onStatus }
   const scale = useVoltageMask ? mapping!.scale_v as number : 1;
   const offset = useVoltageMask ? mapping!.offset_v as number : 0;
   const eyeSeries = charts.eye.map(series => ({ ...series, points: series.points.map(point => ({ x: point.x, y: point.y * scale + offset })) }));
-  const exportJson = () => { download("geometry-channel.experimental.json", JSON.stringify(result, null, 2), "application/json"); onStatus("Experimental SI channel JSON exported"); };
-  const exportReport = () => { download("geometry-channel.experimental.html", buildSiChannelHtmlReport(result), "text/html"); onStatus("Experimental SI channel SVG report exported"); };
+  const exportJson = () => { download(ownerDocument, "geometry-channel.experimental.json", JSON.stringify(result, null, 2), "application/json"); onStatus("Experimental SI channel JSON exported"); };
+  const exportReport = () => { download(ownerDocument, "geometry-channel.experimental.html", buildSiChannelHtmlReport(result), "text/html"); onStatus("Experimental SI channel SVG report exported"); };
   return <section className="si-channel-results">
     <header><div><b>Native channel results</b><small>Ports: {charts.portOrder.join(" → ") || "worker-declared order"}</small></div><div><button onClick={exportJson}><Download size={13} /> JSON</button><button onClick={exportReport}><Download size={13} /> SVG report</button></div></header>
     <div className="si-channel-warning"><AlertTriangle size={14} /> Experimental only: production qualified false; compliance {charts.complianceStatus}. Values are not protocol-compliance or signoff evidence.</div>
@@ -92,13 +95,13 @@ export default function SiChannelResultPanel({ result, eyeMaskResult, onStatus }
     {tab === "tdr" && <><Chart title="TDR impedance" xLabel="Time (s)" yLabel="ohm" series={[charts.tdrImpedanceOhm]} /><Chart title="TDR reflection" xLabel="Time (s)" yLabel="rho" series={[charts.tdrReflection]} /><Chart title="TDT normalized step" xLabel="Time (s)" yLabel="normalized" series={[charts.tdtNormalizedStep]} /></>}
     {tab === "xtalk" && <>
       <div className="si-channel-intro"><b>NEXT / FEXT from the bounded coupled channel</b><p>Matched-port power-wave coupling and loaded victim/source voltage transfer are separate results. The plotted dB floor is −160 dB; CSV preserves retained values.</p></div>
-      <button onClick={() => { download("si-crosstalk.csv", buildSiCrosstalkCsv(result), "text/csv;charset=utf-8"); onStatus("Retained crosstalk samples exported as CSV"); }}><Download size={13} /> Crosstalk CSV</button>
+      <button onClick={() => { download(ownerDocument, "si-crosstalk.csv", buildSiCrosstalkCsv(result), "text/csv;charset=utf-8"); onStatus("Retained crosstalk samples exported as CSV"); }}><Download size={13} /> Crosstalk CSV</button>
       {crosstalk.length > 0 ? <><Chart title="Matched NEXT / FEXT" xLabel="Frequency (Hz)" yLabel="dB" series={floorSiDb(crosstalk)} defaultShowAll /><Chart title="Matched linear coupling" xLabel="Frequency (Hz)" yLabel="power-wave ratio" series={charts.crosstalkLinear} defaultShowAll /></> : <div className="si-channel-empty">No matched NEXT/FEXT samples were returned for this result.</div>}
       {charts.loadedCrosstalkDb.some(item => item.points.length) ? <><Chart title="Loaded victim/source voltage transfer" xLabel="Frequency (Hz)" yLabel="dB V/V" series={floorSiDb(charts.loadedCrosstalkDb)} defaultShowAll /><Chart title="Loaded linear voltage transfer" xLabel="Frequency (Hz)" yLabel="V/V" series={charts.loadedCrosstalkLinear} defaultShowAll /></> : <div className="si-channel-empty">No loaded victim/source transfer was returned.</div>}
       {charts.crosstalkVoltage.length > 0 ? <Chart title="Source and victim waveforms" xLabel="Time (s)" yLabel="V" series={charts.crosstalkVoltage} /> : <p>No voltage waveform retained: {charts.crosstalkTimeStatus}. The UI does not manufacture waveforms from magnitude-only traces.</p>}
     </>}
     {tab === "z" && <>
-      <button onClick={() => { download("si-driving-impedance.csv", buildSiImpedanceCsv(result), "text/csv;charset=utf-8"); onStatus("Retained impedance samples and masks exported"); }}><Download size={13} /> Impedance CSV</button>
+      <button onClick={() => { download(ownerDocument, "si-driving-impedance.csv", buildSiImpedanceCsv(result), "text/csv;charset=utf-8"); onStatus("Retained impedance samples and masks exported"); }}><Download size={13} /> Impedance CSV</button>
       <p>Frequency-domain driving-point impedance; other ports terminated ({charts.impedanceTermination}), selected-port load excluded. This is not TDR impedance. Open/pole and unresolved samples remain gaps.</p>
       <Chart title="Resistance R(f)" xLabel="Frequency (Hz)" yLabel="ohm" series={charts.impedanceReal} />
       <Chart title="Reactance X(f)" xLabel="Frequency (Hz)" yLabel="ohm" series={charts.impedanceImag} />

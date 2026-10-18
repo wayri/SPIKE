@@ -1,0 +1,7 @@
+{
+  "source_volume_mm3": 50.26548245743668,
+  "analytic_volume_mm3": 50.26548245743669,
+  "scaled_volume_mm3": 50.69853928620961,
+  "relative_error": 0.00861539186736393,
+  "result": "rejected: determinant volume relative tolerance 1e-8"
+}

@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+root=$(git rev-parse --show-toplevel)
+exec python "$root/scripts/check_push_identity.py" --remote "$1"

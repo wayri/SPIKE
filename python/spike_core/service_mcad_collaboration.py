@@ -14,6 +14,7 @@ from .mcad_session_contract import SESSION, FEEDBACK, MAX_BYTES, digest, loads, 
 from .project_model_artifacts import read_step_model_artifact
 from .project_package import ProjectPackageError, read_project, write_spike_package
 from .service_project_mcad_placement import _open_current_project, _editable_assembly
+from .material_library import validate_snapshot
 
 
 def _designs(payload):
@@ -65,8 +66,30 @@ def export_mcad_session(params, *, application_version):
         if geometry is None and kind != "group":
             result["diagnostics"].append(f"{entity.id}: no supported solid available; exported as a placement origin only.")
         parent = entity.frame.parent_frame_id
-        result["objects"].append({"id": entity.id, "name": entity.name or entity.id, "kind": kind,
-            "parent_id": frames.get(parent), "transform": list(entity.frame.transform), "geometry": geometry})
+        row = {"id": entity.id, "name": entity.name or entity.id, "kind": kind,
+            "parent_id": frames.get(parent), "transform": list(entity.frame.transform), "geometry": geometry}
+        snapshot = entity.extensions.get("spike.material")
+        if snapshot is not None:
+            try:
+                row["material_snapshot"] = validate_snapshot(snapshot)
+            except ValueError as exc:
+                raise ProjectPackageError(f"{entity.id}: invalid spike.material snapshot: {exc}") from exc
+        layer_snapshots = entity.extensions.get("spike.layer-materials") if kind == "board" else None
+        if layer_snapshots is not None:
+            if not isinstance(layer_snapshots, dict) or not layer_snapshots or len(layer_snapshots) > 256:
+                raise ProjectPackageError(f"{entity.id}: spike.layer-materials must contain layer snapshot assignments.")
+            layer_ids = {layer.id for layer in SpiDeRV2.from_dict(designs[entity.design_id]).layers}
+            if any(not isinstance(layer_id, str) or not layer_id.strip() or len(layer_id) > 512 or layer_id not in layer_ids
+                   for layer_id in layer_snapshots):
+                raise ProjectPackageError(f"{entity.id}: spike.layer-materials contains an unknown canonical layer ID.")
+            try:
+                row["layer_material_snapshots"] = {
+                    layer_id: validate_snapshot(layer_snapshot)
+                    for layer_id, layer_snapshot in layer_snapshots.items()
+                }
+            except (TypeError, ValueError) as exc:
+                raise ProjectPackageError(f"{entity.id}: invalid spike.layer-materials snapshot: {exc}") from exc
+        result["objects"].append(row)
         # Check the running total, not only the final (potentially huge) buffer.
         if sum(len(a["data_base64"]) for a in result["assets"].values()) > MAX_BYTES - 1024**2:
             raise ProjectPackageError("FreeCAD session exceeds the 32 MiB exchange budget.")

@@ -1,0 +1,31 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "PI04-S01",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "7c691ade9f69395f10f35d33622686624d8e3cb38052639972af3c4db689256e",
+    "python/spike_core/pdn_network.py": "160a6ce27359da9532a19968d5f698a26f9be8f07e826b3a922b07a2c58f131b",
+    "tests/python/test_pdn_transient_consistency.py": "c2e308e8e98196735aea43f4aecf5bb58842a53967d5fc514c9d2bba92292ad4"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_floating_capacitor_island_keeps_its_differential_state",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_nonzero_initial_current_and_nonfinite_slopes_rejected",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_parallel_damped_rlc_converges_to_independent_state_exponential",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_rc_retains_second_order_transient_convergence",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_rl_consistency_across_si_time_scales",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_rl_ramp_hold_fall_exact_at_all_refinements",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_series_rlc_preserves_charge_and_energy_at_voltage_jumps",
+      "tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_signed_mutual_inductance_and_unexcited_winding_voltage"
+    ],
+    "run": 8,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI04-S01.log",
+  "log_sha256": "fcc7f7ec5c916df06af28a03e974b368273c6d1e7ff20a0c04d88ec8875c58b6"
+}

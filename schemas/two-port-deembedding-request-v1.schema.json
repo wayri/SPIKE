@@ -1,0 +1,234 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "measured",
+    "left_fixture",
+    "right_fixture"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/two-port-deembedding-request/v1"
+    },
+    "measured": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "port_names",
+        "reference_impedance_ohm",
+        "frequencies_hz",
+        "s_parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "port_names": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "s_parameters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "left_fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "port_names",
+        "reference_impedance_ohm",
+        "frequencies_hz",
+        "s_parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "port_names": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "s_parameters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "right_fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "port_names",
+        "reference_impedance_ohm",
+        "frequencies_hz",
+        "s_parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "port_names": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "s_parameters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/two-port-deembedding-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; exact grids, real references, finite values, orientation and conditioning additionally checked by runtime."
+}

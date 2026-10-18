@@ -47,6 +47,7 @@ export type WorkerProgress = {
 };
 
 const HEAVY_METHODS = new Set([
+  "import_sheet_definition", "preview_sheet_fold",
   "run_studio_board_cosimulation",
   "review_engineering", "quick_engineering_tool",
   "run_cosimulation", "run_em_machine", "run_magnetic_machine",
@@ -231,19 +232,40 @@ export async function getDesktopAppVersion(): Promise<string | null> {
   return getVersion();
 }
 
-export async function subscribeDesktopCloseRequested(
-  onRequested: (preventDefault: () => void, generation: number) => void,
-): Promise<() => void> {
-  if (!isDesktopShell()) return () => undefined;
-  const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  return getCurrentWindow().listen<{ generation: number }>("spike://desktop-close-requested", event => {
-    const generation = event.payload?.generation;
-    if (Number.isSafeInteger(generation) && generation > 0) onRequested(() => undefined, generation);
-  });
+async function mainCloseRecoverySupported(): Promise<boolean> {
+  try {
+    return await invoke<boolean>("main_close_recovery_supported");
+  } catch (error) {
+    // Only a host predating this command may use the legacy window API.
+    const message = errorMessage(error);
+    if (/command\s+[`'"]?main_close_recovery_supported[`'"]?\s+(?:not found|does not exist)/i.test(message)
+      || /unknown command[:\s]+[`'"]?main_close_recovery_supported/i.test(message)) return false;
+    throw error;
+  }
 }
 
-export async function acknowledgeDesktopClose(generation: number): Promise<boolean> {
-  return isDesktopShell() ? invoke<boolean>("acknowledge_desktop_close", { generation }) : false;
+export async function subscribeDesktopCloseRequested(
+  onRequested: (preventDefault: () => void) => void,
+): Promise<() => void> {
+  if (!isDesktopShell()) return () => undefined;
+  if (await mainCloseRecoverySupported()) {
+    return listen<{ requestId: number }>("spike:main-close-requested", event => {
+      const requestId = event.payload?.requestId;
+      if (!Number.isSafeInteger(requestId) || requestId < 1) return;
+      let prevented = false;
+      try {
+        onRequested(() => { prevented = true; });
+      } catch (error) {
+        // Leave the request pending so native recovery remains available.
+        console.error("SPIKE close handler failed; native close recovery remains active", error);
+        return;
+      }
+      void invoke<void>("respond_main_close", { requestId, decision: prevented ? "defer" : "close" })
+        .catch(error => console.error("SPIKE close response failed; native close recovery remains active", error));
+    });
+  }
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  return getCurrentWindow().onCloseRequested(event => onRequested(() => event.preventDefault()));
 }
 
 export async function closeDesktopWindow(closeChild?: () => Promise<void>): Promise<void> {
@@ -264,7 +286,12 @@ export async function closeDesktopWindow(closeChild?: () => Promise<void>): Prom
     }
   }
   // Called only after the main workspace's save/discard close decision.
-  await invoke<void>("close_desktop_app");
+  if (await mainCloseRecoverySupported()) {
+    await invoke<void>("close_main_application");
+    return;
+  }
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  await getCurrentWindow().destroy();
 }
 
 export async function runLocalWorker(request: Record<string, unknown>): Promise<WorkerResponse> {
@@ -402,12 +429,12 @@ export async function cancelLocalWorkerCleanup(operationId: string): Promise<boo
   }
 }
 
-export async function openNativeTextFile(kind: "board" | "project" | "report" | "result" | "netlist" | "license" | "script"): Promise<NativeTextFile | null> {
+export async function openNativeTextFile(kind: "board" | "project" | "report" | "result" | "netlist" | "license" | "script" | "sheet"): Promise<NativeTextFile | null> {
   if (!isDesktopShell()) return null;
   return invoke<NativeTextFile | null>("open_text_file", { kind });
 }
 
-export async function saveNativeTextFile(suggestedName: string, contents: string, kind: "project" | "report" | "step" | "netlist" | "result" | "license" | "script"): Promise<string | null> {
+export async function saveNativeTextFile(suggestedName: string, contents: string, kind: "project" | "report" | "step" | "netlist" | "result" | "license" | "script" | "sheet"): Promise<string | null> {
   if (!isDesktopShell()) return null;
   return invoke<string | null>("save_text_file", { suggestedName, contents, kind });
 }

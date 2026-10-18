@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from .assembly_airflow_runtime import run_air_mesh
 from .assembly_airflow_mesh import validate_geometry
+from .assembly_airflow_admission import admit_airflow_mesh
 from .openfoam_polymesh import write_polymesh
 from .openfoam_multiregion import prepare_runnable_multiregion_case
 from .openfoam_multiregion_execution import run_multiregion_case
@@ -72,6 +73,7 @@ def validate_request(request):
 
 def prepare_airflow_case(request, meshed, output_dir):
     validate_request(request)
+    volumes_mm3 = admit_airflow_mesh(request, meshed)
     root = Path(output_dir)
     cells, points = meshed['cells'], meshed['vertices']
     grouped, faces = {}, {}
@@ -142,7 +144,7 @@ def prepare_airflow_case(request, meshed, output_dir):
         if props.get('power_w', 0) > 0:
             sources.append({'id': region+'_power', 'solid_region_id': region, 'power_w': props['power_w'],
                 'evidence': evidence(props, 'spike/component-power-table/v1'),
-                'fv_option': {'cell_zone': 'source', 'volumetric_power_w_m3': props['power_w']/(meshed['volumes_mm3'][region]*1e-9)}})
+                'fv_option': {'cell_zone': 'source', 'volumetric_power_w_m3': props['power_w']/(volumes_mm3[region]*1e-9)}})
     environment = {'enclosure': 'open', 'radiation': False, 'vacuum': False, 'medium': 'air',
         'ambient_temperature_k': request['ambient_temperature_k'],
         'gravity_m_s2': [0, 0, -9.81] if request['mode'] == 'natural' else [0, 0, 0]}
@@ -169,7 +171,17 @@ def prepare_airflow_case(request, meshed, output_dir):
         'materials': request['materials'], 'regions': regions, 'interfaces': list(interfaces.values()),
         'heat_sources': sources, 'environment': environment, 'fans': fans, 'heatsinks': heatsinks, 'numerics': request['numerics']}
     (root/'translated-request.json').write_text(json.dumps(translated, indent=2), encoding='utf-8')
-    return prepare_runnable_multiregion_case(translated, root/'case', root/'meshes')
+    prepared = prepare_runnable_multiregion_case(translated, root/'case', root/'meshes')
+    coupling = {'status': 'source_volume_admitted', 'model_status': 'experimental',
+        'mesh_sha256': mesh_digest, 'source_ids': meshed['source_ids'],
+        'region_volumes_m3': {r: v * 1e-9 for r, v in volumes_mm3.items()},
+        'sources': [{'source_id': meshed['source_ids'][s['solid_region_id']],
+                     'region_id': s['solid_region_id'], 'requested_power_w': s['power_w'],
+                     'integrated_power_w': s['fv_option']['volumetric_power_w_m3'] * volumes_mm3[s['solid_region_id']] * 1e-9}
+                    for s in sources],
+        'solver_convergence': 'not_evaluated', 'heat_flow_balance': 'not_evaluated'}
+    (root/'source-coupling.json').write_text(json.dumps(coupling, indent=2), encoding='utf-8')
+    return {**prepared, 'source_coupling': coupling}
 
 
 def run_assembly_airflow(request, output_dir, *, cancellation_event=None, timeout_s=600, memory_limit_mb=4096):
@@ -187,6 +199,6 @@ def run_assembly_airflow(request, output_dir, *, cancellation_event=None, timeou
     result = run_multiregion_case(root/'case', timeout_s=timeout_s, memory_limit_mb=memory_limit_mb,
                                  cancellation_event=cancellation_event)
     result.update(request_sha256=digest(request), source_ids=mesh['source_ids'],
-        air_model=request['mode'], production_qualified=False)
+        air_model=request['mode'], production_qualified=False, source_coupling=prepared['source_coupling'])
     (root/'result.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     return result

@@ -15,7 +15,9 @@ the installers to `artifacts/windows/installer`; and writes a SHA-256 manifest.
 The NSIS installer supports per-user or per-machine installation and registers
 the `.spike` project association.
 
-The current MSI/NSIS preview package and application version are `0.3.0`.
+The historical preview checkpoint below used package/application version `0.3.0`.
+Read the version from the candidate manifest and executable for a new build;
+this checkpoint does not describe the currently published Gamma download.
 The SHA-256 installer manifest records the package and application versions.
 This does not promote the physics or release qualification state.
 
@@ -339,3 +341,32 @@ physics.
 - Tauri uses WebView2 on Windows. The preview uses the download bootstrapper if
   the runtime is absent; an offline WebView2 strategy must be selected and
   tested for an offline production package.
+
+
+## Embedded frontend acceptance
+
+Every Windows package build must explicitly enable Tauri's `custom-protocol`
+feature. The isolated preview installer script and Windows CI build path both
+assert this contract. The original public Gamma1 installers omitted it; a
+process staying alive in the development-frontend error dialog is a failure.
+
+After building a candidate, stop the development server and run:
+
+```powershell
+.venv/Scripts/python.exe scripts/verify_windows_desktop.py path/to/spike-desktop.exe --output build/desktop-frontend-qualification.json
+```
+
+The verifier requires Windows, rejects a listener on development port 1420,
+launches only the fixed `--panel-popup-qualification` page in a disposable
+WebView2 profile, and waits for its exact completion title. The page proves
+embedded frontend execution, retained panel draft/action handlers, native
+detach/redock, popup close and no remaining linked panel frames. The verifier
+then requires normal main-window close within ten seconds. Missing windows,
+partial titles, failure titles, early exits and timeout all fail. Windows CI
+runs this verifier against the installed executable before accepting an artifact.
+
+This bounded test imports no user project and runs no solver. It does not
+establish ordinary workspace visual acceptance, native GPU compatibility,
+clean-machine installation, offline runtime dependency coverage, upgrade or
+uninstall data preservation, independent numerical review or production
+qualification. Keep those gates explicit for any stable/long-term candidate.

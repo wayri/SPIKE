@@ -27,7 +27,8 @@ new Function("require", "module", "exports", uiCode)(name => {
   if (name === "./siWorkflowCatalog.json") return catalog;
   if (name === "./SiWorkflowPlots") return { __esModule: true, default: () => null, SiPlot: () => null };
   if (name === "./DataTable") return { default: loadDataTable(), __esModule: true };
-  if (name === "./icons") return new Proxy({}, { get: () => () => null });
+  if (name === "./icons") return require("lucide-react");
+  if (name === "./panelPresentation") return { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) };
   return require(name);
 }, uiModule, uiModule.exports);
 const tree = uiModule.exports.default({ design: null, onStatus() {} });
@@ -58,7 +59,8 @@ function mountWorkflow({ desktop = true, setup = catalog.defaults, worker } = {}
     if (name === "./siWorkflowCatalog.json") return { ...catalog, defaults: request };
     if (name === "./SiWorkflowPlots") return { __esModule: true, default: () => null, SiPlot: () => null };
     if (name === "./DataTable") return { default: loadDataTable(), __esModule: true };
-    if (name === "./icons") return new Proxy({}, { get: () => () => null });
+    if (name === "./icons") return require("lucide-react");
+    if (name === "./panelPresentation") return { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) };
     return require(name);
   }, module, module.exports);
   const render = () => { cursor = 0; return module.exports.default({ design: null, onStatus: s => statuses.push(s) }); };
@@ -103,6 +105,11 @@ assert.equal(pending.button("Run loaded SI study").props.disabled, false);
 const workbenchCode = ts.transpileModule(readFileSync(new URL("../src/SParameterWorkbench.tsx", import.meta.url), "utf8"), { compilerOptions: {
   module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true,
 } }).outputText;
+const searchDraftModule = { exports: {} };
+const searchDraftCode = ts.transpileModule(readFileSync(new URL("../src/siSearchDraft.ts", import.meta.url), "utf8"), { compilerOptions: {
+  module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020,
+} }).outputText;
+new Function("require", "module", "exports", searchDraftCode)(require, searchDraftModule, searchDraftModule.exports);
 let capturedGeometryRequest;
 function mountProtocol(props = {}) {
   const state = [], effects = [];
@@ -114,10 +121,13 @@ function mountProtocol(props = {}) {
       useEffect: effect => effects.push(effect), useMemo: read => read(), useRef: value => ({ current: value }),
     };
     if (name === "./workerBridge") return { isDesktopShell: () => true, runSiProtocolTestSuite: async () => { throw new Error("fixture worker failure"); }, runSiUniformChannel: async (_design, request) => { capturedGeometryRequest = request; return { ok: false, error: "fixture channel stop" }; } };
+    if (name === "./panelPresentation") return { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) };
+    if (name === "./icons") return require("lucide-react");
+    if (name === "./PlotlyChart") return { __esModule: true, default: () => null };
+    if (name.endsWith(".css")) return {};
+    if (name === "./siSearchDraft") return searchDraftModule.exports;
     if (["./sparameters", "./numericRange"].includes(name)) return {};
     if (["./SiChannelResultPanel", "./SiWorkflowWorkbench"].includes(name)) return { __esModule: true, default: () => null };
-    if (name === "./icons") return new Proxy({}, { get: () => () => null });
-    if (name === "./PlotlyChart") return { __esModule: true, default: () => null };
     return require(name);
   }, module, module.exports);
   const render = () => { cursor = 0; return module.exports.default({ assemblyDesigns: null, canonicalDesign: null, onClose() {}, onStatus() {}, ...props }); };

@@ -1,0 +1,172 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "fit_request",
+    "incident_waves",
+    "output_times_s"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rational-network-transient-request/v1"
+    },
+    "fit_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "source",
+        "pole_rates_rad_s",
+        "max_absolute_error"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/sparameter-rational-fit-request/v1"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "port_names",
+            "reference_impedance_ohm",
+            "frequencies_hz",
+            "s_parameters"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "port_names": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            },
+            "reference_impedance_ohm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frequencies_hz": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2048,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "s_parameters": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2048,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "real",
+                      "imag"
+                    ],
+                    "properties": {
+                      "real": {
+                        "type": "number"
+                      },
+                      "imag": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "pole_rates_rad_s": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "uniqueItems": true
+        },
+        "max_absolute_error": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$comment": "SPDX-License-Identifier: Apache-2.0; finite values, real DC, exact dimensions, full rank, conditioning, fit residual and work resources additionally checked by runtime."
+    },
+    "incident_waves": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "port_name",
+          "points"
+        ],
+        "properties": {
+          "port_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "points": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 1024,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "time_s",
+                "value_sqrt_w"
+              ],
+              "properties": {
+                "time_s": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "value_sqrt_w": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output_times_s": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/rational-network-transient-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; exact port coverage, monotone time grids, common horizon, finite values and aggregate resources additionally checked by runtime."
+}

@@ -1,0 +1,506 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "fit_result",
+    "incident_waves",
+    "output_times_s",
+    "port_names",
+    "points",
+    "final_state_sqrt_w",
+    "diagnostics",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rational-network-transient-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "fit_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "model_status",
+        "production_qualified",
+        "input_digest",
+        "source",
+        "pole_rates_rad_s",
+        "max_absolute_error",
+        "model",
+        "reconstructed_network",
+        "diagnostics",
+        "limitations"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/sparameter-rational-fit-result/v1"
+        },
+        "model_status": {
+          "const": "experimental"
+        },
+        "production_qualified": {
+          "const": false
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "input_digest",
+            "network"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "input_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "network": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "port_names",
+                "reference_impedance_ohm",
+                "frequencies_hz",
+                "s_parameters"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "port_names": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                },
+                "reference_impedance_ohm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "frequencies_hz": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2048,
+                  "items": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "s_parameters": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2048,
+                  "items": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 8,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "real",
+                          "imag"
+                        ],
+                        "properties": {
+                          "real": {
+                            "type": "number"
+                          },
+                          "imag": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "pole_rates_rad_s": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "uniqueItems": true
+        },
+        "max_absolute_error": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "direct",
+            "residues",
+            "realization",
+            "stability",
+            "causality"
+          ],
+          "properties": {
+            "direct": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "residues": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "realization": {
+              "const": "x_k_prime=-p_k*x_k+p_k*a; b=D*a+sum(R_k*x_k)"
+            },
+            "stability": {
+              "const": "strictly_stable_supplied_real_poles"
+            },
+            "causality": {
+              "const": "proper_real_rational_by_construction"
+            }
+          }
+        },
+        "reconstructed_network": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "port_names",
+            "reference_impedance_ohm",
+            "frequencies_hz",
+            "s_parameters"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "port_names": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            },
+            "reference_impedance_ohm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frequencies_hz": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2048,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "s_parameters": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2048,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "real",
+                      "imag"
+                    ],
+                    "properties": {
+                      "real": {
+                        "type": "number"
+                      },
+                      "imag": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "diagnostics": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_absolute_error",
+            "rms_complex_error",
+            "equilibrated_condition",
+            "least_squares_optimality_residual",
+            "sampled_smax_max",
+            "conservative_passivity_bound"
+          ],
+          "properties": {
+            "max_absolute_error": {
+              "type": "number",
+              "minimum": 0
+            },
+            "rms_complex_error": {
+              "type": "number",
+              "minimum": 0
+            },
+            "equilibrated_condition": {
+              "type": "number",
+              "minimum": 0
+            },
+            "least_squares_optimality_residual": {
+              "type": "number",
+              "minimum": 0
+            },
+            "sampled_smax_max": {
+              "type": "number",
+              "minimum": 0
+            },
+            "conservative_passivity_bound": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$comment": "SPDX-License-Identifier: Apache-2.0; bounded supplied-pole model only. Source causality, passivity and accuracy outside the fitted samples are not inferred."
+    },
+    "incident_waves": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "port_name",
+          "points"
+        ],
+        "properties": {
+          "port_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "points": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 1024,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "time_s",
+                "value_sqrt_w"
+              ],
+              "properties": {
+                "time_s": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "value_sqrt_w": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output_times_s": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "port_names": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "points": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "time_s",
+          "incident_wave_sqrt_w_by_port",
+          "outgoing_wave_sqrt_w_by_port",
+          "port_voltage_v_by_port",
+          "port_current_a_by_port"
+        ],
+        "properties": {
+          "time_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "incident_wave_sqrt_w_by_port": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 8,
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "outgoing_wave_sqrt_w_by_port": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 8,
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "port_voltage_v_by_port": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 8,
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "port_current_a_by_port": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 8,
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "final_state_sqrt_w": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "items": {
+          "type": "number"
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "integration_method",
+        "interval_count",
+        "estimated_work"
+      ],
+      "properties": {
+        "integration_method": {
+          "const": "exact_piecewise_linear_exponential"
+        },
+        "interval_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20000
+        },
+        "estimated_work": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/rational-network-transient-result/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; prescribed incident-wave fitted-model execution, not arbitrary source/load feedback or out-of-band physical qualification."
+}

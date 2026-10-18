@@ -1,3 +1,22 @@
+import "./interfaceLayout.css";
+import {defaultStudioFeedback} from "./studioFeedback";
+import WorkspaceIntentReviewPanel, {type WorkspaceReviewedIntent} from "./WorkspaceIntentReviewPanel";
+import {suggestWorkspaceIntents,type WorkspaceIntentContext,type WorkspaceIntentSuggestion} from "./workspaceIntentModel";
+import {canonicalIntentNet,thermalIntentScenario,studioIntentFeedback} from "./workspaceIntentAdapters";
+import type {SiSearchDraft} from "./siSearchDraft";
+import PiSearchSetupPanel, { type PiSearchSetupSelection } from "./PiSearchSetupPanel";
+import { suggestPiSetupIntents, type PiSetupIntentSuggestion } from "./piSearchIntent";
+import { PiComponentLoadPanel } from "./PiComponentLoadPanel";
+import { eligibleComponentSupplyPads, type PiComponentLoadSelection } from "./piPinLoads";
+import PdnNetworkPanel from "./PdnNetworkPanel";
+import SolverSuitePanel from "./SolverSuitePanel";
+import { solverDisplayName } from "./solverManagerModel";
+import { solverSuiteCatalog, type SolverSuiteAction } from "./solverSuiteCatalog";
+import NativeCfdWorkbench from "./NativeCfdWorkbench";
+import ViewportQuickTools from "./ViewportQuickTools";
+import { setPanelUiScale } from "./panelWindowBridge";
+import FloatingPanel, { focusFloatingPanel, floatingPanelDocuments } from "./FloatingPanel";
+import { suggestSearchCommands, type SearchTarget, type SearchCommandSuggestion } from "./searchSentences";
 import FocusCommandPanel from "./FocusCommandPanel";
 import { focusCommandsFromElements, type FocusCommand } from "./focusCommands";
 import FocusToolDeck, { useFocusToolState, FocusDockContext, activeFocusPanel, type FocusToolPanel } from "./FocusToolDeck";
@@ -19,7 +38,7 @@ import { PalaceExtension } from "./PalaceExtension";
 import { XyceExtension } from "./XyceExtension";
 import { isExternalSolverId, restoreExternalSolverWorkflows, type ExternalSolverWorkflows } from "./externalSolverWorkspace";
 import { encodeResultScreenshot, resultScreenshotFormats, type ResultScreenshotFormat } from "./resultScreenshot";
-import { MenuButton, MenuItem, MenuSubmenu } from "./ApplicationMenu";
+import { MenuBar, MenuButton, MenuItem, MenuSubmenu } from "./ApplicationMenu";
 import PiQuickTuneBar from "./PiQuickTuneBar";
 import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { bindAssistantWindow, openAssistantWindow, closeOwnedAssistantWindow } from "./assistantWindow";
@@ -36,9 +55,6 @@ import { normalizeSchematicDocument, restoreSchematicWorkspace, schematicBoardDi
 import { selectNativeSchematicFile } from "./workerBridge";
 import ToolbarMenu from "./ToolbarMenu";
 import { WorkspaceDockTabs, WorkspaceDockHeader, dockTabs, hydrateDockViews, type DockPanelViews } from "./WorkspaceDock";
-import { createDesktopCloseHandler } from "./desktopClose";
-import { DesktopCloseDraftDialog } from "./DesktopCloseDraftDialog";
-import { focusAssemblyToolWindow } from "./assemblyToolWindows";
 import ToolRestoreShelf, { type ToolRestoreItem } from "./ToolRestoreShelf";
 import { minimizeTool, removeMinimizedTool } from "./minimizedTools";
 import type { AssemblyToolAction, AssemblyToolKind, AssemblyToolSnapshot, AssemblyToolViewportData } from "./assemblyToolWindowModel";
@@ -132,7 +148,7 @@ import { extractNetGeometry } from "./netGeometry";
 import { emptyProcessResources, ProcessResources, sampleProcessResources, systemMemoryPercent } from "./resourceMonitor";
 import { planResourceCapacity, ResourceCapacityPlan } from "./resourceCapacity";
 import { assemblyAdmissionParams, assemblyAnalysisScope, requireAdmittedAssembly, requireSupportedAssemblyPhysics, type AssemblyAnalysisScope, type AssemblyWorkload } from "./assemblyAdmission";
-import { acknowledgeDesktopClose, cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
+import { cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
 import { emptyTopology, extractTopologyFromBoard, PowerTreeAnalysisPlan, TopologyDomain, TopologyModel, TopologyNode } from "./powerTree";
 import { compilePiPaths, compilePiSeriesSolveHandoff, PiPathTerminalAnchor } from "./piPath";
 import { attachPiPathComponentBridges, combinePiPathPreflights, combinePiPathSegmentExtractions, createPiPathSegmentExtractionRequests, PiPathAnalysisRequest } from "./piPathCircuit";
@@ -140,6 +156,7 @@ import { stackupBandHeight, stackupColor } from "./stackupVisual";
 import { applyStackupToSpiDeR } from "./designStackup";
 import LayerManager from "./LayerManager";
 import FlexBoardManager from "./FlexBoardManager";
+import SheetFoldingPanel from "./SheetFoldingPanel";
 import EMergeRuntimeUpdater from "./EMergeRuntimeUpdater";
 import { useEMergeRuntimeUpdates } from "./useEMergeRuntimeUpdates";
 import { resolveBoardCopperLayers } from "./copperLayerSelection";
@@ -1049,7 +1066,21 @@ export default function App() {
   const [layersOpen, setLayersOpen] = useFocusToolState("layersOpen", false, activateFocusTool);
   const [stackupOpen, setStackupOpen] = useFocusToolState("stackupOpen", false, activateFocusTool);
   const [flexBoardOpen, setFlexBoardOpen] = useFocusToolState("flexBoardOpen", false, activateFocusTool);
+  const [sheetFoldingOpen, setSheetFoldingOpen] = useFocusToolState("sheetFoldingOpen", false, activateFocusTool);
   const [thermalOpen, setThermalOpen] = useFocusToolState("thermalOpen", false, activateFocusTool);
+  const [nativeCfdOpen, setNativeCfdOpen] = useFocusToolState("nativeCfdOpen", false, activateFocusTool);
+  const [solverSuiteQuery, setSolverSuiteQuery] = useState("");
+  const [piSearchSetupOpen, setPiSearchSetupOpen] = useFocusToolState("piSearchSetupOpen", false, activateFocusTool);
+  const [workspaceIntentOpen,setWorkspaceIntentOpen]=useFocusToolState("workspaceIntentOpen",false,activateFocusTool);
+  const [workspaceIntentDraft,setWorkspaceIntentDraft]=useState<{suggestion:WorkspaceIntentSuggestion;context:WorkspaceIntentContext;revision:string}|null>(null);
+  const [workspaceRequestNotice,setWorkspaceRequestNotice]=useState<{version:string;text:string;details:string}|null>(null);
+  const [siSearchRequest,setSiSearchRequest]=useState<{version:string;draft:SiSearchDraft}|null>(null);
+  const [thermalSearchId,setThermalSearchId]=useState("");
+  const [spiceSearchIntent,setSpiceSearchIntent]=useState<{id:string;version:string;page:"feedback"|"parasitics"|"assignments";componentRef?:string}|undefined>();
+  const [piSearchDraft, setPiSearchDraft] = useState<{suggestion:PiSetupIntentSuggestion;board:ParsedBoard;occurrence:string;revision:string}|null>(null);
+
+  const [pdnSuiteOpen, setPdnSuiteOpen] = useFocusToolState("pdnSuiteOpen", false, activateFocusTool);
+  const [solverSuiteOpen, setSolverSuiteOpen] = useFocusToolState("solverSuiteOpen", false, activateFocusTool);
   const [savedThermalView, setSavedThermalView] = useFocusToolState<{ id?: string; section?: "overview" | "plots" | "components" | "transient" | "inputs" } | null>("savedThermalView", null, setFocusTool);
   const [studyManagerOpen, setStudyManagerOpen] = useFocusToolState("studyManagerOpen", false, activateFocusTool);
   const [studyNavigatorOpen, setStudyNavigatorOpen] = useFocusToolState("studyNavigatorOpen", false, activateFocusTool);
@@ -1099,6 +1130,7 @@ export default function App() {
   const [solverId, setSolverId] = useState("auto");
   const [formulation, setFormulation] = useState("auto");
   const [solverCatalog, setSolverCatalog] = useState<SolverCatalogEntry[]>(fallbackSolverCatalog);
+  const [solverRegistry, setSolverRegistry] = useState<SolverCatalogEntry[] | null>(null);
   const desktopShell = isDesktopShell();
   const [workerHealth, setWorkerHealth] = useState<"browser" | "starting" | "ready" | "degraded">(desktopShell ? "starting" : "browser");
   const workerAvailable = workerHealth === "ready";
@@ -1192,7 +1224,6 @@ export default function App() {
   const [assemblyHandlingHeight, setAssemblyHandlingHeight] = useState(0);
   const [assemblyHandlingExpanded, setAssemblyHandlingExpanded] = useFocusToolState("assemblyHandlingExpanded", false, activateFocusTool);
   const [assemblyToolDraftOwner, setAssemblyToolDraftOwner] = useState<AssemblyToolKind | null>(null);
-  const [assemblyCloseBlocked, setAssemblyCloseBlocked] = useState<AssemblyToolKind | null>(null);
   const assemblyToolDraftOwnerRef = useRef<AssemblyToolKind | null>(null);
   assemblyToolDraftOwnerRef.current = assemblyToolDraftOwner;
   useEffect(() => {
@@ -1255,6 +1286,8 @@ export default function App() {
   const [deferredBoardVisual, setDeferredBoardVisual] = useState<{ board: ParsedBoard; sourceFile: string; source: string } | null>(null);
   const [searchQuery, setSearchQuery] = useFocusToolState("searchQuery", "", activateFocusTool);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
+  const [commandPanelDetached, setCommandPanelDetached] = useState(false);
+  const [searchPiRequest, setSearchPiRequest] = useState<{ setup: PiSetup; board: ParsedBoard; occurrence: string } | null>(null);
   const [showModels, setShowModels] = useState(true);
   const [showSmdModels, setShowSmdModels] = useState(true);
   const [showThtModels, setShowThtModels] = useState(true);
@@ -1266,7 +1299,7 @@ export default function App() {
   const [menu, setMenu] = useState<string | null>(null);
   useEffect(() => {
     const openMenu = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || event.isComposing || document.querySelector(".unsaved-project-backdrop")) return;
+      if (event.defaultPrevented || event.isComposing || document.querySelector(".unsaved-project-backdrop, .interface-classic .application-menu-bar")) return;
       if (event.key === "F10" && !event.ctrlKey && !event.metaKey && !event.shiftKey) { event.preventDefault(); setMenu("Menu"); return; }
       if (event.altKey && !event.ctrlKey && !event.metaKey && !event.getModifierState("AltGraph")) {
         const section = ({ f: "File", e: "Edit", v: "View", a: "Analysis", r: "Reports", p: "Project", t: "Tools", x: "Extensions", h: "Help" } as Record<string, string>)[event.key.toLowerCase()];
@@ -1639,6 +1672,10 @@ export default function App() {
     projectDirtyRef.current = true;
     setProjectDirty(true);
   }, []);
+
+  useEffect(() => {
+    void setPanelUiScale(appSettings.uiScale).catch(error=>setStatus(`UI scale could not be applied: ${String(error)}`));
+  }, [appSettings.uiScale]);
 
   useEffect(() => {
     document.documentElement.lang = appSettings.language;
@@ -2554,16 +2591,6 @@ export default function App() {
     setIsolatedAssemblyPartId(null);
     setAssemblySection({ ...DEFAULT_ASSEMBLY_SECTION });
   }, [projectPath]);
-  const finishDesktopClose = async () => {
-    if (allowWindowCloseRef.current) return;
-    allowWindowCloseRef.current = true;
-    setStatus("Closing SPIKE and stopping its workers...");
-    try { await closeDesktopWindow(closeOwnedAssistantWindow); }
-    catch (error) {
-      allowWindowCloseRef.current = false;
-      setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}. Retry Close; your project remains open.`);
-    }
-  };
   const resolveUnsavedPrompt = async (choice: "save" | "discard" | "cancel") => {
     const pending = unsavedPrompt;
     if (!pending) return;
@@ -2572,7 +2599,13 @@ export default function App() {
     if (choice === "discard" && !pending.preserveDirtyUntilApplied) setProjectClean();
     setUnsavedPrompt(null);
     if (pending.closeWindow) {
-      await finishDesktopClose();
+      allowWindowCloseRef.current = true;
+      try {
+        await closeDesktopWindow(closeOwnedAssistantWindow);
+      } catch (error) {
+        allowWindowCloseRef.current = false;
+        setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}`);
+      }
       return;
     }
     await pending.action?.();
@@ -2583,26 +2616,22 @@ export default function App() {
       event.preventDefault();
       event.returnValue = "";
     };
-    if (!desktopShell) window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("beforeunload", onBeforeUnload);
     let disposed = false;
     let unlisten: (() => void) | undefined;
-    const handleClose = createDesktopCloseHandler({
-      isClosing: () => disposed || allowWindowCloseRef.current,
-      draftOwner: () => assemblyToolDraftOwnerRef.current,
-      isDirty: () => projectDirtyRef.current || assistantChatOpenRef.current,
-      showDraft: owner => setAssemblyCloseBlocked(owner as AssemblyToolKind),
-      showUnsaved: () => setUnsavedPrompt({ actionLabel: assistantChatOpenRef.current ? "close SPIKE and discard assistant chats" : "close SPIKE", action: null, closeWindow: true }),
-      close: () => { void finishDesktopClose(); },
-    });
-    if (desktopShell) void subscribeDesktopCloseRequested((preventDefault, generation) => {
-      // Let the host distinguish a live save/discard guard from a dead renderer.
-      void acknowledgeDesktopClose(generation).then(accepted => {
-        if (accepted && !disposed) handleClose(preventDefault);
-      }).catch(error => setStatus(`Close recovery acknowledgement failed: ${String(error)}`));
+    if (desktopShell) void subscribeDesktopCloseRequested(preventDefault => {
+      if (disposed) return;
+      if (assemblyToolDraftOwnerRef.current) { preventDefault(); setStatus(`Save or discard the assembly ${assemblyToolDraftOwnerRef.current} tool draft before closing SPIKE.`); return; }
+      if ((!projectDirtyRef.current && !assistantChatOpenRef.current) || allowWindowCloseRef.current) return;
+      preventDefault();
+      setUnsavedPrompt({ actionLabel: assistantChatOpenRef.current ? "close SPIKE and discard assistant chats" : "close SPIKE", action: null, closeWindow: true });
     }).then(closeListener => {
       if (disposed) closeListener();
       else unlisten = closeListener;
-    }).catch(error => setStatus(`SPIKE close protection could not start: ${String(error)}`));
+    }).catch(error => {
+      console.error("SPIKE close listener could not be installed", error);
+      if (!disposed) setStatus(`Could not install SPIKE close protection: ${error instanceof Error ? error.message : String(error)}`);
+    });
     return () => { disposed = true; unlisten?.(); window.removeEventListener("beforeunload", onBeforeUnload); };
   }, [desktopShell]);
   const loadComparisonBaseline = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -3018,7 +3047,7 @@ export default function App() {
         break;
     }
   };
-  const toggleRibbonVisibility = () => { setMenu("Workspaces"); };
+  const toggleRibbonVisibility = () => { setAppSettings(current => ({...current, ribbonVisible: !current.ribbonVisible})); setMenu(null); };
   const assignShortcut = (action:ShortcutAction,raw:string) => {
     const issue=shortcutBindingIssue(raw);if(issue){setStatus(issue);return;}
     const key=raw.trim()?normalizedShortcutKey(raw):"";
@@ -3158,7 +3187,7 @@ export default function App() {
       const response = await runLocalWorker({ method: "list_solvers", params: {} });
       if (cancelled) return;
       const solvers = response.result?.solvers;
-      if (response.ok && Array.isArray(solvers)) setSolverCatalog(mergeSolverCatalog(solvers as SolverCatalogEntry[]));
+      if (response.ok && Array.isArray(solvers)) { setSolverCatalog(mergeSolverCatalog(solvers as SolverCatalogEntry[])); setSolverRegistry(solvers as SolverCatalogEntry[]); }
       else setStatus(response.error ? `Solver catalog unavailable: ${response.error}` : "Solver catalog unavailable");
     })();
     return () => { cancelled = true; };
@@ -4895,6 +4924,14 @@ export default function App() {
     setAnalysisRunning(true);
     setViewportPiRun({ setup, scope, resolve });
   });
+  useEffect(() => {
+    if (!searchPiRequest) return;
+    setSearchPiRequest(null);
+    if (searchPiRequest.board !== boardData || searchPiRequest.setup !== piSetup || searchPiRequest.occurrence !== piAnalysisOccurrenceId) {
+      setStatus("Search PI request cancelled because the board, net setup or occurrence changed."); return;
+    }
+    void runViewportPi(searchPiRequest.setup, viewportPiScope).catch(error => setStatus(error instanceof Error ? error.message : "PI command could not start."));
+  }, [searchPiRequest, piSetup, boardData, piAnalysisOccurrenceId, viewportPiScope]);
   const piRunImportedDesign = useMemo(() => boardFile.endsWith(".spike-design.json") ? designForSolver() : null,
     [boardData, boardSource, boardFile, activeDesignId, componentBonds]);
   const workspaceExtensionRoutes = extensionWorkspace ? extensionWorkspaceRoutes(extensionCatalog, extensionWorkspace) : [];
@@ -5023,7 +5060,203 @@ export default function App() {
   };
   const ribbonContent = ribbonContentFor(tab);
 
+  const workspaceIntentVersion=useMemo(()=>crypto.randomUUID(),[boardData,canonicalSpiDeR,assemblyIr,assemblyDesigns,activeDesignId,selectedBoardInstanceId,projectPath,projectGeneration.current]);
+  const workspaceIntentContext:WorkspaceIntentContext=useMemo(()=>({version:workspaceIntentVersion,
+    nets:Object.entries(boardData?.nets ?? {}).filter(([,name])=>Boolean(name)).map(([id,name])=>({id,name,occurrenceId:selectedBoardInstanceId ?? undefined})),
+    components:(boardData?.components ?? []).map(row=>({id:row.id,name:row.ref,occurrenceId:selectedBoardInstanceId ?? undefined})),
+    occurrences:virtualBoardProjection.visuals.map(row=>({id:row.id,name:row.name})),
+    selectedNetIds:Object.entries(boardData?.nets ?? {}).filter(([,name])=>name===selected?.net).map(([id])=>id),
+    selectedComponentIds:selected?.type==="component"?[selected.id]:[],selectedOccurrenceIds:selectedBoardInstanceId?[selectedBoardInstanceId]:[]
+  }),[workspaceIntentVersion,boardData,virtualBoardProjection.visuals,selected,selectedBoardInstanceId]);
+  const workspaceIntentStale=workspaceIntentDraft?.context.version!==workspaceIntentVersion?"Workspace geometry or board occurrence changed. Search again.":universalRunning||viewportPiRun||emiBusy||externalEngineBusy||emergeEmiBusy?"Wait for the active operation before applying setup.":"";
+  const applyWorkspaceIntent=({draft,choices}:WorkspaceReviewedIntent)=>{
+    if(!workspaceIntentDraft||workspaceIntentStale||draft.contextVersion!==workspaceIntentVersion||draft.availability==="unsupported"){setStatus(workspaceIntentStale||"Review the current workspace request first.");return;}
+    const id=crypto.randomUUID(),p=draft.parameters,key=draft.workflowKey;
+    let details="Review geometry, models, boundaries, explicit ports and preflight in the opened workflow before running.";
+    const component=boardData?.components.find(row=>row.id===draft.bindings.componentIds[0]);
+    const geometryRequired=["si","thermal","em","model-assignment"].includes(key)||(key==="rf"&&choices.rfMode==="geometry");
+    if(geometryRequired&&draft.scope!=="assembly"&&draft.bindings.occurrenceIds.some(value=>value!==piAnalysisOccurrenceId)){setStatus("Focus the requested board occurrence, then search again to resolve its local nets and components.");return;}
+    if(geometryRequired&&draft.scope!=="assembly"&&(!boardData||searchBoardReason)){setStatus(searchBoardReason||"Load the requested board first.");return;}
+    try{
+      if(key==="si"||(key==="rf"&&choices.rfMode==="geometry")){
+        if(draft.scope==="assembly")throw new Error("Assembly RF extraction requires the retained assembly EM workflow and explicit ports. A board channel will not be substituted.");
+        if(solverSelections.extension_si){setTab("HF / SI");setRightOpen(true);setFocusTool(null);details="Selected SI extension retained. Transfer the reviewed net, frequency and impedance values below into its controls; built-in SI inputs were not applied.";}
+        else {
+          const design=assemblyDesigns?.designs.find(row=>row.design_id===assemblyDesigns.active_design_id) ?? canonicalSpiDeR;
+          const nets=Array.isArray(design?.nets)?design.nets as {id:string;name:string}[]:[];
+          if(!boardData||!nets.length)throw new Error("SI needs the active canonical design. Import or activate it before applying this request.");
+          const next:SiSearchDraft={id,signalNetId:canonicalIntentNet(choices.primaryNetId,boardData,nets),referenceNetId:canonicalIntentNet(choices.referenceNetId,boardData,nets),frequencyStartHz:p.frequencyStartHz,frequencyStopHz:p.frequencyStopHz,impedanceOhm:p.impedanceOhm,riseTimeS:p.riseTimeS,componentRefs:draft.bindings.componentIds.map(value=>boardData!.components.find(row=>row.id===value)!.ref)};
+          setSiChannelResult(null);setTab("HF / SI");openSiWorkbench("geometry",/crosstalk/i.test(draft.suppliedText)?"crosstalk":/eye/i.test(draft.suppliedText)?"eye":"channel");setSiSearchRequest({version:workspaceIntentVersion,draft:next});markProjectDirty();
+          details="Signal/reference nets, frequency bounds and supplied impedance applied. Component references and rise time still require explicit source/receiver pin and waveform review; reference layer, channel models and preflight remain required.";
+        }
+      } else if(key==="thermal"){
+        if(draft.scope==="assembly"){openAssemblyWorkspace();setThermalStudyRequest(id);details="Assembly thermal study opened. Assign the reviewed heat inputs below to retained solids and review contacts, materials, cooling and volume mesh. Board lumped inputs were not substituted.";}
+        else if(solverSelections.extension_thermal){setTab("Thermal");setRightOpen(true);setFocusTool(null);details="Selected thermal extension retained. Transfer the reviewed heat and ambient values below into its controls; built-in thermal inputs were not applied.";}
+        else {setThermalScenario(thermalIntentScenario(boardData!,thermalScenario,{draft,choices}));setThermalPreview(null);setThermalSearchId(id);setTab("Thermal");setThermalOpen(true);markProjectDirty();details="Heat allocation, ambient and supplied duration applied. Existing materials and contacts retained; previous outcomes cleared. Review thermal resistance, cooling, geometry and preflight.";}
+      } else if(key==="electrothermal"||key==="coupling"){
+        if(component)handleSelect({id:component.id,type:"component",name:component.ref,ref:component.ref,position:component.at,layer:component.layer});
+        if(choices.couplingMode!=="field-circuit"){setSpiceWorkspace(current=>({...current,studio_feedback:studioIntentFeedback(current.studio_feedback??defaultStudioFeedback(),p,/steady/i.test(draft.suppliedText))}));markProjectDirty();}
+        setSpiceSearchIntent({id,version:workspaceIntentVersion,page:choices.couplingMode==="field-circuit"?"parasitics":"feedback",componentRef:component?.ref});setSpiceOpen(true);
+        details=choices.couplingMode==="field-circuit"?"PEEC/circuit coupling editor opened. Review exact extraction endpoints and circuit mappings. Thermal inputs, if supplied, remain pending a thermal coupling workflow.":"Coupling editor opened. Review exact circuit pin/loss mappings and feedback controls. Supplied ambient temperature is converted from Celsius to Kelvin in the feedback controls; no coupled model or waveform is inferred.";
+      } else if(key==="em"){
+        setTab("EM");
+        if(draft.scope==="assembly"){setAssemblyEmOpen(true);details="Retained assembly EM editor opened. Map the reviewed sweep below to explicit volumes, materials and ports; board inputs were not substituted.";}
+        else if(solverSelections.extension_em){setRightOpen(true);setFocusTool(null);details="Selected EM extension retained. Reviewed net names and frequency values below remain pending in its setup.";}
+        else {setEmiSetup(current=>({...current,selected_nets:draft.bindings.netIds.filter(value=>value!==draft.roles?.referenceNetId).map(value=>boardData!.nets[value]),return_nets:draft.roles?.referenceNetId?[boardData!.nets[draft.roles.referenceNetId]]:[],frequency:{...current.frequency,...(p.frequencyStartHz!==undefined?{start_hz:p.frequencyStartHz}:{}),...(p.frequencyStopHz!==undefined?{stop_hz:p.frequencyStopHz}:{})}}));setEmiPreflight(null);setEmiScreening(null);setEmiFieldResult(null);setExternalCase(null);setRightOpen(true);setEmiSection("excitation");setFocusTool(null);markProjectDirty();}
+      } else if(key==="cfd"){setTab("Thermal");setNativeCfdOpen(true);}
+      else if(key==="referenceCHT"){
+        const route=extensionWorkspaceRoutes(extensionCatalog,"thermal").find(row=>row.extensionId==="spike.su2-suite"&&/cht/i.test(row.label));
+        if(!route)throw new Error("The fixed SU2 CHT reference route is unavailable. Enable its declared extension first.");
+        setSolverSelections(current=>({...current,extension_thermal:route.key}));setTab("Thermal");setRightOpen(true);setFocusTool(null);details="Fixed CHT reference setup opened. Runtime detection, trust, reference parameters and preflight remain required.";
+      } else if(key==="rf"){openSiWorkbench("workflow","channel");setTab("HF / SI");details="Sampled network workflow opened. Import the Touchstone source and review port assignments and the requested frequency/impedance processing values below.";}
+      else if(key==="import"){
+        if(choices.importKind==="gerber")void openNativeGerber(emergeEmiSetup.python_executable);
+        else if(choices.importKind==="touchstone")openSiWorkbench("workflow","channel");
+        else setSourceImport({kind:choices.importKind});
+        details="Choose the local source through the importer and review its diagnostics. A path in a sentence does not import a file automatically.";
+      } else if(key==="assembly"){
+        if(draft.bindings.occurrenceIds[0])setSelectedBoardInstanceId(draft.bindings.occurrenceIds[0]);
+        if(choices.assemblyAction==="placement")openAssemblyPlacement();else if(choices.assemblyAction==="links")openBoardManager("links");else openAssemblyWorkspace();
+        details="Assembly editor opened. Placement transforms and connector endpoint pairs require explicit review; equal names do not establish connectivity.";
+      } else if(key==="mesh"){
+        if(choices.meshRoute==="volume"){openAssemblyWorkspace();setThermalStudyRequest(id);details="Retain and select solid geometry before generating the volume mesh. Requested mesh size below remains pending in the volume mesh controls.";}
+        else if(solverSelections.extension_mesh||solverSelections.extension_pi){setTab("Mesh");setRightOpen(true);setFocusTool(null);details="Selected mesh/PI extension retained. Reviewed mesh size and geometry scope remain pending in its controls.";}
+        else {
+          if(!boardData||searchBoardReason||draft.bindings.occurrenceIds.some(value=>value!==piAnalysisOccurrenceId))throw new Error(searchBoardReason||"Load and focus the requested board before preparing its mesh.");
+          if(draft.bindings.netIds.length>1)throw new Error("Choose one net in board mesh setup or configure a multi-net study explicitly.");
+          const name=boardData.nets[draft.bindings.netIds[0]];
+          setPiSetup(current=>({...current,...(name&&name!==current.net?{net:name,sources:[],loads:[],returnPath:defaultReturnPath()}:{}),...(p.meshSizeM!==undefined?{meshTargetMm:String(p.meshSizeM*1000),zoneCellMm:String(p.meshSizeM*1000)}:{})}));markProjectDirty();openAnalysisSetup();details="Reviewed board net and supplied mesh target applied. Review geometry, mesh route and quality before meshing.";
+        }
+      } else if(key==="results"){setTab("Results");setResultVisualizerOpen(true);}
+      else if(key==="studies")setStudyManagerOpen(true);
+      else if(key==="model-assignment"){
+        if(component)handleSelect({id:component.id,type:"component",name:component.ref,ref:component.ref,position:component.at,layer:component.layer});
+        if(/spice|circuit/i.test(draft.suppliedText)){setSpiceSearchIntent({id,version:workspaceIntentVersion,page:"assignments",componentRef:component?.ref});setSpiceOpen(true);}else setModelLibraryOpen(true);
+      } else if(key==="export"){
+        if(choices.exportKind==="step")void exportStep();else if(choices.exportKind==="results")void exportReport();else if(choices.exportKind==="touchstone")openSiWorkbench("workflow","channel");else if(choices.exportKind==="netlist")setSpiceOpen(true);else generateReport();
+      }
+      setWorkspaceIntentOpen(false);
+      setWorkspaceRequestNotice({version:workspaceIntentVersion,text:draft.suppliedText,details:`${details} Reviewed values: ${Object.entries(p).map(([name,value])=>`${name}=${value}`).join(", ")||"none supplied"}. Objects: ${[...draft.bindings.netIds.map(value=>boardData?.nets[value]??value),...draft.bindings.componentIds.map(value=>boardData?.components.find(row=>row.id===value)?.ref??value),...draft.bindings.occurrenceIds].join(", ")||"workspace"}.`});setStatus(details);
+    }catch(error){setStatus(error instanceof Error?error.message:String(error));}
+  };
+  const sentenceSearchTargets: SearchTarget[] = globalSearchOpen && boardData ? [
+    ...Object.entries(boardData.nets).filter(([, name]) => Boolean(name)).map(([id, name]) => ({ id, name, kind: "net" as const })),
+    ...boardData.components.map(component => ({ id: component.id, name: component.ref, kind: "component" as const })),
+    ...layerEntries.map(layer => ({ id: layer, name: layer, kind: "layer" as const })),
+  ] : [];
+  const searchBoardReason = virtualBoardProjection.visuals.length > 1 && (!selectedPiOccurrence || selectedPiOccurrence.designId !== activeDesignId)
+    ? "Focus an occurrence of the active board before running this command." : "";
+  const executeSearchSentence = (command: SearchCommandSuggestion) => {
+    if (!boardData || searchBoardReason) { setStatus(searchBoardReason || "Load a board first."); return; }
+    if (command.kind === "layer") {
+      if (!layerEntries.includes(command.target)) { setStatus("Layer no longer exists."); return; }
+      if (command.action === "hide-layer") setLayersVisible([command.target], false);
+      else if (command.action === "show-layer") setLayersVisible([command.target], true);
+      else showOnlyLayer(command.target);
+      setStatus(command.label); return;
+    }
+    if (command.kind === "component") {
+      const part = boardData.components.find(row => row.id === command.target);
+      if (!part) { setStatus("Component no longer exists."); return; }
+      if (selectedPiOccurrence && virtualBoardProjection.visuals.length > 1) handleAssemblyComponentSelect(selectedPiOccurrence.id, part.id);
+      else handleSelect({ id: part.id, type: "component", name: part.ref, ref: part.ref, layer: part.layer, position: part.at });
+      if (command.action === "focus") commandCamera("focus-selection");
+      return;
+    }
+    const net = boardData.nets[command.target];
+    if (!net || net !== command.name) { setStatus("Net no longer exists; search again."); return; }
+    if ((command.action === "run-pi" || command.action === "configure-pi") && (analysisRunning || viewportPiRun || dcRunOpen || solverSelections.extension_pi)) {
+      setStatus("Finish the current analysis or use the selected extension setup before running PI."); return;
+    }
+    if (selectedPiOccurrence && virtualBoardProjection.visuals.length > 1) handleAssemblyNetSelect(selectedPiOccurrence.id, command.target);
+    else { setSelectionFilter("net"); setNetHighlightEnabled(true); selectNetForAnalysis(net, "analysis"); }
+    if (command.action === "focus") { commandCamera("focus-selection"); return; }
+    if (command.action === "isolate") { setIsolatedNet(net); return; }
+    if (command.action !== "run-pi" && command.action !== "configure-pi") return;
+    const ready = piSetup.net === net && piSetup.sources.length > 0 && piSetup.loads.length > 0;
+    const next = piSetup.net === net ? piSetup : { ...piSetup, net, sources: [], loads: [], returnPath: defaultReturnPath() };
+    markProjectDirty(); setPiSetup(next); setAnalysisMode("DC IR Drop"); setAnalysisSetupWorkflow("single");
+    setResultDisplay("none"); setResultVisualization(current => ({ ...current, visible: false }));
+    openSharedWorkspace("Solve", "pi");
+    if (command.action === "run-pi" && ready && workerAvailable) {
+      setSearchPiRequest({ setup: next, board: boardData, occurrence: piAnalysisOccurrenceId });
+      setStatus(`Validating and running PI on ${net} with its configured sources and loads.`);
+    } else {
+      setDcRunOpen(true);
+      setStatus(`${net}: review sources, loads and return path in PI setup before running.`);
+    }
+  };
+  const searchPiBlockReason = analysisRunning || viewportPiRun ? "Wait for the current analysis to finish." : dcRunOpen ? "Finish the open PI setup first." : solverSelections.extension_pi ? "Use the selected PI extension workspace." : "";
+  const piIntentBlockReason=analysisRunning || viewportPiRun ? "Wait for the active analysis." : solverSelections.extension_pi ? "Use the selected PI extension setup." : "";
+  const applySearchPiSetup = (choice: PiSearchSetupSelection) => {
+    if (!piSearchDraft || boardData !== piSearchDraft.board || piAnalysisOccurrenceId !== piSearchDraft.occurrence || searchBoardReason || analysisRunning || viewportPiRun || solverSelections.extension_pi) { setStatus("PI search context changed. Search the current board again."); return; }
+    const sourcePad=boardData.pads.find(pad=>pad.id===choice.sourcePadId);
+    if (!sourcePad || boardData.nets[choice.netId] !== choice.netName || !eligibleComponentSupplyPads(boardData,sourcePad.ref ?? "",choice.netName).some(pad=>pad.id===sourcePad.id)) { setStatus("The source pad or rail changed. Search again."); return; }
+    const sourceChoices=choice.sources ?? [{padId:choice.sourcePadId,voltageV:choice.voltageV,capacityA:choice.sourceCapacityA}];
+    const sourceIds=new Set(sourceChoices.map(row=>row.padId));
+    const seen=new Set<string>();
+    const make=(kind:"source"|"load",index:number,pad:ParsedBoard["pads"][number],value:number):PiTerminal=>({...terminal(kind,index),id:`search-${kind}-${crypto.randomUUID()}`,name:`${pad.ref}.${pad.name}`,x:String(pad.at[0]),y:String(pad.at[1]),anchorId:pad.id,anchorType:"pad",net:choice.netName,layers:pad.layers.includes("*.Cu")?boardData.layers.filter(layer=>layer.endsWith(".Cu")):pad.layers,value:String(value)});
+    const loads:PiTerminal[]=[];
+    try {
+      for(const load of choice.loads){
+        const eligible=eligibleComponentSupplyPads(boardData,load.componentRef,choice.netName);
+        for(const pin of load.pins){const pad=eligible.find(pad=>pad.id===pin.padId);if(!pad || seen.has(pin.padId) || sourceIds.has(pin.padId) || !Number.isFinite(pin.currentA) || pin.currentA<0) throw new Error("Invalid, duplicated or overlapping load pad.");seen.add(pin.padId);loads.push(make("load",loads.length,pad,pin.currentA));}
+        const sum=load.pins.reduce((value,pin)=>value+pin.currentA,0);if(Math.abs(sum-load.totalCurrentA)>1e-12*Math.max(1,load.totalCurrentA))throw new Error("Component pin currents do not match the reviewed total.");
+      }
+      if(!loads.length || !Number.isFinite(choice.voltageV) || choice.voltageV<=0 || (choice.sourceCapacityA!==undefined&&(!Number.isFinite(choice.sourceCapacityA)||choice.sourceCapacityA<=0)))throw new Error("Supply and loads require valid electrical values.");
+      if(!sourceChoices.length || sourceChoices.length!==sourceIds.size)throw new Error("Each source needs a unique pad.");
+      const sources=sourceChoices.map((row,index)=>{const pad=boardData.pads.find(pad=>pad.id===row.padId);if(!pad||!eligibleComponentSupplyPads(boardData,pad.ref ?? "",choice.netName).some(candidate=>candidate.id===pad.id)||!Number.isFinite(row.voltageV)||row.voltageV<=0||(row.capacityA!==undefined&&(!Number.isFinite(row.capacityA)||row.capacityA<=0)))throw new Error("Review the additional source pads and electrical values.");return {...make("source",index,pad,row.voltageV),currentLimit:row.capacityA===undefined?"":String(row.capacityA)};});
+      const next={...piSetup,net:choice.netName,powerPathId:"",sources,loads,returnPath:{...defaultReturnPath(),mode:choice.returnMode,net:choice.returnMode==="explicit"?"":"GND"}};
+      setPiSetup(next);
+      markProjectDirty();setAnalysisMode("DC IR Drop");setAnalysisSetupWorkflow("single");setResultDisplay("none");setResultVisualization(current=>({...current,visible:false}));setPiSearchSetupOpen(false);openSharedWorkspace("Solve","pi");
+      if(choice.run && choice.returnMode==="implicit" && workerAvailable){setDcRunOpen(false);setSearchPiRequest({setup:next,board:boardData,occurrence:piAnalysisOccurrenceId});setStatus(`Validating PI on ${choice.netName} with ${loads.length} reviewed pad loads.`);}
+      else {setDcRunOpen(true);setStatus(`${choice.netName}: ${loads.length} pad loads prepared. Review return path and preflight before running.`);}
+    }catch(error){setStatus(error instanceof Error?error.message:String(error));}
+  };
+  const suggestSentenceCommands = (query: string): UniversalSearchItem[] => [
+    ...suggestWorkspaceIntents(query,workspaceIntentContext).map(suggestion=>({id:suggestion.id,label:suggestion.label,category:"Workspace request",completion:suggestion.completion,keywords:query,icon:Search,description:[...suggestion.draft.missing,suggestion.draft.limitation].join(" "),run:()=>{setWorkspaceIntentDraft({suggestion,context:workspaceIntentContext,revision:crypto.randomUUID()});setWorkspaceIntentOpen(true);}})),
+    ...(boardData && (/\bfrom\b/i.test(query) || !suggestSearchCommands(query,sentenceSearchTargets).length) ? suggestPiSetupIntents(query,boardData).map(suggestion=>({id:suggestion.id,label:suggestion.label,category:"PI setup assistant",keywords:query,completion:suggestion.completion,icon:Play,disabled:Boolean(searchBoardReason||piIntentBlockReason),description:searchBoardReason||piIntentBlockReason||[...suggestion.draft.missing,...suggestion.draft.assumptions].join(" "),run:()=>{setPiSearchDraft({suggestion,board:boardData,occurrence:piAnalysisOccurrenceId,revision:crypto.randomUUID()});setPiSearchSetupOpen(true);}})) : []),
+    ...suggestSearchCommands(query, sentenceSearchTargets, Object.entries(boardData?.nets ?? {}).find(([, name]) => name === (selected?.net ?? piSetup.net))?.[0]).map(command => ({
+    id: command.id, label: command.label, category: "Sentence command", completion: command.completion,
+    icon: command.action === "run-pi" ? Play : command.kind === "layer" ? Layers3 : command.kind === "component" ? Microchip : Route,
+    disabled: Boolean(searchBoardReason) || (command.action === "run-pi" || command.action === "configure-pi") && (analysisRunning || Boolean(viewportPiRun) || dcRunOpen || Boolean(solverSelections.extension_pi)),
+    description: searchBoardReason || ((command.action === "run-pi" || command.action === "configure-pi") ? searchPiBlockReason : "") || (command.action === "run-pi"
+      ? `Net ${command.name} · ${selectedPiOccurrence?.name ?? boardFile} · existing setup is preflighted; missing terminals open setup`
+      : `${command.kind} ${command.name} · ${selectedPiOccurrence?.name ?? boardFile}`),
+    run: () => executeSearchSentence(command),
+  }))];
+
+  const openSuiteWorkflow = (action: SolverSuiteAction, extensionId?: string, capabilityId?: string) => {
+    if (capabilityId === "pi-pdn") { setTab("PI"); setPdnSuiteOpen(true); return; }
+    if (capabilityId === "si-networks") { setTab("HF / SI"); setSparameterOpen(true); return; }
+    if (capabilityId === "si-eye") { setTab("HF / SI"); setSiProtocolSuitesOpen(true); return; }
+    if (capabilityId === "pi-dc") { openAnalysisSetup("DC IR Drop"); return; }
+    if (capabilityId === "pi-peec") { openAnalysisSetup("AC Impedance Sweep"); return; }
+    if (extensionId) { setExtensionSelectedId(extensionId); void openExtensionManager(extensionId); return; }
+    if (action === "spice") setSpiceOpen(true);
+    else if (action === "native-cfd") { setTab("Thermal"); setNativeCfdOpen(true); }
+    else if (action === "python") setPythonOpen(true);
+    else if (action === "extensions") void openExtensionManager();
+    else if (action === "workers") void openExternalEngineCenter();
+    else if (action === "thermal") { setTab("Thermal"); setThermalOpen(true); }
+    else if (action === "machines") { setTab("EM"); setEmiSection("machines"); setRightOpen(true); setFocusTool(null); }
+    else if (action === "em") { setTab("EM"); setRightOpen(true); setFocusTool(null); }
+    else if (action === "si") { setTab("HF / SI"); setRightOpen(true); setFocusTool(null); }
+    else { setTab("PI"); setRightOpen(true); setFocusTool(null); }
+  };
+  const setInterfaceMode=(mode:AppSettings["interfaceMode"])=>{
+    setAppSettings(current=>({...current,interfaceMode:mode,ribbonVisible:mode==="classic"}));
+    setMenu(null);setStatus(`${mode==="classic"?"Classic menus and ribbon":"Clean context tools"} interface selected. Project and solver inputs retained.`);
+  };
   const universalSearchItems: UniversalSearchItem[] = [
+    {id:"interface:classic",label:"Use classic interface",category:"Interface",keywords:"older legacy complex menus ribbon layout",icon:PanelTop,run:()=>setInterfaceMode("classic")},
+    {id:"interface:clean",label:"Use clean interface",category:"Interface",keywords:"new minimalistic simple context layout",icon:LayoutDashboard,run:()=>setInterfaceMode("clean")},
+
+
+    { id: "view:amoled", label: "Use AMOLED black viewport", category: "View", description: "Set the viewport background to true black", keywords: "oled display background", icon: Eye, run: () => setAppSettings(current => ({ ...current, viewportBackground: "amoled" })) },
+    { id: "view:graphite", label: "Use graphite viewport background", category: "View", keywords: "normal dark display", icon: Eye, run: () => setAppSettings(current => ({ ...current, viewportBackground: "dark" })) },
+    { id: "view:grid:show", label: "Show orientation grid", category: "View", keywords: "world ground mesh", icon: Grid3X3, run: () => setAppSettings(current => ({ ...current, viewportGrid: true })) },
+    { id: "view:grid:hide", label: "Hide orientation grid", category: "View", keywords: "world ground mesh", icon: Grid3X3, run: () => setAppSettings(current => ({ ...current, viewportGrid: false })) },
     { id: "view:schematic", label: "Open KiCad schematic viewer", category: "View", description: "Import local schematics and cross-select components and nets", icon: CircuitBoard, run: () => setSchematicOpen(true) },
     ...tabs.map(({ name, icon }) => ({
       id: `workspace:${name}`,
@@ -5051,6 +5284,10 @@ export default function App() {
     { id: "manager:stackup", label: "Stackup manager", category: "Design", description: "Edit copper, dielectric, core, prepreg, and material properties", icon: Layers3, disabled: !boardData, run: () => setStackupOpen(true) },
     { id: "manager:layers", label: "Layer manager", category: "View", description: "Control layer visibility, opacity, models, vias, and separation", icon: Layers2, disabled: !boardData, run: () => openBoardManager("layers") },
     { id: "manager:models", label: "3D model library", category: "Design", description: "Browse and assign local STEP, WRL, and glTF models", keywords: "component package", icon: LibraryBig, disabled: !boardData, run: () => setModelLibraryOpen(true) },
+    { id: "analysis:solver-suite", label: "Solver manager", category: "Simulation", description: "Manage named internal solvers, external engines, scope and setup routes", keywords: "solver suite solvers capabilities studio SPICE simulation methods", icon: Boxes, run: () => {setSolverSuiteQuery("");setSolverSuiteOpen(true);} },
+    { id: "assembly:materials", label: "Material library", category: "Assembly", description: "Browse thermal, mechanical and electrical material evidence and assign saved snapshots", keywords: "MCAD ceramic RF FR4 Rogers Kapton PTFE plastic metal heater conductor laminate", icon: Layers3, run: () => setMcadAttachmentOpen(true) },
+    { id: "assembly:sheet-folding", label: "Sheet and flex folding", category: "Assembly", description: "Import a rectangular sheet and preview finite-radius bends", keywords: "sheet metal nonmetal folding bend radius neutral axis K factor flex rigid-flex PCB DXF flat folded", icon: Spline, run: () => setSheetFoldingOpen(true) },
+    { id: "analysis:native-cfd", label: "Native CFD cavity benchmark", category: "Thermal", description: "Run the bundled experimental C++ 2D laminar cavity solver; velocity and pressure fields", keywords: "airflow fluid dynamics momentum native CFD", icon: Wind, disabled: !workerAvailable, run: () => { setTab("Thermal"); setNativeCfdOpen(true); } },
     { id: "analysis:spice", label: "SPICE model assistant", category: "Simulation", description: "Assign models, pins, ratings, and explicit circuit netlists", keywords: "ngspice circuit", icon: CircuitBoard, run: () => setSpiceOpen(true) },
     { id: "analysis:sparameter", label: "S-parameter workbench", category: "HF / SI", description: "Run the selected S-parameter solver or inspect Touchstone data", keywords: "touchstone port emerge", icon: Waves, run: () => { setTab("HF / SI"); openSelectedSParameters(); } },
     { id: "analysis:emi", label: "EM workspace setup", category: "EM", description: "Configure domains, ports, preflight, full-wave case, and dashboard", keywords: "emi emc electromagnetics openems far field lisn", icon: SatelliteDish, run: () => { setTab("EM"); setRightOpen(true); setEmiSection("domain"); } },
@@ -5075,7 +5312,7 @@ export default function App() {
     { id: "tools:python", label: "Python workspace", category: "Tools", description: "Edit and run Python scripts in the desktop worker", keywords: "script automation ide", icon: SquareTerminal, run: () => setPythonOpen(true) },
     { id: "settings:shortcuts", label: "Keyboard shortcuts", category: "Settings", description: "Review and customize viewport and application bindings", icon: Keyboard, run: () => setShortcutsOpen(true) },
     { id: "settings:resources", label: "Resource monitor", category: "Settings", description: "Inspect CPU, memory, rendering, and capacity information", icon: MemoryStick, run: () => setResourceOpen(true) },
-    { id: "settings:engines", label: "Solver manager", category: "Settings", description: "Configure available internal and external solvers", keywords: "openems openfoam ngspice", icon: ServerCog, run: () => void openExternalEngineCenter() },
+    { id: "settings:engines", label: "Engine registration and tuning", category: "Settings", description: "Configure installed runtime paths and supported solver settings", keywords: "openems openfoam ngspice", icon: ServerCog, run: () => void openExternalEngineCenter() },
     { id: "settings:extensions", label: "Extension manager", category: "Settings", description: "Inspect and run trusted SPIKE extensions", keywords: "plugins modules", icon: Puzzle, run: () => void openExtensionManager() },
     { id: "help:guide", label: "Help and user guide", category: "Help", description: "Search workflows, validity rules, diagnostics, and error codes", icon: CircleHelp, run: () => setHelpOpen(true) },
     ...(globalSearchOpen && boardData ? [
@@ -5100,6 +5337,11 @@ export default function App() {
         run: () => { showOnlyLayer(layer); openBoardManager("layers"); setStatus(`${layer} shown from universal search`); },
       })),
     ] : []),
+    ...solverSuiteCatalog.map(capability => ({
+      id: `solver-capability:${capability.id}`, label: solverDisplayName(capability), category: "Solver manager",
+      description: `${capability.summary} ${capability.limits}`, keywords: `${capability.group} ${capability.reference} ${capability.extensionId ?? ""}`,
+      icon: Boxes, run: () => { setSolverSuiteQuery(capability.title); setSolverSuiteOpen(true); },
+    })),
   ];
 
   const shellStyle = {
@@ -5302,10 +5544,18 @@ export default function App() {
     }}] : []),
     ...(emiFieldResult ? [{ id: "workspace:em", name: "Latest EM field result", onOpen: () => activateStudyCase("workspace", { id: "workspace:em", name: "Latest EM field result", type: "em", mode: "", settings: {}, scenario: {}, notes: "", runs: [], datasetIds: [], resultSnapshot: { fieldResult: emiFieldResult } as unknown as StudyJsonObject }) }] : []),
   ];
+  const selectWorkspace = (name: typeof tab) => {
+    setTab(name);
+    setMenu(null);
+    setLeftOpen(false);
+    setRightOpen(["PI", "HF / SI", "EM", "Thermal"].includes(name));
+    if (name === "Results") setResultVisualizerOpen(true);
+    setStatus(`${name} workspace selected`);
+  };
   const workspaceSwitcher = <div className="workspace-switcher" data-workspace={tab}>
-    <ToolbarMenu label={tab} icon={tabs.find(item => item.name === tab)?.icon ?? FolderOpen} actions={tabs.map(item => ({
+    <ToolbarMenu label={`Workspaces: ${tab}`} icon={tabs.find(item => item.name === tab)?.icon ?? FolderOpen} actions={tabs.map(item => ({
       label: item.name, icon: item.icon, accent: item.name, checked: item.name === tab, radio: true,
-      run: () => { setTab(item.name); setLeftOpen(false); setRightOpen(["PI", "HF / SI", "EM", "Thermal"].includes(item.name)); if (item.name === "Results") setResultVisualizerOpen(true); setStatus(`${item.name} workspace selected`); },
+      run: () => selectWorkspace(item.name),
     }))} />
   </div>;
   const studyNavigator = <StudyNavigator studies={studies} activeCaseId={activeStudyCaseId} projectResults={projectStudyResults}
@@ -5414,17 +5664,23 @@ export default function App() {
       focusManagedNet(name); setSchematicStatus(`${net.name} cross-selected as ${name} on the board.`);
     }
   };
-  const clickedObject = viewportContext?.object ?? null;
+  const actionContext: ViewportContextRequest = viewportContext ?? {clientX:0,clientY:0,object:selected};
+  const clickedObject = actionContext.object;
   const contextResult = displayedResult ?? analysisResult;
   const smartContext = viewportSmartContext({object:clickedObject,board:boardData,boardName:boardFile,workspace:tab,mode:analysisMode,solver:solverId,activeDesignId,occurrences:assemblyIr?.boards ?? [],result:contextResult});
-  const thermalContextCell=viewportContext?.thermalTarget?.cell;
+  const thermalContextCell=actionContext.thermalTarget?.cell;
   if(thermalContextCell)smartContext.summary.push(`Thermal cell ${thermalContextCell.column}, ${thermalContextCell.row} / ${thermalContextCell.layer} / ${thermalContextCell.temperature_c.toFixed(3)} C / ${thermalContextCell.modelStatus}`);
   const contextSelect = () => { if(clickedObject){setSelected(clickedObject);if(clickedObject.occurrenceId)setSelectedBoardInstanceId(clickedObject.occurrenceId);} };
-  const contextPayload = () => ({object:clickedObject,object_data:viewportObjectSnapshot(clickedObject,boardData,smartContext.resultScoped?contextResult:null,smartContext.ownsObject),terminals:smartContext.hasNet?{source_voltage_unit:"V",load_current_unit:"A",position_unit:"mm",sources:piSetup.sources.filter(item=>item.net===clickedObject!.net).map(item=>({id:item.id,name:item.name,voltage:item.value,current_limit_a:item.currentLimit,position:[item.x,item.y],layer:item.layer})),loads:piSetup.loads.filter(item=>item.net===clickedObject!.net).map(item=>({id:item.id,name:item.name,current:item.value,position:[item.x,item.y],layer:item.layer})),return_net:piSetup.returnPath.net,return_mode:piSetup.returnPath.mode}:null,board:{file:boardFile,design_id:activeDesignId,occurrence_id:clickedObject?.occurrenceId ?? null},workspace:{tab,analysis_mode:analysisMode,solver_id:solverId,formulation,mesh_target_mm:piSetup.meshTargetMm},result:smartContext.resultScoped&&contextResult?{analysis_id:contextResult.analysis_id,mode:contextResult.mode,status:contextResult.status,model_status:contextResult.model_status,provenance:contextResult.provenance}:null,thermal_target:viewportContext?.thermalTarget,object_position_units:"mm",scene_focus_point:viewportContext?.focusPoint,scene_focus_frame:"Viewport render coordinates; not source-board mm"});
+  const contextPayload = () => ({object:clickedObject,object_data:viewportObjectSnapshot(clickedObject,boardData,smartContext.resultScoped?contextResult:null,smartContext.ownsObject),terminals:smartContext.hasNet?{source_voltage_unit:"V",load_current_unit:"A",position_unit:"mm",sources:piSetup.sources.filter(item=>item.net===clickedObject!.net).map(item=>({id:item.id,name:item.name,voltage:item.value,current_limit_a:item.currentLimit,position:[item.x,item.y],layer:item.layer})),loads:piSetup.loads.filter(item=>item.net===clickedObject!.net).map(item=>({id:item.id,name:item.name,current:item.value,position:[item.x,item.y],layer:item.layer})),return_net:piSetup.returnPath.net,return_mode:piSetup.returnPath.mode}:null,board:{file:boardFile,design_id:activeDesignId,occurrence_id:clickedObject?.occurrenceId ?? null},workspace:{tab,analysis_mode:analysisMode,solver_id:solverId,formulation,mesh_target_mm:piSetup.meshTargetMm},result:smartContext.resultScoped&&contextResult?{analysis_id:contextResult.analysis_id,mode:contextResult.mode,status:contextResult.status,model_status:contextResult.model_status,provenance:contextResult.provenance}:null,thermal_target:actionContext.thermalTarget,object_position_units:"mm",scene_focus_point:actionContext.focusPoint,scene_focus_frame:"Viewport render coordinates; not source-board mm"});
   const contextConfigurePi = (mode:string,workflow:"single"|"path"="single") => {markProjectDirty();if(clickedObject?.net)selectNetForAnalysis(clickedObject.net,"viewport");setTab("PI");openAnalysisSetup(mode,workflow);};
   const contextConfigureSi = (focus:"channel"|"crosstalk"|"eye"|"impedance"|"ports") => {contextSelect();setTab("HF / SI");openSiWorkbench("geometry",focus);};
   const contextNetReason = smartContext.boardReason ?? smartContext.netReason;
-  const viewportContextGroups:ContextMenuGroup[] = viewportContext ? [
+  const viewportContextGroups:ContextMenuGroup[] = [
+    {id:"workspace",label:"Workspace",actions:[
+      {id:"open-project",label:"Open project manager",run:()=>setProjectManagerOpen(true)},
+      {id:"import-board",label:"Import a board or assembly",disabledReason:universalRunning?"Stop the active simulation before importing another design":undefined,run:()=>void importNativeBoard()},
+      ...(universalRunning?[{id:"stop",label:"Stop active simulation",run:()=>void cancelActiveAnalysis()}]:[])
+    ]},
     {id:"inspect",label:"Inspect and select",actions:[
       {id:"inspect-object",label:"Inspect clicked object",disabledReason:!clickedObject?"Right-click an object first":undefined,run:()=>{contextSelect();setRightOpen(true);}},
       {id:"focus-object",label:"Focus clicked object",disabledReason:!clickedObject?"Right-click an object first":undefined,run:()=>{contextSelect();requestAnimationFrame(()=>commandCamera("focus-selection"));}},
@@ -5434,7 +5690,7 @@ export default function App() {
       {id:"clear-selection",label:"Clear selection",run:()=>setSelected(null)}]},
     {id:"view",label:"View and layers",actions:[
       {id:"fit",label:"Fit scene",run:()=>commandCamera("fit")},
-      {id:"orbit-center",label:"Set orbit center here",disabledReason:viewMode!=="3D"||!viewportContext.focusPoint?"A point in the 3D viewport is required":undefined,run:()=>setCameraCommand(`orbit-target:${viewportContext.focusPoint!.join(",")}:${Date.now()}`)},
+      {id:"orbit-center",label:"Set orbit center here",disabledReason:viewMode!=="3D"||!actionContext.focusPoint?"A point in the 3D viewport is required":undefined,run:()=>setCameraCommand(`orbit-target:${actionContext.focusPoint!.join(",")}:${Date.now()}`)},
       {id:"view-mode",label:`Switch to ${viewMode==="2D"?"3D":"2D"}`,run:()=>setViewMode(current=>current==="2D"?"3D":"2D")},
       {id:"layer-manager",label:"Manage layers of this board",run:()=>{contextSelect();openBoardManager("layers");}},
       {id:"focus-layer",label:"Show only this copper layer",disabledReason:smartContext.boardReason??(!clickedObject?.layer?.endsWith(".Cu")?"Right-click copper on a specific layer":undefined),run:()=>{recordChange();setVisibleLayers(current=>({...current,...Object.fromEntries(boardData!.layers.map(layer=>[layer,layer===clickedObject!.layer]))}));}},
@@ -5450,7 +5706,7 @@ export default function App() {
     {id:"thermal-em",label:"Thermal and electromagnetic tools",actions:[
       {id:"thermal-setup",label:"Configure thermal / airflow scenario",disabledReason:!boardData?"Load a design first":undefined,run:()=>{contextSelect();setTab("Thermal");setThermalOpen(true);}},
       {id:"thermal-contacts",label:"Review thermal / electrical contacts",disabledReason:smartContext.boardReason,run:()=>{contextSelect();setBondManagerOpen(true);}},
-      {id:"thermal-history",label:"Plot temperature vs time",description:"Uses saved transient data; missing histories remain unavailable.",disabledReason:!viewportContext.thermalTarget&&!thermalPreview&&!thermalScenario?"Load a thermal result first":!viewportContext.thermalTarget&&!clickedObject?"Right-click an object or thermal point":undefined,run:()=>setThermalPlotTarget(viewportContext.thermalTarget??{pointMm:clickedObject?.position,componentRef:clickedObject?.type==="component"?clickedObject.ref:undefined,occurrenceId:clickedObject?.occurrenceId})},
+      {id:"thermal-history",label:"Plot temperature vs time",description:"Uses saved transient data; missing histories remain unavailable.",disabledReason:!actionContext.thermalTarget&&!thermalPreview&&!thermalScenario?"Load a thermal result first":!actionContext.thermalTarget&&!clickedObject?"Right-click an object or thermal point":undefined,run:()=>setThermalPlotTarget(actionContext.thermalTarget??{pointMm:clickedObject?.position,componentRef:clickedObject?.type==="component"?clickedObject.ref:undefined,occurrenceId:clickedObject?.occurrenceId})},
       {id:"em-net",label:"Add clicked net to EM excitation domain",disabledReason:contextNetReason,run:()=>{markProjectDirty();setTab("EM");setRightOpen(true);setEmiSection("domain");if(!emiSetup.selected_nets.includes(clickedObject!.net!))setEmiSetup(current=>({...current,selected_nets:[...current.selected_nets,clickedObject!.net!],net_metrics:[...current.net_metrics,{net:clickedObject!.net!,source:"unassigned",dv_dt_v_per_s:0,di_dt_a_per_s:0,peak_current_a:0,loop_area_mm2:0,return_discontinuities:0}]}));}},
       {id:"model-resolver",label:"Review 3D geometry and material assignments",disabledReason:!boardData?"Load a design first":undefined,run:()=>{contextSelect();setModelLibraryOpen(true);}},
       {id:"engines",label:"Choose solver / mesher extension",run:()=>void openExternalEngineCenter()}]},
@@ -5473,9 +5729,9 @@ export default function App() {
       {id:"validate",label:"Check board readiness",disabledReason:smartContext.boardReason,run:()=>{validateDesign();setBottomOpen(true);}},
       {id:"assistant",label:"Open engineering assistant with selection",disabledReason:!desktopShell?"Requires the desktop runtime":undefined,run:()=>{contextSelect();void launchAssistantChat();}},
       ...(clickedObject?.type==="terminal"&&clickedObject.terminalRole?[{id:"delete-terminal",label:"Remove this configured terminal",run:()=>{recordChange();setPiSetup(current=>removePiTerminal(current,clickedObject.terminalRole!,clickedObject.id.replace(/^analysis-terminal:/,"")));setSelected(null);}}]:[])]}
-  ] : [];
-  if(viewportContext) {
-    const preferred = viewportContext.thermalTarget ? ["thermal-history","thermal-contacts"] : clickedObject?.type==="terminal" ? ["pi-DC IR Drop","probe"] : tab==="Thermal" ? ["thermal-history","thermal-setup","thermal-contacts"] : tab==="EM" ? ["em-net","engines"] : tab==="HF / SI" ? ["si-channel","si-eye","si-crosstalk"] : smartContext.resultScoped ? ["result-plots","trace-plots","probe"] : clickedObject?.type==="component" ? ["inspect-object","model-resolver","thermal-contacts"] : smartContext.hasNet ? ["pi-DC IR Drop","si-channel","isolate-net"] : ["fit","layer-manager","validate"];
+  ];
+  {
+    const preferred = actionContext.thermalTarget ? ["thermal-history","thermal-contacts"] : clickedObject?.type==="terminal" ? ["pi-DC IR Drop","probe"] : tab==="Thermal" ? ["thermal-history","thermal-setup","thermal-contacts"] : tab==="EM" ? ["em-net","engines"] : tab==="HF / SI" ? ["si-channel","si-eye","si-crosstalk"] : smartContext.resultScoped ? ["result-plots","trace-plots","probe"] : clickedObject?.type==="component" ? ["inspect-object","model-resolver","thermal-contacts"] : smartContext.hasNet ? ["pi-DC IR Drop","si-channel","isolate-net"] : ["fit","layer-manager","validate"];
     const all=viewportContextGroups.flatMap(group=>group.actions);
     const suggestions=preferred.map(id=>all.find(action=>action.id===id)).filter((action):action is NonNullable<typeof action>=>Boolean(action));
     viewportContextGroups.unshift({id:"suggested",label:"Suggested for this context",actions:suggestions});
@@ -5585,6 +5841,7 @@ export default function App() {
         <MenuSubmenu label="Board managers">
           <MenuItem icon={Layers3} label="Layer manager" onClick={() => { openBoardManager("layers"); setMenu(null); }} />
           <MenuItem icon={Spline} label="Flex PCB manager" onClick={() => { setFlexBoardOpen(true); setMenu(null); }} />
+          <MenuItem icon={Spline} label="Sheet and flex folding" onClick={() => { setSheetFoldingOpen(true); setMenu(null); }} />
         </MenuSubmenu>
         <MenuSubmenu label="Panels" icon={PanelLeft}>
           <MenuItem icon={ListTree} label={studyNavigatorOpen ? "Hide simulation studies" : "Show simulation studies"} onClick={() => { setStudyNavigatorOpen(value => !value); setMenu(null); }} />
@@ -5661,14 +5918,14 @@ export default function App() {
           <MenuItem icon={Focus} label="Interactive analysis guide" onClick={() => { setGuideOpen(true); setMenu(null); }} />
         </MenuSubmenu>
         <MenuSubmenu label="Support">
-          <MenuItem icon={BadgeAlert} label="Report bug" onClick={() => { setMenu(null); void openBugReport(tab).catch(() => setStatus("Could not open the bug report. Visit github.com/wayri/SPIKE-Main/issues/new")); }} />
+          <MenuItem icon={BadgeAlert} label="Report bug" onClick={() => { setMenu(null); void openBugReport(tab).catch(() => setStatus("Could not open the bug report. Visit github.com/wayri/SPIKE/issues/new")); }} />
           <MenuItem icon={CircleHelp} label="About SPIKE" onClick={() => { setAboutOpen(true); setMenu(null); }} />
         </MenuSubmenu>
       </MenuButton>
 
   </>;
   const focusViewportTools = <>
-<div className="view-toggle"><button className={viewMode === "2D" ? "selected" : ""} onClick={() => { setViewMode("2D"); setNavigationMode("pan"); }}>2D</button><button className={viewMode === "3D" ? "selected" : ""} onClick={() => setViewMode("3D")}>3D</button></div>
+<div className="view-toggle"><button role="radio" aria-checked={viewMode === "2D"} className={viewMode === "2D" ? "selected" : ""} onClick={() => { setViewMode("2D"); setNavigationMode("pan"); }}><CircuitBoard size={16} />2D</button><button role="radio" aria-checked={viewMode === "3D"} className={viewMode === "3D" ? "selected" : ""} onClick={() => setViewMode("3D")}><Box size={16} />3D</button></div>
 
 <span className="divider" />
 
@@ -5694,7 +5951,9 @@ export default function App() {
             { label: "Orbit", icon: Orbit, section: "Drag mode", checked: navigationMode === "orbit" && viewMode !== "2D", radio: true, disabled: viewMode === "2D", description: `Left drag · Shift + left drag to pan · ${shortcuts.orbitMode}`, run: () => setNavigationMode("orbit") },
             { label: "Pan", icon: Hand, section: "Drag mode", checked: navigationMode === "pan" || viewMode === "2D", radio: true, description: `Left drag · ${shortcuts.panMode} · 2D always pans`, run: () => setNavigationMode("pan") },
             { label: "Camera inertia", icon: Gauge, section: "View options", checked: navigationInertia, description: "Smoothly settle camera movement", run: () => setNavigationInertia(current => !current) },
-            { label: "Axes and grid", icon: Grid3X3, section: "View options", checked: showAxes, run: () => setShowAxes(current => !current) },
+            { label: "Orientation grid", icon: Grid3X3, section: "View options", checked: appSettings.viewportGrid, run: () => setAppSettings(current => ({ ...current, viewportGrid: !current.viewportGrid })) },
+            { label: "AMOLED · true black", icon: Eye, section: "View options", checked: appSettings.viewportBackground === "amoled", run: () => setAppSettings(current => ({ ...current, viewportBackground: current.viewportBackground === "amoled" ? "dark" : "amoled" })) },
+            { label: "Coordinate axes", icon: Axis3D, section: "View options", checked: showAxes, run: () => setShowAxes(current => !current) },
             { label: "Isometric view", icon: Box, section: "View options", disabled: viewMode === "2D", description: shortcuts.viewIso, run: () => commandCamera("view-iso") },
             ...(["up", "left", "right", "down"] as const).map(direction => ({ label: `Pan ${direction}`, icon: { up: ArrowUp, left: ArrowLeft, right: ArrowRight, down: ArrowDown }[direction], section: "Nudge camera", description: "Arrow key · Shift + arrow for faster pan", run: () => commandCamera(`pan-${direction}`) })),
             { label: "Keyboard shortcuts", icon: Keyboard, section: "Help", description: shortcuts.shortcutWindow, run: () => setShortcutsOpen(true) },
@@ -5860,7 +6119,8 @@ export default function App() {
 { id: "topologyEditor", title: "Power & signal paths", open: Boolean(topologyEditor), content: topologyEditor && <TopologyEditor domain={topologyEditor} board={boardData} model={topologyEditor === "pi" ? piTopology : siTopology} onUndo={undo} onRedo={redo} setModel={(next, record = true) => { if (record) recordChange(); topologyEditor === "pi" ? setPiTopology(next) : setSiTopology(next); }} onClose={() => setTopologyEditor(null)} onUseForAnalysis={(next, scenarioId, plan) => { if (next.domain === "pi") { const jobs = topologyBatchJobs(boardData, next, plan); const first = jobs[0]; const paths = compilePiPaths(next); const reviewedPath = paths.find(path => path.issues.length === 0) ?? paths[0]; const sourceNode = next.nodes.find(node => node.pathGroupId === reviewedPath?.id && node.kind === "source"); const loadNode = next.nodes.find(node => node.pathGroupId === reviewedPath?.id && node.kind === "load"); const pathSource = reviewedPath ? topologyTerminal(boardData, sourceNode, reviewedPath.source_terminal.net, "source", 0, sourceNode?.voltageV ?? 0) : null; const pathLoad = reviewedPath ? topologyTerminal(boardData, loadNode, reviewedPath.load_terminal.net, "load", 0, loadNode ? plan.budget.nodes[loadNode.id]?.currentA ?? loadNode.loadCurrentA ?? 0 : 0) : null; const unresolved = reviewedPath ? [pathSource, pathLoad].filter(item => !item?.anchorId).length : jobs.flatMap(job => [...job.sources, ...job.loads]).filter(item => !item.anchorId).length; setPiTopology(next); if (reviewedPath && pathSource && pathLoad) setPiSetup(current => ({ ...current, powerPathId: reviewedPath.id, net: reviewedPath.source_terminal.net, sources: [pathSource], loads: [pathLoad], batchJobs: jobs })); else if (first) setPiSetup(current => ({ ...current, powerPathId: "", net: first.net, sources: first.sources, loads: first.loads, batchJobs: jobs })); setAnalysisMode(reviewedPath ? "DC IR Drop" : jobs.length > 1 ? "Bulk Net Analysis" : "DC IR Drop"); setTab("PI"); setDock("Power tree"); setAnalysisSetupWorkflow(reviewedPath ? "path" : jobs.length > 1 ? "batch" : "single"); setRightOpen(true); setDcRunOpen(true); setStatus(reviewedPath ? `Power path ${reviewedPath.label} attached: ${reviewedPath.segments.length} net segments, ${reviewedPath.transitions.length} series interfaces; ${unresolved} terminal${unresolved === 1 ? "" : "s"} require placement review` : `Power tree ${scenarioId} case attached: ${jobs.length} PI job${jobs.length === 1 ? "" : "s"}; ${unresolved} terminal${unresolved === 1 ? "" : "s"} require placement review`); } else { setSiTopology(next); setTab("HF / SI"); setStatus(`SI channel topology saved: ${next.nodes.length} elements, ${next.edges.length} connections`); } setTopologyEditor(null); }} onStatus={setStatus} /> },
 { id: "layersOpen", title: "Layers & visibility", open: Boolean(layersOpen && !(assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1)), content: layersOpen && !(assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1) && <LayerManager definitions={boardData?.layerDefinitions ?? layerEntries.map((name, id) => ({ id, name, kind: name.endsWith(".Cu") ? "signal" : "user" }))} stackup={boardData?.stackup ?? []} layers={visibleLayers} opacity={layerOpacity} viaCount={boardData?.vias.length ?? 0} showNetNames={showNetNames} setShowNetNames={setShowNetNames} showVias={showVias} setShowVias={setShowVias} showOnlyVias={showOnlyVias} layerSeparation={layerSeparation} setLayerSeparation={setLayerSeparation} toggleLayer={toggleLayer} setLayersVisible={setLayersVisible} showOnlyLayer={showOnlyLayer} changeOpacity={changeLayerOpacity} beginOpacityChange={recordChange} restoreDefaults={restoreLayerDefaults} showModels={showModels} setShowModels={setShowModels} showSmdModels={showSmdModels} setShowSmdModels={setShowSmdModels} showThtModels={showThtModels} setShowThtModels={setShowThtModels} smdCount={componentMountCounts.smd} thtCount={componentMountCounts.tht} onClose={() => setLayersOpen(false)} /> },
 { id: "stackupOpen", title: "Physical stackup", open: Boolean(stackupOpen), content: stackupOpen && <EditableStackupManager stackup={boardData?.stackup ?? []} copperLayers={boardData?.layers ?? []} onSave={stackup => { recordChange(); setBoardData(current => current ? { ...current, stackup } : current); setCanonicalSpiDeR(current => applyStackupToSpiDeR(current, stackup)); setStatus("Project-local stackup updated; solver validity will be re-evaluated"); }} onClose={() => setStackupOpen(false)} /> },
-{ id: "flexBoardOpen", title: "Flex board manager", open: Boolean(flexBoardOpen), content: flexBoardOpen && <FlexBoardManager board={boardData} onClose={() => setFlexBoardOpen(false)} onStatus={setStatus} onShowLayers={layers => { setLayersVisible(layers, true); commandCamera("fit"); }} /> },
+{ id: "flexBoardOpen", title: "Flex board manager", open: Boolean(flexBoardOpen), content: flexBoardOpen && <FlexBoardManager board={boardData} onClose={() => setFlexBoardOpen(false)} onStatus={setStatus} onOpenFolding={()=>setSheetFoldingOpen(true)} onShowLayers={layers => { setLayersVisible(layers, true); commandCamera("fit"); }} /> },
+{ id: "sheetFoldingOpen", title: "Sheet and flex folding", open: sheetFoldingOpen, content: <SheetFoldingPanel board={boardData} onStatus={setStatus} onClose={()=>setSheetFoldingOpen(false)} /> },
 { id: "modelLibraryOpen", title: "Models & materials", open: Boolean(modelLibraryOpen), content: modelLibraryOpen && <ModelResolverPanel boards={resolverBoards} initialBoardId={modelResolverTarget.designId} initialComponentRef={modelResolverTarget.componentRef} assignedPaths={{ ...assemblyModelAssignments, [assemblyDesigns?.active_design_id ?? activeDesignId ?? "active"]: modelAssignments }} onApplied={applyResolvedComponentModel} onClose={() => { setModelLibraryOpen(false); setModelResolverTarget({}); }} /> },
 { id: "assemblyWorkspaceOpen", title: "Assembly workspace", open: Boolean(assemblyWorkspaceOpen), content: assemblyWorkspaceOpen && <EmbeddedAssemblyTool kind="workspace" snapshot={assemblyToolSnapshot} viewportData={assemblyWorkspaceViewportData} onAction={action => assemblyToolAction("workspace", action)} onClose={() => { setAssemblyWorkspaceOpen(false); setAssemblyToolDraftOwner(current => current === "workspace" ? null : current); }}/> },
 { id: "freecadCollaborationOpen", title: "ECAD / MCAD collaboration", open: Boolean(freecadCollaborationOpen), content: freecadCollaborationOpen && <div className="modal-shade"><section className="floating-panel" role="dialog" aria-modal="true" aria-label="ECAD–MCAD collaboration" style={{ width: "min(960px, calc(100vw - 32px))", maxHeight: "calc(100vh - 40px)", overflow: "auto" }}><header className="floating-panel-title"><strong>ECAD–MCAD collaboration</strong><button type="button" aria-label="Close ECAD–MCAD collaboration" onClick={() => setFreecadCollaborationOpen(false)}><X size={16}/></button></header><FreecadCollaboration projectPath={projectPath} manifestDigest={projectManifestDigest} disabled={!desktopShell || projectDirty || Boolean(assemblyToolDraftOwner)} onUpdated={async () => { if (projectPath) await loadNativeProjectFromApprovedPath(projectPath, projectName); }} onStatus={setStatus}/></section></div> },
@@ -5885,11 +6145,11 @@ export default function App() {
       setSavedThermalView(null); setTab("Thermal");
       setStatus("Showing retained single-board thermal field on its selected occurrence; no coupled solve was run.");
     }} entries={savedThermalInventory} initialId={savedThermalView.id} initialSection={savedThermalView.section} onClose={() => setSavedThermalView(null)} onSetup={() => { setSavedThermalView(null); setThermalOpen(true); }} /> },
-{ id: "thermalOpen", title: "Thermal setup", open: Boolean(thermalOpen), content: thermalOpen && <ThermalWizard onOpenSolidStudy={() => { setThermalOpen(false); setThermalPreview(null); setThermalStudyRequest(crypto.randomUUID()); openAssemblyWorkspace(); setStatus("Thermal volume study: retain component STEP solids, review materials and contacts, generate a volume mesh, then run the thermal field study."); }} assemblyBoards={virtualBoardProjection.visuals} onViewSavedResults={savedThermalInventory.length ? () => { setThermalOpen(false); setThermalPreview(null); setSavedThermalView({}); } : undefined} initialScenario={thermalScenario} componentBonds={componentBonds} board={boardData} design={designForSolver()} boardSource={boardFile.toLowerCase().endsWith(".kicad_pcb") ? boardSource : null} workerAvailable={workerAvailable} onRequireAdmission={requireAssemblyAdmission} onClose={() => { setThermalOpen(false); setThermalPreview(null); }} onStatus={setStatus} onPreview={setThermalPreview} onScenario={scenario => { recordChange(); setThermalScenario(current => ({ ...current, ...scenario })); setThermalPreview(current => ({ ...current, ...scenario })); }} /> },
+{ id: "thermalOpen", title: "Thermal setup", open: Boolean(thermalOpen), content: thermalOpen && <ThermalWizard key={thermalSearchId} onOpenSolidStudy={() => { setThermalOpen(false); setThermalPreview(null); setThermalStudyRequest(crypto.randomUUID()); openAssemblyWorkspace(); setStatus("Thermal volume study: retain component STEP solids, review materials and contacts, generate a volume mesh, then run the thermal field study."); }} assemblyBoards={virtualBoardProjection.visuals} onViewSavedResults={savedThermalInventory.length ? () => { setThermalOpen(false); setThermalPreview(null); setSavedThermalView({}); } : undefined} initialScenario={thermalScenario} componentBonds={componentBonds} board={boardData} design={designForSolver()} boardSource={boardFile.toLowerCase().endsWith(".kicad_pcb") ? boardSource : null} workerAvailable={workerAvailable} onRequireAdmission={requireAssemblyAdmission} onClose={() => { setThermalOpen(false); setThermalPreview(null); }} onStatus={setStatus} onPreview={setThermalPreview} onScenario={scenario => { recordChange(); setThermalScenario(current => ({ ...current, ...scenario })); setThermalPreview(current => ({ ...current, ...scenario })); }} /> },
 { id: "tracePlotsOpen", title: "Trace plots", open: Boolean(tracePlotsOpen), content: tracePlotsOpen && <div className="modal-shade"><div style={{ width: "min(1400px, 94vw)", height: "88vh", background: "#101c25", overflow: "auto" }}><TraceResultsWorkbench result={activeAnalysisResult} domain={resultVisualizerDomain} targetNet={activePdnReview?.net} targetOhm={activePdnReview?.target_ohm}
       onClose={() => setTracePlotsOpen(false)} onDetach={() => void detachTool("trace-plots")} /></div></div> },
 { id: "resultVisualizerOpen", title: "Result visualization", open: Boolean(resultVisualizerOpen), content: resultVisualizerOpen && <ResultVisualizationPanel onTracePlots={() => setTracePlotsOpen(true)} onDetach={() => void detachTool("results")} domain={resultVisualizerDomain} board={boardData} selectedNet={selected?.net ?? piSetup.net ?? null} result={activeAnalysisResult} sourceResult={displayedResult ?? analysisResult} visualization={resultVisualization} workerAvailable={workerAvailable} parasiticsAvailable={solverSupports("partial_inductance", "frequency_dependent_impedance")} riskAvailable={solverSupports("coupled_line_extraction", "electric_field_coupling", "magnetic_field_coupling")} pdnReview={activePdnReview} pdnReviewSourceId={pdnReviewSourceId} dropLimitMv={Number.isFinite(Number(limits.drop)) && Number(limits.drop) > 0 ? Number(limits.drop) : null} densityLimitAMm2={Number.isFinite(Number(limits.density)) && Number(limits.density) > 0 ? Number(limits.density) : null} coupledAssembly={assemblyIr && (assemblyIr.boards.length > 1 || (assemblyIr.extensions as Record<string, unknown> | undefined)?.["spike.multiboard-studies"]) ? assemblyIr : null} projectManifestDigest={projectManifestDigest} onVisualization={setResultVisualization} onConfigure={() => { setResultVisualizerOpen(false); setDcRunOpen(true); }} onRunParasitics={runParasitics} onRunRisk={runSiRisk} onRunPdn={(target, candidate) => void runPdnReview(target, candidate)} onExportAnimation={exportResultAnimation} onClose={() => setResultVisualizerOpen(false)} /> },
-{ id: "sparameterOpen", title: "S-parameter workspace", open: sparameterOpen, content: (sparameterOpen || sparameterActivated) && <div hidden={!sparameterOpen}><SParameterWorkbench assemblyDesigns={assemblyDesigns} canonicalDesign={canonicalSpiDeR} suite={selectedSiSuite} initialResult={siChannelResult} initialView={siWorkbenchIntent.view} initialFocus={siWorkbenchIntent.focus} intentToken={siWorkbenchIntent.token} onClose={() => setSparameterOpen(false)} onStatus={setStatus} onResult={result => { recordChange(); setSiChannelResult(result); }} /></div> },
+{ id: "sparameterOpen", title: "S-parameter workspace", open: sparameterOpen, content: (sparameterOpen || sparameterActivated) && <div hidden={!sparameterOpen}><SParameterWorkbench searchDraft={siSearchRequest?.version===workspaceIntentVersion?siSearchRequest.draft:undefined} assemblyDesigns={assemblyDesigns} canonicalDesign={canonicalSpiDeR} suite={selectedSiSuite} initialResult={siChannelResult} initialView={siWorkbenchIntent.view} initialFocus={siWorkbenchIntent.focus} intentToken={siWorkbenchIntent.token} onClose={() => setSparameterOpen(false)} onStatus={setStatus} onResult={result => { recordChange(); setSiChannelResult(result); }} /></div> },
 { id: "emiDashboardOpen", title: "EM results", open: Boolean(emiDashboardOpen && tab === "EM" && !emiChamberOpen), content: emiDashboardOpen && tab === "EM" && !emiChamberOpen && <EmiDashboard preflight={emiPreflight} screening={emiScreening} fieldResult={emiFieldResult} onClose={() => setEmiDashboardOpen(false)} onScreen={() => void runEmiScreening()} onPrepare={() => void prepareEmiCase()} onSolverManager={() => void openExternalEngineCenter()} /> },
 { id: "acEffectsOpen", title: "AC power integrity", open: Boolean(acEffectsOpen), content: acEffectsOpen && <div className="modal-backdrop"><div className="floating-panel" role="dialog" aria-modal="true" aria-label="AC power integrity effects" style={{ width: "min(1100px, 95vw)", maxHeight: "90vh", overflow: "auto" }}><button className="secondary-btn" onClick={() => setAcEffectsOpen(false)}>Close AC effects</button><button className="secondary-btn" disabled={!acEffectsResult} onClick={async () => { if (!acEffectsResult) return; const { buildAcPowerIntegrityReport } = await import("./acPowerIntegrityReport"); setReportPreview({ fileName: "ac-power-integrity.html", html: buildAcPowerIntegrityReport(projectName, acEffectsRequest, acEffectsResult) }); }}>AC report</button><ACPowerIntegrityEffects callWorker={runLocalWorker} onStatus={setStatus} initialRequest={acEffectsRequest} initialResult={acEffectsResult} onResult={(result, request) => { markProjectDirty(); setAcEffectsRequest(request); setAcEffectsResult(result); }} /></div></div> },
 { id: "revisionComparison", title: "Revision comparison", open: Boolean(revisionComparison), content: revisionComparison && <RevisionComparisonDialog comparison={revisionComparison} onClose={() => setRevisionComparison(null)} /> },
@@ -5912,13 +6172,18 @@ export default function App() {
       canSaveProject={projectDirty && !universalRunning && !extensionWorkflowBusy && !emergeEmiBusy && !boardImport.progress?.busy && !assemblyToolDraftOwner}
       canCloseProject={!projectDirty && !universalRunning && !extensionWorkflowBusy && !emergeEmiBusy && !boardImport.progress?.busy && !assemblyToolDraftOwner && !spiceOpen && !pythonOpen && !harnessEditorOpen && !topologyEditor && !assistantChatOpen}
       onSave={() => saveProject()} onCloseProject={() => { if (projectDirtyRef.current || assemblyToolDraftOwnerRef.current || universalRunning || extensionWorkflowBusy || emergeEmiBusy || boardImport.progress?.busy) { setStatus("Save and close active work before updating."); return; } requestUnsavedAction("close the project for an update", performNewProject); }} /> },
+{id:"workspaceIntentOpen",title:"Workspace request assistant",open:workspaceIntentOpen,content:workspaceIntentDraft&&<WorkspaceIntentReviewPanel key={workspaceIntentDraft.revision} suggestion={workspaceIntentDraft.suggestion} context={workspaceIntentDraft.context} staleReason={workspaceIntentStale} onApply={applyWorkspaceIntent} onClose={()=>setWorkspaceIntentOpen(false)}/>},
+{ id: "piSearchSetupOpen", title: "PI setup assistant", open: piSearchSetupOpen, content: piSearchDraft && <PiSearchSetupPanel key={piSearchDraft.revision} canRun={workerAvailable} suggestion={piSearchDraft.suggestion} board={piSearchDraft.board} staleReason={boardData!==piSearchDraft.board || piAnalysisOccurrenceId!==piSearchDraft.occurrence ? "Board or occurrence changed. Search again before applying this draft." : searchBoardReason || (analysisRunning || viewportPiRun ? "Wait for the active analysis." : "")} onApply={applySearchPiSetup} onClose={()=>setPiSearchSetupOpen(false)}/> },
+{ id: "pdnSuiteOpen", title: "PDN / filter network", open: pdnSuiteOpen, content: <PdnNetworkPanel initial={piTopology.acPdnRequest} availableNets={Object.values(boardData?.nets ?? {})} groundNets={Object.values(boardData?.nets ?? {}).filter(net=>/^(gnd|agnd|dgnd|pgnd|vss|0)$/i.test(net))} onSave={request=>{setPiTopology(current=>({...current,acPdnRequest:request}));markProjectDirty();}} onClose={()=>setPdnSuiteOpen(false)}/> },
+{ id: "solverSuiteOpen", title: "Solver manager", open: solverSuiteOpen, content: <SolverSuitePanel runtimeSolvers={solverRegistry ?? []} runtimeProbed={solverRegistry !== null} onManageEngines={()=>void openExternalEngineCenter()} onClose={()=>setSolverSuiteOpen(false)} onOpenWorkflow={openSuiteWorkflow} initialQuery={solverSuiteQuery} key={solverSuiteQuery}/> },
+{ id: "nativeCfdOpen", title: "Native CFD cavity benchmark", open: nativeCfdOpen, content: <NativeCfdWorkbench workerAvailable={workerAvailable} onStatus={setStatus} /> },
 { id: "preferencesOpen", title: "Settings", open: Boolean(preferencesOpen), content: preferencesOpen && <UniversalSettingsModal settings={appSettings} onOpenUpdates={() => { setPreferencesOpen(false); setAppUpdateOpen(true); }} onClose={() => setPreferencesOpen(false)} onSave={next => { setAppSettings(next); saveAppSettings(next); setNavigationInertia(next.navigationInertia); setPreferencesOpen(false); setStatus("Application settings saved locally"); }} /> },
 { id: "iconGalleryOpen", title: "Icon gallery", open: Boolean(iconGalleryOpen), content: iconGalleryOpen && <IconGallery onClose={() => setIconGalleryOpen(false)} /> },
 { id: "helpOpen", title: "Help center", open: Boolean(helpOpen), content: helpOpen && <Suspense fallback={<div className="modal-shade" role="status">Loading help…</div>}><HelpCenter context={tab} diagnosticCode={helpDiagnosticCode} onClose={() => { setHelpOpen(false); setHelpDiagnosticCode(undefined); }} /></Suspense> },
 { id: "guideOpen", title: "Analysis guide", open: Boolean(guideOpen), content: guideOpen && <AnalysisGuide boardLoaded={Boolean(boardData)} resultAvailable={Boolean(analysisResult || resultRecords.length)} onNavigate={navigateAnalysisGuide} onClose={() => setGuideOpen(false)} /> },
 { id: "aboutOpen", title: "About SPIKE", open: Boolean(aboutOpen), content: aboutOpen && <AboutDialog onClose={() => setAboutOpen(false)} onOpenGuide={() => { setAboutOpen(false); setHelpOpen(true); }} onOpenValidation={() => { setAboutOpen(false); setBenchmarkOpen(true); }} /> },
 { id: "benchmarkOpen", title: "Solver verification", open: Boolean(benchmarkOpen), content: benchmarkOpen && <BenchmarkCenter onClose={() => setBenchmarkOpen(false)} onStatus={setStatus} /> },
-{ id: "spiceOpen", title: "Circuit workspace", open: Boolean(spiceOpen), content: spiceOpen && <SpiceWorkbench boardOccurrenceId={selectedBoardInstanceId ?? "active-board"} onBoardSelect={handleSelect} initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} /> },
+{ id: "spiceOpen", title: "Circuit workspace", open: Boolean(spiceOpen), content: spiceOpen && <SpiceWorkbench searchIntent={spiceSearchIntent?.version===workspaceIntentVersion?spiceSearchIntent:undefined} boardOccurrenceId={selectedBoardInstanceId ?? "active-board"} onBoardSelect={handleSelect} initialEngine={solverSelections.owned_circuit_workspace === "spike.owned_spice_workspace" ? "owned_spice" : "native_mna"} design={designForSolver()} board={boardData} selection={selected} workspace={spiceWorkspace} setWorkspace={next => { markProjectDirty(); setSpiceWorkspace(next); }} analysisResult={analysisResult} onRequireAdmission={requireAssemblyAdmission} onClose={() => setSpiceOpen(false)} onStatus={setStatus} onResult={result => { setAnalysisResult(result); setPdnReview(null); setPdnReviewSourceId(null); setResultRecords(current => boundedResultRecords([...current.filter(record => record.id !== result.analysis_id), resultRecord(result, current.length)])); setResultDisplay(result.analysis_id); setResultVisualization(current => ({ ...current, visible: true, mode: resultModeAvailable(result, "voltage") ? "voltage" : "geometry" })); setDock("Console"); }} /> },
 { id: "assemblyEmOpen", title: "Assembly EM study", open: Boolean(assemblyEmOpen), content: assemblyEmOpen&&<AssemblyEmWorkbench key={projectGeneration.current} study={assemblyEmWorkspace} projectPath={projectPath} manifestDigest={projectManifestDigest} onStudy={next=>{setAssemblyEmWorkspace(next);markProjectDirty();}} onActivate={()=>{setAssemblyEmActiveScope(assemblyEmScope);setResultDisplay(`assembly-em-${assemblyEmWorkspace?.result?.run_id}`);setTab("EM");setViewMode("3D");setEmiChamberOpen(false);setEmResultManagerOpen(true);setCameraCommand(`fit-${Date.now()}`);setEmViewportSettings(current=>({...current,visible:true,frequencyIndex:0,quantity:"volume_e",style:"samples",component:"norm",projection:"magnitude",selectedSample:0}));}} onClose={()=>setAssemblyEmOpen(false)}/> },
 { id: "engineeringReviewOpen", title: "Engineering review", open: engineeringReviewOpen, content: <EngineeringReview key={projectGeneration.current} open={engineeringReviewOpen} context={pythonContext} workspace={engineeringReviewWorkspace} onWorkspaceChange={next => { setEngineeringReviewWorkspace(next); markProjectDirty(); }} onClose={() => setEngineeringReviewOpen(false)} /> },
 { id: "pythonOpen", title: "Python workspace", open: Boolean(pythonOpen), content: pythonOpen && <Suspense fallback={<div className="modal-shade" role="status">Loading Python editor…</div>}><PythonWorkspace onShowViewport={showScriptViewport} initialScript={contextScriptDraft ?? undefined} workspace={pythonContext} onUiAction={handlePythonUiAction} onAttachDataset={attachStudyDataset} design={pythonContext.boards.find(board => board.id === pythonContext.selected_board_id)?.design ?? designForExchange()} results={extensionResultsContext(activeAnalysisResult)} onClose={() => { setPythonOpen(false); setContextScriptDraft(null); }} onStatus={setStatus} /></Suspense> },
@@ -6018,6 +6283,8 @@ export default function App() {
       { id: "navigator", label: "Design navigator", run: () => setLeftOpen(true) },
       { id: "studies", label: "Studies & saved runs", run: () => setStudyNavigatorOpen(true) },
       { id: "inspector", label: "Analysis & selection", run: () => setRightOpen(true) },
+      { id: "solver-suite", label: "Solver manager", icon: Boxes, run: () => {setSolverSuiteQuery("");setSolverSuiteOpen(true);} },
+      { id: "native-cfd", label: "Native CFD cavity benchmark", icon: Wind, run: () => {setTab("Thermal");setNativeCfdOpen(true);} },
       ...dockTabs.map(target => ({ id: "dock:" + target, label: target, run: () => { setDock(target); setBottomOpen(true); } })),
     ] },
     { id: "hide-panels", label: "Hide all panels", run: () => setFocusTool(null) },
@@ -6027,20 +6294,23 @@ export default function App() {
   const focusGroup = (label: string) => focusOriginal(label)?.children ?? [];
   const focusExtra = (id: string) => focusCommandInventory.find(command => command.id === id)!;
   const focusCommands: FocusCommand[] = [
-    { id: "focus-project", label: "Project", children: [...focusGroup("File"), focusOriginal("Edit"), ...focusGroup("Project")] },
-    { id: "focus-design", label: "Design & view", children: [...focusGroup("View"), focusExtra("viewport-tools"), focusExtra("workspace-panels")] },
-    { id: "focus-analyze", label: "Analyze", children: [...focusGroup("Analysis"), focusExtra("workspaces")] },
-    { id: "focus-results", label: "Results & reports", children: [...focusGroup("Reports"), focusExtra("result-tools")] },
-    { id: "focus-tools", label: "Tools", children: [...focusGroup("Tools"), focusOriginal("Extensions"), focusExtra("open-panels"), focusExtra("windows-tools")] },
-    { id: "focus-help", label: "Help", children: focusGroup("Help") },
+    { id: "focus-project", label: "Project", icon: FolderOpen, children: [...focusGroup("File"), focusOriginal("Edit"), ...focusGroup("Project")] },
+    { id: "focus-design", label: "Design & view", icon: CircuitBoard, children: [...focusGroup("View"), focusExtra("viewport-tools"), focusExtra("workspace-panels")] },
+    { id: "focus-analyze", label: "Analyze", icon: Activity, children: [...focusGroup("Analysis"), focusExtra("workspaces")] },
+    { id: "focus-results", label: "Results & reports", icon: BarChart3, children: [...focusGroup("Reports"), focusExtra("result-tools")] },
+    { id: "focus-tools", label: "Tools", icon: Settings2, children: [...focusGroup("Tools"), focusOriginal("Extensions"), focusExtra("open-panels"), focusExtra("windows-tools")] },
+    { id: "focus-help", label: "Help", icon: CircleHelp, children: focusGroup("Help") },
     focusExtra("hide-panels"),
   ];
   const focusMenuSections: Record<string, string> = { File: "focus-project", Edit: focusOriginal("Edit").id, View: "focus-design", Analysis: "focus-analyze", Reports: "focus-results", Project: "focus-project", Tools: "focus-tools", Extensions: focusOriginal("Extensions").id, Help: "focus-help" };
 
-  return <div className={`app-shell board-first focus-shell ${dockMaximized ? "dock-maximized" : ""} ${bottomOpen ? "bottom-open" : "bottom-closed"} ${appSettings.ribbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} style={shellStyle}>
-    <SchematicHost open={schematicOpen} snapshot={{ document: schematicView, linked: schematicLinked, boardName: schematicBinding?.boardName ?? "", selected: schematicSelected, busy: schematicBusy, status: schematicStatus }} onAction={handleSchematicAction} onError={error => { setStatus(`Schematic viewer: ${error}`); setSchematicOpen(false); }} />
-    <header className="topbar"><button type="button" id="focus-menu-toggle" className="focus-menu-toggle spike-control--compact" aria-expanded={menu !== null} aria-controls="focus-command-panel" onClick={() => setMenu(menu === null ? "Menu" : null)}><PanelLeft size={15} /> Menu</button><div className="brand-mark"><b>SPIKE</b></div><button className="project-path" onClick={() => setProjectManagerOpen(true)} title={`Open project manager: ${projectName}`}><span>Project</span><b>{projectName}</b><ChevronDown size={15} /></button><div className="top-actions">{!appSettings.ribbonVisible && workspaceSwitcher}<button className={`icon-btn universal-search-trigger ${globalSearchOpen ? "active" : ""}`} title="Universal search (Ctrl+K)" aria-label="Open universal search" aria-keyshortcuts="Control+K Meta+K" aria-expanded={globalSearchOpen} onClick={() => { setMenu(null); setGlobalSearchOpen(true); }}><Search size={17} /><span>Search</span><kbd>Ctrl K</kbd></button><ViewportNotifications {...notificationProps} mode="button" /><button className="icon-btn" title="Help and user guide" onClick={() => setHelpOpen(true)}><CircleHelp size={17} /></button><button className="avatar" title={appSettings.profile.displayName} onClick={() => setPreferencesOpen(true)}>{appSettings.profile.initials}</button></div></header>
+  const commandMenuOpen = menu !== null && !(appSettings.interfaceMode === "classic" && Object.prototype.hasOwnProperty.call(focusMenuSections, menu));
 
+  return <div className={`app-shell board-first focus-shell interface-${appSettings.interfaceMode} ${dockMaximized ? "dock-maximized" : ""} ${bottomOpen ? "bottom-open" : "bottom-closed"} ${appSettings.ribbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} data-interface-mode={appSettings.interfaceMode} style={shellStyle}>
+    <SchematicHost open={schematicOpen} snapshot={{ document: schematicView, linked: schematicLinked, boardName: schematicBinding?.boardName ?? "", selected: schematicSelected, busy: schematicBusy, status: schematicStatus }} onAction={handleSchematicAction} onError={error => { setStatus(`Schematic viewer: ${error}`); setSchematicOpen(false); }} />
+    <header className="topbar"><button type="button" id="focus-menu-toggle" className="focus-menu-toggle spike-control--compact" aria-expanded={menu !== null} aria-controls="focus-command-panel" onClick={() => {if(commandPanelDetached && focusFloatingPanel("command-menu"))return;setMenu(menu === null ? "Menu" : null);}}><PanelLeft size={15} /> Menu</button><div className="brand-mark"><b>SPIKE</b></div><button className="project-path" onClick={() => setProjectManagerOpen(true)} title={`Open project manager: ${projectName}`}><span>Project</span><b>{projectName}</b><ChevronDown size={15} /></button><div className="top-actions"><label className="interface-mode-control" title="Switch interface layout without changing project or solver inputs"><PanelTop size={14}/><select aria-label="Interface layout" value={appSettings.interfaceMode} onChange={event=>setInterfaceMode(event.target.value as AppSettings["interfaceMode"])}><option value="clean">Clean</option><option value="classic">Classic</option></select></label>{workspaceSwitcher}<button className={`icon-btn universal-search-trigger ${globalSearchOpen ? "active" : ""}`} title="Universal search (Ctrl+K)" aria-label="Open universal search" aria-keyshortcuts="Control+K Meta+K" aria-expanded={globalSearchOpen} onClick={() => { setMenu(null); setGlobalSearchOpen(true); }}><Search size={17} /><span>Search</span><kbd>Ctrl K</kbd></button><ViewportNotifications {...notificationProps} mode="button" /><button className="icon-btn" title="Help and user guide" onClick={() => setHelpOpen(true)}><CircleHelp size={17} /></button><button className="avatar" title={appSettings.profile.displayName} onClick={() => setPreferencesOpen(true)}>{appSettings.profile.initials}</button></div></header>
+
+    {appSettings.interfaceMode==="classic"&&<><MenuBar open={menu!==null} onClose={()=>setMenu(null)}>{applicationMenus}</MenuBar><nav className="classic-workspace-tabs" aria-label="Workspaces">{tabs.map(item=><button type="button" key={item.name} aria-pressed={tab===item.name} onClick={()=>selectWorkspace(item.name)}><item.icon size={14}/><span>{item.name}</span></button>)}</nav></>}
     <>
 
       {appSettings.ribbonVisible && <CommandStrip id="workspace-ribbon-tools" label="Ribbon" className={`ribbon-tools ribbon-${tab.toLowerCase().replace(/[^a-z]+/g, "-")}`} trailing={<div className="workspace-ribbon-tools">{workspaceSwitcher}        <div className={`ribbon-status ${workerAvailable ? "" : "preview"}`}><span className="status-dot" /> {workerHealth === "ready" ? "Desktop worker ready" : workerHealth === "starting" ? "Checking desktop worker" : workerHealth === "degraded" ? "Desktop worker unavailable" : "Preview only - desktop worker required"}<small>spike/v1</small></div></div>}>
@@ -6083,12 +6353,14 @@ export default function App() {
 
 
     <ProjectLoadPanel state={projectLoad.state} onCancel={() => void cancelProjectLoad()} onDismiss={projectLoad.dismiss} />
-    <main className={`workspace focus-workspace ${menu !== null || activeFocusPanel(focusPanels, focusTool) ? "focus-panel-open" : "focus-panel-closed"}`}>
+    <main className={`workspace focus-workspace ${(!commandMenuOpen || commandPanelDetached) && activeFocusPanel(focusPanels, focusTool) ? "focus-panel-open" : "focus-panel-closed"}`}>
 
 
 
       <section className="canvas-area">
-        <CommandStrip className="canvas-toolbar" label="Viewport"><div className="view-toggle"><button type="button" aria-pressed={viewMode === "2D"} className={viewMode === "2D" ? "selected" : ""} onClick={() => { setViewMode("2D"); setNavigationMode("pan"); }}>2D</button><button type="button" aria-pressed={viewMode === "3D"} className={viewMode === "3D" ? "selected" : ""} onClick={() => setViewMode("3D")}>3D</button></div><button type="button" className="plain-btn" onClick={() => openBoardManager("layers")}><Layers3 size={14} /> Layers</button><button type="button" className="plain-btn" onClick={() => commandCamera("fit")}><Focus size={14} /> Fit</button><span className="canvas-spacer"/><button type="button" className="plain-btn" onClick={() => setMenu("Viewport tools")}><SlidersHorizontal size={14} /> View</button></CommandStrip>
+        {workspaceRequestNotice?.version===workspaceIntentVersion&&<aside className="workspace-request-notice" aria-label="Applied workspace request"><div><strong>{workspaceRequestNotice.text}</strong><p>{workspaceRequestNotice.details}</p></div><button type="button" aria-label="Dismiss request summary" onClick={()=>setWorkspaceRequestNotice(null)}><X size={14}/></button></aside>}
+
+        <CommandStrip className="canvas-toolbar" label="Viewport"><div className="view-toggle"><button type="button" aria-pressed={viewMode === "2D"} className={viewMode === "2D" ? "selected" : ""} onClick={() => { setViewMode("2D"); setNavigationMode("pan"); }}><CircuitBoard size={14}/> 2D</button><button type="button" aria-pressed={viewMode === "3D"} className={viewMode === "3D" ? "selected" : ""} onClick={() => setViewMode("3D")}><Box size={14}/> 3D</button></div><label className="viewport-selection-filter" title="Choose what a viewport click selects"><MousePointer2 size={14}/><span className="sr-only">Selection filter</span><select aria-label="Selection filter" value={selectionFilter} onChange={event=>changeSelectionFilter(event.target.value as "all"|"part"|"net")}><option value="all">Select all</option><option value="part">Parts</option><option value="net">Nets</option></select></label><ViewportQuickTools groups={viewportContextGroups} context={{workspace:tab,kind:clickedObject?.type,hasNet:smartContext.hasNet,hasResult:smartContext.resultScoped,hasBoard:Boolean(boardData),busy:universalRunning}} selectionLabel={clickedObject?.net ?? clickedObject?.ref ?? clickedObject?.name ?? (boardData?tab:"No design")} summary={smartContext.summary} onError={setStatus}/><button type="button" className="plain-btn" onClick={() => setMenu("Viewport tools")}><SlidersHorizontal size={14} /> View</button></CommandStrip>
 
         {(tab === "Mesh" || tab === "Solve") && <SimulationWorkspace
           tab={tab} domain={simulationDomain}
@@ -6168,8 +6440,13 @@ export default function App() {
             assemblySection={assemblySection}
             navigationMode={navigationMode}
             navigationInertia={navigationInertia}
+            showWorldGrid={appSettings.viewportGrid}
+            viewportBackground={appSettings.viewportBackground}
             showAxes={showAxes}
             selectionBlink={appSettings.selectionBlink}
+            renderingQuality={appSettings.renderQuality}
+            antialiasing={appSettings.antialiasing}
+            maximumFps={appSettings.maximumFps}
             cameraCommand={cameraCommand}
             viewportRestore={viewportRestore}
             selectionFilter={selectionFilter}
@@ -6272,8 +6549,8 @@ export default function App() {
 
 
 
-      {menu !== null && <FocusCommandPanel commands={focusCommands} initialSection={menu === "Menu" ? null : focusMenuSections[menu ?? ""] ?? menu} onClose={() => setMenu(null)} onError={setStatus} />}
-      <Suspense fallback={<div className="focus-panel-loading" role="status">Loading tool...</div>}><FocusToolDeck panels={focusPanels} activeId={focusTool} commandsOpen={menu !== null} onActivate={setFocusTool} /></Suspense>
+      {commandMenuOpen && <FloatingPanel id="command-menu" title="Menu" active={!commandPanelDetached} onDetached={()=>setCommandPanelDetached(true)} onDocked={()=>setCommandPanelDetached(false)} onError={setStatus}><FocusCommandPanel commands={focusCommands} initialSection={menu === "Menu" ? null : focusMenuSections[menu ?? ""] ?? menu} onClose={() => {setCommandPanelDetached(false);setMenu(null);}} onError={setStatus} /></FloatingPanel>}
+      <Suspense fallback={<div className="focus-panel-loading" role="status">Loading tool...</div>}><FocusToolDeck panels={focusPanels} activeId={focusTool} commandsOpen={commandMenuOpen && !commandPanelDetached} onActivate={setFocusTool} /></Suspense>
 </main>
 
 
@@ -6331,7 +6608,6 @@ export default function App() {
     </Suspense>
 
 
-    {assemblyCloseBlocked && <DesktopCloseDraftDialog owner={assemblyCloseBlocked} onCancel={() => setAssemblyCloseBlocked(null)} onReview={() => focusAssemblyToolWindow(assemblyCloseBlocked)} />}
     {unsavedPrompt && <div className="modal-backdrop unsaved-project-backdrop" role="presentation">
       <section className="modal unsaved-project-dialog" role="alertdialog" aria-modal="true" aria-labelledby="unsaved-project-title" aria-describedby="unsaved-project-description">
         <header><div><small>UNSAVED PROJECT</small><h2 id="unsaved-project-title">Save changes before you {unsavedPrompt.actionLabel}?</h2></div><AlertTriangle size={22} /></header>
@@ -6367,7 +6643,7 @@ export default function App() {
 
 
 
-    <UniversalSearch open={globalSearchOpen} items={universalSearchItems} onClose={() => setGlobalSearchOpen(false)} />
+    <UniversalSearch open={globalSearchOpen} items={universalSearchItems} suggestCommands={suggestSentenceCommands} commands={focusCommandInventory} searchDocuments={() => [document, ...floatingPanelDocuments()]} onRevealPanel={id => { if (id === "command-menu") setMenu("Menu"); else {setMenu(null);setFocusTool(id);} }} onClose={() => setGlobalSearchOpen(false)} />
 
 
     {viewportContext && <ViewportActionMenu x={viewportContext.clientX} y={viewportContext.clientY} title={viewportContext.object?.name ?? "Viewport"} summary={smartContext.summary} groups={viewportContextGroups} onClose={() => setViewportContext(null)} />}
@@ -8193,6 +8469,22 @@ function PiRunDialog({ quickRun = false, onQuickComplete, onPublishResult, board
     <summary aria-label={label}><Network size={14} /><span>{value || "Select a net"}</span><ChevronDown size={14} /></summary>
     <div className="analysis-net-options" role="listbox" aria-label={label}>{choices.map(net => <button type="button" role="option" aria-selected={net === value} className={net === value ? "selected" : ""} key={net} onMouseEnter={() => previewViewportTarget({ kind: "net", net, label: net })} onClick={event => { onNet(net); previewViewportTarget(null); const details = event.currentTarget.closest("details"); if (details) details.open = false; }}><Network size={12} /><span>{net}</span></button>)}</div>
   </details>;
+  const applyComponentPinLoads = (allocation: PiComponentLoadSelection, jobId?: string) => {
+    if (!board || busy) return;
+    const job=jobId?setup.batchJobs.find(row=>row.id===jobId):undefined;
+    const net=loadNetFor(job);
+    const pads=eligibleComponentSupplyPads(board,allocation.componentRef,net);
+    if(allocation.pins.some(pin=>!pads.some(pad=>pad.id===pin.padId)||!Number.isFinite(pin.currentA)||pin.currentA<0)){onResult("Component load pins changed. Review the selected rail again.");return;}
+    const eligibleIds=new Set(pads.map(pad=>pad.id));
+    setSetup(current=>{
+      const target=jobId?current.batchJobs.find(row=>row.id===jobId):current;
+      if(!target)return current;
+      const existing=target.loads.filter(row=>!eligibleIds.has(row.anchorId));
+      const added=allocation.pins.map((pin,index)=>{const pad=pads.find(row=>row.id===pin.padId)!;const previous=target.loads.find(row=>row.anchorId===pad.id);return {...terminal("load",index),...previous,...padPlacement(pad),id:previous?.id ?? `pin-load-${crypto.randomUUID()}`,name:`${allocation.componentRef}.${pad.name}`,value:String(pin.currentA),profile:"constant" as const};});
+      const loads=[...existing,...added];
+      return jobId?{...current,batchJobs:current.batchJobs.map(row=>row.id===jobId?{...row,loads}:row)}:{...current,loads,returnPath:current.returnPath.mode==="implicit"?current.returnPath:{...current.returnPath,loads:[]}};
+    });onResult(`${allocation.componentRef}: ${allocation.totalCurrentA} A assigned across ${allocation.pins.length} rail pads (${allocation.policy}). Edit any pad current in the terminal table; review explicit return pairs again.`);
+  };
   const terminalRows = (kind: "sources" | "loads", unit: string, job?: BatchNetJob) => <div className="terminal-list">
     <PiSiTerminalEditor key={`${job?.id ?? "single"}-${kind}`} rows={job?.[kind] ?? setup[kind]}
       label={`${kind === "sources" ? "Voltage sources" : "Current sinks"} · ${kind === "sources" ? sourceNetFor(job) : loadNetFor(job)}`}
@@ -8372,7 +8664,7 @@ function PiRunDialog({ quickRun = false, onQuickComplete, onPublishResult, board
       </div>
       {transientRunControls}
       <div className="wizard-section solve-only"><label>VOLTAGE SOURCES</label>{terminalRows("sources", "Voltage (V)")}</div>
-      <div className="wizard-section solve-only"><label>CURRENT SINKS</label>{terminalRows("loads", "Current (A)")}</div>
+      <div className="wizard-section solve-only"><label>CURRENT SINKS</label>{terminalRows("loads", "Current (A)")}<details><summary>Distribute component load across supply pins</summary><PiComponentLoadPanel board={board} net={loadNetFor()} busy={busy} onApply={allocation=>applyComponentPinLoads(allocation)}/></details></div>
       <details className="wizard-section pi-engineering-assistant"><summary>SWITCHING CONVERTER LOSS BLOCK</summary>
         {retainedOccurrenceId ? <SmpsConverterPanel workerAvailable={workerAvailable} components={smpsComponents}
           initialRequest={setup.smpsConverter.request} initialResult={setup.smpsConverter.result}
@@ -8416,7 +8708,7 @@ function PiRunDialog({ quickRun = false, onQuickComplete, onPublishResult, board
         {activeBatchJob && activeBatchJob.mode !== "skip" && <div className="batch-job-editor">
           <div className="batch-job-heading"><div><b>{activeBatchJob.net}</b><span>{activeBatchJob.mode.toUpperCase()} job configuration</span></div><span className={`job-mode ${activeBatchJob.mode}`}>{activeBatchJob.mode}</span></div>
           <div className="wizard-section"><label>VOLTAGE SOURCES</label>{terminalRows("sources", "Voltage (V)", activeBatchJob)}</div>
-          <div className="wizard-section"><label>CURRENT SINKS</label>{terminalRows("loads", "Current (A)", activeBatchJob)}</div>
+          <div className="wizard-section"><label>CURRENT SINKS</label>{terminalRows("loads", "Current (A)", activeBatchJob)}<details><summary>Distribute component load across supply pins</summary><PiComponentLoadPanel board={board} net={loadNetFor(activeBatchJob)} busy={busy} onApply={allocation=>applyComponentPinLoads(allocation,activeBatchJob.id)}/></details></div>
           {activeBatchJob.mode === "ac" && <>
             <div className="wizard-section"><label>FREQUENCY SWEEP</label><div className="sweep-grid"><label>Start (Hz)<input value={setup.frequencyStart} onChange={event => setSetup(current => ({ ...current, frequencyStart: event.target.value }))} /></label><label>Stop (Hz)<input value={setup.frequencyStop} onChange={event => setSetup(current => ({ ...current, frequencyStop: event.target.value }))} /></label><label>Points<input value={setup.frequencyPoints} onChange={event => setSetup(current => ({ ...current, frequencyPoints: event.target.value }))} /></label></div></div>
             <div className="wizard-section"><label>NEIGHBOUR COUPLING</label><div className="coupling-header"><label><input type="checkbox" checked={activeBatchJob.coupling.enabled} onChange={event => updateCoupling(activeBatchJob, { enabled: event.target.checked })} /> Analyse interference from nearby conductors</label><span>{activeBatchJob.coupling.enabled ? "CAPABILITY REQUIRED" : "OFF"}</span></div>{activeBatchJob.coupling.enabled && <div className="coupling-grid"><label><input type="checkbox" checked={activeBatchJob.coupling.electricField} onChange={event => updateCoupling(activeBatchJob, { electricField: event.target.checked })} /> Electric-field coupling</label><label><input type="checkbox" checked={activeBatchJob.coupling.magneticField} onChange={event => updateCoupling(activeBatchJob, { magneticField: event.target.checked })} /> Magnetic-field coupling</label><label><input type="checkbox" checked={activeBatchJob.coupling.crossLayer} onChange={event => updateCoupling(activeBatchJob, { crossLayer: event.target.checked })} /> Include other layers</label><label>Neighbour scope<select value={activeBatchJob.coupling.scope} onChange={event => updateCoupling(activeBatchJob, { scope: event.target.value as CouplingScope })}><option value="adjacent">Geometrically adjacent</option><option value="radius">Search radius</option><option value="all_board">Entire board</option></select></label>{activeBatchJob.coupling.scope === "radius" && <label>Radius (mm)<input value={activeBatchJob.coupling.radiusMm} onChange={event => updateCoupling(activeBatchJob, { radiusMm: event.target.value })} /></label>}<label><input type="checkbox" checked={activeBatchJob.coupling.includeTraces} onChange={event => updateCoupling(activeBatchJob, { includeTraces: event.target.checked })} /> Traces</label><label><input type="checkbox" checked={activeBatchJob.coupling.includePlanes} onChange={event => updateCoupling(activeBatchJob, { includePlanes: event.target.checked })} /> Planes</label><label><input type="checkbox" checked={activeBatchJob.coupling.includeZones} onChange={event => updateCoupling(activeBatchJob, { includeZones: event.target.checked })} /> Zones</label></div>}</div>

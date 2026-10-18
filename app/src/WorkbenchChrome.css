@@ -97,7 +97,7 @@
 .app-shell .dock-tabs .command-strip-viewport > button.selected { color: var(--spike-table-focus); border-bottom-color: var(--spike-table-focus); background: var(--spike-table-toolbar); }
 .app-shell .dock-tabs .dock-spacer { flex: 1 1 0; }
 .app-shell .dock-tabs .dock-notice-summary { flex: 0 1 240px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--spike-table-muted); font-size: 10px; }
-.app-shell .dock-tabs .resolve-setup-button { height: 26px; padding-inline: 8px; color: #ffd47d; }
+.app-shell .dock-tabs .resolve-setup-button { height: 26px; padding-inline: 8px; color: var(--spike-status-warning); }
 .app-shell .dock-tabs .board-import-status { height: 26px; padding-inline: 8px; color: var(--spike-table-text); }
 .app-shell .dock-tabs .viewport-quality-host { min-width: 0; flex: 0 1 auto; display: flex; }
 .app-shell .dock-tabs .view-quality { position: static; margin: 0; max-width: 240px; padding: 2px 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -175,7 +175,7 @@
 .app-shell .simulation-workspace > header { flex-wrap: wrap; }
 @container workbench-viewport (max-width: 600px) {
   .app-shell .simulation-workspace-grid { grid-template-columns: minmax(0, 1fr); }
-  .app-shell .simulation-workspace-grid article { border-right: 0; border-bottom: 1px solid #2d434d; }
+  .app-shell .simulation-workspace-grid article { border-right: 0; border-bottom: 1px solid var(--spike-table-border); }
 }
 
 
@@ -279,3 +279,61 @@
 .app-shell .workspace.studies-docked > .study-dock-host { grid-column: 2; grid-row: 1; }
 .app-shell .workspace.studies-docked > .canvas-area { grid-column: 3; grid-row: 1; }
 .app-shell .workspace.studies-docked > .side-panel.right { grid-column: 4; grid-row: 1; }
+
+/* Theme convergence for legacy shell surfaces that still live in styles.css. */
+.app-shell .universal-search-trigger,
+.app-shell .universal-search-dialog,
+.app-shell .notification-popover,
+.app-shell .resource-popover { color: var(--spike-table-text); background: var(--spike-table-surface); border-color: var(--spike-table-border-strong); }
+.app-shell .universal-search-shade { background: var(--spike-popup-backdrop); }
+.app-shell .universal-search-dialog,
+.app-shell .notification-popover,
+.app-shell .resource-popover { background:var(--spike-popup-surface);border-color:var(--spike-popup-border);border-radius:var(--spike-popup-radius);box-shadow: var(--spike-popup-shadow); }
+.app-shell .universal-search-trigger:hover,
+.app-shell .universal-search-trigger.active,
+.app-shell .universal-search-list > button.active,
+.app-shell .resource-summary:hover,
+.app-shell .resource-summary[aria-expanded="true"] { color: var(--spike-table-text-strong); background: var(--spike-table-row-focus); border-color: var(--spike-table-choice-border); }
+.app-shell .universal-search-input,
+.app-shell .universal-search-body > footer,
+.app-shell .universal-search-hints,
+.app-shell .notification-popover > div,
+.app-shell .resource-popover > div { color: var(--spike-table-muted); background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
+.app-shell .universal-search-input { color: var(--spike-table-choice); }
+.app-shell .universal-search-input input,
+.app-shell .universal-search-body > footer b,
+.app-shell .notification-popover article b,
+.app-shell .resource-popover b,
+.app-shell .resource-popover dd { color: var(--spike-table-text-strong); }
+.app-shell .universal-search-input input::placeholder,
+.app-shell .universal-search-list > button,
+.app-shell .universal-search-list > button small,
+.app-shell .universal-search-list > button em,
+.app-shell .universal-search-empty,
+.app-shell .notification-popover article small,
+.app-shell .notification-popover article em,
+.app-shell .notification-popover > p,
+.app-shell .resource-popover dt,
+.app-shell .resource-popover > div span { color: var(--spike-table-muted); }
+.app-shell .universal-search-input button:hover,
+.app-shell .search-field button:hover,
+.app-shell .universal-search-list > button.active svg:first-child,
+.app-shell .universal-search-body > footer span { color: var(--spike-table-choice); }
+.app-shell .universal-search-list > button.active { box-shadow: inset 2px 0 var(--spike-table-focus); }
+.app-shell .universal-search-input kbd,
+.app-shell .universal-search-hints kbd,
+.app-shell .resource-summary { color: var(--spike-table-muted); background: var(--spike-table-field); border-color: var(--spike-table-border); }
+.app-shell .universal-search-list > button,
+.app-shell .universal-search-body > footer,
+.app-shell .universal-search-hints,
+.app-shell .notification-popover article,
+.app-shell .resource-popover dt,
+.app-shell .resource-popover dd { border-color: var(--spike-table-border); }
+
+.app-shell .modal,
+.app-shell .floating-panel,
+.app-shell .preferences,
+.app-shell .extension-manager { color: var(--spike-table-text); background: var(--spike-table-surface); border-color: var(--spike-table-border-strong); }
+.app-shell :is(.modal, .preferences, .extension-manager) { border-radius:var(--spike-popup-radius);box-shadow:var(--spike-popup-shadow); }
+.app-shell :is(.modal, .floating-panel, .preferences, .extension-manager) :is(input, select, textarea) { color: var(--spike-table-text); background: var(--spike-table-field); border-color: var(--spike-table-border-strong); }
+.app-shell :is(.modal, .floating-panel, .preferences, .extension-manager) :is(input, select, textarea):focus-visible { outline-color: var(--spike-table-focus); }

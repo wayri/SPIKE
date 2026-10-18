@@ -44,4 +44,18 @@ assert.equal(validPdnNetworkResult({ ...result, ac: [{ frequency_hz: 1, impedanc
 const nonfinite = structuredClone(result); nonfinite.ac[0].impedance_ohm[0][0].real = NaN;
 assert.equal(validPdnNetworkResult(nonfinite), false, "nonfinite curves rejected");
 assert.equal(validPdnNetworkResult({ ...result, ac: [null] }), false);
+const multiple = JSON.parse(execFileSync(python, ["-c", "import json; from tests.python.test_pdn_multiload_contract import shared_return_request; from python.spike_core.pdn_network import evaluate_pdn_network; print(json.dumps(evaluate_pdn_network(shared_return_request()),allow_nan=False))"],
+  { cwd: root, encoding: "utf8" }));
+assert.equal(validPdnNetworkResult(multiple), true, "actual simultaneous-load result admitted");
+assert.deepEqual(multiple.load_transient.load_port_ids, ["A", "B"]);
+assert.deepEqual(multiple.load_transient.points.at(-1).load_current_a_by_port, { A: 1, B: 1 });
+for (const mutation of ["duplicate", "unknown", "missing_current", "nonfinite_current", "mixed_identity"]) {
+  const bad = structuredClone(multiple), transient = bad.load_transient;
+  if (mutation === "duplicate") transient.load_port_ids = ["A", "A"];
+  else if (mutation === "unknown") transient.load_port_ids = ["A", "elsewhere"];
+  else if (mutation === "missing_current") delete transient.points[0].load_current_a_by_port.B;
+  else if (mutation === "nonfinite_current") transient.points[0].load_current_a_by_port.B = NaN;
+  else transient.load_port_id = "A";
+  assert.equal(validPdnNetworkResult(bad), false, mutation);
+}
 console.log("PDN panel ground defaults, authoring/templates, stale-result guards and actual Python backend passed; no native visual qualification claimed.");

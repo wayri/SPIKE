@@ -195,13 +195,26 @@
   gap: 8px;
   padding: 5px 8px;
   color: var(--spike-table-text);
-  background: transparent;
-  border-color: transparent;
+  background: var(--spike-control-surface);
+  border: 1px solid var(--spike-control-border);
+  border-radius: var(--spike-control-radius);
+  margin-block: 3px;
   text-align: left;
   justify-content: flex-start;
 }
-.focus-command-row > span:first-of-type { flex: 1; text-align: left; overflow-wrap: anywhere; }
+.focus-command-label { flex: 1; text-align: left; overflow-wrap: anywhere; }
 .focus-command-row > svg { flex: none; width: 16px; height: 16px; }
+.focus-command-icon { flex: 0 0 18px; display: inline-flex; align-items: center; justify-content: center; color: var(--spike-table-edit); }
+.focus-command-icon svg { width: 16px; height: 16px; flex: none; }
+.focus-command-row[aria-haspopup="menu"] { border-color: var(--spike-table-border-strong); }
+.focus-command-submenu { margin-left: auto; color: var(--spike-table-muted); }
+.focus-command-row.focus-command-content { flex: 0 0 auto; flex-direction: column; align-items: stretch; gap: 5px; overflow: visible; background: var(--spike-control-field); }
+.focus-command-control-label { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--spike-table-muted); }
+.focus-command-control { min-width: 0; width: 100%; }
+.focus-command-control > select { width: 100%; }
+.focus-command-control :is(select,input,textarea) { border-color: var(--spike-control-border); }
+.focus-command-row[aria-checked="true"] { background: var(--spike-control-surface-active); border-color: var(--spike-control-primary-border); }
+
 .focus-command-row > small { color: var(--spike-table-muted); font-size: 11px; max-width: 45%; overflow-wrap: anywhere; }
 .focus-command-panel > label { padding: 8px; flex: none; }
 .focus-command-panel > label > input { width: 100%; font-size: 12px; }
@@ -280,7 +293,7 @@
   grid-template-areas: "viewport focus-tool";
 }
 .app-shell.focus-shell .workspace.focus-workspace.focus-panel-open {
-  grid-template-columns: minmax(0, 1fr) min(var(--focus-panel-width, 360px), 44vw);
+  grid-template-columns: minmax(0, 1fr) clamp(280px, var(--focus-panel-width, 360px), min(720px, 44vw));
 }
 .app-shell.focus-shell .workspace.focus-workspace.focus-panel-expanded {
   grid-template-columns: 0px minmax(0, 1fr);
@@ -293,12 +306,14 @@
 .focus-shell .brand-mark b { font-size: 14px; color: var(--spike-table-edit); font-weight: 500; }
 .focus-tool-deck { position: relative; display: flex; flex-direction: column; overflow: hidden; background: var(--spike-table-toolbar); border-left: 1px solid var(--spike-table-border); }
 .focus-tool-deck[hidden], .focus-tool-content[hidden] { display: none; }
-.focus-tool-heading { flex: none; display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--spike-table-border); }
-.focus-tool-heading h2 { flex: 1; min-width: 0; margin: 0; font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
-.focus-tool-heading button { display: inline-flex; align-items: center; gap: 4px; }
+.focus-tool-heading { box-sizing: border-box; flex: none; min-height: 38px; display: flex; align-items: center; gap: 4px; padding: 5px 7px; border-bottom: 1px solid var(--spike-table-border); }
+.focus-tool-heading h2 { flex: 1; min-width: 0; margin: 0; font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.focus-tool-heading button { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 28px; }
 .focus-tool-content { flex: 1; min-height: 0; min-width: 0; position: relative; overflow: auto; overscroll-behavior: contain; }
 .focus-tool-content :is(.modal-shade,.modal-backdrop,.modal-overlay,.thermal-setup-shade,.analysis-setup-dock-host) { position: static !important; inset: auto !important; transform: none !important; background: transparent !important; padding: 0 !important; width: 100% !important; height: auto !important; min-height: 0; max-height: none !important; display: block !important; pointer-events: auto; }
-.focus-tool-content :is(.floating-panel,.layer-manager,.model-library-panel,.settings-modal,.study-manager,.spice-workbench,.python-workspace,.result-visualization-panel,.pi-run-dialog,.assembly-tool-root,.study-navigator,.bottom-dock,.side-panel) { position: relative !important; inset: auto !important; transform: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; height: auto !important; max-height: none !important; box-shadow: none !important; }
+.focus-tool-content :is(.floating-panel,.layer-manager,.model-library-panel,.settings-modal,.study-manager,.spice-workbench,.python-workspace,.result-visualization-panel,.pi-run-dialog,.assembly-tool-root,.study-navigator,.bottom-dock,.side-panel) { position: relative !important; inset: auto !important; transform: none !important; box-sizing: border-box; width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-shadow: none !important; }
+.focus-tool-content > :is(.floating-panel,.layer-manager,.model-library-panel,.settings-modal,.study-manager,.spice-workbench,.python-workspace,.result-visualization-panel,.pi-run-dialog,.assembly-tool-root,.study-navigator,.bottom-dock,.side-panel),
+.focus-tool-content > :is(.modal-shade,.modal-backdrop,.modal-overlay,.thermal-setup-shade,.settings-shade,.help-shade) > :is(.floating-panel,.layer-manager,.model-library-panel,.settings-modal,.study-manager,.spice-workbench,.python-workspace,.result-visualization-panel,.pi-run-dialog,.assembly-tool-root,.study-navigator,.bottom-dock,.side-panel) { height: 100% !important; max-height: 100% !important; min-height: 0 !important; overflow: auto; }
 /* Modal shades are retained for focus and Escape handling; their dialog becomes deck content. */
 .focus-tool-content > :is(.modal-shade,.modal-backdrop,.modal-overlay,.settings-shade,.help-shade) {
   box-sizing: border-box;
@@ -382,14 +397,18 @@
 .focus-tool-content .pi-panel-resizer,
 .focus-tool-content .dock-resizer,
 .focus-tool-content .panel-resizer { display: none !important; }
-.focus-tool-content :is(input,select,textarea) { max-width: 100%; }
+.focus-tool-content :is(input,select,textarea) { box-sizing: border-box; max-width: 100%; min-width: 0; }
+.focus-tool-content :is(input,select,textarea):focus-visible { position: relative; z-index: 1; outline: 2px solid var(--spike-control-focus); outline-offset: 1px; }
+.focus-tool-content :is(label,fieldset,form) { min-width: 0; }
 .focus-tool-content .dock-panel-content { min-height: 0; }
 .focus-tool-content .bottom-dock { display: flex; min-height: 400px; }
 .focus-tool-content .probe-results-overlay { position: static; height: auto; }
 .focus-tool-content .workspace-dock-actions { flex-wrap: wrap; }
-.focus-panel-resizer { position: absolute; top: 0; left: 0; bottom: 0; width: 5px; min-width: 0; padding: 0; border-radius: 0; touch-action: none; cursor: ew-resize; }
+.focus-panel-resizer { position: absolute; z-index: 4; top: 50%; left: 0; width: 14px; min-width: 14px; height: 46px; min-height: 46px; display: grid; place-items: center; padding: 0; transform: translate(-50%,-50%); border: 1px solid var(--spike-table-border-strong); border-radius: 5px; color: var(--spike-table-muted); background: var(--spike-table-toolbar); box-shadow: var(--spike-popup-shadow); touch-action: none; cursor: ew-resize; }
+.focus-panel-resizer:hover { color: var(--spike-table-focus); border-color: var(--spike-table-focus); }
+.focus-panel-resizer:focus-visible { outline: 2px solid var(--spike-control-focus); outline-offset: 2px; }
 .focus-shell .canvas-area { grid-template-rows: 32px minmax(0, 1fr) auto !important; }
-.focus-shell .top-actions > :not(.universal-search-trigger) { display: none; }
+.focus-shell .top-actions > :not(.universal-search-trigger, .workspace-switcher, .interface-mode-control) { display: none; }
 .focus-shell .statusline, .focus-shell .workspace-statusline { min-width: 0; width: 100%; }
 .focus-shell .workspace-statusline > :is(.offline-status,.selection-layer,.viewport-quality-host,.status-export,.status-version) { display: none; }
 .focus-shell .brand-mark { max-width: 108px; }
@@ -405,3 +424,49 @@
 .focus-tool-content :is(.universal-settings,.help-center) { color: var(--spike-table-text); background: var(--spike-table-surface); border-color: var(--spike-table-border); }
 .focus-tool-content :is(.universal-settings,.help-center) > :is(header,footer) { background: var(--spike-table-toolbar); border-color: var(--spike-table-border); }
 .focus-tool-content .settings-layout > nav { background: var(--spike-table-surface); }
+
+/* Retained portal hosts occupy the existing slot while native frames stay independent. */
+.focus-tool-deck-host,.focus-floating-slot { min-width:0;min-height:0;height:100%;grid-area:focus-tool;position:relative; }
+.focus-tool-deck-host[hidden],.focus-floating-slot[hidden] { display:none; }
+.focus-floating-slot > div,.floating-panel-frame { height:100%;min-height:0; }
+.floating-panel-frame > .focus-command-panel { display:flex;max-width:none;height:100%; }
+.floating-panel-frame > .focus-tool-deck { height:100%; }
+.focus-floating-native .floating-panel-frame { width:100%;height:100%; }
+.focus-tool-heading,.focus-command-header { cursor:grab;user-select:none; }
+.focus-tool-heading h2,.focus-command-header strong { min-width:70px; }
+.panel-dragging { cursor:grabbing;outline:2px solid var(--spike-control-focus);outline-offset:-2px; }
+.focus-panel-scale select { max-width:68px;min-width:0;height:26px; }
+.floating-panel-notice { padding:6px;margin:0;color:var(--spike-table-danger-text); }
+.focus-tool-content { container-type:inline-size; }
+.focus-tool-content :is(input,select,textarea) { max-width:100%;min-width:0; }
+.focus-floating-native .result-visualizer > header button[aria-label="Close"] { display:none; }
+@container (max-width: 540px) {
+  .focus-tool-content .result-visualizer-body { grid-template-columns:minmax(0,1fr); }
+  .focus-tool-content .result-mode-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:230px;border-right:0;border-bottom:1px solid var(--spike-table-border); }
+  .focus-tool-content .result-mode-list button { min-width:0;min-height:44px;padding:5px 8px; }
+  .focus-tool-content .result-toolbar { gap:8px;padding:7px 8px; }
+  .focus-tool-content .result-toolbar label { flex-wrap:wrap; }
+}
+
+.focus-tool-deck-host { display:flex;flex-direction:column; }
+.focus-tool-deck-host > .focus-floating-slot { flex:1;min-height:0; }
+
+/* Short command flows remain soft popups; deep editors retain the reserved dock. */
+.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"] { position:absolute;inset:8px auto auto 8px;width:min(380px,calc(100% - 16px));height:min(640px,calc(100% - 16px));z-index:45;border:1px solid var(--spike-popup-border);border-radius:var(--spike-popup-radius);overflow:hidden;background:var(--spike-popup-surface);box-shadow:var(--spike-popup-shadow); }
+.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"] .focus-command-panel { border:0; }
+.focus-shell :is(.topbar,.canvas-toolbar,.focus-tool-heading,.focus-command-header) { user-select:none; }
+
+.focus-floating-native [data-spike-inner-dismiss="true"] { display:none !important; }
+
+.focus-tool-deck { container:tool-panel/inline-size; }
+@container tool-panel (max-width:460px) {
+  .focus-tool-heading { flex-wrap:nowrap;gap:4px;padding:6px; }
+  .focus-tool-heading h2 { min-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+  .focus-tool-heading button span { display:none; }
+  .focus-tool-heading button { min-width:26px;padding-inline:5px; }
+  .focus-panel-scale select { width:58px; }
+}
+.focus-tool-content [data-spike-duplicate-title="true"] { display:none; }
+
+/* The dock header already supplies Hide; keep embedded close controls out of form rows. */
+.focus-tool-content [data-spike-inner-dismiss="true"] { display:none !important; }

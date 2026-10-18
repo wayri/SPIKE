@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 .workspace-tool-minimized { display: none !important; }
-.tool-restore-shelf { min-width: 0; max-width: min(46vw, 560px); height: 28px; display: flex; align-items: center; gap: 3px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; border-inline: 1px solid #30454e; padding-inline: 4px; }
-.tool-restore-error { min-width: 80px; max-width: 180px; flex: 0 0 auto; overflow: hidden; color: #ff9b8f; font: 10px/1.2 system-ui, sans-serif; text-overflow: ellipsis; white-space: nowrap; }
-.tool-restore-item { min-width: 0; max-width: 190px; height: 24px; flex: 0 0 auto; display: flex; align-items: stretch; border: 1px solid #3b555f; border-radius: 3px; overflow: hidden; background: #162932; }
-.tool-restore-item button { min-width: 0; height: 22px !important; display: inline-flex !important; align-items: center; justify-content: center; border: 0 !important; border-radius: 0; padding: 0 5px !important; color: #c7d7dc !important; background: transparent !important; font: 10px/1.2 system-ui, sans-serif !important; }
+.tool-restore-shelf { min-width: 0; max-width: min(46vw, 560px); height: 28px; display: flex; align-items: center; gap: 3px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: thin; border-inline: 1px solid var(--spike-border-subtle); padding-inline: 4px; }
+.tool-restore-error { min-width: 80px; max-width: 180px; flex: 0 0 auto; overflow: hidden; color: var(--spike-status-error); font: 10px/1.2 system-ui, sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.tool-restore-item { min-width: 0; max-width: 190px; height: 24px; flex: 0 0 auto; display: flex; align-items: stretch; border: 1px solid var(--spike-border-default); border-radius: 3px; overflow: hidden; background: var(--spike-table-action-bg); }
+.tool-restore-item button { min-width: 0; height: 22px !important; display: inline-flex !important; align-items: center; justify-content: center; border: 0 !important; border-radius: 0; padding: 0 5px !important; color: var(--spike-text) !important; background: transparent !important; font: 10px/1.2 system-ui, sans-serif !important; }
 .tool-restore-button { max-width: 160px; gap: 4px; }
 .tool-restore-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tool-restore-item .tool-restore-close { width: 24px; flex: 0 0 24px; border-left: 1px solid #3b555f !important; color: #8fa5ad !important; padding: 0 !important; }
-.tool-restore-item button:hover, .tool-restore-item button:focus-visible { color: #ffe09c !important; background: #203b46 !important; }
+.tool-restore-item .tool-restore-close { width: 24px; flex: 0 0 24px; border-left: 1px solid var(--spike-border-default) !important; color: var(--spike-text-muted) !important; padding: 0 !important; }
+.tool-restore-item button:hover, .tool-restore-item button:focus-visible { color: var(--spike-accent-text) !important; background: var(--spike-surface-selected) !important; }
 @media (max-width: 760px) {
   .tool-restore-shelf { max-width: min(42vw, 260px); }
   .tool-restore-item { max-width: 112px; }

@@ -26,11 +26,10 @@ with refinement, so this gate is not a continuum error estimate.
 
 ## Evidence and reproduction
 
-The HTML report at `output/cfd-su2-20261011/comparison/index.html` includes
-unit-labeled velocity plots and interpretation. The full comparison at
-`output/cfd-su2-20261011/comparison/comparison.json` retains executable/input
-hashes, convergence and per-grid profiles. Both are local evidence and are not
-included in the release. Each grid
+The [HTML report](../../output/cfd-su2-20261011/comparison/index.html) includes
+unit-labeled velocity plots and interpretation. The
+[full comparison](../../output/cfd-su2-20261011/comparison/comparison.json)
+retains executable/input hashes, convergence and per-grid profiles. Each grid
 also has native and SU2 result JSON, and managed SU2 mesh/config/solution logs.
 The separate local runtime has download provenance under
 `artifacts/su2-runtime/provenance.json`; it is not a release payload.

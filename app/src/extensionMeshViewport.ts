@@ -1,6 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 import * as THREE from "three";
 export type ExtensionMesh = Record<string, unknown>;
+
+/** Select a bounded, deterministic subset while retaining both topology ends. */
+export function boundedMeshDisplayIndices(total: number, budget: number) {
+  const available = Number.isFinite(total) ? Math.max(0, Math.floor(total)) : 0;
+  const count = Number.isFinite(budget) ? Math.min(available, Math.max(0, Math.floor(budget))) : 0;
+  if (!count) return [];
+  if (count === 1) return [0];
+  const last = available - 1;
+  return Array.from({ length: count }, (_, slot) => Math.floor(slot * last / (count - 1)));
+}
+
 /** Mesh display is a bounded subset of returned topology, never solver input. */
 export function buildExtensionMeshScene(mesh: ExtensionMesh, transform: { centerX: number; centerY: number; scale: number; zOffsetMm: number }): THREE.Group {
   const group = new THREE.Group();
@@ -22,8 +33,7 @@ export function buildExtensionMeshScene(mesh: ExtensionMesh, transform: { center
         || nodes.some(node => !Array.isArray(node) || node.length !== 3 || !node.every(Number.isFinite) || !representable(node))
         || tets.some(cell => !Array.isArray(cell) || cell.length !== 4 || new Set(cell).size !== 4 || cell.some(id => !Number.isInteger(id) || id < 0 || id >= nodes.length))) return group;
     total = tets.length;
-    const stride = Math.max(1, Math.ceil(total/5000));
-    for (let i=0; i<tets.length; i+=stride) {
+    for (const i of boundedMeshDisplayIndices(total, 5000)) {
       const cell=tets[i];
       for (const [a,b] of [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]) vertices.push(...point(nodes[cell[a]]),...point(nodes[cell[b]]));
       shown++;

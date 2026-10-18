@@ -1,5 +1,23 @@
 # SPIKE documentation
 
+SPIKE is a PCB-focused multiphysics workbench, from board to complete assembly.
+Solver availability, coupling and validation remain workflow specific.
+
+[Product scope and assembly direction](PRODUCT_SCOPE.md) describes the intended
+end-to-end workflow and the roadmap toward larger coupled assemblies.
+
+[General multiphysics strategy](MULTIPHYSICS_PLATFORM_STRATEGY.md) compares public
+industry capabilities, identifies shared platform gaps and future domain
+directions, and keeps chemical engineering outside active scope. Read the
+[frontier research ledger](MULTIPHYSICS_RESEARCH_FRONTIER.md) and
+[required numerical evidence policy](NUMERICAL_METHOD_EVIDENCE.md) before adding
+physics, material laws, coupling, surrogates or acceleration.
+
+- [Interface layouts](INTERFACE_LAYOUTS.md): Clean and Classic controls.
+- [Command and panel access](COMMAND_ACCESS.md): flat action browsing, live search and editable docks.
+- [Sheet and flex folding](SHEET_FOLDING.md): bounded rectangular sheet import and finite-radius fold previews.
+- [Community and repository governance](COMMUNITY_SETUP.md): Discord setup and branch protection plan.
+
 [Solver improvement action plan](SOLVER_IMPROVEMENT_ACTION_PLAN.md): benchmark
 feedback, small-signal error tests, thermal/EM accuracy work, coupling validation,
 guided setup and performance milestones with explicit completion gates.

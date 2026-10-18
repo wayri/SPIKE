@@ -1,13 +1,29 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-# SPIKE HyperLynx parity and multiphysics development plan
+# SPIKE electronics parity, general physics and wave optics plan
 
-Planning baseline: 12 October 2026.
+Electronics planning baseline: 12 October 2026. General physics, visualization,
+materials, acceleration and wave-optics scope expansion: 14 October 2026.
 
-SPIKE should provide a complete electronics-analysis workflow: import a design,
+The [18 October platform strategy](MULTIPHYSICS_PLATFORM_STRATEGY.md) establishes
+general multiphysics simulation as the product direction, with simulation
+geometry preparation and external ECAD/MCAD inputs. It adds an industry/research
+comparison and recommended gaps beyond existing stages; chemistry remains
+outside active scope. Future numerical work follows the
+[referenced method evidence policy](NUMERICAL_METHOD_EVIDENCE.md). Recommendations
+do not open deferred gates or promote capabilities.
+
+SPIKE should provide a general multiphysics platform with a complete
+electronics-analysis workflow: import a design,
 verify signal and power delivery, predict cooling and electromagnetic behavior,
 couple those domains, and retain reproducible engineering evidence. The immediate
-priority is to qualify and connect existing foundations, then close the major
-SI, field-extraction and cooling gaps. Adding solver names or controls alone
+priority is to qualify shared geometry, material and field foundations, improve
+SI/field/cooling coverage and establish the original parity program first.
+On 18 October 2026 the user explicitly activated a parallel coupled mechanics,
+magnetics, failure and semiconductor-device track. Its bounded scope and stages
+are defined in [the coupled suite plan](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md).
+PI/SI remains the primary parity program; unrelated general physics and optics
+additions retain their post-parity gate.
+Adding solver names or controls alone
 does not achieve parity.
 
 HyperLynx parity covers its SI, PI, schematic analysis, analog mixed-signal,
@@ -52,7 +68,7 @@ but the full target is unmet; **experimental** preserves the current model
 status; **pending** means the inspected evidence does not establish that target.
 Priority P0 removes foundational blockers, P1 closes core board-analysis gaps,
 P2 extends system multiphysics and P3 adds broader specialist applications.
-Milestones M0–M6 are defined below. Their order expresses dependencies, not
+Milestones M0-M9 are defined below. Their order expresses dependencies, not
 promised dates. Multiple increments within one row will be needed.
 
 ## Signal integrity and interface verification
@@ -64,7 +80,7 @@ IBIS-AMI. Broader EM extraction is covered separately below.
 | ID | Target capability | SPIKE baseline and evidence | Required improvement | Priority and milestone |
 | --- | --- | --- | --- | --- |
 | SI01 | Pre-layout topology exploration and constraints | Partial: configurable RLGC/Touchstone endpoints and passives in [SI workflow](SI_WORKFLOW.md). | Reusable topology editor, corners, termination sweeps and export of reviewed layout constraints. | P1 M2 |
-| SI02 | General post-layout channel extraction | Experimental straight/pair and piecewise planar paths; bends omit discontinuity physics. [Geometry channel](GEOMETRY_DERIVED_SI_CHANNEL.md). | Branches, layer changes, return planes, arbitrary coupled conductors; geometry coverage report and converged extraction. | P0 M1, P1 M2 |
+| SI02 | General post-layout channel extraction | Experimental straight/pair and piecewise planar paths; bends omit discontinuity physics. [Geometry channel](GEOMETRY_DERIVED_SI_CHANNEL.md). | Branches, layer changes, return planes, explicit single-ended/differential/multiconductor PCB/coax/cable classes; frequency-dependent RLGC, distributed delay and reflections, geometry coverage and converged extraction. | P0 M1, P1 M2 |
 | SI03 | Vias, launches, connectors and package discontinuities | Bounded optional EM workflows; general board extraction is unqualified. [Solver status](SOLVER_STATUS.md). | Calibrated multiport submodels, explicit reference planes, de-embedding, package/board composition and stitched return paths. | P1 M4 |
 | SI04 | Nonlinear IBIS driver and receiver behavior | Inventory and explicit DC-slope/ramp reduction; nonlinear switching and AMI absent. [SI guide](SI_USER_GUIDE.md). | Qualified IBIS parser/model execution, clamps, V/T behavior, package parasitics, corners and model diagnostics. | P1 M2 |
 | SI05 | SerDes statistical analysis and IBIS-AMI | Deterministic loaded NRZ/PAM4 records and bounded clock recovery; no established AMI or rare-event BER capability. [Solver status](SOLVER_STATUS.md). | Bounded AMI execution, statistical/time-domain modes, CTLE/FFE/DFE, jitter/noise/CDR models and protocol-specific acceptance. | P1 M4 |
@@ -113,8 +129,8 @@ These suite-level scopes do not mean every application uses the same formulation
 | --- | --- | --- | --- | --- |
 | EM01 | Quasi-static R/L/C/G extraction | PEEC and bounded quasi-TEM cross sections; general convergent capacitance and proximity physics remain open. [Solver status](SOLVER_STATUS.md). | Independent electrostatic/magnetoquasistatic oracles, explicit material ranges, frequency validity and full conductor matrices. | P1 M2 |
 | EM02 | Hybrid planar full-board/package extraction | No qualified general hybrid extraction path established. | Segment planar regions and 3D discontinuities without losing return currents; validate interface continuity and multiport composition. | P1 M4 |
-| EM03 | Full-wave 3D multiport SI/PI/RF | Optional EMerge/openEMS execute bounded cases; native `spike.fullwave_3d` remains unavailable. [Solver status](SOLVER_STATUS.md). | Complete geometry/ports, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package fixtures. | P1 M4 |
-| EM04 | Antennas, near/far fields and scattering | Experimental fields/NF2FF and one-way physical optics; public MoM unavailable. [Retained EM](RETAINED_ASSEMBLY_EM.md), [mesh roadmap](ANALYSIS_AND_MESH_ROADMAP.md). | Power calibration, fed antenna matching, antenna/enclosure/cable interaction; complete and qualify MoM only when its use cases justify it. | P2 M4, P3 M6 |
+| EM03 | Full-wave 3D multiport SI/PI/RF | Optional EMerge/openEMS execute bounded cases; native `spike.fullwave_3d` remains unavailable. [Solver status](SOLVER_STATUS.md). | Complete geometry/RF ports and antenna feeds, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package/local RF fixtures; radio-system metrics require their separate RF01/RF02 evidence. | P1 M4 |
+| EM04 | Antennas, near/far fields and scattering | Experimental fields/NF2FF and one-way physical optics; public MoM unavailable. [Retained EM](RETAINED_ASSEMBLY_EM.md), [mesh roadmap](ANALYSIS_AND_MESH_ROADMAP.md). | Power calibration, fed antenna matching, antenna/enclosure/cable interaction; boundary-element/integral-equation radiation and scattering with surface discretization and no volumetric exterior air mesh, qualified near/far fields and accelerated solves. | P2 M4, P3 M6 |
 | EM05 | Conducted/radiated EMC and immunity | EMI screening and reference-profile metadata; regulatory pass/fail and signoff absent. [EMI workflow](EMI_WORKFLOW.md). | Cable/common-mode sources, LISN/receiver/fixture models, shielding/transfer paths, immunity excitation and licensed edition-specific limits with chamber correlation. | P2 M6 |
 | EM06 | Nonlinear magnetics, machines and actuators | Experimental planar FEM, stationary eddy currents and reduced motion/thermal models. [Machine studies](MAGNETIC_MACHINE_STUDIES.md). | 3D material-qualified magnetics, moving interfaces, hysteresis/core loss, drive-circuit feedback and force/torque/loss measurement. | P3 M6 |
 
@@ -152,7 +168,121 @@ extend its current neutral contracts rather than duplicate each domain's setup.
 | WF05 | Batch, optimization and scalable execution | Bounded independent local/remote worker jobs exist; no general single-solve MPI or AMD/Intel GPU claim. [Worker manager](PARALLEL_WORKER_MANAGER.md). | Workload-specific scheduling, checkpoint/recovery, reuse caches; profile before adding distributed kernels/GPU; validate each backend. | P1 M2, P2 M5 |
 | WF06 | Measurement correlation and release qualification | Analytical/reference records and recorded telemetry comparison exist; general physical parity is unqualified. [Co-simulation](COSIMULATION_DIGITAL_TWIN.md), [contributing](../CONTRIBUTING.md). | Version-bound qualification packs, calibrated measurements, separate calibration/validation sets, supported-envelope reports and human numerical release review. | P0 M0, all milestones |
 
+## General physics, optics and scale expansion
+
+The 34 requirements below retain expansion scope; the explicitly requested coupled subset may proceed in parallel. Complete the
+original 34-family parity program before refining and implementing these additions. Reuse
+existing EM/TH/WF owners and contracts; overlapping foundations are shared work,
+not duplicate solver stacks. Full requirements, screenshot mappings, benchmark
+sequence and limits are in [the general physics and wave-optics plan](GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md).
+
+| ID | Target capability | SPIKE baseline and evidence | Required improvement | Priority and milestone |
+| --- | --- | --- | --- | --- |
+| GP01 | General geometry and physical-domain studies | CAD-neutral AssemblyIR and explicit STEP handoffs are bounded foundations. [Evidence](CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md). | Admit non-PCB solids/surfaces/air/fluid/optical regions, scale and frames, sources/boundaries and constitutive requirements without interpreting CAD as solvable physics. | Authorized parallel track; P0 M1, M7 |
+| GP02 | General discretization and mesh qualification | Existing mesh and field handoff paths cover bounded domain cases. [Evidence](ANALYSIS_AND_MESH_ROADMAP.md). | Physics-specific FEM/FVM/FDTD/BEM and high-order/matrix-free feasibility; adaptive interfaces, skin depth, wavelength and boundary-layer resolution with quality/convergence evidence. | Authorized parallel track; P0 M1, M7 |
+| GP03 | General 3D electrostatics and magnetostatics | Bounded field/extraction methods exist; arbitrary 3D geometry/material qualification remains open. [Evidence](SOLVER_STATUS.md). | Stationary 3D coil/electrode/core/air studies, nonlinear law admission, flux/charge/energy and force consistency; reuse EM01/EM06 foundations. | Authorized parallel track; P1 M7 |
+| GP04 | 3D machines, transformers and induction systems | Experimental planar machines and stationary eddy currents do not establish converged 3D moving machines. [Evidence](MAGNETIC_MACHINE_STUDIES.md). | Real winding/core/air geometry, circuit excitation, nonlinear/hysteretic/laminated laws, moving interfaces, losses, torque and electrothermal feedback with measurement. | Authorized parallel track; P1 M7 |
+| GP05 | General interior and exterior fluid domains | Native/SU2/OpenFOAM paths have bounded experimental cases, not arbitrary building/assembly CFD. [Evidence](SOLVER_STATUS.md). | General fluid-domain generation, laminar/turbulent flow, natural/forced convection, exterior boundaries and CHT; conservative interfaces and independently refined/measurement-correlated cases. | Vehicle aerodynamics authorized now; other CFD post-parity; P1 M7 |
+| GP06 | General solid heat and radiative transport | Retained-volume conduction/radiation foundations have declared scope and remaining convergence gaps. [Evidence](THERMAL_RESEARCH_ROADMAP.md). | Non-PCB solids, temperature laws, contacts, enclosure/view-factor radiation and heat-source transfer; preserve TH01-TH05 gates for shared work. | Authorized parallel track; P1 M7 |
+| GP07 | Structural dynamics and thermomechanics | Experimental static isotropic P1 tetra elasticity and executed same-mesh thermal-to-stress coupling; broader assembly qualification remains open. [Evidence](SOLVER_STATUS.md). | Elasticity, contact, modes/vibration and deformation, temperature/force transfer and stress; fatigue/lifetime only with applicable calibrated laws. | Authorized parallel track; P2 M7 |
+| GP10 | Hall sensors and semiconductor magnetotransport | Existing 1D equilibrium TCAD has no biased transport or Hall response. [Scope](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md). | Compact field-driven Hall models, classical magnetic transport and later biased Poisson/carrier continuity, with contact, thermal and current/voltage validation. | Authorized parallel track; P1 M7 |
+| GP11 | Coupled failure and degradation scenarios | General mechanical failure/lifetime qualification is not established. [Scope](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md). | Conditioned screening limits, propagated fault events, later calibrated fatigue/fracture/degradation and mission-history models with uncertainty. | Authorized parallel track; P1 M7 |
+| GP12 | Vibration, random environments and shock response | Requested target; current bounded mechanics does not establish this workflow. [Plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md). | Modal/base/harmonic/transient dynamics, PSD and correlated multi-axis/support excitation, shock/SRS with spectral, damping, convergence and measured-fixture evidence. | Authorized parallel track; P1 M7 |
+| GP13 | PCB package and solder-joint mechanical reliability | Requested target; current bounded mechanics does not establish this workflow. [Plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md). | Revision-bound global/local board-package-joint stress, thermal mismatch and conditioned creep/plasticity/fatigue with calibrated life uncertainty and electrical failure-event transfer. | Authorized parallel track; P1 M7 |
+| GP14 | Multibody gears actuators and precision watch movements | Requested target; current bounded mechanics does not establish this workflow. [Plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md). | Constrained rigid/flexible assemblies, shafts/joints/gears, backlash/friction/contact, motors, springs and watch escapement/balance timing with work, contact and event convergence. | Authorized parallel track; P1 M7 |
+| GP15 | Complete drone code electrical propulsion and flight studies | Requested target; current bounded mechanics does not establish this workflow. [Plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md). | Actual executable-controller SITL, sensors/clocks, battery/ESC/motor back-EMF and propeller loads, 6-DOF aerodynamics, structural/thermal/fault feedback and measured mission/performance evidence. | Authorized parallel track; P1 M7 |
+| GP16 | Satellite and launch-vehicle coupled dynamics | Requested target; current bounded mechanics does not establish this workflow. [Plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md). | Mission-bound environmental/coupled loads, spacecraft thermal-vacuum/attitude/jitter/deployment and launcher ascent/staging/GNC/flexible dynamics with independent and measured evidence. | Authorized parallel track; P1 M7 |
+| GP08 | Acoustic wave and vibroacoustic studies | General acoustic/building/vibroacoustic qualification is not established. [Evidence](SOLVER_STATUS.md). | Pressure waves, sources/impedance/absorbing boundaries, structural coupling, modal/transient/harmonic observables and domain/mesh/time references. | Post-parity; P2 M7 |
+| GP09 | Conservative general multiphysics coupling | Bounded reduced/retained coupling and co-simulation exist; general PDE coupling remains open. [Evidence](COSIMULATION_DIGITAL_TWIN.md). | Shared dependency graph, conservative nonmatching transfers, nonlinear/time-scale coupling, rollback, conservation and coupled convergence; reuse WF04/TH05. | Authorized parallel track; P0 M1, P2 M7 |
+| OP01 | Geometrical optics and lens/mirror assemblies | General mirror/lens ray tracing is not established; far-zone scattering is a different scope. [Evidence](SOLVER_STATUS.md). | Parametric/aspheric surfaces, normals/frames, stops/detectors, reflection/refraction, sequential/nonsequential rays, optical path and controlled multiple reflections. | Post-parity; P1 M9 |
+| OP02 | Coherent scalar wave propagation and diffraction | General coherent mirror/lens diffraction workflow is not established. [Evidence](SOLVER_STATUS.md). | Bounded Gaussian/Fresnel/angular-spectrum propagation, apertures and amplitude/phase surfaces; explicit scalar/paraxial limits, sampling/window refinement and power/phase checks. | Post-parity; P1 M9 |
+| OP03 | Vector wave optics, modes and resonators | Existing RF/PEC scattering adapters do not qualify dielectric vector optical assemblies. [Evidence](SOLVER_STATUS.md). | Polarized vector Maxwell/beam-envelope problems, high-NA/wavelength-scale structures, waveguides/resonators, PML/interfaces and modal/scattering power convergence. | Post-parity; P2 M9 |
+| OP04 | Optical materials and coatings | No qualified general spectral coating/index catalog established. [Evidence](SOLVER_STATUS.md). | Conditioned complex index/absorption/dispersion and anisotropy; passive multilayer amplitude/phase response, Fresnel/TIR and coating reference checks. | Post-parity; P0 M1, P1 M9 |
+| OP05 | Structural-thermal-optical performance | General STOP and optical assembly correlation are not established. [Evidence](SOLVER_STATUS.md). | Absorption-to-heat, dn/dT, stress/deformed surfaces and alignment/tolerance; PSF/MTF/wavefront/error and coupled conservation with independent correlation. | Post-parity; P2 M9 |
+| VF01 | General scientific field visualization | Existing contours, field samples and domain viewers cover bounded result types. [Evidence](VISUALIZATION_ARCHITECTURE.md). | Typed scalar/vector/tensor node/cell/face/sample fields; slices, isosurfaces, volumes, glyphs and streamlines with units, masks, interpolation and raw-result binding. | Authorized parallel track; P0 M1, M7 |
+| VF02 | Time, phase, motion and linked scientific probes | Some time/phase/field viewers exist; a general synchronized scientific scene is not established. [Evidence](VISUALIZATION_ARCHITECTURE.md). | Declared complex/real/modal semantics, transient/rotor/deformation/ray/particle animation, linked probes/integrals, reproducible exports and rendering budgets. | Authorized parallel track; P1 M7, M9 |
+| AX01 | Scalable physics execution and algebra | Hybrid DC acceleration includes single-process PETSc/MUMPS and optional CUDA; general single-solve MPI is absent. [Evidence](ACCELERATION_ARCHITECTURE.md). | Workload-specific matrix-free/sparse/FFT kernels, compatible Krylov/block/AMG methods, CPU/GPU/MPI qualification, precision/error controls and measured RAM/VRAM/time budgets. | Authorized parallel track; P1 M8 |
+| AX02 | Large field storage, meshing and rendering | Independent worker jobs and scene resource management exist; general large-field streaming is not established. [Evidence](ACCELERATION_ARCHITECTURE.md). | Partitioned/chunked meshes and fields, checkpoints, out-of-core limits, cancellation/recovery and rendering/downsampling without changing authoritative results. | Post-parity; P1 M8 |
+| LB01 | Conditioned multiphysics material library | Domain-specific supplied laws exist; the WF02 shared conditioned catalog remains a target. [Evidence](SOLVER_STATUS.md). | One versioned scalar/tensor/surface law catalog with units, frames, ranges, uncertainty, interpolation, provenance/rights and compatibility checks across physics. | Authorized parallel track; P0 M1, M7, M9 |
+| LB02 | Reusable physical assembly and model library | Visual model discovery and explicit component-solid handoff do not establish physical model libraries. [Evidence](MCAD_EXPORT.md). | Typed parametric parts/assemblies, constitutive and compact models, ports/interfaces and detector/source assets; distinguish visuals/solids/laws/measurement and bind revisions/dependencies/rights. | Authorized parallel track; P0 M1, P1 M7, M9 |
+
+## Transmission lines, radio and HVDC scope
+
+Transmission-line and local RF extraction requirements stay active within the
+existing SI/EM parity rows. Radio-system simulation and utility-scale HVDC are
+additional post-parity targets. Their models, observables and acceptance levels
+are specified in [the transmission/RF/HVDC scope](TRANSMISSION_RF_HVDC_SCOPE.md).
+They do not change the original 34-family parity completion gate.
+
+| ID | Target capability | SPIKE baseline and evidence | Required improvement | Priority and milestone |
+| --- | --- | --- | --- | --- |
+| RF01 | Wideband and nonlinear radio-system simulation | RLGC/Touchstone and bounded circuit/EM paths do not establish a complete radio chain. [Evidence](SOLVER_STATUS.md). | Qualified RF device/noise models, carrier/envelope/passband applicability, harmonic/intermodulation and compression effects, modulation, phase/IQ errors, EVM/BER and receiver metrics. | Post-parity; M7-M8 domain stages |
+| RF02 | Antenna, array and radio-link system studies | Experimental antenna/field outputs do not establish calibrated radio-link or MIMO performance. [Evidence](SOLVER_STATUS.md). | Calibrated feeds/patterns, polarization/efficiency, arrays/MIMO, declared channel/propagation/interference models and link budgets with independent measurement and power accounting. | Post-parity; M7-M8 domain stages |
+| PW01 | Utility transmission-line and cable models | Bounded supplied/harness networks do not qualify overhead/underground/submarine power lines. [Evidence](HARNESS_ENGINEERING.md). | Frequency-dependent multiconductor phase-domain traveling waves, explicit DC behavior, conductor/earth returns, skin/proximity/dielectric losses, fitting/causality and delay/reflection references. | Post-parity; M7-M8 domain stages |
+| PW02 | HVDC converter stations and controls | Existing converter/PWM evidence does not establish LCC/VSC/MMC utility converters. [Evidence](SOURCED_POWER_QUALIFICATION.md). | Declared averaged/equivalent/switching LCC/VSC/MMC models, transformers/filters/reactors, submodule energy/balancing and compatible controls; independently verified power, stability and resolution-specific outputs. | Post-parity; M7-M8 domain stages |
+| PW03 | HVDC faults, switching and protection transients | Qualified utility faults, breaker/arrester/protection workflows are not established. [Evidence](SOLVER_STATUS.md). | DC/AC faults, surges, energization/restart, converter interaction and explicit protection models; traveling-wave/timestep refinement, interruption energy and measured/independent fault references. | Post-parity; M7-M8 domain stages |
+| PW04 | Large multi-terminal AC/DC networks | Bounded circuit/co-simulation foundations do not qualify network-scale HVDC studies. [Evidence](COSIMULATION_DIGITAL_TWIN.md). | AC/DC load flow, initialization, multi-terminal controls/stability/contingencies, EMT-phasor or reduced coupling with conservative synchronization, recovery and resource/scale evidence. | Post-parity; M7-M8 domain stages |
+| PW05 | Infrastructure thermal, grounding and insulation fields | General utility ampacity/grounding/insulation qualification is not established. [Evidence](SOLVER_STATUS.md). | Conditioned cable/conductor ampacity and heat, insulation electric fields, return/electrode potentials and local station coupling; applicable boundary/material/standard scope and independent evidence. | Post-parity; M7-M8 domain stages |
+
+## Active parity and deferred expansion
+
+The active execution phase is **parity**. Continue WF01-S04C and the original
+SI/PI/SA/AMS/EM/TH/WF roadmap. Shared geometry, materials, meshing and acceleration
+needed for those original requirements remain in scope. The user's 18 October
+request authorizes GP01/02/03/04/06/07/09/10/11, VF01/02, AX01 and LB01/02
+as a parallel coupled-physics track. The follow-up adds GP12-GP16 vibration,
+electronics reliability, mechanisms, drones and aerospace systems, plus GP05
+restricted to vehicle aerodynamics. See [the delivery matrix](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md).
+This permission does not mark these
+families complete or open the full post-parity gate. Remaining OP, general GP05 outside vehicle aerodynamics, GP08,
+AX02, RF and PW expansion stays deferred. The backlog checker enforces the
+precise exception and retains the full original-family completion gate.
+
 ## Development milestones and dependencies
+
+### Boundary-element radiation without an air-volume mesh
+
+EM04 explicitly includes a surface boundary-element / method-of-moments (BEM/MoM)
+solver for radiated fields and scattering in an admitted homogeneous exterior.
+The intended workflow discretizes conducting surfaces and material interfaces,
+solves their unknowns, and evaluates fields at requested observation points.
+It requires no volumetric exterior air mesh, enclosing air box or exterior PML
+for this formulation. "Meshless" means air-volume-mesh-free here: surface/wire
+discretization and convergence checks are still required. Observation grids used
+for slices and visualization are field-sampling grids, not solver air meshes.
+
+The official [COMSOL BEM interface description](https://doc.comsol.com/6.4/doc/com.comsol.help.rf/rf_ug_radio_frequency.07.091.html)
+documents boundary-only discretization for harmonic radiation/scattering and
+the dense-system cost. Its [RF interface overview](https://doc.comsol.com/6.4/doc/com.comsol.help.rf/rf_introduction.02.02.html)
+also describes a FEM interior with a BEM exterior. These establish comparator
+scope only; no vendor implementation or fixtures are adopted.
+
+| Increment | Planned output | Acceptance before Done |
+| --- | --- | --- |
+| EM04-S01: original PEC exterior reference | Frequency-domain surface-current solve for bounded conducting radiation/scattering, explicit incident fields or supported feeds, open-space Green function and observation probes. | Independently authored PEC sphere scattering and radiating-current references; surface/quadrature/solver refinement; complex field amplitude/phase, polarization, power balance and scattering observables; prove zero exterior volume cells and reject unsupported inputs. |
+| Feed and material expansion | Antenna ports, matching, radiated power, directivity/gain with declared loss model; impedance surfaces, thin-wire models and piecewise homogeneous dielectric interfaces as separately admitted cases. | Reference-port and power normalization, charge/current continuity, surface orientation, dielectric transmission and applicable loss/material ranges; actual independent full-wave and measured comparisons when available. |
+| Scalable and hybrid execution | Profile dense costs; evaluate fast multipole, hierarchical compression, iterative preconditioning and CPU/GPU execution. Couple local FEM volumes to an exterior BEM where needed. | Retained residual and observable error, measured RAM/VRAM/time, cancellation and identical-reference comparison; FEM/BEM interface continuity and power balance. No general speed or GPU claim from eliminating an air mesh. |
+
+Near-field E/H probes (including declared near-surface trace limits), far-field
+patterns, polarization, radiated power and RCS must retain frequency, units,
+phasor convention, incident/source normalization and surface-current ownership.
+EM04-S01 must set explicit reference tolerances and supported electrical sizes
+before implementation. Tests must discriminate formulation/internal-resonance
+failures, low-frequency conditioning, near-singular quadrature and underresolved
+edges/gaps; a small linear residual alone is insufficient evidence.
+
+Arbitrary inhomogeneous or nonlinear volumes are outside the initial pure-surface
+model. Use a separately qualified hybrid or volume formulation when required;
+its interior may need volume cells, while the homogeneous exterior remains
+air-volume-mesh-free. Transient BEM, general dielectric/optical scattering and
+infrastructure-scale scenes are separate later gates. Radiation fields derived
+from prescribed currents do not by themselves qualify a self-consistent fed
+antenna solve. Existing physical-optics/NF2FF results do not establish BEM parity.
+
+The bounded EM04 radiation work belongs to the original M4/M6 parity scope.
+General geometry/material, optical and large-scene expansion still follows the
+post-parity gate; the active WF01 stage is unchanged. No BEM runtime capability
+is enabled by this plan.
 
 Scope effort only after M0 establishes the detailed inventory and available
 engineering capacity. Full feature, accuracy and workflow parity is a sustained
@@ -162,13 +292,16 @@ reported separately.
 
 | Milestone | Deliverable and recommended owner | Dependencies | Exit evidence |
 | --- | --- | --- | --- |
-| M0 Baseline and acceptance | Product/validation owners: requirement inventory for all 34 rows; comparator versions/modules, model rights, supported envelopes and benchmark plans. Reconcile stale summaries with scoped validation records. | None; respect the existing [active queue](ACTIVE_ENGINEERING_QUEUE.md). | Every row has an accountable owner role, input/output contract, exact benchmark, proposed tolerance, reference availability and failure policy. Unknown comparator details remain open. |
+| M0 Baseline and acceptance | Product/validation owners: requirement inventory for the original 34 active parity rows; deferred scope notes retained for the other 34. Pin comparator versions/modules, model rights, supported envelopes and benchmark plans. Reconcile stale summaries with scoped validation records. | None; respect the existing [active queue](ACTIVE_ENGINEERING_QUEUE.md). | Every active parity row has an accountable owner role, input/output contract, exact benchmark, proposed tolerance, reference availability and failure policy. Detailed post-parity planning waits for parity establishment; unknown comparator details remain open. |
 | M1 Shared foundation and existing failures | Geometry, contracts and validation owners: canonical geometry/model coverage, job dependencies, loss ledger, conservative transfer contracts and reproducible convergence runner. | M0, existing SpiDeR/AssemblyIR/AnalysisSpec/AnalysisResult. | Geometry/unit/ownership checks and stale-result rejection pass; known thermal refinement and SI passivity failures are resolved or remain blocked with a bounded supported scope. |
 | M2 Core board SI and PI | SI/PI and UI owners: nonlinear IBIS increment, stronger channel/PDN extraction, network quality, DRC/schematic-analysis subsets, bounded AMS verification and topology/corner/batch flows and first correlated board pack. | M1; qualified extractors required for physical decap placement. | R/L/C/G and loaded electrical observables pass declared analytical, independent and measurement gates; DRC coverage explicit. No DDR/AMI claim yet. |
 | M3 Solid thermal and assembly cooling | Thermal/CFD and geometry owners: solid/package qualification, reliable fluid-domain compiler, contacts/radiosity, cooling workflow and measured assembly pack. | M1; explicit electrical loss inputs from M2 where needed. | Heat and mass balances, mesh/time refinement, independent solid/flow references and calibrated temperature/flow comparisons pass within the declared envelope. |
 | M4 High-speed interfaces and 3D EM | EM/SI owners: qualified discontinuity extraction, multiport composition, AMI and DDR interface workflows. Develop these as separate bounded increments. | M1/M2; EM03 qualification precedes geometry-derived full-wave link claims. | Two/four/N-port calibration, passivity/reciprocity/causality as applicable, port/PML convergence, interface timing and permitted protocol-model benchmarks pass. |
 | M5 Integrated cross-domain studies | Coupling/application owners: one study graph for electrical, EM, thermal and circuit feedback; sensitivity and constrained optimization. | Qualified subsets of M2/M3/M4, versioned transfer contracts. | Coupled fixed-point/time refinement, conservative transfers, event/rollback behavior, no duplicated losses, reproducible restart and end-to-end measured pack. |
 | M6 Broader system capability and release | EMC/magnetics/structures/release owners: cables/shielding/immunity, selected machine/structural routes and scalable distribution. | Relevant qualified M3–M5 paths; reference hardware and model rights. | Domain-specific qualification; numerical human review, offline/upgrade/uninstall and clean-machine release gates. Each added application gets its own envelope. |
+| M7 General 3D physics and scientific scenes | Geometry, field, material and domain owners: non-PCB admission, original dipole/coil visualization, stationary 3D fields and incremental machine/fluid/thermal/structural/acoustic cases. | The scoped coupled track is authorized now; remaining expansion requires established original M0-M6 parity. Reuse M1 contracts and domain foundations. | Domain-specific mesh/boundary/time references, correct field association/units and conservation; advanced moving/nonlinear cases remain separate gates. |
+| M8 Scalable compute and large datasets | Numerics/performance owners: profiled CPU/GPU/MPI kernels, matrix-free/preconditioned methods, field streaming and recovery. | Established original parity, then exact reference workloads from M7/M9. | Identical-model CPU equivalence, error/residual limits, RAM/VRAM/wall-time measurements and explicit backend failure/fallback; no universal speed claim. |
+| M9 Wave optics and optical assemblies | Optics/material owners: bounded coherent scalar propagation, ray/lens/mirror assemblies, vector optics and later STOP coupling. | Established original M0-M6 parity, completed shared contracts and optics references; subsequent work can progress alongside M7. | Gaussian/diffraction/Fresnel/power/phase oracles and sampling/mesh/PML convergence; coatings, high-NA and multiphysics have separate qualified envelopes. |
 
 Parallel work is economical after M1: thermal M3 and board SI/PI M2 can use the
 same geometry/provenance foundation with distinct physics owners. AMI and DDR
@@ -277,7 +410,7 @@ implementation still requires knowledgeable human review before release.
 
 Report supported requirement counts separately for functional, predictive and
 workflow parity, with denominators and exclusions. Do not invent a single
-percentage from these 34 broad rows. A benchmark dashboard should link exact
+percentage from these 68 broad rows. A benchmark dashboard should link exact
 engine/build/model/mesh identities, inputs, logs, results, uncertainty, reviewer
 and known failures. New evidence updates Solver status and capability flags only
 through the project's acceptance process.
@@ -285,14 +418,14 @@ through the project's acceptance process.
 ## First implementation batch
 
 Implementation tracking is now in [the versioned development backlog](parity-capability-backlog-v1.json).
-It covers all 34 rows without changing runtime capability flags. WF01 has its
+It covers all 68 rows without changing runtime capability flags. WF01 has its
 first bounded import-assurance increment: [an original KiCad coupon](../benchmarks/parity-import/README.md)
 passed real CLI execution and 24 geometry/reference assertions. The other
 benchmark definitions remain pending, so Start01 is not yet an acceptance-complete
 benchmark inventory. Check backlog coverage with `python scripts/check_parity_backlog.py`.
 
-Bounded implementation stages are tracked separately from the M0–M6 program
-milestones and the 34 overall capabilities. A stage is marked **Done** only
+Bounded implementation stages are tracked separately from the M0-M9 program
+milestones and the 68 overall capability families. A stage is marked **Done** only
 after its declared checks pass; neither M0 nor WF01 as a whole is complete.
 
 | Stage | Status | Acceptance evidence |
@@ -305,6 +438,33 @@ after its declared checks pass; neither M0 nor WF01 as a whole is complete.
 | WF01-S04B | Done | [Actual native ODB export](validation/parity/WF01-S04B.json): 14 CLI assertions, member/native geometry/topology/reference gates and 56 pad pose/shape cases. Initial failures and the original candidate remain historical evidence. |
 | WF01-S04C | In progress | Explicit package-model placement, solid geometry and material qualification; native composed KiCad placement and material evidence remain open. |
 | WF01-S04C1 | Done | [Explicit neutral STEP handoff](validation/parity/WF01-S04C1.json): three source-bound package occurrences, actual native solid counts/volumes/bounds and STEP round trips. Source KiCad transforms remain unapplied. |
+| WF01-S04C2 | Done | [Retained component admission gate](validation/parity/WF01-S04C2.json): actual native meshing, repeated occurrence identity, supplied conductivity/provenance transfer and saved-package/stale-source checks; synthetic material evidence only. |
+| WF01-S04C3 | Done | [Native STEP placement reference](validation/parity/WF01-S04C3.md): twelve front/back instances at 37/90 degrees, exact solid corners/bounds/volumes, copper datum and preserved exporter clearance; automatic placement/material qualification remain open. |
+| WF01-S04C4 | Done | [Placement review drafts](COMPONENT_PLACEMENT_REVIEW.md): eight native-reference-backed rigid proposals, exact baseline/source consistency and frame/stack guards; explicit review and handoff required, nonuniform scale rejected. |
+| WF01-S04C5 | Done | [Derived STEP scale assets](COMPONENT_STEP_SCALE.md): positive scale baked into geometry with source/derived digests, actual native/reimport witnesses, resource bounds and curved-conversion rejection; placement stays rigid. |
+| WF01-S04C6 | Done | [Scaled component review](SCALED_COMPONENT_REVIEW.md): four actual bake-then-rigid proposals match native STEP corners; snapshots, control budgets, cancellation and derived-registration requirements preserve source/project ownership. |
+| SI08-S01 | Done | [Explicit mixed-mode pairing](PI_SI_PARITY_EXECUTION.md): seven independent polarity, impedance, power and rejection checks; [source-bound execution](validation/parity/SI08-S01.json). |
+| PI04-S01 | Done | [Inductive-cutset transient consistency](PI_SI_PARITY_EXECUTION.md#pi04-s01-transient-consistency): eight independent waveform/energy/refinement checks; [source-bound execution](validation/parity/PI04-S01.json). |
+| PI04-S02 | Done | [Simultaneous supplied loads](PDN_SIMULTANEOUS_LOADS.md): eight asynchronous shared-return, energy, superposition and failure/worker checks; [source-bound execution](validation/parity/PI04-S02.json). Legacy single-load shapes preserved. |
+| PI02-S01 | Done | [Finite dielectric AC admittance](PDN_DIELECTRIC_AC.md): twelve actual complex-field, layered/multielectrode power, units and schema/worker checks; [source-bound execution](validation/parity/PI02-S01.json). Experimental finite-domain scope remains explicit. |
+| PI02-S02 | Done | [Passive sampled reduction](PDN_ADMITTANCE_REDUCTION.md): nine circuit, coupled/nonreciprocal power, ordering, rejection and actual extraction-to-worker checks; [source-bound execution](validation/parity/PI02-S02.json). No causal fitting or geometry qualification implied. |
+| PI02-S03 | Done | [Dielectric AC loss to temperature](PDN_DIELECTRIC_THERMAL.md): ten conservative heat, coherent-drive, temperature-refinement and actual worker checks; [source-bound execution](validation/parity/PI02-S03.json). One-way same-mesh multiphysics with no temperature feedback. |
+| PI02-S04 | Done | [Conductivity-temperature feedback](PDN_DIELECTRIC_FEEDBACK.md): nine independent coupled-reference, raw convergence, failure and worker/schema checks; [source-bound execution](validation/parity/PI02-S04.json). Other constitutive properties and transient stability remain separate. |
+| PI03-S01 | Done | [Supplied decap operating corners](PDN_DECAP_CORNERS.md): ten independent circuit, multiport, failure and worker/schema/example checks; [source-bound execution](validation/parity/PI03-S01.json). Automatic component laws, location extraction and BOM optimization remain open. |
+| PI03-S02 | Done | [BOM-constrained supplied decap selection](PDN_DECAP_SELECTION.md): ten independent circuit, site-effect, ranking, failure and worker/schema checks; [source-bound execution](validation/parity/PI03-S02.json). General placement extraction, catalog models and measured qualification remain open. |
+| SI08-S02 | Done | [Explicit two-port fixture removal](TWO_PORT_DEEMBEDDING.md): ten independent matched/reflective/directional, failure and worker/schema checks; [source-bound execution](validation/parity/SI08-S02.json). Calibration, uncertainty, arbitrary multiport removal and causality remain open. |
+| SI08-S03 | Done | [Explicit resampling and DC](SPARAMETER_RESAMPLING.md): nine independent affine/refinement/passivity, failure and worker/schema checks; [source-bound execution](validation/parity/SI08-S03.json). Causality, broader interpolation accuracy and passive causal fitting remain open. |
+| SI08-S04 | Done | [Supplied stable-pole rational models](SPARAMETER_RATIONAL_FIT.md): eleven independent coefficient/state, failure and worker/schema checks; [source-bound execution](validation/parity/SI08-S04.json). Automatic pole selection, general passive fitting and physical broadband validation remain open. |
+| SI07-S01 | Done | [Rational network transient execution](RATIONAL_NETWORK_TRANSIENT.md): eleven independent PWL/state, simultaneous-port, precision/failure and worker/schema checks; [source-bound execution](validation/parity/SI07-S01.json). General terminations, physical broadband accuracy and measured waveform validation remain open. |
+| SI07-S02 | Done | [Resistively terminated network transients](TERMINATED_NETWORK_TRANSIENT.md): eleven independent RC/divider, feedback/stability, failure and worker/schema checks; [source-bound execution](validation/parity/SI07-S02.json). Reactive/nonlinear boundaries and physical/measured waveform qualification remain open. |
+| SI07-S03 | Done | [Mixed resistive/series-inductive transients](INDUCTIVE_NETWORK_TRANSIENT.md): eleven independent RLC/coupled-port, energy, unit/reference, failure and worker/schema/example checks; [source-bound execution](validation/parity/SI07-S03.json). General capacitive/nonlinear/descriptor boundaries, thermal integration and measured qualification remain open. |
+| SI07-S04 | Done | [Mixed resistive/shunt-capacitive transients](CAPACITIVE_NETWORK_TRANSIENT.md): eleven independent RC/parallel-RLC, coupled two-capacitor, current-split, energy, failure and worker/schema/example checks; [source-bound execution](validation/parity/SI07-S04.json). Combined arbitrary RLC/descriptor/nonlinear boundaries, thermal execution and measured qualification remain open. |
+
+Current execution priority is the complete PI/SI stack (SI01–SI08, PI01–PI06).
+See the [ordered stack plan and numerical acceptance](PI_SI_PARITY_EXECUTION.md).
+Further placement work waits behind that priority; unfinished placement parents
+remain open. The explicitly scoped coupled-physics track remains authorized;
+other expansion retains its existing parity gate.
 
 The checker rejects a Done stage with stale fixture/manifest/runner bytes,
 failed or incomplete import evidence, or unfinished dependencies. These are
@@ -361,9 +521,84 @@ diagnostic; material IDs retain properties without promoting physics readiness.
 Original 2x3x4 mm solids have volume 24 mm3; three supplied placements are checked
 against analytical bounds and actual native STEP round trips. This does not
 apply the original KiCad model vectors or authenticate source URI contents.
-Native composed-placement export still times out in standalone and host probes;
-[the recorded attempts](validation/parity/WF01-S04C-progress.json) preserve the
-missing reference. S04C remains in progress.
+Earlier native composed-placement exports timed out in standalone and host probes.
+The [recorded attempts and current reference](validation/parity/WF01-S04C-progress.json)
+now include six successful native front/back VRML cases. Independent arithmetic
+checks rotation order and nonuniform scale below 2e-6 mm coordinate tolerance.
+The cause of the earlier timeouts remains unknown. STEP/general composition,
+native-to-SPIKE datum reconciliation and conditioned materials remain open;
+S04C stays in progress and source transforms remain unapplied.
+
+S04C1 verification: all 57 focused tests pass, including native STEP export and
+isolated extension dispatch. Architecture, source-bound backlog and five
+documentation checks pass. The full host suite ran 3770 tests with 69 skips,
+two debugger deadline failures and one native Gerber subprocess timeout. C1's
+tests pass in that run; these broader failures remain unresolved and recorded
+in the receipt. No test deadline or acceptance tolerance was weakened, and no
+zero-failure full-suite or release claim is made.
+
+Parity-first resumption: the existing component/material promotion path passes
+all seven checks, including actual retained STEP meshing in the admitted Python
+3.11/Gmsh runtime. Synthetic materials and geometry verify software admission,
+repeated occurrence placement and stale-source rejection. They do not qualify
+actual package material laws or native KiCad placement composition. The current
+audit and environment resolution are retained in
+[S04C progress](validation/parity/WF01-S04C-progress.json); S04C remains in progress.
+
+S04C2 turns the component admission audit into a reproducible, source-bound
+Done gate. Run `scripts/parity_component_admission_gate.py` with the admitted
+Python 3.11 runtime and new `--output` and `--log` paths. All seven tests must
+execute, including the native OCC case; skips, failures, incomplete coverage,
+changed sources or a changed execution log withhold Done. Actual component
+volumes, SI bounds and supplied conductivity/provenance transfer are checked.
+This verifies software admission using original synthetic fixtures. Conditioned
+package material laws and general source-model placement remain S04C requirements.
+
+S04C3 extends the native reference to actual STEP cuboids on both board sides
+at 90 and 37 degree footprint angles. All twelve instances match independent
+eight-corner, bounds and volume predictions; the maximum corner discrepancy is
+8.413e-12 mm. Explicit copper exports establish SPIKE depth as `1.565-nativeZ`
+for this stack, with negated native Y. Native STEP retains an observed 0.05 mm
+component clearance even with `--no-extra-pad-thickness`; the reference preserves
+that gap. The source-bound gate recomputes geometry and tests reject stale,
+incomplete, altered or falsely promoted evidence. See the
+[reproduction and limitations](validation/parity/WF01-S04C3.md). General solids,
+stackups/versions, automatic source projection and conditioned material evidence
+remain open; S04C stays In progress.
+
+S04C4 makes the unit-scale native reference usable as an inert Python placement
+review helper. Eight draft matrices match the retained actual STEP corners;
+source footprint origins avoid pad-centroid displacement. Conflicting component,
+model or retained-node declarations, unknown physical layers, wrong frame/units,
+stale baselines and unsupported geometry/version/scale reject. The helper retains
+the measured 0.05 mm clearance and proposes no contact/material law. The existing
+explicit STEP handoff accepts a separately reviewed matrix; partial model coverage
+remains diagnostic. See [ADR 0079](adr/0079-native-reference-placement-review-drafts.md)
+and the [source-bound receipt](validation/parity/WF01-S04C4.json). General automatic
+placement and conditioned material qualification remain open in S04C.
+
+S04C5 adds supervised positive STEP geometry scaling without scaling placement
+frames. Original polyhedral native probes pass six bakes and thirteen expected
+rejections. Three production-caller scale cases verify actual derived/reimported
+cube vertices, volume and bounds; the known cylinder conversion is rejected
+through the same caller. Determinant volume uses relative 1e-8 tolerance with
+no absolute floor. Conservative bounding-box padding is recorded separately
+from strict polyhedral vertex checks. Every asset retains original/derived
+digests, scale and native facts; source models are not overwritten. See
+[ADR 0080](adr/0080-derived-component-step-scale.md) and the
+[source-bound Done receipt](validation/parity/WF01-S04C5.json). General curved
+fidelity, automatic source placement and conditioned materials remain open.
+
+S04C6 connects nonuniform derived geometry to proper-rigid placement review.
+The four referenced front/back 37/90 degree cases match actual native STEP
+corners, with scale applied once in geometry and determinant +1 in each matrix.
+The original unit-scale workflow is re-executed after shared validation refactoring.
+Snapshot and post-job baseline checks reject in-flight source changes; control,
+asset and native-process budgets bound the operation. No original model binding
+or project mutation is produced: separate derived-model registration and explicit
+placement review remain required. See [ADR 0081](adr/0081-scaled-component-review-proposals.md)
+and the [source-bound receipt](validation/parity/WF01-S04C6.json). General geometry,
+stackups, automatic placement and conditioned material qualification remain open.
 
 S03 verification: 48 focused geometry tests passed (one optional FreeCAD check
 skipped in the sandbox), plus 20 backlog/corpus tests. The full host Python run
@@ -378,7 +613,7 @@ These tickets make M0/M1 concrete without claiming to implement every solver.
 
 | Ticket | Owned output | Dependency | Acceptance |
 | --- | --- | --- | --- |
-| Start01 | Versioned requirement/benchmark manifest expanding the 34 rows. | None. | Each requirement binds comparator scope, current evidence, owner, target, tolerance and blocked reason. |
+| Start01 | Versioned requirement/benchmark manifest for the 34 active parity rows; preserve the other 34 as deferred scope notes. | None. | Each requirement binds comparator scope, current evidence, owner, target, tolerance and blocked reason. |
 | Start02 | Geometry/material/model coverage audit for one DC board, one coupled SI coupon and one heated assembly. | Start01. | All source IDs, stackup, ports, contacts and omitted objects accounted for; unknown data blocks dependent calculations. |
 | Start03 | Replay and diagnose existing SI passivity and thermal refinement failures. | Exact retained inputs and admitted runtimes. | Independent cause evidence; fix passes old and discriminating cases, or the affected workflow remains blocked. |
 | Start04 | Reusable convergence/evidence runner extending current harnesses. | Start01/02. | Real executions retain mesh/time/sweep settings, quantities of interest, failures, uncertainty and resource costs. |

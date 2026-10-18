@@ -38,6 +38,10 @@ def handle_simulation_request(
     thermal_adapter_registry: Dict[str, Any] | None = None,
 ) -> Dict[str, Any] | None:
     """Handle model and simulation requests, or return ``None``."""
+    from .service_sparameter_processing import handle_sparameter_processing_request
+    network_response = handle_sparameter_processing_request(method, params)
+    if network_response is not None:
+        return network_response
     from .service_pdn_network import handle_pdn_network_request
     pdn_response = handle_pdn_network_request(method, params)
     if pdn_response is not None:

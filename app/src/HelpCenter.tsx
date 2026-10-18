@@ -5,6 +5,7 @@ import { APP_VERSION } from "./appVersion";
 import { helpTopics } from "./HelpTopics";
 import HelpMarkdown, { CopyCode } from "./HelpMarkdown";
 import { helpSlug, searchHelp, type HelpTopic } from "./helpModel";
+import { usePanelPresentation } from "./panelPresentation";
 import reference from "./helpReference.generated.json";
 import controls from "./helpControls.generated.json";
 import "./helpCenter.css";
@@ -21,6 +22,8 @@ const documents = import.meta.glob([
   "../../docs/SI_WORKFLOW.md", "../../docs/PI_PATH_ANALYSIS.md",
   "../../docs/EXTERNAL_ENGINE_INTEROPERABILITY.md", "../../docs/PROJECT_FORMAT.md",
   "../../docs/PYTHON_WORKSPACE.md",
+  "../../docs/SOLVER_MATHEMATICS.md", "../../docs/SOLVER_HANDBOOK.md",
+  "../../docs/SOLVER_REFERENCES.md", "../../docs/MESHING_ENGINE.md",
 ], { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
 const rootDocuments = import.meta.glob(["../../TROUBLESHOOTING.md", "../../QUICK_REFERENCE.md"], { eager: true, query: "?raw", import: "default" }) as Record<string, string>;
 function plain(node: ReactNode): string {
@@ -67,6 +70,7 @@ function makeTopics(): HelpTopic[] {
 }
 
 export default function HelpCenter({ onClose, diagnosticCode, context }: { onClose: () => void; diagnosticCode?: string; context?: string }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const topics = useMemo(makeTopics, []);
   const initial = diagnosticCode && topics.some(topic => topic.id === errorTopic(diagnosticCode)) ? errorTopic(diagnosticCode) : "home";
   const [history, setHistory] = useState([initial]), [position, setPosition] = useState(0);
@@ -99,8 +103,9 @@ export default function HelpCenter({ onClose, diagnosticCode, context }: { onClo
     scrollToAnchor(pendingAnchor.current); pendingAnchor.current = "";
     article.current?.focus({ preventScroll: true });
   }, [active]);
-  useEffect(() => { const previous = document.activeElement as HTMLElement | null; search.current?.focus(); return () => previous?.focus(); }, []);
+  useEffect(() => { const previous = ownerDocument?.activeElement as HTMLElement | null; search.current?.focus(); return () => { if (previous?.isConnected) previous.focus(); }; }, [ownerDocument]);
   useEffect(() => {
+    const doc = ownerDocument, view = ownerWindow; if (!doc || !view) return;
     const key = (event: KeyboardEvent) => {
       if (modal.current?.closest("[hidden]")) return;
       const embedded = Boolean(modal.current?.closest(".focus-tool-content"));
@@ -116,20 +121,20 @@ export default function HelpCenter({ onClose, diagnosticCode, context }: { onClo
         const scope = lightbox ? modal.current?.querySelector(".help-lightbox") : modal.current;
         const focusable = Array.from(scope?.querySelectorAll<HTMLElement>('button:not(:disabled), input, select, a[href], summary, [tabindex="0"]') ?? []).filter(element => element.getClientRects().length > 0);
         const first = focusable[0], last = focusable[focusable.length - 1];
-        if (event.shiftKey && (document.activeElement === first || !focusable.includes(document.activeElement as HTMLElement))) { event.preventDefault(); last?.focus(); }
-        else if (!event.shiftKey && (document.activeElement === last || !focusable.includes(document.activeElement as HTMLElement))) { event.preventDefault(); first?.focus(); }
+        if (event.shiftKey && (doc.activeElement === first || !focusable.includes(doc.activeElement as HTMLElement))) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && (doc.activeElement === last || !focusable.includes(doc.activeElement as HTMLElement))) { event.preventDefault(); first?.focus(); }
       }
     };
-    window.addEventListener("keydown", key, true); return () => window.removeEventListener("keydown", key, true);
-  }, [onClose, lightbox]);
+    view.addEventListener("keydown", key, true); return () => view.removeEventListener("keydown", key, true);
+  }, [ownerDocument, ownerWindow, onClose, lightbox]);
   const hasTopic = (id: string) => topics.some(topic => topic.id === id);
   const setSearch = (value: string) => { if (value.startsWith("help:")) { const [id, anchor = ""] = value.slice(5).split("#"); if (hasTopic(id)) { navigate(id, anchor); setQuery(""); return; } } setQuery(value); };
   return <div className="modal-shade help-shade" role="dialog" aria-modal="true" aria-label="SPIKE help and user guide"><section ref={modal} className="help-center help-browser">
     <header><div><BookOpen size={22} /><span><b>SPIKE Help</b><small>Offline guide · v{APP_VERSION}{context ? ` · ${context} workspace` : ""}</small></span></div><div className="help-header-actions"><button onClick={() => navigate("doc:docs/WORKBENCH_HANDBOOK.md")}>Workbench handbook</button><button className="canvas-icon" aria-label="Close help" onClick={onClose}><X size={18} /></button></div></header>
     <div className="help-layout"><aside className="help-sidebar"><label className="help-search"><Search size={17} /><input ref={search} aria-label="Search all help" value={query} onChange={event => setSearch(event.target.value)} placeholder="Search topics, buttons, errors…" /></label><select aria-label="Help category" value={category} onChange={event => setCategory(event.target.value)}>{categories.map(name => <option key={name}>{name}</option>)}</select><div className="help-result-count" role="status">{filtered.length} articles{query ? ` matching “${query}”` : ""}</div><nav aria-label="Help articles">{filtered.slice(0, limit).map(topic => <button key={topic.id} aria-current={active === topic.id ? "page" : undefined} className={active === topic.id ? "active" : ""} onClick={() => navigate(topic.id)}><small>{topic.category}</small><span>{topic.title}</span>{query && <em>{topic.text.slice(Math.max(0, topic.text.toLowerCase().indexOf(query.toLowerCase()) - 35), Math.max(0, topic.text.toLowerCase().indexOf(query.toLowerCase()) - 35) + 145)}</em>}</button>)}{!filtered.length && <p className="help-empty">No matching articles. Try fewer words or select All. Unknown codes require their original diagnostic record.</p>}{filtered.length > limit && <button onClick={() => setLimit(limit + 80)}>Show more articles ({filtered.length - limit} remaining)</button>}</nav></aside>
-    <div className="help-reading"><div className="help-toolbar"><button aria-label="Back in help" disabled={position === 0} onClick={() => setPosition(position - 1)}><ArrowLeft size={16} /></button><button aria-label="Forward in help" disabled={position === history.length - 1} onClick={() => setPosition(position + 1)}><ArrowRight size={16} /></button><button onClick={() => navigate("home")}>Home</button><span>{current.category}</span><button aria-label={bookmarks.includes(active) ? "Remove bookmark" : "Bookmark article"} aria-pressed={bookmarks.includes(active)} onClick={() => { const next = bookmarks.includes(active) ? bookmarks.filter(id => id !== active) : [...bookmarks, active]; setBookmarks(next); saveLocal("spike.help.bookmarks", next); }}><Bookmark size={16} fill={bookmarks.includes(active) ? "currentColor" : "none"} /></button><button onClick={() => void navigator.clipboard.writeText(`help:${active}`).then(() => setNotice("Help link copied. Paste it into help search to open this article."), () => setNotice(`Copy this help address: help:${active}`))}><Copy size={14} /> Link</button><button onClick={() => window.print()}>Print</button></div>
+    <div className="help-reading"><div className="help-toolbar"><button aria-label="Back in help" disabled={position === 0} onClick={() => setPosition(position - 1)}><ArrowLeft size={16} /></button><button aria-label="Forward in help" disabled={position === history.length - 1} onClick={() => setPosition(position + 1)}><ArrowRight size={16} /></button><button onClick={() => navigate("home")}>Home</button><span>{current.category}</span><button aria-label={bookmarks.includes(active) ? "Remove bookmark" : "Bookmark article"} aria-pressed={bookmarks.includes(active)} onClick={() => { const next = bookmarks.includes(active) ? bookmarks.filter(id => id !== active) : [...bookmarks, active]; setBookmarks(next); saveLocal("spike.help.bookmarks", next); }}><Bookmark size={16} fill={bookmarks.includes(active) ? "currentColor" : "none"} /></button><button onClick={() => void navigator.clipboard.writeText(`help:${active}`).then(() => setNotice("Help link copied. Paste it into help search to open this article."), () => setNotice(`Copy this help address: help:${active}`))}><Copy size={14} /> Link</button><button onClick={() => ownerWindow?.print()}>Print</button></div>
     {notice && <div className="help-notice" role="status">{notice}</div>}
-    <article key={active} ref={article} tabIndex={-1} onClick={event => { const target = event.target; const link = target instanceof Element ? target.closest<HTMLAnchorElement>("a[data-help-topic]") : null; if (link?.dataset.helpTopic) { event.preventDefault(); navigate(link.dataset.helpTopic); return; } const image = target instanceof HTMLImageElement ? target : target instanceof Element ? target.closest("[data-help-image]")?.querySelector("img") : null; if (image instanceof HTMLImageElement) { event.preventDefault(); setLightbox({ src: image.src, alt: image.alt }); } }}><div className="help-eyebrow">SPIKE / {current.category}</div><h1>{current.title}</h1>{toc.length > 2 && <details className="help-toc"><summary>On this page · {toc.length} sections</summary>{toc.map(item => <button key={item.id} onClick={() => scrollToAnchor(item.id)}>{item.label}</button>)}</details>}{current.markdown ? <HelpMarkdown text={current.markdown} source={current.source ?? ""} navigate={navigate} hasTopic={hasTopic} /> : current.body}<div className="help-related"><h2>Continue learning</h2><button onClick={() => navigate("doc:docs/WORKBENCH_HANDBOOK.md")}>Workbench handbook</button><button onClick={() => navigate("doc:docs/HELP_FAQ.md")}>FAQ & recovery</button><button onClick={() => { setCategory("Controls"); setQuery(""); }}>Browse controls</button><button onClick={() => navigate("picture-guide")}>Picture walkthrough</button><button onClick={() => navigate("feature-coverage")}>Feature coverage & gaps</button><button onClick={() => navigate("evidence")}>Screenshots & results</button></div></article></div></div>
+    <article key={active} ref={article} tabIndex={-1} onClick={event => { const target = event.target as Element | null; const element = target?.nodeType === 1 ? target : null; const link = element?.closest<HTMLAnchorElement>("a[data-help-topic]"); if (link?.dataset.helpTopic) { event.preventDefault(); navigate(link.dataset.helpTopic); return; } const image = element?.tagName === "IMG" ? element as HTMLImageElement : element?.closest("[data-help-image]")?.querySelector<HTMLImageElement>("img"); if (image) { event.preventDefault(); setLightbox({ src: image.src, alt: image.alt }); } }}><div className="help-eyebrow">SPIKE / {current.category}</div><h1>{current.title}</h1>{toc.length > 2 && <details className="help-toc"><summary>On this page · {toc.length} sections</summary>{toc.map(item => <button key={item.id} onClick={() => scrollToAnchor(item.id)}>{item.label}</button>)}</details>}{current.markdown ? <HelpMarkdown text={current.markdown} source={current.source ?? ""} navigate={navigate} hasTopic={hasTopic} /> : current.body}<div className="help-related"><h2>Continue learning</h2><button onClick={() => navigate("doc:docs/WORKBENCH_HANDBOOK.md")}>Workbench handbook</button><button onClick={() => navigate("doc:docs/HELP_FAQ.md")}>FAQ & recovery</button><button onClick={() => { setCategory("Controls"); setQuery(""); }}>Browse controls</button><button onClick={() => navigate("picture-guide")}>Picture walkthrough</button><button onClick={() => navigate("feature-coverage")}>Feature coverage & gaps</button><button onClick={() => navigate("evidence")}>Screenshots & results</button></div></article></div></div>
     <footer><span>Offline reference · Result validity and runtime diagnostics take precedence.</span><small>Ctrl+F search · Esc close</small></footer>
     {lightbox && <div className="help-lightbox" role="dialog" aria-label="Enlarged screenshot" aria-modal="true"><button autoFocus onClick={() => setLightbox(null)}><X size={18} /> Close image</button><img src={lightbox.src} alt={lightbox.alt} /><p>{lightbox.alt}</p></div>}
   </section></div>;

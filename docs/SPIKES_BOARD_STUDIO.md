@@ -57,3 +57,25 @@ verification are separate from source and headless checks.
 See [SPICE workspace](SPICE_WORKSPACE.md), [solver status](SOLVER_STATUS.md) and
 [Studio coupling](STUDIO_BOARD_COSIMULATION.md) for model applicability and
 numerical validation details.
+
+## Runtime discovery and transfer state
+
+Use **Check Studio runtime** before preparing or opening a standalone Studio
+snapshot. The check reads fixed local launch prerequisites without importing the
+GUI or executing a caller-supplied path. Source installations can prepare a
+handoff when the Studio modules are present. Launch also requires wxPython and
+the first-party launcher. Frozen worker packages without that launcher report
+unavailable; this check does not establish numerical-library readiness.
+
+The board selection follows the selected board reference in the embedded
+workspace. Review counts show how many extracted parts have confirmed model/pin
+bindings. Transfers are revision-bound snapshots, not live bidirectional editing.
+Changing board occurrence invalidates an extraction in flight, and an obsolete
+handoff response cannot replace current transfer status. Circuit execution and
+workspace edits are held while the board handoff is busy. Model values and pin
+maps still need explicit review; unsupported parts remain inert.
+
+Open **Solver suite** from search or Menu > Design & view > Workspace panels to
+browse the current solver families, including standalone Studio/CLI foundations.
+Capability names also appear in universal search; selecting one opens the suite
+for scope review. Each setup workflow retains its own runtime and execution gates.

@@ -1,0 +1,174 @@
+{
+  "freecad_version": [
+    "1",
+    "1",
+    "3",
+    "20260725 (Git shallow)",
+    "Unknown",
+    "2026/07/25 04:52:02",
+    "grafted,grafted",
+    "145529fe741292ff0b3977a01195bf0247425794"
+  ],
+  "worker_sha256": "4a8812b02639f88856b080db73d8dd0ebab83a1245e292cd835aa402c5470aa7",
+  "fixture_provenance": "Original SPIKE analytic primitives; no vendor fixtures or implementation read",
+  "limits": {
+    "input_step_bytes": 16777216,
+    "output_step_bytes": 16777216,
+    "request_bytes": 4096,
+    "vertices": 256,
+    "scale_min": 0.001,
+    "scale_max": 1000,
+    "axis_ratio_max": 1000000.0
+  },
+  "cases": [
+    {
+      "name": "box_2x3x4",
+      "status": "passed",
+      "volume_mm3": 23.999999999999996,
+      "bounds_mm": [
+        -1e-07,
+        -1e-07,
+        -1e-07,
+        4.0000001,
+        3.0000001,
+        2.0000001
+      ],
+      "vertices_status": "complete"
+    },
+    {
+      "name": "translated_box",
+      "status": "passed",
+      "volume_mm3": 23.999999999999993,
+      "bounds_mm": [
+        -6.0000001,
+        4.9999999,
+        3.4999999,
+        -1.9999999,
+        8.0000001,
+        5.5000001
+      ],
+      "vertices_status": "complete"
+    },
+    {
+      "name": "triangular_prism",
+      "status": "passed",
+      "volume_mm3": 36.00000000001145,
+      "bounds_mm": [
+        -1e-07,
+        -1e-07,
+        -1e-07,
+        6.0000001,
+        1.5000001,
+        8.0000001
+      ],
+      "vertices_status": "complete"
+    },
+    {
+      "name": "identity_box",
+      "status": "passed",
+      "volume_mm3": 23.999999999999996,
+      "bounds_mm": [
+        -1e-07,
+        -1e-07,
+        -1e-07,
+        2.0000001,
+        3.0000001,
+        4.0000001
+      ],
+      "vertices_status": "complete"
+    },
+    {
+      "name": "uniform_box",
+      "status": "passed",
+      "volume_mm3": 2.9999999999999996,
+      "bounds_mm": [
+        -1e-07,
+        -1e-07,
+        -1e-07,
+        1.0000001,
+        1.5000001,
+        2.0000001
+      ],
+      "vertices_status": "complete"
+    },
+    {
+      "name": "bounded_vertex_omission",
+      "status": "passed",
+      "volume_mm3": 37.68443602989255,
+      "bounds_mm": [
+        -4.000000100001,
+        -1.99941612816,
+        -1e-07,
+        4.000000100001,
+        1.99941612816,
+        1.5000001
+      ],
+      "vertices_status": "omitted_over_limit"
+    },
+    {
+      "name": "cylinder_fail_closed",
+      "status": "expected_rejection",
+      "message": "Native STEP scaling failed the determinant-scaled volume check."
+    },
+    {
+      "name": "sheet_rejected",
+      "status": "expected_rejection",
+      "message": "STEP scaling requires exactly one valid closed solid."
+    },
+    {
+      "name": "multiple_solids_rejected",
+      "status": "expected_rejection",
+      "message": "STEP scaling requires exactly one valid closed solid."
+    },
+    {
+      "name": "mixed_sheet_rejected",
+      "status": "expected_rejection",
+      "message": "STEP scaling rejects mixed solid and non-solid geometry."
+    },
+    {
+      "name": "zero",
+      "status": "expected_rejection",
+      "message": "STEP scales must be finite numbers in [1e-3, 1e3]."
+    },
+    {
+      "name": "mirror",
+      "status": "expected_rejection",
+      "message": "STEP scales must be finite numbers in [1e-3, 1e3]."
+    },
+    {
+      "name": "boolean",
+      "status": "expected_rejection",
+      "message": "STEP scales must be finite numbers in [1e-3, 1e3]."
+    },
+    {
+      "name": "too_small",
+      "status": "expected_rejection",
+      "message": "STEP scales must be finite numbers in [1e-3, 1e3]."
+    },
+    {
+      "name": "too_large",
+      "status": "expected_rejection",
+      "message": "STEP scales must be finite numbers in [1e-3, 1e3]."
+    },
+    {
+      "name": "nan",
+      "status": "expected_rejection",
+      "message": "STEP scales must be finite numbers in [1e-3, 1e3]."
+    },
+    {
+      "name": "digest_rejected",
+      "status": "expected_rejection",
+      "message": "STEP source SHA-256 does not match the request."
+    },
+    {
+      "name": "path_field_rejected",
+      "status": "expected_rejection",
+      "message": "Invalid STEP scaling request fields."
+    },
+    {
+      "name": "budget_rejected",
+      "status": "expected_rejection",
+      "message": "STEP scaling input is empty or exceeds its byte budget."
+    }
+  ]
+}

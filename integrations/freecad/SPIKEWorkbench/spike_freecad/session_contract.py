@@ -20,6 +20,11 @@ def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
+def _material_record_digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
+                                     allow_nan=False).encode("utf-8")).hexdigest()
+
+
 def keys(value, required, optional=()):
     if not isinstance(value, dict) or not set(required) <= value.keys() or value.keys() - set(required) - set(optional):
         raise ValueError("Invalid collaboration record fields.")
@@ -60,6 +65,21 @@ def _sha(value):
         raise ValueError("Invalid SHA-256 identity.")
 
 
+def material_snapshot(value):
+    """Validate an inert material snapshot without interpreting its properties."""
+    keys(value, {"schema_version", "material_id", "revision", "digest", "record"})
+    if type(value["schema_version"]) is not int or value["schema_version"] != 1:
+        raise ValueError("Unsupported material snapshot version.")
+    text(value["material_id"]); text(value["revision"]); _sha(value["digest"])
+    record = value["record"]
+    if not isinstance(record, dict):
+        raise ValueError("Material snapshot record must be an object.")
+    if record.get("id") != value["material_id"] or record.get("revision") != value["revision"]:
+        raise ValueError("Material snapshot identity mismatch.")
+    if _material_record_digest(record) != value["digest"]:
+        raise ValueError("Material snapshot digest mismatch.")
+
+
 def validate(value):
     pending = [(value, 0)]
     count = 0
@@ -81,8 +101,17 @@ def validate(value):
         raise ValueError("Collaboration requires 1–130 occurrences.")
     ids = set()
     for obj in objects:
-        keys(obj, {"id", "name", "transform"} | ({"kind", "parent_id", "geometry"} if session else set()))
+        keys(obj, {"id", "name", "transform"} | ({"kind", "parent_id", "geometry"} if session else set()),
+             {"material_snapshot", "layer_material_snapshots"} if session else ())
         text(obj["id"]); text(obj["name"]); rigid(obj["transform"])
+        if session and "material_snapshot" in obj:
+            material_snapshot(obj["material_snapshot"])
+        if session and "layer_material_snapshots" in obj:
+            snapshots = obj["layer_material_snapshots"]
+            if not isinstance(snapshots, dict) or not snapshots or len(snapshots) > 256:
+                raise ValueError("Layer material snapshots require 1–256 layer assignments.")
+            for layer_id, snapshot in snapshots.items():
+                text(layer_id); material_snapshot(snapshot)
         if obj["id"] in ids: raise ValueError("Duplicate occurrence identity.")
         ids.add(obj["id"])
     if session:

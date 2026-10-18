@@ -13,6 +13,10 @@ import tempfile
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_REPOSITORY = 'wayri/SPIKE'
+CANONICAL_LOGIN = 'wayri'
+CANONICAL_NAME = 'wayri'
+CANONICAL_EMAIL = '16292067+wayri@users.noreply.github.com'
 
 
 def version(root: Path) -> str:
@@ -21,6 +25,8 @@ def version(root: Path) -> str:
         raise ValueError('Application version must be a semantic version.')
     lock = json.loads((root / 'app/package-lock.json').read_text())
     values = {
+        'UI': re.search(r'APP_VERSION\s*=\s*[\'"]([^\'"]+)',
+                        (root / 'app/src/appVersion.ts').read_text())[1],
         'package-lock': lock['version'],
         'package-lock root': lock['packages']['']['version'],
         'Tauri': json.loads((root / 'app/src-tauri/tauri.conf.json').read_text())['version'],
@@ -31,11 +37,6 @@ def version(root: Path) -> str:
     for label, value in values.items():
         if value != app:
             raise ValueError(f'{label} version {value} differs from app version {app}.')
-    ui = (root / 'app/src/appVersion.ts').read_text()
-    if 'export const APP_VERSION = packageMetadata.version;' not in ui:
-        literal = re.search(r"APP_VERSION\s*=\s*['\"]([^'\"]+)", ui)
-        if literal is None or literal[1] != app:
-            raise ValueError('UI version differs from app version.')
     native = re.search(r'project\(SPIKE VERSION ([^ ]+)', (root / 'CMakeLists.txt').read_text())[1]
     if native != app.split('-')[0]:
         raise ValueError('CMake version differs from the application version.')
@@ -63,6 +64,60 @@ def tag_commit(repo: str, tag: str) -> str | None:
     return obj['sha']
 
 
+def require_publication_identity(repo: str, commit: str) -> None:
+    """Fail closed unless the publisher and release commit belong to wayri."""
+    if repo != CANONICAL_REPOSITORY:
+        raise ValueError(f'Release repository must be {CANONICAL_REPOSITORY}.')
+    if not re.fullmatch(r'[0-9a-f]{40}', commit):
+        raise ValueError('Release commit must be a full lowercase commit SHA.')
+
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        run_id = os.environ.get('GITHUB_RUN_ID')
+        if not run_id or not run_id.isdecimal():
+            raise ValueError('GitHub release publication requires a workflow run ID.')
+        run = json.loads(gh('api', f'repos/{repo}/actions/runs/{run_id}'))
+        publisher = (run.get('actor') or {}).get('login')
+        triggering_publisher = (run.get('triggering_actor') or {}).get('login')
+        if publisher != CANONICAL_LOGIN or triggering_publisher != CANONICAL_LOGIN:
+            raise ValueError('Release workflow actor and triggering actor must both be wayri.')
+        if (run.get('repository') or {}).get('full_name') != repo:
+            raise ValueError('Release workflow run belongs to another repository.')
+        if run.get('head_sha') != commit:
+            raise ValueError('Release workflow commit differs from the candidate commit.')
+    else:
+        publisher = json.loads(gh('api', 'user')).get('login')
+        if publisher != CANONICAL_LOGIN:
+            raise ValueError('Authenticated release publisher must be wayri.')
+
+    candidate = json.loads(gh('api', f'repos/{repo}/commits/{commit}'))
+    if candidate.get('sha') != commit:
+        raise ValueError('GitHub returned another release commit.')
+    author_record = candidate.get('commit', {}).get('author') or {}
+    author_login = (candidate.get('author') or {}).get('login')
+    author_is_canonical = (
+        author_login == CANONICAL_LOGIN
+        and author_record.get('name') == CANONICAL_NAME
+        and author_record.get('email') == CANONICAL_EMAIL
+    )
+    if not author_is_canonical:
+        raise ValueError('Release commit author must be wayri using the canonical noreply identity.')
+
+    committer_record = candidate.get('commit', {}).get('committer') or {}
+    committer_login = (candidate.get('committer') or {}).get('login')
+    committer_is_canonical = (
+        committer_login == CANONICAL_LOGIN
+        and committer_record.get('name') == CANONICAL_NAME
+        and committer_record.get('email') == CANONICAL_EMAIL
+    )
+    committer_is_github_merge = (
+        committer_login == 'web-flow'
+        and committer_record.get('name') == 'GitHub'
+        and committer_record.get('email') == 'noreply@github.com'
+    )
+    if not committer_is_canonical and not committer_is_github_merge:
+        raise ValueError('Release commit committer must be wayri or GitHub web-flow for a wayri-authored merge.')
+
+
 def check(root: Path = ROOT) -> dict[str, str]:
     release_version = version(root)
     tag = os.environ.get('RELEASE_TAG') or f'v{release_version}'
@@ -71,6 +126,7 @@ def check(root: Path = ROOT) -> dict[str, str]:
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
     if os.environ.get('RELEASE_PUBLISH') == 'true':
         repo = os.environ['GITHUB_REPOSITORY']
+        require_publication_identity(repo, commit)
         existing = tag_commit(repo, tag)
         if existing is not None and existing != commit:
             raise ValueError('The release tag points to another commit. Use a new version and tag.')
@@ -110,6 +166,7 @@ def publish(root: Path = ROOT) -> None:
     repo = os.environ['GITHUB_REPOSITORY']
     if tag != f'v{release_version}':
         raise ValueError('Release tag and application version differ.')
+    require_publication_identity(repo, commit)
     assets = packages(root / 'dist-release', release_version)
     existing_commit = tag_commit(repo, tag)
     if existing_commit is not None and existing_commit != commit:

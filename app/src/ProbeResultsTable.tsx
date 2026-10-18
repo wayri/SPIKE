@@ -4,6 +4,7 @@ import type { BoardObject } from "./BoardViewport";
 import DataTable from "./DataTable";
 import type { SolverResultBundle } from "./analysisResults";
 import { buildProbeRows, evaluateProbeFormulas, probeResultsCsv, type ProbeFormulaRow, type ProbeQuantity, type ProbeReferenceValues } from "./probeCalculations";
+import { usePanelPresentation } from "./panelPresentation";
 import "./ProbeResultsTable.css";
 
 export type ProbeResultsTableProps = {
@@ -21,6 +22,7 @@ export type ProbeResultsTableProps = {
 const shown = (item?: ProbeQuantity) => item ? `${item.value.toPrecision(5)} ${item.unit === "1" ? "" : item.unit}`.trim() : "-";
 
 export default function ProbeResultsTable({ probes, result, calculatedRows, onCalculatedRowsChange, onRemoveProbe, onRenameProbe, onExportCsv, probeReferenceIds = {}, windowActions }: ProbeResultsTableProps) {
+  const { ownerDocument } = usePanelPresentation();
   const rows = buildProbeRows(probes, result, probeReferenceIds);
   const references: ProbeReferenceValues = Object.fromEntries(rows.map(row => [row.id, row.values]));
   const calculations = evaluateProbeFormulas(calculatedRows, references);
@@ -28,7 +30,8 @@ export default function ProbeResultsTable({ probes, result, calculatedRows, onCa
   const exportCsv = () => {
     const csv = probeResultsCsv(rows, calculations);
     if (onExportCsv) { onExportCsv(csv); return; }
-    const link = document.createElement("a");
+    if (!ownerDocument) return;
+    const link = ownerDocument.createElement("a");
     link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
     link.download = "spike-probe-results.csv"; link.click(); URL.revokeObjectURL(link.href);
   };

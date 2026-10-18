@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -13,6 +14,20 @@ from spike_core.native_airflow import detect_native_airflow, run_native_cavity, 
 
 
 class NativeAirflowContractTests(unittest.TestCase):
+    def test_frozen_discovery_is_independent_of_checkout(self):
+        with tempfile.TemporaryDirectory() as directory:
+            suffix = ".exe" if sys.platform == "win32" else ""
+            expected = Path(directory) / "native" / ("spike_native_airflow" + suffix)
+            with patch.dict("os.environ", {}, clear=True), patch.object(sys, "frozen", True, create=True), patch.object(sys, "_MEIPASS", directory, create=True):
+                missing = detect_native_airflow()
+                self.assertEqual(missing["executable"], str(expected))
+                self.assertFalse(missing["available"])
+                expected.parent.mkdir()
+                expected.touch()
+                self.assertTrue(detect_native_airflow()["available"])
+                with patch.dict("os.environ", {"SPIKE_NATIVE_AIRFLOW_EXECUTABLE": __file__}):
+                    self.assertEqual(detect_native_airflow()["executable"], str(Path(__file__).resolve()))
+
     def test_rejects_unsupported_and_invalid_settings(self):
         for request in ({"n": 9}, {"n": 3}, {"n": True}, {"n": 16.5},
                         {"reynolds": math.nan}, {"reynolds": 401},

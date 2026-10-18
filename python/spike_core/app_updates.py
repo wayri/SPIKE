@@ -81,11 +81,7 @@ def cache_root():
 
 
 def select_release(release, current_version, system, machine):
-    installed = re.fullmatch(r"v?(\d+\.\d+\.\d+)(?:-([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*))?", str(current_version))
-    if installed is None:
-        raise ValueError("The installed SPIKE version is malformed.")
-    current = version(installed[1])
-    current_is_prerelease = installed[2] is not None
+    current = version(current_version)
     latest = version(release.get("tag_name"))
     if release.get("draft") or release.get("prerelease"):
         raise ValueError("Only published stable releases can be installed.")
@@ -93,7 +89,7 @@ def select_release(release, current_version, system, machine):
               "latest_version": str(release["tag_name"]).removeprefix("v"),
               "release_url": "https://github.com/wayri/spike/releases/latest",
               "status": "current", "received_bytes": 0, "total_bytes": 0}
-    if latest < current or (latest == current and not current_is_prerelease):
+    if latest <= current:
         result["message"] = "This SPIKE version is current or newer than the stable release."
         return result
     arch = {"x86_64": "x64", "aarch64": "arm64"}.get(machine)

@@ -5,6 +5,7 @@ import { previewViewportTarget } from "./BoardViewport";
 import type { BoardObject } from "./BoardViewport";
 import { resolveBoardCopperLayers } from "./copperLayerSelection";
 import NetCatalog from "./NetCatalog";
+import "./netManager.css";
 
 type NetRole = "source" | "return" | "series" | "unassigned";
 type LoopExtractionSetup = {
@@ -185,35 +186,38 @@ export default function NetManager({
     assignRole(selectedNet, suggestedRole);
   };
 
-  return <div className="modal-shade net-manager-shade" onPointerDown={event => {
+  return <div className="modal-shade net-manager-shade" role="presentation" onPointerDown={event => {
     if (event.target === event.currentTarget) onClose();
   }}>
-    <section className="net-manager" role="dialog" aria-modal="true" aria-label="PI Net Manager">
-      <header>
-        <div><b>PI NET MANAGER</b><small>Imported copper nets, simulation roles, and cross-net paths</small></div>
-        <button onClick={onClose} title="Close Net Manager" aria-label="Close Net Manager"><X size={17} /></button>
+    <section className="net-manager" role="dialog" aria-modal="true" aria-labelledby="net-manager-title">
+      <header className="net-manager-header">
+        <div><b id="net-manager-title">PI NET MANAGER</b><small>Imported copper nets, simulation roles, and cross-net paths</small></div>
+        <button type="button" className="spike-control--icon" onClick={onClose} title="Close Net Manager" aria-label="Close Net Manager"><X size={17} /></button>
       </header>
 
       <div className="net-manager-toolbar">
-        <div className="net-manager-tabs"><button className={view === "nets" ? "selected" : ""} onClick={() => setView("nets")}><Network size={14} /> Nets</button><button className={view === "loops" ? "selected" : ""} onClick={() => setView("loops")}><Waypoints size={14} /> Loop RLC</button></div>
-        {view === "nets" && <label><Search size={14} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Find net by name" autoFocus /></label>}
-        {view === "loops" && <button onClick={addLoop}><Plus size={15} /> Add loop</button>}
-        <button disabled={!selectedNet} onClick={useViewportSelection} title="Add the net currently selected in the board viewport using a safe suggested role"><MousePointer2 size={15} /> Use viewport selection</button>
-        <button className="primary" onClick={onOpenPowerPaths} title="Open the component-level series diagram for these managed nets"><ListTree size={15} /> Open Power Tree</button>
-        <button disabled={!pathGroups.length} onClick={onOpenSeriesAnalysis} title={pathGroups.length ? "Configure a cross-net solve using a reviewed Power Tree path" : "Create and review a Power Tree path first"}><Play size={15} /> Analyze series path</button>
+        <div className="net-manager-tabs" role="tablist" aria-label="Net manager view"><button type="button" role="tab" aria-selected={view === "nets"} className={view === "nets" ? "selected" : ""} onClick={() => setView("nets")}><Network size={14} /> Nets</button><button type="button" role="tab" aria-selected={view === "loops"} className={view === "loops" ? "selected" : ""} onClick={() => setView("loops")}><Waypoints size={14} /> Loop RLC</button></div>
+        {view === "nets" ? <label className="net-manager-search"><Search size={14} /><input aria-label="Find imported net" value={query} onChange={event => setQuery(event.target.value)} placeholder="Find net by name" autoFocus /></label> : <button type="button" className="spike-control--compact net-manager-add-loop" onClick={addLoop}><Plus size={15} /> Add loop</button>}
+        <div className="net-manager-actions" role="group" aria-label="Net workflow actions">
+          <button type="button" className="spike-control--compact" disabled={!selectedNet} onClick={useViewportSelection} title="Add the net currently selected in the board viewport using a safe suggested role"><MousePointer2 size={15} /><span>Use selected</span></button>
+          <button type="button" className="spike-control--compact spike-control--primary" onClick={onOpenPowerPaths} title="Open the component-level series diagram for these managed nets"><ListTree size={15} /><span>Power tree</span></button>
+          <button type="button" className="spike-control--compact" disabled={!pathGroups.length} onClick={onOpenSeriesAnalysis} title={pathGroups.length ? "Configure a cross-net solve using a reviewed Power Tree path" : "Create and review a Power Tree path first"}><Play size={15} /><span>Analyze path</span></button>
+        </div>
       </div>
 
       <div className="net-manager-body">
-        <aside>
+        <aside className="net-manager-selection-rail">
           <h3>{view === "nets" ? "MANAGED NETS" : "LOOP EXTRACTIONS"}</h3>
-          {view === "nets" && (managedNets.length ? managedNets.map(net => <button key={net} className={activeNet === net ? "active" : ""} onClick={() => selectRow(net)} onMouseEnter={() => previewViewportTarget({ kind: "net", net, label: net })} onMouseLeave={() => previewViewportTarget(null)}>
+          <div className="net-manager-selection-list">
+          {view === "nets" && (managedNets.length ? managedNets.map(net => <button type="button" key={net} aria-pressed={activeNet === net} className={activeNet === net ? "active" : ""} onClick={() => selectRow(net)} onMouseEnter={() => previewViewportTarget({ kind: "net", net, label: net })} onMouseLeave={() => previewViewportTarget(null)}>
             <span className={`net-role-dot ${roleFor(net)}`} />
-            <b>{net}</b><small>{roleFor(net)}</small>
+            <b title={net}>{net}</b><small>{roleFor(net)}</small>
           </button>) : <p>No nets assigned. Select an imported net and choose a role.</p>)}
-          {view === "loops" && (loopExtractions.length ? loopExtractions.map(item => <button key={item.id} className={activeLoop?.id === item.id ? "active" : ""} onClick={() => setActiveLoopId(item.id)}>
-            <span className="net-role-dot series" /><b>{item.name}</b><small>{item.forwardNet && item.returnNet && item.forwardStartPadId && item.forwardEndPadId && item.returnStartPadId && item.returnEndPadId ? "ready" : "incomplete"}</small>
+          {view === "loops" && (loopExtractions.length ? loopExtractions.map(item => <button type="button" key={item.id} aria-pressed={activeLoop?.id === item.id} className={activeLoop?.id === item.id ? "active" : ""} onClick={() => setActiveLoopId(item.id)}>
+            <span className="net-role-dot series" /><b title={item.name}>{item.name}</b><small>{item.forwardNet && item.returnNet && item.forwardStartPadId && item.forwardEndPadId && item.returnStartPadId && item.returnEndPadId ? "ready" : "incomplete"}</small>
           </button>) : <p>No loop extraction is configured. Add one to define explicit forward and return paths.</p>)}
-          <div className="net-manager-guidance"><Network size={16} /><p>A copper net is one connected conductor name. Open the <b>Power Tree</b> to visualize and edit the ordered source-to-load series diagram, including components that bridge these net segments.</p></div>
+          </div>
+          <details className="net-manager-guidance"><summary><Network size={14} /> About managed nets</summary><p>A copper net is one connected conductor name. Open the <b>Power Tree</b> to visualize and edit the ordered source-to-load series diagram, including components that bridge these net segments.</p></details>
         </aside>
 
         {view === "nets" ? <NetCatalog rows={filtered.map(net => ({ id: net, name: net, metrics: metrics.get(net)! }))} activeId={activeNet} onSelect={selectRow}
@@ -225,7 +229,7 @@ export default function NetManager({
                   <option value="series">Series segment</option>
                 </select>}/> : <div className="loop-editor">
           {activeLoop ? <>
-            <div className="loop-editor-heading"><div><b>PAD-TO-PAD LOOP EXTRACTION</b><small>Forward current travels source to load; return current travels load side back to source side.</small></div><button onClick={() => { const next = loopExtractions.filter(item => item.id !== activeLoop.id); setLoopExtractions(next); setActiveLoopId(next[0]?.id ?? ""); }} title="Delete loop"><Trash2 size={15} /></button></div>
+            <div className="loop-editor-heading"><div><b>PAD-TO-PAD LOOP EXTRACTION</b><small>Forward current travels source to load; return current travels load side back to source side.</small></div><button type="button" className="spike-control--icon spike-control--danger" aria-label="Delete loop" onClick={() => { const next = loopExtractions.filter(item => item.id !== activeLoop.id); setLoopExtractions(next); setActiveLoopId(next[0]?.id ?? ""); }} title="Delete loop"><Trash2 size={15} /></button></div>
             <label className="loop-name">Name<input aria-label="Loop name" value={activeLoop.name} onChange={event => patchLoop({ name: event.target.value })} /></label>
             <div className="loop-conductor-grid">
               <section><header><span className="net-role-dot source" /><b>FORWARD PATH</b></header>
@@ -246,9 +250,9 @@ export default function NetManager({
         </div>}
       </div>
 
-      <footer>
+      <footer className="net-manager-footer">
         <span>{nets.length} imported nets | {managedNets.length} managed | {managedNets.filter(net => roleFor(net) === "series").length} series segments</span>
-        <button onClick={onClose}>Done</button>
+        <button type="button" className="spike-control--compact spike-control--primary" onClick={onClose}>Done</button>
       </footer>
     </section>
   </div>;

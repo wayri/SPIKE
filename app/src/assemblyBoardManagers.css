@@ -2,48 +2,48 @@
 .assembly-board-managers {
   width: min(600px, 94vw); min-width: min(600px, 94vw); max-width: min(600px, 94vw); height: min(780px, 88vh); min-height: 0;
   display: grid; grid-template-rows: auto auto auto minmax(0, 1fr);
-  overflow: hidden; background: #101a21; border: 1px solid #526873;
-  color: #cbdadd; font: 11px/1.4 Inter, ui-sans-serif, system-ui, sans-serif;
+  overflow: hidden; background: var(--spike-surface-panel); border: 1px solid var(--spike-border-default);
+  color: var(--spike-text); font: 11px/1.4 Inter, ui-sans-serif, system-ui, sans-serif;
 }
 .assembly-board-managers > header, .assembly-board-managers > nav {
   display: flex; align-items: center; gap: 8px; padding: 10px 12px;
-  border-bottom: 1px solid #324650; background: #192832;
+  border-bottom: 1px solid var(--spike-border-subtle); background: var(--spike-surface-raised);
 }
 .assembly-board-managers > header { justify-content: space-between; }
 .assembly-board-managers > header div { display: grid; gap: 3px; min-width: 0; }
-.assembly-board-managers > header b { color: #e4edf0; font-size: 11px; letter-spacing: 1.1px; }
-.assembly-board-managers > header small { color: #78909a; font-size: 9px; }
+.assembly-board-managers > header b { color: var(--spike-text-strong); font-size: 11px; letter-spacing: 1.1px; }
+.assembly-board-managers > header small { color: var(--spike-text-muted); font-size: 9px; }
 .assembly-board-managers > header button, .assembly-board-managers > nav button {
   min-height: 30px; display: inline-flex; align-items: center; justify-content: center;
-  gap: 6px; border: 1px solid #405761; padding: 5px 10px;
-  background: #172730; color: #b9cbd0; font-size: 10px;
+  gap: 6px; border: 1px solid var(--spike-table-action-border); padding: 5px 10px;
+  background: var(--spike-table-action-bg); color: var(--spike-text); font-size: 10px;
 }
-.assembly-board-managers > nav button.selected { background: #24414b; color: #6fd4c8; border-color: #5a938f; }
-.assembly-board-picker { display: flex; gap: 12px; align-items: center; min-width: 0; padding: 10px 12px; border-bottom: 1px solid #2a3e48; }
+.assembly-board-managers > nav button.selected { background: var(--spike-table-choice-bg); color: var(--spike-accent-text); border-color: var(--spike-table-choice-border); }
+.assembly-board-picker { display: flex; gap: 12px; align-items: center; min-width: 0; padding: 10px 12px; border-bottom: 1px solid var(--spike-border-subtle); }
 .assembly-board-picker select {
-  min-width: 0; max-width: 100%; height: 30px; border: 1px solid #38505b;
-  padding: 0 9px; color: #d2dee1; background: #0c171d; font-size: 10px;
+  min-width: 0; max-width: 100%; height: 30px; border: 1px solid var(--spike-border-default);
+  padding: 0 9px; color: var(--spike-text); background: var(--spike-surface-field); font-size: 10px;
 }
 .assembly-board-picker select { flex: 1; }
 .assembly-manager-content { min-width: 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
 .assembly-manager-content > :only-child { flex: 1; min-height: 0; }
 .assembly-board-managers:has(.assembly-connector-links) { grid-template-rows: auto auto minmax(0, 1fr); }
 .assembly-board-managers .layer-manager.embedded { position: static; min-height: 0; border: 0; }
-.assembly-board-managers .layer-manager .floating-heading { padding: 0 12px; background: #192832; border-bottom: 1px solid #324650; }
+.assembly-board-managers .layer-manager .floating-heading { padding: 0 12px; background: var(--spike-surface-raised); border-bottom: 1px solid var(--spike-border-subtle); }
 .assembly-net-manager { height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
 .assembly-net-manager .net-manager-toolbar label { min-width: 0; }
 .assembly-net-manager .net-manager-toolbar label button { min-height: 0; padding: 2px; border: 0; background: transparent; }
 .assembly-net-manager .net-manager-body { min-width: 0; }
 .assembly-net-manager .net-catalog { min-width: 0; overflow: auto; }
 .assembly-net-manager .net-table { min-width: 620px; }
-.assembly-net-manager > footer { padding: 10px 12px; color: #78909a; font-size: 9px; border-top: 1px solid #2b404a; }
-.assembly-net-selected b { overflow-wrap: anywhere; color: #efbc5d; }
-.assembly-board-managers :is(button, input, select):focus-visible { outline: 2px solid #58cfc1; outline-offset: 2px; }
+.assembly-net-manager > footer { padding: 10px 12px; color: var(--spike-text-muted); font-size: 9px; border-top: 1px solid var(--spike-border-subtle); }
+.assembly-net-selected b { overflow-wrap: anywhere; color: var(--spike-accent-text); }
+.assembly-board-managers :is(button, input, select):focus-visible { outline: 2px solid var(--spike-accent); outline-offset: 2px; }
 @media (max-width: 720px) {
   .assembly-board-picker { flex-wrap: wrap; gap: 5px; }
   .assembly-board-picker select { flex-basis: 100%; width: 100%; }
   .assembly-net-manager .net-manager-body { display: flex; flex-direction: column; overflow: hidden; }
-  .assembly-net-manager .net-manager-body > aside { flex-shrink: 0; border-right: 0; border-bottom: 1px solid #2b404a; padding: 8px 12px; }
+  .assembly-net-manager .net-manager-body > aside { flex-shrink: 0; border-right: 0; border-bottom: 1px solid var(--spike-border-subtle); padding: 8px 12px; }
   .assembly-net-manager .net-manager-body aside h3, .assembly-net-manager .net-manager-guidance { margin: 0; }
   .assembly-net-manager .net-catalog { flex: 1; }
 }

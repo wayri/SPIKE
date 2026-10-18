@@ -1,0 +1,40 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "PI03-S01",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "1634d92178ed41111da9eac1aea3664ce339366fe2f95b4154f3dd696ba98547",
+    "python/spike_core/pdn_decap_corners.py": "63f2bc5eb9b5e98366064f6a23c51fd2f4497301f4db0c78a64c19ec67ab7d7f",
+    "python/spike_core/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
+    "python/spike_core/service_pdn_network.py": "3252f731ef0cb4f586c7a1e64ef3a0300a43312e505c4af812b9823a9ff7c7ec",
+    "tests/python/test_pdn_decap_corners.py": "0ae90e771e6615664a9f8f25843603d5cd814335357168c0981a6273dd331626",
+    "tests/python/test_pdn_decap_corners_contract.py": "9a6f797e9bf1204e0cb25094f57d58638054aef335ac3408abd87097fd6be7ee",
+    "examples/pdn_decap_corners/run_corners.py": "0050ef2daaa7f97368dbec15b794c0b5ccb14e5ff70f36f0d886f87a852bfa7e",
+    "schemas/pdn-network-request-v1.schema.json": "89fc9091507d0d04500a64358c1621754e8e1de67ae35985da14ff11012e28cf",
+    "schemas/pdn-decap-corners-request-v1.schema.json": "5da61873067460fbee862ecc0232507158810f7e9edb64bbb9ac59b037a01d9d",
+    "schemas/pdn-decap-corners-result-v1.schema.json": "a015a5a17b848a9a9856bd19b3bd6b07b80fc569facba23a36ef11f64d2f8905"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_cancel_numerical_failure_and_nonfinite_ratio_publish_no_partial_result",
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_malformed_corner_topology_and_value_admission_before_solves",
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_multiport_shared_return_against_direct_nodal_admittance",
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_order_invariance_metadata_mapping_and_collision_avoidance",
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_parallel_source_rlc_oracle_and_exact_worst_sample",
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_resource_preflight_and_aggregate_work_bound",
+      "tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_target_failure_is_valid_and_target_change_does_not_change_network",
+      "tests.python.test_pdn_decap_corners_contract.DecapCornerContractTests.test_actual_worker_rejects_incomplete_corner_and_unknown_fields",
+      "tests.python.test_pdn_decap_corners_contract.DecapCornerContractTests.test_actual_worker_schema_and_failed_target_retention",
+      "tests.python.test_pdn_decap_corners_contract.DecapCornerContractTests.test_documented_example_matches_independent_parallel_impedance"
+    ],
+    "run": 10,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI03-S01-network-transient-reverified.log",
+  "log_sha256": "32bdd4fe1c687db92657c8cffaa5aa627f58347ee521c39cc8bfd0d4c0fd5632"
+}

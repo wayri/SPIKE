@@ -79,3 +79,5 @@ Only published interface behavior informed this clean-room adapter. Tests use
 original inert mesh/artifact bytes and process fixtures, not upstream examples
 or physical accuracy oracles. Run `python -m unittest discover -s tests/python -p test_palace_extension.py -v` for admission, source binding, unsupported
 assets, output integrity, malformed tables and cancellation plumbing checks.
+
+

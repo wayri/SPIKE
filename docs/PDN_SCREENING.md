@@ -1,8 +1,26 @@
 # PDN Target and Decoupling Screening
 
+The [passive sampled reduction workflow](PDN_ADMITTANCE_REDUCTION.md) admits
+explicit auxiliary-port loads and floating ports while retaining selected PDN
+ports. It preserves the exact grid and reference; no causal fitting is implied.
+
+For explicitly meshed dielectric conductivity and AC loss, use the separate
+[finite-dielectric admittance workflow](PDN_DIELECTRIC_AC.md). It solves complex
+fields and returns finite-band samples; it does not infer capacitors for the
+frequency-invariant transient model.
+
 Source additions for explicit AC/filter and load-spike execution are described
 in [the new workflow](#explicit-ac-pdn-and-filter-workflow). Existing extracted
 board PI validity limits below remain unchanged.
+
+The [PI04-S01 consistency correction](PI_SI_PARITY_EXECUTION.md#pi04-s01-transient-consistency)
+preserves passive energy while correcting finite-rise inductive-cutset voltages.
+Initial/interior PWL corners use right-sided voltage observations; the final
+endpoint uses the left derivative. Single-load, supplied linear-network scope
+and unsupported arbitrary initial stored energy remain explicit for that stage.
+The additive [simultaneous-load form](PDN_SIMULTANEOUS_LOADS.md) supplies
+independent named-port PWL waveforms with a common horizon and shared-return
+voltage/energy accounting. It retains the legacy single-load form.
 
 SPIKE reviews a solver-produced driving-point impedance sweep against a
 positive target impedance. It reports violating points, resonance and

@@ -1220,3 +1220,4 @@ Only bindings already marked `reviewed` by the source workspace and supported as
 Studio primitives become executable records. Unavailable parts and reviewed
 subcircuits without an admitted implementation remain visible and inert with an
 explicit reason. Studio never infers a model from a reference or displayed value.
+

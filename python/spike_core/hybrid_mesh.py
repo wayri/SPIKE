@@ -1750,7 +1750,7 @@ class _Builder:
                     "warning",
                     f"{source_id} has no usable simple filled copper polygon.",
                     path=f"design.zones[{source_id}]",
-                    suggestion="Repair the imported zone outline before using it for a conductor solve.",
+                    suggestion="Check mesher and worker versions, then inspect the retained source boundary and topology diagnostics. Preserve valid KiCad cutouts; do not replace the plane with a hull or remove holes.",
                     status="approximate",
                 ))
                 continue

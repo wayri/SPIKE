@@ -1,0 +1,285 @@
+{
+  "native_version": "10.0.6",
+  "cases": [
+    {
+      "name": "front-90",
+      "side": "front",
+      "footprint_angle_deg": 90.0,
+      "footprint_position_mm": [
+        20.0,
+        10.0
+      ],
+      "layer": "F.Cu",
+      "board_thickness_mm": 1.6,
+      "models": [
+        {
+          "model_index": 0,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            1.25,
+            -2.5,
+            3.0
+          ],
+          "rotation_deg": [
+            15.0,
+            30.0,
+            45.0
+          ],
+          "scale": [
+            2.0,
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "model_index": 1,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            -1.0,
+            0.0,
+            4.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            90.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "model_index": 2,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "front-37",
+      "side": "front",
+      "footprint_angle_deg": 37.0,
+      "footprint_position_mm": [
+        20.0,
+        10.0
+      ],
+      "layer": "F.Cu",
+      "board_thickness_mm": 1.6,
+      "models": [
+        {
+          "model_index": 0,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            1.25,
+            -2.5,
+            3.0
+          ],
+          "rotation_deg": [
+            15.0,
+            30.0,
+            45.0
+          ],
+          "scale": [
+            2.0,
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "model_index": 1,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            -1.0,
+            0.0,
+            4.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            90.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "model_index": 2,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back-90",
+      "side": "back",
+      "footprint_angle_deg": 90.0,
+      "footprint_position_mm": [
+        20.0,
+        10.0
+      ],
+      "layer": "B.Cu",
+      "board_thickness_mm": 1.6,
+      "models": [
+        {
+          "model_index": 0,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            1.25,
+            -2.5,
+            3.0
+          ],
+          "rotation_deg": [
+            15.0,
+            30.0,
+            45.0
+          ],
+          "scale": [
+            2.0,
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "model_index": 1,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            -1.0,
+            0.0,
+            4.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            90.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "model_index": 2,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "back-37",
+      "side": "back",
+      "footprint_angle_deg": 37.0,
+      "footprint_position_mm": [
+        20.0,
+        10.0
+      ],
+      "layer": "B.Cu",
+      "board_thickness_mm": 1.6,
+      "models": [
+        {
+          "model_index": 0,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            1.25,
+            -2.5,
+            3.0
+          ],
+          "rotation_deg": [
+            15.0,
+            30.0,
+            45.0
+          ],
+          "scale": [
+            2.0,
+            1.0,
+            0.5
+          ]
+        },
+        {
+          "model_index": 1,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            -1.0,
+            0.0,
+            4.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            90.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        {
+          "model_index": 2,
+          "source_path": "C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/benchmarks/parity-import/component-solid.step",
+          "offset_mm": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation_deg": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        }
+      ]
+    }
+  ]
+}

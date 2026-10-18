@@ -35,9 +35,56 @@
     }
   ],
   "remaining_acceptance": [
-    "Healthy initialized native composed-placement reference for front/back, rotation order and nonuniform scale.",
-    "Body/material assignments with applicable thermal/electrical evidence."
+    "Qualify general STEP solids/stackups and source projection using the bounded native reference, preserving exporter clearance and explicit physical placement review.",
+    "Body/material assignments with applicable conditioned thermal/electrical evidence."
   ],
-  "limitation": "Public model APIs prove declared vectors only. Causes of native export timeouts are not established. Source projection remains forbidden.",
-  "bounded_increment": "WF01-S04C1: explicit source-bound neutral STEP handoff; does not apply source KiCad model vectors."
+  "limitation": "Native metadata and bounded VRML/STEP composition references exist. General solids/stackups and conditioned material evidence remain open; source projection remains forbidden.",
+  "bounded_increment": "WF01-S04C1: explicit source-bound neutral STEP handoff; does not apply source KiCad model vectors.",
+  "component_material_admission_audit": {
+    "checked_on": "2026-10-14",
+    "status": "passed_local_development",
+    "tests": 7,
+    "elapsed_s": 5.031,
+    "skipped": 0,
+    "log": "build/parity-stage04c-native-material-admission-final.log",
+    "log_sha256": "3d60560fe6301e4f6ccded051dbd0e2a0612a0f8cfd426757a9acfc4e7a6632b",
+    "runtime": "Installed Python 3.11.9 and hash-admitted Gmsh 4.15.2 OCC; local development only.",
+    "checks": [
+      "Explicit reviewed placement, exact model/source ownership and supplied thermal material admission.",
+      "Distinct repeated-board occurrences, saved-package preservation and stale-source/material rejection.",
+      "Actual retained STEP meshing: four bodies, two component volumes of 1e-9 m3 and expected SI bounds/source digests."
+    ],
+    "source_bindings": {
+      "tests/python/test_thermal_component_promotion.py": "9ea1d294fc5253fbd1963c2bfe832c690bef9ea412a22d2a1b85e4b2384cf3f8",
+      "python/spike_core/assembly_thermal_components.py": "f52e5b5fea2c22b36c82839ce5962aadb3f8ee73520b7c761e4827a7d485371d",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/gmsh_occ_runtime.py": "c434aea9386fa62eda2a5a68940c3a98e839d2e44da3a95e0ea40f7dfa069c3e"
+    },
+    "environment_resolution": "Default Python 3.12 skipped the CPython 3.11 native case. Installed existing jsonschema 4.25.1 test dependency in .venv-emerge3, then all seven tests passed; no geometry/solver/test requirements changed.",
+    "initial_logs": [
+      "build/parity-stage04c-material-admission-audit.log",
+      "build/parity-stage04c-native-material-admission-audit.log",
+      "build/parity-stage04c-native-test-dependency.log"
+    ],
+    "limitation": "Original synthetic geometry/material values verify software and meshing admission only. Actual conditioned package material evidence, native KiCad composition and physics qualification remain open.",
+    "superseded_by": "docs/validation/parity/WF01-S04C2.json",
+    "historical_source_snapshot": true
+  },
+  "active_priority": "Original parity first; broad general multiphysics/optics deferred until parity establishment.",
+  "bounded_admission_stage": "WF01-S04C2: passed source-bound native admission gate; actual conditioned package material evidence remains open.",
+  "native_composed_placement_reference": {
+    "status": "passed_local_black_box_reference",
+    "evidence": "build/native-placement-resume/composition-reference.json",
+    "sha256": "88b51d8f4db336e671db14b158acad1a3fd36d935408ac6b0ef12b04f5b06dae",
+    "cases": 6,
+    "max_vertex_error_mm": 8.76130645366402e-07,
+    "tolerance_mm": 2e-06,
+    "scope": "Original synthetic triangulated VRML box, three model vector sets, front/back at footprint (20,10,90deg), 1.6mm board; no STEP, arbitrary-angle, production adapter, physics or material qualification",
+    "reproduction": "build/native-placement-resume/FINDINGS.txt",
+    "limitation": "Observed native CLI now exports triangulated owned VRML; previous timeout cause remains unknown. No source placement projection enabled."
+  },
+  "native_step_placement_stage": "WF01-S04C3: passed12 actual STEP cases and copper/no-extra datum controls; see docs/validation/parity/WF01-S04C3.json",
+  "placement_review_stage": "WF01-S04C4: eight native-reference-backed unit-scale placement drafts; review/explicit handoff required, canonical source transforms stay unapplied.",
+  "step_scale_stage": "WF01-S04C5: bounded positive derived STEP scaling with native/reimport checks; curved mismatch rejected, source models and rigid placement contracts unchanged.",
+  "scaled_placement_review_stage": "WF01-S04C6: four actual nonuniform bake-then-rigid review proposals verified; source and project remain unchanged, derived registration/review still required."
 }

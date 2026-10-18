@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PlotlyChart from "./PlotlyChart";
 import { reflectionMetrics } from "./siChannelResults";
+import { usePanelPresentation } from "./panelPresentation";
 
 export type Point = { x: number; y: number };
 export type Curve = { name: string; points: Point[] };
@@ -29,6 +30,7 @@ export function svgViewBoxX(clientX: number, left: number, width: number, height
 }
 
 export function SiPlot({ title, curves, xLabel, yLabel }: { title: string; curves: Curve[]; xLabel: string; yLabel: string }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const [expanded, setExpanded] = useState(false);
   const expandButton = useRef<HTMLButtonElement>(null);
   const expandedWindow = useRef<HTMLElement>(null);
@@ -39,6 +41,7 @@ export function SiPlot({ title, curves, xLabel, yLabel }: { title: string; curve
       restoreExpandedFocus.current = false;
       return;
     }
+    const doc = ownerDocument, view = ownerWindow; if (!doc || !view) return;
     restoreExpandedFocus.current = true;
     const containKeyboardFocus = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -51,17 +54,17 @@ export function SiPlot({ title, curves, xLabel, yLabel }: { title: string; curve
         .filter(element => !element.hasAttribute("disabled"));
       if (!focusable.length) return;
       const first = focusable[0], last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
+      if (event.shiftKey && doc.activeElement === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && doc.activeElement === last) {
         event.preventDefault();
         first.focus();
       }
     };
-    window.addEventListener("keydown", containKeyboardFocus);
-    return () => window.removeEventListener("keydown", containKeyboardFocus);
-  }, [expanded]);
+    view.addEventListener("keydown", containKeyboardFocus);
+    return () => view.removeEventListener("keydown", containKeyboardFocus);
+  }, [expanded, ownerDocument, ownerWindow]);
   const hasData = curves.some(curve => curve.points.some(point => Number.isFinite(point.x) && Number.isFinite(point.y)));
   if (!hasData) return <div className="si-plot"><h4>{title}</h4><p>No returned trace data.</p></div>;
   const data = curves.map((curve, index) => ({

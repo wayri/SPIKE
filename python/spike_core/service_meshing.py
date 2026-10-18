@@ -6,6 +6,9 @@ from .service_helpers import error_response, operation_id
 
 
 def handle_meshing_request(method, params, *, request_id=None):
+    if method in {"import_sheet_definition", "preview_sheet_fold"}:
+        from .service_sheet_folding import handle_sheet_folding_request
+        return handle_sheet_folding_request(method, params)
     if method not in {"internal_mesh_capabilities", "run_internal_meshing", "prepare_pcb_volume_mesh",
                       "pcb_volume_mesh_capabilities"}:
         return None

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { APP_VERSION, RELEASE_CHANNEL } from "./appVersion";
 
-const ISSUE_URL = "https://github.com/wayri/SPIKE-Main/issues/new";
+const ISSUE_URL = "https://github.com/wayri/SPIKE/issues/new";
 const WORKSPACES = new Set([
   "Home", "Mesh", "Solve", "PI", "HF / SI", "EM", "EMI", "Thermal", "Probes",
   "Results", "Reports", "Extensions", "Settings",

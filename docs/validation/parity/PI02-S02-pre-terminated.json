@@ -1,0 +1,47 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "PI02-S02",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "1634d92178ed41111da9eac1aea3664ce339366fe2f95b4154f3dd696ba98547",
+    "python/spike_core/pdn_dielectric_ac.py": "06be9774d53d488a8ca7ee850c9b06c4903908f7fa4be9c2add00b860480af83",
+    "python/spike_core/pdn_electrostatic.py": "e081542abe3f915a64b6816fbe9ed95e0546e8daefe35e72b2500d0d4b39b521",
+    "python/spike_core/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
+    "python/spike_core/assembly_tetra_thermal_validation.py": "54ad05eaedbb4a47f5a866af7df97e94e25f871e4ada2aa3f8daa07db3ff4bd3",
+    "python/spike_core/tetra_aabb_candidates.py": "f7bcba55ced57a7c5104a73afaede5b4e26f9c1a871d281905f3b46e54cb6870",
+    "python/spike_core/service_pdn_network.py": "3252f731ef0cb4f586c7a1e64ef3a0300a43312e505c4af812b9823a9ff7c7ec",
+    "tests/python/test_pdn_dielectric_ac.py": "ea7633a766f0530494a8c039e6061a0a05af70b7bb422d47d03f11ef57c38b32",
+    "tests/python/test_pdn_dielectric_ac_contract.py": "9ee8906dc030845cadce595aca26b4309814564f7ef1972e44f9f31966f10e07",
+    "tests/python/test_pdn_electrostatic.py": "ea77b8053989c106c045101207aaf93ef34a21a553d4b25173ff26921b5fdf6e",
+    "tests/python/test_assembly_tetra_thermal.py": "27f6fad65ae1e92eb87ff25251be6ee15414b66b7e548efc0c1d29896ac93347",
+    "schemas/pdn-dielectric-ac-request-v1.schema.json": "9df2b8ec3f2edb14648fc235e6616b64f51069e8753968fa1b9e05321a7ebc1c",
+    "schemas/pdn-dielectric-ac-result-v1.schema.json": "1925bc76732ae4bb75f7ae383c10e9b9bb3ea8ec5833aaea99f15b87c9746186",
+    "python/spike_core/pdn_admittance_reduction.py": "037062bfd1b3ab38dc6ac4e2829893bc6ba0868c538a2222544f534ea4b273b0",
+    "tests/python/test_pdn_admittance_reduction.py": "f3f0a1d08e851774286bde83d3a8f2a718fa8e84b61d1fab4dd4853231ba4194",
+    "tests/python/test_pdn_reduction_contract.py": "5d6860b713d36fd792d65c3fc40e0e5cbdee6252184e19b7a7bab6ce547b5f96",
+    "schemas/pdn-admittance-reduction-request-v1.schema.json": "f655d7af7d77c4112f31224e0010681aaf98d8ddfbf0b4095e525745be50fd5c",
+    "schemas/pdn-admittance-reduction-result-v1.schema.json": "f4894adf38687f2f9d8893ba8fae2db930ccdd46fd38c6724d81cc1812ec00fd"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_complete_circuit_reference_with_crosscoupled_complex_termination",
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_complex_nonreciprocal_passive_source_without_symmetry_repair",
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_dielectric_projection_binding_and_copies",
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_malformed_partition_complex_values_frequency_and_status",
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_resistor_ladder_floating_and_terminated_auxiliary",
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_resource_bounds_before_solve_and_atomic_cancellation",
+      "tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_singular_conditioning_active_and_corrupted_solve_rejections",
+      "tests.python.test_pdn_reduction_contract.ReductionContractTests.test_actual_extraction_worker_and_schema",
+      "tests.python.test_pdn_reduction_contract.ReductionContractTests.test_owned_worker_rejects_bad_partition_and_active_load"
+    ],
+    "run": 9,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI02-S02-network-transient-reverified.log",
+  "log_sha256": "c3d06ab2aba0d4339790159c384aba1b33e49a12fc545231893938cea08eef14"
+}

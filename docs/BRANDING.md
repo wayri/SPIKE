@@ -70,3 +70,11 @@ This is an engineering record, not a legal trademark clearance. Before public co
 3. Register SPIKE's word mark and logo only after clearance.
 4. Keep source prompts, generation metadata, and asset hashes with the release record.
 5. Do not add third-party logos to SPIKE's UI without permission.
+
+## Solver suite mark
+
+The solver suite uses the single typographic **S** derived from the SPIKE
+wordmark, in `app/public/spike-solver-suite.png`. Its transparent square canvas
+includes padding for compact and circular placements. The asset was prepared
+with an image-editing model using the existing wordmark as its reference.
+The Discord server retains the circuit-shaped S in `app/public/spike-icon.png`.

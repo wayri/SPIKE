@@ -87,9 +87,16 @@ examining or adapting third-party source.
 
 ## Change gates
 
-Numerical changes require a derivation or literature reference, units,
-conditioning analysis, convergence evidence, a regression fixture, and stated
-validity limits. A faster result is not acceptable if its error is unknown.
+Numerical changes require an independent derivation **and traceable primary
+references** for their governing mathematics, physics and selected method,
+explicit subject-matter assumptions, units, conditioning analysis, convergence
+evidence, an independent regression/reference fixture and stated validity limits.
+Follow [the method evidence policy](docs/NUMERICAL_METHOD_EVIDENCE.md) and its
+template. Record the precise source version/sections actually reviewed; original
+derivations still reference their physical/mathematical foundations. Existing
+provenance gaps remain explicit. A faster result is not acceptable if its error
+is unknown. Research/preprint methods remain experimental until their declared
+independent acceptance evidence passes; novelty does not establish qualification.
 
 Importer changes require a real or minimal source fixture, object-count and
 coordinate checks, unit checks, explicit unsupported-object behavior, and an

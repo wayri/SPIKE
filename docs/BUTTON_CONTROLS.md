@@ -68,13 +68,21 @@ gesture targets are checked by their owning interaction tests; when they expose
 ## Focus workspace
 
 The main shell uses the Graphite + Teal professional-dark tokens. Menu opens a
-reserved, keyboard-accessible command panel. Submenus replace its current list;
+small, keyboard-accessible popup which can also detach into a native window. Submenus replace its current list;
 Back and Escape move to the parent. All existing menu and toolbar handlers are
 discovered from their React descriptors rather than copied into another command
 registry. Dynamic extension visibility and disabled states remain authoritative.
 
-The viewport keeps only 2D/3D, Layers, Fit and View. Camera, selection filters,
+The viewport keeps 2D/3D, Layers, Fit and View, plus a compact context quick-tools
+bar in a reserved row. Its More popup exposes the complete context action catalog. Camera, selection filters,
 model toggles, result display and advanced workspace commands open on demand.
+The bar shows the active workspace and selection, with teal tool icons and
+bounded horizontal overflow. Drag its grip to reposition without changing the
+grab point. On the grip, Left/Right moves in small steps and Home/End aligns
+to an edge; on tool buttons, those keys navigate the available actions.
+Shared `--spike-popup-*` tokens define opaque graphite surfaces, subtle borders,
+soft corners and shadows for context menus, command popups, search, notifications
+and measurement cards. Light and high-contrast settings retain their own palette.
 The navigator, studies, setup, managers and results share one reserved tool slot.
 Hide keeps inputs mounted; a tool closes through its existing Close/Apply/Discard
 flow. Expand/Restore and a bounded resize handle support large tools. Native
@@ -92,3 +100,34 @@ The probe dock combines formula, export, detach and close commands into one
 header. It shows one empty-state instruction, instead of stacked empty panels.
 Layers on the viewport toolbar opens the floating layer manager. Its docking
 controls and close button remain available; View > Layer manager also reopens it.
+
+
+### Context quick tools
+
+The movable compact bar at the top of the viewport follows the selected object,
+board occurrence, workspace, saved result admission, and active job. Its short
+icon buttons reuse the workspace context handlers. Availability is resolved
+again on activation; a missing or disabled action does not run. PI and SI
+buttons open existing setup/preflight workflows. Stop appears during a job.
+More retains all context actions and their reasons when unavailable. Move the
+bar with its grip, or focus the grip and use the left/right arrow keys.
+
+Presentation tokens apply to first-party UI surfaces and popup controls. Semantic
+warning/error colors and engineering plot/field scales retain their meanings.
+
+
+### Responsive editor surfaces
+
+Project and net managers use compact action groups and named container queries.
+Narrow net catalogs retain all metrics as labeled cards. Study, SPICE, EMI, flex
+and script-result editors adapt to their actual panel width rather than the
+main monitor width. Table columns which require side-by-side editing remain
+available in bounded horizontal scrolling. Temporary confirmations stay inside
+their editor pane. Native floating panels use the OS title-bar close control;
+closing that frame returns its current draft to the dock.
+
+Run `test:quick-tools`, `test:responsive-managers`, `test:table-theme` and
+`node scripts/test-panel-responsive-layout.mjs` from `app`, plus the focused
+workflow tests for the changed editor. Native linked-window qualification is
+available with `--panel-popup-qualification`; it uses an isolated presentation
+route and does not open a project or run a solver.

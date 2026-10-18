@@ -262,7 +262,8 @@ for (const field of ["materials", "thermal_contacts", "electrical_bonds", "expec
   assert.ok(semanticsEditor.includes(field), `assembly semantics request is missing ${field}`);
 }
 assert.ok(panel.includes("STEP tessellation is still required"), "STEP display limit must be explicit after attach");
-assert.ok(panel.includes("no material properties, contact, bond, boundary, or solver semantics are inferred"), "solver non-claim is missing");
+assert.ok(panel.includes("Neither tessellation nor exact-selector extraction establishes a solver mesh, material region, contact physics, or production-qualified geometry."), "solver geometry non-claim is missing");
+assert.ok(panel.includes("Use Material library to retain explicit property snapshots; contact, bond, boundary and solver semantics are never inferred."), "explicit material snapshot and solver semantics boundary is missing");
 assert.ok(panel.includes("visual-only and not solver-qualified"), "derived STEP visualization must not imply solver geometry");
 assert.ok(app.includes("assembly_ir: assemblyIr, assembly_designs: assemblyDesigns, assembly_package_shapes: assemblyPackageShapes, models: modelIndex"), "frontend snapshots must preserve AssemblyIR, retained designs, exact package shapes, and model index");
 assert.ok(app.includes("setAssemblyDesigns(normalizeAssemblyDesigns(data.assembly_designs, { copyDesigns: !(path && manifestDigest) }))"), "only authenticated native frontend open may retain the complete multi-design projection without copying it");

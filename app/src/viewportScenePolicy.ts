@@ -1,3 +1,5 @@
+import type { Viewport2DState, Viewport3DCameraState, ViewportRestoreCommand } from "./workspaceState";
+
 export type ViewportSceneKind =
   | "substrate"
   | "region"
@@ -58,6 +60,22 @@ export type ViewportRenderProfile = {
   targetFps: number;
   largeScene: boolean;
 };
+
+/** Preserve the historical enabled default while honoring an explicit user choice. */
+export function viewportAntialiasingEnabled(requested: boolean | undefined) {
+  return requested !== false;
+}
+
+/** Carry the latest live views through a renderer-only remount. */
+export function viewportRendererRemountRestore(
+  token: number,
+  live: { threeD?: Viewport3DCameraState; twoD?: Viewport2DState },
+  fallback: ViewportRestoreCommand | null | undefined,
+): ViewportRestoreCommand | null {
+  const threeD = live.threeD ?? fallback?.threeD;
+  const twoD = live.twoD ?? fallback?.twoD;
+  return threeD || twoD ? { token, threeD, twoD } : null;
+}
 
 type ResultOverlayState = {
   visible?: boolean;
@@ -181,13 +199,18 @@ export function adaptiveMaximumCameraDistance(radius: number) {
  * profile only adjusts presentation cost: pixel ratio, shadow resolution, and
  * frame cadence. Geometry, picking, and solver-result data remain unchanged.
  */
-export function viewportRenderProfile(objectCount: number, devicePixelRatio: number): ViewportRenderProfile {
+export function viewportRenderProfile(objectCount: number, devicePixelRatio: number, quality: "balanced" | "quality" | "performance" = "balanced"): ViewportRenderProfile {
   const largeScene = objectCount >= 12_000;
   const ultraDenseScene = objectCount >= 250_000;
-  const fullPixelRatio = Math.min(Math.max(devicePixelRatio, 0.75), largeScene ? 1 : 1.25);
+  const density = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0 ? devicePixelRatio : 1;
+  // Never undersample a settled engineering view in the default profile.
+  // Quality supersamples ordinary displays; dense scenes keep a bounded cost.
+  const fullPixelRatio = quality === "performance" ? Math.min(density, largeScene ? 1 : 1.25)
+    : quality === "quality" ? Math.min(Math.max(density, 1.5), ultraDenseScene ? 1.5 : 2)
+    : Math.min(Math.max(density, 1), ultraDenseScene ? 1.25 : 2);
   return {
     fullPixelRatio,
-    interactionPixelRatio: Math.min(fullPixelRatio, largeScene ? 0.7 : 0.85),
+    interactionPixelRatio: quality === "quality" ? fullPixelRatio : Math.min(fullPixelRatio, quality === "performance" ? .85 : 1),
     shadowMapSize: largeScene ? 512 : 1024,
     dynamicShadowUpdates: !largeScene,
     // The old 24/30 FPS hard cap made capable systems look underutilized and

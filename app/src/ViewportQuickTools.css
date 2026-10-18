@@ -1,0 +1,27 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.viewport-quick-tools-slot { display:flex;position:relative;flex:none;min-width:0;max-width:100%;padding:7px 10px 9px;box-sizing:border-box;background:var(--spike-table-surface); }
+.viewport-quick-tools { display:flex;align-items:center;gap:5px;min-width:0;max-width:100%;box-sizing:border-box;padding:5px 6px;border:1px solid var(--spike-popup-border);border-radius:var(--spike-popup-radius);background:var(--spike-popup-surface);box-shadow:var(--spike-popup-shadow);color:var(--spike-table-text); }
+.viewport-quick-tools button { flex:none;min-height:28px;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:11px;white-space:nowrap; }
+.viewport-quick-tools .quick-tools-grip { cursor:grab;touch-action:none;min-width:18px;padding:2px;color:var(--spike-table-muted); }
+.quick-tools-grip:active { cursor:grabbing; }
+.quick-tools-context { flex:0 1 auto;min-width:0;max-width:160px;padding-inline:4px 9px;border-right:1px solid var(--spike-table-border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:500;color:var(--spike-table-choice); }
+.quick-tools-context > * { display:block;overflow:hidden;text-overflow:ellipsis; }
+.quick-tools-context strong { font-size:11px;font-weight:500; }
+.quick-tools-workspace { color:var(--spike-table-muted);font-size:9px;line-height:1.1; }
+.viewport-quick-tools .quick-tools-actions button > svg { flex:none;color:var(--spike-accent-text); }
+.viewport-quick-tools .quick-tools-actions button:disabled > svg { color:inherit; }
+.viewport-quick-tools .quick-tools-more { border-left:1px solid var(--spike-popup-border); }
+.viewport-quick-tools button:focus-visible { outline:2px solid var(--spike-control-focus);outline-offset:-2px; }
+.quick-tools-actions { display:flex;gap:4px;min-width:0;overflow:auto;scrollbar-width:thin; }
+.focus-shell .canvas-area { display:flex;flex-direction:column;min-height:0; }
+.focus-shell .canvas-area > .canvas-toolbar { flex:none; }
+.focus-shell .canvas-area > .board-canvas { flex:1;min-height:0; }
+@media(max-width:1100px) { .quick-tools-context { max-width:95px; }.quick-tools-actions button span { display:none; }.quick-tools-actions button { min-width:29px;padding-inline:6px; } }
+
+/* One reserved viewport row: the floating bar replaces duplicate Fit/Layer buttons. */
+.app-shell.focus-shell .canvas-toolbar { height:40px;min-height:40px; }
+.app-shell.focus-shell .canvas-toolbar .command-strip-viewport > .viewport-quick-tools-slot { flex:1 1 0;min-width:120px;align-self:center;container:quick-tools/inline-size;padding:0 6px; }
+.canvas-toolbar .viewport-quick-tools { padding:3px 5px; }
+.canvas-toolbar .viewport-quick-tools button { min-height:24px; }
+@container quick-tools (max-width:740px) { .quick-tools-context { max-width:80px; }.quick-tools-actions button span { display:none; }.quick-tools-actions button { min-width:27px;padding-inline:5px; } }
+@container quick-tools (max-width:420px) { .quick-tools-context { display:none; }.quick-tools-more span { display:none; } }
