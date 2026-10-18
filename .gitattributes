@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Preserve exact bytes for hash-bound evidence across Git checkouts.
+licenses/runtime-notices/** -text
 examples/correlation/uniform_sheet/analytical.json -text
 benchmarks/parity-import/coupon.kicad_pcb -text
 benchmarks/parity-import/geometry.kicad_pcb -text
