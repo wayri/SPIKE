@@ -34,6 +34,8 @@ assert.equal(svgViewBoxX(890, 100, 1580, 540), 395, "scaled viewBox coordinates 
 assert.match(source, /role="dialog"/);
 assert.match(source, /event\.key === "Escape"/);
 assert.match(source, /event\.key !== "Tab"/);
+assert.match(source, /usePanelPresentation/, "expanded plot focus follows the panel owner window");
+assert.match(source, /view\.addEventListener\("keydown"/, "detached expanded plots bind keyboard handling to their owner window");
 assert.match(source, /expandButton\.current\?\.focus\(\)/);
 assert.match(source, /aria-label={`Close expanded \$\{title\}`}/);
 assert.match(source, /import PlotlyChart from "\.\/PlotlyChart"/, "SI plots use the shared interactive chart engine");

@@ -1,63 +1,63 @@
-.si-flow { padding: 14px 20px; overflow: auto; min-height: 440px; max-height: 78vh; color: var(--text-primary, #dce6f4); }
+.si-flow { padding: 14px 20px; overflow: auto; min-height: 440px; max-height: 78vh; color: var(--spike-text); }
 .si-flow .si-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0; }
-.si-flow button, .si-file { display: inline-flex; align-items: center; gap: 6px; border: 1px solid #52647a; border-radius: 5px; background: #203247; color: #edf4fc; padding: 8px 12px; cursor: pointer; font-size: 12px; }
+.si-flow button, .si-file { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--spike-table-action-border); border-radius: 5px; background: var(--spike-table-action-bg); color: var(--spike-text); padding: 8px 12px; cursor: pointer; font-size: 12px; }
 .si-flow button:disabled { opacity: .5; cursor: default; }
-.si-flow .primary-btn, .si-steps button.active { background: #075985; border-color: #38bdf8; }
+.si-flow .primary-btn, .si-steps button.active { background: var(--spike-table-choice-bg); border-color: var(--spike-table-choice-border); color: var(--spike-accent-text); }
 .si-steps { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
-.si-flow .si-note { border-left: 3px solid #eab308; background: #2b3040; padding: 10px 14px; margin: 10px 0; font-size: 12px; line-height: 1.65; }
-.si-flow fieldset { border: 1px solid #475569; border-radius: 6px; margin: 12px 0; padding: 14px; min-width: 0; }
+.si-flow .si-note { border-left: 3px solid var(--spike-status-warning); background: var(--spike-table-warning-bg); padding: 10px 14px; margin: 10px 0; font-size: 12px; line-height: 1.65; }
+.si-flow fieldset { border: 1px solid var(--spike-border-subtle); border-radius: 6px; margin: 12px 0; padding: 14px; min-width: 0; }
 .si-flow fieldset.si-stage { border: 0; padding: 0; }
-.si-flow legend { padding: 0 8px; color: #7dd3fc; }
+.si-flow legend { padding: 0 8px; color: var(--spike-accent-text); }
 .si-flow h3 { margin: 12px 0; font-size: 16px; }
 .si-flow p { line-height: 1.65; font-size: 12px; max-width: 1100px; }
 .si-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 12px 0; }
 .si-flow label { display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
-.si-flow input:not([type=checkbox]):not([type=file]), .si-flow select, .si-flow textarea { box-sizing: border-box; width: 100%; min-width: 100px; background: #111d2e; color: #f1f5f9; border: 1px solid #62748a; border-radius: 4px; padding: 8px; font: inherit; }
+.si-flow input:not([type=checkbox]):not([type=file]), .si-flow select, .si-flow textarea { box-sizing: border-box; width: 100%; min-width: 100px; background: var(--spike-surface-field); color: var(--spike-text); border: 1px solid var(--spike-border-default); border-radius: 4px; padding: 8px; font: inherit; }
 .si-flow input[type=checkbox] { align-self: flex-start; }
 .si-flow .si-file { position: relative; display: inline-flex; flex-direction: row; overflow: hidden; }
 .si-file input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
-.si-endpoint-table-wrap { overflow-x: auto; border: 1px solid #475569; border-radius: 6px; margin: 10px 0; }
+.si-endpoint-table-wrap { overflow-x: auto; border: 1px solid var(--spike-border-subtle); border-radius: 6px; margin: 10px 0; }
 .si-endpoint-table { border-collapse: collapse; min-width: 900px; width: 100%; font-size: 12px; }
-.si-endpoint-table th, .si-endpoint-table td { border-bottom: 1px solid #334155; padding: 7px; text-align: left; vertical-align: middle; }
-.si-endpoint-table thead th { background: #1d2d40; color: #bae6fd; font-weight: 600; white-space: nowrap; }
+.si-endpoint-table th, .si-endpoint-table td { border-bottom: 1px solid var(--spike-border-subtle); padding: 7px; text-align: left; vertical-align: middle; }
+.si-endpoint-table thead th { background: var(--spike-surface-header); color: var(--spike-text-strong); font-weight: 600; white-space: nowrap; }
 .si-endpoint-table tbody tr:last-child th, .si-endpoint-table tbody tr:last-child td { border-bottom: 0; }
-.si-endpoint-table tbody tr:hover { background: #17263a; }
+.si-endpoint-table tbody tr:hover { background: var(--spike-surface-hover); }
 .si-endpoint-table input { min-width: 94px; padding: 6px !important; }
 .si-endpoint-table button { padding: 5px 7px; }
-.si-endpoint-ibis { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: #facc15; }
-.si-endpoint-hint { margin-top: 6px !important; color: #94a3b8; }
+.si-endpoint-ibis { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: var(--spike-status-warning); }
+.si-endpoint-hint { margin-top: 6px !important; color: var(--spike-text-muted); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .si-json { height: 430px; font-family: monospace !important; }
-.si-flow pre { white-space: pre-wrap; word-break: break-word; background: #101a29; padding: 12px; max-height: 400px; overflow: auto; font-size: 11px; }
+.si-flow pre { white-space: pre-wrap; word-break: break-word; background: var(--spike-surface-field); padding: 12px; max-height: 400px; overflow: auto; font-size: 11px; }
 .si-flow details { margin: 14px 0; }
 .si-flow summary { cursor: pointer; padding: 8px 0; }
 .si-parameter-field { min-width: 0; display: flex; flex-direction: column; gap: 5px; font-size: 12px; }
 .si-flow .si-parameter-field details { position: relative; margin: 0; min-width: 0; }
-.si-flow .si-parameter-field summary { box-sizing: border-box; width: 100%; min-height: 37px; padding: 8px 10px; border: 1px solid #62748a; border-radius: 4px; color: #f1f5f9; background: #111d2e; }
-.si-parameter-options { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; width: 100%; max-height: min(240px, 42vh); overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 4px; box-sizing: border-box; padding: 6px; border: 1px solid #62748a; border-radius: 4px; background: #111d2e; box-shadow: 0 12px 30px #0009; }
+.si-flow .si-parameter-field summary { box-sizing: border-box; width: 100%; min-height: 37px; padding: 8px 10px; border: 1px solid var(--spike-border-default); border-radius: 4px; color: var(--spike-text); background: var(--spike-surface-field); }
+.si-parameter-options { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; width: 100%; max-height: min(240px, 42vh); overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 4px; box-sizing: border-box; padding: 6px; border: 1px solid var(--spike-border-default); border-radius: 4px; background: var(--spike-surface-panel); box-shadow: var(--spike-popup-shadow); }
 .si-flow .si-parameter-options button { justify-content: center; min-height: 32px; padding: 4px 8px; }
-.si-flow .si-parameter-options button[aria-current="true"] { border-color: #f0bf67; color: #f0bf67; background: #2b281d; }
+.si-flow .si-parameter-options button[aria-current="true"] { border-color: var(--spike-table-choice-border); color: var(--spike-accent-text); background: var(--spike-table-choice-bg); }
 .si-plot { border: 1px solid var(--spike-table-border); background: var(--spike-table-surface); padding: 8px 12px; margin: 14px 0; border-radius: 6px; }
 .si-plot h4 { min-width: 0; overflow-wrap: anywhere; margin: 6px 0; font-size: 13px; color: var(--spike-table-text); }
 .si-plot-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .si-flow .si-plot-heading button { padding: 5px 9px; }
 .si-plot > svg { width: 100%; max-height: 320px; display: block; }
-.si-plot > svg text { fill: #cbd5e1; font-size: 10px; }
-.si-plot small { color: #94a3b8; display: block; font-size: 10px; }
-.si-plot-shade { position: fixed; z-index: var(--z-modal, 200); inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(3, 8, 11, .78); }
-.si-plot-window { box-sizing: border-box; width: min(1100px, calc(100vw - 36px)); height: min(720px, calc(100vh - 36px)); min-width: min(540px, calc(100vw - 36px)); min-height: 360px; resize: both; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr); border: 1px solid var(--spike-table-border-strong); border-radius: 7px; color: var(--spike-table-text); background: var(--spike-table-surface); box-shadow: 0 24px 80px rgba(0, 0, 0, .7); }
+.si-plot > svg text { fill: var(--spike-text-muted); font-size: 10px; }
+.si-plot small { color: var(--spike-text-muted); display: block; font-size: 10px; }
+.si-plot-shade { position: fixed; z-index: var(--z-modal, 200); inset: 0; display: grid; place-items: center; padding: 18px; background: var(--spike-popup-backdrop); }
+.si-plot-window { box-sizing: border-box; width: min(1100px, calc(100vw - 36px)); height: min(720px, calc(100vh - 36px)); min-width: min(540px, calc(100vw - 36px)); min-height: 360px; resize: both; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr); border: 1px solid var(--spike-table-border-strong); border-radius: 7px; color: var(--spike-table-text); background: var(--spike-table-surface); box-shadow: var(--spike-popup-shadow); }
 .si-plot-window > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; border-bottom: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); }
 .si-plot-window > header h3 { margin: 0; font-size: 14px; }
 .si-flow .si-plot-window > header button { padding: 6px 10px; }
 .si-plot-window-body { min-height: 0; overflow: auto; padding: 10px 14px; }
 .si-plot-window-body > svg { width: 100%; height: calc(100% - 28px); min-height: 280px; display: block; }
-.si-plot-window-body > svg text { fill: #cbd5e1; font-size: 10px; }
-.si-plot-window-body small { color: #94a3b8; display: block; padding-top: 5px; font-size: 10px; }
+.si-plot-window-body > svg text { fill: var(--spike-text-muted); font-size: 10px; }
+.si-plot-window-body small { color: var(--spike-text-muted); display: block; padding-top: 5px; font-size: 10px; }
 @media (max-width: 620px), (max-height: 440px) {
   .si-plot-shade { padding: 0; }
   .si-plot-window { width: 100vw; height: 100vh; min-width: 0; min-height: 0; resize: none; border: 0; border-radius: 0; }
 }
 .si-metrics { display: flex; flex-wrap: wrap; gap: 18px; margin: 14px 0; }
 .si-metrics div { display: flex; flex-direction: column; gap: 6px; }
-.si-metrics span { color: #94a3b8; font-size: 11px; }
-.si-flow :focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+.si-metrics span { color: var(--spike-text-muted); font-size: 11px; }
+.si-flow :focus-visible { outline: 2px solid var(--spike-accent); outline-offset: 2px; }

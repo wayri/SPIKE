@@ -20,9 +20,23 @@ for (const role of ['source', 'load', 'source_return', 'load_return']) {
 }
 assert.equal(removePiTerminal(setup, 'source', 'missing').sources.length, 1);
 const app = readFileSync(new URL('../src/App.tsx', import.meta.url), 'utf8');
-assert.match(app, /clickedObject\?\.type==="terminal"&&clickedObject\.terminalRole/,
-  'every terminal role is offered a removal action outside the PI tab');
-assert.match(app, /label:"Remove this configured terminal"/);
-assert.match(app, /removePiTerminal\(current,clickedObject\.terminalRole!,clickedObject\.id\.replace\(\/\^analysis-terminal:\/,""\)\)/,
-  'the viewport action removes only the clicked terminal role and id');
-console.log('PI terminal coordinates and role-scoped deletion passed.');
+const ast=ts.createSourceFile('App.tsx',app,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+let actionSource;
+function visit(node){
+ if(ts.isObjectLiteralExpression(node) && node.properties.some(prop=>ts.isPropertyAssignment(prop) && prop.name.getText(ast)==='id' && ts.isStringLiteral(prop.initializer) && prop.initializer.text==='delete-terminal')) actionSource=node.getText(ast);
+ ts.forEachChild(node,visit);
+}
+visit(ast);assert.ok(actionSource,'the actual terminal deletion action remains in the workspace context catalog');
+const compiled=ts.transpileModule(`export function action(deps){const {clickedObject,recordChange,setPiSetup,setSelected,removePiTerminal,smartContext}=deps;return (${actionSource});}`,{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText;
+const module={exports:{}};
+new Function('module','exports',compiled)(module,module.exports);
+for(const role of ['source','load','source_return','load_return']){
+ let changes=0,selected='terminal',next=setup;
+ const action=module.exports.action({clickedObject:{id:'analysis-terminal:same',type:'terminal',terminalRole:role},smartContext:{},recordChange:()=>changes++,setPiSetup:update=>next=update(next),setSelected:value=>selected=value,removePiTerminal});
+ action.run();assert.equal(changes,1);assert.equal(selected,null);
+ const lists=[next.sources,next.loads,next.returnPath.sources,next.returnPath.loads];
+ assert.equal(lists.filter(items=>!items.length).length,1,'context action removes only its terminal role');
+ assert.equal(lists[['source','load','source_return','load_return'].indexOf(role)].length,0);
+ assert.equal(next.batchJobs,setup.batchJobs);
+}
+console.log('PI terminal coordinates and production context role-scoped deletion passed.');

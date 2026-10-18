@@ -20,6 +20,13 @@ formulations remain in that repository's `docs/RESEARCH_BASE.md` and
 `docs/formulations/`; they are not copied into this public handbook. Native
 research prototypes do not automatically become advertised application physics.
 
+## Mathematical reference
+
+[Solver mathematics and methods](SOLVER_MATHEMATICS.md) collects the implemented
+equations, units, discretizations, boundary conditions, numerical solution methods,
+source owners and verification links by family. Its coverage and gap ledger is
+explicit; it does not promote experimental models or external runtimes.
+
 ## Runtime and model boundaries
 
 EDA input enters through an importer and becomes SpiDeR. AnalysisSpec binds

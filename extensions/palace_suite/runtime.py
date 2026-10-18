@@ -343,3 +343,6 @@ def native_validate(params,binding,cancellation_event=None):
         'validation_scope':'Palace --dry-run schema and resolved configuration; no field solve or accuracy qualification',
         'native_validation':{'return_code':process['return_code'],'log':str(job/'validation.log')},
         'issues':[] if process['return_code']==0 else [{'code':'native_validation_failed','message':process['stderr'][-8192:]}]}
+
+
+

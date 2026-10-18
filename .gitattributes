@@ -42,3 +42,150 @@ python/spike_core/mcad_component_models.py text eol=lf
 scripts/parity_component_model_gate.py text eol=lf
 benchmarks/parity-import/*.step -text
 docs/validation/parity/*-native-solids.json text eol=lf
+scripts/parity_native_step_placement_gate.py text eol=lf
+scripts/parity_component_placement_math.py text eol=lf
+benchmarks/parity-import/native-step-reference/** -text
+docs/validation/parity/WF01-S04C3-native-step.json -text
+python/spike_core/component_placement_review.py text eol=lf
+scripts/parity_component_review_gate.py text eol=lf
+python/spike_core/component_step_scale.py text eol=lf
+python/spike_core/freecad_scale_step.py text eol=lf
+scripts/parity_step_scale_gate.py text eol=lf
+benchmarks/parity-import/step-scale/** -text
+docs/validation/parity/WF01-S04C5*-native.json -text
+python/spike_core/scaled_component_review.py text eol=lf
+scripts/parity_scaled_review_gate.py text eol=lf
+docs/validation/parity/WF01-S04C6*-native.json -text
+python/spike_core/sparameter_modes.py text eol=lf
+python/spike_core/sparameters.py text eol=lf
+python/spike_core/pdn_network.py text eol=lf
+tests/python/test_sparameter_modes.py text eol=lf
+tests/python/test_pdn_transient_consistency.py text eol=lf
+scripts/parity_pisi_gate.py text eol=lf
+docs/validation/parity/SI08-S01* text eol=lf
+docs/validation/parity/PI04-S01* text eol=lf
+tests/python/test_pdn_multiload.py text eol=lf
+tests/python/test_pdn_multiload_contract.py text eol=lf
+schemas/pdn-network-request-v1.schema.json text eol=lf
+docs/validation/parity/PI04-S02* text eol=lf
+python/spike_core/pdn_dielectric_ac.py text eol=lf
+python/spike_core/service_pdn_network.py text eol=lf
+python/spike_core/pdn_electrostatic.py text eol=lf
+python/spike_core/assembly_tetra_thermal_validation.py -text
+python/spike_core/tetra_aabb_candidates.py text eol=lf
+tests/python/test_pdn_dielectric_ac.py text eol=lf
+tests/python/test_pdn_dielectric_ac_contract.py text eol=lf
+tests/python/test_pdn_electrostatic.py text eol=lf
+tests/python/test_assembly_tetra_thermal.py text eol=lf
+schemas/pdn-dielectric-ac-request-v1.schema.json text eol=lf
+schemas/pdn-dielectric-ac-result-v1.schema.json text eol=lf
+docs/validation/parity/PI02-S01* text eol=lf
+# Execution logs are byte-bound; preserve Windows/native line endings.
+docs/validation/parity/*.log -text -eol
+python/spike_core/pdn_admittance_reduction.py text eol=lf
+tests/python/test_pdn_admittance_reduction.py text eol=lf
+tests/python/test_pdn_reduction_contract.py text eol=lf
+schemas/pdn-admittance-reduction-request-v1.schema.json text eol=lf
+schemas/pdn-admittance-reduction-result-v1.schema.json text eol=lf
+docs/validation/parity/PI02-S02*.json text eol=lf
+python/spike_core/pdn_dielectric_thermal.py text eol=lf
+python/spike_core/assembly_tetra_thermal.py -text
+python/spike_core/assembly_tetra_radiation.py -text
+tests/python/test_pdn_dielectric_thermal.py text eol=lf
+tests/python/test_pdn_dielectric_thermal_contract.py text eol=lf
+examples/pdn_dielectric_thermal/run_slab.py text eol=lf
+schemas/pdn-dielectric-thermal-request-v1.schema.json text eol=lf
+schemas/pdn-dielectric-thermal-result-v1.schema.json text eol=lf
+docs/validation/parity/PI02-S03*.json text eol=lf
+python/spike_core/pdn_dielectric_feedback.py text eol=lf
+tests/python/test_pdn_dielectric_feedback.py text eol=lf
+tests/python/test_pdn_dielectric_feedback_contract.py text eol=lf
+examples/pdn_dielectric_thermal/run_feedback.py text eol=lf
+schemas/pdn-dielectric-feedback-request-v1.schema.json text eol=lf
+schemas/pdn-dielectric-feedback-result-v1.schema.json text eol=lf
+docs/validation/parity/PI02-S04*.json text eol=lf
+python/spike_core/pdn_decap_corners.py text eol=lf
+tests/python/test_pdn_decap_corners.py text eol=lf
+tests/python/test_pdn_decap_corners_contract.py text eol=lf
+schemas/pdn-decap-corners-request-v1.schema.json text eol=lf
+schemas/pdn-decap-corners-result-v1.schema.json text eol=lf
+docs/validation/parity/PI03-S01*.json text eol=lf
+examples/pdn_decap_corners/run_corners.py text eol=lf
+python/spike_core/pdn_decap_selection.py text eol=lf
+tests/python/test_pdn_decap_selection.py text eol=lf
+tests/python/test_pdn_decap_selection_contract.py text eol=lf
+schemas/pdn-decap-selection-request-v1.schema.json text eol=lf
+schemas/pdn-decap-selection-result-v1.schema.json text eol=lf
+docs/validation/parity/PI03-S02*.json text eol=lf
+python/spike_core/sparameter_deembedding.py text eol=lf
+python/spike_core/service_sparameter_processing.py text eol=lf
+python/spike_core/service_simulation_handlers.py text eol=lf
+tests/python/test_sparameter_deembedding.py text eol=lf
+tests/python/test_sparameter_deembedding_contract.py text eol=lf
+schemas/two-port-deembedding-request-v1.schema.json text eol=lf
+schemas/two-port-deembedding-result-v1.schema.json text eol=lf
+docs/validation/parity/SI08-S02*.json text eol=lf
+python/spike_core/sparameter_sampling.py text eol=lf
+tests/python/test_sparameter_sampling.py text eol=lf
+tests/python/test_sparameter_sampling_contract.py text eol=lf
+schemas/sparameter-resampling-request-v1.schema.json text eol=lf
+schemas/sparameter-resampling-result-v1.schema.json text eol=lf
+docs/validation/parity/SI08-S03*.json text eol=lf
+python/spike_core/sparameter_rational.py text eol=lf
+tests/python/test_sparameter_rational.py text eol=lf
+tests/python/test_sparameter_rational_contract.py text eol=lf
+schemas/sparameter-rational-fit-request-v1.schema.json text eol=lf
+schemas/sparameter-rational-fit-result-v1.schema.json text eol=lf
+docs/validation/parity/SI08-S04*.json text eol=lf
+python/spike_core/sparameter_transient.py text eol=lf
+tests/python/test_sparameter_transient.py text eol=lf
+tests/python/test_sparameter_transient_contract.py text eol=lf
+schemas/rational-network-transient-request-v1.schema.json text eol=lf
+schemas/rational-network-transient-result-v1.schema.json text eol=lf
+docs/validation/parity/SI07-S01*.json text eol=lf
+python/spike_core/sparameter_terminated.py text eol=lf
+tests/python/test_sparameter_terminated.py text eol=lf
+tests/python/test_sparameter_terminated_contract.py text eol=lf
+schemas/terminated-network-transient-request-v1.schema.json text eol=lf
+schemas/terminated-network-transient-result-v1.schema.json text eol=lf
+docs/validation/parity/SI07-S02*.json text eol=lf
+
+scripts/parity_structural_gate.py text eol=lf
+
+python/spike_core/assembly_tetra_structural.py text eol=lf
+
+python/spike_core/assembly_thermomechanical.py text eol=lf
+
+python/spike_core/service_structural.py text eol=lf
+
+python/spike_core/service_assembly_field.py text eol=lf
+
+tests/python/test_assembly_tetra_structural.py text eol=lf
+
+tests/python/test_assembly_thermomechanical.py text eol=lf
+
+docs/validation/parity/GP07-S01*.json text eol=lf
+
+python/spike_core/service.py text eol=crlf
+python/spike_core/service_helpers.py text eol=lf
+tests/python/test_assembly_structural_contract.py text eol=lf
+schemas/assembly-tetra-structural-*.schema.json text eol=lf
+schemas/assembly-thermomechanical-*.schema.json text eol=lf
+
+python/spike_core/sparameter_inductive_terminated.py text eol=lf
+tests/python/test_sparameter_inductive_terminated.py text eol=lf
+tests/python/test_sparameter_inductive_contract.py text eol=lf
+examples/inductive_network_transient/run_rlc.py text eol=lf
+schemas/inductive-network-transient-request-v1.schema.json text eol=lf
+schemas/inductive-network-transient-result-v1.schema.json text eol=lf
+docs/INDUCTIVE_NETWORK_TRANSIENT.md text eol=lf
+docs/validation/parity/SI07-S03*.json text eol=lf
+
+python/spike_core/sparameter_capacitive_terminated.py text eol=lf
+tests/python/test_sparameter_capacitive_terminated.py text eol=lf
+tests/python/test_sparameter_capacitive_contract.py text eol=lf
+examples/capacitive_network_transient/run_rc.py text eol=lf
+schemas/capacitive-network-transient-request-v1.schema.json text eol=lf
+schemas/capacitive-network-transient-result-v1.schema.json text eol=lf
+docs/CAPACITIVE_NETWORK_TRANSIENT.md text eol=lf
+docs/validation/parity/SI07-S04*.json text eol=lf

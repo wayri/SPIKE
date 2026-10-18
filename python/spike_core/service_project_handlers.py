@@ -36,6 +36,7 @@ from .service_project_volume_electrothermal import handle_volume_electrothermal_
 from .service_project_thermal_mesh import handle_thermal_mesh_project_request
 from .service_project_airflow import handle_airflow_project_request
 from .service_project_mcad_placement import handle_mcad_placement_project_request
+from .service_material_library import handle_material_library_request
 from .service_project_selector_preview import generate_mcad_selector_preview_in_project, read_mcad_selector_previews
 from .normalized_source_codec import compact_normalized_source_for_open, encode_normalized_source
 from .service_project_persistence import project_for_desktop, prepare_persistent_state, read_persistent_artifact, without_saved_results, migrate_saved_assembly_results
@@ -80,6 +81,11 @@ def handle_project_request(
     )
     if placement_response is not None:
         return placement_response
+    material_response = handle_material_library_request(
+        method, params, request_id=request_id, application_version=application_version,
+    )
+    if material_response is not None:
+        return material_response
     if method == "generate_mcad_selector_preview_in_project":
         try:
             return {"ok": True, "result": generate_mcad_selector_preview_in_project(

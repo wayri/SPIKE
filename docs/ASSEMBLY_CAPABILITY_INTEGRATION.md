@@ -107,3 +107,95 @@ reference comparisons after WSL recovers. Native window visual acceptance is
 also pending. Cancelling the Windows proxy has not proved immediate termination
 of WSL solver descendants; do not claim complete cancellation containment.
 Knowledgeable numerical review remains required before release.
+
+## Conservative geometry-to-CHT source admission (October 18, 2026)
+
+Before writing an OpenFOAM case, `assembly_airflow_admission.py` now checks the
+mesher's explicit millimetre units, complete `solid_N` to retained-source mapping,
+requested cell/vertex limits and positive tetrahedron orientation. Missing solid
+or air cells, duplicate tetrahedra/coordinates, invalid indices, nonfinite values
+and ill-conditioned tetrahedra are rejected. Each region volume is recomputed
+from its vertices; the reported volume must agree to a relative 1e-9. Solid
+volumes must also remain within the existing 2% CAD tessellation tolerance.
+Older cached mesh records without units and complete source/CAD identities must
+be regenerated. These checks precede all case writes and do not replace native
+`checkMesh`, establish arbitrary tetrahedral non-overlap, or validate CAD physics.
+
+The independently derived source conversion is
+`V_mm3 = sum(det(b-a, c-a, d-a) / 6)`, `V_m3 = 1e-9 * V_mm3`, and
+`q_W_m3 = requested_power_W / V_m3`. The integration invariant is therefore
+`sum(q_W_m3 * cell_volume_m3) = requested_power_W`. Recomputed volumes control
+normalization even when metadata differences are within roundoff tolerance.
+The determinant threshold is 64 machine epsilons times the cube of the largest
+cell coordinate difference; it rejects unresolved slivers instead of amplifying
+their roundoff. Positive contributions are summed with compensated `math.fsum`.
+
+Preparation retains `source-coupling.json` and returns `source_coupling`; execution
+also returns this evidence with source IDs, mesh digest, SI region volumes and
+requested/integrated watts. It explicitly labels solver convergence and heat/flow
+balance `not_evaluated`. A failed native status stays failed. Source integration
+conservation alone cannot establish a completed, converged or validated CHT solve.
+
+Reproduce the original analytical checks with:
+
+```powershell
+python -m unittest tests.python.test_assembly_airflow tests.python.test_assembly_airflow_conservation -v
+```
+
+A 0.5 mm3 solid in a 1 mm3 enclosure is independently partitioned into 48,
+384 and 3,072 tetrahedra. All three refinements retain 3.25 W (tolerance 1e-13 W)
+and the expected 6.5e9 W/m3 source density. Malformed source/geometry/volume
+records fail before writing a case. A mocked failed-to-converge engine result
+tests status propagation only; it is not executed CFD evidence. The fixtures and
+derivation are original SPIKE work with no external mesh, source or reference
+data. Native airflow temperature, flow/heat balance and mesh/time convergence
+acceptance remain pending as described above.
+
+### Actual bounded native CHT execution, October 18, 2026
+
+The previously unavailable WSL OpenFOAM runtime responded during this check:
+Ubuntu `/usr/bin/openfoam2606`, version 2606. An original 48-tetrahedron case
+passed the new source admission and native `checkMesh -allRegions`, then executed
+through the existing hash-verified runner with a 60-second per-command budget.
+Full inputs, commands, stdout/stderr, fields and observation hashes are retained
+locally in `.local/validation/cht-source-admission-20261018/`; `run_case.py` and
+`summarize.py` describe the exact generation and observation procedure.
+
+The 1 mm cube has equal solid and fluid half-volumes, a 0.001 W solid load,
+298.15 K exterior temperature and zero gravity. Both reference materials have
+density 1 kg/m3, heat capacity 1 J/(kg K) and conductivity 1 W/(m K); fluid
+dynamic viscosity is 0.01 Pa s. These deliberately simple reference properties
+do not represent physical air or a PCB. Twenty 0.001-second steps with ten outer
+correctors per step completed in static mode. Imported solid temperatures were
+298.1778323..298.2239153 K, fluid cell temperatures 298.1520907..298.1729697 K,
+velocity exactly zero and pressure 101325 Pa. Final thermal equation residuals
+were 3.5292e-9 (fluid) and 7.5135e-9 (solid); the last two written temperature
+fields agreed at the exported precision.
+
+Negating the native inward-positive exterior `wallHeatFlux` integrals gives
+0.00013768089959 W from the fluid and 0.00086231909443 W from the solid. Their
+sum differs from the prescribed 0.001 W by 5.98e-9 relative. This is an observed
+final power balance and iterative residual check on one grid and time step;
+it does not qualify continuum temperature accuracy or mesh/time convergence.
+
+The same mesh with a prescribed 5e-9 m3/s inlet on y=0 and pressure outlet on
+y=1 **failed**. The maximum Courant number grew to about 100.6; at t=0.002 s
+the engine aborted with return code 134 and negative temperature. The adapter
+returned `failed` with empty imported fields, and all failure logs remain in
+the separate `forced` directory. This failed case provides no accepted fields.
+
+One revised case in `forced-small-step` used 1e-9 m3/s (mean prescribed inlet
+velocity 0.002 m/s) and a 1e-8 s step for 100 steps. The minimum tetrahedron
+inradius is 1.03553e-4 m: the input convective scale U*dt/h is 1.93137e-7 and
+viscous scale nu*dt/h^2 is 0.00932548. The actual maximum logged Courant number
+was 1.55491e-7. This case completed with native solid temperatures
+298.1779424..298.2256488 K, fluid temperatures 298.1522221..298.1799947 K and
+maximum returned fluid speed 0.0026061383 m/s. Final outward mass fluxes were
+-1.00000000000000006e-9 kg/s at the inlet and 1.00000000024811330e-9 kg/s
+at the outlet (relative imbalance 2.48113e-10). This establishes actual
+moving-fluid and temperature execution for this tiny reference case. Its
+startup energy storage and full open-boundary heat transport were not balanced;
+no energy-conservation, continuum-accuracy or convergence claim is made.
+General forced/natural-flow stability and refinement, physical-air properties,
+general CAD and hardware correlation remain pending.
+Knowledgeable numerical review remains required before release.

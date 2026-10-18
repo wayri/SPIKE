@@ -31,10 +31,12 @@ class AssemblyAirflowTest(unittest.TestCase):
         r = request()
         r['geometry']['solids'].append({**copy.deepcopy(r['geometry']['solids'][0]), 'id': 'sink'})
         r['region_properties']['sink'] = {'role': 'heatsink', 'power_w': 0}
-        mesh = cube()
+        mesh = cube(unit='mm')
         for index, cell in enumerate(mesh['cells']):
             cell['material_id'] = ('solid_0', 'solid_1', 'air')[index // 2]
         mesh['volumes_mm3'] = {'solid_0': 1/3, 'solid_1': 1/3, 'air': 1/3}
+        mesh['cad_volumes_mm3'] = {'solid_0': 1/3, 'solid_1': 1/3}
+        mesh['source_ids'] = {'solid_0': 'board', 'solid_1': 'sink'}
         before = copy.deepcopy(mesh)
         with tempfile.TemporaryDirectory() as folder:
             with self.assertRaisesRegex(ValueError, 'acknowledge perfect'):
@@ -61,10 +63,12 @@ class AssemblyAirflowTest(unittest.TestCase):
         from tests.python.test_assembly_tetra_thermal import cube
         r = request()
         r['region_properties']['board']['role'] = 'heatsink'
-        mesh = cube()
+        mesh = cube(unit='mm')
         for index, cell in enumerate(mesh['cells']):
             cell['material_id'] = 'solid_0' if index < 3 else 'air'
         mesh['volumes_mm3'] = {'solid_0': 0.5, 'air': 0.5}
+        mesh['cad_volumes_mm3'] = {'solid_0': .5}
+        mesh['source_ids'] = {'solid_0': 'board'}
         with tempfile.TemporaryDirectory() as folder, self.assertRaisesRegex(ValueError, 'shared solid mounting'):
             prepare_airflow_case(r, mesh, folder)
 

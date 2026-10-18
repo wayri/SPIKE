@@ -1,0 +1,15 @@
+{
+  "command": [
+    "C:\\Users\\yawar\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-step-reference\\check_reference.py",
+    "--repo-root",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE",
+    "--output-root",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-step-reference"
+  ],
+  "timeout_s": 15,
+  "returncode": 0,
+  "stdout": "{\n  \"status\": \"passed_local_black_box_reference\",\n  \"cases\": 12,\n  \"max_vertex_error_mm\": 8.412825991399586e-12,\n  \"max_volume_error_mm3\": 7.105427357601002e-15\n}\n",
+  "stderr": "Failed to find real location of C:\\Users\\yawar\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe\n",
+  "elapsed_s": 0.35312680000060936
+}

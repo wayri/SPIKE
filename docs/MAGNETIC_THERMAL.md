@@ -158,3 +158,4 @@ material accuracy, machine loss correlation, CFD, radiation, axial conduction,
 3D end effects, motion, hysteresis, PM temperature/demagnetization behavior, or
 production qualification. Mesh, air-box, thermal-boundary and coupling-step
 convergence and independent device evidence remain necessary.
+

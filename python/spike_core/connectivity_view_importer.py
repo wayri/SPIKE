@@ -180,7 +180,7 @@ def _generated_svg(components: list[dict[str, Any]], nets: list[dict[str, Any]])
             rows.append(f'<line x1="{x + column_width}" y1="{py}" x2="{x + column_width + 18}" y2="{py}"/>')
             rows.append(f'<text x="{x + column_width - 8}" y="{py + 4}" text-anchor="end">{html.escape(pin)}</text>')
             visible_net = net if len(net) <= 22 else net[:19] + "..."
-            rows.append(f'<text class="net" x="{x + column_width + 22}" y="{py + 4}">'
+            rows.append(f'<text class="net" x="{x + column_width + 22}" y="{py + 4}">' 
                         f'<title>{html.escape(net)}</title>{html.escape(visible_net)}</text>')
             pin_records.append({"number": pin, "uuid": "", "net": net})
         rows.append("</g>")

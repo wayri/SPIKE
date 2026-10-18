@@ -105,6 +105,11 @@ Invoke-Checked "cmake" @(
     "--parallel", "2"
 ) $root
 
+Invoke-Checked $python @(
+    "scripts/build_native_airflow.py", "--build-dir", "build-native-airflow",
+    "--generator", "Ninja"
+) $root
+Invoke-Checked $python @("scripts/build_packaged_circuit_worker.py") $root
 Invoke-Checked $python @("scripts/build_packaged_worker.py") $root
 Invoke-Checked "cargo" @("test", "--manifest-path", "app/src-tauri/Cargo.toml", "--lib") $root
 $frozenWorker = Join-Path $root "app\src-tauri\resources\worker\spike-worker\spike-worker.exe"
@@ -116,7 +121,7 @@ Invoke-Checked $python @("scripts/verify_packaged_cli.py", "--", $frozenWorker, 
 Invoke-Checked "npm.cmd" @("ci") $app
 Invoke-Checked "npm.cmd" @("run", "build") $app
 Invoke-Checked $python @("scripts/prepare_release_resources.py", "--config-output", "build/tauri.release.json") $root
-Invoke-Checked "npm.cmd" @("run", "tauri", "build", "--", "--bundles", "nsis", "--config", "../build/tauri.release.json") $app
+Invoke-Checked "npm.cmd" @("run", "tauri", "build", "--", "--bundles", "nsis", "--features", "custom-protocol", "--config", "../build/tauri.release.json") $app
 
 $bundleRoot = Join-Path $app "src-tauri\target\release\bundle\nsis"
 $installers = @(Get-ChildItem -LiteralPath $bundleRoot -Filter "*.exe" -File)
@@ -162,19 +167,12 @@ $desktopCandidates = @(Get-ChildItem -LiteralPath $installRoot -Recurse -Filter 
 if ($desktopCandidates.Count -ne 1) {
     throw "Expected exactly one installed desktop executable; found $($desktopCandidates.Count)."
 }
-$desktop = Start-Process -FilePath $desktopCandidates[0].FullName -WindowStyle Hidden -PassThru
-try {
-    Start-Sleep -Seconds 10
-    if ($desktop.HasExited) {
-        throw "Installed SPIKE desktop exited during the 10-second startup smoke check (exit code $($desktop.ExitCode))."
-    }
-}
-finally {
-    if (-not $desktop.HasExited) {
-        Stop-Process -Id $desktop.Id -Force
-        $desktop.WaitForExit()
-    }
-}
+# A live process can still be displaying the missing-frontend error dialog.
+# Require the embedded JavaScript/native panel proof and a normal close instead.
+Invoke-Checked $python @(
+    "scripts/verify_windows_desktop.py", $desktopCandidates[0].FullName,
+    "--output", (Join-Path $root "build/desktop-frontend-qualification.json")
+) $root
 
 $uninstaller = Join-Path $installRoot "uninstall.exe"
 $uninstall = Start-Process -FilePath $uninstaller -ArgumentList @("/S", "/CurrentUser") `

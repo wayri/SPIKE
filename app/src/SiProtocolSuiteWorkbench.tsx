@@ -4,6 +4,7 @@ import {
   builtinSiProtocolSuites, createCustomSiProtocolSuite, protocolSuiteExtensionBundle,
   SiAnalysisId, SiProtocolSuite, validateSiProtocolSuite,
 } from "./siProtocolSuites";
+import { usePanelPresentation } from "./panelPresentation";
 
 type Props = {
   extensionSuites?: SiProtocolSuite[];
@@ -32,9 +33,10 @@ function loadCustomSuites(): SiProtocolSuite[] {
   } catch { return []; }
 }
 
-function download(name: string, value: unknown) {
+function download(ownerDocument: Document | undefined, name: string, value: unknown) {
+  if (!ownerDocument) return;
   const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: "application/json" }));
-  const anchor = document.createElement("a");
+  const anchor = ownerDocument.createElement("a");
   anchor.href = url;
   anchor.download = name;
   anchor.click();
@@ -46,6 +48,7 @@ function contributionSuites(values: SiProtocolSuite[] | undefined): SiProtocolSu
 }
 
 export default function SiProtocolSuiteWorkbench({ extensionSuites, onClose, onStatus, onOpenTopology, onOpenNetwork, onOpenExtensions }: Props) {
+  const { ownerDocument } = usePanelPresentation();
   const importRef = useRef<HTMLInputElement>(null);
   const [customSuites, setCustomSuites] = useState<SiProtocolSuite[]>(loadCustomSuites);
   const [selectedId, setSelectedId] = useState("spike.si.ddr");
@@ -126,7 +129,7 @@ export default function SiProtocolSuiteWorkbench({ extensionSuites, onClose, onS
         <footer className="si-suite-footer"><span><BookOpenCheck size={14} /> {selected.provenance.title} · {selected.provenance.access.replace(/_/g, " ")}</span><button className="secondary-btn" onClick={onOpenExtensions}><Boxes size={14} /> Extension manager</button><button className="primary-btn" onClick={() => runAnalysis("topology")}><Play size={14} /> Configure suite</button></footer>
       </main>}
     </div> : <div className="si-builder">
-      <div className="si-builder-toolbar"><button className={builderMode === "gui" ? "selected" : ""} onClick={() => setBuilderMode("gui")}><Settings2 size={14} /> GUI</button><button className={builderMode === "code" ? "selected" : ""} onClick={() => setBuilderMode("code")}><Code2 size={14} /> JSON code</button><button onClick={() => importRef.current?.click()}><Upload size={14} /> Import</button><input ref={importRef} className="hidden-input" type="file" accept=".json,.spike-protocol.json" onChange={event => void importSuite(event.target.files?.[0])} /><button onClick={() => download(`${draft.id}.spike-protocol.json`, draft)}><Download size={14} /> Suite</button><button onClick={() => download(`${draft.id}.spike-extension-source.json`, protocolSuiteExtensionBundle(draft))}><FileJson size={14} /> Extension source</button></div>
+      <div className="si-builder-toolbar"><button className={builderMode === "gui" ? "selected" : ""} onClick={() => setBuilderMode("gui")}><Settings2 size={14} /> GUI</button><button className={builderMode === "code" ? "selected" : ""} onClick={() => setBuilderMode("code")}><Code2 size={14} /> JSON code</button><button onClick={() => importRef.current?.click()}><Upload size={14} /> Import</button><input ref={importRef} className="hidden-input" type="file" accept=".json,.spike-protocol.json" onChange={event => void importSuite(event.target.files?.[0])} /><button onClick={() => download(ownerDocument, `${draft.id}.spike-protocol.json`, draft)}><Download size={14} /> Suite</button><button onClick={() => download(ownerDocument, `${draft.id}.spike-extension-source.json`, protocolSuiteExtensionBundle(draft))}><FileJson size={14} /> Extension source</button></div>
       <div className="si-builder-gate"><ShieldAlert size={16} /><span>The GUI and JSON modes generate the same declarative contract. Optional extension code is exported dormant: it cannot run until digest-bound publisher trust, exact permissions, and an OS sandbox are implemented and approved.</span></div>
       {builderMode === "gui" ? <div className="si-builder-form">
         <section><h3>Identity</h3><div className="si-builder-grid"><label>ID<input value={draft.id} onChange={event => updateDraft({ ...draft, id: event.target.value.toLowerCase() })} /></label><label>Name<input value={draft.name} onChange={event => updateDraft({ ...draft, name: event.target.value })} /></label><label>Family<select value={draft.family} onChange={event => updateDraft({ ...draft, family: event.target.value as SiProtocolSuite["family"] })}>{["DDR", "GDDR", "SERDES", "LVDS", "PCI", "PCIE", "PXI", "DISPLAYPORT", "HDMI", "USB", "ETHERNET", "MIPI", "SATA", "CXL", "JESD204", "HBM", "CUSTOM"].map(item => <option key={item}>{item}</option>)}</select></label><label>Revision<input value={draft.revision} onChange={event => updateDraft({ ...draft, revision: event.target.value })} /></label><label>Signaling<select value={draft.signaling} onChange={event => updateDraft({ ...draft, signaling: event.target.value as SiProtocolSuite["signaling"] })}><option value="single_ended">Single ended</option><option value="differential">Differential</option><option value="parallel_bus">Parallel bus</option><option value="mixed">Mixed</option></select></label><label>Encoding<select value={draft.encoding} onChange={event => updateDraft({ ...draft, encoding: event.target.value as SiProtocolSuite["encoding"] })}><option>NRZ</option><option>PAM4</option><option>mixed</option><option value="user_defined">User defined</option></select></label></div><label>Description<textarea value={draft.description} onChange={event => updateDraft({ ...draft, description: event.target.value })} /></label></section>

@@ -78,6 +78,7 @@ new Function("require", "module", "exports", compiled)(name => {
   if (name === "./emergeGeometryPreview") return geometryPreview;
   if (name === "./scriptDataViews") return scriptDataViews;
   if (name === "./scriptResultViewportModel") return viewportModel;
+  if (name === "./panelPresentation") return { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) };
   if (name === "./extensionAnalysisResult") return { extensionAnalysisResult: () => null };
   if (name.slice(2) in stubs) return { default: stubs[name.slice(2)] };
   return require(name);

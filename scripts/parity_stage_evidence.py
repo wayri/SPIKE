@@ -27,6 +27,55 @@ def _digest(path: Path) -> str:
 
 def validate_done_import_stage(stage: dict, root: Path) -> None:
     receipt = json.loads(_path(root, stage.get('evidence')).read_text(encoding='utf-8'))
+    if stage['id'] == 'GP07-S01':
+        if __package__:
+            from .parity_structural_gate import validate_receipt
+        else:
+            from parity_structural_gate import validate_receipt
+        validate_receipt(receipt, root, stage['id'])
+        return
+    if stage['id'] in ('SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'SI07-S03', 'SI07-S04'):
+        if __package__:
+            from .parity_pisi_gate import validate_receipt
+        else:
+            from parity_pisi_gate import validate_receipt
+        validate_receipt(receipt, root, stage['id'])
+        return
+    if stage['id'] == 'WF01-S04C6':
+        if __package__:
+            from .parity_scaled_review_gate import validate_receipt
+        else:
+            from parity_scaled_review_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'WF01-S04C5':
+        if __package__:
+            from .parity_step_scale_gate import validate_receipt
+        else:
+            from parity_step_scale_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'WF01-S04C4':
+        if __package__:
+            from .parity_component_review_gate import validate_receipt
+        else:
+            from parity_component_review_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'WF01-S04C3':
+        if __package__:
+            from .parity_native_step_placement_gate import validate_receipt
+        else:
+            from parity_native_step_placement_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'WF01-S04C2':
+        if __package__:
+            from .parity_component_admission_gate import validate_receipt
+        else:
+            from parity_component_admission_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
     if (receipt.get('contract') != 'spike/parity-stage-evidence/v1'
             or receipt.get('stage_id') != stage['id']):
         raise ValueError('stage receipt identity mismatch')

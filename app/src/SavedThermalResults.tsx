@@ -7,6 +7,7 @@ import { numericExtent } from "./numericRange";
 import { boardThermalAxisEdges } from "./boardThermalViewport";
 import { thermalRecord, thermalResultEvidence, type SavedThermalEntry } from "./thermalSavedResultModel";
 import { thermalOccurrenceMatchesDesign } from "./thermalAssemblyFrame";
+import { usePanelPresentation } from "./panelPresentation";
 import "./savedThermalResults.css";
 
 type Section = "overview" | "plots" | "components" | "transient" | "inputs";
@@ -19,6 +20,7 @@ export default function SavedThermalResults({ entries, initialId, initialSection
     occurrences?: Array<{ id: string; name: string; designId: string; sourceNativeId?: string }>;
     onShow?: (entry: SavedThermalEntry, occurrenceId?: string) => void;
     onClose: () => void; onSetup: () => void }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const [selectedId, setSelectedId] = useState(initialId ?? entries[0]?.id ?? "");
   const [section, setSection] = useState<Section>(initialSection);
   const [layer, setLayer] = useState(-1);
@@ -29,16 +31,17 @@ export default function SavedThermalResults({ entries, initialId, initialSection
   useEffect(() => { setSelectedId(initialId ?? entries[0]?.id ?? ""); setSection(initialSection); }, [initialId, initialSection]);
   useEffect(() => { setLayer(-1); setFrame(-1); setPlaying(false); setOccurrenceId(""); }, [entry?.id]);
   useEffect(() => {
-    const close = (event: KeyboardEvent) => { if (document.querySelector(".saved-thermal-backdrop")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
-  }, [onClose]);
+    const doc = ownerDocument, view = ownerWindow; if (!doc || !view) return;
+    const close = (event: KeyboardEvent) => { if (doc.querySelector(".saved-thermal-backdrop")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
+    view.addEventListener("keydown", close);
+    return () => view.removeEventListener("keydown", close);
+  }, [ownerDocument, ownerWindow, onClose]);
   const frames = entry && Array.isArray(entry.result.transient) ? entry.result.transient.map(thermalRecord).filter(item => item && number(item.time_s) !== null) : [];
   useEffect(() => {
-    if (!playing || frames.length < 2) return;
-    const timer = window.setInterval(() => setFrame(value => (value + 1) % frames.length), 400);
-    return () => window.clearInterval(timer);
-  }, [playing, frames.length]);
+    const view = ownerWindow; if (!view || !playing || frames.length < 2) return;
+    const timer = view.setInterval(() => setFrame(value => (value + 1) % frames.length), 400);
+    return () => view.clearInterval(timer);
+  }, [ownerWindow, playing, frames.length]);
   const evidence = entry ? thermalResultEvidence(entry) : null;
   const matchingOccurrences = occurrences.filter(item => thermalOccurrenceMatchesDesign(item, evidence?.designId));
   const selectedOccurrence = matchingOccurrences.find(item => item.id === occurrenceId)

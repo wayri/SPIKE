@@ -1,0 +1,10 @@
+{
+  "command": [
+    "C:/Users/yawar/AppData/Local/Programs/FreeCAD 1.1/bin/python.exe",
+    "-c",
+    "import FreeCAD, Part; print(FreeCAD.Version())"
+  ],
+  "returncode": 0,
+  "stdout": "['1', '1', '3', '20260725 (Git shallow)', 'Unknown', '2026/07/25 04:52:02', 'grafted,grafted', '145529fe741292ff0b3977a01195bf0247425794']\n",
+  "stderr": ""
+}

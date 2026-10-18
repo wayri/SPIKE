@@ -1,0 +1,14 @@
+* SPDX-License-Identifier: Apache-2.0
+* 1000-V, 10:1 RC divider transient; ideal source, no safety qualification.
+Vhv high 0 PULSE(0 1000 0 1n 1n 1 2)
+Rhigh high sense 9Meg
+Rlow sense 0 1Meg
+Csense sense 0 10n IC=0
+.tran 50u 50m uic
+.control
+run
+set wr_singlescale
+set wr_vecnames
+wrdata hv_rc_divider.csv v(sense)
+.endc
+.end

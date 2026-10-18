@@ -23,7 +23,7 @@
 .assistant-chat__message--assistant { align-self: flex-start; }
 .assistant-chat__evidence { border: 1px solid var(--spike-table-border); padding: 6px 8px; }
 .assistant-chat pre { max-height: 190px; overflow: auto; margin: 6px 0 0; padding: 7px; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--spike-table-field); }
-.assistant-chat__review { position: absolute; z-index: 5; inset: 12% 14px auto; max-height: 70%; overflow: auto; padding: 14px; border: 1px solid var(--spike-table-focus); border-radius: 6px; color: var(--spike-table-text); background: var(--spike-table-surface); box-shadow: 0 8px 30px #0008; }
+.assistant-chat__review { position: absolute; z-index: 5; inset: 12% 14px auto; max-height: 70%; overflow: auto; padding: 14px; border: 1px solid var(--spike-table-focus); border-radius: 6px; color: var(--spike-table-text); background: var(--spike-table-surface); box-shadow: var(--spike-popup-shadow); }
 .assistant-chat__composer { display: grid; gap: 6px; padding: 10px 14px; border-top: 1px solid var(--spike-table-border); }
 .assistant-chat__composer textarea { resize: vertical; max-height: 180px; }
 @media (max-width: 420px) {
@@ -44,6 +44,6 @@
 .assistant-window__chat { display: flex; flex: 1; min-height: 0; }
 .assistant-window__chat[hidden] { display: none; }
 .assistant-window__chat > .assistant-chat { width: 100%; flex: 1; min-height: 0; border-left: 0; }
-.assistant-window__dialog { position: fixed; z-index: 10; inset: 12px; margin: auto; height: fit-content; max-height: calc(100vh - 24px); overflow: auto; padding: 20px; border: 1px solid var(--spike-table-focus); background: var(--spike-table-surface); box-shadow: 0 0 0 100vmax #0009; }
+.assistant-window__dialog { position: fixed; z-index: 10; inset: 12px; margin: auto; height: fit-content; max-height: calc(100vh - 24px); overflow: auto; padding: 20px; border: 1px solid var(--spike-table-focus); background: var(--spike-table-surface); box-shadow: 0 0 0 100vmax var(--spike-popup-backdrop); }
 .assistant-window__dialog textarea { width: 100%; max-height: 50vh; }
 .assistant-window__dialog button { margin: 8px 8px 0 0; }

@@ -9,11 +9,11 @@
   max-width: calc(100% - 16px);
   padding: 6px 8px;
   box-sizing: border-box;
-  border: 1px solid #77939c;
+  border: 1px solid var(--spike-border-default);
   border-radius: 5px;
-  background: rgba(10, 22, 28, .96);
-  color: #edf7fa;
-  box-shadow: 0 3px 12px #0006;
+  background: color-mix(in srgb, var(--spike-surface-panel) 96%, transparent);
+  color: var(--spike-text);
+  box-shadow: var(--spike-popup-shadow);
   font: 12px/1.25 ui-monospace, Consolas, monospace;
 }
 .assembly-gizmo-number[hidden] { display: none; }
@@ -24,16 +24,16 @@
   height: 26px;
   box-sizing: border-box;
   padding: 3px 5px;
-  border: 1px solid #77939c;
+  border: 1px solid var(--spike-border-default);
   border-radius: 3px;
-  background: #142933;
-  color: #fff;
+  background: var(--spike-surface-field);
+  color: var(--spike-text-strong);
   font: inherit;
 }
-.assembly-gizmo-number input:focus { outline: 2px solid #65d6ee; outline-offset: 1px; }
-.assembly-gizmo-number input[aria-invalid="true"] { border-color: #ff987b; }
+.assembly-gizmo-number input:focus { outline: 2px solid var(--spike-accent); outline-offset: 1px; }
+.assembly-gizmo-number input[aria-invalid="true"] { border-color: var(--spike-status-error); }
 .assembly-gizmo-number small {
   grid-column: 1 / -1;
-  color: #b8cbd1;
+  color: var(--spike-text-muted);
   font: 10px/1.2 ui-sans-serif, system-ui, sans-serif;
 }

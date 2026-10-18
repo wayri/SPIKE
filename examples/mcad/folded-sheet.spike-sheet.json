@@ -1,0 +1,35 @@
+{
+  "contract": "spike/sheet-folding/v1",
+  "id": "two-bend-enclosure-wall",
+  "kind": "sheet_metal",
+  "sheet": {
+    "length_mm": 120.0,
+    "width_mm": 40.0,
+    "thickness_mm": 1.5,
+    "material": {
+      "name": "demonstration sheet",
+      "note": "Inert descriptive snapshot; no constitutive model is selected."
+    }
+  },
+  "bends": [
+    {
+      "id": "bend-a",
+      "start_x_mm": 30.0,
+      "angle_deg": 90.0,
+      "inside_radius_mm": 3.0,
+      "k_factor": 0.4,
+      "fixed_side": "negative_x",
+      "segments": 12
+    },
+    {
+      "id": "bend-b",
+      "start_x_mm": 70.0,
+      "angle_deg": -45.0,
+      "inside_radius_mm": 3.0,
+      "k_factor": 0.4,
+      "fixed_side": "negative_x",
+      "segments": 8
+    }
+  ],
+  "flex_regions": []
+}

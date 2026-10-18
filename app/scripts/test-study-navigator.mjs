@@ -104,3 +104,4 @@ button("Dock study navigator").props.onClick();
 assert.deepEqual(events, ["float", "close", "dock"]);
 assert.equal(treeRows().filter(element => element.props.tabIndex === 0).length, 1, "one visible item participates in tab navigation");
 console.log("Study navigator: hierarchy, exact callbacks, double clicks, arrow keys, search, archives, absent payloads and docking passed.");
+

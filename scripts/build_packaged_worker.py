@@ -409,6 +409,13 @@ def _verify(executable: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str,
         raise RuntimeError(
             "Packaged worker differs from the qualified source runtime: " + failures
         )
+    cavity = _request(executable, "cfd_capabilities")["result"]["engines"]["spike.native_cavity"]
+    cavity_path = Path(cavity["executable"]).resolve()
+    if not cavity["available"] or not cavity_path.is_relative_to(executable.parent.resolve()):
+        raise RuntimeError("Packaged worker must discover its bundled native airflow executable.")
+    cavity_run = _request(executable, "run_native_cfd", {"request": {"n": 8}})["result"]
+    if cavity_run.get("status") != "converged" or cavity_run.get("production_qualified") is not False:
+        raise RuntimeError("Packaged native cavity execution failed its experimental CFD gate.")
     geometry_arrow_probe = _verify_geometry_arrow_package(executable)
     spikes_engine_probe = _verify_spikes_engine(executable)
     from scripts.verify_extension_runtime import verify_extension_runtime
@@ -476,6 +483,10 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
     pyinstaller_version = _require_pyinstaller()
     native_extension = _native_extension()
     spikes_library = _spikes_library()
+    from python.spike_core.native_airflow import detect_native_airflow
+    native_airflow = detect_native_airflow()
+    if not native_airflow["available"]:
+        raise RuntimeError("Native airflow executable missing; run python scripts/build_native_airflow.py first.")
     RESOURCE_ROOT.mkdir(parents=True, exist_ok=True)
     BUILD_ROOT.mkdir(parents=True, exist_ok=True)
     artifact_dir = RESOURCE_ROOT / "spike-worker"
@@ -510,6 +521,8 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         f"{native_extension}{os.pathsep}python",
         "--add-binary",
         f"{spikes_library}{os.pathsep}spikes",
+        "--add-binary",
+        f"{native_airflow['executable']}{os.pathsep}native",
         "--add-data",
         (
             f"{ROOT / 'python' / 'spike_core' / 'validation_data'}"
@@ -545,6 +558,8 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         f"{staged_extensions}{os.pathsep}extensions",
         "--add-data",
         f"{ROOT / 'schemas'}{os.pathsep}schemas",
+        "--add-data",
+        f"{ROOT / 'data' / 'materials'}{os.pathsep}data/materials",
         str(ROOT / "scripts" / "spike_worker_entry.py"),
     ]
     subprocess.run(command, cwd=ROOT, check=True)

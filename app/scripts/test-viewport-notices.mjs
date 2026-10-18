@@ -11,8 +11,7 @@ const code = ts.transpileModule(readFileSync(new URL("../src/ViewportNotificatio
   compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 },
 }).outputText;
 const module = { exports: {} };
-new Function("require", "module", "exports", code)(name => name.endsWith(".css") ? {} : name === "./icons"
-  ? new Proxy({}, { get: () => () => null }) : require(name), module, module.exports);
+new Function("require", "module", "exports", code)(name => name.endsWith(".css") ? {} : name === "./icons" ? require("lucide-react") : require(name), module, module.exports);
 const { default: Notifications, ViewportNoticeCorner } = module.exports;
 const notice = { level: "error", title: "A very long model scene warning ".repeat(12), detail: "Detailed diagnostic stays outside the canvas" };
 let details = 0, dismissed = 0, retried = 0;

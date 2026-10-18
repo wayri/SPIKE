@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/pdn-dielectric-thermal-result/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; conservative source maps, same-mesh binding and solver/numerical evidence are additionally checked by the implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "coupling_mode",
+    "frequency_hz",
+    "drive",
+    "nodes",
+    "reference_node",
+    "heat_sources_w_m3",
+    "cell_power_w",
+    "cell_lineage",
+    "total_dielectric_power_w",
+    "port_power_w",
+    "loss_relative_error",
+    "thermal_result",
+    "electrical_diagnostics",
+    "diagnostics",
+    "limitations",
+    "input_digest",
+    "electrical_input_digest",
+    "thermal_input_digest",
+    "generated_thermal_input_digest",
+    "mesh_digest",
+    "context_digest"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/pdn-dielectric-thermal-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "coupling_mode": {
+      "const": "one_way_no_temperature_feedback"
+    },
+    "frequency_hz": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "drive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "frequency_hz",
+        "voltages_v"
+      ],
+      "properties": {
+        "frequency_hz": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "voltages_v": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 15,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "real",
+              "imag"
+            ],
+            "properties": {
+              "real": {
+                "type": "number"
+              },
+              "imag": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 15,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "reference_node": {
+      "type": "string"
+    },
+    "heat_sources_w_m3": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 2000,
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "cell_power_w": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 2000,
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "cell_lineage": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cell_id",
+          "material_id",
+          "source_object_ids",
+          "volume_m3"
+        ],
+        "properties": {
+          "cell_id": {
+            "type": "string"
+          },
+          "material_id": {
+            "type": "string"
+          },
+          "source_object_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "volume_m3": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "total_dielectric_power_w": {
+      "type": "number",
+      "minimum": 0
+    },
+    "port_power_w": {
+      "type": "number"
+    },
+    "loss_relative_error": {
+      "type": "number",
+      "minimum": 0
+    },
+    "thermal_result": {
+      "type": "object",
+      "required": [
+        "contract",
+        "model_status",
+        "production_qualified",
+        "node_temperatures_k",
+        "heat_balance"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/assembly-tetra-thermal-result/v1"
+        },
+        "model_status": {
+          "const": "experimental"
+        },
+        "production_qualified": {
+          "const": false
+        },
+        "node_temperatures_k": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 1000,
+          "items": {
+            "type": "number"
+          }
+        },
+        "heat_balance": {
+          "type": "object"
+        }
+      }
+    },
+    "electrical_diagnostics": {
+      "type": "object"
+    },
+    "diagnostics": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "electrical_input_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "thermal_input_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "generated_thermal_input_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "mesh_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "context_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

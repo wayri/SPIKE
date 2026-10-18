@@ -28,7 +28,8 @@ class UpgradeTests(unittest.TestCase):
                 for surface in ('panel','field','canvas'):
                     a,b=sorted((luminance(p[text]),luminance(p[surface])))
                     self.assertGreaterEqual((b+.05)/(a+.05),4.5,(name,text,surface))
-        self.assertEqual(PALETTES['Dark']['canvas'],'#000000')
+        self.assertEqual(PALETTES['Dark']['canvas'],'#191c20')
+        self.assertEqual(PALETTES['High contrast']['canvas'],'#000000')
 
     def test_pane_groups_weights_and_unit_safety(self):
         traces=[('V(a)',[1,2],'V'),('V(b)',[2,3],'V'),('I(R)',[1,2],'A')]

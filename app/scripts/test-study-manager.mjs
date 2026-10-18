@@ -26,6 +26,7 @@ new Function("require", "module", "exports", compiled)(name => {
   if (name === "./simulationStudies") return studiesModel;
   if (name === "./studyWorkspaceModel") return workspaceModel;
   if (name === "./workerBridge") return { isDesktopShell: () => false, saveNativeTextFile: async () => null };
+  if (name === "./panelPresentation") return { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) };
   if (name.endsWith(".css")) return {};
   return require(name);
 }, module, module.exports);

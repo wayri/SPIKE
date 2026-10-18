@@ -2,6 +2,11 @@
 
 ## Purpose
 
+For explicit physical port pairing, use the [mixed-mode API and numerical
+contract](PI_SI_PARITY_EXECUTION.md#si08-s01-api-and-derivation). It returns a
+derived `NetworkData` plus physical mode mapping; automatic workbench traces
+retain their adjacent-pair convention.
+
 SPIKE separates geometry extraction, field solving, and network processing. A
 solver plugin receives normalized geometry and returns an inspectable network
 contract. Network processors may then calculate transmission-line, S-parameter,

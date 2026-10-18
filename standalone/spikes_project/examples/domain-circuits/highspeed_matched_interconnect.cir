@@ -1,0 +1,14 @@
+* SPDX-License-Identifier: Apache-2.0
+* Bounded ideal 50-ohm interconnect; time in s, voltages in V.
+Vstep src 0 PULSE(0 1 1n 50p 50p 40n 100n)
+Rsource src near 50
+Tline near 0 far 0 Z0=50 TD=5n
+Rload far 0 50
+.tran 20p 20n
+.control
+run
+set wr_singlescale
+set wr_vecnames
+wrdata highspeed_matched_interconnect.csv v(near) v(far)
+.endc
+.end

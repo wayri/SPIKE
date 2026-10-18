@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useRef, useState } from "react";
 import { Download, FileUp, Layers3, Plus, X } from "./icons";
-import { downloadEMergeText } from "./emergeSampleExport";
 import { copperName, gerberDraftFromSource, gerberSourceFromDraft, GERBER_FILE_BYTES, GERBER_TOTAL_BYTES, newGerberDraft, type EMergeGerberSource, type GerberDraft, type GerberFile } from "./emergeGerberSource";
+import { usePanelPresentation } from "./panelPresentation";
 import "./EMergeGerberImport.css";
 
 type Props = { source?: EMergeGerberSource | null; runtime?: Record<string, unknown> | null; disabled?: boolean;
   onImport: (source: EMergeGerberSource) => Promise<void>; onClose: () => void };
 export default function EMergeGerberImport({ source, runtime, disabled = false, onImport, onClose }: Props) {
+  const { ownerDocument } = usePanelPresentation();
   const [draft, setDraft] = useState<GerberDraft>(() => source ? gerberDraftFromSource(source) : newGerberDraft());
   const [error, setError] = useState(""), [busy, setBusy] = useState(false), [reading, setReading] = useState(0);
   const generation = useRef(0), fileReads = useRef(new Map<string, number>()), dialog = useRef<HTMLElement>(null), close = useRef<HTMLButtonElement>(null);
-  useEffect(() => { const previous = document.activeElement as HTMLElement | null; close.current?.focus(); return () => { generation.current++; previous?.focus(); }; }, []);
+  useEffect(() => { const previous = ownerDocument?.activeElement as HTMLElement | null; close.current?.focus(); return () => { generation.current++; if (previous?.isConnected) previous.focus(); }; }, [ownerDocument]);
   const locked = disabled || busy || reading > 0;
   const field = (key: "name" | "resolution", value: string) => setDraft(current => ({ ...current, [key]: value }));
   const read = async (file: File, key: string, apply: (file: GerberFile) => void) => {
@@ -47,13 +48,13 @@ export default function EMergeGerberImport({ source, runtime, disabled = false, 
     finally { setBusy(false); }
   };
   const exportSource = () => {
-    try { downloadEMergeText("native-gerber.spike-gerber.json", JSON.stringify(gerberSourceFromDraft(draft), null, 2)); setError(""); }
+    try { if (!ownerDocument) throw new Error("The panel document is unavailable."); const url = URL.createObjectURL(new Blob([JSON.stringify(gerberSourceFromDraft(draft), null, 2)], { type: "text/plain;charset=utf-8" })); const link = ownerDocument.createElement("a"); link.href = url; link.download = "native-gerber.spike-gerber.json"; link.click(); URL.revokeObjectURL(url); setError(""); }
     catch (failure) { setError(failure instanceof Error ? failure.message : "Complete the source setup before exporting."); }
   };
   return <div className="modal-shade"><section ref={dialog} className="emerge-gerber-manager" role="dialog" aria-modal="true" aria-labelledby="emerge-gerber-title" onKeyDown={event => {
     event.stopPropagation(); if (event.key === "Escape" && !busy) onClose();
     if (event.key === "Tab") { const items = [...(dialog.current?.querySelectorAll<HTMLElement>("button:not(:disabled),select:not(:disabled),input:not(:disabled),summary,[tabindex='0']") ?? [])].filter(item => item.getClientRects().length > 0);
-      const index = items.indexOf(document.activeElement as HTMLElement); if (event.shiftKey && index <= 0 || !event.shiftKey && index === items.length - 1) { event.preventDefault(); items[event.shiftKey ? items.length - 1 : 0]?.focus(); } }
+      const index = items.indexOf(ownerDocument?.activeElement as HTMLElement); if (event.shiftKey && index <= 0 || !event.shiftKey && index === items.length - 1) { event.preventDefault(); items[event.shiftKey ? items.length - 1 : 0]?.focus(); } }
   }}>
     <header><div><Layers3 size={22}/><h2 id="emerge-gerber-title">Native EMerge Gerber study</h2></div><button ref={close} aria-label="Close Gerber setup" title="Close setup and retain the current design" disabled={busy} onClick={onClose}><X size={18}/></button></header>
     <p>Load original copper files through EMerge's native Gerber tools. Define the physical stack and port planes explicitly; Gerber artwork supplies no verified net or pad identities.</p>

@@ -8,6 +8,7 @@ class StandardShortcuts(unittest.TestCase):
         for command,key in {'edit.copy':'Ctrl+C','edit.select_all':'Ctrl+A',
                             'edit.paste':'Ctrl+V','edit.undo':'Ctrl+Z','edit.redo':'Ctrl+Y',
                             'edit.properties_standard':'Ctrl+E','edit.rotate_standard':'Ctrl+R',
+                            'edit.move':'M','edit.drag':'G','edit.wire_bend':'/',
                             'file.export':'Ctrl+Shift+E'}.items():
             self.assertEqual(keys[command],key)
         for profile in ('SPIKES','KiCad-inspired','LTspice-inspired'):

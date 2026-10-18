@@ -8,14 +8,6 @@ import ts from "typescript";
 // data URLs. Emit only the runtime dependency closure of the requested fixture.
 const directory = mkdtempSync(join(tmpdir(), "spike-schematic-test-"));
 const emitted = new Set();
-function emitPackageMetadata() {
-  const name = "__packageMetadata";
-  if (emitted.has(name)) return name;
-  emitted.add(name);
-  const metadata = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
-  writeFileSync(join(directory, `${name}.mjs`), `export default ${JSON.stringify(metadata)};\n`);
-  return name;
-}
 function emit(name) {
   if (!/^[A-Za-z0-9_-]+$/.test(name)) throw new Error(`Unsupported test module: ${name}`);
   if (emitted.has(name)) return;
@@ -23,10 +15,6 @@ function emit(name) {
   const source = readFileSync(new URL(`../src/${name}.ts`, import.meta.url), "utf8");
   let code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText;
   code = code.replace(/from (["'])([^"']+)\1/g, (_, quote, dependency) => {
-    if (dependency === "../package.json") {
-      const metadataName = emitPackageMetadata();
-      return `from "./${metadataName}.mjs"`;
-    }
     if (dependency.startsWith("./")) {
       const name = dependency.slice(2); emit(name); return `from "./${name}.mjs"`;
     }

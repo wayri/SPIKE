@@ -17,6 +17,19 @@ children remain in board/part-local coordinates. FreeCAD's placement editor and
 normal selection tools provide the interactive mechanical workspace. Save the
 document as FCStd to resume later.
 
+An occurrence with an assigned `extensions["spike.material"]` snapshot carries
+that complete snapshot into FreeCAD. The occurrence's read only SPIKE properties
+show its material name, stable ID and revision; `SPIKEMaterialJSON` retains the
+full property values, units, applicability and provenance through FCStd save and
+reopen. This is inert reference data for mechanical collaboration. The workbench
+does not select a constitutive model, create FEM material objects, flatten
+orthotropic or sampled properties, or qualify any thermal, mechanical or
+electrical analysis from the snapshot.
+Board occurrences also retain their canonical layer assignment map from
+`extensions["spike.layer-materials"]` in the read only
+`SPIKELayerMaterialsJSON` property. Layer identities and every complete snapshot
+remain available for inspection without projecting them onto FreeCAD solids.
+
 Select two occurrence containers (or their geometry children) and choose
 **Measure SPIKE Solid Clearance**. The workbench computes minimum separation
 and common solid volume. Zero separation can mean touching or intersection;
@@ -38,6 +51,10 @@ that path adds occurrences rather than replacing existing ones. Native FreeCAD
 assembly-workbench constraints/App::Link variants have not been qualified for
 session feedback. Do not interpret the presence of FreeCAD's tools as support
 for importing their constraint history into SPIKE.
+Occurrence and board-layer material snapshots are also outside the feedback
+surface. Their serialized values are bound on import and any programmatic change
+is rejected when feedback is built; assign or update materials in SPIKE and
+export a fresh session.
 
 ## Geometry and results
 
@@ -94,6 +111,13 @@ being disguised as rigid placements.
 - No payload-specified host paths, scripts or macros are executed. STEP data uses
   fixed Part import APIs in FreeCAD. Duplicate JSON keys, unsupported fields,
   non-finite numbers, reflections, scales/shears, missing assets and cycles fail.
+- Optional material snapshots use the existing `spike.material` identity shape.
+  The portable validator checks bounded JSON, exact wrapper fields, stable ID and
+  revision agreement, and the canonical UTF-8 record digest without interpreting
+  material properties. SPIKE additionally applies the material-library semantic
+  validator before export.
+- Optional board layer maps preserve 1–256 assignments keyed by canonical layer
+  ID. Every value is independently admitted by the same snapshot validation.
 - The native host requires the approved project path and opened manifest binding.
   Applying feedback requires the existing `project.write` capability and the
   digest of the reviewed proposal. Digests establish identity, not publisher trust.

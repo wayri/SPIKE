@@ -1,0 +1,76 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.project-manager-shade { box-sizing: border-box; }
+.project-manager-modal.project-manager-modal {
+  width: min(980px, calc(100vw - 32px));
+  height: min(680px, calc(100vh - 32px));
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  container: project-manager / inline-size;
+  border: 1px solid var(--spike-table-border-strong, #4b626c);
+  border-radius: 6px;
+  color: var(--spike-table-text, #d5e1e5);
+  background: var(--spike-table-surface, #122029);
+  box-shadow: var(--spike-popup-shadow);
+}
+.project-manager-header { min-width: 0; min-height: 48px; }
+.project-manager-header > div { min-width: 0; }
+.project-manager-header button { flex: 0 0 auto; }
+.project-manager-scroll { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.project-manager-current { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid var(--spike-table-border, #2d424b); }
+.project-manager-current > div { min-width: 0; display: grid; gap: 4px; padding: 13px 15px; border-right: 1px solid var(--spike-table-border, #2d424b); }
+.project-manager-current > div:last-child { border-right: 0; }
+.project-manager-current span { color: var(--spike-table-muted, #79919b); font-size: 9px; font-weight: 650; letter-spacing: .07em; text-transform: uppercase; }
+.project-manager-current b { min-width: 0; overflow: hidden; color: var(--spike-table-text-strong, #e1e9ec); font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.project-manager-current small { min-width: 0; overflow: hidden; color: var(--spike-table-muted, #79919b); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+
+.project-manager-modal .project-manager-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 12px; border-bottom: 1px solid var(--spike-table-border, #2d424b); background: transparent; }
+.project-action-group { min-width: 0; }
+.project-action-group > h3 { margin: 0 0 6px; color: var(--spike-table-muted, #829aa4); font-size: 9px; font-weight: 650; letter-spacing: .07em; text-transform: uppercase; }
+.project-action-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.project-manager-modal .project-action-list > button { min-width: 0; min-height: 44px; display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; justify-content: start; gap: 8px; padding: 6px 9px; border-color: var(--spike-table-border, #344a54); border-radius: 4px; background: var(--spike-table-toolbar, #172831); color: var(--spike-table-text, #b7c8cd); text-align: left; }
+.project-manager-modal .project-action-list > button:hover { border-color: var(--spike-table-edit, #59c8ca); background: var(--spike-table-hover, #20353e); color: var(--spike-table-text-strong, #eef6f7); }
+.project-action-list > button > svg { color: var(--spike-table-edit, #66c8c5); }
+.project-action-list > button > span { min-width: 0; display: grid; gap: 2px; }
+.project-action-list > button b, .project-action-list > button small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-action-list > button b { font-size: 10px; font-weight: 600; }
+.project-action-list > button small { color: var(--spike-table-muted, #79919b); font-size: 8px; font-weight: 400; }
+
+.project-manager-modal .recent-projects { min-width: 0; padding: 12px; overflow: visible; }
+.project-manager-modal .recent-projects > h3 { margin-bottom: 6px; }
+.recent-project-list > button { width: 100%; min-width: 0; min-height: 42px; display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid var(--spike-table-border, #263b44); border-radius: 0; padding: 5px 8px; color: var(--spike-table-muted, #8ca2ab); background: transparent; text-align: left; }
+.recent-project-list > button:hover { color: var(--spike-table-edit, #69c9c6); background: var(--spike-table-hover, #192d35); }
+.recent-project-list > button span { min-width: 0; display: grid; gap: 2px; }
+.recent-project-list > button b, .recent-project-list > button small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-project-list > button b { color: var(--spike-table-text, #cbd8dc); font-size: 10px; }
+.recent-project-list > button small, .recent-project-list > button time { color: var(--spike-table-muted, #708892); font-size: 8px; }
+.project-manager-modal > footer { min-width: 0; }
+.project-manager-modal > footer .secondary-btn { flex: 0 0 auto; }
+
+.focus-tool-content .project-manager-modal { height: 100%; border: 0; border-radius: 0; }
+
+@container project-manager (max-width: 620px) {
+  .project-manager-modal .project-manager-current { grid-template-columns: minmax(0, 1fr); }
+  .project-manager-modal .project-manager-current > div { border-right: 0; border-bottom: 1px solid var(--spike-table-border, #2d424b); }
+  .project-manager-modal .project-manager-current > div:last-child { border-bottom: 0; }
+  .project-manager-modal .project-manager-actions { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .project-manager-modal .recent-project-list > button { grid-template-columns: 20px minmax(0, 1fr); }
+  .project-manager-modal .recent-project-list > button time { grid-column: 2; }
+}
+
+@container project-manager (max-width: 380px) {
+  .project-manager-modal .project-manager-header small { display: none; }
+  .project-manager-modal .project-manager-current > div { padding: 10px; }
+  .project-manager-modal .project-manager-actions { padding: 10px; }
+  .project-manager-modal .project-action-list { grid-template-columns: minmax(0, 1fr); }
+  .project-manager-modal .project-action-list > button { min-height: 40px; }
+  .project-manager-modal .recent-projects { padding: 10px; }
+  .project-manager-modal > footer span { display: none; }
+  .project-manager-modal > footer { justify-content: flex-end; }
+}
+
+@media (forced-colors: active) {
+  .project-manager-modal, .project-action-list > button { border-color: CanvasText; }
+}

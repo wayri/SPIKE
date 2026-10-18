@@ -50,6 +50,17 @@ class InteractionTests(unittest.TestCase):
         x,y=axis.transData.transform((20,5));controller.motion(SimpleNamespace(x=x,y=y))
         self.assertEqual(owner.cursors[0],10)
 
+    def test_heading_hit_is_separate_from_cursor_drag(self):
+        from unittest.mock import patch
+        canvas,axis=self.figure();line=add_waveform(axis,np.array([0,5,10]),np.array([0,5,10]),label='v(out)')
+        legend=axis.legend();legend.get_texts()[0]._spikes_expression='v(out)';canvas.draw()
+        owner=SimpleNamespace(plot=canvas,axes=[axis],cursors=[],toolbar=SimpleNamespace(mode=''),guarded=lambda fn:fn())
+        controller=PlotInteractions(owner)
+        box=legend.get_texts()[0].get_window_extent();event=MouseEvent('button_press_event',canvas,(box.x0+box.x1)/2,(box.y0+box.y1)/2,button=1)
+        with patch('spikes_studio.waveform_editor.show') as editor:
+            controller.press(event);editor.assert_called_once_with(owner,'v(out)')
+        self.assertEqual(owner.cursors,[])
+
     @unittest.skipUnless(os.environ.get('SPIKES_TEST_WX')=='1','Opt-in real wx cursor-window test')
     def test_native_cursor_window_live_readings(self):
         import wx

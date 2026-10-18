@@ -13,3 +13,17 @@ export function viewportDampingFactor(nominalFactor: number, deltaSeconds: numbe
   const elapsed = Math.max(0, Math.min(deltaSeconds, 0.1));
   return 1 - Math.pow(1 - nominalFactor, elapsed * 60);
 }
+
+/** Phase-preserving frame budget: early RAF timestamps must not halve FPS. */
+export class ViewportFrameClock {
+  private deadline = 0;
+  private frequency = 0;
+  due(nowMs: number, moving: boolean, maximumFps = 120): boolean {
+    const fps = moving ? Math.max(1, Math.min(240, Number.isFinite(maximumFps) ? maximumFps : 120)) : 5;
+    const interval = 1000 / fps;
+    if(this.frequency !== fps){this.frequency=fps;this.deadline=nowMs;}
+    if(nowMs + .5 < this.deadline)return false;
+    this.deadline = nowMs - this.deadline > interval * 2 ? nowMs + interval : this.deadline + interval;
+    return true;
+  }
+}

@@ -2,12 +2,21 @@
 <!-- Copyright (c) 2026 SigHarmonic -->
 # Solver research, standards and validation references
 
-Curated 2026-09-20. Read alongside the [solver handbook](SOLVER_HANDBOOK.md).
+Curated 2026-09-20. Read alongside the [solver handbook](SOLVER_HANDBOOK.md)
+and [mathematical methods reference](SOLVER_MATHEMATICS.md).
 This ledger identifies sources already recorded in the public repository, not
 an invented reconstruction of every developer's reading history. The broader
 [generated inventory](generated/solver-reference-inventory.json) preserves
 recorded links/DOIs with file/line evidence. It includes non-research links and
 is not an automatically endorsed bibliography.
+
+The 18 October 2026 [platform assessment](MULTIPHYSICS_PLATFORM_STRATEGY.md) and
+[frontier ledger](MULTIPHYSICS_RESEARCH_FRONTIER.md) add **candidate/design
+guidance** from current official product descriptions and selected primary
+research. They do not change the implemented lineage recorded below.
+[Numerical evidence requirements](NUMERICAL_METHOD_EVIDENCE.md) now explicitly
+bind future derivations, subject knowledge, precise references and independent
+verification/validation; older documented provenance gaps remain open.
 
 **Status vocabulary:** implemented method lineage; design guidance; external
 engine/documentation; measurement admission; exploratory comparison; candidate
@@ -17,6 +26,22 @@ explicit rather than guessed. Older foundational work is retained honestly;
 newer publication dates do not retroactively change development provenance.
 
 ## Conductor and network methods
+
+SI07-S04 [shunt-capacitive boundaries](CAPACITIVE_NETWORK_TRANSIENT.md) record
+18 October 2026 review of David H. Staelin's *Electromagnetics and Applications*
+(copyright 2011; MIT OCW-hosted text), sections 3.1.3/3.4.1/3.5.1–3.5.2:
+capacitor law/energy, KCL and parallel RLC equations. The installed SciPy 1.17.0
+`expm` API documentation provides the numerical dependency reference. The linked
+ledger distinguishes reviewed sections from unreviewed algorithm-paper details;
+the mixed formulation and synthetic reference circuits are independently authored.
+
+SI07-S03 [inductive network boundaries](INDUCTIVE_NETWORK_TRANSIENT.md) record
+18 October 2026 review of MIT OCW 18.03SC *RLC Circuits* (Fall 2011), pp.1–3,
+equations (1)/(3)/(5), and the installed SciPy 1.17.0 `expm` API algorithm
+reference. The linked method ledger distinguishes reviewed physics/API guidance
+from the unavailable Kurokawa full text and unreviewed Higham paper details.
+Its mixed wave algebra, PWL formulation and analytical/reference fixtures are
+independently authored; synthetic evidence does not establish measurement parity.
 
 ### R1 - PEEC foundation
 

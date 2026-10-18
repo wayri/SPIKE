@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Bounded, theme-aware glyphs for symbol library and palette rows.
 
 The icons are drawn with wx primitives so SPIKES does not acquire a packaged

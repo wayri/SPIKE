@@ -117,11 +117,18 @@ textarea,
   color: var(--spike-control-primary-text);
   background: var(--spike-control-primary-surface);
 }
+:where(.spike-control--primary, [data-spike-control="primary"]):hover:not(:disabled) {
+  border-color: var(--spike-accent-text);
+  background: var(--spike-table-choice-hover);
+}
 
 :where(.spike-control--danger, [data-spike-control="danger"]) {
   border-color: var(--spike-control-danger-border);
   color: var(--spike-control-danger-text);
   background: var(--spike-control-danger-surface);
+}
+:where(.spike-control--danger, [data-spike-control="danger"]):hover:not(:disabled) {
+  background: var(--spike-table-danger-hover);
 }
 
 :where(.spike-control--compact, [data-spike-control="compact"]) {

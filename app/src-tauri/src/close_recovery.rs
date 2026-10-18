@@ -5,7 +5,8 @@ use std::sync::Mutex;
 use std::time::Duration;
 #[cfg(target_os = "windows")]
 use sysinfo::{ProcessRefreshKind, ProcessesToUpdate, System};
-use tauri::Manager;
+use tauri::{Emitter, Manager};
+const RESPONSE_TIMEOUT: Duration = Duration::from_secs(5);
 #[derive(Default)]
 pub(crate) struct CloseRecoveryState(Mutex<CloseGate>);
 #[derive(Default)]
@@ -85,7 +86,7 @@ pub(crate) fn respond_main_close(
         .unwrap_or_else(|e| e.into_inner())
         .respond(request_id);
     if accepted && decision == "close" {
-        shutdown(&app);
+        commit_shutdown(&app);
     }
     Ok(())
 }
@@ -95,7 +96,7 @@ pub(crate) fn close_main_application(
     app: tauri::AppHandle,
 ) -> Result<(), String> {
     main_only(&window)?;
-    shutdown(&app);
+    commit_shutdown(&app);
     Ok(())
 }
 pub(crate) fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent) {
@@ -106,9 +107,49 @@ pub(crate) fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent
         return;
     };
     api.prevent_close();
-    super::desktop_lifecycle::on_main_close_requested(window);
+    let app = window.app_handle().clone();
+    let Some((id, start_timer)) = app
+        .state::<CloseRecoveryState>()
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .request()
+    else {
+        return;
+    };
+    let _ = window.emit(
+        "spike:main-close-requested",
+        serde_json::json!({"requestId":id}),
+    );
+    if !start_timer {
+        return;
+    }
+    std::thread::spawn(move || {
+        std::thread::sleep(RESPONSE_TIMEOUT);
+        if !app
+            .state::<CloseRecoveryState>()
+            .0
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .recover(id)
+        {
+            return;
+        }
+        let response=rfd::MessageDialog::new().set_title("SPIKE is not responding to Close")
+   .set_description("The workspace did not respond to the Close button. You can keep waiting, or close SPIKE and its owned simulation processes. Unsaved changes may be lost. Saved projects and completed result files are retained.")
+   .set_level(rfd::MessageLevel::Warning)
+   .set_buttons(rfd::MessageButtons::OkCancelCustom("Force close SPIKE".into(),"Keep open".into())).show();
+        if response == rfd::MessageDialogResult::Custom("Force close SPIKE".into()) {
+            commit_shutdown(&app);
+        } else {
+            app.state::<CloseRecoveryState>()
+                .0
+                .lock()
+                .unwrap_or_else(|e| e.into_inner())
+                .keep_open();
+        }
+    });
 }
-
 /// Walk only this application's descendant tree; never kill by executable name.
 fn descendants(root: u32, parents: &HashMap<u32, u32>) -> Vec<u32> {
     let mut seen = HashSet::from([root]);
@@ -164,6 +205,15 @@ pub(crate) fn retire_owned_children() {
 }
 #[cfg(not(target_os = "windows"))]
 pub(crate) fn retire_owned_children() {}
+
+fn commit_shutdown(app: &tauri::AppHandle) {
+    app.state::<CloseRecoveryState>()
+        .0
+        .lock()
+        .unwrap_or_else(|error| error.into_inner())
+        .close();
+    super::desktop_lifecycle::begin_shutdown(app.clone());
+}
 #[cfg(any(target_os = "windows", test))]
 mod native_process {
     use std::collections::HashMap;
@@ -252,18 +302,6 @@ mod native_process {
     #[cfg(target_os = "windows")]
     pub(crate) use windows::OwnedHandle;
 }
-fn shutdown(app: &tauri::AppHandle) {
-    if !app
-        .state::<CloseRecoveryState>()
-        .0
-        .lock()
-        .unwrap_or_else(|e| e.into_inner())
-        .close()
-    {
-        return;
-    }
-    super::desktop_lifecycle::begin_shutdown(app.clone());
-}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -344,6 +382,11 @@ mod tests {
 
 // Update handoff has its own validated helper; suppress the ordinary force-close path.
 pub(crate) fn mark_update_exit(app: &tauri::AppHandle) {
-    app.state::<CloseRecoveryState>().0.lock().unwrap_or_else(|e|e.into_inner()).close();
-    app.state::<super::desktop_lifecycle::Lifecycle>().admit_update_exit();
+    app.state::<CloseRecoveryState>()
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .close();
+    app.state::<super::desktop_lifecycle::Lifecycle>()
+        .admit_update_exit();
 }

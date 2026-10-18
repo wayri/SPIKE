@@ -184,6 +184,8 @@ type Props = {
   thermalScenario?: ThermalScenarioView | null;
   thermalVisibility?: ThermalSceneVisibility;
   translucentScene?: boolean;
+  viewportBackground?: import("./viewportEnvironment").ViewportBackground;
+  showWorldGrid?: boolean;
   showAxes?: boolean;
   cameraCommand: string;
   viewportRestore?: ViewportRestoreCommand | null;
@@ -253,7 +255,7 @@ function trackCoveredByZones(track: ParsedBoard["tracks"][number], zones: Parsed
   return coverage >= 5;
 }
 
-function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, showNetNames = false, selectedId, selectedPosition, selectedNet = null, highlightedNets = [], hoverPreview = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, onHoverProbe, onValueScale, onNetTune, terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true }, translucentScene = false, showAxes = true, cameraCommand, viewportRestore = null, onViewChange, selectionBlink = true, selectionFilter, onSelect, onContextMenu }: Props) {
+function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, showNetNames = false, selectedId, selectedPosition, selectedNet = null, highlightedNets = [], hoverPreview = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, onHoverProbe, onValueScale, onNetTune, terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true }, translucentScene = false, viewportBackground = "dark", showWorldGrid = true, showAxes = true, cameraCommand, viewportRestore = null, onViewChange, selectionBlink = true, selectionFilter, onSelect, onContextMenu }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const dragRef = useRef({ x: 0, y: 0, moved: false });
   const draggingRef = useRef(false);
@@ -1042,7 +1044,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         return <g key={`highlight-${via.id}`}>
           {netFocusActive && <circle cx={point[0]} cy={point[1]} r={via.size / 2 + 0.24} fill="#061116" />}
           <circle cx={point[0]} cy={point[1]} r={via.size / 2} fill={exactSelection ? "#ffc04f" : netColor} />
-          <circle cx={point[0]} cy={point[1]} r={via.drill / 2} fill="#0b141a" />
+          <circle cx={point[0]} cy={point[1]} r={via.drill / 2} fill={viewportBackground === "amoled" ? "#000000" : "#0b141a"} />
         </g>;
       })}
     </g>;
@@ -1139,7 +1141,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     return <line key={`result-vector-${sample.element_id ?? index}`} x1={point[0]} y1={point[1]} x2={point[0] + sample.vector[0] / norm * vectorLength} y2={point[1] + sample.vector[1] / norm * vectorLength} stroke="#f7d15e" strokeWidth={Math.max(view.width * 0.00045, 0.055)} markerEnd="url(#result-vector-arrow)" vectorEffect="non-scaling-stroke" opacity="0.9" pointerEvents="none" />;
   })), [resultVisualization?.showVectors, resultVisualization?.vectorScale, resultVectors, resultVectorMaximum, resultCellSize, view.width, projectionKey]);
 
-  return <div className={`layout-viewport ${dragging ? "dragging" : ""} ${isolatedNet ? "net-isolated" : ""} ${netFocusActive ? "net-focused" : ""} ${activeCopperLayer === "Overview" ? "overview-active" : ""}`} data-highlighted-net={highlightedNetNames.join(" ")}>
+  return <div style={{ background: viewportBackground === "amoled" ? "#000000" : "#0b141a" }} className={`layout-viewport ${dragging ? "dragging" : ""} ${isolatedNet ? "net-isolated" : ""} ${netFocusActive ? "net-focused" : ""} ${activeCopperLayer === "Overview" ? "overview-active" : ""}`} data-highlighted-net={highlightedNetNames.join(" ")}>
     {navigationStatus && <div role="status" className="viewport-navigation-status">{navigationStatus}</div>}
     <svg
       ref={svgRef}
@@ -1187,7 +1189,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         </marker>
       </defs>
       <rect x={sourceViewBox[0] - sourceViewBox[2] * 4} y={sourceViewBox[1] - sourceViewBox[3] * 4} width={sourceViewBox[2] * 9} height={sourceViewBox[3] * 9} fill="#0b141a" />
-      {showAxes && <rect x={sourceViewBox[0]} y={sourceViewBox[1]} width={sourceViewBox[2]} height={sourceViewBox[3]} fill="url(#layout-grid-large)" />}
+      {showWorldGrid && <rect opacity={0.55} pointerEvents="none" x={view.x} y={view.y} width={view.width} height={view.height} fill="url(#layout-grid-large)" />}
       {showAxes && <g className="layout-measurement-axes" pointerEvents="none">
         <line x1={sourceViewBox[0]} y1={sourceViewBox[1]} x2={sourceViewBox[0] + sourceViewBox[2]} y2={sourceViewBox[1]} />
         <line x1={sourceViewBox[0]} y1={sourceViewBox[1]} x2={sourceViewBox[0]} y2={sourceViewBox[1] + sourceViewBox[3]} />

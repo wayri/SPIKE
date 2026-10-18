@@ -21,7 +21,13 @@ The kernel requires only a C++20 compiler and standard library. CMake builds
 `spike_native_airflow` and runs native numerical tests. Python discovers the
 executable in `build-native-airflow[/Release]`, or the locally configured
 `SPIKE_NATIVE_AIRFLOW_EXECUTABLE`. Worker requests cannot supply executables.
-Executables are local trusted software. The environment override is not a
+Packaged workers include the built executable in their PyInstaller `native`
+directory and discover it there without a source checkout. Build the native
+CFD target before `scripts/build_packaged_worker.py`; worker packaging fails
+if the executable is absent. The packaging gate also checks discovery inside
+the artifact and executes an eight-cell cavity through the frozen worker.
+The environment override also applies to packaged
+workers. Executables are local trusted software. The environment override is not a
 sandbox for untrusted code. The adapter terminates the direct process on a
 300-second timeout. No child processes are launched by this kernel.
 
@@ -156,3 +162,37 @@ self-refinement evidence, not an independent cavity accuracy measurement.
 The six Python boundary tests passed, including actual native execution,
 dimensional rescaling, forged diagnostic rejection, nonfinite-field rejection,
 wall-aware coarse-grid interpolation and process timeout behavior.
+
+## Packaged runtime verification, 2026-10-16
+
+`python scripts/build_native_airflow.py --generator "Visual Studio 18 2026"`
+rebuilt the kernel; its native CTest passed in 77.77 seconds. All seven adapter
+contract tests passed under the release Python 3.12.9 environment.
+`.venv/Scripts/python.exe scripts/build_packaged_worker.py --keep-work` completed
+its frozen worker qualification and integrity manifest. With no
+`SPIKE_NATIVE_AIRFLOW_EXECUTABLE` override and the artifact directory as working
+directory, `cfd_capabilities` discovered `_internal/native/spike_native_airflow.exe`
+and `run_native_cfd` at n=16, Re=100 converged in 4240 steps. The maximum
+dimensionless divergence was 3.393e-12 and final velocity-change rate 9.676e-8.
+The artifact includes the MSVC runtime DLLs collected by PyInstaller. This is
+local packaging/execution evidence; clean-machine installation, upgrade and
+uninstall qualification remain release gates. The model limits above still apply.
+
+## Desktop workbench
+
+Open Menu, search `native CFD`, and choose **Native CFD cavity benchmark**
+under Design & view > Workspace panels. Universal search also exposes it when
+an operational local worker is available. Select **Check / retry runtime**,
+choose the grid and Reynolds number, then **Run native CFD**. Execution uses
+the worker process; returned converged velocity magnitude and gauge pressure
+are available as interactive heatmaps. Changed inputs mark prior results stale.
+Unavailable runtimes, failed convergence and malformed fields have explicit
+recovery states. This is the bounded cavity model described above; it does not
+accept board geometry or provide conjugate heat transfer.
+
+The integrated production frontend build, payload admission tests, viewport
+cadence/vector tests and architecture/control checks passed on 2026-10-16.
+Browser preview verified menu discovery and the unavailable-worker layout.
+Native window screenshot acceptance was blocked by the computer-use helper's
+failure to activate the development host dialog. Installed and published Gamma
+binaries were not replaced by this verification.

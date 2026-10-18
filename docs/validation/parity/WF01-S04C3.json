@@ -1,0 +1,16 @@
+{
+  "contract": "spike/native-step-placement-stage/v1",
+  "stage_id": "WF01-S04C3",
+  "status": "passed",
+  "production_qualified": false,
+  "material_qualified": false,
+  "source_projection_enabled": false,
+  "reference": "docs/validation/parity/WF01-S04C3-native-step.json",
+  "reference_sha256": "699de5e073ba7aaa5acd2c1a721b13c169395527859eadfc7c544906e145f464",
+  "artifact_root": "benchmarks/parity-import/native-step-reference",
+  "validators": {
+    "scripts/parity_native_step_placement_gate.py": "0cc6f5fe77270aa6ceff65ae7eee5530ffea6578db6246342e6c65da4491242c",
+    "scripts/parity_component_placement_math.py": "5a20f05e45ed9d05c6e53300bc89b0a6f596d61e7b55bdd283a21521be393f96"
+  },
+  "scope": "Original cuboid, one stackup, front/back,37/90 degree footprints and three positive model vector sets; no automatic placement, general solids or conditioned material qualification."
+}

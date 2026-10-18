@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { build } from "esbuild";
+import { unlinkSync } from "node:fs";
+import { fileURLToPath,pathToFileURL } from "node:url";
+const output=fileURLToPath(new URL(".quick-tools-test.mjs",import.meta.url));
+try {
+  await build({entryPoints:[fileURLToPath(new URL("../src/quickToolModel.ts",import.meta.url))],outfile:output,bundle:true,platform:"node",format:"esm",logLevel:"silent"});
+  const {quickToolActions,quickToolPosition,runQuickTool}=await import(pathToFileURL(output).href);
+  assert.equal(quickToolPosition(.5,0,300),.5,"grabbing does not jump");
+  assert.equal(quickToolPosition(.5,75,300),.75,"drag uses bar travel, not host width");
+  assert.equal(quickToolPosition(.5,-1000,300),0);
+  assert.equal(quickToolPosition(.5,1000,300),1);
+  assert.equal(quickToolPosition(.5,30,0),.5,"full-width bar remains stationary");
+  assert.equal(quickToolPosition(.5,NaN,300),.5);
+  assert.equal(quickToolPosition(NaN,0,0),.5);
+  let runs=0;const errors=[];
+  const ids=["fit","layer-manager","open-project","import-board","inspect-object","isolate-net","pi-DC IR Drop","si-channel","probe","thermal-setup","thermal-history","thermal-contacts","em-net","engines","model-resolver","stop","result-plots","trace-plots","playback","report","validate","stackup","power-tree","si-eye","si-crosstalk","si-ports","schematic"];
+  const groups=[{id:"all",label:"All",actions:ids.map(id=>({id,label:id,run:()=>runs++}))}];
+  const context={workspace:"Home",hasBoard:true,hasNet:false,hasResult:false,busy:false};
+  const selected=c=>quickToolActions(groups,{...context,...c}).map(item=>item.id);
+  assert.deepEqual(selected({hasBoard:false}),["fit","layer-manager","open-project","import-board"]);
+  assert.ok(selected({hasNet:true}).includes("pi-DC IR Drop"));
+  assert.ok(!selected({hasNet:false}).includes("pi-DC IR Drop"));
+  assert.ok(selected({workspace:"Thermal"}).includes("thermal-history"));
+  assert.ok(selected({workspace:"EM"}).includes("em-net"));
+  assert.ok(selected({workspace:"HF / SI"}).includes("si-eye"));
+  assert.ok(selected({workspace:"Results",hasResult:true}).includes("playback"));
+  assert.ok(!selected({workspace:"Results",hasResult:false}).includes("playback"));
+  assert.ok(selected({kind:"component"}).includes("model-resolver"));
+  assert.ok(selected({busy:true}).includes("stop"));
+  assert.ok(!selected({busy:true}).includes("pi-DC IR Drop"));
+  assert.equal(new Set(selected({hasNet:true})).size,selected({hasNet:true}).length);
+  assert.equal(await runQuickTool("pi-DC IR Drop",groups,message=>errors.push(message)),true);assert.equal(runs,1);
+  const blocked=[{...groups[0],actions:[{id:"pi-DC IR Drop",label:"PI",disabledReason:"Other board occurrence",run:()=>runs++}]}];
+  assert.equal(await runQuickTool("pi-DC IR Drop",blocked,message=>errors.push(message)),false);assert.equal(runs,1);assert.equal(errors.at(-1),"Other board occurrence");
+  assert.equal(await runQuickTool("removed",groups,message=>errors.push(message)),false);assert.equal(runs,1);
+  const failed=[{id:"bad",label:"Bad",actions:[{id:"bad",label:"Bad",run:()=>{throw Error("Worker rejected preflight");}}]}];
+  assert.equal(await runQuickTool("bad",failed,message=>errors.push(message)),false);assert.equal(errors.at(-1),"Worker rejected preflight");
+  console.log("Quick tools: context changes, jobs, result admission, exact target callbacks, disabled/stale actions and recovery passed.");
+} finally {try{unlinkSync(output);}catch{}}

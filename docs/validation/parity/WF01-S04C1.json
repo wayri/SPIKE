@@ -176,10 +176,22 @@
     "native_solids": 3,
     "cli_model_assertions": 30,
     "full_python_suite": {
-      "status": "running",
-      "log": "build/parity-stage04c-full-python.log"
+      "status": "failed",
+      "tests": 3770,
+      "failures": 2,
+      "errors": 1,
+      "skipped": 69,
+      "elapsed_s": 1496.843,
+      "log": "build/parity-stage04c-full-python.log",
+      "reported_failures": [
+        "test_python_debug.PythonDebugTest.test_break_step_into_out_locals_and_output: starting did not reach paused within the 4-second deadline.",
+        "test_python_debug.PythonDebugTest.test_exception_and_nonfinite_publication_fail_cleanly: starting did not reach failed within the 4-second deadline.",
+        "test_emerge_gerber.EMergeGerberTests.test_real_filebasedpcb_loads_units_clear_region_and_native_mesh: native subprocess exceeded its 60-second limit."
+      ],
+      "scope": "Component-solid and source-bound parity checks pass in the full run. These debugger/Gerber failures also occurred in earlier runs; root causes remain unestablished. No deadlines were weakened or clean full-suite/release claim made."
     },
-    "limitation": "Explicit neutral mechanical geometry only. KiCad composed placement and material/physics qualification remain pending."
+    "limitation": "Explicit neutral mechanical geometry only. KiCad composed placement and material/physics qualification remain pending.",
+    "backlog": "passed"
   },
   "remaining_parent_evidence": "docs/validation/parity/WF01-S04C-progress.json",
   "review": {

@@ -28,6 +28,9 @@ const stale = actions.boundedClipboardOperation(() => new Promise(resolve => { r
 assert.deepEqual(await stale, { status: "stale" }, "late clipboard work cannot edit a changed document");
 assert.deepEqual(await actions.boundedClipboardOperation(() => new Promise(() => {}), () => true, 5), { status: "timeout" });
 const editor = readFileSync(new URL("../src/PythonCodeEditor.tsx", import.meta.url), "utf8");
+assert.match(editor, /usePanelPresentation/, "editor DOM work follows its panel owner realm");
+assert.match(editor, /new view\.ResizeObserver/, "editor resize observation rebinds after panel adoption");
+assert.match(editor, /doc\.createElement\("span"\)/, "completion measurement nodes come from the editor document");
 assert.match(editor, /ActionContextMenu[\s\S]*title="Python editor"/);
 assert.match(editor, /currentDocumentKey\.current === snapshotKey[\s\S]*currentCode\.current === snapshot[\s\S]*editor\.current\?\.value === snapshot/);
 assert.match(editor, /pythonCompletion[\s\S]*has-breakpoint[\s\S]*python-syntax-layer/, "completion, breakpoints and highlighting remain integrated");

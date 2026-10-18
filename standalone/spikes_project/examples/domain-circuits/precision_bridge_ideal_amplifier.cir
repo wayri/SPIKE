@@ -1,0 +1,17 @@
+* SPDX-License-Identifier: Apache-2.0
+* Wheatstone sensor bridge and explicit ideal VCVS amplifier; V and ohm.
+Vexc excitation 0 5
+Rtop_p excitation bridge_p 10k
+Rsensor bridge_p 0 10.01k
+Rtop_n excitation bridge_n 10k
+Rref bridge_n 0 10k
+Eideal output 0 bridge_p bridge_n 100
+Rout output 0 10k
+.op
+.control
+run
+set wr_singlescale
+set wr_vecnames
+wrdata precision_bridge_ideal_amplifier.csv v(bridge_p) v(bridge_n) v(output)
+.endc
+.end

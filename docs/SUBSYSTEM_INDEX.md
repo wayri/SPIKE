@@ -1,5 +1,46 @@
 # Subsystem Index
 
+Bounded rectangular sheet/flex folding is owned by
+`python/spike_core/sheet_folding.py`; read-only worker routes by
+`service_sheet_folding.py`; the desktop workspace by `app/src/SheetFoldingPanel.tsx`.
+See [geometry, imports and limits](SHEET_FOLDING.md). This geometric preview is
+separate from flat PCB solver inputs and does not create a formed CAD solid or
+qualify deformation-dependent physics.
+
+Mixed resistor/shunt-capacitor fitted-network transients are owned by
+`python/spike_core/sparameter_capacitive_terminated.py`, using the existing
+rational fitter and sampled-network service. See [referenced mathematics and
+API](CAPACITIVE_NETWORK_TRANSIENT.md) and
+[ADR 0096](adr/0096-shunt-capacitive-network-boundaries.md). Source/network currents,
+loss and storage are distinct typed observables; thermal integration is separate.
+
+Mixed resistive/series-inductive fitted-network transients are owned by
+`python/spike_core/sparameter_inductive_terminated.py`, using the existing
+rational fitter and sampled-network service boundary. Read the
+[referenced equations, API and limits](INDUCTIVE_NETWORK_TRANSIENT.md) and
+[ADR 0095](adr/0095-series-inductive-network-boundaries.md). Typed electrical
+loss/energy histories support future coupling; thermal integration is separate.
+
+Shared thermal, electrical and mechanical material evidence is owned by
+`python/spike_core/material_library.py`; catalog facts and placeholders by
+`data/materials/catalog.json`. The MCAD material browser is
+`app/src/MaterialLibraryPanel.tsx`. See [material records and limits](MATERIAL_LIBRARY.md)
+and [assignment workflow](MCAD_MATERIAL_WORKFLOW.md). Material availability does
+not establish solver support or constitutive qualification.
+
+Planned vibration/shock, solder-joint submodels/fatigue, multibody mechanisms,
+full-drone code/propulsion/flight and satellite/launch applications are tracked
+in [the vehicle/mechanism plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md) and
+the parity backlog under GP12-GP16. These stages have no new solver ownership
+yet; existing static mechanics and scalar co-simulation retain their limits.
+
+Bounded structural mechanics is owned by `python/spike_core/assembly_tetra_structural.py`;
+executed same-mesh thermal coupling by `assembly_thermomechanical.py` and worker
+admission by `service_structural.py`. Read [scope and planned coupling](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md)
+and [ADR 0094](adr/0094-bounded-static-thermoelastic-coupling.md). Existing thermal
+mesh ownership validation is reused; mechanical contact/dynamics and Hall
+transport are separate planned stages.
+
 Two-application IC/ASIC project preflight is owned by `python/spikes/asic_project.py`;
 read-only native KLayout layout inspection by `python/spikes/klayout_bridge.py`
 and `scripts/klayout/spikes_layout_probe.py`. CLI `asic-plan`/`layout-inspect`
@@ -124,6 +165,10 @@ roadmap coverage/evidence paths and fixture integrity. Import corpus assurance
 is owned by `scripts/benchmark_board_corpus.py` and `board_corpus_assertions.py`.
 The first independent geometry fixture is [the parity coupon](../benchmarks/parity-import/README.md).
 These tools do not change the runtime or release capability ledger.
+The [general physics and wave-optics expansion](GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md)
+adds non-PCB domains, scientific field scenes, optics, material/model catalogs
+and scalable execution requirements. These are planned, not runtime capability
+promotions; existing geometry/domain/worker owners remain authoritative.
 `scripts/parity_stage_evidence.py` owns Done-stage source/manifest/result binding
 and dependency checks; stage receipts live in `docs/validation/parity/`.
 `arc_legacy_projection.py` owns exact Arc/chord admission and strict legacy
@@ -506,6 +551,9 @@ See [headless operation and LLM skill](HEADLESS_AUTOMATION.md) and
 | `python/spike_core/layers.py` | Physical copper-layer ordering and helpers |
 | `python/spike_core/models.py`, `model_resolver_staging.py` | 3D model discovery and KiCad scene export; parser-scoped visual-only model staging |
 | `python/spike_core/mcad_component_models.py`, `scripts/parity_component_model_gate.py` | Explicit occurrence/design-bound STEP body handoff and owned native solid reference gate; no inferred source placement or material/solver qualification. See [mechanical export](MCAD_EXPORT.md). |
+| `python/spike_core/component_placement_review.py` | Inert, native-reference-backed placement review drafts within a bounded source/STEP/stack envelope; no automatic placement or material/solver promotion. See [review workflow](COMPONENT_PLACEMENT_REVIEW.md). |
+| `python/spike_core/component_step_scale.py`, `freecad_scale_step.py` | Digest-bound positive STEP geometry scaling through the existing supervised native CAD process, with roundtrip and invariant checks; curved conversion failures remain rejected. See [workflow and limits](COMPONENT_STEP_SCALE.md). |
+| `python/spike_core/scaled_component_review.py` | Snapshot-bound bake-then-rigid component review proposals within the native reference envelope; separate derived identity registration and explicit placement review remain required. See [workflow](SCALED_COMPONENT_REVIEW.md). |
 | `integrations/prism/` | Opt-in source-only Prism snapshot and bound result bridge through the existing extension SDK | [Protocol, workflow and limits](PRISM_BRIDGE.md); installer qualification pending |
 | `python/spike_core/extensions.py` | General extension discovery and isolation |
 | `python/spike_core/emerge_runtime_updates.py`, `emerge_runtime_updates_io.py` | Explicit EMerge 3+ virtual-environment updates, fixed-index pip boundary, bounded background status and runtime-use exclusion; [contract and recovery](EMERGE_RUNTIME_UPDATES.md) |
@@ -557,6 +605,7 @@ selection remains in `gmsh_occ_runtime.py` / `gmsh_extension_runtime.py`.
 | `quasistatic_capacitance.py` | Capacitance extraction | `docs/RLCG_EXTRACTION_VALIDITY.md` |
 | `ngspice_plugin.py` | ngspice co-simulation adapter | `docs/SOLVER_STATUS.md` |
 | `sparameters.py` | Network parameter calculations | `docs/SIGNAL_INTEGRITY_NETWORK_INTEGRATION.md` |
+| `sparameter_modes.py` | Explicit real-reference mixed-mode pairing and physical port mapping | `docs/PI_SI_PARITY_EXECUTION.md` |
 | `meshing.py` | General mesh representations | `docs/MESHING_ENGINE.md` |
 | `internal_meshing_engine.py`, `service_meshing.py` | Versioned internal tetra worker boundary, bounded requests/candidates and digest provenance | `docs/INTERNAL_MESH_ENGINE.md` |
 | `scripts/benchmark_internal_mesher.py`, `scripts/benchmark_pcb_mesher.py` | Original fixtures, before/after mesher timings, process-memory evidence and black-box comparisons | `docs/validation/INTERNAL_MESHER_OPTIMIZATION_20261012.md` |
@@ -567,6 +616,11 @@ selection remains in `gmsh_occ_runtime.py` / `gmsh_extension_runtime.py`.
 | `numerics.py` | Shared numerical safeguards | Tests define supported behavior |
 | `pdn.py` | PDN target review, explicit mounting-path screening, and two-port candidate loading | `docs/PDN_SCREENING.md` |
 | `pdn_network.py`, `pdn_electrostatic.py`, `pdn_shunt_capacitance.py`, `pdn_series_capacitors.py` | Explicit passive AC/filter and load-spike network, finite retained dielectric C extraction, reference-bound capacitor attachment, and series sharing review | `docs/PDN_SCREENING.md#explicit-ac-pdn-and-filter-workflow` |
+| `pdn_network.py`, `schemas/pdn-network-request-v1.schema.json` | Additive simultaneous PWL loads, exact event union, physical load identities and combined source work | `docs/PDN_SIMULTANEOUS_LOADS.md` |
+| `pdn_dielectric_ac.py`, `service_pdn_network.py` | Supplied finite dielectric AC fields, electrode admittance, conductive/dielectric loss and power evidence | `docs/PDN_DIELECTRIC_AC.md` |
+| `pdn_admittance_reduction.py`, `service_pdn_network.py` | Explicit passive auxiliary-port termination, Schur reduction and power identity | `docs/PDN_ADMITTANCE_REDUCTION.md` |
+| `pdn_dielectric_thermal.py`, `service_pdn_network.py` | Coherent RMS dielectric loss to exact retained-cell thermal sources, conserved power and actual steady thermal solve | `docs/PDN_DIELECTRIC_THERMAL.md` |
+| `pdn_dielectric_feedback.py`, `service_pdn_network.py` | Cellwise supplied conductivity-temperature laws, bounded fixed-point coupling and raw convergence evidence | `docs/PDN_DIELECTRIC_FEEDBACK.md` |
 | `app/src/PdnNetworkPanel.tsx`, `service_pdn_network.py` | Power-tree AC setup, source/field admission, worker execution and returned-data plots; no inferred PCB models | `docs/PDN_SCREENING.md#explicit-ac-pdn-and-filter-workflow` |
 | `thermal.py` | Compact thermal scenario/model | `docs/THERMAL_WORKFLOW.md` |
 | `board_thermal.py`, `layered_board_thermal.py`, `thermal_copper_geometry.py` | Board plate and optional structured layered steady/transient thermal solve, imported pad contact coupling, sampled/blurred copper coverage and via links | `docs/validation/EBRAKE1_BOARD_THERMAL_20260928.md`, `docs/validation/EBRAKE1_LAYERED_THERMAL_20260928.md`, `docs/validation/EBRAKE1_LAYERED_TRANSIENT_20260928.md`; experimental, approximate geometry |
@@ -710,7 +764,7 @@ Exports and validation: `scripts/build_spikes_requested_library.py` and
 
 ## Viewport keyboard suite
 
-`shortcutCatalog.ts` owns validated bindings, KiCad/legacy presets and migration. `ShortcutManager.tsx` owns searchable chord capture and conflict review. `viewportKeyboardCamera.ts` owns display camera transforms; `App.tsx` dispatches current workspace actions. See [viewport shortcuts](VIEWPORT_SHORTCUTS.md).
+`shortcutCatalog.ts` owns validated bindings, KiCad/legacy presets and migration. `ShortcutManager.tsx` owns searchable chord capture and conflict review. `viewportEnvironment.ts` owns exact viewport background colors and bounded orientation-grid extent; `viewportKeyboardCamera.ts` owns display camera transforms; `App.tsx` dispatches current workspace actions. See [viewport shortcuts](VIEWPORT_SHORTCUTS.md).
 
 Workspace panel tabs, independent size/maximize preferences and the persistent
 tool taskbar: `app/src/WorkspaceDock.tsx`, composed by App.tsx and styled in
@@ -761,3 +815,107 @@ hide/restore and resizing. `FocusWorkspace.css` owns compact chrome;
 `tableTheme.css` owns palette tokens. `EmbeddedAssemblyTool.tsx` reuses existing
 assembly components and App-owned actions without a native window bridge.
 `App.tsx` remains the project/worker state authority. See WORKSPACE_PANELS.md.
+
+`searchSentences.ts` owns bounded sentence-command parsing and canonical target suggestions; `UniversalSearch.tsx` owns keyboard completion and explicit execution. `App.tsx` resolves board occurrence scope and dispatches through existing selections, layer controls and PI preflight. See [search sentences](VIEWPORT_SHORTCUTS.md#search-sentences-and-commands).
+
+`FloatingPanel.tsx` owns retained DOM portal adoption, drag-to-detach and return-to-dock lifecycle; `panelPresentation.ts` supplies the active document/window to editors; `panelWindowBridge.ts` and native `panel_popup.rs` own the presentation-only scale boundary and restricted linked native popup hosts. Blank children have no additional native permissions and panel state remains owned by the main workspace.
+
+
+The context quick-tools bar is owned by `app/src/ViewportQuickTools.tsx` and
+`quickToolModel.ts`. It presents existing workspace action callbacks and exact
+availability reasons; it never dispatches solver or file operations directly.
+`ProjectManager.tsx`/`projectManager.css` and `NetManager.tsx`/`netManager.css`
+own compact manager layouts and container breakpoints. Shared first-party
+chrome follows `tableTheme.css` and `buttonStandard.css`; engineering field and
+plot series colors remain data semantics. See [controls](BUTTON_CONTROLS.md).
+
+## Solver suite discovery
+
+`app/src/solverSuiteCatalog.ts` and `SolverSuitePanel.tsx` own the presentation
+index of bounded source capabilities and setup routes. `App.tsx` owns navigation
+and universal search; runtime eligibility remains in the selected worker workflow.
+`python/spike_core/studio_bridge.py` owns inert standalone Studio discovery and
+revision-bound snapshot staging/launch. See [solver suite](SOLVER_SUITE.md).
+
+## PI sentence setup and prescribed pin loading
+
+`app/src/piSearchIntent.ts` owns bounded endpoint sentence planning and ambiguity
+reporting. `PiSearchSetupPanel.tsx` owns missing-value review; App composes the
+existing PI terminals and preflight. `piPinLoads.ts` and `PiComponentLoadPanel.tsx`
+own rail-pad eligibility and editable current apportionment. This is input
+preparation, not IC device inference or a new electrical solver. See
+[PI search workflow](VIEWPORT_SHORTCUTS.md#pi-endpoint-sentences-and-missing-details).
+
+
+## Cross-workflow sentence requests
+
+`app/src/workspaceIntentModel.ts` owns bounded lexical workflow planning, scoped
+identity, unit parsing and inert review records. `WorkspaceIntentReviewPanel.tsx`
+owns missing-value and ambiguity review. `workspaceIntentAdapters.ts` translates
+unique canonical SI net IDs, explicit thermal heat allocation and Studio feedback
+temperature/time units without dispatching solvers. App routes reviewed requests
+to existing setup editors, importers and exporters and rejects changed context.
+`siSearchDraft.ts` owns reviewed SI field admission; `SParameterWorkbench.tsx`
+applies each draft once and invalidates superseded results. Tests are grouped by
+`npm --prefix app run test:workspace-intents`. See
+[request coverage and limitations](VIEWPORT_SHORTCUTS.md#reviewed-requests-across-spike).
+
+
+## Windows embedded-frontend package acceptance
+
+`scripts/verify_windows_desktop.py` owns the bounded Windows package runtime
+check, reusing the existing inert `PanelPopupQualification.tsx` / native popup
+qualification route. It observes only windows belonging to its launched process,
+uses a disposable WebView2 profile and requires the exact completed lifecycle
+marker followed by a normal close. `scripts/build_windows_ci.ps1` invokes it
+before publishing a CI artifact. Unit tests cover rejection of error dialogs,
+process-only survival, partial success markers, failures and early exits. See
+[acceptance scope](WINDOWS_INSTALLER.md#embedded-frontend-acceptance).
+
+## Supplied decap operating corners
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `pdn_decap_corners.py`, `service_pdn_network.py` | Explicit corner admission, existing PDN composition, sampled target evidence and generated identity preservation | [PDN decap corners](PDN_DECAP_CORNERS.md) |
+
+## BOM-constrained decap selection
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `pdn_decap_selection.py`, `service_pdn_network.py` | Finite population enumeration, cost/inventory admission, cumulative work bounds and deterministic corner-result ranking | [PDN decap selection](PDN_DECAP_SELECTION.md) |
+
+Interface layout selection: `app/src/appSettings.ts`, `app/src/interfaceLayout.css`,
+`App.tsx`, and `UniversalSettingsModal.tsx`; see [Interface layouts](INTERFACE_LAYOUTS.md).
+
+## Sampled two-port fixture removal
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `sparameter_deembedding.py`, `service_sparameter_processing.py` | Explicit oriented two-fixture wave-chain solves, retained sources and per-sample conditioning/reconstruction evidence | [Two-port de-embedding](TWO_PORT_DEEMBEDDING.md) |
+
+## Explicit sampled network preparation
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `sparameter_sampling.py`, `service_sparameter_processing.py` | Explicit bounded Cartesian-linear grid transformation, real supplied/source DC policy and per-target provenance | [S-parameter resampling](SPARAMETER_RESAMPLING.md) |
+
+## Supplied-pole sampled network models
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `sparameter_rational.py`, `service_sparameter_processing.py` | Real proper rational coefficient fit at supplied stable real poles, sample-error admission and state-realization evidence | [Rational network fit](SPARAMETER_RATIONAL_FIT.md) |
+
+## Rational network waveform execution
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `sparameter_transient.py`, `service_sparameter_processing.py` | Actual rational-fit composition, simultaneous prescribed-wave PWL propagation, exact event union and port V/I histories | [Network transient](RATIONAL_NETWORK_TRANSIENT.md) |
+
+## Resistively terminated rational network execution
+
+| Owner files | Responsibility | Reference |
+| --- | --- | --- |
+| `sparameter_terminated.py`, `service_sparameter_processing.py` | Finite Thevenin feedback, loop/stability admission, bounded augmented exponentials and port-boundary evidence | [Terminated network](TERMINATED_NETWORK_TRANSIENT.md) |
+
+Live first-party control search is owned by `app/src/liveControlSearch.ts` and
+`UniversalSearch.tsx`; [command access](COMMAND_ACCESS.md) describes runtime coverage.

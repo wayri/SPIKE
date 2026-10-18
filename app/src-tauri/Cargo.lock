@@ -3342,7 +3342,7 @@ dependencies = [
 
 [[package]]
 name = "spike-desktop"
-version = "0.3.11-gamma.1"
+version = "0.3.12-gamma.1"
 dependencies = [
  "base64 0.22.1",
  "ed25519-dalek",

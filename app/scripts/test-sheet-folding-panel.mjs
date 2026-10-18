@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
+
+const require = createRequire(import.meta.url);
+const source = readFileSync(new URL("../src/SheetFoldingPanel.tsx", import.meta.url), "utf8");
+const compile = code => ts.transpileModule(code, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
+let initialText;
+let stateIndex = 0;
+const fakeReact = { ...React, useMemo: factory => factory(), useState(initial) { const value = stateIndex++ === 0 && initialText !== undefined ? initialText : typeof initial === "function" ? initial() : initial; return [value, () => {}]; } };
+const module = { exports: {} };
+new Function("require", "module", "exports", compile(source))(name => {
+  if (name === "react") return fakeReact;
+  if (name === "./icons") return new Proxy({}, { get: () => props => React.createElement("svg", props) });
+  if (name === "./PlotlyChart") return { __esModule: true, default: () => React.createElement("div", { "data-plot": true }) };
+  if (name === "./workerBridge") return { openNativeTextFile() {}, runLocalWorker() {}, saveNativeTextFile() {} };
+  if (name.endsWith(".css")) return {};
+  return require(name);
+}, module, module.exports);
+
+const { default: Panel, editableSheetDraft, parseSheetDefinition, previewMeshTrace } = module.exports;
+const valid = { contract: "spike/sheet-folding/v1", id: "coupon", kind: "sheet_metal", sheet: { length_mm: 20, width_mm: 10, thickness_mm: 0.5, material: null }, bends: [{ id: "b1", start_x_mm: 8, angle_deg: 45, inside_radius_mm: 1, k_factor: 0.4, fixed_side: "negative_x", segments: 8 }], flex_regions: [] };
+assert.equal(parseSheetDefinition(JSON.stringify(valid)).sheet.thickness_mm, 0.5);
+assert.throws(() => parseSheetDefinition(JSON.stringify({ ...valid, sheet: { ...valid.sheet, thickness_mm: 0 } })), /positive millimetre/);
+assert.throws(() => parseSheetDefinition(JSON.stringify({ ...valid, bends: [{ ...valid.bends[0], inside_radius_mm: -1 }] })), /Bend 1/);
+assert.equal(parseSheetDefinition(JSON.stringify({ ...valid, bends: [{ ...valid.bends[0], k_factor: 0 }] })).bends[0].k_factor, 0);
+assert.throws(() => parseSheetDefinition(JSON.stringify({ ...valid, kind: "flex_pcb" })), /explicit flex region/);
+const trace = previewMeshTrace({ vertices: [{ id: "a", position_mm: [0, 0, 0] }, { id: "b", position_mm: [1, 0, 0] }, { id: "c", position_mm: [0, 1, 0] }], triangles: [{ id: "t", vertex_ids: ["a", "b", "c"] }] });
+assert.deepEqual(trace.i, [0]); assert.deepEqual(trace.j, [1]); assert.deepEqual(trace.k, [2]);
+assert.throws(() => previewMeshTrace({ vertices: [], triangles: [] }), /no displayable triangle mesh/);
+assert.equal(editableSheetDraft({ contract: "spike/sheet-folding/v1", id: "broken", sheet: {} }), null, "Incomplete drafts must not enter field rendering.");
+initialText = JSON.stringify({ contract: "spike/sheet-folding/v1", id: "broken", sheet: {} }); stateIndex = 0;
+assert.doesNotThrow(() => renderToStaticMarkup(React.createElement(Panel, { board: null, onStatus() {} })), "Incomplete valid JSON remains editable without crashing.");
+initialText = undefined; stateIndex = 0;
+const markup = renderToStaticMarkup(React.createElement(Panel, { board: null, onStatus() {} }));
+assert.match(markup, /Sheet folding preview/);
+assert.match(markup, /analytical geometry preview/);
+assert.match(markup, /Import JSON or DXF/);
+assert.match(markup, /Neutral sheet definition JSON/);
+assert.match(markup, /Preview fold/);
+assert.match(markup, /Add bend/);
+assert.match(markup, /Add flex region/);
+assert.match(markup, /does not calculate strain, springback, collision/);
+assert.ok(source.includes('openNativeTextFile("sheet"'));
+assert.match(markup, /Required for DXF/);
+assert.ok(source.includes('method: "import_sheet_definition"'));
+assert.ok(source.includes('method: "preview_sheet_fold"'));
+assert.ok(source.includes('.spike-sheet.json'));
+assert.ok(source.includes("if (path) onStatus"), "A cancelled export must not announce a saved file.");
+assert.ok(!source.includes("localStorage"), "Field edits must not persist automatically.");
+console.log("sheet folding panel checks passed");

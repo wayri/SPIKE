@@ -1,6 +1,6 @@
 """Stable application contracts and local analysis service for SPIKE."""
 
-__version__ = "0.3.11-gamma.1"
+__version__ = "0.3.12-gamma.1"
 
 from .capabilities import capabilities
 from .capability_ledger import native_capability_ledger

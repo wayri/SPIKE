@@ -8,7 +8,10 @@ Verification and full-suite limitations are recorded in
 Current scope is offline operation: local solver execution, file-based model
 exchange, recorded measurement import/replay and local comparison reports.
 Live telemetry, network acquisition, cloud execution, device control and
-hardware-in-the-loop are deferred outside this workstream.
+hardware-in-the-loop are deferred outside this workstream. The separately
+requested [drone/vehicle plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md) now targets actual
+offline firmware/plant SITL adapters. They are not implemented by this scalar
+replay/gain service. Live HIL remains a separate hardware-integration stage.
 
 SPIKE already implements reviewed PEEC/native MNA fixed-point coupling and
 specialized electrical/thermal coupling. Preserve those engines and their

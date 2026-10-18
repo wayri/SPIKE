@@ -22,6 +22,7 @@ mod close_recovery;
 mod desktop_lifecycle;
 mod app_updates;
 mod webview_policy;
+mod panel_popup;
 #[cfg(not(feature = "custom-protocol"))]
 mod dev_server;
 
@@ -888,6 +889,8 @@ fn project_worker_paths(request: &serde_json::Value) -> Result<Vec<PathBuf>, Str
                 | "extract_mcad_package_shape_in_project"
                 | "generate_mcad_selector_preview_in_project"
                 | "update_assembly_semantics_in_project"
+                | "list_material_catalog"
+                | "assign_material_to_project"
                 | "update_assembly_topology_setup_in_project"
                 | "apply_assembly_geometric_constraint_in_project"
                 | "update_assembly_structure_in_project"
@@ -975,6 +978,8 @@ fn dialog_for_kind(kind: &str, save: bool) -> rfd::FileDialog {
         ("project", true) => dialog.add_filter("SPIKE project", &["spike"]),
         ("report", _) => dialog.add_filter("HTML report", &["html", "htm"]),
         ("step", _) => dialog.add_filter("STEP model", &["step", "stp"]),
+        ("sheet", false) => dialog.add_filter("SPIKE sheet definition or planar DXF", &["json", "dxf"]),
+        ("sheet", true) => dialog.add_filter("SPIKE sheet definition", &["json"]),
         ("netlist", _) => dialog.add_filter("SPICE netlist", &["cir", "sp", "spice", "net"]),
         ("result", _) => dialog.add_filter("SPIKE result bundle", &["spike-results.json", "json"]),
         ("script", _) => dialog.add_filter("Python script", &["py"]),
@@ -2023,7 +2028,9 @@ async fn run_worker(
         let _admission = admission;
         if use_resident {
             let workspace = resolve_worker_root(&app)?;
-            run_resident_worker_request(&workspace, &resident_state, request, cancellation, &lifecycle)
+            run_resident_worker_request(
+                &workspace, &resident_state, request, cancellation, &lifecycle,
+            )
         } else {
             run_worker_process(app, request, cancellation)
         }
@@ -2101,7 +2108,12 @@ pub fn run() {
     }
     let pending_project = startup_project.map(|(_, selected)| selected);
     tauri::Builder::default()
-        .on_page_load(|webview, _| webview_policy::apply(webview))
+        .on_page_load(|webview, _| {
+            webview_policy::apply(webview);
+            if let Err(error) = panel_popup::apply_ui_scale(webview) {
+                eprintln!("Could not apply SPIKE UI scale: {error}");
+            }
+        })
         .plugin(tauri_plugin_opener::init())
         .manage(ResourceState(Mutex::new(ResourceSampler {
             system: System::new(),
@@ -2118,14 +2130,15 @@ pub fn run() {
         .on_window_event(close_recovery::on_window_event)
         .manage(project_trust_binding::ProjectManifestState::new())
         .manage(mcp_bridge::BridgeState::default())
+        .manage(panel_popup::PanelWindowState::default())
+        .setup(panel_popup::create_main)
         .invoke_handler(tauri::generate_handler![
+            panel_popup::set_panel_ui_scale,
             app_updates::app_update_status,
             app_updates::app_update_check,
             app_updates::app_update_download,
             app_updates::app_update_cancel,
             app_updates::app_update_install,
-            desktop_lifecycle::acknowledge_desktop_close,
-            desktop_lifecycle::close_desktop_app,
             close_recovery::main_close_recovery_supported,
             close_recovery::respond_main_close,
             close_recovery::close_main_application,
@@ -2655,6 +2668,13 @@ mod tests {
             "params": { "project_path": "fixture.spike" }
         });
         assert_eq!(project_worker_paths(&semantics_edit).unwrap().len(), 1);
+        for method in ["list_material_catalog", "assign_material_to_project"] {
+            let material_request = json!({
+                "method": method,
+                "params": { "project_path": "fixture.spike" }
+            });
+            assert_eq!(project_worker_paths(&material_request).unwrap().len(), 1);
+        }
         let exact_shape = json!({
             "method": "extract_mcad_package_shape_in_project",
             "params": { "project_path": "fixture.spike" }

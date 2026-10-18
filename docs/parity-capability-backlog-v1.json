@@ -28,7 +28,7 @@
       "title": "General post-layout channel extraction",
       "owner_role": "SI",
       "baseline": "Experimental straight/pair and piecewise planar paths; bends omit discontinuity physics. [Geometry channel](GEOMETRY_DERIVED_SI_CHANNEL.md).",
-      "target": "Branches, layer changes, return planes, arbitrary coupled conductors; geometry coverage report and converged extraction.",
+      "target": "Branches, layer changes, return planes, explicit single-ended/differential/multiconductor PCB/coax/cable classes; frequency-dependent RLGC, distributed delay and reflections, geometry coverage and converged extraction.",
       "priority": "P0 M1, P1 M2",
       "status": "planned",
       "baseline_evidence": [
@@ -40,7 +40,7 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Branches, layer changes, return planes, arbitrary coupled conductors; geometry coverage report and converged extraction."
+        "Branches, layer changes, return planes, explicit single-ended/differential/multiconductor PCB/coax/cable classes; frequency-dependent RLGC, distributed delay and reflections, geometry coverage and converged extraction."
       ]
     },
     {
@@ -127,12 +127,18 @@
       "id": "SI07",
       "title": "Crosstalk, waveform, eye and TDR diagnostics",
       "owner_role": "SI",
-      "baseline": "Partial experimental NEXT/FEXT, deterministic eyes, loaded transfer and TDR. [SI guide](SI_USER_GUIDE.md).",
+      "baseline": "Experimental eyes/TDR, prescribed-wave rational transients and bounded finite R/RL or R/shunt-C Thevenin feedback with distinct source/network currents, derivatives, losses and stored energy. [Capacitive models](CAPACITIVE_NETWORK_TRANSIENT.md).",
       "target": "Multi-aggressor switching, timing/noise budgets, spatial cross-probing and independent two/four-port VNA/TDR correlation.",
       "priority": "P1 M2",
-      "status": "planned",
+      "status": "in_progress",
       "baseline_evidence": [
-        "SI_USER_GUIDE.md"
+        "SI_USER_GUIDE.md",
+        "RATIONAL_NETWORK_TRANSIENT.md",
+        "TERMINATED_NETWORK_TRANSIENT.md",
+        "INDUCTIVE_NETWORK_TRANSIENT.md",
+        "validation/SI07_INDUCTIVE_NETWORK_TRANSIENT.md",
+        "CAPACITIVE_NETWORK_TRANSIENT.md",
+        "validation/SI07_CAPACITIVE_NETWORK_TRANSIENT.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -140,19 +146,23 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Multi-aggressor switching, timing/noise budgets, spatial cross-probing and independent two/four-port VNA/TDR correlation."
+        "General combined RLC/nonlinear/descriptor source/load connections and arbitrary initial states; steppable sessions/thermal integration; full multi-aggressor timing/noise budgets, spatial cross-probing and independent measured VNA/TDR/transient correlation."
       ]
     },
     {
       "id": "SI08",
       "title": "Network quality and interoperability",
       "owner_role": "SI",
-      "baseline": "Operational Touchstone S/Z/Y, renormalization, bounded mixed mode, passivity/reciprocity; arbitrary causality checks unavailable. [Solver status](SOLVER_STATUS.md#network-data-workbench).",
+      "baseline": "Operational sampled conversions, mixed modes, supplied fixture removal, explicit resampling/DC and bounded supplied stable-pole rational models. [Rational models](SPARAMETER_RATIONAL_FIT.md).",
       "target": "Reviewed causality/resampling/DC policy, calibrated fixture removal, general port pairing and passive causal broadband model fitting.",
       "priority": "P0 M1, P1 M2",
-      "status": "planned",
+      "status": "in_progress",
       "baseline_evidence": [
-        "SOLVER_STATUS.md#network-data-workbench"
+        "SOLVER_STATUS.md#network-data-workbench",
+        "PI_SI_PARITY_EXECUTION.md",
+        "TWO_PORT_DEEMBEDDING.md",
+        "SPARAMETER_RESAMPLING.md",
+        "SPARAMETER_RATIONAL_FIT.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -160,7 +170,7 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Reviewed causality/resampling/DC policy, calibrated fixture removal, general port pairing and passive causal broadband model fitting."
+        "Source causality and broader resampling/extrapolation policies; automatic calibration and uncertainty evidence; general multiport fixture removal; automatic pole selection, general passive causal fitting and measured/transient qualification."
       ]
     },
     {
@@ -187,12 +197,16 @@
       "id": "PI02",
       "title": "Broadband AC PDN extraction",
       "owner_role": "PI",
-      "baseline": "Approximate PEEC driving-point networks and candidate review; C/G estimates and scaling limits remain. [AC PI](AC_POWER_INTEGRITY_EFFECTS.md).",
+      "baseline": "Approximate PEEC driving-point networks and candidate review; C/G estimates and scaling limits remain. [AC PI](AC_POWER_INTEGRITY_EFFECTS.md). PI02-S01 verifies finite dielectric complex admittance from explicit scalar/tensor permittivity, conductivity and loss tangent, with layered/multielectrode plate references; general board extraction and causal reduction remain open. PI02-S02 verifies explicit passive sampled port reduction and actual dielectric-source handoff; causal dynamic fitting and general geometry qualification remain open. PI02-S03 verifies coherent dielectric loss to exact-cell thermal sources and actual steady temperatures, as a one-way conservative multiphysics foundation; temperature feedback and general mesh transfer remain open. PI02-S04 verifies bounded conductivity-temperature feedback with raw temperature/power convergence; all other constitutive feedback, transient stability and measured qualification remain open.",
       "target": "Converged capacitance/dielectric loss, proximity redistribution, plane/via/package multiports and passivity-preserving reduction.",
       "priority": "P1 M2",
-      "status": "planned",
+      "status": "in_progress",
       "baseline_evidence": [
-        "AC_POWER_INTEGRITY_EFFECTS.md"
+        "AC_POWER_INTEGRITY_EFFECTS.md",
+        "PDN_DIELECTRIC_AC.md",
+        "PDN_ADMITTANCE_REDUCTION.md",
+        "PDN_DIELECTRIC_THERMAL.md",
+        "PDN_DIELECTRIC_FEEDBACK.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -207,12 +221,14 @@
       "id": "PI03",
       "title": "Physical decap selection and placement optimization",
       "owner_role": "PI",
-      "baseline": "Supplied-network candidate/single-cap comparison exists. [PI tools](PI_ENGINEERING_TOOLS.md).",
+      "baseline": "Supplied-network comparisons, explicit C/ESR/ESL operating corners and bounded BOM/site selection. [Decap selection](PDN_DECAP_SELECTION.md).",
       "target": "Location-dependent extraction, bias/temperature/tolerance models, BOM constraints and validated optimizer; retain rejected candidates.",
       "priority": "P1 M2, P2 M5",
-      "status": "planned",
+      "status": "in_progress",
       "baseline_evidence": [
-        "PI_ENGINEERING_TOOLS.md"
+        "PI_ENGINEERING_TOOLS.md",
+        "PDN_DECAP_CORNERS.md",
+        "PDN_DECAP_SELECTION.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -220,19 +236,21 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Location-dependent extraction, bias/temperature/tolerance models, BOM constraints and validated optimizer; retain rejected candidates."
+        "Location-dependent geometry extraction; automatic manufacturer bias/temperature/tolerance models and catalog/BOM data admission; scalable optimization beyond supplied finite domain; measured correlation and unsampled resonance bounds."
       ]
     },
     {
       "id": "PI04",
       "title": "Switching loads, SSN and circuit/field interaction",
       "owner_role": "PI",
-      "baseline": "Native transient, staged ngspice and bounded field/circuit paths exist. [Solver status](SOLVER_STATUS.md).",
+      "baseline": "Native transient, staged ngspice and bounded field/circuit paths exist. [Solver status](SOLVER_STATUS.md). Consistent inductive-cutset PWL voltages verified in PI04-S01; general dynamic models remain open. PI04-S02 verifies simultaneous supplied PWL loads with shared-return accounting; nonlinear regulators and measured-board qualification remain open.",
       "target": "Qualified switching/model subsets, package PDN, simultaneous-switching return currents, stable broadband N-port coupling and reference comparisons.",
       "priority": "P1 M2, P2 M5",
-      "status": "planned",
+      "status": "in_progress",
       "baseline_evidence": [
-        "SOLVER_STATUS.md"
+        "SOLVER_STATUS.md",
+        "PI_SI_PARITY_EXECUTION.md",
+        "PDN_SIMULTANEOUS_LOADS.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -368,7 +386,7 @@
       "title": "Full-wave 3D multiport SI/PI/RF",
       "owner_role": "EM",
       "baseline": "Optional EMerge/openEMS execute bounded cases; native `spike.fullwave_3d` remains unavailable. [Solver status](SOLVER_STATUS.md).",
-      "target": "Complete geometry/ports, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package fixtures.",
+      "target": "Complete geometry/RF ports and antenna feeds, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package/local RF fixtures; radio-system metrics require their separate RF01/RF02 evidence.",
       "priority": "P1 M4",
       "status": "planned",
       "baseline_evidence": [
@@ -380,7 +398,7 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Complete geometry/ports, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package fixtures."
+        "Complete geometry/RF ports and antenna feeds, dielectric dispersion and conductor loss, boundary convergence, multi-excitation calibration and qualified PCB/package/local RF fixtures; radio-system metrics require their separate RF01/RF02 evidence."
       ]
     },
     {
@@ -388,7 +406,7 @@
       "title": "Antennas, near/far fields and scattering",
       "owner_role": "EM",
       "baseline": "Experimental fields/NF2FF and one-way physical optics; public MoM unavailable. [Retained EM](RETAINED_ASSEMBLY_EM.md), [mesh roadmap](ANALYSIS_AND_MESH_ROADMAP.md).",
-      "target": "Power calibration, fed antenna matching, antenna/enclosure/cable interaction; complete and qualify MoM only when its use cases justify it.",
+      "target": "Power calibration, fed antenna matching, antenna/enclosure/cable interaction; boundary-element/integral-equation radiation and scattering with surface discretization and no volumetric exterior air mesh, qualified near/far fields and accelerated solves.",
       "priority": "P2 M4, P3 M6",
       "status": "planned",
       "baseline_evidence": [
@@ -401,7 +419,8 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Power calibration, fed antenna matching, antenna/enclosure/cable interaction; complete and qualify MoM only when its use cases justify it."
+        "Power calibration, fed antenna matching, antenna/enclosure/cable interaction; boundary-element/integral-equation radiation and scattering with surface discretization and no volumetric exterior air mesh, qualified near/far fields and accelerated solves.",
+        "Admit homogeneous exterior and surface geometry/material limits; qualify conditioning, resonance handling, quadrature and surface refinement; hybrid interiors and general/optical scenes need separate evidence."
       ]
     },
     {
@@ -555,7 +574,8 @@
       "priority": "P3 M6",
       "status": "planned",
       "baseline_evidence": [
-        "SOLVER_STATUS.md"
+        "SOLVER_STATUS.md",
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -687,6 +707,757 @@
       },
       "open_gaps": [
         "Version-bound qualification packs, calibrated measurements, separate calibration/validation sets, supported-envelope reports and human numerical release review."
+      ]
+    },
+    {
+      "id": "GP01",
+      "title": "General geometry and physical-domain studies",
+      "owner_role": "Geometry/contracts",
+      "baseline": "CAD-neutral AssemblyIR and explicit STEP handoffs are bounded foundations.",
+      "target": "Admit non-PCB solids/surfaces/air/fluid/optical regions, scale and frames, sources/boundaries and constitutive requirements without interpreting CAD as solvable physics.",
+      "priority": "Authorized parallel track; P0 M1, M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Admit non-PCB solids/surfaces/air/fluid/optical regions, scale and frames, sources/boundaries and constitutive requirements without interpreting CAD as solvable physics."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP02",
+      "title": "General discretization and mesh qualification",
+      "owner_role": "Meshing/numerics",
+      "baseline": "Existing mesh and field handoff paths cover bounded domain cases.",
+      "target": "Physics-specific FEM/FVM/FDTD/BEM and high-order/matrix-free feasibility; adaptive interfaces, skin depth, wavelength and boundary-layer resolution with quality/convergence evidence.",
+      "priority": "Authorized parallel track; P0 M1, M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "ANALYSIS_AND_MESH_ROADMAP.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Physics-specific FEM/FVM/FDTD/BEM and high-order/matrix-free feasibility; adaptive interfaces, skin depth, wavelength and boundary-layer resolution with quality/convergence evidence."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP03",
+      "title": "General 3D electrostatics and magnetostatics",
+      "owner_role": "Electromagnetics",
+      "baseline": "Bounded field/extraction methods exist; arbitrary 3D geometry/material qualification remains open.",
+      "target": "Stationary 3D coil/electrode/core/air studies, nonlinear law admission, flux/charge/energy and force consistency; reuse EM01/EM06 foundations.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Stationary 3D coil/electrode/core/air studies, nonlinear law admission, flux/charge/energy and force consistency; reuse EM01/EM06 foundations."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP04",
+      "title": "3D machines, transformers and induction systems",
+      "owner_role": "Magnetics/machines",
+      "baseline": "Experimental planar machines and stationary eddy currents do not establish converged 3D moving machines.",
+      "target": "Real winding/core/air geometry, circuit excitation, nonlinear/hysteretic/laminated laws, moving interfaces, losses, torque and electrothermal feedback with measurement.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "MAGNETIC_MACHINE_STUDIES.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Real winding/core/air geometry, circuit excitation, nonlinear/hysteretic/laminated laws, moving interfaces, losses, torque and electrothermal feedback with measurement."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP05",
+      "title": "General interior and exterior fluid domains",
+      "owner_role": "CFD",
+      "baseline": "Native/SU2/OpenFOAM paths have bounded experimental cases, not arbitrary building/assembly CFD.",
+      "target": "General fluid-domain generation, laminar/turbulent flow, natural/forced convection, exterior boundaries and CHT; conservative interfaces and independently refined/measurement-correlated cases.",
+      "priority": "Vehicle aerodynamics authorized now; remaining general CFD post-parity; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "General fluid-domain generation, laminar/turbulent flow, natural/forced convection, exterior boundaries and CHT; conservative interfaces and independently refined/measurement-correlated cases."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP06",
+      "title": "General solid heat and radiative transport",
+      "owner_role": "Thermal",
+      "baseline": "Retained-volume conduction/radiation foundations have declared scope and remaining convergence gaps.",
+      "target": "Non-PCB solids, temperature laws, contacts, enclosure/view-factor radiation and heat-source transfer; preserve TH01-TH05 gates for shared work.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "THERMAL_RESEARCH_ROADMAP.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Non-PCB solids, temperature laws, contacts, enclosure/view-factor radiation and heat-source transfer; preserve TH01-TH05 gates for shared work."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP07",
+      "title": "Structural dynamics and thermomechanics",
+      "owner_role": "Structural",
+      "baseline": "Experimental static isotropic P1 tetra thermoelasticity and actual steady same-mesh thermal-to-stress coupling; bounded stage evidence only.",
+      "target": "Elasticity, contact, modes/vibration and deformation, temperature/force transfer and stress; fatigue/lifetime only with applicable calibrated laws.",
+      "priority": "Authorized parallel track; P2 M7",
+      "status": "in_progress",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+        "COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md",
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Elasticity, contact, modes/vibration and deformation, temperature/force transfer and stress; fatigue/lifetime only with applicable calibrated laws."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP08",
+      "title": "Acoustic wave and vibroacoustic studies",
+      "owner_role": "Acoustics",
+      "baseline": "General acoustic/building/vibroacoustic qualification is not established.",
+      "target": "Pressure waves, sources/impedance/absorbing boundaries, structural coupling, modal/transient/harmonic observables and domain/mesh/time references.",
+      "priority": "Post-parity; P2 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Pressure waves, sources/impedance/absorbing boundaries, structural coupling, modal/transient/harmonic observables and domain/mesh/time references."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP09",
+      "title": "Conservative general multiphysics coupling",
+      "owner_role": "Coupling",
+      "baseline": "Bounded reduced/retained coupling and co-simulation exist; general PDE coupling remains open.",
+      "target": "Shared dependency graph, conservative nonmatching transfers, nonlinear/time-scale coupling, rollback, conservation and coupled convergence; reuse WF04/TH05.",
+      "priority": "Authorized parallel track; P0 M1, P2 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "COSIMULATION_DIGITAL_TWIN.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Shared dependency graph, conservative nonmatching transfers, nonlinear/time-scale coupling, rollback, conservation and coupled convergence; reuse WF04/TH05."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "OP01",
+      "title": "Geometrical optics and lens/mirror assemblies",
+      "owner_role": "Optics",
+      "baseline": "General mirror/lens ray tracing is not established; far-zone scattering is a different scope.",
+      "target": "Parametric/aspheric surfaces, normals/frames, stops/detectors, reflection/refraction, sequential/nonsequential rays, optical path and controlled multiple reflections.",
+      "priority": "Post-parity; P1 M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Parametric/aspheric surfaces, normals/frames, stops/detectors, reflection/refraction, sequential/nonsequential rays, optical path and controlled multiple reflections."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "OP02",
+      "title": "Coherent scalar wave propagation and diffraction",
+      "owner_role": "Optics",
+      "baseline": "General coherent mirror/lens diffraction workflow is not established.",
+      "target": "Bounded Gaussian/Fresnel/angular-spectrum propagation, apertures and amplitude/phase surfaces; explicit scalar/paraxial limits, sampling/window refinement and power/phase checks.",
+      "priority": "Post-parity; P1 M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Bounded Gaussian/Fresnel/angular-spectrum propagation, apertures and amplitude/phase surfaces; explicit scalar/paraxial limits, sampling/window refinement and power/phase checks."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "OP03",
+      "title": "Vector wave optics, modes and resonators",
+      "owner_role": "Optics/Maxwell",
+      "baseline": "Existing RF/PEC scattering adapters do not qualify dielectric vector optical assemblies.",
+      "target": "Polarized vector Maxwell/beam-envelope problems, high-NA/wavelength-scale structures, waveguides/resonators, PML/interfaces and modal/scattering power convergence.",
+      "priority": "Post-parity; P2 M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Polarized vector Maxwell/beam-envelope problems, high-NA/wavelength-scale structures, waveguides/resonators, PML/interfaces and modal/scattering power convergence."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "OP04",
+      "title": "Optical materials and coatings",
+      "owner_role": "Optical materials",
+      "baseline": "No qualified general spectral coating/index catalog established.",
+      "target": "Conditioned complex index/absorption/dispersion and anisotropy; passive multilayer amplitude/phase response, Fresnel/TIR and coating reference checks.",
+      "priority": "Post-parity; P0 M1, P1 M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Conditioned complex index/absorption/dispersion and anisotropy; passive multilayer amplitude/phase response, Fresnel/TIR and coating reference checks."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "OP05",
+      "title": "Structural-thermal-optical performance",
+      "owner_role": "Optomechanics",
+      "baseline": "General STOP and optical assembly correlation are not established.",
+      "target": "Absorption-to-heat, dn/dT, stress/deformed surfaces and alignment/tolerance; PSF/MTF/wavefront/error and coupled conservation with independent correlation.",
+      "priority": "Post-parity; P2 M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Absorption-to-heat, dn/dT, stress/deformed surfaces and alignment/tolerance; PSF/MTF/wavefront/error and coupled conservation with independent correlation."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "VF01",
+      "title": "General scientific field visualization",
+      "owner_role": "Visualization",
+      "baseline": "Existing contours, field samples and domain viewers cover bounded result types.",
+      "target": "Typed scalar/vector/tensor node/cell/face/sample fields; slices, isosurfaces, volumes, glyphs and streamlines with units, masks, interpolation and raw-result binding.",
+      "priority": "Authorized parallel track; P0 M1, M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "VISUALIZATION_ARCHITECTURE.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Typed scalar/vector/tensor node/cell/face/sample fields; slices, isosurfaces, volumes, glyphs and streamlines with units, masks, interpolation and raw-result binding."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "VF02",
+      "title": "Time, phase, motion and linked scientific probes",
+      "owner_role": "Visualization/workflow",
+      "baseline": "Some time/phase/field viewers exist; a general synchronized scientific scene is not established.",
+      "target": "Declared complex/real/modal semantics, transient/rotor/deformation/ray/particle animation, linked probes/integrals, reproducible exports and rendering budgets.",
+      "priority": "Authorized parallel track; P1 M7, M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "VISUALIZATION_ARCHITECTURE.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Declared complex/real/modal semantics, transient/rotor/deformation/ray/particle animation, linked probes/integrals, reproducible exports and rendering budgets."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "AX01",
+      "title": "Scalable physics execution and algebra",
+      "owner_role": "Acceleration/numerics",
+      "baseline": "Hybrid DC acceleration includes single-process PETSc/MUMPS and optional CUDA; general single-solve MPI is absent.",
+      "target": "Workload-specific matrix-free/sparse/FFT kernels, compatible Krylov/block/AMG methods, CPU/GPU/MPI qualification, precision/error controls and measured RAM/VRAM/time budgets.",
+      "priority": "Authorized parallel track; P1 M8",
+      "status": "planned",
+      "baseline_evidence": [
+        "ACCELERATION_ARCHITECTURE.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Workload-specific matrix-free/sparse/FFT kernels, compatible Krylov/block/AMG methods, CPU/GPU/MPI qualification, precision/error controls and measured RAM/VRAM/time budgets."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "AX02",
+      "title": "Large field storage, meshing and rendering",
+      "owner_role": "Data/performance",
+      "baseline": "Independent worker jobs and scene resource management exist; general large-field streaming is not established.",
+      "target": "Partitioned/chunked meshes and fields, checkpoints, out-of-core limits, cancellation/recovery and rendering/downsampling without changing authoritative results.",
+      "priority": "Post-parity; P1 M8",
+      "status": "planned",
+      "baseline_evidence": [
+        "ACCELERATION_ARCHITECTURE.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Partitioned/chunked meshes and fields, checkpoints, out-of-core limits, cancellation/recovery and rendering/downsampling without changing authoritative results."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "LB01",
+      "title": "Conditioned multiphysics material library",
+      "owner_role": "Materials",
+      "baseline": "Domain-specific supplied laws exist; the WF02 shared conditioned catalog remains a target.",
+      "target": "One versioned scalar/tensor/surface law catalog with units, frames, ranges, uncertainty, interpolation, provenance/rights and compatibility checks across physics.",
+      "priority": "Authorized parallel track; P0 M1, M7, M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "One versioned scalar/tensor/surface law catalog with units, frames, ranges, uncertainty, interpolation, provenance/rights and compatibility checks across physics."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "LB02",
+      "title": "Reusable physical assembly and model library",
+      "owner_role": "Models/library",
+      "baseline": "Visual model discovery and explicit component-solid handoff do not establish physical model libraries.",
+      "target": "Typed parametric parts/assemblies, constitutive and compact models, ports/interfaces and detector/source assets; distinguish visuals/solids/laws/measurement and bind revisions/dependencies/rights.",
+      "priority": "Authorized parallel track; P0 M1, P1 M7, M9",
+      "status": "planned",
+      "baseline_evidence": [
+        "MCAD_EXPORT.md",
+        "GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Define original domain-specific fixture, quantity/units, validity envelope, independent reference, refinement study, error/resource tolerances and failure policy before implementation/qualification."
+      },
+      "open_gaps": [
+        "Typed parametric parts/assemblies, constitutive and compact models, ports/interfaces and detector/source assets; distinguish visuals/solids/laws/measurement and bind revisions/dependencies/rights."
+      ],
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "RF01",
+      "title": "Wideband and nonlinear radio-system simulation",
+      "owner_role": "RF circuits/systems",
+      "baseline": "RLGC/Touchstone and bounded circuit/EM paths do not establish a complete radio chain.",
+      "target": "Qualified RF device/noise models, carrier/envelope/passband applicability, harmonic/intermodulation and compression effects, modulation, phase/IQ errors, EVM/BER and receiver metrics.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "Qualified RF device/noise models, carrier/envelope/passband applicability, harmonic/intermodulation and compression effects, modulation, phase/IQ errors, EVM/BER and receiver metrics."
+      ]
+    },
+    {
+      "id": "RF02",
+      "title": "Antenna, array and radio-link system studies",
+      "owner_role": "RF propagation",
+      "baseline": "Experimental antenna/field outputs do not establish calibrated radio-link or MIMO performance.",
+      "target": "Calibrated feeds/patterns, polarization/efficiency, arrays/MIMO, declared channel/propagation/interference models and link budgets with independent measurement and power accounting.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "Calibrated feeds/patterns, polarization/efficiency, arrays/MIMO, declared channel/propagation/interference models and link budgets with independent measurement and power accounting."
+      ]
+    },
+    {
+      "id": "PW01",
+      "title": "Utility transmission-line and cable models",
+      "owner_role": "Power-system EMT",
+      "baseline": "Bounded supplied/harness networks do not qualify overhead/underground/submarine power lines.",
+      "target": "Frequency-dependent multiconductor phase-domain traveling waves, explicit DC behavior, conductor/earth returns, skin/proximity/dielectric losses, fitting/causality and delay/reflection references.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "HARNESS_ENGINEERING.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "Frequency-dependent multiconductor phase-domain traveling waves, explicit DC behavior, conductor/earth returns, skin/proximity/dielectric losses, fitting/causality and delay/reflection references."
+      ]
+    },
+    {
+      "id": "PW02",
+      "title": "HVDC converter stations and controls",
+      "owner_role": "HVDC circuits/controls",
+      "baseline": "Existing converter/PWM evidence does not establish LCC/VSC/MMC utility converters.",
+      "target": "Declared averaged/equivalent/switching LCC/VSC/MMC models, transformers/filters/reactors, submodule energy/balancing and compatible controls; independently verified power, stability and resolution-specific outputs.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "SOURCED_POWER_QUALIFICATION.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "Declared averaged/equivalent/switching LCC/VSC/MMC models, transformers/filters/reactors, submodule energy/balancing and compatible controls; independently verified power, stability and resolution-specific outputs."
+      ]
+    },
+    {
+      "id": "PW03",
+      "title": "HVDC faults, switching and protection transients",
+      "owner_role": "Power-system EMT/protection",
+      "baseline": "Qualified utility faults, breaker/arrester/protection workflows are not established.",
+      "target": "DC/AC faults, surges, energization/restart, converter interaction and explicit protection models; traveling-wave/timestep refinement, interruption energy and measured/independent fault references.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "DC/AC faults, surges, energization/restart, converter interaction and explicit protection models; traveling-wave/timestep refinement, interruption energy and measured/independent fault references."
+      ]
+    },
+    {
+      "id": "PW04",
+      "title": "Large multi-terminal AC/DC networks",
+      "owner_role": "Power-system networks",
+      "baseline": "Bounded circuit/co-simulation foundations do not qualify network-scale HVDC studies.",
+      "target": "AC/DC load flow, initialization, multi-terminal controls/stability/contingencies, EMT-phasor or reduced coupling with conservative synchronization, recovery and resource/scale evidence.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "COSIMULATION_DIGITAL_TWIN.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "AC/DC load flow, initialization, multi-terminal controls/stability/contingencies, EMT-phasor or reduced coupling with conservative synchronization, recovery and resource/scale evidence."
+      ]
+    },
+    {
+      "id": "PW05",
+      "title": "Infrastructure thermal, grounding and insulation fields",
+      "owner_role": "Power infrastructure/multiphysics",
+      "baseline": "General utility ampacity/grounding/insulation qualification is not established.",
+      "target": "Conditioned cable/conductor ampacity and heat, insulation electric fields, return/electrode potentials and local station coupling; applicable boundary/material/standard scope and independent evidence.",
+      "priority": "Post-parity; M7-M8 domain stages",
+      "status": "planned",
+      "scheduling_state": "deferred_until_parity",
+      "baseline_evidence": [
+        "SOLVER_STATUS.md",
+        "TRANSMISSION_RF_HVDC_SCOPE.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Declare line/radio/HVDC model resolution and operating/frequency range, original fixture, independent reference/measurement, refinement, power/energy balance, error/resource budget and failure policy."
+      },
+      "open_gaps": [
+        "Conditioned cable/conductor ampacity and heat, insulation electric fields, return/electrode potentials and local station coupling; applicable boundary/material/standard scope and independent evidence."
+      ]
+    },
+    {
+      "id": "GP10",
+      "title": "Hall sensors and semiconductor magnetotransport",
+      "owner_role": "Coupled physics",
+      "baseline": "Not implemented; see the scoped coupled suite plan and existing solver status.",
+      "target": "Field-driven compact Hall sensors, classical magnetic carrier transport and later biased Poisson/carrier-continuity models with contact, thermal, polarity and conservation references.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md",
+        "SOLVER_STATUS.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Field-driven compact Hall sensors, classical magnetic carrier transport and later biased Poisson/carrier-continuity models with contact, thermal, polarity and conservation references."
+      },
+      "open_gaps": [
+        "Field-driven compact Hall sensors, classical magnetic carrier transport and later biased Poisson/carrier-continuity models with contact, thermal, polarity and conservation references."
+      ]
+    },
+    {
+      "id": "GP11",
+      "title": "Coupled failure and degradation scenarios",
+      "owner_role": "Coupled physics",
+      "baseline": "Not implemented; see the scoped coupled suite plan and existing solver status.",
+      "target": "Conditioned screening margins and propagated fault events; calibrated fatigue, fracture and degradation only with applicable laws, mission histories and uncertainty.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md",
+        "SOLVER_STATUS.md",
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Conditioned screening margins and propagated fault events; calibrated fatigue, fracture and degradation only with applicable laws, mission histories and uncertainty."
+      },
+      "open_gaps": [
+        "Conditioned screening margins and propagated fault events; calibrated fatigue, fracture and degradation only with applicable laws, mission histories and uncertainty."
+      ]
+    },
+    {
+      "id": "GP12",
+      "title": "Vibration, random environments and shock response",
+      "owner_role": "Coupled dynamics and application validation",
+      "baseline": "Requested target; current static thermoelasticity and scalar replay/gain co-simulation do not establish this workflow.",
+      "target": "Modal/base/harmonic/transient dynamics, PSD and correlated multi-axis/support excitation, shock/SRS with spectral, damping, convergence and measured-fixture evidence.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+        "SOLVER_STATUS.md",
+        "COSIMULATION_DIGITAL_TWIN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Modal/base/harmonic/transient dynamics, PSD and correlated multi-axis/support excitation, shock/SRS with spectral, damping, convergence and measured-fixture evidence."
+      },
+      "open_gaps": [
+        "Modal/base/harmonic/transient dynamics, PSD and correlated multi-axis/support excitation, shock/SRS with spectral, damping, convergence and measured-fixture evidence."
+      ]
+    },
+    {
+      "id": "GP13",
+      "title": "PCB package and solder-joint mechanical reliability",
+      "owner_role": "Coupled dynamics and application validation",
+      "baseline": "Requested target; current static thermoelasticity and scalar replay/gain co-simulation do not establish this workflow.",
+      "target": "Revision-bound global/local board-package-joint stress, thermal mismatch and conditioned creep/plasticity/fatigue with calibrated life uncertainty and electrical failure-event transfer.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+        "SOLVER_STATUS.md",
+        "COSIMULATION_DIGITAL_TWIN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Revision-bound global/local board-package-joint stress, thermal mismatch and conditioned creep/plasticity/fatigue with calibrated life uncertainty and electrical failure-event transfer."
+      },
+      "open_gaps": [
+        "Revision-bound global/local board-package-joint stress, thermal mismatch and conditioned creep/plasticity/fatigue with calibrated life uncertainty and electrical failure-event transfer."
+      ]
+    },
+    {
+      "id": "GP14",
+      "title": "Multibody gears actuators and precision watch movements",
+      "owner_role": "Coupled dynamics and application validation",
+      "baseline": "Requested target; current static thermoelasticity and scalar replay/gain co-simulation do not establish this workflow.",
+      "target": "Constrained rigid/flexible assemblies, shafts/joints/gears, backlash/friction/contact, motors, springs and watch escapement/balance timing with work, contact and event convergence.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+        "SOLVER_STATUS.md",
+        "COSIMULATION_DIGITAL_TWIN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Constrained rigid/flexible assemblies, shafts/joints/gears, backlash/friction/contact, motors, springs and watch escapement/balance timing with work, contact and event convergence."
+      },
+      "open_gaps": [
+        "Constrained rigid/flexible assemblies, shafts/joints/gears, backlash/friction/contact, motors, springs and watch escapement/balance timing with work, contact and event convergence."
+      ]
+    },
+    {
+      "id": "GP15",
+      "title": "Complete drone code electrical propulsion and flight studies",
+      "owner_role": "Coupled dynamics and application validation",
+      "baseline": "Requested target; current static thermoelasticity and scalar replay/gain co-simulation do not establish this workflow.",
+      "target": "Actual executable-controller SITL, sensors/clocks, battery/ESC/motor back-EMF and propeller loads, 6-DOF aerodynamics, structural/thermal/fault feedback and measured mission/performance evidence.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+        "SOLVER_STATUS.md",
+        "COSIMULATION_DIGITAL_TWIN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Actual executable-controller SITL, sensors/clocks, battery/ESC/motor back-EMF and propeller loads, 6-DOF aerodynamics, structural/thermal/fault feedback and measured mission/performance evidence."
+      },
+      "open_gaps": [
+        "Actual executable-controller SITL, sensors/clocks, battery/ESC/motor back-EMF and propeller loads, 6-DOF aerodynamics, structural/thermal/fault feedback and measured mission/performance evidence."
+      ]
+    },
+    {
+      "id": "GP16",
+      "title": "Satellite and launch-vehicle coupled dynamics",
+      "owner_role": "Coupled dynamics and application validation",
+      "baseline": "Requested target; current static thermoelasticity and scalar replay/gain co-simulation do not establish this workflow.",
+      "target": "Mission-bound environmental/coupled loads, spacecraft thermal-vacuum/attitude/jitter/deployment and launcher ascent/staging/GNC/flexible dynamics with independent and measured evidence.",
+      "priority": "Authorized parallel track; P1 M7",
+      "status": "planned",
+      "baseline_evidence": [
+        "VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+        "SOLVER_STATUS.md",
+        "COSIMULATION_DIGITAL_TWIN.md"
+      ],
+      "benchmark": {
+        "status": "definition_pending",
+        "manifest": null,
+        "acceptance": "Mission-bound environmental/coupled loads, spacecraft thermal-vacuum/attitude/jitter/deployment and launcher ascent/staging/GNC/flexible dynamics with independent and measured evidence."
+      },
+      "open_gaps": [
+        "Mission-bound environmental/coupled loads, spacecraft thermal-vacuum/attitude/jitter/deployment and launcher ascent/staging/GNC/flexible dynamics with independent and measured evidence."
       ]
     }
   ],
@@ -924,11 +1695,1521 @@
         "native_solids": 3,
         "cli_model_assertions": 30,
         "full_python_suite": {
-          "status": "running",
-          "log": "build/parity-stage04c-full-python.log"
+          "status": "failed",
+          "tests": 3770,
+          "failures": 2,
+          "errors": 1,
+          "skipped": 69,
+          "elapsed_s": 1496.843,
+          "log": "build/parity-stage04c-full-python.log",
+          "reported_failures": [
+            "test_python_debug.PythonDebugTest.test_break_step_into_out_locals_and_output: starting did not reach paused within the 4-second deadline.",
+            "test_python_debug.PythonDebugTest.test_exception_and_nonfinite_publication_fail_cleanly: starting did not reach failed within the 4-second deadline.",
+            "test_emerge_gerber.EMergeGerberTests.test_real_filebasedpcb_loads_units_clear_region_and_native_mesh: native subprocess exceeded its 60-second limit."
+          ],
+          "scope": "Component-solid and source-bound parity checks pass in the full run. These debugger/Gerber failures also occurred in earlier runs; root causes remain unestablished. No deadlines were weakened or clean full-suite/release claim made."
         },
-        "limitation": "Explicit neutral mechanical geometry only. KiCad composed placement and material/physics qualification remain pending."
+        "limitation": "Explicit neutral mechanical geometry only. KiCad composed placement and material/physics qualification remain pending.",
+        "backlog": "passed"
+      }
+    },
+    {
+      "id": "WF01-S04C2",
+      "capability_id": "WF01",
+      "title": "Retained component solid and supplied-material admission gate",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04C1"
+      ],
+      "acceptance": [
+        "Execute all component admission tests in the admitted CPython 3.11 native OCC runtime with no failures, errors or skips.",
+        "Verify actual component volumes and SI bounds, repeated occurrence identity, supplied conductivity/provenance transfer, package retention and stale-source rejection.",
+        "Bind current implementation, fixture and schema digests to execution evidence; keep synthetic materials and software admission separate from conditioned package material and physics qualification."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04C2.json"
+    },
+    {
+      "id": "WF01-S04C3",
+      "capability_id": "WF01",
+      "title": "Source-bound native STEP component placement and board datum reference",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04C2"
+      ],
+      "acceptance": [
+        "Twelve actual native STEP instances on front/back at 37/90 degrees retain valid solids, all eight independent cuboid corners, bounds and volumes within 1e-6 mm/mm3.",
+        "Native copper exports independently establish the full-stack datum; retain observed 0.05 mm component clearance and no-extra-pad-thickness negative control.",
+        "Bind original source, native outputs/reader/scripts and independent validators; failures, stale evidence, missing/duplicate cases, altered geometry or datum cannot qualify Done. No automatic projection or material/physics promotion."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04C3.json"
+    },
+    {
+      "id": "WF01-S04C4",
+      "capability_id": "WF01",
+      "title": "Bounded native-reference-backed component placement review drafts",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04C3"
+      ],
+      "acceptance": [
+        "Eight rigid draft matrices match actual retained native STEP corners, preserve exporter clearance and use native footprint origins instead of pad centroids.",
+        "Reject conflicting source declarations, unknown physical layers, stale design/STEP/version, nonuniform scale and wrong units/frame; no design mutation or automatic placement/material promotion.",
+        "The existing explicit STEP handoff accepts a reviewed draft and retains partial-coverage diagnostics; source/native/log/test bindings and failed/skipped/overclaimed evidence withhold Done."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04C4.json",
+      "verification": {
+        "focused": {
+          "tests": 36,
+          "passed_in_sandbox": 35,
+          "skipped_in_sandbox": 1,
+          "log": "build/parity-stage04c4-focused.log"
+        },
+        "host_skip_resolution": {
+          "tests": 1,
+          "passed": 1,
+          "elapsed_s": 11.485,
+          "log": "build/parity-stage04c4-native-export.log"
+        },
+        "architecture": "passed",
+        "documentation_files": 4,
+        "independent_review": "Source-conflict, unknown physical-layer and coordinate-frame findings addressed with rejection tests; numerical review before release remains required.",
+        "full_release_suite": "Not rerun for this isolated draft helper; previous broader failures remain outside this bounded stage.",
+        "shared_source_refresh": {
+          "tests": 6,
+          "skipped": 0,
+          "log": "docs/validation/parity/WF01-S04C4-c6-final.log"
+        }
+      }
+    },
+    {
+      "id": "WF01-S04C5",
+      "capability_id": "WF01",
+      "title": "Supervised derived STEP positive-scale geometry preprocessing",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04C4"
+      ],
+      "acceptance": [
+        "Bake positive scale into a derived STEP without changing source models or scaling rigid placement frames; source/derived digests and geometry provenance remain explicit.",
+        "Actual polyhedral bakes pass valid closed-solid, determinant-volume, axis-bounds, bounded vertex and native STEP reimport checks; runtime/time/memory/byte budgets and explicit omissions are enforced.",
+        "Six successful native polyhedral probes and thirteen rejection controls are retained; three supervised cube cases and curved-cylinder rejection pass. Relative volume tolerance remains 1e-8, bbox padding is separately admitted, curved fidelity and physics/material qualification remain unsupported.",
+        "Source-bound current implementation, test execution, native assets and logs withhold Done for stale, skipped, failed or overclaimed evidence."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04C5.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 6,
+          "skipped": 0,
+          "log": "docs/validation/parity/WF01-S04C5-final.log",
+          "native_evidence": "docs/validation/parity/WF01-S04C5-final-native.json"
+        },
+        "native_worker_probes": {
+          "cases": 19,
+          "successful_bakes": 6,
+          "expected_rejections": 13,
+          "report": "benchmarks/parity-import/step-scale/report.json"
+        },
+        "focused_regressions": {
+          "tests": 34,
+          "skipped": 0,
+          "elapsed_s": 10.215,
+          "log": "build/parity-stage04c5-focused.log"
+        },
+        "architecture": "passed",
+        "documentation_files": 4,
+        "full_release_suite": "Not rerun for this isolated geometry preprocessing service; prior broader failures remain outside this bounded stage."
+      }
+    },
+    {
+      "id": "WF01-S04C6",
+      "capability_id": "WF01",
+      "title": "Snapshot-bound nonuniform geometry and rigid placement review proposals",
+      "status": "done",
+      "depends_on": [
+        "WF01-S04C5"
+      ],
+      "acceptance": [
+        "Four actual baked/reimported STEP proposals on front/back at 37/90 degrees match independently retained native corners within 1e-6 mm; scale appears once in geometry and placement matrices remain proper rigid.",
+        "Reject unsupported source controls, stale baselines, oversized review controls and failed/cancelled native work; snapshot isolates vector aliases and post-job digest checks prevent stale proposals.",
+        "Keep original component/model owners, source/derived provenance and exporter clearance; require separate derived registration and review, without project/source mutation or automatic physics/material/placement promotion.",
+        "Refresh the original unit-scale source-bound stage and bind current implementation, dependency receipts, native artifacts and zero-skip execution; stale/failed/incomplete evidence cannot mark Done."
+      ],
+      "evidence": "docs/validation/parity/WF01-S04C6.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 5,
+          "skipped": 0,
+          "elapsed_s": 3.823,
+          "log": "docs/validation/parity/WF01-S04C6-verified.log",
+          "native_cases": 4
+        },
+        "focused_regressions": {
+          "tests": 41,
+          "skipped": 0,
+          "elapsed_s": 12.446,
+          "log": "build/parity-stage04c6-focused.log"
+        },
+        "independent_review": "Bounded matrices/provenance reviewed; no consequential defect found. Human numerical review before release remains required.",
+        "architecture": "passed",
+        "documentation_files": 4,
+        "full_release_suite": "Not rerun for this bounded review service; prior broader failures remain outside this stage."
+      }
+    },
+    {
+      "id": "GP01-S01",
+      "capability_id": "GP01",
+      "title": "General study, field and material admission",
+      "status": "planned",
+      "depends_on": [],
+      "acceptance": [
+        "Extend existing contracts with explicit domain/quantity/units/frames, materials/ranges and source/result/dependency provenance.",
+        "Reject incompatible units, unknown field associations, stale dependencies and unsupported ranges; preserve result validity states across save/reload."
+      ],
+      "evidence": null,
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "VF01-S01",
+      "capability_id": "VF01",
+      "title": "Original dipole/current-loop fields and visualization",
+      "status": "planned",
+      "depends_on": [
+        "GP01-S01"
+      ],
+      "acceptance": [
+        "Original analytical scalar/vector fixtures with singular masks and frame covariance checks.",
+        "Returned field slices/glyphs/streamlines pass sample and trace-step refinement checks; no invented fields or magnitude mapping."
+      ],
+      "evidence": null,
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "LB01-S01",
+      "capability_id": "LB01",
+      "title": "Conditioned shared material and asset catalog",
+      "status": "planned",
+      "depends_on": [
+        "GP01-S01"
+      ],
+      "acceptance": [
+        "Typed versioned bulk/surface/tensor laws and model assets carry units, ranges, provenance, rights and revision hashes.",
+        "Missing laws, invalid units, stale dependencies and unsupported extrapolation remain explicit; names/visual assets do not establish physics readiness."
+      ],
+      "evidence": null,
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "GP03-S01",
+      "capability_id": "GP03",
+      "title": "Stationary linear 3D coil/core/air reference",
+      "status": "planned",
+      "depends_on": [
+        "GP01-S01",
+        "LB01-S01"
+      ],
+      "acceptance": [
+        "Original stationary linear references pass mesh/outer-boundary refinement, analytical/independent field and flux/energy checks.",
+        "Nonlinear/moving/circuit-driven machines remain outside this stage until separate evidence passes."
+      ],
+      "evidence": null,
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "OP02-S01",
+      "capability_id": "OP02",
+      "title": "Bounded coherent scalar optics reference",
+      "status": "planned",
+      "depends_on": [
+        "GP01-S01",
+        "LB01-S01"
+      ],
+      "acceptance": [
+        "Original Gaussian/aperture/phase-plane cases establish amplitude/phase/power and propagation composition.",
+        "Sampling/window refinement and scalar/paraxial admission limits pass; no vector/high-NA/real-coating or general lens qualification claim."
+      ],
+      "evidence": null,
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "AX01-S01",
+      "capability_id": "AX01",
+      "title": "Workload-specific acceleration reference",
+      "status": "planned",
+      "depends_on": [
+        "GP01-S01"
+      ],
+      "acceptance": [
+        "Profile actual admitted reference workloads and compare identical CPU/backend physical models and meshes.",
+        "Record residual/error, wall time, RAM/VRAM and failure/fallback provenance; installing a backend does not qualify it."
+      ],
+      "evidence": null,
+      "scheduling_state": "deferred_until_parity"
+    },
+    {
+      "id": "EM04-S01",
+      "capability_id": "EM04",
+      "title": "Boundary-element PEC radiation/scattering without exterior air-volume meshes",
+      "status": "planned",
+      "depends_on": [],
+      "acceptance": [
+        "Define original PEC sphere scattering and radiating-current references, phasor/port/power normalization, supported frequency/electrical-size envelope and observable tolerances before implementation.",
+        "Execute a self-consistent surface-current radiation/scattering solve; verify complex near/far fields, polarization, power/scattering quantities, surface/quadrature/solver refinement and zero exterior volume cells.",
+        "Reject unsupported geometry/materials and unresolved conditioning/internal resonance; observation sampling grids are not solver air meshes, and supplied-current postprocessing alone cannot qualify fed antenna solving."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "SI08-S01",
+      "capability_id": "SI08",
+      "title": "Explicit power-normalized mixed-mode port pairing",
+      "status": "done",
+      "depends_on": [],
+      "acceptance": [
+        "Exact arbitrary positive/negative port partition, retained unpaired ports and physical mapping; reject unequal within-pair references and invalid data.",
+        "Independent analytic polarity and voltage/current impedance oracles, singular-value/reciprocity invariants, legacy compatibility and preserved input.",
+        "Seven zero-skip checks bind current implementation/test/runner bytes and execution log; no causality, geometry or release qualification."
+      ],
+      "evidence": "docs/validation/parity/SI08-S01.json",
+      "verification": {
+        "stage_tests": 7,
+        "skipped": 0,
+        "focused_regressions": {
+          "tests": 60,
+          "skipped": 0,
+          "elapsed_s": 13.953,
+          "log": "build/parity-pisi-focused.log"
+        },
+        "documentation_files": 6,
+        "backlog": "passed; 61 families; post-parity gate closed",
+        "architecture": "Blocked by unrelated direct native IPC in App.tsx and PanelPopupQualification.tsx; not edited."
+      }
+    },
+    {
+      "id": "PI04-S01",
+      "capability_id": "PI04",
+      "title": "Consistent inductive-cutset finite-rise transient voltages",
+      "status": "done",
+      "depends_on": [],
+      "acceptance": [
+        "Exact RL ramp/hold/fall voltages at four refinements, signed mutual inductance, series charge/energy and floating capacitor islands.",
+        "Independent RC and damped RLC state-exponential refinement; explicit right-sided interior and left-sided final PWL observations.",
+        "Eight zero-skip checks bind current source/test/runner bytes; retain conditioning, resource, energy, cancellation and invalid-input rejection."
+      ],
+      "evidence": "docs/validation/parity/PI04-S01.json",
+      "verification": {
+        "stage_tests": 8,
+        "skipped": 0,
+        "focused_network_worker_tests": 22,
+        "architecture": "Blocked by unrelated direct native IPC in App.tsx and PanelPopupQualification.tsx; not edited.",
+        "full_release_suite": "Not rerun; prior unrelated broader failures remain outside bounded numerical acceptance.",
+        "focused_regressions": {
+          "tests": 60,
+          "skipped": 0,
+          "elapsed_s": 13.953,
+          "log": "build/parity-pisi-focused.log"
+        },
+        "documentation_files": 6,
+        "backlog": "passed; 61 families; post-parity gate closed"
+      }
+    },
+    {
+      "id": "PI04-S02",
+      "capability_id": "PI04",
+      "title": "Simultaneous independent supplied PWL loads",
+      "status": "done",
+      "depends_on": [
+        "PI04-S01"
+      ],
+      "acceptance": [
+        "Explicit independent load waveforms across ports, exact event union and reviewed source identities without implicit geometry.",
+        "Independent superposition and shared-return voltage/energy oracles, corner convention, conditioning, work/output bounds and cancellation.",
+        "Run retained source-bound benchmarks and relevant worker regressions before marking Done."
+      ],
+      "evidence": "docs/validation/parity/PI04-S02.json",
+      "verification": {
+        "stage_tests": 8,
+        "skipped": 0,
+        "prior_stage_replay": {
+          "PI04-S01": 8,
+          "SI08-S01": 7
+        },
+        "desktop_backend_admission": "npm run test:pdn-network passed; actual single and simultaneous Python runs, malformed result checks",
+        "typescript": "passed",
+        "architecture": "passed",
+        "full_release_suite": "Not rerun for bounded additive transient contract; prior unrelated broader failures remain outside this stage.",
+        "focused_regressions": {
+          "tests": 69,
+          "skipped": 0,
+          "elapsed_s": 16.909,
+          "log": "build/parity-pi04s02-focused.log"
+        },
+        "documentation_files": 9,
+        "backlog": "passed; 61 families, post-parity gate remains closed"
+      }
+    },
+    {
+      "id": "PI02-S01",
+      "capability_id": "PI02",
+      "title": "Finite dielectric AC conductivity and loss admittance",
+      "status": "done",
+      "depends_on": [],
+      "acceptance": [
+        "Actual complex P1 solve of explicit finite dielectric gamma=sigma I+omega tan(delta) epsilon+j omega epsilon; preserve source/electrode identities and original lossless API.",
+        "Independent homogeneous/layered/multielectrode plate references at mesh refinements; check current conservation, reciprocity, passive conjugate field power and complex redistribution.",
+        "Bound resource work/output before solving, reject malformed/ill-conditioned data, cancellation without partial success and actual offline schema/owned-worker checks.",
+        "Retain zero-skip source-bound execution and replay prior affected receipts; keep experimental status, finite boundaries and no causal transient/macromodel qualification."
+      ],
+      "evidence": "docs/validation/parity/PI02-S01.json",
+      "verification": {
+        "stage_tests": 12,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "SI08-S01": 7
+        },
+        "architecture": "passed",
+        "full_release_suite": "Not rerun for bounded additive field solver; earlier unrelated release-suite failures remain outside stage acceptance.",
+        "focused_regressions": {
+          "tests": 89,
+          "skipped": 0,
+          "elapsed_s": 23.239,
+          "log": "build/parity-pi02s01-focused.log"
+        },
+        "layered_reference": {
+          "free_nodes": [
+            9,
+            75
+          ],
+          "maximum_relative_admittance_error": 2e-14,
+          "maximum_relative_field_power_error": 2e-14,
+          "scope": "Aligned finite layered plates only"
+        },
+        "documentation_files": 9,
+        "backlog": "passed; 61 families; PI/SI remains first priority and post-parity gate closed"
+      }
+    },
+    {
+      "id": "PI02-S02",
+      "capability_id": "PI02",
+      "title": "Explicit passive sampled admittance termination and reduction",
+      "status": "done",
+      "depends_on": [
+        "PI02-S01"
+      ],
+      "acceptance": [
+        "Exact ordered retained/eliminated port partition and shared sample grid/reference; conditioned Schur solve for passive full-matrix loads or floating ports.",
+        "Independent circuit, complex nonreciprocal passive and conjugate-power references; reject active, malformed, singular, ill-conditioned and resource-exceeding inputs; atomic cancellation.",
+        "Actual finite-dielectric projection, owned-worker and offline schema checks; preserve input/source/context identity and approximate/experimental model status.",
+        "Zero-skip source-bound execution and replay affected prior stages; no causal broadband fitting, interpolation, inferred geometry or production qualification."
+      ],
+      "evidence": "docs/validation/parity/PI02-S02.json",
+      "verification": {
+        "stage_tests": 9,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "PI02-S01": 12,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "SI08-S01": 7
+        },
+        "full_release_suite": "Not rerun for bounded sampled reduction; earlier unrelated broader failures remain outside this stage.",
+        "focused_regressions": {
+          "tests": 99,
+          "skipped": 0,
+          "elapsed_s": 19.194,
+          "log": "build/parity-pi02s02-focused.log"
+        },
+        "architecture": "passed",
+        "documentation_files": 9,
+        "backlog": "passed; 61 families; PI/SI priority remains active, post-parity gate closed"
+      }
+    },
+    {
+      "id": "PI02-S03",
+      "capability_id": "PI02",
+      "title": "Conservative coherent dielectric AC heating to steady thermal solve",
+      "status": "done",
+      "depends_on": [
+        "PI02-S01"
+      ],
+      "acceptance": [
+        "Execute actual AC fields for one coherent RMS tone with every signal drive explicit; compute per-cell conductive/dielectric heat without reactive-power conversion or double counting.",
+        "Require identical retained mesh/source ownership and verify integrated volume heat against independently computed terminal power before executing existing steady thermal solver.",
+        "Independent uniform/layered loss, phase/cross-term/amplitude and heated-slab temperature refinement; malformed/stale/mismatched/resource/cancellation rejection and actual owned-worker/schema execution.",
+        "Retain input/source/context/mesh digests, conservative cell sources and returned heat balance; remain experimental one-way without temperature feedback, general mesh transfer or production qualification."
+      ],
+      "evidence": "docs/validation/parity/PI02-S03.json",
+      "verification": {
+        "stage_tests": 10,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "PI02-S02": 9,
+          "PI02-S01": 12,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "SI08-S01": 7
+        },
+        "architecture": "Failed on unrelated app/src/piSearchIntent.ts spread extrema; file not edited.",
+        "full_release_suite": "Not rerun for bounded one-way coupling; prior broader unrelated failures remain outside this stage.",
+        "computed_demo": {
+          "command": ".venv/Scripts/python.exe examples/pdn_dielectric_thermal/run_slab.py --plot",
+          "port_power_w": 50.03141592653593,
+          "volume_heat_w": 50.031415926535914,
+          "peak_temperature_k": 306.2539269908164,
+          "result": "build/pdn-dielectric-thermal-example/result.json",
+          "plot": "build/pdn-dielectric-thermal-example/temperature.png",
+          "visual_inspection": "Actual plotted node temperatures and reference inspected; labels/layout verified.",
+          "result_sha256": "2b239c0d4ae1922d8f3e1ddd259781c9154935e0b98518458d2600d4805a6a0f",
+          "plot_sha256": "70000c510197e1a12ba1f32f74d8109714360e847bd7bf2011986a7d6ab772d5"
+        },
+        "focused_regressions": {
+          "tests": 121,
+          "skipped": 0,
+          "elapsed_s": 19.063,
+          "log": "build/parity-pi02s03-focused.log"
+        },
+        "documentation_files": 9,
+        "backlog": "passed; PI/SI remains first priority, shared multiphysics foundations active, post-parity gate closed"
+      }
+    },
+    {
+      "id": "PI02-S04",
+      "capability_id": "PI02",
+      "title": "Cellwise conductivity-temperature steady feedback",
+      "status": "done",
+      "depends_on": [
+        "PI02-S03"
+      ],
+      "acceptance": [
+        "Use explicit linear conductivity laws at cell-mean temperature with valid nodal ranges, exact original-material coverage and preserved original geometry/source identities.",
+        "Compose actual one-way AC/thermal subsolves; raw temperature and power convergence precede success, with explicit evaluation/thermal states and no relaxed-residual false closure.",
+        "Independent coupled discrete P1 reference, positive/negative and zero-law behavior, mapping/input preservation, range/exhaustion/resource/cancellation failures and actual worker/schema checks.",
+        "Bind source/test execution with zero skips, replay affected earlier stages and retain experimental constant-other-property scope without transient stability, runaway or hardware qualification."
+      ],
+      "evidence": "docs/validation/parity/PI02-S04.json",
+      "verification": {
+        "stage_tests": 9,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "PI02-S03": 10,
+          "PI02-S02": 9,
+          "PI02-S01": 12,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "SI08-S01": 7
+        },
+        "full_release_suite": "Not rerun for bounded steady conductivity feedback; full release and human numerical review remain separate.",
+        "computed_demo": {
+          "command": ".venv/Scripts/python.exe examples/pdn_dielectric_thermal/run_feedback.py --plot",
+          "baseline_power_w": 50.031415926535914,
+          "feedback_power_w": 54.16771564717282,
+          "peak_temperature_k": 306.68377106730804,
+          "iterations": 17,
+          "result": "build/pdn-dielectric-feedback-example/result.json",
+          "plot": "build/pdn-dielectric-feedback-example/feedback.png",
+          "visual_inspection": "Actual node comparison and raw convergence plot inspected; layout and labels verified.",
+          "result_sha256": "8c44a82e1e9b1eeb9aa15badb222dddc2c9478c51b028fdd3a8c5d094ec48962",
+          "plot_sha256": "9c3033212a45e164779e16e4a0ecba8bc75026b3e6165f3e16775739df82fba5"
+        },
+        "focused_regressions": {
+          "tests": 131,
+          "skipped": 0,
+          "elapsed_s": 14.514,
+          "log": "build/parity-pi02s04-focused.log"
+        },
+        "architecture": "passed",
+        "documentation_files": 10,
+        "backlog": "passed; PI/SI priority and shared multiphysics foundations active; broader parity gate remains closed"
+      }
+    },
+    {
+      "id": "PI03-S01",
+      "capability_id": "PI03",
+      "title": "Supplied decap operating-corner target assessment",
+      "status": "done",
+      "depends_on": [
+        "PI04-S02"
+      ],
+      "acceptance": [
+        "Exact supplied capacitor/corner and port-target coverage, unchanged base requests, preserved provenance and generated element identities.",
+        "Actual existing PDN decap stamps and multiport solves at every corner; retain failed sampled targets and deterministic worst corner/port/frequency.",
+        "Independent scalar circuit and shared-return multiport references, zero parasitics, malformed coverage, resources, cancellation and actual worker/schema/example checks.",
+        "Source-bound execution with zero skips and replays of affected stages; experimental scope without inferred material laws, optimization or measured qualification."
+      ],
+      "evidence": "docs/validation/parity/PI03-S01.json",
+      "verification": {
+        "stage_tests": 10,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9
+        },
+        "architecture": "passed",
+        "full_release_suite": "Not rerun for bounded supplied-corner assessment; broader PI/SI parity and human numerical review before release remain open.",
+        "focused_regressions": {
+          "tests": 142,
+          "skipped": 0,
+          "elapsed_s": 23.143,
+          "log": "build/parity-pi03s01-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families, PI/SI priority retained, post-parity gate closed",
+        "example": {
+          "command": ".venv/Scripts/python.exe examples/pdn_decap_corners/run_corners.py",
+          "frequency_samples": 161,
+          "corners": 2,
+          "meets_target": true,
+          "worst_ratio": 0.909087356056509,
+          "result": "build/pdn-decap-corners-example/result.json"
+        }
+      }
+    },
+    {
+      "id": "PI03-S02",
+      "capability_id": "PI03",
+      "title": "Bounded BOM-constrained supplied decap selection",
+      "status": "done",
+      "depends_on": [
+        "PI03-S01"
+      ],
+      "acceptance": [
+        "Enumerate every nonempty supplied site/part population under a bounded discrete domain with exact part identity, corner and inventory coverage.",
+        "Admit all options and aggregate resources before solving, retain cost/inventory/count rejection and sampled target failures, preserve source inputs and selected full corner result.",
+        "Independently establish circuit responses and feasible/infeasible rankings, multiport return effects, deterministic ties and failure/resource/cancellation behavior with actual worker/schema checks.",
+        "Source-bound zero-skip execution and prior-stage replays; experimental supplied-domain optimum only, with full PI03 and release qualification open."
+      ],
+      "evidence": "docs/validation/parity/PI03-S02.json",
+      "verification": {
+        "stage_tests": 10,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9,
+          "PI03-S01": 10
+        },
+        "architecture": "passed",
+        "full_release_suite": "Not rerun for bounded supplied-domain BOM selection; full PI/SI parity, release qualification and human numerical review remain open.",
+        "focused_regressions": {
+          "tests": 153,
+          "skipped": 0,
+          "elapsed_s": 14.407,
+          "log": "build/parity-pi03s02-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families; PI/SI priority active; post-parity gate closed"
+      }
+    },
+    {
+      "id": "SI08-S02",
+      "capability_id": "SI08",
+      "title": "Explicit sampled two-port fixture removal",
+      "status": "done",
+      "depends_on": [
+        "SI08-S01"
+      ],
+      "acceptance": [
+        "Exact oriented port names, frequency grids and common real references; preserve source snapshots and derived identity with no implicit flips, renormalization or interpolation.",
+        "Conditioned left/right wave-chain solves, finite derived matrices and reconstruction residual; retain active/nonreciprocal responses without repair or causality promotion.",
+        "Independent matched and internal-wave connection references, reflective/directional DUT recovery, DC/nonuniform grids and malformed/singular/resource/cancellation checks including actual worker/schemas.",
+        "Zero-skip source-bound execution and earlier PI/SI replays; supplied-model algebra only, with calibration, uncertainty, multiport and release qualification open."
+      ],
+      "evidence": "docs/validation/parity/SI08-S02.json",
+      "verification": {
+        "stage_tests": 10,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9,
+          "PI03-S01": 10,
+          "PI03-S02": 10
+        },
+        "architecture": "passed",
+        "full_release_suite": "Not rerun for bounded sampled two-port fixture algebra; full PI/SI parity, measurement qualification and human numerical review remain open.",
+        "focused_regressions": {
+          "tests": 164,
+          "skipped": 0,
+          "elapsed_s": 14.224,
+          "log": "build/parity-si08s02-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families; PI/SI priority active; post-parity gate closed"
+      }
+    },
+    {
+      "id": "SI08-S03",
+      "capability_id": "SI08",
+      "title": "Explicit Cartesian-linear network resampling and DC",
+      "status": "done",
+      "depends_on": [
+        "SI08-S02"
+      ],
+      "acceptance": [
+        "Admit exact named-port and matrix dimensions, finite nonnegative strict grids, a common real reference and explicit source/supplied real DC without extrapolation or overriding source samples.",
+        "Preserve source identity and exact supported complex samples; record every target support/weight and diagnostic with no implicit workflow resampling or active-data repair.",
+        "Independent affine and multiport references, delayed-line second-order refinement, passive convexity and active preservation, malformed/resource/cancellation tests and actual worker/schema checks.",
+        "Zero-skip source-bound execution and prior-stage replays; experimental interpolation only, with causality, broad accuracy and release qualification open."
+      ],
+      "evidence": "docs/validation/parity/SI08-S03.json",
+      "verification": {
+        "stage_tests": 9,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9,
+          "PI03-S01": 10,
+          "PI03-S02": 10,
+          "SI08-S02": 10
+        },
+        "architecture": "passed",
+        "refinement_errors": [
+          0.027630079602323384,
+          0.006931543045073782,
+          0.0017343898152841772,
+          0.00043369149797885985
+        ],
+        "full_release_suite": "Not rerun for bounded explicit grid interpolation; full PI/SI parity, causality, measurement qualification and human numerical review remain open.",
+        "focused_regressions": {
+          "tests": 174,
+          "skipped": 0,
+          "elapsed_s": 19.242,
+          "log": "build/parity-si08s03-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families; PI/SI priority active; post-parity gate closed"
+      }
+    },
+    {
+      "id": "SI08-S04",
+      "capability_id": "SI08",
+      "title": "Supplied stable real-pole rational network models",
+      "status": "done",
+      "depends_on": [
+        "SI08-S03"
+      ],
+      "acceptance": [
+        "Preserve exact source identity/port/reference conventions and explicitly supplied positive pole rates; fit real proper coefficients without automatic pole relocation or active-data repair.",
+        "Equilibrated full-rank least-squares solve with condition/optimality limits, actual maximum sample-error admission and real stable causal realization metadata.",
+        "Independent known-coefficient multiport, state/time-frequency, active/nonreciprocal and pole/rank/error/resource/cancellation references plus actual worker/schema checks.",
+        "Zero-skip source-bound execution and prior-stage replays; construction does not certify source causality, broad accuracy, passivity enforcement or release qualification."
+      ],
+      "evidence": "docs/validation/parity/SI08-S04.json",
+      "verification": {
+        "stage_tests": 11,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9,
+          "PI03-S01": 10,
+          "PI03-S02": 10,
+          "SI08-S02": 10,
+          "SI08-S03": 9
+        },
+        "architecture": "passed",
+        "reference_maximum_error": 1.1102230246251565e-16,
+        "reference_condition": 4.518233710590494,
+        "full_release_suite": "Not rerun for bounded supplied-pole rational models; full PI/SI parity, source causality, transient qualification and human numerical review remain open.",
+        "focused_regressions": {
+          "tests": 186,
+          "skipped": 0,
+          "elapsed_s": 15.343,
+          "log": "build/parity-si08s04-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families; PI/SI priority active; post-parity gate closed"
+      }
+    },
+    {
+      "id": "SI07-S01",
+      "capability_id": "SI07",
+      "title": "Prescribed-wave rational network transient execution",
+      "status": "done",
+      "depends_on": [
+        "SI08-S04"
+      ],
+      "acceptance": [
+        "Execute actual supplied-pole fit with complete explicit PWL incident-port coverage, exact common horizon and zero initial model memory; preserve source and fitting evidence.",
+        "Analytic stable exponential propagation on the full event union; return outgoing waves, current-into-network V/I and final states without implicit source/load feedback.",
+        "Independent ramp/hold and multi-input references, feedthrough, small/large pole-time accuracy, output-grid invariance and admission/resource/cancellation failures with actual worker/schemas.",
+        "Zero-skip source-bound execution and prior-stage replays; model waveform execution does not qualify physical out-of-band response, nonlinear devices or measured correlation."
+      ],
+      "evidence": "docs/validation/parity/SI07-S01.json",
+      "verification": {
+        "stage_tests": 11,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9,
+          "PI03-S01": 10,
+          "PI03-S02": 10,
+          "SI08-S02": 10,
+          "SI08-S03": 9,
+          "SI08-S04": 11
+        },
+        "architecture": "passed",
+        "reference_max_wave_error_sqrt_w": 2.220446049250313e-16,
+        "reference_final_state_error_sqrt_w": 5.551115123125783e-17,
+        "full_release_suite": "Not rerun for bounded prescribed-wave rational-model execution; general source/load feedback, full PI/SI parity, measured qualification and human numerical review remain open.",
+        "focused_regressions": {
+          "tests": 198,
+          "skipped": 0,
+          "elapsed_s": 13.044,
+          "log": "build/parity-si07s01-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families; PI/SI priority active; post-parity gate closed"
+      }
+    },
+    {
+      "id": "SI07-S02",
+      "capability_id": "SI07",
+      "title": "Resistively terminated rational network transients",
+      "status": "done",
+      "depends_on": [
+        "SI07-S01"
+      ],
+      "acceptance": [
+        "Compose actual fit with explicit finite resistive Thevenin boundaries at every port; preserve sources, time/horizon/port identities and returned fit evidence.",
+        "Conditioned algebraic wave feedback with inverse-gain/stability admission; bounded PWL augmented exponentials and boundary residual checks, without automatic repair.",
+        "Independent physical RC/divider and simultaneous-source references, matched equivalence, singular/unstable/precision/resource/cancellation failures and actual worker/schema checks.",
+        "Zero-skip source-bound execution and prior-stage replays; physical out-of-band accuracy, reactive/nonlinear boundaries and measured qualification remain open."
+      ],
+      "evidence": "docs/validation/parity/SI07-S02.json",
+      "verification": {
+        "stage_tests": 11,
+        "skipped": 0,
+        "prior_stage_replays": {
+          "SI08-S01": 7,
+          "PI04-S01": 8,
+          "PI04-S02": 8,
+          "PI02-S01": 12,
+          "PI02-S02": 9,
+          "PI02-S03": 10,
+          "PI02-S04": 9,
+          "PI03-S01": 10,
+          "PI03-S02": 10,
+          "SI08-S02": 10,
+          "SI08-S03": 9,
+          "SI08-S04": 11,
+          "SI07-S01": 11
+        },
+        "architecture": "passed",
+        "reference_maximum_voltage_error_v": 8.881784197001252e-16,
+        "reference_maximum_boundary_relative_residual": 1.4719616800160394e-16,
+        "full_release_suite": "Not rerun for bounded finite-resistance feedback around fitted models; reactive/nonlinear boundaries, full PI/SI parity, measured qualification and human numerical review remain open.",
+        "focused_regressions": {
+          "tests": 210,
+          "skipped": 0,
+          "elapsed_s": 20.319,
+          "log": "build/parity-si07s02-focused.log"
+        },
+        "documentation_files": 8,
+        "backlog": "passed; 61 families; PI/SI priority active; post-parity gate closed"
+      }
+    },
+    {
+      "id": "GP07-S01",
+      "capability_id": "GP07",
+      "title": "Bounded static tetra thermoelasticity with executed same-mesh thermal coupling",
+      "status": "done",
+      "depends_on": [],
+      "acceptance": [
+        "Independent affine/traction/thermal stress, reactions, elastic energy, units and manufactured refinement references pass.",
+        "Actual thermal solver temperatures transfer on the identical mesh with source and context digests; worker admission and failure/cancellation controls pass.",
+        "Source-bound executed tests pass without skips; experimental scope and numerical/resource limits remain explicit."
+      ],
+      "evidence": "docs/validation/parity/GP07-S01.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 16,
+          "skipped": 0,
+          "log": "docs/validation/parity/GP07-S01-lf-reverified.log"
+        },
+        "focused_regressions": {
+          "tests": 206,
+          "skipped": 0,
+          "elapsed_s": 16.323
+        },
+        "architecture": "passed",
+        "numerical_review": "Agent read-only review found no actionable defect; knowledgeable human release review remains required.",
+        "full_release_suite": "Not rerun; prior unrelated full-suite failures remain open."
+      }
+    },
+    {
+      "id": "GP07-S02",
+      "capability_id": "GP07",
+      "title": "Mechanical load workflow and tensor/deformed field visualization",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S01"
+      ],
+      "acceptance": [
+        "Integrated force/moment references and typed raw-result-bound stress/deformation workflow pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP07-S03",
+      "capability_id": "GP07",
+      "title": "Modal and transient supported mechanical assemblies",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S02"
+      ],
+      "acceptance": [
+        "Mass, frequencies, damping and time/mesh refinement with energy references pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP07-S04",
+      "capability_id": "GP07",
+      "title": "Nonlinear contact and thermomechanical geometry feedback",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S03"
+      ],
+      "acceptance": [
+        "Converged contact/material work and deformation feedback with explicit law applicability pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP04-S01",
+      "capability_id": "GP04",
+      "title": "Stationary 3D magnetic diffusion and circuit excitation",
+      "status": "planned",
+      "depends_on": [
+        "GP03-S01"
+      ],
+      "acceptance": [
+        "Skin depth/time, circuit power and conserved loss/heat transfer reference checks pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP04-S02",
+      "capability_id": "GP04",
+      "title": "Moving 3D motors and actuator assemblies",
+      "status": "planned",
+      "depends_on": [
+        "GP04-S01",
+        "GP07-S03"
+      ],
+      "acceptance": [
+        "Moving interface/state, back-EMF, force/torque work and time convergence references pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP09-S01",
+      "capability_id": "GP09",
+      "title": "Conservative coupled electrical magnetic thermal mechanical studies",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S01",
+        "GP04-S01"
+      ],
+      "acceptance": [
+        "Conservative frame/revision-bound transfers, feedback, coupled time refinement and rollback pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP10-S01",
+      "capability_id": "GP10",
+      "title": "Compact field-driven Hall plate and sensor models",
+      "status": "planned",
+      "depends_on": [
+        "GP03-S01"
+      ],
+      "acceptance": [
+        "Signed sensitivity, bias/temperature, active-area orientation, loading and field-transfer references pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP10-S02",
+      "capability_id": "GP10",
+      "title": "Classical semiconductor Hall magnetotransport",
+      "status": "planned",
+      "depends_on": [
+        "GP10-S01"
+      ],
+      "acceptance": [
+        "Contacts, signed carrier tensor, current conservation, polarity/zero-field and mesh references pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP10-S03",
+      "capability_id": "GP10",
+      "title": "Biased Poisson and carrier continuity with thermal laws",
+      "status": "planned",
+      "depends_on": [
+        "GP10-S02"
+      ],
+      "acceptance": [
+        "Biased current/depletion/contact references and nonlinear conservation/convergence pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP11-S01",
+      "capability_id": "GP11",
+      "title": "Coupled failure-event screening",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S01"
+      ],
+      "acceptance": [
+        "Conditioned allowables and threshold/fault propagation references pass; no unsupported lifetime claim."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP11-S02",
+      "capability_id": "GP11",
+      "title": "Calibrated degradation fatigue and fault transients",
+      "status": "planned",
+      "depends_on": [
+        "GP11-S01",
+        "GP07-S04"
+      ],
+      "acceptance": [
+        "Applicable calibrated history-dependent failure laws and independent references with uncertainty pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP12-S01",
+      "capability_id": "GP12",
+      "title": "Modal and deterministic base harmonic vibration",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S03"
+      ],
+      "acceptance": [
+        "Independent damped oscillator/base transmissibility phase/amplitude, effective mass, support reactions and energy pass.",
+        "Damping and modal normalization conventions, mode-count/frequency/mesh refinement and rigid/support modes remain explicit."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP12-S02",
+      "capability_id": "GP12",
+      "title": "Random vibration PSD and correlated multi-axis support motion",
+      "status": "planned",
+      "depends_on": [
+        "GP12-S01"
+      ],
+      "acceptance": [
+        "PSD sidedness, Hz/rad/s and acceleration units are explicit; Hermitian PSD cross-spectral matrices and finite-band integration are validated.",
+        "Independent response spectra/RMS and frequency/modal convergence pass; RMS is not presented as deterministic peak or fatigue life."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP12-S03",
+      "capability_id": "GP12",
+      "title": "Transient shock and shock-response spectra",
+      "status": "planned",
+      "depends_on": [
+        "GP12-S01"
+      ],
+      "acceptance": [
+        "Pulse/interpolation, absolute/relative SRS, damping/Q and input filtering conventions are defined.",
+        "Analytical pulse/oscillator references and time/sample/frequency refinement pass; nonlinear impact remains separately scoped."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP13-S01",
+      "capability_id": "GP13",
+      "title": "Board package and solder-joint stress submodels",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S04",
+        "GP12-S01"
+      ],
+      "acceptance": [
+        "Conditioned board/laminate, package/lead/ball/underfill and fixture properties are admitted with provenance.",
+        "Global/local displacement or traction transfer preserves applicable force/work and avoids overconstraint; thermal/bending joint references and local mesh refinement pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP13-S02",
+      "capability_id": "GP13",
+      "title": "Calibrated solder degradation and electrical failure feedback",
+      "status": "planned",
+      "depends_on": [
+        "GP13-S01",
+        "GP11-S02",
+        "GP12-S02"
+      ],
+      "acceptance": [
+        "Alloy/temperature/rate/aging-specific creep, plasticity and fatigue laws have calibrated independent coupon/assembly evidence and uncertainty.",
+        "Actual mission/cycle/dwell histories and combined-environment assumptions are retained; degradation/intermittent/open events affect actual circuit state with restart/replay checks."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP14-S01",
+      "capability_id": "GP14",
+      "title": "Constrained multibody shafts joints and ideal gear trains",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S03"
+      ],
+      "acceptance": [
+        "Pendulum/shaft/gear-ratio and reaction references pass with inertia/frames, constraint residual/drift and energy/work convergence.",
+        "Motor/actuator effort-flow ports preserve torque/speed work; ideal constraints do not claim tooth-contact stress."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP14-S02",
+      "capability_id": "GP14",
+      "title": "Compliant gear backlash friction and bearing contact",
+      "status": "planned",
+      "depends_on": [
+        "GP14-S01",
+        "GP07-S04"
+      ],
+      "acceptance": [
+        "Supplied tooth/bearing/contact/friction/lubrication laws retain conditions; reversal, force/penetration, loss/heat and local stress references pass.",
+        "Contact/event/mesh/time refinement and unsupported wear/fatigue-law rejection pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP14-S03",
+      "capability_id": "GP14",
+      "title": "Watch mainspring train escapement and regulated timing",
+      "status": "planned",
+      "depends_on": [
+        "GP14-S02"
+      ],
+      "acceptance": [
+        "Mainspring/barrel, escapement impulse/contact, balance/hairspring and bearing models execute with time/event convergence.",
+        "Independent rate/amplitude/beat-error/power-reserve and temperature/orientation/shock references pass; magnetic sensitivity requires physical field/material coupling."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP05-S01",
+      "capability_id": "GP05",
+      "title": "Qualified vehicle aerodynamic and propeller coefficient models",
+      "status": "planned",
+      "depends_on": [],
+      "acceptance": [
+        "Density, geometry, frames, coefficient conventions, RPM/rev-s and axial advance are explicit; thrust/torque/power reference maps and operating-range rejection pass.",
+        "Airframe drag/lift/moment or blade-element models have independent applicable measured references; no map interpolation is presented as resolved CFD."
+      ],
+      "evidence": null,
+      "scope": "vehicle_aerodynamics"
+    },
+    {
+      "id": "GP05-S02",
+      "capability_id": "GP05",
+      "title": "Resolved vehicle rotor airframe aerodynamic load studies",
+      "status": "planned",
+      "depends_on": [
+        "GP05-S01"
+      ],
+      "acceptance": [
+        "Admitted flow/rotation/boundaries, interference/inflow/wake assumptions and supported operating regime are explicit.",
+        "Pressure/traction force/moment/power integration, mesh/time/rotating-interface refinement and applicable measurement comparisons pass."
+      ],
+      "evidence": null,
+      "scope": "vehicle_aerodynamics"
+    },
+    {
+      "id": "GP15-S01",
+      "capability_id": "GP15",
+      "title": "Battery ESC motor back-EMF shaft and propeller load bench",
+      "status": "planned",
+      "depends_on": [
+        "GP05-S01"
+      ],
+      "acceptance": [
+        "Actual loaded spin-up/down, current, voltage, back-EMF, torque, RPM, battery sag and losses pass independent electrical/mechanical references.",
+        "Averaged DC-equivalent and phase-resolved BLDC/PMSM/PWM fidelity are distinguished; propeller opposing torque, inertia, thermal behavior and power budget are checked."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP15-S02",
+      "capability_id": "GP15",
+      "title": "Six-DOF multirotor plant and sampled sensor models",
+      "status": "planned",
+      "depends_on": [
+        "GP15-S01"
+      ],
+      "acceptance": [
+        "Frames/attitude, CG/inertia, gravity/wind, force/moment and sensor bias/noise/orientation/filter/delay definitions are admitted.",
+        "Free fall, torque-free rotation, hover/trim, maneuver and step/frame invariance references pass; actual firmware execution is not implied."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP15-S03",
+      "capability_id": "GP15",
+      "title": "Executable flight-controller software-in-the-loop",
+      "status": "planned",
+      "depends_on": [
+        "GP15-S02"
+      ],
+      "acceptance": [
+        "Pinned executable/source/toolchain/configuration actually executes and controller code changes alter observed control response.",
+        "Scheduling/clocks/latency/jitter/sample-hold, state reset/replay, isolation/deadlines/cancellation and nominal/fault trajectory/step checks pass; MCU cycle emulation and live hardware are separate."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP15-S04",
+      "capability_id": "GP15",
+      "title": "Vehicle aerodynamic structural and propulsion feedback",
+      "status": "planned",
+      "depends_on": [
+        "GP15-S02",
+        "GP05-S02",
+        "GP07-S03",
+        "GP09-S01"
+      ],
+      "acceptance": [
+        "Actual vehicle aero/propeller loads feed structures and deformation/motion feed aero with conservative work/frame/revision-bound transfers.",
+        "Interference/inflow/ground-effect/windmilling claims require applicable models, mesh/time/interface convergence and measured references."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP15-S05",
+      "capability_id": "GP15",
+      "title": "Integrated drone mission performance and fault campaigns",
+      "status": "planned",
+      "depends_on": [
+        "GP15-S03",
+        "GP15-S04",
+        "GP13-S02"
+      ],
+      "acceptance": [
+        "One study executes code/sensors, power/ESC/motor/propeller, aerodynamic flight, thermal/structural/joint response and actual fault feedback.",
+        "Measured hold-out current/RPM/trajectory/energy/endurance and mission/wind/payload references, uncertainty and coupled-step convergence pass; HIL remains a separately authorized hardware stage."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP16-S01",
+      "capability_id": "GP16",
+      "title": "Mission launch vibration shock and coupled structural loads",
+      "status": "planned",
+      "depends_on": [
+        "GP12-S02",
+        "GP12-S03",
+        "GP07-S05"
+      ],
+      "acceptance": [
+        "Reviewed mission/fixture/axis/duration/damping/specification revision binds quasi-static/sine/random/multi-point/acoustic-input/shock loads.",
+        "Mode/support/coupled-load references and convergence pass; acoustic-load import does not claim sound propagation, and buckling/prestress require validated formulations."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP16-S02",
+      "capability_id": "GP16",
+      "title": "Satellite orbital thermal attitude deployment and jitter",
+      "status": "planned",
+      "depends_on": [
+        "GP16-S01",
+        "GP14-S02",
+        "GP09-S01"
+      ],
+      "acceptance": [
+        "Mission orbit/illumination/eclipse/thermal-vacuum and mass/inertia/frame inputs are bound to actual thermal/attitude/flexible deployment/motor-jitter state.",
+        "Independent attitude, thermal energy and structural/multibody coupling, pointing and applicable measured subsystem references pass."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP16-S03",
+      "capability_id": "GP16",
+      "title": "Launch-vehicle ascent staging and flexible GNC loads",
+      "status": "planned",
+      "depends_on": [
+        "GP16-S01",
+        "GP07-S03",
+        "GP09-S01"
+      ],
+      "acceptance": [
+        "Admitted propulsion/thrust/gimbal/mass-depletion, atmosphere/aero and frame models execute through ascent/staging/flexible GNC events.",
+        "Mass/momentum/work event balances, independent trajectory/mode/control and time/coupling refinement pass; slosh/flutter/POGO/combustion require separate models and evidence."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "GP07-S05",
+      "capability_id": "GP07",
+      "title": "Beam shell layered orthotropic and prestressed buckling mechanics",
+      "status": "planned",
+      "depends_on": [
+        "GP07-S03"
+      ],
+      "acceptance": [
+        "Beam/shell patch and locking, laminate stiffness/thermal, mass/mode and prestressed buckling references pass with independent convergence.",
+        "Thin boards/structures retain physical property/frame/boundary provenance; nonlinear post-buckling and imperfections require separate GP07-S04 evidence."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "SI07-S03",
+      "capability_id": "SI07",
+      "title": "Mixed resistive and series-inductive fitted-network transients",
+      "status": "done",
+      "depends_on": [
+        "SI07-S02"
+      ],
+      "acceptance": [
+        "Execute actual supplied-pole fit with finite R>=0 and L>=0 Thevenin boundaries, at least one L>0; zero initial states and continuous PWL drive. Preserve ordered ports, supplied boundaries, fit and inductor states.",
+        "Independent under/critical/overdamped series RLC and PWL/mixed-multiport references check V/I, inductive derivative, V+RI+L*dI/dt=Vs, energy and observation-grid invariance with quantitative tolerances.",
+        "Reject singular or unresolved stable feedback, invalid units/fields, precision/resource collapse and cancellation; pass actual worker/schema and source-bound zero-skip evidence.",
+        "Document independently derived wave/state equations and reviewed primary physics/numerical references; preserve experimental and unsupported general reactive/nonlinear/physical-band claims."
+      ],
+      "evidence": "docs/validation/parity/SI07-S03.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 11,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S03-inductive-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 14,
+        "focused_regressions": {
+          "tests": 235,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 27.453,
+          "log": "build/si07-s03-focused.log"
+        },
+        "architecture": "passed",
+        "documentation_files": 8,
+        "review": "Independent agent numerical review found no actionable defect; added its requested reference-impedance invariance checks. Human numerical release review remains required.",
+        "full_release_suite": "Not rerun; prior unrelated full-suite failures remain outside bounded development acceptance."
+      }
+    },
+    {
+      "id": "SI07-S04",
+      "capability_id": "SI07",
+      "title": "Mixed resistive and shunt-capacitive fitted-network transients",
+      "status": "done",
+      "depends_on": [
+        "SI07-S03"
+      ],
+      "acceptance": [
+        "Execute the actual supplied-pole fitter with nonnegative shunt C and finite Thevenin R, requiring positive R for C>0 and at least one C>0; preserve source and network currents as distinct quantities.",
+        "Independent RC, under/critical/overdamped parallel-RLC, PWL and mixed/coupled multiport references verify KCL, capacitor voltage derivative, actual resistor loss, stored energy and source-work balance.",
+        "Verify reference-impedance/unit/output-grid invariance and fail on unsupported singular/unstable/precision/resource/malformed/cancelled requests; actual worker/schema/example execution and source-bound zero-skip evidence pass.",
+        "Record independently derived mixed wave/state mathematics and reviewed primary physical/numerical sources; keep descriptor/nonlinear/general-RLC, steppable/thermal coupling and measured qualification separate."
+      ],
+      "evidence": "docs/validation/parity/SI07-S04.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 11,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S04-capacitive-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 15,
+        "focused_regressions": {
+          "tests": 247,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 22.25,
+          "log": "build/si07-s04-focused.log"
+        },
+        "architecture": "passed",
+        "review": "Independent numerical review found no actionable defect; its requested independent coupled two-positive-capacitor oracle was added and passed. Knowledgeable human review remains required before release.",
+        "full_release_suite": "Full Python discovery attempted, interrupted after unrelated assistant-provider connection failures; isolated reproduction retained in build/si07-s04-full-provider-blocker.log. No complete or clean full-suite result, UI/native release checks or release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 46,
+          "skipped": 0,
+          "log": "build/si07-s04-tracking.log"
+        }
       }
     }
-  ]
+  ],
+  "scope_expansion_date": "2026-10-14",
+  "scope_expansion_evidence": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+  "execution_policy": {
+    "active_phase": "parity",
+    "updated_on": "2026-10-18",
+    "parity_capabilities": [
+      "SI01",
+      "SI02",
+      "SI03",
+      "SI04",
+      "SI05",
+      "SI06",
+      "SI07",
+      "SI08",
+      "PI01",
+      "PI02",
+      "PI03",
+      "PI04",
+      "PI05",
+      "PI06",
+      "SA01",
+      "AMS01",
+      "EM01",
+      "EM02",
+      "EM03",
+      "EM04",
+      "EM05",
+      "EM06",
+      "TH01",
+      "TH02",
+      "TH03",
+      "TH04",
+      "TH05",
+      "TH06",
+      "WF01",
+      "WF02",
+      "WF03",
+      "WF04",
+      "WF05",
+      "WF06"
+    ],
+    "post_parity_capabilities": [
+      "GP01",
+      "GP02",
+      "GP03",
+      "GP04",
+      "GP05",
+      "GP06",
+      "GP07",
+      "GP08",
+      "GP09",
+      "OP01",
+      "OP02",
+      "OP03",
+      "OP04",
+      "OP05",
+      "VF01",
+      "VF02",
+      "AX01",
+      "AX02",
+      "LB01",
+      "LB02",
+      "RF01",
+      "RF02",
+      "PW01",
+      "PW02",
+      "PW03",
+      "PW04",
+      "PW05",
+      "GP10",
+      "GP11",
+      "GP12",
+      "GP13",
+      "GP14",
+      "GP15",
+      "GP16"
+    ],
+    "instruction": "PI/SI remains primary. Execute the explicitly authorized coupled track in parallel; other expansion requires established parity.",
+    "completion_rule": "Every original parity capability is complete with closed gaps and accepted benchmark evidence; only then select the post_parity phase.",
+    "active_priority": "pi_si_stack",
+    "priority_capabilities": [
+      "SI01",
+      "SI02",
+      "SI03",
+      "SI04",
+      "SI05",
+      "SI06",
+      "SI07",
+      "SI08",
+      "PI01",
+      "PI02",
+      "PI03",
+      "PI04",
+      "PI05",
+      "PI06"
+    ],
+    "shared_multiphysics_foundations": "Conservative electrical/thermal handoffs and bounded supplied conductivity feedback within PI/SI; general multiphysics and broader material laws retain separate gates.",
+    "parallel_expansion": {
+      "enabled": true,
+      "requested_on": "2026-10-18",
+      "authorization": "User explicitly requested mechanical stress/deformation, integrated failure, magnetics/motion, motors/actuators and Hall/semiconductor simulation now. Follow-up explicitly includes high vibration/shock, solder joints, satellites/launch vehicles, complete drone code-to-aerodynamics/motor/propeller response and watch/geared mechanisms; GP05 is restricted to vehicle aerodynamics.",
+      "capability_ids": [
+        "GP01",
+        "GP02",
+        "GP03",
+        "GP04",
+        "GP06",
+        "GP07",
+        "GP09",
+        "GP10",
+        "GP11",
+        "VF01",
+        "VF02",
+        "AX01",
+        "LB01",
+        "LB02",
+        "GP12",
+        "GP13",
+        "GP14",
+        "GP15",
+        "GP16",
+        "GP05"
+      ],
+      "restricted_scopes": {
+        "GP05": "vehicle_aerodynamics"
+      }
+    }
+  },
+  "additional_scope_evidence": [
+    "docs/TRANSMISSION_RF_HVDC_SCOPE.md",
+    "docs/PI_SI_PARITY_EXECUTION.md",
+    "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md"
+  ],
+  "platform_strategy": {
+    "evidence": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+    "research_evidence": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+    "numerical_policy": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+    "product": "general_multiphysics_simulation",
+    "geometry_role": "simulation_preparation_and_external_ecad_mcad_inputs",
+    "chemical_engineering": "outside_active_scope",
+    "recommendations_promote_runtime_capabilities": false
+  }
 }

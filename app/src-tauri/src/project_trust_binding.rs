@@ -31,6 +31,7 @@ pub fn is_targeted_project_read(method: &str) -> bool {
             | "export_mcad_session"
             | "preview_mcad_feedback"
             | "apply_mcad_feedback"
+            | "assign_material_to_project"
     )
 }
 
@@ -198,6 +199,7 @@ mod tests {
             "read_project_visual_bundle",
             "read_assembly_field_study_in_project",
             "prepare_assembly_design_visual_bundle",
+            "assign_material_to_project",
         ] {
             assert!(is_targeted_project_read(method));
             let state = ProjectManifestState::new();

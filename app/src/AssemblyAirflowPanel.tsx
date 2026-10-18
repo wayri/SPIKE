@@ -145,3 +145,4 @@ export default function AssemblyAirflowPanel({ projectPath, manifestDigest, mesh
     {invalid && <p role="status">{invalid}</p>}<button type="button" className="spike-control--primary" disabled={locked || !meshSetup || !acknowledged || !!invalid || advanced !== format(draft)} onClick={() => void action("run_assembly_airflow_in_project", { ...meshSetup, request: draft }, read => { if (read.saved && read.result?.status === "completed") { setResult(read.result); setDirty(false); setStatus("Completed airflow result saved in this project."); void onUpdated(); } else { setResult(null); setError(read.result?.message || "Airflow did not complete; no result saved."); setStatus(read.result?.status || read.status); } })}>Run and save airflow</button></>}
     {status && <p role="status">{status}</p>}{error && <p role="alert">{error}</p>}{result?.status === "completed" && <AirflowFieldView result={result}/>}</details>;
 }
+

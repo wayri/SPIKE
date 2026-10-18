@@ -4,6 +4,7 @@ import {openNativeTextFile,runLocalWorker,runNativeProjectWorker,saveNativeTextF
 import {assertFieldAssembly} from "./assemblyFieldStudyPresentation";
 import {assemblyEmStudy,type AssemblyEmStudy} from "./retainedAssemblyEm";
 import InteractivePlot from "./InteractivePlot";
+import {usePanelPresentation} from "./panelPresentation";
 import "./EngineeringReview.css";
 import "./buttonStandard.css";
 
@@ -11,6 +12,7 @@ export default function AssemblyEmWorkbench({study,projectPath,manifestDigest,on
   study:AssemblyEmStudy|null;projectPath:string|null;manifestDigest:string|null;
   onStudy:(value:AssemblyEmStudy)=>void;onActivate:()=>void;onClose:()=>void;
 }) {
+  const {ownerDocument}=usePanelPresentation();
   const largeRequestMarker="Large retained geometry: use the reproducible request builder or import a revised study. Inline editing is disabled.";
   const requestText=(value:AssemblyEmStudy|null)=>{const raw=value?JSON.stringify(value.request):"";return raw.length>2*1024*1024?largeRequestMarker:raw;};
   const [text,setText]=useState(()=>requestText(study));
@@ -23,7 +25,7 @@ export default function AssemblyEmWorkbench({study,projectPath,manifestDigest,on
       .catch(cause=>{if(active)setError(String(cause));});
     return()=>{active=false;generation.current++;};
   },[projectPath,manifestDigest]);
-  useEffect(()=>{const previous=document.activeElement as HTMLElement|null;dialog.current?.querySelector<HTMLButtonElement>("button")?.focus();return()=>{if(previous?.isConnected)previous.focus();};},[]);
+  useEffect(()=>{const previous=ownerDocument?.activeElement as HTMLElement|null;dialog.current?.querySelector<HTMLButtonElement>("button")?.focus();return()=>{if(previous?.isConnected)previous.focus();};},[ownerDocument]);
   const action=async(work:(ticket:number)=>Promise<void>)=>{const ticket=generation.current;setBusy(true);setError("");try{await work(ticket);}catch(cause){if(ticket===generation.current)setError(String(cause));}finally{if(ticket===generation.current)setBusy(false);}};
   const admit=async(value:unknown)=>{const candidate=assemblyEmStudy(value);assertFieldAssembly(candidate.request.geometry,physical);const response=await runLocalWorker({method:"admit_assembly_em_study",params:{record:candidate}});if(!response.ok)throw new Error(response.error);return assemblyEmStudy(response.result);};
   const lockedRequest=text===largeRequestMarker;
@@ -38,7 +40,7 @@ export default function AssemblyEmWorkbench({study,projectPath,manifestDigest,on
   const frequencies=(result?.frequency_hz??[]) as number[],columns=(result?.s_parameter_column??[]) as any[];
   return <div className="modal-shade engineering-shade"><div ref={dialog} className="engineering-review assembly-em-workbench" role="dialog" aria-modal="true" aria-labelledby="assembly-em-title" onKeyDown={event=>{
     if(event.key==="Escape"){event.preventDefault();onClose();}
-    if(event.key==="Tab"){const nodes=[...dialog.current!.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled)')];const first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}}
+    if(event.key==="Tab"){const nodes=[...dialog.current!.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),textarea:not(:disabled),select:not(:disabled)')];const first=nodes[0],last=nodes[nodes.length-1];if(event.shiftKey&&ownerDocument?.activeElement===first){event.preventDefault();last?.focus();}else if(!event.shiftKey&&ownerDocument?.activeElement===last){event.preventDefault();first?.focus();}}
   }}><header><h2 id="assembly-em-title">Retained assembly EM · OpenEMS</h2><button type="button" aria-label="Close assembly EM" onClick={onClose}>×</button></header>
   <div className="engineering-actions"><button type="button" disabled={busy||!physical} onClick={()=>void open()}>Open study / request</button><button type="button" disabled={busy||!physical||!text} onClick={()=>void validate()}>Validate geometry and ports</button><button type="button" disabled={busy||!physical||!prepared||!current} onClick={()=>void run()}>Run OpenEMS</button><button type="button" disabled={busy||!physical||!result?.field_capture?.preview} onClick={()=>void action(async()=>{await admit(study);onActivate();onClose();})}>Show saved fields in viewport</button><button type="button" disabled={busy||!study} onClick={()=>void saveNativeTextFile("assembly-em-study.json",JSON.stringify(study),"result")}>Export study</button></div>
   <div className="engineering-body">{!projectPath&&<p role="status">Save the assembly project first so input geometry can be checked against its physical occurrences.</p>}{busy&&<p role="status">Managed worker running; this may take several minutes.</p>}{error&&<p role="alert">{error}</p>}

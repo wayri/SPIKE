@@ -1,3 +1,4 @@
+import "./sparameterResponsive.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, Download, Play, Upload, X } from "./icons";
 import { checkNetwork, parseTouchstone, TouchstoneData, trace } from "./sparameters";
@@ -8,6 +9,8 @@ import SiChannelResultPanel from "./SiChannelResultPanel";
 import SiWorkflowWorkbench from "./SiWorkflowWorkbench";
 import PlotlyChart from "./PlotlyChart";
 import type { SiProtocolSuite } from "./siProtocolSuites";
+import { usePanelPresentation } from "./panelPresentation";
+import { siSearchDraftError, type SiSearchDraft } from "./siSearchDraft";
 
 type Props = {
   assemblyDesigns: AssemblyDesigns | null;
@@ -21,6 +24,7 @@ type Props = {
   initialView?: "workflow" | "geometry";
   initialFocus?: "channel" | "crosstalk" | "eye" | "pam4" | "impedance" | "ports";
   intentToken?: number;
+  searchDraft?: SiSearchDraft;
   onResult?: (result: Record<string, unknown>) => void;
 };
 
@@ -135,15 +139,17 @@ function siSummary(result: SiResult | null) {
   };
 }
 
-const downloadJson = (name: string, value: unknown) => {
-  const anchor = document.createElement("a");
+const downloadJson = (ownerDocument: Document | undefined, name: string, value: unknown) => {
+  if (!ownerDocument) return;
+  const anchor = ownerDocument.createElement("a");
   anchor.href = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: "application/json" }));
   anchor.download = /\.s\d+p$/i.test(name) ? name.replace(/\.s\d+p$/i, "") + ".spike-sparams.json" : name;
   anchor.click();
   URL.revokeObjectURL(anchor.href);
 };
 
-export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, onClose, onStatus, suite, selectedProfile, initialResult, initialView, initialFocus = "channel", intentToken, onResult }: Props) {
+export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, onClose, onStatus, suite, selectedProfile, initialResult, initialView, initialFocus = "channel", intentToken, searchDraft, onResult }: Props) {
+  const { ownerDocument } = usePanelPresentation();
   const [workflowView, setWorkflowView] = useState(() => initialView ? initialView === "workflow" : !suite && !selectedProfile && initialResult?.contract !== "spike/si-channel-result/v1");
   useEffect(() => { if ((suite || selectedProfile) && !initialView) setWorkflowView(false); }, [suite?.id, selectedProfile?.id, initialView]);
   useEffect(() => { if (initialView && intentToken) setWorkflowView(initialView === "workflow"); }, [initialView, intentToken]);
@@ -164,6 +170,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const [frequencyStopHz, setFrequencyStopHz] = useState("4e9");
   const [frequencyPoints, setFrequencyPoints] = useState("1025");
   const [bitRateHz, setBitRateHz] = useState("1e9");
+  const [referenceImpedanceOhm, setReferenceImpedanceOhm] = useState("50");
   const [modulation, setModulation] = useState<"NRZ" | "PAM4">("NRZ");
   const [txFfeTaps, setTxFfeTaps] = useState("1.0");
   const [rxDfeTaps, setRxDfeTaps] = useState("0.0");
@@ -177,6 +184,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const [crosstalkTerminations, setCrosstalkTerminations] = useState(["50", "50", "50", "50"]);
   const [siBusy, setSiBusy] = useState(false);
   const [siError, setSiError] = useState("");
+  const [searchReview, setSearchReview] = useState("");
+  const admittedSearchDraft = useRef<{ id: string; design: Record<string, unknown> } | null>(null);
   const [siResult, setSiResult] = useState<SiResult | null>(() => initialResult?.contract === "spike/si-channel-result/v1" ? initialResult : null);
   const [suiteResult, setSuiteResult] = useState<Record<string, unknown> | null>(null);
   const [eyeMaskJson, setEyeMaskJson] = useState("");
@@ -197,6 +206,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const selected = points[Math.min(sample, Math.max(0, points.length - 1))];
 
   useEffect(() => {
+    if (searchDraft && admittedSearchDraft.current?.id === searchDraft.id && admittedSearchDraft.current.design === activeDesign) return;
     const ground = designNets.find(net => /(^|[/_-])(gnd|vss|return|0v)([/_-]|$)/i.test(net.name));
     const signal = suggestedSuiteSignal(designNets.filter(net => net.id !== ground?.id), suite);
     setSignalNet(signal?.id ?? "");
@@ -217,6 +227,33 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   useEffect(() => {
     setSiResult(initialResult?.contract === "spike/si-channel-result/v1" ? initialResult : null);
   }, [initialResult]);
+  useEffect(() => {
+    if (!searchDraft || !activeDesign || siBusy) return;
+    const previous = admittedSearchDraft.current;
+    if (previous?.id === searchDraft.id) {
+      if (previous.design !== activeDesign) {
+        setSignalNet(""); setReferenceNet(""); setReferenceLayer("");
+        setSiResult(null); setSuiteResult(null);
+        setSearchReview("Board context changed. Search the current board again before applying SI setup.");
+      }
+      return;
+    }
+    admittedSearchDraft.current = { id: searchDraft.id, design: activeDesign };
+    setWorkflowView(false);
+    setSiResult(null); setSuiteResult(null); setData(null);
+    setSignalNet(""); setReferenceNet(""); setReferenceLayer("");
+    setVictimNet(""); setDifferentialMateNet("");
+    const problem = siSearchDraftError(searchDraft, designNets.map(net => net.id));
+    if (problem) { setSiError(problem); setSearchReview(problem); return; }
+    setSignalNet(searchDraft.signalNetId ?? "");
+    setReferenceNet(searchDraft.referenceNetId ?? "");
+    if (searchDraft.frequencyStartHz !== undefined) setFrequencyStartHz(String(searchDraft.frequencyStartHz));
+    if (searchDraft.frequencyStopHz !== undefined) setFrequencyStopHz(String(searchDraft.frequencyStopHz));
+    if (searchDraft.bitRateHz !== undefined) setBitRateHz(String(searchDraft.bitRateHz));
+    if (searchDraft.impedanceOhm !== undefined) setReferenceImpedanceOhm(String(searchDraft.impedanceOhm));
+    setSiError("");
+    setSearchReview(`Reviewed search inputs applied. Select the reference copper layer and review signal, return, differential mate or victim, and frequency settings before running.${searchDraft.componentRefs?.length ? ` Component references ${searchDraft.componentRefs.join(", ")} do not define source/receiver pin endpoints; review explicit endpoints in the source-to-receiver workflow.` : " Source/receiver pin endpoints require separate review in the source-to-receiver workflow."}${searchDraft.riseTimeS !== undefined ? ` Requested rise time ${searchDraft.riseTimeS} s remains pending review: geometry channel setup has no source rise-time input. No waveform is inferred from this value; configure the source rise time in the source-to-receiver workflow.` : ""}`);
+  }, [searchDraft, activeDesign, designNets, siBusy]);
 
   const runGeometryChannel = async () => {
     if (!activeDesign) return;
@@ -240,6 +277,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     const skewTolerance = Number(skewToleranceMm);
     if (coupledMate && (!Number.isFinite(separationTolerance) || separationTolerance < 0 || !Number.isFinite(skewTolerance) || skewTolerance < 0)) { setSiError("Coupled separation and skew tolerances must be finite, non-negative millimetre values."); return; }
     if (!Number.isFinite(bitRate) || bitRate <= 0) { setSiError(`${modulation === "PAM4" ? "Symbol" : "Bit"} rate must be positive and finite.`); return; }
+    const referenceImpedance = Number(referenceImpedanceOhm);
+    if (!Number.isFinite(referenceImpedance) || referenceImpedance <= 0) { setSiError("Reference impedance must be positive and finite."); return; }
     const step = (stop - start) / (count - 1);
     const frequencies = Array.from({ length: count }, (_, index) => start + step * index);
     const request: Record<string, unknown> = {
@@ -248,7 +287,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
       signal_net: signalNet,
       reference_net: referenceNet,
       reference_layer: referenceLayer,
-      reference_impedance_ohm: 50,
+      reference_impedance_ohm: referenceImpedance,
       frequencies_hz: frequencies,
       trace_limit: 512,
       path_mode: "piecewise_planar",
@@ -377,7 +416,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   return <div className="modal-backdrop"><section className="modal sparam-workbench" role="dialog" aria-modal="true" aria-label="S-parameter workbench">
     <header><div><span className="eyebrow">HF / SI NETWORK ANALYSIS</span><h2>S-parameter workbench</h2></div><button className="icon-btn" onClick={onClose} title="Close"><X size={17} /></button></header>
     <div className="sparam-commandbar"><button className={workflowView ? "primary-btn" : "secondary-btn"} onClick={() => setWorkflowView(true)}>Source-to-receiver workflow</button><button className={!workflowView ? "primary-btn" : "secondary-btn"} onClick={() => setWorkflowView(false)}>Geometry / protocol / network inspection</button></div>
-    <div hidden={!workflowView}><SiWorkflowWorkbench design={activeDesign} initialResult={initialResult} initialStep={initialFocus === "ports" ? "endpoints" : "channel"} intentToken={intentToken} onResult={onResult} onStatus={onStatus} /></div>
+    {searchReview && <div className="sparam-error" role="status"><AlertTriangle size={16} /> {searchReview}</div>}
+    <div hidden={!workflowView}><SiWorkflowWorkbench key={searchDraft?.id ?? "saved-workflow"} design={activeDesign} initialResult={searchDraft ? null : initialResult} initialStep={initialFocus === "ports" ? "endpoints" : "channel"} intentToken={intentToken} onResult={onResult} onStatus={onStatus} /></div>
     {!workflowView && <>
     {!desktop && <p className="si-note">Geometry and protocol execution requires the SPIKE desktop app. Browser preview supports configuration and network inspection.</p>}
     <div className="sparam-commandbar"><b>{initialFocus === "crosstalk" ? "NEXT / FEXT · select an aggressor and separate victim net" : initialFocus === "pam4" ? "PAM4 channel and eye" : initialFocus === "eye" ? "NRZ channel and eye" : initialFocus === "impedance" ? "Channel impedance and TDR" : suite ? `${suite.name} preset · geometry channel` : "Geometry-derived channel"} · experimental, not signoff/compliance qualified</b></div>
@@ -404,6 +444,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
             <label><span>Start frequency (Hz)</span><input value={frequencyStartHz} onChange={event => setFrequencyStartHz(event.target.value)} inputMode="decimal" /></label>
             <label><span>Stop frequency (Hz)</span><input value={frequencyStopHz} onChange={event => setFrequencyStopHz(event.target.value)} inputMode="decimal" /></label>
             <label><span>Uniform points</span><input value={frequencyPoints} onChange={event => setFrequencyPoints(event.target.value)} inputMode="numeric" /></label>
+            <label><span>Reference impedance (ohm)</span><input value={referenceImpedanceOhm} onChange={event => setReferenceImpedanceOhm(event.target.value)} inputMode="decimal" /></label>
             <label><span>Modulation</span><select value={modulation} disabled={Boolean(eyeMaskProfileId)} onChange={event => setModulation(event.target.value as "NRZ" | "PAM4")}><option>NRZ</option><option>PAM4</option></select></label>
             <label><span>{modulation === "PAM4" ? "Symbol rate (baud)" : "Bit rate (bit/s)"}</span><input value={bitRateHz} disabled={Boolean(eyeMaskProfileId)} onChange={event => setBitRateHz(event.target.value)} inputMode="decimal" /></label>
           </div>
@@ -434,7 +475,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
               <div><span>NORMALIZED EYE / BER</span><b>{summary.eye}</b></div>
               <div><span>EXTRACTED MODEL</span><b>{summary.model}</b></div>
             </div>
-            <button className="secondary-btn" onClick={() => downloadJson("geometry-channel.experimental.json", { ...siResult, production_qualified: false, compliance_status: "not_evaluated" })}><Download size={15} /> Export experimental channel result</button>
+            <button className="secondary-btn" onClick={() => downloadJson(ownerDocument, "geometry-channel.experimental.json", { ...siResult, production_qualified: false, compliance_status: "not_evaluated" })}><Download size={15} /> Export experimental channel result</button>
             <div className="sparam-check warning"><AlertTriangle size={14} /><span>Piecewise planar routing length is included, but bend discontinuities, vias, launches, connectors, packages, skin/proximity/roughness and receiver nonlinearity require explicit models. NRZ and PAM4 BER values remain bounded numerical proxies, never protocol compliance evidence.</span></div>
             <SiChannelResultPanel result={siResult!} eyeMaskResult={Object.keys(eyeMaskResult).length ? eyeMaskResult : null} onStatus={onStatus} />
           </>}
@@ -444,7 +485,7 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     <div className="sparam-commandbar">
       <button className="primary-btn" onClick={() => input.current?.click()}><Upload size={15} /> Import Touchstone</button>
       <input ref={input} className="hidden-input" type="file" accept=".s1p,.s2p,.s3p,.s4p,.s5p,.s6p,.s8p,.s12p,.s16p,.s32p" onChange={event => void load(event.target.files?.[0])} />
-      <button className="secondary-btn" disabled={!data} onClick={() => data && downloadJson(data.name, { contract: "spike/touchstone-preview/v1", data, checks })}><Download size={15} /> Export normalized JSON</button>
+      <button className="secondary-btn" disabled={!data} onClick={() => data && downloadJson(ownerDocument, data.name, { contract: "spike/touchstone-preview/v1", data, checks })}><Download size={15} /> Export normalized JSON</button>
       {data && <span>{data.name}</span>}
     </div>
     {error && <div className="sparam-error"><AlertTriangle size={16} /> {error}</div>}

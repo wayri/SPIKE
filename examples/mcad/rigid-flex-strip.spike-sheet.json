@@ -1,0 +1,209 @@
+{
+  "contract": "spike/sheet-folding/v1",
+  "id": "rigid-flex-strip-coupon",
+  "kind": "rigid_flex_pcb",
+  "sheet": {
+    "length_mm": 100,
+    "width_mm": 20,
+    "thickness_mm": 0.2,
+    "material": {
+      "schema_version": 1,
+      "material_id": "generic-polyimide",
+      "revision": "1",
+      "digest": "7b99518593d9762b490fabca2767fb892d4ede293fc771757fe6f44b6778ff33",
+      "record": {
+        "schema_version": 1,
+        "id": "generic-polyimide",
+        "revision": "1",
+        "name": "Polyimide (generic)",
+        "family": "polymer",
+        "description": "Generic screening material; no grade, procurement or solver qualification. ",
+        "tags": [
+          "mcad",
+          "screening"
+        ],
+        "properties": {
+          "density": {
+            "unit": "kg/m^3",
+            "status": "estimate",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "temperature_k": [
+                293.15,
+                293.15
+              ],
+              "notes": "Illustrative room-temperature constant only; composition, processing, humidity and frequency not qualified. Replace with reviewed lot/grade data before engineering decisions."
+            },
+            "shape": "scalar",
+            "value": 1400
+          },
+          "specific_heat": {
+            "unit": "J/(kg*K)",
+            "status": "estimate",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "temperature_k": [
+                293.15,
+                293.15
+              ],
+              "notes": "Illustrative room-temperature constant only; composition, processing, humidity and frequency not qualified. Replace with reviewed lot/grade data before engineering decisions."
+            },
+            "shape": "scalar",
+            "value": 1100
+          },
+          "thermal_conductivity": {
+            "unit": "W/(m*K)",
+            "status": "estimate",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "temperature_k": [
+                293.15,
+                293.15
+              ],
+              "notes": "Illustrative room-temperature constant only; composition, processing, humidity and frequency not qualified. Replace with reviewed lot/grade data before engineering decisions."
+            },
+            "shape": "scalar",
+            "value": 0.2
+          },
+          "youngs_modulus": {
+            "unit": "Pa",
+            "status": "estimate",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "temperature_k": [
+                293.15,
+                293.15
+              ],
+              "notes": "Illustrative room-temperature constant only; composition, processing, humidity and frequency not qualified. Replace with reviewed lot/grade data before engineering decisions."
+            },
+            "shape": "scalar",
+            "value": 2500000000.0
+          },
+          "poissons_ratio": {
+            "unit": "1",
+            "status": "estimate",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "temperature_k": [
+                293.15,
+                293.15
+              ],
+              "notes": "Illustrative room-temperature constant only; composition, processing, humidity and frequency not qualified. Replace with reviewed lot/grade data before engineering decisions."
+            },
+            "shape": "scalar",
+            "value": 0.34
+          },
+          "thermal_expansion": {
+            "unit": "1/K",
+            "status": "estimate",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "temperature_k": [
+                293.15,
+                293.15
+              ],
+              "notes": "Illustrative room-temperature constant only; composition, processing, humidity and frequency not qualified. Replace with reviewed lot/grade data before engineering decisions."
+            },
+            "shape": "scalar",
+            "value": 3e-05
+          },
+          "electrical_conductivity": {
+            "unit": "S/m",
+            "status": "unavailable",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "notes": "Requires reviewed grade, direction, test method and temperature/frequency evidence."
+            },
+            "shape": "unavailable"
+          },
+          "relative_permittivity": {
+            "unit": "1",
+            "status": "unavailable",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "notes": "Requires reviewed grade, direction, test method and temperature/frequency evidence."
+            },
+            "shape": "unavailable"
+          },
+          "dielectric_loss_tangent": {
+            "unit": "1",
+            "status": "unavailable",
+            "provenance": {
+              "source": "SPIKE original illustrative screening assumptions; not measured or manufacturer data",
+              "reviewed": "2026-10-18; no external material-property qualification performed",
+              "license": "Apache-2.0 (original SPIKE catalog)"
+            },
+            "applicability": {
+              "notes": "Requires reviewed grade, direction, test method and temperature/frequency evidence."
+            },
+            "shape": "unavailable"
+          }
+        }
+      }
+    }
+  },
+  "bends": [
+    {
+      "id": "bend-1",
+      "start_x_mm": 30,
+      "angle_deg": 90,
+      "inside_radius_mm": 2,
+      "k_factor": 0.5,
+      "fixed_side": "negative_x",
+      "segments": 24
+    },
+    {
+      "id": "bend-2",
+      "start_x_mm": 65,
+      "angle_deg": -90,
+      "inside_radius_mm": 2,
+      "k_factor": 0.5,
+      "fixed_side": "negative_x",
+      "segments": 24
+    }
+  ],
+  "flex_regions": [
+    {
+      "id": "flex-1",
+      "start_x_mm": 25,
+      "end_x_mm": 40
+    },
+    {
+      "id": "flex-2",
+      "start_x_mm": 60,
+      "end_x_mm": 75
+    }
+  ]
+}

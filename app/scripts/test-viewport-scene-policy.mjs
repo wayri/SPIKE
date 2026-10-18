@@ -15,6 +15,8 @@ import {
   selectionPulseFactor,
   solverResultOverlayActive,
   substrateZBounds,
+  viewportAntialiasingEnabled,
+  viewportRendererRemountRestore,
   viewportRenderProfile,
   viewportRenderOrder,
   viewportSceneIdentity,
@@ -187,6 +189,13 @@ const standardProfile = viewportRenderProfile(500, 2);
 const largeProfile = viewportRenderProfile(20_000, 2);
 const ultraDenseProfile = viewportRenderProfile(500_000, 2);
 assert.equal(standardProfile.largeScene, false);
+assert.equal(standardProfile.fullPixelRatio, 2, "balanced view retains high-DPI edges");
+assert.ok(largeProfile.fullPixelRatio >= 1, "large settled scenes never render below CSS resolution");
+assert.ok(largeProfile.interactionPixelRatio >= 1, "balanced orbit retains CSS resolution");
+const qualityProfile = viewportRenderProfile(20_000, 1, "quality");
+assert.equal(qualityProfile.fullPixelRatio, 1.5, "quality supersamples ordinary displays");
+assert.equal(qualityProfile.interactionPixelRatio, qualityProfile.fullPixelRatio, "quality does not visibly degrade during orbit");
+assert.equal(viewportRenderProfile(500, NaN).fullPixelRatio, 1, "invalid device density recovers safely");
 assert.equal(largeProfile.largeScene, true);
 assert.ok(largeProfile.fullPixelRatio <= standardProfile.fullPixelRatio);
 assert.ok(largeProfile.interactionPixelRatio <= largeProfile.fullPixelRatio);
@@ -195,6 +204,37 @@ assert.equal(largeProfile.dynamicShadowUpdates, false);
 assert.equal(standardProfile.targetFps, 60);
 assert.equal(largeProfile.targetFps, 45);
 assert.equal(ultraDenseProfile.targetFps, 30);
+assert.equal(viewportAntialiasingEnabled(undefined), true, "existing workspaces retain antialiasing by default");
+assert.equal(viewportAntialiasingEnabled(true), true, "enabled antialiasing reaches renderer setup");
+assert.equal(viewportAntialiasingEnabled(false), false, "disabled antialiasing reaches renderer setup");
+const savedThreeD = { contract:"spike/viewport-camera/v1", position:[1,2,3], target:[4,5,6], up:[0,0,1] };
+const liveThreeD = { contract:"spike/viewport-camera/v1", position:[7,8,9], target:[1,1,1], up:[0,0,1] };
+const savedTwoD = { contract:"spike/layout-view/v1", x:1, y:2, width:30, height:20 };
+const liveTwoD = { contract:"spike/layout-view/v1", x:5, y:6, width:12, height:8 };
+const savedRestore = { token:99, threeD:savedThreeD, twoD:savedTwoD };
+assert.deepEqual(viewportRendererRemountRestore(-1,{threeD:liveThreeD,twoD:liveTwoD},savedRestore),
+  {token:-1,threeD:liveThreeD,twoD:liveTwoD},"renderer remount keeps the latest live 3D and 2D views");
+assert.deepEqual(viewportRendererRemountRestore(-2,{threeD:liveThreeD},savedRestore),
+  {token:-2,threeD:liveThreeD,twoD:savedTwoD},"a missing live view falls back to the authoritative restore");
+assert.equal(viewportRendererRemountRestore(-1,{},null),null,"an empty remount does not invent a view");
+const boardViewportSource = readFileSync(new URL("../src/BoardViewport.tsx", import.meta.url), "utf8");
+assert.match(boardViewportSource, /antialias: antialiasing/,
+  "WebGL context creation must use the resolved antialiasing preference");
+assert.match(boardViewportSource, /key={`webgl-antialias-\${antialiasing}`}/,
+  "changing a context-only preference must remount the complete scene lifecycle");
+assert.match(boardViewportSource, /viewportRestore={retainedRestoreRef\.current}[\s\S]*onCamera={recordCamera} onLayoutView={recordLayoutView}/,
+  "the remounted scene receives the retained live camera and layout callbacks");
+assert.ok(boardViewportSource.indexOf("props.viewportRestore?.token !== explicitRestoreTokenRef.current")
+    < boardViewportSource.indexOf("antialiasing !== previousAntialiasingRef.current"),
+  "an explicit project restore remains authoritative when it coincides with an antialias change");
+assert.ok(boardViewportSource.indexOf("props.board !== restoreBoardRef.current")
+    < boardViewportSource.indexOf("antialiasing !== previousAntialiasingRef.current"),
+  "a board change clears the prior live view before an antialias remount snapshot is resolved");
+assert.match(boardViewportSource, /dataset\.antialiasingRequested = String\(antialiasing\)[\s\S]*getContextAttributes\(\)\?\.antialias/,
+  "diagnostics distinguish the requested setting from actual WebGL context support");
+const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+assert.match(appSource, /antialiasing={appSettings\.antialiasing}/,
+  "the persisted application preference must reach BoardViewport");
 
 const renderDirectory = mkdtempSync(join(process.cwd(), ".tmp-layout-render-"));
 try {

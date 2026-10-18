@@ -1,11 +1,11 @@
-.workflow-schematic { margin: 12px 0; border: 1px solid #47636f; background: #14252d; color: #cadce1; font-size: 12px; }
+.workflow-schematic { margin: 12px 0; border: 1px solid var(--spike-border-default); background: var(--spike-surface-panel); color: var(--spike-text); font-size: 12px; }
 .workflow-schematic > summary { padding: 12px; cursor: pointer; font-weight: 600; }
-.workflow-schematic > summary > span { display: block; margin: 5px 0 0 15px; font-size: 10px; color: #94b0ba; font-weight: normal; }
+.workflow-schematic > summary > span { display: block; margin: 5px 0 0 15px; font-size: 10px; color: var(--spike-text-muted); font-weight: normal; }
 .workflow-schematic-controls { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; gap: 8px; }
-.workflow-schematic-controls button { color: #d4ece5; background: #26473f; border: 1px solid #64877d; padding: 6px 10px; cursor: pointer; }
+.workflow-schematic-controls button { color: var(--spike-accent-text); background: var(--spike-table-choice-bg); border: 1px solid var(--spike-table-choice-border); padding: 6px 10px; cursor: pointer; }
 .workflow-schematic-sheet { overflow: auto; max-height: 290px; background: #f6f5ed; background-image: radial-gradient(#c9d1c6 .8px, transparent .8px); background-size: 20px 20px; }
 .workflow-schematic.expanded .workflow-schematic-sheet { max-height: 65vh; }
-.workflow-schematic.expanded { position: fixed; inset: 35px; z-index: 90; overflow: auto; margin: 0; padding: 10px; box-shadow: 0 20px 80px #000b; }
+.workflow-schematic.expanded { position: fixed; inset: 35px; z-index: 90; overflow: auto; margin: 0; padding: 10px; box-shadow: var(--spike-popup-shadow); }
 .workflow-schematic.expanded .workflow-schematic-sheet { min-height: 45vh; }
 .workflow-schematic.expanded .workflow-schematic-sheet svg { width: 100%; height: auto; }
 .workflow-schematic-sheet svg { display: block; }

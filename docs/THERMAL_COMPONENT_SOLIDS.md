@@ -220,3 +220,22 @@ software tests, not arbitrary CAD robustness or production qualification.
 
 See [the working-tree comparison and proposed shared benchmark](QUICKTHERM_PACKAGE_COMPARISON.md)
 for board-grid versus package-volume coverage and external validation limits.
+
+## Reproducible parity admission check
+
+WF01-S04C2 verifies the retained STEP/material admission path with original
+synthetic fixtures. From the repository root, use the admitted local CPython
+3.11 environment:
+
+```powershell
+.venv-emerge3/Scripts/python.exe scripts/parity_component_admission_gate.py --output build/component-admission.json --log build/component-admission.log
+```
+
+Both output paths must be new and inside the repository. The runner retains
+current source/schema hashes, exact test identities and an execution log. A
+skipped native test, error, failure or changed source prevents a passed gate.
+The roadmap checker revalidates the stored [stage receipt](validation/parity/WF01-S04C2.json).
+Checks cover native closed STEP meshing, volume and SI placement, material
+conductivity/provenance transfer, repeated occurrences, saved-project retention
+and stale-source rejection. Supplied synthetic material values do not establish
+conditioned package material laws or thermal prediction accuracy.

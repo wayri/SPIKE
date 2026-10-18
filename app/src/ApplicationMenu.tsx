@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon } from "./icons";
 import "./ApplicationMenu.css";
 
 type Icon = LucideIcon;
@@ -124,7 +124,7 @@ export function MenuSubmenu({ label, icon: Icon, children }: { label: string; ic
   const identity = useId(), triggerId = `${identity}-trigger`, menuId = `${identity}-menu`;
   useLayoutEffect(() => { if (open && flyout.current) fitFlyout(flyout.current, true); }, [open]);
   return <div className="application-submenu" onPointerEnter={() => setOpen(true)} onPointerLeave={() => setOpen(false)}>
-    <button id={triggerId} type="button" role="menuitem" tabIndex={-1} className="menu-item" aria-haspopup="menu" aria-controls={menuId} aria-expanded={open} onClick={() => setOpen(value => !value)} onKeyDown={event => { if (event.key !== "Enter" && event.key !== " ") return; event.preventDefault(); const trigger = event.currentTarget; if (!open) setOpen(true); requestAnimationFrame(() => { const popup = trigger.parentElement?.querySelector<HTMLElement>(':scope > [role="menu"]'); if (popup) focusAt(directItems(popup), 0); }); }}>{Icon && <Icon size={14} aria-hidden={true}/>}<span>{label}</span><small aria-hidden="true">›</small></button>
+    <button id={triggerId} type="button" role="menuitem" tabIndex={-1} className="menu-item" aria-haspopup="menu" aria-controls={menuId} aria-expanded={open} onClick={event => setOpen(value => event.detail === 0 ? !value : true)} onKeyDown={event => { if (event.key !== "Enter" && event.key !== " ") return; event.preventDefault(); const trigger = event.currentTarget; if (!open) setOpen(true); requestAnimationFrame(() => { const popup = trigger.parentElement?.querySelector<HTMLElement>(':scope > [role="menu"]'); if (popup) focusAt(directItems(popup), 0); }); }}>{Icon && <Icon size={14} aria-hidden={true}/>}<span>{label}</span><small aria-hidden="true">›</small></button>
     {open && <div id={menuId} aria-labelledby={triggerId} ref={flyout} className="menu-dropdown application-menu-popup application-submenu-popup" role="menu">{children}</div>}
   </div>;
 }

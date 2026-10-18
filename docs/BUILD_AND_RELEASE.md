@@ -15,7 +15,7 @@ their SHA-256 files appear under that run's artifacts and are retained for
 From the command line:
 
 ```sh
-gh workflow run release.yml --repo wayri/SPIKE-Main --ref main
+gh workflow run release.yml --repo wayri/SPIKE --ref main
 ```
 
 ## Publish a new version
@@ -72,3 +72,20 @@ These scripts install build dependencies and prepare resources in a disposable
 checkout. Use a clean checkout; resource staging updates its Tauri configuration.
 See [platform installation and CLI commands](PLATFORM_PACKAGES.md) for running
 the finished packages.
+
+
+## Stabilizing the Gamma candidate
+
+The public `v0.3.11-gamma.1` installers and the current development checkout
+are different source/artifact identities. The original Gamma installers have a
+known missing-frontend packaging defect. Local repairs do not replace those
+published downloads. Do not relabel that artifact as stable or long-term ready.
+A stable candidate requires a frozen source identity, its own version and
+checksums, complete regression results, required numerical/dependency reviews,
+and actual supported-platform install/offline/upgrade/uninstall acceptance.
+See [Windows acceptance](WINDOWS_INSTALLER.md#embedded-frontend-acceptance).
+
+Windows CI now explicitly builds with `custom-protocol` and requires the fixed
+inert native panel qualification to finish, with the development server absent.
+Process survival alone is not frontend readiness. This check does not run the
+normal workspace, a solver, or a clean-machine installer acceptance campaign.

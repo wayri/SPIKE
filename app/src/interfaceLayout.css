@@ -1,0 +1,20 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Both layouts share mounted editors and the same responsive tool deck. */
+.interface-mode-control{display:flex;align-items:center;gap:4px;min-width:0;color:var(--spike-table-muted)}
+.interface-mode-control select{font:var(--spike-control-font);width:80px;min-width:0;max-width:90px;min-height:26px;padding:3px 5px}
+.app-shell.focus-shell.ribbon-visible{grid-template-rows:40px auto minmax(0,1fr) 28px!important}
+.app-shell.focus-shell.ribbon-visible>.ribbon-tools{display:flex;min-width:0;max-height:112px;overflow:hidden;align-items:stretch}
+.app-shell.focus-shell.interface-classic{grid-template-rows:40px 28px 32px minmax(0,1fr) 28px!important}
+.app-shell.focus-shell.interface-classic.ribbon-visible{grid-template-rows:40px 28px 32px auto minmax(0,1fr) 28px!important}
+.app-shell.focus-shell.interface-classic>.application-menu-bar{display:flex;min-width:0;height:28px;gap:2px;padding-inline:8px;border-bottom:1px solid var(--spike-table-border);background:var(--spike-table-toolbar)}
+.classic-workspace-tabs{display:flex;min-width:0;gap:3px;overflow-x:auto;align-items:center;padding:2px 6px;background:var(--spike-table-surface);border-bottom:1px solid var(--spike-table-border)}
+.classic-workspace-tabs button{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;min-height:26px;padding:3px 8px;font:var(--spike-control-font);white-space:nowrap}
+.classic-workspace-tabs button[aria-pressed="true"]{background:var(--spike-table-choice-bg);border-color:var(--spike-table-choice-border);color:var(--spike-table-text-strong)}
+.app-shell.focus-shell.interface-classic .workspace-taskbar{display:flex;flex:0 1 auto;max-width:45vw;overflow:auto;gap:3px;align-items:center}
+@media(max-width:1080px){.interface-mode-control>svg{display:none}.interface-mode-control select{width:70px}.classic-workspace-tabs button{padding-inline:6px}}
+
+.viewport-selection-filter { display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;min-width:0; }
+.viewport-selection-filter select { width:96px;min-width:0;height:26px;padding:3px 5px;font:var(--spike-control-font); }
+
+.app-shell.focus-shell .workspace.focus-workspace { position:relative; }
+.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"] { grid-area:1 / 1 / 2 / -1; }

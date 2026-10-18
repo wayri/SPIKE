@@ -13,7 +13,7 @@ function visit(node) {
   ts.forEachChild(node, visit);
 }
 visit(ast); assert.ok(body, 'the production wheel effect is exercised');
-const js = ts.transpileModule(`export function mount(deps) { const {host,plotlyRef,controls,zoom,update,setNotice,ResizeObserver,Element,requestAnimationFrame,cancelAnimationFrame,plotWheelTarget,plotZoomChanges,plotPanChanges,wheelPlotFactor}=deps; ${body.slice(1,-1)} }`, { compilerOptions: options }).outputText;
+const js = ts.transpileModule(`export function mount(deps) { const {host,plotlyRef,controls,zoom,update,setNotice,ownerWindow,plotWheelTarget,plotZoomChanges,plotPanChanges,wheelPlotFactor}=deps; ${body.slice(1,-1)} }`, { compilerOptions: options }).outputText;
 const { mount } = await import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
 class Element {
   constructor(cls = '') { this.cls=cls; this.parentElement=null; this.classList={contains: cls2 => cls===cls2}; }
@@ -26,9 +26,9 @@ graph._fullLayout={xaxis:xa,yaxis:ya,_plots:{xy:{xaxis:xa,yaxis:ya}}};
 graph.getBoundingClientRect=()=>({left:10,top:20});
 graph.addEventListener=(type,fn,opts)=>{ assert.equal(opts.capture,true); assert.equal(opts.passive,false); listeners.set(type,fn); };
 graph.removeEventListener=(type,fn,capture)=>{assert.equal(listeners.get(type),fn);assert.equal(capture,true);listeners.delete(type);};
-const controls={current:{wheelZoom:true,wheelTarget:'auto',data:[{type:'scatter'}]}}, cleanup=mount({ ...helpers,host:{current:graph},plotlyRef:{current:{Plots:{resize(){}}}},controls,
-  zoom:(factor,target)=>calls.push(helpers.plotZoomChanges(graph._fullLayout,factor,target)),update:changes=>calls.push(changes),setNotice:message=>{throw Error(message);},
-  ResizeObserver:class{observe(){} disconnect(){}},Element,requestAnimationFrame:fn=>{frames.push(fn);return frames.length;},cancelAnimationFrame(){} });
+const ownerWindow={ResizeObserver:class{observe(){} disconnect(){}},Element,requestAnimationFrame:fn=>{frames.push(fn);return frames.length;},cancelAnimationFrame(){}};
+const controls={current:{wheelZoom:true,wheelTarget:'auto',data:[{type:'scatter'}]}}, cleanup=mount({ ...helpers,host:{current:graph},plotlyRef:{current:{Plots:{resize(){}}}},controls,ownerWindow,
+  zoom:(factor,target)=>calls.push(helpers.plotZoomChanges(graph._fullLayout,factor,target)),update:changes=>calls.push(changes),setNotice:message=>{throw Error(message);} });
 const fire=(x,y,target=graph,extra={})=>{let prevented=false,stopped=false;listeners.get('wheel')({clientX:x+10,clientY:y+20,deltaY:-120,deltaX:0,deltaMode:0,target,preventDefault(){prevented=true;},stopPropagation(){stopped=true;},...extra});return {prevented,stopped};};
 const flush=()=>{while(frames.length)frames.shift()();};
 assert.deepEqual(fire(260,130),{prevented:true,stopped:true});flush();assert.ok(calls[0]['xaxis.range']);assert.ok(calls[0]['yaxis.range'],'plain wheel zooms by default');

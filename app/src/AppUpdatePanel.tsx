@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Download, RefreshCw, ShieldCheck, Minus, X } from "./icons";
 import { appUpdateCheck, appUpdateStatus, appUpdateDownload, appUpdateCancel, appUpdateInstall, isDesktopShell } from "./workerBridge";
 import { admittedAppUpdate, idleAppUpdate, canInstallAppUpdate, updateDownloadPercent, updateBytes, type AppUpdateSnapshot } from "./appUpdateModel";
+import { usePanelPresentation } from "./panelPresentation";
 import "./buttonStandard.css";
 import "./AppUpdatePanel.css";
 type Preferences = { checkAtStartup: boolean; autoDownload: boolean };
@@ -14,6 +15,7 @@ export default function AppUpdatePanel({ visible, onHide, blockers, canCloseProj
   visible: boolean; onHide: () => void; blockers: readonly string[]; canCloseProject: boolean; canSaveProject: boolean;
   onSave: () => Promise<unknown>; onCloseProject: () => void; onStatus: (message: string) => void;
 }) {
+  const { ownerDocument } = usePanelPresentation();
   const [state,setState]=useState<AppUpdateSnapshot>(idleAppUpdate);
   const [pending,setPending]=useState(false),[acknowledged,setAcknowledged]=useState(false),[unattended,setUnattended]=useState(false);
   const [preferences,setPreferences]=useState(loadPreferences);
@@ -51,10 +53,10 @@ export default function AppUpdatePanel({ visible, onHide, blockers, canCloseProj
   useEffect(()=>{setAcknowledged(false);},[blockers.join("|"),state.latest_version]);
   useEffect(()=>{
     if(!visible)return;
-    const previous=document.activeElement;
+    const previous=ownerDocument?.activeElement as HTMLElement | null;
     panel.current?.querySelector<HTMLElement>("button:not(:disabled)")?.focus();
-    return()=>{if(previous instanceof HTMLElement&&previous.isConnected)previous.focus();};
-  },[visible]);
+    return()=>{if(previous?.isConnected)previous.focus();};
+  },[visible,ownerDocument]);
   const cancel=async()=>{
     if(cancelPending)return;setCancelPending(true);
     try{await appUpdateCancel();publish(await appUpdateStatus());}catch(error){fail(error);}finally{if(mounted.current)setCancelPending(false);}
@@ -75,8 +77,8 @@ export default function AppUpdatePanel({ visible, onHide, blockers, canCloseProj
       if(event.key==="Escape"){event.preventDefault();if(state.status!=="installing")onHide();}
       if(event.key==="Tab"){
         const entries=[...(panel.current?.querySelectorAll<HTMLElement>("button:not(:disabled),input:not(:disabled),summary,a[href]") ?? [])],first=entries[0],last=entries[entries.length-1];
-        if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
-        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+        if(event.shiftKey&&ownerDocument?.activeElement===first){event.preventDefault();last?.focus();}
+        else if(!event.shiftKey&&ownerDocument?.activeElement===last){event.preventDefault();first?.focus();}
       }
     }}>
     <section className="app-update-panel" ref={panel}>

@@ -9,7 +9,10 @@ const palettes = new Map();
 paletteSheet.walkRules(rule => {
   for (const name of ["professional-dark", "light", "high-contrast"]) {
     if (!rule.selector.includes(`[data-table-theme="${name}"]`)) continue;
-    palettes.set(name, Object.fromEntries(rule.nodes.filter(node => node.type === "decl").map(node => [node.prop, node.value])));
+    palettes.set(name, {
+      ...(palettes.get(name) ?? {}),
+      ...Object.fromEntries(rule.nodes.filter(node => node.type === "decl").map(node => [node.prop, node.value])),
+    });
   }
 });
 const rgb = hex => {

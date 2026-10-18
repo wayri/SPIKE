@@ -8,7 +8,7 @@
     "tests/python",
     "benchmarks"
   ],
-  "files_scanned": 869,
+  "files_scanned": 1694,
   "scope": "Recorded links and DOIs only; not proof of reading, adoption, accuracy or license permission. Includes non-paper links.",
   "excluded": [
     "private repositories",
@@ -19,11 +19,28 @@
   ],
   "references": [
     {
+      "url": "http://127.0.0.1",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 103
+        }
+      ]
+    },
+    {
       "url": "http://127.0.0.1:11434",
       "occurrences": [
         {
+          "file": "docs/INTEGRATED_ASSISTANT.md",
+          "line": 29
+        },
+        {
           "file": "docs/LOCAL_LLM_MCP.md",
-          "line": 41
+          "line": 120
+        },
+        {
+          "file": "python/spike_core/assistant_provider.py",
+          "line": 20
         },
         {
           "file": "python/spike_core/local_llm.py",
@@ -35,8 +52,16 @@
       "url": "http://127.0.0.1:1234",
       "occurrences": [
         {
+          "file": "docs/INTEGRATED_ASSISTANT.md",
+          "line": 28
+        },
+        {
           "file": "docs/LOCAL_LLM_MCP.md",
-          "line": 41
+          "line": 120
+        },
+        {
+          "file": "python/spike_core/assistant_provider.py",
+          "line": 20
         },
         {
           "file": "python/spike_core/local_llm.py",
@@ -54,6 +79,24 @@
       ]
     },
     {
+      "url": "http://127.0.0.1:80/evil",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "url": "http://127.0.0.1:80?secret=x",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 103
+        }
+      ]
+    },
+    {
       "url": "http://127.0.0.1:{cls.http.server_address",
       "occurrences": [
         {
@@ -63,11 +106,148 @@
       ]
     },
     {
+      "url": "http://127.0.0.1:{self.server.server_port}",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "url": "http://evil",
+      "occurrences": [
+        {
+          "file": "tests/python/test_emerge_runtime_updates.py",
+          "line": 274
+        }
+      ]
+    },
+    {
+      "url": "http://example.org:80",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "url": "http://github.com/wayri/spike/releases/download/x/a.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "http://invalid:9999",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "url": "http://localhost:1234",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "url": "http://tauri.localhost/",
+      "occurrences": [
+        {
+          "file": "docs/validation/MULTIBOARD_WORKSPACE_20261003.md",
+          "line": 27
+        }
+      ]
+    },
+    {
       "url": "http://timestamp.digicert.com",
       "occurrences": [
         {
           "file": "tests/python/test_windows_signing_contract.py",
           "line": 52
+        }
+      ]
+    },
+    {
+      "url": "http://user:key@127.0.0.1:80",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "url": "http://www.w3.org/2000/svg",
+      "occurrences": [
+        {
+          "file": "python/spike_core/connectivity_view_importer.py",
+          "line": 197
+        },
+        {
+          "file": "python/spikes/qualification_artifacts.py",
+          "line": 35
+        },
+        {
+          "file": "tests/python/test_kicad_schematic_viewer.py",
+          "line": 42
+        },
+        {
+          "file": "tests/python/test_kicad_schematic_viewer.py",
+          "line": 93
+        },
+        {
+          "file": "tests/python/test_kicad_schematic_viewer.py",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "url": "https://127.0.0.1:80",
+      "occurrences": [
+        {
+          "file": "tests/python/test_assistant_provider.py",
+          "line": 103
+        }
+      ]
+    },
+    {
+      "url": "https://ansys.synopsys.com/products/electronics/ansys-icepak",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "url": "https://api.chrono.projectchrono.org/tutorial_demo_gears.html",
+      "occurrences": [
+        {
+          "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+          "line": 139
+        }
+      ]
+    },
+    {
+      "url": "https://api.github.com/repos/wayri/spike/releases/latest",
+      "occurrences": [
+        {
+          "file": "docs/APP_UPDATE_BACKEND.md",
+          "line": 4
+        },
+        {
+          "file": "python/spike_core/app_updates.py",
+          "line": 15
         }
       ]
     },
@@ -153,11 +333,51 @@
       ]
     },
     {
+      "url": "https://arxiv.org/abs/1602.06434",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 20
+        }
+      ]
+    },
+    {
       "url": "https://arxiv.org/abs/1702.01771",
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 209
+          "line": 213
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1910.02046",
+      "occurrences": [
+        {
+          "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
+          "line": 107
+        },
+        {
+          "file": "docs/validation/MOM_REFERENCE_OPERATORS_20260930.md",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/1911.09220",
+      "occurrences": [
+        {
+          "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2104.01590",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_BATTERY_MODEL.md",
+          "line": 162
         }
       ]
     },
@@ -171,11 +391,162 @@
       ]
     },
     {
+      "url": "https://arxiv.org/abs/2210.12253",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2402.05193",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2407.04516v3",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_MESH_ENGINE.md",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2407.20026",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2507.18339",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 17
+        }
+      ]
+    },
+    {
       "url": "https://arxiv.org/abs/2507.18491",
       "occurrences": [
         {
           "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
-          "line": 93
+          "line": 117
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2507.20707",
+      "occurrences": [
+        {
+          "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
+          "line": 108
+        },
+        {
+          "file": "docs/validation/MOM_REFERENCE_OPERATORS_20260930.md",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2508.20223",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2603.15635",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "url": "https://assets.nexperia.com/documents/data-sheet/74HC_HCT125.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "url": "https://assets.nexperia.com/documents/data-sheet/74HC_HCT126.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "url": "https://assets.nexperia.com/documents/data-sheet/74HC_HCT151.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 73
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "url": "https://assets.nexperia.com/documents/data-sheet/74HC_HCT164.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 107
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 357
+        }
+      ]
+    },
+    {
+      "url": "https://assets.nexperia.com/documents/data-sheet/74HC_HCT{code}.pdf",
+      "occurrences": [
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 150
+        }
+      ]
+    },
+    {
+      "url": "https://assets.nexperia.com/documents/selection-guide/Nexperia_Selection_Guide_2025.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "url": "https://assets.wolfspeed.com/uploads/2022/04/wolfspeed_power_line_card.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 113
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 367
         }
       ]
     },
@@ -184,11 +555,42 @@
       "occurrences": [
         {
           "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
-          "line": 91
+          "line": 115
         },
         {
           "file": "python/spike_core/mom_surface_basis.py",
           "line": 11
+        }
+      ]
+    },
+    {
+      "url": "https://blogs.sw.siemens.com/electronic-systems-design/2026/03/12/hyperlynx-a-parallel-reality/",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 34
+        },
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "url": "https://circuits.mit.edu/_static/S24/handouts/lec14a/lec26.pdf",
+      "occurrences": [
+        {
+          "file": "docs/MULTIBOARD_EM.md",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "url": "https://community.infineon.com/t5/Knowledge-Base-Articles/Estimating-SiC-MOSFET-switching-losses-in-applications/ta-p/709113",
+      "occurrences": [
+        {
+          "file": "docs/ASSEMBLY_ELECTROTHERMAL.md",
+          "line": 321
         }
       ]
     },
@@ -233,7 +635,7 @@
       "occurrences": [
         {
           "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
-          "line": 713
+          "line": 717
         }
       ]
     },
@@ -247,11 +649,47 @@
       ]
     },
     {
+      "url": "https://developer.apple.com/documentation/apple-silicon/porting-your-macos-apps-to-apple-silicon",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "url": "https://developer.apple.com/opencl/",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 138
+        }
+      ]
+    },
+    {
+      "url": "https://developers.openai.com/api/docs/guides/function-calling",
+      "occurrences": [
+        {
+          "file": "docs/INTEGRATED_ASSISTANT.md",
+          "line": 109
+        }
+      ]
+    },
+    {
       "url": "https://digitalcommons.usu.edu/all_datasets/126/",
       "occurrences": [
         {
           "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
           "line": 46
+        }
+      ]
+    },
+    {
+      "url": "https://discord.com/channels/1560191329269719081/1560191331249160235",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 13
         }
       ]
     },
@@ -278,6 +716,19 @@
         {
           "file": "src/peec/sparse_magnetic_energy.hpp",
           "line": 71
+        }
+      ]
+    },
+    {
+      "url": "https://dlmf.nist.gov/10.25",
+      "occurrences": [
+        {
+          "file": "docs/HARNESS_ENGINEERING.md",
+          "line": 257
+        },
+        {
+          "file": "python/spike_core/harness_rlgc_geometry.py",
+          "line": 15
         }
       ]
     },
@@ -312,7 +763,7 @@
       "occurrences": [
         {
           "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
-          "line": 721
+          "line": 725
         }
       ]
     },
@@ -330,11 +781,65 @@
       ]
     },
     {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.heat/heat_ug_theory.07.054.html",
+      "occurrences": [
+        {
+          "file": "docs/MULTIBOARD_RADIATION.md",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.models.mph.heat_radiation_1d/heat_radiation_1d.html",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 87
+        }
+      ]
+    },
+    {
       "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.models.particle.inertial_focusing/inertial_focusing.html",
       "occurrences": [
         {
           "file": "docs/BOUNDED_CHT_AND_RADIATION.md",
           "line": 36
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.rf/rf_introduction.02.02.html",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 256
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.rf/rf_ug_radio_frequency.07.091.html",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 254
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.sme/sme_ug_theory.06.043.html",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "url": "https://doc.modelica.org/om/Modelica.Fluid.UsersGuide.ComponentDefinition.BalanceEquations.html",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 80
         }
       ]
     },
@@ -402,6 +907,33 @@
       ]
     },
     {
+      "url": "https://docs.arduino.cc/static/",
+      "occurrences": [
+        {
+          "file": "tests/python/test_arduino_shield_acceptance.py",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://docs.arduino.cc/static/ae97aad5c05de6a565c7f93a28c04717/ABX00080-cad-files.zip",
+      "occurrences": [
+        {
+          "file": "docs/validation/ARDUINO_RPI_MULTIBOARD_ACCEPTANCE_20261002.md",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "url": "https://docs.arduino.cc/static/c919f2fcead5d5e20cd8957999d0297f/A000110-cad-files.zip",
+      "occurrences": [
+        {
+          "file": "docs/validation/ARDUINO_RPI_MULTIBOARD_ACCEPTANCE_20261002.md",
+          "line": 24
+        }
+      ]
+    },
+    {
       "url": "https://docs.cupy.dev/en/stable/reference/generated/cupyx.scipy.sparse.linalg.spsolve.html",
       "occurrences": [
         {
@@ -411,11 +943,83 @@
       ]
     },
     {
+      "url": "https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/tools/qemu.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_FIRMWARE_EMULATION.md",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "url": "https://docs.flexcompute.com/rf/latest/autogenerated/flex_rf/tidy3d/hammerstadsurfaceroughness/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/conductor_ac_loss.py",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "url": "https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 441
+        }
+      ]
+    },
+    {
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 439
+        }
+      ]
+    },
+    {
+      "url": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 440
+        }
+      ]
+    },
+    {
       "url": "https://docs.kicad.org/8.0/en/pcbnew/pcbnew.pdf",
       "occurrences": [
         {
           "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
-          "line": 715
+          "line": 719
+        }
+      ]
+    },
+    {
+      "url": "https://docs.kicad.org/9.0/en/pcbnew/pcbnew.html#actions-reference",
+      "occurrences": [
+        {
+          "file": "docs/VIEWPORT_SHORTCUTS.md",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://docs.mfem.org/4.10/classmfem_1_1Device.html",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 136
+        }
+      ]
+    },
+    {
+      "url": "https://docs.ollama.com/api/chat",
+      "occurrences": [
+        {
+          "file": "docs/INTEGRATED_ASSISTANT.md",
+          "line": 112
         }
       ]
     },
@@ -424,7 +1028,7 @@
       "occurrences": [
         {
           "file": "docs/LOCAL_LLM_MCP.md",
-          "line": 32
+          "line": 111
         }
       ]
     },
@@ -458,11 +1062,29 @@
       ]
     },
     {
+      "url": "https://docs.openems.de/en/latest/concepts/dump.html",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
+          "line": 142
+        }
+      ]
+    },
+    {
       "url": "https://docs.openems.de/en/latest/concepts/mesh.html",
       "occurrences": [
         {
           "file": "docs/validation/OPENEMS_ACTUAL_GRID_20260928.md",
           "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/en/latest/concepts/ports.html",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
+          "line": 138
         }
       ]
     },
@@ -485,11 +1107,47 @@
       ]
     },
     {
+      "url": "https://docs.openems.de/en/latest/python/CSXCAD/CSPrimitives/CSPrimPolyhedron.html",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_ASSEMBLY_EM.md",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/en/latest/python/CSXCAD/CSProperties/CSPropDumpBox.html",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_ASSEMBLY_EM.md",
+          "line": 109
+        }
+      ]
+    },
+    {
       "url": "https://docs.openems.de/en/latest/python/manual_install.html#windows",
       "occurrences": [
         {
           "file": "docs/PI_SI_OPENEMS_TUTORIAL.md",
           "line": 190
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/en/latest/python/openEMS/ports.html",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_ASSEMBLY_EM.md",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "url": "https://docs.openems.de/en/latest/python/openEMS/utilities.html",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
+          "line": 140
         }
       ]
     },
@@ -525,6 +1183,64 @@
       ]
     },
     {
+      "url": "https://docs.px4.io/main/en/simulation/",
+      "occurrences": [
+        {
+          "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "url": "https://docs.python.org/3.11/library/ssl.html",
+      "occurrences": [
+        {
+          "file": "docs/PARALLEL_WORKER_MANAGER.md",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "url": "https://docs.scipy.org/doc/scipy-1.17.0/reference/generated/scipy.linalg.expm.html",
+      "occurrences": [
+        {
+          "file": "docs/CAPACITIVE_NETWORK_TRANSIENT.md",
+          "line": 141
+        },
+        {
+          "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
+          "line": 142
+        }
+      ]
+    },
+    {
+      "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.ive.html",
+      "occurrences": [
+        {
+          "file": "python/spike_core/harness_rlgc_geometry.py",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "url": "https://docs.scipy.org/doc/scipy/tutorial/signal.html#spectral-analysis",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ANALYSIS_PLOTS.md",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1002/fld.1650030305",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
+          "line": 214
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1007/s001900000116",
       "occurrences": [
         {
@@ -534,11 +1250,38 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1007/s10543-024-01040-x",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.cma.2024.116975",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 25
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1016/j.crma.2004.08.004",
       "occurrences": [
         {
           "file": "python/spike_core/peec_conforming_dc.py",
           "line": 12
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.electacta.2021.138909",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_BATTERY_MODEL.md",
+          "line": 163
         }
       ]
     },
@@ -561,6 +1304,19 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1109/TAP.1982.1142818",
+      "occurrences": [
+        {
+          "file": "docs/validation/MOM_REFERENCE_OPERATORS_20260930.md",
+          "line": 13
+        },
+        {
+          "file": "python/spike_core/mom_far_field.py",
+          "line": 26
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1109/TCPMT.2023.3284551",
       "occurrences": [
         {
@@ -574,7 +1330,46 @@
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 213
+          "line": 217
+        },
+        {
+          "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
+          "line": 143
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1137/0719090",
+      "occurrences": [
+        {
+          "file": "docs/validation/MOM_REFERENCE_OPERATORS_20260930.md",
+          "line": 15
+        },
+        {
+          "file": "python/spike_core/mom_singular_source.py",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1137/09074721X",
+      "occurrences": [
+        {
+          "file": "docs/CAPACITIVE_NETWORK_TRANSIENT.md",
+          "line": 141
+        },
+        {
+          "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
+          "line": 142
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1145/3386569.3392385",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_MESH_ENGINE.md",
+          "line": 138
         }
       ]
     },
@@ -588,6 +1383,15 @@
         {
           "file": "src/peec/volume_inductance.cpp",
           "line": 15
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1177/10943420231175462",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 24
         }
       ]
     },
@@ -645,11 +1449,74 @@
       ]
     },
     {
+      "url": "https://doi.org/10.6028/bulletin.185",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "url": "https://ecp.ep.liu.se/index.php/modelica/article/view/1356",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "url": "https://eda.sw.siemens.com/en-US/pcb/hyperlynx/3d-em/",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "url": "https://emtp.com/applications/all-applications",
+      "occurrences": [
+        {
+          "file": "docs/TRANSMISSION_RF_HVDC_SCOPE.md",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Microwave_and_RF_Design_II_-_Transmission_Lines_%28Steer%29/02%3A_Transmission_Lines/2.07%3A_Models_of_Transmission_Lines",
+      "occurrences": [
+        {
+          "file": "docs/AC_POWER_INTEGRITY_EFFECTS.md",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "url": "https://evil",
+      "occurrences": [
+        {
+          "file": "tests/python/test_emerge_runtime_updates.py",
+          "line": 240
+        }
+      ]
+    },
+    {
       "url": "https://evil.example",
       "occurrences": [
         {
           "file": "tests/python/test_windows_signing_contract.py",
           "line": 52
+        }
+      ]
+    },
+    {
+      "url": "https://example.com/a.schema.json",
+      "occurrences": [
+        {
+          "file": "tests/python/test_mcp_protocol.py",
+          "line": 162
         }
       ]
     },
@@ -703,11 +1570,87 @@
       ]
     },
     {
+      "url": "https://example.test/badge.svg",
+      "occurrences": [
+        {
+          "file": "tests/python/test_documentation_quality.py",
+          "line": 59
+        }
+      ]
+    },
+    {
       "url": "https://example.test/fixture",
       "occurrences": [
         {
           "file": "tests/python/test_board_corpus_benchmark.py",
-          "line": 16
+          "line": 25
+        }
+      ]
+    },
+    {
+      "url": "https://example.test/guide#missing-locally",
+      "occurrences": [
+        {
+          "file": "tests/python/test_documentation_quality.py",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "url": "https://feacluster.com/CalculiX/ccx_2.18/doc/ccx/node236.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 185
+        }
+      ]
+    },
+    {
+      "url": "https://feacluster.com/CalculiX/ccx_2.18/doc/ccx/node285.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 181
+        }
+      ]
+    },
+    {
+      "url": "https://feacluster.com/CalculiX/ccx_2.18/doc/ccx/node307.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 187
+        }
+      ]
+    },
+    {
+      "url": "https://flathub.org/repo/flathub.flatpakrepo",
+      "occurrences": [
+        {
+          "file": "docs/PLATFORM_PACKAGES.md",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://fmi-standard.org/docs/3.0.2/",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 14
+        },
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "url": "https://fmi-standard.org/fmi-ls-bus/1.0.0/",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 19
         }
       ]
     },
@@ -716,7 +1659,34 @@
       "occurrences": [
         {
           "file": "docs/MULTIBOARD_HARNESS_ASSEMBLIES.md",
-          "line": 167
+          "line": 381
+        }
+      ]
+    },
+    {
+      "url": "https://fscdn.rohm.com/en/products/databook/applinote/common/overview_of_rohms_simulation_models_ic_discreet_an-e.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "url": "https://ginkgo-project.github.io/ginkgo-generated-documentation/doc/master/group__Executor.html",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "url": "https://github.com.evil.test/wayri/spike/releases/download/x/a.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 38
         }
       ]
     },
@@ -725,7 +1695,7 @@
       "occurrences": [
         {
           "file": "docs/HARNESS_PI.md",
-          "line": 71
+          "line": 76
         },
         {
           "file": "docs/PI_SI_WORKED_CASEBOOK.md",
@@ -733,7 +1703,7 @@
         },
         {
           "file": "docs/SI_USER_GUIDE.md",
-          "line": 5
+          "line": 7
         }
       ]
     },
@@ -742,7 +1712,7 @@
       "occurrences": [
         {
           "file": "docs/THERMAL_USER_GUIDE.md",
-          "line": 146
+          "line": 148
         }
       ]
     },
@@ -751,11 +1721,11 @@
       "occurrences": [
         {
           "file": "docs/THERMAL_USER_GUIDE.md",
-          "line": 7
+          "line": 9
         },
         {
           "file": "docs/THERMAL_USER_GUIDE.md",
-          "line": 136
+          "line": 138
         }
       ]
     },
@@ -787,15 +1757,24 @@
       ]
     },
     {
+      "url": "https://github.com/FennisRobert/EMerge-hub",
+      "occurrences": [
+        {
+          "file": "docs/EMERGE_RUNTIME_UPDATES.md",
+          "line": 9
+        }
+      ]
+    },
+    {
       "url": "https://github.com/FreeCAD/FreeCAD-documentation/blob/main/wiki/TopoShape_API.md",
       "occurrences": [
         {
           "file": "docs/FREECAD_COLLABORATION.md",
-          "line": 110
+          "line": 134
         },
         {
           "file": "docs/MULTIBOARD_HARNESS_ASSEMBLIES.md",
-          "line": 166
+          "line": 380
         }
       ]
     },
@@ -804,7 +1783,7 @@
       "occurrences": [
         {
           "file": "docs/MCAD_EXPORT.md",
-          "line": 131
+          "line": 174
         }
       ]
     },
@@ -813,7 +1792,7 @@
       "occurrences": [
         {
           "file": "docs/FREECAD_COLLABORATION.md",
-          "line": 111
+          "line": 135
         }
       ]
     },
@@ -823,6 +1802,23 @@
         {
           "file": "docs/VISUALIZATION_ARCHITECTURE.md",
           "line": 16
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/IHP-GmbH/IHP-Open-PDK",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_OPEN_PDK_WORKFLOW.md",
+          "line": 9
+        },
+        {
+          "file": "python/spikes/pdk_inventory.py",
+          "line": 38
+        },
+        {
+          "file": "tests/python/test_spikes_pdk_inventory.py",
+          "line": 33
         }
       ]
     },
@@ -840,7 +1836,7 @@
       "occurrences": [
         {
           "file": "docs/SIGNAL_INTEGRITY_NETWORK_INTEGRATION.md",
-          "line": 62
+          "line": 67
         },
         {
           "file": "docs/SIGNAL_INTEGRITY_NETWORK_WORKBENCH.md",
@@ -862,7 +1858,34 @@
       "occurrences": [
         {
           "file": "docs/MCAD_EXPORT.md",
-          "line": 132
+          "line": 175
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/The-OpenROAD-Project/OpenROAD/blob/master/LICENSE",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ASIC_TWO_APPLICATION_FLOW.md",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/The-OpenROAD-Project/OpenSTA",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ASIC_TWO_APPLICATION_FLOW.md",
+          "line": 104
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/YosysHQ/yosys/blob/main/COPYING",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ASIC_TWO_APPLICATION_FLOW.md",
+          "line": 99
         }
       ]
     },
@@ -871,7 +1894,91 @@
       "occurrences": [
         {
           "file": "docs/HARNESS_PI.md",
-          "line": 78
+          "line": 83
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/buganini/Kikakuka#flexible-pcb-bending",
+      "occurrences": [
+        {
+          "file": "docs/KIKAKUKA_FLEX_FORMAT.md",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/buganini/Kikakuka/tree/3f8a1384d81427c189ab78bf00dc39221bdbb2bf",
+      "occurrences": [
+        {
+          "file": "docs/KIKAKUKA_FLEX_FORMAT.md",
+          "line": 6
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/buserror/simavr",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_FIRMWARE_EMULATION.md",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/example/spike/blob/v0.3.0/LICENSE",
+      "occurrences": [
+        {
+          "file": "tests/python/test_release_automation.py",
+          "line": 108
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/example/spike/blob/v0.3.0/docs/LLM_DEVELOPMENT.md",
+      "occurrences": [
+        {
+          "file": "tests/python/test_release_automation.py",
+          "line": 107
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/google/gf180mcu-pdk",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_OPEN_PDK_WORKFLOW.md",
+          "line": 8
+        },
+        {
+          "file": "python/spikes/pdk_inventory.py",
+          "line": 32
+        },
+        {
+          "file": "tests/python/test_spikes_pdk_inventory.py",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/google/skywater-pdk",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_OPEN_PDK_WORKFLOW.md",
+          "line": 7
+        },
+        {
+          "file": "python/spikes/pdk_inventory.py",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/hatlabs/SH-RPi-hardware",
+      "occurrences": [
+        {
+          "file": "docs/validation/ARDUINO_RPI_MULTIBOARD_ACCEPTANCE_20261002.md",
+          "line": 84
         }
       ]
     },
@@ -894,11 +2001,38 @@
       ]
     },
     {
+      "url": "https://github.com/other/repo/releases/download/x/a.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 40
+        }
+      ]
+    },
+    {
       "url": "https://github.com/rust-lang/crates.io-index",
       "occurrences": [
         {
           "file": "tests/python/test_windows_release_provenance.py",
           "line": 403
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/su2code/SU2/releases/download/v8.5.0/SU2-v8.5.0-win64-omp.zip",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/thliebig/openEMS",
+      "occurrences": [
+        {
+          "file": "docs/EXTERNAL_ENGINE_INTEROPERABILITY.md",
+          "line": 290
         }
       ]
     },
@@ -916,11 +2050,78 @@
       "occurrences": [
         {
           "file": "docs/CAPABILITY_TUTORIAL_ATLAS.md",
-          "line": 36
+          "line": 38
         },
         {
           "file": "docs/CAPABILITY_TUTORIAL_ATLAS.md",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/SPIKE-Main/issues",
+      "occurrences": [
+        {
+          "file": "docs/LLM_DEVELOPMENT.md",
           "line": 38
+        },
+        {
+          "file": "docs/releases/v0.3.2.md",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/SPIKE-Main/releases/tag/v0.3.0",
+      "occurrences": [
+        {
+          "file": "docs/ESP32_QUICKSTART.md",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/SPIKE-Main/releases/tag/v0.3.2",
+      "occurrences": [
+        {
+          "file": "docs/PLATFORM_PACKAGES.md",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/spike",
+      "occurrences": [
+        {
+          "file": "docs/APP_UPDATES.md",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/spike/releases/download/%2e%2e/a.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/spike/releases/download/v0.4.0/SPIKE_0.4.0_x64-setup.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/spike/releases/latest",
+      "occurrences": [
+        {
+          "file": "python/spike_core/app_updates.py",
+          "line": 90
         }
       ]
     },
@@ -929,7 +2130,46 @@
       "occurrences": [
         {
           "file": "docs/ANALYSIS_AND_MESH_ROADMAP.md",
-          "line": 88
+          "line": 104
+        },
+        {
+          "file": "docs/LARGE_STUDY_FEASIBILITY.md",
+          "line": 116
+        },
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 133
+        },
+        {
+          "file": "docs/validation/INTERNAL_MESHER_OPTIMIZATION_20261012.md",
+          "line": 168
+        }
+      ]
+    },
+    {
+      "url": "https://gmsh.info/doc/texinfo/gmsh.html#Specifying-mesh-element-sizes",
+      "occurrences": [
+        {
+          "file": "docs/PCB_FOCUSED_VOLUME_MESHING.md",
+          "line": 116
+        }
+      ]
+    },
+    {
+      "url": "https://helpfiles.keysight.com/csg/e5071c/measurement/fixture_simulator/evaluating_balanced_devices_balance_unbalance_conversion.htm",
+      "occurrences": [
+        {
+          "file": "docs/PI_SI_PARITY_EXECUTION.md",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "url": "https://host/emerge.whl",
+      "occurrences": [
+        {
+          "file": "tests/python/test_emerge_runtime_updates.py",
+          "line": 99
         }
       ]
     },
@@ -938,7 +2178,7 @@
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 221
+          "line": 225
         }
       ]
     },
@@ -961,11 +2201,20 @@
       ]
     },
     {
+      "url": "https://industrial.panasonic.com/ww/products/pt/high-precision-chip-resistors/models/ERA3VEB1002V",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 9
+        }
+      ]
+    },
+    {
       "url": "https://json-schema.org/draft/2020-12/schema",
       "occurrences": [
         {
           "file": "python/spike_core/public_release_readiness.py",
-          "line": 68
+          "line": 69
         },
         {
           "file": "tests/python/test_dc_fem_geometry_schema.py",
@@ -990,6 +2239,15 @@
       ]
     },
     {
+      "url": "https://klayout.org/downloads/master/doc-qt4/manual/lvs_io.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ASIC_TWO_APPLICATION_FLOW.md",
+          "line": 80
+        }
+      ]
+    },
+    {
       "url": "https://learn.microsoft.com/en-us/windows/win32/api/pdh/nf-pdh-pdhgetformattedcounterarrayw",
       "occurrences": [
         {
@@ -999,11 +2257,29 @@
       ]
     },
     {
+      "url": "https://libceed.org/en/latest/gettingstarted/",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 136
+        }
+      ]
+    },
+    {
+      "url": "https://live.ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/d3be4ea78b036a6362230fb41780cf54_MIT6_013S09_notes.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CAPACITIVE_NETWORK_TRANSIENT.md",
+          "line": 140
+        }
+      ]
+    },
+    {
       "url": "https://lmstudio.ai/docs/app/mcp",
       "occurrences": [
         {
           "file": "docs/LOCAL_LLM_MCP.md",
-          "line": 13
+          "line": 92
         }
       ]
     },
@@ -1011,8 +2287,30 @@
       "url": "https://lmstudio.ai/docs/developer/openai-compat/tools",
       "occurrences": [
         {
+          "file": "docs/INTEGRATED_ASSISTANT.md",
+          "line": 111
+        },
+        {
           "file": "docs/LOCAL_LLM_MCP.md",
-          "line": 32
+          "line": 111
+        }
+      ]
+    },
+    {
+      "url": "https://m-selig.web.engr.illinois.edu/props/propDB.html",
+      "occurrences": [
+        {
+          "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "url": "https://matplotlib.org/stable/users/explain/axes/axes_ticks.html",
+      "occurrences": [
+        {
+          "file": "docs/PLOT_INTERFACES.md",
+          "line": 100
         }
       ]
     },
@@ -1030,11 +2328,101 @@
       ]
     },
     {
+      "url": "https://mfem.org/features/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 45
+        }
+      ]
+    },
+    {
       "url": "https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle",
       "occurrences": [
         {
           "file": "docs/LOCAL_LLM_MCP.md",
-          "line": 3
+          "line": 17
+        }
+      ]
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic",
+      "occurrences": [
+        {
+          "file": "docs/MCP_PROTOCOL_UPGRADE.md",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio",
+      "occurrences": [
+        {
+          "file": "docs/MCP_PROTOCOL_UPGRADE.md",
+          "line": 81
+        }
+      ]
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/basic/versioning",
+      "occurrences": [
+        {
+          "file": "docs/MCP_PROTOCOL_UPGRADE.md",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/discover",
+      "occurrences": [
+        {
+          "file": "docs/MCP_PROTOCOL_UPGRADE.md",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/resources",
+      "occurrences": [
+        {
+          "file": "docs/MCP_PROTOCOL_UPGRADE.md",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "url": "https://modelcontextprotocol.io/specification/2026-07-28/server/tools",
+      "occurrences": [
+        {
+          "file": "docs/MCP_PROTOCOL_UPGRADE.md",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "url": "https://mooseframework.inl.gov/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 45
+        }
+      ]
+    },
+    {
+      "url": "https://mooseframework.inl.gov/moose/modules/heat_transfer/nafems_t3_verif.html",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "url": "https://nepp.nasa.gov/files/16408/08_163_4_JPL_Scheick.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SPICE_FAULT_RELIABILITY.md",
+          "line": 92
         }
       ]
     },
@@ -1048,11 +2436,86 @@
       ]
     },
     {
+      "url": "https://ngspice.sourceforge.io/docs.html",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "url": "https://ngspice.sourceforge.io/docs/ngspice-46-manual.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_SIN_PARITY_2026-10-12.md",
+          "line": 23
+        }
+      ]
+    },
+    {
+      "url": "https://ngspice.sourceforge.io/docs/ngspice-manual.pdf",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_SPICE_SIN_SOURCE.md",
+          "line": 20
+        },
+        {
+          "file": "docs/INTERNAL_SPICE_SOURCE_WAVEFORMS.md",
+          "line": 73
+        },
+        {
+          "file": "docs/INTERNAL_SPICE_TRANSIENT_CONTROLS.md",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "url": "https://ngspice.sourceforge.io/ngspice-electrothermal-tutorial.html",
+      "occurrences": [
+        {
+          "file": "docs/ASSEMBLY_ELECTROTHERMAL.md",
+          "line": 313
+        },
+        {
+          "file": "docs/ASSEMBLY_ELECTROTHERMAL.md",
+          "line": 320
+        }
+      ]
+    },
+    {
+      "url": "https://ngspice.sourceforge.io/osdi.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_EQUATION_DEVICES.md",
+          "line": 113
+        }
+      ]
+    },
+    {
+      "url": "https://nsis.sourceforge.io/Which_command_line_parameters_can_be_used_to_configure_installers",
+      "occurrences": [
+        {
+          "file": "docs/APP_UPDATE_BACKEND.md",
+          "line": 73
+        }
+      ]
+    },
+    {
       "url": "https://ntrs.nasa.gov/api/citations/19900004089/downloads/19900004089.pdf",
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 205
+          "line": 209
+        }
+      ]
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/20100042600/downloads/20100042600.pdf",
+      "occurrences": [
+        {
+          "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+          "line": 52
         }
       ]
     },
@@ -1066,11 +2529,47 @@
       ]
     },
     {
+      "url": "https://ntrs.nasa.gov/citations/19930058665",
+      "occurrences": [
+        {
+          "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "url": "https://numpy.org/doc/stable/reference/routines.fft.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ANALYSIS_PLOTS.md",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/035929616dc2553a2fee2aa787a96652_MIT18_03SCF11_s20_1text.pdf",
+      "occurrences": [
+        {
+          "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/2-25-advanced-fluid-mechanics-fall-2013/1a114d602956fa0dd328155f9b45f93d_MIT2_25F13_Couet_and_Pois.pdf",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_AIRFLOW.md",
+          "line": 112
+        }
+      ]
+    },
+    {
       "url": "https://odbplusplus.com/design/odb-design-format-specification/",
       "occurrences": [
         {
           "file": "docs/ODB_AND_HARNESS_EXTENSIONS.md",
-          "line": 70
+          "line": 88
         }
       ]
     },
@@ -1106,7 +2605,7 @@
       "occurrences": [
         {
           "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
-          "line": 719
+          "line": 723
         }
       ]
     },
@@ -1115,11 +2614,20 @@
       "occurrences": [
         {
           "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
-          "line": 724
+          "line": 728
         },
         {
           "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
           "line": 151
+        }
+      ]
+    },
+    {
+      "url": "https://petsc.org/release/overview/gpu_roadmap/",
+      "occurrences": [
+        {
+          "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+          "line": 121
         }
       ]
     },
@@ -1133,6 +2641,55 @@
       ]
     },
     {
+      "url": "https://physics.nist.gov/cuu/pdf/all.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/MOM_REFERENCE_OPERATORS_20260930.md",
+          "line": 19
+        },
+        {
+          "file": "python/spike_core/mom_far_field.py",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "url": "https://physics.nist.gov/cuu/pdf/all_2018.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_TCAD_EQUILIBRIUM.md",
+          "line": 52
+        }
+      ]
+    },
+    {
+      "url": "https://pip.pypa.io/en/stable/topics/configuration/",
+      "occurrences": [
+        {
+          "file": "docs/EMERGE_RUNTIME_UPDATES.md",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "url": "https://pip.raspberrypi.com/categories/1210-design-files",
+      "occurrences": [
+        {
+          "file": "docs/validation/ARDUINO_RPI_MULTIBOARD_ACCEPTANCE_20261002.md",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "url": "https://platform.claude.com/docs/en/api/python/messages/create",
+      "occurrences": [
+        {
+          "file": "docs/INTEGRATED_ASSISTANT.md",
+          "line": 110
+        }
+      ]
+    },
+    {
       "url": "https://plm.sw.siemens.com/en-US/simcenter/fluids-thermal-simulation/flotherm/",
       "occurrences": [
         {
@@ -1142,11 +2699,96 @@
       ]
     },
     {
+      "url": "https://plotly.com/javascript/configuration-options/",
+      "occurrences": [
+        {
+          "file": "docs/PLOT_INTERFACES.md",
+          "line": 97
+        }
+      ]
+    },
+    {
       "url": "https://plotly.com/javascript/plotlyjs-function-reference/",
       "occurrences": [
         {
+          "file": "docs/PLOT_INTERFACES.md",
+          "line": 99
+        },
+        {
           "file": "docs/TRACE_RESULT_GRAPHS.md",
           "line": 36
+        }
+      ]
+    },
+    {
+      "url": "https://plotly.com/javascript/reference/layout/xaxis/",
+      "occurrences": [
+        {
+          "file": "docs/PLOT_INTERFACES.md",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "url": "https://portal.hdfgroup.org/documentation/hdf5/latest/_s_w_m_r_t_n.html",
+      "occurrences": [
+        {
+          "file": "docs/LARGE_STUDY_FEASIBILITY.md",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "url": "https://precice.org/configuration-acceleration",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 101
+        }
+      ]
+    },
+    {
+      "url": "https://precice.org/configuration-mapping",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "url": "https://precice.org/couple-your-code-implicit-coupling",
+      "occurrences": [
+        {
+          "file": "docs/LARGE_STUDY_FEASIBILITY.md",
+          "line": 152
+        }
+      ]
+    },
+    {
+      "url": "https://proceedings.mlr.press/v235/mouli24a.html",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://product.samsungsem.com/mlcc/CL10B104KB8NNN.do",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "url": "https://productfinder.pulseelectronics.com/api/open/part-attachments/datasheet/PA4340.153ANLT",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 16
         }
       ]
     },
@@ -1160,15 +2802,37 @@
       ]
     },
     {
+      "url": "https://pypi.org/pypi/emerge/json",
+      "occurrences": [
+        {
+          "file": "python/spike_core/emerge_runtime_updates_io.py",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "url": "https://pypi.org/simple",
+      "occurrences": [
+        {
+          "file": "python/spike_core/emerge_runtime_updates.py",
+          "line": 144
+        },
+        {
+          "file": "tests/python/test_emerge_runtime_updates.py",
+          "line": 93
+        }
+      ]
+    },
+    {
       "url": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=35789",
       "occurrences": [
         {
           "file": "docs/EMI_WORKFLOW.md",
-          "line": 103
+          "line": 105
         },
         {
           "file": "docs/EMI_WORKFLOW.md",
-          "line": 104
+          "line": 106
         },
         {
           "file": "python/spike_core/emi.py",
@@ -1177,6 +2841,78 @@
         {
           "file": "python/spike_core/emi.py",
           "line": 46
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/DrTimothyAldenDavis/SuiteSparse/master/UMFPACK/Doc/UMFPACK_UserGuide.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 135
+        }
+      ]
+    },
+    {
+      "url": "https://release-assets.githubusercontent.com/github-production-release-asset/123/abc?token=1",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "url": "https://release-assets.githubusercontent.com/other/a.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "url": "https://renode.io/news/systemc-co-simulation-in-renode/",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/advanced/co-simulating-with-an-hdl-simulator.html",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/basic/machines.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_FIRMWARE_EMULATION.md",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/host-integration/arduino.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_FIRMWARE_EMULATION.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/introduction/supported-boards.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_FIRMWARE_EMULATION.md",
+          "line": 36
         }
       ]
     },
@@ -1190,11 +2926,56 @@
       ]
     },
     {
+      "url": "https://rogerscorp.com/-/media/project/rogerscorp/documents/advanced-electronics-solutions/english/data-sheets/ro4000-laminates-ro4003c-and-ro4350b---data-sheet.pdf",
+      "occurrences": [
+        {
+          "file": "docs/MATERIAL_LIBRARY.md",
+          "line": 75
+        }
+      ]
+    },
+    {
       "url": "https://scdn.rohde-schwarz.com/ur/pws/dl_downloads/dl_common_library/dl_manuals/dl_user_manual/ES-K1_Manual_en_08.pdf",
       "occurrences": [
         {
           "file": "docs/emi-chamber-workflow.md",
           "line": 19
+        }
+      ]
+    },
+    {
+      "url": "https://search.kyocera-avx.com/product/04025C104KAT2A",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "url": "https://search.murata.co.jp/Ceramy/image/img/A01X/G101/ENG/GCM188R71C334KA37-01A.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "url": "https://spike.local/schemas/",
+      "occurrences": [
+        {
+          "file": "python/spike_core/contract_catalog.py",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "url": "https://spike.local/schemas/assembly-thermal-mesh-assignments-v1.schema.json",
+      "occurrences": [
+        {
+          "file": "tests/python/test_thermal_component_promotion.py",
+          "line": 140
         }
       ]
     },
@@ -1217,11 +2998,213 @@
       ]
     },
     {
+      "url": "https://spike.local/schemas/{name}.schema.json",
+      "occurrences": [
+        {
+          "file": "tests/python/test_multiboard_volume_electrothermal.py",
+          "line": 144
+        }
+      ]
+    },
+    {
       "url": "https://standards.ieee.org/ieee/370/6165/",
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 217
+          "line": 221
+        }
+      ]
+    },
+    {
+      "url": "https://standards.nasa.gov/standard/gsfc/gsfc-std-7000",
+      "occurrences": [
+        {
+          "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "url": "https://store.qorvo.com/datasheets/qorvo/NBB-400.pdf",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 391
+        }
+      ]
+    },
+    {
+      "url": "https://store.qorvo.com/products/detail/fh101g-qorvo/395632/",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 390
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Custom-Output/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 124
+        },
+        {
+          "file": "docs/SU2_CHT.md",
+          "line": 180
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Execution/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Guide-to-v7/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Markers-and-BC/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_CHT.md",
+          "line": 179
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Mesh-File/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 118
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Multizone/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_CHT.md",
+          "line": 177
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Physical-Definition/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 120
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/docs_v7/Theory/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/download.html",
+      "occurrences": [
+        {
+          "file": "docs/SU2_AIRFLOW.md",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "url": "https://su2code.github.io/tutorials/Static_CHT/",
+      "occurrences": [
+        {
+          "file": "docs/SU2_CHT.md",
+          "line": 178
+        }
+      ]
+    },
+    {
+      "url": "https://sundials.readthedocs.io/en/v7.5.0/cvode/Mathematics_link.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ADAPTIVE_SWITCHING_FOUNDATION.md",
+          "line": 74
+        }
+      ]
+    },
+    {
+      "url": "https://support.discord.com/hc/en-us/articles/10989121220631-How-to-Protect-Your-Server-from-Raids-101",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 447
+        }
+      ]
+    },
+    {
+      "url": "https://support.discord.com/hc/en-us/articles/11074987197975-Community-Onboarding-FAQ",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 443
+        }
+      ]
+    },
+    {
+      "url": "https://support.discord.com/hc/en-us/articles/13497665141655-Server-Guide-FAQ",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 444
+        }
+      ]
+    },
+    {
+      "url": "https://support.discord.com/hc/en-us/articles/360047132851-Enabling-Your-Community-Server",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 442
+        }
+      ]
+    },
+    {
+      "url": "https://support.discord.com/hc/en-us/articles/4421269296535-AutoMod-FAQ",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 446
+        }
+      ]
+    },
+    {
+      "url": "https://support.discord.com/hc/en-us/articles/6208479917079-Forum-Channels-FAQ",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 445
+        }
+      ]
+    },
+    {
+      "url": "https://systemc.org/overview/systemc-ams/",
+      "occurrences": [
+        {
+          "file": "docs/BOARD_LIBRARY_RESEARCH.md",
+          "line": 16
         }
       ]
     },
@@ -1258,6 +3241,10 @@
         {
           "file": "docs/CFD_PUBLIC_REFERENCE_CORPUS.md",
           "line": 12
+        },
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 85
         }
       ]
     },
@@ -1266,7 +3253,7 @@
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 207
+          "line": 211
         }
       ]
     },
@@ -1280,11 +3267,85 @@
       ]
     },
     {
+      "url": "https://user@github.com/wayri/spike/releases/download/x/a.exe",
+      "occurrences": [
+        {
+          "file": "tests/python/test_app_updates.py",
+          "line": 39
+        }
+      ]
+    },
+    {
       "url": "https://vesa.org/displayport-developer/compliance/",
       "occurrences": [
         {
           "file": "docs/SI_SPICE_EMI_RF_ENGINE_GATES.md",
           "line": 105
+        }
+      ]
+    },
+    {
+      "url": "https://wakefieldthermal.com/content/data_sheets/2021_data_sheets/Wakefield-Thermal-DC-Fans-Data-Sheet.pdf",
+      "occurrences": [
+        {
+          "file": "docs/ASSEMBLY_ELECTROTHERMAL.md",
+          "line": 296
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter10/10.7.html",
+      "occurrences": [
+        {
+          "file": "docs/AC_POWER_INTEGRITY_EFFECTS.md",
+          "line": 77
+        },
+        {
+          "file": "docs/HARNESS_ENGINEERING.md",
+          "line": 256
+        },
+        {
+          "file": "python/spike_core/harness_rlgc_geometry.py",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter12/Backup/12.4.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/MOM_REFERENCE_OPERATORS_20260930.md",
+          "line": 16
+        },
+        {
+          "file": "python/spike_core/mom_far_field.py",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter14/14.2.html",
+      "occurrences": [
+        {
+          "file": "docs/HARNESS_ENGINEERING.md",
+          "line": 254
+        },
+        {
+          "file": "python/spike_core/harness_rlgc_geometry.py",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter8/8.6.html",
+      "occurrences": [
+        {
+          "file": "docs/HARNESS_ENGINEERING.md",
+          "line": 255
+        },
+        {
+          "file": "python/spike_core/harness_rlgc_geometry.py",
+          "line": 12
         }
       ]
     },
@@ -1298,11 +3359,38 @@
       ]
     },
     {
+      "url": "https://web.mit.edu/6.101/www/s2020/handouts/L06.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_DEVICE_PHYSICS_COVERAGE.md",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/calculix_v2.7/CalculiX/ccx_2.7/doc/ccx/node174.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 180
+        }
+      ]
+    },
+    {
+      "url": "https://webbook.nist.gov/chemistry/fluid/",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
+          "line": 154
+        }
+      ]
+    },
+    {
       "url": "https://webstore.iec.ch/copyright",
       "occurrences": [
         {
           "file": "docs/EMI_WORKFLOW.md",
-          "line": 114
+          "line": 116
         }
       ]
     },
@@ -1311,7 +3399,7 @@
       "occurrences": [
         {
           "file": "docs/EMI_WORKFLOW.md",
-          "line": 102
+          "line": 104
         },
         {
           "file": "python/spike_core/emi.py",
@@ -1324,11 +3412,284 @@
       "occurrences": [
         {
           "file": "docs/EMI_WORKFLOW.md",
-          "line": 101
+          "line": 103
         },
         {
           "file": "python/spike_core/emi.py",
           "line": 34
+        }
+      ]
+    },
+    {
+      "url": "https://wikis.khronos.org/opengl/Shader_Compilation",
+      "occurrences": [
+        {
+          "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
+          "line": 137
+        }
+      ]
+    },
+    {
+      "url": "https://www.3ds.com/products/simulia/all-products",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "url": "https://www.3ds.com/products/simulia/cst-studio-suite",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 125
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/license/spice-models.html",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/ad811.html",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 83
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 194
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/ad8628.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 200
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/ada4522-1.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 195
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/ada4522-2.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 196
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/ada4522-4.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 197
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/lt1012.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 201
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/op07.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 198
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/products/op27.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 199
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/media/en/simulation-models/spice-models/ad811.cir",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 204
+        }
+      ]
+    },
+    {
+      "url": "https://www.ansys.com/de-DE/products/electronics/ansys-hfss",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "url": "https://www.ansys.com/en-in/products",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "url": "https://www.ansys.com/products/ansys-workbench",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "url": "https://www.coilcraft.com/en-us/products/power/shielded-inductors/ferrite-drum/lps/lps4018/",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/blogs/how-to-calculate-a-capacitance-matrix-in-comsol-multiphysics/",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
+          "line": 136
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/blogs/introduction-to-computing-radiative-heat-exchange/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIBOARD_RADIATION.md",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/heat-transfer-module",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 142
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/multiphysics/electrostatics-theory",
+      "occurrences": [
+        {
+          "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/products",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 40
+        },
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 136
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/ray-optics-module",
+      "occurrences": [
+        {
+          "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+          "line": 146
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/release/6.4/studies-and-solvers",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/release/6.4?wvideo=lgxi7wwe74",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/rf-module",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 158
+        }
+      ]
+    },
+    {
+      "url": "https://www.comsol.com/wave-optics-module",
+      "occurrences": [
+        {
+          "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
+          "line": 147
+        }
+      ]
+    },
+    {
+      "url": "https://www.dhondt.de/",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 6
+        },
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 179
+        }
+      ]
+    },
+    {
+      "url": "https://www.dhondt.de/ccx_2.20.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/ASSEMBLY_THERMAL_TRANSIENT_20261008.md",
+          "line": 39
         }
       ]
     },
@@ -1355,6 +3716,51 @@
       ]
     },
     {
+      "url": "https://www.feacluster.com/CalculiX/ccx_2.18/doc/ccx/node253.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 182
+        }
+      ]
+    },
+    {
+      "url": "https://www.feacluster.com/CalculiX/ccx_2.18/doc/ccx/node279.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 184
+        }
+      ]
+    },
+    {
+      "url": "https://www.feacluster.com/CalculiX/ccx_2.18/doc/ccx/node316.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 183
+        }
+      ]
+    },
+    {
+      "url": "https://www.feacluster.com/CalculiX/ccx_2.18/doc/ccx/node337.html",
+      "occurrences": [
+        {
+          "file": "docs/CALCULIX_THERMAL.md",
+          "line": 186
+        }
+      ]
+    },
+    {
+      "url": "https://www.femm.info/doku/doku.php?do=&id=pyfemm",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 91
+        }
+      ]
+    },
+    {
       "url": "https://www.grc.nasa.gov/WWW/wind/valid/tutorial/consistency.html",
       "occurrences": [
         {
@@ -1364,11 +3770,37 @@
       ]
     },
     {
+      "url": "https://www.grc.nasa.gov/www/wind/valid/tutorial/spatconv.html",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 38
+        },
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 84
+        },
+        {
+          "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
+          "line": 224
+        }
+      ]
+    },
+    {
+      "url": "https://www.grc.nasa.gov/www/wind/valid/tutorial/tutorial.html",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 48
+        }
+      ]
+    },
+    {
       "url": "https://www.harwin.com/resources/product-datasheets",
       "occurrences": [
         {
           "file": "docs/HARNESS_PI.md",
-          "line": 35
+          "line": 38
         }
       ]
     },
@@ -1395,7 +3827,7 @@
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 211
+          "line": 215
         }
       ]
     },
@@ -1436,6 +3868,118 @@
       ]
     },
     {
+      "url": "https://www.infineon.com/dgdl/Infineon-InfineonSpice_2025.01-UserManual-v01_00-EN.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/BAR64-02V",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/BSC010N04LS6",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 286
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/BSP316P",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 317
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/BSP322P",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 318
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/BSZ0902NSI",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/IPB017N10N5",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 285
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/IPD90P04P4L-04",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 316
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/IRF540N",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 283
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/IRF9540N",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 315
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/IRLZ44N",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 284
+        }
+      ]
+    },
+    {
+      "url": "https://www.infineon.com/part/{mpn}",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 340
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 407
+        }
+      ]
+    },
+    {
       "url": "https://www.ipc.org/TOC/IPC-2228_TOC.pdf",
       "occurrences": [
         {
@@ -1467,11 +4011,163 @@
       ]
     },
     {
+      "url": "https://www.isabellenhuette.de/fileadmin/Daten/Praezisionswiderstaende/Datenblaetter/BVN.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "url": "https://www.itl.nist.gov/div898/handbook/apr/section1/apr124.htm",
+      "occurrences": [
+        {
+          "file": "docs/SPICE_FAULT_RELIABILITY.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://www.itl.nist.gov/div898/handbook/apr/section1/apr151.htm",
+      "occurrences": [
+        {
+          "file": "docs/SPICE_FAULT_RELIABILITY.md",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "url": "https://www.itl.nist.gov/div898/handbook/apr/section1/apr162.htm",
+      "occurrences": [
+        {
+          "file": "docs/SPICE_FAULT_RELIABILITY.md",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "url": "https://www.itl.nist.gov/div898/strd/general/howto.html",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 89
+        }
+      ]
+    },
+    {
+      "url": "https://www.iue.tuwien.ac.at/phd/vitanov/node43.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_TCAD_EQUILIBRIUM.md",
+          "line": 50
+        }
+      ]
+    },
+    {
+      "url": "https://www.keysight.com/ci/en/assets/9018-05241/user-manuals/9018-05241.pdf",
+      "occurrences": [
+        {
+          "file": "docs/PI_SI_PARITY_EXECUTION.md",
+          "line": 75
+        }
+      ]
+    },
+    {
       "url": "https://www.kicad.org/discover/3dviewer/",
       "occurrences": [
         {
           "file": "docs/VISUALIZATION_ARCHITECTURE.md",
           "line": 18
+        }
+      ]
+    },
+    {
+      "url": "https://www.klayout.de/development.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_ASIC_TWO_APPLICATION_FLOW.md",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "url": "https://www.macom.com/products/product-detail/MA4P7493-134",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 122
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 422
+        }
+      ]
+    },
+    {
+      "url": "https://www.macom.com/products/product-detail/MAAM02350-A2",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 399
+        }
+      ]
+    },
+    {
+      "url": "https://www.macom.com/products/product-detail/MAAM37000-A1",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 400
+        }
+      ]
+    },
+    {
+      "url": "https://www.macom.com/products/product-detail/MADP-000907-14020P",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 121
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 420
+        }
+      ]
+    },
+    {
+      "url": "https://www.macom.com/products/product-detail/MADP-007448-12790T",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 423
+        }
+      ]
+    },
+    {
+      "url": "https://www.macom.com/products/product-detail/MADP-009989",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 421
+        }
+      ]
+    },
+    {
+      "url": "https://www.mathworks.com/help/simrf/gs/circuit-envelope-basics.html",
+      "occurrences": [
+        {
+          "file": "docs/TRANSMISSION_RF_HVDC_SCOPE.md",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "url": "https://www.mathworks.com/help/sm/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 44
         }
       ]
     },
@@ -1485,11 +4181,299 @@
       ]
     },
     {
+      "url": "https://www.nafems.org/community/vendor-network/code-verification-archived/",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "url": "https://www.nasa.gov/smallsat-institute/sst-soa/thermal-control/",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/2N7002",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 271
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BAT54",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 469
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BC807-40",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 248
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BC817-40",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 224
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BC846B",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 223
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BC847B",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 222
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BC856B",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 247
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BC857B",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 246
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BSS138P",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 272
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BSS84P",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 304
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/BUK9Y12-40E",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 275
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/MMBT3904",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 226
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/MMBT3906",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 250
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMBT2222A",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 225
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMBT2907A",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMEG120G20ELR",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 473
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMEG2010AEB",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 470
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMEG4010CEJ",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 471
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMEG6010CEJ",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 472
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMV20XNE",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 273
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMV30XP",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 307
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMV48XP",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 306
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PMV65XP",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 305
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/product/PSMN1R0-40YLD",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 274
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/products/analog-logic-ics/logic/flip-flops-latches-registers-counters-dividers",
+      "occurrences": [
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 337
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/products/analog-logic-ics/logic/flip-flops-latches-registers-counters-dividers/shift-registers/serie/74hc164-74hct164",
+      "occurrences": [
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 319
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/products/gan-fets/high-voltage-gan-650-v",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 332
+        }
+      ]
+    },
+    {
+      "url": "https://www.nexperia.com/products/mosfets/family/dfn1006-mosfets",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 90
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/pml/nist-technical-note-1297",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/publications/calibration-multiconductor-transmission-lines",
+      "occurrences": [
+        {
+          "file": "docs/HARNESS_ENGINEERING.md",
+          "line": 258
+        }
+      ]
+    },
+    {
       "url": "https://www.nist.gov/publications/comments-conversions-between-s-z-y-h-abcd-and-t-parameters-which-are-valid-complex",
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 215
+          "line": 219
         }
       ]
     },
@@ -1507,7 +4491,16 @@
       "occurrences": [
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
-          "line": 219
+          "line": 223
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/srd/nist-standard-reference-database-10",
+      "occurrences": [
+        {
+          "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
+          "line": 153
         }
       ]
     },
@@ -1548,6 +4541,96 @@
       ]
     },
     {
+      "url": "https://www.pscad.com/webhelp/EMTDC/Transmission_Lines/Frequency_Dependent_Models.htm",
+      "occurrences": [
+        {
+          "file": "docs/TRANSMISSION_RF_HVDC_SCOPE.md",
+          "line": 96
+        }
+      ]
+    },
+    {
+      "url": "https://www.rohm.com/news-detail?defaultGroupId=false&news-title=2023-05-08_news_gan",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 352
+        }
+      ]
+    },
+    {
+      "url": "https://www.rohm.com/products/sic-power-devices/sic-mosfet/information",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 376
+        }
+      ]
+    },
+    {
+      "url": "https://www.sandia.gov/research/publications/details/a-conservative-discontinuous-galerkin-in-time-dgit-multirate-time-integrati-2024-06-01/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-gb/products/pcb/hyperlynx/signal-integrity/",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-gb/products/simcenter/fluids-thermal-simulation/flotherm/",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 140
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-gb/products/simcenter/fluids-thermal-simulation/star-ccm/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-gb/products/simcenter/integration-solutions/heeds/",
+      "occurrences": [
+        {
+          "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-us/products/pcb/hyperlynx/electrical-design-rule-check/",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "url": "https://www.siemens.com/en-us/products/pcb/hyperlynx/power-integrity/",
+      "occurrences": [
+        {
+          "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
+          "line": 93
+        }
+      ]
+    },
+    {
       "url": "https://www.sparselizard.org/",
       "occurrences": [
         {
@@ -1566,11 +4649,846 @@
       ]
     },
     {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/1n4007.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 433
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/1n4148.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 432
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/1n5408.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 434
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/bat54.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 461
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/stps0560z.html",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 103
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 457
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/stps10l60.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 460
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/stps2l60.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 458
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/stps5l60.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 459
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/stth102.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 436
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/diodes-and-rectifiers/uf4007.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 435
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/power-bipolar-transistors/tip41c.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/power-bipolar-transistors/tip42c.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 262
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/power-transistors/stl110n10f7.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 295
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/power-transistors/stp55nf06.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 296
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/space-products/1n6640u.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 437
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/2n2222a.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 234
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/2n2907a.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 258
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/bc327-40.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 260
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/bc337-40.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 236
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/bc547b.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 235
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/bc557b.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 259
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/mmbt2222a.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 237
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/en/transistors/mmbt2907a.html",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 261
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/user_manual/dm00064632.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 102
+        }
+      ]
+    },
+    {
+      "url": "https://www.thermalradiation.net/sectionc/C-11.html",
+      "occurrences": [
+        {
+          "file": "docs/ASSEMBLY_FIELD_HANDOFF.md",
+          "line": 171
+        },
+        {
+          "file": "docs/validation/ASSEMBLY_FIELD_20261004.md",
+          "line": 62
+        },
+        {
+          "file": "python/spike_core/assembly_view_factors.py",
+          "line": 20
+        },
+        {
+          "file": "tests/python/test_assembly_view_factors.py",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/",
+      "occurrences": [
+        {
+          "file": "tests/python/test_spikes_logic_portfolio.py",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/document-viewer/lit/html/SLVAFK6/GUID-0B3C241B-688B-44BB-847B-682F017BB8A9",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_SMPS_STABILITY.md",
+          "line": 184
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/legal/terms-conditions/terms-of-sale.html",
+      "occurrences": [
+        {
+          "file": "tests/python/test_spikes_manufacturer_model_catalog.py",
+          "line": 105
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/legal/terms-conditions/terms-of-use.html",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_FIRST_EXECUTION_REVIEW.md",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/an/slua341a/slua341a.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SMPS_CONVERTER_BLOCKS.md",
+          "line": 194
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/an/slva059a/slva059a.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SMPS_CONVERTER_BLOCKS.md",
+          "line": 189
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/an/slva372d/slva372d.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SMPS_CONVERTER_BLOCKS.md",
+          "line": 185
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/an/slva477b/slva477b.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SMPS_CONVERTER_BLOCKS.md",
+          "line": 182
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/cd74hc283.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 76
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 259
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc00.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 59
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 34
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc02.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 60
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc04.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 61
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc08.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 62
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc10.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 63
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc11.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 64
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc138.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 71
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 169
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc139.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 72
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 189
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc153.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 74
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 220
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc157.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 75
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 237
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc161.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 106
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 353
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc20.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 65
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 40
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc21.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 66
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc245.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 78
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 293
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc32.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 67
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc373.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 108
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 361
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc595.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 109
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 365
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc688.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 77
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 274
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc74.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 105
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 306
+        },
+        {
+          "file": "python/spikes/logic_portfolio.py",
+          "line": 349
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc86.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/LOGIC_PORTFOLIO_LEDGER.md",
+          "line": 68
+        },
+        {
+          "file": "docs/SPIKES_STANDARD_PARTS.md",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/sn74hc{function}.pdf",
+      "occurrences": [
+        {
+          "file": "python/spikes/standard_logic.py",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/pdf/slva274a",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_SMPS_STABILITY.md",
+          "line": 181
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ug/spru889/spru889.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CAPACITOR_PLACEMENT.md",
+          "line": 183
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/zip/SNOM211B",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_FIRST_EXECUTION_REVIEW.md",
+          "line": 18
+        },
+        {
+          "file": "tests/python/test_spikes_manufacturer_model_catalog.py",
+          "line": 65
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/zip/SNOM268",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_FIRST_EXECUTION_REVIEW.md",
+          "line": 17
+        },
+        {
+          "file": "tests/python/test_spikes_manufacturer_model_catalog.py",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/zip/{model_id}",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 187
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/product/LM358",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_FIRST_EXECUTION_REVIEW.md",
+          "line": 17
+        },
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/product/LM741",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_FIRST_EXECUTION_REVIEW.md",
+          "line": 18
+        },
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 79
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/product/SN74HC10",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_VENDOR_LOGIC_REFERENCE.md",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/product/SN74HC11",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_VENDOR_LOGIC_REFERENCE.md",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/product/TL072A",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/product/{mpn}",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 183
+        },
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 483
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/quality-reliability/reliability/terminology.html",
+      "occurrences": [
+        {
+          "file": "docs/SPICE_FAULT_RELIABILITY.md",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "url": "https://www.usb.org/document-library/usb-20-specification",
+      "occurrences": [
+        {
+          "file": "python/spike_core/si_eye_mask_profiles.py",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/doc/?52022=",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STANDARD_PASSIVE_LIBRARY.md",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/doc/?63395=",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_PASSIVE_MANUFACTURER_SOURCES.md",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/docs/28372/e-series.pdf",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STANDARD_PASSIVE_LIBRARY.md",
+          "line": 74
+        }
+      ]
+    },
+    {
       "url": "https://www.vishay.com/docs/49562/49562.pdf",
       "occurrences": [
         {
           "file": "docs/SI_WORKFLOW.md",
           "line": 259
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/en/product/74444/tab/designtools-ppg/",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
+          "line": 117
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/en/product/81857/",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 445
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/en/product/88503/",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 446
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/en/product/88729/",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 448
+        }
+      ]
+    },
+    {
+      "url": "https://www.vishay.com/en/product/88755/",
+      "occurrences": [
+        {
+          "file": "python/spikes/manufacturer_model_catalog.py",
+          "line": 447
+        }
+      ]
+    },
+    {
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/menubar/",
+      "occurrences": [
+        {
+          "file": "docs/APPLICATION_MENUS.md",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=OJCembb8SfI",
+      "occurrences": [
+        {
+          "file": "docs/ACTIVE_ENGINEERING_QUEUE.md",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=samd0gbBEAQ",
+      "occurrences": [
+        {
+          "file": "docs/ACTIVE_ENGINEERING_QUEUE.md",
+          "line": 22
         }
       ]
     },

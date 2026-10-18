@@ -4,6 +4,7 @@ import { Archive, ArchiveRestore, ArrowDown, ArrowUp, Copy, Database, Download, 
 import { MAX_STUDY_DATASETS, normalizeStudies, type SimulationStudy, type SimulationStudyCase, type StudyDataset, type StudyRun } from "./simulationStudies";
 import { comparisonCompatibility, exportStudyDataset, MAX_STUDY_DOCUMENT_BYTES, prepareStudyDataset, preflightStudyDatasetUpdate, preflightStudyDocument, studyMatchesQuery } from "./studyWorkspaceModel";
 import { isDesktopShell, saveNativeTextFile } from "./workerBridge";
+import { usePanelPresentation } from "./panelPresentation";
 import "./studyManager.css";
 
 export type StudyCaseType = { value: string; label: string; disabled?: boolean; description?: string };
@@ -37,13 +38,14 @@ const pretty = (value: unknown) => JSON.stringify(value, null, 2);
 const dateText = (value: string) => { const date = new Date(value); return Number.isFinite(date.valueOf()) ? date.toLocaleString() : "Unknown time"; };
 const valueText = (value: unknown) => value === null ? "null" : ["string", "number", "boolean"].includes(typeof value) ? String(value) : Array.isArray(value) ? `${value.length} items` : value && typeof value === "object" ? `${Object.keys(value).length} fields` : "Not recorded";
 
-async function exportText(name: string, contents: string, mediaType: string) {
+async function exportText(ownerDocument: Document | undefined, name: string, contents: string, mediaType: string) {
   if (isDesktopShell()) {
     const path = await saveNativeTextFile(name, contents, "result");
     return path ? `Exported to ${path}` : "Export canceled.";
   }
+  if (!ownerDocument) return "Download unavailable because the panel document is missing.";
   const url = URL.createObjectURL(new Blob([contents], { type: mediaType }));
-  const link = document.createElement("a"); link.href = url; link.download = name; link.click();
+  const link = ownerDocument.createElement("a"); link.href = url; link.download = name; link.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);
   return `Download requested for ${name}.`;
 }
@@ -54,6 +56,7 @@ function Facts({ run }: { run: StudyRun }) {
 }
 
 export default function StudyManager(props: Props) {
+  const { ownerDocument } = usePanelPresentation();
   const types = props.caseTypes?.length ? props.caseTypes : DEFAULT_TYPES;
   const defaultType = types.some(type => type.value === props.currentType && !type.disabled) ? props.currentType : types.find(type => !type.disabled)?.value ?? "";
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -133,12 +136,12 @@ export default function StudyManager(props: Props) {
       const contents = JSON.stringify({ version: study.version, studies: [study] });
       const admission = preflightStudyDocument(study);
       if (!admission.ok || new TextEncoder().encode(contents).length > MAX_STUDY_DOCUMENT_BYTES) throw new Error(admission.ok ? "Study export exceeds the 256 MiB study document limit." : admission.error);
-      setMessage(await exportText(`${cleanName(study.name, "study")}.spike-study.json`, contents, "application/json"));
+      setMessage(await exportText(ownerDocument, `${cleanName(study.name, "study")}.spike-study.json`, contents, "application/json"));
     }
     catch (error) { setMessage(error instanceof Error ? error.message : "Export failed."); }
   };
   const exportDataset = async (dataset: StudyDataset) => {
-    try { const exported = exportStudyDataset(dataset); setMessage(await exportText(exported.fileName, exported.contents, exported.mediaType)); }
+    try { const exported = exportStudyDataset(dataset); setMessage(await exportText(ownerDocument, exported.fileName, exported.contents, exported.mediaType)); }
     catch (error) { setMessage(error instanceof Error ? error.message : "Export failed."); }
   };
   const confirmDelete = () => {
@@ -186,7 +189,7 @@ export default function StudyManager(props: Props) {
             <div className="study-action-stack"><button onClick={() => props.onActivateCase(study.id, selectedCase)}><Play size={14}/> Activate saved setup</button><button disabled={selectedCase.id !== props.activeCaseId} onClick={() => props.onSaveCaseSetup(study.id, selectedCase)}><Save size={14}/> Save current setup</button><button disabled={selectedCase.id !== props.activeCaseId} title={selectedCase.id !== props.activeCaseId ? "Activate this case before recording the current workspace result." : "Save a workspace-captured snapshot; this does not rerun the solver."} onClick={() => props.onCaptureCaseResult(study.id, selectedCase)}><Save size={14}/> Record snapshot</button><button onClick={() => props.onDuplicateCase(study.id, selectedCase.id)}><Copy size={14}/> Duplicate case</button></div>
             <details><summary>Saved setup JSON</summary><pre>{pretty({ scenario: selectedCase.scenario, settings: selectedCase.settings })}</pre></details>
           </>}
-          {tab === "runs" && <>{!selectedCase.runs.length ? <p className="study-muted">No recorded snapshots. Recording freezes the current workspace result, setup, and reported status. Capture time is not a solver execution timestamp.</p> : <div className="study-run-layout"><div className="study-run-list">{[...selectedCase.runs].reverse().map(run => <button key={run.id} className={run.id === inspectedRun?.id ? "selected" : ""} onClick={() => setRunId(run.id)}><span>{dateText(run.capturedAt)}{run.facts.status ? ` · ${run.facts.status}` : ""}</span><small>{run.facts.modelStatus ? `Model: ${run.facts.modelStatus}` : "Model status not reported"}</small></button>)}</div>{inspectedRun && <div className="study-run-detail"><h4>Workspace captured {dateText(inspectedRun.capturedAt)}</h4><Facts run={inspectedRun}/><div className="study-inline-actions">{props.onOpenResult && <button disabled={inspectedRun.resultSnapshot == null} title={inspectedRun.resultSnapshot == null ? "This capture has no embedded result payload." : undefined} onClick={() => props.onOpenResult?.(inspectedRun, selectedCase)}>Load capture in workspace</button>}<button onClick={() => void exportText(`${cleanName(selectedCase.name, "case")}-${cleanName(inspectedRun.id, "run")}.json`, pretty(inspectedRun), "application/json").then(setMessage)}><Download size={13}/> Export</button><button className="danger-btn" onClick={() => setPendingDelete({ kind: "run", id: inspectedRun.id })}><Trash2 size={13}/> Delete</button></div><details><summary>Raw recorded JSON</summary><pre>{pretty(inspectedRun)}</pre></details></div>}</div>}</>}
+          {tab === "runs" && <>{!selectedCase.runs.length ? <p className="study-muted">No recorded snapshots. Recording freezes the current workspace result, setup, and reported status. Capture time is not a solver execution timestamp.</p> : <div className="study-run-layout"><div className="study-run-list">{[...selectedCase.runs].reverse().map(run => <button key={run.id} className={run.id === inspectedRun?.id ? "selected" : ""} onClick={() => setRunId(run.id)}><span>{dateText(run.capturedAt)}{run.facts.status ? ` · ${run.facts.status}` : ""}</span><small>{run.facts.modelStatus ? `Model: ${run.facts.modelStatus}` : "Model status not reported"}</small></button>)}</div>{inspectedRun && <div className="study-run-detail"><h4>Workspace captured {dateText(inspectedRun.capturedAt)}</h4><Facts run={inspectedRun}/><div className="study-inline-actions">{props.onOpenResult && <button disabled={inspectedRun.resultSnapshot == null} title={inspectedRun.resultSnapshot == null ? "This capture has no embedded result payload." : undefined} onClick={() => props.onOpenResult?.(inspectedRun, selectedCase)}>Load capture in workspace</button>}<button onClick={() => void exportText(ownerDocument, `${cleanName(selectedCase.name, "case")}-${cleanName(inspectedRun.id, "run")}.json`, pretty(inspectedRun), "application/json").then(setMessage)}><Download size={13}/> Export</button><button className="danger-btn" onClick={() => setPendingDelete({ kind: "run", id: inspectedRun.id })}><Trash2 size={13}/> Delete</button></div><details><summary>Raw recorded JSON</summary><pre>{pretty(inspectedRun)}</pre></details></div>}</div>}</>}
           {tab === "datasets" && <><label>Attachment role<select aria-label="Dataset attachment role" value={datasetRole} onChange={event => setDatasetRole(event.target.value as "source" | "result")}><option value="source">Source / reference data</option><option value="result">Result-derived data</option></select></label><button className="primary-btn" onClick={() => datasetRef.current?.click()}><Database size={14}/> Attach JSON or CSV</button><p className="study-muted">Choose the role explicitly. Result-derived payloads may be stripped from result-free project copies. Maximum 2 MiB.</p><div className="study-dataset-list">{study.datasets.map(dataset => <article key={dataset.id}><FileJson size={18}/><div><b title={dataset.name}>{dataset.name}</b><small>{dataset.kind.toUpperCase()} · {dataset.resultDerived ? "Result-derived" : "Source"} · {dataset.provenance || "No provenance supplied"}</small></div><button aria-label={`Export ${dataset.name}`} onClick={() => void exportDataset(dataset)}><Download size={13}/></button><button aria-label={`${selectedCase.datasetIds.includes(dataset.id) ? "Unlink" : "Link"} ${dataset.name}`} onClick={() => props.onUpdateCase(study.id, selectedCase.id, { datasetIds: selectedCase.datasetIds.includes(dataset.id) ? selectedCase.datasetIds.filter(id => id !== dataset.id) : [...selectedCase.datasetIds, dataset.id] })}>{selectedCase.datasetIds.includes(dataset.id) ? <X size={13}/> : <Plus size={13}/>}</button><button aria-label={`Remove ${dataset.name}`} onClick={() => setPendingDelete({ kind: "dataset", id: dataset.id })}><Trash2 size={13}/></button></article>)}{!study.datasets.length && <p className="study-muted">No datasets are attached to this study.</p>}</div></>}
           {tab === "compare" && <><p className="study-muted">Select two or more recorded snapshots. Values retain their reported units and model status.</p><div className="study-compare-picker">{selectedCase.runs.map(run => <label key={run.id}><input type="checkbox" checked={compareIds.includes(run.id)} onChange={event => setCompareIds(ids => event.target.checked ? [...ids, run.id] : ids.filter(id => id !== run.id))}/><span>{dateText(run.capturedAt)}{run.facts.status ? ` · ${run.facts.status}` : ""}</span></label>)}</div>{compared.length >= 2 && compatibility.compatible ? <div className="study-compare-table"><table><thead><tr><th>Fact</th>{compared.map(run => <th key={run.id}>{dateText(run.capturedAt)}</th>)}</tr></thead><tbody>{["status", "modelStatus", "contract", "designId", "units"].map(key => <tr key={key}><th>{key}</th>{compared.map(run => <td key={run.id}>{key === "units" ? <pre>{pretty(run.facts.units ?? "Not recorded")}</pre> : String(run.facts[key as keyof typeof run.facts] ?? "Not recorded")}</td>)}</tr>)}</tbody></table></div> : <p className="study-muted">{compared.length < 2 ? "Select at least two runs to compare." : `Comparison unavailable: ${compatibility.reasons.join(" ")}`}</p>}</>}
           </div>

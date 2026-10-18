@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import * as THREE from "three";
-import { buildExtensionMeshScene } from "../src/extensionMeshViewport.ts";
+import { boundedMeshDisplayIndices, buildExtensionMeshScene } from "../src/extensionMeshViewport.ts";
 import { disposeScene } from "../src/sceneResourceCache.ts";
 
 const admission = {contract:"spike/extension-mesh-admission/v1",design_bound:true,complete_connectivity:true,physics_validated:false,cross_engine_reuse:false};
@@ -40,11 +40,23 @@ for(let i=0;i<6001;i++) {
 }
 const manyScene=buildExtensionMeshScene(many,transform);
 assert.equal(manyScene.userData.total,6001);
-assert.ok(manyScene.userData.shown>0 && manyScene.userData.shown<=5000);
+assert.equal(manyScene.userData.shown,5000,"tetra preview fills its bounded display budget");
 assert.ok(manyScene.userData.shown<many.tetrahedra.length);
 assert.equal(manyScene.children[0].geometry.attributes.position.count,manyScene.userData.shown*12);
+const displayedMaximum = manyScene.children[0].geometry.attributes.position.array.reduce(
+  (maximum,value)=>Math.max(maximum,value),-Infinity);
+assert.equal(displayedMaximum,11981,
+  "bounded tetra preview retains the final cell and full displayed extent");
 assert.equal(many.tetrahedra.length,6001,"bounded display never truncates the underlying mesh");
 disposeScene(manyScene);
+
+const justOverBudget = boundedMeshDisplayIndices(5001,5000);
+assert.equal(justOverBudget.length,5000,"just-over-budget sampling does not discard half the visual budget");
+assert.equal(new Set(justOverBudget).size,5000,"bounded sampling does not repeat cells");
+assert.deepEqual([justOverBudget[0],justOverBudget.at(-1)],[0,5000],
+  "bounded sampling retains both topology endpoints");
+assert.deepEqual(boundedMeshDisplayIndices(4,5000),[0,1,2,3]);
+assert.deepEqual(boundedMeshDisplayIndices(Infinity,5000),[]);
 
 const grid={...header,contract:"spike/openems-grid/v1",lines_mm:{x:[10,12,16],y:[20,24],z:[-1.6,0]}};
 const gridScene=buildExtensionMeshScene(grid,transform);

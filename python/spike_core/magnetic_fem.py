@@ -428,3 +428,4 @@ def solve_eddy_current_step(*, nodes_m, triangles, region_ids, materials, stack_
                        "Backward Euler numerical dissipation is reported separately from Joule heat.",
                        "Mesh, timestep, boundary convergence and independent measurement remain required."],
     }
+

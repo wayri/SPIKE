@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-.spike-action-context-menu{position:fixed;z-index:var(--z-transient,240);display:flex;flex-direction:column;min-width:215px;max-width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px);overflow:auto;padding:6px;background:var(--spike-table-surface,#201b2b);color:var(--spike-table-text,#ece6f7);border:1px solid var(--spike-table-border-strong,#776388);border-radius:7px;box-shadow:0 10px 30px #0007}
+.spike-action-context-menu{position:fixed;z-index:var(--z-transient,240);display:flex;flex-direction:column;min-width:215px;max-width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 16px);overflow:auto;padding:6px;background:var(--spike-table-surface,#151a20);color:var(--spike-table-text,#e6edf3);border:1px solid var(--spike-table-border-strong,#718393);border-radius:7px;box-shadow:var(--spike-popup-shadow,0 10px 30px #0007)}
 .spike-action-context-menu>strong{padding:7px 9px;font-size:12px;overflow-wrap:anywhere}
 .spike-action-context-menu>button{border:0;background:transparent;color:inherit;text-align:left;padding:9px;border-radius:4px;min-height:32px}
-.spike-action-context-menu>button:hover,.spike-action-context-menu>button:focus-visible{background:var(--spike-table-hover,#534167);outline:2px solid var(--spike-table-edit,#c89bef);outline-offset:-2px}
+.spike-action-context-menu>button:hover,.spike-action-context-menu>button:focus-visible{background:var(--spike-table-hover,#2b353e);outline:2px solid var(--spike-table-edit,#45c4b0);outline-offset:-2px}
 .spike-action-context-menu>button:disabled{opacity:.45}
 
 .spike-action-context-menu>button{display:flex;align-items:center;gap:8px;flex-shrink:0}

@@ -12,6 +12,7 @@ from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import AssemblyIRV1, AssemblyPart, BoardInstance, SpiDeRV2
 from python.spike_core.spider_v2_schema import CoordinateFrame
 from python.spike_core.mcad_session_contract import FEEDBACK, HEADER, digest, loads, validate
+from python.spike_core.material_library import load_catalog, material_snapshot
 from python.spike_core.mcad_tessellation import _freecad_path, McadTessellationError
 from python.spike_core.mcad_importer import import_mcad_artifact
 from python.spike_core.project_package import read_project, write_spike_package
@@ -70,6 +71,28 @@ class CollaborationTests(unittest.TestCase):
         before = self.path.read_bytes()
         request(self.path, "export_mcad_session")
         self.assertEqual(before, self.path.read_bytes())
+
+    def test_export_carries_valid_material_snapshot_and_rejects_tampering(self):
+        opened = read_project(self.path, include_members=True)
+        payload = copy.deepcopy(opened.payload)
+        snapshot = material_snapshot(load_catalog()[0])
+        layer_id = payload["design_ir"]["layers"][0]["id"]
+        payload["assembly_ir"]["boards"][0].setdefault("extensions", {})["spike.material"] = snapshot
+        payload["assembly_ir"]["boards"][0]["extensions"]["spike.layer-materials"] = {layer_id: snapshot}
+        write_spike_package(self.path, payload, preserved_members=opened.members)
+        exported = request(self.path, "export_mcad_session")
+        self.assertTrue(exported["ok"], exported)
+        row = next(o for o in exported["result"]["objects"] if o["id"] == "a")
+        self.assertEqual(row["material_snapshot"], snapshot)
+        self.assertEqual(row["layer_material_snapshots"], {layer_id: snapshot})
+
+        opened = read_project(self.path, include_members=True)
+        payload = copy.deepcopy(opened.payload)
+        payload["assembly_ir"]["boards"][0]["extensions"]["spike.material"]["record"]["name"] = "tampered"
+        write_spike_package(self.path, payload, preserved_members=opened.members)
+        rejected = request(self.path, "export_mcad_session")
+        self.assertFalse(rejected["ok"])
+        self.assertIn("invalid spike.material snapshot", rejected["error"])
 
     def test_repeated_design_occurrences_roundtrip_by_id_and_cannot_be_removed(self):
         rows = {row["id"]: row for row in self.session["objects"]}
@@ -154,6 +177,18 @@ class CollaborationTests(unittest.TestCase):
                        lambda s: s["objects"].append(copy.deepcopy(s["objects"][0]))):
             session = copy.deepcopy(self.session); mutate(session)
             with self.assertRaises(ValueError): validate(session)
+        snapshot = material_snapshot(load_catalog()[0])
+        for mutate in (lambda s: s.update(digest="0" * 64),
+                       lambda s: s.update(material_id="other"),
+                       lambda s: s["record"].update(unexpected=float("nan"))):
+            session = copy.deepcopy(self.session)
+            session["objects"][0]["material_snapshot"] = copy.deepcopy(snapshot)
+            mutate(session["objects"][0]["material_snapshot"])
+            with self.assertRaises(ValueError): validate(session)
+        for layer_map in ({}, {"": snapshot}, {"layer": {**snapshot, "digest": "0" * 64}}):
+            session = copy.deepcopy(self.session)
+            session["objects"][0]["layer_material_snapshots"] = layer_map
+            with self.assertRaises(ValueError): validate(session)
 
     def test_schemas_and_duplicate_feedback_json(self):
         from jsonschema import Draft202012Validator
@@ -209,6 +244,9 @@ import Part
 from spike_freecad.collaboration import import_session, build_feedback, measure_clearance, write_feedback, session_root
 doc = App.newDocument("Collaboration")
 session = json.load(open("session.json"))
+snapshot = {material_snapshot(load_catalog()[0])!r}
+session["objects"][0]["material_snapshot"] = snapshot
+session["objects"][0]["layer_material_snapshots"] = {{"layer-0": snapshot}}
 # Exercise embedded STEP solids as well as generated board outlines.
 Part.makeBox(10,10,1.6).exportStep("fixture.step")
 step_bytes = open("fixture.step","rb").read()
@@ -232,8 +270,11 @@ doc = App.openDocument("collaboration.FCStd")
 root = session_root(doc)
 good = build_feedback(doc, root)
 assert {{o["id"] for o in good["objects"]}} == {{"a", "b", "group"}}
-write_feedback("feedback.json", good)
 by_id = {{o.SPIKEOccurrenceId:o for o in doc.Objects if hasattr(o,"SPIKEOccurrenceId")}}
+assert json.loads(by_id["a"].SPIKEMaterialJSON) == snapshot
+assert by_id["a"].SPIKEMaterialId == snapshot["material_id"]
+assert json.loads(by_id["a"].SPIKELayerMaterialsJSON) == {{"layer-0": snapshot}}
+write_feedback("feedback.json", good)
 feature = doc.getObject(by_id["a"].SPIKEGeometryName)
 feature.Placement.Base.z = 2
 try:
@@ -248,6 +289,18 @@ try:
     raise AssertionError("Changed solid accepted")
 except ValueError: pass
 feature.Shape = original_shape
+by_id["a"].SPIKEMaterialJSON = by_id["a"].SPIKEMaterialJSON.replace(snapshot["material_id"], "changed", 1)
+try:
+    build_feedback(doc,root)
+    raise AssertionError("Changed material snapshot accepted")
+except ValueError: pass
+by_id["a"].SPIKEMaterialJSON = json.dumps(snapshot, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+by_id["a"].SPIKELayerMaterialsJSON = "{{}}"
+try:
+    build_feedback(doc,root)
+    raise AssertionError("Changed layer material snapshots accepted")
+except ValueError: pass
+by_id["a"].SPIKELayerMaterialsJSON = json.dumps({{"layer-0": snapshot}}, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 by_id["b"].addObject(by_id["a"])
 try:
     build_feedback(doc,root)
