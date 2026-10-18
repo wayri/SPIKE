@@ -10579,10 +10579,10 @@
     },
     {
       "path": "docs/releases/v0.3.12-gamma.1.md",
-      "git_blob": "f24571eef342166f054567dc78190a03afb357bd",
+      "git_blob": "13a63f65d270e0059cc53df69e27bcf715477301",
       "mode": "100644",
-      "bytes": 2911,
-      "sha256": "0ecda0063cf7d5df7b83ffef6c151afb435b05347596e8ad76db079515255977"
+      "bytes": 3130,
+      "sha256": "278669e06692953c1298154e3e669af45f0d9e0e75a4c0697b9006d337515874"
     },
     {
       "path": "docs/releases/v0.3.2.md",
