@@ -9,6 +9,21 @@ from pathlib import Path
 from . import gmsh_occ_runtime as runtime
 from .assembly_airflow_mesh import validate_geometry, build_air_mesh
 
+DEVELOPMENT_PYTHON_SHA256 = '5f7b89a612c9b8af1d6456cdfcd1dbe5ca630849e79aebced9bee9a6694952ec'
+
+
+def _development_python311_path():
+    local_app_data = os.environ.get('LOCALAPPDATA')
+    base = Path(local_app_data) if local_app_data else Path.home()/'AppData'/'Local'
+    return base/'Programs'/'Python'/'Python311'/'python.exe'
+
+
+def _admitted_development_python311():
+    executable = _development_python311_path()
+    if not executable.is_file() or runtime._sha(executable) != DEVELOPMENT_PYTHON_SHA256:
+        raise ValueError('AIRFLOW_RUNTIME: pinned development Python 3.11 unavailable')
+    return executable
+
 
 def worker(digest):
     provenance = runtime.verify_installation()
@@ -43,9 +58,7 @@ def run_air_mesh(job, output_dir, *, cancellation_event=None, timeout_s=180, mem
     validate_geometry(job)
     # Parent desktop workers may use another Python; only the isolated admitted
     # child loads the Gmsh DLL. Pin the same local development interpreter.
-    executable = Path('C:/Users/yawar/AppData/Local/Programs/Python/Python311/python.exe')
-    if not executable.is_file() or runtime._sha(executable) != '5f7b89a612c9b8af1d6456cdfcd1dbe5ca630849e79aebced9bee9a6694952ec':
-        raise ValueError('AIRFLOW_RUNTIME: pinned development Python 3.11 unavailable')
+    executable = _admitted_development_python311()
     for path, expected in runtime.ARTIFACTS.items():
         if not path.is_file() or path.is_symlink() or runtime._sha(path) != expected:
             raise ValueError('AIRFLOW_RUNTIME: Gmsh entry artifact changed')

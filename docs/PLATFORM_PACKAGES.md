@@ -1,4 +1,14 @@
-# Linux and macOS
+# Platform installation and command line
+
+## Windows Gamma preview
+
+The current Windows x64 Gamma prerelease is
+[0.3.12-gamma.1](https://github.com/wayri/SPIKE/releases/tag/v0.3.12-gamma.1).
+Use the attached EXE or MSI and verify its SHA-256 checksum. It is unsigned;
+numerical human review and clean-machine qualification remain pending. Save and
+close your work before installing. This release does not refresh Linux or macOS.
+
+## Earlier experimental Linux and macOS packages
 
 The experimental platform packages include the desktop app, Python runtime,
 native kernels, and command-line interface. A separate Python installation is
@@ -6,25 +16,26 @@ not needed.
 
 ## Linux: Flatpak
 
-Download the `.flatpak` file from the [0.3.2 release](https://github.com/wayri/SPIKE-Main/releases/tag/v0.3.2).
+Download the `.flatpak` file from the [0.3.5 release](https://github.com/wayri/SPIKE/releases/tag/v0.3.5).
 With Flatpak installed, run:
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install --user ./SPIKE_0.3.2_linux-x86_64_EXPERIMENTAL.flatpak
+flatpak install --user ./SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak
 flatpak run org.spike.integrity
 ```
 
-The package is for x86-64 Linux and uses the GNOME 50 runtime. Flatpak downloads
+The package is for x86-64 Linux. Flatpak downloads
 the runtime on first installation. SPIKE can then run locally without a network
 connection. The app can read and write your home directory and uses the network
 for configured local model services and extensions.
 
 ## macOS: DMG
 
-Choose `macos-arm64` for Apple Silicon or `macos-x86_64` for an Intel Mac.
-Open the DMG and drag SPIKE into Applications. The packages are tested on macOS 15;
-earlier versions have not been tested.
+Use the earlier 0.3.5 `macos-arm64` package for Apple Silicon. Intel macOS
+packaging is held; no verified Intel package is claimed. Open the DMG and drag
+SPIKE into Applications. The recorded build baseline is macOS 15; earlier
+versions have not been tested.
 
 These experimental builds are ad-hoc signed, without Apple notarization.
 macOS may block the first launch. If you trust the downloaded file, use
@@ -59,6 +70,8 @@ inside the sandbox. This restriction also applies to CLI extension commands.
 ## Building
 
 The [automated build and release chain](BUILD_AND_RELEASE.md) generates the
-Windows installer, Flatpak, and both macOS DMGs. It runs on version tags or from
+Windows installer and experimental Unix packages. Gamma tags are excluded from
+the automatic multi-platform publication chain; their platform-specific build
+evidence must be recorded separately. The general chain runs on other version tags or from
 **Actions - Build and release SPIKE - Run workflow**. The resulting packages
 and SHA-256 files are stored in `dist-release`.
