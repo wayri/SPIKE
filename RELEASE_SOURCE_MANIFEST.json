@@ -17719,10 +17719,10 @@
     },
     {
       "path": "licenses/runtime-notices/INDEX.json",
-      "git_blob": "b03167304b5f0f0a746a6b94f282adea06ff8bff",
+      "git_blob": "091be59697623b722b9d32dc85330ebd28bea489",
       "mode": "100644",
-      "bytes": 326155,
-      "sha256": "998d3cba39a25ca4d75ca3378d751d0963cb76c000244e3b4af3fb32b5156a95"
+      "bytes": 356736,
+      "sha256": "5c67bf87567f0ae0c8b5b8f120e784573940d00432bed4e1dc5a23fa98a5f5a5"
     },
     {
       "path": "licenses/runtime-notices/PyYAML-6.0.3/1f5c94674b-LICENSE",
@@ -18076,6 +18076,13 @@
     },
     {
       "path": "licenses/runtime-notices/alloc-no-stdlib-3.0.0/c693279643-LICENSE",
+      "git_blob": "cd496ba72eb37e83a44958358d1f89a8a28cbc15",
+      "mode": "100644",
+      "bytes": 1483,
+      "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+    },
+    {
+      "path": "licenses/runtime-notices/alloc-stdlib-0.3.0/92529f8f69-LICENSE",
       "git_blob": "cd496ba72eb37e83a44958358d1f89a8a28cbc15",
       "mode": "100644",
       "bytes": 1483,
@@ -18474,6 +18481,13 @@
       "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
     },
     {
+      "path": "licenses/runtime-notices/certifi-2026.7.22/c1aedbaa6d-LICENSE",
+      "git_blob": "62b076cdee58ec8f34034141ba0befd9015b0c7e",
+      "mode": "100644",
+      "bytes": 989,
+      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+    },
+    {
       "path": "licenses/runtime-notices/cesu8-1.1.0/8553b6e207-COPYRIGHT-RUST.txt",
       "git_blob": "52039ea7e5734462f2989ef7f30ebbaf80fef949",
       "mode": "100644",
@@ -18521,6 +18535,13 @@
       "mode": "100644",
       "bytes": 1071,
       "sha256": "6d0d41bfe170ac6c7dc248c9a63e254d0fb45a60d50a8257d0af92c6e249b887"
+    },
+    {
+      "path": "licenses/runtime-notices/charset-normalizer-3.5.1/28e1644ce5-LICENSE",
+      "git_blob": "8885be9624d2bf3fdeca3551d3b5f475bcb536db",
+      "mode": "100644",
+      "bytes": 1092,
+      "sha256": "18577485d3704f1a479ded8e573c0976cfed315fd2fd17983fa988da4c2f70d1"
     },
     {
       "path": "licenses/runtime-notices/chrono-0.4.45/d0ed4cc3fb-LICENSE.txt",
@@ -18782,6 +18803,13 @@
       "sha256": "f1218143d766da3fea66f13396b7f15df46a83303f29bf96ba6e98eb4d42f408"
     },
     {
+      "path": "licenses/runtime-notices/cyclopts-4.23.3/a1b3276dfc-LICENSE",
+      "git_blob": "5edb597aa6afc0762dde6658a5f59131e9678b2d",
+      "mode": "100644",
+      "bytes": 11357,
+      "sha256": "f14b20048c12393cb9920065c47fadc030210b0f9cab9849ce0a68a063ededc5"
+    },
+    {
       "path": "licenses/runtime-notices/darling-0.23.0/c693279643-LICENSE",
       "git_blob": "0b48eadc9d0314e4f0e93ce68e8b08a494499a16",
       "mode": "100644",
@@ -18920,6 +18948,13 @@
       "mode": "100644",
       "bytes": 1023,
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "path": "licenses/runtime-notices/docstring-parser-0.18.0/764223c671-LICENSE.md",
+      "git_blob": "f75411dcf7bbeb12daaf9eebc2b9266f3d190ff6",
+      "mode": "100644",
+      "bytes": 1084,
+      "sha256": "dfe514a337ae8417abd31a8af707bbd6172b03e5430bb083e145899ea97a3eea"
     },
     {
       "path": "licenses/runtime-notices/dom_query-0.28.0/c693279643-LICENSE",
@@ -19207,6 +19242,20 @@
       "mode": "100644",
       "bytes": 20022,
       "sha256": "94a83aaee0729a0f302d34acc4acecbd9d58366f262429075fe557e4a54b2e69"
+    },
+    {
+      "path": "licenses/runtime-notices/fonttools-4.63.0/cc2f1e3f8f-LICENSE",
+      "git_blob": "5d93d01649cd74ff8679c8494a0fb03f682c5420",
+      "mode": "100644",
+      "bytes": 1093,
+      "sha256": "22bef80697ecfaa17f97e62b9a26dfa12820be05583e8dd12ad169b241274c99"
+    },
+    {
+      "path": "licenses/runtime-notices/fonttools-4.63.0/e3c94b1075-LICENSE.external",
+      "git_blob": "e5312f3c03d79f5c4742605e400d16081ed5fca6",
+      "mode": "100644",
+      "bytes": 20410,
+      "sha256": "b082a5f86775b2641f01bccb8b9c82908481de5f502bb254b1e13bfc2a9f303d"
     },
     {
       "path": "licenses/runtime-notices/foreign-types-0.5.0/1b7a452802-LICENSE-APACHE",
@@ -19748,6 +19797,13 @@
       "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
     },
     {
+      "path": "licenses/runtime-notices/idna-3.19/acdc930330-LICENSE.md",
+      "git_blob": "f706835ab3a5dd709a6e1f57aee0a94ae1415df6",
+      "mode": "100644",
+      "bytes": 1541,
+      "sha256": "1a9a4f0e3d479a27240ddd59a9137a66ab4a0f9dfdc8ca6188cc0bfd85187f04"
+    },
+    {
       "path": "licenses/runtime-notices/idna_adapter-1.2.2/1b7a452802-LICENSE-APACHE",
       "git_blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
       "mode": "100644",
@@ -19951,6 +20007,13 @@
       "sha256": "cf20799d32de0eefa2ea904e3ac5122f47aed5d352930751eb61724762c49d90"
     },
     {
+      "path": "licenses/runtime-notices/kiwisolver-1.5.0/ca6d4913a7-LICENSE",
+      "git_blob": "a291584c97295b3c5c487ce7d88ac219acd980ba",
+      "mode": "100644",
+      "bytes": 3360,
+      "sha256": "b24c2bf6185f31a124ad6bacccae3071bdc7ad7882de00b00110aa62abb76a15"
+    },
+    {
       "path": "licenses/runtime-notices/libappindicator-0.9.0/1b7a452802-LICENSE-APACHE",
       "git_blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
       "mode": "100644",
@@ -20084,6 +20147,20 @@
       "sha256": "1e7290b35280a048667bbf0ebabac1c7fd52a75300e8b2946ac165715997f2bc"
     },
     {
+      "path": "licenses/runtime-notices/markdown-it-py-4.2.0/b883c1f025-LICENSE.markdown-it",
+      "git_blob": "7ffa058cb78f8fb9beb974d9fd429004d2d2e585",
+      "mode": "100644",
+      "bytes": 1073,
+      "sha256": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473"
+    },
+    {
+      "path": "licenses/runtime-notices/markdown-it-py-4.2.0/d0465fdc9e-LICENSE",
+      "git_blob": "582ddf59e08277fe6e78cee924d2c84805fe36fe",
+      "mode": "100644",
+      "bytes": 1078,
+      "sha256": "4a2260d6e2cd0f5a151a1e86dbfe7d3ed552b1e2beabf9941c1ba5c49cbce484"
+    },
+    {
       "path": "licenses/runtime-notices/markup5ever-0.39.0/1b7a452802-LICENSE-APACHE",
       "git_blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
       "mode": "100644",
@@ -20117,6 +20194,34 @@
       "mode": "100644",
       "bytes": 4816,
       "sha256": "d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "path": "licenses/runtime-notices/matplotlib-3.11.1/e61cd4285a-LICENSE",
+      "git_blob": "61d2d0f111f5a63241999113e8d6c7da5b2f7931",
+      "mode": "100644",
+      "bytes": 63442,
+      "sha256": "822e8e528147569a41975592aee19c11992ab667ba50451cd929031d5fc74491"
+    },
+    {
+      "path": "licenses/runtime-notices/matplotlib-3.11.1/ed755d6e0d-LICENSE_STIX",
+      "git_blob": "6034d94748146993f78c8059c345adafc860317b",
+      "mode": "100644",
+      "bytes": 5476,
+      "sha256": "bab3d31dfef07f483624f2f65f2711e76065b8e7273278b1c071ede1041c9959"
+    },
+    {
+      "path": "licenses/runtime-notices/matplotlib-3.11.1/f44a05d579-LICENSE_DEJAVU",
+      "git_blob": "254e2cc42a6d0135cccf2047768b9e44f25e666f",
+      "mode": "100644",
+      "bytes": 4816,
+      "sha256": "d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "path": "licenses/runtime-notices/mdurl-0.1.2/95bd6addf3-LICENSE",
+      "git_blob": "2a920c59d8abdd485a774087915986448495fd7c",
+      "mode": "100644",
+      "bytes": 2338,
+      "sha256": "7c605df6e28667a9603118e98274f64a49ce3eed0d26fccce9534a345e0ef955"
     },
     {
       "path": "licenses/runtime-notices/memchr-2.8.3/400d38e5cf-COPYING",
@@ -20196,6 +20301,13 @@
       "sha256": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b"
     },
     {
+      "path": "licenses/runtime-notices/mplcursors-0.7.1/99d29bd457-LICENSE.txt",
+      "git_blob": "21c23f7d91dcf7b95d57c2ec8c949685124e6ba7",
+      "mode": "100644",
+      "bytes": 857,
+      "sha256": "a66dc1ac46089efb0b98e8648af0fb2e888bc4ad52e161dc5319d4c4fb7737eb"
+    },
+    {
       "path": "licenses/runtime-notices/ms-2.1.3/734662f195-license.md",
       "git_blob": "fa5d39b6213f8a5e142b643575f99d9149cc71c6",
       "mode": "100644",
@@ -20225,6 +20337,13 @@
     },
     {
       "path": "licenses/runtime-notices/nanobind-2.11.0/12ad33eac6-LICENSE",
+      "git_blob": "3d3426d400064d53d291c028457f699b3edf9b7c",
+      "mode": "100644",
+      "bytes": 1521,
+      "sha256": "f305091a4e57805870b217a28ea4b1f16610eece8457d2370f822a9696b75836"
+    },
+    {
+      "path": "licenses/runtime-notices/nanobind-3.0.0/a8540ae846-LICENSE",
       "git_blob": "3d3426d400064d53d291c028457f699b3edf9b7c",
       "mode": "100644",
       "bytes": 1521,
@@ -20469,6 +20588,139 @@
       "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
     },
     {
+      "path": "licenses/runtime-notices/numpy-2.5.2/0f4ffb2948-LICENSE.txt",
+      "git_blob": "375a7faa07019536b6b9aad67949fbfa5b4c12db",
+      "mode": "100644",
+      "bytes": 1039,
+      "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/23105799d3-LICENSE.md",
+      "git_blob": "fb75aa5b380f24d69518397ed93da5317c9da113",
+      "mode": "100644",
+      "bytes": 340,
+      "sha256": "454ec7350e478e037061850b67395753b425b1cb0a34bbc26290b020bf89d763"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/2ee881cf90-LICENSE.md",
+      "git_blob": "4f9513f1eddbc5aba61a8a1ef8f64869b2b4a917",
+      "mode": "100644",
+      "bytes": 3582,
+      "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/87e9167888-LICENSE.txt",
+      "git_blob": "375a7faa07019536b6b9aad67949fbfa5b4c12db",
+      "mode": "100644",
+      "bytes": 1039,
+      "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/89589bcab0-LICENSE.md",
+      "git_blob": "84707451a9f5c6432ef3a959f6c60d401327b981",
+      "mode": "100644",
+      "bytes": 1253,
+      "sha256": "28cad82ce1379dc529df30da78ec012d7d0d1d576b03ddcb93388aee53659f59"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/94c08f23f3-LICENSE",
+      "git_blob": "f165a0f6dbf57b89e2f6e23b9f042750dde3caab",
+      "mode": "100644",
+      "bytes": 1616,
+      "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/954175b43c-LICENSE.md",
+      "git_blob": "364e728d996d5cf4ca5251560050f6246a435601",
+      "mode": "100644",
+      "bytes": 2986,
+      "sha256": "92c10699884321f1c2947fe2a70ab23b0fbf1507f756d89dd08f38c61fc3d4fa"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/95d0e1668f-LICENSE",
+      "git_blob": "51b8406fa98999f72f20a5cc72d321188b660eb0",
+      "mode": "100644",
+      "bytes": 1573,
+      "sha256": "585483905b13d4b42f800c55ba99e89d6e2e33ccd5f503e201c07531d148ff41"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/99d1a212bd-LICENSE.md",
+      "git_blob": "da7487a3110780bd9bc1e682d2a0c4f8b5f1e9e1",
+      "mode": "100644",
+      "bytes": 1176,
+      "sha256": "41190663b77bee5302386495a07b7eabfbfa571aa0ae2f11da6764162062fc4f"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/9d6c3b8daf-LICENSE.md",
+      "git_blob": "3d693b8e9c756567fa50cc8b9ec2f6590396c0d6",
+      "mode": "100644",
+      "bytes": 2805,
+      "sha256": "cf5619f25b112d5ce7c896efffc8e610bcb345dfadcc19f2c1460aa48fff2c9e"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/9f8e40c515-LICENSE",
+      "git_blob": "70cc735458ff85838fb08a61148eb8c9fe4ef8ad",
+      "mode": "100644",
+      "bytes": 21155,
+      "sha256": "d208152e2777ffd0126eacc1bd21c0320d69e4e6b622d21a2a12a47e8ef73763"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/c21c93791a-LICENSE.md",
+      "git_blob": "4f9513f1eddbc5aba61a8a1ef8f64869b2b4a917",
+      "mode": "100644",
+      "bytes": 3582,
+      "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/c2e32b07d0-LICENSE.txt",
+      "git_blob": "4d23316b6739404951c27f97b9098612931d4247",
+      "mode": "100644",
+      "bytes": 2314,
+      "sha256": "19060ef465e1797d682ee0fc3081bd25ab1395e995e43d25c9d13c95d9a3cd6b"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/cd3c96ff38-LICENSE.md",
+      "git_blob": "99399cd4ec783c1c2af00c6e38357fb518d7b250",
+      "mode": "100644",
+      "bytes": 1542,
+      "sha256": "a732977853530066790c42817087f4829b518dd98d340c916acbfd227e39d3cb"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/d0fb1067d0-LICENSE.md",
+      "git_blob": "79b818c5e05787714dfea4bb234c8b2b0ef0b064",
+      "mode": "100644",
+      "bytes": 1523,
+      "sha256": "8db000e158c162e7249787852d8c69764706502ccee725c06641b31c1e95c8af"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/ddfcf34665-LICENSE",
+      "git_blob": "f165a0f6dbf57b89e2f6e23b9f042750dde3caab",
+      "mode": "100644",
+      "bytes": 1616,
+      "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/e4f92bad13-COPYING",
+      "git_blob": "6a223f9f6b2d351e52b2112af654c49cdcd742df",
+      "mode": "100644",
+      "bytes": 704,
+      "sha256": "aea41976c720f91bd19725c16916a1ace40eb1ea42620d340e587a5de4bbcea0"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/fb5540f41a-LICENSE.txt",
+      "git_blob": "2ee057eeb0bc419bc18d1c5bd9a0683d4b1a6815",
+      "mode": "100644",
+      "bytes": 45831,
+      "sha256": "a804dff0ead9fadc5293456410bcbfc32bf024be9c4513459663fb7b442d2341"
+    },
+    {
+      "path": "licenses/runtime-notices/numpy-2.5.2/fccf2a3b0f-LICENSE.md",
+      "git_blob": "c815ae29364457c0bdccf417d170c2dd8696e09a",
+      "mode": "100644",
+      "bytes": 1540,
+      "sha256": "322ac46d870c8aeead6c53adcccc839296fb3c8e456eae155081297daf7f8013"
+    },
+    {
       "path": "licenses/runtime-notices/once_cell-1.21.4/1b7a452802-LICENSE-APACHE",
       "git_blob": "16fe87b06e802f094b3fbb0894b137bca2b16ef1",
       "mode": "100644",
@@ -20516,6 +20768,27 @@
       "mode": "100644",
       "bytes": 197,
       "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "path": "licenses/runtime-notices/packaging-26.3/11c854e2fe-LICENSE",
+      "git_blob": "6f62d44e4ef733c0e713afcd2371fed7f2b3de67",
+      "mode": "100644",
+      "bytes": 197,
+      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "path": "licenses/runtime-notices/packaging-26.3/e9a5bac8b5-LICENSE.APACHE",
+      "git_blob": "f433b1a53f5b830a205fd2df78e2b34974656c7b",
+      "mode": "100644",
+      "bytes": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": "licenses/runtime-notices/packaging-26.3/ef96a0844c-LICENSE.BSD",
+      "git_blob": "42ce7b75c92fb01a3f6ed17eea363f756b7da582",
+      "mode": "100644",
+      "bytes": 1344,
+      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
     },
     {
       "path": "licenses/runtime-notices/pango-0.18.3/84a6545219-COPYRIGHT",
@@ -20642,6 +20915,13 @@
       "mode": "100644",
       "bytes": 76461,
       "sha256": "86b6cc52cd6b139932286592bbdaf4b54f9efb3a196c4051313c5a355f8da5a2"
+    },
+    {
+      "path": "licenses/runtime-notices/pillow-12.3.0/60b8570677-LICENSE",
+      "git_blob": "fd5fb1f72646e5892ab2e1f876aa632b3d798cc5",
+      "mode": "100644",
+      "bytes": 78016,
+      "sha256": "4f7866a74802c6326f81faff59a56546b6aec2b10b91973e0e9308de95e79857"
     },
     {
       "path": "licenses/runtime-notices/pin-project-lite-0.2.17/1b7a452802-LICENSE-APACHE",
@@ -20973,6 +21253,13 @@
       "sha256": "ad64fcb9589f162720f3cc5010ad76ca6ad3764e11861f9192c489df176bb71d"
     },
     {
+      "path": "licenses/runtime-notices/platformdirs-4.11.4/d7c559d683-LICENSE",
+      "git_blob": "f35fed9191b1142ddaada8a96de4a9461c5d796c",
+      "mode": "100644",
+      "bytes": 1089,
+      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+    },
+    {
       "path": "licenses/runtime-notices/platformdirs-4.5.1/a1fcd41b7f-LICENSE",
       "git_blob": "f35fed9191b1142ddaada8a96de4a9461c5d796c",
       "mode": "100644",
@@ -21162,6 +21449,13 @@
       "sha256": "d1c981370f1ffd4edcdd2fb3565c8939cc40c75e24e1f92d581d04e54f0dff81"
     },
     {
+      "path": "licenses/runtime-notices/pygments-2.21.0/62c35449c9-LICENSE",
+      "git_blob": "446a1a805c8a949579fb8a9799f2bec7777349dc",
+      "mode": "100644",
+      "bytes": 1331,
+      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+    },
+    {
       "path": "licenses/runtime-notices/pyinstaller-6.21.0/9024232810-COPYING.txt",
       "git_blob": "51bf4bd138e68f0ccafce4fbf7723842dceaa1d1",
       "mode": "100644",
@@ -21195,6 +21489,13 @@
       "mode": "100644",
       "bytes": 1088,
       "sha256": "81aebb07c490f1e72e24eda6bc713de559141225c2407228513d25d80b587798"
+    },
+    {
+      "path": "licenses/runtime-notices/pyvista-0.48.4/49ca666de8-LICENSE",
+      "git_blob": "9133bef22164de5a6ec24510d3fe883b7c36e978",
+      "mode": "100644",
+      "bytes": 1088,
+      "sha256": "ef781b94ef972e69777b03022520150b77ae9bd1c6e0225c452a14e82251e9e5"
     },
     {
       "path": "licenses/runtime-notices/pywin32-ctypes-0.2.3/e9fda7e83e-LICENSE.txt",
@@ -21386,7 +21687,28 @@
       "sha256": "ef831761646313921375fc2cb888e8eeaf7da213d0b92852c10c42f3a0b4d138"
     },
     {
+      "path": "licenses/runtime-notices/reportlab-5.0.1/55678dbd7a-LICENSE",
+      "git_blob": "0ff4a17617915da75cff14d17c67538a957011ce",
+      "mode": "100644",
+      "bytes": 1707,
+      "sha256": "ef831761646313921375fc2cb888e8eeaf7da213d0b92852c10c42f3a0b4d138"
+    },
+    {
       "path": "licenses/runtime-notices/requests-2.32.5/5ffe5c6399-LICENSE",
+      "git_blob": "67db8588217f266eb561f75fae738656325deac9",
+      "mode": "100644",
+      "bytes": 10142,
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "path": "licenses/runtime-notices/requests-2.34.2/bd7b91afd6-NOTICE",
+      "git_blob": "1ff62db688277b77c83c1766dac7f165364d3528",
+      "mode": "100644",
+      "bytes": 38,
+      "sha256": "f5110972dedad2b4e9d314518daf3b7d72d6e02e499acd802181de6f74571dcc"
+    },
+    {
+      "path": "licenses/runtime-notices/requests-2.34.2/fb0b720c70-LICENSE",
       "git_blob": "67db8588217f266eb561f75fae738656325deac9",
       "mode": "100644",
       "bytes": 10142,
@@ -21412,6 +21734,20 @@
       "mode": "100644",
       "bytes": 1079,
       "sha256": "65fc947f4bac882a2cd104ef73c246b1b037059df9f2b3a58b7f77f0b9e56071"
+    },
+    {
+      "path": "licenses/runtime-notices/rich-15.0.0/bb9c3b1eee-LICENSE",
+      "git_blob": "4415505566f261c802b671426be529a31f914137",
+      "mode": "100644",
+      "bytes": 1056,
+      "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
+    },
+    {
+      "path": "licenses/runtime-notices/rich-rst-2.1.0/c0b707d8fc-LICENSE",
+      "git_blob": "b37a4ed7990cbc4313e70a4a2fc81b3ee4135026",
+      "mode": "100644",
+      "bytes": 1050,
+      "sha256": "afd4029d4a3f931ff188b56413dc125a8de083130164a4b6019731dff935523a"
     },
     {
       "path": "licenses/runtime-notices/rollup-4.62.2/4673a3aba0-LICENSE.md",
@@ -21582,7 +21918,49 @@
       "sha256": "ed9bf58c6d74d3fad9d92d1d67d9bff8141d8ab60de784516b0711364fd43357"
     },
     {
+      "path": "licenses/runtime-notices/scipy-1.18.1/1254351382-LICENSE",
+      "git_blob": "90e4b0a1e185e7073aae5d480af303b0ea992700",
+      "mode": "100644",
+      "bytes": 1543,
+      "sha256": "e4c4acc31e8287066d7c995d26e3ef902ca1977ee187b260b11c278366503811"
+    },
+    {
+      "path": "licenses/runtime-notices/scipy-1.18.1/4204666d1d-LICENSE.md",
+      "git_blob": "b5aa9769746affa6c430599612a3146108f0a974",
+      "mode": "100644",
+      "bytes": 1523,
+      "sha256": "c04661685cff9d8035fe1c4c3ab357e7f7633cafc06a73e9d90c3c5fede8a86a"
+    },
+    {
+      "path": "licenses/runtime-notices/scipy-1.18.1/8989e278a2-COPYING_QHULL.txt",
+      "git_blob": "3d82c45e3554d8f18b1cc346a60e39d3b3c1761b",
+      "mode": "100644",
+      "bytes": 1759,
+      "sha256": "2a6ebb495e26dd5f88cbc40c593733da6edb27b64936f70409cd5a1acafb1c32"
+    },
+    {
+      "path": "licenses/runtime-notices/scipy-1.18.1/a443b9ad7f-LICENSE_DOP",
+      "git_blob": "924d5104c8830ee363060c575d15448a8427543e",
+      "mode": "100644",
+      "bytes": 3648,
+      "sha256": "6cc2ed6e35b8f376ff3d8f86aeef4e0c34c2309bd6f4a0565936d577839ba023"
+    },
+    {
+      "path": "licenses/runtime-notices/scipy-1.18.1/d98f685fd2-LICENSE.txt",
+      "git_blob": "0f8a93890445d9fc15bf94d8daf1f00035aab32a",
+      "mode": "100644",
+      "bytes": 45881,
+      "sha256": "f0f5c56b298ec9795df1199edc328a987242716d14a1bde6813112e22dc15f99"
+    },
+    {
       "path": "licenses/runtime-notices/scooby-0.11.0/5e8507fd91-LICENSE",
+      "git_blob": "e5d21994d3af62eabca2b35f7e81e4ae23f788a9",
+      "mode": "100644",
+      "bytes": 1092,
+      "sha256": "82208b11be7124de546e1ea8d7fd8bc478ffb2d62be46d8221007978d2483a5b"
+    },
+    {
+      "path": "licenses/runtime-notices/scooby-0.11.2/fd448fce5c-LICENSE",
       "git_blob": "e5d21994d3af62eabca2b35f7e81e4ae23f788a9",
       "mode": "100644",
       "bytes": 1092,
@@ -21601,6 +21979,20 @@
       "mode": "100644",
       "bytes": 1097,
       "sha256": "fb77f0a9c53e473abe5103c8632ef9f0f2874d4fb3f17cb2d8c661aab9cee9d7"
+    },
+    {
+      "path": "licenses/runtime-notices/selectors-0.38.0/79c1dc073e-MPL-2.0.txt",
+      "git_blob": "d0a1fa1482eea82e19510e7920cbe3a03e41f691",
+      "mode": "100644",
+      "bytes": 16726,
+      "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+    },
+    {
+      "path": "licenses/runtime-notices/selectors-0.38.0/SOURCE_NOTICE.txt",
+      "git_blob": "bd157b5a29962f7298161cd96bba46734228a6e5",
+      "mode": "100644",
+      "bytes": 985,
+      "sha256": "79705d0694ac23a798bd0a88499ed7b885bdaf5baebc779859bb1dcbfbcd2d23"
     },
     {
       "path": "licenses/runtime-notices/semver-1.0.28/1b7a452802-LICENSE-APACHE",
@@ -22352,6 +22744,20 @@
       "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
     },
     {
+      "path": "licenses/runtime-notices/tauri-plugin-2.7.0/d2415d63af-LICENSE-APACHE-2.0",
+      "git_blob": "f433b1a53f5b830a205fd2df78e2b34974656c7b",
+      "mode": "100644",
+      "bytes": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": "licenses/runtime-notices/tauri-plugin-2.7.0/feb271f03f-LICENSE-MIT",
+      "git_blob": "b08530d59433b3060f4fad8751ac2610c0b0aff3",
+      "mode": "100644",
+      "bytes": 1090,
+      "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+    },
+    {
       "path": "licenses/runtime-notices/tauri-plugin-opener-2.6.0/5a8a9d851c-LICENSE_MIT",
       "git_blob": "4d75472566358fac0eed03625b37d1837a33dfe2",
       "mode": "100644",
@@ -22856,6 +23262,13 @@
       "sha256": "a5e9f9b1575301c7a7a03508fdaa2e05a918cc17fd21c6e898096a96d6a34f61"
     },
     {
+      "path": "licenses/runtime-notices/typing-extensions-4.16.0/2231b6c46c-LICENSE",
+      "git_blob": "f26bcf4d2de6eb136e31006ca3ab447d5e488adf",
+      "mode": "100644",
+      "bytes": 13936,
+      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+    },
+    {
       "path": "licenses/runtime-notices/typing_extensions-4.15.0/ea22ee0698-LICENSE",
       "git_blob": "f26bcf4d2de6eb136e31006ca3ab447d5e488adf",
       "mode": "100644",
@@ -22927,6 +23340,13 @@
     },
     {
       "path": "licenses/runtime-notices/urllib3-2.6.3/3a3078ccf9-LICENSE.txt",
+      "git_blob": "e6183d0276b26c5b87aecccf8d0d5bcd7b1148d4",
+      "mode": "100644",
+      "bytes": 1093,
+      "sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686"
+    },
+    {
+      "path": "licenses/runtime-notices/urllib3-2.7.0/0339980ea9-LICENSE.txt",
       "git_blob": "e6183d0276b26c5b87aecccf8d0d5bcd7b1148d4",
       "mode": "100644",
       "bytes": 1093,
@@ -23022,6 +23442,13 @@
       "mode": "100644",
       "bytes": 1761,
       "sha256": "11232448be82e0ea2c2c66219c2e36389f42249894070ee10c549ff182fc08b6"
+    },
+    {
+      "path": "licenses/runtime-notices/vtk-9.6.2/3874422d3e-LICENSE",
+      "git_blob": "a4e694eeecfb93de49292b2fa4b52a8a705ef414",
+      "mode": "100644",
+      "bytes": 1795,
+      "sha256": "fb3c1d41b57425cf3026c4bb4cd244c982a7a9475596424de5d1b7f32ea78285"
     },
     {
       "path": "licenses/runtime-notices/walkdir-2.5.0/400d38e5cf-COPYING",
@@ -23141,6 +23568,27 @@
       "mode": "100644",
       "bytes": 1078,
       "sha256": "281b72cb008466810da31680e72005b9899c7e9d7705b909c86098260e12aa7d"
+    },
+    {
+      "path": "licenses/runtime-notices/webview2-com-0.39.1/da8dff6f52-LICENSE",
+      "git_blob": "de9a7e660e173136b351982a34f715af424ff812",
+      "mode": "100644",
+      "bytes": 1067,
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+    },
+    {
+      "path": "licenses/runtime-notices/webview2-com-macros-0.8.1/da8dff6f52-LICENSE",
+      "git_blob": "de9a7e660e173136b351982a34f715af424ff812",
+      "mode": "100644",
+      "bytes": 1067,
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+    },
+    {
+      "path": "licenses/runtime-notices/webview2-com-sys-0.39.1/da8dff6f52-LICENSE",
+      "git_blob": "de9a7e660e173136b351982a34f715af424ff812",
+      "mode": "100644",
+      "bytes": 1067,
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
     },
     {
       "path": "licenses/runtime-notices/winapi-0.3.9/1b7a452802-LICENSE-APACHE",
@@ -23844,6 +24292,20 @@
     },
     {
       "path": "licenses/runtime-notices/wxPython-4.2.4/e5d407083a-LICENSE_BSD_Simple.txt",
+      "git_blob": "9a7ace03f2ee7236369221a998228996a5ac4800",
+      "mode": "100644",
+      "bytes": 1313,
+      "sha256": "42b972151ea0ca1fba614bec8a057abafba9aefca49130e1d86473aad33a2950"
+    },
+    {
+      "path": "licenses/runtime-notices/wxpython-4.3.1/7fa6a8aa16-LICENSE.txt",
+      "git_blob": "426e2e04906bd55e066aacc6f5c0d1222e6efe5e",
+      "mode": "100644",
+      "bytes": 31221,
+      "sha256": "0d5cca7fb8ee32d9313e3b1660a009846caaef4fe166e493c7ca4dfd95a0ab5c"
+    },
+    {
+      "path": "licenses/runtime-notices/wxpython-4.3.1/e5d407083a-LICENSE_BSD_Simple.txt",
       "git_blob": "9a7ace03f2ee7236369221a998228996a5ac4800",
       "mode": "100644",
       "bytes": 1313,

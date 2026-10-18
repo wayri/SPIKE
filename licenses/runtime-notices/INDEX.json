@@ -2,1358 +2,6 @@
   "status": "notice texts retained; production/legal review pending",
   "entries": [
     {
-      "component": "altgraph",
-      "version": "0.17.5",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "altgraph-0.17.5.dist-info/LICENSE",
-      "file": "altgraph-0.17.5/fb197afb75-LICENSE",
-      "sha256": "6c194d6db0c64d45535d10c95142b9b0cda7b7dcc7f1ddee302b3d536f3dbe46"
-    },
-    {
-      "component": "attrs",
-      "version": "26.1.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "attrs-26.1.0.dist-info/licenses/LICENSE",
-      "file": "attrs-26.1.0/0d26a74c4c-LICENSE",
-      "sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f"
-    },
-    {
-      "component": "certifi",
-      "version": "2026.1.4",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "certifi-2026.1.4.dist-info/licenses/LICENSE",
-      "file": "certifi-2026.1.4/f93e33205a-LICENSE",
-      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
-    },
-    {
-      "component": "charset-normalizer",
-      "version": "3.4.4",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "charset_normalizer-3.4.4.dist-info/licenses/LICENSE",
-      "file": "charset-normalizer-3.4.4/41cf8ee1d3-LICENSE",
-      "sha256": "6d0d41bfe170ac6c7dc248c9a63e254d0fb45a60d50a8257d0af92c6e249b887"
-    },
-    {
-      "component": "contourpy",
-      "version": "1.3.3",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "contourpy-1.3.3.dist-info/LICENSE",
-      "file": "contourpy-1.3.3/19fd8c3d83-LICENSE",
-      "sha256": "34170979fc64f4f5e6dfa66ef27dec314ffffc5852000c60f4836ec1dfbf156e"
-    },
-    {
-      "component": "cycler",
-      "version": "0.12.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "cycler-0.12.1.dist-info/LICENSE",
-      "file": "cycler-0.12.1/4e2f52aab7-LICENSE",
-      "sha256": "f1218143d766da3fea66f13396b7f15df46a83303f29bf96ba6e98eb4d42f408"
-    },
-    {
-      "component": "fonttools",
-      "version": "4.61.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "fonttools-4.61.1.dist-info/licenses/LICENSE",
-      "file": "fonttools-4.61.1/b3dd12d9f0-LICENSE",
-      "sha256": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383"
-    },
-    {
-      "component": "fonttools",
-      "version": "4.61.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "fonttools-4.61.1.dist-info/licenses/LICENSE.external",
-      "file": "fonttools-4.61.1/bce21af3e8-LICENSE.external",
-      "sha256": "94a83aaee0729a0f302d34acc4acecbd9d58366f262429075fe557e4a54b2e69"
-    },
-    {
-      "component": "idna",
-      "version": "3.11",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "idna-3.11.dist-info/licenses/LICENSE.md",
-      "file": "idna-3.11/5ceea29fca-LICENSE.md",
-      "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
-    },
-    {
-      "component": "jsonschema",
-      "version": "4.25.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "jsonschema-4.25.1.dist-info/licenses/COPYING",
-      "file": "jsonschema-4.25.1/65433f4947-COPYING",
-      "sha256": "4f92a015a13c4d1a040bef018aa13430b4f1bc73b41b16bb846c346766de7439"
-    },
-    {
-      "component": "jsonschema-specifications",
-      "version": "2025.9.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "jsonschema_specifications-2025.9.1.dist-info/licenses/COPYING",
-      "file": "jsonschema-specifications-2025.9.1/43964009a4-COPYING",
-      "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
-    },
-    {
-      "component": "kiwisolver",
-      "version": "1.4.9",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "kiwisolver-1.4.9.dist-info/licenses/LICENSE",
-      "file": "kiwisolver-1.4.9/3118a8da97-LICENSE",
-      "sha256": "cf20799d32de0eefa2ea904e3ac5122f47aed5d352930751eb61724762c49d90"
-    },
-    {
-      "component": "matplotlib",
-      "version": "3.10.8",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "matplotlib-3.10.8.dist-info/LICENSE",
-      "file": "matplotlib-3.10.8/1b2617b91d-LICENSE",
-      "sha256": "dbb9ad7495a83b0f2f48c94b06e23020587d82f8d1492dcb717fb1ebc2f86c18"
-    },
-    {
-      "component": "matplotlib",
-      "version": "3.10.8",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "matplotlib/mpl-data/fonts/ttf/LICENSE_DEJAVU",
-      "file": "matplotlib-3.10.8/f44a05d579-LICENSE_DEJAVU",
-      "sha256": "d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
-    },
-    {
-      "component": "matplotlib",
-      "version": "3.10.8",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "matplotlib/mpl-data/fonts/ttf/LICENSE_STIX",
-      "file": "matplotlib-3.10.8/ed755d6e0d-LICENSE_STIX",
-      "sha256": "bab3d31dfef07f483624f2f65f2711e76065b8e7273278b1c071ede1041c9959"
-    },
-    {
-      "component": "nanobind",
-      "version": "2.11.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "nanobind-2.11.0.dist-info/licenses/LICENSE",
-      "file": "nanobind-2.11.0/12ad33eac6-LICENSE",
-      "sha256": "f305091a4e57805870b217a28ea4b1f16610eece8457d2370f822a9696b75836"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/LICENSE.txt",
-      "file": "numpy-2.4.2/3b4bdcbee9-LICENSE.txt",
-      "sha256": "dc97d59562c75c04557f1e9a68f3eae326699eb119d569cd4ed6a4eafe5f9abb"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
-      "file": "numpy-2.4.2/c18a288196-LICENSE.txt",
-      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
-      "file": "numpy-2.4.2/03c1cd5a7c-COPYING",
-      "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE",
-      "file": "numpy-2.4.2/6fcb35f3c2-LICENSE",
-      "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
-      "file": "numpy-2.4.2/56a2ab8ad1-LICENSE.md",
-      "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
-      "file": "numpy-2.4.2/06b46e685c-LICENSE",
-      "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
-      "file": "numpy-2.4.2/77c9c86960-LICENSE.md",
-      "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
-      "file": "numpy-2.4.2/576dc9df83-LICENSE.txt",
-      "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE",
-      "file": "numpy-2.4.2/29e947a614-LICENSE",
-      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md",
-      "file": "numpy-2.4.2/482b760e35-LICENSE.md",
-      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
-      "file": "numpy-2.4.2/57653b99c0-LICENSE.md",
-      "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
-      "file": "numpy-2.4.2/e2dc5f581c-LICENSE.md",
-      "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
-      "file": "numpy-2.4.2/33a3d64024-LICENSE.md",
-      "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
-      "file": "numpy-2.4.2/62383cbcd0-LICENSE.md",
-      "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
-      "file": "numpy-2.4.2/011ddfd6d5-LICENSE.md",
-      "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
-      "file": "numpy-2.4.2/114672b32c-LICENSE.md",
-      "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy/_core/include/numpy/random/LICENSE.txt",
-      "file": "numpy-2.4.2/0f4ffb2948-LICENSE.txt",
-      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy/ma/LICENSE",
-      "file": "numpy-2.4.2/ddfcf34665-LICENSE",
-      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
-    },
-    {
-      "component": "numpy",
-      "version": "2.4.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "numpy/random/LICENSE.md",
-      "file": "numpy-2.4.2/c21c93791a-LICENSE.md",
-      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
-    },
-    {
-      "component": "packaging",
-      "version": "26.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "packaging-26.0.dist-info/licenses/LICENSE",
-      "file": "packaging-26.0/e4a034ba8e-LICENSE",
-      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
-    },
-    {
-      "component": "packaging",
-      "version": "26.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "packaging-26.0.dist-info/licenses/LICENSE.APACHE",
-      "file": "packaging-26.0/60541d01bd-LICENSE.APACHE",
-      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
-    },
-    {
-      "component": "packaging",
-      "version": "26.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "packaging-26.0.dist-info/licenses/LICENSE.BSD",
-      "file": "packaging-26.0/3e24fb3dae-LICENSE.BSD",
-      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
-    },
-    {
-      "component": "pefile",
-      "version": "2024.8.26",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pefile-2024.8.26.dist-info/LICENSE",
-      "file": "pefile-2024.8.26/9814bad7ec-LICENSE",
-      "sha256": "b44409c067c6da52bfb54bb6624fb11a7b52157c3a13ae1400232f8196e86ad3"
-    },
-    {
-      "component": "pillow",
-      "version": "12.1.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pillow-12.1.0.dist-info/licenses/LICENSE",
-      "file": "pillow-12.1.0/275c85f31a-LICENSE",
-      "sha256": "86b6cc52cd6b139932286592bbdaf4b54f9efb3a196c4051313c5a355f8da5a2"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/LICENSE.txt",
-      "file": "pip-26.0.1/06270d6c7f-LICENSE.txt",
-      "sha256": "634300a669d49aeae65b12c6c48c924c51a4cdf3d1ff086dc3456dc8bcaa2104"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/cachecontrol/LICENSE.txt",
-      "file": "pip-26.0.1/3722ca84eb-LICENSE.txt",
-      "sha256": "86eeee87be2a43f3ff1f56496f451f69243926f025fedbb033666c304c4c161b"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/certifi/LICENSE",
-      "file": "pip-26.0.1/63619e19e3-LICENSE",
-      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/dependency_groups/LICENSE.txt",
-      "file": "pip-26.0.1/acf592016c-LICENSE.txt",
-      "sha256": "1ab36e3e2a4ba8631625384f87e9e091db1faed034c5b23325b3239abf2cc525"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/distlib/LICENSE.txt",
-      "file": "pip-26.0.1/f8799de97e-LICENSE.txt",
-      "sha256": "808e10c8a6ab8deb149ff9b3fb19f447a808094606d712a9ca57fead3552599d"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/distro/LICENSE",
-      "file": "pip-26.0.1/5a3a04917f-LICENSE",
-      "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md",
-      "file": "pip-26.0.1/4025eee283-LICENSE.md",
-      "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/msgpack/COPYING",
-      "file": "pip-26.0.1/c1e6d9dcca-COPYING",
-      "sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE",
-      "file": "pip-26.0.1/949028d66f-LICENSE",
-      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.APACHE",
-      "file": "pip-26.0.1/7cd248d22a-LICENSE.APACHE",
-      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.BSD",
-      "file": "pip-26.0.1/5275566852-LICENSE.BSD",
-      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/pkg_resources/LICENSE",
-      "file": "pip-26.0.1/65ecd34c64-LICENSE",
-      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/platformdirs/LICENSE",
-      "file": "pip-26.0.1/91e7c9f2d2-LICENSE",
-      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/pygments/LICENSE",
-      "file": "pip-26.0.1/f7aff05a44-LICENSE",
-      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/pyproject_hooks/LICENSE",
-      "file": "pip-26.0.1/ade387d3a0-LICENSE",
-      "sha256": "1b22b049b5267d6dfc23a67bf4a84d8ec04b9fdfb1a51d360e42b4342c8b4154"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/requests/LICENSE",
-      "file": "pip-26.0.1/801abd0041-LICENSE",
-      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/resolvelib/LICENSE",
-      "file": "pip-26.0.1/b042b1ed8a-LICENSE",
-      "sha256": "f388fd38cad13112c1dc0f669bbe80e7f84541edbafb72f3030d2ca7642c3c9d"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/rich/LICENSE",
-      "file": "pip-26.0.1/0dfdea4dad-LICENSE",
-      "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/tomli/LICENSE",
-      "file": "pip-26.0.1/15f361bc1c-LICENSE",
-      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/tomli_w/LICENSE",
-      "file": "pip-26.0.1/ad240068df-LICENSE",
-      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/truststore/LICENSE",
-      "file": "pip-26.0.1/2033a1005d-LICENSE",
-      "sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/urllib3/LICENSE.txt",
-      "file": "pip-26.0.1/3ceca8e30f-LICENSE.txt",
-      "sha256": "c37bf186e27cf9dbe9619e55edfe3cea7b30091ceb3da63c7dacbe0e6d77907b"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/cachecontrol/LICENSE.txt",
-      "file": "pip-26.0.1/c41fdd4af7-LICENSE.txt",
-      "sha256": "86eeee87be2a43f3ff1f56496f451f69243926f025fedbb033666c304c4c161b"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/certifi/LICENSE",
-      "file": "pip-26.0.1/ba5c9fe972-LICENSE",
-      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/dependency_groups/LICENSE.txt",
-      "file": "pip-26.0.1/ef85ffb23c-LICENSE.txt",
-      "sha256": "1ab36e3e2a4ba8631625384f87e9e091db1faed034c5b23325b3239abf2cc525"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/distlib/LICENSE.txt",
-      "file": "pip-26.0.1/e976c6a8e7-LICENSE.txt",
-      "sha256": "808e10c8a6ab8deb149ff9b3fb19f447a808094606d712a9ca57fead3552599d"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/distro/LICENSE",
-      "file": "pip-26.0.1/a2ada58074-LICENSE",
-      "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/idna/LICENSE.md",
-      "file": "pip-26.0.1/c983bbef49-LICENSE.md",
-      "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/msgpack/COPYING",
-      "file": "pip-26.0.1/28d0dd680f-COPYING",
-      "sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/packaging/LICENSE",
-      "file": "pip-26.0.1/840f56b88f-LICENSE",
-      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/packaging/LICENSE.APACHE",
-      "file": "pip-26.0.1/eb332b84d6-LICENSE.APACHE",
-      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/packaging/LICENSE.BSD",
-      "file": "pip-26.0.1/6d4ee3350c-LICENSE.BSD",
-      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/pkg_resources/LICENSE",
-      "file": "pip-26.0.1/e2746e4295-LICENSE",
-      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/platformdirs/LICENSE",
-      "file": "pip-26.0.1/5847ccf18f-LICENSE",
-      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/pygments/LICENSE",
-      "file": "pip-26.0.1/b04af2263f-LICENSE",
-      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/pyproject_hooks/LICENSE",
-      "file": "pip-26.0.1/d9a107c5f0-LICENSE",
-      "sha256": "1b22b049b5267d6dfc23a67bf4a84d8ec04b9fdfb1a51d360e42b4342c8b4154"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/requests/LICENSE",
-      "file": "pip-26.0.1/1ee72cc72a-LICENSE",
-      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/resolvelib/LICENSE",
-      "file": "pip-26.0.1/9e7a953abe-LICENSE",
-      "sha256": "f388fd38cad13112c1dc0f669bbe80e7f84541edbafb72f3030d2ca7642c3c9d"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/rich/LICENSE",
-      "file": "pip-26.0.1/c71e4af665-LICENSE",
-      "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/tomli/LICENSE",
-      "file": "pip-26.0.1/1e6e78cd05-LICENSE",
-      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/tomli_w/LICENSE",
-      "file": "pip-26.0.1/94559abf5d-LICENSE",
-      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/truststore/LICENSE",
-      "file": "pip-26.0.1/5049051d91-LICENSE",
-      "sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
-    },
-    {
-      "component": "pip",
-      "version": "26.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pip/_vendor/urllib3/LICENSE.txt",
-      "file": "pip-26.0.1/559b62f872-LICENSE.txt",
-      "sha256": "c37bf186e27cf9dbe9619e55edfe3cea7b30091ceb3da63c7dacbe0e6d77907b"
-    },
-    {
-      "component": "platformdirs",
-      "version": "4.5.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "platformdirs-4.5.1.dist-info/licenses/LICENSE",
-      "file": "platformdirs-4.5.1/a1fcd41b7f-LICENSE",
-      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
-    },
-    {
-      "component": "pooch",
-      "version": "1.9.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pooch-1.9.0.dist-info/licenses/LICENSE.txt",
-      "file": "pooch-1.9.0/c37d746626-LICENSE.txt",
-      "sha256": "af0482d59fc7a9d68d9f64682c74ce6e8a4684406bb3a21a191ae329950916b4"
-    },
-    {
-      "component": "pyarrow",
-      "version": "25.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyarrow-25.0.1.dist-info/licenses/LICENSE.txt",
-      "file": "pyarrow-25.0.1/2827e71464-LICENSE.txt",
-      "sha256": "d1c981370f1ffd4edcdd2fb3565c8939cc40c75e24e1f92d581d04e54f0dff81"
-    },
-    {
-      "component": "pyarrow",
-      "version": "25.0.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyarrow-25.0.1.dist-info/licenses/NOTICE.txt",
-      "file": "pyarrow-25.0.1/1d679011f5-NOTICE.txt",
-      "sha256": "afd895d61a00101f6d5a41cf518c83865d815e8109e956f512a0ce4ea9738c06"
-    },
-    {
-      "component": "pyinstaller",
-      "version": "6.21.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyinstaller-6.21.0.dist-info/licenses/COPYING.txt",
-      "file": "pyinstaller-6.21.0/9024232810-COPYING.txt",
-      "sha256": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245"
-    },
-    {
-      "component": "pyinstaller-hooks-contrib",
-      "version": "2026.6",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyinstaller_hooks_contrib-2026.6.dist-info/licenses/LICENSE",
-      "file": "pyinstaller-hooks-contrib-2026.6/736c40f141-LICENSE",
-      "sha256": "91d0baaff00773038e72c0a1fc9d5d2d38706b7a2b9c04f34296608f931b9cd0"
-    },
-    {
-      "component": "pyparsing",
-      "version": "3.3.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyparsing-3.3.2.dist-info/licenses/LICENSE",
-      "file": "pyparsing-3.3.2/325a1a4b3f-LICENSE",
-      "sha256": "a5425f9dc14ac74d4c5f0b679e941f2442e32cca7452a4418d5b1a49893ebe4e"
-    },
-    {
-      "component": "python-dateutil",
-      "version": "2.9.0.post0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "python_dateutil-2.9.0.post0.dist-info/LICENSE",
-      "file": "python-dateutil-2.9.0.post0/bd1e7a7d4b-LICENSE",
-      "sha256": "ba00f51a0d92823b5a1cde27d8b5b9d2321e67ed8da9bc163eff96d5e17e577e"
-    },
-    {
-      "component": "pyvista",
-      "version": "0.46.5",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyvista-0.46.5.dist-info/licenses/LICENSE",
-      "file": "pyvista-0.46.5/652d3ec4ed-LICENSE",
-      "sha256": "81aebb07c490f1e72e24eda6bc713de559141225c2407228513d25d80b587798"
-    },
-    {
-      "component": "pywin32-ctypes",
-      "version": "0.2.3",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pywin32_ctypes-0.2.3.dist-info/LICENSE.txt",
-      "file": "pywin32-ctypes-0.2.3/e9fda7e83e-LICENSE.txt",
-      "sha256": "cc03ae891a362c85d508a4e47af954314a2e4ccbd445140cb8dca7e2baee19f7"
-    },
-    {
-      "component": "PyYAML",
-      "version": "6.0.3",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "pyyaml-6.0.3.dist-info/licenses/LICENSE",
-      "file": "PyYAML-6.0.3/1f5c94674b-LICENSE",
-      "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4"
-    },
-    {
-      "component": "referencing",
-      "version": "0.37.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "referencing-0.37.0.dist-info/licenses/COPYING",
-      "file": "referencing-0.37.0/08ac984ee3-COPYING",
-      "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
-    },
-    {
-      "component": "reportlab",
-      "version": "4.5.1",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "reportlab-4.5.1.dist-info/licenses/LICENSE",
-      "file": "reportlab-4.5.1/baa3b2f7fa-LICENSE",
-      "sha256": "ef831761646313921375fc2cb888e8eeaf7da213d0b92852c10c42f3a0b4d138"
-    },
-    {
-      "component": "requests",
-      "version": "2.32.5",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "requests-2.32.5.dist-info/licenses/LICENSE",
-      "file": "requests-2.32.5/5ffe5c6399-LICENSE",
-      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
-    },
-    {
-      "component": "rpds-py",
-      "version": "2026.6.3",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "rpds_py-2026.6.3.dist-info/licenses/LICENSE",
-      "file": "rpds-py-2026.6.3/fcd0c1933c-LICENSE",
-      "sha256": "314e4e91be3baa93c0fb4bccc9e4e97cd643eb839b065af921782c2175fe9909"
-    },
-    {
-      "component": "scipy",
-      "version": "1.17.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "scipy-1.17.0.dist-info/LICENSE.txt",
-      "file": "scipy-1.17.0/76affe60e9-LICENSE.txt",
-      "sha256": "e6993ffc464425a198e3558f9d76fb888420c42ff0ae95b07a544087754a5995"
-    },
-    {
-      "component": "scipy",
-      "version": "1.17.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "scipy/_lib/_uarray/LICENSE",
-      "file": "scipy-1.17.0/1254351382-LICENSE",
-      "sha256": "c80c39b5fce06ba4897e14e0b0a88b54458334d951eb1361402ffad2cfb863b4"
-    },
-    {
-      "component": "scipy",
-      "version": "1.17.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "scipy/fft/_pocketfft/LICENSE.md",
-      "file": "scipy-1.17.0/260d69ad56-LICENSE.md",
-      "sha256": "c254b2b5fd30ae3c89d36ba061730563b9760fca04f1b746a1b2c3157da2c789"
-    },
-    {
-      "component": "scipy",
-      "version": "1.17.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "scipy/integrate/LICENSE_DOP",
-      "file": "scipy-1.17.0/a443b9ad7f-LICENSE_DOP",
-      "sha256": "ed9bf58c6d74d3fad9d92d1d67d9bff8141d8ab60de784516b0711364fd43357"
-    },
-    {
-      "component": "scipy",
-      "version": "1.17.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "scipy/spatial/qhull_src/COPYING_QHULL.txt",
-      "file": "scipy-1.17.0/8989e278a2-COPYING_QHULL.txt",
-      "sha256": "106d55c931fd6a84822e5345d900273d059f1c27310d02567ccb313c5d18c55d"
-    },
-    {
-      "component": "scooby",
-      "version": "0.11.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "scooby-0.11.0.dist-info/licenses/LICENSE",
-      "file": "scooby-0.11.0/5e8507fd91-LICENSE",
-      "sha256": "82208b11be7124de546e1ea8d7fd8bc478ffb2d62be46d8221007978d2483a5b"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools-84.0.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/aeab75b4c2-LICENSE",
-      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE",
-      "file": "setuptools-84.0.0/b8b1f5f037-LICENSE",
-      "sha256": "ade78d04982d69972d444a8e14a94f87a2334dd3855cc80348ea8e240aa0df2d"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
-      "file": "setuptools-84.0.0/c9e41e71fb-LICENSE",
-      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/4a7fd6a9c6-LICENSE",
-      "sha256": "458502e12d97bbf64438606a20044aa85eb05fb0a8a807bb35dbec253fd1fc04"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE",
-      "file": "setuptools-84.0.0/9fe05a3195-LICENSE",
-      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/4d09286af1-LICENSE",
-      "sha256": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/63a92caf81-LICENSE",
-      "sha256": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/6562dd76db-LICENSE",
-      "sha256": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/c2780f51d1-LICENSE",
-      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.APACHE",
-      "file": "setuptools-84.0.0/123439bfbc-LICENSE.APACHE",
-      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.BSD",
-      "file": "setuptools-84.0.0/c80865de46-LICENSE.BSD",
-      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/d6b8bc4557-LICENSE",
-      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/1ab641e912-LICENSE",
-      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt",
-      "file": "setuptools-84.0.0/8b28658c9e-LICENSE.txt",
-      "sha256": "30c23618679108f3e8ea1d2a658c7ca417bdfc891c98ef1a89fa4ff0c9828654"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE",
-      "file": "setuptools-84.0.0/0e45092c30-LICENSE",
-      "sha256": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/config/NOTICE",
-      "file": "setuptools-84.0.0/4094fd3590-NOTICE",
-      "sha256": "2dddf08818297a3b89d43d95ff659d8da85741108c9136dfa3a4d856c0623bd8"
-    },
-    {
-      "component": "setuptools",
-      "version": "84.0.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "setuptools/config/_validate_pyproject/NOTICE",
-      "file": "setuptools-84.0.0/e972ee51f8-NOTICE",
-      "sha256": "09c9bcea95ca086f8bc5bed174e40bc835b297d40fb5f86bbbb570fe0a5581a7"
-    },
-    {
-      "component": "shapely",
-      "version": "2.1.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "shapely-2.1.2.dist-info/licenses/LICENSE.txt",
-      "file": "shapely-2.1.2/d9dc139bf3-LICENSE.txt",
-      "sha256": "4a207eac9bf257ed286e1c6f0fce253d1abfdb134fc61ec855e37f5692a3f754"
-    },
-    {
-      "component": "shapely",
-      "version": "2.1.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "shapely-2.1.2.dist-info/licenses/LICENSE_GEOS",
-      "file": "shapely-2.1.2/d1c8cb4c88-LICENSE_GEOS",
-      "sha256": "138b2c2f9450073d7c116abe397ca4382625671c752b7a9a5f320b33fc3f3f2a"
-    },
-    {
-      "component": "shapely",
-      "version": "2.1.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "shapely-2.1.2.dist-info/licenses/LICENSE_win32",
-      "file": "shapely-2.1.2/ce1a8ff3b9-LICENSE_win32",
-      "sha256": "2ad0ead5166d5d420bee57d045b0e38f54dec3979c8cb3fdbdcd3c47437468f9"
-    },
-    {
-      "component": "six",
-      "version": "1.17.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "six-1.17.0.dist-info/LICENSE",
-      "file": "six-1.17.0/3681ec3e03-LICENSE",
-      "sha256": "4375ba20e2b9c6c4e7cad2940a628fd90e95cc3d50ee92aae755715d8ba1fbd0"
-    },
-    {
-      "component": "typing_extensions",
-      "version": "4.15.0",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "typing_extensions-4.15.0.dist-info/licenses/LICENSE",
-      "file": "typing_extensions-4.15.0/ea22ee0698-LICENSE",
-      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
-    },
-    {
-      "component": "urllib3",
-      "version": "2.6.3",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "urllib3-2.6.3.dist-info/licenses/LICENSE.txt",
-      "file": "urllib3-2.6.3/3a3078ccf9-LICENSE.txt",
-      "sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686"
-    },
-    {
-      "component": "vtk",
-      "version": "9.5.2",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "vtk-9.5.2.dist-info/licenses/LICENSE",
-      "file": "vtk-9.5.2/e03b18cce3-LICENSE",
-      "sha256": "11232448be82e0ea2c2c66219c2e36389f42249894070ee10c549ff182fc08b6"
-    },
-    {
-      "component": "wxPython",
-      "version": "4.2.4",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "wx/lib/pubsub/LICENSE_BSD_Simple.txt",
-      "file": "wxPython-4.2.4/e5d407083a-LICENSE_BSD_Simple.txt",
-      "sha256": "42b972151ea0ca1fba614bec8a057abafba9aefca49130e1d86473aad33a2950"
-    },
-    {
-      "component": "wxPython",
-      "version": "4.2.4",
-      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
-      "original_notice": "wxpython-4.2.4.dist-info/licenses/LICENSE.txt",
-      "file": "wxPython-4.2.4/beddfabe33-LICENSE.txt",
-      "sha256": "0d5cca7fb8ee32d9313e3b1660a009846caaef4fe166e493c7ca4dfd95a0ab5c"
-    },
-    {
-      "component": "baseline-browser-mapping",
-      "version": "2.11.27",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.txt",
-      "file": "baseline-browser-mapping-2.11.27/d0ed4cc3fb-LICENSE.txt",
-      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
-    },
-    {
-      "component": "browserslist",
-      "version": "4.29.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "browserslist-4.29.3/c693279643-LICENSE",
-      "sha256": "21c2679a63d7699c0e644409e2f17d0adbc7a965003feb06b3ff4b833d21f722"
-    },
-    {
-      "component": "caniuse-lite",
-      "version": "1.0.30001814",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "caniuse-lite-1.0.30001814/c693279643-LICENSE",
-      "sha256": "fd3a263fe19ed8faa9068b43abaebafc02c77897b0c6fc09abc04bb592e5f16e"
-    },
-    {
-      "component": "convert-source-map",
-      "version": "2.0.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "convert-source-map-2.0.0/c693279643-LICENSE",
-      "sha256": "1fa6ee8bb95a81ae3d73a5bd074a3ac380ffec13697051063ca1a601921b91db"
-    },
-    {
-      "component": "csstype",
-      "version": "3.2.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "csstype-3.2.3/c693279643-LICENSE",
-      "sha256": "11d55bd4541c75ee7879547ac49089c489163dae49551389713c3d026cab383e"
-    },
-    {
-      "component": "debug",
-      "version": "4.4.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "debug-4.4.3/c693279643-LICENSE",
-      "sha256": "3a61c6c96caf5c1d9b623fb9b04c822b783dfcb78aa7e49c76a3f643e6ed7f95"
-    },
-    {
-      "component": "electron-to-chromium",
-      "version": "1.5.444",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "electron-to-chromium-1.5.444/c693279643-LICENSE",
-      "sha256": "25ba5c59dad3e0dd8f9540beaa0f0a86a10e3aec35af5fdc8e88c5f6a5c0d8c6"
-    },
-    {
-      "component": "esbuild",
-      "version": "0.25.12",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.md",
-      "file": "esbuild-0.25.12/4673a3aba0-LICENSE.md",
-      "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681"
-    },
-    {
-      "component": "escalade",
-      "version": "3.2.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "license",
-      "file": "escalade-3.2.0/cc1d3b0234-license",
-      "sha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97"
-    },
-    {
-      "component": "fdir",
-      "version": "6.5.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "fdir-6.5.0/c693279643-LICENSE",
-      "sha256": "9a39f2aadab11a3697edd668ff2d8ad885b649737b7ab4d3bf12b34e5ada0c86"
-    },
-    {
-      "component": "fflate",
-      "version": "0.8.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "fflate-0.8.3/c693279643-LICENSE",
-      "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551"
-    },
-    {
-      "component": "gensync",
-      "version": "1.0.0-beta.2",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "gensync-1.0.0-beta.2/c693279643-LICENSE",
-      "sha256": "e3a956681ee067f971ac413994171b3d90ca801ec6324e76c9c55366cfe31cb0"
-    },
-    {
-      "component": "js-tokens",
-      "version": "4.0.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "js-tokens-4.0.0/c693279643-LICENSE",
-      "sha256": "2213d91c606205c71eb051a199478cdc2adde945893404d7f1421436dd6d5cc1"
-    },
-    {
-      "component": "jsesc",
-      "version": "3.1.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE-MIT.txt",
-      "file": "jsesc-3.1.0/16bb13fa10-LICENSE-MIT.txt",
-      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a"
-    },
-    {
-      "component": "json5",
-      "version": "2.2.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.md",
-      "file": "json5-2.2.3/4673a3aba0-LICENSE.md",
-      "sha256": "53e59feb13058722d977c699eb0407c7bce2f93c949b681bbd2ff31698535927"
-    },
-    {
-      "component": "loose-envify",
-      "version": "1.4.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "loose-envify-1.4.0/c693279643-LICENSE",
-      "sha256": "4eb7543b08d955a6d23fcc224601d43ff566e775be918805e26210d7f6eb4893"
-    },
-    {
-      "component": "lru-cache",
-      "version": "5.1.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "lru-cache-5.1.1/c693279643-LICENSE",
-      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
-    },
-    {
-      "component": "lucide-react",
-      "version": "0.468.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "lucide-react-0.468.0/c693279643-LICENSE",
-      "sha256": "1e7290b35280a048667bbf0ebabac1c7fd52a75300e8b2946ac165715997f2bc"
-    },
-    {
-      "component": "meshoptimizer",
-      "version": "0.18.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.md",
-      "file": "meshoptimizer-0.18.1/4673a3aba0-LICENSE.md",
-      "sha256": "063805e3b8e24ceab4c5dea358b03245ee41c31be87cf65c61d836636cb494bb"
-    },
-    {
-      "component": "ms",
-      "version": "2.1.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "license.md",
-      "file": "ms-2.1.3/734662f195-license.md",
-      "sha256": "1662fae9b5314d11cf51284e2dcd1f006a354f7343f08712a730fcff9a359801"
-    },
-    {
-      "component": "nanoid",
-      "version": "3.3.18",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "nanoid-3.3.18/c693279643-LICENSE",
-      "sha256": "da4db1480d9beea3483a2eda5c53b22238d0827d57da162b48f122e04d2d9987"
-    },
-    {
-      "component": "node-releases",
-      "version": "2.0.57",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "node-releases-2.0.57/c693279643-LICENSE",
-      "sha256": "3706296ed611888111ceccc1dff4712844dea4bde0b185c82d718c3b69895abe"
-    },
-    {
-      "component": "picocolors",
-      "version": "1.1.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "picocolors-1.1.1/c693279643-LICENSE",
-      "sha256": "6582629e2979466878f6014313dcc2f3756c9616148682227ce3063dde310750"
-    },
-    {
-      "component": "picomatch",
-      "version": "4.0.5",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "picomatch-4.0.5/c693279643-LICENSE",
-      "sha256": "d0cd141b0c322fded5dfad1d4645bb2fedfc05b7321fe1009469638190d59ef9"
-    },
-    {
-      "component": "plotly.js-dist-min",
-      "version": "3.7.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "plotly.js-dist-min-3.7.0/c693279643-LICENSE",
-      "sha256": "8c45d9eaf50c2f72dd9c7ab9ef440788ba58a3538484b5c51c1f17d5128752e7"
-    },
-    {
-      "component": "postcss",
-      "version": "8.5.26",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "postcss-8.5.26/c693279643-LICENSE",
-      "sha256": "5be1f3465bba68a626777f984878814aaf35e7ef8e9fd314d469bcf887050fb8"
-    },
-    {
-      "component": "react",
-      "version": "18.3.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "react-18.3.1/c693279643-LICENSE",
-      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
-    },
-    {
-      "component": "react-dom",
-      "version": "18.3.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "react-dom-18.3.1/c693279643-LICENSE",
-      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
-    },
-    {
-      "component": "react-refresh",
-      "version": "0.17.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "react-refresh-0.17.0/c693279643-LICENSE",
-      "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
-    },
-    {
-      "component": "rollup",
-      "version": "4.62.2",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.md",
-      "file": "rollup-4.62.2/4673a3aba0-LICENSE.md",
-      "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8"
-    },
-    {
-      "component": "scheduler",
-      "version": "0.23.2",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "scheduler-0.23.2/c693279643-LICENSE",
-      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
-    },
-    {
-      "component": "semver",
-      "version": "6.3.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "semver-6.3.1/c693279643-LICENSE",
-      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
-    },
-    {
-      "component": "source-map-js",
-      "version": "1.2.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "source-map-js-1.2.1/c693279643-LICENSE",
-      "sha256": "6cb0631f71c7749763fd3dd1d5bee52dd1070ec17f2edc1710079ad070bd2fbd"
-    },
-    {
-      "component": "three",
-      "version": "0.171.0",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "three-0.171.0/c693279643-LICENSE",
-      "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
-    },
-    {
-      "component": "tinyglobby",
-      "version": "0.2.17",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "tinyglobby-0.2.17/c693279643-LICENSE",
-      "sha256": "22c68811e174cbbfb3813d4135918df4f540959c14d872e601d9abe83d3cde8f"
-    },
-    {
-      "component": "typescript",
-      "version": "5.9.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.txt",
-      "file": "typescript-5.9.3/d0ed4cc3fb-LICENSE.txt",
-      "sha256": "a5e9f9b1575301c7a7a03508fdaa2e05a918cc17fd21c6e898096a96d6a34f61"
-    },
-    {
-      "component": "update-browserslist-db",
-      "version": "1.3.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "update-browserslist-db-1.3.3/c693279643-LICENSE",
-      "sha256": "9877e90da14aa8c931a1f9d07cc2a20ce119106e5dab1ebb41af865266d0cd2a"
-    },
-    {
-      "component": "vite",
-      "version": "6.4.3",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE.md",
-      "file": "vite-6.4.3/4673a3aba0-LICENSE.md",
-      "sha256": "008938a3441801ca3960f8e3ccb4c0738e7996442a53063141d57d3769a7344d"
-    },
-    {
-      "component": "yallist",
-      "version": "3.1.1",
-      "scope": "npm dependency notice evidence",
-      "original_notice": "LICENSE",
-      "file": "yallist-3.1.1/c693279643-LICENSE",
-      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
-    },
-    {
       "component": "@babel/code-frame",
       "version": "7.29.7",
       "scope": "npm dependency notice evidence",
@@ -1754,6 +402,22 @@
       "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
     },
     {
+      "component": "alloc-stdlib",
+      "version": "0.3.0",
+      "scope": "Locked Windows Cargo normal/build dependency notice evidence; source commit recorded by Cargo registry metadata",
+      "original_notice": "github.com/dropbox/rust-alloc-no-stdlib@0a81fd6928ea3b33c8cd484aa4575d50ffb98012/LICENSE",
+      "file": "alloc-stdlib-0.3.0/92529f8f69-LICENSE",
+      "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+    },
+    {
+      "component": "altgraph",
+      "version": "0.17.5",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "altgraph-0.17.5.dist-info/LICENSE",
+      "file": "altgraph-0.17.5/fb197afb75-LICENSE",
+      "sha256": "6c194d6db0c64d45535d10c95142b9b0cda7b7dcc7f1ddee302b3d536f3dbe46"
+    },
+    {
       "component": "anyhow",
       "version": "1.0.104",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -1818,6 +482,14 @@
       "sha256": "6226d0632e2e1a80c23597e964da9812ae193c535fe058154afb034e94167aa5"
     },
     {
+      "component": "attrs",
+      "version": "26.1.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "attrs-26.1.0.dist-info/licenses/LICENSE",
+      "file": "attrs-26.1.0/0d26a74c4c-LICENSE",
+      "sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f"
+    },
+    {
       "component": "autocfg",
       "version": "1.5.1",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -1880,6 +552,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "base64ct-1.8.3/421f8eecf7-LICENSE-MIT",
       "sha256": "2d1c57bff28344b9e698f51063bc8509799cc4c99a4e0cf2aa3f7e7c3e1f9a9d"
+    },
+    {
+      "component": "baseline-browser-mapping",
+      "version": "2.11.27",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.txt",
+      "file": "baseline-browser-mapping-2.11.27/d0ed4cc3fb-LICENSE.txt",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
     },
     {
       "component": "bit-set",
@@ -1984,6 +664,14 @@
       "original_notice": "LICENSE",
       "file": "brotli-decompressor-6.0.1/c693279643-LICENSE",
       "sha256": "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+    },
+    {
+      "component": "browserslist",
+      "version": "4.29.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "browserslist-4.29.3/c693279643-LICENSE",
+      "sha256": "21c2679a63d7699c0e644409e2f17d0adbc7a965003feb06b3ff4b833d21f722"
     },
     {
       "component": "bs58",
@@ -2106,6 +794,14 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "caniuse-lite",
+      "version": "1.0.30001814",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "caniuse-lite-1.0.30001814/c693279643-LICENSE",
+      "sha256": "fd3a263fe19ed8faa9068b43abaebafc02c77897b0c6fc09abc04bb592e5f16e"
+    },
+    {
       "component": "cargo-platform",
       "version": "0.1.9",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2152,6 +848,22 @@
       "original_notice": "LICENSE-MIT",
       "file": "cc-1.4.0/421f8eecf7-LICENSE-MIT",
       "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+    },
+    {
+      "component": "certifi",
+      "version": "2026.1.4",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "certifi-2026.1.4.dist-info/licenses/LICENSE",
+      "file": "certifi-2026.1.4/f93e33205a-LICENSE",
+      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+    },
+    {
+      "component": "certifi",
+      "version": "2026.7.22",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "certifi-2026.7.22.dist-info/licenses/LICENSE",
+      "file": "certifi-2026.7.22/c1aedbaa6d-LICENSE",
+      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
     },
     {
       "component": "cesu8",
@@ -2202,6 +914,22 @@
       "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
     },
     {
+      "component": "charset-normalizer",
+      "version": "3.4.4",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "charset_normalizer-3.4.4.dist-info/licenses/LICENSE",
+      "file": "charset-normalizer-3.4.4/41cf8ee1d3-LICENSE",
+      "sha256": "6d0d41bfe170ac6c7dc248c9a63e254d0fb45a60d50a8257d0af92c6e249b887"
+    },
+    {
+      "component": "charset-normalizer",
+      "version": "3.5.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "charset_normalizer-3.5.1.dist-info/licenses/LICENSE",
+      "file": "charset-normalizer-3.5.1/28e1644ce5-LICENSE",
+      "sha256": "18577485d3704f1a479ded8e573c0976cfed315fd2fd17983fa988da4c2f70d1"
+    },
+    {
       "component": "chrono",
       "version": "0.4.45",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2232,6 +960,22 @@
       "original_notice": "LICENSE-MIT",
       "file": "const-oid-0.9.6/421f8eecf7-LICENSE-MIT",
       "sha256": "bada9e7ed8dc00d63502053c455d7c8d7575dfb7e8277a2a832531844d900682"
+    },
+    {
+      "component": "contourpy",
+      "version": "1.3.3",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "contourpy-1.3.3.dist-info/LICENSE",
+      "file": "contourpy-1.3.3/19fd8c3d83-LICENSE",
+      "sha256": "34170979fc64f4f5e6dfa66ef27dec314ffffc5852000c60f4836ec1dfbf156e"
+    },
+    {
+      "component": "convert-source-map",
+      "version": "2.0.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "convert-source-map-2.0.0/c693279643-LICENSE",
+      "sha256": "1fa6ee8bb95a81ae3d73a5bd074a3ac380ffec13697051063ca1a601921b91db"
     },
     {
       "component": "cookie",
@@ -2426,6 +1170,14 @@
       "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
     },
     {
+      "component": "csstype",
+      "version": "3.2.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "csstype-3.2.3/c693279643-LICENSE",
+      "sha256": "11d55bd4541c75ee7879547ac49089c489163dae49551389713c3d026cab383e"
+    },
+    {
       "component": "ctor",
       "version": "1.0.13",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2466,6 +1218,22 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "cycler",
+      "version": "0.12.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "cycler-0.12.1.dist-info/LICENSE",
+      "file": "cycler-0.12.1/4e2f52aab7-LICENSE",
+      "sha256": "f1218143d766da3fea66f13396b7f15df46a83303f29bf96ba6e98eb4d42f408"
+    },
+    {
+      "component": "cyclopts",
+      "version": "4.23.3",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "cyclopts-4.23.3.dist-info/licenses/LICENSE",
+      "file": "cyclopts-4.23.3/a1b3276dfc-LICENSE",
+      "sha256": "f14b20048c12393cb9920065c47fadc030210b0f9cab9849ce0a68a063ededc5"
+    },
+    {
       "component": "darling",
       "version": "0.23.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2504,6 +1272,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "dbus-0.9.12/421f8eecf7-LICENSE-MIT",
       "sha256": "de3911c2d98c8bd2d701ee721347053d9b55995a11f9a8c955e44d3ca1b376bf"
+    },
+    {
+      "component": "debug",
+      "version": "4.4.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "debug-4.4.3/c693279643-LICENSE",
+      "sha256": "3a61c6c96caf5c1d9b623fb9b04c822b783dfcb78aa7e49c76a3f643e6ed7f95"
     },
     {
       "component": "der",
@@ -2618,6 +1394,14 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "docstring-parser",
+      "version": "0.18.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "docstring_parser-0.18.0.dist-info/licenses/LICENSE.md",
+      "file": "docstring-parser-0.18.0/764223c671-LICENSE.md",
+      "sha256": "dfe514a337ae8417abd31a8af707bbd6172b03e5430bb083e145899ea97a3eea"
+    },
+    {
       "component": "dom_query",
       "version": "0.28.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2714,6 +1498,14 @@
       "sha256": "7a313964a6e050794d2ad57f4863c11f6bbe055c0ae6ce2cf3b9fc45150bada3"
     },
     {
+      "component": "electron-to-chromium",
+      "version": "1.5.444",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "electron-to-chromium-1.5.444/c693279643-LICENSE",
+      "sha256": "25ba5c59dad3e0dd8f9540beaa0f0a86a10e3aec35af5fdc8e88c5f6a5c0d8c6"
+    },
+    {
       "component": "embed-resource",
       "version": "3.0.11",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2786,6 +1578,22 @@
       "sha256": "8764a597675778ddfd4e25f81b08a05dbcf089ac05662df7613fe67f150e3aa2"
     },
     {
+      "component": "esbuild",
+      "version": "0.25.12",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.md",
+      "file": "esbuild-0.25.12/4673a3aba0-LICENSE.md",
+      "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681"
+    },
+    {
+      "component": "escalade",
+      "version": "3.2.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "license",
+      "file": "escalade-3.2.0/cc1d3b0234-license",
+      "sha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97"
+    },
+    {
       "component": "fastrand",
       "version": "2.5.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -2816,6 +1624,22 @@
       "original_notice": "LICENSE-MIT",
       "file": "fdeflate-0.3.7/421f8eecf7-LICENSE-MIT",
       "sha256": "c77a4cf9da729987d0fe7ccd811e3bd27393914ddf3d23467c18cc22954513b3"
+    },
+    {
+      "component": "fdir",
+      "version": "6.5.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "fdir-6.5.0/c693279643-LICENSE",
+      "sha256": "9a39f2aadab11a3697edd668ff2d8ad885b649737b7ab4d3bf12b34e5ada0c86"
+    },
+    {
+      "component": "fflate",
+      "version": "0.8.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "fflate-0.8.3/c693279643-LICENSE",
+      "sha256": "0a1df3a083d0c010560aa342e87959c8c1070e6fd54545741f083f22d0c8b551"
     },
     {
       "component": "field-offset",
@@ -2888,6 +1712,38 @@
       "original_notice": "LICENSE",
       "file": "foldhash-0.2.0/c693279643-LICENSE",
       "sha256": "b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744"
+    },
+    {
+      "component": "fonttools",
+      "version": "4.61.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "fonttools-4.61.1.dist-info/licenses/LICENSE",
+      "file": "fonttools-4.61.1/b3dd12d9f0-LICENSE",
+      "sha256": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383"
+    },
+    {
+      "component": "fonttools",
+      "version": "4.61.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "fonttools-4.61.1.dist-info/licenses/LICENSE.external",
+      "file": "fonttools-4.61.1/bce21af3e8-LICENSE.external",
+      "sha256": "94a83aaee0729a0f302d34acc4acecbd9d58366f262429075fe557e4a54b2e69"
+    },
+    {
+      "component": "fonttools",
+      "version": "4.63.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "fonttools-4.63.0.dist-info/licenses/LICENSE",
+      "file": "fonttools-4.63.0/cc2f1e3f8f-LICENSE",
+      "sha256": "22bef80697ecfaa17f97e62b9a26dfa12820be05583e8dd12ad169b241274c99"
+    },
+    {
+      "component": "fonttools",
+      "version": "4.63.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "fonttools-4.63.0.dist-info/licenses/LICENSE.external",
+      "file": "fonttools-4.63.0/e3c94b1075-LICENSE.external",
+      "sha256": "b082a5f86775b2641f01bccb8b9c82908481de5f502bb254b1e13bfc2a9f303d"
     },
     {
       "component": "foreign-types",
@@ -3040,6 +1896,14 @@
       "original_notice": "LICENSE",
       "file": "generic-array-0.14.7/c693279643-LICENSE",
       "sha256": "ad4fcfaf8d5b12b97409c137a03d4a4e4b21024c65c54f976cc3b609c1bd5b0f"
+    },
+    {
+      "component": "gensync",
+      "version": "1.0.0-beta.2",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "gensync-1.0.0-beta.2/c693279643-LICENSE",
+      "sha256": "e3a956681ee067f971ac413994171b3d90ca801ec6324e76c9c55366cfe31cb0"
     },
     {
       "component": "getrandom",
@@ -3490,6 +2354,22 @@
       "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
     },
     {
+      "component": "idna",
+      "version": "3.11",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "idna-3.11.dist-info/licenses/LICENSE.md",
+      "file": "idna-3.11/5ceea29fca-LICENSE.md",
+      "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
+    },
+    {
+      "component": "idna",
+      "version": "3.19",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "idna-3.19.dist-info/licenses/LICENSE.md",
+      "file": "idna-3.19/acdc930330-LICENSE.md",
+      "sha256": "1a9a4f0e3d479a27240ddd59a9137a66ab4a0f9dfdc8ca6188cc0bfd85187f04"
+    },
+    {
       "component": "idna_adapter",
       "version": "1.2.2",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -3626,6 +2506,22 @@
       "sha256": "1d85bd754b04ceec93e98e890edd1fa3c6a22e81bcb32135806beeccefa51cd1"
     },
     {
+      "component": "js-tokens",
+      "version": "4.0.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "js-tokens-4.0.0/c693279643-LICENSE",
+      "sha256": "2213d91c606205c71eb051a199478cdc2adde945893404d7f1421436dd6d5cc1"
+    },
+    {
+      "component": "jsesc",
+      "version": "3.1.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE-MIT.txt",
+      "file": "jsesc-3.1.0/16bb13fa10-LICENSE-MIT.txt",
+      "sha256": "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a"
+    },
+    {
       "component": "json-patch",
       "version": "4.2.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -3640,6 +2536,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "json-patch-4.2.0/421f8eecf7-LICENSE-MIT",
       "sha256": "87f7527b1066337751f7f4d717089bf514ff8f7ee7d66c4c5b891b09e744ec11"
+    },
+    {
+      "component": "json5",
+      "version": "2.2.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.md",
+      "file": "json5-2.2.3/4673a3aba0-LICENSE.md",
+      "sha256": "53e59feb13058722d977c699eb0407c7bce2f93c949b681bbd2ff31698535927"
     },
     {
       "component": "jsonptr",
@@ -3658,6 +2562,22 @@
       "sha256": "2bc107bdc18a74263d20bdefdb8073e17bc1a01b6b374dc5835683a33ee5ba7d"
     },
     {
+      "component": "jsonschema",
+      "version": "4.25.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "jsonschema-4.25.1.dist-info/licenses/COPYING",
+      "file": "jsonschema-4.25.1/65433f4947-COPYING",
+      "sha256": "4f92a015a13c4d1a040bef018aa13430b4f1bc73b41b16bb846c346766de7439"
+    },
+    {
+      "component": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "jsonschema_specifications-2025.9.1.dist-info/licenses/COPYING",
+      "file": "jsonschema-specifications-2025.9.1/43964009a4-COPYING",
+      "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
+    },
+    {
       "component": "keyboard-types",
       "version": "0.8.3",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -3672,6 +2592,22 @@
       "original_notice": "LICENSE-MIT",
       "file": "keyboard-types-0.8.3/421f8eecf7-LICENSE-MIT",
       "sha256": "31dbbab009f1b2e59a1622d5955dfafc38ebe834000215b49d954c6f85fe927c"
+    },
+    {
+      "component": "kiwisolver",
+      "version": "1.4.9",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "kiwisolver-1.4.9.dist-info/licenses/LICENSE",
+      "file": "kiwisolver-1.4.9/3118a8da97-LICENSE",
+      "sha256": "cf20799d32de0eefa2ea904e3ac5122f47aed5d352930751eb61724762c49d90"
+    },
+    {
+      "component": "kiwisolver",
+      "version": "1.5.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "kiwisolver-1.5.0.dist-info/licenses/LICENSE",
+      "file": "kiwisolver-1.5.0/ca6d4913a7-LICENSE",
+      "sha256": "b24c2bf6185f31a124ad6bacccae3071bdc7ad7882de00b00110aa62abb76a15"
     },
     {
       "component": "libappindicator",
@@ -3802,6 +2738,46 @@
       "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
     },
     {
+      "component": "loose-envify",
+      "version": "1.4.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "loose-envify-1.4.0/c693279643-LICENSE",
+      "sha256": "4eb7543b08d955a6d23fcc224601d43ff566e775be918805e26210d7f6eb4893"
+    },
+    {
+      "component": "lru-cache",
+      "version": "5.1.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "lru-cache-5.1.1/c693279643-LICENSE",
+      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
+    },
+    {
+      "component": "lucide-react",
+      "version": "0.468.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "lucide-react-0.468.0/c693279643-LICENSE",
+      "sha256": "1e7290b35280a048667bbf0ebabac1c7fd52a75300e8b2946ac165715997f2bc"
+    },
+    {
+      "component": "markdown-it-py",
+      "version": "4.2.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "markdown_it_py-4.2.0.dist-info/licenses/LICENSE",
+      "file": "markdown-it-py-4.2.0/d0465fdc9e-LICENSE",
+      "sha256": "4a2260d6e2cd0f5a151a1e86dbfe7d3ed552b1e2beabf9941c1ba5c49cbce484"
+    },
+    {
+      "component": "markdown-it-py",
+      "version": "4.2.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "markdown_it_py-4.2.0.dist-info/licenses/LICENSE.markdown-it",
+      "file": "markdown-it-py-4.2.0/b883c1f025-LICENSE.markdown-it",
+      "sha256": "792c48c5a849a15fdf9e37e8bcf9e6d1dd13b32b46c642a748a0a46a9919d473"
+    },
+    {
       "component": "markup5ever",
       "version": "0.39.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -3816,6 +2792,62 @@
       "original_notice": "LICENSE-MIT",
       "file": "markup5ever-0.39.0/421f8eecf7-LICENSE-MIT",
       "sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+    },
+    {
+      "component": "matplotlib",
+      "version": "3.10.8",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "matplotlib-3.10.8.dist-info/LICENSE",
+      "file": "matplotlib-3.10.8/1b2617b91d-LICENSE",
+      "sha256": "dbb9ad7495a83b0f2f48c94b06e23020587d82f8d1492dcb717fb1ebc2f86c18"
+    },
+    {
+      "component": "matplotlib",
+      "version": "3.10.8",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "matplotlib/mpl-data/fonts/ttf/LICENSE_DEJAVU",
+      "file": "matplotlib-3.10.8/f44a05d579-LICENSE_DEJAVU",
+      "sha256": "d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "component": "matplotlib",
+      "version": "3.10.8",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "matplotlib/mpl-data/fonts/ttf/LICENSE_STIX",
+      "file": "matplotlib-3.10.8/ed755d6e0d-LICENSE_STIX",
+      "sha256": "bab3d31dfef07f483624f2f65f2711e76065b8e7273278b1c071ede1041c9959"
+    },
+    {
+      "component": "matplotlib",
+      "version": "3.11.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "matplotlib-3.11.1.dist-info/LICENSE",
+      "file": "matplotlib-3.11.1/e61cd4285a-LICENSE",
+      "sha256": "822e8e528147569a41975592aee19c11992ab667ba50451cd929031d5fc74491"
+    },
+    {
+      "component": "matplotlib",
+      "version": "3.11.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "matplotlib/mpl-data/fonts/ttf/LICENSE_DEJAVU",
+      "file": "matplotlib-3.11.1/f44a05d579-LICENSE_DEJAVU",
+      "sha256": "d75938dec098f06f0ac3c00853065d94f020be1c3c62ef1dc2975ba15b4d9b0e"
+    },
+    {
+      "component": "matplotlib",
+      "version": "3.11.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "matplotlib/mpl-data/fonts/ttf/LICENSE_STIX",
+      "file": "matplotlib-3.11.1/ed755d6e0d-LICENSE_STIX",
+      "sha256": "bab3d31dfef07f483624f2f65f2711e76065b8e7273278b1c071ede1041c9959"
+    },
+    {
+      "component": "mdurl",
+      "version": "0.1.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "mdurl-0.1.2.dist-info/LICENSE",
+      "file": "mdurl-0.1.2/95bd6addf3-LICENSE",
+      "sha256": "7c605df6e28667a9603118e98274f64a49ce3eed0d26fccce9534a345e0ef955"
     },
     {
       "component": "memchr",
@@ -3840,6 +2872,14 @@
       "original_notice": "LICENSE",
       "file": "memoffset-0.9.1/c693279643-LICENSE",
       "sha256": "3234ac55816264ee7b6c7ee27efd61cf0a1fe775806870e3d9b4c41ea73c5cb1"
+    },
+    {
+      "component": "meshoptimizer",
+      "version": "0.18.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.md",
+      "file": "meshoptimizer-0.18.1/4673a3aba0-LICENSE.md",
+      "sha256": "063805e3b8e24ceab4c5dea358b03245ee41c31be87cf65c61d836636cb494bb"
     },
     {
       "component": "mime",
@@ -3898,6 +2938,22 @@
       "sha256": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b"
     },
     {
+      "component": "mplcursors",
+      "version": "0.7.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "mplcursors-0.7.1.dist-info/licenses/LICENSE.txt",
+      "file": "mplcursors-0.7.1/99d29bd457-LICENSE.txt",
+      "sha256": "a66dc1ac46089efb0b98e8648af0fb2e888bc4ad52e161dc5319d4c4fb7737eb"
+    },
+    {
+      "component": "ms",
+      "version": "2.1.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "license.md",
+      "file": "ms-2.1.3/734662f195-license.md",
+      "sha256": "1662fae9b5314d11cf51284e2dcd1f006a354f7343f08712a730fcff9a359801"
+    },
+    {
       "component": "muda",
       "version": "0.20.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -3922,12 +2978,44 @@
       "sha256": "b99f9d43803f2ac979c50949df630bd8eeaf2fcd1b9fdb9093710d70f5dfb63d"
     },
     {
+      "component": "nanobind",
+      "version": "2.11.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "nanobind-2.11.0.dist-info/licenses/LICENSE",
+      "file": "nanobind-2.11.0/12ad33eac6-LICENSE",
+      "sha256": "f305091a4e57805870b217a28ea4b1f16610eece8457d2370f822a9696b75836"
+    },
+    {
+      "component": "nanobind",
+      "version": "3.0.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "nanobind-3.0.0.dist-info/licenses/LICENSE",
+      "file": "nanobind-3.0.0/a8540ae846-LICENSE",
+      "sha256": "f305091a4e57805870b217a28ea4b1f16610eece8457d2370f822a9696b75836"
+    },
+    {
+      "component": "nanoid",
+      "version": "3.3.18",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "nanoid-3.3.18/c693279643-LICENSE",
+      "sha256": "da4db1480d9beea3483a2eda5c53b22238d0827d57da162b48f122e04d2d9987"
+    },
+    {
       "component": "new_debug_unreachable",
       "version": "1.0.6",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
       "original_notice": "LICENSE-MIT",
       "file": "new_debug_unreachable-1.0.6/421f8eecf7-LICENSE-MIT",
       "sha256": "f7715d38a3fa1b4ac97c5729740752505a39cb92ee83ab5b102aeb5eaa7cdea4"
+    },
+    {
+      "component": "node-releases",
+      "version": "2.0.57",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "node-releases-2.0.57/c693279643-LICENSE",
+      "sha256": "3706296ed611888111ceccc1dff4712844dea4bde0b185c82d718c3b69895abe"
     },
     {
       "component": "ntapi",
@@ -4026,6 +3114,310 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/LICENSE.txt",
+      "file": "numpy-2.4.2/3b4bdcbee9-LICENSE.txt",
+      "sha256": "dc97d59562c75c04557f1e9a68f3eae326699eb119d569cd4ed6a4eafe5f9abb"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "file": "numpy-2.4.2/c18a288196-LICENSE.txt",
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "file": "numpy-2.4.2/03c1cd5a7c-COPYING",
+      "sha256": "3f2c1ffa76383a55ae0aac01c9737cd70050dff63e1f026694fbe9d662573c98"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+      "file": "numpy-2.4.2/6fcb35f3c2-LICENSE",
+      "sha256": "e340270d4f64384569a91d546acb5b094d69ce47f0c015db77abb74dc6f815af"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "file": "numpy-2.4.2/56a2ab8ad1-LICENSE.md",
+      "sha256": "211e7d737d6179a08f791ebb0a99897ce7cd2457410c542876d125576edfe910"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+      "file": "numpy-2.4.2/06b46e685c-LICENSE",
+      "sha256": "c17011467b4fe6e20fbfbeda4df09e58c2bca5480a063e55735a4000a379aad9"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "file": "numpy-2.4.2/77c9c86960-LICENSE.md",
+      "sha256": "a85ca13fdf90160b64a0698215868c13b74d835ad0a4e2ba44713b8c5058a056"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "file": "numpy-2.4.2/576dc9df83-LICENSE.txt",
+      "sha256": "a14cc25e10d40a3aa705b7de2fb764a6535d8ee9b2db4e1724900585457dfd55"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/ma/LICENSE",
+      "file": "numpy-2.4.2/29e947a614-LICENSE",
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/LICENSE.md",
+      "file": "numpy-2.4.2/482b760e35-LICENSE.md",
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+      "file": "numpy-2.4.2/57653b99c0-LICENSE.md",
+      "sha256": "469778be8f33d54e1bcaab28c281cc472916d2d273f835e55bc487d30503face"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "file": "numpy-2.4.2/e2dc5f581c-LICENSE.md",
+      "sha256": "0e111337b25494a773106695f0e799f642b8567aaacca4f116a74a8177179156"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "file": "numpy-2.4.2/33a3d64024-LICENSE.md",
+      "sha256": "e7d4f4fb20358f314210a892ae17351e04993813646f697ec387385ca2a36918"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+      "file": "numpy-2.4.2/62383cbcd0-LICENSE.md",
+      "sha256": "6f5828a57223d4cc7f8ea505a2623e7b978b242752c1515e355f46ba2cec1800"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "file": "numpy-2.4.2/011ddfd6d5-LICENSE.md",
+      "sha256": "9d4098846018319cd68e228ee6220361787f73bccbf00237a85e4fc9621b998f"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy-2.4.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+      "file": "numpy-2.4.2/114672b32c-LICENSE.md",
+      "sha256": "268b0ca06759d31ea3ca68dd35f20e877916e927b1c2a835e4592a3c4354b1f9"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy/_core/include/numpy/random/LICENSE.txt",
+      "file": "numpy-2.4.2/0f4ffb2948-LICENSE.txt",
+      "sha256": "fbc539f47d0cf83bc61378080fb873d5c14630126cacbfe754035c3926daa5ec"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy/ma/LICENSE",
+      "file": "numpy-2.4.2/ddfcf34665-LICENSE",
+      "sha256": "05f3b88351988ecfad10abe92c0c50e5875c6452d5009a0084cc291551ffcca6"
+    },
+    {
+      "component": "numpy",
+      "version": "2.4.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "numpy/random/LICENSE.md",
+      "file": "numpy-2.4.2/c21c93791a-LICENSE.md",
+      "sha256": "103166b62b80443afb9eb3488e052ea06be0cff566b908f199e561fde49af19f"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/LICENSE.txt",
+      "file": "numpy-2.5.2/fb5540f41a-LICENSE.txt",
+      "sha256": "a804dff0ead9fadc5293456410bcbfc32bf024be9c4513459663fb7b442d2341"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "file": "numpy-2.5.2/87e9167888-LICENSE.txt",
+      "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "file": "numpy-2.5.2/e4f92bad13-COPYING",
+      "sha256": "aea41976c720f91bd19725c16916a1ace40eb1ea42620d340e587a5de4bbcea0"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/_core/src/highway/LICENSE",
+      "file": "numpy-2.5.2/9f8e40c515-LICENSE",
+      "sha256": "d208152e2777ffd0126eacc1bd21c0320d69e4e6b622d21a2a12a47e8ef73763"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "file": "numpy-2.5.2/cd3c96ff38-LICENSE.md",
+      "sha256": "a732977853530066790c42817087f4829b518dd98d340c916acbfd227e39d3cb"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/_core/src/umath/svml/LICENSE",
+      "file": "numpy-2.5.2/95d0e1668f-LICENSE",
+      "sha256": "585483905b13d4b42f800c55ba99e89d6e2e33ccd5f503e201c07531d148ff41"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "file": "numpy-2.5.2/d0fb1067d0-LICENSE.md",
+      "sha256": "8db000e158c162e7249787852d8c69764706502ccee725c06641b31c1e95c8af"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "file": "numpy-2.5.2/c2e32b07d0-LICENSE.txt",
+      "sha256": "19060ef465e1797d682ee0fc3081bd25ab1395e995e43d25c9d13c95d9a3cd6b"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/ma/LICENSE",
+      "file": "numpy-2.5.2/94c08f23f3-LICENSE",
+      "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/LICENSE.md",
+      "file": "numpy-2.5.2/2ee881cf90-LICENSE.md",
+      "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+      "file": "numpy-2.5.2/9d6c3b8daf-LICENSE.md",
+      "sha256": "cf5619f25b112d5ce7c896efffc8e610bcb345dfadcc19f2c1460aa48fff2c9e"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "file": "numpy-2.5.2/954175b43c-LICENSE.md",
+      "sha256": "92c10699884321f1c2947fe2a70ab23b0fbf1507f756d89dd08f38c61fc3d4fa"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "file": "numpy-2.5.2/99d1a212bd-LICENSE.md",
+      "sha256": "41190663b77bee5302386495a07b7eabfbfa571aa0ae2f11da6764162062fc4f"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+      "file": "numpy-2.5.2/fccf2a3b0f-LICENSE.md",
+      "sha256": "322ac46d870c8aeead6c53adcccc839296fb3c8e456eae155081297daf7f8013"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "file": "numpy-2.5.2/89589bcab0-LICENSE.md",
+      "sha256": "28cad82ce1379dc529df30da78ec012d7d0d1d576b03ddcb93388aee53659f59"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy-2.5.2.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+      "file": "numpy-2.5.2/23105799d3-LICENSE.md",
+      "sha256": "454ec7350e478e037061850b67395753b425b1cb0a34bbc26290b020bf89d763"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy/_core/include/numpy/random/LICENSE.txt",
+      "file": "numpy-2.5.2/0f4ffb2948-LICENSE.txt",
+      "sha256": "d544761558b510866c21f7e8a2d5716fca76e0b98117e3b6b86314db7244d150"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy/ma/LICENSE",
+      "file": "numpy-2.5.2/ddfcf34665-LICENSE",
+      "sha256": "d78dbb208b80d92b4d333e41a4baae50d12444f46e53199fa7726a91de6e2da7"
+    },
+    {
+      "component": "numpy",
+      "version": "2.5.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "numpy/random/LICENSE.md",
+      "file": "numpy-2.5.2/c21c93791a-LICENSE.md",
+      "sha256": "b4bc2f4fa1c95778f1ed3dd8f14706bece399475b978f9f34b5d3cd72521b48a"
+    },
+    {
       "component": "once_cell",
       "version": "1.21.4",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4056,6 +3448,54 @@
       "original_notice": "LICENSE.txt",
       "file": "option-ext-0.2.0/d0ed4cc3fb-LICENSE.txt",
       "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172"
+    },
+    {
+      "component": "packaging",
+      "version": "26.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "packaging-26.0.dist-info/licenses/LICENSE",
+      "file": "packaging-26.0/e4a034ba8e-LICENSE",
+      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "component": "packaging",
+      "version": "26.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "packaging-26.0.dist-info/licenses/LICENSE.APACHE",
+      "file": "packaging-26.0/60541d01bd-LICENSE.APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "component": "packaging",
+      "version": "26.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "packaging-26.0.dist-info/licenses/LICENSE.BSD",
+      "file": "packaging-26.0/3e24fb3dae-LICENSE.BSD",
+      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+    },
+    {
+      "component": "packaging",
+      "version": "26.3",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "packaging-26.3.dist-info/licenses/LICENSE",
+      "file": "packaging-26.3/11c854e2fe-LICENSE",
+      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "component": "packaging",
+      "version": "26.3",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "packaging-26.3.dist-info/licenses/LICENSE.APACHE",
+      "file": "packaging-26.3/e9a5bac8b5-LICENSE.APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "component": "packaging",
+      "version": "26.3",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "packaging-26.3.dist-info/licenses/LICENSE.BSD",
+      "file": "packaging-26.3/ef96a0844c-LICENSE.BSD",
+      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
     },
     {
       "component": "pango",
@@ -4114,6 +3554,14 @@
       "sha256": "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
     },
     {
+      "component": "pefile",
+      "version": "2024.8.26",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pefile-2024.8.26.dist-info/LICENSE",
+      "file": "pefile-2024.8.26/9814bad7ec-LICENSE",
+      "sha256": "b44409c067c6da52bfb54bb6624fb11a7b52157c3a13ae1400232f8196e86ad3"
+    },
+    {
       "component": "percent-encoding",
       "version": "2.3.2",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4170,6 +3618,38 @@
       "sha256": "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38"
     },
     {
+      "component": "picocolors",
+      "version": "1.1.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "picocolors-1.1.1/c693279643-LICENSE",
+      "sha256": "6582629e2979466878f6014313dcc2f3756c9616148682227ce3063dde310750"
+    },
+    {
+      "component": "picomatch",
+      "version": "4.0.5",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "picomatch-4.0.5/c693279643-LICENSE",
+      "sha256": "d0cd141b0c322fded5dfad1d4645bb2fedfc05b7321fe1009469638190d59ef9"
+    },
+    {
+      "component": "pillow",
+      "version": "12.1.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pillow-12.1.0.dist-info/licenses/LICENSE",
+      "file": "pillow-12.1.0/275c85f31a-LICENSE",
+      "sha256": "86b6cc52cd6b139932286592bbdaf4b54f9efb3a196c4051313c5a355f8da5a2"
+    },
+    {
+      "component": "pillow",
+      "version": "12.3.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "pillow-12.3.0.dist-info/licenses/LICENSE",
+      "file": "pillow-12.3.0/60b8570677-LICENSE",
+      "sha256": "4f7866a74802c6326f81faff59a56546b6aec2b10b91973e0e9308de95e79857"
+    },
+    {
       "component": "pin-project-lite",
       "version": "0.2.17",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4184,6 +3664,350 @@
       "original_notice": "LICENSE-MIT",
       "file": "pin-project-lite-0.2.17/421f8eecf7-LICENSE-MIT",
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/LICENSE.txt",
+      "file": "pip-26.0.1/06270d6c7f-LICENSE.txt",
+      "sha256": "634300a669d49aeae65b12c6c48c924c51a4cdf3d1ff086dc3456dc8bcaa2104"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/cachecontrol/LICENSE.txt",
+      "file": "pip-26.0.1/3722ca84eb-LICENSE.txt",
+      "sha256": "86eeee87be2a43f3ff1f56496f451f69243926f025fedbb033666c304c4c161b"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/certifi/LICENSE",
+      "file": "pip-26.0.1/63619e19e3-LICENSE",
+      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/dependency_groups/LICENSE.txt",
+      "file": "pip-26.0.1/acf592016c-LICENSE.txt",
+      "sha256": "1ab36e3e2a4ba8631625384f87e9e091db1faed034c5b23325b3239abf2cc525"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/distlib/LICENSE.txt",
+      "file": "pip-26.0.1/f8799de97e-LICENSE.txt",
+      "sha256": "808e10c8a6ab8deb149ff9b3fb19f447a808094606d712a9ca57fead3552599d"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/distro/LICENSE",
+      "file": "pip-26.0.1/5a3a04917f-LICENSE",
+      "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md",
+      "file": "pip-26.0.1/4025eee283-LICENSE.md",
+      "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/msgpack/COPYING",
+      "file": "pip-26.0.1/c1e6d9dcca-COPYING",
+      "sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE",
+      "file": "pip-26.0.1/949028d66f-LICENSE",
+      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.APACHE",
+      "file": "pip-26.0.1/7cd248d22a-LICENSE.APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/packaging/LICENSE.BSD",
+      "file": "pip-26.0.1/5275566852-LICENSE.BSD",
+      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/pkg_resources/LICENSE",
+      "file": "pip-26.0.1/65ecd34c64-LICENSE",
+      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/platformdirs/LICENSE",
+      "file": "pip-26.0.1/91e7c9f2d2-LICENSE",
+      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/pygments/LICENSE",
+      "file": "pip-26.0.1/f7aff05a44-LICENSE",
+      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/pyproject_hooks/LICENSE",
+      "file": "pip-26.0.1/ade387d3a0-LICENSE",
+      "sha256": "1b22b049b5267d6dfc23a67bf4a84d8ec04b9fdfb1a51d360e42b4342c8b4154"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/requests/LICENSE",
+      "file": "pip-26.0.1/801abd0041-LICENSE",
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/resolvelib/LICENSE",
+      "file": "pip-26.0.1/b042b1ed8a-LICENSE",
+      "sha256": "f388fd38cad13112c1dc0f669bbe80e7f84541edbafb72f3030d2ca7642c3c9d"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/rich/LICENSE",
+      "file": "pip-26.0.1/0dfdea4dad-LICENSE",
+      "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/tomli/LICENSE",
+      "file": "pip-26.0.1/15f361bc1c-LICENSE",
+      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/tomli_w/LICENSE",
+      "file": "pip-26.0.1/ad240068df-LICENSE",
+      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/truststore/LICENSE",
+      "file": "pip-26.0.1/2033a1005d-LICENSE",
+      "sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip-26.0.1.dist-info/licenses/src/pip/_vendor/urllib3/LICENSE.txt",
+      "file": "pip-26.0.1/3ceca8e30f-LICENSE.txt",
+      "sha256": "c37bf186e27cf9dbe9619e55edfe3cea7b30091ceb3da63c7dacbe0e6d77907b"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/cachecontrol/LICENSE.txt",
+      "file": "pip-26.0.1/c41fdd4af7-LICENSE.txt",
+      "sha256": "86eeee87be2a43f3ff1f56496f451f69243926f025fedbb033666c304c4c161b"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/certifi/LICENSE",
+      "file": "pip-26.0.1/ba5c9fe972-LICENSE",
+      "sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/dependency_groups/LICENSE.txt",
+      "file": "pip-26.0.1/ef85ffb23c-LICENSE.txt",
+      "sha256": "1ab36e3e2a4ba8631625384f87e9e091db1faed034c5b23325b3239abf2cc525"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/distlib/LICENSE.txt",
+      "file": "pip-26.0.1/e976c6a8e7-LICENSE.txt",
+      "sha256": "808e10c8a6ab8deb149ff9b3fb19f447a808094606d712a9ca57fead3552599d"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/distro/LICENSE",
+      "file": "pip-26.0.1/a2ada58074-LICENSE",
+      "sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/idna/LICENSE.md",
+      "file": "pip-26.0.1/c983bbef49-LICENSE.md",
+      "sha256": "b7a336abf3b04e180ec065cdd16e705d079e1cc7a14f910aa6e9187f36b9cd87"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/msgpack/COPYING",
+      "file": "pip-26.0.1/28d0dd680f-COPYING",
+      "sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/packaging/LICENSE",
+      "file": "pip-26.0.1/840f56b88f-LICENSE",
+      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/packaging/LICENSE.APACHE",
+      "file": "pip-26.0.1/eb332b84d6-LICENSE.APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/packaging/LICENSE.BSD",
+      "file": "pip-26.0.1/6d4ee3350c-LICENSE.BSD",
+      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/pkg_resources/LICENSE",
+      "file": "pip-26.0.1/e2746e4295-LICENSE",
+      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/platformdirs/LICENSE",
+      "file": "pip-26.0.1/5847ccf18f-LICENSE",
+      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/pygments/LICENSE",
+      "file": "pip-26.0.1/b04af2263f-LICENSE",
+      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/pyproject_hooks/LICENSE",
+      "file": "pip-26.0.1/d9a107c5f0-LICENSE",
+      "sha256": "1b22b049b5267d6dfc23a67bf4a84d8ec04b9fdfb1a51d360e42b4342c8b4154"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/requests/LICENSE",
+      "file": "pip-26.0.1/1ee72cc72a-LICENSE",
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/resolvelib/LICENSE",
+      "file": "pip-26.0.1/9e7a953abe-LICENSE",
+      "sha256": "f388fd38cad13112c1dc0f669bbe80e7f84541edbafb72f3030d2ca7642c3c9d"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/rich/LICENSE",
+      "file": "pip-26.0.1/c71e4af665-LICENSE",
+      "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/tomli/LICENSE",
+      "file": "pip-26.0.1/1e6e78cd05-LICENSE",
+      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/tomli_w/LICENSE",
+      "file": "pip-26.0.1/94559abf5d-LICENSE",
+      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/truststore/LICENSE",
+      "file": "pip-26.0.1/5049051d91-LICENSE",
+      "sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+    },
+    {
+      "component": "pip",
+      "version": "26.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pip/_vendor/urllib3/LICENSE.txt",
+      "file": "pip-26.0.1/559b62f872-LICENSE.txt",
+      "sha256": "c37bf186e27cf9dbe9619e55edfe3cea7b30091ceb3da63c7dacbe0e6d77907b"
     },
     {
       "component": "pkcs8",
@@ -4202,12 +4026,36 @@
       "sha256": "ad64fcb9589f162720f3cc5010ad76ca6ad3764e11861f9192c489df176bb71d"
     },
     {
+      "component": "platformdirs",
+      "version": "4.11.4",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "platformdirs-4.11.4.dist-info/licenses/LICENSE",
+      "file": "platformdirs-4.11.4/d7c559d683-LICENSE",
+      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+    },
+    {
+      "component": "platformdirs",
+      "version": "4.5.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "platformdirs-4.5.1.dist-info/licenses/LICENSE",
+      "file": "platformdirs-4.5.1/a1fcd41b7f-LICENSE",
+      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+    },
+    {
       "component": "plist",
       "version": "1.10.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
       "original_notice": "LICENCE",
       "file": "plist-1.10.0/b4668a5268-LICENCE",
       "sha256": "5b0ae40d1a35f7ae6591a28e44771240e6a88cb03a66c9189a45b9681639b466"
+    },
+    {
+      "component": "plotly.js-dist-min",
+      "version": "3.7.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "plotly.js-dist-min-3.7.0/c693279643-LICENSE",
+      "sha256": "8c45d9eaf50c2f72dd9c7ab9ef440788ba58a3538484b5c51c1f17d5128752e7"
     },
     {
       "component": "png",
@@ -4240,6 +4088,22 @@
       "original_notice": "LICENSE-MIT",
       "file": "png-0.18.1/421f8eecf7-LICENSE-MIT",
       "sha256": "eaf40297c75da471f7cda1f3458e8d91b4b2ec866e609527a13acfa93b638652"
+    },
+    {
+      "component": "pooch",
+      "version": "1.9.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pooch-1.9.0.dist-info/licenses/LICENSE.txt",
+      "file": "pooch-1.9.0/c37d746626-LICENSE.txt",
+      "sha256": "af0482d59fc7a9d68d9f64682c74ce6e8a4684406bb3a21a191ae329950916b4"
+    },
+    {
+      "component": "postcss",
+      "version": "8.5.26",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "postcss-8.5.26/c693279643-LICENSE",
+      "sha256": "5be1f3465bba68a626777f984878814aaf35e7ef8e9fd314d469bcf887050fb8"
     },
     {
       "component": "potential_utf",
@@ -4370,6 +4234,94 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "pyarrow",
+      "version": "25.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyarrow-25.0.1.dist-info/licenses/LICENSE.txt",
+      "file": "pyarrow-25.0.1/2827e71464-LICENSE.txt",
+      "sha256": "d1c981370f1ffd4edcdd2fb3565c8939cc40c75e24e1f92d581d04e54f0dff81"
+    },
+    {
+      "component": "pyarrow",
+      "version": "25.0.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyarrow-25.0.1.dist-info/licenses/NOTICE.txt",
+      "file": "pyarrow-25.0.1/1d679011f5-NOTICE.txt",
+      "sha256": "afd895d61a00101f6d5a41cf518c83865d815e8109e956f512a0ce4ea9738c06"
+    },
+    {
+      "component": "pygments",
+      "version": "2.21.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "pygments-2.21.0.dist-info/licenses/LICENSE",
+      "file": "pygments-2.21.0/62c35449c9-LICENSE",
+      "sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+    },
+    {
+      "component": "pyinstaller",
+      "version": "6.21.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyinstaller-6.21.0.dist-info/licenses/COPYING.txt",
+      "file": "pyinstaller-6.21.0/9024232810-COPYING.txt",
+      "sha256": "dcf75fdb959db1e3b41c0f8505069d2ece781b5ec6b3d0a4d30975cfc6580245"
+    },
+    {
+      "component": "pyinstaller-hooks-contrib",
+      "version": "2026.6",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyinstaller_hooks_contrib-2026.6.dist-info/licenses/LICENSE",
+      "file": "pyinstaller-hooks-contrib-2026.6/736c40f141-LICENSE",
+      "sha256": "91d0baaff00773038e72c0a1fc9d5d2d38706b7a2b9c04f34296608f931b9cd0"
+    },
+    {
+      "component": "pyparsing",
+      "version": "3.3.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyparsing-3.3.2.dist-info/licenses/LICENSE",
+      "file": "pyparsing-3.3.2/325a1a4b3f-LICENSE",
+      "sha256": "a5425f9dc14ac74d4c5f0b679e941f2442e32cca7452a4418d5b1a49893ebe4e"
+    },
+    {
+      "component": "python-dateutil",
+      "version": "2.9.0.post0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "python_dateutil-2.9.0.post0.dist-info/LICENSE",
+      "file": "python-dateutil-2.9.0.post0/bd1e7a7d4b-LICENSE",
+      "sha256": "ba00f51a0d92823b5a1cde27d8b5b9d2321e67ed8da9bc163eff96d5e17e577e"
+    },
+    {
+      "component": "pyvista",
+      "version": "0.46.5",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyvista-0.46.5.dist-info/licenses/LICENSE",
+      "file": "pyvista-0.46.5/652d3ec4ed-LICENSE",
+      "sha256": "81aebb07c490f1e72e24eda6bc713de559141225c2407228513d25d80b587798"
+    },
+    {
+      "component": "pyvista",
+      "version": "0.48.4",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "pyvista-0.48.4.dist-info/licenses/LICENSE",
+      "file": "pyvista-0.48.4/49ca666de8-LICENSE",
+      "sha256": "ef781b94ef972e69777b03022520150b77ae9bd1c6e0225c452a14e82251e9e5"
+    },
+    {
+      "component": "pywin32-ctypes",
+      "version": "0.2.3",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pywin32_ctypes-0.2.3.dist-info/LICENSE.txt",
+      "file": "pywin32-ctypes-0.2.3/e9fda7e83e-LICENSE.txt",
+      "sha256": "cc03ae891a362c85d508a4e47af954314a2e4ccbd445140cb8dca7e2baee19f7"
+    },
+    {
+      "component": "PyYAML",
+      "version": "6.0.3",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "pyyaml-6.0.3.dist-info/licenses/LICENSE",
+      "file": "PyYAML-6.0.3/1f5c94674b-LICENSE",
+      "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4"
+    },
+    {
       "component": "quick-xml",
       "version": "0.41.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4442,6 +4394,30 @@
       "sha256": "ae895c8576e682f310fb70d93d9f99b1dd82872094c54a8f6cdfe2ca5c2d6ecb"
     },
     {
+      "component": "react",
+      "version": "18.3.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "react-18.3.1/c693279643-LICENSE",
+      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
+    },
+    {
+      "component": "react-dom",
+      "version": "18.3.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "react-dom-18.3.1/c693279643-LICENSE",
+      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
+    },
+    {
+      "component": "react-refresh",
+      "version": "0.17.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "react-refresh-0.17.0/c693279643-LICENSE",
+      "sha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
       "component": "redox_syscall",
       "version": "0.5.18",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4488,6 +4464,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "ref-cast-impl-1.0.26/421f8eecf7-LICENSE-MIT",
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "component": "referencing",
+      "version": "0.37.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "referencing-0.37.0.dist-info/licenses/COPYING",
+      "file": "referencing-0.37.0/08ac984ee3-COPYING",
+      "sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
     },
     {
       "component": "regex",
@@ -4538,6 +4522,46 @@
       "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
     },
     {
+      "component": "reportlab",
+      "version": "4.5.1",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "reportlab-4.5.1.dist-info/licenses/LICENSE",
+      "file": "reportlab-4.5.1/baa3b2f7fa-LICENSE",
+      "sha256": "ef831761646313921375fc2cb888e8eeaf7da213d0b92852c10c42f3a0b4d138"
+    },
+    {
+      "component": "reportlab",
+      "version": "5.0.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "reportlab-5.0.1.dist-info/licenses/LICENSE",
+      "file": "reportlab-5.0.1/55678dbd7a-LICENSE",
+      "sha256": "ef831761646313921375fc2cb888e8eeaf7da213d0b92852c10c42f3a0b4d138"
+    },
+    {
+      "component": "requests",
+      "version": "2.32.5",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "requests-2.32.5.dist-info/licenses/LICENSE",
+      "file": "requests-2.32.5/5ffe5c6399-LICENSE",
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "component": "requests",
+      "version": "2.34.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "requests-2.34.2.dist-info/licenses/LICENSE",
+      "file": "requests-2.34.2/fb0b720c70-LICENSE",
+      "sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+    },
+    {
+      "component": "requests",
+      "version": "2.34.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "requests-2.34.2.dist-info/licenses/NOTICE",
+      "file": "requests-2.34.2/bd7b91afd6-NOTICE",
+      "sha256": "f5110972dedad2b4e9d314518daf3b7d72d6e02e499acd802181de6f74571dcc"
+    },
+    {
       "component": "reqwest",
       "version": "0.13.4",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4560,6 +4584,38 @@
       "original_notice": "LICENSE",
       "file": "rfd-0.15.4/c693279643-LICENSE",
       "sha256": "65fc947f4bac882a2cd104ef73c246b1b037059df9f2b3a58b7f77f0b9e56071"
+    },
+    {
+      "component": "rich",
+      "version": "15.0.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "rich-15.0.0.dist-info/licenses/LICENSE",
+      "file": "rich-15.0.0/bb9c3b1eee-LICENSE",
+      "sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
+    },
+    {
+      "component": "rich-rst",
+      "version": "2.1.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "rich_rst-2.1.0.dist-info/licenses/LICENSE",
+      "file": "rich-rst-2.1.0/c0b707d8fc-LICENSE",
+      "sha256": "afd4029d4a3f931ff188b56413dc125a8de083130164a4b6019731dff935523a"
+    },
+    {
+      "component": "rollup",
+      "version": "4.62.2",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.md",
+      "file": "rollup-4.62.2/4673a3aba0-LICENSE.md",
+      "sha256": "fa1bd040c5bdeefe65b3821cebf474f2733ce65df13089bd151dda1778e62fe8"
+    },
+    {
+      "component": "rpds-py",
+      "version": "2026.6.3",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "rpds_py-2026.6.3.dist-info/licenses/LICENSE",
+      "file": "rpds-py-2026.6.3/fcd0c1933c-LICENSE",
+      "sha256": "314e4e91be3baa93c0fb4bccc9e4e97cd643eb839b065af921782c2175fe9909"
     },
     {
       "component": "rustc-hash",
@@ -4658,6 +4714,14 @@
       "sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
     },
     {
+      "component": "scheduler",
+      "version": "0.23.2",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "scheduler-0.23.2/c693279643-LICENSE",
+      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
+    },
+    {
       "component": "schemars",
       "version": "0.8.22",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4690,6 +4754,102 @@
       "sha256": "1954992a2b32e8a2af24a4c11b726902e344c1934b947a77f04d404908f8db30"
     },
     {
+      "component": "scipy",
+      "version": "1.17.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "scipy-1.17.0.dist-info/LICENSE.txt",
+      "file": "scipy-1.17.0/76affe60e9-LICENSE.txt",
+      "sha256": "e6993ffc464425a198e3558f9d76fb888420c42ff0ae95b07a544087754a5995"
+    },
+    {
+      "component": "scipy",
+      "version": "1.17.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "scipy/_lib/_uarray/LICENSE",
+      "file": "scipy-1.17.0/1254351382-LICENSE",
+      "sha256": "c80c39b5fce06ba4897e14e0b0a88b54458334d951eb1361402ffad2cfb863b4"
+    },
+    {
+      "component": "scipy",
+      "version": "1.17.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "scipy/fft/_pocketfft/LICENSE.md",
+      "file": "scipy-1.17.0/260d69ad56-LICENSE.md",
+      "sha256": "c254b2b5fd30ae3c89d36ba061730563b9760fca04f1b746a1b2c3157da2c789"
+    },
+    {
+      "component": "scipy",
+      "version": "1.17.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "scipy/integrate/LICENSE_DOP",
+      "file": "scipy-1.17.0/a443b9ad7f-LICENSE_DOP",
+      "sha256": "ed9bf58c6d74d3fad9d92d1d67d9bff8141d8ab60de784516b0711364fd43357"
+    },
+    {
+      "component": "scipy",
+      "version": "1.17.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "scipy/spatial/qhull_src/COPYING_QHULL.txt",
+      "file": "scipy-1.17.0/8989e278a2-COPYING_QHULL.txt",
+      "sha256": "106d55c931fd6a84822e5345d900273d059f1c27310d02567ccb313c5d18c55d"
+    },
+    {
+      "component": "scipy",
+      "version": "1.18.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "scipy-1.18.1.dist-info/LICENSE.txt",
+      "file": "scipy-1.18.1/d98f685fd2-LICENSE.txt",
+      "sha256": "f0f5c56b298ec9795df1199edc328a987242716d14a1bde6813112e22dc15f99"
+    },
+    {
+      "component": "scipy",
+      "version": "1.18.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "scipy/_lib/_uarray/LICENSE",
+      "file": "scipy-1.18.1/1254351382-LICENSE",
+      "sha256": "e4c4acc31e8287066d7c995d26e3ef902ca1977ee187b260b11c278366503811"
+    },
+    {
+      "component": "scipy",
+      "version": "1.18.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "scipy/fft/_duccfft/LICENSE.md",
+      "file": "scipy-1.18.1/4204666d1d-LICENSE.md",
+      "sha256": "c04661685cff9d8035fe1c4c3ab357e7f7633cafc06a73e9d90c3c5fede8a86a"
+    },
+    {
+      "component": "scipy",
+      "version": "1.18.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "scipy/integrate/LICENSE_DOP",
+      "file": "scipy-1.18.1/a443b9ad7f-LICENSE_DOP",
+      "sha256": "6cc2ed6e35b8f376ff3d8f86aeef4e0c34c2309bd6f4a0565936d577839ba023"
+    },
+    {
+      "component": "scipy",
+      "version": "1.18.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "scipy/spatial/qhull_src/COPYING_QHULL.txt",
+      "file": "scipy-1.18.1/8989e278a2-COPYING_QHULL.txt",
+      "sha256": "2a6ebb495e26dd5f88cbc40c593733da6edb27b64936f70409cd5a1acafb1c32"
+    },
+    {
+      "component": "scooby",
+      "version": "0.11.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "scooby-0.11.0.dist-info/licenses/LICENSE",
+      "file": "scooby-0.11.0/5e8507fd91-LICENSE",
+      "sha256": "82208b11be7124de546e1ea8d7fd8bc478ffb2d62be46d8221007978d2483a5b"
+    },
+    {
+      "component": "scooby",
+      "version": "0.11.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "scooby-0.11.2.dist-info/licenses/LICENSE",
+      "file": "scooby-0.11.2/fd448fce5c-LICENSE",
+      "sha256": "82208b11be7124de546e1ea8d7fd8bc478ffb2d62be46d8221007978d2483a5b"
+    },
+    {
       "component": "scopeguard",
       "version": "1.2.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4706,6 +4866,14 @@
       "sha256": "fb77f0a9c53e473abe5103c8632ef9f0f2874d4fb3f17cb2d8c661aab9cee9d7"
     },
     {
+      "component": "selectors",
+      "version": "0.38.0",
+      "scope": "Locked Windows Cargo normal/build dependency declared-license preservation; upstream package has no standalone notice file; normative text sourced from Mozilla; build-route evidence only; production/legal review pending",
+      "original_notice": "authoritative-license-text:https://www.mozilla.org/MPL/2.0/index.txt",
+      "file": "selectors-0.38.0/79c1dc073e-MPL-2.0.txt",
+      "sha256": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+    },
+    {
       "component": "semver",
       "version": "1.0.28",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4720,6 +4888,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "semver-1.0.28/421f8eecf7-LICENSE-MIT",
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "component": "semver",
+      "version": "6.3.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "semver-6.3.1/c693279643-LICENSE",
+      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
     },
     {
       "component": "serde",
@@ -4946,6 +5122,142 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools-84.0.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/aeab75b4c2-LICENSE",
+      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/autocommand-2.2.2.dist-info/LICENSE",
+      "file": "setuptools-84.0.0/b8b1f5f037-LICENSE",
+      "sha256": "ade78d04982d69972d444a8e14a94f87a2334dd3855cc80348ea8e240aa0df2d"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/backports.tarfile-1.2.0.dist-info/LICENSE",
+      "file": "setuptools-84.0.0/c9e41e71fb-LICENSE",
+      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/importlib_metadata-8.7.1.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/4a7fd6a9c6-LICENSE",
+      "sha256": "458502e12d97bbf64438606a20044aa85eb05fb0a8a807bb35dbec253fd1fc04"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/jaraco.text-4.0.0.dist-info/LICENSE",
+      "file": "setuptools-84.0.0/9fe05a3195-LICENSE",
+      "sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/jaraco_context-6.1.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/4d09286af1-LICENSE",
+      "sha256": "9755a18519666e5f0f4cae3daad3d7012bcae48a600b31237d75e9fe134e6683"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/jaraco_functools-4.4.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/63a92caf81-LICENSE",
+      "sha256": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/more_itertools-10.8.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/6562dd76db-LICENSE",
+      "sha256": "09f1c8c9e941af3e584d59641ea9b87d83c0cb0fd007eb5ef391a7e2643c1a46"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/c2780f51d1-LICENSE",
+      "sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.APACHE",
+      "file": "setuptools-84.0.0/123439bfbc-LICENSE.APACHE",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/packaging-26.0.dist-info/licenses/LICENSE.BSD",
+      "file": "setuptools-84.0.0/c80865de46-LICENSE.BSD",
+      "sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/platformdirs-4.4.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/d6b8bc4557-LICENSE",
+      "sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/tomli-2.4.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/1ab641e912-LICENSE",
+      "sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/wheel-0.46.3.dist-info/licenses/LICENSE.txt",
+      "file": "setuptools-84.0.0/8b28658c9e-LICENSE.txt",
+      "sha256": "30c23618679108f3e8ea1d2a658c7ca417bdfc891c98ef1a89fa4ff0c9828654"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/_vendor/zipp-3.23.0.dist-info/licenses/LICENSE",
+      "file": "setuptools-84.0.0/0e45092c30-LICENSE",
+      "sha256": "5a57cb4db85e2a2dd88c290628908add57e3451449e0a9a71fdfb38776fd759d"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/config/NOTICE",
+      "file": "setuptools-84.0.0/4094fd3590-NOTICE",
+      "sha256": "2dddf08818297a3b89d43d95ff659d8da85741108c9136dfa3a4d856c0623bd8"
+    },
+    {
+      "component": "setuptools",
+      "version": "84.0.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "setuptools/config/_validate_pyproject/NOTICE",
+      "file": "setuptools-84.0.0/e972ee51f8-NOTICE",
+      "sha256": "09c9bcea95ca086f8bc5bed174e40bc835b297d40fb5f86bbbb570fe0a5581a7"
+    },
+    {
       "component": "sha2",
       "version": "0.10.9",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -4960,6 +5272,30 @@
       "original_notice": "LICENSE-MIT",
       "file": "sha2-0.10.9/421f8eecf7-LICENSE-MIT",
       "sha256": "b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1"
+    },
+    {
+      "component": "shapely",
+      "version": "2.1.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "shapely-2.1.2.dist-info/licenses/LICENSE.txt",
+      "file": "shapely-2.1.2/d9dc139bf3-LICENSE.txt",
+      "sha256": "4a207eac9bf257ed286e1c6f0fce253d1abfdb134fc61ec855e37f5692a3f754"
+    },
+    {
+      "component": "shapely",
+      "version": "2.1.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "shapely-2.1.2.dist-info/licenses/LICENSE_GEOS",
+      "file": "shapely-2.1.2/d1c8cb4c88-LICENSE_GEOS",
+      "sha256": "138b2c2f9450073d7c116abe397ca4382625671c752b7a9a5f320b33fc3f3f2a"
+    },
+    {
+      "component": "shapely",
+      "version": "2.1.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "shapely-2.1.2.dist-info/licenses/LICENSE_win32",
+      "file": "shapely-2.1.2/ce1a8ff3b9-LICENSE_win32",
+      "sha256": "2ad0ead5166d5d420bee57d045b0e38f54dec3979c8cb3fdbdcd3c47437468f9"
     },
     {
       "component": "shlex",
@@ -5008,6 +5344,14 @@
       "original_notice": "COPYING",
       "file": "siphasher-1.0.3/400d38e5cf-COPYING",
       "sha256": "c962ee4d1d05ddc138b202b2540219ebc57893fcf97b364852094a9a94ce1365"
+    },
+    {
+      "component": "six",
+      "version": "1.17.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "six-1.17.0.dist-info/LICENSE",
+      "file": "six-1.17.0/3681ec3e03-LICENSE",
+      "sha256": "4375ba20e2b9c6c4e7cad2940a628fd90e95cc3d50ee92aae755715d8ba1fbd0"
     },
     {
       "component": "slab",
@@ -5080,6 +5424,14 @@
       "original_notice": "LICENSE",
       "file": "soup3-sys-0.5.0/c693279643-LICENSE",
       "sha256": "7ade43ec5e1a5e43000aa871d290dff4c0e9e2e16b7f6bea2ecf091e3d056d31"
+    },
+    {
+      "component": "source-map-js",
+      "version": "1.2.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "source-map-js-1.2.1/c693279643-LICENSE",
+      "sha256": "6cb0631f71c7749763fd3dd1d5bee52dd1070ec17f2edc1710079ad070bd2fbd"
     },
     {
       "component": "spki",
@@ -5378,6 +5730,22 @@
       "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
     },
     {
+      "component": "tauri-plugin",
+      "version": "2.7.0",
+      "scope": "Locked Windows Cargo normal/build dependency notice evidence; source commit recorded by Cargo registry metadata",
+      "original_notice": "github.com/tauri-apps/tauri@447fa9f3f993fe77724189e355078b38ce20baea/LICENSE-APACHE-2.0",
+      "file": "tauri-plugin-2.7.0/d2415d63af-LICENSE-APACHE-2.0",
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "component": "tauri-plugin",
+      "version": "2.7.0",
+      "scope": "Locked Windows Cargo normal/build dependency notice evidence; source commit recorded by Cargo registry metadata",
+      "original_notice": "github.com/tauri-apps/tauri@447fa9f3f993fe77724189e355078b38ce20baea/LICENSE-MIT",
+      "file": "tauri-plugin-2.7.0/feb271f03f-LICENSE-MIT",
+      "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+    },
+    {
       "component": "tauri-plugin-opener",
       "version": "2.6.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -5538,6 +5906,14 @@
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
     },
     {
+      "component": "three",
+      "version": "0.171.0",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "three-0.171.0/c693279643-LICENSE",
+      "sha256": "4c40a1ef62450b857c3b2aaf294936304cd552d965fbcd9d32d4c5bcf4ba4454"
+    },
+    {
       "component": "time",
       "version": "0.3.54",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -5584,6 +5960,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "time-macros-0.2.32/421f8eecf7-LICENSE-MIT",
       "sha256": "2537228d9a1b44a5dc595241349cae7090b326c8de165aaf89bfddef4a00d0fc"
+    },
+    {
+      "component": "tinyglobby",
+      "version": "0.2.17",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "tinyglobby-0.2.17/c693279643-LICENSE",
+      "sha256": "22c68811e174cbbfb3813d4135918df4f540959c14d872e601d9abe83d3cde8f"
     },
     {
       "component": "tinystr",
@@ -5930,6 +6314,30 @@
       "sha256": "a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f"
     },
     {
+      "component": "typescript",
+      "version": "5.9.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.txt",
+      "file": "typescript-5.9.3/d0ed4cc3fb-LICENSE.txt",
+      "sha256": "a5e9f9b1575301c7a7a03508fdaa2e05a918cc17fd21c6e898096a96d6a34f61"
+    },
+    {
+      "component": "typing-extensions",
+      "version": "4.16.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "typing_extensions-4.16.0.dist-info/licenses/LICENSE",
+      "file": "typing-extensions-4.16.0/2231b6c46c-LICENSE",
+      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+    },
+    {
+      "component": "typing_extensions",
+      "version": "4.15.0",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "typing_extensions-4.15.0.dist-info/licenses/LICENSE",
+      "file": "typing_extensions-4.15.0/ea22ee0698-LICENSE",
+      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+    },
+    {
       "component": "unicode-ident",
       "version": "1.0.24",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -5978,6 +6386,14 @@
       "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
     },
     {
+      "component": "update-browserslist-db",
+      "version": "1.3.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "update-browserslist-db-1.3.3/c693279643-LICENSE",
+      "sha256": "9877e90da14aa8c931a1f9d07cc2a20ce119106e5dab1ebb41af865266d0cd2a"
+    },
+    {
       "component": "url",
       "version": "2.5.8",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -5992,6 +6408,22 @@
       "original_notice": "LICENSE-MIT",
       "file": "url-2.5.8/421f8eecf7-LICENSE-MIT",
       "sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+    },
+    {
+      "component": "urllib3",
+      "version": "2.6.3",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "urllib3-2.6.3.dist-info/licenses/LICENSE.txt",
+      "file": "urllib3-2.6.3/3a3078ccf9-LICENSE.txt",
+      "sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686"
+    },
+    {
+      "component": "urllib3",
+      "version": "2.7.0",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "urllib3-2.7.0.dist-info/licenses/LICENSE.txt",
+      "file": "urllib3-2.7.0/0339980ea9-LICENSE.txt",
+      "sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686"
     },
     {
       "component": "urlpattern",
@@ -6066,6 +6498,14 @@
       "sha256": "b7e650f3fce5c53249d1cdc608b54df156a97edd636cf9d23498d0cfe7aec63e"
     },
     {
+      "component": "vite",
+      "version": "6.4.3",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE.md",
+      "file": "vite-6.4.3/4673a3aba0-LICENSE.md",
+      "sha256": "008938a3441801ca3960f8e3ccb4c0738e7996442a53063141d57d3769a7344d"
+    },
+    {
       "component": "vswhom",
       "version": "0.1.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -6080,6 +6520,22 @@
       "original_notice": "LICENSE",
       "file": "vswhom-sys-0.1.3/c693279643-LICENSE",
       "sha256": "b9b7e5d4bf8857061fbecab39ef1923644eba639337af22d7ad0bb9b3ce59c49"
+    },
+    {
+      "component": "vtk",
+      "version": "9.5.2",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "vtk-9.5.2.dist-info/licenses/LICENSE",
+      "file": "vtk-9.5.2/e03b18cce3-LICENSE",
+      "sha256": "11232448be82e0ea2c2c66219c2e36389f42249894070ee10c549ff182fc08b6"
+    },
+    {
+      "component": "vtk",
+      "version": "9.6.2",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "vtk-9.6.2.dist-info/licenses/LICENSE",
+      "file": "vtk-9.6.2/3874422d3e-LICENSE",
+      "sha256": "fb3c1d41b57425cf3026c4bb4cd244c982a7a9475596424de5d1b7f32ea78285"
     },
     {
       "component": "walkdir",
@@ -6216,6 +6672,30 @@
       "original_notice": "LICENSE",
       "file": "webkit2gtk-sys-2.0.2/c693279643-LICENSE",
       "sha256": "281b72cb008466810da31680e72005b9899c7e9d7705b909c86098260e12aa7d"
+    },
+    {
+      "component": "webview2-com",
+      "version": "0.39.1",
+      "scope": "Locked Windows Cargo normal/build dependency notice evidence; source commit recorded by Cargo registry metadata",
+      "original_notice": "github.com/wravery/webview2-rs@edc2caf886175ccaebe86078c9cfe1ae2a187328/LICENSE",
+      "file": "webview2-com-0.39.1/da8dff6f52-LICENSE",
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+    },
+    {
+      "component": "webview2-com-macros",
+      "version": "0.8.1",
+      "scope": "Locked Windows Cargo normal/build dependency notice evidence; source commit recorded by Cargo registry metadata",
+      "original_notice": "github.com/wravery/webview2-rs@edc2caf886175ccaebe86078c9cfe1ae2a187328/LICENSE",
+      "file": "webview2-com-macros-0.8.1/da8dff6f52-LICENSE",
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+    },
+    {
+      "component": "webview2-com-sys",
+      "version": "0.39.1",
+      "scope": "Locked Windows Cargo normal/build dependency notice evidence; source commit recorded by Cargo registry metadata",
+      "original_notice": "github.com/wravery/webview2-rs@edc2caf886175ccaebe86078c9cfe1ae2a187328/LICENSE",
+      "file": "webview2-com-sys-0.39.1/da8dff6f52-LICENSE",
+      "sha256": "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
     },
     {
       "component": "winapi",
@@ -7010,6 +7490,38 @@
       "sha256": "26235c41e314fb0da35b33b2bb5bcbc4dd523839f8eeca52efcd43586f441fb5"
     },
     {
+      "component": "wxPython",
+      "version": "4.2.4",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "wx/lib/pubsub/LICENSE_BSD_Simple.txt",
+      "file": "wxPython-4.2.4/e5d407083a-LICENSE_BSD_Simple.txt",
+      "sha256": "42b972151ea0ca1fba614bec8a057abafba9aefca49130e1d86473aad33a2950"
+    },
+    {
+      "component": "wxPython",
+      "version": "4.2.4",
+      "scope": "Python build/runtime environment notice evidence; actual payload in frozen file manifests",
+      "original_notice": "wxpython-4.2.4.dist-info/licenses/LICENSE.txt",
+      "file": "wxPython-4.2.4/beddfabe33-LICENSE.txt",
+      "sha256": "0d5cca7fb8ee32d9313e3b1660a009846caaef4fe166e493c7ca4dfd95a0ab5c"
+    },
+    {
+      "component": "wxpython",
+      "version": "4.3.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "wx/lib/pubsub/LICENSE_BSD_Simple.txt",
+      "file": "wxpython-4.3.1/e5d407083a-LICENSE_BSD_Simple.txt",
+      "sha256": "42b972151ea0ca1fba614bec8a057abafba9aefca49130e1d86473aad33a2950"
+    },
+    {
+      "component": "wxpython",
+      "version": "4.3.1",
+      "scope": "Pinned current Python requirement wheel notice evidence; superset of the actual Gamma frozen environment; actual bundled versions are determined by frozen file manifests",
+      "original_notice": "wxpython-4.3.1.dist-info/licenses/LICENSE.txt",
+      "file": "wxpython-4.3.1/7fa6a8aa16-LICENSE.txt",
+      "sha256": "0d5cca7fb8ee32d9313e3b1660a009846caaef4fe166e493c7ca4dfd95a0ab5c"
+    },
+    {
       "component": "x11",
       "version": "2.21.0",
       "scope": "Locally cached locked Cargo dependency notice evidence; may include build/other-platform crates",
@@ -7024,6 +7536,14 @@
       "original_notice": "LICENSE-MIT",
       "file": "x11-dl-2.21.0/421f8eecf7-LICENSE-MIT",
       "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+    },
+    {
+      "component": "yallist",
+      "version": "3.1.1",
+      "scope": "npm dependency notice evidence",
+      "original_notice": "LICENSE",
+      "file": "yallist-3.1.1/c693279643-LICENSE",
+      "sha256": "4ec3d4c66cd87f5c8d8ad911b10f99bf27cb00cdfcff82621956e379186b016b"
     },
     {
       "component": "yoke",

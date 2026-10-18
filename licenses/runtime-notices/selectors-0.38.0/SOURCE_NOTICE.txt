@@ -1,0 +1,12 @@
+SPIKE runtime-notice provenance record
+
+Component: selectors 0.38.0
+Cargo registry source: https://crates.io/api/v1/crates/selectors/0.38.0/download
+Cargo registry metadata VCS commit: 572ecba2d1600e7c3d490586692a209faf703baa
+VCS path: selectors
+Upstream repository: https://github.com/servo/stylo
+Declared license metadata: MPL-2.0
+Upstream notice-file evidence: the exact crates.io source and the exact VCS commit contain no standalone LICENSE, LICENCE, NOTICE, COPYING, or COPYRIGHT file for selectors.
+Preserved governing text source: https://www.mozilla.org/MPL/2.0/index.txt
+Dependency scope: the locked Windows normal/build inverse tree reaches selectors through dom_query and tauri-utils in Tauri code-generation, proc-macro, plugin build, and build-script routes; this record does not establish that selectors is linked into a shipped runtime library.
+Review status: notice text retained; production/legal review pending. No redistribution or compliance approval is asserted.
