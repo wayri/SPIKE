@@ -7996,10 +7996,10 @@
     },
     {
       "path": "docs/ATTRIBUTION_POLICY.md",
-      "git_blob": "2a6eef5c89209a2d7c7c0080f85265bee7dabe08",
+      "git_blob": "af13d1cade3d87aa3cc7b0f06385adb7beae20e5",
       "mode": "100644",
-      "bytes": 3173,
-      "sha256": "4d3d4a5479371b3c5713fd700c0051692de316c909cf178b93b6bd1c1551daf7"
+      "bytes": 4540,
+      "sha256": "804b9cfa6f2e6d089110483437905e700a38efadf7a0ee32d0e906bb9fe490a1"
     },
     {
       "path": "docs/BERKELEY_BSIM_OSDI_QUALIFICATION.md",
@@ -10579,10 +10579,10 @@
     },
     {
       "path": "docs/releases/v0.3.12-gamma.1.md",
-      "git_blob": "13a63f65d270e0059cc53df69e27bcf715477301",
+      "git_blob": "b4a2278d2aed0639d82bf0d66ea83979746263b8",
       "mode": "100644",
-      "bytes": 3130,
-      "sha256": "278669e06692953c1298154e3e669af45f0d9e0e75a4c0697b9006d337515874"
+      "bytes": 3432,
+      "sha256": "95e8e33ed5af754986b5e391fad002a74b68dd29b66a554eed24d21143f73e07"
     },
     {
       "path": "docs/releases/v0.3.2.md",
@@ -31334,10 +31334,10 @@
     },
     {
       "path": "scripts/release_automation.py",
-      "git_blob": "1051425e2cc572a1e657f715dc0508bcd442510f",
+      "git_blob": "17484efba9c20fe915084c0d328f1bbae7604f67",
       "mode": "100644",
-      "bytes": 11202,
-      "sha256": "53650bc116f8fef91ef8169e3cf44a4b123c0eac8b0f2956c7622408af841452"
+      "bytes": 11750,
+      "sha256": "8b900b22c6aeb7d551f054582e41290682d34b981c0993e9b6f45b232623a28a"
     },
     {
       "path": "scripts/render_brand_assets.py",
@@ -39104,10 +39104,10 @@
     },
     {
       "path": "tests/python/test_release_automation.py",
-      "git_blob": "070534d7686dea8ce53b3191e10c67e77dcfdf4a",
+      "git_blob": "962dd59e2db8a3cb69054373deedd22d999a55f9",
       "mode": "100644",
-      "bytes": 11240,
-      "sha256": "a7394ce7927dd0c942d3b22dfd4cd67d0bb2b5b2d956066352462d19aeea93d6"
+      "bytes": 13876,
+      "sha256": "ca9957aa5a6e84890cf8b80779feb91ff7f888c7cb0a431cf8daeae9294b2e9d"
     },
     {
       "path": "tests/python/test_result_face_projection_index.py",
