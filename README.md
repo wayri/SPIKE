@@ -7,6 +7,7 @@
 [![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.12-gamma.1/SPIKE_0.3.12-gamma.1_x64-setup.exe)
 [![Linux Flatpak download](https://img.shields.io/badge/download-Linux_Flatpak-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak)
 [![macOS Apple Silicon download](https://img.shields.io/badge/download-macOS_Apple_Silicon-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_macos-arm64_EXPERIMENTAL.dmg)
+[![Discord community](https://img.shields.io/badge/community-Discord-5865F2?logo=discord&logoColor=white)](https://discord.gg/EvGh3cXtk)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)](LICENSE)
 
 [![Power integrity](https://img.shields.io/badge/analysis-power_integrity-476582)](#pcb-analysis-capabilities)
@@ -44,6 +45,10 @@ macOS packaging is held, with no current package claimed as verified.
 · [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
 · [User guides](docs/README.md)
 · [Build from source](docs/DEVELOPER_GUIDE.md)
+· [Join the SPIKE Discord community](https://discord.gg/EvGh3cXtk)
+
+The community invite currently expires after 30 days (issued 2026-10-18).
+If it has expired, request a fresh invite through [GitHub Issues](https://github.com/wayri/SPIKE/issues/new).
 
 See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md).
 
