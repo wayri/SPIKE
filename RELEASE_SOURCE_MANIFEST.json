@@ -3173,10 +3173,10 @@
     },
     {
       "path": "app/src-tauri/tauri.conf.json",
-      "git_blob": "6b81cef77b5a2080b1410fb662809fc3181a31e0",
+      "git_blob": "8b2503566efb443a565df15c8282bd51f6cedd8a",
       "mode": "100644",
-      "bytes": 3203,
-      "sha256": "f33d8451ac09a7186683369068cc69ae300792c3a05113c6fd012bf01d2971b6"
+      "bytes": 3257,
+      "sha256": "1b4cbdf89f7e1a637ecbe8e6e1c989ac06b34d236af9e11689b701b0496e0adb"
     },
     {
       "path": "app/src-tauri/tauri.production.conf.json",
