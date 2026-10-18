@@ -79,10 +79,11 @@ authored; no external solver implementation was used as source material.
 
 ## Verification and reproducible cache microbenchmark
 
-The standalone harness avoids PCB/UI dependencies:
+The standalone harness avoids PCB/UI dependencies. Set `Eigen3_DIR` in your
+environment to your Eigen 3.4 CMake package directory before running:
 
 ```powershell
-cmake -S tests/native_spikes -B build-spikes-adaptive-20261010 -G "Visual Studio 18 2026" -A x64 -DEigen3_DIR=C:/Users/yawar/Documents/agws/Autoplacer/vcpkg/packages/eigen3_x64-windows/share/eigen3
+cmake -S tests/native_spikes -B build-spikes-adaptive-20261010 -G "Visual Studio 18 2026" -A x64 -DEigen3_DIR="$env:Eigen3_DIR"
 cmake --build build-spikes-adaptive-20261010 --config Release --parallel 4
 ctest --test-dir build-spikes-adaptive-20261010 -C Release --output-on-failure
 $env:SPIKES_TEST_NATIVE_LIBRARY=(Resolve-Path build-spikes-adaptive-20261010/Release/spikes_c_api.dll).Path

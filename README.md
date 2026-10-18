@@ -41,7 +41,7 @@ numerical, packaging, and knowledgeable-human reviews. Experimental Linux
 x86-64 Flatpak and macOS Apple Silicon packages remain at version 0.3.5. Intel
 macOS packaging is held, with no current package claimed as verified.
 
-[Downloads and release notes](https://github.com/wayri/SPIKE/releases/latest)
+[Downloads and release notes](https://github.com/wayri/SPIKE/releases/tag/v0.3.12-gamma.1)
 · [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
 · [User guides](docs/README.md)
 · [Build from source](docs/DEVELOPER_GUIDE.md)
