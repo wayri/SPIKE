@@ -1,0 +1,14 @@
+* SPDX-License-Identifier: Apache-2.0
+* RF series RLC resonance; voltages in V, frequency in Hz.
+Vac in 0 AC 1
+Rloss in sense 10
+Ltank sense tank 1u
+Ctank tank 0 25.3303p
+.ac dec 200 1Meg 300Meg
+.control
+run
+set wr_singlescale
+set wr_vecnames
+wrdata rf_series_resonance.csv mag(v(in,sense))
+.endc
+.end

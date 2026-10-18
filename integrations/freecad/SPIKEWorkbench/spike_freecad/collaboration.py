@@ -12,7 +12,7 @@ import tempfile
 import FreeCAD as App
 import Part
 
-from .session_contract import HEADER, SESSION, FEEDBACK, MAX_BYTES, digest, loads, validate
+from .session_contract import HEADER, SESSION, FEEDBACK, MAX_BYTES, digest, loads, material_snapshot, validate
 
 
 def _property(obj, name, value):
@@ -80,6 +80,12 @@ def import_session(document, payload):
                     "objects": [{k: o[k] for k in ("id", "name", "transform")} for o in payload["objects"]], "measurements": []}
         _property(root, "SPIKEBaselineJSON", json.dumps(baseline))
         _property(root, "SPIKEParentsJSON", json.dumps({o["id"]: o["parent_id"] for o in payload["objects"]}))
+        _property(root, "SPIKEMaterialsJSON", json.dumps({o["id"]: o["material_snapshot"] for o in payload["objects"]
+                                                          if "material_snapshot" in o}, sort_keys=True,
+                                                         separators=(",", ":"), ensure_ascii=False))
+        _property(root, "SPIKELayerMaterialsJSON", json.dumps({o["id"]: o["layer_material_snapshots"] for o in payload["objects"]
+                                                               if "layer_material_snapshots" in o}, sort_keys=True,
+                                                              separators=(",", ":"), ensure_ascii=False))
         _property(root, "SPIKEDiagnosticsJSON", json.dumps(payload["diagnostics"]))
         _property(root, "SPIKEMeasurementsJSON", "[]")
         _property(root, "SPIKEMeasurementPoses", "")
@@ -90,6 +96,17 @@ def import_session(document, payload):
             _property(obj, "SPIKEOccurrenceId", row["id"])
             _property(obj, "SPIKESessionId", payload["session_id"])
             _property(obj, "SPIKEGeometryName", "")
+            if "material_snapshot" in row:
+                snapshot = row["material_snapshot"]
+                _property(obj, "SPIKEMaterialJSON", json.dumps(snapshot, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
+                _property(obj, "SPIKEMaterialBaselineSHA256", digest(snapshot))
+                _property(obj, "SPIKEMaterialId", snapshot["material_id"])
+                _property(obj, "SPIKEMaterialRevision", snapshot["revision"])
+                _property(obj, "SPIKEMaterialName", str(snapshot["record"].get("name", snapshot["material_id"])))
+            if "layer_material_snapshots" in row:
+                snapshots = row["layer_material_snapshots"]
+                _property(obj, "SPIKELayerMaterialsJSON", json.dumps(snapshots, sort_keys=True, separators=(",", ":"), ensure_ascii=False))
+                _property(obj, "SPIKELayerMaterialsBaselineSHA256", digest(snapshots))
             created[row["id"]] = obj
             if row["geometry"]:
                 feature = document.addObject("Part::Feature", "SPIKE_Geometry")
@@ -140,6 +157,8 @@ def session_root(document, selection=()):
 def build_feedback(document, root):
     result = loads(root.SPIKEBaselineJSON)
     parents = json.loads(root.SPIKEParentsJSON)
+    materials = json.loads(getattr(root, "SPIKEMaterialsJSON", "{}"))
+    layer_materials = json.loads(getattr(root, "SPIKELayerMaterialsJSON", "{}"))
     expected_ids = {o["id"] for o in result["objects"]}
     occurrences = [o for o in document.Objects if getattr(o, "SPIKESessionId", "") == root.SPIKESessionId and hasattr(o, "SPIKEOccurrenceId")]
     by_id = {o.SPIKEOccurrenceId: o for o in occurrences}
@@ -153,6 +172,35 @@ def build_feedback(document, root):
         if obj not in parent.Group or obj.getParentGeoFeatureGroup() != parent:
             raise ValueError("Reparenting requires a new session; this feedback supports placement and label edits.")
         expected_children = {by_id[i].Name for i, p in parents.items() if p == row["id"]}
+        expected_material = materials.get(row["id"])
+        if (expected_material is None) != (not hasattr(obj, "SPIKEMaterialJSON")):
+            raise ValueError("Material assignment structure changed; material feedback is not supported.")
+        if expected_material is not None:
+            try:
+                snapshot = json.loads(obj.SPIKEMaterialJSON)
+                material_snapshot(snapshot)
+            except (ValueError, TypeError, json.JSONDecodeError) as exc:
+                raise ValueError("Material snapshot changed or became invalid; material feedback is not supported.") from exc
+            if (snapshot != expected_material or digest(snapshot) != obj.SPIKEMaterialBaselineSHA256 or
+                    obj.SPIKEMaterialId != snapshot["material_id"] or obj.SPIKEMaterialRevision != snapshot["revision"] or
+                    obj.SPIKEMaterialName != str(snapshot["record"].get("name", snapshot["material_id"]))):
+                raise ValueError("Material snapshot changed; material feedback is not supported.")
+        expected_layers = layer_materials.get(row["id"])
+        if (expected_layers is None) != (not hasattr(obj, "SPIKELayerMaterialsJSON")):
+            raise ValueError("Layer material assignment structure changed; material feedback is not supported.")
+        if expected_layers is not None:
+            try:
+                snapshots = json.loads(obj.SPIKELayerMaterialsJSON)
+                if not isinstance(snapshots, dict) or not snapshots or len(snapshots) > 256:
+                    raise ValueError("Invalid layer material snapshot map.")
+                for layer_id, snapshot in snapshots.items():
+                    if not isinstance(layer_id, str):
+                        raise ValueError("Invalid layer identity.")
+                    material_snapshot(snapshot)
+            except (ValueError, TypeError, json.JSONDecodeError) as exc:
+                raise ValueError("Layer material snapshots changed or became invalid; material feedback is not supported.") from exc
+            if snapshots != expected_layers or digest(snapshots) != obj.SPIKELayerMaterialsBaselineSHA256:
+                raise ValueError("Layer material snapshots changed; material feedback is not supported.")
         if obj.SPIKEGeometryName:
             expected_children.add(obj.SPIKEGeometryName)
             feature = document.getObject(obj.SPIKEGeometryName)

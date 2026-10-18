@@ -59,6 +59,34 @@ SPIKE is an offline-first engineering application with these constraints:
 
 ## Runtime architecture
 
+Cellwise conductivity-temperature feedback composes the existing one-way
+dielectric/thermal workflow in Python. It preserves original geometry/source
+identity, records generated material mappings and checks raw temperature/power
+residuals before convergence. See
+[ADR 0086](docs/adr/0086-cellwise-dielectric-conductivity-feedback.md).
+
+One-way dielectric AC heating reuses the Python field and retained thermal
+solvers on an identical mesh. Coherent RMS excitation generates conservative
+cell heat, checked against port power before thermal execution. It preserves
+experimental status and does not feed temperature back into electrical laws.
+See [ADR 0085](docs/adr/0085-conservative-dielectric-thermal-coupling.md).
+
+Explicit passive sampled PDN port reduction remains in the Python numerical
+boundary, with an exact port partition, conditioned Schur solve and conjugate
+power identity. Its source projection does not establish a causal macromodel.
+See [ADR 0084](docs/adr/0084-explicit-passive-pdn-port-reduction.md).
+
+The separate finite-dielectric AC module owns complex P1 field execution at
+supplied frequencies, reusing electrostatic geometry admission and the existing
+Python worker. It returns admittance and conjugate field-power evidence without
+promoting sample data to a transient macromodel. See
+[ADR 0083](docs/adr/0083-finite-dielectric-ac-admittance.md).
+
+Explicit simultaneous PDN loads use the existing Python worker and passive
+descriptor engine. The additive schema preserves legacy scalar execution;
+ordered load identities and combined source work remain numerical authority.
+See [ADR 0082](docs/adr/0082-explicit-simultaneous-pdn-loads.md).
+
 Optional EMerge package maintenance stays in the Python worker. The
 `emerge_runtime_updates` service owns bounded background update state and
 exclusion with active EMerge operations; its IO adapter validates a dedicated
@@ -436,3 +464,56 @@ engineering workflows. [docs/USER_TASK_SEQUENCES.md](docs/USER_TASK_SEQUENCES.md
 contains evidence-bound user task sequences. Structured failure navigation
 starts in [TROUBLESHOOTING.md](TROUBLESHOOTING.md), with immutable code metadata
 in [docs/ERROR_CODE_CATALOG.md](docs/ERROR_CODE_CATALOG.md).
+
+## Supplied capacitor corner composition
+
+The Python `pdn_decap_corners` application service composes the existing PDN
+decap stamp across explicit supplied operating corners behind a versioned
+worker contract. No numerical stamps or bias/temperature laws are duplicated.
+See [ADR 0087](docs/adr/0087-supplied-decap-operating-corners.md).
+
+## Bounded supplied decap selection
+
+The Python `pdn_decap_selection` service exhaustively enumerates a bounded
+supplied BOM/site domain and composes the existing operating-corner service.
+Integer cost/inventory constraints and ranking remain application logic;
+electrical stamps remain in the PDN core. See
+[ADR 0088](docs/adr/0088-bounded-decap-bom-selection.md).
+
+## Explicit two-port fixture removal
+
+`sparameter_deembedding` owns bounded sampled wave-chain transforms in Python;
+`service_sparameter_processing` supplies the versioned worker boundary through
+the simulation dispatcher. Original sources remain separate from derived
+networks. See [ADR 0089](docs/adr/0089-explicit-two-port-fixture-removal.md).
+
+## Explicit network grid preparation
+
+`sparameter_sampling` owns the sampled network transformation in Python;
+the existing network-processing worker boundary exposes versioned requests.
+Existing channel and composition services retain their admission policies.
+See [ADR 0090](docs/adr/0090-explicit-network-resampling-and-dc.md).
+
+## Supplied-pole rational network models
+
+`sparameter_rational` owns bounded fixed-pole least-squares model construction
+in Python behind the existing network-processing worker boundary. Source
+identity, real coefficients and numerical admission remain authoritative;
+automatic transient integration remains separate. See
+[ADR 0091](docs/adr/0091-supplied-stable-pole-network-models.md).
+
+## Prescribed-wave rational network transients
+
+`sparameter_transient` composes the actual rational fitter with zero-state
+analytic PWL propagation in Python. The existing network worker exposes
+versioned requests and returned histories. Arbitrary source/load feedback
+and physical transient qualification remain separate. See
+[ADR 0092](docs/adr/0092-prescribed-wave-rational-transients.md).
+
+## Resistive feedback around rational network models
+
+`sparameter_terminated` composes the actual fitted model and shared waveform
+admission with a conditioned resistive feedback connection and bounded
+augmented-exponential propagation. Worker contracts retain the source/fit and
+declared boundaries. See
+[ADR 0093](docs/adr/0093-resistive-rational-network-feedback.md).

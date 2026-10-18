@@ -39,17 +39,16 @@ for (const [group, labels] of Object.entries(groups)) {
   }
 }
 
-const toolbarContracts = [
-  ["RLC", "<Component size={14} /> RLC"],
-  ["Translucency", "<Blend size={14} /> Translucent"],
-  ["Net isolation", "<RouteOff size={14} /> Nets only"],
-  ["Model visibility", "<Boxes size={14} /> Models"],
-  ["Contour", "<Spline size={14} /> Contour"],
-  ["Smooth field", "<Combine size={14} /> Smooth field"],
-  ["Vectors", "<MoveUpRight size={14} /> Arrows"],
-];
-for (const [name, snippet] of toolbarContracts) {
-  if (!source.includes(snippet)) throw new Error(`${name} toolbar icon contract is missing.`);
+// Result controls now live in the result panel, and selection is a named combobox.
+if(!source.includes('aria-label="Selection filter"'))throw new Error('Viewport selection combobox is missing');
+for(const value of ['all','part','net'])if(!source.includes(`<option value="${value}">`))throw new Error(`Selection mode ${value} is missing`);
+const results=fs.readFileSync(path.join(root,'src','ResultVisualizationPanel.tsx'),'utf8');
+for(const id of ['voltage','voltage_drop','current','current_density','impedance','power_loss','mesh']){
+ const entry=results.match(new RegExp(`\\{ id: "${id}", label: "[^"\\n]+", icon: ([A-Za-z0-9_]+)`));
+ if(!entry)throw new Error(`Result mode ${id} has no named semantic icon`);
 }
+const quick=fs.readFileSync(path.join(root,'src','ViewportQuickTools.tsx'),'utf8');
+for(const label of ['Fit','Layers','Inspect','PI setup','Channel','Probe','Thermal setup','EM domain','Results'])if(!quick.includes(`["${label}",`))throw new Error(`Quick tool ${label} has no icon mapping`);
+if(!source.includes('<ResultVisualizationPanel'))throw new Error('Result visualization panel is not connected to the workspace');
 
 console.log(`Ribbon icon vocabulary passed for ${Object.keys(groups).length} workspaces.`);

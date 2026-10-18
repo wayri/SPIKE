@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import {build} from 'esbuild';
+import {fileURLToPath} from 'node:url';
 import ts from 'typescript';
-import {importTestTypescript} from './import-test-typescript.mjs';
 const compile=s=>ts.transpileModule(s,{compilerOptions:{module:ts.ModuleKind.ES2022,target:ts.ScriptTarget.ES2022}}).outputText;
 const load=async s=>import(`data:text/javascript;base64,${Buffer.from(compile(s)).toString('base64')}`);
 const source=await readFile(new URL('../src/LayoutViewport.tsx',import.meta.url),'utf8');
@@ -35,7 +36,8 @@ const many={...board,pads:Array.from({length:10000},(_,i)=>pad(`P${i}`,4+(i%100)
 const bounded=annotate(many,{...view,maxX:510,maxY:510},{},'All',null,false,[]);assert.equal(bounded.labels.length,600);assert.equal(bounded.pinOne.length,10000,'Pin markers must not silently truncate components to text budget');
 assert.match(source,/return layoutFeatureAnnotations\(board/);assert.match(source,/data-pin-one-count=/);
 console.log('Actual2D annotation function: pad numbers/nets, trace/zone labels, pin1/A1, visible-layer/isolated-net filters, zoom, collisions and600text budget passed');
-const {parseKicadBoard}=await importTestTypescript('boardParser');
+const parserBundle=await build({entryPoints:[fileURLToPath(new URL('../src/boardParser.ts',import.meta.url))],bundle:true,write:false,format:'esm',platform:'node'});
+const {parseKicadBoard}=await import(`data:text/javascript;base64,${Buffer.from(parserBundle.outputFiles[0].contents).toString('base64')}`);
 for(const path of process.argv.slice(2)){
  const real=parseKicadBoard(await readFile(path,'utf8'));
  const padIds=new Set();let repeatedPadIds=0;

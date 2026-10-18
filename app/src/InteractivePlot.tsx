@@ -13,6 +13,7 @@ import { buildPlotAxes, type AxisDraft, type AxisSettings } from "./plotAxisSett
 import { openContextScript, plotScriptContext } from "./contextScript";
 import ResultValueScale from "./ResultValueScale";
 import { plotColorScales, type PlotColorScale } from "./plotColorScales";
+import { usePanelPresentation } from "./panelPresentation";
 import "./PlotlyChart.css";
 
 type Point = { x: number; y: number; curveNumber: number; pointNumber: number; pointIndex?: number; customdata?: unknown };
@@ -27,6 +28,7 @@ async function clipboardAccess<T>(task: Promise<T>): Promise<T> {
 }
 
 export default function InteractivePlot({ data, layout, revision, title = "Interactive result plot", onPointClick, onSelectSamples, contextActions = [] }: Props) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const host = useRef<Graph>(null), plotlyRef = useRef<typeof Plotly | null>(null), renderRevision = useRef(0);
   const renderQueue = useRef<Promise<void>>(Promise.resolve());
   const controls = useRef({ wheelZoom: true, wheelTarget: "auto" as WheelPreference, data, layout, comparisons: [] as PlotTrace[], onPointClick, onSelectSamples });
@@ -60,7 +62,8 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
     // Plotly can annotate its inputs; protect solver-owned arrays and metadata.
     renderQueue.current = renderQueue.current.then(async () => {
       if (token !== renderRevision.current) return;
-      const themed = getComputedStyle(element), merged = { ...layout };
+      const view = (ownerWindow ?? element.ownerDocument.defaultView) as (Window & typeof globalThis) | null; if (!view) return;
+      const themed = view.getComputedStyle(element), merged = { ...layout };
       for (const [key, value] of Object.entries(axisOverrides)) merged[key] = { ...(layout[key] as object ?? {}), ...value };
       if (axisOverrides.xaxis?.showspikes) merged.hovermode = "closest";
       const figure = { data: structuredClone([...data, ...comparisons]), layout: preparePlotLayout(merged, { text: themed.getPropertyValue("--spike-table-text").trim(), line: themed.getPropertyValue("--spike-table-muted").trim(), grid: themed.getPropertyValue("--spike-table-border").trim(), surface: themed.getPropertyValue("--spike-table-surface").trim() }) };
@@ -71,7 +74,7 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
         setState({ loading: false, error: "" });
       }
     }).catch(reason => { if (token === renderRevision.current) setState({ loading: false, error: String(reason instanceof Error ? reason.message : reason) }); });
-  }, [data, layout, revision, ready, comparisons, mode, axisOverrides, axisRevision, probes]);
+  }, [ownerWindow, data, layout, revision, ready, comparisons, mode, axisOverrides, axisRevision, probes]);
   useEffect(() => {
     const element = host.current; if (!element || !ready || state.loading) return;
     const refresh = () => setColorScales(plotColorScales(element._fullData ?? [], (element._fullLayout ?? {}) as Record<string, unknown>));
@@ -98,11 +101,12 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
   };
   useEffect(() => {
     const element = host.current; if (!element) return;
+    const view = (ownerWindow ?? element.ownerDocument.defaultView) as (Window & typeof globalThis) | null; if (!view) return;
     let frame = 0, pending = 0, target: WheelTarget | null = null;
     const wheel = (event: WheelEvent) => {
       if (!plotlyRef.current || !element._fullLayout) return;
       if (!controls.current.wheelZoom && !event.ctrlKey && !event.metaKey) return;
-      const node = event.target instanceof Element ? event.target : null;
+      const node = event.target instanceof view.Element ? event.target : null;
       if (node?.closest(".legend,.colorbar,.modebar")) return;
       let hint: string | undefined;
       for (let item = node; item && item !== element; item = item.parentElement) {
@@ -120,12 +124,12 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       }
       if (target && JSON.stringify({ ...target, x: 0, y: 0, fraction: 0 }) !== JSON.stringify({ ...next, x: 0, y: 0, fraction: 0 })) pending = 0;
       target = next; pending += Math.log(wheelPlotFactor(event.deltaY || event.deltaX, event.deltaMode));
-      if (!frame) frame = requestAnimationFrame(() => { frame = 0; if (target) zoom(Math.exp(Math.max(-1, Math.min(1, pending))), target); pending = 0; });
+      if (!frame) frame = view.requestAnimationFrame(() => { frame = 0; if (target) zoom(Math.exp(Math.max(-1, Math.min(1, pending))), target); pending = 0; });
     };
     const resize = () => { if (plotlyRef.current && element._fullLayout) void Promise.resolve(plotlyRef.current.Plots.resize(element)).catch(reason => setNotice(`Plot resize failed: ${String(reason)}`)); };
-    const observer = new ResizeObserver(resize); observer.observe(element); element.addEventListener("wheel", wheel, { passive: false, capture: true });
-    return () => { observer.disconnect(); element.removeEventListener("wheel", wheel, true); if (frame) cancelAnimationFrame(frame); };
-  }, []);
+    const observer = view.ResizeObserver ? new view.ResizeObserver(resize) : null; observer?.observe(element); element.addEventListener("wheel", wheel, { passive: false, capture: true });
+    return () => { observer?.disconnect(); element.removeEventListener("wheel", wheel, true); if (frame) view.cancelAnimationFrame(frame); };
+  }, [ownerWindow]);
   useEffect(() => {
     const element = host.current; if (!element || !ready || state.loading) return;
     const click = (event: { points?: Point[] }) => { const point = event.points?.[0];
@@ -142,12 +146,12 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
     return () => { element.removeListener?.("plotly_click", click); element.removeListener?.("plotly_selected", select); };
   }, [ready, state.loading]);
   useEffect(() => {
-    if (!menu) return;
+    const doc = ownerDocument, view = ownerWindow; if (!menu || !doc || !view) return;
     menuRef.current?.querySelector<HTMLElement>("button:not(:disabled)")?.focus();
     const dismiss = (event: PointerEvent) => { if (!menuRef.current?.contains(event.target as Node)) setMenu(null); }, close = () => setMenu(null);
-    document.addEventListener("pointerdown", dismiss); window.addEventListener("resize", close); window.addEventListener("scroll", close, true);
-    return () => { document.removeEventListener("pointerdown", dismiss); window.removeEventListener("resize", close); window.removeEventListener("scroll", close, true); };
-  }, [menu]);
+    doc.addEventListener("pointerdown", dismiss); view.addEventListener("resize", close); view.addEventListener("scroll", close, true);
+    return () => { doc.removeEventListener("pointerdown", dismiss); view.removeEventListener("resize", close); view.removeEventListener("scroll", close, true); };
+  }, [ownerDocument, ownerWindow, menu]);
   useEffect(() => { if (pasteOpen) pasteRef.current?.focus(); }, [pasteOpen]);
   const action = async (task: () => Promise<void>) => {
     setMenu(null); setBusy(true); try { await task(); } catch (reason) { setNotice(String(reason instanceof Error ? reason.message : reason)); } finally { setBusy(false); }
@@ -161,9 +165,9 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
     const blob = await (await fetch(url)).blob(); await clipboardAccess(navigator.clipboard.write([new ClipboardItem({ "image/png": blob })])); setNotice("Plot image copied. Paste directly into a document, slide or message.");
   });
   const downloadImage = () => action(async () => {
-    if (!host.current || !plotlyRef.current) return;
+    if (!host.current || !plotlyRef.current || !ownerDocument) return;
     const url = await plotlyRef.current.toImage(host.current, { format: "png", width: 1200, height: 800 });
-    const link = document.createElement("a"); link.href = url; link.download = "spike-plot.png"; link.click(); setNotice("Plot PNG downloaded.");
+    const link = ownerDocument.createElement("a"); link.href = url; link.download = "spike-plot.png"; link.click(); setNotice("Plot PNG downloaded.");
   });
   const importText = (text: string) => {
     try {
@@ -180,7 +184,7 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
     } catch { setPasteOpen(true); setNotice("Paste your X/Y table into the text box, then choose Add comparison."); }
   });
   const button = (name: string, run: () => void, icon: ReactNode, disabled = !usable || busy, pressed?: boolean) => <button type="button" disabled={disabled} aria-pressed={pressed} title={name} onClick={run}>{icon}<span>{name}</span></button>;
-  const openMenu = (x: number, y: number) => setMenu({ x: Math.max(8, Math.min(x, window.innerWidth - 238)), y: Math.max(8, Math.min(y, window.innerHeight - 390)) });
+  const openMenu = (x: number, y: number) => setMenu({ x: Math.max(8, Math.min(x, (ownerWindow?.innerWidth ?? x + 238) - 238)), y: Math.max(8, Math.min(y, (ownerWindow?.innerHeight ?? y + 390) - 390)) });
   return <section className="trace-plot-host spike-plot" aria-label={title}>
     <CommandStrip label="Plot tools" className="spike-plot-toolbar">
       {button(scene ? "Orbit" : "Pan", () => setMode("pan"), <Move size={14}/>, !usable || busy, mode === "pan")}
@@ -230,10 +234,10 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
       try { setAxisOverrides(buildPlotAxes(settings, [...data, ...comparisons])); setAxisRevision(value => value + 1); setAxisEditor(null); setNotice("Axis settings applied to this view. Sample values and units are unchanged."); return ""; }
       catch (reason) { return String(reason instanceof Error ? reason.message : reason); }
     }}/>}
-    {menu && createPortal(<div ref={menuRef} className="spike-plot-menu" role="menu" aria-label="Plot context menu" style={{ left: menu.x, top: menu.y }} onKeyDown={event => {
+    {menu && ownerDocument?.body && createPortal(<div ref={menuRef} className="spike-plot-menu" role="menu" aria-label="Plot context menu" style={{ left: menu.x, top: menu.y }} onKeyDown={event => {
       event.stopPropagation();
       if (event.key === "Escape") { event.preventDefault(); setMenu(null); host.current?.focus(); }
-      const items = [...event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")], index = items.indexOf(document.activeElement as HTMLButtonElement);
+      const items = [...event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")], index = items.indexOf(ownerDocument.activeElement as HTMLButtonElement);
       if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) { event.preventDefault(); items[event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (index + (event.key === "ArrowUp" ? -1 : 1) + items.length) % items.length]?.focus(); }
       if (event.key === "Tab") { event.preventDefault(); setMenu(null); host.current?.focus(); }
     }}>
@@ -244,6 +248,6 @@ export default function InteractivePlot({ data, layout, revision, title = "Inter
         { name: "Paste traces · Ctrl+V", run: () => void paste(), disabled: !canPaste },
         { name: "Paste X/Y table…", run: () => setPasteOpen(true), disabled: !canPaste }, { name: "Download PNG", run: () => void downloadImage() },
         { name: "Clear pasted comparisons", run: () => setComparisons([]), disabled: !comparisons.length }].map(item => <button key={item.name} role="menuitem" disabled={!usable || busy || item.disabled} onClick={() => { setMenu(null); item.run(); host.current?.focus(); }}>{item.name}</button>)}
-    </div>, document.body)}
+    </div>, ownerDocument.body)}
   </section>;
 }

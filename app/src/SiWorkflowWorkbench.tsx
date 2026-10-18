@@ -4,6 +4,7 @@ import { Download, Play, Plus, Trash2, Upload, X } from "./icons";
 import { cancelLocalWorker, isDesktopShell, runLocalWorker } from "./workerBridge";
 import catalogJson from "./siWorkflowCatalog.json";
 import SiWorkflowPlots, { SiPlot } from "./SiWorkflowPlots";
+import { usePanelPresentation } from "./panelPresentation";
 import "./siWorkflow.css";
 
 type RecordData = Record<string, unknown>;
@@ -28,9 +29,10 @@ const labels: Record<string, string> = {
   bit_rate_hz: "Bit rate (Hz)", bit_count: "PRBS bit count", delay_s: "Stimulus delay (s)", pattern_shift_bits: "PRBS7 shift (0–126 bits)",
 };
 
-function download(name: string, value: string, type = "application/json") {
+function download(ownerDocument: Document | undefined, name: string, value: string, type = "application/json") {
+  if (!ownerDocument) return;
   const url = URL.createObjectURL(new Blob([value], { type }));
-  const a = document.createElement("a"); a.href = url; a.download = name; a.click();
+  const a = ownerDocument.createElement("a"); a.href = url; a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 function Numeric({ name, value, onChange }: { name: string; value: unknown; onChange: (n: number) => void }) {
@@ -56,6 +58,7 @@ function NumericFields({ value, onChange, omit = [] }: { value: RecordData; onCh
 
 type Props = { design: RecordData | null; initialResult?: RecordData | null; initialStep?: "channel" | "endpoints"; intentToken?: number; onResult?: (r: RecordData) => void; onStatus: (s: string) => void };
 export default function SiWorkflowWorkbench({ design, initialResult, initialStep = "channel", intentToken, onResult, onStatus }: Props) {
+  const { ownerDocument } = usePanelPresentation();
   const saved = initialResult?.contract === "spike/si-workflow-result/v1" ? initialResult : null;
   const [setup, setSetup] = useState<RecordData>(() => clone(saved?.request ? rec(saved.request) : rec(catalog.defaults)));
   const [result, setResult] = useState<RecordData | null>(saved);
@@ -151,7 +154,7 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
     {running
       ? <button className="primary-btn" onClick={() => void stop()}><X size={15} />Stop SI study</button>
       : <button className="primary-btn" disabled={busy || !desktop} onClick={() => void run()}><Play size={15} />{busy ? "Inspecting IBIS..." : "Run loaded SI study"}</button>}
-    <button onClick={() => download("si-study.json", pretty(setup))}><Download size={15} />Save setup</button>
+    <button onClick={() => download(ownerDocument, "si-study.json", pretty(setup))}><Download size={15} />Save setup</button>
     <label className="si-file"><Upload size={15} />Open setup / result<input disabled={busy} type="file" accept=".json" onChange={e => { void loadFile(e.target.files?.[0], "setup"); e.target.value = ""; }} /></label>
     <button disabled={busy} onClick={() => { setJsonDraft(pretty(setup)); setStep("json"); }}>Edit JSON</button>
   </div>
@@ -213,8 +216,8 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
   {step === "json" && <><h3>Complete study setup</h3><p>All units are SI unless specified. JSON port indices are zero-based. Applying updates the form; validation runs in the worker.</p><textarea className="si-json" value={jsonDraft} spellCheck={false} onChange={e => setJsonDraft(e.target.value)} /><button onClick={() => { try { const v = rec(JSON.parse(jsonDraft)); if (v.contract !== "spike/si-workflow-request/v1") throw new Error("Unsupported SI workflow contract."); setSetup(v); setStep("channel"); } catch (e) { setError(message(e)); } }}>Apply JSON</button></>}
   {step === "results" && (!result ? <p>Run a study to inspect network quality, loaded transfers, eyes, TDR, noise and resolved models.</p> : <>
     {stale && <p className="si-note">Setup differs from this saved result. Run again to update results and export.</p>}
-    <div className="si-row"><button onClick={() => download("si-result.json", pretty(result))}><Download size={15} />Save complete result</button>
-      <button disabled={!rec(result.touchstone).text} onClick={() => download(String(rec(result.touchstone).name), String(rec(result.touchstone).text), "text/plain")}><Download size={15} />Export Touchstone</button></div>
+    <div className="si-row"><button onClick={() => download(ownerDocument, "si-result.json", pretty(result))}><Download size={15} />Save complete result</button>
+      <button disabled={!rec(result.touchstone).text} onClick={() => download(ownerDocument, String(rec(result.touchstone).name), String(rec(result.touchstone).text), "text/plain")}><Download size={15} />Export Touchstone</button></div>
     {rec(result.touchstone).error ? <p className="sparam-error">Export: {String(rec(result.touchstone).error)}</p> : null}
     <p>Time domain: <b>{String(rec(result.time_domain).status)}</b> · Passivity: <b>{String(rec(rec(rec(result.network).checks).passivity).status)}</b> · Reciprocity: <b>{String(rec(rec(rec(result.network).checks).reciprocity).status)}</b> · Compliance: not evaluated</p>
     <SiWorkflowPlots result={result} />

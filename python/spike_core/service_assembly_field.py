@@ -5,6 +5,10 @@ from .service_helpers import error_response, operation_id
 
 
 def handle_assembly_field_request(method, params, *, request_id=None):
+    from .service_structural import handle_structural_request
+    response = handle_structural_request(method, params, request_id=request_id)
+    if response is not None:
+        return response
     from .service_pwm_electrothermal import handle_pwm_electrothermal_request
     response = handle_pwm_electrothermal_request(method, params, request_id=request_id)
     if response is not None:

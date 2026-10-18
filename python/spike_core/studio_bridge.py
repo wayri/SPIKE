@@ -8,6 +8,24 @@ from pathlib import Path
 import subprocess
 import sys
 
+def studio_runtime_capabilities():
+    """Discover fixed local launch prerequisites without importing GUI modules."""
+    repository = Path(__file__).resolve().parents[2]
+    source = repository / "standalone" / "spikes_project" / "studio" / "python" / "spikes_studio"
+    prepare = all((source / name).is_file() for name in ("document.py", "studio_handoff.py"))
+    launcher = repository / "scripts" / "launch_spikes_studio.py"
+    frozen = bool(getattr(sys, "frozen", False))
+    wx_available = importlib.util.find_spec("wx") is not None
+    launch = prepare and not frozen and launcher.is_file() and wx_available
+    reason = ("Source Studio launch prerequisites found; numerical library readiness is checked by Studio."
+              if launch else "This worker package does not include the standalone Studio launcher."
+              if frozen else "SPIKES Studio source modules are missing." if not prepare
+              else "SPIKES Studio requires the optional wxPython runtime." if not wx_available
+              else "SPIKES Studio launch script is missing.")
+    return {"contract": "spike/studio-runtime/v1", "can_prepare": prepare,
+            "can_launch": launch, "reason": reason,
+            "transfer": "revision-bound snapshot", "live_sync": False}
+
 def _runtime():
     source=Path(__file__).resolve().parents[2]/"standalone"/"spikes_project"/"studio"/"python"
     if not source.is_dir(): raise RuntimeError("SPIKES Studio runtime is unavailable in this installation")
@@ -47,10 +65,14 @@ def handle_launch_spikes_studio(params, workspace_root):
 
 def handle_studio_bridge_request(method, params, workspace_root):
     """Return a standard worker response for fixed Studio actions only."""
-    if method not in {"prepare_spikes_studio_handoff", "launch_spikes_studio"}:
+    if method not in {"studio_runtime_capabilities", "prepare_spikes_studio_handoff", "launch_spikes_studio"}:
         return None
     from .service_helpers import error_response
     try:
+        if method == "studio_runtime_capabilities":
+            if params != {}:
+                raise ValueError("Studio runtime discovery accepts no parameters")
+            return {"ok": True, "result": studio_runtime_capabilities()}
         if not isinstance(params, dict) or set(params) != {"request"}:
             raise ValueError("Studio handoff requires only the bounded request graph")
         operation = handle_prepare_spikes_studio_handoff if method.startswith("prepare_") else handle_launch_spikes_studio

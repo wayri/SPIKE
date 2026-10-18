@@ -31,7 +31,13 @@ item = MenuItem({ icon, label: "Blocked", onClick: () => clicks++, disabled: tru
 const button = MenuButton({ label: "File", mnemonic: "F", open: false, onClick: () => clicks++, children: null });
 const trigger = button.props.children[0]; assert.equal(trigger.props.role, "menuitem"); assert.equal(trigger.props["aria-haspopup"], "menu"); assert.equal(trigger.props["data-mnemonic"], "f");
 const submenu = MenuSubmenu({ label: "Export", children: null }); const submenuTrigger = submenu.props.children[0];
-assert.equal(submenuTrigger.props["aria-haspopup"], "menu"); assert.equal(submenuTrigger.props.className, "menu-item"); assert.equal(submenuTrigger.props["aria-controls"], "menu-test-menu"); submenuTrigger.props.onClick(); assert.equal(states.at(-1).value, true, "touch click opens submenu state");
+assert.equal(submenuTrigger.props["aria-haspopup"], "menu"); assert.equal(submenuTrigger.props.className, "menu-item"); assert.equal(submenuTrigger.props["aria-controls"], "menu-test-menu"); submenuTrigger.props.onClick({detail:1}); assert.equal(states.at(-1).value, true, "touch click opens submenu state");
+submenu.props.onPointerEnter();
+submenuTrigger.props.onClick({detail:1});
+assert.equal(states.at(-1).value,true,"hover followed by a pointer click must keep the submenu open");
+submenuTrigger.props.onClick({detail:0});
+assert.equal(states.at(-1).value,false,"programmatic keyboard close still toggles the submenu");
+
 globalThis.requestAnimationFrame = callback => { callback(); return 1; };
 const childItem = { tabIndex: -1, disabled: false, focused: 0, getAttribute: () => null, focus() { this.focused++; }, closest: () => childMenu };
 const childMenu = { querySelectorAll: () => [childItem] };

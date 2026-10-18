@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Check that a packaged desktop starts and stays running for ten seconds."""
+"""Check process survival only; this does not establish frontend readiness."""
 import os
 import signal
 import subprocess
@@ -14,7 +14,7 @@ with tempfile.TemporaryFile() as log:
     try:
         result = process.wait(timeout=10)
     except subprocess.TimeoutExpired:
-        print('Desktop startup smoke check passed.')
+        print('Desktop process survival check passed; frontend readiness remains unverified.')
     else:
         log.seek(0)
         raise SystemExit(f'Desktop exited during startup ({result}):\n{log.read().decode(errors="replace")}')

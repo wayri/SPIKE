@@ -2,6 +2,7 @@ from pathlib import Path
 import sys
 import unittest
 from copy import deepcopy
+from tempfile import TemporaryDirectory
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'studio/python'))
 from spikes_studio.document import Document,Keymap
 from spikes_studio.preferred_values import recommend
@@ -26,6 +27,37 @@ class EditorTests(unittest.TestCase):
         with self.assertRaises(ValueError):d.connect(('missing',0),(d.data['components'][0]['id'],0))
         self.assertEqual(d.data,before)
         with self.assertRaises(ValueError):d.rotate(['missing'])
+    def test_connectivity_is_source_authoritative_read_only_and_persistent(self):
+        d=Document.from_netlist('Connectivity\nRz NetB 0 1k\nR2 shared n2 1k\nR1 SHARED n1 1k\nR4 shared n4 1k\nR3 shared n3 1k\n.op\n.end\n')
+        parts={p['ref']:p for p in d.data['components']}
+        # Loaded documents may retain spelling aliases even though net identity
+        # is case-insensitive.  Preserve each terminal's source spelling.
+        parts['R1']['nodes'][0]='SHARED'
+        junction='junction-a'
+        d.data['junctions']=[{'id':junction,'x':300,'y':200,
+                              'source_terminal':[parts['R1']['id'],0],'source_node':'SHARED'}]
+        d.data['wires']=[
+            {'id':'wire-c','a':[parts['R1']['id'],0],'b':[junction],'waypoints':[],'bend':'horizontal','manual':True},
+            {'id':'wire-a','a':[junction],'b':[parts['R2']['id'],0],'waypoints':[],'bend':'horizontal','manual':True},
+            {'id':'wire-b','a':[parts['R3']['id'],0],'b':[parts['R4']['id'],0],'waypoints':[],'bend':'horizontal','manual':True},
+        ]
+        d.validate();before=deepcopy(d.data);revision=d.data['revision'];dirty=d.dirty
+        first=d.connectivity();self.assertEqual(first,d.connectivity())
+        self.assertEqual(d.data,before);self.assertEqual(d.data['revision'],revision);self.assertEqual(d.dirty,dirty)
+        shared=next(net for net in first if net['normalized_name']=='shared')
+        self.assertEqual(shared['name'],'SHARED')
+        self.assertEqual([pin['node'] for pin in shared['pins']],['SHARED','shared','shared','shared'])
+        self.assertEqual(shared['terminal_count'],4)
+        self.assertEqual([pin['ref'] for pin in shared['pins']],['R1','R2','R3','R4'])
+        self.assertEqual(shared['wire_ids'],['wire-a','wire-b','wire-c'])
+        self.assertEqual(shared['drawing_groups'],2)
+        # A disconnected drawing group does not split the single source-named net.
+        self.assertEqual(sum(net['normalized_name']=='shared' for net in first),1)
+        self.assertEqual([net['normalized_name'] for net in first],sorted(net['normalized_name'] for net in first))
+        with TemporaryDirectory(dir=Path(__file__).parent) as folder:
+            path=Path(folder)/'connectivity.spikes.json';d.save(path);reopened=Document.load(path)
+            self.assertEqual(reopened.connectivity(),first)
+            self.assertFalse(reopened.dirty)
     def test_preferred_values(self):
         self.assertEqual(recommend(4750)['nearest'],4700)
         self.assertEqual(recommend(9900)['nearest'],10000)
@@ -44,16 +76,20 @@ class EditorTests(unittest.TestCase):
                             with self.subTest(offset=offset,rotations=(ra,rb),pins=(ia,ib)):
                                 a={'x':100,'y':100,'rotation':ra}
                                 b={'x':100+offset[0],'y':100+offset[1],'rotation':rb}
-                                points=route({'a':a,'b':b},{'a':['a',ia],'b':['b',ib]})
-                                self.assertEqual(points[0],terminal(a,ia));self.assertEqual(points[-1],terminal(b,ib))
-                                for p,q in zip(points,points[1:]):
-                                    self.assertTrue(p[0]==q[0] or p[1]==q[1])
-                                    for part in (a,b):
-                                        corners=[transform(part,x,y) for x in (-55,55) for y in (-30,30)]
-                                        left,right=min(v[0] for v in corners),max(v[0] for v in corners)
-                                        top,bottom=min(v[1] for v in corners),max(v[1] for v in corners)
-                                        horizontal=p[1]==q[1] and top<p[1]<bottom and max(min(p[0],q[0]),left)<min(max(p[0],q[0]),right)
-                                        vertical=p[0]==q[0] and left<p[0]<right and max(min(p[1],q[1]),top)<min(max(p[1],q[1]),bottom)
-                                        self.assertFalse(horizontal or vertical,(p,q,part,points))
+                                wires=[{'a':['a',ia],'b':['b',ib]},
+                                       {'a':['a',ia],'b':['b',ib],'manual':True,'bend':'horizontal'},
+                                       {'a':['a',ia],'b':['b',ib],'manual':True,'bend':'vertical'}]
+                                for wire in wires:
+                                    points=route({'a':a,'b':b},wire)
+                                    self.assertEqual(points[0],terminal(a,ia));self.assertEqual(points[-1],terminal(b,ib))
+                                    for p,q in zip(points,points[1:]):
+                                        self.assertTrue(p[0]==q[0] or p[1]==q[1])
+                                        for part in (a,b):
+                                            corners=[transform(part,x,y) for x in (-55,55) for y in (-30,30)]
+                                            left,right=min(v[0] for v in corners),max(v[0] for v in corners)
+                                            top,bottom=min(v[1] for v in corners),max(v[1] for v in corners)
+                                            horizontal=p[1]==q[1] and top<p[1]<bottom and max(min(p[0],q[0]),left)<min(max(p[0],q[0]),right)
+                                            vertical=p[0]==q[0] and left<p[0]<right and max(min(p[1],q[1]),top)<min(max(p[1],q[1]),bottom)
+                                            self.assertFalse(horizontal or vertical,(wire,p,q,part,points))
 
 if __name__=='__main__':unittest.main()

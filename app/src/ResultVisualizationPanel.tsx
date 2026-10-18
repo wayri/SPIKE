@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DataTable from "./DataTable";
 import SourceCapacityResults from "./SourceCapacityResults";
 import SavedAssemblyResults from "./SavedAssemblyResults";
@@ -66,6 +66,7 @@ export default function ResultVisualizationPanel({
   domain, board, selectedNet, result: rawResult, sourceResult: rawSourceResult, visualization, workerAvailable, parasiticsAvailable, riskAvailable, pdnReview, pdnReviewSourceId, densityLimitAMm2, dropLimitMv,
   onVisualization, onConfigure, onRunParasitics, onRunRisk, onRunPdn, onExportAnimation, onClose, onDetach, onTracePlots, coupledAssembly, projectManifestDigest,
 }: Props) {
+  const panel = useRef<HTMLElement>(null);
   const result = rawResult?.status === "preview" || resultSolvedForPresentation(rawResult) ? rawResult : null;
   const sourceResult = resultSolvedForPresentation(rawSourceResult) ? rawSourceResult : null;
   const [pdnTarget, setPdnTarget] = useState("0.05");
@@ -103,7 +104,7 @@ export default function ResultVisualizationPanel({
     ...selectedGeometry.pads.flatMap(item => item.layers.some(layer => layer === "*.Cu" || layer === "F&B.Cu") ? board?.layers ?? [] : item.layers),
   ].filter(layer => Boolean(layer) && Boolean(board?.layers.includes(layer))))];
   const toggleList = (selector: string) =>
-    [...document.querySelectorAll<HTMLInputElement>(selector)].filter(input => input.checked).map(input => input.value);
+    [...(panel.current?.querySelectorAll<HTMLInputElement>(selector) ?? [])].filter(input => input.checked).map(input => input.value);
   const selectedParasitic = result?.parasitics.find(item => item.net === selected) ?? result?.parasitics[0];
   const selectedLoopParasitic = result?.loop_parasitics.find(item =>
     item.forward_nets.includes(selected) || item.return_nets.includes(selected),
@@ -208,7 +209,10 @@ export default function ResultVisualizationPanel({
   });
   const dcReview = domain === "pi" ? buildDcReview(result, selected || null, visualization.visibleResultLayers, dropLimitMv ?? null, densityLimitAMm2) : null;
   const terminalReview = domain === "pi" ? sourceLoadReview(result, selected || null, dropLimitMv ?? null) : null;
-  const vectorMode = ["current", "current_density", "electric_field", "magnetic_field"].includes(visualization.mode);
+  const vectorMode = ["current", "current_density", "voltage", "voltage_drop", "power_loss"].includes(visualization.mode)
+    ? Boolean(result?.vector_fields.current_density.length)
+    : visualization.mode === "electric_field" ? Boolean(result?.vector_fields.electric_field.length)
+      : visualization.mode === "magnetic_field" && Boolean(result?.vector_fields.magnetic_field.length);
   const analyticsValue = (value: number | null, unit = "") => value === null ? "-" : `${value.toPrecision(6)}${unit ? ` ${unit}` : ""}`;
   const dcSampleIdentity = (sample: { element_id?: string; source_id?: string; source_kind?: string; net?: string; layer?: string } | null) =>
     sample ? `${sample.element_id || "sample"} / ${sample.net || "net unknown"} / ${sample.layer || "layer unknown"}${sample.source_id ? ` / geometry ${sample.source_kind || "object"} ${sample.source_id}` : " / geometry identity unavailable"}` : "No scoped sample returned";
@@ -223,7 +227,7 @@ export default function ResultVisualizationPanel({
     if (number >= 1024) return `${(number / 1024).toFixed(1)} KB`;
     return `${number.toFixed(0)} B`;
   };
-  return <section className={`floating-panel result-visualizer domain-${domain}`}>
+  return <section ref={panel} className={`floating-panel result-visualizer domain-${domain}`}>
     <header className="floating-heading"><div><b>{coupledAssembly && !result ? "PROJECT RESULTS" : domain === "pi" ? "PI RESULT VIEWER" : "SI / HF RESULT VIEWER"}</b><span>{resultLabel}</span></div>{onTracePlots && <button onClick={onTracePlots}>Trace plots</button>}{onDetach && <button onClick={onDetach} title="Move result controls and analytics to a separate desktop window">Detach</button>}<button onClick={onClose} aria-label="Close"><X size={17} /></button></header>
     <div className="result-visualizer-body">
       <nav className="result-mode-list">

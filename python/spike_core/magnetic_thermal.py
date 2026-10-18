@@ -268,3 +268,4 @@ def simulate_magnetic_thermal(*, nodes_m, triangles, region_ids, magnetic_materi
                            "Magnetic B-H and PM laws and thermal properties are temperature independent.",
                            "Additional winding watts are user-supplied losses, not solved circuit heating.",
                            "No CFD, 3D end effects, radiation, hysteresis or measured device qualification."]}
+

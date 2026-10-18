@@ -118,3 +118,4 @@ it does not rerun a solver.
 Implemented scope is the generated high-speed SI reports. It does not establish
 full desktop cross-probing, commercial feature parity or new physical validation.
 The captured geometry is a two-substrate/trace box model, not complete PCB artwork.
+

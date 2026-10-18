@@ -1,0 +1,154 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "source",
+    "target_frequencies_hz",
+    "dc_policy"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/sparameter-resampling-request/v1"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "port_names",
+        "reference_impedance_ohm",
+        "frequencies_hz",
+        "s_parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "port_names": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "s_parameters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "target_frequencies_hz": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "dc_policy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "const": "require_source"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "s_parameters"
+          ],
+          "properties": {
+            "mode": {
+              "const": "supplied"
+            },
+            "s_parameters": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 16,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/sparameter-resampling-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; finite values, exact matrix/port dimensions, real DC, grid range and work resources additionally checked by runtime."
+}

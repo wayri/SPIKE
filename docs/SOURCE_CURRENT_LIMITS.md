@@ -81,3 +81,21 @@ source-node loading, unlimited compatibility, malformed values and unsupported
 engine/mode admission. Exact terminal evidence enumerates source-to-load
 voltage references for each matching source; it does not infer current paths
 or attribute all sink current to a particular source.
+
+## Component input-pin load allocation
+
+The UI can distribute a supplied component sink total across selected copper
+pads on one rail. For enabled nonnegative weights, the prescribed input is
+`I_i = I_total * w_i / sum(w)`. The final positive-weight pad receives the
+floating-point remainder so the total is conserved. Equal sharing uses unit
+weights. Zero-weight pads receive zero; all-zero weights, duplicate pad IDs,
+nonfinite values and overflowing weight sums are rejected. These operations
+prepare existing current-sink terminals; they do not alter the DC solver.
+
+PCB connectivity does not determine internal IC load distribution or power-pin
+functions. The selected pins and allocation require review against device data.
+The solver still determines source sharing from solved conductances and KCL;
+load-pin weights do not prescribe supply branch currents. The frontend tests
+include extreme finite totals, rail/name identity, NPTH/copper exclusion and
+original multi-pin fixtures. No semiconductor or current-sharing qualification
+is claimed by those tests.

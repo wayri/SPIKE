@@ -40,7 +40,7 @@ globalThis.document={activeElement:null};
 globalThis.window={setInterval(){return 1;},clearInterval(){}};
 const source=readFileSync(new URL("../src/AppUpdatePanel.tsx",import.meta.url),"utf8"),module={exports:{}};
 new Function("require","module","exports",ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(
- name=>name==="react"?react:name==="react/jsx-runtime"?jsx:name==="./workerBridge"?bridge:name==="./appUpdateModel"?model:{},module,module.exports);
+ name=>name==="react"?react:name==="react/jsx-runtime"?jsx:name==="./workerBridge"?bridge:name==="./appUpdateModel"?model:name==="./panelPresentation"?{usePanelPresentation:()=>({ownerDocument:globalThis.document,ownerWindow:globalThis.window,detached:false})}:{},module,module.exports);
 let props={visible:true,onHide(){},blockers:[],canCloseProject:true,canSaveProject:false,onSave:async()=>{},onCloseProject(){},onStatus(){}};
 const render=()=>{index=0;return module.exports.default(props);};
 const nodes=tree=>!tree||typeof tree!=="object"?[]:[tree,...[tree.props?.children].flat(Infinity).flatMap(nodes)];

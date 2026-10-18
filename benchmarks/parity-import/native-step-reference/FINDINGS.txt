@@ -1,0 +1,80 @@
+SPDX-License-Identifier: Apache-2.0
+Native STEP composed placement reference, 2026-10-14
+
+Outcome: 12 original synthetic cuboid placements passed local black-box
+comparison, using KiCad 10.0.6 CLI and FreeCAD 1.1.3 public Part APIs.
+The overall WF01-S04C stage remains in progress. No source placement adapter,
+material qualification, physics capability, or release approval is implied.
+
+Reproduce from repository root:
+  python build/native-step-reference/run_reference.py
+The launcher accepts --repo-root, --output-root, --kicad-python, --cli, and
+--freecad-python. An output root separate from the scripts is supported.
+Only existing installed runtimes are used; nothing is installed or downloaded.
+Each native export has a 30-second timeout; preparation/inspection are bounded.
+The launcher first retains the installed CLI help and version, then prepares,
+exports, inspects and independently checks all outputs. Existing editor
+processes are neither opened nor operated. Scratch .kicad_prl may be written
+by KiCad beside generated input boards. No source fixture is changed.
+
+Inputs and provenance:
+- benchmarks/parity-import/models.kicad_pcb: existing SPIKE-owned fixture.
+- benchmarks/parity-import/component-solid.step: existing original FreeCAD
+  cuboid, native mm units, corners (0/2,0/3,0/4), volume 24 mm3.
+- Three existing model offset/rotation/scale sets are preserved. Case 0 has
+  noncommuting (15,30,45) degree rotations and nonuniform (2,1,.5) scaling.
+- Native pcbnew LoadBoard, footprint Flip/SetOrientationDegrees, SaveBoard,
+  and a second LoadBoard establish front/back and 90/37 degree instances.
+- No external implementation source, documentation examples, meshes, tests,
+  or model assets were examined or adapted. Scripts and arithmetic are original.
+
+Observations and frame reconciliation:
+- Four default native STEP exports each contain three valid eight-vertex
+  component solids plus one valid sixteen-vertex board dielectric solid.
+- Exact FreeCAD Part.Shape.read / Shape.Solids / Solid.Vertexes, BoundBox,
+  Volume, and isValid are used. No tessellation or graphical measurement.
+- Board core bounds are [-1,-20,0,30,1,1.53] mm. Board volume is
+  (31*21 - 2*2)*1.53 = 989.91 mm3, including the original outline cutout.
+- Copper controls include tracks/pads and --no-extra-pad-thickness. The front
+  arc/pad Z extent is [1.53,1.565] mm; the flipped back pad is [-.035,0] mm.
+  Thus the actual full physical stack spans [-.035,1.565], thickness 1.6 mm.
+- Identity-model mounting planes are front 1.615 mm and back -.085 mm,
+  an observed .05 mm clearance beyond the copper surfaces. No claim is made
+  about the internal reason for that offset.
+- --no-extra-pad-thickness alone does NOT change component placements.
+  The initial hypothesis that it removed the .05 mm offset was rejected by
+  the two retained no-extra control exports.
+- STEP to SPIKE board-local positive-depth coordinates is explicitly
+  (x,y,z)_STEP -> (x,-y,1.565-z)_SPIKE in mm. The dielectric then occupies
+  SPIKE depth .035..1.565 mm and total copper-to-copper depth is 0..1.6 mm.
+- Same model corners expressed in mm obey the prior VRML rotation order,
+  scale-before-rotation and offset convention. STEP differs in Z by
+  .765 + side*.05 from midplane-centered VRML (side=+1 front,-1 back).
+  Prior WRL source coordinate units used 2.54 mm/unit; STEP is already mm.
+
+Independent arithmetic:
+  B = Rz(footprint_angle) [front]
+  B = Rz(footprint_angle)*Rx(180) [back]
+  p_STEP = (20,-10,z_mount) + B*offset
+           + B*Rz(-rz)*Ry(-ry)*Rx(-rx)*diag(scale)*p_source_mm
+Each predicted corner must match a distinct observed exact solid vertex.
+All eight corners, transformed bounds, validity and volume 24*prod(scale)
+are asserted for every instance. Coordinate tolerance 2e-6 mm; volume
+tolerance 1e-6 mm3. This fixture's scales all have determinant 1; the eight
+corners, not volume alone, distinguish nonuniform scaling behavior.
+
+Artifact map:
+- inputs.json: native-reopened side/angle, thickness and model vectors.
+- observed-solids.json: exact native source/export solid measurements.
+- composition-reference.json: 12 comparisons, board checks, copper controls,
+  frame conversion, source and artifact SHA-256 bindings, native command logs.
+- *-export.json: exact commands, return codes, stdout/stderr and output hashes.
+- *.step and *.kicad_pcb: actual native outputs and normalized input boards.
+- check-log.json is intentionally not included in its own report hash.
+
+Limits: bounded cuboid, one stackup, two footprint angles, two board sides,
+three positive scale/rotation/offset sets, one installed KiCad version.
+No arbitrary solids, negative scale, assemblies, other stackups/native builds,
+production projection, body-material assignment, or physical qualification.
+DRC/electrical connectivity and rendered screenshots are outside this synthetic
+geometry-only reference; native parsing and exact solid checks are retained.

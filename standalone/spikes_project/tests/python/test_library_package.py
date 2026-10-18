@@ -35,6 +35,8 @@ class PackageTests(unittest.TestCase):
             target=base/'export.spklib';store.export_package(target,'generic.passives',scope='installed')
             self.assertEqual(load(target)['records'],records)
             self.assertEqual(len(store.search('PASSIVES')),2)
+            self.assertEqual(len(store.search('pasives')),2)
+            self.assertEqual(len(store.search('pasives',scope='installed')),1)
 
     def test_conflict_update_and_rollback(self):
         records=catalog()['records'][:1]

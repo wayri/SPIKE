@@ -1,0 +1,12 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* The same workbench is embedded in the dock and shown in standalone windows. */
+.focus-tool-content .sparam-workbench{position:relative!important;inset:auto!important;transform:none!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;max-height:none!important;margin:0!important;box-sizing:border-box;box-shadow:none!important}
+.focus-tool-content .sparam-commandbar{flex-wrap:wrap;min-width:0;min-height:0;padding:8px}
+.focus-tool-content .sparam-commandbar>*{min-width:0;max-width:100%;overflow-wrap:anywhere;white-space:normal}
+.focus-tool-content .sparam-workbench .si-flow{box-sizing:border-box;min-width:0;min-height:0;max-height:none;padding:10px;overflow:visible}
+.focus-tool-content .sparam-workbench .si-fields{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}
+.focus-tool-content .sparam-workbench .si-fields>*{min-width:0}
+.focus-tool-content .sparam-workbench .si-note{overflow-wrap:anywhere}
+@container (max-width:540px){.sparam-workbench .sparam-body{grid-template-columns:minmax(0,1fr)}.sparam-workbench .sparam-body>aside{border-right:0;border-bottom:1px solid var(--spike-table-border)}.sparam-workbench .sparam-body>main{padding:10px}}
+
+.focus-tool-content .sparam-commandbar .primary-btn{background:var(--spike-control-primary-surface);color:var(--spike-control-primary-text);border-color:var(--spike-control-primary-border)}

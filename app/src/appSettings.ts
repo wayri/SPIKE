@@ -1,4 +1,5 @@
 export type AppLanguage = "en" | "de" | "es" | "fr" | "ja" | "zh-CN";
+export type InterfaceMode = "clean" | "classic";
 export type UnitSystem = "si" | "engineering" | "imperial";
 
 export type AppSettings = {
@@ -8,6 +9,10 @@ export type AppSettings = {
   temperatureUnit: "C" | "F" | "K";
   significantDigits: number;
   theme: "professional-dark" | "high-contrast" | "system";
+  uiScale: number;
+  interfaceMode: InterfaceMode;
+  viewportBackground: "dark" | "amoled";
+  viewportGrid: boolean;
   renderQuality: "balanced" | "quality" | "performance";
   maximumFps: 30 | 60 | 120;
   antialiasing: boolean;
@@ -31,6 +36,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   temperatureUnit: "C",
   significantDigits: 5,
   theme: "professional-dark",
+  uiScale: 1,
+  interfaceMode: "clean",
+  viewportBackground: "dark",
+  viewportGrid: true,
   renderQuality: "balanced",
   maximumFps: 60,
   antialiasing: true,
@@ -68,8 +77,12 @@ export function loadAppSettings(): AppSettings {
       ...DEFAULT_SETTINGS,
       ...known,
       // Migrate the old always-expanded ribbon once; retain subsequent user choices.
+      interfaceMode: saved.interfaceMode === "classic" ? "classic" : "clean",
       chromeVersion: 2,
       ribbonVisible: saved.chromeVersion === 2 && typeof saved.ribbonVisible === "boolean" ? saved.ribbonVisible : false,
+      uiScale: typeof saved.uiScale === "number" && Number.isFinite(saved.uiScale) ? Math.max(.65, Math.min(1.5, saved.uiScale)) : 1,
+      viewportBackground: saved.viewportBackground === "amoled" ? "amoled" : "dark",
+      viewportGrid: typeof saved.viewportGrid === "boolean" ? saved.viewportGrid : true,
       solverMemoryLimitGb,
       profile: {
         displayName: typeof saved.profile?.displayName === "string" ? saved.profile.displayName : DEFAULT_SETTINGS.profile.displayName,

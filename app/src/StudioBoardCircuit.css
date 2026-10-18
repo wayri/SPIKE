@@ -16,3 +16,7 @@
 
 .spice-assistant-body .studio-board-page input,.spice-assistant-body .studio-board-page select{font-size:12px;}.spice-assistant-body .studio-board-page input[type=checkbox]{width:14px;height:14px;flex:none;}
 .studio-circuit-drawing svg{touch-action:none;user-select:none;}
+
+.studio-circuit-runtime {display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 9px;border-bottom:1px solid var(--spike-table-border);color:var(--spike-table-muted);font-size:11px;}
+.studio-circuit-runtime button {display:inline-flex;align-items:center;gap:5px;font:inherit;min-height:28px;}
+@media(max-width:760px){.studio-circuit-grid{grid-template-columns:125px minmax(0,1fr);overflow:auto}.studio-part-inspector{grid-column:1/-1;max-height:240px}.studio-circuit-drawing{min-height:280px}}

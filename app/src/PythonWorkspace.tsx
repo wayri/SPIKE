@@ -18,6 +18,7 @@ import { boundFloatingRect, initialFloatingRect, type FloatingRect } from "./pyt
 import { emergeGeometryPreview } from "./emergeGeometryPreview";
 import { admitDataViews } from "./scriptDataViews";
 import { physicalGeometry } from "./scriptResultViewportModel";
+import { usePanelPresentation } from "./panelPresentation";
 import "./pythonWorkspace.css";
 import "./PythonCodeEditor.css";
 
@@ -31,6 +32,7 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   onClose: () => void; onStatus: (message: string) => void; onAttachDataset?: (name: string, payload: unknown) => string;
   onShowViewport?: (result: unknown, label: string, keepEditorOpen?: boolean) => void;
 }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const context = useMemo(() => workspace ?? pythonWorkspaceContext(design), [workspace, design]);
   const contextKey = useMemo(() => pythonContextKey(context), [context]);
   const uiContext = useRef({ context, contextKey, onUiAction }); uiContext.current = { context, contextKey, onUiAction };
@@ -54,7 +56,7 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   const [backup, setBackup] = useState<{ ok: boolean; pending?: boolean; timestamp?: number; error?: string }>({ ok: true, pending: true });
   const [outputVisible, setOutputVisible] = useState(true);
   const [floating, setFloating] = useState(false);
-  const [floatingRect, setFloatingRect] = useState<FloatingRect>(() => initialFloatingRect(window.innerWidth, window.innerHeight));
+  const [floatingRect, setFloatingRect] = useState<FloatingRect>(() => initialFloatingRect(ownerWindow?.innerWidth ?? 1024, ownerWindow?.innerHeight ?? 768));
   const floatingDrag = useRef<{ kind: "move" | "resize"; rect: FloatingRect; x: number; y: number } | null>(null);
   const [inspectorVisible, setInspectorVisible] = useState(true);
   const tabStrip = useRef<HTMLDivElement>(null);
@@ -77,9 +79,10 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   const openedInitialScript = useRef<string | null>(null);
   const desktop = isDesktopShell();
   useEffect(() => {
-    const resize = () => setFloatingRect(rect => boundFloatingRect(rect, window.innerWidth, window.innerHeight));
-    window.addEventListener("resize", resize); return () => window.removeEventListener("resize", resize);
-  }, []);
+    const view = ownerWindow; if (!view) return;
+    const resize = () => setFloatingRect(rect => boundFloatingRect(rect, view.innerWidth, view.innerHeight));
+    resize(); view.addEventListener("resize", resize); return () => view.removeEventListener("resize", resize);
+  }, [ownerWindow]);
   const beginFloatingGesture = (event: PointerEvent<HTMLElement>, kind: "move" | "resize") => {
     if (!floating || event.button !== 0 || kind === "move" && Boolean((event.target as HTMLElement).closest("button,input,select,a"))) return;
     event.preventDefault(); event.currentTarget.setPointerCapture(event.pointerId);
@@ -88,7 +91,7 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   const moveFloatingGesture = (event: PointerEvent<HTMLElement>) => {
     const drag = floatingDrag.current; if (!drag) return;
     const dx = event.clientX - drag.x, dy = event.clientY - drag.y;
-    setFloatingRect(boundFloatingRect(drag.kind === "move" ? { ...drag.rect, x: drag.rect.x + dx, y: drag.rect.y + dy } : { ...drag.rect, width: drag.rect.width + dx, height: drag.rect.height + dy }, window.innerWidth, window.innerHeight));
+    setFloatingRect(boundFloatingRect(drag.kind === "move" ? { ...drag.rect, x: drag.rect.x + dx, y: drag.rect.y + dy } : { ...drag.rect, width: drag.rect.width + dx, height: drag.rect.height + dy }, ownerWindow?.innerWidth ?? 1024, ownerWindow?.innerHeight ?? 768));
   };
   const endFloatingGesture = (event: PointerEvent<HTMLElement>) => {
     floatingDrag.current = null;
@@ -132,10 +135,11 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
   }, [session]);
   useEffect(() => { tabStrip.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]')?.scrollIntoView({ block: "nearest", inline: "nearest" }); }, [session.activeId]);
   useEffect(() => {
+    const view = ownerWindow; if (!view) return;
     const flush = () => persistPythonWorkspace(sessionRef.current);
-    window.addEventListener("pagehide", flush);
-    return () => window.removeEventListener("pagehide", flush);
-  }, []);
+    view.addEventListener("pagehide", flush);
+    return () => view.removeEventListener("pagehide", flush);
+  }, [ownerWindow]);
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -256,7 +260,7 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
       } else {
         const name = snapshot.name.endsWith(".py") ? snapshot.name : `${snapshot.name}.py`;
         const url = URL.createObjectURL(new Blob([snapshot.code], { type: "text/x-python;charset=utf-8" }));
-        const link = documentCreateLink(url, name); link.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+        const link = documentCreateLink(ownerDocument, url, name); link?.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
         setMessage(`Download requested for ${name}. The draft remains unsaved until saved to a file.`);
         return false;
       }
@@ -428,10 +432,11 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
     <footer><span role="status" title={message}>{message}</span><button type="button" className={`python-backup-status ${backup.ok ? "" : "failed"}`} title={backup.error ?? "Local recovery snapshots; Save writes your file."} onClick={() => { setPane("backups"); setPaneVisible(true); }}>{backup.ok ? backup.pending ? "Backing up…" : `Backed up${backup.timestamp ? ` ${new Date(backup.timestamp).toLocaleTimeString()}` : ""}` : "Backup unavailable"}</button><small>Ln {cursor.line}, Col {cursor.column} · Python{!desktop ? " · desktop required to run" : ""}</small><button type="button" onClick={() => requestClose()} disabled={running}>Close</button></footer>
     {!backup.ok && <p className="python-backup-error" role="alert">{backup.error ?? "Automatic recovery is unavailable. Save scripts to files."}</p>}
     {closing && <div className="python-close-shade"><section role="alertdialog" aria-modal="true" aria-label="Unsaved Python changes"><h3>Save your Python changes?</h3><p>{closing.kind === "tab" ? session.documents.find(document => document.id === closing.id)?.name : `${session.documents.filter(pythonDirty).length} changed files`} {closing.kind === "tab" ? "has" : "have"} unsaved edits.</p><div><button type="button" onClick={() => void finishClose(true)} disabled={saving}>Save and close</button><button type="button" onClick={() => void finishClose(false)} disabled={saving}>Discard edits</button><button type="button" onClick={() => setClosing(null)} disabled={saving} autoFocus>Cancel</button></div></section></div>}
-    {floating && <button type="button" className="python-resize-handle" aria-label="Resize Python window" title="Drag to resize; arrow keys resize by 20 px" onPointerDown={event => beginFloatingGesture(event, "resize")} onPointerMove={moveFloatingGesture} onPointerUp={endFloatingGesture} onPointerCancel={endFloatingGesture} onKeyDown={event => { const changes: Record<string, [number, number]> = { ArrowLeft: [-20, 0], ArrowRight: [20, 0], ArrowUp: [0, -20], ArrowDown: [0, 20] }; const change = changes[event.key]; if (change) { event.preventDefault(); setFloatingRect(rect => boundFloatingRect({ ...rect, width: rect.width + change[0], height: rect.height + change[1] }, window.innerWidth, window.innerHeight)); } }}>◢</button>}
+    {floating && <button type="button" className="python-resize-handle" aria-label="Resize Python window" title="Drag to resize; arrow keys resize by 20 px" onPointerDown={event => beginFloatingGesture(event, "resize")} onPointerMove={moveFloatingGesture} onPointerUp={endFloatingGesture} onPointerCancel={endFloatingGesture} onKeyDown={event => { const changes: Record<string, [number, number]> = { ArrowLeft: [-20, 0], ArrowRight: [20, 0], ArrowUp: [0, -20], ArrowDown: [0, 20] }; const change = changes[event.key]; if (change) { event.preventDefault(); setFloatingRect(rect => boundFloatingRect({ ...rect, width: rect.width + change[0], height: rect.height + change[1] }, ownerWindow?.innerWidth ?? 1024, ownerWindow?.innerHeight ?? 768)); } }}>◢</button>}
   </section></div>;
 }
 
-function documentCreateLink(url: string, name: string): HTMLAnchorElement {
-  const link = document.createElement("a"); link.href = url; link.download = name; return link;
+function documentCreateLink(ownerDocument: Document | undefined, url: string, name: string): HTMLAnchorElement | null {
+  if (!ownerDocument) return null;
+  const link = ownerDocument.createElement("a"); link.href = url; link.download = name; return link;
 }

@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import React from "react";
 import { importTestTypescript } from "./import-test-typescript.mjs";
 
-const { focusCommandsFromElements, searchFocusCommands } = await importTestTypescript("focusCommands");
+const { focusCommandsFromElements, searchFocusCommands, searchableFocusCommands } = await importTestTypescript("focusCommands");
 const untouched = name => () => { throw new Error(`${name} component was invoked`); };
 const MenuButton = untouched("MenuButton"), MenuSubmenu = untouched("MenuSubmenu");
 const MenuItem = untouched("MenuItem"), ToolGroup = untouched("ToolGroup"), Tool = untouched("Tool");
@@ -62,3 +62,36 @@ assert.match(panel, /\[initialSection\]/, "mounted panel follows menu-section ch
 assert.match(panel, /id="focus-command-panel"/); assert.match(panel, /menuitemradio/);
 assert.match(panel, /className="focus-command-row focus-command-content"/, "custom command content has a panel row");
 console.log("Focus commands: nested extraction, disabled state, handlers, file picker content, path search and panel focus contract passed.");
+
+const preservedIcon = React.createElement(icon, { size: 15 });
+const nativeIconButton = React.createElement("button", { title: "Open layer visibility and stack controls", onClick: () => opened++ }, preservedIcon, " Layers");
+const nativeRadio = React.createElement("button", { role: "radio", "aria-checked": true, onClick: () => {} }, preservedIcon, "3D");
+const nativeRows = focusCommandsFromElements([nativeIconButton, nativeRadio], "native-icons");
+assert.equal(nativeRows[0].label, "Layers", "Visible short text must not become a verbose tooltip");
+assert.equal(nativeRows[0].description, "Open layer visibility and stack controls");
+assert.equal(nativeRows[0].iconNode, preservedIcon, "Native icons retain their original React element without invocation");
+assert.equal(nativeRows[1].checked, true);
+assert.equal(nativeRows[1].radio, true);
+const beforeNativeClick = opened; nativeRows[0].run(); assert.equal(opened, beforeNativeClick + 1, "Restored icon metadata preserves action binding");
+
+assert.equal(searchFocusCommands(nativeRows, "visibility stack")[0].command.label, "Layers", "Descriptions remain searchable after shortening the label");
+
+let enteredWorkspace = 0, ranWorkspaceCommand = 0;
+const searchable = searchableFocusCommands([{ id: "workspaces", label: "Workspaces", children: [
+  { id: "workspace:pi", label: "PI", onEnter: () => { enteredWorkspace++; }, children: [
+    { id: "run-pi", label: "Run PI", shortcut: "Ctrl+R", run: () => { ranWorkspaceCommand++; } },
+    { id: "blocked", label: "Blocked action", disabled: true, run: () => { throw new Error("must remain gated"); } },
+  ] },
+] }]);
+const workspaceRow = searchable.find(row => row.id === "command:workspace:pi");
+assert.equal(workspaceRow.category, "Workspaces");
+assert.match(workspaceRow.keywords, /workspace tab ribbon/);
+await workspaceRow.run(); assert.equal(enteredWorkspace, 1, "workspace rows execute their live entry callback");
+const runRow = searchable.find(row => row.id === "command:run-pi");
+assert.equal(runRow.shortcut, "Ctrl+R"); assert.match(runRow.description, /Workspaces \/ PI \/ Run PI/);
+await runRow.run(); assert.deepEqual([enteredWorkspace, ranWorkspaceCommand], [2, 1], "nested commands enter their workspace before using the original handler");
+assert.equal(searchable.find(row => row.id === "command:blocked").disabled, true, "unavailable command gating survives search projection");
+const inheritedGate = searchableFocusCommands([{ id: "offline", label: "Offline workspace", disabled: true, children: [
+  { id: "offline-run", label: "Run offline action", run: () => { throw new Error("must remain gated"); } },
+] }]);
+assert.equal(inheritedGate[0].disabled, true, "a disabled parent gates descendants projected into universal search");

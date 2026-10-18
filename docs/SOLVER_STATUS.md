@@ -1,5 +1,35 @@
 # SPIKE Solver Status
 
+Experimental [shunt-capacitive fitted-network boundaries](CAPACITIVE_NETWORK_TRANSIENT.md)
+add zero-initial-state capacitor voltage/derivative and distinguish source from
+network current. Actual resistor loss uses source current; capacitor energy and
+KCL evidence retain units/provenance. The bounded regular stable model has
+independent RC/parallel-RLC references. General descriptor/nonlinear/combined-RLC
+boundaries, integrated thermal handoff and measured qualification remain open.
+
+Experimental [series-inductive fitted-network boundaries](INDUCTIVE_NETWORK_TRANSIENT.md)
+now augment zero-initial-state transients with supplied R/L source/load states,
+actual boundary derivatives, resistor power and inductor energy. Independent RLC
+and coupled multiport references cover the bounded regular stable model. General
+descriptor/capacitive/nonlinear boundaries, integrated thermal handoff and measured
+broadband qualification remain open; this does not complete SI07 or PI/SI parity.
+
+Requested [vibration, solder reliability, satellite/launcher, complete drone and
+watch/geared mechanism studies](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md) now
+have tracked planned stages and validation gates. Dynamic environmental response,
+calibrated joint fatigue, executable flight-controller/propulsion/aerodynamics
+coupling and moving gear/watch contact are not established by current static
+mechanics or scalar replay/gain co-simulation. No capability is promoted by this
+scope expansion.
+
+Experimental [3D static thermoelasticity](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md)
+now provides bounded isotropic P1 tetra stress, displacement, reactions and
+elastic energy, plus executed same-mesh steady thermal-to-mechanical coupling.
+Independent patches, thermal/traction references and manufactured refinement
+cover this first stage. Worker APIs are available; mechanical UI, contact,
+dynamics, failure/lifetime, general moving 3D machines and Hall transport remain
+planned. This does not establish production qualification or complete parity.
+
 [Requested active-part library work](library/REQUESTED_LIBRARY_CAMPAIGN.md) adds
 20 functional logic families, an owned C++ four-state digital SDK and two
 original compiled sampled controller models. Manufacturer acquisition metadata
@@ -1093,6 +1123,39 @@ solver-specific limits and must not infer readiness from preview admission.
 
 ## Network Data Workbench
 
+[Supplied conductivity-temperature feedback](PDN_DIELECTRIC_FEEDBACK.md)
+iterates the dielectric/thermal workflow with per-cell conductivity updates,
+bounded material ranges and raw temperature/power residuals. It remains
+experimental; convergence does not establish transient stability, general
+material behavior or measured-board validity.
+
+[One-way dielectric-to-thermal execution](PDN_DIELECTRIC_THERMAL.md) combines
+actual complex AC fields into per-cell heat, checks terminal/volume power and
+executes the retained steady thermal solver on an identical mesh. This shared
+PI/multiphysics foundation remains experimental; it has no temperature feedback
+into electrical materials, general mesh transfer or measured-board qualification.
+
+[Explicit passive sampled admittance reduction](PDN_ADMITTANCE_REDUCTION.md)
+retains selected ports with floating or passive auxiliary loads and independent
+power accounting. It preserves approximate/experimental status; sample
+passivity does not qualify a causal broadband or transient model.
+
+The separate [finite-dielectric AC path](PDN_DIELECTRIC_AC.md) solves supplied
+conductivity/loss-tangent and permittivity fields at positive frequencies. It
+retains complex electrode currents and independent field-power evidence with
+experimental status. Finite plate references do not qualify general board
+extraction, open boundaries or causal transient coupling.
+
+The explicit passive PDN engine also admits [simultaneous supplied PWL
+loads](PDN_SIMULTANEOUS_LOADS.md), with exact event union, ordered per-load
+currents and shared-return voltage/energy accounting. This does not establish
+nonlinear regulator or general board-extraction validity.
+
+The [explicit mixed-mode API](PI_SI_PARITY_EXECUTION.md)
+additionally supports arbitrary ordered pairs, different real references between
+pairs and retained unpaired ports, with independent impedance/power checks.
+Unequal within-pair references and causality qualification remain unsupported.
+
 Touchstone network ingestion and post-processing are operational and independent
 of the field-solver catalog. Available functions include S/Z/Y ingestion,
 S/Z/Y conversion, real-reference renormalization, adjacent-pair mixed-mode
@@ -1519,3 +1582,72 @@ fixture reports 2.36% capacitance and 4.91% maximum gap-field discrepancy;
 Arduino qualification and dissipative-loss validation remain separate gates.
 See [retained assembly EM](RETAINED_ASSEMBLY_EM.md) and
 [independent reference](RETAINED_EM_INDEPENDENT_REFERENCE.md).
+
+## Supplied decap corner assessment
+
+PI03-S01 adds experimental evaluation of explicitly supplied C/ESR/ESL values
+at named bias/temperature corners. The existing full supplied PDN is solved
+at every corner, preserving failed sampled targets and generated requests.
+Independent scalar and multiport regression evidence is retained; see
+[PDN decap corners](PDN_DECAP_CORNERS.md). Automatic constitutive models,
+location extraction, BOM optimization and measured qualification remain open.
+This development stage does not establish PI03 family parity or release readiness.
+
+## Bounded decap BOM selection
+
+PI03-S02 adds experimental exhaustive selection within explicit supplied sites,
+parts, operating corners and sampled targets. Cost, quantity and population
+limits preserve rejection evidence and deterministic ranking. The service
+composes existing corner solves and introduces no new electrical formulation.
+See [selection scope and evidence](PDN_DECAP_SELECTION.md). General physical
+placement, automatic component data and measured qualification remain open;
+this does not close PI03 or establish full PI/SI parity.
+
+## Supplied two-port fixture removal
+
+SI08-S02 adds experimental algebraic removal of explicit left/right two-port
+fixtures with exact grids, common real references, oriented named ports and
+conditioned wave-chain solves. Source snapshots and active/nonreciprocal DUT
+data are retained. See [scope and evidence](TWO_PORT_DEEMBEDDING.md).
+Automatic calibration, uncertainty, arbitrary multiport fixture removal and
+causality qualification remain open; this does not close SI08 or SI/PI parity.
+
+## Explicit network resampling and DC
+
+SI08-S03 adds experimental Cartesian-linear interpolation onto an explicit
+grid with source or supplied real DC. It preserves exact support samples,
+source identity, named ports and target weights, and rejects extrapolation.
+Independent affine and delayed-line refinement checks establish bounded
+behavior; see [scope and evidence](SPARAMETER_RESAMPLING.md). Active data
+remains active. Causality, arbitrary broadband accuracy, calibrated uncertainty
+and passive causal fitting remain open; SI08 and full parity remain incomplete.
+
+## Supplied stable-pole rational network fit
+
+SI08-S04 adds experimental real proper rational model construction at supplied
+negative real poles, with an enforced sample-error limit and conditioning/
+optimality checks. The realization is stable and causal by construction;
+this does not certify source causality or physical broadband accuracy.
+See [scope and evidence](SPARAMETER_RATIONAL_FIT.md). Active/nonreciprocal
+models remain permitted, with diagnostic sampled SVD and a conservative norm
+bound. Automatic pole selection, general passive fitting and measured or
+transient qualification remain open; SI08 and full parity remain incomplete.
+
+## Rational network prescribed-wave transients
+
+SI07-S01 adds experimental simultaneous incident-wave execution of the actual
+supplied-pole fitted network. Analytic PWL integration retains all input
+corners and returns outgoing waves, port V/I and final model memory.
+See [scope and evidence](RATIONAL_NETWORK_TRANSIENT.md). This is model
+execution under prescribed incident boundaries; general source/load feedback,
+out-of-band accuracy, nonlinear devices and measured transient validation
+remain open. SI07 and the full PI/SI parity program remain incomplete.
+
+## Resistively terminated rational network transients
+
+SI07-S02 adds experimental finite-resistance Thevenin source/load feedback
+around the actual fitted network. Algebraic singularities and unresolved
+unstable connections fail explicitly; returned wave/V/I histories retain
+the boundary evidence. See [scope and verification](TERMINATED_NETWORK_TRANSIENT.md).
+Open/reactive/nonlinear connections, physical out-of-band accuracy, measured
+correlation and full SI07/PI-SI parity remain open.

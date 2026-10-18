@@ -1,5 +1,30 @@
 # Versioned Data Contracts
 
+`spike/capacitive-network-transient-request/v1` and
+`spike/capacitive-network-transient-result/v1` support mixed resistor/shunt-C
+Thevenin boundaries around an executed rational fit. Require at least one C>0,
+and R>0 on those ports. Source current and network current are separate outputs;
+capacitor voltage/derivative, KCL residual, resistor loss and capacitor energy
+preserve units/port identity. Registered schemas and runtime closure/stability/
+resource admission have [explicit semantics and limits](CAPACITIVE_NETWORK_TRANSIENT.md).
+
+`spike/inductive-network-transient-request/v1` and
+`spike/inductive-network-transient-result/v1` add supplied nonnegative series R/L
+boundaries around an executed rational fit, requiring at least one positive L.
+Registered schemas preserve fit/source/boundaries and typed V/I/derivative/loss/
+energy histories. Runtime additionally admits the complete port partition,
+regular stable closure, state/resource/precision limits and waveform horizon.
+See [semantics and reference derivation](INDUCTIVE_NETWORK_TRANSIENT.md).
+
+Experimental structural request/result contracts use
+`spike/assembly-tetra-structural-request/v1` and
+`spike/assembly-tetra-structural-result/v1`; coupled thermal-to-elastic execution
+uses `spike/assembly-thermomechanical-request/v1` and
+`spike/assembly-thermomechanical-result/v1`. Schemas are registered in the catalog;
+runtime admission additionally checks geometry, ownership, exact mesh identity,
+material coverage, constraints, conditioning and limits. See
+[semantics and unsupported effects](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md).
+
 Standalone Studio's `spikes/manufacturer-parts/v1` retains sourced identity and
 model-readiness metadata. `spikes/wire-rlc/v1` binds explicit lumped extraction
 values to a project/source hash and stable wire IDs; admission is atomic and
@@ -237,9 +262,114 @@ board occurrence, part placement and explicit connectivity. The
 and optional conductor geometry bindings; accepted frames belong to
 `spike/studio-board-cosimulation-result/v1`. See [board Studio](SPIKES_BOARD_STUDIO.md).
 
+## Dielectric conductivity feedback
+
+`spike/pdn-dielectric-feedback-request/v1` wraps an existing one-way study with
+explicit conductivity-temperature laws and bounded iteration controls. Results
+retain the operating electrical-temperature state, final thermal state, raw
+residual history and generated material/source identities. See
+[feedback contract](PDN_DIELECTRIC_FEEDBACK.md).
+
+## Dielectric-to-thermal coupling
+
+The separate `spike/pdn-dielectric-thermal-request/v1` couples one coherent RMS
+electrical drive to a steady thermal request on an identical retained mesh.
+`spike/pdn-dielectric-thermal-result/v1` preserves cell heat/power, port-to-volume
+energy evidence and the returned thermal result with experimental one-way
+status. See [coupling contract](PDN_DIELECTRIC_THERMAL.md).
+
+## Passive sampled PDN reduction
+
+`spike/pdn-admittance-reduction-request/v1` supplies ordered admittance samples,
+an exact retained/eliminated partition and passive termination matrices on the
+same grid/reference. Its result retains reduced samples, auxiliary voltage
+bases, power evidence and source/model identity. See
+[sampled reduction contract](PDN_ADMITTANCE_REDUCTION.md).
+
+## Finite dielectric AC admittance
+
+The separate `spike/pdn-dielectric-ac-request/v1` supplies retained finite
+dielectric geometry, explicit scalar/tensor permittivity, conductivity and loss
+tangent at ordered positive frequencies. `spike/pdn-dielectric-ac-result/v1`
+retains complex electrode admittance, field/current/power evidence and source
+lineage with experimental status. See [contract and derivation](PDN_DIELECTRIC_AC.md).
+
+## Simultaneous PDN loads
+
+The additive `spike/pdn-network-request/v1` transient form admits explicit
+ordered `loads` with independent PWL points and a common horizon. The existing
+scalar form remains compatible. Multi-load results retain `load_port_ids` and
+per-point `load_current_a_by_port`; scalar aliases are reserved for legacy
+requests. See [contract and numerical acceptance](PDN_SIMULTANEOUS_LOADS.md).
+
 ## SpiDeR interoperability API
 
 The additive `spider/api-result/v1` envelope carries validation, normalization,
 paged entity/reference queries and revision differences over existing v1/v2
 designs. It does not replace either design contract or establish solver
 qualification. See [interfaces](MCP_SPIDER_INTERFACES.md) and ADR 0076.
+
+## Supplied PDN decap corners
+
+`run_pdn_decap_corners` accepts `spike/pdn-decap-corners-request/v1` and returns
+`spike/pdn-decap-corners-result/v1` through the owned worker. Exact corner and
+port coverage, finite supplied series-RLC values and aggregate resources are
+admitted before execution. Failed impedance targets remain explicit results;
+invalid/numerically failed studies return structured errors without success.
+See [operating-corner workflow](PDN_DECAP_CORNERS.md) and its versioned schemas.
+
+## Supplied decap BOM selection
+
+`run_pdn_decap_selection` accepts `spike/pdn-decap-selection-request/v1` and
+returns `spike/pdn-decap-selection-result/v1` through the owned worker.
+Explicit sites, complete supplied part-corner tables, integer costs and
+inventory define the bounded exhaustive domain. Constraint-rejected and
+electrically failing populations remain visible; only the selected population
+retains the full corner result. See [selection workflow](PDN_DECAP_SELECTION.md).
+
+## Explicit two-port fixture removal
+
+`deembed_two_port` accepts `spike/two-port-deembedding-request/v1` and returns
+`spike/two-port-deembedding-result/v1` through the owned worker. All measured
+and fixture networks use ordered receiver/source S matrices, matched exact
+grids and one common positive real reference. Orientation, conditioning,
+source snapshots and reconstruction diagnostics are explicit. See
+[fixture-removal workflow](TWO_PORT_DEEMBEDDING.md).
+
+## Explicit sampled network grids and DC
+
+`resample_sparameter_network` accepts `spike/sparameter-resampling-request/v1`
+and returns `spike/sparameter-resampling-result/v1` through the owned worker.
+Source and target grids, real reference, named ports and an explicit DC policy
+define a bounded Cartesian-linear transformation. Source snapshots and target
+support/weight diagnostics remain separate from derived samples. See
+[resampling workflow](SPARAMETER_RESAMPLING.md).
+
+## Supplied stable-pole rational network fit
+
+`fit_sparameter_rational` accepts `spike/sparameter-rational-fit-request/v1`
+and returns `spike/sparameter-rational-fit-result/v1` through the owned worker.
+Explicit stable real pole rates and a maximum sample error bound define a
+full-rank real least-squares model. Original source, coefficients, realization,
+sample reconstruction and conditioning/error diagnostics remain inspectable.
+See [rational fit workflow](SPARAMETER_RATIONAL_FIT.md).
+
+## Prescribed-wave rational network transients
+
+`run_rational_network_transient` accepts
+`spike/rational-network-transient-request/v1` and returns
+`spike/rational-network-transient-result/v1` through the owned worker.
+The actual rational fit composes with exact PWL state propagation of explicit
+incident waves at every port, retaining fit evidence and final memory states.
+Voltages/currents use the original common real reference and current into the
+network. See [transient workflow](RATIONAL_NETWORK_TRANSIENT.md).
+
+## Resistively terminated rational network transients
+
+`run_terminated_network_transient` accepts
+`spike/terminated-network-transient-request/v1` and returns
+`spike/terminated-network-transient-result/v1` through the owned worker.
+Every port has an explicit finite nonnegative Thevenin resistance and PWL
+source voltage. Connected loop/stability admission precedes exact PWL
+state propagation; full fit, termination and boundary evidence is retained.
+See [terminated workflow](TERMINATED_NETWORK_TRANSIENT.md).

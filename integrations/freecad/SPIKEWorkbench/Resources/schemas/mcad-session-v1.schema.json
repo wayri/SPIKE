@@ -213,6 +213,87 @@
                 "additionalProperties": false
               }
             ]
+          },
+          "material_snapshot": {
+            "type": "object",
+            "properties": {
+              "schema_version": {
+                "const": 1
+              },
+              "material_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "\\S"
+              },
+              "revision": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 512,
+                "pattern": "\\S"
+              },
+              "digest": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "record": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "schema_version",
+              "material_id",
+              "revision",
+              "digest",
+              "record"
+            ],
+            "additionalProperties": false
+          },
+          "layer_material_snapshots": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 256,
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 512,
+              "pattern": "\\S"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "schema_version": {
+                  "const": 1
+                },
+                "material_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "\\S"
+                },
+                "revision": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 512,
+                  "pattern": "\\S"
+                },
+                "digest": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "record": {
+                  "type": "object"
+                }
+              },
+              "required": [
+                "schema_version",
+                "material_id",
+                "revision",
+                "digest",
+                "record"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [

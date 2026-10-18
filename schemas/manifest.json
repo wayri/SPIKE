@@ -88,6 +88,14 @@
     "spike/ac-pi-result/v1": "ac-pi-result-v1.schema.json",
     "spike/si-eye-mask/v1": "si-eye-mask-v1.schema.json",
     "spike/pdn-network-request/v1": "pdn-network-request-v1.schema.json",
-    "spike/series-capacitor-leg/v1": "series-capacitor-leg-v1.schema.json"
+    "spike/series-capacitor-leg/v1": "series-capacitor-leg-v1.schema.json",
+    "spike/assembly-tetra-structural-request/v1": "assembly-tetra-structural-request-v1.schema.json",
+    "spike/assembly-tetra-structural-result/v1": "assembly-tetra-structural-result-v1.schema.json",
+    "spike/assembly-thermomechanical-request/v1": "assembly-thermomechanical-request-v1.schema.json",
+    "spike/assembly-thermomechanical-result/v1": "assembly-thermomechanical-result-v1.schema.json",
+    "spike/inductive-network-transient-request/v1": "inductive-network-transient-request-v1.schema.json",
+    "spike/inductive-network-transient-result/v1": "inductive-network-transient-result-v1.schema.json",
+    "spike/capacitive-network-transient-request/v1": "capacitive-network-transient-request-v1.schema.json",
+    "spike/capacitive-network-transient-result/v1": "capacitive-network-transient-result-v1.schema.json"
   }
 }

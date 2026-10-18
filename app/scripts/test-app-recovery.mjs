@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import {createRequire} from "node:module";
+import ts from "typescript";
+const require=createRequire(import.meta.url),module={exports:{}};
+let calls=0,fail=false;
+const code=ts.transpileModule(readFileSync(new URL("../src/AppErrorBoundary.tsx",import.meta.url),"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
+new Function("require","module","exports",code)(name=>name.endsWith(".css")?{}:name==="./icons"?new Proxy({},{get:()=>()=>null}):name==="./workerBridge"?{closeDesktopWindow:async()=>{calls++;if(fail)throw Error("host unavailable");}}:require(name),module,module.exports);
+const Boundary=module.exports.default;
+const boundary=new Boundary({children:"workspace"});boundary.setState=patch=>Object.assign(boundary.state,typeof patch==="function"?patch(boundary.state):patch);
+assert.equal(boundary.render(),"workspace");boundary.state.error=new Error("fixture interface crash");
+globalThis.window={__TAURI_INTERNALS__:{}};
+const nodes=tree=>!tree||typeof tree!=="object"?[]:[tree,...[tree.props?.children].flat(Infinity).flatMap(nodes)];
+const text=tree=>typeof tree==="string"?tree:!tree||typeof tree!=="object"?"":(tree.props?.children instanceof Array?tree.props.children:[tree.props?.children]).flat(Infinity).map(text).join("");
+let tree=boundary.render();assert.match(text(tree),/may discard unsaved edits/);assert.ok(!text(tree).includes("Close and discard unsaved edits"));
+await boundary.close();assert.equal(calls,0,"No close without explicit discard confirmation");
+nodes(tree).find(row=>row.type==="button"&&text(row)==="Close SPIKE").props.onClick();tree=boundary.render();assert.match(text(tree),/Saved project files will remain/);
+fail=true;await boundary.close();assert.equal(calls,1);assert.equal(boundary.state.closing,false);assert.match(boundary.state.closeError,/host unavailable/);
+fail=false;await boundary.close();assert.equal(calls,2);assert.equal(boundary.state.closing,true);await boundary.close();assert.equal(calls,2,"Duplicate close requests are bounded");
+delete window.__TAURI_INTERNALS__;boundary.state.confirmClose=false;boundary.state.closing=false;assert.ok(!text(boundary.render()).includes("Close SPIKE"),"Browser preview does not offer a native close");delete globalThis.window;
+console.log("Crash recovery: explicit unsaved discard, bounded native close, bridge error recovery and browser availability passed.");

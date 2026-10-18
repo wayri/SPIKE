@@ -105,6 +105,11 @@ if ($isProduction) {
 }
 
 if (-not $SkipWorker) {
+    Invoke-Checked $python @(
+        "scripts/build_native_airflow.py", "--build-dir", "build-native-airflow",
+        "--generator", "Ninja"
+    ) $root
+    Invoke-Checked $python @("scripts/build_packaged_circuit_worker.py") $root
     Invoke-Checked $python @("scripts/build_packaged_worker.py") $root
 }
 if (-not $SkipTests) {
@@ -126,7 +131,7 @@ if ($isProduction) {
     ) $root
     Invoke-Checked "npm.cmd" @(
         "run", "tauri", "build", "--", "--bundles", "nsis,msi",
-        "--config", "src-tauri/tauri.production.conf.json"
+        "--features", "custom-protocol", "--config", "src-tauri/tauri.production.conf.json"
     ) $app
 } else {
     # Rust embeds assets over the duration of compilation. A concurrent Vite
@@ -147,7 +152,7 @@ if ($isProduction) {
     $snapshotJson = @{ build = @{ frontendDist = $snapshotRelativePath } } | ConvertTo-Json -Depth 3
     [System.IO.File]::WriteAllText($frontendSnapshotConfig, $snapshotJson, [System.Text.UTF8Encoding]::new($false))
     Write-Output "Frontend snapshot config: $frontendSnapshotConfig"
-    $previewBuildArguments = @("run", "tauri", "build", "--", "--config", $frontendSnapshotConfig)
+    $previewBuildArguments = @("run", "tauri", "build", "--", "--features", "custom-protocol", "--config", $frontendSnapshotConfig)
     if ($BuildOnly) { $previewBuildArguments += "--no-bundle" }
     else { $previewBuildArguments += @("--bundles", "nsis,msi") }
     Invoke-Checked "npm.cmd" $previewBuildArguments $app

@@ -8,6 +8,7 @@ import math
 import os
 from pathlib import Path
 import subprocess
+import sys
 from typing import Any, Mapping
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,8 +22,13 @@ def _executable(executable: str | Path | None = None) -> Path:
     if override:
         return Path(override).expanduser().resolve()
     suffix = ".exe" if os.name == "nt" else ""
+    name = "spike_native_airflow" + suffix
+    if getattr(sys, "frozen", False):
+        # PyInstaller owns this directory; never depend on a developer checkout.
+        bundle = Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent))
+        return bundle / "native" / name
     base = ROOT / "build-native-airflow"
-    paths = [base / "Release" / ("spike_native_airflow" + suffix), base / ("spike_native_airflow" + suffix)]
+    paths = [base / "Release" / name, base / name]
     return next((path for path in paths if path.is_file()), paths[0])
 
 

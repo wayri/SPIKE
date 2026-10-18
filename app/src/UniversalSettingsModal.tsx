@@ -1,17 +1,20 @@
 import { Gauge, Globe2, MonitorCog, Ruler, ShieldCheck, SlidersHorizontal, UserRound, X } from "./icons";
 import { useEffect, useState } from "react";
 import { AppSettings, LANGUAGE_NAMES } from "./appSettings";
+import { usePanelPresentation } from "./panelPresentation";
 
 type SettingsTab = "General" | "Units" | "Interface" | "Language" | "Profile" | "Privacy";
 
 export default function UniversalSettingsModal({ settings, onSave, onClose, onOpenUpdates }: { onOpenUpdates?: () => void; settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const [draft, setDraft] = useState<AppSettings>(() => structuredClone(settings));
   const [tab, setTab] = useState<SettingsTab>("General");
   useEffect(() => {
-    const key = (event: KeyboardEvent) => { if (document.querySelector(".settings-shade")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, [onClose]);
+    const doc = ownerDocument, view = ownerWindow; if (!doc || !view) return;
+    const key = (event: KeyboardEvent) => { if (doc.querySelector(".settings-shade")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
+    view.addEventListener("keydown", key);
+    return () => view.removeEventListener("keydown", key);
+  }, [ownerDocument, ownerWindow, onClose]);
   const update = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => setDraft(current => ({ ...current, [key]: value }));
   const tabs: { id: SettingsTab; icon: typeof Gauge }[] = [
     { id: "General", icon: SlidersHorizontal }, { id: "Units", icon: Ruler }, { id: "Interface", icon: MonitorCog },
@@ -38,7 +41,12 @@ export default function UniversalSettingsModal({ settings, onSave, onClose, onOp
             <Setting label="Temperature"><select value={draft.temperatureUnit} onChange={event => update("temperatureUnit", event.target.value as AppSettings["temperatureUnit"])}><option value="C">Celsius</option><option value="F">Fahrenheit</option><option value="K">Kelvin</option></select></Setting>
           </SettingsSection>}
           {tab === "Interface" && <SettingsSection title="Rendering and interaction">
+            <Setting label="Interface layout"><select value={draft.interfaceMode} onChange={event => setDraft(current=>({...current,interfaceMode:event.target.value as AppSettings["interfaceMode"],ribbonVisible:event.target.value==="classic"}))}><option value="clean">Clean · context tools and soft menus</option><option value="classic">Classic · menus, workspace tabs and ribbon</option></select></Setting>
+            <p className="settings-note">Both layouts use the same project, solvers and saved inputs. Change layout without restarting. Classic restores persistent command access; Clean keeps the viewport prominent.</p>
             <Setting label="Theme"><select value={draft.theme} onChange={event => update("theme", event.target.value as AppSettings["theme"])}><option value="professional-dark">Graphite + Teal</option><option value="high-contrast">High contrast</option><option value="system">Follow system</option></select></Setting>
+            <Setting label="UI scale"><select value={draft.uiScale} onChange={event => update("uiScale", Number(event.target.value))}>{[.65, .75, .9, 1, 1.1, 1.25, 1.5].map(value => <option key={value} value={value}>{Math.round(value * 100)}%</option>)}</select></Setting>
+            <Setting label="Viewport background"><select value={draft.viewportBackground} onChange={event => update("viewportBackground", event.target.value as AppSettings["viewportBackground"])}><option value="dark">Graphite</option><option value="amoled">AMOLED · true black</option></select></Setting>
+            <Setting label="Orientation grid"><input type="checkbox" checked={draft.viewportGrid} onChange={event => update("viewportGrid", event.target.checked)} /></Setting>
             <Setting label="Rendering profile"><select value={draft.renderQuality} onChange={event => update("renderQuality", event.target.value as AppSettings["renderQuality"])}><option value="quality">Quality</option><option value="balanced">Balanced</option><option value="performance">Performance</option></select></Setting>
             <Setting label="Maximum frame rate"><select value={draft.maximumFps} onChange={event => update("maximumFps", Number(event.target.value) as AppSettings["maximumFps"])}><option value={30}>30 FPS</option><option value={60}>60 FPS</option><option value={120}>120 FPS</option></select></Setting>
             <Setting label="Antialiasing"><input type="checkbox" checked={draft.antialiasing} onChange={event => update("antialiasing", event.target.checked)} /></Setting>

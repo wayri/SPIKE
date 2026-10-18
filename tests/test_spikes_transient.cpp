@@ -999,7 +999,7 @@ void analytic_sine_sources_use_internal_time_and_delay_breakpoints() {
 
 } // namespace
 
-int main() try {
+int main() {
   analytic_sine_sources_use_internal_time_and_delay_breakpoints();
   rc_step_matches_backward_euler_recurrence();
   rl_step_matches_backward_euler_recurrence();
@@ -1033,8 +1033,4 @@ int main() try {
 #endif
   std::cout << "SPIKES transient tests passed\n";
   return 0;
-}
-catch (const std::exception &error) {
-  std::cerr << "SPIKES native regression failed: " << error.what() << '\n';
-  return 1;
 }

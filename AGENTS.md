@@ -68,6 +68,20 @@ justifies it. Never start separate user-visible tasks unless requested.
 
 ## SPIKE correctness constraints
 
+SPIKE is a general multiphysics simulation platform. PCB/ECAD and MCAD are
+geometry/identity inputs; simulation geometry preparation is in scope, building
+a general MCAD authoring product is not. Chemical-engineering expansion remains
+outside active scope. Follow `docs/MULTIPHYSICS_PLATFORM_STRATEGY.md` and preserve
+the existing execution gates when evaluating recommended future directions.
+
+All future physics-affecting changes require established governing mathematics,
+subject-matter assumptions, an independently authored derivation and traceable
+primary references under `docs/NUMERICAL_METHOD_EVIDENCE.md`. Record the exact
+method/source/version reviewed, units, validity, numerical analysis and executed
+verification/validation evidence. Evaluate frontier methods as explicitly
+experimental candidates against established references; do not infer correctness
+from novelty, citations, plots or AI output. Existing provenance gaps remain open.
+
 Follow `CONTRIBUTING.md` and its required architecture, design, language,
 licensing, and validation guidance when changing the relevant implementation.
 Use `docs/SUBSYSTEM_INDEX.md` to locate ownership and `docs/SOLVER_STATUS.md`
@@ -79,3 +93,18 @@ Required knowledgeable human review of numerical code before release remains.
 
 The portable copy/paste version is `docs/EFFICIENT_WORK_PROMPT.md`; this file
 is the authoritative project policy and need not be duplicated in every prompt.
+
+## Publication identity
+
+SPIKE source and releases use only the `wayri` GitHub identity. For this
+repository, the canonical Git author and committer are `wayri` with
+`16292067+wayri@users.noreply.github.com`. Never author, commit, sign off, tag,
+or publish SPIKE work as a work account or with a work email address. Before
+creating a commit, verify both `git var GIT_AUTHOR_IDENT` and
+`git var GIT_COMMITTER_IDENT`; stop if either identity differs. Repository-local
+Git configuration must use `user.useConfigOnly=true` so an absent identity
+is not guessed. Because Git still honors global identity configuration, the
+repository-local `user.name` and `user.email` values must both exist and match
+the canonical identity above. Release publication additionally follows
+`docs/ATTRIBUTION_POLICY.md` and the fail-closed release automation checks.
+Before pushing, use the repository pre-push identity guard described there.

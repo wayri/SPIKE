@@ -5,14 +5,34 @@ from .service_helpers import error_response
 
 def handle_pdn_network_request(method, params):
     methods = {'evaluate_pdn_network', 'validate_pdn_network', 'normalize_pdn_shunt_capacitance',
-               'pdn_capacitor_elements', 'review_series_capacitor_leg', 'extract_pdn_electrostatic'}
+               'pdn_capacitor_elements', 'review_series_capacitor_leg', 'extract_pdn_electrostatic',
+               'extract_pdn_dielectric_ac', 'reduce_pdn_admittance', 'run_pdn_dielectric_thermal',
+               'run_pdn_dielectric_feedback', 'run_pdn_decap_corners', 'run_pdn_decap_selection'}
     if method not in methods:
         return None
     try:
         fields = {'request', 'expected_context_digest'} if method == 'pdn_capacitor_elements' else {'request'}
         if not isinstance(params, dict) or set(params) != fields:
             raise ValueError('PDN_FIELDS: exactly one request is required')
-        if method == 'extract_pdn_electrostatic':
+        if method == 'run_pdn_decap_selection':
+            from .pdn_decap_selection import run_pdn_decap_selection
+            result = run_pdn_decap_selection(params['request'])
+        elif method == 'run_pdn_decap_corners':
+            from .pdn_decap_corners import run_pdn_decap_corners
+            result = run_pdn_decap_corners(params['request'])
+        elif method == 'run_pdn_dielectric_feedback':
+            from .pdn_dielectric_feedback import run_pdn_dielectric_feedback
+            result = run_pdn_dielectric_feedback(params['request'])
+        elif method == 'run_pdn_dielectric_thermal':
+            from .pdn_dielectric_thermal import run_pdn_dielectric_thermal
+            result = run_pdn_dielectric_thermal(params['request'])
+        elif method == 'reduce_pdn_admittance':
+            from .pdn_admittance_reduction import reduce_pdn_admittance
+            result = reduce_pdn_admittance(params['request'])
+        elif method == 'extract_pdn_dielectric_ac':
+            from .pdn_dielectric_ac import extract_pdn_dielectric_ac
+            result = extract_pdn_dielectric_ac(params['request'])
+        elif method == 'extract_pdn_electrostatic':
             from .pdn_electrostatic import extract_pdn_electrostatic
             from .pdn_shunt_capacitance import pdn_capacitor_elements
             result = extract_pdn_electrostatic(params['request'])

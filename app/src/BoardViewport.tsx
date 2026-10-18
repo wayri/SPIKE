@@ -1,15 +1,17 @@
+import { resultVectorGlyphs, type ResultVectorGlyph } from "./resultVectorGlyphs";
+import { viewportBackgroundColor, worldGridSize, type ViewportBackground } from "./viewportEnvironment";
 import { assemblyNetLabels } from "./assemblyNetLabels";
 import { applyNetFocusColor } from "./netFocusMaterial";
 import { viewportMouseButtons } from "./viewportMouseNavigation";
 import { updateCopperSelectionBoundary, copperSelectionOpacity } from "./copperSelectionOverlay";
 import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { ViewportOccurrenceCuller } from "./viewportOccurrenceCulling";
-import { viewportDampingFactor, viewportFrameDue } from "./viewportFrameCadence";
+import { viewportDampingFactor, ViewportFrameClock } from "./viewportFrameCadence";
 import { sectionHitVisible } from "./viewportSection";
 import ViewportNetViewer from "./ViewportNetViewer";
 import { netViewerBoard, viewportNetRows } from "./viewportNetViewerModel";
 import { applyAssemblySceneVisibility, updateAssemblySceneSelection } from "./assemblySceneVisibility";
-import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { flipCamera, navigationPanFraction, zoomCameraAt } from "./viewportKeyboardCamera";
 import { createPortal } from "react-dom";
 import * as THREE from "three";
@@ -86,8 +88,10 @@ import {
   solverResultOverlayActive,
   viaSpanVisible,
   viewportRenderProfile,
+  viewportRendererRemountRestore,
   viewportRenderOrder,
   viewportSceneIdentity,
+  viewportAntialiasingEnabled,
   type ViewportSceneKind,
   boardSceneVisibility,
 } from "./viewportScenePolicy";
@@ -242,8 +246,13 @@ type Props = {
   assemblySection?: AssemblySection;
   navigationMode: "orbit" | "pan";
   navigationInertia: boolean;
+  showWorldGrid?: boolean;
+  viewportBackground?: ViewportBackground;
   showAxes?: boolean;
   selectionBlink?: boolean;
+  renderingQuality?: "balanced" | "quality" | "performance";
+  antialiasing?: boolean;
+  maximumFps?: number;
   cameraCommand: string;
   viewportRestore?: ViewportRestoreCommand | null;
   selectionFilter: SelectionFilter;
@@ -977,7 +986,7 @@ function resultAxisTicks(minimumMm: number, maximumMm: number, desiredCount = 5)
 const EMPTY_VIEWPORT_LIST: never[] = [];
 const EMPTY_VIEWPORT_MAP: Record<string, never> = {};
 
-function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, layerOpacity, layerSeparation, showVias, showNetNames = false, showModels, showSmdModels, showThtModels, assemblyModels = EMPTY_VIEWPORT_LIST, assemblySelectorPreviews = EMPTY_VIEWPORT_LIST, virtualBoards = EMPTY_VIEWPORT_LIST, assemblyBoardDesigns = EMPTY_VIEWPORT_MAP, assemblyLayerVisibility = EMPTY_VIEWPORT_MAP, assemblyLayerOpacity = EMPTY_VIEWPORT_MAP, assemblyLayerFocus = EMPTY_VIEWPORT_MAP, onAssemblyLayerFocus, assemblyBoardVisibility = EMPTY_VIEWPORT_MAP, assemblyExplodeOffsets = EMPTY_VIEWPORT_MAP, assemblySnapTargets = EMPTY_VIEWPORT_LIST, selectedAssemblySnapTargetId = null, onAssemblySnapTarget, assemblyResultOverlays = EMPTY_VIEWPORT_LIST, selectedBoardInstanceId = null, onBoardInstanceSelect, onAssemblyNetSelect, onAssemblyComponentSelect, onShowAllAssemblyBoards, linkedAssemblyNets = EMPTY_VIEWPORT_MAP, virtualHarnesses = EMPTY_VIEWPORT_LIST, selectedHarnessId = null, selectedHarnessConductorId = null, onHarnessSelect, topologySelectorActive = false, selectedTopologyId = null, onTopologySelect, isolatedAssemblyPartId = null, assemblySection = DEFAULT_ASSEMBLY_SECTION, navigationMode, navigationInertia, showAxes = true, selectionBlink = true, cameraCommand, viewportRestore = null, selectionFilter, selectedId, selectedPosition, selectedNet = null, highlightedNets = EMPTY_VIEWPORT_LIST, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = EMPTY_VIEWPORT_LIST, probes = EMPTY_VIEWPORT_LIST, showProbes = true, hoverProbeEnabled = false, hoverProbeKind = "universal", traceValuePopupsEnabled = false, tracePopupHistoryLimit = 48, tracePopupResultBoardInstanceId = null, terminalMarkers = EMPTY_VIEWPORT_LIST, thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true, field: true }, emRadiation = null, emOverlay = null, extensionMesh = null, onEmSample, siCrosstalk = null, board, onSelect, onHoverProbe, onNetTune, onContextMenu, onOrbitCenter, onCamera, onLayoutView, onTelemetry, onModelStatus, sceneLoadToken = null, onSceneReady, onAssemblyPartViewportStatus }: Props) {
+function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLayers, layerOpacity, layerSeparation, showVias, showNetNames = false, showModels, showSmdModels, showThtModels, assemblyModels = EMPTY_VIEWPORT_LIST, assemblySelectorPreviews = EMPTY_VIEWPORT_LIST, virtualBoards = EMPTY_VIEWPORT_LIST, assemblyBoardDesigns = EMPTY_VIEWPORT_MAP, assemblyLayerVisibility = EMPTY_VIEWPORT_MAP, assemblyLayerOpacity = EMPTY_VIEWPORT_MAP, assemblyLayerFocus = EMPTY_VIEWPORT_MAP, onAssemblyLayerFocus, assemblyBoardVisibility = EMPTY_VIEWPORT_MAP, assemblyExplodeOffsets = EMPTY_VIEWPORT_MAP, assemblySnapTargets = EMPTY_VIEWPORT_LIST, selectedAssemblySnapTargetId = null, onAssemblySnapTarget, assemblyResultOverlays = EMPTY_VIEWPORT_LIST, selectedBoardInstanceId = null, onBoardInstanceSelect, onAssemblyNetSelect, onAssemblyComponentSelect, onShowAllAssemblyBoards, linkedAssemblyNets = EMPTY_VIEWPORT_MAP, virtualHarnesses = EMPTY_VIEWPORT_LIST, selectedHarnessId = null, selectedHarnessConductorId = null, onHarnessSelect, topologySelectorActive = false, selectedTopologyId = null, onTopologySelect, isolatedAssemblyPartId = null, assemblySection = DEFAULT_ASSEMBLY_SECTION, navigationMode, navigationInertia, showWorldGrid = true, viewportBackground = "dark", showAxes = true, selectionBlink = true, renderingQuality = "balanced", antialiasing = true, maximumFps = 120, cameraCommand, viewportRestore = null, selectionFilter, selectedId, selectedPosition, selectedNet = null, highlightedNets = EMPTY_VIEWPORT_LIST, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = EMPTY_VIEWPORT_LIST, probes = EMPTY_VIEWPORT_LIST, showProbes = true, hoverProbeEnabled = false, hoverProbeKind = "universal", traceValuePopupsEnabled = false, tracePopupHistoryLimit = 48, tracePopupResultBoardInstanceId = null, terminalMarkers = EMPTY_VIEWPORT_LIST, thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true, field: true }, emRadiation = null, emOverlay = null, extensionMesh = null, onEmSample, siCrosstalk = null, board, onSelect, onHoverProbe, onNetTune, onContextMenu, onOrbitCenter, onCamera, onLayoutView, onTelemetry, onModelStatus, sceneLoadToken = null, onSceneReady, onAssemblyPartViewportStatus }: Props) {
   const renderQuality = (badge: ReactNode) => qualityTarget ? createPortal(badge, qualityTarget) : badge;
   const [incomingBoard, setIncomingBoard] = useState<ParsedBoard | null>(null);
   const [fullModelState, setFullModelState] = useState<"none" | "loading" | "ready" | "failed">("none");
@@ -1187,6 +1196,8 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     size: new THREE.Vector3(200, 120, 12),
   });
   const renderProfileRef = useRef(viewportRenderProfile(0, window.devicePixelRatio));
+  const maximumFpsRef = useRef(maximumFps);
+  maximumFpsRef.current = maximumFps;
   const navigationModeRef = useRef(navigationMode);
   navigationModeRef.current = navigationMode;
   const viewModeRef = useRef<ViewMode>(viewMode);
@@ -1249,12 +1260,13 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       + assemblySelectorPreviews.reduce((total, preview) => total + preview.references.size, 0);
     const complexity = boardComplexity + resultComplexity + assemblyComplexity;
     interactionComplexityRef.current = complexity;
-    const profile = viewportRenderProfile(complexity, window.devicePixelRatio);
+    const profile = viewportRenderProfile(complexity, window.devicePixelRatio, renderingQuality);
     renderProfileRef.current = profile;
     const renderer = rendererRef.current;
     if (renderer) {
       renderer.setPixelRatio(profile.fullPixelRatio);
-      renderer.shadowMap.autoUpdate = profile.dynamicShadowUpdates;
+      renderer.shadowMap.autoUpdate = false;
+      renderer.shadowMap.needsUpdate = true;
     }
     if (keyLightRef.current) {
       keyLightRef.current.shadow.mapSize.set(profile.shadowMapSize, profile.shadowMapSize);
@@ -1264,7 +1276,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       hostRef.current.dataset.interactionLod = complexity > 12000 ? `large;objects=${complexity}` : `standard;objects=${complexity}`;
       hostRef.current.dataset.renderProfile = profile.largeScene ? "large-board" : "standard-board";
     }
-  }, [activeBoard, analysisResult, assemblyModels, assemblySelectorPreviews, geometryBoards, virtualHarnesses]);
+  }, [activeBoard, analysisResult, assemblyModels, assemblySelectorPreviews, geometryBoards, virtualHarnesses, renderingQuality]);
   useEffect(() => {
     const handler = (event: Event) => setHoverPreview((event as CustomEvent<ViewportHoverTarget | null>).detail ?? null);
     window.addEventListener("spike-viewport-hover-preview", handler);
@@ -1313,7 +1325,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     const host = hostRef.current;
     if (!host) return;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x171d21);
+    scene.background = new THREE.Color(viewportBackgroundColor(viewportBackground));
     // Engineering geometry must not disappear with camera distance. Depth
     // planes are derived from scene bounds below, so atmospheric fog would
     // only hide valid PCB, chamber, enclosure, or assembly content.
@@ -1321,7 +1333,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     host.dataset.distanceFade = "disabled";
 
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: antialiasing,
       alpha: false,
       powerPreference: "high-performance",
       logarithmicDepthBuffer: true,
@@ -1335,7 +1347,8 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     renderer.autoClear = false;
     renderer.info.autoReset = false;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.autoUpdate = initialProfile.dynamicShadowUpdates;
+    renderer.shadowMap.autoUpdate = false;
+    renderer.shadowMap.needsUpdate = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.localClippingEnabled = true;
     renderer.domElement.className = "three-canvas";
@@ -1345,6 +1358,8 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       restored: () => { host.dataset.webglContext = "ready"; renderer.shadowMap.needsUpdate = true; setModelError(message => message.startsWith("[SPIKE-FE-VIEW-E-0002]") ? "" : message); },
     });
     host.dataset.webglContext = "ready";
+    host.dataset.antialiasingRequested = String(antialiasing);
+    host.dataset.antialiasing = String(renderer.getContext().getContextAttributes()?.antialias ?? false);
     const occurrenceCuller = new ViewportOccurrenceCuller();
     const renderScene = () => {
       const camera = activeCameraRef.current!;
@@ -1515,7 +1530,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       qualityRestoreTimer = window.setTimeout(() => {
         const currentProfile = renderProfileRef.current;
         renderer.setPixelRatio(currentProfile.fullPixelRatio);
-        renderer.shadowMap.autoUpdate = currentProfile.dynamicShadowUpdates;
+        renderer.shadowMap.autoUpdate = false;
         // A camera-relative key needs one fresh shadow map after each orbit,
         // even when large-scene profiles disable continuous shadow updates.
         renderer.shadowMap.needsUpdate = true;
@@ -1610,6 +1625,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       const shadowMoved = lastKeyPosition.distanceToSquared(key.position) > Math.max(sceneRadius * sceneRadius * 0.0025, 0.25);
       if (shadowMoved && now - lastShadowRefresh > 180) {
         key.shadow.needsUpdate = true;
+        renderer.shadowMap.needsUpdate = true;
         lastKeyPosition.copy(key.position);
         lastShadowRefresh = now;
       }
@@ -2404,10 +2420,13 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     let telemetryFrames = 0;
     let telemetryWorkMs = 0;
     let lastRender = 0;
+    const frameClock = new ViewportFrameClock();
     let interactionUntil = performance.now() + 300;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const markInteractive = () => { interactionUntil = performance.now() + 300; };
-    requestInteractiveFrameRef.current = markInteractive;
+    // Scene/material invalidations request one shadow refresh. Camera events
+    // use markInteractive directly and the camera-light rig throttles shadows.
+    requestInteractiveFrameRef.current = () => {renderer.shadowMap.needsUpdate = true;markInteractive();};
     controls3d.addEventListener("start", markInteractive);
     controls3d.addEventListener("change", markInteractive);
     controls2d.addEventListener("start", markInteractive);
@@ -2424,7 +2443,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
         || (selectionMaterialsRef.current.size > 0 && selectionBlinkRef.current && !resultOverlayActiveRef.current);
       const moving = cameraGestureActive || now < interactionUntil || animatedHighlight
         || assemblyGizmo.dragging || assemblyRotationGizmo.dragging || viewHelper.animating;
-      if (document.hidden || gpuRecovery.lost || !viewportFrameDue(now, lastRender, moving)) return;
+      if (document.hidden || gpuRecovery.lost || !frameClock.due(now, moving, maximumFpsRef.current)) return;
       const cameraDelta = lastRender ? Math.min((now - lastRender) / 1000, 0.1) : 1 / 60;
       lastRender = now;
       numericGizmo?.updateAnchor();
@@ -4150,31 +4169,38 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     assemblyBoardDesigns, assemblyBoardVisibility, assemblyExplodeOffsets, assemblyLayerVisibility]);
 
   useEffect(() => {
+    if (sceneRef.current) sceneRef.current.background = new THREE.Color(viewportBackgroundColor(viewportBackground));
+  }, [viewportBackground]);
+
+  useEffect(() => {
     const group = axisGroupRef.current;
     if (!group) return;
     clearGroup(group);
     const resultsActive = Boolean(analysisResult && resultVisualization?.visible && resultVisualization.mode !== "geometry");
-    group.visible = showAxes && viewMode === "3D";
-    if (!group.visible || !activeBoard) return;
+    group.visible = (showAxes || showWorldGrid) && viewMode === "3D";
+    if (!group.visible) return;
     const { scale, centerX, centerY } = boardTransformRef.current;
-    const size = Math.max(activeBoard.width, activeBoard.height, 10) * scale * 1.35;
-    const divisions = Math.max(10, Math.min(40, Math.ceil(size / Math.max(scale * 5, 1))));
+    const worldBounds = visibleBoundsRef.current;
+    const size = worldGridSize(Math.max(activeBoard ? activeBoard.width * scale : 0, worldBounds.size.x), Math.max(activeBoard ? activeBoard.height * scale : 0, worldBounds.size.y));
+    const divisions = 40;
     const grid = new THREE.GridHelper(size, divisions, 0x66808b, 0x30434b);
     grid.rotation.x = Math.PI / 2;
-    grid.position.z = -boardThicknessMm(activeBoard) * scale / 2 - 0.65;
+    grid.position.set(worldBounds.center.x, worldBounds.center.y, Math.min(activeBoard ? -boardThicknessMm(activeBoard) * scale / 2 : 0, worldBounds.center.z - worldBounds.size.z / 2) - 0.65);
+    grid.visible = showWorldGrid;
     const materials = Array.isArray(grid.material) ? grid.material : [grid.material];
     materials.forEach(material => {
       material.transparent = true;
-      material.opacity = 0.52;
+      material.opacity = 0.22;
       material.depthWrite = false;
     });
     grid.renderOrder = -10;
     group.add(grid);
     const axes = new THREE.AxesHelper(Math.max(size * 0.16, 8));
     axes.position.set(-size / 2, -size / 2, grid.position.z + 0.04);
+    axes.visible = showAxes;
     axes.renderOrder = 140;
     group.add(axes);
-    if (!resultsActive) return;
+    if (!resultsActive || !showAxes || !activeBoard) return;
     const xTicks = resultAxisTicks(activeBoard.bounds.minX, activeBoard.bounds.maxX);
     const yTicks = resultAxisTicks(activeBoard.bounds.minY, activeBoard.bounds.maxY);
     const tickLength = Math.max(size * 0.012, 1.2);
@@ -4249,7 +4275,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
         group.add(zUnit);
       }
     }
-  }, [activeBoard, analysisResult, resultVisualization, showAxes, viewMode]);
+  }, [activeBoard, analysisResult, resultVisualization, showAxes, showWorldGrid, viewMode, virtualBoards, assemblyBoardDesigns, assemblyBoardVisibility, assemblyExplodeOffsets]);
 
   useEffect(() => {
     const perspective = perspectiveRef.current;
@@ -5268,30 +5294,28 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
     const field = mode === "electric_field"
       ? analysisResult.vector_fields.electric_field
       : mode === "magnetic_field" ? analysisResult.vector_fields.magnetic_field
-        : mode === "current" || mode === "current_density" ? analysisResult.vector_fields.current_density : [];
+        : ["current", "current_density", "voltage", "voltage_drop", "power_loss"].includes(mode) ? analysisResult.vector_fields.current_density : [];
     const visibleVectors = field.filter(sample => sampleInBounds(sample)
       && pointOnResultConductor(activeBoard, [sample.x_mm, sample.y_mm], sample.net, sample.layer)
       && netIsVisible(sample.net) && layerIsVisible(sample.layer));
     if (resultVisualization.showVectors && visibleVectors.length) {
       const maximum = Math.max(numericMaximum(visibleVectors.map(sample => sample.magnitude), 0), Number.EPSILON);
       if (mode === 'electric_field' || mode === 'magnetic_field') setScalarValueScale({minimum:0, maximum, mode, result:analysisResult});
-      const vectorLimit = renderProfileRef.current.largeScene ? 96 : 180;
+      const vectorLimit = renderProfileRef.current.largeScene ? 600 : 1200;
       const renderedVectors = spatiallyThinSamples(visibleVectors.filter(sample => sample.magnitude >= maximum * 0.01), vectorLimit);
       const boardVectorScale = THREE.MathUtils.clamp(Math.max(activeBoard.width, activeBoard.height) * scale * 0.032, 0.8, 5.5);
+      const glyphs: ResultVectorGlyph[] = [];
       renderedVectors.forEach(sample => {
         const direction = new THREE.Vector3(sample.vector[0], -sample.vector[1], sample.vector[2]);
         if (!direction.lengthSq()) return;
         const normalizedMagnitude = THREE.MathUtils.clamp(sample.magnitude / maximum, 0, 1);
         const length = boardVectorScale * (0.35 + 0.65 * Math.sqrt(normalizedMagnitude)) * resultVisualization.vectorScale;
-        group.add(new THREE.ArrowHelper(
-          direction.normalize(),
-          position(sample),
-          length,
-          mode === "electric_field" ? 0x42d9ff : 0xff68bd,
-          Math.max(length * 0.2, 0.25),
-          Math.max(length * 0.1, 0.12),
-        ));
+        const color = mode === "electric_field" ? new THREE.Color(0x42d9ff)
+          : mode === "magnetic_field" ? new THREE.Color(0xff68bd)
+          : new THREE.Color(0x79decf).lerp(new THREE.Color(0xf4a259), normalizedMagnitude);
+        glyphs.push({direction, origin:position(sample), length, color});
       });
+      group.add(resultVectorGlyphs(glyphs));
     }
     // Result contours and transient peaks may rise well above the board. They
     // participate in depth clipping, but never in the board-centric fit box.
@@ -5628,6 +5652,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       {navigationStatus && <div role="status" className="viewport-navigation-status">{navigationStatus}</div>}
       <div ref={hostRef} className={`three-host ${viewMode === "2D" && activeBoard ? "layout-active" : ""}`} data-model-metrics={modelMetrics} data-hover-preview={hoverPreview?.label ?? ""}>
       {viewMode === "2D" && virtualBoards.length > 1 && <AssemblyLayoutViewport
+        viewportBackground={viewportBackground} showWorldGrid={showWorldGrid}
         designs={assemblyBoardDesigns} boards={assemblyDisplayBoards(virtualBoards, assemblyBoardVisibility, assemblyExplodeOffsets)} harnesses={assemblyDisplayHarnesses(virtualHarnesses, assemblyBoardVisibility, assemblyExplodeOffsets)}
         assemblyLayerVisibility={assemblyLayerVisibility} assemblyLayerOpacity={assemblyLayerOpacity} focusedLayerByBoard={assemblyLayerFocus} onLayerFocus={onAssemblyLayerFocus}
         selectedBoardId={selectedBoardInstanceId} linkedNets={linkedAssemblyNets}
@@ -5663,6 +5688,7 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
         thermalScenario={thermalScenario}
         thermalVisibility={thermalVisibility}
         translucentScene={Boolean(resultVisualization?.translucentScene || resultVisualization?.sceneMode === "translucent")}
+        viewportBackground={viewportBackground} showWorldGrid={showWorldGrid}
         showAxes={showAxes}
         cameraCommand={cameraCommand}
         viewportRestore={viewportRestore}
@@ -5787,6 +5813,53 @@ function BoardViewport({ qualityTarget, onEmiScene, viewMode, visibleLayers, lay
       </div>}
     </div>
   );
+}
+
+function BoardViewport(props: Props) {
+  const antialiasing = viewportAntialiasingEnabled(props.antialiasing);
+  const latestThreeDRef = useRef<Viewport3DCameraState | undefined>(props.viewportRestore?.threeD);
+  const latestTwoDRef = useRef<Viewport2DState | undefined>(props.viewportRestore?.twoD);
+  const retainedRestoreRef = useRef<ViewportRestoreCommand | null>(props.viewportRestore ?? null);
+  const explicitRestoreTokenRef = useRef(props.viewportRestore?.token);
+  const restoreBoardRef = useRef(props.board);
+  const previousAntialiasingRef = useRef(antialiasing);
+  const antialiasRemountGenerationRef = useRef(0);
+
+  // Explicit project/workspace restores replace any live snapshot before an
+  // antialias remount is considered in the same render.
+  if (props.viewportRestore?.token !== explicitRestoreTokenRef.current) {
+    explicitRestoreTokenRef.current = props.viewportRestore?.token;
+    retainedRestoreRef.current = props.viewportRestore ?? null;
+    latestThreeDRef.current = props.viewportRestore?.threeD;
+    latestTwoDRef.current = props.viewportRestore?.twoD;
+  }
+  if (props.board !== restoreBoardRef.current) {
+    restoreBoardRef.current = props.board;
+    retainedRestoreRef.current = props.viewportRestore ?? null;
+    latestThreeDRef.current = props.viewportRestore?.threeD;
+    latestTwoDRef.current = props.viewportRestore?.twoD;
+  }
+  if (antialiasing !== previousAntialiasingRef.current) {
+    previousAntialiasingRef.current = antialiasing;
+    antialiasRemountGenerationRef.current += 1;
+    retainedRestoreRef.current = viewportRendererRemountRestore(
+      -antialiasRemountGenerationRef.current,
+      { threeD: latestThreeDRef.current, twoD: latestTwoDRef.current },
+      retainedRestoreRef.current,
+    );
+  }
+
+  const recordCamera = useCallback((camera: Viewport3DCameraState) => {
+    latestThreeDRef.current = camera;
+    props.onCamera(camera);
+  }, [props.onCamera]);
+  const recordLayoutView = useCallback((view: Viewport2DState) => {
+    latestTwoDRef.current = view;
+    props.onLayoutView?.(view);
+  }, [props.onLayoutView]);
+  return <BoardViewportRenderer key={`webgl-antialias-${antialiasing}`} {...props}
+    antialiasing={antialiasing} viewportRestore={retainedRestoreRef.current}
+    onCamera={recordCamera} onLayoutView={recordLayoutView} />;
 }
 
 export default memo(BoardViewport);

@@ -1,0 +1,132 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.net-manager-shade { box-sizing: border-box; }
+.net-manager.net-manager {
+  width: min(1160px, calc(100vw - 48px));
+  height: min(760px, calc(100vh - 48px));
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  container: net-manager / inline-size;
+  border: 1px solid var(--spike-table-border-strong, #526873);
+  border-radius: 6px;
+  background: var(--spike-table-surface, #101a21);
+  box-shadow: var(--spike-popup-shadow);
+}
+.net-manager-header { min-width: 0; min-height: 46px; }
+.net-manager-header > div { min-width: 0; }
+.net-manager-header small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.net-manager-header > button { flex: 0 0 auto; border-radius: 4px; }
+
+.net-manager .net-manager-toolbar {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(170px, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--spike-table-border, #2a3e48);
+  background: var(--spike-table-toolbar, #131f26);
+}
+.net-manager .net-manager-tabs { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); height: auto; border-color: var(--spike-table-border, #405761); border-radius: 4px; overflow: hidden; }
+.net-manager .net-manager-tabs button { min-width: 0; min-height: 28px; padding: 0 9px; white-space: nowrap; }
+.net-manager .net-manager-tabs button.selected { color: var(--spike-table-edit, #6fd4c8); background: var(--spike-table-edit-hover, #24414b); }
+.net-manager .net-manager-search { min-width: 0; width: auto; height: 30px; display: flex; align-items: center; gap: 7px; padding: 0 8px; border: 1px solid var(--spike-table-border-strong, #38505b); border-radius: 4px; background: var(--spike-table-field, #0c171d); color: var(--spike-table-muted, #76909a); }
+.net-manager .net-manager-search input { width: 100%; min-width: 0; height: 26px; padding: 0; border: 0; background: transparent; color: var(--spike-table-text, #d2dee1); font-size: 10px; }
+.net-manager .net-manager-add-loop { justify-self: start; }
+.net-manager-actions { min-width: 0; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.net-manager .net-manager-actions > button { min-width: 0; min-height: 28px; padding: 0 8px; white-space: nowrap; }
+.net-manager .net-manager-actions > button > span { overflow: hidden; text-overflow: ellipsis; }
+
+.net-manager .net-manager-body { min-width: 0; min-height: 0; display: grid; grid-template-columns: minmax(190px, 220px) minmax(0, 1fr); overflow: hidden; }
+.net-manager-selection-rail { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; padding: 10px 8px; border-right: 1px solid var(--spike-table-border, #2b404a); background: var(--spike-table-toolbar, #111e25); }
+.net-manager-selection-rail > h3 { flex: 0 0 auto; margin: 0 5px 7px; }
+.net-manager-selection-list { min-width: 0; min-height: 0; overflow: auto; scrollbar-width: thin; }
+.net-manager-selection-list > button { width: 100%; min-width: 0; min-height: 36px; display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; align-items: center; gap: 7px; border: 0; border-bottom: 1px solid var(--spike-table-border, #21343d); border-radius: 0; padding: 0 7px; background: transparent; color: var(--spike-table-text, #b9cbd0); text-align: left; }
+.net-manager-selection-list > button:hover, .net-manager-selection-list > button.active { background: var(--spike-table-hover, #1a2b34); }
+.net-manager-selection-list > button.active { box-shadow: inset 2px 0 var(--spike-table-edit, #59c8ca); color: var(--spike-table-text-strong, #eaf4f5); }
+.net-manager-selection-list > button b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+.net-manager-selection-list > button small { color: var(--spike-table-muted, #708993); font-size: 8px; text-transform: uppercase; }
+.net-manager-selection-list > p { margin: 8px; color: var(--spike-table-muted, #7e969f); font-size: 10px; line-height: 1.45; }
+.net-manager .net-manager-guidance { flex: 0 0 auto; display: block; margin-top: 8px; padding: 0; border: 1px solid var(--spike-table-border, #2f4650); border-left: 2px solid var(--spike-table-edit, #4a8291); border-radius: 3px; background: var(--spike-table-toolbar, #14262e); color: var(--spike-table-muted, #89a4ad); }
+.net-manager-guidance > summary { display: flex; align-items: center; gap: 6px; padding: 7px 8px; color: var(--spike-table-text, #aac0c7); font-size: 9px; cursor: pointer; list-style: none; }
+.net-manager-guidance > summary::-webkit-details-marker { display: none; }
+.net-manager-guidance > p { margin: 0; padding: 0 8px 8px; font-size: 9px; line-height: 1.45; }
+
+.net-manager .net-catalog { min-width: 0; min-height: 0; overflow: auto; padding: 9px; }
+.net-manager .net-catalog > .spike-data-table { --table-max-height: none; }
+.net-manager .net-table { width: 100%; min-width: 700px; }
+.net-manager .net-table th:first-child { min-width: 170px; }
+.net-manager .net-table select { width: 100%; }
+.net-manager .net-name { min-width: 0; }
+
+.net-manager .loop-editor { min-width: 0; padding: 12px; }
+.net-manager .loop-editor-heading > div { min-width: 0; }
+.net-manager .loop-editor-heading small { display: block; line-height: 1.4; }
+.net-manager .loop-conductor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.net-manager .loop-conductor-grid section, .net-manager .loop-model-link { border-radius: 4px; background: var(--spike-table-toolbar, #13232b); }
+.net-manager .loop-pad-control { min-width: 0; }
+.net-manager .loop-pad-control button { flex: 0 0 auto; }
+.net-manager .loop-validity { border-left-color: var(--spike-table-warning, #d19b41); }
+.net-manager-footer { min-width: 0; min-height: 40px; gap: 10px; }
+.net-manager-footer > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.net-manager-footer > button { flex: 0 0 auto; min-height: 28px; }
+
+.focus-tool-content .net-manager.net-manager { width: 100%; height: 100%; border: 0; border-radius: 0; }
+
+@container net-manager (max-width: 900px) {
+  .net-manager .net-manager-toolbar { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "tabs search" "actions actions"; }
+  .net-manager-tabs { grid-area: tabs; }
+  .net-manager-search, .net-manager-add-loop { grid-area: search; }
+  .net-manager-actions { grid-area: actions; justify-content: stretch; }
+  .net-manager .net-manager-actions > button { flex: 1 1 0; }
+  .net-manager .loop-conductor-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@container net-manager (max-width: 680px) {
+  .net-manager.net-manager { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+  .net-manager-header { padding: 7px 9px; }
+  .net-manager .net-manager-toolbar { grid-template-columns: minmax(0, 1fr); grid-template-areas: "tabs" "search" "actions"; padding: 7px; }
+  .net-manager .net-manager-tabs, .net-manager .net-manager-search, .net-manager .net-manager-add-loop { width: 100%; }
+  .net-manager .net-manager-add-loop { justify-self: stretch; }
+  .net-manager .net-manager-body { display: block; overflow: auto; }
+  .net-manager-selection-rail { max-height: 210px; overflow: hidden; border-right: 0; border-bottom: 1px solid var(--spike-table-border, #2b404a); }
+  .net-manager-selection-list { max-height: 122px; }
+  .net-manager .net-manager-guidance { margin-top: 6px; }
+  .net-manager .net-catalog { overflow: visible; padding: 7px; }
+  .net-manager .net-table { width: 100%; min-width: 0; table-layout: fixed; }
+  .net-manager .net-table > thead { display: none; }
+  .net-manager .spike-data-table table.net-table > tbody { display: block; }
+  .net-manager .spike-data-table table.net-table > tbody > tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding: 8px; border-bottom: 1px solid var(--spike-table-border, #2b404a); }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; height: auto; padding: 5px 6px; border: 0; overflow: hidden; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:first-child,
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(2) { grid-column: 1 / -1; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(n+3)::before { color: var(--spike-table-muted, #78909a); font-size: 8px; letter-spacing: .05em; text-transform: uppercase; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(3)::before { content: "Layers"; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(4)::before { content: "Tracks"; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(5)::before { content: "Vias"; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(6)::before { content: "Pads"; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(7)::before { content: "Zones"; }
+  .net-manager .spike-data-table table.net-table > tbody > tr > td:nth-child(8)::before { content: "Parts"; }
+  .net-manager .spike-data-table table.net-table .net-name { width: 100%; justify-content: flex-start; }
+  .net-manager .spike-data-table table.net-table select { min-width: 0; width: 100%; }
+  .net-manager .loop-editor { overflow: visible; padding: 9px; }
+  .net-manager-footer { padding: 6px 8px; }
+}
+
+@container net-manager (max-width: 400px) {
+  .net-manager-header small { display: none; }
+  .net-manager .net-manager-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .net-manager .net-manager-actions > button { width: 100%; padding: 0 4px; font-size: 9px; }
+  .net-manager .net-manager-actions > button svg { width: 13px; }
+  .net-manager .spike-data-table table.net-table > tbody > tr { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 6px; }
+  .net-manager .loop-pad-control, .net-manager .loop-model-link { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+  .net-manager .loop-pad-control button, .net-manager .loop-model-link button { width: 100%; justify-content: center; }
+  .net-manager .loop-selection-note { align-items: flex-start; }
+  .net-manager-footer > span { font-size: 8px; }
+}
+
+@media (forced-colors: active) {
+  .net-manager.net-manager, .net-manager-selection-rail, .net-manager .net-manager-guidance { border-color: CanvasText; }
+}

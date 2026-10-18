@@ -14,7 +14,7 @@ const jsx = { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({
 const source = readFileSync(new URL("../src/ShortcutManager.tsx", import.meta.url), "utf8");
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText;
 const module = { exports: {} };
-new Function("require", "module", "exports", compiled)(name => name === "react" ? react : name === "react/jsx-runtime" ? jsx : name === "./shortcutCatalog" ? model : {}, module, module.exports);
+new Function("require", "module", "exports", compiled)(name => name === "react" ? react : name === "react/jsx-runtime" ? jsx : name === "./shortcutCatalog" ? model : name === "./panelPresentation" ? { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) } : {}, module, module.exports);
 let shortcuts = { ...model.defaultShortcuts }, assignments = [], presets = [], resets = 0, closes = 0;
 const props = { shortcuts, onAssign(action, key) { assignments.push([action, key]); const conflict = Object.keys(shortcuts).find(other => other !== action && key && shortcuts[other] === key); if (conflict) shortcuts[conflict] = shortcuts[action]; shortcuts[action] = key; }, onPreset(name) { presets.push(name); }, onReset() { resets++; }, onClose() { closes++; } };
 const render = () => { index = 0; return module.exports.default(props); };

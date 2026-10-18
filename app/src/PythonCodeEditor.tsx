@@ -9,6 +9,7 @@ import { pythonHighlightWindow, updatePythonSyntaxCache, type PythonLineTokens, 
 import { pythonBoardNets, type PythonWorkspaceContext } from "./pythonWorkspaceContext";
 import { PYTHON_CODE_LIMIT } from "./pythonWorkspaceModel";
 import { PYTHON_TEMPLATES } from "./pythonWorkspaceTemplates";
+import { usePanelPresentation } from "./panelPresentation";
 import "./pythonCompletions.css";
 
 const EMPTY_WORKSPACE: PythonWorkspaceContext = { boards: [], selected_board_id: null, assembly: null };
@@ -34,6 +35,7 @@ export default function PythonCodeEditor({ code, documentKey, breakpoints, execu
   onInserted?: () => void; onChange: (code: string) => void; onBreakpoint: (line: number) => void;
   onCursor: (line: number, column: number) => void; onShortcut: (event: KeyboardEvent) => void;
 }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const editor = useRef<HTMLTextAreaElement>(null), container = useRef<HTMLDivElement>(null), popup = useRef<HTMLDivElement>(null), mirror = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(), syntaxCache = useRef<PythonSyntaxCache>();
   const rightClickSelection = useRef<{ start: number; end: number } | null>(null), active = useRef(true), currentCode = useRef(code), currentDocumentKey = useRef(documentKey);
@@ -51,14 +53,16 @@ export default function PythonCodeEditor({ code, documentKey, breakpoints, execu
   const apply = (edit: PythonEditorEdit) => {
     if (byteLength(edit.code) > PYTHON_CODE_LIMIT) { setClipboardStatus("Edit exceeds the 512 KB script limit."); reportCursor(); return false; }
     onChange(edit.code); setCompletion(null);
-    requestAnimationFrame(() => { const element = editor.current; if (!element) return; element.focus(); element.setSelectionRange(edit.start, edit.end); reportCursor(edit.code, edit.start); });
+    const view = ownerWindow ?? editor.current?.ownerDocument.defaultView;
+    view?.requestAnimationFrame(() => { const element = editor.current; if (!element) return; element.focus(); element.setSelectionRange(edit.start, edit.end); reportCursor(edit.code, edit.start); });
     return true;
   };
-  const restoreSelection = (start: number, end: number) => requestAnimationFrame(() => { const element = editor.current; if (!element) return; element.focus({ preventScroll: true }); element.setSelectionRange(start, end); reportCursor(code, start); });
+  const restoreSelection = (start: number, end: number) => (ownerWindow ?? editor.current?.ownerDocument.defaultView)?.requestAnimationFrame(() => { const element = editor.current; if (!element) return; element.focus({ preventScroll: true }); element.setSelectionRange(start, end); reportCursor(code, start); });
   const place = () => {
     const element = editor.current, root = container.current, measuring = mirror.current; if (!element || !root || !measuring) return;
-    const style = getComputedStyle(element); Object.assign(measuring.style, { font: style.font, letterSpacing: style.letterSpacing, lineHeight: style.lineHeight, padding: style.padding, tabSize: style.tabSize });
-    measuring.textContent = element.value.slice(0, element.selectionStart); const marker = document.createElement("span"); marker.textContent = "\u200b"; measuring.appendChild(marker);
+    const doc = ownerDocument ?? element.ownerDocument, view = ownerWindow ?? doc.defaultView; if (!view) return;
+    const style = view.getComputedStyle(element); Object.assign(measuring.style, { font: style.font, letterSpacing: style.letterSpacing, lineHeight: style.lineHeight, padding: style.padding, tabSize: style.tabSize });
+    measuring.textContent = element.value.slice(0, element.selectionStart); const marker = doc.createElement("span"); marker.textContent = "\u200b"; measuring.appendChild(marker);
     const point = marker.getBoundingClientRect(), bounds = measuring.getBoundingClientRect(), editorLeft = element.parentElement?.offsetLeft ?? element.offsetLeft;
     const x = editorLeft + point.left - bounds.left - element.scrollLeft, y = point.top - bounds.top - element.scrollTop;
     const width = Math.min(380, Math.max(180, root.clientWidth - editorLeft - 8)), popupHeight = Math.min(300, Math.max(110, root.clientHeight - 16));
@@ -93,7 +97,7 @@ export default function PythonCodeEditor({ code, documentKey, breakpoints, execu
     if (result.status === "ok") { const caret = selection.start + result.value.length; if (apply({ code: snapshot.slice(0, selection.start) + result.value + snapshot.slice(selection.end), start: caret, end: caret })) setClipboardStatus("Pasted Python source."); } else finishFailure("Paste", result, snapshot, snapshotKey, selection); if (active.current) setClipboardPending(false);
   })();
   useEffect(() => { const element = editor.current; if (!element || !insertion || locked) return; const start = element.selectionStart, end = element.selectionEnd; apply({ code: code.slice(0, start) + insertion.text + code.slice(end), start: start + insertion.text.length, end: start + insertion.text.length }); onInserted?.(); }, [insertion?.revision]);
-  useEffect(() => { const element = editor.current; if (!element) return; const update = () => setViewport(current => ({ ...current, height: element.clientHeight })); update(); const observer = new ResizeObserver(update); observer.observe(element); return () => observer.disconnect(); }, []);
+  useEffect(() => { const element = editor.current; if (!element) return; const view = (ownerWindow ?? element.ownerDocument.defaultView) as (Window & typeof globalThis) | null; if (!view) return; const update = () => setViewport(current => ({ ...current, height: element.clientHeight })); update(); if (!view.ResizeObserver) return; const observer = new view.ResizeObserver(update); observer.observe(element); return () => observer.disconnect(); }, [ownerWindow]);
   useEffect(() => { active.current = true; return () => { active.current = false; clearTimeout(timer.current); }; }, []);
   useEffect(() => { if (locked) { clearTimeout(timer.current); setCompletion(null); } }, [locked]);
   useEffect(() => { clearTimeout(timer.current); setCompletion(null); }, [workspace]);

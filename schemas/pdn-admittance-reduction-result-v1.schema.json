@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/pdn-admittance-reduction-result/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; dimensions, exact sample grid, numeric power and passivity gates remain solver responsibilities. Auxiliary basis is dimensionless; admittance/power identity matrices use siemens.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "nodes",
+    "retained_nodes",
+    "eliminated_nodes",
+    "source_nodes",
+    "reference_node",
+    "source_id",
+    "model_status",
+    "production_qualified",
+    "frequencies_hz",
+    "admittance_s",
+    "auxiliary_voltage_basis",
+    "power_identity_matrix_s",
+    "diagnostics",
+    "limitations",
+    "source_digest",
+    "input_digest",
+    "context_digest",
+    "termination_admittance_s"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/pdn-admittance-reduction-result/v1"
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "retained_nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "eliminated_nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "source_nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      }
+    },
+    "reference_node": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "source_id": {
+      "type": "string"
+    },
+    "model_status": {
+      "enum": [
+        "approximate",
+        "experimental"
+      ]
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "frequencies_hz": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "admittance_s": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 32,
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "real",
+              "imag"
+            ],
+            "properties": {
+              "real": {
+                "type": "number"
+              },
+              "imag": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "auxiliary_voltage_basis": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 32,
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "real",
+              "imag"
+            ],
+            "properties": {
+              "real": {
+                "type": "number"
+              },
+              "imag": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "power_identity_matrix_s": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 32,
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "real",
+              "imag"
+            ],
+            "properties": {
+              "real": {
+                "type": "number"
+              },
+              "imag": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "context_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "termination_admittance_s": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 512,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 32,
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "real",
+              "imag"
+            ],
+            "properties": {
+              "real": {
+                "type": "number"
+              },
+              "imag": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

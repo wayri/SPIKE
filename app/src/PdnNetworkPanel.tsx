@@ -18,7 +18,9 @@ export function examplePdnRequest(reference = "GND"): Record<string, unknown> {
 
 type NetworkResult = { contract: string; model_status: string; port_ids: string[];
   ac: { frequency_hz: number; impedance_ohm: { real: number; imag: number }[][]; node_transfer_impedance_ohm: Record<string, { real: number; imag: number }[]> }[];
-  load_transient: null | { load_port_id: string; points: { time_s: number; port_voltage_v: Record<string, number>; node_voltage_v: Record<string, number> }[]; energy_balance_error_j: number };
+  load_transient: null | { load_port_id?: string; load_port_ids?: string[];
+    points: { time_s: number; load_current_a?: number; load_current_a_by_port?: Record<string, number>;
+      port_voltage_v: Record<string, number>; node_voltage_v: Record<string, number> }[]; energy_balance_error_j: number };
   diagnostics: { max_ac_relative_residual: number; limitations: string[] } };
 
 export function validPdnNetworkResult(value: unknown): value is NetworkResult {
@@ -47,12 +49,22 @@ export function validPdnNetworkResult(value: unknown): value is NetworkResult {
   if (result.load_transient !== null) {
     const transient = result.load_transient;
     if (!transient || !Array.isArray(transient.points) || transient.points.length < 1 || transient.points.length > 2048) return false;
+    const multiple = "load_port_ids" in transient;
+    const loads = multiple ? transient.load_port_ids : [transient.load_port_id];
+    if (!Array.isArray(loads) || loads.length < 1 || loads.length > 16
+      || loads.some(id => typeof id !== "string" || !result.port_ids.includes(id))
+      || new Set(loads).size !== loads.length || (multiple && "load_port_id" in transient)) return false;
     previous = -1;
     for (const point of transient.points) {
       if (!point || typeof point !== "object" || !finite(point.time_s) || point.time_s <= previous || !point.port_voltage_v || !point.node_voltage_v
         || result.port_ids.some(p => !finite(point.port_voltage_v[p])) || Object.keys(point.node_voltage_v).length > 64
         || Object.keys(point.node_voltage_v).length !== nodeKeys.length || nodeKeys.some(node => !(node in point.node_voltage_v))
         || Object.values(point.node_voltage_v).some(v => !finite(v))) return false;
+      if (multiple) {
+        if ("load_current_a" in point || !point.load_current_a_by_port
+          || Object.keys(point.load_current_a_by_port).length !== loads.length
+          || loads.some(id => !finite(point.load_current_a_by_port![id!]))) return false;
+      } else if (!finite(point.load_current_a) || "load_current_a_by_port" in point) return false;
       previous = point.time_s;
     }
   }

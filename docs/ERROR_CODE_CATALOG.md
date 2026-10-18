@@ -121,7 +121,7 @@ issued entry.
 | `SPIKE-BE-IMPORT-E-0002` | MCAD assembly import failed | Save the project, verify the STEP or glTF artifact and embedded resources, then retry. |
 | `SPIKE-BE-VIEW-E-0001` | Board visual preparation failed | Keep completed stages, review the failed-stage diagnostic, correct its source or local tool issue, and retry that stage. |
 | `SPIKE-BE-MESH-W-0001` | Mesh validity warning | Inspect diagnostics and refine geometry or settings. |
-| `SPIKE-BE-MESH-W-0002` | Copper polygon is unusable | Repair or refill the identified copper zone, re-import it, and inspect the mesh preview. |
+| `SPIKE-BE-MESH-W-0002` | Copper polygon is unusable | Check application/worker versions and the [KiCad filled-plane guidance](MESHING_ENGINE.md#kicad-filled-planes-and-zero-width-cuts) before changing copper; older meshers reject valid zero-width-cut holes. Inspect the identified source zone and mesh diagnostics. |
 | `SPIKE-BE-MESH-W-0003` | Pad geometry approximated | Inspect the pad and use a polygon-preserving import path when exact geometry is required. |
 | `SPIKE-BE-MESH-W-0004` | Copper geometry skipped | Repair the identified copper primitive dimensions and re-import before solving. |
 | `SPIKE-BE-MESH-E-0001` | Conductor mesh escaped source geometry | Inspect the identified source geometry and mesh settings; do not solve until ownership validation passes. |

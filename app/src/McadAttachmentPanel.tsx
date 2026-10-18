@@ -4,6 +4,7 @@ import { runNativeProjectWorker, selectNativeMcadFile, type NativeSelectedFile }
 import { buildAssemblyHierarchy, localTransformFromAssembly, MAX_ASSEMBLY_SECTION_PLANES, nextAssemblySectionPlane, partVisualSettings, placementFromTransform, placementPolicySettings, transformFromPlacement, validReparentTargets, type AssemblyDesigns, type AssemblyHierarchyNode, type AssemblyIr, type AssemblyPartVisual, type AssemblyPlacement, type AssemblySection, type AssemblySectionPlane } from "./mcadAssembly";
 import AssemblySemanticsEditor from "./AssemblySemanticsEditor";
 import AssemblyTopologyEditor from "./AssemblyTopologyEditor";
+import MaterialLibraryPanel from "./MaterialLibraryPanel";
 import { packageShapeForPart, type AssemblyPackageShapesIndex, type TopologyReference } from "./assemblyPackageShapes";
 
 type Props = {
@@ -41,7 +42,7 @@ function HierarchyBranch({ node, selectedPartId, onSelectPart }: { node: Assembl
   </li>;
 }
 
-export default function McadAttachmentPanel({ initialSource, projectPath, projectManifestDigest, assemblyIr, assemblyPackageShapes, focusedPartId, focusedTopologyReference, desktopShell, isolatedPartId, section, onIsolatedPart, onSection, onAttached, onStatus, onClose, onOpenHarnessEditor, onOpenAssemblyWorkspace }: Props) {
+export default function McadAttachmentPanel({ initialSource, projectPath, projectManifestDigest, assemblyIr, assemblyDesigns, assemblyPackageShapes, focusedPartId, focusedTopologyReference, desktopShell, isolatedPartId, section, onIsolatedPart, onSection, onAttached, onStatus, onClose, onOpenHarnessEditor, onOpenAssemblyWorkspace }: Props) {
   const [source, setSource] = useState<NativeSelectedFile | null>(initialSource ?? null);
   const [name, setName] = useState(initialSource?.fileName.replace(/\.(?:step|stp|gltf|glb)$/i, "") ?? "");
   useEffect(() => {
@@ -341,7 +342,8 @@ export default function McadAttachmentPanel({ initialSource, projectPath, projec
     <section className="mcad-attachment-panel">
       <header><div><Box size={18} /><span><b id="mcad-attachment-title">MCAD assembly</b><small>Transactional attachment and numeric placement</small></span></div><button className="canvas-icon" onClick={onClose} title="Close MCAD assembly"><X size={16} /></button></header>
       <div className="mcad-attachment-body">
-        <div className="mcad-boundary-note"><ShieldAlert size={16} /><span><b>Qualification boundary</b>STEP/STP is retained and may be tessellated by the bounded optional FreeCAD adapter for viewport display. A separate bounded extraction can retain an exact BREP plus source-owned face, edge, axis, solid, shell, and vertex selectors. Self-contained glTF/GLB remains visual-only. Neither tessellation nor exact-selector extraction establishes a solver mesh, material region, contact physics, or production-qualified geometry. Material IDs are explicit labels only; no material properties, contact, bond, boundary, or solver semantics are inferred.</span></div>
+        <MaterialLibraryPanel projectPath={projectPath} manifestDigest={projectManifestDigest} assembly={assemblyIr} designs={assemblyDesigns} desktopShell={desktopShell} onUpdated={onAttached} onStatus={onStatus} />
+        <div className="mcad-boundary-note"><ShieldAlert size={16} /><span><b>Qualification boundary</b>STEP/STP is retained and may be tessellated by the bounded optional FreeCAD adapter for viewport display. A separate bounded extraction can retain an exact BREP plus source-owned face, edge, axis, solid, shell, and vertex selectors. Self-contained glTF/GLB remains visual-only. Neither tessellation nor exact-selector extraction establishes a solver mesh, material region, contact physics, or production-qualified geometry. Free-text material IDs remain labels. Use Material library to retain explicit property snapshots; contact, bond, boundary and solver semantics are never inferred.</span></div>
         {!desktopShell && <p className="mcad-gate">MCAD attachment requires the SPIKE desktop shell.</p>}
         {desktopShell && !projectPath && <p className="mcad-gate">Save this project as a native <code>.spike</code> package before attaching MCAD.</p>}
         <button className="mcad-source-picker" onClick={() => void pickSource()} disabled={!desktopShell || busy}><FileBox size={17} /><span><b>{source?.fileName ?? "Select STEP, STP, glTF, or GLB"}</b><small>{source?.path ?? "The native picker approves this exact source path for one project operation."}</small></span></button>

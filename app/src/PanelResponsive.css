@@ -1,0 +1,124 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Import after styles.css and FocusWorkspace.css. These rules adapt legacy deep grids to their panel, not the browser viewport. */
+
+.spice-workbench.spice-workbench {
+  box-sizing: border-box;
+  width: min(1420px, calc(100% - 32px));
+  height: min(820px, calc(100% - 32px));
+  max-width: 100%;
+  max-height: 100%;
+  container: spice-workbench / inline-size;
+}
+.focus-tool-content .spice-workbench.spice-workbench { width: 100% !important; height: 100% !important; max-height: 100% !important; }
+
+@container spice-workbench (max-width: 900px) {
+  .spice-toolbar { flex-wrap: wrap; }
+  .spice-toolbar > span { margin-left: 0; }
+  .spice-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spice-split-page { grid-template-columns: minmax(170px, 210px) minmax(0, 1fr); }
+  .spice-assignment-page { grid-template-columns: minmax(170px, 210px) minmax(0, 1fr); }
+  .spice-assignment-inspector { grid-column: 1 / -1; border-top: 1px solid var(--spike-table-border); border-left: 0; }
+  .spice-run-layout { min-height: 0; grid-template-columns: minmax(0, 1fr); }
+  .spice-run-layout textarea { min-height: 300px; }
+  .spice-run-layout > aside { max-height: 360px; }
+  .spice-binding { grid-template-columns: minmax(0, 1fr) minmax(150px, .6fr); }
+  .spice-binding > small { grid-column: 1 / -1; }
+}
+
+@container spice-workbench (max-width: 540px) {
+  .spice-workbench > header, .spice-workbench > footer { min-height: 44px; flex-wrap: wrap; padding: 7px 9px; }
+  .spice-workbench > header small { white-space: normal; overflow-wrap: anywhere; }
+  .spice-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 6px; }
+  .spice-toolbar > button { width: 100%; min-width: 0; padding-inline: 5px; }
+  .spice-toolbar > span { grid-column: 1 / -1; justify-self: start; }
+  .spice-setup-page, .spice-parasitics-page, .spice-run-page { padding: 9px; }
+  .spice-section-heading { align-items: stretch; flex-direction: column; }
+  .spice-section-heading > button { align-self: start; }
+  .spice-form-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .spice-flow-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .spice-flow-summary > div { min-width: 0; }
+  .spice-flow-summary > i { display: none; }
+  .spice-split-page, .spice-assignment-page { display: block; min-height: 0; }
+  .spice-split-page > aside, .spice-assignment-page > aside:not(.spice-assignment-inspector) { max-height: 190px; border-right: 0; border-bottom: 1px solid var(--spike-table-border); }
+  .spice-split-page > main, .spice-assignment-page > main, .spice-assignment-inspector { padding: 9px; }
+  .spice-assign-command { align-items: stretch; flex-direction: column; }
+  .spice-assign-command > button { align-self: stretch; }
+  .spice-assignment-inspector { border-top: 1px solid var(--spike-table-border); }
+  .spice-pin-table { min-width: 390px; }
+  .spice-rating-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .spice-run-controls { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+  .spice-run-controls label { align-items: stretch; display: grid; grid-template-columns: minmax(90px, auto) minmax(0, 1fr); }
+  .spice-run-controls input, .spice-run-controls select { width: 100%; }
+  .spice-validation-summary { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .spice-binding { grid-template-columns: minmax(0, 1fr); padding: 8px; }
+  .spice-binding > small { grid-column: 1; }
+  .spice-workbench > footer > span { flex: 1 1 100%; }
+  .spice-workbench > footer > button { margin-left: auto; }
+}
+
+@container spice-workbench (max-width: 360px) {
+  .spice-toolbar { grid-template-columns: minmax(0, 1fr); }
+  .spice-toolbar > span { grid-column: 1; }
+  .spice-flow-summary, .spice-rating-grid { grid-template-columns: minmax(0, 1fr); }
+  .spice-assignment-list > button { grid-template-columns: 60px minmax(0, 1fr); }
+  .spice-assignment-list > button small { grid-column: 2; }
+  .spice-run-controls label { grid-template-columns: minmax(0, 1fr); }
+}
+
+.emi-dashboard.emi-dashboard { container: emi-dashboard / inline-size; }
+.focus-tool-content .emi-dashboard.emi-dashboard,
+.emi-dashboard-embedded > .emi-dashboard.emi-dashboard {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  box-shadow: none;
+}
+.emi-dashboard > footer p { display: flex; }
+
+@container emi-dashboard (max-width: 900px) {
+  .emi-dashboard-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .emi-dashboard-body { grid-template-columns: minmax(210px, .75fr) minmax(0, 1.25fr); }
+  .emi-dashboard-body > section:last-child { grid-column: 1 / -1; border-top: 1px solid var(--spike-table-border); }
+  .emi-polar-result { grid-template-columns: minmax(0, 1fr); }
+  .emi-field-metrics { border-top: 1px solid var(--spike-table-border); border-left: 0; }
+}
+
+@container emi-dashboard (max-width: 540px) {
+  .emi-dashboard > header { min-height: 48px; padding: 7px 9px; }
+  .emi-dashboard > header small { line-height: 1.35; }
+  .emi-dashboard-summary article { min-height: 52px; padding: 8px; }
+  .emi-dashboard-body { display: block; overflow: auto; }
+  .emi-dashboard-body > section, .emi-dashboard-body > section:last-child { padding: 10px; border-right: 0; border-bottom: 1px solid var(--spike-table-border); }
+  .emi-ranking > header { display: none; }
+  .emi-ranking > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 9px; padding: 9px; }
+  .emi-ranking > div > :is(b, span, strong, small) { min-width: 0; display: grid; gap: 2px; white-space: normal; overflow-wrap: anywhere; }
+  .emi-ranking > div > b::before { content: "Priority"; }
+  .emi-ranking > div > span::before { content: "Net"; }
+  .emi-ranking > div > strong::before { content: "Score"; }
+  .emi-ranking > div > small::before { content: "Evidence"; }
+  .emi-ranking > div > :is(b, span, strong, small)::before { color: var(--spike-table-muted); font-size: 7px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }
+  .emi-field-toolbar { align-items: stretch; flex-direction: column; }
+  .emi-field-validity { align-self: start; }
+  .emi-dashboard > footer { flex-wrap: wrap; padding: 7px 9px; }
+  .emi-dashboard > footer p { flex: 1 1 100%; white-space: normal; line-height: 1.4; }
+  .emi-dashboard > footer button { flex: 1 1 160px; }
+}
+
+@container emi-dashboard (max-width: 360px) {
+  .emi-dashboard-summary { grid-template-columns: minmax(0, 1fr); }
+  .emi-dashboard-summary article { border-right: 0; border-bottom: 1px solid var(--spike-table-border); }
+  .emi-stage-grid article { grid-template-columns: 22px minmax(0, 1fr); }
+  .emi-stage-grid article > em { grid-column: 2; }
+  .emi-ranking > div, .emi-field-metrics { grid-template-columns: minmax(0, 1fr); }
+  .emi-dashboard > footer button { flex-basis: 100%; }
+}
+
+@container (max-width: 360px) {
+  .emi-field-grid { grid-template-columns: minmax(0, 1fr); }
+  .emi-inline-actions { align-items: stretch; flex-direction: column; }
+  .emi-inline-actions > button { width: 100%; }
+  .emi-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

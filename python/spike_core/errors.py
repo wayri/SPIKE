@@ -281,10 +281,10 @@ _CATALOG_ENTRIES = (
     _metadata(
         "SPIKE-BE-MESH-W-0002",
         "Copper polygon is unusable",
-        "An imported copper polygon is invalid, self-intersecting, empty, or cannot be triangulated.",
+        "A copper boundary was not admitted: it may be empty, genuinely self-intersecting, unsupported, or beyond the mesher limits.",
         recoverable=True,
         retryable=True,
-        user_action="Repair or refill the identified copper zone in the source design, re-import it, and inspect the mesh preview.",
+        user_action="Check application and worker versions and inspect the identified source zone and mesh diagnostics. Older meshers reject valid KiCad filled holes joined by zero-width cuts; do not remove holes or alter valid copper to silence the warning.",
     ),
     _metadata(
         "SPIKE-BE-MESH-W-0003",

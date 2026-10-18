@@ -1,0 +1,2766 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "base_request",
+    "corners",
+    "target_impedance_ohm_by_port",
+    "sites",
+    "inventory",
+    "budget_minor",
+    "max_capacitors",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "base_input_digest",
+    "selected_id",
+    "selected_result",
+    "configurations",
+    "meets_target",
+    "diagnostics",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/pdn-decap-selection-result/v1"
+    },
+    "base_request": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$comment": "SPDX-License-Identifier: Apache-2.0; topology, monotone grids, finite SI values and resource work bounds additionally checked by typed admission.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "reference",
+        "nodes",
+        "elements",
+        "ports",
+        "frequencies_hz",
+        "load_transient"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/pdn-network-request/v1"
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "positive",
+                  "negative",
+                  "resistance_ohm"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "resistor"
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "resistance_ohm": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "positive",
+                  "negative",
+                  "inductance_h",
+                  "resistance_ohm"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "inductor"
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "inductance_h": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "resistance_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "positive",
+                  "negative",
+                  "inductance_h",
+                  "resistance_ohm"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "dm_choke"
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "inductance_h": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "resistance_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "positive",
+                  "negative",
+                  "capacitance_f"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "capacitor"
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "capacitance_f": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "positive",
+                  "negative",
+                  "capacitance_f",
+                  "esr_ohm",
+                  "esl_h"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "decap"
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "capacitance_f": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "esr_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "esl_h": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "positive",
+                  "negative",
+                  "resistance_ohm",
+                  "inductance_h"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "source_output_impedance"
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "resistance_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "inductance_h": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "node",
+                  "capacitance_f"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "net_ground_capacitance"
+                  },
+                  "node": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "capacitance_f": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "provenance",
+                  "type",
+                  "winding_a",
+                  "winding_b",
+                  "coupling_coefficient",
+                  "polarity"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "kind",
+                      "source_id"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "supplied",
+                          "measured",
+                          "extracted"
+                        ]
+                      },
+                      "source_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  "type": {
+                    "const": "cm_choke"
+                  },
+                  "winding_a": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "positive",
+                      "negative",
+                      "inductance_h",
+                      "resistance_ohm"
+                    ],
+                    "properties": {
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "inductance_h": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "resistance_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "winding_b": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "positive",
+                      "negative",
+                      "inductance_h",
+                      "resistance_ohm"
+                    ],
+                    "properties": {
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "inductance_h": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "resistance_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "coupling_coefficient": {
+                    "type": "number",
+                    "minimum": 0,
+                    "exclusiveMaximum": 1
+                  },
+                  "polarity": {
+                    "enum": [
+                      "a_positive_to_b_positive",
+                      "opposing"
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 128
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "mode",
+                  "positive",
+                  "negative"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "mode": {
+                    "enum": [
+                      "single",
+                      "differential"
+                    ]
+                  },
+                  "positive": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "negative": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "mode",
+                  "positive_nodes",
+                  "negative_nodes"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "mode": {
+                    "const": "common"
+                  },
+                  "positive_nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  },
+                  "negative_nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "minItems": 2,
+                    "maxItems": 2
+                  }
+                }
+              }
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "minItems": 1,
+          "maxItems": 512
+        },
+        "load_transient": {
+          "type": "null"
+        }
+      }
+    },
+    "corners": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "bias_voltage_v",
+          "temperature_k"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "bias_voltage_v": {
+            "type": "number",
+            "minimum": 0
+          },
+          "temperature_k": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "target_impedance_ohm_by_port": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 16,
+      "additionalProperties": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "sites": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "positive",
+          "negative",
+          "options"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "positive": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "negative": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "options": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "part_id",
+                "unit_cost_minor",
+                "provenance",
+                "corners"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "part_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "unit_cost_minor": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "provenance": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "source_id"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "supplied",
+                        "measured",
+                        "extracted"
+                      ]
+                    },
+                    "source_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  }
+                },
+                "corners": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "corner_id",
+                      "capacitance_f",
+                      "esr_ohm",
+                      "esl_h"
+                    ],
+                    "properties": {
+                      "corner_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "capacitance_f": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "esr_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "esl_h": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "inventory": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "part_id",
+          "max_quantity"
+        ],
+        "properties": {
+          "part_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "max_quantity": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "budget_minor": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_capacitors": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "base_input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "selected_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "selected_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "model_status",
+        "production_qualified",
+        "input_digest",
+        "base_input_digest",
+        "base_request",
+        "corner_ids",
+        "port_ids",
+        "frequencies_hz",
+        "target_impedance_ohm_by_port",
+        "corners",
+        "meets_target",
+        "worst_case",
+        "diagnostics",
+        "limitations"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/pdn-decap-corners-result/v1"
+        },
+        "model_status": {
+          "const": "experimental"
+        },
+        "production_qualified": {
+          "const": false
+        },
+        "input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "base_input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "base_request": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "$comment": "SPDX-License-Identifier: Apache-2.0; topology, monotone grids, finite SI values and resource work bounds additionally checked by typed admission.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contract",
+            "reference",
+            "nodes",
+            "elements",
+            "ports",
+            "frequencies_hz",
+            "load_transient"
+          ],
+          "properties": {
+            "contract": {
+              "const": "spike/pdn-network-request/v1"
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "nodes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "minItems": 1,
+              "maxItems": 64
+            },
+            "elements": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "positive",
+                      "negative",
+                      "resistance_ohm"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "resistor"
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "resistance_ohm": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "positive",
+                      "negative",
+                      "inductance_h",
+                      "resistance_ohm"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "inductor"
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "inductance_h": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "resistance_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "positive",
+                      "negative",
+                      "inductance_h",
+                      "resistance_ohm"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "dm_choke"
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "inductance_h": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "resistance_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "positive",
+                      "negative",
+                      "capacitance_f"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "capacitor"
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "capacitance_f": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "positive",
+                      "negative",
+                      "capacitance_f",
+                      "esr_ohm",
+                      "esl_h"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "decap"
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "capacitance_f": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "esr_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "esl_h": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "positive",
+                      "negative",
+                      "resistance_ohm",
+                      "inductance_h"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "source_output_impedance"
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "resistance_ohm": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "inductance_h": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "node",
+                      "capacitance_f"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "net_ground_capacitance"
+                      },
+                      "node": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "capacitance_f": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "provenance",
+                      "type",
+                      "winding_a",
+                      "winding_b",
+                      "coupling_coefficient",
+                      "polarity"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "provenance": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "kind",
+                          "source_id"
+                        ],
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "supplied",
+                              "measured",
+                              "extracted"
+                            ]
+                          },
+                          "source_id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          }
+                        }
+                      },
+                      "type": {
+                        "const": "cm_choke"
+                      },
+                      "winding_a": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "positive",
+                          "negative",
+                          "inductance_h",
+                          "resistance_ohm"
+                        ],
+                        "properties": {
+                          "positive": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "negative": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "inductance_h": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "resistance_ohm": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        }
+                      },
+                      "winding_b": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "positive",
+                          "negative",
+                          "inductance_h",
+                          "resistance_ohm"
+                        ],
+                        "properties": {
+                          "positive": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "negative": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "inductance_h": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "resistance_ohm": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        }
+                      },
+                      "coupling_coefficient": {
+                        "type": "number",
+                        "minimum": 0,
+                        "exclusiveMaximum": 1
+                      },
+                      "polarity": {
+                        "enum": [
+                          "a_positive_to_b_positive",
+                          "opposing"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 128
+            },
+            "ports": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "mode",
+                      "positive",
+                      "negative"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "mode": {
+                        "enum": [
+                          "single",
+                          "differential"
+                        ]
+                      },
+                      "positive": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "negative": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "mode",
+                      "positive_nodes",
+                      "negative_nodes"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      },
+                      "mode": {
+                        "const": "common"
+                      },
+                      "positive_nodes": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "negative_nodes": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 16
+            },
+            "frequencies_hz": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "minItems": 1,
+              "maxItems": 512
+            },
+            "load_transient": {
+              "type": "null"
+            }
+          }
+        },
+        "corner_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "port_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 512,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "target_impedance_ohm_by_port": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "corners": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "corner",
+              "generated_request",
+              "generated_input_digest",
+              "element_mapping",
+              "network_result",
+              "samples",
+              "meets_target",
+              "worst_case"
+            ],
+            "properties": {
+              "corner": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "bias_voltage_v",
+                  "temperature_k"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "bias_voltage_v": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "temperature_k": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "generated_request": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "$comment": "SPDX-License-Identifier: Apache-2.0; topology, monotone grids, finite SI values and resource work bounds additionally checked by typed admission.",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contract",
+                  "reference",
+                  "nodes",
+                  "elements",
+                  "ports",
+                  "frequencies_hz",
+                  "load_transient"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "spike/pdn-network-request/v1"
+                  },
+                  "reference": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "minItems": 1,
+                    "maxItems": 64
+                  },
+                  "elements": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "positive",
+                            "negative",
+                            "resistance_ohm"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "resistor"
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "resistance_ohm": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "positive",
+                            "negative",
+                            "inductance_h",
+                            "resistance_ohm"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "inductor"
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "inductance_h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "resistance_ohm": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "positive",
+                            "negative",
+                            "inductance_h",
+                            "resistance_ohm"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "dm_choke"
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "inductance_h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "resistance_ohm": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "positive",
+                            "negative",
+                            "capacitance_f"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "capacitor"
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "capacitance_f": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "positive",
+                            "negative",
+                            "capacitance_f",
+                            "esr_ohm",
+                            "esl_h"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "decap"
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "capacitance_f": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "esr_ohm": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "esl_h": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "positive",
+                            "negative",
+                            "resistance_ohm",
+                            "inductance_h"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "source_output_impedance"
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "resistance_ohm": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "inductance_h": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "node",
+                            "capacitance_f"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "net_ground_capacitance"
+                            },
+                            "node": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "capacitance_f": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "provenance",
+                            "type",
+                            "winding_a",
+                            "winding_b",
+                            "coupling_coefficient",
+                            "polarity"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "provenance": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "kind",
+                                "source_id"
+                              ],
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "supplied",
+                                    "measured",
+                                    "extracted"
+                                  ]
+                                },
+                                "source_id": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              }
+                            },
+                            "type": {
+                              "const": "cm_choke"
+                            },
+                            "winding_a": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "positive",
+                                "negative",
+                                "inductance_h",
+                                "resistance_ohm"
+                              ],
+                              "properties": {
+                                "positive": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                },
+                                "negative": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                },
+                                "inductance_h": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "resistance_ohm": {
+                                  "type": "number",
+                                  "minimum": 0
+                                }
+                              }
+                            },
+                            "winding_b": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "positive",
+                                "negative",
+                                "inductance_h",
+                                "resistance_ohm"
+                              ],
+                              "properties": {
+                                "positive": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                },
+                                "negative": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                },
+                                "inductance_h": {
+                                  "type": "number",
+                                  "exclusiveMinimum": 0
+                                },
+                                "resistance_ohm": {
+                                  "type": "number",
+                                  "minimum": 0
+                                }
+                              }
+                            },
+                            "coupling_coefficient": {
+                              "type": "number",
+                              "minimum": 0,
+                              "exclusiveMaximum": 1
+                            },
+                            "polarity": {
+                              "enum": [
+                                "a_positive_to_b_positive",
+                                "opposing"
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 128
+                  },
+                  "ports": {
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "mode",
+                            "positive",
+                            "negative"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "mode": {
+                              "enum": [
+                                "single",
+                                "differential"
+                              ]
+                            },
+                            "positive": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "negative": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "id",
+                            "mode",
+                            "positive_nodes",
+                            "negative_nodes"
+                          ],
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "mode": {
+                              "const": "common"
+                            },
+                            "positive_nodes": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "minItems": 2,
+                              "maxItems": 2
+                            },
+                            "negative_nodes": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "minItems": 2,
+                              "maxItems": 2
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 16
+                  },
+                  "frequencies_hz": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "minItems": 1,
+                    "maxItems": 512
+                  },
+                  "load_transient": {
+                    "type": "null"
+                  }
+                }
+              },
+              "generated_input_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "element_mapping": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 16,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "capacitor_id",
+                    "element_id",
+                    "provenance",
+                    "capacitance_f",
+                    "esr_ohm",
+                    "esl_h"
+                  ],
+                  "properties": {
+                    "capacitor_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "element_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "provenance": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "source_id"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "supplied",
+                            "measured",
+                            "extracted"
+                          ]
+                        },
+                        "source_id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        }
+                      }
+                    },
+                    "capacitance_f": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "esr_ohm": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "esl_h": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "network_result": {
+                "type": "object"
+              },
+              "samples": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 512,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "frequency_hz",
+                    "impedance_magnitude_ohm_by_port",
+                    "target_ratio_by_port",
+                    "meets_target"
+                  ],
+                  "properties": {
+                    "frequency_hz": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "impedance_magnitude_ohm_by_port": {
+                      "type": "object",
+                      "minProperties": 1,
+                      "maxProperties": 16,
+                      "additionalProperties": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "target_ratio_by_port": {
+                      "type": "object",
+                      "minProperties": 1,
+                      "maxProperties": 16,
+                      "additionalProperties": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "meets_target": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              "meets_target": {
+                "type": "boolean"
+              },
+              "worst_case": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "corner_id",
+                  "port_id",
+                  "frequency_hz",
+                  "impedance_magnitude_ohm",
+                  "target_impedance_ohm",
+                  "target_ratio"
+                ],
+                "properties": {
+                  "corner_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "port_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "frequency_hz": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "impedance_magnitude_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "target_impedance_ohm": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "target_ratio": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "meets_target": {
+          "type": "boolean"
+        },
+        "worst_case": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "corner_id",
+            "port_id",
+            "frequency_hz",
+            "impedance_magnitude_ohm",
+            "target_impedance_ohm",
+            "target_ratio"
+          ],
+          "properties": {
+            "corner_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "port_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "frequency_hz": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "impedance_magnitude_ohm": {
+              "type": "number",
+              "minimum": 0
+            },
+            "target_impedance_ohm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "target_ratio": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "diagnostics": {
+          "type": "object"
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$comment": "SPDX-License-Identifier: Apache-2.0; solver numerical admission and exact generated identities are additionally checked by runtime."
+    },
+    "configurations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "selection",
+          "cost_minor",
+          "capacitor_count",
+          "part_quantities",
+          "status",
+          "constraint_violations",
+          "meets_target",
+          "worst_case"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "selection": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "site_id",
+                "option_id",
+                "part_id"
+              ],
+              "properties": {
+                "site_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "option_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "part_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          },
+          "cost_minor": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "capacitor_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          },
+          "part_quantities": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "status": {
+            "enum": [
+              "constraint_rejected",
+              "evaluated"
+            ]
+          },
+          "constraint_violations": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 40,
+            "items": {
+              "type": "string"
+            }
+          },
+          "meets_target": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "worst_case": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "corner_id",
+                  "port_id",
+                  "frequency_hz",
+                  "impedance_magnitude_ohm",
+                  "target_impedance_ohm",
+                  "target_ratio"
+                ],
+                "properties": {
+                  "corner_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "port_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "frequency_hz": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "impedance_magnitude_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "target_impedance_ohm": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "target_ratio": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "meets_target": {
+      "type": "boolean"
+    },
+    "diagnostics": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/pdn-decap-selection-result/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; runtime enforces complete enumeration, ranking and source identity. Rejected configurations retain null electrical outcomes."
+}

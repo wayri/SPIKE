@@ -1,0 +1,11 @@
+{
+  "command": [
+    "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe",
+    "--version"
+  ],
+  "timeout_s": 15,
+  "returncode": 0,
+  "stdout": "10.0.6\n",
+  "stderr": "05:05:46: Error: Can't create registry key 'HKCU\\Software\\kicad-cli' (error 5: Access is denied.)\n05:05:46: Error: Can't open registry key 'HKCU\\Software\\kicad-cli' (error 5: Access is denied.)\n",
+  "elapsed_s": 3.4865892000016174
+}

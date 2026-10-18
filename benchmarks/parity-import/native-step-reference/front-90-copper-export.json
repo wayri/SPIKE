@@ -1,0 +1,23 @@
+{
+  "command": [
+    "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe",
+    "pcb",
+    "export",
+    "step",
+    "--force",
+    "--no-extra-pad-thickness",
+    "--include-pads",
+    "--include-tracks",
+    "--user-origin",
+    "0x0mm",
+    "--output",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-step-reference\\front-90-copper.step",
+    "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\native-step-reference\\front-90.kicad_pcb"
+  ],
+  "timeout_s": 30,
+  "returncode": 0,
+  "stdout": "STEP file 'C:/Users/yawar/Documents/agws/KiCAD_plugins/SPIKE/build/native-step-reference/front-90-copper.step' created.\n\nExport time 0.041 s\n",
+  "stderr": "05:06:10: Error: Can't create registry key 'HKCU\\Software\\kicad-cli' (error 5: Access is denied.)\n05:06:10: Error: Can't open registry key 'HKCU\\Software\\kicad-cli' (error 5: Access is denied.)\n",
+  "elapsed_s": 6.2454789000039455,
+  "output_sha256": "d1388b428e939ace82c7055ec48729eb8eeda69070e6ce4104098a7577221dfc"
+}

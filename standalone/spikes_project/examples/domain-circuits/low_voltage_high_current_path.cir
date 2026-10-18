@@ -1,0 +1,15 @@
+* SPDX-License-Identifier: Apache-2.0
+* Ideal 12-V source feeding a 0.1-ohm load through RLC path parasitics.
+Vsupply supply 0 PULSE(0 12 0 1u 1u 1 2)
+Rpath supply winding 20m
+Lpath winding output 100u IC=0
+Cbulk output 0 10m IC=0
+Rload output 0 100m
+.tran 10u 30m uic
+.control
+run
+set wr_singlescale
+set wr_vecnames
+wrdata low_voltage_high_current_path.csv v(output) i(Lpath)
+.endc
+.end

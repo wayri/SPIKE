@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 .python-code-editor { position: relative; overflow: hidden; }
 .python-caret-mirror { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; white-space: pre; width: max-content; }
-.python-completion-popup { position: absolute; z-index: 5; display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--spike-table-edit-border, #61aaa8); border-radius: 4px; box-shadow: 0 5px 16px #0007; background: var(--spike-table-surface, #11202a); font-size: 11px; }
+.python-completion-popup { position: absolute; z-index: 5; display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--spike-table-edit-border); border-radius: 4px; box-shadow: var(--spike-popup-shadow); background: var(--spike-table-surface); font-size: 11px; }
 .python-completion-popup [role="listbox"] { min-height: 0; overflow: auto; flex: 1; }
 .python-workspace .python-completion-popup button { display: flex; width: 100%; min-height: 27px; border: 0; border-radius: 0; padding: 4px 7px; gap: 8px; text-align: left; justify-content: flex-start; background: transparent; }
-.python-workspace .python-completion-popup button[aria-selected="true"] { background: var(--spike-table-selected, #254654); box-shadow: inset 2px 0 var(--spike-table-edit, #63c8bc); }
-.python-completion-popup button > small { flex: 0 0 52px; font-size: 9px; color: var(--spike-table-edit, #80c8d0); }
+.python-workspace .python-completion-popup button[aria-selected="true"] { background: var(--spike-table-row-focus); box-shadow: inset 2px 0 var(--spike-table-edit); }
+.python-completion-popup button > small { flex: 0 0 52px; font-size: 9px; color: var(--spike-table-edit); }
 .python-completion-popup button > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: Consolas, monospace; }
-.python-completion-popup button > em { max-width: 42%; font-size: 9px; font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--spike-table-muted, #acc2ca); }
-.python-completion-detail { flex: 0 0 auto; display: grid; gap: 5px; padding: 7px; border-top: 1px solid var(--spike-table-border, #344e59); }
+.python-completion-popup button > em { max-width: 42%; font-size: 9px; font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--spike-table-muted); }
+.python-completion-detail { flex: 0 0 auto; display: grid; gap: 5px; padding: 7px; border-top: 1px solid var(--spike-table-border); }
 .python-completion-detail > span { max-height: 55px; overflow: auto; overflow-wrap: anywhere; line-height: 1.4; }
-.python-completion-detail > small { color: var(--spike-table-muted, #acc2ca); font-size: 9px; }
+.python-completion-detail > small { color: var(--spike-table-muted); font-size: 9px; }

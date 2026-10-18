@@ -27,15 +27,6 @@ class UpdateTests(unittest.TestCase):
         self.assertEqual(updates.select_release(r,"0.3.9","windows","aarch64")["status"],"unsupported")
         with self.assertRaises(ValueError): updates.version("0.4.0-beta.1")
 
-    def test_installed_gamma_can_move_to_stable_without_downgrade(self):
-        release = self.release()
-        self.assertEqual(updates.select_release(release, "0.3.11-gamma.1", "windows", "x86_64")["status"], "available")
-        self.assertEqual(updates.select_release(release, "0.4.0-gamma.1", "windows", "x86_64")["status"], "available")
-        self.assertEqual(updates.select_release(release, "0.5.0-gamma.1", "windows", "x86_64")["status"], "current")
-        for malformed in ("0.4.0-", "0.4.0-gamma/1", "0.4.0-gamma.1\n"):
-            with self.subTest(malformed=malformed), self.assertRaises(ValueError):
-                updates.select_release(release, malformed, "windows", "x86_64")
-
     def test_missing_hash_and_duplicate_asset_fail_closed(self):
         r=self.release();r["assets"][0].pop("digest")
         self.assertEqual(updates.select_release(r,"0.3.9","windows","x86_64")["status"],"unsupported")

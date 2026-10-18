@@ -128,6 +128,7 @@ def main() -> int:
         "app/src/reportPreviewWindow.ts",
         "app/src/schematicWindow.ts",
         "app/src/assistantWindow.ts",
+        "app/src/panelWindowBridge.ts",
     }
     for path in typescript:
         name = relative(path)

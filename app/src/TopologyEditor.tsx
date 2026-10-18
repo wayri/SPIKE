@@ -15,6 +15,7 @@ import PdnNetworkPanel from "./PdnNetworkPanel";
 import { appendTopology } from "./topologyGeneration";
 import "./schematic.css";
 import { isDesktopShell, runLocalWorker } from "./workerBridge";
+import { usePanelPresentation } from "./panelPresentation";
 import { numericMaximum, numericMinimum } from "./numericRange";
 import {
   buildPowerTreeAnalysisPlan, calculatePowerTree, defaultTopologyPorts, emptyTopology,
@@ -119,6 +120,7 @@ export default function TopologyEditor({
   onUseForAnalysis: (model: TopologyModel, scenarioId: string, plan: PowerTreeAnalysisPlan) => void;
   onStatus: (message: string) => void;
 }) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const treeName = domain === "pi" ? "Power Tree" : "Channel Tree";
   const [acPdnOpen, setAcPdnOpen] = useState(false);
   const scenarios = topologyScenarios(model);
@@ -134,7 +136,7 @@ export default function TopologyEditor({
   const [generatorOpen, setGeneratorOpen] = useState(false);
   const [extractionPreview, setExtractionPreview] = useState<TopologyModel | null>(null);
   const [fitPending, setFitPending] = useState(true);
-  const [inspectorOpen, setInspectorOpen] = useState(() => window.innerWidth >= 1100);
+  const [inspectorOpen, setInspectorOpen] = useState(() => (ownerWindow?.innerWidth ?? 1100) >= 1100);
   const [pathMode, setPathMode] = useState<"add" | "replace">("add");
   const [modelAssistantOpen, setModelAssistantOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -319,8 +321,9 @@ export default function TopologyEditor({
     }
   };
   const exportTopologyText = () => {
+    if (!ownerDocument) return;
     const url = URL.createObjectURL(new Blob([textEquivalent], { type: "text/plain;charset=utf-8" }));
-    const anchor = document.createElement("a");
+    const anchor = ownerDocument.createElement("a");
     anchor.href = url;
     anchor.download = `${model.name.replace(/[^a-z0-9._-]+/gi, "-").replace(/^-|-$/g, "") || model.domain}-topology.spike-topology.txt`;
     anchor.click();
@@ -493,6 +496,7 @@ export default function TopologyEditor({
   };
 
   useEffect(() => {
+    const view = ownerWindow; if (!view) return;
     const onKey = (event: KeyboardEvent) => {
       if (canvasRef.current?.closest("[hidden]")) return;
       const target = event.target as HTMLElement | null;
@@ -503,8 +507,8 @@ export default function TopologyEditor({
       if (event.key === "Delete" || event.key === "Backspace") { event.preventDefault(); deleteSelected(); return; }
       if (event.key === "Escape") { setContextMenu(null); setLinkFrom(null); setWirePointer(null); setPendingDestructive(null); selectNodes([]); }
     };
-    window.addEventListener("keydown", onKey, true);
-    return () => window.removeEventListener("keydown", onKey, true);
+    view.addEventListener("keydown", onKey, true);
+    return () => view.removeEventListener("keydown", onKey, true);
   });
 
   useEffect(() => {

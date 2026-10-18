@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { defaultShortcuts, eventShortcutKey, fixedShortcuts, shortcutBindingIssue, shortcutGroups, shortcutLabels, type ShortcutAction, type ShortcutMap, type ShortcutPreset } from "./shortcutCatalog";
+import { usePanelPresentation } from "./panelPresentation";
 import "./buttonStandard.css";
 import "./ShortcutManager.css";
 
@@ -13,6 +14,7 @@ export type ShortcutManagerProps = {
 };
 
 export default function ShortcutManager({ shortcuts, onAssign, onReset, onPreset, onClose }: ShortcutManagerProps) {
+  const { ownerDocument } = usePanelPresentation();
   const [query, setQuery] = useState("");
   const [capturing, setCapturing] = useState<ShortcutAction | null>(null);
   const [notice, setNotice] = useState("");
@@ -20,10 +22,10 @@ export default function ShortcutManager({ shortcuts, onAssign, onReset, onPreset
   const dialog = useRef<HTMLDivElement>(null);
   const search = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    const previous = document.activeElement;
+    const previous = ownerDocument?.activeElement as HTMLElement | null;
     search.current?.focus();
-    return () => { if (previous instanceof HTMLElement && previous.isConnected) previous.focus(); };
-  }, []);
+    return () => { if (previous?.isConnected) previous.focus(); };
+  }, [ownerDocument]);
   const beginCapture = (action: ShortcutAction) => { setCapturing(action); setPending(null); setNotice(`Press the shortcut for ${shortcutLabels[action]}. Escape cancels; Delete clears.`); };
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     // Do not let assignments reach workspace or viewport hotkeys.
@@ -53,8 +55,8 @@ export default function ShortcutManager({ shortcuts, onAssign, onReset, onPreset
     if (event.key === "Tab") {
       const controls = [...(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input, select, a[href]') ?? [])];
       const first = controls[0], last = controls[controls.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      if (event.shiftKey && ownerDocument?.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && ownerDocument?.activeElement === last) { event.preventDefault(); first?.focus(); }
     }
   };
   const term = query.trim().toLowerCase();

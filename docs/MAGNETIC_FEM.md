@@ -196,3 +196,4 @@ relative criterion.
 Passing tests establish the listed mathematical limits. Machine CAD,
 air-boundary convergence, force-contour convergence, skin-depth resolution,
 measured material accuracy and device correlation remain separate evidence.
+

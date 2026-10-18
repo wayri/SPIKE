@@ -26,9 +26,16 @@ ring = record({"role": {"enum": ["outer", "cutout"]}, "start_mm": point, "segmen
 geometry = {"oneOf": [{"type": "null"}, record({"type": {"const": "step"}, "asset_sha256": sha}),
     record({"type": {"const": "board_outline"}, "rings": array(ring, 1, 256),
             "height_mm": {"type": "number", "exclusiveMinimum": 0}, "z_mm": {"type": "number"}})]}
+material_snapshot = record({"schema_version": {"const": 1}, "material_id": string, "revision": string,
+                            "digest": sha, "record": {"type": "object"}})
+layer_material_snapshots = {"type": "object", "minProperties": 1, "maxProperties": 256,
+                            "propertyNames": string, "additionalProperties": material_snapshot}
 session = record({"contract": {"const": "spike/mcad-session/v1"}, **header,
     "objects": array(record({**pose, "kind": {"enum": ["board", "part", "group"]},
-                              "parent_id": {"oneOf": [string, {"type": "null"}]}, "geometry": geometry}), 1),
+                              "parent_id": {"oneOf": [string, {"type": "null"}]}, "geometry": geometry,
+                              "material_snapshot": material_snapshot,
+                              "layer_material_snapshots": layer_material_snapshots},
+                            required=[*pose, "kind", "parent_id", "geometry"]), 1),
     "assets": {"type": "object", "maxProperties": 100, "propertyNames": sha,
                "additionalProperties": record({"type": {"const": "step"}, "data_base64": {"type": "string", "contentEncoding": "base64"}})},
     "diagnostics": array(string, 0, 1000)})

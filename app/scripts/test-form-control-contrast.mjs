@@ -6,10 +6,10 @@ const scriptDir = dirname(fileURLToPath(import.meta.url));
 const styles = readFileSync(resolve(scriptDir, "../src/styles.css"), "utf8");
 
 const requiredRules = [
-  [/:root\s*\{[\s\S]*?color-scheme:\s*dark\s*;/, "root dark color scheme"],
-  [/select\s*\{\s*color-scheme:\s*dark\s*;\s*\}/, "native select dark color scheme"],
-  [/select option,\s*select optgroup\s*\{[^}]*color:\s*#d9e2ea\s*;[^}]*background-color:\s*#0f1a21\s*;/, "option popup foreground and background"],
-  [/select option:disabled\s*\{[^}]*color:\s*#647b85\s*;/, "disabled option contrast"],
+  [/:root\s*\{[\s\S]*?color-scheme:\s*var\(--spike-table-scheme,\s*dark\)\s*;/, "theme-aware root color scheme with dark fallback"],
+  [/select\s*\{\s*color-scheme:\s*var\(--spike-table-scheme,\s*dark\)\s*;\s*\}/, "theme-aware native select color scheme"],
+  [/select option,\s*select optgroup\s*\{[^}]*color:\s*var\(--spike-text,\s*#[0-9a-f]{6}\)\s*;[^}]*background-color:\s*var\(--spike-surface-panel,\s*#[0-9a-f]{6}\)\s*;/i, "tokenized option popup foreground and background"],
+  [/select option:disabled\s*\{[^}]*color:\s*var\(--spike-text-muted,\s*#[0-9a-f]{6}\)\s*;/i, "tokenized disabled option contrast"],
 ];
 
 for (const [pattern, description] of requiredRules) {

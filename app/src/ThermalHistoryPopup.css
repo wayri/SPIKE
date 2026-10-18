@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 .thermal-history-popup { width: min(900px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); box-sizing: border-box; overflow: auto; padding: 16px; border: 1px solid var(--spike-table-border-strong); border-radius: 8px; color: var(--spike-table-text); background: var(--spike-table-surface); }
-.thermal-history-popup::backdrop { background: #0009; }
+.thermal-history-popup::backdrop { background: var(--spike-popup-backdrop); }
 .thermal-history-popup header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .thermal-history-popup h2 { margin: 0; font-size: 18px; }
 .thermal-history-popup p { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }

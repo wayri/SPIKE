@@ -63,6 +63,7 @@ class ReleaseAutomationTests(unittest.TestCase):
             return ''
         with patch.dict(os.environ, {'RELEASE_TAG': 'v0.3.0', 'RELEASE_COMMIT': 'a' * 40, 'GITHUB_REPOSITORY': 'example/spike'}), \
              patch.object(release, 'version', return_value='0.3.0'), \
+             patch.object(release, 'require_publication_identity'), \
              patch.object(release, 'tag_commit', return_value=None), \
              patch.object(release, 'gh', side_effect=fake_gh):
             with self.assertRaisesRegex(RuntimeError, 'upload failed'):
@@ -96,6 +97,7 @@ class ReleaseAutomationTests(unittest.TestCase):
         with patch.dict(os.environ, {'RELEASE_TAG': 'v0.3.0', 'RELEASE_COMMIT': 'a' * 40,
                                      'GITHUB_REPOSITORY': 'example/spike'}), \
                 patch.object(release, 'version', return_value='0.3.0'), \
+                patch.object(release, 'require_publication_identity'), \
                 patch.object(release, 'tag_commit', return_value=None), \
                 patch.object(release, 'gh', side_effect=fake_gh):
             release.publish(self.root)
@@ -104,6 +106,97 @@ class ReleaseAutomationTests(unittest.TestCase):
             self.assertIn('LLM-driven under human review', content)
             self.assertIn('https://github.com/example/spike/blob/v0.3.0/docs/LLM_DEVELOPMENT.md', content)
             self.assertIn('https://github.com/example/spike/blob/v0.3.0/LICENSE', content)
+
+    @staticmethod
+    def _candidate(*, author_name='wayri', author_email=release.CANONICAL_EMAIL,
+                   author_login='wayri', committer_name='wayri',
+                   committer_email=release.CANONICAL_EMAIL, committer_login='wayri'):
+        return {
+            'sha': 'a' * 40,
+            'author': {'login': author_login},
+            'committer': {'login': committer_login},
+            'commit': {
+                'author': {'name': author_name, 'email': author_email},
+                'committer': {'name': committer_name, 'email': committer_email},
+            },
+        }
+
+    def test_nonpublishing_check_does_not_require_publisher_identity(self):
+        with patch.dict(os.environ, {'RELEASE_TAG': 'v0.3.0'}, clear=True), \
+                patch.object(release, 'version', return_value='0.3.0'), \
+                patch.object(release.subprocess, 'check_output', return_value='a' * 40 + '\n'), \
+                patch.object(release, 'gh') as github:
+            self.assertEqual(release.check(self.root)['commit'], 'a' * 40)
+        github.assert_not_called()
+
+    def test_publish_rejects_wrong_authenticated_account_before_mutation(self):
+        calls = []
+
+        def fake_gh(*args, **kwargs):
+            calls.append(args)
+            if args == ('api', 'user'):
+                return json.dumps({'login': 'y-w-r'})
+            raise AssertionError(f'unexpected GitHub call: {args}')
+
+        with patch.dict(os.environ, {'RELEASE_TAG': 'v0.3.0', 'RELEASE_COMMIT': 'a' * 40,
+                                     'GITHUB_REPOSITORY': release.CANONICAL_REPOSITORY}, clear=True), \
+                patch.object(release, 'version', return_value='0.3.0'), \
+                patch.object(release, 'gh', side_effect=fake_gh):
+            with self.assertRaisesRegex(ValueError, 'publisher must be wayri'):
+                release.publish(self.root)
+        self.assertEqual(calls, [('api', 'user')])
+
+    def test_publish_rejects_wrong_commit_identity_before_mutation(self):
+        candidate = self._candidate(author_name='y-w-r', author_login='y-w-r')
+        calls = []
+
+        def fake_gh(*args, **kwargs):
+            calls.append(args)
+            if args == ('api', 'user'):
+                return json.dumps({'login': 'wayri'})
+            if args[:2] == ('api', f'repos/{release.CANONICAL_REPOSITORY}/commits/{"a" * 40}'):
+                return json.dumps(candidate)
+            raise AssertionError(f'unexpected GitHub call: {args}')
+
+        with patch.dict(os.environ, {'RELEASE_TAG': 'v0.3.0', 'RELEASE_COMMIT': 'a' * 40,
+                                     'GITHUB_REPOSITORY': release.CANONICAL_REPOSITORY}, clear=True), \
+                patch.object(release, 'version', return_value='0.3.0'), \
+                patch.object(release, 'gh', side_effect=fake_gh):
+            with self.assertRaisesRegex(ValueError, 'author must be wayri'):
+                release.publish(self.root)
+        self.assertFalse(any(call and call[0] == 'release' for call in calls))
+
+    def test_workflow_identity_uses_run_api_and_rejects_wrong_actor(self):
+        run = {'actor': {'login': 'y-w-r'}, 'triggering_actor': {'login': 'wayri'},
+               'repository': {'full_name': release.CANONICAL_REPOSITORY}, 'head_sha': 'a' * 40}
+        with patch.dict(os.environ, {'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ID': '123'}, clear=True), \
+                patch.object(release, 'gh', return_value=json.dumps(run)) as github:
+            with self.assertRaisesRegex(ValueError, 'actor and triggering actor'):
+                release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
+        github.assert_called_once_with('api', f'repos/{release.CANONICAL_REPOSITORY}/actions/runs/123')
+
+    def test_canonical_wayri_identity_passes(self):
+        candidate = self._candidate()
+
+        def fake_gh(*args, **kwargs):
+            if args == ('api', 'user'):
+                return json.dumps({'login': 'wayri'})
+            return json.dumps(candidate)
+
+        with patch.dict(os.environ, {}, clear=True), patch.object(release, 'gh', side_effect=fake_gh):
+            release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
+
+    def test_wayri_author_with_github_merge_committer_passes(self):
+        candidate = self._candidate(committer_name='GitHub', committer_email='noreply@github.com',
+                                    committer_login='web-flow')
+
+        def fake_gh(*args, **kwargs):
+            if args == ('api', 'user'):
+                return json.dumps({'login': 'wayri'})
+            return json.dumps(candidate)
+
+        with patch.dict(os.environ, {}, clear=True), patch.object(release, 'gh', side_effect=fake_gh):
+            release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
 
     def test_version_drift_is_rejected(self):
         paths = {

@@ -1,10 +1,10 @@
 <img src="app/public/spike-logo-tagline.png" alt="SPIKE — SI, PI, Thermal, EM" width="420">
 
-# SPIKE - PCB Simulation for KiCad
+# SPIKE - Multiphysics Simulation Workbench
 
-[![Latest release: v0.3.11-gamma.1](https://img.shields.io/badge/latest_release-v0.3.11-gamma.1-blue)](https://github.com/wayri/SPIKE/releases/tag/v0.3.11-gamma.1)
-[![Gamma preview](https://img.shields.io/badge/status-Gamma_unreviewed_preview-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.11-gamma.1)
-[![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.11-gamma.1/SPIKE_0.3.11-gamma.1_x64-setup.exe)
+[![Latest release: v0.3.12-gamma.1](https://img.shields.io/badge/latest_release-v0.3.12--gamma.1-blue)](https://github.com/wayri/SPIKE/releases/tag/v0.3.12-gamma.1)
+[![Gamma prerelease](https://img.shields.io/badge/status-Gamma_prerelease_reviews_pending-orange)](https://github.com/wayri/SPIKE/releases/tag/v0.3.12-gamma.1)
+[![Windows x64 download](https://img.shields.io/badge/download-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases/download/v0.3.12-gamma.1/SPIKE_0.3.12-gamma.1_x64-setup.exe)
 [![Linux Flatpak download](https://img.shields.io/badge/download-Linux_Flatpak-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak)
 [![macOS Apple Silicon download](https://img.shields.io/badge/download-macOS_Apple_Silicon-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_macos-arm64_EXPERIMENTAL.dmg)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)](LICENSE)
@@ -15,22 +15,32 @@
 [![EM and RF](https://img.shields.io/badge/analysis-EM_%26_RF-476582)](#pcb-analysis-capabilities)
 [![Circuit simulation](https://img.shields.io/badge/analysis-circuits-476582)](#circuit-simulation-choices)
 
-**Gamma: numerical and engineering reviews are pending.** Published with the owner's explicit authorization for community testing. This preview includes unreviewed, experimental and approximate work; automated checks do not establish physical accuracy, compliance or design sign-off. Back up projects and independently verify results before relying on them. See [Gamma release notes](docs/releases/v0.3.11-gamma.1.md).
+**PCB-focused multiphysics, from board to complete assembly.**
 
-SPIKE is an open-source PCB analysis and simulation workbench for KiCad boards.
-Explore **power integrity (PI), signal integrity (SI), board thermal analysis,
-and RF antenna simulation** in one desktop app. Import a board, inspect its
-copper and components in 2D or 3D, set up a study, and probe the results in the
-board viewport. Optional **[EMerge](https://github.com/FennisRobert/EMerge)** and
+SPIKE is an open-source, local-first multiphysics simulation workbench centered
+on PCBs and the systems built around them. It brings **power integrity (PI),
+signal integrity (SI), circuits, thermal and airflow, selected EM/RF, and bounded
+mechanical workflows** into a shared environment for boards, enclosures,
+interconnects and mechanical parts. Retain assembly geometry and material
+evidence, prepare studies, and inspect supported results in 2D or 3D.
+
+The product direction is end-to-end assembly preparation and simulation,
+including larger assemblies and coordinated cross-domain studies. Current
+coupling, CAD coverage and execution scale depend on the specific workflow;
+large-scale arbitrary-assembly simulation is a development target, not a
+blanket validated capability. See [product scope and assembly direction](docs/PRODUCT_SCOPE.md)
+and [current solver evidence](docs/SOLVER_STATUS.md).
+Optional **[EMerge](https://github.com/FennisRobert/EMerge)** and
 **[openEMS](https://openems.de/)** extensions add electromagnetic
 simulation workflows.
 
-SPIKE runs locally and includes a command-line interface. The current Windows
-x64 Gamma preview is version 0.3.11-gamma.1. Experimental Linux x86-64 Flatpak and macOS Apple
-Silicon packages remain at version 0.3.5. Intel macOS packaging is held, with no
-current package claimed as verified.
+SPIKE runs locally and includes a command-line interface. The Windows x64
+Gamma prerelease is version 0.3.12-gamma.1 and remains pending source,
+numerical, packaging, and knowledgeable-human reviews. Experimental Linux
+x86-64 Flatpak and macOS Apple Silicon packages remain at version 0.3.5. Intel
+macOS packaging is held, with no current package claimed as verified.
 
-[Downloads and release notes](https://github.com/wayri/SPIKE/releases/tag/v0.3.11-gamma.1)
+[Downloads and release notes](https://github.com/wayri/SPIKE/releases/latest)
 · [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
 · [User guides](docs/README.md)
 · [Build from source](docs/DEVELOPER_GUIDE.md)
@@ -170,6 +180,7 @@ generate reports. See the [CLI reference](docs/CLI.md).
 
 - [Guides and tutorials](docs/README.md), including [thermal](docs/THERMAL_USER_GUIDE.md), [signal integrity](docs/SI_USER_GUIDE.md), and the [ESP32 example](examples/esp32/README.md)
 - [Solver status and numerical limits](docs/SOLVER_STATUS.md)
+- [Solver mathematics and numerical methods](docs/SOLVER_MATHEMATICS.md), [handbook](docs/SOLVER_HANDBOOK.md), and [research references](docs/SOLVER_REFERENCES.md)
 - [Local LLM and MCP setup](docs/LOCAL_LLM_MCP.md) for LM Studio or Ollama
 - [Contributing](CONTRIBUTING.md), [developer setup](docs/DEVELOPER_GUIDE.md), and [architecture](ARCHITECTURE.md)
 - [Report a bug](https://github.com/wayri/SPIKE/issues/new?template=bug_report.yml) with a small reproducible example; review your report before sharing board data

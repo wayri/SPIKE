@@ -15,6 +15,7 @@ on:
         type: string
         default: ''
 permissions:
+  actions: read
   contents: read
 concurrency:
   group: spike-release
@@ -35,7 +36,12 @@ jobs:
         run: |
           python scripts/check_architecture.py
           python -m unittest discover -s tests/python -p test_release_automation.py -v
-      - name: Check version and release target
+      - name: Verify workflow publication actor
+        if: github.event_name == 'push' || inputs.publish
+        run: |
+          test "$GITHUB_ACTOR" = wayri
+          test "$GITHUB_TRIGGERING_ACTOR" = wayri
+      - name: Check version, release target, and publication identity
         id: version
         env:
           GH_TOKEN: ${{ github.token }}
@@ -68,6 +74,7 @@ jobs:
     if: github.event_name == 'push' || inputs.publish
     runs-on: ubuntu-24.04
     permissions:
+      actions: read
       contents: write
     steps:
       - uses: actions/checkout@v4

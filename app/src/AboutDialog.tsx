@@ -2,6 +2,7 @@ import { BookOpen, CircleCheck, Gauge, Info, X } from "./icons";
 import { useEffect, useState } from "react";
 import { APP_VERSION, PRODUCT_NAME, PRODUCT_TAGLINE, RELEASE_CHANNEL } from "./appVersion";
 import { getDesktopAppVersion } from "./workerBridge";
+import { usePanelPresentation } from "./panelPresentation";
 
 type AboutDialogProps = {
   onClose: () => void;
@@ -10,6 +11,7 @@ type AboutDialogProps = {
 };
 
 export default function AboutDialog({ onClose, onOpenGuide, onOpenValidation }: AboutDialogProps) {
+  const { ownerDocument, ownerWindow } = usePanelPresentation();
   const [hostVersion, setHostVersion] = useState<string | null>(null);
 
   useEffect(() => {
@@ -21,10 +23,11 @@ export default function AboutDialog({ onClose, onOpenGuide, onOpenValidation }: 
   }, []);
 
   useEffect(() => {
-    const key = (event: KeyboardEvent) => { if (document.querySelector(".about-shade")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
-    window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
-  }, [onClose]);
+    const doc = ownerDocument, view = ownerWindow; if (!doc || !view) return;
+    const key = (event: KeyboardEvent) => { if (doc.querySelector(".about-shade")?.closest("[hidden]")) return; if (event.key === "Escape") onClose(); };
+    view.addEventListener("keydown", key);
+    return () => view.removeEventListener("keydown", key);
+  }, [ownerDocument, ownerWindow, onClose]);
 
   const runtimeLine = hostVersion
     ? "Native desktop shell"

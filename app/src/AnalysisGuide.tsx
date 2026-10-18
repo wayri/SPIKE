@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CircleHelp, Focus, X } from "./icons";
+import { usePanelPresentation } from "./panelPresentation";
 import "./AnalysisGuide.css";
 
 export type GuideDestination = "board-import" | "emerge" | "emerge-emi" | "emerge-em-result" | "pi" | "si" | "emi" | "thermal" | "circuit" | "results";
@@ -267,16 +268,16 @@ const flows: Record<GuideFlow, { label: string; capability: string; next: string
   },
 };
 
-function visible(element: HTMLElement): boolean {
+function visible(element: HTMLElement, ownerWindow: Window): boolean {
   if (!element.isConnected || element.closest('[aria-hidden="true"], [hidden]')) return false;
-  const style = getComputedStyle(element);
+  const style = ownerWindow.getComputedStyle(element);
   return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
 }
 
-function findTarget(selectors: string[]): HTMLElement | null {
+function findTarget(selectors: string[], ownerDocument: Document, ownerWindow: Window): HTMLElement | null {
   for (const selector of selectors) {
     try {
-      const target = [...document.querySelectorAll<HTMLElement>(selector)].find(visible);
+      const target = [...ownerDocument.querySelectorAll<HTMLElement>(selector)].find(element => visible(element, ownerWindow));
       if (target) return target;
     } catch { /* An unsupported fallback selector is ignored. */ }
   }
@@ -289,6 +290,7 @@ export default function AnalysisGuide({ boardLoaded, resultAvailable, onNavigate
   onNavigate: (destination: GuideDestination) => void;
   onClose: () => void;
 }) {
+  const { ownerDocument, ownerWindow, detached } = usePanelPresentation();
   const [flow, setFlow] = useState<GuideFlow>("emerge-si");
   const [index, setIndex] = useState(0);
   const [target, setTarget] = useState<HTMLElement | null>(null);
@@ -298,7 +300,9 @@ export default function AnalysisGuide({ boardLoaded, resultAvailable, onNavigate
   const step = flows[flow].steps[index];
   const workflow = flows[flow];
   const completed = useMemo(() => index === 0 && boardLoaded, [boardLoaded, index]);
-  const recommendation = !boardLoaded
+  const recommendation = detached
+    ? "Dock the guide to highlight and focus controls in the SPIKE workspace."
+    : !boardLoaded
     ? "Import a board, then check its stackup and validation issues."
     : !target && !step.optional
       ? "Open the indicated workspace or setup panel, then use Find control. If the control remains absent, check runtime availability."
@@ -308,10 +312,12 @@ export default function AnalysisGuide({ boardLoaded, resultAvailable, onNavigate
 
   useEffect(() => {
     if (step.destination) navigateRef.current(step.destination);
+    const doc = ownerDocument, view = ownerWindow; if (!doc || !view || detached) { setTarget(null); return; }
+    const realm = view as Window & typeof globalThis;
     let highlighted: HTMLElement | null = null;
     let initialized = false;
     const update = () => {
-      const next = findTarget(step.selectors);
+      const next = findTarget(step.selectors, doc, view);
       if (initialized && next === highlighted) return;
       initialized = true;
       highlighted?.classList.remove("analysis-guide-highlight");
@@ -320,20 +326,21 @@ export default function AnalysisGuide({ boardLoaded, resultAvailable, onNavigate
       setTarget(next);
       next?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
     };
-    const frame = requestAnimationFrame(update);
-    const observer = new MutationObserver(update);
-    observer.observe(document.body, { childList: true, subtree: true });
+    const frame = realm.requestAnimationFrame(update);
+    const observer = realm.MutationObserver ? new realm.MutationObserver(update) : null;
+    observer?.observe(doc.body, { childList: true, subtree: true });
     update();
     return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
+      realm.cancelAnimationFrame(frame);
+      observer?.disconnect();
       highlighted?.classList.remove("analysis-guide-highlight");
     };
-  }, [flow, index, step]);
+  }, [ownerDocument, ownerWindow, detached, flow, index, step]);
 
   const findControl = () => {
     if (step.destination) navigateRef.current(step.destination);
-    const next = findTarget(step.selectors);
+    if (detached || !ownerDocument || !ownerWindow) { setTarget(null); return; }
+    const next = findTarget(step.selectors, ownerDocument, ownerWindow);
     if (!next) { setTarget(null); return; }
     next.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
     const focusable = next.matches("button, input, select, textarea, [tabindex]")
@@ -361,9 +368,9 @@ export default function AnalysisGuide({ boardLoaded, resultAvailable, onNavigate
       <h3>{step.title}</h3>
       <p>{step.instruction}</p>
       <div className={target ? "analysis-guide-target found" : "analysis-guide-target missing"} role="status" aria-live="polite" data-pulse={pulse}>
-        {target ? "Control highlighted in SPIKE" : completed ? "Board already loaded" : index === workflow.steps.length - 1 && resultAvailable ? "A saved result exists; confirm it belongs to this workflow" : step.optional ? "Control is not currently available in this workspace" : "Target unavailable. Open the relevant panel, then use Find control."}
+        {detached ? "Dock the guide to highlight controls in the SPIKE workspace" : target ? "Control highlighted in SPIKE" : completed ? "Board already loaded" : index === workflow.steps.length - 1 && resultAvailable ? "A saved result exists; confirm it belongs to this workflow" : step.optional ? "Control is not currently available in this workspace" : "Target unavailable. Open the relevant panel, then use Find control."}
       </div>
-      <button type="button" className="analysis-guide-find" onClick={findControl}><Focus size={14} /> Find control</button>
+      <button type="button" className="analysis-guide-find" onClick={findControl} disabled={detached} title={detached ? "Dock the guide to find workspace controls" : undefined}><Focus size={14} /> Find control</button>
       <section className="analysis-guide-next" aria-label="Recommended next step">
         <b>RECOMMENDED NEXT STEP</b>
         <p>{recommendation}</p>

@@ -1,5 +1,16 @@
 # Rigid-flex design support
 
+## Sheet folding workspace
+
+Open **Sheet and flex folding** from command search or the Flex PCB manager.
+The [bounded sheet workflow](SHEET_FOLDING.md) imports neutral definitions and
+rectangular planar DXF outlines, retains reviewed thickness and material data,
+and previews finite-radius parallel bends with explicit flex-strip confinement.
+Flat/folded geometry is independent of the source PCB. Existing imported PCB
+regions, traces, vias and component placements are not automatically mapped or
+deformed by that workspace. Folded previews do not change the solver policy
+below or establish manufacturing/strain qualification.
+
 SPIKE's normalized `SpiDeR` identifies board construction independently of
 the EDA source:
 

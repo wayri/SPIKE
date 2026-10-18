@@ -86,6 +86,6 @@ def build_air_mesh(gmsh, job):
     for i, cad in enumerate(source_volumes):
         if abs(volumes['solid_'+str(i)]-cad) > .02*cad:
             raise ValueError('AIRFLOW_MESH: solid mesh volume differs from CAD by more than two percent; refine mesh')
-    return {'vertices': points, 'cells': cells, 'volumes_mm3': volumes,
+    return {'units': 'mm', 'vertices': points, 'cells': cells, 'volumes_mm3': volumes,
             'source_ids': {'solid_'+str(i): s['id'] for i, s in enumerate(job['solids'])},
             'cad_volumes_mm3': {'solid_'+str(i): v for i, v in enumerate(source_volumes)}}
