@@ -58,7 +58,7 @@ translation must be explicit, reviewed and loss-reported.
 
 ```powershell
 python -m python.spikes asic-plan examples/spikes/asic/minimal_project.spkasic
-python -m python.spikes layout-inspect design.gds --klayout C:/Users/yawar/AppData/Roaming/KLayout/klayout_app.exe -o layout-inspection.json
+python -m python.spikes layout-inspect design.gds --klayout "$env:APPDATA/KLayout/klayout_app.exe" -o layout-inspection.json
 ```
 
 The initial project intentionally has no fabricated models, layouts, engines
