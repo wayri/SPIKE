@@ -1,5 +1,6 @@
 #include "spikes/transient_solver.hpp"
 #include "spikes/osdi_device.hpp"
+#include "spikes/transient_session.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -13,6 +14,271 @@ namespace {
 
 bool near(double actual, double expected, double tolerance) {
   return std::abs(actual - expected) <= tolerance;
+}
+
+void radau_ramp_all_time_oracles_cover_signed_scales_and_dense_sparse() {
+  constexpr double rise = 1e-5;
+  constexpr double tau = 1e-3;
+  for (const bool inductive : {false, true}) {
+    for (const double amplitude : {1.0, -1.0, 1e-3, -1e-3, 1e-6, -1e-6, 0.0}) {
+      for (const std::size_t sparse_threshold : {0u, 1u}) {
+        spikes::Circuit circuit;
+        spikes::PulseWaveform pulse;
+        pulse.pulsed_value = amplitude;
+        pulse.rise_time_s = rise;
+        pulse.fall_time_s = rise;
+        pulse.pulse_width_s = 0.01;
+        pulse.period_s = 0.02;
+        circuit.add_pulse_voltage_source("V1", "in", "0", pulse);
+        circuit.add_resistor("R1", "in", "out", 1000.0);
+        if (inductive) circuit.add_inductor("X1", "out", "0", 1.0);
+        else circuit.add_capacitor("X1", "out", "0", 1e-6);
+        spikes::TransientOptions options;
+        options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+        options.sparse_linear_threshold = sparse_threshold;
+        options.time_step_s = 2.5e-7;
+        options.stop_time_s = 1.01e-3;
+        const auto result = spikes::solve_transient(circuit, options);
+        assert(result.converged());
+        for (const auto &point : result.points()) {
+          const long double t = point.time_s;
+          const long double response = t <= rise
+              ? (t + tau * std::expm1(-t / tau)) / rise
+              : 1.0L + tau / rise * std::expm1(-rise / tau) * std::exp(-(t - rise) / tau);
+          const double source = amplitude * std::min(point.time_s / rise, 1.0);
+          const double voltage = inductive ? source - amplitude * static_cast<double>(response)
+                                           : amplitude * static_cast<double>(response);
+          const double current = inductive ? amplitude * static_cast<double>(response) / 1000.0
+                                           : (source - voltage) / 1000.0;
+          assert(near(point.node_voltage("out"), voltage, 1e-12 + 5e-6 * std::abs(voltage)));
+          assert(near(point.element_current("X1"), current, 1e-15 + 5e-6 * std::abs(current)));
+        }
+        assert(result.diagnostics().radau_iia3_steps == result.diagnostics().completed_steps);
+        assert(result.diagnostics().backward_euler_steps == 0);
+        assert(result.diagnostics().source_breakpoint_steps == 1);
+        assert(result.diagnostics().factorization_reuses > 1000);
+      }
+    }
+  }
+}
+
+void radau_jump_limits_preserve_storage_and_persistent_edge_identity() {
+  spikes::Circuit circuit;
+  spikes::PulseWaveform pulse;
+  pulse.pulsed_value = 1.0;
+  pulse.delay_s = 0.25;
+  pulse.rise_time_s = 0.0;
+  pulse.fall_time_s = 0.0;
+  pulse.pulse_width_s = 0.01;
+  pulse.period_s = 1.0;
+  circuit.add_pulse_voltage_source("V1", "in", "0", pulse);
+  circuit.add_resistor("R1", "in", "out", 1.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0);
+  spikes::TransientOptions options;
+  options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+  options.time_step_s = 0.25;
+  options.stop_time_s = 0.5;
+  const auto result = spikes::solve_transient(circuit, options);
+  assert(result.converged());
+  assert(near(result.points()[1].time_s, 0.25, 1e-15));
+  assert(result.points()[1].node_voltage("out") == 0.0);
+  assert(result.points()[1].node_voltage("in") == 0.0); // Left limit at actual jump.
+  assert(near(result.points()[2].node_voltage("out"), -std::expm1(-0.01), 2e-10));
+  assert(near(result.points().back().node_voltage("out"),
+              -std::expm1(-0.01) * std::exp(-0.24), 5e-7));
+  spikes::TransientSession session(circuit, options);
+  assert(session.step(0.25));
+  assert(session.node_voltage("out") == 0.0);
+  assert(session.step(0.25));
+  assert(near(session.node_voltage("out"), result.points().back().node_voltage("out"), 2e-14));
+  assert(session.diagnostics().radau_iia3_steps == 3);
+}
+
+void radau_is_stiffly_damped_and_rejects_unsupported_history_contracts() {
+  spikes::Circuit circuit;
+  circuit.add_voltage_source("V1", "in", "0", 1.0);
+  circuit.add_resistor("R1", "in", "out", 1.0);
+  circuit.add_capacitor("C1", "out", "0", 1e-6);
+  spikes::TransientOptions options;
+  options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+  options.initialize_from_operating_point = false;
+  options.time_step_s = 1e-3;
+  options.stop_time_s = 1e-3;
+  const auto stiff = spikes::solve_transient(circuit, options);
+  assert(stiff.converged());
+  assert(std::abs(stiff.points().back().node_voltage("out") - 1.0) < 0.003);
+  options.adaptive_time_step = true;
+  assert(!spikes::solve_transient(circuit, options).converged());
+  options.adaptive_time_step = false;
+  circuit.add_diode("D1", "out", "0");
+  assert(!spikes::solve_transient(circuit, options).converged());
+  spikes::Circuit constrained;
+  constrained.add_voltage_source("V1", "out", "0", 1.0);
+  constrained.add_capacitor("C1", "out", "0", 1.0);
+  const auto rejected = spikes::solve_transient(constrained, options);
+  assert(!rejected.converged());
+  assert(rejected.message().find("loops") != std::string::npos);
+  spikes::Circuit cutset;
+  cutset.add_current_source("I1", "0", "out", 1.0);
+  cutset.add_inductor("L1", "out", "0", 1.0);
+  assert(!spikes::solve_transient(cutset, options).converged());
+}
+
+void radau_third_order_refinement_and_nonzero_uic_are_independent_of_history() {
+  for (const bool inductive : {false, true}) {
+    double previous_error = 0.0;
+    for (const double h : {0.25, 0.125, 0.0625}) {
+      spikes::Circuit circuit;
+      circuit.add_voltage_source("V1", "in", "0", 1.0);
+      circuit.add_resistor("R1", "in", "out", 1.0);
+      if (inductive) circuit.add_inductor("X1", "out", "0", 1.0, 0.3);
+      else circuit.add_capacitor("X1", "out", "0", 1.0, 0.3);
+      spikes::TransientOptions options;
+      options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+      options.initialize_from_operating_point = false;
+      options.time_step_s = h;
+      options.stop_time_s = 1.0;
+      const auto result = spikes::solve_transient(circuit, options);
+      assert(result.converged());
+      const double final = inductive ? result.points().back().element_current("X1")
+                                    : result.points().back().node_voltage("out");
+      const double error = std::abs(final - (1.0 - 0.7 * std::exp(-1.0)));
+      if (previous_error > 0.0) assert(previous_error / error > 7.0 && previous_error / error < 9.0);
+      previous_error = error;
+    }
+  }
+  spikes::Circuit loop;
+  loop.add_resistor("R1", "out", "0", 1.0);
+  loop.add_capacitor("C1", "out", "0", 1.0, 0.3);
+  loop.add_capacitor("C2", "out", "0", 1.0, 0.4);
+  spikes::TransientOptions options;
+  options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+  options.initialize_from_operating_point = false;
+  assert(!spikes::solve_transient(loop, options).converged());
+  spikes::Circuit driven;
+  driven.add_current_source("I1", "0", "out", 1.0);
+  driven.add_resistor("R1", "out", "0", 1.0);
+  driven.add_capacitor("C1", "out", "0", 0.5, 0.3);
+  driven.add_capacitor("C2", "out", "0", 0.5, 0.3);
+  options.time_step_s = 0.01;
+  options.stop_time_s = 1.0;
+  const auto consistent = spikes::solve_transient(driven, options);
+  assert(consistent.converged());
+  assert(near(consistent.points().back().node_voltage("out"), 1.0 - 0.7 * std::exp(-1.0), 1e-8));
+}
+
+void radau_full_duty_pulse_has_no_spurious_period_jump() {
+  spikes::Circuit circuit;
+  spikes::PulseWaveform pulse;
+  pulse.pulsed_value = 1.0;
+  pulse.delay_s = 0.25;
+  pulse.rise_time_s = pulse.fall_time_s = 0.0;
+  pulse.pulse_width_s = pulse.period_s = 1.0;
+  circuit.add_pulse_voltage_source("V1", "in", "0", pulse);
+  circuit.add_resistor("R1", "in", "out", 1.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0);
+  spikes::TransientOptions options;
+  options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+  options.time_step_s = 0.05;
+  options.stop_time_s = 1.25;
+  const auto result = spikes::solve_transient(circuit, options);
+  assert(result.converged());
+  assert(near(result.points().back().node_voltage("in"), 1.0, 1e-14));
+  assert(near(result.points().back().node_voltage("out"), -std::expm1(-1.0), 1e-6));
+  // All coincident edge shapes retain their actual left limits: zero-width
+  // empty pulse, immediate rise with sloped fall, and sloped rise followed by
+  // an immediate fall exactly at the period boundary.
+  for (const int shape : {0, 1, 2}) {
+    spikes::Circuit edge_circuit;
+    pulse.rise_time_s = shape == 2 ? 1.0 : 0.0;
+    pulse.fall_time_s = shape == 1 ? 1.0 : 0.0;
+    pulse.pulse_width_s = 0.0;
+    edge_circuit.add_pulse_voltage_source("V1", "in", "0", pulse);
+    edge_circuit.add_resistor("R1", "in", "0", 1.0);
+    const auto edge_result = spikes::solve_transient(edge_circuit, options);
+    assert(edge_result.converged());
+    const double expected = shape == 2 ? 1.0 : 0.0;
+    assert(near(edge_result.points().back().node_voltage("in"), expected, 2e-14));
+  }
+}
+
+void radau_sinusoidal_forcing_has_third_order_endpoint_convergence() {
+  spikes::Circuit circuit;
+  spikes::SineWaveform sine;
+  sine.frequency_hz = 1.0 / (2.0 * std::acos(-1.0));
+  circuit.add_sine_voltage_source("V1", "in", "0", sine);
+  circuit.add_resistor("R1", "in", "out", 1.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0);
+  const double expected = (std::sin(1.0) - std::cos(1.0) + std::exp(-1.0)) / 2.0;
+  double previous_error = 0.0;
+  for (const double h : {0.1, 0.05, 0.025}) {
+    spikes::TransientOptions options;
+    options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+    options.time_step_s = h;
+    options.stop_time_s = 1.0;
+    const auto result = spikes::solve_transient(circuit, options);
+    assert(result.converged());
+    const double error = std::abs(result.points().back().node_voltage("out") - expected);
+    if (previous_error > 0.0) assert(previous_error / error >= 7.0);
+    previous_error = error;
+    spikes::TransientSession session(circuit, options);
+    for (int i = 0; i < static_cast<int>(std::round(1.0 / h)); ++i) assert(session.step(h));
+    assert(near(session.node_voltage("out"), result.points().back().node_voltage("out"), 2e-13));
+  }
+}
+
+void radau_pwl_checkpoint_and_failed_window_preserve_storage() {
+  spikes::Circuit circuit;
+  circuit.add_pwl_voltage_source("V1", "in", "0", {{0.0, 0.0}, {0.2, 1.0}, {0.4, 0.0}, {1.0, 0.0}});
+  circuit.add_resistor("R1", "in", "out", 1.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0);
+  spikes::TransientOptions options;
+  options.integration_method = spikes::TransientIntegrationMethod::radau_iia3;
+  options.time_step_s = 0.1;
+  options.stop_time_s = 0.5;
+  const auto batch = spikes::solve_transient(circuit, options);
+  assert(batch.converged());
+  spikes::TransientSession session(circuit, options);
+  for (int i = 0; i < 2; ++i) assert(session.step(0.1));
+  const auto checkpoint = session.checkpoint();
+  for (int i = 0; i < 3; ++i) assert(session.step(0.1));
+  assert(near(session.node_voltage("out"), batch.points().back().node_voltage("out"), 2e-14));
+  session.restore(checkpoint);
+  for (int i = 0; i < 3; ++i) assert(session.step(0.1));
+  assert(near(session.node_voltage("out"), batch.points().back().node_voltage("out"), 2e-14));
+  options.max_steps = 1;
+  spikes::TransientSession bounded(circuit, options);
+  assert(bounded.step(0.1));
+  const double accepted = bounded.node_voltage("out");
+  assert(!bounded.step(0.4)); // Multiple corner-aligned stages exceed the bound.
+  assert(bounded.time_s() == 0.1);
+  assert(bounded.node_voltage("out") == accepted);
+  assert(bounded.step(0.1));
+  assert(near(bounded.node_voltage("out"), batch.points()[2].node_voltage("out"), 2e-14));
+}
+
+void source_breakpoint_diagnostics_include_on_grid_accepted_corners() {
+  spikes::Circuit circuit;
+  circuit.add_pwl_voltage_source("V1", "in", "0",
+      {{0.0, 0.0}, {0.25, 1.0}, {0.5, 1.0}, {0.75, 0.0}});
+  circuit.add_resistor("R1", "in", "out", 1.0);
+  circuit.add_capacitor("C1", "out", "0", 1.0);
+  spikes::TransientOptions options;
+  options.time_step_s = 0.25;
+  options.stop_time_s = 1.0;
+  const auto result = spikes::solve_transient(circuit, options);
+  assert(result.converged());
+  assert(result.diagnostics().source_breakpoint_steps == 3);
+
+  // Failure before acceptance must not fabricate a completed corner landing.
+  spikes::Circuit singular;
+  singular.add_pwl_voltage_source("V1", "in", "0",
+      {{0.0, 0.0}, {0.25, 1.0}});
+  singular.add_resistor("Rfloat", "a", "b", 1.0);
+  options.initialize_from_operating_point = false;
+  const auto failed = spikes::solve_transient(singular, options);
+  assert(!failed.converged());
+  assert(failed.diagnostics().source_breakpoint_steps == 0);
 }
 
 void rc_step_matches_backward_euler_recurrence() {
@@ -1000,6 +1266,14 @@ void analytic_sine_sources_use_internal_time_and_delay_breakpoints() {
 } // namespace
 
 int main() {
+  radau_ramp_all_time_oracles_cover_signed_scales_and_dense_sparse();
+  radau_jump_limits_preserve_storage_and_persistent_edge_identity();
+  radau_is_stiffly_damped_and_rejects_unsupported_history_contracts();
+  radau_third_order_refinement_and_nonzero_uic_are_independent_of_history();
+  radau_full_duty_pulse_has_no_spurious_period_jump();
+  radau_sinusoidal_forcing_has_third_order_endpoint_convergence();
+  radau_pwl_checkpoint_and_failed_window_preserve_storage();
+  source_breakpoint_diagnostics_include_on_grid_accepted_corners();
   analytic_sine_sources_use_internal_time_and_delay_breakpoints();
   rc_step_matches_backward_euler_recurrence();
   rl_step_matches_backward_euler_recurrence();

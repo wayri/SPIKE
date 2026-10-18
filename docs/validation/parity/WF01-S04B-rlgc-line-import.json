@@ -1,0 +1,1542 @@
+{
+  "design": {
+    "design_id": "c5005b3e-818a-5b68-abe7-049aea68b6c5",
+    "name": "pcb",
+    "source": {
+      "source_format": "odb++",
+      "source_digest": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+      "native_id": "odb-3f02f6b198854f817bd2b393",
+      "artifact_path": "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\benchmarks\\parity-import\\geometry-native-odb-qualified.zip"
+    },
+    "frame": {
+      "frame_id": "board",
+      "parent_frame_id": "",
+      "units": "mm",
+      "handedness": "right",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "contract": "spike/design-ir/v2",
+    "materials": [
+      {
+        "id": "a8417feb-6877-5306-94b0-7ffba1d8509c",
+        "source_id": "COMP_+_TOP",
+        "name": "component",
+        "extensions": {
+          "spike.v1": {
+            "id": "COMP_+_TOP",
+            "name": "COMP_+_TOP",
+            "order": 0,
+            "type": "component",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "1",
+              "CONTEXT": "BOARD",
+              "TYPE": "COMPONENT",
+              "NAME": "COMP_+_TOP",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "material_class": "component",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": null,
+        "loss_tangent": null,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      },
+      {
+        "id": "160599b9-6bc1-5e77-99ce-75f2c9d3f7d2",
+        "source_id": "F.Cu",
+        "name": "signal",
+        "extensions": {
+          "spike.v1": {
+            "id": "F.Cu",
+            "name": "F.Cu",
+            "order": 1,
+            "type": "signal",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "2",
+              "CONTEXT": "BOARD",
+              "TYPE": "SIGNAL",
+              "NAME": "F.CU",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "material_class": "signal",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": null,
+        "loss_tangent": null,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      },
+      {
+        "id": "eb0a8c2b-02ef-58be-bb17-b7d56d53002e",
+        "source_id": "DIELECTRIC_1",
+        "name": "dielectric",
+        "extensions": {
+          "spike.v1": {
+            "id": "DIELECTRIC_1",
+            "name": "DIELECTRIC_1",
+            "order": 2,
+            "type": "dielectric",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "3",
+              "CONTEXT": "BOARD",
+              "TYPE": "DIELECTRIC",
+              "NAME": "DIELECTRIC_1",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "DIELECTRIC_TYPE": "CORE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "material_class": "dielectric",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": null,
+        "loss_tangent": null,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      },
+      {
+        "id": "4bca06b5-f467-517b-9f99-db367151233a",
+        "source_id": "EDGE.CUTS",
+        "name": "document",
+        "extensions": {
+          "spike.v1": {
+            "id": "EDGE.CUTS",
+            "name": "EDGE.CUTS",
+            "order": 4,
+            "type": "document",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "5",
+              "CONTEXT": "MISC",
+              "TYPE": "DOCUMENT",
+              "NAME": "EDGE.CUTS",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "material_class": "document",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": null,
+        "loss_tangent": null,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      }
+    ],
+    "layers": [
+      {
+        "id": "f362f310-fb23-5d85-944c-cbfbf11464e4",
+        "source_id": "COMP_+_TOP",
+        "name": "COMP_+_TOP",
+        "extensions": {
+          "spike.v1": {
+            "id": "COMP_+_TOP",
+            "name": "COMP_+_TOP",
+            "order": 0,
+            "type": "component",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "1",
+              "CONTEXT": "BOARD",
+              "TYPE": "COMPONENT",
+              "NAME": "COMP_+_TOP",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "component",
+        "order": 0,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "a8417feb-6877-5306-94b0-7ffba1d8509c",
+        "region_ids": []
+      },
+      {
+        "id": "cddcbebc-c272-5f9f-88c0-399f6e93c904",
+        "source_id": "F.Cu",
+        "name": "F.Cu",
+        "extensions": {
+          "spike.v1": {
+            "id": "F.Cu",
+            "name": "F.Cu",
+            "order": 1,
+            "type": "signal",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "2",
+              "CONTEXT": "BOARD",
+              "TYPE": "SIGNAL",
+              "NAME": "F.CU",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "copper",
+        "order": 1,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "160599b9-6bc1-5e77-99ce-75f2c9d3f7d2",
+        "region_ids": []
+      },
+      {
+        "id": "4dd30acf-bf70-5216-8f46-c57632c36157",
+        "source_id": "DIELECTRIC_1",
+        "name": "DIELECTRIC_1",
+        "extensions": {
+          "spike.v1": {
+            "id": "DIELECTRIC_1",
+            "name": "DIELECTRIC_1",
+            "order": 2,
+            "type": "dielectric",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "3",
+              "CONTEXT": "BOARD",
+              "TYPE": "DIELECTRIC",
+              "NAME": "DIELECTRIC_1",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "DIELECTRIC_TYPE": "CORE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "dielectric",
+        "order": 2,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "eb0a8c2b-02ef-58be-bb17-b7d56d53002e",
+        "region_ids": []
+      },
+      {
+        "id": "883fee85-c301-53ea-83b8-2302a7ee6a2b",
+        "source_id": "B.Cu",
+        "name": "B.Cu",
+        "extensions": {
+          "spike.v1": {
+            "id": "B.Cu",
+            "name": "B.Cu",
+            "order": 3,
+            "type": "signal",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "4",
+              "CONTEXT": "BOARD",
+              "TYPE": "SIGNAL",
+              "NAME": "B.CU",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "copper",
+        "order": 3,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "160599b9-6bc1-5e77-99ce-75f2c9d3f7d2",
+        "region_ids": []
+      },
+      {
+        "id": "4f286839-8bf7-5b78-9457-88f84020bd77",
+        "source_id": "EDGE.CUTS",
+        "name": "EDGE.CUTS",
+        "extensions": {
+          "spike.v1": {
+            "id": "EDGE.CUTS",
+            "name": "EDGE.CUTS",
+            "order": 4,
+            "type": "document",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "5",
+              "CONTEXT": "MISC",
+              "TYPE": "DOCUMENT",
+              "NAME": "EDGE.CUTS",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "document",
+        "order": 4,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "4bca06b5-f467-517b-9f99-db367151233a",
+        "region_ids": []
+      },
+      {
+        "id": "1cbfaa28-7e4d-53d1-967b-66d146fb3354",
+        "source_id": "MARGIN",
+        "name": "MARGIN",
+        "extensions": {
+          "spike.v1": {
+            "id": "MARGIN",
+            "name": "MARGIN",
+            "order": 5,
+            "type": "document",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "6",
+              "CONTEXT": "MISC",
+              "TYPE": "DOCUMENT",
+              "NAME": "MARGIN",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "document",
+        "order": 5,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "4bca06b5-f467-517b-9f99-db367151233a",
+        "region_ids": []
+      },
+      {
+        "id": "49b4821f-30c1-57bd-bb34-ef1aae05ca40",
+        "source_id": "B.COURTYARD",
+        "name": "B.COURTYARD",
+        "extensions": {
+          "spike.v1": {
+            "id": "B.COURTYARD",
+            "name": "B.COURTYARD",
+            "order": 6,
+            "type": "document",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "7",
+              "CONTEXT": "MISC",
+              "TYPE": "DOCUMENT",
+              "NAME": "B.COURTYARD",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "document",
+        "order": 6,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "4bca06b5-f467-517b-9f99-db367151233a",
+        "region_ids": []
+      },
+      {
+        "id": "329ca06b-430a-518a-9e17-f318c8f72a6e",
+        "source_id": "F.COURTYARD",
+        "name": "F.COURTYARD",
+        "extensions": {
+          "spike.v1": {
+            "id": "F.COURTYARD",
+            "name": "F.COURTYARD",
+            "order": 7,
+            "type": "document",
+            "odb_source": {
+              "block": "LAYER",
+              "ROW": "8",
+              "CONTEXT": "MISC",
+              "TYPE": "DOCUMENT",
+              "NAME": "F.COURTYARD",
+              "OLD_NAME": "",
+              "POLARITY": "POSITIVE",
+              "COLOR": "0"
+            }
+          }
+        },
+        "layer_type": "document",
+        "order": 7,
+        "z_mm": 0.0,
+        "thickness_mm": null,
+        "material_id": "4bca06b5-f467-517b-9f99-db367151233a",
+        "region_ids": []
+      }
+    ],
+    "nets": [
+      {
+        "id": "ccc0e68e-e35e-515f-beee-794ac7478400",
+        "source_id": "2",
+        "name": "SIGNAL",
+        "extensions": {
+          "spike.v1": {
+            "id": 2,
+            "name": "SIGNAL",
+            "odb_source": {
+              "attributes": {},
+              "uid": "",
+              "record": "NET SIGNAL"
+            },
+            "properties": []
+          }
+        },
+        "net_class": "signal",
+        "aliases": []
+      }
+    ],
+    "tracks": [],
+    "arcs": [
+      {
+        "id": "c4ef3033-856a-5052-b7fa-be174fb9f0bc",
+        "source_id": "odb:f.cu:0",
+        "name": "",
+        "extensions": {
+          "spike.v1": {
+            "id": "odb:f.cu:0",
+            "layer": "F.Cu",
+            "layers": [
+              "F.Cu"
+            ],
+            "odb_source": {
+              "attributes": {},
+              "uid": "",
+              "record": "A 14.0 0.0 10.0 0.0 12.0 0.0 0 P 0 Y",
+              "line": 25,
+              "feature_index": 0,
+              "records": [
+                "A 14.0 0.0 10.0 0.0 12.0 0.0 0 P 0 Y"
+              ]
+            },
+            "kind": "arc",
+            "start": [
+              14.0,
+              0.0
+            ],
+            "end": [
+              10.0,
+              0.0
+            ],
+            "width": 0.3,
+            "mid": [
+              12.0,
+              -2.0
+            ],
+            "center": [
+              12.0,
+              0.0
+            ],
+            "clockwise": true,
+            "net_id": 2
+          }
+        },
+        "net_id": "ccc0e68e-e35e-515f-beee-794ac7478400",
+        "layer_id": "cddcbebc-c272-5f9f-88c0-399f6e93c904",
+        "start_mm": [
+          14.0,
+          0.0
+        ],
+        "mid_mm": [
+          12.0,
+          -2.0
+        ],
+        "end_mm": [
+          10.0,
+          0.0
+        ],
+        "width_mm": 0.3
+      }
+    ],
+    "zones": [],
+    "pads": [
+      {
+        "id": "e88096c7-9603-5f13-9735-f1a1c348df5f",
+        "source_id": "odb:f.cu:1",
+        "name": "1",
+        "extensions": {
+          "spike.v1": {
+            "id": "odb:f.cu:1",
+            "layer": "F.Cu",
+            "layers": [
+              "F.Cu"
+            ],
+            "odb_source": {
+              "attributes": {
+                ".pad_usage": {
+                  "raw": "0"
+                },
+                ".smd": {
+                  "raw": true
+                }
+              },
+              "uid": "",
+              "record": "P 21.0 -8.0 1 P 0 8 0.0 ;0=0,1",
+              "line": 26,
+              "feature_index": 1,
+              "records": [
+                "P 21.0 -8.0 1 P 0 8 0.0 ;0=0,1"
+              ]
+            },
+            "kind": "pad",
+            "at": [
+              21.0,
+              -8.0
+            ],
+            "size": [
+              1.2,
+              0.8
+            ],
+            "shape": "rect",
+            "rotation": -0.0,
+            "type": "smd",
+            "net_id": 2,
+            "component": "J1",
+            "number": "1"
+          }
+        },
+        "net_id": "ccc0e68e-e35e-515f-beee-794ac7478400",
+        "component_id": "bf203098-132e-50b1-998c-d6fd52917b7a",
+        "pin_id": "f9e9323e-ae87-5f19-9716-4902ce676251",
+        "layer_ids": [
+          "cddcbebc-c272-5f9f-88c0-399f6e93c904"
+        ],
+        "center_mm": [
+          21.0,
+          -8.0
+        ],
+        "size_mm": [
+          1.2,
+          0.8
+        ],
+        "shape": "rect",
+        "drill_size_mm": [
+          0.0,
+          0.0
+        ],
+        "drill_shape": "none",
+        "plated": false,
+        "pad_kind": "smd",
+        "zone_connection_override": "inherit",
+        "zone_connection_declared": false,
+        "zone_connection_layer_overrides": {},
+        "thermal_gap_override_mm": null,
+        "thermal_spoke_width_override_mm": null,
+        "thermal_spoke_angle_deg": null,
+        "thermal_settings_valid": false
+      }
+    ],
+    "vias": [],
+    "drills": [],
+    "castellations": [],
+    "pins": [
+      {
+        "id": "f9e9323e-ae87-5f19-9716-4902ce676251",
+        "source_id": "bf203098-132e-50b1-998c-d6fd52917b7a:1",
+        "name": "",
+        "extensions": {},
+        "component_id": "bf203098-132e-50b1-998c-d6fd52917b7a",
+        "number": "1",
+        "net_id": "ccc0e68e-e35e-515f-beee-794ac7478400",
+        "pad_ids": [
+          "e88096c7-9603-5f13-9735-f1a1c348df5f"
+        ]
+      }
+    ],
+    "components": [
+      {
+        "id": "bf203098-132e-50b1-998c-d6fd52917b7a",
+        "source_id": "odb:comp_+_top:component:0",
+        "name": "J1",
+        "extensions": {
+          "spike.v1": {
+            "id": "odb:comp_+_top:component:0",
+            "reference": "J1",
+            "value": "RotationFixture",
+            "part_name": "Parity_RotatedPad",
+            "footprint": "RotatedPad",
+            "at": [
+              20.0,
+              -10.0
+            ],
+            "rotation": -270.0,
+            "layer": "F.Cu",
+            "side": "top",
+            "mirrored": false,
+            "properties": [
+              {
+                "name": "Datasheet",
+                "values": [
+                  ""
+                ],
+                "record": "PRP Datasheet ''"
+              },
+              {
+                "name": "Description",
+                "values": [
+                  ""
+                ],
+                "record": "PRP Description ''"
+              },
+              {
+                "name": "Value",
+                "values": [
+                  "RotationFixture"
+                ],
+                "record": "PRP Value 'RotationFixture'"
+              }
+            ],
+            "pins": [
+              {
+                "index": 0,
+                "at": [
+                  21.0,
+                  -8.0
+                ],
+                "rotation": -0.0,
+                "mirrored": false,
+                "net_index": 1,
+                "subnet_index": 0,
+                "number": "1",
+                "record": "TOP 0 21.0 -8.0 0.0 N 1 0 1"
+              }
+            ],
+            "bom_records": [],
+            "odb_source": {
+              "attributes": {
+                ".comp_mount_type": {
+                  "raw": "0"
+                }
+              },
+              "uid": "",
+              "record": "CMP 0 20.0 -10.0 270.0 N J1 Parity_RotatedPad ;0=0"
+            },
+            "odb_package_ref": {
+              "index": 0,
+              "name": "RotatedPad",
+              "bounds_mm": [
+                -0.25,
+                -0.25,
+                2.4,
+                1.6
+              ]
+            }
+          }
+        },
+        "reference": "J1",
+        "value": "RotationFixture",
+        "footprint": "RotatedPad",
+        "side": "top",
+        "position_mm": [
+          20.0,
+          -10.0
+        ],
+        "rotation_deg": -270.0,
+        "pin_ids": [
+          "f9e9323e-ae87-5f19-9716-4902ce676251"
+        ],
+        "model_ids": [],
+        "zone_connection_override": "inherit",
+        "zone_connection_declared": false,
+        "thermal_gap_override_mm": null,
+        "thermal_spoke_width_override_mm": null,
+        "thermal_settings_valid": false
+      }
+    ],
+    "component_bonds": [],
+    "connectors": [],
+    "regions": [],
+    "bends": [],
+    "models": [],
+    "constraints": [],
+    "variants": [],
+    "simulation_models": [],
+    "issues": [
+      {
+        "code": "ODB_STACKUP_MISSING",
+        "severity": "warning",
+        "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+        "path": "",
+        "suggestion": "",
+        "status": "open"
+      },
+      {
+        "code": "ODB_MODELS_MISSING",
+        "severity": "warning",
+        "message": "No explicit component 3D model assignments were supplied.",
+        "path": "",
+        "suggestion": "",
+        "status": "open"
+      }
+    ],
+    "vendor_extensions": {},
+    "metadata": {
+      "odb_matrix": [
+        {
+          "block": "STEP",
+          "COL": "1",
+          "NAME": "PCB"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "1",
+          "CONTEXT": "BOARD",
+          "TYPE": "COMPONENT",
+          "NAME": "COMP_+_TOP",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "2",
+          "CONTEXT": "BOARD",
+          "TYPE": "SIGNAL",
+          "NAME": "F.CU",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "3",
+          "CONTEXT": "BOARD",
+          "TYPE": "DIELECTRIC",
+          "NAME": "DIELECTRIC_1",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "DIELECTRIC_TYPE": "CORE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "4",
+          "CONTEXT": "BOARD",
+          "TYPE": "SIGNAL",
+          "NAME": "B.CU",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "5",
+          "CONTEXT": "MISC",
+          "TYPE": "DOCUMENT",
+          "NAME": "EDGE.CUTS",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "6",
+          "CONTEXT": "MISC",
+          "TYPE": "DOCUMENT",
+          "NAME": "MARGIN",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "7",
+          "CONTEXT": "MISC",
+          "TYPE": "DOCUMENT",
+          "NAME": "B.COURTYARD",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        },
+        {
+          "block": "LAYER",
+          "ROW": "8",
+          "CONTEXT": "MISC",
+          "TYPE": "DOCUMENT",
+          "NAME": "F.COURTYARD",
+          "OLD_NAME": "",
+          "POLARITY": "POSITIVE",
+          "COLOR": "0"
+        }
+      ],
+      "arcs": [
+        {
+          "id": "odb:f.cu:0",
+          "layer": "F.Cu",
+          "layers": [
+            "F.Cu"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "A 14.0 0.0 10.0 0.0 12.0 0.0 0 P 0 Y",
+            "line": 25,
+            "feature_index": 0,
+            "records": [
+              "A 14.0 0.0 10.0 0.0 12.0 0.0 0 P 0 Y"
+            ]
+          },
+          "kind": "arc",
+          "start": [
+            14.0,
+            0.0
+          ],
+          "end": [
+            10.0,
+            0.0
+          ],
+          "width": 0.3,
+          "mid": [
+            12.0,
+            -2.0
+          ],
+          "center": [
+            12.0,
+            0.0
+          ],
+          "clockwise": true,
+          "net_id": 2
+        }
+      ],
+      "odb_artwork": [
+        {
+          "id": "odb:edge.cuts:0",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L -1.0 1.0 30.0 1.0 0 P 0",
+            "line": 22,
+            "feature_index": 0,
+            "records": [
+              "L -1.0 1.0 30.0 1.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            -1.0,
+            1.0
+          ],
+          "end": [
+            30.0,
+            1.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:1",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L 30.0 1.0 30.0 -20.0 0 P 0",
+            "line": 23,
+            "feature_index": 1,
+            "records": [
+              "L 30.0 1.0 30.0 -20.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            30.0,
+            1.0
+          ],
+          "end": [
+            30.0,
+            -20.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:2",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L 30.0 -20.0 -1.0 -20.0 0 P 0",
+            "line": 24,
+            "feature_index": 2,
+            "records": [
+              "L 30.0 -20.0 -1.0 -20.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            30.0,
+            -20.0
+          ],
+          "end": [
+            -1.0,
+            -20.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:3",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L -1.0 -20.0 -1.0 1.0 0 P 0",
+            "line": 25,
+            "feature_index": 3,
+            "records": [
+              "L -1.0 -20.0 -1.0 1.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            -1.0,
+            -20.0
+          ],
+          "end": [
+            -1.0,
+            1.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:4",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L 6.0 -6.0 8.0 -6.0 0 P 0",
+            "line": 26,
+            "feature_index": 4,
+            "records": [
+              "L 6.0 -6.0 8.0 -6.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            6.0,
+            -6.0
+          ],
+          "end": [
+            8.0,
+            -6.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:5",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L 8.0 -6.0 8.0 -8.0 0 P 0",
+            "line": 27,
+            "feature_index": 5,
+            "records": [
+              "L 8.0 -6.0 8.0 -8.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            8.0,
+            -6.0
+          ],
+          "end": [
+            8.0,
+            -8.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:6",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L 8.0 -8.0 6.0 -8.0 0 P 0",
+            "line": 28,
+            "feature_index": 6,
+            "records": [
+              "L 8.0 -8.0 6.0 -8.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            8.0,
+            -8.0
+          ],
+          "end": [
+            6.0,
+            -8.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        },
+        {
+          "id": "odb:edge.cuts:7",
+          "layer": "EDGE.CUTS",
+          "layers": [
+            "EDGE.CUTS"
+          ],
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "L 6.0 -8.0 6.0 -6.0 0 P 0",
+            "line": 29,
+            "feature_index": 7,
+            "records": [
+              "L 6.0 -8.0 6.0 -6.0 0 P 0"
+            ]
+          },
+          "kind": "track",
+          "start": [
+            6.0,
+            -8.0
+          ],
+          "end": [
+            6.0,
+            -6.0
+          ],
+          "width": 0.05,
+          "net_id": 0
+        }
+      ],
+      "board_outline_rings": [
+        {
+          "role": "outer",
+          "start_mm": [
+            30.0,
+            1.0
+          ],
+          "segments": [
+            {
+              "kind": "line",
+              "end_mm": [
+                30.0,
+                -20.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                -1.0,
+                -20.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                -1.0,
+                1.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                30.0,
+                1.0
+              ]
+            }
+          ]
+        },
+        {
+          "role": "cutout",
+          "start_mm": [
+            6.0,
+            -6.0
+          ],
+          "segments": [
+            {
+              "kind": "line",
+              "end_mm": [
+                6.0,
+                -8.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                8.0,
+                -8.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                8.0,
+                -6.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                6.0,
+                -6.0
+              ]
+            }
+          ]
+        }
+      ],
+      "board_bounds_mm": [
+        -1.0,
+        -20.0,
+        30.0,
+        1.0
+      ],
+      "source_sha256": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+      "source_size_bytes": 6733,
+      "odb_steps": [
+        "pcb"
+      ],
+      "odb_selected_step": "pcb",
+      "odb_info": "JOB_NAME=job\nUNITS=MM\nODB_VERSION_MAJOR=8\nODB_VERSION_MINOR=1\nODB_SOURCE=KiCad EDA\nCREATION_DATE=20261014.012959\nSAVE_DATE=20261014.012959\nSAVE_APP=KiCad EDA 10.0.6\n",
+      "odb_packages": [
+        {
+          "name": "RotatedPad",
+          "odb_source": {
+            "attributes": {},
+            "uid": "",
+            "record": "PKG RotatedPad 1.0 -0.250 -0.250 2.40 1.60;"
+          },
+          "records": [
+            "CT",
+            "OB 1.60 -1.60 I",
+            "OS 1.60 -1.60",
+            "OS 1.60 -0.40",
+            "OS 2.40 -0.40",
+            "OS 2.40 -1.60",
+            "OS 1.60 -1.60",
+            "OE",
+            "CE",
+            "PIN 1 S 2.0 -1.0 0 E S",
+            "CT",
+            "OB 1.60 -0.40 I",
+            "OS 1.60 -0.40",
+            "OS 2.40 -0.40",
+            "OS 2.40 -1.60",
+            "OS 1.60 -1.60",
+            "OS 1.60 -0.40",
+            "OE",
+            "CE"
+          ],
+          "properties": [],
+          "bounds_mm": [
+            -0.25,
+            -0.25,
+            2.4,
+            1.6
+          ]
+        }
+      ],
+      "odb_subnets": [
+        {
+          "net_id": 2,
+          "type": "TOP",
+          "fields": [
+            "T",
+            "0",
+            "0"
+          ],
+          "features": [
+            {
+              "layer": "f.cu",
+              "index": 1,
+              "type": "C"
+            }
+          ]
+        },
+        {
+          "net_id": 2,
+          "type": "TRC",
+          "fields": [],
+          "features": [
+            {
+              "layer": "f.cu",
+              "index": 0,
+              "type": "C"
+            }
+          ]
+        }
+      ],
+      "odb_retained": [],
+      "odb_issue_counts": {
+        "ODB_STACKUP_MISSING": 1,
+        "ODB_MODELS_MISSING": 1
+      },
+      "odb_issue_severity_counts": {
+        "ODB_STACKUP_MISSING:warning": 1,
+        "ODB_MODELS_MISSING:warning": 1
+      },
+      "odb_members": [
+        {
+          "name": "job/matrix/matrix",
+          "size_bytes": 1040
+        },
+        {
+          "name": "job/misc/info",
+          "size_bytes": 165
+        },
+        {
+          "name": "job/steps/pcb/eda/data",
+          "size_bytes": 475
+        },
+        {
+          "name": "job/steps/pcb/layers/b.courtyard/attrlist",
+          "size_bytes": 0
+        },
+        {
+          "name": "job/steps/pcb/layers/b.courtyard/features",
+          "size_bytes": 32
+        },
+        {
+          "name": "job/steps/pcb/layers/b.cu/attrlist",
+          "size_bytes": 44
+        },
+        {
+          "name": "job/steps/pcb/layers/b.cu/features",
+          "size_bytes": 32
+        },
+        {
+          "name": "job/steps/pcb/layers/comp_+_top/attrlist",
+          "size_bytes": 0
+        },
+        {
+          "name": "job/steps/pcb/layers/comp_+_top/components",
+          "size_bytes": 249
+        },
+        {
+          "name": "job/steps/pcb/layers/comp_+_top/features",
+          "size_bytes": 32
+        },
+        {
+          "name": "job/steps/pcb/layers/dielectric_1/attrlist",
+          "size_bytes": 84
+        },
+        {
+          "name": "job/steps/pcb/layers/dielectric_1/features",
+          "size_bytes": 32
+        },
+        {
+          "name": "job/steps/pcb/layers/edge.cuts/attrlist",
+          "size_bytes": 0
+        },
+        {
+          "name": "job/steps/pcb/layers/edge.cuts/features",
+          "size_bytes": 378
+        },
+        {
+          "name": "job/steps/pcb/layers/f.courtyard/attrlist",
+          "size_bytes": 0
+        },
+        {
+          "name": "job/steps/pcb/layers/f.courtyard/features",
+          "size_bytes": 32
+        },
+        {
+          "name": "job/steps/pcb/layers/f.cu/attrlist",
+          "size_bytes": 44
+        },
+        {
+          "name": "job/steps/pcb/layers/f.cu/features",
+          "size_bytes": 266
+        },
+        {
+          "name": "job/steps/pcb/layers/margin/attrlist",
+          "size_bytes": 0
+        },
+        {
+          "name": "job/steps/pcb/layers/margin/features",
+          "size_bytes": 32
+        },
+        {
+          "name": "job/steps/pcb/netlists/cadnet/netlist",
+          "size_bytes": 85
+        },
+        {
+          "name": "job/steps/pcb/profile",
+          "size_bytes": 219
+        },
+        {
+          "name": "job/steps/pcb/stephdr",
+          "size_bytes": 148
+        }
+      ],
+      "geometry_normalized": true,
+      "geometry_solver_ready": true,
+      "physical_units_resolved": true,
+      "parser": "ODB++Design",
+      "parser_revision": "odb-v1",
+      "stackup_physical_complete": false,
+      "stackup_missing_copper_layers": [
+        "F.Cu",
+        "B.Cu"
+      ],
+      "importer_id": "odb-design",
+      "importer_contract": "spike/importer-descriptor/v1",
+      "legacy_design_id": "odb-3f02f6b198854f817bd2b393",
+      "technology": "rigid",
+      "spike.v1.stackup": [],
+      "import_report": {
+        "importer_id": "odb-design",
+        "source_format": "odb++",
+        "source_sha256": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+        "source_size_bytes": 6733,
+        "status": "completed_with_warnings",
+        "contract": "spike/import-report/v1",
+        "coverage": {
+          "layers": 8,
+          "nets": 1,
+          "tracks": 0,
+          "arcs": 1,
+          "zones": 0,
+          "pads": 1,
+          "vias": 0,
+          "drills": 0,
+          "castellations": 0,
+          "components": 1,
+          "models": 0
+        },
+        "inferred": [
+          {
+            "code": "ODB_STACKUP_MISSING",
+            "severity": "warning",
+            "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          },
+          {
+            "code": "ODB_MODELS_MISSING",
+            "severity": "warning",
+            "message": "No explicit component 3D model assignments were supplied.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          }
+        ],
+        "unsupported": [],
+        "geometry_errors": [],
+        "object_map": {
+          "COMP_+_TOP": "f362f310-fb23-5d85-944c-cbfbf11464e4",
+          "F.Cu": "cddcbebc-c272-5f9f-88c0-399f6e93c904",
+          "DIELECTRIC_1": "4dd30acf-bf70-5216-8f46-c57632c36157",
+          "EDGE.CUTS": "4f286839-8bf7-5b78-9457-88f84020bd77",
+          "B.Cu": "883fee85-c301-53ea-83b8-2302a7ee6a2b",
+          "MARGIN": "1cbfaa28-7e4d-53d1-967b-66d146fb3354",
+          "B.COURTYARD": "49b4821f-30c1-57bd-bb34-ef1aae05ca40",
+          "F.COURTYARD": "329ca06b-430a-518a-9e17-f318c8f72a6e",
+          "2": "ccc0e68e-e35e-515f-beee-794ac7478400",
+          "odb:f.cu:0": "c4ef3033-856a-5052-b7fa-be174fb9f0bc",
+          "odb:f.cu:1": "e88096c7-9603-5f13-9735-f1a1c348df5f",
+          "bf203098-132e-50b1-998c-d6fd52917b7a:1": "f9e9323e-ae87-5f19-9716-4902ce676251",
+          "odb:comp_+_top:component:0": "bf203098-132e-50b1-998c-d6fd52917b7a"
+        },
+        "layer_order": [
+          "COMP_+_TOP",
+          "F.Cu",
+          "DIELECTRIC_1",
+          "B.Cu",
+          "EDGE.CUTS",
+          "MARGIN",
+          "B.COURTYARD",
+          "F.COURTYARD"
+        ],
+        "model_resolution": {
+          "declared": 0,
+          "resolved": 0
+        },
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving."
+            ]
+          },
+          "pi_ac": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          },
+          "si": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          },
+          "thermal": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving."
+            ]
+          },
+          "emi": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          }
+        },
+        "diagnostics": []
+      }
+    }
+  },
+  "report": {
+    "importer_id": "odb-design",
+    "source_format": "odb++",
+    "source_sha256": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+    "source_size_bytes": 6733,
+    "status": "completed_with_warnings",
+    "contract": "spike/import-report/v1",
+    "coverage": {
+      "layers": 8,
+      "nets": 1,
+      "tracks": 0,
+      "arcs": 1,
+      "zones": 0,
+      "pads": 1,
+      "vias": 0,
+      "drills": 0,
+      "castellations": 0,
+      "components": 1,
+      "models": 0
+    },
+    "inferred": [
+      {
+        "code": "ODB_STACKUP_MISSING",
+        "severity": "warning",
+        "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+        "path": "",
+        "suggestion": "",
+        "status": "open"
+      },
+      {
+        "code": "ODB_MODELS_MISSING",
+        "severity": "warning",
+        "message": "No explicit component 3D model assignments were supplied.",
+        "path": "",
+        "suggestion": "",
+        "status": "open"
+      }
+    ],
+    "unsupported": [],
+    "geometry_errors": [],
+    "object_map": {
+      "COMP_+_TOP": "f362f310-fb23-5d85-944c-cbfbf11464e4",
+      "F.Cu": "cddcbebc-c272-5f9f-88c0-399f6e93c904",
+      "DIELECTRIC_1": "4dd30acf-bf70-5216-8f46-c57632c36157",
+      "EDGE.CUTS": "4f286839-8bf7-5b78-9457-88f84020bd77",
+      "B.Cu": "883fee85-c301-53ea-83b8-2302a7ee6a2b",
+      "MARGIN": "1cbfaa28-7e4d-53d1-967b-66d146fb3354",
+      "B.COURTYARD": "49b4821f-30c1-57bd-bb34-ef1aae05ca40",
+      "F.COURTYARD": "329ca06b-430a-518a-9e17-f318c8f72a6e",
+      "2": "ccc0e68e-e35e-515f-beee-794ac7478400",
+      "odb:f.cu:0": "c4ef3033-856a-5052-b7fa-be174fb9f0bc",
+      "odb:f.cu:1": "e88096c7-9603-5f13-9735-f1a1c348df5f",
+      "bf203098-132e-50b1-998c-d6fd52917b7a:1": "f9e9323e-ae87-5f19-9716-4902ce676251",
+      "odb:comp_+_top:component:0": "bf203098-132e-50b1-998c-d6fd52917b7a"
+    },
+    "layer_order": [
+      "COMP_+_TOP",
+      "F.Cu",
+      "DIELECTRIC_1",
+      "B.Cu",
+      "EDGE.CUTS",
+      "MARGIN",
+      "B.COURTYARD",
+      "F.COURTYARD"
+    ],
+    "model_resolution": {
+      "declared": 0,
+      "resolved": 0
+    },
+    "solver_readiness": {
+      "pi_dc": {
+        "ready": false,
+        "reasons": [
+          "ODB++ copper requires explicit layer thickness before solving."
+        ]
+      },
+      "pi_ac": {
+        "ready": false,
+        "reasons": [
+          "ODB++ copper requires explicit layer thickness before solving.",
+          "Stackup or dielectric material data is incomplete."
+        ]
+      },
+      "si": {
+        "ready": false,
+        "reasons": [
+          "ODB++ copper requires explicit layer thickness before solving.",
+          "Stackup or dielectric material data is incomplete."
+        ]
+      },
+      "thermal": {
+        "ready": false,
+        "reasons": [
+          "ODB++ copper requires explicit layer thickness before solving."
+        ]
+      },
+      "emi": {
+        "ready": false,
+        "reasons": [
+          "ODB++ copper requires explicit layer thickness before solving.",
+          "Stackup or dielectric material data is incomplete."
+        ]
+      }
+    },
+    "diagnostics": []
+  }
+}

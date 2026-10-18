@@ -85,6 +85,15 @@ OS sandbox: trust remains required for external code.
 
 ## ODB++ coverage
 
+Folder and archive jobs may gzip individual text members, including
+`matrix/matrix.gz`. Step inspection and full import discover the same job root
+and read those members through the same bounded decompression path. Mixed plain
+and gzip versions of a requested member are rejected as ambiguous; multiple job
+roots require a separate package. Original compressed member names, sizes and
+source digest remain provenance. Unix compress (`.Z`) members remain unsupported
+and require re-export as gzip or plain text. Gzip support does not expand panel
+instances or change the declared geometry and units.
+
 The implementation follows the [Siemens ODB++Design format specification](https://odbplusplus.com/design/odb-design-format-specification/).
 It reads matrix layer/step definitions, independent file units, symbol units,
 profiles, positive circular strokes, arcs, round/rectangular/oval/elliptical pads,
@@ -217,3 +226,31 @@ The corresponding normalized Marble project package measured 95,943,327 bytes.
 Its compact reopen worker frame measured 245,974,230 bytes and retained all 122
 canonical zones. Canonical `design/design-ir.json` members have a separate
 512 MiB verified limit; other control-plane JSON members retain the 64 MiB cap.
+
+## Drag and drop import
+
+In the desktop workspace, drop local KiCad `.kicad_pcb` boards, ODB++ job
+folders or ZIP/TAR/TGZ archives, and STEP/STP/GLB/glTF mechanical models.
+The dropped-source queue identifies each format. Choose **Review** for a source
+to open the existing import dialog. ODB++ uses its job-step selection and import
+coverage report; mechanical models continue into the assembly attachment tool.
+Reviewing a file does not by itself replace a board or attach a model.
+
+Up to 32 sources can be staged together. Duplicate paths are merged. Review
+sources individually; importing several boards does not implicitly build an
+assembly or electrical interconnection. Existing unsaved-project and model
+attachment checks still apply. Finish an active import, load or solver operation
+before dropping additional sources. Unsupported files have a visible explanation.
+External CAD application object/clipboard payloads are not file imports; export
+a supported mechanical model first.
+
+Native drops approve only the exact canonical files/folders delivered by the
+operating system to the main window. They do not grant blanket read access to a
+folder's descendants or add a frontend path-approval command. ODB++ folder
+contents are consumed by the existing bounded package reader. A transient drop
+hint disappears after dropping or leaving; no permanent toolbar is added.
+
+Browser preview accepts KiCad boards and text SPIKE snapshots/projects/results,
+with a 64 MiB per-file limit. ODB++, mechanical sources, harnesses and IPC-2581
+use the desktop workflow. Native packaged `.spike` projects require the desktop
+package loader; browser text import is not a replacement for that loader.

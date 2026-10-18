@@ -434,7 +434,7 @@ export async function openNativeTextFile(kind: "board" | "project" | "report" | 
   return invoke<NativeTextFile | null>("open_text_file", { kind });
 }
 
-export async function saveNativeTextFile(suggestedName: string, contents: string, kind: "project" | "report" | "step" | "netlist" | "result" | "license" | "script" | "sheet"): Promise<string | null> {
+export async function saveNativeTextFile(suggestedName: string, contents: string, kind: "project" | "report" | "support-report" | "step" | "netlist" | "result" | "license" | "script" | "sheet"): Promise<string | null> {
   if (!isDesktopShell()) return null;
   return invoke<string | null>("save_text_file", { suggestedName, contents, kind });
 }
@@ -562,3 +562,12 @@ export const appUpdateCheck = () => invoke<AppUpdateSnapshot>("app_update_check"
 export const appUpdateDownload = () => invoke<AppUpdateSnapshot>("app_update_download");
 export const appUpdateCancel = () => invoke<void>("app_update_cancel");
 export const appUpdateInstall = (acknowledged: boolean, unattended = false) => invoke<AppUpdateSnapshot>("app_update_install", { acknowledged, unattended });
+
+/** Native drop paths are approved by the OS event handler, never by a UI command. */
+export async function subscribeNativeImportDrops(onDrop:(payload:unknown)=>void,onDrag:(active:boolean)=>void):Promise<UnlistenFn> {
+  const drop=await listen<unknown>("spike://import-drop",event=>onDrop(event.payload));
+  try {
+    const drag=await listen<{active:boolean}>("spike://import-drag",event=>onDrag(event.payload.active===true));
+    return ()=>{drop();drag();};
+  } catch(error) {drop();throw error;}
+}

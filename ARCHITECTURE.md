@@ -1,5 +1,14 @@
 # SPIKE Architecture
 
+Manufacturer product discovery and local LTspice indexing are separate from
+generic presets and executable model qualification; see
+[ADR 0111](docs/adr/0111-manufacturer-discovery-and-local-model-index.md).
+
+SPIKES Studio has an explicit experimental native Renode firmware backend for
+three admitted Cortex-M board targets, separate from inert pinout templates and
+sampled C/C++ callbacks. Its process, trust, ELF physical-loading and sampled
+DI/DO boundaries are recorded in [ADR 0110](docs/adr/0110-explicit-native-firmware-backend.md).
+
 The IC/ASIC target has two visible applications, SPIKES and external KLayout,
 with explicitly approved managed backends. Revision-bound project preflight
 and read-only KLayout batch inspection are implemented; physical closure and

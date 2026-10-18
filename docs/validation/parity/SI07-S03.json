@@ -4,12 +4,12 @@
   "status": "passed",
   "production_qualified": false,
   "sources": {
-    "scripts/parity_pisi_gate.py": "4cdfed268d0a3ad4ddbe79eb564694cc36cdf805ee8b1e5780afea302e540289",
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
     "python/spike_core/sparameter_terminated.py": "20508afc27dc35401d94cee3c6d0a24b0d30dd5423f3ee83fc245c8898d2a574",
     "python/spike_core/sparameter_transient.py": "df92677d5f36da656efde8f5b20985942278c2d1120ef442e95e6c3a23b6a500",
     "python/spike_core/sparameter_rational.py": "9498d2e9ce2768fe0aff462457ac774652850aa3530071a1c0aa546c3ba53b56",
     "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
-    "python/spike_core/service_sparameter_processing.py": "a0ab3898725ae370fe32824cab24c36728af0f9cbf25f170380ac1c2089bab70",
+    "python/spike_core/service_sparameter_processing.py": "d79edcdd35c3e33ab47a309bb2b6dda6af7933c5592c4a3537346441b2803df8",
     "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
     "tests/python/test_sparameter_terminated.py": "ecfe004d7db268a8def6bca3b74ff22c127340eaf9ac8e33586ecfe8983cee48",
     "tests/python/test_sparameter_terminated_contract.py": "9a6307c5b42d2fb460d6b3829d1585e94fecdd153deda031eb12ed9b1b0b4226",
@@ -47,6 +47,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/SI07-S03-capacitive-reverified.log",
-  "log_sha256": "93bb54fc15f73d282acc5455aeeb76531e55e0ac55d65ef6d1b728b821d8f47c"
+  "log": "docs/validation/parity/SI07-S03-star-junction-20261019-reverified.log",
+  "log_sha256": "4700ca7d3139e928f17ba7f21c5babfe018319e4fa91f5be4d373828fef6f197"
 }

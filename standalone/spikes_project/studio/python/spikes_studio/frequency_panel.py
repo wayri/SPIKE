@@ -48,7 +48,7 @@ class FrequencyPanel(wx.Panel):
         note=wx.StaticText(self,label='Expressions: V(out)/V(in), V(in)/(-I(V1)), f [Hz]. Click a trace for frequency/value readout; circles/squares mark sweep start/end. Nyquist here is a sampled locus, not a closed-contour stability certificate.')
         note.Wrap(990);box.Add(note,0,wx.ALL,6);self.SetSizer(box)
         self.plot.mpl_connect('button_press_event',self.pick)
-        ax=self.figure.add_subplot();ax.set_title('Run a linear circuit or open recorded frequency data');ax.set_xlabel('Frequency [Hz]');self.plot.draw()
+        ax=self.figure.add_subplot();ax.set_title('Run a linear circuit or open recorded frequency data');ax.set_xlabel('Frequency [Hz]');self.plot.draw_idle()
 
     def settings(self):
         from .frequency import parse_hz

@@ -5,6 +5,7 @@ import { cancelLocalWorker, isDesktopShell, runLocalWorker } from "./workerBridg
 import catalogJson from "./siWorkflowCatalog.json";
 import SiWorkflowPlots, { SiPlot } from "./SiWorkflowPlots";
 import { usePanelPresentation } from "./panelPresentation";
+import { changeSiChannel, siChannelPortCount, siWorkflowPortIssues } from "./siWorkflowAssignments";
 import "./siWorkflow.css";
 
 type RecordData = Record<string, unknown>;
@@ -63,6 +64,7 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
   const [setup, setSetup] = useState<RecordData>(() => clone(saved?.request ? rec(saved.request) : rec(catalog.defaults)));
   const [result, setResult] = useState<RecordData | null>(saved);
   const [busy, setBusy] = useState(false), [error, setError] = useState("");
+  const [assignmentNotice, setAssignmentNotice] = useState("");
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState<string>(initialStep), [jsonDraft, setJsonDraft] = useState("");
   useEffect(() => { if (intentToken) setStep(initialStep); }, [initialStep, intentToken]);
@@ -74,17 +76,23 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
   const [editValue, setEditValue] = useState("50"), [editKind, setEditKind] = useState("renormalize");
   const channel = rec(setup.channel), sources = records(setup.sources), receivers = records(setup.receivers), passives = records(setup.passives);
   const desktop = isDesktopShell();
-  // A filename supplies only a UI hint; the worker validates the actual network.
-  const portCount = channel.kind === "rlgc" ? (channel.coupled ? 4 : 2)
-    : channel.kind === "touchstone" ? Number(String(channel.name).match(/\.s(\d+)p$/i)?.[1]) || null
-    : channel.kind === "geometry" ? (rec(channel.request).victim_net ? 4 : 2) : null;
+  const portCount = siChannelPortCount(channel);
+  const assignmentIssues = siWorkflowPortIssues(setup);
   const occupiedPorts = new Set([...sources, ...receivers].map(endpoint => Number(endpoint.port)));
   const freePort = Array.from({ length: portCount ?? 16 }, (_, i) => i).find(port => !occupiedPorts.has(port));
   const netRecords = records(design?.nets), layerRecords = records(design?.layers).filter(l => l.layer_type === "copper");
-  const change = (key: string, value: unknown) => { setSetup(s => ({ ...s, [key]: value })); setError(""); };
+  const change = (key: string, value: unknown) => {
+    if (key === "channel") {
+      const changed = changeSiChannel(setup, rec(value));
+      setSetup(changed.setup);
+      if (changed.notice) setAssignmentNotice(changed.notice);
+    } else setSetup(s => ({ ...s, [key]: value }));
+    setError("");
+  };
   const updateEndpoint = (key: "sources" | "receivers", index: number, value: RecordData) => change(key, records(setup[key]).map((m, i) => i === index ? value : m));
   const updatePassive = (index: number, value: RecordData) => change("passives", passives.map((m, i) => i === index ? value : m));
   const run = async () => {
+    if (assignmentIssues.length) { setError(assignmentIssues.join(" ")); setStep("endpoints"); return; }
     setBusy(true); setRunning(true); setError("");
     try {
       const response = await runLocalWorker({ method: "run_si_workflow", params: { request: setup, design } });
@@ -112,6 +120,7 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
         const parsed = rec(JSON.parse(text)), request = parsed.contract === "spike/si-workflow-result/v1" ? rec(parsed.request) : parsed;
         if (request.contract !== "spike/si-workflow-request/v1") throw new Error("Expected a version 1 SI workflow setup or result.");
         setSetup({ ...clone(rec(catalog.defaults)), ...request });
+        setAssignmentNotice("");
         if (parsed.contract === "spike/si-workflow-result/v1") setResult(parsed);
       } else if (kind === "ibis") {
         setBusy(true);
@@ -140,7 +149,7 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
     <div className="si-row"><h3>{key === "sources" ? "Sources and aggressors" : "Receivers"}</h3><button disabled={freePort === undefined} title={freePort === undefined ? "All channel ports already have an endpoint." : "Assign the next unused channel port"} onClick={() => { if (freePort !== undefined) change(key, [...values, { ...clone(rec(catalog[key === "sources" ? "source" : "receiver"])), port: freePort }]); }}><Plus size={14} /> Add {key === "sources" ? "source" : "receiver"}</button></div>
     <div className="si-endpoint-table-wrap"><DataTable label="Signal integrity endpoints" className="si-endpoint-table"><thead><tr><th scope="col">{key === "sources" ? "Endpoint" : "Receiver"}</th><th scope="col">Port</th>{numericKeys.map(field => <th scope="col" key={field}>{labels[field] ?? field.replace(/_/g, " ")}</th>)}<th scope="col">IBIS</th><th scope="col"><span className="sr-only">Actions</span></th></tr></thead>
       <tbody>{values.map((value, i) => <tr key={i}><th scope="row">{key === "sources" ? (i ? `Aggressor ${i}` : "Primary source") : `Receiver ${i + 1}`}</th>
-        <td><input aria-label={`${kind} ${i + 1} port (1-based)`} type="number" min="1" value={Number(value.port) + 1} onChange={e => updateEndpoint(key, i, { ...value, port: Number(e.target.value) - 1 })} /></td>
+        <td><input aria-label={`${kind} ${i + 1} port (1-based)`} type="number" min="1" max={portCount ?? undefined} value={Number(value.port) + 1} onChange={e => updateEndpoint(key, i, { ...value, port: Number(e.target.value) - 1 })} /></td>
         {numericKeys.map(field => <td key={field}><TableNumeric name={field} value={value[field]} onChange={n => updateEndpoint(key, i, { ...value, [field]: n })} /></td>)}
         <td>{value.ibis ? <span className="si-endpoint-ibis" title={`IBIS model ${String(rec(value.ibis).model)}, ${String(rec(value.ibis).corner)} corner`}>Bound <button onClick={() => { const next = { ...value }; delete next.ibis; updateEndpoint(key, i, next); }}>Detach</button></span> : "—"}</td>
         <td><button title={`Remove ${kind}`} aria-label={`Remove ${kind} ${i + 1}`} onClick={() => change(key, values.filter((_, j) => j !== i))}><Trash2 size={14} /></button></td></tr>)}</tbody></DataTable></div>
@@ -153,13 +162,15 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
   return <div className="si-flow" aria-busy={busy}><div className="si-row si-toolbar">
     {running
       ? <button className="primary-btn" onClick={() => void stop()}><X size={15} />Stop SI study</button>
-      : <button className="primary-btn" disabled={busy || !desktop} onClick={() => void run()}><Play size={15} />{busy ? "Inspecting IBIS..." : "Run loaded SI study"}</button>}
+      : <button className="primary-btn" disabled={busy || !desktop || assignmentIssues.length > 0} title={assignmentIssues.length ? "Correct the listed port assignments before running" : undefined} onClick={() => void run()}><Play size={15} />{busy ? "Inspecting IBIS..." : "Run loaded SI study"}</button>}
     <button onClick={() => download(ownerDocument, "si-study.json", pretty(setup))}><Download size={15} />Save setup</button>
     <label className="si-file"><Upload size={15} />Open setup / result<input disabled={busy} type="file" accept=".json" onChange={e => { void loadFile(e.target.files?.[0], "setup"); e.target.value = ""; }} /></label>
     <button disabled={busy} onClick={() => { setJsonDraft(pretty(setup)); setStep("json"); }}>Edit JSON</button>
   </div>
   <nav className="si-steps" aria-label="SI workflow stages">{[["channel", "1 · Channel"], ["endpoints", "2 · Sources / receivers"], ["passives", "3 · Passives"], ["ibis", "4 · IBIS"], ["edits", "5 · Network edits"], ["results", "6 · Results"]].map(([id, name]) => <button key={id} className={step === id ? "active" : ""} onClick={() => setStep(id)}>{name}</button>)}</nav>
   {error && <div className="sparam-error" role="alert">{error}</div>}
+  {assignmentNotice && <p className="si-note" role="status">{assignmentNotice}</p>}
+  {assignmentIssues.length > 0 && <div className="sparam-error" role="alert"><b>Review port assignments before running</b><ul>{assignmentIssues.map(issue => <li key={issue}>{issue}</li>)}</ul><button type="button" disabled={busy} onClick={() => setStep("endpoints")}>Review sources / receivers</button></div>}
   {!desktop && <p className="si-note">Browser preview supports setup editing and saved results. Open the SPIKE desktop app to run studies or inspect IBIS files.</p>}
   <div className="si-note">Experimental linear SI. Defaults are editable assumptions. The exported Touchstone describes the channel after network edits; loaded source, receiver and passive responses are reported separately.</div>
   <fieldset disabled={busy} className="si-stage">
@@ -167,7 +178,7 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
     <button onClick={() => change("channel", clone(rec(rec(catalog.defaults).channel)))}>Uniform RLGC line</button>
     <label className="si-file"><Upload size={15} />Import Touchstone<input type="file" accept=".s2p,.s3p,.s4p,.s6p,.s8p,.s12p,.s16p" onChange={e => { void loadFile(e.target.files?.[0], "touchstone"); e.target.value = ""; }} /></label>
     <button disabled={!design} onClick={useGeometry}>Extract active board path</button></div>
-    {channel.kind === "rlgc" && <><label><input type="checkbox" checked={!!channel.coupled} onChange={e => { change("channel", { ...channel, coupled: e.target.checked }); change("receivers", [{ ...rec(catalog.receiver), port: e.target.checked ? 2 : 1 }]); }} /> Coupled pair (4 ports)</label>
+    {channel.kind === "rlgc" && <><label><input type="checkbox" checked={!!channel.coupled} onChange={e => change("channel", { ...channel, coupled: e.target.checked })} /> Coupled pair (4 ports)</label>
       <p>4-port order: 1 aggressor near, 2 victim near, 3 aggressor far, 4 victim far. NEXT: source 1 → port 2. FEXT: source 1 → port 4. Two-port lines use 1 near, 2 far.</p>
       <NumericFields value={channel} onChange={v => change("channel", v)} /></>}
     {channel.kind === "touchstone" && <p>Imported: <b>{String(channel.name)}</b>. Assign endpoints to the file’s port order; use the reorder editor to change it. DC and uniform spacing are required for time-domain work.</p>}
@@ -213,7 +224,7 @@ export default function SiWorkflowWorkbench({ design, initialResult, initialStep
     {records(setup.edits).map((edit, i) => <div className="si-row" key={i}><span>{i + 1}. {String(edit.kind)} · {pretty({ ...edit, ...(edit.channel ? { channel: rec(edit.channel).name } : {}) })}</span><button onClick={() => change("edits", records(setup.edits).filter((_, j) => i !== j))}>Remove</button></div>)}
     <label>Touchstone export encoding<select value={String(setup.export_format)} onChange={e => change("export_format", e.target.value)}><option>RI</option><option>MA</option><option>DB</option></select></label>
   </>}
-  {step === "json" && <><h3>Complete study setup</h3><p>All units are SI unless specified. JSON port indices are zero-based. Applying updates the form; validation runs in the worker.</p><textarea className="si-json" value={jsonDraft} spellCheck={false} onChange={e => setJsonDraft(e.target.value)} /><button onClick={() => { try { const v = rec(JSON.parse(jsonDraft)); if (v.contract !== "spike/si-workflow-request/v1") throw new Error("Unsupported SI workflow contract."); setSetup(v); setStep("channel"); } catch (e) { setError(message(e)); } }}>Apply JSON</button></>}
+  {step === "json" && <><h3>Complete study setup</h3><p>All units are SI unless specified. JSON port indices are zero-based. Applying updates the form; validation runs in the worker.</p><textarea className="si-json" value={jsonDraft} spellCheck={false} onChange={e => setJsonDraft(e.target.value)} /><button onClick={() => { try { const v = rec(JSON.parse(jsonDraft)); if (v.contract !== "spike/si-workflow-request/v1") throw new Error("Unsupported SI workflow contract."); setSetup(v); setAssignmentNotice(""); setStep("channel"); } catch (e) { setError(message(e)); } }}>Apply JSON</button></>}
   {step === "results" && (!result ? <p>Run a study to inspect network quality, loaded transfers, eyes, TDR, noise and resolved models.</p> : <>
     {stale && <p className="si-note">Setup differs from this saved result. Run again to update results and export.</p>}
     <div className="si-row"><button onClick={() => download(ownerDocument, "si-result.json", pretty(result))}><Download size={15} />Save complete result</button>

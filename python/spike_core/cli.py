@@ -1312,6 +1312,9 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("candidate", type=Path)
     compare.add_argument("--tolerance-percent", type=float, default=1.0)
 
+    sub.add_parser("pdn-network", help="Solve an explicit lumped PI network: AC impedance and optional load transient").add_argument("request", type=Path)
+    sub.add_parser("rlgc-cascade", help="Solve a supplied piecewise RLGC line, local fields and section losses").add_argument("request", type=Path)
+    sub.add_parser("rlgc-junction", help="Solve supplied RLGC star legs, coherent fields and distributed losses").add_argument("request", type=Path)
     pdn = sub.add_parser("pdn-review", help="Check an AC result against a PDN target and screen lumped decoupling candidates")
     pdn.add_argument("result", type=Path)
     pdn.add_argument("--target-ohm", type=float, required=True)
@@ -1865,6 +1868,18 @@ def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
             metrics[key] = {"baseline": before, "candidate": after, "change_percent": percent}
             exceeded = exceeded or percent > args.tolerance_percent
         result = {"contract": "spike/result-comparison/v1", "status": "regression" if exceeded else "pass", "tolerance_percent": args.tolerance_percent, "metrics": metrics}
+    elif args.command == "pdn-network":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("PDN network request exceeds 8 MiB.")
+        result = _response("evaluate_pdn_network", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-junction":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("RLGC junction request exceeds 8 MiB.")
+        result = _response("run_rlgc_line_junction", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-cascade":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("RLGC cascade request exceeds 8 MiB.")
+        result = _response("run_rlgc_line_cascade", {"request": _read_json(args.request)})["result"]
     elif args.command == "pdn-review":
         source = _read_json(args.result)
         if "result" in source and isinstance(source["result"], dict):

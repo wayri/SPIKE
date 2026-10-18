@@ -18,7 +18,7 @@
     "python/spike_core/gmsh_occ_runtime.py": "c434aea9386fa62eda2a5a68940c3a98e839d2e44da3a95e0ea40f7dfa069c3e",
     "python/spike_core/gmsh_occ_mesher.py": "3d872da940ee704d47e081bb576eb384d107449bf8adfbe1eb3089c3a7b34b03",
     "python/spike_core/service_project_thermal_mesh.py": "cf8e11581e52326d5d5bf12d4b4059ca8291cba4d396bb67ab29096c4a76a9cb",
-    "python/spike_core/project_package.py": "29a631aadbc1f6a5f3dd1aa68cde37dfa8bce97750c63ae72cf5a5117955a39b",
+    "python/spike_core/project_package.py": "0c46751b69293eb5d647153e0b5f017586df88c564b9ed0cd684fe922b47c2c4",
     "schemas/thermal-component-promotion-v1.schema.json": "aa6050c84aaf3f4a1cd90a9e8f6e003ad1d2492e94415299fd4a6218dc918f80",
     "schemas/assembly-thermal-mesh-assignments-v1.schema.json": "e57d084aeeb1c3a4d4377df4bde81474caf258bd80f6886768746079500010e2"
   },
@@ -43,6 +43,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/WF01-S04C2.log",
-  "log_sha256": "0d119909cb5c7ef6b071ac414e60897f3c968a7e9082f0318266723597ab2b29"
+  "log": "docs/validation/parity/WF01-S04C2-rlgc-fields-native-reverified.log",
+  "log_sha256": "4d5058e766c291ae8297ed6fde9364492db23a073102226bb1d06e97e2c10d98"
 }

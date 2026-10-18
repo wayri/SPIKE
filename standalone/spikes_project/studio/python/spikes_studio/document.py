@@ -59,6 +59,7 @@ class Document:
         self.data.setdefault('plot_layout',default_layout())
         self.data.setdefault('instruments',[])
         self.data.setdefault('controller_setup',None)
+        self.data.setdefault('controller_boards',[])
         from .power_tree import empty_tree
         self.data.setdefault('power_tree',empty_tree());self.data.setdefault('analytics_extensions',[])
         from .directives import reconcile
@@ -301,6 +302,10 @@ class Document:
         if self.data['controller_setup'] is not None:
             from .controller_block import validate as validate_controller
             validate_controller(self.data['controller_setup'])
+        from .controller_board_blocks import validate as validate_board_blocks
+        validate_board_blocks(self.data['controller_boards'])
+        from .controller_board_blocks import validate_attachment
+        validate_attachment(self.data['controller_setup'],self.data['controller_boards'])
         from .plot_workspace import validate_instruments
         validate_instruments(self.data['instruments'],self.data['components'])
         from .power_tree import validate as validate_power
@@ -573,6 +578,7 @@ COMMANDS.update({'edit.rotate':'Space','edit.wire':'W','edit.move':'M','edit.dra
 COMMANDS.update({'view.command_search':'Ctrl+Shift+K'})
 COMMANDS.update({'view.net_navigator':'Ctrl+Shift+N'})
 COMMANDS.update({'edit.copy':'Ctrl+C','edit.select_all':'Ctrl+A',
+                 'edit.duplicate':'Ctrl+Shift+D',
                  'edit.properties_standard':'Ctrl+E','edit.rotate_standard':'Ctrl+R',
                  'edit.redo_alternative':'Ctrl+Shift+Z','view.schematic':'Ctrl+1',
                  'view.plots':'Ctrl+2','view.circuit_text':'Ctrl+3'})

@@ -1,8 +1,10 @@
-import { Boxes, Cable, Cpu, Grid3X3, Layers3, Play, ShieldAlert, SlidersHorizontal, SquareTerminal, Waves } from "./icons";
+import { Boxes, Cable, Cpu, Grid3X3, Layers3, Play, ShieldAlert, SlidersHorizontal, Square, SquareTerminal, Waves } from "./icons";
 import type { SimulationDomain, SimulationWorkspaceTab } from "./sharedSimulationWorkspace";
 import { simulationDomainLabel } from "./sharedSimulationWorkspace";
+import "./SimulationWorkspace.css";
 
 type Props = {
+  compact?: boolean;
   tab: SimulationWorkspaceTab; domain: SimulationDomain; analysisMode: string; net: string;
   meshSummary: string; solverName: string; running: boolean; hasBoard: boolean; canExtract: boolean;
   onDomain: (domain: SimulationDomain) => void; onConfigure: () => void; onNets: () => void;
@@ -13,7 +15,7 @@ type Props = {
 
 export default function SimulationWorkspace(props: Props) {
   const mesh = props.tab === "Mesh";
-  return <section className="simulation-workspace" aria-label={`${props.tab} workspace`}>
+  const content = <>
     <header>
       <div><span>SHARED SIMULATION WORKSPACE</span><h2>{props.tab}</h2><p>{mesh
         ? "Review the geometry and discretization inputs used by PI and SI workflows."
@@ -43,5 +45,26 @@ export default function SimulationWorkspace(props: Props) {
         <button className={props.running ? "danger" : "primary"} onClick={props.running ? props.onStop : props.onRun} disabled={!props.hasBoard}><Play size={16} /> {props.running ? "Stop" : props.domain === "pi" ? "Open run controls" : "Open extraction controls"}</button>
       </>}
     </div>
+  </>;
+  if (!props.compact) return <section className="simulation-workspace" aria-label={`${props.tab} workspace`}>{content}</section>;
+  const compactAction = props.running
+    ? { label: "Stop", name: "Stop active analysis", run: props.onStop, disabled: false }
+    : mesh
+      ? { label: "Extract RLC", name: "Extract RLC from the configured domain", run: props.onExtract, disabled: !props.hasBoard || !props.canExtract }
+      : { label: "Run", name: props.domain === "pi" ? "Run configured PI analysis" : "Open SI extraction controls", run: props.onRun, disabled: !props.hasBoard };
+  return <section className="simulation-workspace simulation-workspace-compact" aria-label={`${props.tab} workspace`}>
+    <details className="simulation-workspace-disclosure">
+      <summary title={`Show ${props.tab.toLowerCase()} setup and secondary actions`}>
+        <b>{props.tab}</b>
+        <span className="simulation-compact-context" title={`${simulationDomainLabel(props.domain)}: ${props.net || "No net selected"}`}>{props.domain.toUpperCase()} · {props.net || "No net selected"}</span>
+        <span className="simulation-compact-hint">Setup</span>
+      </summary>
+      <div className="simulation-workspace simulation-workspace-details-body">{content}</div>
+    </details>
+    <button type="button" className={`simulation-workspace-run spike-control--compact ${props.running ? "spike-control--danger" : "spike-control--primary"}`}
+      onClick={compactAction.run} disabled={compactAction.disabled}
+      aria-label={compactAction.name} title={compactAction.disabled ? "Import a design and choose an analysis net to enable this action" : compactAction.name}>
+      {props.running ? <Square size={13} /> : mesh ? <Cpu size={13} /> : <Play size={13} />}{compactAction.label}
+    </button>
   </section>;
 }

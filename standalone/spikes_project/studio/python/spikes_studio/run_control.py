@@ -34,7 +34,7 @@ def native_batch(source, library, method='hybrid_trapezoidal'):
         result.setdefault('provenance',{}).update(step_index=index,step_parameters=dict(variant.parameters) if variant else {})
         if result['status']!='completed':return result
         if project.measurements:
-            from python.spikes.runner import _measurements
+            from python.spikes.measurements import _measurements
             result['measurements']=_measurements(project,result['data'])
             result['provenance'].update(measurements=result['measurements'],measurement_processing='Python reduction of native recorded samples; AVG/RMS are sample-weighted, FIND is linearly interpolated')
         results.append(result)
@@ -244,7 +244,7 @@ class InteractiveRun:
                 'source_sha256': self.project.source_sha256, 'library': str(self.library),
                 'capture': 'rolling_window', 'total_samples': total,
                 'dropped_samples': total-len(rows), 'control_events': events,
-                'controller':None if self.controller is None else {'manifest_sha256':self.controller.manifest.manifest_sha256,'step_s':self.controller.config['step_s'],'semantics':'sampled feedback; zero-order held outputs; first tick after accepted plant point; trusted subprocess per tick'},
+                'controller':None if self.controller is None else (self.controller.provenance() if hasattr(self.controller,'provenance') else {'manifest_sha256':self.controller.manifest.manifest_sha256,'step_s':self.controller.config['step_s'],'semantics':'sampled feedback; zero-order held outputs; first tick after accepted plant point; trusted subprocess per tick'}),
                 'hard_real_time_qualified': False}}
 
     def _work(self):
@@ -286,7 +286,7 @@ class InteractiveRun:
                         if self.controller is not None:
                             changes=self.controller.advance(session)
                             with self.condition:
-                                for name,value in changes.items():self.control_events.append({'time_s':session.time_s,'source':name,'value':value,'origin':'compiled_controller'})
+                                for name,value in changes.items():self.control_events.append({'time_s':session.time_s,'source':name,'value':value,'origin':getattr(self.controller,'event_origin','compiled_controller')})
                         if not session.step(step): raise RuntimeError(session.message)
                         record()
                         deadline += step / self.speed_ratio
@@ -300,3 +300,6 @@ class InteractiveRun:
                     with self.condition: self.state = 'stopped'
         except Exception as exc:
             with self.condition: self.state, self.error = 'failed', str(exc)
+        finally:
+            if self.controller is not None and getattr(self.controller,'close_after_run',False):
+                self.controller.close()

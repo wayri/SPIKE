@@ -2,6 +2,88 @@
 <!-- Copyright (c) 2026 SigHarmonic -->
 # Solver mathematics and numerical methods
 
+For [supplied ideal RLGC stars](RLGC_LINE_JUNCTION.md), common node voltage
+and zero summed inward current give the real-reference wave relation
+`a_J=(2/m*11^T-I)*b_J`. The symmetric orthogonal junction operator conserves
+power; a conditioned connection solve gives ordered external multiport S and
+coherent child drives. Unchanged child field integrals account for distributed
+conductor/dielectric heat exactly once. No physical junction energy or loss
+is inferred.
+
+
+[Piecewise RLGC wave connections](RLGC_LINE_CASCADE.md) derive internal
+incident/outgoing wave swaps from voltage continuity and opposite inward
+currents at a shared real reference. The conditioned solve (I-C*W)*a=U*a_ext
+produces external two-port basis responses and actual coherent local drives.
+Unchanged parent analytic field integrals retain section conductor/dielectric
+heat; internal transported power cancels and is never added as dissipation.
+
+
+[Driven sampled RLGC fields and loss integration](RLGC_LINE_FIELDS.md)
+solve two coherent RMS end-wave constraints using decaying phasor waves.
+Signed Re(V*conj(I)) obeys dp/dx=-(R*|I|²+G*|V|²); analytic continuous
+spatial integrals distinguish conductor/dielectric watts from average nominal
+.5*C*|V|²/.5*L*|I|² in J/m. Positive sum/difference integrals and small-argument
+series retain coherent near-cancellation without clipping or redistributing
+residuals. Probe density does not control integrated loss accuracy.
+
+
+[Uniform sampled RLGC two-ports](RLGC_LINE_NETWORK.md) solve the effective
+phasor telegrapher system dV/dx=-(R+j*omega*L)I,
+dI/dx=-(G+j*omega*C)V using a scaled analytic spatial matrix exponential.
+Decaying exponentials avoid growing hyperbolic intermediates; analytic zero
+propagation limits admit DC series/shunt/thru cases. Independent matrix solves
+and finite-ladder refinement check the result. Positive sampled losses imply
+sampled power-wave contraction, without proving broadband material causality.
+
+
+[Distortionless line attenuation](DISTORTIONLESS_LINE_TRANSIENT.md) imposes
+Rp=kappa*Lp and Gp=kappa*Cp with kappa>=0. The effective telegrapher equations
+then have constant real Z0 and delayed waves weighted by exp(-kappa*flight_time).
+Named probes report separate Rp*I² and Gp*V² in W/m and stored
+u=(Cp*V²+Lp*I²)/2 in J/m, with checked total loss=2*kappa*u. Independently
+multiplying the governing equations proves du/dt+dp/dx=-loss. This is not a
+general dispersive material law or a conservative thermal deposition map.
+
+
+[Distributed lossless TEM line transients](LOSSLESS_LINE_TRANSIENT.md) solve
+the uniform lossless telegrapher equations with zero history and two explicit
+resistive PWL drives. Positive one-way delay makes alternating end-wave recursion
+a finite causal expansion at each observation, using exact retarded-time order
+and checked amplitudes. Interior V/I, signed transport and local J/m follow
+traveling-wave identities; terminal current is positive into the line at either
+end. No rational delay approximation, temporal mesh or distributed loss model
+is introduced, and stored field energy is not deposited heat.
+
+
+[Initialized network-port reflectometry](NETWORK_REFLECTOMETRY.md) derives
+real voltage waves `Vplus=sqrt(Z0)*a`, `Vminus=sqrt(Z0)*b`, checks network
+`V=Vplus+Vminus` and `I=(Vplus-Vminus)/Z0`, and reports signed `p=V*I`.
+Explicit positive floors control apparent `Vminus/Vplus` and direct `V/I`
+ratios; unresolved values retain null and reason statuses. Probe current excludes
+external shunt-capacitor current. Transported power is not a generic heat law,
+and loaded instantaneous ratios are not frequency impedance or isolated S11.
+
+
+[Supplied crosstalk timing corners](CROSSTALK_TIMING_CORNERS.md) translate
+aggressor PWL drives as `wbar(t-delay)` with explicit endpoint holds on the
+unchanged horizon and unchanged supplied local-zero state. Retaining shifted
+interior knots and interpolating only clipped endpoints preserves each PWL
+function. Min/max over complete per-corner signed-family sampled envelopes
+produces the finite-union envelope, with attaining corner ids and actual parent
+witnesses. This establishes neither an extremum over continuous skew nor an
+intersample peak or energy-superposition identity.
+
+
+The [sampled multi-aggressor derivation](MULTI_AGGRESSOR_CROSSTALK.md) uses
+linear initialized RLC response `v_sigma = v_base + sum sigma_j v_j`, where
+common initial state and fixed drivers occur only in the baseline. At each
+requested time, independent fixed waveform polarities yield envelope
+`v_base +/- sum abs(v_j)`. Two complete fixed-pattern solves verify the global
+sampled extrema and full traces. No intersample guarantee or addition of
+quadratic heat/storage follows from voltage superposition.
+
+
 This is the central mathematical map of the implemented SPIKE solver families.
 It connects equations, units, discrete operators, boundary conditions, solution
 methods and acceptance evidence. Detailed derivations already maintained in
@@ -280,6 +362,31 @@ created. [Network graph](../python/spike_core/si_network_graph.py) and
 normalization; finite-band passivity screens apply only to that convention.
 
 ## Waveforms, eyes and resonance
+
+The [continuous RLC energy ledger](RLC_ENERGY_LEDGER.md) integrates quadratic
+physical rows on the augmented PWL state using a scaled covariance Gramian and
+doubling. It retains `Wsource-Wnetwork-Qresistor-(Efinal-Einitial)` per port and
+interval, as well as full-horizon totals, without clipping heat or redistributing
+residuals. Gramian identity/symmetry/positivity and independent analytic energy
+references admit the bounded method. Signed fitted-network work is not inferred
+to be heat or generic internal storage; thermal deposition remains separate.
+
+The [initialized RLC extension](RLC_INITIAL_STATES.md) sets the supplied
+`z0=[x0,sqrt(Z0) I0,V0/sqrt(Z0)]` before mixed closure and PWL propagation.
+Composition of the linear initial-value solution checks explicitly resliced
+split runs against uninterrupted histories. Physical energy references include
+initial storage as well as source work, heat and final storage. Source horizon,
+local-clock translation, model identity and parameter-change limits are explicit;
+this is not a general session or thermal-coupling implementation.
+
+The bounded [combined R/L and shunt-C extension](RLC_NETWORK_TRANSIENT.md)
+enforces `Vs=V+R Isrc+L dIsrc/dt` and `Isrc=Inet+C dV/dt` simultaneously.
+Capacitor-voltage algebraic rows take precedence over current rows on ports
+with both states. A regular mixed solve and stable augmented PWL propagation
+retain separate source/network currents and the boundary identity
+`Vs Isrc-V Inet=R Isrc^2+d(.5 L Isrc^2+.5 C V^2)/dt`.
+The referenced independent derivation defines normalized state blocks, units,
+conditioning and the limits on general circuit and thermal coupling claims.
 
 The bounded [shunt-capacitive source/load extension](CAPACITIVE_NETWORK_TRANSIENT.md)
 uses `Isrc=(Vs-V)/R=Inet+Csh*dV/dt` and `v=V/sqrt(Z0)=a+b` to form mixed
@@ -626,3 +733,9 @@ conservation identity, independent oracle and convergence study, source/test
 links, provenance, and remaining physical limits here or in a linked domain
 derivation. Update [solver status](SOLVER_STATUS.md) only when the required
 evidence supports a capability change.
+
+The opt-in native linear `radau_iia3` descriptor-system discretization, exact
+stage equations, current reconstruction, source-jump convention, stability
+analysis and independent ramp/sine verification are recorded in
+[the numerical evidence record](NUMERICAL_METHOD_EVIDENCE.md#native-linear-radau-iia3--18-october-2026).
+It does not replace legacy methods or admit general nonlinear/high-index DAEs.

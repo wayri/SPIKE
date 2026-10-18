@@ -1,5 +1,11 @@
 # Source-to-receiver SI workflow
 
+[Run SI and PI now](RUN_SI_PI_NOW.md) provides tested entrypoints and a
+repeatable readiness command. Simple default four-to-two-port channel changes
+now remap the receiver explicitly with a notice. Custom assignments are
+preserved; invalid endpoint/passive/reorder mappings block execution until
+corrected. Physical port order still requires review.
+
 For a step-by-step Marble board context and executable four-port tutorial
 covering S-parameters, reflection/VSWR, NEXT/FEXT, TDR/TDT, and eyes, see the
 [SI user guide](SI_USER_GUIDE.md). Its analytical channel is explicitly

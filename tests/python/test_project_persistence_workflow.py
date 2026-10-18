@@ -6,6 +6,7 @@ import unittest
 import zlib
 from pathlib import Path
 
+from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.odb_importer import import_odb_design
 from python.spike_core.normalized_source_codec import decode_normalized_source, encode_normalized_source
@@ -55,6 +56,63 @@ class ProjectPersistenceWorkflowTests(unittest.TestCase):
             self.assertEqual(reopened["project"]["future_project"], {"keep": True})
             for key, value in canonical["metadata"].items():
                 self.assertEqual(reopened["canonical"]["design_ir"]["metadata"][key], json.loads(json.dumps(value)))
+
+    def test_opened_multiboard_projection_resaves_exact_canonical_ids_and_links(self):
+        legacy = SpiDeR(
+            design_id="source-native-overlap", name="Source native overlap", source_format="kicad",
+            layers=[{"id": 1, "name": "F.Cu"}], nets=[{"id": 1, "name": "GND"}],
+            metadata={"source_sha256": "7" * 64},
+        )
+        canonical = SpiDeRV2.from_v1(legacy).to_dict()
+        assembly_ir = {
+            "contract": "spike/assembly-ir/v1", "assembly_id": "assembly", "name": "Assembly",
+            "units": "mm", "coordinate_frame": "right-handed-z-up", "frames": [], "parts": [],
+            "boards": [{"id": "board-a", "design_id": canonical["design_id"]}],
+            "harnesses": [], "connector_mappings": [], "rigid_flex_links": [], "metadata": {},
+        }
+        retained_active = copy.deepcopy(canonical)
+        retained_active["name"] = "Pre-resolution active record"
+        assembly_designs = {"contract": "spike/assembly-designs/v1",
+                            "active_design_id": canonical["design_id"], "designs": [retained_active]}
+        package_payload = {"project": {"id": "roundtrip", "name": "Roundtrip"},
+                           "design_ir": canonical, "assembly_ir": assembly_ir,
+                           "assembly_designs": assembly_designs}
+        projected = project_for_desktop(package_payload, {
+            "format": "spike-project-package/v2", "project": {"name": "Roundtrip"}, "analysis": {},
+            "design": SpiDeRV2.from_dict(canonical).to_v1().to_dict(),
+            "assembly_ir": assembly_ir, "assembly_designs": assembly_designs,
+        })
+        # The legacy view retains colliding source-native layer/net IDs. The
+        # exact canonical view remains authoritative for package persistence.
+        self.assertEqual(projected["design"]["layers"][0]["id"], projected["design"]["nets"][0]["id"])
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "roundtrip.spike"
+            self.request("write_project_package", path=str(target), snapshot=projected,
+                         generate_geometry_tables=False)
+            reopened = read_spike_package(target).payload
+        self.assertEqual(reopened["design_ir"]["design_id"], canonical["design_id"])
+        self.assertEqual(reopened["design_ir"]["source"], canonical["source"])
+        for collection in ("layers", "nets", "tracks", "vias", "pads", "zones", "components"):
+            self.assertEqual([item["id"] for item in reopened["design_ir"][collection]],
+                             [item["id"] for item in canonical[collection]])
+        self.assertEqual(reopened["design_ir"]["components"], canonical["components"])
+        reopened_active = reopened["assembly_designs"]["designs"][0]
+        self.assertEqual(reopened_active["name"], reopened["design_ir"]["name"])
+        for collection in ("layers", "nets", "tracks", "vias", "pads", "zones", "components"):
+            self.assertEqual([item["id"] for item in reopened_active[collection]],
+                             [item["id"] for item in reopened["design_ir"][collection]])
+        self.assertEqual([(board["id"], board["design_id"]) for board in reopened["assembly_ir"]["boards"]],
+                         [(board["id"], board["design_id"]) for board in assembly_ir["boards"]])
+
+        damaged = copy.deepcopy(projected)
+        damaged["design"]["canonical_design"]["nets"][0]["id"] = canonical["layers"][0]["id"]
+        with tempfile.TemporaryDirectory() as directory:
+            failed = handle_project_request("write_project_package", {
+                "path": str(Path(directory) / "damaged.spike"), "snapshot": damaged,
+                "generate_geometry_tables": False,
+            }, request_id="damaged-canonical", application_version="test")
+            self.assertFalse(failed["ok"])
+            self.assertIn("canonical entity IDs must be unique", failed["error"])
 
     def test_engineering_review_evidence_survives_native_package_roundtrip(self):
         from python.spike_core.engineering_review import review_engineering

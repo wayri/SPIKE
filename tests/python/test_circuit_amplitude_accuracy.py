@@ -1,7 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 """ACC01 exact amplitude-oracle and frozen-floor regression checks."""
 import math
+import json
+from pathlib import Path
+import subprocess
+import tempfile
 import unittest
+from unittest.mock import patch
 
 from scripts.benchmark_circuit_timestep_accuracy import (
     ABSOLUTE_TOLERANCES,
@@ -10,6 +15,8 @@ from scripts.benchmark_circuit_timestep_accuracy import (
     assess_waveforms,
     exact_observables,
     ramp_response_all_times,
+    _run_amplitude_stratum,
+    run_amplitude,
 )
 
 
@@ -97,6 +104,33 @@ class CircuitAmplitudeAccuracyTests(unittest.TestCase):
         for times, volts, amps in invalid:
             with self.subTest(times=times), self.assertRaises(ValueError):
                 assess_waveforms("rc", 1.0, times, volts, amps)
+
+    def test_explicit_method_mismatch_is_not_accepted_as_bound_evidence(self):
+        # A synthetic wrong-backend response tests admission, not solver accuracy.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            library = root/'fixture.dll'
+            times = [0., STOP_TIME_S]
+            reference = [exact_observables('rc', t, 1.) for t in times]
+            payload = {'status': 'completed', 'data': {'time_s': times}, 'probes': {
+                'V(out)': {'values': [r['voltage_v'] for r in reference]},
+                'I(R1)': {'values': [r['current_a'] for r in reference]}}, 'provenance': {
+                'solver': 'SPIKES owned C++ kernel', 'owned_cpp_transient': True,
+                'library': str(library), 'integration': 'bdf2'}}
+            completed = subprocess.CompletedProcess([], 0, json.dumps(payload).encode(), b'')
+            with patch('scripts.benchmark_circuit_timestep_accuracy.subprocess.run', return_value=completed) as child:
+                result = _run_amplitude_stratum(library, root, 'rc', 1., 2.5e-7, 2, 1, {}, 'radau_iia3')
+            self.assertEqual(result['gate_status'], 'passed')
+            self.assertEqual(result['backend_identity_status'], 'inconclusive')
+            self.assertEqual(result['status'], 'inconclusive')
+            self.assertIn('radau_iia3', child.call_args.args[0])
+
+    def test_unknown_method_fails_before_artifact_or_native_loading(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'new'
+            with self.assertRaisesRegex(ValueError, 'method'):
+                run_amplitude(Path(directory)/'missing.dll', output, integration_method='shell text')
+            self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

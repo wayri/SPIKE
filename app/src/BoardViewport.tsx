@@ -1,4 +1,5 @@
 import { resultVectorGlyphs, type ResultVectorGlyph } from "./resultVectorGlyphs";
+import { appendProceduralDrillHoles, proceduralPadDrillPath } from "./proceduralDrillGeometry";
 import { viewportBackgroundColor, worldGridSize, type ViewportBackground } from "./viewportEnvironment";
 import { assemblyNetLabels } from "./assemblyNetLabels";
 import { applyNetFocusColor } from "./netFocusMaterial";
@@ -867,12 +868,8 @@ function padPath(pad: ParsedPad, scale: number): THREE.Shape {
   } else {
     shape = roundedRectanglePath(width, height, Math.min(width, height) * 0.06);
   }
-  if (pad.drill > 0) {
-    const hole = new THREE.Path();
-    const radius = pad.drill * scale / 2;
-    hole.absellipse(0, 0, radius, radius, 0, Math.PI * 2, false);
-    shape.holes.push(hole);
-  }
+  const bore = proceduralPadDrillPath(pad, scale);
+  if (bore) shape.holes.push(bore);
   return shape;
 }
 
@@ -1336,7 +1333,8 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       antialias: antialiasing,
       alpha: false,
       powerPreference: "high-performance",
-      logarithmicDepthBuffer: true,
+      // Bounded conventional depth preserves early depth tests and polygon
+      // bias on PCB skins. Reverse depth failed the retained WebView fixture.
     });
     const initialProfile = renderProfileRef.current;
     const fullPixelRatio = initialProfile.fullPixelRatio;
@@ -1425,7 +1423,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         perspective.updateProjectionMatrix();
       }
       host.dataset.depthPrecision = [
-        "adaptive-logarithmic-z",
+        renderer.capabilities.reverseDepthBuffer ? "adaptive-reversed-z" : "adaptive-standard-z",
         `near=${near.toFixed(3)}`,
         `far=${far.toFixed(3)}`,
         `distance=${distance.toFixed(3)}`,
@@ -1848,11 +1846,13 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
     const pickPriority = (candidate: { hit: THREE.Intersection; data: BoardObject }) =>
       Number(candidate.hit.object.userData.pickPriority ?? (candidate.data.type === "component" ? 1 : 0));
     const exactRaycastCandidates = () => {
-      const source = [...pickablesRef.current, ...assemblyModelPickablesRef.current];
-      if (interactionComplexityRef.current <= 12_000 || source.length < 2_000) return source;
+      const sourceCount = pickablesRef.current.length + assemblyModelPickablesRef.current.length;
+      if (interactionComplexityRef.current <= 12_000 || sourceCount < 2_000)
+        return [...pickablesRef.current, ...assemblyModelPickablesRef.current];
       let cached = pickablesIndexRef.current;
       if (!cached || cached.revision !== pickablesRevisionRef.current) {
         scene.updateMatrixWorld(true);
+        const source = [...pickablesRef.current, ...assemblyModelPickablesRef.current];
         const records: SpatialBounds<THREE.Object3D>[] = source.flatMap(object => {
           const bounds = new THREE.Box3().setFromObject(object);
           if (bounds.isEmpty()) return [];
@@ -1872,7 +1872,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         raycaster.ray.direction.toArray() as [number, number, number],
       );
       host.dataset.raycastBroadphase = [
-        `input=${source.length}`, `candidates=${query.values.length}`,
+        `input=${sourceCount}`, `candidates=${query.values.length}`,
         `cells=${query.cells}`, `global=${query.global}`,
       ].join(";");
       return query.values;
@@ -2686,6 +2686,10 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       if (points.length > 2) boardShape.holes.push(pathFromPoints(points));
     });
 
+    const drillReport = appendProceduralDrillHoles(boardShape, activeBoard, world);
+    if (hostRef.current) hostRef.current.dataset.proceduralDrills = JSON.stringify(drillReport);
+    if (drillReport.diagnostics.length && !activeBoard.boardModelUrl) setModelError(`Procedural board preview: ${drillReport.diagnostics.length} intersecting or invalid drills need authoritative geometry; use the source board model for these openings.`);
+
     // The substrate fills the space between conductors. Including the outer
     // copper/finish thickness or extruding a bevel beyond it hides enabled copper.
     const substrateBounds = substrateZBounds(
@@ -2839,7 +2843,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       for (const layer of padLayers) {
         const mesh = new THREE.Mesh(
           copperGeometryPool.acquire(
-            `pad:${pad.shape}:${pad.width.toFixed(5)}:${pad.height.toFixed(5)}:${pad.drill.toFixed(5)}:${scale.toFixed(7)}:${pad.customPolygon ? JSON.stringify(pad.customPolygon) : ""}`,
+            `pad:${pad.shape}:${pad.width.toFixed(5)}:${pad.height.toFixed(5)}:${pad.drill.toFixed(5)}:${pad.drill_shape}:${pad.drill_size?.join(",")}:${scale.toFixed(7)}:${pad.customPolygon ? JSON.stringify(pad.customPolygon) : ""}`,
             () => new THREE.ShapeGeometry(padPath(pad, scale), proceduralLod ? 4 : 12),
           ),
           displayMaterial(new THREE.Color(layerCssColor(layer, activeBoard.layers.indexOf(layer))).getHex(), { metalness: 0.48, roughness: 0.43 }),
@@ -2881,7 +2885,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
           ),
           displayMaterial(0xa96f2f, { metalness: 0.62, roughness: 0.44 }),
         );
-        ring.position.z = copperZ(faceLayer, activeBoard.layers, boardThickness, activeBoard.stackup);
+        ring.position.z = copperZ(faceLayer, activeBoard.layers, boardThickness, activeBoard.stackup) + copperClearance * 2 * (faceLayer === endLayer ? -1 : 1);
         ring.userData = { ...data, viaFaceLayer: faceLayer, basePositionZ: ring.position.z };
         identifySceneObject(ring, "via-face", faceLayer, `${via.id}-${faceLayer}`, activeBoard.layers);
         viaGroup.add(ring);
@@ -4183,7 +4187,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
     const worldBounds = visibleBoundsRef.current;
     const size = worldGridSize(Math.max(activeBoard ? activeBoard.width * scale : 0, worldBounds.size.x), Math.max(activeBoard ? activeBoard.height * scale : 0, worldBounds.size.y));
     const divisions = 40;
-    const grid = new THREE.GridHelper(size, divisions, 0x66808b, 0x30434b);
+    const grid = new THREE.GridHelper(size, divisions, viewportBackground === "light" ? 0x607783 : 0x66808b, viewportBackground === "light" ? 0x7e929b : 0x30434b);
     grid.rotation.x = Math.PI / 2;
     grid.position.set(worldBounds.center.x, worldBounds.center.y, Math.min(activeBoard ? -boardThicknessMm(activeBoard) * scale / 2 : 0, worldBounds.center.z - worldBounds.size.z / 2) - 0.65);
     grid.visible = showWorldGrid;
@@ -4275,7 +4279,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         group.add(zUnit);
       }
     }
-  }, [activeBoard, analysisResult, resultVisualization, showAxes, showWorldGrid, viewMode, virtualBoards, assemblyBoardDesigns, assemblyBoardVisibility, assemblyExplodeOffsets]);
+  }, [viewportBackground, activeBoard, analysisResult, resultVisualization, showAxes, showWorldGrid, viewMode, virtualBoards, assemblyBoardDesigns, assemblyBoardVisibility, assemblyExplodeOffsets]);
 
   useEffect(() => {
     const perspective = perspectiveRef.current;

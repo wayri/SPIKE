@@ -136,3 +136,11 @@ recovery and electrothermal models, evaluate preconditioned nonsymmetric Krylov
 methods, multirate/PSS startup acceleration and EMT/phasor coupling. Ordinary CG
 is not a general solver for indefinite, nonsymmetric MNA. Multicore benefit,
 cross-engine parity and hardware/HIL certification remain separate evidence gates.
+
+For fixed-step **linear** independent-source RLC/index-one circuits, the explicit
+CLI option `--method radau-iia3` selects the separately named third-order,
+L-stable method; legacy defaults stay unchanged. Do not combine it with adaptive
+controls or nonlinear/OSDI/dependent-source devices. Its startup, ramp/jump,
+session, admission and frozen-amplitude verification is documented in
+[numerical method evidence](NUMERICAL_METHOD_EVIDENCE.md#native-linear-radau-iia3--18-october-2026)
+and [ADR 0065](adr/0065-adaptive-native-transient-recovery.md).

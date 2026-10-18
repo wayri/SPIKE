@@ -125,6 +125,7 @@ def main() -> int:
         "app/src/resourceMonitor.ts",
         "app/src/detachedToolWindows.tsx",
         "app/src/assemblyToolWindows.ts",
+        "app/src/workspaceViewWindows.ts",
         "app/src/reportPreviewWindow.ts",
         "app/src/schematicWindow.ts",
         "app/src/assistantWindow.ts",

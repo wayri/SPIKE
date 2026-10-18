@@ -13,7 +13,7 @@ for (const mode of ["classic","clean"]) {
 }
 storage.set(APP_SETTINGS_STORAGE_KEY, JSON.stringify({interfaceMode:"unknown",chromeVersion:2,ribbonVisible:true}));
 assert.equal(loadAppSettings().interfaceMode,"clean");
-assert.equal(loadAppSettings().ribbonVisible,true);
+assert.equal(loadAppSettings().ribbonVisible,false,"old clean ribbon visibility must not reappear after migration");
 storage.set(APP_SETTINGS_STORAGE_KEY,"bad JSON");
 assert.equal(loadAppSettings().interfaceMode,"clean");
 console.log("Interface preference migration, persistence and corrupt-storage recovery passed.");

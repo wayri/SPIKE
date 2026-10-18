@@ -332,6 +332,59 @@ class OdbImportTests(unittest.TestCase):
         self.assertFalse(result.report.solver_readiness["pi_ac"]["ready"])
         self.assertFalse(result.report.solver_readiness["pi_dc"]["ready"])
 
+    def test_fully_compressed_job_preserves_geometry_and_source_identity(self):
+        # Original minimal fixture: compress every logical text file, including
+        # the root marker, so this exercises more than feature-file gzip reads.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_board(tmp)
+            expected = import_odb_design(str(path))
+            for member in list(path.rglob("*")):
+                if member.is_file():
+                    member.with_name(member.name + ".gz").write_bytes(
+                        gzip.compress(member.read_bytes(), mtime=0))
+                    member.unlink()
+            sources = [path]
+            for suffix in (".zip", ".tgz"):
+                target = Path(tmp) / ("compressed" + suffix)
+                if suffix == ".zip":
+                    with zipfile.ZipFile(target, "w") as archive:
+                        for member in path.rglob("*"):
+                            if member.is_file():
+                                archive.write(member, "release/job/" + member.relative_to(path).as_posix())
+                else:
+                    with tarfile.open(target, "w:gz") as archive:
+                        archive.add(path, arcname="release/job")
+                sources.append(target)
+            for source in sources:
+                with self.subTest(source=source.name):
+                    actual = import_odb_design(str(source))
+                    for field in ("layers", "nets", "tracks", "pads", "zones", "components"):
+                        self.assertEqual(getattr(actual, field), getattr(expected, field))
+                    self.assertEqual(len(actual.tracks), 1)
+                    self.assertEqual(len(actual.pads), 1)
+                    self.assertEqual(actual.tracks[0]["start"], [1, 1])
+                    self.assertEqual(actual.tracks[0]["end"], [4, 1])
+                    self.assertEqual(actual.tracks[0]["width"], .25)
+                    self.assertEqual(actual.metadata["board_bounds_mm"], [0, 0, 10, 5])
+                    self.assertEqual(actual.metadata["odb_issue_counts"], expected.metadata["odb_issue_counts"])
+                    self.assertEqual(actual.metadata["source_sha256"], source_identity(source)[0])
+                    self.assertTrue(all(row["name"].endswith(".gz") for row in actual.metadata["odb_members"]))
+
+    def test_compressed_job_keeps_unsupported_copper_diagnostics(self):
+        files = board_files()
+        key = "steps/board/layers/top/features"
+        files[key] = files[key].replace("L 1 1 4 1 1 P", "L 1 1 4 1 1 N")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_board(tmp, files)
+            matrix = path / "matrix/matrix"
+            matrix.with_name("matrix.gz").write_bytes(gzip.compress(matrix.read_bytes()))
+            matrix.unlink()
+            design = import_odb_design(str(path))
+        self.assertEqual(len(design.tracks), 0)
+        self.assertFalse(design.metadata["geometry_solver_ready"])
+        self.assertIn("ODB_FEATURE_UNSUPPORTED", design.metadata["odb_issue_counts"])
+        self.assertTrue(design.metadata["odb_retained"])
+
     def test_unsupported_negative_geometry_is_retained_and_blocks_readiness(self):
         files = board_files()
         files["steps/board/layers/top/features"] = files["steps/board/layers/top/features"].replace("L 1 1 4 1 1 P", "L 1 1 4 1 1 N")

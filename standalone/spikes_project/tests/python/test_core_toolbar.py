@@ -15,13 +15,15 @@ class CoreToolbarTests(unittest.TestCase):
         app=wx.GetApp() or wx.App(False);frame=Studio()
         try:
             frame.Show();wx.Yield();buttons={command:control for control,command in frame.command_controls}
-            self.assertEqual(len(buttons),8)
+            self.assertEqual(len(buttons),9)
             self.assertTrue(all(control.GetLabel() for control in buttons.values()))
             frame.context_tools()
             self.assertFalse(buttons['edit.rotate'].IsEnabled())
+            self.assertFalse(buttons['edit.duplicate'].IsEnabled())
             self.assertIn('Select',buttons['edit.rotate'].GetToolTipText())
             part=frame.doc.data['components'][1];frame.canvas.selected={part['id']};frame.refresh_inspector();frame.context_tools()
             self.assertTrue(buttons['edit.rotate'].IsEnabled())
+            self.assertTrue(buttons['edit.duplicate'].IsEnabled())
             buttons['edit.rotate'].activate()
             self.assertEqual(frame.doc.data['components'][1]['rotation'],90)
             frame.set_split('side_by_side');buttons['edit.wire'].activate()

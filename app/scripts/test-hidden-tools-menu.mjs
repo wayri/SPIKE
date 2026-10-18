@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+const jsx=(type,props)=>({type,props:props??{}}), calls=[], errors=[];
+let anchor={x:10,y:20}, registered=[{id:"nets",label:"Board nets",restore(){},close(){}}];
+const module={exports:{}}, source=readFileSync(new URL("../src/HiddenToolsMenu.tsx",import.meta.url),"utf8");
+const code=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+new Function("require","module","exports",code)(name=>{
+ if(name==="react")return {useEffect(){},useState:initial=>[typeof initial==="function"?initial():anchor,()=>{}]};
+ if(name==="react/jsx-runtime")return {jsx,jsxs:jsx,Fragment:"fragment"};
+ if(name==="./navigationIcons")return {ShowControlIcon:"eye",CloseControlIcon:"x"};
+ if(name==="./ActionContextMenu")return {default:"popup"};
+ if(name==="./minimizedTools")return {minimizedToolSnapshot:()=>registered,subscribeMinimizedTools:()=>()=>{},restoreMinimizedTool:async id=>calls.push(["restore",id]),closeMinimizedTool:async id=>calls.push(["close",id])};
+ throw new Error(name);
+},module,module.exports);
+const props={items:[{id:"nets",label:"stale duplicate",restore(){throw Error("stale");}},{id:"quick",label:"Quick tools",restore:()=>calls.push(["show","quick"])}],onError:message=>errors.push(message)};
+const tree=module.exports.default(props),[button,popup]=tree.props.children;
+assert.equal(button.props["aria-label"],"Show hidden tools");
+assert.equal(button.props.disabled,false);
+assert.deepEqual(popup.props.actions.map(action=>action.label),["Show Board nets","Close Board nets","Show Quick tools"],"registered callbacks replace stale entries without duplicate controls");
+for(const action of popup.props.actions)action.run();
+await new Promise(resolve=>setImmediate(resolve));
+assert.deepEqual(calls,[["restore","nets"],["close","nets"],["show","quick"]]);
+registered=[];
+const failed=module.exports.default({items:[{id:"bad",label:"Failed window",restore:()=>{throw Error("focus denied");}}],onError:message=>errors.push(message)});
+failed.props.children[1].props.actions[0].run();
+await new Promise(resolve=>setImmediate(resolve));
+assert.match(errors[0],/Could not show Failed window.*focus denied.*Retry from Show hidden tools/);
+assert.equal(module.exports.default({items:[],onError(){}}).props.children[0].props.disabled,true);
+console.log("Hidden tools: named compact trigger, merged registry, exact restore/close callbacks, empty state and visible recovery passed.");

@@ -1,0 +1,2057 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/crosstalk-timing-corners-result/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "source_crosstalk_request",
+    "corners",
+    "envelope",
+    "worst_upper_pattern",
+    "worst_lower_pattern",
+    "diagnostics"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/crosstalk-timing-corners-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_crosstalk_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "transient_request",
+        "victim_port",
+        "aggressors",
+        "lower_limit_v",
+        "upper_limit_v"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/multi-aggressor-crosstalk-request/v1"
+        },
+        "transient_request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "contract",
+            "fit_request",
+            "terminations",
+            "output_times_s",
+            "initial_state"
+          ],
+          "properties": {
+            "contract": {
+              "const": "spike/rlc-network-transient-request/v2"
+            },
+            "fit_request": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contract",
+                "source",
+                "pole_rates_rad_s",
+                "max_absolute_error"
+              ],
+              "properties": {
+                "contract": {
+                  "const": "spike/sparameter-rational-fit-request/v1"
+                },
+                "source": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "port_names",
+                    "reference_impedance_ohm",
+                    "frequencies_hz",
+                    "s_parameters"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "port_names": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 8,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80
+                      }
+                    },
+                    "reference_impedance_ohm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "frequencies_hz": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2048,
+                      "items": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    },
+                    "s_parameters": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2048,
+                      "items": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 8,
+                        "items": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 8,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "real",
+                              "imag"
+                            ],
+                            "properties": {
+                              "real": {
+                                "type": "number"
+                              },
+                              "imag": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "pole_rates_rad_s": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "uniqueItems": true
+                },
+                "max_absolute_error": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              },
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "$comment": "SPDX-License-Identifier: Apache-2.0; finite values, real DC, exact dimensions, full rank, conditioning, fit residual and work resources additionally checked by runtime."
+            },
+            "terminations": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "port_name",
+                  "resistance_ohm",
+                  "voltage_points",
+                  "capacitance_f",
+                  "inductance_h"
+                ],
+                "properties": {
+                  "port_name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "resistance_ohm": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "voltage_points": {
+                    "type": "array",
+                    "minItems": 2,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "time_s",
+                        "voltage_v"
+                      ],
+                      "properties": {
+                        "time_s": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "voltage_v": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "capacitance_f": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "inductance_h": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "capacitance_f": {
+                          "exclusiveMinimum": 0
+                        },
+                        "inductance_h": {
+                          "const": 0
+                        }
+                      },
+                      "required": [
+                        "capacitance_f",
+                        "inductance_h"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "resistance_ohm": {
+                          "exclusiveMinimum": 0
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "allOf": [
+                {
+                  "contains": {
+                    "type": "object",
+                    "required": [
+                      "inductance_h"
+                    ],
+                    "properties": {
+                      "inductance_h": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  "minContains": 1
+                },
+                {
+                  "contains": {
+                    "type": "object",
+                    "required": [
+                      "capacitance_f"
+                    ],
+                    "properties": {
+                      "capacitance_f": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    }
+                  },
+                  "minContains": 1
+                }
+              ]
+            },
+            "output_times_s": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 1024,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "initial_state": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "contract",
+                "fit_request_digest",
+                "fit_state_sqrt_w",
+                "inductor_current_a_by_port",
+                "capacitor_voltage_v_by_port"
+              ],
+              "properties": {
+                "contract": {
+                  "const": "spike/rlc-initial-state/v1"
+                },
+                "fit_request_digest": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "fit_state_sqrt_w": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "inductor_current_a_by_port": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "maxProperties": 8,
+                  "propertyNames": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "additionalProperties": {
+                    "type": "number"
+                  }
+                },
+                "capacitor_voltage_v_by_port": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "maxProperties": 8,
+                  "propertyNames": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "additionalProperties": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "victim_port": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aggressors": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "port_name",
+              "reference_voltage_v"
+            ],
+            "properties": {
+              "port_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reference_voltage_v": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "lower_limit_v": {
+          "type": "number"
+        },
+        "upper_limit_v": {
+          "type": "number"
+        }
+      }
+    },
+    "corners": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "delay_s_by_port",
+          "result"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "delay_s_by_port": {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 6,
+            "additionalProperties": {
+              "type": "number"
+            }
+          },
+          "result": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "contract",
+              "model_status",
+              "production_qualified",
+              "input_digest",
+              "source_request",
+              "victim_port",
+              "aggressor_port_names",
+              "reference_voltage_v_by_port",
+              "lower_limit_v",
+              "upper_limit_v",
+              "baseline_result",
+              "contributions",
+              "envelope",
+              "worst_upper_pattern",
+              "worst_lower_pattern",
+              "diagnostics"
+            ],
+            "properties": {
+              "contract": {
+                "const": "spike/multi-aggressor-crosstalk-result/v1"
+              },
+              "model_status": {
+                "const": "experimental"
+              },
+              "production_qualified": {
+                "const": false
+              },
+              "input_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_request": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contract",
+                  "fit_request",
+                  "terminations",
+                  "output_times_s",
+                  "initial_state"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "spike/rlc-network-transient-request/v2"
+                  },
+                  "fit_request": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "source",
+                      "pole_rates_rad_s",
+                      "max_absolute_error"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "const": "spike/sparameter-rational-fit-request/v1"
+                      },
+                      "source": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "port_names",
+                          "reference_impedance_ohm",
+                          "frequencies_hz",
+                          "s_parameters"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "port_names": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 8,
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            }
+                          },
+                          "reference_impedance_ohm": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "frequencies_hz": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2048,
+                            "items": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          },
+                          "s_parameters": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2048,
+                            "items": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 8,
+                              "items": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 8,
+                                "items": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "real",
+                                    "imag"
+                                  ],
+                                  "properties": {
+                                    "real": {
+                                      "type": "number"
+                                    },
+                                    "imag": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "pole_rates_rad_s": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16,
+                        "items": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "uniqueItems": true
+                      },
+                      "max_absolute_error": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      }
+                    },
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$comment": "SPDX-License-Identifier: Apache-2.0; finite values, real DC, exact dimensions, full rank, conditioning, fit residual and work resources additionally checked by runtime."
+                  },
+                  "terminations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "port_name",
+                        "resistance_ohm",
+                        "voltage_points",
+                        "capacitance_f",
+                        "inductance_h"
+                      ],
+                      "properties": {
+                        "port_name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "resistance_ohm": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "voltage_points": {
+                          "type": "array",
+                          "minItems": 2,
+                          "maxItems": 1024,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "time_s",
+                              "voltage_v"
+                            ],
+                            "properties": {
+                              "time_s": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "voltage_v": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "capacitance_f": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "inductance_h": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "capacitance_f": {
+                                "exclusiveMinimum": 0
+                              },
+                              "inductance_h": {
+                                "const": 0
+                              }
+                            },
+                            "required": [
+                              "capacitance_f",
+                              "inductance_h"
+                            ]
+                          },
+                          "then": {
+                            "properties": {
+                              "resistance_ohm": {
+                                "exclusiveMinimum": 0
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "allOf": [
+                      {
+                        "contains": {
+                          "type": "object",
+                          "required": [
+                            "inductance_h"
+                          ],
+                          "properties": {
+                            "inductance_h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        "minContains": 1
+                      },
+                      {
+                        "contains": {
+                          "type": "object",
+                          "required": [
+                            "capacitance_f"
+                          ],
+                          "properties": {
+                            "capacitance_f": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        "minContains": 1
+                      }
+                    ]
+                  },
+                  "output_times_s": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "initial_state": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "fit_request_digest",
+                      "fit_state_sqrt_w",
+                      "inductor_current_a_by_port",
+                      "capacitor_voltage_v_by_port"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "const": "spike/rlc-initial-state/v1"
+                      },
+                      "fit_request_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "fit_state_sqrt_w": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16,
+                        "items": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 8,
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "inductor_current_a_by_port": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 8,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      },
+                      "capacitor_voltage_v_by_port": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 8,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "victim_port": {
+                "type": "string",
+                "minLength": 1
+              },
+              "aggressor_port_names": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 6,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "reference_voltage_v_by_port": {
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 6,
+                "additionalProperties": {
+                  "type": "number"
+                }
+              },
+              "lower_limit_v": {
+                "type": "number"
+              },
+              "upper_limit_v": {
+                "type": "number"
+              },
+              "baseline_result": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contract",
+                  "model_status",
+                  "production_qualified",
+                  "input_digest",
+                  "fit_result",
+                  "terminations",
+                  "output_times_s",
+                  "port_names",
+                  "points",
+                  "final_state_sqrt_w",
+                  "diagnostics",
+                  "limitations",
+                  "capacitive_port_names",
+                  "final_capacitor_voltage_v_by_port",
+                  "inductive_port_names",
+                  "final_inductor_current_a_by_port",
+                  "initial_state",
+                  "restart_state"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "spike/rlc-network-transient-result/v2"
+                  },
+                  "model_status": {
+                    "const": "experimental"
+                  },
+                  "production_qualified": {
+                    "const": false
+                  },
+                  "input_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "fit_result": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "model_status",
+                      "production_qualified",
+                      "input_digest",
+                      "source",
+                      "pole_rates_rad_s",
+                      "max_absolute_error",
+                      "model",
+                      "reconstructed_network",
+                      "diagnostics",
+                      "limitations"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "const": "spike/sparameter-rational-fit-result/v1"
+                      },
+                      "model_status": {
+                        "const": "experimental"
+                      },
+                      "production_qualified": {
+                        "const": false
+                      },
+                      "input_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "source": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "input_digest",
+                          "network"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "input_digest": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "network": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "id",
+                              "port_names",
+                              "reference_impedance_ohm",
+                              "frequencies_hz",
+                              "s_parameters"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "port_names": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 8,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 80
+                                }
+                              },
+                              "reference_impedance_ohm": {
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                              },
+                              "frequencies_hz": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 2048,
+                                "items": {
+                                  "type": "number",
+                                  "minimum": 0
+                                }
+                              },
+                              "s_parameters": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 2048,
+                                "items": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "maxItems": 8,
+                                  "items": {
+                                    "type": "array",
+                                    "minItems": 1,
+                                    "maxItems": 8,
+                                    "items": {
+                                      "type": "object",
+                                      "additionalProperties": false,
+                                      "required": [
+                                        "real",
+                                        "imag"
+                                      ],
+                                      "properties": {
+                                        "real": {
+                                          "type": "number"
+                                        },
+                                        "imag": {
+                                          "type": "number"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "pole_rates_rad_s": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16,
+                        "items": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "uniqueItems": true
+                      },
+                      "max_absolute_error": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "model": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "direct",
+                          "residues",
+                          "realization",
+                          "stability",
+                          "causality"
+                        ],
+                        "properties": {
+                          "direct": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 8,
+                            "items": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 8,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "residues": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 16,
+                            "items": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 8,
+                              "items": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 8,
+                                "items": {
+                                  "type": "number"
+                                }
+                              }
+                            }
+                          },
+                          "realization": {
+                            "const": "x_k_prime=-p_k*x_k+p_k*a; b=D*a+sum(R_k*x_k)"
+                          },
+                          "stability": {
+                            "const": "strictly_stable_supplied_real_poles"
+                          },
+                          "causality": {
+                            "const": "proper_real_rational_by_construction"
+                          }
+                        }
+                      },
+                      "reconstructed_network": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "port_names",
+                          "reference_impedance_ohm",
+                          "frequencies_hz",
+                          "s_parameters"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "port_names": {
+                            "type": "array",
+                            "minItems": 1,
+                            "maxItems": 8,
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            }
+                          },
+                          "reference_impedance_ohm": {
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                          },
+                          "frequencies_hz": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2048,
+                            "items": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          },
+                          "s_parameters": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2048,
+                            "items": {
+                              "type": "array",
+                              "minItems": 1,
+                              "maxItems": 8,
+                              "items": {
+                                "type": "array",
+                                "minItems": 1,
+                                "maxItems": 8,
+                                "items": {
+                                  "type": "object",
+                                  "additionalProperties": false,
+                                  "required": [
+                                    "real",
+                                    "imag"
+                                  ],
+                                  "properties": {
+                                    "real": {
+                                      "type": "number"
+                                    },
+                                    "imag": {
+                                      "type": "number"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "diagnostics": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "max_absolute_error",
+                          "rms_complex_error",
+                          "equilibrated_condition",
+                          "least_squares_optimality_residual",
+                          "sampled_smax_max",
+                          "conservative_passivity_bound"
+                        ],
+                        "properties": {
+                          "max_absolute_error": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "rms_complex_error": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "equilibrated_condition": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "least_squares_optimality_residual": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "sampled_smax_max": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "conservative_passivity_bound": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        }
+                      },
+                      "limitations": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 32,
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$comment": "SPDX-License-Identifier: Apache-2.0; bounded supplied-pole model only. Source causality, passivity and accuracy outside the fitted samples are not inferred."
+                  },
+                  "terminations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "port_name",
+                        "resistance_ohm",
+                        "voltage_points",
+                        "capacitance_f",
+                        "inductance_h"
+                      ],
+                      "properties": {
+                        "port_name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "resistance_ohm": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "voltage_points": {
+                          "type": "array",
+                          "minItems": 2,
+                          "maxItems": 1024,
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "time_s",
+                              "voltage_v"
+                            ],
+                            "properties": {
+                              "time_s": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "voltage_v": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        "capacitance_f": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "inductance_h": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "capacitance_f": {
+                                "exclusiveMinimum": 0
+                              },
+                              "inductance_h": {
+                                "const": 0
+                              }
+                            },
+                            "required": [
+                              "capacitance_f",
+                              "inductance_h"
+                            ]
+                          },
+                          "then": {
+                            "properties": {
+                              "resistance_ohm": {
+                                "exclusiveMinimum": 0
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "allOf": [
+                      {
+                        "contains": {
+                          "type": "object",
+                          "required": [
+                            "inductance_h"
+                          ],
+                          "properties": {
+                            "inductance_h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        "minContains": 1
+                      },
+                      {
+                        "contains": {
+                          "type": "object",
+                          "required": [
+                            "capacitance_f"
+                          ],
+                          "properties": {
+                            "capacitance_f": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        "minContains": 1
+                      }
+                    ]
+                  },
+                  "output_times_s": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  },
+                  "port_names": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "points": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "time_s",
+                        "source_voltage_v_by_port",
+                        "incident_wave_sqrt_w_by_port",
+                        "outgoing_wave_sqrt_w_by_port",
+                        "port_voltage_v_by_port",
+                        "port_current_a_by_port",
+                        "capacitor_voltage_v_by_port",
+                        "capacitor_voltage_derivative_v_per_s_by_port",
+                        "boundary_residual_a_by_port",
+                        "termination_resistor_power_w_by_port",
+                        "capacitor_energy_j_by_port",
+                        "source_current_a_by_port",
+                        "inductor_current_a_by_port",
+                        "inductor_current_derivative_a_per_s_by_port",
+                        "inductor_energy_j_by_port",
+                        "boundary_residual_v_by_port"
+                      ],
+                      "properties": {
+                        "time_s": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "source_voltage_v_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "incident_wave_sqrt_w_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "outgoing_wave_sqrt_w_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "port_voltage_v_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "port_current_a_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "capacitor_voltage_v_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "capacitor_voltage_derivative_v_per_s_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "boundary_residual_a_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "termination_resistor_power_w_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "capacitor_energy_j_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "source_current_a_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "inductor_current_a_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "inductor_current_derivative_a_per_s_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        },
+                        "inductor_energy_j_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        },
+                        "boundary_residual_v_by_port": {
+                          "type": "object",
+                          "minProperties": 1,
+                          "maxProperties": 8,
+                          "additionalProperties": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "final_state_sqrt_w": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 16,
+                    "items": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 8,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "diagnostics": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "algebraic_loop_condition",
+                      "algebraic_loop_backward_error",
+                      "closed_system_stability_margin_per_s",
+                      "closed_system_relative_stability_margin",
+                      "maximum_boundary_relative_residual",
+                      "interval_count",
+                      "unique_exponential_count",
+                      "estimated_work",
+                      "integration_method",
+                      "maximum_voltage_state_relative_residual",
+                      "maximum_current_state_relative_residual"
+                    ],
+                    "properties": {
+                      "algebraic_loop_condition": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "algebraic_loop_backward_error": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "closed_system_stability_margin_per_s": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "closed_system_relative_stability_margin": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "maximum_boundary_relative_residual": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "interval_count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 1024
+                      },
+                      "unique_exponential_count": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 128
+                      },
+                      "estimated_work": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "integration_method": {
+                        "const": "exact_piecewise_linear_augmented_exponential"
+                      },
+                      "maximum_voltage_state_relative_residual": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "maximum_current_state_relative_residual": {
+                        "type": "number",
+                        "minimum": 0
+                      }
+                    }
+                  },
+                  "limitations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 32,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "capacitive_port_names": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "final_capacitor_voltage_v_by_port": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 8,
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "inductive_port_names": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    }
+                  },
+                  "final_inductor_current_a_by_port": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 8,
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "initial_state": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "fit_request_digest",
+                      "fit_state_sqrt_w",
+                      "inductor_current_a_by_port",
+                      "capacitor_voltage_v_by_port"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "const": "spike/rlc-initial-state/v1"
+                      },
+                      "fit_request_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "fit_state_sqrt_w": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16,
+                        "items": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 8,
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "inductor_current_a_by_port": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 8,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      },
+                      "capacitor_voltage_v_by_port": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 8,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "restart_state": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "fit_request_digest",
+                      "fit_state_sqrt_w",
+                      "inductor_current_a_by_port",
+                      "capacitor_voltage_v_by_port"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "const": "spike/rlc-initial-state/v1"
+                      },
+                      "fit_request_digest": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "fit_state_sqrt_w": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 16,
+                        "items": {
+                          "type": "array",
+                          "minItems": 1,
+                          "maxItems": 8,
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "inductor_current_a_by_port": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 8,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      },
+                      "capacitor_voltage_v_by_port": {
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 8,
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "additionalProperties": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "contributions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 6,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "port_name",
+                    "input_digest",
+                    "victim_voltage_v"
+                  ],
+                  "properties": {
+                    "port_name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "input_digest": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "victim_voltage_v": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1024,
+                      "items": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              "envelope": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1024,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "time_s",
+                    "baseline_voltage_v",
+                    "minimum_voltage_v",
+                    "maximum_voltage_v",
+                    "lower_margin_v",
+                    "upper_margin_v"
+                  ],
+                  "properties": {
+                    "time_s": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "baseline_voltage_v": {
+                      "type": "number"
+                    },
+                    "minimum_voltage_v": {
+                      "type": "number"
+                    },
+                    "maximum_voltage_v": {
+                      "type": "number"
+                    },
+                    "lower_margin_v": {
+                      "type": "number"
+                    },
+                    "upper_margin_v": {
+                      "type": "number"
+                    }
+                  }
+                }
+              },
+              "worst_upper_pattern": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sample_time_s",
+                  "victim_voltage_v",
+                  "margin_v",
+                  "polarity_by_port",
+                  "verified_input_digest",
+                  "verified_victim_voltage_v",
+                  "maximum_superposition_error_v"
+                ],
+                "properties": {
+                  "sample_time_s": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "victim_voltage_v": {
+                    "type": "number"
+                  },
+                  "margin_v": {
+                    "type": "number"
+                  },
+                  "polarity_by_port": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 6,
+                    "additionalProperties": {
+                      "enum": [
+                        -1,
+                        1
+                      ]
+                    }
+                  },
+                  "verified_input_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "verified_victim_voltage_v": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "maximum_superposition_error_v": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              "worst_lower_pattern": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sample_time_s",
+                  "victim_voltage_v",
+                  "margin_v",
+                  "polarity_by_port",
+                  "verified_input_digest",
+                  "verified_victim_voltage_v",
+                  "maximum_superposition_error_v"
+                ],
+                "properties": {
+                  "sample_time_s": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "victim_voltage_v": {
+                    "type": "number"
+                  },
+                  "margin_v": {
+                    "type": "number"
+                  },
+                  "polarity_by_port": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 6,
+                    "additionalProperties": {
+                      "enum": [
+                        -1,
+                        1
+                      ]
+                    }
+                  },
+                  "verified_input_digest": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "verified_victim_voltage_v": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "number"
+                    }
+                  },
+                  "maximum_superposition_error_v": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              "diagnostics": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "solution_count",
+                  "estimated_work",
+                  "sample_count",
+                  "maximum_superposition_error_v"
+                ],
+                "properties": {
+                  "solution_count": {
+                    "type": "integer",
+                    "minimum": 4,
+                    "maximum": 9
+                  },
+                  "estimated_work": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100000000
+                  },
+                  "sample_count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1024
+                  },
+                  "maximum_superposition_error_v": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "envelope": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "time_s",
+          "minimum_voltage_v",
+          "maximum_voltage_v",
+          "lower_margin_v",
+          "upper_margin_v",
+          "minimum_corner_id",
+          "maximum_corner_id"
+        ],
+        "properties": {
+          "time_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minimum_voltage_v": {
+            "type": "number"
+          },
+          "maximum_voltage_v": {
+            "type": "number"
+          },
+          "lower_margin_v": {
+            "type": "number"
+          },
+          "upper_margin_v": {
+            "type": "number"
+          },
+          "minimum_corner_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "maximum_corner_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        }
+      }
+    },
+    "worst_upper_pattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_time_s",
+        "victim_voltage_v",
+        "margin_v",
+        "polarity_by_port",
+        "verified_input_digest",
+        "verified_victim_voltage_v",
+        "maximum_superposition_error_v",
+        "corner_id"
+      ],
+      "properties": {
+        "sample_time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "victim_voltage_v": {
+          "type": "number"
+        },
+        "margin_v": {
+          "type": "number"
+        },
+        "polarity_by_port": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 6,
+          "additionalProperties": {
+            "enum": [
+              -1,
+              1
+            ]
+          }
+        },
+        "verified_input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "verified_victim_voltage_v": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1024,
+          "items": {
+            "type": "number"
+          }
+        },
+        "maximum_superposition_error_v": {
+          "type": "number",
+          "minimum": 0
+        },
+        "corner_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "worst_lower_pattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_time_s",
+        "victim_voltage_v",
+        "margin_v",
+        "polarity_by_port",
+        "verified_input_digest",
+        "verified_victim_voltage_v",
+        "maximum_superposition_error_v",
+        "corner_id"
+      ],
+      "properties": {
+        "sample_time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "victim_voltage_v": {
+          "type": "number"
+        },
+        "margin_v": {
+          "type": "number"
+        },
+        "polarity_by_port": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 6,
+          "additionalProperties": {
+            "enum": [
+              -1,
+              1
+            ]
+          }
+        },
+        "verified_input_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "verified_victim_voltage_v": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1024,
+          "items": {
+            "type": "number"
+          }
+        },
+        "maximum_superposition_error_v": {
+          "type": "number",
+          "minimum": 0
+        },
+        "corner_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "solution_count",
+        "estimated_work",
+        "corner_count",
+        "sample_count"
+      ],
+      "properties": {
+        "solution_count": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 72
+        },
+        "estimated_work": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        },
+        "corner_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        }
+      }
+    }
+  }
+}

@@ -20,9 +20,9 @@ MAX_ANALYTIC_PWL_POINTS = 1_000_000
 
 
 def _project_measurements(project: CircuitProject, data: dict[str, Any]) -> dict[str, Any]:
-    # Import lazily because spike_core's runtime registry imports this native
-    # runner while the reference runner imports spike_core's MNA adapter.
-    from .runner import _measurements
+    if not project.measurements:
+        return {}
+    from .measurements import _measurements
 
     return _measurements(project, data, transient_weighting="time")
 
@@ -290,8 +290,14 @@ def run_native_project(
         raise ValueError("Adaptive transient controls require a transient analysis.")
     if nondefault_adaptive_controls and not adaptive_time_step:
         raise ValueError("Non-default adaptive controls require adaptive_time_step=True.")
-    if adaptive_time_step and str(integration_method).strip().lower() == "backward_euler":
+    normalized_method = str(integration_method).strip().lower()
+    reported_method = (
+        "radau_iia3" if normalized_method == "radau_iia3" else integration_method
+    )
+    if adaptive_time_step and normalized_method == "backward_euler":
         raise ValueError("Adaptive time stepping requires hybrid_trapezoidal or bdf2 integration.")
+    if adaptive_time_step and normalized_method == "radau_iia3":
+        raise ValueError("Radau IIA3 does not support adaptive time stepping.")
     if adaptive_time_step and project.analysis.mode == "transient":
         assert project.analysis.time_step_s is not None
         assert project.analysis.stop_time_s is not None
@@ -420,6 +426,7 @@ def run_native_project(
                 project,
                 elements=tuple(elements),
                 analysis=AnalysisDirective(mode="operating_point"),
+                measurements=(),
             )
             point_result = run_native_project(
                 point_project,
@@ -552,7 +559,7 @@ def run_native_project(
             integration_count = result.point_count
             integration_data = {
                 "time_s": [result.time(index) for index in range(integration_count)],
-                "integration": integration_method,
+                "integration": reported_method,
                 "node_voltage_v": {
                     name: [result.node_voltage(index, name) for index in range(integration_count)]
                     for name in node_names
@@ -597,7 +604,7 @@ def run_native_project(
                 provenance={
                     "solver": "SPIKES owned C++ kernel",
                     "implementation": "strict_fp_dense_mna",
-                    "integration": integration_method,
+                    "integration": reported_method,
                     "owned_cpp_transient": True,
                     "transient_controls": {
                         "integration_origin_s": 0.0,
@@ -620,6 +627,10 @@ def run_native_project(
                             )
                         ),
                         "final_stop_included": True,
+                        **({
+                            "source_breakpoint_samples":
+                                "left_limit_at_actual_source_jumps",
+                        } if normalized_method == "radau_iia3" else {}),
                     },
                     **({
                         "analytic_source_lowering": "fixed_step_pwl_samples",

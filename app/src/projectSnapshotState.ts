@@ -71,6 +71,7 @@ export function withoutSavedResults(snapshot: Record<string, any>): Record<strin
   if (copy.thermal?.scenario) {
     copy.thermal.scenario.result = null;
     copy.thermal.scenario.field_result = null;
+    copy.thermal.scenario.board_thermal_result = null;
   }
   copy.results = {};
   const coupledStudies = copy.assembly_ir?.extensions?.["spike.multiboard-studies"];
@@ -112,9 +113,16 @@ export function retainOpaqueResultState(retained: Record<string, any> | undefine
 
 export function createResultPackage(projectSnapshot: Record<string, any>, visuals?: unknown): Record<string, unknown> {
   const analysis = projectSnapshot.analysis ?? {};
+  const coupledStudies = projectSnapshot.assembly_ir?.extensions?.['spike.multiboard-studies'];
   const hasResults = analysis.latest_result || analysis.result_history?.length || analysis.si?.latest_channel_result
     || projectSnapshot.emi?.field_result || projectSnapshot.emi?.screening || projectSnapshot.thermal?.scenario?.result
     || projectSnapshot.thermal?.scenario?.field_result
+    || projectSnapshot.thermal?.scenario?.board_thermal_result
+    || (coupledStudies && typeof coupledStudies === 'object' && !Array.isArray(coupledStudies)
+      && Object.values(coupledStudies).some(study => {
+        const result = study && typeof study === 'object' ? (study as Record<string, unknown>).result : null;
+        return result != null && typeof result === 'object' && !Array.isArray(result);
+      }))
     || (Array.isArray(projectSnapshot.studies) && projectSnapshot.studies.some((study: any) =>
       Array.isArray(study?.cases) && study.cases.some((item: any) => item?.resultSnapshot != null
         || Array.isArray(item?.runs) && item.runs.some((run: any) => run?.resultSnapshot != null))

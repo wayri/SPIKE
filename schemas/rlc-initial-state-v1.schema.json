@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "fit_request_digest",
+    "fit_state_sqrt_w",
+    "inductor_current_a_by_port",
+    "capacitor_voltage_v_by_port"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlc-initial-state/v1"
+    },
+    "fit_request_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "fit_state_sqrt_w": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 8,
+        "items": {
+          "type": "number"
+        }
+      }
+    },
+    "inductor_current_a_by_port": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 8,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "capacitor_voltage_v_by_port": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 8,
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "additionalProperties": {
+        "type": "number"
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/rlc-initial-state/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; supplied fit-bound initial state, not an authenticated checkpoint; no clock. Exact dimensions and positive-L/C port subsets admitted at runtime."
+}

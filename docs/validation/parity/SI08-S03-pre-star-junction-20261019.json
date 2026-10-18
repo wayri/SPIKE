@@ -1,0 +1,37 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI08-S03",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "8bdc97d52ba45f1fb6c2a19b29d2ac54ac36d0f8b78260e881bbd851e9b1fdb0",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "4c28ffb8c8079cdbbb20e5f32087dd119a79a655bdb38453166d5ceb7861d198",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_sparameter_sampling.py": "5bd9f51264cabdccfc56b8a4ad3ab79486d79d4a15c35286fcedfe444c364c88",
+    "tests/python/test_sparameter_sampling_contract.py": "b19559e8bd373e1839529cdd9d08a6b025d7e2aefb3439d3ef42242d724f4dcf",
+    "schemas/sparameter-resampling-request-v1.schema.json": "4e14e480577715708dc0ecc0c7dfb4c5be04d49df00c59dff8554cc17ef7ec95",
+    "schemas/sparameter-resampling-result-v1.schema.json": "4a816e683ec1d9496c2f3b25e1282f28e0da99eabf504a01a4691d4828980979"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_affine_complex_multiport_exactness_and_interpolation_mapping",
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_convex_passive_preservation_and_active_samples_retained",
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_delayed_line_cartesian_interpolation_second_order_refinement",
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_exact_source_copy_snapshot_identity_and_one_sample_support",
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_resources_extreme_frequencies_and_cancellation_discard_partial",
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_strict_dc_shapes_ranges_grids_and_finite_admission",
+      "tests.python.test_sparameter_sampling.SParameterSamplingTests.test_supplied_real_filter_dc_and_no_inferred_zero_frequency",
+      "tests.python.test_sparameter_sampling_contract.SamplingContractTests.test_actual_worker_rejects_extrapolation_implicit_dc_and_invalid_policy",
+      "tests.python.test_sparameter_sampling_contract.SamplingContractTests.test_actual_worker_schema_dc_provenance_and_exact_samples"
+    ],
+    "run": 9,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI08-S03-rlgc-cascade-reverified.log",
+  "log_sha256": "5596ae990cd495f66ad60f7dc374b2335b30ee7a5be3102181e9e59b6046cafa"
+}

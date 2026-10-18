@@ -1,3 +1,5 @@
+import { useWorkspaceViews } from "./useWorkspaceViews";
+import WorkspaceHeader from "./WorkspaceHeader";
 import "./interfaceLayout.css";
 import {defaultStudioFeedback} from "./studioFeedback";
 import WorkspaceIntentReviewPanel, {type WorkspaceReviewedIntent} from "./WorkspaceIntentReviewPanel";
@@ -10,10 +12,17 @@ import { PiComponentLoadPanel } from "./PiComponentLoadPanel";
 import { eligibleComponentSupplyPads, type PiComponentLoadSelection } from "./piPinLoads";
 import PdnNetworkPanel from "./PdnNetworkPanel";
 import SolverSuitePanel from "./SolverSuitePanel";
+import SupportReportPreview from "./SupportReportPreview";
 import { solverDisplayName } from "./solverManagerModel";
 import { solverSuiteCatalog, type SolverSuiteAction } from "./solverSuiteCatalog";
 import NativeCfdWorkbench from "./NativeCfdWorkbench";
+import { HideControlIcon } from "./navigationIcons";
+import FileDropImport from "./FileDropImport";
+import type { DroppedImport } from "./dropImportModel";
+import HiddenToolsMenu from "./HiddenToolsMenu";
 import ViewportQuickTools from "./ViewportQuickTools";
+import ViewportEssentialTools from "./ViewportEssentialTools";
+import WorkspaceEditorTabs, { workspaceEditorPanels } from "./WorkspaceEditorTabs";
 import { setPanelUiScale } from "./panelWindowBridge";
 import FloatingPanel, { focusFloatingPanel, floatingPanelDocuments } from "./FloatingPanel";
 import { suggestSearchCommands, type SearchTarget, type SearchCommandSuggestion } from "./searchSentences";
@@ -113,7 +122,7 @@ import {
   Redo2, RefreshCw, Route, RouteOff, SatelliteDish, Save, ScanEye, ScanLine, ScanSearch, Search,
   ServerCog, Settings2, ShieldAlert, ShieldCheck, SlidersHorizontal, Spline, Split, SquareTerminal,
   Table2, TableProperties, Thermometer, ThermometerSun, Trash2, TrendingDown, Undo2, Upload, Waves,
-  Waypoints, Wind, Workflow, X, XCircle, Zap, ZoomIn, ZoomOut, Axis3D, Combine
+  Waypoints, Wind, Workflow, X, XCircle, Zap, ZoomIn, ZoomOut, Axis3D, Combine, FilePlus2, SaveAll
 } from "./icons";
 import BoardViewport, { AnalysisTerminalMarker, BoardObject, ModelLoadStatus, previewViewportTarget, RenderTelemetry, SelectionFilter, ViewportContextRequest } from "./BoardViewport";
 import { ParsedBoard, ParsedLayerDefinition, ParsedPad, ParsedStackupLayer } from "./boardParser";
@@ -242,7 +251,7 @@ import { validateSiProtocolSuite, type SiProtocolSuite } from "./siProtocolSuite
 import { throughHoleComponentRefs, uniqueViewportNets } from "./viewportPerformance";
 import SimulationWorkspace from "./SimulationWorkspace";
 import type { SimulationDomain } from "./sharedSimulationWorkspace";
-import { openBugReport } from "./bugReport";
+
 
 const TopologyEditor = lazy(() => import("./TopologyEditor"));
 const NetManager = lazy(() => import("./NetManager"));
@@ -1080,6 +1089,7 @@ export default function App() {
   const [piSearchDraft, setPiSearchDraft] = useState<{suggestion:PiSetupIntentSuggestion;board:ParsedBoard;occurrence:string;revision:string}|null>(null);
 
   const [pdnSuiteOpen, setPdnSuiteOpen] = useFocusToolState("pdnSuiteOpen", false, activateFocusTool);
+  const [supportReportOpen, setSupportReportOpen] = useFocusToolState("supportReportOpen", false, activateFocusTool);
   const [solverSuiteOpen, setSolverSuiteOpen] = useFocusToolState("solverSuiteOpen", false, activateFocusTool);
   const [savedThermalView, setSavedThermalView] = useFocusToolState<{ id?: string; section?: "overview" | "plots" | "components" | "transient" | "inputs" } | null>("savedThermalView", null, setFocusTool);
   const [studyManagerOpen, setStudyManagerOpen] = useFocusToolState("studyManagerOpen", false, activateFocusTool);
@@ -1297,6 +1307,9 @@ export default function App() {
   const layout2DRef = useRef<Viewport2DState>();
   const [viewportRestore, setViewportRestore] = useState<ViewportRestoreCommand | null>(null);
   const [menu, setMenu] = useState<string | null>(null);
+  const [commandMenuTop,setCommandMenuTop] = useState(8);
+  const lastCommandRoute = useRef("Menu");
+  const commandMenuMounted = useRef(false);
   useEffect(() => {
     const openMenu = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing || document.querySelector(".unsaved-project-backdrop, .interface-classic .application-menu-bar")) return;
@@ -1678,11 +1691,13 @@ export default function App() {
   }, [appSettings.uiScale]);
 
   useEffect(() => {
+    saveAppSettings(appSettings);
     document.documentElement.lang = appSettings.language;
     document.documentElement.dataset.theme = appSettings.theme;
     document.documentElement.dataset.renderQuality = appSettings.renderQuality;
+    window.dispatchEvent(new Event("spike-appearance-change"));
     setNavigationInertia(appSettings.navigationInertia);
-  }, [appSettings.language, appSettings.theme, appSettings.renderQuality, appSettings.navigationInertia]);
+  }, [appSettings]);
 
   useEffect(() => {
     if (dock === "Console" && bottomOpen) setActivityUnread(0);
@@ -2413,25 +2428,40 @@ export default function App() {
         setStatus(error instanceof Error ? `Startup project open failed: ${error.message}` : "Startup project open failed");
       });
   }, [desktopShell]);
+  const reviewApprovedSource = async (file: NativeSelectedFile, directory = false) => {
+    let kind = directory ? "odb++" as const : classifyOpenSource(file.fileName);
+    if (kind === "unknown" && file.fileName.toLowerCase().endsWith(".json")) {
+      const text = await readApprovedSourceFile(file.path);
+      kind = classifyOpenSource(file.fileName, JSON.parse(text.contents));
+    }
+    if (kind === "unknown") throw new Error("Unrecognized source. Drop a KiCad board, ODB++ job/archive, STEP, GLB or glTF model, or choose a format from Import project / CAD.");
+    if (kind === "project" || kind === "results") requestUnsavedAction("open another project", async () => {
+      try {
+        if (kind === "results") { const result = await readApprovedResultFile(file.path); await applyResultFile(result.contents, result.fileName); }
+        else await loadNativeProjectFromApprovedPath(file.path, file.fileName);
+      } catch (error) { setStatus(error instanceof Error ? `Project open failed: ${error.message}` : "Project open failed"); }
+    });
+    else setSourceImport({ source: file, kind });
+  };
+  const reviewDroppedSource = async (item: DroppedImport) => {
+    if (item.native) { await reviewApprovedSource(item.native, item.native.isDirectory); return; }
+    if (!item.file || item.reason) throw new Error(item.reason ?? "Dropped file is unavailable. Drop it again.");
+    const text = await item.file.text();
+    const kind = item.kind === "unknown" ? classifyOpenSource(item.fileName, JSON.parse(text)) : item.kind;
+    if (!["kicad", "normalized", "project", "results"].includes(kind)) throw new Error("This source requires the SPIKE desktop import workflow.");
+    requestUnsavedAction("import a dropped source", async () => {
+      try {
+        if (kind === "project") await applyProjectPackage(text, item.fileName, null);
+        else if (kind === "results") await applyResultFile(text, item.fileName);
+        else await applyImportedBoard(kind === "normalized" && !item.fileName.toLowerCase().endsWith(".spike-design.json") ? `${item.fileName}.spike-design.json` : item.fileName, text);
+      } catch(error) { setStatus(`Dropped import failed: ${error instanceof Error ? error.message : String(error)}`); }
+    });
+  };
   const performOpenProject = async () => {
     if (!desktopShell) { projectInputRef.current?.click(); return; }
     try {
       const file = await selectNativeWorkbenchFile();
-      if (file) {
-        let kind = classifyOpenSource(file.fileName);
-        if (kind === "unknown" && file.fileName.toLowerCase().endsWith(".json")) {
-          const text = await readApprovedSourceFile(file.path);
-          kind = classifyOpenSource(file.fileName, JSON.parse(text.contents));
-        }
-        if (kind === "unknown") throw new Error("Unrecognized source. Use Import project / CAD to choose its format explicitly.");
-        if (kind === "project" || kind === "results") requestUnsavedAction("open another project", async () => {
-          try {
-            if (kind === "results") { const result = await readApprovedResultFile(file.path); await applyResultFile(result.contents, result.fileName); }
-            else await loadNativeProjectFromApprovedPath(file.path, file.fileName);
-          } catch (error) { setStatus(error instanceof Error ? `Project open failed: ${error.message}` : "Project open failed"); }
-        });
-        else setSourceImport({ source: file, kind });
-      }
+      if (file) await reviewApprovedSource(file);
       else setStatus("Project open cancelled");
     } catch (error) { setStatus(error instanceof Error ? `Project open failed: ${error.message}` : "Project open failed"); }
   };
@@ -3732,11 +3762,7 @@ export default function App() {
     }
     if (destination === "board-import") {
       setTab("Home");
-      if (!appSettings.ribbonVisible) setAppSettings(current => {
-        const next = { ...current, ribbonVisible: true };
-        saveAppSettings(next);
-        return next;
-      });
+      void importNativeBoard();
       return;
     }
     if (destination === "emerge-emi") { setTab("EM"); setEmergeEmiOpen(true); return; }
@@ -5245,10 +5271,13 @@ export default function App() {
     else { setTab("PI"); setRightOpen(true); setFocusTool(null); }
   };
   const setInterfaceMode=(mode:AppSettings["interfaceMode"])=>{
-    setAppSettings(current=>({...current,interfaceMode:mode,ribbonVisible:mode==="classic"}));
+    setAppSettings(current=>({...current,interfaceMode:mode,ribbonVisible:mode==="classic",quickToolsVisible:false}));
     setMenu(null);setStatus(`${mode==="classic"?"Classic menus and ribbon":"Clean context tools"} interface selected. Project and solver inputs retained.`);
   };
   const universalSearchItems: UniversalSearchItem[] = [
+    {id:"appearance:light",label:"Use light workspace theme",category:"Appearance",keywords:"workspace light theme background",icon:Eye,run:()=>setAppSettings(current=>({...current,theme:"light"}))},
+    {id:"appearance:dark",label:"Use graphite workspace theme",category:"Appearance",keywords:"workspace dark teal theme",icon:Eye,run:()=>setAppSettings(current=>({...current,theme:"professional-dark"}))},
+    {id:"viewport:light",label:"Use light viewport background",category:"View",keywords:"light white canvas board results",icon:Eye,run:()=>setAppSettings(current=>({...current,viewportBackground:"light"}))},
     {id:"interface:classic",label:"Use classic interface",category:"Interface",keywords:"older legacy complex menus ribbon layout",icon:PanelTop,run:()=>setInterfaceMode("classic")},
     {id:"interface:clean",label:"Use clean interface",category:"Interface",keywords:"new minimalistic simple context layout",icon:LayoutDashboard,run:()=>setInterfaceMode("clean")},
 
@@ -5265,7 +5294,7 @@ export default function App() {
       description: `Open the ${name} command ribbon and workflow`,
       keywords: `tab ribbon ${name}${name === "EM" ? " electromagnetics radiation emi emc" : ""}`,
       icon,
-      run: () => { setTab(name); if (name === "Results") setResultVisualizerOpen(true); setStatus(`${name} workspace selected from universal search`); },
+      run: () => selectWorkspace(name),
     })),
     { id: "project:new", label: "New project", category: "Project", description: "Create an empty SPIKE project", icon: FilePlus, run: newProject },
     { id: "project:open", label: "Open file or project", category: "Project", description: "Open SPIKE projects, boards, ODB++, harness connections or MCAD models", keywords: "load recall file", icon: FolderOpen, run: () => void openProject() },
@@ -5284,7 +5313,8 @@ export default function App() {
     { id: "manager:stackup", label: "Stackup manager", category: "Design", description: "Edit copper, dielectric, core, prepreg, and material properties", icon: Layers3, disabled: !boardData, run: () => setStackupOpen(true) },
     { id: "manager:layers", label: "Layer manager", category: "View", description: "Control layer visibility, opacity, models, vias, and separation", icon: Layers2, disabled: !boardData, run: () => openBoardManager("layers") },
     { id: "manager:models", label: "3D model library", category: "Design", description: "Browse and assign local STEP, WRL, and glTF models", keywords: "component package", icon: LibraryBig, disabled: !boardData, run: () => setModelLibraryOpen(true) },
-    { id: "analysis:solver-suite", label: "Solver manager", category: "Simulation", description: "Manage named internal solvers, external engines, scope and setup routes", keywords: "solver suite solvers capabilities studio SPICE simulation methods", icon: Boxes, run: () => {setSolverSuiteQuery("");setSolverSuiteOpen(true);} },
+    { id: "application:support-report", label: "Report a bug or interface error", category: "Application", description: "Preview, redact, copy or save a support report before sharing", keywords: "crash diagnostic anonymized anonymous privacy report support github bug", icon: BadgeAlert, run: () => setSupportReportOpen(true) },
+    { id: "analysis:solver-suite", label: "Solver manager", category: "Simulation", description: "Manage named internal solvers, external engines, scope and setup routes", keywords: "solver suite solvers capabilities studio SPICE simulation methods blocks packages dependencies install PCB Harness MCAD CFD CHT Thermal", icon: Boxes, run: () => {setSolverSuiteQuery("");setSolverSuiteOpen(true);} },
     { id: "assembly:materials", label: "Material library", category: "Assembly", description: "Browse thermal, mechanical and electrical material evidence and assign saved snapshots", keywords: "MCAD ceramic RF FR4 Rogers Kapton PTFE plastic metal heater conductor laminate", icon: Layers3, run: () => setMcadAttachmentOpen(true) },
     { id: "assembly:sheet-folding", label: "Sheet and flex folding", category: "Assembly", description: "Import a rectangular sheet and preview finite-radius bends", keywords: "sheet metal nonmetal folding bend radius neutral axis K factor flex rigid-flex PCB DXF flat folded", icon: Spline, run: () => setSheetFoldingOpen(true) },
     { id: "analysis:native-cfd", label: "Native CFD cavity benchmark", category: "Thermal", description: "Run the bundled experimental C++ 2D laminar cavity solver; velocity and pressure fields", keywords: "airflow fluid dynamics momentum native CFD", icon: Wind, disabled: !workerAvailable, run: () => { setTab("Thermal"); setNativeCfdOpen(true); } },
@@ -5302,6 +5332,7 @@ export default function App() {
     { id: "view:2d", label: "Switch to 2D layout", category: "View", description: "Use the planar layout viewport and pan controls", icon: MapPinPlus, run: () => { setViewMode("2D"); setNavigationMode("pan"); } },
     { id: "view:3d", label: "Switch to 3D board view", category: "View", description: "Use the native Three.js board scene", icon: Cuboid, run: () => setViewMode("3D") },
     { id: "view:fit", label: "Fit board to viewport", category: "View", description: "Frame the active board or analysis geometry", keywords: "zoom all", icon: Focus, run: () => commandCamera("fit") },
+    { id: "view:quick-tools", label: appSettings.quickToolsVisible ? "Hide optional quick-tools bar" : "Show optional quick-tools bar", category: "View", keywords: "floating toolbar contextual optional", icon: SlidersHorizontal, run: () => setAppSettings(current=>({...current,quickToolsVisible:!current.quickToolsVisible})) },
     { id: "view:ribbon", label: appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon", category: "View", description: "Show or hide advanced commands; the workspace selector stays available", icon: PanelTop, run: toggleRibbonVisibility },
     { id: "view:navigator", label: leftOpen ? "Hide design navigator" : "Show design navigator", category: "View", icon: PanelLeft, run: () => setLeftOpen(current => !current) },
     { id: "view:analysis", label: rightOpen ? "Hide analysis setup" : "Show analysis setup", category: "View", keywords: "sidebar inspector panel settings setup", icon: PanelRight, run: () => setRightOpen(current => !current) },
@@ -5345,6 +5376,7 @@ export default function App() {
   ];
 
   const shellStyle = {
+    "--ui-title-height": appSettings.interfaceMode === "classic" ? "52px" : "48px",
     "--left-panel-width": `${leftPanelWidth}px`,
     "--right-panel-width": `${rightPanelWidth}px`,
     "--bottom-panel-height": `${dockHeight}px`,
@@ -5448,6 +5480,47 @@ export default function App() {
     }
   };
 
+  const workspaceViewOwner = useRef(crypto.randomUUID());
+  const workspaceViewParts = useMemo(() => (assemblyIr?.parts ?? []).map(part => ({partId:part.id,title:part.name})), [assemblyIr?.parts]);
+  const workspaceViews = useWorkspaceViews({
+    projectSession: `${workspaceViewOwner.current}:${projectGeneration.current}`,
+    revision: assemblyToolRevision, viewportRevision: assemblyWorkspaceViewportRevision,
+    boards: assemblyBoardVisuals.boards, occurrences: virtualBoardProjection.visuals,
+    assemblyModels: assemblySceneModels, parts: workspaceViewParts,
+    visibility: assemblyBoardVisibility, layerVisibility: resolvedAssemblyLayerVisibility,
+    layerOpacity: resolvedAssemblyLayerOpacity, layerFocus: assemblyLayerFocus, linkedNets: linkedAssemblyNets,
+    analysisDomain: tab === "HF / SI" ? "si" : tab === "Thermal" ? "thermal" : tab === "EM" ? "em" : tab === "PI" ? "pi" : "results",
+    onError: setStatus,
+    onAction: async (action, view) => {
+      const boardId = view.scope.kind === "board-occurrence" ? view.scope.occurrenceId : undefined;
+      if (action.type === "status") { setStatus(action.value); return; }
+      if (action.type === "layer-visibility" || action.type === "layer-opacity") return assemblyToolAction("workspace", {type:action.type,boardId:action.occurrenceId,layer:action.layer,value:action.value});
+      if (action.type === "layer-focus") return assemblyToolAction("workspace", {type:"layer-focus",boardId:action.occurrenceId,value:action.layer});
+      if (action.type === "select-net") { handleAssemblyNetSelect(action.occurrenceId,action.netId); return; }
+      if (action.type === "select-component") { handleAssemblyComponentSelect(action.occurrenceId,action.componentId); return; }
+      if (action.type === "select-object") {
+        if (boardId) { const board=virtualBoardProjection.visuals.find(item=>item.id===boardId); if(board)handleBoardInstanceSelect(board); }
+        else handleSelect({id:action.sourceObjectId,type:"component",name:view.title,assemblyPartId:view.scope.kind==="assembly-part"?view.scope.partId:undefined});
+        return;
+      }
+      if (action.type === "open-analysis") {
+        if(boardId) { const board=virtualBoardProjection.visuals.find(item=>item.id===boardId); if(!board)throw new Error("This board occurrence is no longer available."); handleBoardInstanceSelect(board); setIsolatedAssemblyPartId(null); }
+        if(view.scope.kind==="assembly-part") { handleSelect({id:view.scope.partId,type:"component",name:view.title,assemblyPartId:view.scope.partId}); setIsolatedAssemblyPartId(view.scope.partId); }
+        selectWorkspace(action.domain==="si"?"HF / SI":action.domain==="pi"?"PI":action.domain==="em"?"EM":action.domain==="thermal"?"Thermal":"Results");
+        setRightOpen(true);
+      }
+    },
+  });
+
+  const scopedViewportActive = Boolean(workspaceViews.activeRenderer);
+  const previousScopedViewport = useRef(false);
+  useEffect(() => {
+    if (scopedViewportActive && !previousScopedViewport.current) {
+      setViewportRestore(current => ({token:(current?.token ?? 0)+1,threeD:camera3DRef.current,twoD:layout2DRef.current}));
+    }
+    previousScopedViewport.current = scopedViewportActive;
+  }, [scopedViewportActive]);
+
   const openNotificationDock = () => { setDock("Notifications"); setBottomOpen(true); };
   const notificationCount = Number(Boolean(modelNotice)) + Number(boardDisplayDiagnostics.length > 0 || harnessProjection.diagnostics.length > 0) + Number(importReviewCount > 0);
   const notificationProps = {
@@ -5511,7 +5584,7 @@ export default function App() {
               <button className={emiSetup.viewport.analysis_nets_only ? "selected" : ""} onClick={() => setEmiSetup(current => ({ ...current, viewport: { ...current.viewport, analysis_nets_only: !current.viewport.analysis_nets_only } }))} title="Show only EMI candidate and return nets"><RouteOff size={14} /> Nets only</button>
               <button onClick={() => void validateEmi()} disabled={emiBusy}><ClipboardCheck size={14} /> Preflight</button>
               <button onClick={() => void runEmiScreening()} disabled={emiBusy}><Radar size={14} /> Screen</button>
-              <button className="spike-control--compact" aria-label="Minimize EM tools to bottom bar" onClick={() => setEmToolsMinimized(true)}><PanelBottom size={14} /> Minimize</button>
+              <button className="spike-control--compact" aria-label="Hide EM tools" title="Restore with Show hidden tools" onClick={() => setEmToolsMinimized(true)}><HideControlIcon size={14} /> Hide</button>
             </div>}
   </>;
   const locateStudyResult = async () => {
@@ -5676,7 +5749,12 @@ export default function App() {
   const contextConfigureSi = (focus:"channel"|"crosstalk"|"eye"|"impedance"|"ports") => {contextSelect();setTab("HF / SI");openSiWorkbench("geometry",focus);};
   const contextNetReason = smartContext.boardReason ?? smartContext.netReason;
   const viewportContextGroups:ContextMenuGroup[] = [
+    {id:"appearance",label:"Appearance",actions:[
+      {id:"workspace-light",label:appSettings.theme==="light"?"Use graphite workspace":"Use light workspace",run:()=>setAppSettings(current=>({...current,theme:current.theme==="light"?"professional-dark":"light"}))},
+      ...(["light","dark","amoled"] as const).map(mode=>({id:`background-${mode}`,label:`${mode==="light"?"Light":mode==="dark"?"Graphite":"AMOLED black"} viewport`,run:()=>setAppSettings(current=>({...current,viewportBackground:mode}))}))
+    ]},
     {id:"workspace",label:"Workspace",actions:[
+      {id:"viewport-help",label:"Viewport and assembly help",description:"Camera controls, selection, board layers and linked views",run:()=>setHelpOpen(true)},
       {id:"open-project",label:"Open project manager",run:()=>setProjectManagerOpen(true)},
       {id:"import-board",label:"Import a board or assembly",disabledReason:universalRunning?"Stop the active simulation before importing another design":undefined,run:()=>void importNativeBoard()},
       ...(universalRunning?[{id:"stop",label:"Stop active simulation",run:()=>void cancelActiveAnalysis()}]:[])
@@ -5918,13 +5996,20 @@ export default function App() {
           <MenuItem icon={Focus} label="Interactive analysis guide" onClick={() => { setGuideOpen(true); setMenu(null); }} />
         </MenuSubmenu>
         <MenuSubmenu label="Support">
-          <MenuItem icon={BadgeAlert} label="Report bug" onClick={() => { setMenu(null); void openBugReport(tab).catch(() => setStatus("Could not open the bug report. Visit github.com/wayri/SPIKE/issues/new")); }} />
+          <MenuItem icon={BadgeAlert} label="Report bug" onClick={() => { setMenu(null); setSupportReportOpen(true); }} />
           <MenuItem icon={CircleHelp} label="About SPIKE" onClick={() => { setAboutOpen(true); setMenu(null); }} />
         </MenuSubmenu>
       </MenuButton>
 
   </>;
+  const viewportEssentials = <ViewportEssentialTools viewMode={viewMode} navigationMode={navigationMode} selectionFilter={selectionFilter} onMode={mode=>{setViewMode(mode);if(mode==="2D")setNavigationMode("pan");}} onNavigation={setNavigationMode} onFilter={changeSelectionFilter} onCamera={commandCamera}/>;
   const focusViewportTools = <>
+<ToolbarMenu label="Appearance" icon={Eye} actions={[
+  {label:"Light workspace",icon:Eye,checked:appSettings.theme==="light",radio:true,section:"Workspace theme",run:()=>setAppSettings(current=>({...current,theme:"light"}))},
+  {label:"Graphite workspace",icon:Eye,checked:appSettings.theme==="professional-dark",radio:true,section:"Workspace theme",run:()=>setAppSettings(current=>({...current,theme:"professional-dark"}))},
+  ...(["light","dark","amoled"] as const).map(mode=>({label:`${mode==="light"?"Light":mode==="dark"?"Graphite":"AMOLED black"} viewport`,icon:Eye,checked:appSettings.viewportBackground===mode,radio:true,section:"Viewport background",run:()=>setAppSettings(current=>({...current,viewportBackground:mode}))}))
+]}/>
+<button type="button" aria-pressed={appSettings.quickToolsVisible} onClick={()=>setAppSettings(current=>({...current,quickToolsVisible:!current.quickToolsVisible}))}><SlidersHorizontal size={14}/>{appSettings.quickToolsVisible?"Hide":"Show"} optional quick-tools bar</button>
 <div className="view-toggle"><button role="radio" aria-checked={viewMode === "2D"} className={viewMode === "2D" ? "selected" : ""} onClick={() => { setViewMode("2D"); setNavigationMode("pan"); }}><CircuitBoard size={16} />2D</button><button role="radio" aria-checked={viewMode === "3D"} className={viewMode === "3D" ? "selected" : ""} onClick={() => setViewMode("3D")}><Box size={16} />3D</button></div>
 
 <span className="divider" />
@@ -6046,7 +6131,7 @@ export default function App() {
             {hasVectorResult && ["current", "current_density", "electric_field", "magnetic_field"].includes(resultVisualization.mode) && <button className={resultVisualization.showVectors ? "selected" : ""} onClick={() => setResultVisualization(current => ({ ...current, showVectors: !current.showVectors }))} title={resultVisualization.showVectors ? "Hide result direction arrows" : "Show result direction arrows"}><MoveUpRight size={14} /> Arrows</button>}
           </div>}
 </>;
-  const focusPanels: FocusToolPanel[] = [{ id: "leftOpen", title: "Design navigator", open: leftOpen, content: <aside className={leftOpen ? "side-panel left" : "side-panel left collapsed"}>
+  const focusPanels: FocusToolPanel[] = workspaceEditorPanels([{ id: "leftOpen", title: "Design navigator", open: leftOpen, content: <aside className={leftOpen ? "side-panel left" : "side-panel left collapsed"}>
         <div className="panel-heading"><button className="panel-title-toggle" onClick={() => setLeftOpen(current => !current)} aria-expanded={leftOpen} title={leftOpen ? "Collapse scene navigator" : "Expand scene navigator"}>SCENE NAVIGATOR</button><button onClick={() => setLeftOpen(current => !current)} className="collapse-btn" title={leftOpen ? "Collapse scene navigator" : "Expand scene navigator"} aria-label={leftOpen ? "Collapse scene navigator" : "Expand scene navigator"}>{leftOpen ? <PanelLeft size={15} /> : <PanelRight size={17} />}</button></div>
         {leftOpen && <SceneNavigator
           onObjectContext={setViewportContext}
@@ -6116,7 +6201,7 @@ export default function App() {
     </section> },
 { id: "resourceOpen", title: "Resources & performance", open: resourceOpen, content: <ResourceMonitor open={resourceOpen} setOpen={setResourceOpen} resources={processResources} render={renderTelemetry} board={boardData} /> },
 { id: "netManagerOpen", title: "Nets & analysis domains", open: Boolean(netManagerOpen && !(assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1)), content: netManagerOpen && !(assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1) && <NetManager board={boardData} selectedNet={selected?.net} selectedObject={selected ?? undefined} managedNets={powerNets} setManagedNets={nets => { setPowerNets(nets); if (nets[0]) setPiSetup(current => ({ ...current, net: nets[0] })); }} loopExtractions={piSetup.loopExtractions} setLoopExtractions={loopExtractions => setPiSetup(current => ({ ...current, loopExtractions }))} pathGroups={[...new Map(piTopology.nodes.filter(node => node.pathGroupId).map(node => [node.pathGroupId!, node.pathGroupLabel || node.pathGroupId!])).entries()].map(([id, label]) => ({ id, label }))} onSelectNet={focusManagedNet} onOpenPowerPaths={() => { setNetManagerOpen(false); setDock("Power tree"); setTopologyEditor("pi"); }} onOpenSeriesAnalysis={() => { setNetManagerOpen(false); openAnalysisSetup("DC IR Drop", "path"); }} onStatus={setStatus} onClose={() => { previewViewportTarget(null); setNetManagerOpen(false); }} /> },
-{ id: "topologyEditor", title: "Power & signal paths", open: Boolean(topologyEditor), content: topologyEditor && <TopologyEditor domain={topologyEditor} board={boardData} model={topologyEditor === "pi" ? piTopology : siTopology} onUndo={undo} onRedo={redo} setModel={(next, record = true) => { if (record) recordChange(); topologyEditor === "pi" ? setPiTopology(next) : setSiTopology(next); }} onClose={() => setTopologyEditor(null)} onUseForAnalysis={(next, scenarioId, plan) => { if (next.domain === "pi") { const jobs = topologyBatchJobs(boardData, next, plan); const first = jobs[0]; const paths = compilePiPaths(next); const reviewedPath = paths.find(path => path.issues.length === 0) ?? paths[0]; const sourceNode = next.nodes.find(node => node.pathGroupId === reviewedPath?.id && node.kind === "source"); const loadNode = next.nodes.find(node => node.pathGroupId === reviewedPath?.id && node.kind === "load"); const pathSource = reviewedPath ? topologyTerminal(boardData, sourceNode, reviewedPath.source_terminal.net, "source", 0, sourceNode?.voltageV ?? 0) : null; const pathLoad = reviewedPath ? topologyTerminal(boardData, loadNode, reviewedPath.load_terminal.net, "load", 0, loadNode ? plan.budget.nodes[loadNode.id]?.currentA ?? loadNode.loadCurrentA ?? 0 : 0) : null; const unresolved = reviewedPath ? [pathSource, pathLoad].filter(item => !item?.anchorId).length : jobs.flatMap(job => [...job.sources, ...job.loads]).filter(item => !item.anchorId).length; setPiTopology(next); if (reviewedPath && pathSource && pathLoad) setPiSetup(current => ({ ...current, powerPathId: reviewedPath.id, net: reviewedPath.source_terminal.net, sources: [pathSource], loads: [pathLoad], batchJobs: jobs })); else if (first) setPiSetup(current => ({ ...current, powerPathId: "", net: first.net, sources: first.sources, loads: first.loads, batchJobs: jobs })); setAnalysisMode(reviewedPath ? "DC IR Drop" : jobs.length > 1 ? "Bulk Net Analysis" : "DC IR Drop"); setTab("PI"); setDock("Power tree"); setAnalysisSetupWorkflow(reviewedPath ? "path" : jobs.length > 1 ? "batch" : "single"); setRightOpen(true); setDcRunOpen(true); setStatus(reviewedPath ? `Power path ${reviewedPath.label} attached: ${reviewedPath.segments.length} net segments, ${reviewedPath.transitions.length} series interfaces; ${unresolved} terminal${unresolved === 1 ? "" : "s"} require placement review` : `Power tree ${scenarioId} case attached: ${jobs.length} PI job${jobs.length === 1 ? "" : "s"}; ${unresolved} terminal${unresolved === 1 ? "" : "s"} require placement review`); } else { setSiTopology(next); setTab("HF / SI"); setStatus(`SI channel topology saved: ${next.nodes.length} elements, ${next.edges.length} connections`); } setTopologyEditor(null); }} onStatus={setStatus} /> },
+{ id: "topologyEditor", title: "Power & signal paths", open: Boolean(topologyEditor), content: topologyEditor && <TopologyEditor onOpenStudio={() => setSpiceOpen(true)} domain={topologyEditor} board={boardData} model={topologyEditor === "pi" ? piTopology : siTopology} onUndo={undo} onRedo={redo} setModel={(next, record = true) => { if (record) recordChange(); topologyEditor === "pi" ? setPiTopology(next) : setSiTopology(next); }} onClose={() => setTopologyEditor(null)} onUseForAnalysis={(next, scenarioId, plan) => { if (next.domain === "pi") { const jobs = topologyBatchJobs(boardData, next, plan); const first = jobs[0]; const paths = compilePiPaths(next); const reviewedPath = paths.find(path => path.issues.length === 0) ?? paths[0]; const sourceNode = next.nodes.find(node => node.pathGroupId === reviewedPath?.id && node.kind === "source"); const loadNode = next.nodes.find(node => node.pathGroupId === reviewedPath?.id && node.kind === "load"); const pathSource = reviewedPath ? topologyTerminal(boardData, sourceNode, reviewedPath.source_terminal.net, "source", 0, sourceNode?.voltageV ?? 0) : null; const pathLoad = reviewedPath ? topologyTerminal(boardData, loadNode, reviewedPath.load_terminal.net, "load", 0, loadNode ? plan.budget.nodes[loadNode.id]?.currentA ?? loadNode.loadCurrentA ?? 0 : 0) : null; const unresolved = reviewedPath ? [pathSource, pathLoad].filter(item => !item?.anchorId).length : jobs.flatMap(job => [...job.sources, ...job.loads]).filter(item => !item.anchorId).length; setPiTopology(next); if (reviewedPath && pathSource && pathLoad) setPiSetup(current => ({ ...current, powerPathId: reviewedPath.id, net: reviewedPath.source_terminal.net, sources: [pathSource], loads: [pathLoad], batchJobs: jobs })); else if (first) setPiSetup(current => ({ ...current, powerPathId: "", net: first.net, sources: first.sources, loads: first.loads, batchJobs: jobs })); setAnalysisMode(reviewedPath ? "DC IR Drop" : jobs.length > 1 ? "Bulk Net Analysis" : "DC IR Drop"); setTab("PI"); setDock("Power tree"); setAnalysisSetupWorkflow(reviewedPath ? "path" : jobs.length > 1 ? "batch" : "single"); setRightOpen(true); setDcRunOpen(true); setStatus(reviewedPath ? `Power path ${reviewedPath.label} attached: ${reviewedPath.segments.length} net segments, ${reviewedPath.transitions.length} series interfaces; ${unresolved} terminal${unresolved === 1 ? "" : "s"} require placement review` : `Power tree ${scenarioId} case attached: ${jobs.length} PI job${jobs.length === 1 ? "" : "s"}; ${unresolved} terminal${unresolved === 1 ? "" : "s"} require placement review`); } else { setSiTopology(next); setTab("HF / SI"); setStatus(`SI channel topology saved: ${next.nodes.length} elements, ${next.edges.length} connections`); } setTopologyEditor(null); }} onStatus={setStatus} /> },
 { id: "layersOpen", title: "Layers & visibility", open: Boolean(layersOpen && !(assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1)), content: layersOpen && !(assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1) && <LayerManager definitions={boardData?.layerDefinitions ?? layerEntries.map((name, id) => ({ id, name, kind: name.endsWith(".Cu") ? "signal" : "user" }))} stackup={boardData?.stackup ?? []} layers={visibleLayers} opacity={layerOpacity} viaCount={boardData?.vias.length ?? 0} showNetNames={showNetNames} setShowNetNames={setShowNetNames} showVias={showVias} setShowVias={setShowVias} showOnlyVias={showOnlyVias} layerSeparation={layerSeparation} setLayerSeparation={setLayerSeparation} toggleLayer={toggleLayer} setLayersVisible={setLayersVisible} showOnlyLayer={showOnlyLayer} changeOpacity={changeLayerOpacity} beginOpacityChange={recordChange} restoreDefaults={restoreLayerDefaults} showModels={showModels} setShowModels={setShowModels} showSmdModels={showSmdModels} setShowSmdModels={setShowSmdModels} showThtModels={showThtModels} setShowThtModels={setShowThtModels} smdCount={componentMountCounts.smd} thtCount={componentMountCounts.tht} onClose={() => setLayersOpen(false)} /> },
 { id: "stackupOpen", title: "Physical stackup", open: Boolean(stackupOpen), content: stackupOpen && <EditableStackupManager stackup={boardData?.stackup ?? []} copperLayers={boardData?.layers ?? []} onSave={stackup => { recordChange(); setBoardData(current => current ? { ...current, stackup } : current); setCanonicalSpiDeR(current => applyStackupToSpiDeR(current, stackup)); setStatus("Project-local stackup updated; solver validity will be re-evaluated"); }} onClose={() => setStackupOpen(false)} /> },
 { id: "flexBoardOpen", title: "Flex board manager", open: Boolean(flexBoardOpen), content: flexBoardOpen && <FlexBoardManager board={boardData} onClose={() => setFlexBoardOpen(false)} onStatus={setStatus} onOpenFolding={()=>setSheetFoldingOpen(true)} onShowLayers={layers => { setLayersVisible(layers, true); commandCamera("fit"); }} /> },
@@ -6175,6 +6260,7 @@ export default function App() {
 {id:"workspaceIntentOpen",title:"Workspace request assistant",open:workspaceIntentOpen,content:workspaceIntentDraft&&<WorkspaceIntentReviewPanel key={workspaceIntentDraft.revision} suggestion={workspaceIntentDraft.suggestion} context={workspaceIntentDraft.context} staleReason={workspaceIntentStale} onApply={applyWorkspaceIntent} onClose={()=>setWorkspaceIntentOpen(false)}/>},
 { id: "piSearchSetupOpen", title: "PI setup assistant", open: piSearchSetupOpen, content: piSearchDraft && <PiSearchSetupPanel key={piSearchDraft.revision} canRun={workerAvailable} suggestion={piSearchDraft.suggestion} board={piSearchDraft.board} staleReason={boardData!==piSearchDraft.board || piAnalysisOccurrenceId!==piSearchDraft.occurrence ? "Board or occurrence changed. Search again before applying this draft." : searchBoardReason || (analysisRunning || viewportPiRun ? "Wait for the active analysis." : "")} onApply={applySearchPiSetup} onClose={()=>setPiSearchSetupOpen(false)}/> },
 { id: "pdnSuiteOpen", title: "PDN / filter network", open: pdnSuiteOpen, content: <PdnNetworkPanel initial={piTopology.acPdnRequest} availableNets={Object.values(boardData?.nets ?? {})} groundNets={Object.values(boardData?.nets ?? {}).filter(net=>/^(gnd|agnd|dgnd|pgnd|vss|0)$/i.test(net))} onSave={request=>{setPiTopology(current=>({...current,acPdnRequest:request}));markProjectDirty();}} onClose={()=>setPdnSuiteOpen(false)}/> },
+{ id: "supportReportOpen", title: "Support report", open: supportReportOpen, content: <SupportReportPreview workspace={tab} onClose={() => setSupportReportOpen(false)} /> },
 { id: "solverSuiteOpen", title: "Solver manager", open: solverSuiteOpen, content: <SolverSuitePanel runtimeSolvers={solverRegistry ?? []} runtimeProbed={solverRegistry !== null} onManageEngines={()=>void openExternalEngineCenter()} onClose={()=>setSolverSuiteOpen(false)} onOpenWorkflow={openSuiteWorkflow} initialQuery={solverSuiteQuery} key={solverSuiteQuery}/> },
 { id: "nativeCfdOpen", title: "Native CFD cavity benchmark", open: nativeCfdOpen, content: <NativeCfdWorkbench workerAvailable={workerAvailable} onStatus={setStatus} /> },
 { id: "preferencesOpen", title: "Settings", open: Boolean(preferencesOpen), content: preferencesOpen && <UniversalSettingsModal settings={appSettings} onOpenUpdates={() => { setPreferencesOpen(false); setAppUpdateOpen(true); }} onClose={() => setPreferencesOpen(false)} onSave={next => { setAppSettings(next); saveAppSettings(next); setNavigationInertia(next.navigationInertia); setPreferencesOpen(false); setStatus("Application settings saved locally"); }} /> },
@@ -6271,10 +6357,10 @@ export default function App() {
 { id: "searchQuery", title: "Search results", open: Boolean(searchQuery), content: searchQuery && <SearchPanel query={searchQuery} board={boardData} onClose={() => setSearchQuery("")} onSelect={handleSelect} /> },
 { id: "thermalPlotTarget", title: "Temperature history", open: Boolean(viewportThermalHistory), content: viewportThermalHistory && <ThermalHistoryPopup history={viewportThermalHistory} onClose={() => setThermalPlotTarget(null)} /> },
 { id: "dcRunOpen", aliases: ["viewportPiRun"], title: "PI analysis setup", open: Boolean((dcRunOpen || viewportPiRun)), content: (dcRunOpen || viewportPiRun) && <PiRunDialog key={viewportPiRun ? "viewport-pi" : "setup-pi"} quickRun={Boolean(viewportPiRun)} onQuickComplete={() => { viewportPiRunLock.current = false; viewportPiRun?.resolve(); setViewportPiRun(null); }} onPublishResult={result => { if (viewportPiRun && (viewportPiRun.scope !== viewportPiCurrent.current.scope || viewportPiRun.setup !== viewportPiCurrent.current.setup)) { setStatus("PI completed for an older setup; its overlay was not applied."); return; } window.dispatchEvent(new CustomEvent("spike-analysis-result", { detail: result })); if (viewportPiRun) setResultVisualizerOpen(false); }} importedDesign={piRunImportedDesign} board={boardData} occurrenceId={piAnalysisOccurrenceId} workerAvailable={workerAvailable} selected={selected} analysisMode={analysisMode} initialWorkflow={analysisSetupWorkflow} sharedStage={tab === "Mesh" ? "Mesh" : "Solve"} onSharedStage={stage => openSharedWorkspace(stage, "pi")} setup={viewportPiRun?.setup ?? piSetup} setSetup={next => { markProjectDirty(); setPiSetup(next); }} topology={piTopology} limits={limits} solverId={solverId} formulation={formulation} solverCatalog={solverCatalog} probes={probes} resources={processResources} appSettings={appSettings} onRequireAdmission={requireAssemblyAdmission} onOpenPowerPaths={() => { setDcRunOpen(false); setDock("Power tree"); setTopologyEditor("pi"); }} onOpenSpice={() => { setDcRunOpen(false); setSpiceOpen(true); }} onDiagnosticHelp={code => { setHelpDiagnosticCode(code); setHelpOpen(true); }} onClose={() => setDcRunOpen(false)} onRunState={(running, progress) => { setAnalysisRunning(running); setOperationDisplay(running ? progress ?? { label: "Running analysis", elapsedSeconds: 0 } : null); }} onResult={(message, summary) => { setAnalysisRunning(false); setOperationDisplay(null); setStatus(message); if (summary && (!viewportPiRun || viewportPiRun.scope === viewportPiCurrent.current.scope && viewportPiRun.setup === viewportPiCurrent.current.setup)) setAnalysisSummary(summary); }} /> },
-{ id: "emResultManagerOpen", title: "EM field controls", open: Boolean(emResultManagerOpen && emViewportRecords.length > 0), content: emResultManagerOpen && emViewportRecords.length > 0 && <EMViewportResultManager records={emViewportRecords} activeRecordId={emViewportRecord?.id ?? ""} settings={emViewportSettings} data={emViewportData} onSelectRecord={id => { setResultDisplay(id); setEmViewportSettings(current => ({ ...current, visible: true, frequencyIndex: 0, selectedSample: 0, quantity: availableEMQuantities(emViewportRecords.find(row => row.id === id)!)[0]?.id ?? "far_e" })); setViewMode("3D"); setEmiChamberOpen(false); }} onSettingsChange={setEmViewportSettings} onClose={() => setEmResultManagerOpen(false)} /> }];
+{ id: "emResultManagerOpen", title: "EM field controls", open: Boolean(emResultManagerOpen && emViewportRecords.length > 0), content: emResultManagerOpen && emViewportRecords.length > 0 && <EMViewportResultManager records={emViewportRecords} activeRecordId={emViewportRecord?.id ?? ""} settings={emViewportSettings} data={emViewportData} onSelectRecord={id => { setResultDisplay(id); setEmViewportSettings(current => ({ ...current, visible: true, frequencyIndex: 0, selectedSample: 0, quantity: availableEMQuantities(emViewportRecords.find(row => row.id === id)!)[0]?.id ?? "far_e" })); setViewMode("3D"); setEmiChamberOpen(false); }} onSettingsChange={setEmViewportSettings} onClose={() => setEmResultManagerOpen(false)} /> }]);
   const focusCommandInventory: FocusCommand[] = [
     ...focusCommandsFromElements(applicationMenus, "application"),
-    { id: "workspaces", label: "Workspaces", children: tabs.map(item => ({ id: "workspace:" + item.name, label: item.name, icon: item.icon, onEnter: () => setTab(item.name), children: focusCommandsFromElements(ribbonContentFor(item.name), item.name) })) },
+    { id: "workspaces", label: "Workspaces", children: tabs.map(item => ({ id: "workspace:" + item.name, label: item.name, icon: item.icon, onEnter: () => selectWorkspace(item.name), children: focusCommandsFromElements(ribbonContentFor(item.name), item.name) })) },
     { id: "viewport-tools", label: "Viewport tools", children: focusCommandsFromElements(focusViewportTools, "viewport") },
     { id: "result-tools", label: "Result display", children: focusCommandsFromElements(focusResultTools, "result") },
     { id: "open-panels", label: "Open panels", children: focusPanels.filter(panel => panel.open).map(panel => ({ id: "panel:" + panel.id, label: panel.title, run: () => setFocusTool(panel.id) })) },
@@ -6305,10 +6391,32 @@ export default function App() {
   const focusMenuSections: Record<string, string> = { File: "focus-project", Edit: focusOriginal("Edit").id, View: "focus-design", Analysis: "focus-analyze", Reports: "focus-results", Project: "focus-project", Tools: "focus-tools", Extensions: focusOriginal("Extensions").id, Help: "focus-help" };
 
   const commandMenuOpen = menu !== null && !(appSettings.interfaceMode === "classic" && Object.prototype.hasOwnProperty.call(focusMenuSections, menu));
+  if (commandMenuOpen) { lastCommandRoute.current = menu!; commandMenuMounted.current = true; }
 
   return <div className={`app-shell board-first focus-shell interface-${appSettings.interfaceMode} ${dockMaximized ? "dock-maximized" : ""} ${bottomOpen ? "bottom-open" : "bottom-closed"} ${appSettings.ribbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} data-interface-mode={appSettings.interfaceMode} style={shellStyle}>
     <SchematicHost open={schematicOpen} snapshot={{ document: schematicView, linked: schematicLinked, boardName: schematicBinding?.boardName ?? "", selected: schematicSelected, busy: schematicBusy, status: schematicStatus }} onAction={handleSchematicAction} onError={error => { setStatus(`Schematic viewer: ${error}`); setSchematicOpen(false); }} />
-    <header className="topbar"><button type="button" id="focus-menu-toggle" className="focus-menu-toggle spike-control--compact" aria-expanded={menu !== null} aria-controls="focus-command-panel" onClick={() => {if(commandPanelDetached && focusFloatingPanel("command-menu"))return;setMenu(menu === null ? "Menu" : null);}}><PanelLeft size={15} /> Menu</button><div className="brand-mark"><b>SPIKE</b></div><button className="project-path" onClick={() => setProjectManagerOpen(true)} title={`Open project manager: ${projectName}`}><span>Project</span><b>{projectName}</b><ChevronDown size={15} /></button><div className="top-actions"><label className="interface-mode-control" title="Switch interface layout without changing project or solver inputs"><PanelTop size={14}/><select aria-label="Interface layout" value={appSettings.interfaceMode} onChange={event=>setInterfaceMode(event.target.value as AppSettings["interfaceMode"])}><option value="clean">Clean</option><option value="classic">Classic</option></select></label>{workspaceSwitcher}<button className={`icon-btn universal-search-trigger ${globalSearchOpen ? "active" : ""}`} title="Universal search (Ctrl+K)" aria-label="Open universal search" aria-keyshortcuts="Control+K Meta+K" aria-expanded={globalSearchOpen} onClick={() => { setMenu(null); setGlobalSearchOpen(true); }}><Search size={17} /><span>Search</span><kbd>Ctrl K</kbd></button><ViewportNotifications {...notificationProps} mode="button" /><button className="icon-btn" title="Help and user guide" onClick={() => setHelpOpen(true)}><CircleHelp size={17} /></button><button className="avatar" title={appSettings.profile.displayName} onClick={() => setPreferencesOpen(true)}>{appSettings.profile.initials}</button></div></header>
+    {workspaceViews.hosts}
+    <WorkspaceHeader projectName={projectName} activeWorkspace={tab} workspaces={tabs} showWorkspaceBar={false} workspaceSwitcher={workspaceSwitcher}
+      menuOpen={menu!==null} onMenu={()=>{if(commandPanelDetached&&focusFloatingPanel("command-menu"))return;setMenu(menu===null?lastCommandRoute.current:null);}}
+      searchOpen={globalSearchOpen} onSearch={()=>{setMenu(null);setGlobalSearchOpen(true);}}
+      onWorkspace={name=>selectWorkspace(name as typeof tab)} onFilesOpen={()=>setMenu(null)}
+      fileActions={[
+        {label:"New project",icon:FilePlus,run:newProject,section:"Open and import"},
+        {label:"Open project…",icon:FolderOpen,run:openProject},
+        {label:"Import board / CAD…",icon:Upload,run:()=>void importNativeBoard()},
+        {label:"Open saved results…",icon:FolderOpen,run:()=>requestUnsavedAction("open saved results",async()=>{await locateStudyResult();})},
+        {label:"Save",icon:Save,run:()=>void saveProject(),section:"Save and export"},
+        {label:"Save as…",icon:Save,run:()=>void saveProject(projectFileName(projectName),true)},
+        {label:"Export project without results…",icon:Save,run:saveProjectWithoutResults},
+        {label:"Export results…",icon:Download,run:()=>void exportReport()},
+        {label:"Export STEP…",icon:Download,run:()=>void exportStep(),disabled:!boardData},
+        {label:"Project manager",icon:FolderOpen,run:()=>{setMenu(null);setProjectManagerOpen(true);},section:"Manage"},
+      ]}
+      utilities={<><HiddenToolsMenu items={[...toolRestoreItems,
+        ...focusPanels.filter(panel=>panel.open&&panel.id!==activeFocusPanel(focusPanels,focusTool)?.id).map(panel=>({id:`focus:${panel.id}`,label:panel.title,restore:()=>setFocusTool(panel.id)})),
+        ...(!appSettings.quickToolsVisible?[{id:"quick-tools",label:"Quick tools",restore:()=>setAppSettings(current=>({...current,quickToolsVisible:true}))}]:[]),
+      ]} onError={setStatus}/><label className="interface-mode-control" title="Switch interface layout without changing project or solver inputs"><PanelTop size={14}/><select aria-label="Interface layout" value={appSettings.interfaceMode} onChange={event=>setInterfaceMode(event.target.value as AppSettings["interfaceMode"])}><option value="clean">Clean</option><option value="classic">Classic</option></select></label><ViewportNotifications {...notificationProps} mode="button"/><button type="button" className="icon-btn" title="Help and user guide" onClick={()=>{setMenu(null);setHelpOpen(true);}}><CircleHelp size={17}/></button><button type="button" className="avatar" title={appSettings.profile.displayName} onClick={()=>{setMenu(null);setPreferencesOpen(true);}}>{appSettings.profile.initials}</button></>}/>
+
 
     {appSettings.interfaceMode==="classic"&&<><MenuBar open={menu!==null} onClose={()=>setMenu(null)}>{applicationMenus}</MenuBar><nav className="classic-workspace-tabs" aria-label="Workspaces">{tabs.map(item=><button type="button" key={item.name} aria-pressed={tab===item.name} onClick={()=>selectWorkspace(item.name)}><item.icon size={14}/><span>{item.name}</span></button>)}</nav></>}
     <>
@@ -6353,16 +6461,17 @@ export default function App() {
 
 
     <ProjectLoadPanel state={projectLoad.state} onCancel={() => void cancelProjectLoad()} onDismiss={projectLoad.dismiss} />
-    <main className={`workspace focus-workspace ${(!commandMenuOpen || commandPanelDetached) && activeFocusPanel(focusPanels, focusTool) ? "focus-panel-open" : "focus-panel-closed"}`}>
+    <main style={{"--focus-command-top":`${commandMenuTop}px`} as CSSProperties} className={`workspace focus-workspace ${focusPanels.some(panel=>panel.open&&panel.presentation==="document")?"has-editor-tabs":""} ${activeFocusPanel(focusPanels,focusTool)?.presentation==="document"?"workspace-document-open":""} ${activeFocusPanel(focusPanels, focusTool) ? "focus-panel-open" : "focus-panel-closed"}`}>
 
 
 
-      <section className="canvas-area">
+      <WorkspaceEditorTabs panels={focusPanels} activeId={focusTool} onActivate={setFocusTool}/>
+      <section id="workspace-board-content" className="canvas-area">
         {workspaceRequestNotice?.version===workspaceIntentVersion&&<aside className="workspace-request-notice" aria-label="Applied workspace request"><div><strong>{workspaceRequestNotice.text}</strong><p>{workspaceRequestNotice.details}</p></div><button type="button" aria-label="Dismiss request summary" onClick={()=>setWorkspaceRequestNotice(null)}><X size={14}/></button></aside>}
 
-        <CommandStrip className="canvas-toolbar" label="Viewport"><div className="view-toggle"><button type="button" aria-pressed={viewMode === "2D"} className={viewMode === "2D" ? "selected" : ""} onClick={() => { setViewMode("2D"); setNavigationMode("pan"); }}><CircuitBoard size={14}/> 2D</button><button type="button" aria-pressed={viewMode === "3D"} className={viewMode === "3D" ? "selected" : ""} onClick={() => setViewMode("3D")}><Box size={14}/> 3D</button></div><label className="viewport-selection-filter" title="Choose what a viewport click selects"><MousePointer2 size={14}/><span className="sr-only">Selection filter</span><select aria-label="Selection filter" value={selectionFilter} onChange={event=>changeSelectionFilter(event.target.value as "all"|"part"|"net")}><option value="all">Select all</option><option value="part">Parts</option><option value="net">Nets</option></select></label><ViewportQuickTools groups={viewportContextGroups} context={{workspace:tab,kind:clickedObject?.type,hasNet:smartContext.hasNet,hasResult:smartContext.resultScoped,hasBoard:Boolean(boardData),busy:universalRunning}} selectionLabel={clickedObject?.net ?? clickedObject?.ref ?? clickedObject?.name ?? (boardData?tab:"No design")} summary={smartContext.summary} onError={setStatus}/><button type="button" className="plain-btn" onClick={() => setMenu("Viewport tools")}><SlidersHorizontal size={14} /> View</button></CommandStrip>
+        <div className="workspace-view-topbar">{workspaceViews.tabs}{!workspaceViews.activeRenderer&&<CommandStrip className="canvas-toolbar" label="Viewport">{viewportEssentials}{appSettings.quickToolsVisible&&<ViewportQuickTools onHide={()=>setAppSettings(current=>({...current,quickToolsVisible:false}))} groups={viewportContextGroups} context={{workspace:tab,kind:clickedObject?.type,hasNet:smartContext.hasNet,hasResult:smartContext.resultScoped,hasBoard:Boolean(boardData),busy:universalRunning}} selectionLabel={clickedObject?.net ?? clickedObject?.ref ?? clickedObject?.name ?? (boardData?tab:"No design")} summary={smartContext.summary} onError={setStatus}/>}<button type="button" className="plain-btn" aria-expanded={commandMenuOpen&&lastCommandRoute.current==="Viewport tools"} aria-controls="focus-command-panel" onClick={event => {if(commandPanelDetached&&focusFloatingPanel("command-menu"))return;const workspace=event.currentTarget.closest(".workspace");if(workspace)setCommandMenuTop(Math.max(8,event.currentTarget.getBoundingClientRect().bottom-workspace.getBoundingClientRect().top+4));setMenu(current=>current==="Viewport tools"?null:"Viewport tools");}}><SlidersHorizontal size={14} /> View</button></CommandStrip>}</div>
 
-        {(tab === "Mesh" || tab === "Solve") && <SimulationWorkspace
+        {(tab === "Mesh" || tab === "Solve") && <SimulationWorkspace compact={appSettings.interfaceMode==="clean"}
           tab={tab} domain={simulationDomain}
           analysisMode={simulationDomain === "pi" ? analysisMode : "SI channel analysis"}
           net={simulationDomain === "pi" ? piSetup.net : selected?.net ?? ""}
@@ -6380,13 +6489,14 @@ export default function App() {
           onTetraMesh={() => setTetraMeshOpen(true)}
         />}
         <div style={{ "--assembly-handling-height": `${assemblyHandlingHeight}px` } as React.CSSProperties} className={`board-canvas ${assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1 ? "has-assembly-handling " : ""}is-${viewMode.toLowerCase()}${viewportResultScale ? " has-result-scale" : ""}`}>
+          {workspaceViews.activeRenderer ?? <>
           {tab === "EM" && emiSection === "machines" ? <div className="main-machine-workspace">
             <EmMachineWorkbench study={emiSetup.machine_study} busy={emiBusy || externalEngineBusy}
               onStudy={machine_study => { markProjectDirty(); setEmiSetup(current => ({ ...current, machine_study })); }} />
           </div> : <>
 
           {assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1 && <div ref={assemblyHandlingRef} className="assembly-handling-slot">
-            <AssemblyQuickBar boards={virtualBoardProjection.visuals} selectedId={selectedBoardInstanceId} visibility={assemblyBoardVisibility} expanded={assemblyHandlingExpanded}
+            <AssemblyQuickBar compact={appSettings.interfaceMode==="clean"} boards={virtualBoardProjection.visuals} selectedId={selectedBoardInstanceId} visibility={assemblyBoardVisibility} expanded={assemblyHandlingExpanded}
               onSelect={id => { const visual = virtualBoardProjection.visuals.find(board => board.id === id); if (visual) handleBoardInstanceSelect(visual); }}
               onVisibility={(id, value) => { recordChange(); setAssemblyBoardVisibility(current => ({ ...current, [id]: value })); }}
               moveMode={assemblyMoveMode} onMoveMode={selectAssemblyMoveMode}
@@ -6504,6 +6614,7 @@ export default function App() {
           </div>}
 
           </>}
+          </>}
         </div>
         {tab === "EM" && emiSection === "machines" ? <div className="results-strip results-strip--summary">
           <div><span className="eyebrow">ACTIVE WORKSPACE</span><b>Machines and actuators</b></div>
@@ -6549,8 +6660,8 @@ export default function App() {
 
 
 
-      {commandMenuOpen && <FloatingPanel id="command-menu" title="Menu" active={!commandPanelDetached} onDetached={()=>setCommandPanelDetached(true)} onDocked={()=>setCommandPanelDetached(false)} onError={setStatus}><FocusCommandPanel commands={focusCommands} initialSection={menu === "Menu" ? null : focusMenuSections[menu ?? ""] ?? menu} onClose={() => {setCommandPanelDetached(false);setMenu(null);}} onError={setStatus} /></FloatingPanel>}
-      <Suspense fallback={<div className="focus-panel-loading" role="status">Loading tool...</div>}><FocusToolDeck panels={focusPanels} activeId={focusTool} commandsOpen={commandMenuOpen && !commandPanelDetached} onActivate={setFocusTool} /></Suspense>
+      {commandMenuMounted.current && <FloatingPanel id="command-menu" title="Menu" active={commandMenuOpen&&!commandPanelDetached} onDetached={()=>setCommandPanelDetached(true)} onDocked={()=>setCommandPanelDetached(false)} onError={setStatus}><FocusCommandPanel active={commandMenuOpen} commands={focusCommands} initialSection={lastCommandRoute.current === "Menu" ? null : focusMenuSections[lastCommandRoute.current] ?? lastCommandRoute.current} onClose={() => {setCommandPanelDetached(false);setMenu(null);}} onError={setStatus} /></FloatingPanel>}
+      <Suspense fallback={<div className="focus-panel-loading" role="status">Loading tool...</div>}><FocusToolDeck panels={focusPanels} activeId={focusTool} commandsOpen={false} onActivate={setFocusTool} /></Suspense>
 </main>
 
 
@@ -6596,6 +6707,7 @@ export default function App() {
 
 
 
+    <FileDropImport desktop={desktopShell} blocked={Boolean(sourceImport || unsavedPrompt || universalRunning || (projectLoad.state && projectLoad.state.status !== "ready") || boardImport.progress?.busy)} onReview={reviewDroppedSource} onError={setStatus}/>
     {sourceImport && <ImportSourceDialog initialSource={sourceImport.source} initialKind={sourceImport.kind} onApply={applySourceImport} onClose={() => setSourceImport(null)} />}
 
 
@@ -6646,7 +6758,7 @@ export default function App() {
     <UniversalSearch open={globalSearchOpen} items={universalSearchItems} suggestCommands={suggestSentenceCommands} commands={focusCommandInventory} searchDocuments={() => [document, ...floatingPanelDocuments()]} onRevealPanel={id => { if (id === "command-menu") setMenu("Menu"); else {setMenu(null);setFocusTool(id);} }} onClose={() => setGlobalSearchOpen(false)} />
 
 
-    {viewportContext && <ViewportActionMenu x={viewportContext.clientX} y={viewportContext.clientY} title={viewportContext.object?.name ?? "Viewport"} summary={smartContext.summary} groups={viewportContextGroups} onClose={() => setViewportContext(null)} />}
+    {viewportContext && <ViewportActionMenu x={viewportContext.clientX} y={viewportContext.clientY} title={viewportContext.object?.name ?? "Viewport"} summary={smartContext.summary} groups={viewportContextGroups} essentialTools={viewportEssentials} onClose={() => setViewportContext(null)} />}
   </div>;
 }
 

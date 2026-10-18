@@ -1,0 +1,977 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-line-cascade-result-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "source_request",
+    "network",
+    "sections",
+    "points",
+    "diagnostics",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-line-cascade-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "sections",
+        "excitations"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/rlgc-line-cascade-request/v1"
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "line_request",
+              "probes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "line_request": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contract",
+                  "length_m",
+                  "reference_impedance_ohm",
+                  "inductance_h_per_m",
+                  "capacitance_f_per_m",
+                  "samples"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "spike/rlgc-line-network-request/v1"
+                  },
+                  "length_m": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "reference_impedance_ohm": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "inductance_h_per_m": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "capacitance_f_per_m": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "samples": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "frequency_hz",
+                        "resistance_ohm_per_m",
+                        "conductance_s_per_m"
+                      ],
+                      "properties": {
+                        "frequency_hz": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "resistance_ohm_per_m": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "conductance_s_per_m": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "probes": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "id",
+                    "fractional_position"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "fractional_position": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "excitations": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1024,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "frequency_hz",
+              "incident_left",
+              "incident_right"
+            ],
+            "properties": {
+              "frequency_hz": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "incident_left": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              },
+              "incident_right": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "port_names",
+        "reference_impedance_ohm",
+        "frequencies_hz",
+        "s_parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "port_names": {
+          "const": [
+            "left",
+            "right"
+          ]
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 1,
+          "maxItems": 1024
+        },
+        "s_parameters": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "minItems": 1,
+          "maxItems": 1024
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "result"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "result": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "contract",
+              "model_status",
+              "production_qualified",
+              "input_digest",
+              "source_request",
+              "network",
+              "points",
+              "diagnostics",
+              "limitations"
+            ],
+            "properties": {
+              "contract": {
+                "const": "spike/rlgc-line-fields-result/v1"
+              },
+              "model_status": {
+                "const": "experimental"
+              },
+              "production_qualified": {
+                "const": false
+              },
+              "input_digest": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_request": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "contract",
+                  "line_request",
+                  "excitations",
+                  "probes"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "spike/rlgc-line-fields-request/v1"
+                  },
+                  "line_request": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "contract",
+                      "length_m",
+                      "reference_impedance_ohm",
+                      "inductance_h_per_m",
+                      "capacitance_f_per_m",
+                      "samples"
+                    ],
+                    "properties": {
+                      "contract": {
+                        "const": "spike/rlgc-line-network-request/v1"
+                      },
+                      "length_m": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "reference_impedance_ohm": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "inductance_h_per_m": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "capacitance_f_per_m": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "samples": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 1024,
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "frequency_hz",
+                            "resistance_ohm_per_m",
+                            "conductance_s_per_m"
+                          ],
+                          "properties": {
+                            "frequency_hz": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "resistance_ohm_per_m": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "conductance_s_per_m": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "excitations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1024,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "frequency_hz",
+                        "incident_left",
+                        "incident_right"
+                      ],
+                      "properties": {
+                        "frequency_hz": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "incident_left": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "real",
+                            "imag"
+                          ],
+                          "properties": {
+                            "real": {
+                              "type": "number"
+                            },
+                            "imag": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "incident_right": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "real",
+                            "imag"
+                          ],
+                          "properties": {
+                            "real": {
+                              "type": "number"
+                            },
+                            "imag": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "probes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 32,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "id",
+                        "fractional_position"
+                      ],
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "fractional_position": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "network": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "port_names",
+                  "reference_impedance_ohm",
+                  "frequencies_hz",
+                  "s_parameters"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "port_names": {
+                    "const": [
+                      "left",
+                      "right"
+                    ]
+                  },
+                  "reference_impedance_ohm": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "frequencies_hz": {
+                    "type": "array",
+                    "items": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "minItems": 1,
+                    "maxItems": 1024
+                  },
+                  "s_parameters": {
+                    "type": "array",
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "real",
+                            "imag"
+                          ],
+                          "properties": {
+                            "real": {
+                              "type": "number"
+                            },
+                            "imag": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                      },
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "minItems": 1,
+                    "maxItems": 1024
+                  }
+                }
+              },
+              "points": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 1024,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "frequency_hz",
+                    "boundary_values",
+                    "probe_values",
+                    "power_balance"
+                  ],
+                  "properties": {
+                    "frequency_hz": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "boundary_values": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "left",
+                        "right"
+                      ],
+                      "properties": {
+                        "left": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "voltage_v",
+                            "current_into_line_a",
+                            "input_power_w"
+                          ],
+                          "properties": {
+                            "voltage_v": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "real",
+                                "imag"
+                              ],
+                              "properties": {
+                                "real": {
+                                  "type": "number"
+                                },
+                                "imag": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "current_into_line_a": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "real",
+                                "imag"
+                              ],
+                              "properties": {
+                                "real": {
+                                  "type": "number"
+                                },
+                                "imag": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "input_power_w": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "right": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "voltage_v",
+                            "current_into_line_a",
+                            "input_power_w"
+                          ],
+                          "properties": {
+                            "voltage_v": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "real",
+                                "imag"
+                              ],
+                              "properties": {
+                                "real": {
+                                  "type": "number"
+                                },
+                                "imag": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "current_into_line_a": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "real",
+                                "imag"
+                              ],
+                              "properties": {
+                                "real": {
+                                  "type": "number"
+                                },
+                                "imag": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "input_power_w": {
+                              "type": "number"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "probe_values": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 32,
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "id",
+                          "fractional_position",
+                          "voltage_v",
+                          "current_left_to_right_a",
+                          "transported_power_w",
+                          "electric_energy_j_per_m",
+                          "magnetic_energy_j_per_m",
+                          "conductor_loss_w_per_m",
+                          "dielectric_loss_w_per_m",
+                          "total_loss_w_per_m"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 80
+                          },
+                          "fractional_position": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                          },
+                          "voltage_v": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "real",
+                              "imag"
+                            ],
+                            "properties": {
+                              "real": {
+                                "type": "number"
+                              },
+                              "imag": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "current_left_to_right_a": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "real",
+                              "imag"
+                            ],
+                            "properties": {
+                              "real": {
+                                "type": "number"
+                              },
+                              "imag": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          "transported_power_w": {
+                            "type": "number"
+                          },
+                          "electric_energy_j_per_m": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "magnetic_energy_j_per_m": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "conductor_loss_w_per_m": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "dielectric_loss_w_per_m": {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          "total_loss_w_per_m": {
+                            "type": "number",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    },
+                    "power_balance": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "net_input_w",
+                        "conductor_loss_w",
+                        "dielectric_loss_w",
+                        "total_loss_w",
+                        "residual_w"
+                      ],
+                      "properties": {
+                        "net_input_w": {
+                          "type": "number"
+                        },
+                        "conductor_loss_w": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "dielectric_loss_w": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "total_loss_w": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "residual_w": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "diagnostics": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sample_count",
+                  "probe_count",
+                  "maximum_power_balance_residual_w"
+                ],
+                "properties": {
+                  "sample_count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 1024
+                  },
+                  "probe_count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 32
+                  },
+                  "maximum_power_balance_residual_w": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              "limitations": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "points": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "power_balance",
+          "junctions"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "power_balance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "net_input_w",
+              "conductor_loss_w",
+              "dielectric_loss_w",
+              "total_loss_w",
+              "residual_w"
+            ],
+            "properties": {
+              "net_input_w": {
+                "type": "number"
+              },
+              "conductor_loss_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "dielectric_loss_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "total_loss_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "residual_w": {
+                "type": "number"
+              }
+            }
+          },
+          "junctions": {
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 7,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "left_section_id",
+                "right_section_id",
+                "voltage_residual_v",
+                "current_residual_a",
+                "power_residual_w"
+              ],
+              "properties": {
+                "left_section_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "right_section_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "voltage_residual_v": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "current_residual_a": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "power_residual_w": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_count",
+        "section_count",
+        "maximum_power_balance_residual_w",
+        "maximum_junction_power_residual_w",
+        "maximum_connection_condition_number"
+      ],
+      "properties": {
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "section_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "maximum_power_balance_residual_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximum_junction_power_residual_w": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maximum_connection_condition_number": {
+          "type": "number",
+          "minimum": 1
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

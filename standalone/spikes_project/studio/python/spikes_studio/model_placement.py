@@ -6,6 +6,7 @@ from .document import Document
 
 PINS={'D':('D',('A','K')),'NPN':('Q',('C','B','E')),
       'NMOS':('M',('D','G','S','B')),'BSIMBULK':('M',('D','G','S','B')),
+      'SPK_GAN':('Z',('D','G','S','B','T')),'SPK_SIC':('Z',('D','G','S','B','T')),
       'BSIMCMG':('M',('D','G','S','E'))}
 
 def is_model_card(text):

@@ -73,18 +73,22 @@ Back and Escape move to the parent. All existing menu and toolbar handlers are
 discovered from their React descriptors rather than copied into another command
 registry. Dynamic extension visibility and disabled states remain authoritative.
 
-The viewport keeps 2D/3D, Layers, Fit and View, plus a compact context quick-tools
-bar in a reserved row. Its More popup exposes the complete context action catalog. Camera, selection filters,
-model toggles, result display and advanced workspace commands open on demand.
-The bar shows the active workspace and selection, with teal tool icons and
-bounded horizontal overflow. Drag its grip to reposition without changing the
-grab point. On the grip, Left/Right moves in small steps and Home/End aligns
-to an edge; on tool buttons, those keys navigate the available actions.
+The viewport keeps compact icon controls for 2D/3D, orbit, pan, fit, camera
+views and selection filters in its top ribbon and at the top of its context
+menu, including scoped board and result views. Orbit and 3D camera presets
+are disabled in 2D. Other settings remain in contextual menus and search.
+The optional context quick-tools bar is hidden by default. Enable it explicitly
+through Settings > Interface > Show optional quick-tools bar, Viewport tools,
+or command search. The preference persists; changing workspaces and importing
+boards does not enable it. Its existing drag and keyboard positioning remain
+available when enabled.
 Shared `--spike-popup-*` tokens define opaque graphite surfaces, subtle borders,
 soft corners and shadows for context menus, command popups, search, notifications
 and measurement cards. Light and high-contrast settings retain their own palette.
-The navigator, studies, setup, managers and results share one reserved tool slot.
-Hide keeps inputs mounted; a tool closes through its existing Close/Apply/Discard
+Workspace Light + Teal and viewport Light/Graphite/AMOLED are independently
+selectable in Settings > Interface, contextual Appearance commands and search.
+Large setup forms and editors open in full-width workspace tabs; spatial
+inspectors remain in the reserved dock slot. Hide keeps inputs mounted; a tool closes through its existing Close/Apply/Discard
 flow. Expand/Restore and a bounded resize handle support large tools. Native
 secondary windows remain explicit actions. See WORKSPACE_PANELS.md.
 
@@ -131,3 +135,27 @@ Run `test:quick-tools`, `test:responsive-managers`, `test:table-theme` and
 workflow tests for the changed editor. Native linked-window qualification is
 available with `--panel-popup-qualification`; it uses an isolated presentation
 route and does not open a project or run a solver.
+
+## Universal navigation and floating control icons
+
+`app/src/navigationIcons.ts` owns the navigation and visibility vocabulary.
+Use the same Orbit, hand (Pan), board (2D), cube (3D), fit target, and selection
+pointer in ribbons, context menus, and scoped board/result views. The shared
+`ViewportEssentialTools` renders these controls with tooltips, accessible names,
+pressed states and 2D restrictions. Visibility uses a plain eye or crossed eye;
+the electrical signal-eye symbol remains distinct.
+
+Floating tools expose named icon actions: crossed eye hides while retaining
+inputs, eye shows again, X closes a transient menu or an explicitly closable
+window, and chevrons collapse/expand content. Docking and detaching keep their
+own icons. Tool panels retain their hide action in detached windows as well.
+The header's **Show hidden tools** eye opens a compact recovery popup in Clean
+and Classic layouts, including tools registered with the existing restore shelf.
+It must remain reachable when Clean hides the legacy bottom taskbar.
+
+Quick tools remain opt-in and have an explicit hide icon; show them again from
+the header recovery popup, View, Interface settings, or search. The board net
+viewer can collapse or hide without resetting its filter. Hiding a tool panel
+preserves its mounted input state and expanded presentation. Closing an editor
+through its own workflow can have different semantics; do not substitute a
+hide action for a document's save or discard flow.

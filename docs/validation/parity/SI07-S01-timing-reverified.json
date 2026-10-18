@@ -1,0 +1,43 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI07-S01",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "f4156028d52e0a1e066737203c5295b2d32fa0708cda88393ffa04c15fe28d50",
+    "python/spike_core/sparameter_transient.py": "df92677d5f36da656efde8f5b20985942278c2d1120ef442e95e6c3a23b6a500",
+    "python/spike_core/sparameter_rational.py": "9498d2e9ce2768fe0aff462457ac774652850aa3530071a1c0aa546c3ba53b56",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "c13799afbfbe3c80835cdb212119756a7f93711c4f5afd70fae0ce4dffe9eab8",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_sparameter_transient.py": "7cee3d969702aa9a89776df092e833ec558ca16180a6ca51888513aeb3bc4b0d",
+    "tests/python/test_sparameter_transient_contract.py": "96a69941dfe243966ada87bfcbc821faca3d4f4810172a35fbd96b1096a6719e",
+    "schemas/sparameter-rational-fit-request-v1.schema.json": "268bf209ca7a54887481a21b05b218c6f0ecf3fa8e44c9dd1b47011f000533c3",
+    "schemas/sparameter-rational-fit-result-v1.schema.json": "f75c0c2b53f0749275cb21c5f6e412097d00c1594f3010b34cf7a02225e65f7b",
+    "schemas/rational-network-transient-request-v1.schema.json": "398443341ec658714579e29c8c8457981862df78ca3c930435982f07e4d5dcc0",
+    "schemas/rational-network-transient-result-v1.schema.json": "9b88dd8cf09e54f797d2e4e2c76780da44976041d6311c8c13fb666b52b7d06a"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_cancellation_and_corrupt_fitted_identity_discard_trajectory",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_multiport_asynchronous_inputs_superposition_and_voltage_current_identity",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_nonzero_initial_step_feedthrough_and_exact_relaxation",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_one_pole_ramp_hold_against_augmented_matrix_exponential",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_output_grid_invariance_and_final_horizon_without_final_output",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_small_large_and_overflowed_rate_time_products",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_strict_waveform_coverage_horizon_times_and_resources_before_fit",
+      "tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_union_precision_collapse_fraction_collapse_and_rate_time_underflow",
+      "tests.python.test_sparameter_transient_contract.TransientContractTests.test_actual_worker_rejects_port_time_boolean_unknown_and_failed_fit",
+      "tests.python.test_sparameter_transient_contract.TransientContractTests.test_actual_worker_schema_step_feedthrough_voltage_current_and_snapshot",
+      "tests.python.test_sparameter_transient_contract.TransientContractTests.test_actual_worker_simultaneous_inputs_preserve_source_port_order"
+    ],
+    "run": 11,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI07-S01-timing-reverified.log",
+  "log_sha256": "3f7cba9f7b23ccbe2c8e3e8dfe239af83d8fd33148a651f86b6aacd8d4f175fa"
+}

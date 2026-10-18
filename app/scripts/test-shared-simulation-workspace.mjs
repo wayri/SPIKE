@@ -34,3 +34,40 @@ assert.match(shortcuts, /openMeshWorkspace/);
 assert.match(shortcuts, /openSolveWorkspace/);
 
 console.log("shared simulation workspace: all assertions passed");
+
+const [{build}, {default:React}, {renderToStaticMarkup}, {pathToFileURL}] = await Promise.all([
+  import("esbuild"), import("react"), import("react-dom/server"), import("node:url"),
+]);
+const output=path.join(root,"scripts",`.simulation-workspace-test-${process.pid}.mjs`);
+try {
+  await build({entryPoints:[path.join(root,"src","SimulationWorkspace.tsx")],outfile:output,bundle:true,platform:"node",format:"esm",external:["react","react-dom","lucide-react"],logLevel:"silent"});
+  const {default:Workspace}=await import(pathToFileURL(output).href);
+  for(const tab of ["Mesh","Solve"]) for(const domain of ["pi","si"]) {
+    const calls=[];
+    const props={tab,domain,analysisMode:"Configured analysis",net:"Long explicit net name for the current domain",meshSummary:"0.5 mm target",solverName:"Configured solver",running:false,hasBoard:true,canExtract:true,
+      onDomain(){},onConfigure(){},onNets(){},onStackup(){},onExtract:()=>calls.push("extract"),onRun:()=>calls.push("run"),onStop:()=>calls.push("stop"),onHarness(){},onTetraMesh(){}};
+    const classic=renderToStaticMarkup(React.createElement(Workspace,props));
+    assert.ok(!classic.includes("<details"),"Classic remains expanded by default");
+    assert.ok(classic.includes("simulation-workspace-grid"));
+    const compact=Workspace({...props,compact:true});
+    const [details,action]=compact.props.children;
+    assert.equal(details.type,"details","setup uses native keyboard-accessible disclosure");
+    assert.ok(!details.props.open,"Clean starts with secondary setup collapsed");
+    assert.equal(action.props.disabled,false);
+    action.props.onClick();
+    assert.equal(calls.pop(),tab==="Mesh"?"extract":"run","the compact primary action preserves the stage callback");
+    const summary=renderToStaticMarkup(details.props.children[0]);
+    assert.ok(summary.includes(tab)&&summary.includes(domain.toUpperCase())&&summary.includes(props.net),"the one-line summary retains stage, domain and exact net context");
+    const retained=renderToStaticMarkup(details.props.children[1]);
+    assert.ok(retained.includes("simulation-workspace-grid")&&retained.includes(tab==="Mesh"?"Explicit tetra mesh":"Harness PI"),"secondary controls remain mounted under the disclosure");
+    const unavailable=Workspace({...props,compact:true,hasBoard:false}).props.children[1];
+    assert.equal(unavailable.props.disabled,true,"missing designs cannot start work");
+    if(tab==="Mesh")assert.equal(Workspace({...props,compact:true,canExtract:false}).props.children[1].props.disabled,true,"extraction retains its explicit-net eligibility gate");
+    const stop=Workspace({...props,compact:true,running:true,hasBoard:false}).props.children[1];
+    assert.equal(stop.props.disabled,false,"Stop remains reachable during an active operation");
+    stop.props.onClick();assert.equal(calls.pop(),"stop","Stop keeps its cancellation callback");
+  }
+  console.log("Compact simulation disclosure: Classic default, retained setup, stage action callbacks, extraction admission and reachable Stop passed.");
+} finally {
+  for(const filename of [output,output.replace(/\.mjs$/,".css")])try{fs.unlinkSync(filename);}catch{}
+}

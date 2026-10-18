@@ -31,7 +31,7 @@ BATTERY_VOLTAGES={'battery_liion':(3.,4.2),'battery_lifepo4':(2.5,3.65),'battery
 COMMON_LIMITATION='Original generic approximation; not fitted to a named product, not safety-qualified. No package parasitics, thermal network, aging, statistical spread or breakdown unless explicitly stated. Pin/input units are SI.'
 
 
-def catalog(*,include_passives=False):
+def catalog(*,include_passives=False,include_lumped_physics=False,include_packaged_devices=False):
     records=[]
     for category,families in FAMILIES.items():
         for family,param,base,unit in families:
@@ -53,13 +53,25 @@ def catalog(*,include_passives=False):
     if include_passives:
         from .passive_catalog import records as passive_records
         records.extend(passive_records())
-    return {'contract':CONTRACT,'version':'1.1.0' if include_passives else '1.0.0','records':records,
+    if include_lumped_physics:
+        from .lumped_physics_library import records as lumped_physics_records
+        records.extend(lumped_physics_records())
+    if include_packaged_devices:
+        from .packaged_device_library import records as packaged_device_records
+        records.extend(packaged_device_records())
+    return {'contract':CONTRACT,'version':'1.3.0' if include_packaged_devices else '1.2.0' if include_lumped_physics else '1.1.0' if include_passives else '1.0.0','records':records,
             'counts':dict(Counter(r['category'] for r in records)),
-            'archetype_count':sum(map(len,FAMILIES.values())),
-            'notice':'Original presets plus optional configurable preferred-value passives; NOT distinct validated manufacturer component models.' if include_passives else '500 presets per category from 10 archetypes each; NOT 500 distinct validated component models per category.'}
+            'archetype_count':sum(map(len,FAMILIES.values()))+(5 if include_lumped_physics else 0)+(2 if include_packaged_devices else 0),
+            'notice':'Original presets plus optional configurable native model libraries; NOT distinct validated manufacturer component models.' if include_passives or include_lumped_physics or include_packaged_devices else '500 presets per category from 10 archetypes each; NOT 500 distinct validated component models per category.'}
 
 
 def validate_record(record):
+    if isinstance(record,dict) and record.get('model_type')=='packaged_lumped_device_v1':
+        from .packaged_device_library import validate_record as validate_packaged_device
+        return validate_packaged_device(record)
+    if isinstance(record,dict) and record.get('model_type')=='lumped_physics_part_v1':
+        from .lumped_physics_library import validate_record as validate_lumped_physics
+        return validate_lumped_physics(record)
     if isinstance(record,dict) and record.get('model_type')=='lumped_passive_rlc_v1':
         from .passive_catalog import validate_record as validate_passive
         return validate_passive(record)
@@ -83,6 +95,12 @@ def validate_record(record):
 
 
 def native_recipe(record):
+    if record.get('model_type')=='packaged_lumped_device_v1':
+        from .packaged_device_library import model
+        return model(record)
+    if record.get('model_type')=='lumped_physics_part_v1':
+        from .lumped_physics_library import model
+        return model(record)
     if record.get('model_type')=='lumped_passive_rlc_v1':
         from .passive_catalog import validate_record as validate_passive,model
         validate_passive(record);return model(record)
@@ -115,6 +133,12 @@ def evaluate(record,inputs=None,state=None,dt=1e-4):
 
     Ideal stateful blocks use sampled updates, not implicit circuit DAE stamping.
     """
+    if record.get('model_type')=='packaged_lumped_device_v1':
+        from .packaged_device_library import evaluate as evaluate_packaged_device
+        return evaluate_packaged_device(record,inputs,state,dt)
+    if record.get('model_type')=='lumped_physics_part_v1':
+        from .lumped_physics_library import evaluate as evaluate_lumped_physics
+        return evaluate_lumped_physics(record,inputs,state,dt)
     if record.get('model_type')=='lumped_passive_rlc_v1':
         from .passive_catalog import validate_record as validate_passive,evaluate as evaluate_passive
         validate_passive(record);return evaluate_passive(record,inputs)
@@ -231,4 +255,4 @@ def evaluate(record,inputs=None,state=None,dt=1e-4):
 
 def materialize(path):
     from .document import write_json
-    payload=catalog(include_passives=True);write_json(path,payload);return payload
+    payload=catalog(include_passives=True,include_lumped_physics=True,include_packaged_devices=True);write_json(path,payload);return payload

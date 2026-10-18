@@ -5,12 +5,13 @@ from __future__ import annotations
 import hashlib
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 from python.spike_core.assembly_designs import AssemblyDesignError, canonicalize_assembly_designs
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import AssemblyIRV1, SpiDeRV2
-from python.spike_core.project_package import ProjectPackageError, read_project, write_spike_package
+from python.spike_core.project_package import PackageLimits, ProjectPackageError, read_project, read_spike_package, write_spike_package
 from python.spike_core.service_project_assembly import _prune_removed_entity_bindings
 from python.spike_core.service_project_handlers import handle_project_request
 
@@ -53,6 +54,46 @@ class AssemblyDesignTests(unittest.TestCase):
             self.assertEqual(reopened.payload["assembly_designs"], canonical)
             self.assertIn("design/assembly-designs.json", reopened.members)
             self.assertEqual({board["design_id"] for board in reopened.payload["assembly_ir"]["boards"]}, {first["design_id"], second["design_id"]})
+
+    def test_assembly_design_set_uses_design_ir_budget_without_bypassing_integrity(self):
+        first, _, assembly, retained = self.fixture()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "assembly-budget.spike"
+            write_spike_package(path, {
+                "project": {"id": "assembly-budget"}, "design_ir": first,
+                "assembly_ir": assembly, "assembly_designs": retained,
+            })
+            with zipfile.ZipFile(path, "r") as archive:
+                sizes = {item.filename: item.file_size for item in archive.infolist()}
+            assembly_size = sizes["design/assembly-designs.json"]
+            ordinary_size = max(size for name, size in sizes.items() if name.endswith(".json")
+                                and name not in {"manifest.json", "design/design-ir.json", "design/assembly-designs.json"})
+            self.assertGreater(assembly_size, ordinary_size)
+
+            limits = PackageLimits(max_control_plane_json_bytes=ordinary_size,
+                                   max_design_ir_json_bytes=assembly_size)
+            self.assertEqual(read_spike_package(path, limits=limits).payload["assembly_designs"], retained)
+            with self.assertRaisesRegex(ProjectPackageError, "control-plane JSON member exceeds.*assembly-designs"):
+                read_spike_package(path, limits=PackageLimits(
+                    max_control_plane_json_bytes=ordinary_size,
+                    max_design_ir_json_bytes=assembly_size - 1,
+                ))
+            with self.assertRaisesRegex(ProjectPackageError, "control-plane JSON member exceeds"):
+                read_spike_package(path, limits=PackageLimits(
+                    max_control_plane_json_bytes=ordinary_size - 1,
+                    max_design_ir_json_bytes=assembly_size,
+                ))
+
+            damaged = root / "assembly-budget-damaged.spike"
+            with zipfile.ZipFile(path, "r") as source, zipfile.ZipFile(damaged, "w", allowZip64=True) as target:
+                for info in source.infolist():
+                    data = source.read(info.filename)
+                    if info.filename == "design/assembly-designs.json":
+                        data = data[:-2] + (b" " if data[-2:-1] != b" " else b"\t") + data[-1:]
+                    target.writestr(info, data)
+            with self.assertRaisesRegex(ProjectPackageError, "member integrity check failed"):
+                read_spike_package(damaged, limits=limits)
 
     def test_missing_duplicate_or_mismatched_active_design_fails_closed(self):
         first, _, assembly, retained = self.fixture()

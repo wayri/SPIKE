@@ -47,6 +47,8 @@ extern "C" {
 #define SPIKES_INTEGRATION_HYBRID_TRAPEZOIDAL 1u
 /** Variable-step second-order backward differentiation with BE restarts. */
 #define SPIKES_INTEGRATION_BDF2 2u
+/** Fixed-step, two-stage third-order Radau IIA integration. */
+#define SPIKES_INTEGRATION_RADAU_IIA3 3u
 
 typedef struct spikes_circuit spikes_circuit;
 typedef struct spikes_result spikes_result;
@@ -361,6 +363,9 @@ SPIKES_API spikes_error_code spikes_transient_result_integration_diagnostics(
 /** Additive BDF2 diagnostic; preserves the ABI-v1 integration diagnostic. */
 SPIKES_API spikes_error_code spikes_transient_result_bdf2_steps(
     const spikes_transient_result *result, size_t *out_bdf2_steps);
+/** Additive Radau IIA3 diagnostic; preserves ABI-v1 structures. */
+SPIKES_API spikes_error_code spikes_transient_result_radau_iia3_steps(
+    const spikes_transient_result *result, size_t *out_radau_iia3_steps);
 SPIKES_API spikes_error_code spikes_transient_result_lte_diagnostics(
     const spikes_transient_result *result, size_t *out_rejected_steps,
     double *out_last_lte_ratio, double *out_minimum_accepted_step_s,
@@ -430,6 +435,8 @@ SPIKES_API spikes_error_code spikes_transient_session_integration_diagnostics(
     size_t *out_trapezoidal_steps);
 SPIKES_API spikes_error_code spikes_transient_session_bdf2_steps(
     const spikes_transient_session *session, size_t *out_bdf2_steps);
+SPIKES_API spikes_error_code spikes_transient_session_radau_iia3_steps(
+    const spikes_transient_session *session, size_t *out_radau_iia3_steps);
 SPIKES_API spikes_error_code spikes_transient_session_checkpoint_create(
     const spikes_transient_session *session,
     spikes_transient_checkpoint **out_checkpoint);

@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+import ts from "typescript";
+import {importTestTypescript} from "./import-test-typescript.mjs";
+const model=await importTestTypescript("dropImportModel");
+const source=(fileName,isDirectory=false)=>({path:`C:/sources/${fileName}`,fileName,isDirectory});
+const data=model.nativeDropItems({files:[source("Main.KICAD_PCB"),source("job.tar.gz"),source("enclosure.STEP"),source("body.glb"),source("job-folder",true)]});
+assert.deepEqual(data.items.map(item=>item.kind),["kicad","odb++","mcad","mcad","odb++"]);
+assert.equal(model.nativeDropItems({files:[source("image.png")]}).items[0].reason.startsWith("Unsupported"),true);
+assert.throws(()=>model.nativeDropItems({files:[{path:"bad",fileName:"missing directory flag"}]}),/Invalid dropped/);
+assert.throws(()=>model.nativeDropItems({files:Array(33).fill(source("file.step"))}),/at most 32/);
+assert.deepEqual(model.nativeDropItems({files:[],rejected:["missing path",4]}).rejected,["missing path"]);
+const browserFiles=[new File(["(kicad_pcb)"],"board.kicad_pcb"),new File(["archive"],"job.tgz"),new File(["model"],"case.glb")];
+const browser=model.browserDropItems(browserFiles);
+assert.equal(browser[0].reason,undefined);
+assert.match(browser[1].reason,/desktop app/);assert.match(browser[2].reason,/desktop app/);
+assert.match(model.browserDropItems([{name:"big.kicad_pcb",size:65*1024*1024,lastModified:1}])[0].reason,/64 MiB/);
+assert.equal(model.mergeDroppedImports(data.items,[data.items[0]]).length,5);
+assert.throws(()=>model.mergeDroppedImports(Array.from({length:32},(_,i)=>({...data.items[0],id:String(i)})),[{...data.items[0],id:"overflow"}]),/queue is full/);
+
+const jsx=(type,props)=>({type,props:props??{}});
+const compiled=ts.transpileModule(readFileSync(new URL("../src/FileDropImport.tsx",import.meta.url),"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+const flatten=node=>node&&typeof node==="object"?[node,...[node.props?.children].flat(Infinity).flatMap(flatten)]:[];
+function harness(desktop=false){
+ const state=[],refs=[],effects=[],docEvents=new Map(),nativeEvents=new Map(),errors=[],reviews=[],cleanups=[];
+ let slot=0,ref=0,props={desktop,blocked:false,onReview:async item=>reviews.push(item),onError:message=>errors.push(message)};
+ const previous=globalThis.document;
+ globalThis.document={addEventListener:(name,fn)=>docEvents.set(name,fn),removeEventListener:(name)=>docEvents.delete(name),getElementById:()=>({focus(){}})};
+ const react={useState(initial){const i=slot++;if(!(i in state))state[i]=typeof initial==="function"?initial():initial;return[state[i],next=>state[i]=typeof next==="function"?next(state[i]):next];},useRef(initial){const i=ref++;return refs[i]??(refs[i]={current:initial});},useEffect(fn){if(!mounted)effects.push(fn);}};
+ const module={exports:{}};let mounted=false;
+ new Function("require","module","exports",compiled)(name=>{
+  if(name==="react")return react;if(name==="react/jsx-runtime")return {jsx,jsxs:jsx,Fragment:"fragment"};
+  if(name==="./workerBridge")return {subscribeNativeImportDrops:async(onDrop,onDrag)=>{nativeEvents.set("spike://import-drop",event=>onDrop(event.payload));nativeEvents.set("spike://import-drag",event=>onDrag(event.payload.active));return()=>nativeEvents.clear();}};
+  if(name==="./dropImportModel")return model;if(name==="./icons")return {Upload:"upload",FileBox:"file",X:"x"};if(name.endsWith(".css"))return {};
+  throw Error(name);
+ },module,module.exports);
+ const render=(extra={})=>{props={...props,...extra};slot=0;ref=0;return module.exports.default(props);};
+ render();mounted=true;effects.forEach(effect=>{const cleanup=effect();if(cleanup)cleanups.push(cleanup);});
+ return {render,docEvents,nativeEvents,errors,reviews,unmount(){cleanups.forEach(fn=>fn());globalThis.document=previous;}};
+}
+const browserHarness=harness();
+let prevented=0;
+browserHarness.docEvents.get("drop")({dataTransfer:{types:["Files"],files:browserFiles},preventDefault(){prevented++;}});
+let tree=browserHarness.render(),nodes=flatten(tree);
+assert.equal(prevented,1,"file drops cannot navigate away from the workspace");
+assert.equal(nodes.filter(node=>node.props?.["aria-label"]?.startsWith("Review ")).length,3);
+const kicad=nodes.find(node=>node.props?.["aria-label"]==="Review board.kicad_pcb");await kicad.props.onClick();await new Promise(resolve=>setImmediate(resolve));
+assert.equal(browserHarness.reviews[0].file,browserFiles[0],"review forwards the original file without importing automatically");
+assert.equal(flatten(browserHarness.render()).some(node=>node.props?.["aria-label"]==="Review board.kicad_pcb"),false);
+assert.equal(nodes.find(node=>node.props?.["aria-label"]==="Review job.tgz").props.disabled,true);
+browserHarness.render({blocked:true});browserHarness.docEvents.get("drop")({dataTransfer:{types:["Files"],files:[browserFiles[0]]},preventDefault(){}});
+assert.match(browserHarness.errors.at(-1),/Close the active dialog/);
+browserHarness.unmount();assert.equal(browserHarness.docEvents.size,0);
+const native=harness(true);await new Promise(resolve=>setImmediate(resolve));
+native.nativeEvents.get("spike://import-drop")({payload:{files:[source("enclosure.step"),source("job",true)]}});
+assert.equal(native.reviews.length,0,"a drop stages review and never replaces the active design");
+nodes=flatten(native.render());await nodes.find(node=>node.props?.["aria-label"]==="Review enclosure.step").props.onClick();await new Promise(resolve=>setImmediate(resolve));
+assert.equal(native.reviews[0].native.path,"C:/sources/enclosure.step");
+native.unmount();assert.equal(native.nativeEvents.size,0);
+const app=readFileSync(new URL("../src/App.tsx",import.meta.url),"utf8");
+assert.match(app,/reviewApprovedSource\(item.native, item.native.isDirectory\)/);
+assert.match(app,/sourceImport \|\| unsavedPrompt \|\| universalRunning/);
+assert.match(app,/requestUnsavedAction\("import a dropped source"/);
+console.log("File drops: KiCad/ODB/MCAD routing, directory metadata, limits, duplicate queue, native/browser review, blocked states, no auto-apply and listener cleanup passed.");

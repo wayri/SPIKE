@@ -21,7 +21,7 @@ public:
    * Create a persistent session from an immutable circuit snapshot.
    *
    * Version 1 accepts constant/PULSE/PWL independent sources and backward
-   * Euler, hybrid trapezoidal, or BDF2 integration. Waveform event times are
+   * Euler, hybrid trapezoidal, BDF2, or admitted linear Radau IIA3 integration. Waveform event times are
    * interpreted on the persistent global clock and exact internal source
    * breakpoints remain bounded by max_steps.
    */

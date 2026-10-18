@@ -1,3 +1,4 @@
+import { CloseControlIcon } from "./navigationIcons";
 import { FloatingPanelControls, useFloatingPanel } from "./FloatingPanel";
 import { usePanelPresentation } from "./panelPresentation";
 import { ArrowLeft, ChevronRight, MousePointer2, SlidersHorizontal, Search } from "./icons";
@@ -8,6 +9,7 @@ import { searchFocusCommands, type FocusCommand, type FocusCommandMatch } from "
 export type FocusCommandPanelProps = {
   commands: readonly FocusCommand[];
   initialSection?: string | null;
+  active?: boolean;
   onClose: () => void;
   onError?: (message: string) => void;
 };
@@ -31,11 +33,12 @@ function resolveSection(commands: readonly FocusCommand[], ids: readonly string[
   return { active, items };
 }
 
-export default function FocusCommandPanel({ commands, initialSection = null, onClose, onError }: FocusCommandPanelProps) {
+export default function FocusCommandPanel({ commands, initialSection = null, active = true, onClose, onError }: FocusCommandPanelProps) {
   const floating = useFloatingPanel();
   const ownerDocument = usePanelPresentation().ownerDocument ?? document;
   const panel = useRef<HTMLElement>(null), search = useRef<HTMLInputElement>(null), closeHandler = useRef(onClose);
   closeHandler.current = onClose;
+  const lastFocus = useRef<HTMLElement | null>(null);
   const identity = useId();
   const [path, setPath] = useState<string[]>(() => initialSection ? commandPath(commands, initialSection) : []);
   const [query, setQuery] = useState(""), [error, setError] = useState("");
@@ -43,7 +46,7 @@ export default function FocusCommandPanel({ commands, initialSection = null, onC
   const section = resolveSection(commands, path), term = query.trim();
   const matches = useMemo(() => searchFocusCommands(commands, term), [commands, term]);
   const restoreToggle = () => document.getElementById("focus-menu-toggle")?.focus();
-  const close = () => { restoreToggle(); closeHandler.current(); };
+  const close = () => { if(floating?.detached)floating.dock(); restoreToggle(); closeHandler.current(); };
   const rows = () => Array.from(panel.current?.querySelectorAll<HTMLElement>(
     "button.focus-command-row:not(:disabled), .focus-command-content input:not(:disabled), .focus-command-content select:not(:disabled), .focus-command-content textarea:not(:disabled), .focus-command-content button:not(:disabled)"
   ) ?? []);
@@ -77,6 +80,9 @@ export default function FocusCommandPanel({ commands, initialSection = null, onC
     setPath(initialSection ? commandPath(commands, initialSection) : []);
     setQuery("");
   }, [initialSection]);
+  useLayoutEffect(() => {
+    if(active) { if(lastFocus.current?.isConnected) lastFocus.current.focus({preventScroll:true}); else focusAt(0); }
+  }, [active]);
   useLayoutEffect(() => {
     if (!term) focusAt(0);
   }, [path.join("/"), term]);
@@ -137,10 +143,10 @@ export default function FocusCommandPanel({ commands, initialSection = null, onC
     </button>;
   };
 
-  return <section id="focus-command-panel" ref={panel} className="focus-command-panel" role="dialog" aria-labelledby={`${identity}-title`} onKeyDown={onKeyDown}>
+  return <section id="focus-command-panel" ref={panel} className="focus-command-panel" role="dialog" aria-labelledby={`${identity}-title`} onKeyDown={onKeyDown} onFocusCapture={event=>{lastFocus.current=event.target as HTMLElement;}}>
     <header className="focus-command-header" onPointerDown={floating?.onHeaderPointerDown} title="Drag this header outside the main window to detach">
       <strong id={`${identity}-title`}>Menu{section.active ? ` / ${section.active.label}` : ""}</strong>
-      <FloatingPanelControls/>{!floating?.detached&&<button type="button" aria-label="Close Menu" onClick={close}>×</button>}
+      <FloatingPanelControls/><button type="button" className="spike-control--icon" title="Close menu; reopen with Menu or View" aria-label="Close Menu" onClick={close}><CloseControlIcon size={14}/></button>
     </header>
     <label>
       <span className="sr-only">Search all commands</span>

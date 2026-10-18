@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-line-network-request-v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "length_m",
+    "reference_impedance_ohm",
+    "inductance_h_per_m",
+    "capacitance_f_per_m",
+    "samples"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-line-network-request/v1"
+    },
+    "length_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "reference_impedance_ohm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "inductance_h_per_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "capacitance_f_per_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "samples": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "resistance_ohm_per_m",
+          "conductance_s_per_m"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "minimum": 0
+          },
+          "resistance_ohm_per_m": {
+            "type": "number",
+            "minimum": 0
+          },
+          "conductance_s_per_m": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

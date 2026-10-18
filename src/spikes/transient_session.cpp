@@ -177,6 +177,15 @@ bool TransientSession::step(double step_s) {
       if (element.waveform_type == Circuit::WaveformType::constant) {
         continue;
       }
+      if (options_.integration_method == TransientIntegrationMethod::radau_iia3) {
+        // Preserve analytic edge identity and both stage source values. A
+        // PULSE-to-PWL conversion would turn an actual jump into a ramp.
+        element.waveform_time_offset_s = time_s_;
+        element.value = element.waveform_type == Circuit::WaveformType::pulse
+            ? pulse_value_at(element.pulse, time_s_)
+            : pwl_value_at(element.pwl, time_s_);
+        continue;
+      }
       std::vector<PwlPoint> local_points;
       const auto append = [&](double global_time, double value) {
         const double local_time = global_time - time_s_;
@@ -261,6 +270,7 @@ bool TransientSession::step(double step_s) {
   diagnostics_.backward_euler_steps += step_diagnostics.backward_euler_steps;
   diagnostics_.trapezoidal_steps += step_diagnostics.trapezoidal_steps;
   diagnostics_.bdf2_steps += step_diagnostics.bdf2_steps;
+  diagnostics_.radau_iia3_steps += step_diagnostics.radau_iia3_steps;
   diagnostics_.sparse_assemblies += step_diagnostics.sparse_assemblies;
   diagnostics_.sparse_symbolic_analyses += step_diagnostics.sparse_symbolic_analyses;
   diagnostics_.sparse_numeric_factorizations += step_diagnostics.sparse_numeric_factorizations;
@@ -296,7 +306,9 @@ bool TransientSession::step(double step_s) {
   has_point_ = true;
   first_step_ = false;
   status_ = SolveStatus::converged;
-  message_ = options_.integration_method == TransientIntegrationMethod::bdf2
+  message_ = options_.integration_method == TransientIntegrationMethod::radau_iia3
+                 ? "persistent linear Radau IIA3 step completed"
+                 : options_.integration_method == TransientIntegrationMethod::bdf2
                  ? "persistent BDF2 step completed"
                  : options_.integration_method ==
                      TransientIntegrationMethod::hybrid_trapezoidal

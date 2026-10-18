@@ -1,5 +1,6 @@
 import os
 import unittest
+from collections import Counter
 from pathlib import Path
 
 from python.spike_core.service import _design_from_kicad, handle, validate_design
@@ -11,15 +12,34 @@ from python.spike_core.solver_plugins import default_solver_registry
 
 FIXTURE_PROFILES = {
     "ebrake1": {
+        # Independent KiCad 10.0.6 inventory; see
+        # docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md.
+        "source_sha256": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca",
         "minimum_counts": {
             "nets": 80,
             "tracks": 700,
             "vias": 90,
             "pads": 450,
-            "zones": 150,
             "components": 100,
             "stackup": 10,
         },
+        "filled_zone_layers": {
+            "3110c870-71c4-4885-b8ca-f76016cd3a52": {"F.Cu": 1},
+            "9c88fc49-1ddd-49e5-84f4-275ca82131d2": {"F.Cu": 1},
+            "2c3f1b1c-0171-4db4-9179-13867a4c75fa": {"F.Cu": 1, "B.Cu": 1},
+            "0cb49f67-e064-4728-9668-e6dd455be214": {"F.Cu": 1, "B.Cu": 2, "In1.Cu": 1, "In2.Cu": 1},
+            "456e478a-4b71-4f6e-9e2f-a770ccf7db69": {"F.Cu": 1, "B.Cu": 1, "In1.Cu": 2, "In2.Cu": 1},
+            "8319d80f-a16f-437e-8a4d-b5ddfe687501": {"F.Cu": 1, "B.Cu": 1, "In1.Cu": 1, "In2.Cu": 1},
+            "3e92eaae-cc72-46d6-841f-64a3ea5ffdd5": {"B.Cu": 1},
+            "6398ebd9-7882-40fa-8944-cf87f97795f8": {"B.Cu": 1},
+            "989b1b2f-c00d-4f18-9138-3bcef7fbc5e4": {"B.Cu": 1},
+            "9a8c62d9-1a90-4414-9d24-b9def4ab082d": {"B.Cu": 1},
+            "a7ad4cdd-aafd-499b-b6f6-d8d5a6e96a54": {"B.Cu": 1},
+            "c7757bbe-17ec-474f-9f97-0dab53be7151": {"B.Cu": 1},
+            "f506a9f0-f2ea-4e6f-b5b4-7f868f43e5ae": {"B.Cu": 1},
+            "f67bf072-6636-4e2c-a3a4-009107466d33": {"B.Cu": 1},
+        },
+        "copper_graphics": {("388e6d16-82ed-4c7b-b385-33da3fae27dd", "F.Cu"): 1},
         "dc_spec": {
             "mode": "dc",
             "net_names": ["3Vin"],
@@ -52,7 +72,7 @@ FIXTURE_PROFILES = {
                 "max_conductors": 1200,
             },
         },
-        "ac_geometry_counts": {"track": 8, "zone": 2, "via": 1, "pad": 4},
+        "ac_geometry_counts": {"track": 8, "zone": 1, "via": 1, "pad": 4},
     },
 }
 
@@ -77,9 +97,24 @@ class KicadFixtureTests(unittest.TestCase):
 
     def test_board_extracts_expected_geometry(self):
         design = _design_from_kicad(str(self.board))
+        self.assertEqual(design.metadata["source_sha256"], self.profile["source_sha256"])
         counts = self.profile["minimum_counts"]
         for field, minimum in counts.items():
             self.assertGreaterEqual(len(getattr(design, field)), minimum, field)
+        filled = [zone for zone in design.zones if zone.get("source_kind") == "filled_zone"]
+        self.assertEqual(
+            Counter((zone["source_zone_id"], zone["layer"]) for zone in filled),
+            Counter({(source, layer): count
+                     for source, layers in self.profile["filled_zone_layers"].items()
+                     for layer, count in layers.items()}),
+        )
+        self.assertTrue(all(zone["filled_copper_state"] == "source_filled" for zone in filled))
+        self.assertEqual(len({zone["id"] for zone in filled}), len(filled))
+        self.assertEqual(
+            Counter((zone["id"], zone["layer"]) for zone in design.zones
+                    if zone.get("source_kind") != "filled_zone"),
+            Counter(self.profile["copper_graphics"]),
+        )
         net_names = {item["id"]: item["name"] for item in design.nets}
         self.assertTrue(all(track["net_name"] == net_names[track["net_id"]] for track in design.tracks))
         self.assertTrue(all(via["net_name"] == net_names[via["net_id"]] for via in design.vias))
@@ -110,7 +145,7 @@ class KicadFixtureTests(unittest.TestCase):
             levels=[2, 1, 0.5, 0.25],
             minimum_levels=3,
         )
-        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["status"], "passed", report["comparisons"])
         self.assertTrue(report["can_sign_off"])
         self.assertTrue(all(
             item["status"] == "passed"
@@ -129,7 +164,7 @@ class KicadFixtureTests(unittest.TestCase):
             },
         })
         result = response["result"]
-        self.assertEqual(result["status"], "completed")
+        self.assertEqual(result["status"], "completed", result["issues"])
         self.assertEqual(
             result["summary"]["geometry_counts"],
             self.profile["ac_geometry_counts"],

@@ -26,6 +26,7 @@ ABSOLUTE_TOLERANCES = {"voltage": 1.0e-12, "current": 1.0e-15}
 SOURCE_PATHS = (
     "scripts/benchmark_circuit_timestep_accuracy.py",
     "python/spikes/native_runner.py",
+    "python/spikes/cli.py",
     "python/spikes/native_abi.py",
     "python/spikes/netlist.py",
     "python/spikes/contracts.py",
@@ -200,6 +201,7 @@ def _run_amplitude_stratum(
     step_index: int,
     requested_abi_version: int,
     source_hashes_before: dict[str, str | None],
+    integration_method: str = "hybrid_trapezoidal",
 ) -> dict[str, Any]:
     elements, voltage_probe, current_probe = _case_definition(case_id)
     stem = f"{case_id}-{_scale_label(excitation_v)}-step-{step_index}"
@@ -216,6 +218,7 @@ def _run_amplitude_stratum(
     command = [
         sys.executable, "-m", "python.spikes", "native-run", str(deck_path.resolve()),
         "--library", str(library), "--probe", voltage_probe, "--probe", current_probe,
+        "--method", {"hybrid_trapezoidal": "trap", "backward_euler": "be"}.get(integration_method, integration_method),
     ]
     input_hash_before = _sha256(deck_path)
     request = {
@@ -228,6 +231,7 @@ def _run_amplitude_stratum(
         "requested_backend": {
             "solver": "SPIKES owned C++ kernel",
             "transport": "python.spikes native-run",
+            "integration": integration_method,
             "c_abi_version": requested_abi_version,
             "library": str(library),
         },
@@ -303,6 +307,7 @@ def _run_amplitude_stratum(
         backend_matches = (
             record["executed_backend"]["solver"] == "SPIKES owned C++ kernel"
             and record["executed_backend"]["owned_cpp_transient"] is True
+            and record["executed_backend"]["integration"] == integration_method
             and Path(record["executed_backend"]["library"] or "").resolve() == library
         )
         if completed.returncode != 0 or payload.get("status") != "completed":
@@ -361,8 +366,10 @@ def _qualification_summary(records: Sequence[dict[str, Any]]) -> dict[str, Any]:
     return summary
 
 
-def run_amplitude(library: Path, output: Path) -> dict[str, Any]:
-    """Execute the ACC01 signed amplitude/timestep matrix without changing solver controls."""
+def run_amplitude(library: Path, output: Path, *, integration_method="hybrid_trapezoidal") -> dict[str, Any]:
+    """Execute frozen ACC01 gates with an explicitly identified integration method."""
+    if integration_method not in ("hybrid_trapezoidal", "backward_euler", "bdf2", "radau_iia3"):
+        raise ValueError("Explicit supported integration method required")
     library = _absolute_existing_file(library)
     if output.exists():
         raise ValueError("Output directory must be new to preserve prior evidence")
@@ -377,6 +384,7 @@ def run_amplitude(library: Path, output: Path) -> dict[str, Any]:
                 records.append(_run_amplitude_stratum(
                     library, output, case_id, excitation_v, step_s, step_index,
                     abi_version_before, sources_before,
+                    integration_method,
                 ))
 
     library_hash_after = _sha256(library)
@@ -403,6 +411,7 @@ def run_amplitude(library: Path, output: Path) -> dict[str, Any]:
         "requested_backend": {
             "solver": "SPIKES owned C++ kernel",
             "transport": "python.spikes native-run",
+            "integration": integration_method,
             "c_abi_version": abi_version_before,
             "library": str(library),
         },
@@ -526,9 +535,13 @@ def main() -> int:
         default="historical",
         help="Preserve the historical v1 endpoint benchmark by default; select amplitude for ACC01 v2.",
     )
+    parser.add_argument("--method", choices=("hybrid_trapezoidal", "backward_euler", "bdf2", "radau_iia3"),
+                        default=None, help="Explicit amplitude-mode method; gates and reporting grid are unchanged.")
     args = parser.parse_args()
+    if args.method is not None and args.mode != "amplitude":
+        parser.error("--method requires --mode amplitude; historical v1 controls are unchanged")
     report = (
-        run_amplitude(args.library, args.output)
+        run_amplitude(args.library, args.output, integration_method=args.method or "hybrid_trapezoidal")
         if args.mode == "amplitude"
         else run(args.library, args.output)
     )

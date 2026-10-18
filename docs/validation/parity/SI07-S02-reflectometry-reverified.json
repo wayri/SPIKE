@@ -1,0 +1,44 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI07-S02",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "331f9056f58bbab367691257c68fa9364ea580a0e660c981b35ad030a8ee1b80",
+    "python/spike_core/sparameter_terminated.py": "20508afc27dc35401d94cee3c6d0a24b0d30dd5423f3ee83fc245c8898d2a574",
+    "python/spike_core/sparameter_transient.py": "df92677d5f36da656efde8f5b20985942278c2d1120ef442e95e6c3a23b6a500",
+    "python/spike_core/sparameter_rational.py": "9498d2e9ce2768fe0aff462457ac774652850aa3530071a1c0aa546c3ba53b56",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "a95a3574de1bf6e4f45acafdc7c234980662dbe398d4751e16f8f31d6725f90f",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_sparameter_terminated.py": "ecfe004d7db268a8def6bca3b74ff22c127340eaf9ac8e33586ecfe8983cee48",
+    "tests/python/test_sparameter_terminated_contract.py": "9a6307c5b42d2fb460d6b3829d1585e94fecdd153deda031eb12ed9b1b0b4226",
+    "schemas/sparameter-rational-fit-request-v1.schema.json": "268bf209ca7a54887481a21b05b218c6f0ecf3fa8e44c9dd1b47011f000533c3",
+    "schemas/sparameter-rational-fit-result-v1.schema.json": "f75c0c2b53f0749275cb21c5f6e412097d00c1594f3010b34cf7a02225e65f7b",
+    "schemas/terminated-network-transient-request-v1.schema.json": "a56e65942c70b98a515cc947803535853f9291cdaccffb6de6bd7f246945c29c",
+    "schemas/terminated-network-transient-result-v1.schema.json": "e1cc7c9fd566709e456952bf8dd9beb12fae6241acb6ef40dc45e796b34f5c4c"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_extreme_normalization_forcing_and_interval_underflow_reject",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_loop_singular_unstable_marginal_and_unresolved_cancellation",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_malformed_inputs_and_precision_collapse",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_output_grid_invariance",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_physical_capacitor_ramp_hold_signed_source_and_identity",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_resource_preflight_generator_limits_and_cancellation",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_step_initial_feedthrough_and_matched_equivalence",
+      "tests.python.test_sparameter_terminated.TerminatedTests.test_through_two_port_simultaneous_thevenins_and_order",
+      "tests.python.test_sparameter_terminated_contract.TerminatedContractTests.test_actual_worker_capacitor_charging_current_boundary_and_provenance",
+      "tests.python.test_sparameter_terminated_contract.TerminatedContractTests.test_actual_worker_rejects_invalid_resistance_port_time_and_unsupported_loop",
+      "tests.python.test_sparameter_terminated_contract.TerminatedContractTests.test_actual_worker_through_resistive_divider_and_well_posed_ideal_source"
+    ],
+    "run": 11,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI07-S02-reflectometry-reverified.log",
+  "log_sha256": "2bd2d71558ca2a458ea2cf890eecb6cef2a7e7f166e1c783b275c4070a1b11bb"
+}

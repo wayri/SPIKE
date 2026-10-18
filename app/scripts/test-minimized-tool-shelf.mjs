@@ -44,7 +44,7 @@ const require = createRequire(import.meta.url);
 new Function("require", "module", "exports", shelfJs)(name => {
   if (name === "react") return react;
   if (name === "react/jsx-runtime") return { jsx: (type, props, key) => React.createElement(type, key === undefined ? props : { ...props, key }), jsxs: (type, props, key) => React.createElement(type, key === undefined ? props : { ...props, key }), Fragment: React.Fragment };
-  if (name === "./icons" || name === "lucide-react") return { PanelTopOpen: () => null, X: () => null };
+  if (name === "./navigationIcons") return { ShowControlIcon: () => null, CloseControlIcon: () => null };
   if (name === "./minimizedTools") return {
     minimizedToolSnapshot: () => [registered], subscribeMinimizedTools: () => () => {},
     restoreMinimizedTool: id => restored.push(id), closeMinimizedTool: id => closed.push(id),

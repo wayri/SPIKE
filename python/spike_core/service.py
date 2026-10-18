@@ -49,6 +49,7 @@ from .si_workflow import run_si_workflow, workflow_catalog
 from .si_ibis import parse_ibis
 from .si_protocol_test_runner import SiProtocolTestRunnerError, run_si_protocol_test_suite
 from .external_engines import external_engine_catalog
+from .solver_blocks import handle_solver_blocks
 from .solver_plugins import default_solver_registry
 from .solver_manager import (
     recommend_emi_nets,
@@ -265,6 +266,7 @@ def _dispatch(request: Dict[str, Any]) -> Dict[str, Any]:
         }}
     if method == "list_external_engines":
         return {"ok": True, "result": external_engine_catalog(refresh=bool(params.get("refresh", False)))}
+    if method == "solver_blocks": return handle_solver_blocks(params)
     if method == "solver_manager":
         return {"ok": True, "result": solver_manager_catalog(
             _solver_registry.catalog(), refresh=bool(params.get("refresh", False)),

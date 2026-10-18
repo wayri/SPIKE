@@ -14,6 +14,10 @@ assert.match(workflowUi, /Bound IBIS values override matching editable parameter
 // Render the actual endpoint page, not just markup string checks. Worker calls
 // are not needed to edit the source/receiver setup.
 const require = createRequire(import.meta.url);
+const assignments = { exports: {} };
+new Function("module", "exports", ts.transpileModule(readFileSync(new URL("../src/siWorkflowAssignments.ts", import.meta.url), "utf8"), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+}).outputText)(assignments, assignments.exports);
 const uiModule = { exports: {} };
 const catalog = JSON.parse(readFileSync(new URL("../src/siWorkflowCatalog.json", import.meta.url), "utf8"));
 const uiCode = ts.transpileModule(workflowUi, { compilerOptions: {
@@ -25,6 +29,7 @@ new Function("require", "module", "exports", uiCode)(name => {
   if (name.endsWith(".css")) return {};
   if (name === "./workerBridge") return { isDesktopShell: () => true };
   if (name === "./siWorkflowCatalog.json") return catalog;
+  if (name === "./siWorkflowAssignments") return assignments.exports;
   if (name === "./SiWorkflowPlots") return { __esModule: true, default: () => null, SiPlot: () => null };
   if (name === "./DataTable") return { default: loadDataTable(), __esModule: true };
   if (name === "./icons") return require("lucide-react");
@@ -43,7 +48,7 @@ assert.equal(updates[0](catalog.defaults).sources[0].port, 2, 'displayed ports p
 
 // Exercise stateful workflow actions, including occupied ports, imports during
 // a run, browser admission, partial results and operation defaults.
-function mountWorkflow({ desktop = true, setup = catalog.defaults, worker } = {}) {
+function mountWorkflow({ desktop = true, setup = catalog.defaults, worker, design = null } = {}) {
   const state = [], statuses = [];
   let cursor = 0;
   const module = { exports: {} };
@@ -57,13 +62,14 @@ function mountWorkflow({ desktop = true, setup = catalog.defaults, worker } = {}
     if (name.endsWith(".css")) return {};
     if (name === "./workerBridge") return { isDesktopShell: () => desktop, runLocalWorker: worker };
     if (name === "./siWorkflowCatalog.json") return { ...catalog, defaults: request };
+    if (name === "./siWorkflowAssignments") return assignments.exports;
     if (name === "./SiWorkflowPlots") return { __esModule: true, default: () => null, SiPlot: () => null };
     if (name === "./DataTable") return { default: loadDataTable(), __esModule: true };
     if (name === "./icons") return require("lucide-react");
     if (name === "./panelPresentation") return { usePanelPresentation: () => ({ ownerDocument: globalThis.document, ownerWindow: globalThis.window, detached: false }) };
     return require(name);
   }, module, module.exports);
-  const render = () => { cursor = 0; return module.exports.default({ design: null, onStatus: s => statuses.push(s) }); };
+  const render = () => { cursor = 0; return module.exports.default({ design, onStatus: s => statuses.push(s) }); };
   const button = label => nodes(render()).find(node => node.type === "button" && textOf(node.props.children).includes(label));
   const click = label => { const found = button(label); assert.ok(found, `button ${label} exists`); found.props.onClick(); };
   return { render, button, click, statuses, setup: () => state[0] };
@@ -80,6 +86,58 @@ flow.click("Add receiver");
 assert.equal(flow.setup().receivers[1].port, 3, "new receivers must avoid every occupied source/receiver port");
 assert.equal(flow.button("Add source").props.disabled, true, "full channel cannot add another endpoint");
 assert.equal(flow.button("Add receiver").props.disabled, true);
+
+// Changing the default four-port model must not retain an impossible port 3
+// receiver on a two-port board path or imported file. Exercise real handlers.
+const board = { nets: [{ id: "s", name: "SIG" }, { id: "g", name: "GND" }], layers: [{ id: "top", layer_type: "copper" }, { id: "return", layer_type: "copper" }] };
+const modelValues = structuredClone(catalog.defaults);
+modelValues.receivers[0].capacitance_f = 7e-12;
+modelValues.receivers[0].resistance_ohm = 4700;
+let submitted;
+const boardFlow = mountWorkflow({ setup: modelValues, design: board, worker: async payload => { submitted = payload; return { ok: true, result: { status: "completed" } }; } });
+boardFlow.click("Extract active board path");
+assert.equal(boardFlow.setup().receivers[0].port, 1);
+assert.deepEqual(boardFlow.setup().receivers[0], { ...modelValues.receivers[0], port: 1 }, "all receiver parameters survive automatic default remapping");
+assert.match(textOf(boardFlow.render()), /receiver moved from port 3 to port 2/);
+assert.equal(boardFlow.button("Run loaded SI study").props.disabled, false);
+boardFlow.click("Run loaded SI study");
+await Promise.resolve(); await Promise.resolve();
+assert.equal(submitted.params.request.receivers[0].port, 1, "the actual worker payload has the valid two-port receiver");
+const imported = mountWorkflow();
+const importInput = nodes(imported.render()).find(node => node.type === "input" && node.props.accept?.startsWith(".s2p"));
+importInput.props.onChange({ target: { files: [{ name: "measured.s2p", size: 100, text: async () => "# Hz S RI R 50\n0 0 0 1 0 1 0 0 0\n" }], value: "file" } });
+await Promise.resolve(); await Promise.resolve();
+assert.equal(imported.setup().receivers[0].port, 1);
+assert.equal(imported.button("Run loaded SI study").props.disabled, false);
+const toggleFlow = mountWorkflow({ setup: modelValues });
+const toggleCoupling = checked => nodes(nodes(toggleFlow.render()).find(node => node.type === "label" && textOf(node).includes("Coupled pair (4 ports)"))).find(node => node.type === "input").props.onChange({ target: { checked } });
+toggleCoupling(false);
+assert.deepEqual(toggleFlow.setup().receivers[0], { ...modelValues.receivers[0], port: 1 });
+toggleCoupling(true);
+assert.deepEqual(toggleFlow.setup().receivers[0], modelValues.receivers[0], "coupled toggling preserves custom receiver model values in both directions");
+
+const custom = structuredClone(modelValues);
+custom.sources[0].port = 1;
+custom.receivers[0].port = 3;
+custom.passives = [{ port: 3, kind: "capacitor", capacitance_f: 1e-12 }];
+custom.edits = [{ kind: "reorder", ports: [0, 1, 2, 3] }];
+let invalidCalls = 0;
+const customFlow = mountWorkflow({ setup: custom, design: board, worker: () => { invalidCalls++; throw Error("Invalid assignments must not reach the worker"); } });
+customFlow.click("Extract active board path");
+for (const key of ["sources", "receivers", "passives", "edits"]) assert.deepEqual(customFlow.setup()[key], custom[key], `${key} must not be silently changed or dropped`);
+assert.equal(customFlow.button("Run loaded SI study").props.disabled, true);
+assert.match(textOf(customFlow.render()), /Receiver 1: choose a whole-number port from 1 to 2/);
+assert.match(textOf(customFlow.render()), /Passive 1 \(Passives\)/);
+assert.match(textOf(customFlow.render()), /update the reorder operation/);
+customFlow.click("Run loaded SI study");
+assert.equal(invalidCalls, 0, "the handler also guards direct invocation while disabled");
+const corrected = { ...customFlow.setup(), sources: [{ ...custom.sources[0], port: 0 }], receivers: [{ ...custom.receivers[0], port: 1 }], passives: [{ ...custom.passives[0], port: 1 }], edits: [{ kind: "reorder", ports: [0, 1] }] };
+assert.deepEqual(assignments.exports.siWorkflowPortIssues(corrected), [], "correcting every assignment restores admission");
+assert.match(assignments.exports.siWorkflowPortIssues({ ...corrected, receivers: [{ ...corrected.receivers[0], port: 0 }] }).join(" "), /already has an endpoint/);
+const withPassive = { ...modelValues, passives: [{ port: 2, kind: "capacitor" }] };
+const preserved = assignments.exports.changeSiChannel(withPassive, { kind: "rlgc", coupled: false });
+assert.deepEqual(preserved.setup.receivers, withPassive.receivers, "even otherwise default ports need manual review when passives are attached");
+assert.deepEqual(preserved.setup.passives, withPassive.passives);
 const twoPortSetup = structuredClone(catalog.defaults);
 twoPortSetup.channel.coupled = false;
 twoPortSetup.receivers[0].port = 1;

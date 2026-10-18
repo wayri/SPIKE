@@ -158,3 +158,55 @@ lifecycle.releaseIdle();
 assert.deepEqual(lifecycle.stats, { entries: 0, bytes: 0, users: 0 });
 assert.deepEqual(lifecycleDisposals.get('shared'), { geometry: 1, texture: 1, material: 1 });
 console.log('Viewport teardown releases retained and late sources exactly once; shared clones and future cache reuse remain safe.');
+
+// Shader uniforms and Scene-level image slots are owned resources too. Missing
+// them from the walk leaves decoded images alive across repeated open/close.
+let nestedTextureDisposals = 0;
+const nestedTexture = new THREE.DataTexture(new Uint8Array(4 * 4 * 4), 4, 4);
+nestedTexture.addEventListener('dispose', () => nestedTextureDisposals++);
+const environmentTexture = new THREE.DataTexture(new Uint8Array(2 * 2 * 4), 2, 2);
+environmentTexture.addEventListener('dispose', () => nestedTextureDisposals++);
+const nestedSceneTexture = new THREE.DataTexture(new Uint8Array(3 * 2 * 4), 3, 2);
+nestedSceneTexture.addEventListener('dispose', () => nestedTextureDisposals++);
+const aliasedUniformArray = [nestedTexture];
+const nestedSource = new THREE.Scene();
+nestedSource.environment = environmentTexture;
+nestedSource.add(new THREE.Mesh(
+  new THREE.BoxGeometry(),
+  new THREE.ShaderMaterial({ uniforms: {
+    direct: { value: nestedTexture },
+    nested: { value: { layers: [nestedTexture] } },
+    aliasA: { value: aliasedUniformArray },
+    aliasB: { value: aliasedUniformArray },
+  } }),
+));
+nestedSource.add(Object.assign(new THREE.Scene(), { background: nestedSceneTexture }));
+const nestedCache = new SceneResourceCache(async () => nestedSource, 1024 ** 2, 1);
+const nestedClones = await Promise.all(Array.from({ length: 64 }, () => nestedCache.clone('shader.glb')));
+const nestedClone = nestedClones[0];
+assert.equal(nestedClone.children[0].material.uniforms.direct.value, nestedTexture,
+  'occurrence material clones retain the exact shared shader texture');
+assert.equal(nestedClone.environment, environmentTexture,
+  'scene-level environment texture remains exact across the occurrence clone');
+assert.equal(nestedClone.children[1].background, nestedSceneTexture,
+  'a nested Scene shares its exact source texture and participates in ownership');
+assert.equal(nestedClone.children[0].material.uniforms.aliasA.value[0], nestedTexture,
+  'the first clone of an aliased uniform container restores the shared source texture');
+assert.equal(nestedClone.children[0].material.uniforms.aliasB.value[0], nestedTexture,
+  'a second clone of the same source uniform container also restores the shared texture');
+assert.equal(new Set(nestedClones.map(item => item.children[0].material.uniforms.direct.value)).size, 1,
+  'repeated occurrences share one shader texture object rather than cloning one per material');
+assert.equal(new Set(nestedClones.map(item => item.children[0].material)).size, 64,
+  'shader materials remain independent per occurrence');
+const nestedDecodedBytes = Math.ceil(nestedTexture.image.data.byteLength * 4 / 3)
+  + Math.ceil(environmentTexture.image.data.byteLength * 4 / 3)
+  + Math.ceil(nestedSceneTexture.image.data.byteLength * 4 / 3);
+assert.ok(nestedCache.stats.bytes >= nestedDecodedBytes,
+  'retention accounting includes nested shader and scene-level decoded textures');
+for (const clone of nestedClones) disposeScene(clone);
+assert.equal(nestedTextureDisposals, 0, 'idle retained sources continue owning shared nested textures');
+nestedCache.releaseIdle();
+assert.equal(nestedTextureDisposals, 3, 'viewport close disposes each nested and scene-level texture exactly once');
+assert.deepEqual(nestedCache.stats, { entries: 0, bytes: 0, users: 0 });
+console.log(JSON.stringify({ shaderOccurrences: nestedClones.length, retainedShaderTextureObjects: 1,
+  sharedOccurrenceTextureReferences: nestedClones.length, nestedDecodedBytes, nestedTextureDisposals }));

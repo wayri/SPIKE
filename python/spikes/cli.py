@@ -95,11 +95,15 @@ def _parser() -> argparse.ArgumentParser:
     native_run.add_argument("--library", type=Path, required=True)
     native_run.add_argument(
         "--method",
-        choices=("trap", "be", "bdf2"),
+        choices=(
+            "trap", "hybrid_trapezoidal", "be", "bdf2",
+            "radau-iia3", "radau_iia3",
+        ),
         default="trap",
         help=(
             "Transient integration: event-aware hybrid trapezoidal (trap, "
-            "default), backward Euler (be), or variable-step BDF2 (bdf2)."
+            "default), backward Euler (be), variable-step BDF2 (bdf2), or "
+            "fixed-step third-order Radau IIA (radau-iia3)."
         ),
     )
     native_run.add_argument(
@@ -596,8 +600,11 @@ def main(argv: Iterable[str] | None = None) -> int:
 
             method = {
                 "trap": "hybrid_trapezoidal",
+                "hybrid_trapezoidal": "hybrid_trapezoidal",
                 "be": "backward_euler",
                 "bdf2": "bdf2",
+                "radau-iia3": "radau_iia3",
+                "radau_iia3": "radau_iia3",
             }[arguments.method]
             result = run_native_project(
                 project,

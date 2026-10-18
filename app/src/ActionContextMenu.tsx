@@ -1,3 +1,4 @@
+import { CloseControlIcon } from "./navigationIcons";
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -31,7 +32,7 @@ export default function ActionContextMenu({ x, y, title, actions, onClose, id }:
       if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
       event.preventDefault(); const items = [...event.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")], current = items.indexOf(ownerDocument.activeElement as HTMLButtonElement);
       items[event.key === "Home" ? 0 : event.key === "End" ? items.length - 1 : (current + (event.key === "ArrowUp" ? -1 : 1) + items.length) % items.length]?.focus();
-    }}><strong>{title}</strong>{actions.map((action, index) => { const Icon = action.icon ?? ( /^cut$/i.test(action.label) ? Scissors : /^paste$/i.test(action.label) ? ClipboardPaste : /^select all$/i.test(action.label) ? TextSelect : /^dedent$/i.test(action.label) ? IndentDecrease : /^indent$/i.test(action.label) ? IndentIncrease : /comment/i.test(action.label) ? Hash : /script/i.test(action.label) ? Code2 : /copy|duplicate/i.test(action.label) ? Copy : /material/i.test(action.label) ? Atom : /layer/i.test(action.label) ? Layers3 : /edit/i.test(action.label) ? Pencil : MousePointer2);
+    }}><header className="action-menu-heading"><strong>{title}</strong><button type="button" className="spike-control--icon" title={`Close ${title}`} aria-label={`Close ${title}`} onClick={close}><CloseControlIcon size={14}/></button></header>{actions.map((action, index) => { const Icon = action.icon ?? ( /^cut$/i.test(action.label) ? Scissors : /^paste$/i.test(action.label) ? ClipboardPaste : /^select all$/i.test(action.label) ? TextSelect : /^dedent$/i.test(action.label) ? IndentDecrease : /^indent$/i.test(action.label) ? IndentIncrease : /comment/i.test(action.label) ? Hash : /script/i.test(action.label) ? Code2 : /copy|duplicate/i.test(action.label) ? Copy : /material/i.test(action.label) ? Atom : /layer/i.test(action.label) ? Layers3 : /edit/i.test(action.label) ? Pencil : MousePointer2);
       return <div className="action-menu-row" key={action.label}>
         {action.section && action.section !== actions[index - 1]?.section && <div className="action-menu-section" role="presentation">{action.section}</div>}
         <button type="button" role={action.checked === undefined ? "menuitem" : action.radio ? "menuitemradio" : "menuitemcheckbox"} aria-checked={action.checked}

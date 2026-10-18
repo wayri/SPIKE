@@ -27,12 +27,24 @@
       "id": "SI02",
       "title": "General post-layout channel extraction",
       "owner_role": "SI",
-      "baseline": "Experimental straight/pair and piecewise planar paths; bends omit discontinuity physics. [Geometry channel](GEOMETRY_DERIVED_SI_CHANNEL.md).",
+      "baseline": "Experimental planar geometry paths, supplied uniform lossless/Heaviside transients, independent sampled scalar RLGC networks and driven RMS fields/loss ledgers. Ordered supplied scalar sections now connect through ideal common-reference junctions, with coherent local fields, raw interface residuals and section/global loss balance. Physical geometry/return/discontinuity extraction, branches, causal material laws and thermal deposition remain open. Supplied ideal scalar star junctions now retain coherent leg fields and conserved distributed heat across named external ports.",
       "target": "Branches, layer changes, return planes, explicit single-ended/differential/multiconductor PCB/coax/cable classes; frequency-dependent RLGC, distributed delay and reflections, geometry coverage and converged extraction.",
       "priority": "P0 M1, P1 M2",
-      "status": "planned",
+      "status": "in_progress",
       "baseline_evidence": [
-        "GEOMETRY_DERIVED_SI_CHANNEL.md"
+        "GEOMETRY_DERIVED_SI_CHANNEL.md",
+        "LOSSLESS_LINE_TRANSIENT.md",
+        "validation/SI02_LOSSLESS_LINE_TRANSIENT.md",
+        "DISTORTIONLESS_LINE_TRANSIENT.md",
+        "validation/SI02_DISTORTIONLESS_LINE_TRANSIENT.md",
+        "RLGC_LINE_NETWORK.md",
+        "validation/SI02_RLGC_LINE_NETWORK.md",
+        "RLGC_LINE_FIELDS.md",
+        "validation/SI02_RLGC_LINE_FIELDS.md",
+        "RLGC_LINE_CASCADE.md",
+        "validation/SI02_RLGC_LINE_CASCADE.md",
+        "RLGC_LINE_JUNCTION.md",
+        "validation/SI02_RLGC_LINE_JUNCTION.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -40,7 +52,7 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "Branches, layer changes, return planes, explicit single-ended/differential/multiconductor PCB/coax/cable classes; frequency-dependent RLGC, distributed delay and reflections, geometry coverage and converged extraction."
+        "Qualified branches, layer changes, return planes, coupled PCB/coax/cable geometry and physical interface/fringing/launch/via/bend models; causal complex constitutive laws/dispersive energy, skin/proximity/material extraction, general distributed states/terminations and DC/transient lossy fields; heat allocation, conservative thermal mapping/feedback and measured/converged extraction. Ideal scalar supplied-section junctions do not establish these capabilities."
       ]
     },
     {
@@ -127,7 +139,7 @@
       "id": "SI07",
       "title": "Crosstalk, waveform, eye and TDR diagnostics",
       "owner_role": "SI",
-      "baseline": "Experimental eyes/TDR, prescribed-wave rational transients and bounded finite R/RL or R/shunt-C Thevenin feedback with distinct source/network currents, derivatives, losses and stored energy. [Capacitive models](CAPACITIVE_NETWORK_TRANSIENT.md).",
+      "baseline": "Experimental initialized RLC rational transients, boundary energy ledgers, sampled multi-aggressor and finite timing-corner envelopes, plus network-port apparent transient reflectometry. Original source/state/probe identity, fixed drivers, explicit ratio resolution and signed transported power are retained; spatial/instrument/physical correlation and continuous timing bounds remain open.",
       "target": "Multi-aggressor switching, timing/noise budgets, spatial cross-probing and independent two/four-port VNA/TDR correlation.",
       "priority": "P1 M2",
       "status": "in_progress",
@@ -138,7 +150,19 @@
         "INDUCTIVE_NETWORK_TRANSIENT.md",
         "validation/SI07_INDUCTIVE_NETWORK_TRANSIENT.md",
         "CAPACITIVE_NETWORK_TRANSIENT.md",
-        "validation/SI07_CAPACITIVE_NETWORK_TRANSIENT.md"
+        "validation/SI07_CAPACITIVE_NETWORK_TRANSIENT.md",
+        "RLC_NETWORK_TRANSIENT.md",
+        "validation/SI07_RLC_NETWORK_TRANSIENT.md",
+        "RLC_INITIAL_STATES.md",
+        "validation/SI07_RLC_INITIAL_STATES.md",
+        "RLC_ENERGY_LEDGER.md",
+        "validation/SI07_RLC_ENERGY_LEDGER.md",
+        "MULTI_AGGRESSOR_CROSSTALK.md",
+        "validation/SI07_MULTI_AGGRESSOR_CROSSTALK.md",
+        "CROSSTALK_TIMING_CORNERS.md",
+        "validation/SI07_CROSSTALK_TIMING_CORNERS.md",
+        "NETWORK_REFLECTOMETRY.md",
+        "validation/SI07_NETWORK_REFLECTOMETRY.md"
       ],
       "benchmark": {
         "status": "definition_pending",
@@ -146,7 +170,7 @@
         "acceptance": "Define task-specific fixture, observables, reference and tolerances before implementation/qualification."
       },
       "open_gaps": [
-        "General combined RLC/nonlinear/descriptor source/load connections and arbitrary initial states; steppable sessions/thermal integration; full multi-aggressor timing/noise budgets, spatial cross-probing and independent measured VNA/TDR/transient correlation."
+        "Arbitrary circuit topology, mutual boundary L/C and nonlinear/descriptor models with consistent initial conditions; managed steppable sessions/clock/rollback, thermal ownership/transfer/feedback and physical fitted-network dissipation/storage; full multi-aggressor timing/noise budgets, spatial cross-probing and independent measured VNA/TDR/transient correlation."
       ]
     },
     {
@@ -1472,7 +1496,7 @@
         "Real CLI import passes count, unit, source-digest and identity gates.",
         "All 24 independently specified geometry/reference assertions pass."
       ],
-      "evidence": "docs/validation/parity/WF01-S01.json"
+      "evidence": "docs/validation/parity/WF01-S01-refresh-20261018.json"
     },
     {
       "id": "WF01-S02",
@@ -1486,7 +1510,7 @@
         "Native KiCad parses and renders the source; DRC findings are retained without claiming DRC cleanliness.",
         "All 12 rotated-pad, native-origin, model-value and reference assertions pass real CLI import."
       ],
-      "evidence": "docs/validation/parity/WF01-S02.json"
+      "evidence": "docs/validation/parity/WF01-S02-refresh-20261018.json"
     },
     {
       "id": "WF01-S03",
@@ -1500,7 +1524,7 @@
         "Preserve and qualify exact curved-source geometry without duplicate conductor representations.",
         "Verify cutout topology through canonical geometry consumers and independent source oracles."
       ],
-      "evidence": "docs/validation/parity/WF01-S03.json",
+      "evidence": "docs/validation/parity/WF01-S03-refresh-20261018.json",
       "failure_evidence": "docs/validation/parity/WF01-S03-failed-arc.json",
       "verification": {
         "focused_geometry_tests": 48,
@@ -1547,7 +1571,7 @@
         "Native pcbnew confirms all paths and declared offset/scale/rotation vectors; JSON and legacy round-trip preserve occurrence identity and component links.",
         "Unapplied source placement remains explicit; malformed vectors are retained with diagnostics without losing the component or pad."
       ],
-      "evidence": "docs/validation/parity/WF01-S04A.json",
+      "evidence": "docs/validation/parity/WF01-S04A-refresh-20261018.json",
       "verification": {
         "focused_tests": 39,
         "architecture": "passed",
@@ -1586,7 +1610,7 @@
         "Native source/export gates recompute byte bindings, arc/pad/component geometry, cutout area/topology and net ownership; missing stackup/models and omitted generated font are explicit.",
         "All 48 native pose and eight supported custom-pad/slot cases agree with current source import and geometry consumers; solver readiness stays false."
       ],
-      "evidence": "docs/validation/parity/WF01-S04B.json",
+      "evidence": "docs/validation/parity/WF01-S04B-refresh-20261018.json",
       "failure_evidence": "docs/validation/parity/WF01-S04B-progress.json",
       "verification": {
         "native_geometry": {
@@ -1682,7 +1706,7 @@
         "Reject stale/foreign/duplicate/nonrigid handoffs; partial model coverage stays diagnostic and source transforms remain unapplied.",
         "Three native solids match independently specified 24 mm3 volumes and transformed cuboid bounds; STEP round trips pass without material or solver readiness promotion."
       ],
-      "evidence": "docs/validation/parity/WF01-S04C1.json",
+      "evidence": "docs/validation/parity/WF01-S04C1-refresh-20261018.json",
       "verification": {
         "focused": {
           "status": "passed",
@@ -1726,7 +1750,7 @@
         "Verify actual component volumes and SI bounds, repeated occurrence identity, supplied conductivity/provenance transfer, package retention and stale-source rejection.",
         "Bind current implementation, fixture and schema digests to execution evidence; keep synthetic materials and software admission separate from conditioned package material and physics qualification."
       ],
-      "evidence": "docs/validation/parity/WF01-S04C2.json"
+      "evidence": "docs/validation/parity/WF01-S04C2-member-metadata-refresh-20261018.json"
     },
     {
       "id": "WF01-S04C3",
@@ -3068,13 +3092,628 @@
           "log": "build/si07-s04-tracking.log"
         }
       }
+    },
+    {
+      "id": "SI07-S05",
+      "capability_id": "SI07",
+      "title": "Combined series-R/L and shunt-C fitted-network source/load boundaries",
+      "status": "done",
+      "depends_on": [
+        "SI07-S03",
+        "SI07-S04"
+      ],
+      "acceptance": [
+        "Supplied finite R/L/C with at least one positive L and C, zero initial state, continuous PWL sources and regular resolved stable mixed closure; immutable source/port identity and separate source/network currents.",
+        "Independent analytic loaded-RLC damping references, simultaneous coupled L/C physical ODE, mixed R/RL/RC reductions, PWL/refinement, units/reference invariance, KVL/KCL and component power/storage/source-work balance.",
+        "State/resource/precision/admission/cancellation checks plus actual worker/public schemas/example and source-bound zero-skip executions; referenced independent derivation. General topology/DAE, nonlinear boundaries, thermal transfer and measured qualification remain open."
+      ],
+      "evidence": "docs/validation/parity/SI07-S05.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 10,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S05-rlc-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 16,
+        "focused_regressions": {
+          "tests": 258,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 26.0,
+          "log": "build/si07-s05-focused.log"
+        },
+        "architecture": "passed",
+        "review": "Independent read-only numerical review found no actionable defect and confirmed the nonzero fitted-memory and expanded multiport checks close the identified coverage gap. Knowledgeable human numerical review remains required before release.",
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 47,
+          "skipped": 0,
+          "log": "build/si07-s05-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI07-S06",
+      "capability_id": "SI07",
+      "title": "Supplied RLC initial states and stateless continuation",
+      "status": "done",
+      "depends_on": [
+        "SI07-S05"
+      ],
+      "acceptance": [
+        "Admit finite signed supplied fit-memory/inductor-current/capacitor-voltage states with exact dimensions, source-ordered port subsets and fit-request digest; preserve unchanged zero-state v1 API and reuse numerical propagation.",
+        "Verify charged/energized free and forced analytic RLC references, genuine nonzero physical fitted-memory initialization, initial-energy/source-work/heat/storage balance, multiport ordering and reference/unit invariance.",
+        "Compare explicitly resliced PWL chunks at and inside source knots against uninterrupted execution; returned state is at source horizon even if observations end earlier. Reject stale/incompatible/malformed/precision/resource/cancelled inputs without partial success.",
+        "Actual worker/public schemas/example, referenced derivation and independent review, zero-skip source-bound stage executions and relevant regressions pass. General DAE, authenticated/managed sessions and thermal coupling remain separate."
+      ],
+      "evidence": "docs/validation/parity/SI07-S06.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 11,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S06-ramp-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 17,
+        "focused_regressions": {
+          "tests": 270,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 30.531,
+          "log": "build/si07-s06-focused.log"
+        },
+        "architecture": "passed",
+        "review": "Independent read-only numerical review found no actionable defect or material missing coverage, including corrected true nonzero-ramp continuation. Knowledgeable human numerical review remains required before release.",
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 48,
+          "skipped": 0,
+          "log": "build/si07-s06-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI07-S07",
+      "capability_id": "SI07",
+      "title": "Integrated RLC source/network work, resistor heat and boundary storage ledger",
+      "status": "done",
+      "depends_on": [
+        "SI07-S06"
+      ],
+      "acceptance": [
+        "Reuse actual initialized transient interval states in a bounded continuous quadratic energy integral; separate signed source/network work, nonnegative supplied resistor heat and endpoint L/C storage, with per-port interval and full-horizon balances.",
+        "Independent analytic scalar heat/work quadrature, free/forced initial-energy balance, nonzero physical fitted memory, coupled/PWL reference, true-ramp split/refinement additivity, units/reference invariance and active/zero-R behavior.",
+        "Verify Gramian residual/symmetry/positivity, scaled doubling and resource/precision/cancellation gates without clipping or fabricated balance; preserve all existing public transient outputs, source identity and initial states.",
+        "Actual worker/public schemas/example, referenced independent derivation, independent numerical review, zero-skip source-bound executions and relevant regressions pass. Thermal mesh mapping and generic fitted-network physical dissipation remain separate."
+      ],
+      "evidence": "docs/validation/parity/SI07-S07.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 11,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S07-energy-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 18,
+        "focused_regressions": {
+          "tests": 282,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 36.954,
+          "log": "build/si07-s07-focused.log"
+        },
+        "architecture": "passed",
+        "review": "Independent read-only numerical review found no actionable issue; 32 ledger and existing RLC tests passed, including added mixed-row/reference/time-energy checks. Knowledgeable human numerical review remains required before release.",
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 49,
+          "skipped": 0,
+          "log": "build/si07-s07-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI07-S08",
+      "capability_id": "SI07",
+      "title": "Biased multi-aggressor sampled crosstalk attribution and signed switching envelopes",
+      "status": "done",
+      "depends_on": [
+        "SI07-S07"
+      ],
+      "acceptance": [
+        "Explicit reference-biased signed source waveforms, source-ordered zero-state attribution and baseline-only common initial state and fixed sources.",
+        "Exact finite-family envelopes at requested observation times and two actual fixed-pattern full-trace witness solves within 2e-10 V absolute plus 1e-9 relative tolerance; no intersample or BER claim.",
+        "Independent physical PWL conductance/RLC enumeration, analytic references, genuine fitted memory, source order, ties, reference/time-unit checks, aggregate prefit resource/finite arithmetic/cancellation rejection.",
+        "Actual worker, strict registered schemas and executable example; referenced derivation, independent numerical review and zero-skip source-bound executions plus relevant regressions. Quadratic heat is not superposed."
+      ],
+      "evidence": "docs/validation/parity/SI07-S08.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 9,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S08-schema-verified.log"
+        },
+        "prior_numerical_stages_reexecuted": 19,
+        "focused_regressions": {
+          "tests": 292,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 34.265,
+          "log": "build/si07-s08-focused.log"
+        },
+        "architecture": {
+          "status": "blocked_by_unrelated_workspace_change",
+          "earlier_check": "passed before unrelated desktop file appeared",
+          "log": "build/si07-s08-architecture.log",
+          "issue": "app/src/workspaceViewWindows.ts: native IPC must be wrapped by a desktop bridge module. This stage did not modify that file or the architecture guard."
+        },
+        "review": "Independent read-only numerical review found no actionable issue; 31 multi-aggressor, initialized RLC and energy numerical/contract tests passed with zero skips. Knowledgeable human numerical review remains required before release.",
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 50,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si07-s08-tracking.log"
+        },
+        "concurrent_shared_worker_reverification": {
+          "stage": "GP07-S01",
+          "tests": 16,
+          "skipped": 0,
+          "log": "docs/validation/parity/GP07-S01-aggressor-shared-worker.log",
+          "reason": "A concurrent change to service.py made the old structural receipt stale after the earlier successful tracking run. Actual structural tests were rerun before updating its canonical receipt."
+        }
+      }
+    },
+    {
+      "id": "SI07-S09",
+      "capability_id": "SI07",
+      "title": "Supplied signed timing/skew corners for sampled multi-aggressor crosstalk",
+      "status": "done",
+      "depends_on": [
+        "SI07-S08"
+      ],
+      "acceptance": [
+        "Explicit finite signed delays for every aggressor at each unique supplied corner; endpoint-held shifted PWL on the unchanged horizon, original initial state, fixed drives, bias and output observations retained.",
+        "Execute every supplied corner through the existing multi-aggressor solver; exact finite-corner/signed-family envelopes at requested samples, deterministic corner/sample ties and directly verified complete extreme switching witnesses.",
+        "Independent hand-derived shifted waveforms, physical finite-corner/all-polarity references, initial/fixed-source ownership, reference/time scaling and clipping/refinement checks; aggregate all-corner work and byte/finite/precision/cancellation admission before fitting.",
+        "Actual worker, strict registered schemas, executable example, reviewed primary math/physics, original derivation, independent numerical review, zero-skip source-bound executions and relevant regressions. No continuous-skew/intersample/BER bound or quadratic heat superposition."
+      ],
+      "evidence": "docs/validation/parity/SI07-S09.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 9,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S09-timing-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 20,
+        "focused_regressions": {
+          "tests": 302,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 42.234,
+          "log": "build/si07-s09-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si07-s09-architecture.log"
+        },
+        "review": "Independent read-only review found no actionable issue; 29 timing/multi-aggressor/initialized numerical and worker/schema/example tests passed with zero skips. Human knowledgeable numerical review remains required before release.",
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 51,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si07-s09-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI07-S10",
+      "capability_id": "SI07",
+      "title": "Initialized network-port transient reflectometry and apparent impedance",
+      "status": "done",
+      "depends_on": [
+        "SI07-S09"
+      ],
+      "acceptance": [
+        "One actual initialized RLC solve; explicit fitted-network probe plane and common-real reference, source/state/current identity, instantaneous signed waves and network-port power retained.",
+        "Finite reflection and apparent V/I impedance only above explicit incident/current floors; unresolved samples retain null values and explicit reasons. Preserve signed/active responses without clipping or frequency/spatial interpretation.",
+        "Independent analytic loaded-RLC resistor and genuine fitted-memory physical references, external-C source/network-current distinction, multiport/state/reference/time/refinement invariants, strict threshold/near-open/sign and pre-fit resource/finite/cancellation/reconstruction rejection.",
+        "Actual worker, strict registered schemas, executable example, reviewed primary wave/power math, independent derivation and numerical review, zero-skip source-bound executions and relevant regressions. Power entering a network is not automatically heat; no calibrated/measured/spatial TDR qualification."
+      ],
+      "evidence": "docs/validation/parity/SI07-S10.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 9,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI07-S10-reflectometry-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 21,
+        "focused_regressions": {
+          "tests": 312,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 43.813,
+          "log": "build/si07-s10-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si07-s10-architecture.log"
+        },
+        "review": "Independent read-only review found no actionable issue; 31 reflectometry, initialized RLC and energy numerical/worker/schema/example tests passed with zero skips. Human knowledgeable numerical review remains required before release.",
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 52,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si07-s10-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI02-S01",
+      "capability_id": "SI02",
+      "title": "Causal distributed lossless TEM line transient with repeated reflections",
+      "status": "done",
+      "depends_on": [
+        "SI07-S10"
+      ],
+      "acceptance": [
+        "Supplied uniform lossless two-conductor L/C/length model with causal propagation delay, two explicitly driven finite-resistive boundaries, zero initial line/history and continuous PWL drives; no rational delay approximation or time mesh.",
+        "Interior ordered named probes return directional waves, voltage/current, signed power and local energy density; terminal currents point into line and source KVL/resistor power retain cross-domain ownership.",
+        "Independent matched finite-ramp delay, mismatch/multiple-bounce geometric references, two-sided drives, ideal zero-R finite-horizon behavior, pre-arrival causality, power/energy and unit/refinement checks; finite precision/depth/work/bytes/cancellation fail closed before or during execution.",
+        "Actual worker, strict registered schemas, executable original example, reviewed primary telegrapher/wave/reflection math, independent derivation and numerical review, zero-skip source-bound tests and relevant regressions. No lossy/dispersive line, coupled/branched extraction, nonzero line state or measured qualification."
+      ],
+      "evidence": "docs/validation/parity/SI02-S01.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 10,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI02-S01-lossless-line-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 22,
+        "focused_regressions": {
+          "tests": 323,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 65.828,
+          "log": "build/si02-s01-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si02-s01-architecture.log"
+        },
+        "review": {
+          "status": "no_actionable_issue",
+          "tests": 10,
+          "skipped": 0,
+          "scope": "Independent read-only review and actual execution of seven standalone lossless-line numerical tests and three actual worker/schema/example tests. No other numerical kernel is shared.",
+          "reviewed": "Two-ended wave recurrence, exact retarded-time ordering on binary64 inputs, signed terminal/probe currents, KVL, transported power/local stored energy, geometric echoes, finite-pulse energy oracle, representability, resources, cancellation and provenance.",
+          "limits": "Uniform lossless nondispersive two-conductor TEM; zero history; finite zero-start PWL sources and finite R>=0 ends. No distributed loss/coupling/branches/geometry extraction, thermal mapping, measured or production qualification. Human knowledgeable numerical review remains required before release."
+        },
+        "full_release_suite": "Not rerun; previous full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 53,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si02-s01-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI02-S02",
+      "capability_id": "SI02",
+      "title": "Distortionless distributed line attenuation and conductor/dielectric loss density",
+      "status": "done",
+      "depends_on": [
+        "SI02-S01"
+      ],
+      "acceptance": [
+        "Explicit Heaviside condition via nonnegative common rate kappa=R/L=G/C; causal delayed voltage attenuation, two driven finite-resistive boundaries and named probes with original zero-history line/source identity.",
+        "Derived R per length, G per length and neper attenuation, signed transported power, stored energy and separate conductor/dielectric loss W/m; local total loss=2*kappa*stored J/m verified without confusing heat with storage.",
+        "Independent attenuated-ramp/geometric echo/two-end references, zero-rate exact lossless values, smooth-wave lossy PDE and matched-pulse spatial/time energy/dissipation balance, reference/unit/refinement checks and fail-closed exponent/product/budget/cancellation admission.",
+        "Actual worker, strict registered schemas, executable original example, reviewed primary lossy telegrapher/Heaviside physics, independent derivation and numerical review, zero-skip source-bound execution and relevant regressions. General frequency-dependent/non-Heaviside/coupled/geometry/thermal-transfer qualification remains open."
+      ],
+      "evidence": "docs/validation/parity/SI02-S02.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 9,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI02-S02-distortionless-line-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 23,
+        "focused_regressions": {
+          "tests": 333,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 57.39,
+          "log": "build/si02-s02-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si02-s02-architecture.log"
+        },
+        "review": {
+          "status": "no_actionable_issue",
+          "reviewer": "independent read-only numerical review",
+          "tests": 19,
+          "skipped": 0,
+          "scope": "Nine settled distortionless-line numerical/contract tests and ten parent lossless tests independently executed. Reviewed attenuation per flight/probe leg, terminal signs, local losses, exact zero-loss equivalence, PDE/finite-pulse energy checks, admission/resources/cancellation and provenance.",
+          "findings": [],
+          "limits": "Constant Heaviside distributed-circuit model only; no arbitrary/frequency-dependent RLGC, multiconductor/geometry extraction, volumetric heat ownership, measured validation or production qualification. Knowledgeable human numerical review before release remains required."
+        },
+        "full_release_suite": "Not rerun; previous provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 54,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si02-s02-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI02-S03",
+      "capability_id": "SI02",
+      "title": "Supplied uniform sampled RLGC line two-port network",
+      "status": "done",
+      "depends_on": [
+        "SI02-S02"
+      ],
+      "acceptance": [
+        "Independent nonnegative sampled R/G and positive uniform L/C/length with increasing frequency including explicit DC; equal positive real reference and named left/right ports.",
+        "Stable telegrapher two-port evaluation, exact degenerate DC series/shunt/thru limits, sampled reciprocity/passivity admission, finite output and original supplied parameter identity.",
+        "Independent spatial matrix-exponential and finite-ladder refinement references, lossless/Heaviside/DC and unit/scaling cases; malformed, numerical/resource and cancellation rejection.",
+        "Actual worker, strict registered schemas, executable example, compatible sampled-network handoff, primary referenced independent derivation, source-bound execution and numerical review. No broadband causality, extracted material/geometry law, thermal deposition or production qualification claim."
+      ],
+      "evidence": "docs/validation/parity/SI02-S03.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 18,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI02-S03-rlgc-line-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 24,
+        "focused_regressions": {
+          "tests": 352,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 67.281,
+          "log": "build/si02-s03-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si02-s03-architecture.log"
+        },
+        "review": {
+          "status": "no_actionable_issue",
+          "reviewer": "independent read-only numerical review",
+          "tests": 18,
+          "skipped": 0,
+          "scope": "Independently executed 15 settled numerical plus three worker/schema/spatial-oracle/resampling tests. Reviewed scaled telegrapher chain/scattering derivation, right-port sign, exact DC limits, positive-sum weak-attenuation fix and adversarial regression, expm1/scaling, representation caps, denominator conditioning, sampled SVD passivity/reciprocity, immutable provenance, resource bounds and cancellation.",
+          "findings": [],
+          "limits": "Supplied scalar uniform sampled RLGC with constant positive L/C and nonnegative R/G only. Sampled passivity is not broadband causality. No geometry/material extraction, complex dispersive laws, coupled/branched topology, fields/heat transfer, measured validation or production qualification. Knowledgeable human numerical review before release remains required."
+        },
+        "full_release_suite": "Not rerun; prior full-Python provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 10,
+        "import_evidence_refresh": {
+          "stages": 6,
+          "status": "passed",
+          "log": "build/si02-s03-import-reexecution.log",
+          "reason": "Final tracking exposed historical v1 receipts against the current v2 import-evidence validator; actual pinned CLI imports were replayed, v2 receipts validated and earlier receipts archived."
+        },
+        "final_tracking_checks": {
+          "tests": 55,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si02-s03-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI02-S04",
+      "capability_id": "SI02",
+      "title": "Coherently driven sampled RLGC fields and integrated conductor/dielectric loss ledger",
+      "status": "done",
+      "depends_on": [
+        "SI02-S03"
+      ],
+      "acceptance": [
+        "Explicit coherent RMS incident power waves at both ends on an exact matching positive-frequency grid, named fractional probes and original line/excitation identity.",
+        "Complex interior V/I, signed terminal/transported power, distinct average L/C storage and local conductor/dielectric W/m; integrated nonnegative conductor/dielectric heat and checked whole-line power balance without clipping or residual redistribution.",
+        "Independent spatial boundary/exponential and loss-quadrature references, matched analytic loss, coherent interference/lossless/unit/refinement and fail-closed malformed/precision/resource/cancellation checks.",
+        "Actual worker, registered strict schemas, executable original example, referenced phasor physics and independent numerical review, zero-skip source-bound execution and regressions. DC, broadband causality, thermal ownership/deposition, geometry/material extraction and production qualification remain open."
+      ],
+      "evidence": "docs/validation/parity/SI02-S04.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 15,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI02-S04-rlgc-fields-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 25,
+        "focused_regressions": {
+          "tests": 407,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 55.469,
+          "log": "build/si02-s04-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si02-s04-architecture.log"
+        },
+        "review": {
+          "status": "no_actionable_issue",
+          "reviewer": "independent read-only numerical review",
+          "tests": 15,
+          "skipped": 0,
+          "scope": "Independently executed12 settled numerical and3 worker/schema/example tests. Reviewed coherent RMS endpoint equations, inward right-current sign, complex fields, nominal average L/C storage, local R/G heat, analytic H/J and stable H-J integrals including tiny antiphase witness, raw whole-line power balance, exact parent network agreement, provenance, conditioning, resources and cancellation.",
+          "findings": [],
+          "limits": "Uniform uncoupled supplied scalar RLGC line, positive-frequency independent steady states and nominal nondispersive L/C storage only. No broadband causality, complex dispersive energy, geometry/material ownership, thermal deposition, transient/DC fields, measured validation or production qualification. Knowledgeable human numerical review before release remains required."
+        },
+        "package_signature_formatting": {
+          "scope": "Compacted only the existing read_project wrapper signature by three lines to preserve the 800-line architecture limit; no behavior changed.",
+          "tests": 39,
+          "skipped": 0,
+          "log": "build/si02-s04-package.log"
+        },
+        "full_release_suite": "Not rerun; prior provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "dependent_native_admission_reexecuted": {
+          "stage": "WF01-S04C2",
+          "tests": 7,
+          "skipped": 0,
+          "runtime": ".venv-emerge3 CPython3.11",
+          "log": "docs/validation/parity/WF01-S04C2-rlgc-fields-native-reverified.log",
+          "initial_broad_failure_log": "build/si02-s04-focused-initial-stale-admission.log",
+          "reason": "Signature-only formatting changed source bytes bound by the existing admission receipt; actual native tests rerun, prior receipt archived."
+        },
+        "documentation_files": 10,
+        "final_tracking_checks": {
+          "tests": 56,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si02-s04-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI02-S05",
+      "capability_id": "SI02",
+      "title": "Supplied piecewise RLGC cascade and conservative section loss ledger",
+      "status": "done",
+      "depends_on": [
+        "SI02-S04"
+      ],
+      "acceptance": [
+        "Ordered named scalar uniform sections with an exact common positive-frequency grid and real reference, coherent external RMS waves, explicit zero-length ideal adjacent junctions and retained per-section input/probe identity.",
+        "Conditioned wave connection solve yields external two-port and local section drives; parent fields/losses retained unchanged with explicit interface V/I/flux residuals and global conductor/dielectric balance, without double-counting internal transfer as heat.",
+        "Independent spatial matrix-chain and per-section quadrature references, uniform segmentation equivalence, mismatched/coherent/lossless/scaling/zero cases, malformed/conditioning/resource/cancellation rejection.",
+        "Actual worker/CLI, strict registered schemas, executable saved example, primary referenced independent derivation, numerical review, actual source-bound execution and preserved runnable SI/PI regressions. Geometry/branches/bends/launch physics, thermal mapping and qualification remain open."
+      ],
+      "evidence": "docs/validation/parity/SI02-S05.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 14,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI02-S05-rlgc-cascade-reverified.log"
+        },
+        "prior_numerical_stages_reexecuted": 26,
+        "focused_regressions": {
+          "tests": 483,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "elapsed_s": 64.984,
+          "log": "build/si02-s05-focused.log"
+        },
+        "architecture": {
+          "status": "passed",
+          "log": "build/si02-s05-architecture.log"
+        },
+        "review": {
+          "status": "no_actionable_issue",
+          "reviewer": "independent read-only numerical review",
+          "tests": 14,
+          "skipped": 0,
+          "scope": "Independently ran 11 settled numerical and three actual worker/schema/example/CLI tests. Reviewed (I-CW) wave connections, external scattering and coherent local-drive extraction, original input and derived child provenance, raw junction V/I/power signs, single-count section heat, independent external wave/terminal power balance, conditioning, finite-value/invariant admission, combined work/output preflight and cancellation. Independent spatial-chain, quadrature, segmentation, quarter-wave step, reversal/scaling, exact-zero and corrupt-child rejection were assessed.",
+          "findings": [],
+          "limits": "Supplied scalar series cascades with ideal common-reference junctions only. No branches, automatic renormalization, interface parasitics, geometry/material extraction, conductor heat allocation, thermal deposition/feedback, broadband causality, transient/DC fields, measured validation or production qualification. Knowledgeable human numerical review before release remains required."
+        },
+        "runnable_workflows": {
+          "cases": 9,
+          "status": "passed",
+          "report": "build/pisi-stability-20261018-cascade/readiness.json",
+          "si_frontend": "build/si02-s05-si-ui.log"
+        },
+        "full_release_suite": "Not rerun; prior provider connection failures remain unresolved. No clean full-suite/release qualification claimed.",
+        "documentation_files": 11,
+        "final_tracking_checks": {
+          "tests": 57,
+          "skipped": 0,
+          "failures": 0,
+          "errors": 0,
+          "log": "build/si02-s05-tracking.log"
+        }
+      }
+    },
+    {
+      "id": "SI02-S06",
+      "capability_id": "SI02",
+      "title": "Supplied ideal RLGC star junction with coherent leg fields and conservative losses",
+      "status": "done",
+      "depends_on": [
+        "SI02-S05"
+      ],
+      "acceptance": [
+        "Explicit two through eight named scalar legs with external left ends and one common ideal right-end node; exactly matching positive-frequency grids and real reference, coherent RMS drives and retained original per-leg inputs.",
+        "Conditioned wave connection solve, compatible ordered multiport network, unchanged child fields and separate distributed conductor/dielectric heat; raw common-node voltage, KCL and signed-power residuals and global single-count loss balance.",
+        "Independent physical spatial-boundary and loss-quadrature references, phased matched three-port formula, two-leg cascade equivalence, permutation/scaling/exact-zero identities, malformed/numerical/conditioning/resource/cancellation and corrupt-result rejection.",
+        "Actual worker/CLI and registered strict schemas, executable saved example, referenced independent derivation, independent review and source-bound execution. Supplied ideal topology only; physical junction/return parasitics, geometry/material extraction, thermal mapping and measured qualification remain open."
+      ],
+      "evidence": "docs/validation/parity/SI02-S06.json",
+      "verification": {
+        "stage_execution": {
+          "tests": 15,
+          "skipped": 0,
+          "log": "docs/validation/parity/SI02-S06-star-junction-20261019.log"
+        },
+        "prior_numerical_stages_reexecuted": 27,
+        "focused_regressions": {
+          "tests": 99,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "log": "build/si02-s06-focused-workspace-temp.log"
+        },
+        "review": {
+          "status": "no_actionable_issue",
+          "reviewer": "independent read-only numerical review",
+          "tests": 15,
+          "skipped": 0,
+          "elapsed_s": 9.921,
+          "scope": "Ideal star wave law and conditioning, coherent field signs, child provenance/boundary/network identity, single-count per-leg conductor/dielectric heat, common-node voltage/KCL/power and global balance, independent physical nodal/spatial oracle, quadrature and refinement, matched 3/8-port and two-leg equivalence, strong attenuation, scaling/permutation/zero, schemas/worker/CLI and numerical/resource/cancellation failure admission.",
+          "findings": [],
+          "limits": "Supplied scalar common-reference ideal stars; no physical geometry, junction parasitics, arbitrary graphs, broadband causality, DC/transients, thermal deposition or measured qualification. Human numerical review before release remains required."
+        },
+        "runnable_workflows": {
+          "status": "passed",
+          "cases": 9,
+          "before": "build/pisi-readiness-20261019-post-hold/readiness.json",
+          "after": "build/pisi-readiness-20261019-star-junction/readiness.json"
+        },
+        "actual_board_audit": "docs/validation/BOARD_PISI_READINESS_20261019.md",
+        "full_python_suite": "In progress with before/after source guards at build/si02-s06-full-python; no full-run or release claim from this stage."
+      }
     }
   ],
   "scope_expansion_date": "2026-10-14",
   "scope_expansion_evidence": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
   "execution_policy": {
     "active_phase": "parity",
-    "updated_on": "2026-10-18",
+    "updated_on": "2026-10-19",
     "parity_capabilities": [
       "SI01",
       "SI02",

@@ -1,0 +1,163 @@
+{
+  "contract": "spike/rlgc-line-cascade-request/v1",
+  "sections": [
+    {
+      "id": "launch",
+      "line_request": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.2,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 2.5e-07,
+        "capacitance_f_per_m": 1e-10,
+        "samples": [
+          {
+            "frequency_hz": 1000000.0,
+            "resistance_ohm_per_m": 2.0,
+            "conductance_s_per_m": 0.0002
+          },
+          {
+            "frequency_hz": 100000000.0,
+            "resistance_ohm_per_m": 2.0,
+            "conductance_s_per_m": 0.0002
+          },
+          {
+            "frequency_hz": 400000000.0,
+            "resistance_ohm_per_m": 2.0,
+            "conductance_s_per_m": 0.0002
+          }
+        ]
+      },
+      "probes": [
+        {
+          "id": "left",
+          "fractional_position": 0.0
+        },
+        {
+          "id": "middle",
+          "fractional_position": 0.5
+        },
+        {
+          "id": "right",
+          "fractional_position": 1.0
+        }
+      ]
+    },
+    {
+      "id": "middle",
+      "line_request": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.15,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 4.5e-07,
+        "capacitance_f_per_m": 8e-11,
+        "samples": [
+          {
+            "frequency_hz": 1000000.0,
+            "resistance_ohm_per_m": 5.0,
+            "conductance_s_per_m": 0.0005
+          },
+          {
+            "frequency_hz": 100000000.0,
+            "resistance_ohm_per_m": 5.0,
+            "conductance_s_per_m": 0.0005
+          },
+          {
+            "frequency_hz": 400000000.0,
+            "resistance_ohm_per_m": 5.0,
+            "conductance_s_per_m": 0.0005
+          }
+        ]
+      },
+      "probes": [
+        {
+          "id": "left",
+          "fractional_position": 0.0
+        },
+        {
+          "id": "middle",
+          "fractional_position": 0.5
+        },
+        {
+          "id": "right",
+          "fractional_position": 1.0
+        }
+      ]
+    },
+    {
+      "id": "receive",
+      "line_request": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.1,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 2e-07,
+        "capacitance_f_per_m": 1.2e-10,
+        "samples": [
+          {
+            "frequency_hz": 1000000.0,
+            "resistance_ohm_per_m": 1.5,
+            "conductance_s_per_m": 0.0003
+          },
+          {
+            "frequency_hz": 100000000.0,
+            "resistance_ohm_per_m": 1.5,
+            "conductance_s_per_m": 0.0003
+          },
+          {
+            "frequency_hz": 400000000.0,
+            "resistance_ohm_per_m": 1.5,
+            "conductance_s_per_m": 0.0003
+          }
+        ]
+      },
+      "probes": [
+        {
+          "id": "left",
+          "fractional_position": 0.0
+        },
+        {
+          "id": "middle",
+          "fractional_position": 0.5
+        },
+        {
+          "id": "right",
+          "fractional_position": 1.0
+        }
+      ]
+    }
+  ],
+  "excitations": [
+    {
+      "frequency_hz": 1000000.0,
+      "incident_left": {
+        "real": 1.0,
+        "imag": 0.2
+      },
+      "incident_right": {
+        "real": 0.3,
+        "imag": -0.4
+      }
+    },
+    {
+      "frequency_hz": 100000000.0,
+      "incident_left": {
+        "real": 1.0,
+        "imag": 0.2
+      },
+      "incident_right": {
+        "real": 0.3,
+        "imag": -0.4
+      }
+    },
+    {
+      "frequency_hz": 400000000.0,
+      "incident_left": {
+        "real": 1.0,
+        "imag": 0.2
+      },
+      "incident_right": {
+        "real": 0.3,
+        "imag": -0.4
+      }
+    }
+  ]
+}

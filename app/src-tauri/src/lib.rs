@@ -23,6 +23,7 @@ mod desktop_lifecycle;
 mod app_updates;
 mod webview_policy;
 mod panel_popup;
+mod import_drop;
 #[cfg(not(feature = "custom-protocol"))]
 mod dev_server;
 
@@ -977,6 +978,7 @@ fn dialog_for_kind(kind: &str, save: bool) -> rfd::FileDialog {
         ("project", false) => dialog.add_filter("SPIKE project or results", &["spike", "json"]),
         ("project", true) => dialog.add_filter("SPIKE project", &["spike"]),
         ("report", _) => dialog.add_filter("HTML report", &["html", "htm"]),
+        ("support-report", _) => dialog.add_filter("SPIKE support report", &["json", "md"]),
         ("step", _) => dialog.add_filter("STEP model", &["step", "stp"]),
         ("sheet", false) => dialog.add_filter("SPIKE sheet definition or planar DXF", &["json", "dxf"]),
         ("sheet", true) => dialog.add_filter("SPIKE sheet definition", &["json"]),
@@ -2128,6 +2130,7 @@ pub fn run() {
         .manage(close_recovery::CloseRecoveryState::default())
         .manage(app_updates::UpdateState::default())
         .on_window_event(close_recovery::on_window_event)
+        .on_webview_event(import_drop::on_webview_event)
         .manage(project_trust_binding::ProjectManifestState::new())
         .manage(mcp_bridge::BridgeState::default())
         .manage(panel_popup::PanelWindowState::default())

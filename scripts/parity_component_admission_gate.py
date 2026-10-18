@@ -27,6 +27,7 @@ SOURCES = (
     'python/spike_core/gmsh_occ_mesher.py',
     'python/spike_core/service_project_thermal_mesh.py',
     'python/spike_core/project_package.py',
+    'python/spike_core/project_member_metadata.py',
     'schemas/thermal-component-promotion-v1.schema.json',
     'schemas/assembly-thermal-mesh-assignments-v1.schema.json',
 )

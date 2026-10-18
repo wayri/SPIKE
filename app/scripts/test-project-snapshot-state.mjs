@@ -117,6 +117,18 @@ const datasetOnlyPackage = createResultPackage({ design: linked.design, analysis
 assert.deepEqual(datasetOnlyPackage.project_snapshot.studies[0].datasets[0].payload, { samples: [1, 2] });
 assert.deepEqual(linked.thermal.scenario.field_result, { grid: [55] }, 'export must not clear live results');
 assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage({ ...linked, analysis: {}, emi: {}, thermal: linked.thermal }))).snapshot.thermal, linked.thermal);
+const boardThermalOnly = { design: linked.design, analysis: {}, thermal: { scenario: {
+  ambient_c: 25, board_thermal_request: { board_id: 'occ-A' },
+  board_thermal_result: { temperature_c: [25, 48], status: 'completed' },
+} } };
+assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage(boardThermalOnly))).snapshot, boardThermalOnly,
+  'a board thermal result alone must be exportable with its original inputs');
+const boardThermalSetup = withoutSavedResults(boardThermalOnly);
+assert.equal(boardThermalSetup.thermal.scenario.board_thermal_result, null);
+assert.deepEqual(boardThermalSetup.thermal.scenario.board_thermal_request, { board_id: 'occ-A' });
+assert.deepEqual(boardThermalOnly.thermal.scenario.board_thermal_result.temperature_c, [25, 48],
+  'exporting without results must not clear the live board thermal solution');
+assert.throws(() => createResultPackage(boardThermalSetup), /Run a simulation/);
 const old = readResultPackage(JSON.stringify({ contract: 'spike/result-package/v1', active_result: results[0].bundle, results }));
 assert.equal(old.results.result_history.length, 25);
 assert.equal(old.snapshot, null, 'legacy result files must not pretend to contain design geometry');
@@ -128,6 +140,24 @@ const strippedStudy = withoutSavedResults(assemblyStudy);
 assert.deepEqual(strippedStudy.assembly_ir.extensions['spike.multiboard-studies'].pi.request, { source: 12 });
 assert.equal(strippedStudy.assembly_ir.extensions['spike.multiboard-studies'].pi.result, undefined);
 assert.equal(assemblyStudy.assembly_ir.extensions['spike.multiboard-studies'].pi.result.status, 'completed');
+for (const domain of ['pi', 'si', 'thermal', 'em']) {
+  const multiboardOnly = { design: linked.design, analysis: {}, assembly_ir: { ...linked.assembly_ir,
+    extensions: { 'spike.multiboard-studies': { [domain]: {
+      assembly_digest: 'retained-assembly', request: { source: 12 }, result: { status: 'completed' },
+    } } },
+  } };
+  assert.deepEqual(readResultPackage(JSON.stringify(createResultPackage(multiboardOnly))).snapshot, multiboardOnly,
+    `${domain} multiboard-only result export must preserve assembly links and request binding`);
+  assert.throws(() => createResultPackage(withoutSavedResults(multiboardOnly)), /Run a simulation/);
+}
+assert.throws(() => createResultPackage({ design: linked.design, analysis: {}, assembly_ir: {
+  extensions: { 'spike.multiboard-studies': { pi: { request: { source: 12 }, result: null } } },
+} }), /Run a simulation/, 'a multiboard draft without outputs is not a result');
+for (const result of [false, 0, 'not a result', []]) {
+  assert.throws(() => createResultPackage({ design: linked.design, analysis: {}, assembly_ir: {
+    extensions: { 'spike.multiboard-studies': { pi: { result } } },
+  } }), /Run a simulation/, 'non-record placeholders must not qualify as coupled results');
+}
 
 const parallelState = { contract: 'spike/parallel-workspace/v1', draft: { jobs_json: '[]', concurrency: '2', threads_per_job: '3', timeout_s: '120' }, runs: [{ id:'past', result:{outputs:[1]}, status:'completed' }] };
 const parallelProject = { analysis: { parallel_execution: parallelState } };

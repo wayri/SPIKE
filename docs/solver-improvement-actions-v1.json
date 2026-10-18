@@ -5,6 +5,84 @@
   "plan_document": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
   "baseline_report": "output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf",
   "all_solver_qualified": false,
+  "accuracy_refresh_20261018": {
+    "method": "radau_iia3",
+    "scope": "Opt-in fixed-step independent-source linear RLC/index-one systems; legacy methods/defaults retained.",
+    "report": "output/acc01-radau-20261018/report.json",
+    "runs": 42,
+    "passed": 42,
+    "binding_status": "conclusive",
+    "gates_changed": false,
+    "minimum_tested_input_volts": 0.000001,
+    "native_regression_executables_passed": 8,
+    "import_receipts": "Six fresh WF01 v2 receipts and retained import artifacts, dated 20261018; original failed evidence retained.",
+    "full_suite_status": "Passed locally: 4293 tests, zero failures/errors, 69 skips. No acceptance gates or tolerances weakened; not release qualification.",
+    "full_suite_green": true,
+    "verification_completed_date": "2026-10-19",
+    "post_checks": {
+      "architecture": "passed",
+      "solver_action_register": "passed",
+      "parity_backlog_and_receipts": "passed",
+      "documentation": "passed",
+      "reference_inventory": "passed",
+      "scoped_diff_whitespace": "passed",
+      "accuracy_source_drift": [],
+      "retained_report_and_log_hashes": "matched"
+    },
+    "full_suite_attempts": [
+      {
+        "log": "output/acc01-radau-20261018/full-python-suite-20261018.log",
+        "tests": 4235,
+        "failures": 1,
+        "errors": 5,
+        "skipped": 65,
+        "status": "failed; original evidence retained"
+      },
+      {
+        "log": "output/acc01-radau-20261018/full-python-suite-final-20261018.log",
+        "tests": 4250,
+        "failures": 0,
+        "errors": 4,
+        "skipped": 65,
+        "status": "failed; concurrent PI/SI gate edits after module loading caused stale-evidence rejection; retained without reclassification"
+      },
+      {
+        "log": "output/acc01-radau-20261018/full-python-suite-stable-20261018.log",
+        "tests": 4270,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 65,
+        "gate_and_library_hashes_unchanged": true,
+        "status": "failed; debugger remained starting beyond the existing four-second observation budget for its one-second deadline; no gate weakening"
+      },
+      {
+        "log": "output/acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
+        "tests": 4293,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 69,
+        "duration_s": 994.704,
+        "qualification_inputs_and_library_hashes_unchanged": true,
+        "status": "passed locally; optional skips remain explicit, not release qualification"
+      }
+    ],
+    "stable_full_suite_log": "output/acc01-radau-20261018/full-python-suite-stable-20261018.log",
+    "latest_full_suite_log": "output/acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
+    "latest_full_suite_log_sha256": "a823b67ab2325ba961cd94d074e078d7033184590ac0a8e791838ab8a5620c96",
+    "accuracy_report_sha256": "7de3e08ed748eacd1b8ec3708764d4f09f0dfaeea14038c17b44873403653645",
+    "qualification_inputs_sha256_before_and_after": "5fc39942f0a21fc5cb310fb20724d903f355e57cb7875ba01ec394c4c60ceab6",
+    "native_library_sha256_before_and_after": "9a2bd6745538483c38858642eab1eeef103fefe9121ef1cdc33085e661799447",
+    "additional_skips_since_prior_run": {
+      "count": 4,
+      "module": "test_controller_firmware_runtime.FirmwareNativeTests",
+      "reason": "opt-in real native emulator tests",
+      "earlier_failing_tests_converted_to_skips": false
+    },
+    "stable_full_suite_guard": "Compare parity gate/receipt, debugger implementation/tests/guide and native DLL SHA-256 identities before and after final execution; drift is inconclusive, never green.",
+    "debugger_focused_tests_passed": 16,
+    "debugger_limits": "Original deadlines and four-second observation gates retained. Parent polling enforces startup deadline before child watchdog initialization; unobserved startup is not OS-enforced. Ordinary-user script execution is not a security sandbox.",
+    "limits": "No nonlinear/adaptive/OSDI/high-index admission; no measured validation; knowledgeable human numerical release review pending."
+  },
   "first_batch_validation": {
     "date": "2026-10-13",
     "full_python_tests": 3666,
@@ -61,7 +139,7 @@
         "python/spikes/transient_controls.py"
       ],
       "instructions_and_completion_gates": "Owner: circuit numerics. Extend\n`scripts/benchmark_circuit_timestep_accuracy.py` into an amplitude/timestep\nmatrix. Run original linear RC/RL cases at scales 1, 1e-3 and 1e-6 with steps\n1, 0.5 and 0.25 us. Retain volts and amperes as separate observables, raw\nwaveforms and unit-correct normalized errors. Include zero input and sign\nreversal. Do not subtract fitted delay or rescale output after execution.\n\nFor the finest linear fixture, propose\n`abs(error) <= atol + 5e-6*abs(reference)`, with declared initial floors\n`atol_V=1e-12 V` and `atol_I=1e-15 A`. These are tests of a proposed envelope,\nnot an assertion that SPIKE already meets it. Compare error divided by the\nexcitation scale; if it stops scaling, locate tolerances, conditioning,\nintegration, interpolation or serialization as separate causes. Change\nsolver tolerance handling only when the discriminating test identifies it.\nCompletion: publish the minimum verified amplitude and error floor per\nobservable; every failing stratum stays failed.",
-      "execution_evidence": ["output/acc01-20261013-rerun-1/report.json: conclusive actual owned-C++ 42-run sweep; 36 nonzero strata failed, six zero strata passed. Proposed floors/envelope are not qualified.", "output/acc01-20261013/report.json: original run retained with inconclusive source binding."]
+      "execution_evidence": ["output/acc01-20261013-rerun-1/report.json: historical conclusive hybrid-trapezoidal sweep; 36 nonzero strata failed, six zero strata passed. Retained without reclassification.", "output/acc01-20261013/report.json: original run retained with inconclusive source binding.", "output/acc01-radau-20261018/report.json: owner-approved explicit radau_iia3 method; all 42 signed/zero RC/RL strata passed unchanged all-time voltage/current budgets with conclusive source/binary/input bindings. Lowest tested input 1e-6 V, not a universal floor; no nonlinear or measured qualification."]
     },
     {
       "id": "ACC02",

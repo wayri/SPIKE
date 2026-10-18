@@ -24,7 +24,7 @@ class ParityBacklogTests(unittest.TestCase):
         self.assertTrue({'GP01', 'GP04', 'OP01', 'OP02', 'OP03', 'OP04', 'OP05',
                          'VF01', 'VF02', 'AX01', 'AX02', 'LB01', 'LB02'}.issubset(
                              result['benchmark_definitions_pending']))
-        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04'])
+        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04', 'SI07-S05', 'SI07-S06', 'SI07-S07', 'SI07-S08', 'SI07-S09', 'SI07-S10', 'SI02-S01', 'SI02-S02', 'SI02-S03', 'SI02-S04', 'SI02-S05', 'SI02-S06'])
 
     def test_duplicate_missing_and_unknown_capabilities_fail(self):
         for mutation in ('duplicate', 'missing', 'unknown'):
@@ -168,15 +168,23 @@ class ParityBacklogTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=ROOT / 'build/parity-test-temp') as directory:
             path = Path(directory) / 'receipt.json'
             stage['evidence'] = path.relative_to(ROOT).as_posix()
-            for mutation in ('failed', 'stale_manifest', 'stale_runner', 'partial_assertions', 'wrong_source'):
+            for mutation in ('failed', 'stale_manifest', 'manifest_drift', 'stale_runner',
+                             'runner_drift', 'stale_import', 'partial_assertions', 'wrong_source'):
                 receipt = copy.deepcopy(original)
                 summary = receipt['summary']
                 if mutation == 'failed':
                     summary['status'] = 'failed'
                 elif mutation == 'stale_manifest':
                     summary['manifest_sha256'] = '0' * 64
+                elif mutation == 'manifest_drift':
+                    summary['manifest_sha256_after'] = '0' * 64
                 elif mutation == 'stale_runner':
                     summary['runner_sources']['scripts/benchmark_board_corpus.py'] = '0' * 64
+                    summary['runner_sources_after']['scripts/benchmark_board_corpus.py'] = '0' * 64
+                elif mutation == 'runner_drift':
+                    summary['runner_sources_after']['scripts/benchmark_board_corpus.py'] = '0' * 64
+                elif mutation == 'stale_import':
+                    receipt['import_evidence']['sha256'] = '0' * 64
                 elif mutation == 'partial_assertions':
                     summary['boards'][0]['entity_assertions_checked'] = 0
                 else:

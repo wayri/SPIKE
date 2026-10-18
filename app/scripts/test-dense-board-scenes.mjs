@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import * as THREE from 'three';
+import { proceduralPadDrillPath } from '../src/proceduralDrillGeometry.ts';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { viewportSceneIdentity, viewportRenderOrder } from '../src/viewportScenePolicy.ts';
@@ -19,7 +20,7 @@ const js = ts.transpileModule(declarations.map(node => node.getText(ast)).join('
 }).outputText;
 const prepare = new Function('THREE', 'mergeGeometries', 'viewportSceneIdentity', 'viewportRenderOrder', 'configureImportedMaterial',
   `${js}\nreturn prepareImportedScene;`)(THREE, mergeGeometries, viewportSceneIdentity, viewportRenderOrder, configureImportedMaterial);
-const padPath = new Function('THREE', `${js}\nreturn padPath;`)(THREE);
+const padPath = new Function('THREE', 'proceduralPadDrillPath', `${js}\nreturn padPath;`)(THREE, proceduralPadDrillPath);
 const customPad = padPath({width:2,height:2,drill:0,shape:'custom',customPolygon:[[-1,0],[0,1],[1,0],[0,-1]]},2);
 assert.ok(Math.abs(Math.abs(THREE.ShapeUtils.area(customPad.getPoints())) - 8) < 1e-6, 'custom pad must retain polygon area instead of its rectangular bounds');
 assert.deepEqual(customPad.getPoints().slice(0,4).map(p=>[p.x || 0,p.y || 0]),[[-2,0],[0,-2],[2,0],[0,2]]);

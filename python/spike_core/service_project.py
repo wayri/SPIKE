@@ -74,8 +74,20 @@ def canonicalize_project_payload(raw: Dict[str, Any]) -> tuple[Dict[str, Any], D
     if str(raw.get("format", "")) not in LEGACY_FORMATS:
         raise ProjectPackageError("A project save requires a supported SPIKE snapshot or v3 payload.")
     # Artifact references are admitted after the Save As base is loaded.
-    payload = migrate_legacy_payload(raw, validate_parallel=False)
     design = raw.get("design") if isinstance(raw.get("design"), dict) else {}
+    retained = design.get("canonical_design")
+    if isinstance(retained, dict) and retained.get("contract") == "spike/design-ir/v2":
+        # The desktop projection deliberately carries the exact canonical design.
+        # Its v1 view may reuse source-native numeric IDs across entity kinds;
+        # rebuilding v2 from that lossy view would reject an otherwise valid open
+        # package before the retained canonical record could be restored.
+        SpiDeRV2.from_dict(retained)
+        payload = migrate_legacy_payload(raw, validate_parallel=False, canonical_design=retained)
+    else:
+        payload = migrate_legacy_payload(raw, validate_parallel=False)
+    for key in ("assembly_ir", "assembly_designs", "assembly_package_shapes"):
+        if isinstance(raw.get(key), dict):
+            payload[key] = copy.deepcopy(raw[key])
     source_text = decode_normalized_source(design.get("source_board", ""))
     source_name = Path(str(design.get("source_file") or "embedded.kicad_pcb")).name
     source_artifacts: Dict[str, bytes] = {}
@@ -110,11 +122,23 @@ def canonicalize_project_payload(raw: Dict[str, Any]) -> tuple[Dict[str, Any], D
                         source_name, payload["design_ir"]["source"]["source_digest"],
                     )
                 )
-    retained = design.get("canonical_design")
     if isinstance(retained, dict) and retained.get("contract") == "spike/design-ir/v2":
         current = payload.get("design_ir") or {}
         if retained.get("source", {}).get("source_digest") == current.get("source", {}).get("source_digest"):
             payload["design_ir"] = merge_future_fields(retained, current)
+    retained_set = payload.get("assembly_designs")
+    active_design = payload.get("design_ir")
+    if isinstance(retained_set, dict) and isinstance(active_design, dict):
+        active_id = retained_set.get("active_design_id")
+        if active_id == active_design.get("design_id") and isinstance(retained_set.get("designs"), list):
+            # Import-time model resolution and other owner-approved active-board
+            # updates are applied to design.canonical_design. Keep the duplicate
+            # active record in the retained assembly set synchronized by identity;
+            # all sibling designs and board occurrence links remain untouched.
+            retained_set["designs"] = [
+                copy.deepcopy(active_design) if isinstance(item, dict) and item.get("design_id") == active_id else item
+                for item in retained_set["designs"]
+            ]
     payload["saved_at"] = str(raw.get("saved_at") or "")
     if isinstance(raw.get("workspace"), dict):
         payload["workspace"] = dict(raw["workspace"])

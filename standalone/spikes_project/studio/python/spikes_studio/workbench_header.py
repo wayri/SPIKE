@@ -6,7 +6,7 @@ from .flat_controls import ActionButton
 
 PRIMARY_VIEWS = [('Schematic', 0), ('Waveforms', 1), ('Netlist', 2), ('Dashboard', 13)]
 SCHEMATIC_TOOLS = [('Select', 'edit.box_select'), ('Wire · W', 'edit.wire'),
-    ('Move · M', 'edit.move'), ('Rotate · Space', 'edit.rotate'),
+    ('Move · M', 'edit.move'), ('Duplicate · Ctrl+Shift+D', 'edit.duplicate'), ('Rotate · Space', 'edit.rotate'),
     ('Properties · E', 'edit.properties'), ('Probe V · P', 'probe.voltage'),
     ('Parts', 'view.component_catalog'), ('Fit', 'view.fit_schematic')]
 

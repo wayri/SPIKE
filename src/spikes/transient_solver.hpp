@@ -8,7 +8,10 @@
  * nonlinear DAEs, and direct sparse assembly for sufficiently large linear
  * systems and nonlinear Jacobians. Adaptive runs can reject failed Newton
  * attempts without committing device history. This is not
- * a claim of complete SPICE compatibility.
+ * a claim of complete SPICE compatibility. Opt-in Radau IIA3 is a fixed-step,
+ * two-stage, order-three L-stable method for admitted independent-source linear
+ * index-one RLC circuits; C/V loops and L/I cutsets are rejected. Actual source
+ * jumps use left-limit endpoint samples. It does not run nonlinear/OSDI devices.
  */
 
 #pragma once
@@ -29,6 +32,7 @@ enum class TransientIntegrationMethod {
   backward_euler,
   hybrid_trapezoidal,
   bdf2,
+  radau_iia3,
 };
 
 struct TransientOptions {
@@ -70,6 +74,7 @@ struct TransientDiagnostics {
   std::size_t backward_euler_steps{0};
   std::size_t trapezoidal_steps{0};
   std::size_t bdf2_steps{0};
+  std::size_t radau_iia3_steps{0};
   std::size_t rejected_lte_steps{0};
   std::size_t rejected_newton_steps{0};
   std::size_t embedded_lte_solves{0};
@@ -167,7 +172,7 @@ private:
 };
 
 /**
- * Solve a bounded backward-Euler transient. time_step_s is the maximum step;
+ * Solve a bounded transient with the requested method. time_step_s is the maximum step;
  * PULSE and PWL source breakpoints force smaller steps so source transitions
  * are never crossed without a solve at the edge.
  *

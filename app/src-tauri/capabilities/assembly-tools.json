@@ -2,6 +2,6 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "assembly-tools",
   "description": "Local assembly tool windows communicate with the owning workspace and preserve dirty drafts on native close requests.",
-  "windows": ["spike-assembly-workspace", "spike-assembly-placement", "spike-assembly-managers"],
+  "windows": ["spike-assembly-workspace", "spike-assembly-placement", "spike-assembly-managers", "spike-assembly-view-*"],
   "permissions": ["core:event:default", "core:window:allow-destroy"]
 }

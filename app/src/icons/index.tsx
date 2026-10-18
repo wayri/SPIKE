@@ -43,8 +43,13 @@ export const Microchip = defineIcon("Microchip", "Circuit and SPICE model", "Ele
 export const Plug = defineIcon("Plug", "RF or electrical port", "Electrical", [p("M8 4v6M16 4v6M6 10h12v2a6 6 0 0 1-6 6v3M9 7h6")]);
 export const PlugZap = defineIcon("PlugZap", "Driven source terminal", "Electrical", [p("M7 3v6M15 3v6M5 9h12v2a6 6 0 0 1-6 6v4M14 12l-3 4h3l-2 3")]);
 export const ChartSpline = defineIcon("ChartSpline", "Frequency response curve", "Results", [p("M4 4v16h17M6 16c3-7 5 2 8-5s4-4 7-1"), c(14, 11, 1)]);
-export const Eye = defineIcon("Eye", "Signal eye or visibility", "RF / SI", [p("M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"), c(12, 12, 2.3), p("M8 8l8 8M16 8l-8 8")]);
+// Visibility controls stay distinct from the electrical signal-eye symbol.
+export const Visibility = defineIcon("Visibility", "Show a hidden tool or control", "Application", [p("M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12"), c(12,12,3)]);
+export const VisibilityOff = defineIcon("VisibilityOff", "Hide a tool and retain its state", "Application", [p("m3 3 18 18M9.5 6.3A13 13 0 0 1 12 6c6.5 0 10 6 10 6a19 19 0 0 1-3.1 3.5M6.2 6.8A19 19 0 0 0 2 12s3.5 6 10 6c1.9 0 3.6-.5 5-1.2M10 10a3 3 0 0 0 4 4")]);
+export const SignalEye = defineIcon("SignalEye", "Signal integrity eye diagram", "RF / SI", [p("M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5z"), c(12, 12, 2.3), p("M8 8l8 8M16 8l-8 8")]);
 export const Layers3 = defineIcon("Layers3", "PCB stackup and material layers", "Geometry", [p("M3 8l9-5 9 5-9 5zM5 12l7 4 7-4M5 16l7 4 7-4")]);
+// The generic visibility name always uses the conventional eye glyph.
+export const Eye = Visibility;
 export const Boxes = defineIcon("Boxes", "MCAD assembly solids", "Geometry", [p("M4 7l5-3 5 3-5 3zM4 7v6l5 3 5-3V7M14 10l3-2 4 2-4 2zM14 10v6l3 2 4-2v-6")]);
 export const Cable = defineIcon("Cable", "Harness or bond connection", "Electrical", [p("M5 5h4v4H7v4a5 5 0 0 0 10 0V9h-2V5h4M3 3h2v4H3zM19 3h2v4h-2z")]);
 export const Network = defineIcon("Network", "Connected electrical topology", "Electrical", [c(5, 6, 2), c(19, 6, 2), c(12, 18, 2), p("M7 7l4 9M17 7l-4 9M7 6h10")]);

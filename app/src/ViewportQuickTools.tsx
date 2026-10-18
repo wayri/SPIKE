@@ -1,6 +1,7 @@
 ﻿// SPDX-License-Identifier: Apache-2.0
+import { HideControlIcon as EyeOff } from "./navigationIcons";
 import { useEffect, useRef, useState } from "react";
-import { Activity, Box, CircuitBoard, ClipboardCheck, Eye, Focus, FolderOpen, GripVertical, Layers3, Magnet, MoreHorizontal, Network, Pause, Play, Search, SlidersHorizontal, Square, Target, Thermometer, Unplug, Upload, Waves, type LucideIcon } from "./icons";
+import { Activity, Box, CircuitBoard, ClipboardCheck, Eye, SignalEye, Focus, FolderOpen, GripVertical, Layers3, Magnet, MoreHorizontal, Network, Pause, Play, Search, SlidersHorizontal, Square, Target, Thermometer, Unplug, Upload, Waves, type LucideIcon } from "./icons";
 import ViewportActionMenu, { type ContextMenuGroup } from "./ViewportActionMenu";
 import { quickToolActions, quickToolPosition, runQuickTool, type QuickToolContext } from "./quickToolModel";
 import "./buttonStandard.css";
@@ -8,7 +9,7 @@ import "./ViewportQuickTools.css";
 
 const labels: Record<string,[string,LucideIcon]> = {
   fit:["Fit",Focus], "layer-manager":["Layers",Layers3], "inspect-object":["Inspect",Search], "isolate-net":["Isolate",Eye],
-  "pi-DC IR Drop":["PI setup",Activity], "si-channel":["Channel",Waves], "si-eye":["Eye / mask",Eye], "si-crosstalk":["Crosstalk",Network], "si-ports":["Ports",Unplug],
+  "pi-DC IR Drop":["PI setup",Activity], "si-channel":["Channel",Waves], "si-eye":["Eye / mask",SignalEye], "si-crosstalk":["Crosstalk",Network], "si-ports":["Ports",Unplug],
   probe:["Probe",Target], "thermal-setup":["Thermal setup",Thermometer], "thermal-history":["Temperature",Activity], "thermal-contacts":["Contacts",Network],
   "em-net":["EM domain",Magnet], engines:["Engines",SlidersHorizontal], "model-resolver":["Models",Box], schematic:["Schematic",CircuitBoard],
   "result-plots":["Results",Activity], "trace-plots":["Traces",Waves], playback:["Playback",Play], report:["Report",ClipboardCheck],
@@ -16,7 +17,7 @@ const labels: Record<string,[string,LucideIcon]> = {
   "open-project":["Open",FolderOpen], "import-board":["Import",Upload],
 };
 
-export default function ViewportQuickTools({ groups, context, selectionLabel, summary, onError }: {groups:ContextMenuGroup[];context:QuickToolContext;selectionLabel:string;summary:string[];onError:(message:string)=>void}) {
+export default function ViewportQuickTools({ groups, context, selectionLabel, summary, onError, onHide }: {groups:ContextMenuGroup[];context:QuickToolContext;selectionLabel:string;summary:string[];onError:(message:string)=>void;onHide?:()=>void}) {
   const [more,setMore]=useState<{x:number;y:number}|null>(null),[position,setPosition]=useState(()=>{try{const value=Number(localStorage.getItem("spike.quickTools.position")??.5);return Number.isFinite(value)?Math.min(1,Math.max(0,value)):.5;}catch{return .5;}});
   const root=useRef<HTMLDivElement>(null),bar=useRef<HTMLElement>(null),[travel,setTravel]=useState(0), current=useRef(groups), dragCleanup=useRef<(()=>void)|null>(null);current.current=groups;
   useEffect(()=>()=>dragCleanup.current?.(),[]);
@@ -42,6 +43,7 @@ export default function ViewportQuickTools({ groups, context, selectionLabel, su
         {primary.map(action=>{const [label,Icon]=labels[action.id]??[action.label,SlidersHorizontal];return <button key={action.id} type="button" className={`spike-control--compact ${action.id==="stop"?"spike-control--danger":""}`} disabled={Boolean(action.disabledReason)} title={action.disabledReason??action.description??action.label} aria-label={action.label} onClick={()=>void runQuickTool(action.id,current.current,onError)}><Icon size={15}/><span>{action.id==="isolate-net" && action.label.startsWith("Exit")?"Show all":action.id==="playback" && action.label.startsWith("Pause")?<><Pause size={12}/> Pause</>:label}</span></button>;})}
       </div>
       <button type="button" className="spike-control--compact quick-tools-more" title="All tools for the current selection and workspace" aria-haspopup="menu" aria-expanded={Boolean(more)} onClick={event=>{const bounds=event.currentTarget.getBoundingClientRect();setMore(more?null:{x:bounds.right,y:bounds.bottom+6});}}><MoreHorizontal size={16}/><span>More</span></button>
+      {onHide&&<button type="button" className="spike-control--icon" title="Hide quick tools; show again from View or Settings > Interface" aria-label="Hide quick tools" onClick={()=>{setMore(null);dragCleanup.current?.();onHide();}}><EyeOff size={15}/></button>}
     </nav>
     {more&&<ViewportActionMenu x={more.x} y={more.y} title={selectionLabel} summary={summary} groups={groups} onClose={()=>setMore(null)}/>}
   </div>;

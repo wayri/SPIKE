@@ -14,11 +14,11 @@ const moduleRecord = { exports: {} };
 new Function("require", "exports", "module", compiled)(createRequire(import.meta.url), moduleRecord.exports, moduleRecord);
 const icons = moduleRecord.exports;
 
-assert.equal(icons.workbenchIconInventory.length, 60, "native inventory should stay broad and reviewable");
+assert.equal(icons.workbenchIconInventory.length, 62, "native inventory should stay broad and reviewable");
 assert.equal(new Set(icons.workbenchIconInventory.map(item => item.name)).size, icons.workbenchIconInventory.length, "icon names must be unique");
 assert.ok(new Set(icons.workbenchIconInventory.map(item => item.category)).size >= 6, "inventory should cover every workbench category");
 
-for (const name of ["CircuitBoard", "Grid3X3", "RadioTower", "ThermometerSun", "SquareTerminal", "Search"]) {
+for (const name of ["Visibility", "VisibilityOff", "CircuitBoard", "Grid3X3", "RadioTower", "ThermometerSun", "SquareTerminal", "Search"]) {
   const decorative = renderToStaticMarkup(React.createElement(icons[name], { size: 18, className: "fixture-icon", style: { opacity: .8 } }));
   assert.match(decorative, /viewBox="0 0 24 24"/);
   assert.match(decorative, /xmlns="http:\/\/www\.w3\.org\/2000\/svg"/);
@@ -50,8 +50,10 @@ const sourceFiles = (await readdir(sourceRoot, { recursive: true, withFileTypes:
   .filter(entry => entry.isFile() && /\.(?:ts|tsx)$/.test(entry.name) && !entry.parentPath.endsWith("\\icons"));
 for (const entry of sourceFiles) {
   const text = await readFile(pathToFileURL(`${entry.parentPath}/${entry.name}`), "utf8");
-  const runtimeImports = text.replace(/^import\s+type\b[^;]*from\s+["']lucide-react["'];?\s*$/gm, "");
-  assert.ok(!runtimeImports.includes('from "lucide-react"'), `${entry.name} bypasses the local icon barrel`);
+  assert.ok(!text.includes('from "lucide-react"'), `${entry.name} bypasses the local icon barrel`);
 }
 
 console.log(`Workbench icon pack: ${icons.workbenchIconInventory.length} native icons rendered and verified`);
+
+assert.equal(icons.Eye, icons.Visibility, "visibility must not use the electrical eye-diagram glyph");
+assert.notEqual(icons.SignalEye, icons.Visibility, "signal eye diagrams retain a separate semantic glyph");

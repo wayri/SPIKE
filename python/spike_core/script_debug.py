@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import shutil
 import signal
@@ -116,6 +117,32 @@ def _read_output(path: Path) -> str:
 def _process_alive(pid: Any) -> bool:
     if isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
         return False
+    if os.name == "nt":
+        if pid > 0xFFFFFFFF:
+            return False
+        import ctypes
+        from ctypes import wintypes
+
+        kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+        kernel.OpenProcess.restype = wintypes.HANDLE
+        kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+        kernel.WaitForSingleObject.restype = wintypes.DWORD
+        kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel.CloseHandle.restype = wintypes.BOOL
+        # SYNCHRONIZE alone suffices; never use os.kill(pid, 0) on Windows.
+        # An exited process object may remain available while a handle is held.
+        handle = kernel.OpenProcess(0x00100000, False, pid)
+        if not handle:
+            # ERROR_INVALID_PARAMETER means this PID no longer exists. Denied
+            # access and other probe failures cannot establish that it exited.
+            return ctypes.get_last_error() != 87
+        try:
+            # Only WAIT_OBJECT_0 proves termination; timeout/failure is unknown
+            # or still running and must not synthesize an unexpected-exit result.
+            return kernel.WaitForSingleObject(handle, 0) != 0
+        finally:
+            kernel.CloseHandle(handle)
     try:
         os.kill(pid, 0)
         return True
@@ -166,7 +193,8 @@ def _terminate_process(pid: Any) -> None:
         time.sleep(0.01)
 
 
-def _write_terminal_state(directory: Path, state: dict[str, Any], status: str, reason: str) -> dict[str, Any]:
+def _write_terminal_state(directory: Path, state: dict[str, Any], status: str, reason: str,
+                          *, return_code: int = 1) -> dict[str, Any]:
     updated = {
         "contract": CONTRACT,
         "session_id": state["session_id"],
@@ -174,7 +202,7 @@ def _write_terminal_state(directory: Path, state: dict[str, Any], status: str, r
         "status": status,
         "revision": int(state.get("revision", 0)) + 1,
         "command_ack": int(state.get("command_ack", 0)),
-        "frames": [], "reason": reason, "return_code": 1,
+        "frames": [], "reason": reason, "return_code": return_code,
         "updated_at": time.time(), "pid": state.get("pid"),
     }
     _atomic_json(directory / "state.json", updated)
@@ -210,16 +238,45 @@ def _cleanup_sessions(*, keep: str | None = None) -> None:
             continue
 
 
-def _snapshot(directory: Path, *, touch: bool = True) -> dict[str, Any]:
-    request = _read_json(directory / "request.json")
+def _read_state(directory: Path, request: dict[str, Any]) -> dict[str, Any]:
     state = _read_json(directory / "state.json")
     if state.get("contract") != CONTRACT or state.get("session_id") != request.get("session_id") \
             or state.get("token") != request.get("token"):
         raise ValueError("Python debug session state failed token validation.")
+    return state
+
+
+def _snapshot(directory: Path, *, touch: bool = True) -> dict[str, Any]:
+    request = _read_json(directory / "request.json")
+    state = _read_state(directory, request)
+    if state.get("status") in {"starting", "running", "paused"}:
+        deadline = request.get("deadline")
+        try:
+            valid_deadline = not isinstance(deadline, bool) and isinstance(deadline, (int, float)) \
+                and math.isfinite(deadline)
+        except OverflowError:
+            valid_deadline = False
+        if not valid_deadline:
+            raise ValueError("Python debug session deadline must be finite.")
+        if time.time() >= deadline:
+            # Startup imports precede the child's watchdog. Status polling must
+            # enforce the original request deadline during that interval too.
+            _terminate_process(_state_pid(directory, state))
+            state = _read_state(directory, request)
+            if state.get("status") in {"starting", "running", "paused"}:
+                state = _write_terminal_state(
+                    directory, state, "failed", "Python debug session exceeded its time limit.",
+                    return_code=124,
+                )
     if touch and state.get("status") in {"starting", "running", "paused"}:
         _touch_lease(directory, str(request["token"]))
     if state.get("status") in {"starting", "running", "paused"} and not _process_alive(_state_pid(directory, state)):
-        state = _write_terminal_state(directory, state, "failed", "Python debug child exited unexpectedly.")
+        # The child may have published its terminal state between our read and
+        # the liveness check. Once it has exited, read its final publication
+        # before classifying the exit; otherwise a timeout becomes failed/1.
+        state = _read_state(directory, request)
+        if state.get("status") in {"starting", "running", "paused"}:
+            state = _write_terminal_state(directory, state, "failed", "Python debug child exited unexpectedly.")
     if state.get("status") in {"completed", "failed", "stopped"}:
         pid = _state_pid(directory, state)
         cutoff = time.monotonic() + 0.1

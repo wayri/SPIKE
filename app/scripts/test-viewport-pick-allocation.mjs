@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+import ts from 'typescript';
+import * as THREE from 'three';
+import { importTestTypescript } from './import-test-typescript.mjs';
+const spatial = await importTestTypescript('viewportSpatialIndex');
+const source = readFileSync(process.argv[2] ?? new URL('../src/BoardViewport.tsx', import.meta.url), 'utf8');
+const parsed = ts.createSourceFile('BoardViewport.tsx', source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+let expression;
+function visit(node) {
+  if (ts.isVariableDeclaration(node) && node.name.getText(parsed) === 'exactRaycastCandidates') expression = node.initializer.getText(parsed);
+  ts.forEachChild(node, visit);
+}
+visit(parsed);
+assert.ok(expression, 'Exercise the actual production picking closure');
+const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5), material = new THREE.MeshBasicMaterial();
+const objects = Array.from({length:20000}, (_, i) => { const mesh = new THREE.Mesh(geometry, material); mesh.position.set(i % 200, Math.floor(i / 200), 0); return mesh; });
+const scene = new THREE.Scene(); scene.add(...objects);
+let sourceIterations = 0;
+const first = objects.slice(0,10000), second = objects.slice(10000);
+for (const rows of [first,second]) Object.defineProperty(rows, Symbol.iterator, {value: function* () { sourceIterations++; yield* Array.prototype.values.call(this); }});
+const refs = {pickablesRef:{current:first}, assemblyModelPickablesRef:{current:second}, interactionComplexityRef:{current:20000}, pickablesIndexRef:{current:null}, pickablesRevisionRef:{current:0}};
+const raycaster = new THREE.Raycaster(new THREE.Vector3(20,30,10), new THREE.Vector3(0,0,-1));
+const host = {dataset:{}};
+const code = ts.transpileModule(`var get = ${expression}; get;`, {compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+const query = vm.runInNewContext(code, {...refs, THREE, scene, raycaster, host, ...spatial});
+const cold = query();
+assert.ok(cold.includes(objects[30*200+20]));
+const afterCold = sourceIterations;
+for (let i=0;i<60;i++) assert.deepEqual(query(), cold);
+assert.equal(sourceIterations, afterCold, 'warm indexed picks must not iterate/concatenate every source object');
+objects[30*200+20].position.x = 150;
+refs.pickablesRevisionRef.current++;
+assert.ok(!query().includes(objects[30*200+20]), 'placement revision rebuilds the exact candidate bounds');
+assert.equal(sourceIterations, afterCold+2);
+refs.interactionComplexityRef.current=10;
+assert.deepEqual(Array.from(query()), objects, 'small scenes retain every source in original order');
+geometry.dispose(); material.dispose();
+console.log('Actual viewport closure: 20,000 picks, 60 warm queries, zero warm source traversals; placement invalidation and complete fallback passed.');

@@ -23,6 +23,8 @@ def icon(label,palette):
     elif 'Drag' in label:
         dc.DrawRectangle(4,5,13,13);dc.DrawLine(17,11,24,11);dc.DrawLine(11,18,11,25)
         lines([(18,20),(23,25),(26,17),(18,20)])
+    elif 'Duplicate' in label:
+        dc.DrawRectangle(4,4,13,13);dc.DrawRectangle(10,10,13,13)
     elif 'Interact' in label:
         dc.DrawCircle(12,12,8);lines([(10,8),(10,18),(15,15),(19,21),(22,19),(17,13),(10,8)])
     elif 'Limit' in label:

@@ -24,9 +24,59 @@ class SuggestionTests(unittest.TestCase):
         rows=suggestions('LM358',manufacturers=records);self.assertEqual(rows[0]['kind'],'manufacturer_review')
         rows=suggestions('V(o',nets=['out','other']);self.assertEqual({r['payload'] for r in rows if r['completion']},{'V(out)','V(other)'})
 
+    def test_browse_families_collections_and_availability(self):
+        from spikes_studio.component_catalog import catalog
+        records=catalog()['records']
+        rows=suggestions('',records,category='Discrete')
+        self.assertEqual(len(rows),10)
+        self.assertEqual(len({r['icon'] for r in rows}),10)
+        self.assertEqual(next(r for r in rows if r['icon']=='npn')['kind'],'review')
+        rows=suggestions('',records,category='Circuit-ready')
+        self.assertGreater(len(rows),4)
+        self.assertTrue(all(r['kind']=='component' for r in rows))
+        ids=['generic.npn.010','generic.resistor.012']
+        rows=suggestions('',records,category='Recent',recent=[*ids,ids[0],'missing'])
+        self.assertEqual([r['payload'] for r in rows],ids)
+        rows=suggestions('resistor',records,category='Favorites',favorites=ids)
+        self.assertEqual([r['payload'] for r in rows],[ids[1]])
+        self.assertEqual(suggestions('',records,category='Favorites'),[])
+        rows=suggestions('',records,category='Bench only')
+        self.assertTrue(rows)
+        self.assertTrue(all(r['kind']=='review' for r in rows))
+
+    def test_blank_components_browse_distinct_families_and_search_values(self):
+        from spikes_studio.component_catalog import catalog
+        records=catalog()['records']
+        rows=suggestions('',records,category='Components')
+        self.assertEqual(len({r['payload'] for r in rows}),len(rows))
+        self.assertGreater(len({r['icon'] for r in rows}),10)
+        target=records[37]
+        rows=suggestions(target['id'],records,category=target['category'])
+        self.assertEqual(rows[0]['payload'],target['id'])
+
 
 @unittest.skipUnless(os.environ.get('SPIKES_TEST_WX')=='1','opt-in native wx')
 class QuickInsertTests(unittest.TestCase):
+    def test_collection_filter_and_empty_state(self):
+        import wx
+        from spikes_studio.desktop import Studio
+        from spikes_studio.quick_insert_popup import QuickInsert
+        app=wx.GetApp() or wx.App(False);frame=Studio();popup=None
+        try:
+            popup=QuickInsert(frame,(600,400))
+            popup.category.SetStringSelection('Favorites');popup.refresh()
+            self.assertEqual(popup.rows,[])
+            self.assertIn('No matching',popup.count_label.GetLabel())
+            popup.category.SetStringSelection('Discrete');popup.refresh()
+            self.assertEqual(len(popup.rows),10)
+            popup.list.SetItemState(2,wx.LIST_STATE_SELECTED,wx.LIST_STATE_SELECTED)
+            ident=popup.rows[2]['payload'];popup.refresh()
+            self.assertEqual(popup.rows[popup.list.GetFirstSelected()]['payload'],ident)
+            self.assertEqual(frame.doc.data['metadata'].get('library_browser',{}),{})
+        finally:
+            if popup and not popup.closed:popup.close()
+            frame.timer.Stop();frame.autosave_timer.Stop();frame.Destroy();wx.Yield()
+
     def test_actual_component_editor_and_monitor_binding(self):
         import wx
         from spikes_studio.desktop import Studio

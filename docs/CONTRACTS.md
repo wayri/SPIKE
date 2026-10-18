@@ -1,5 +1,96 @@
 # Versioned Data Contracts
 
+Supplied piecewise line execution uses `spike/rlgc-line-cascade-request/v1`
+and `spike/rlgc-line-cascade-result/v1`, worker `run_rlgc_line_cascade` and CLI
+`rlgc-cascade request.json`. Named sections share an exact positive-frequency
+grid and real wave reference; coherent connection solves retain complete
+section field/loss results, raw interface residuals and global heat balance.
+See [exact schema/units/ownership](RLGC_LINE_CASCADE.md) and
+[ADR 0109](adr/0109-piecewise-rlgc-cascade.md). Ideal series junctions do not
+qualify physical discontinuities or geometry extraction.
+
+
+Driven sampled RLGC fields use `spike/rlgc-line-fields-request/v1` and
+`spike/rlgc-line-fields-result/v1` through `run_rlgc_line_fields`. Exact positive
+frequency grids, coherent RMS incident waves, named fractional probes and
+original supplied constitutive tables produce complex V/I, signed power,
+nominal L/C storage, local losses and integrated conductor/dielectric watts.
+See [exact units, derivation and limits](RLGC_LINE_FIELDS.md) and
+[ADR 0107](adr/0107-driven-rlgc-line-loss-ledger.md). Thermal mapping and feedback
+remain separate; frequencies are independent steady-state cases.
+
+
+Supplied uniform sampled RLGC lines use `spike/rlgc-line-network-request/v1`
+and `spike/rlgc-line-network-result/v1` through `build_rlgc_line_network`.
+Independent nonnegative per-frequency R/G, positive constant L/C/length and a
+common positive real reference produce a named compatible sampled two-port.
+See [exact fields, units, DC and coupling limits](RLGC_LINE_NETWORK.md) and
+[ADR 0106](adr/0106-supplied-rlgc-line-network.md). Sampled execution does not
+qualify broadband causality, geometry extraction or thermal loss deposition.
+
+
+`spike/distortionless-line-transient-request/v1` wraps baseline line controls
+with one nonnegative rate kappa=R/L=G/C. Result/v1 retains source identity,
+attenuated causal waves, derived distributed R/G/attenuation, terminal ownership
+and separate conductor/dielectric loss W/m alongside stored J/m. The explicit
+[Heaviside model and limits](DISTORTIONLESS_LINE_TRANSIENT.md) do not admit
+arbitrary independent lossy RLGC or implicitly execute thermal transfer.
+
+
+`spike/lossless-line-transient-request/v1` supplies uniform positive line
+L/C per length and length, two finite-resistive zero-start PWL sources, named
+fractional-position probes and observations. Result/v1 retains the exact source,
+physical delay/impedance/speed, terminal current orientation/KVL/resistor power,
+traveling waves, signed transport and local stored energy density. See
+[causal distributed model and limits](LOSSLESS_LINE_TRANSIENT.md).
+
+
+`spike/network-reflectometry-request/v1` wraps initialized RLC v2 with an
+explicit network-port probe and positive incident-voltage/current floors.
+Result/v1 retains the actual full parent result, reference, thresholds, voltage
+waves, network V/I, signed instantaneous power and apparent ratios. Unresolved
+ratios are null with explicit reasons; strict schemas enforce status/value
+consistency. See [reference plane and math](NETWORK_REFLECTOMETRY.md).
+
+
+`spike/crosstalk-timing-corners-request/v1` wraps a multi-aggressor request
+with 1–8 named supplied signed-delay maps covering every aggressor. Result/v1
+retains original source, complete shifted corner results and their identities,
+requested-sample finite-family envelopes with attaining corner ids and directly
+verified global witnesses. Endpoint holds and unchanged supplied initial state
+are explicit. See [timing semantics and limits](CROSSTALK_TIMING_CORNERS.md).
+
+
+`spike/multi-aggressor-crosstalk-request/v1` wraps initialized RLC v2 with
+explicit victim, 1–6 aggressor reference voltages and voltage limits. Result/v1
+retains original source, actual baseline, zero-state contributions, requested-time
+signed-family envelopes and two directly verified fixed-pattern traces with
+request digests. See [derivation and API](MULTI_AGGRESSOR_CROSSTALK.md). Cross-field
+identity and finite/resource gates complement strict registered schemas.
+
+
+`spike/rlc-energy-ledger-request/v1` and result/v1 wrap an initialized RLC
+transient with explicit energy-balance tolerances. Result intervals/totals retain
+signed source/network work, nonnegative supplied resistor heat, initial/final
+L/C storage and raw residuals in joules, plus the complete transient result and
+Gramian/work diagnostics. See [semantics and limits](RLC_ENERGY_LEDGER.md).
+
+`spike/rlc-network-transient-request/v2` and result/v2 retain the RLC topology and
+add mandatory supplied state and returned restart state in
+`spike/rlc-initial-state/v1`. Fit-request digest, finite memory dimensions and
+exact positive-L/C port subsets are checked before fitting. Original v1 remains
+zero-state. State records have no clock; restart is at source horizon, not
+necessarily last observation. See [semantics and limits](RLC_INITIAL_STATES.md).
+
+`spike/rlc-network-transient-request/v1` and
+`spike/rlc-network-transient-result/v1` combine supplied series R/L and shunt C
+around an executed rational fit. Require at least one positive L and C across
+the request; C-only ports require positive R. Separate source/network currents,
+both component states/derivatives/energies, resistor watts and KVL/KCL residuals
+retain source-ordered identities. Registered schemas and runtime admission have
+[referenced semantics and limits](RLC_NETWORK_TRANSIENT.md); this is a bounded
+regular stable LTI model, not arbitrary circuit/DAE or thermal qualification.
+
 `spike/capacitive-network-transient-request/v1` and
 `spike/capacitive-network-transient-result/v1` support mixed resistor/shunt-C
 Thevenin boundaries around an executed rational fit. Require at least one C>0,

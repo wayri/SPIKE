@@ -8,10 +8,10 @@ export type AppSettings = {
   coordinateUnit: "mm" | "mil" | "inch";
   temperatureUnit: "C" | "F" | "K";
   significantDigits: number;
-  theme: "professional-dark" | "high-contrast" | "system";
+  theme: "professional-dark" | "light" | "high-contrast" | "system";
   uiScale: number;
   interfaceMode: InterfaceMode;
-  viewportBackground: "dark" | "amoled";
+  viewportBackground: "dark" | "light" | "amoled";
   viewportGrid: boolean;
   renderQuality: "balanced" | "quality" | "performance";
   maximumFps: 30 | 60 | 120;
@@ -19,7 +19,8 @@ export type AppSettings = {
   navigationInertia: boolean;
   selectionBlink: boolean;
   ribbonVisible: boolean;
-  chromeVersion: 2;
+  quickToolsVisible: boolean;
+  chromeVersion: 3;
   extensionUiVisibility: Record<string, { menuBar: boolean; titleBar: boolean }>;
   solverMemoryFraction: number;
   solverMemoryLimitGb: number;
@@ -46,7 +47,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   navigationInertia: false,
   selectionBlink: true,
   ribbonVisible: false,
-  chromeVersion: 2,
+  quickToolsVisible: false,
+  chromeVersion: 3,
   extensionUiVisibility: {},
   solverMemoryFraction: 0.65,
   solverMemoryLimitGb: 2,
@@ -77,11 +79,13 @@ export function loadAppSettings(): AppSettings {
       ...DEFAULT_SETTINGS,
       ...known,
       // Migrate the old always-expanded ribbon once; retain subsequent user choices.
+      theme: saved.theme === "light" || saved.theme === "high-contrast" || saved.theme === "system" ? saved.theme : "professional-dark",
       interfaceMode: saved.interfaceMode === "classic" ? "classic" : "clean",
-      chromeVersion: 2,
-      ribbonVisible: saved.chromeVersion === 2 && typeof saved.ribbonVisible === "boolean" ? saved.ribbonVisible : false,
+      quickToolsVisible: saved.chromeVersion === 3 && saved.quickToolsVisible === true,
+      chromeVersion: 3,
+      ribbonVisible: (saved.chromeVersion === 3 || saved.interfaceMode === "classic") && saved.ribbonVisible === true,
       uiScale: typeof saved.uiScale === "number" && Number.isFinite(saved.uiScale) ? Math.max(.65, Math.min(1.5, saved.uiScale)) : 1,
-      viewportBackground: saved.viewportBackground === "amoled" ? "amoled" : "dark",
+      viewportBackground: saved.viewportBackground === "amoled" ? "amoled" : saved.viewportBackground === "light" ? "light" : "dark",
       viewportGrid: typeof saved.viewportGrid === "boolean" ? saved.viewportGrid : true,
       solverMemoryLimitGb,
       profile: {

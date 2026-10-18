@@ -4,7 +4,7 @@
   "status": "passed",
   "production_qualified": false,
   "sources": {
-    "scripts/parity_pisi_gate.py": "4cdfed268d0a3ad4ddbe79eb564694cc36cdf805ee8b1e5780afea302e540289",
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
     "python/spike_core/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
     "tests/python/test_pdn_transient_consistency.py": "c2e308e8e98196735aea43f4aecf5bb58842a53967d5fc514c9d2bba92292ad4"
   },
@@ -26,6 +26,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/PI04-S01-capacitive-reverified.log",
-  "log_sha256": "709dbc727b9d17e8ce6b8f49997c11b10392095c86de4989791722e8ced736bd"
+  "log": "docs/validation/parity/PI04-S01-star-junction-20261019-reverified.log",
+  "log_sha256": "78b6275d45df8ad8aa3836d71303c6ad5909bec681d38cf826ec422b93e71706"
 }

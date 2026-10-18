@@ -9,9 +9,49 @@ from .component_catalog import native_recipe,FAMILIES
 from .fuzzy_search import score
 
 SORTS=('Name','Category','Family','Primary value','Execution')
+_SUBCKT_HEADER=re.compile(r'^\s*\.subckt\s+([A-Za-z_][A-Za-z0-9_.$+-]*)\b',re.I)
+_SUBCKT_END=re.compile(r'^\s*\.ends(?:\s|$)',re.I)
+
+
+def _subcircuit_blocks(source):
+    """Return exact top-level subcircuit blocks keyed case-insensitively."""
+    blocks={};start=None;name=None;lines=source.splitlines(keepends=True)
+    for index,line in enumerate(lines):
+        header=_SUBCKT_HEADER.match(line)
+        if header:
+            if start is not None:raise ValueError('Nested .subckt definitions are not supported')
+            start=index;name=header.group(1);continue
+        if start is not None and _SUBCKT_END.match(line):
+            block=''.join(lines[start:index+1]).replace('\r\n','\n').rstrip('\n')+'\n'
+            blocks.setdefault(name.casefold(),[]).append((name,block));start=None;name=None
+    if start is not None:raise ValueError(f'Unterminated .subckt definition: {name}')
+    return blocks
+
+
+def _verified_generated_reuse(document_source,generated_source):
+    """Reuse only exact, complete generated definitions; never claim edited source."""
+    expected=_subcircuit_blocks(generated_source)
+    if not expected:raise ValueError('Generated catalog source has no .subckt definition')
+    existing=_subcircuit_blocks(document_source)
+    present={name for name in expected if name in existing}
+    if not present:return False
+    names=', '.join(expected[name][0][0] for name in sorted(expected))
+    if present!=set(expected):
+        raise ValueError(f'Catalog model definition conflict: only part of generated namespace {names} exists; source was not changed')
+    for name,expected_blocks in expected.items():
+        existing_blocks=existing[name]
+        if len(expected_blocks)!=1 or len(existing_blocks)!=1 or existing_blocks[0][1]!=expected_blocks[0][1]:
+            raise ValueError(f'Catalog model definition conflict: existing {expected_blocks[0][0]} is edited or duplicated; source was not changed')
+    return True
 
 
 def primary(record):
+    if record.get('model_type')=='packaged_lumped_device_v1':
+        from .packaged_device_library import primary_value
+        return primary_value(record)
+    if record.get('model_type')=='lumped_physics_part_v1':
+        from .lumped_physics_library import primary_value
+        return primary_value(record)
     key=next(row[1] for row in FAMILIES[record['category']] if row[0]==record['family'])
     return record['parameters'][key]
 
@@ -76,7 +116,11 @@ def insertion_plan(document,record,mapping,*,count=1,x=140,y=180,spacing=220,pri
     source=document.data['source'];suffix=hashlib.sha256(model['source'].encode()).hexdigest()[:12];name=model['name']+'_'+suffix
     definitions=re.search(r'(?im)^\.subckt\s+'+re.escape(name)+r'\s',source)
     plain=primitive and not record.get('model_type') and record['family'] in ('resistor','capacitor','inductor','termination','cable')
-    insertion='' if plain or definitions else model['source'].replace(model['name'],name)
+    generated=model['source'].replace(model['name'],name)
+    if plain:insertion=''
+    elif record.get('model_type'):
+        insertion='' if _verified_generated_reuse(source,generated) else generated
+    else:insertion='' if definitions else generated
     occupied=set(re.findall(r'(?im)^\s*([RXCL]\S+)\s',source));occupied={s.upper() for s in occupied};refs=[];number=1
     for i in range(count):
         prefix={'capacitor':'C','inductor':'L'}.get(record['family'],'R')+'NEW' if plain else 'XCAT'
@@ -99,7 +143,15 @@ def insertion_plan(document,record,mapping,*,count=1,x=140,y=180,spacing=220,pri
         for j,part in enumerate(group):
             part['x']=x+(index%columns)*group_width+(j%2)*140;part['y']=y+(index//columns)*(180+80*len(group))+(j//2)*130
     plan={'source':candidate.data['source'],'components':candidate.data['components'],'title':candidate.data['title'],'refs':refs,'model':name}
-    if record.get('model_type'):plan['passive_model']={'record':deepcopy(record),'compiled_source_sha256':hashlib.sha256(model['source'].encode()).hexdigest()}
+    if record.get('model_type')=='lumped_passive_rlc_v1':
+        plan['passive_model']={'record':deepcopy(record),'compiled_source_sha256':hashlib.sha256(model['source'].encode()).hexdigest()}
+    elif record.get('model_type')=='lumped_physics_part_v1':
+        plan['lumped_physics_model']={'record':deepcopy(record),'compiled_source_sha256':hashlib.sha256(model['source'].encode()).hexdigest(),
+                                      'pins':list(model['pins']),'model_status':record['model_status']}
+    elif record.get('model_type')=='packaged_lumped_device_v1':
+        plan['packaged_device_model']={'record':deepcopy(record),'compiled_source_sha256':hashlib.sha256(model['source'].encode()).hexdigest(),
+                                       'pins':list(model['pins']),'model_status':record['model_status'],
+                                       'core_builder_kind':record['core_builder_kind'],'package_builder':record['package_builder']}
     return plan
 
 
@@ -109,6 +161,8 @@ def apply_insertion(document,plan,record_id):
         preferences=data['metadata'].setdefault('library_browser',{})
         preferences['recent']=[record_id]+[i for i in preferences.get('recent',[]) if i!=record_id][:49]
         if 'passive_model' in plan:data['metadata'].setdefault('passive_models',{})[plan['model']]=deepcopy(plan['passive_model'])
+        if 'lumped_physics_model' in plan:data['metadata'].setdefault('lumped_physics_models',{})[plan['model']]=deepcopy(plan['lumped_physics_model'])
+        if 'packaged_device_model' in plan:data['metadata'].setdefault('packaged_device_models',{})[plan['model']]=deepcopy(plan['packaged_device_model'])
     document.commit(mutate)
 
 

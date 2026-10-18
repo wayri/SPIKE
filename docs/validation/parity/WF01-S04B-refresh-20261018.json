@@ -1,0 +1,302 @@
+{
+  "contract": "spike/parity-stage-evidence/v2",
+  "stage_id": "WF01-S04B",
+  "manifest": "benchmarks/parity-import/native-odb-manifest.json",
+  "summary": {
+    "contract": "spike/board-corpus-benchmark/v2",
+    "status": "passed",
+    "runner_sources": {
+      "scripts/benchmark_board_corpus.py": "1df22dc7374af2c055395b36df59ac144758e7dc2ff60b8ded21f6125b98d6c3",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/contracts.py": "252a1d04297301d4a63615d118e29e6a5c7914936d3b255cf65eef0300d1314a",
+      "python/spike_core/importers.py": "248d48b2d8cf72fb11aedc360bdc860ef62967d3c5983baf6251078eddc17146",
+      "python/spike_core/source_package.py": "c57670b2882c30cd18b5963decfa51ee139a2b0aba20804fc0b22aaeb11f2cf9",
+      "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+      "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+      "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+      "python/core/filled_polygon_offset.py": "a349c830f77ec7c3b82f787a5e25875bbf2de63a2a958d7229a80a853a80e884",
+      "python/core/simple_polygon_union.py": "683ab0bbc74be4b8b8363f0090909781fa998a85e5325c7a453e0b4942801a0f",
+      "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+      "python/spike_core/odb_importer.py": "09fe71f2732eb95f5006f9dacdad9b094e14fd20f2fe91d3d6f0c9d7ea30cf1b",
+      "python/spike_core/odb_features.py": "393bbb3a4a2b027d8b291ad74863e5a12ea23ed242103f7d9ad28e2894c14edd",
+      "python/spike_core/odb_stackup.py": "7c51d02e64965435c7b700be24ef1b09501bbda59ce9932974daf9a7a0b7fba1",
+      "python/spike_core/odb_source_inspection.py": "93597ce95895dce3aa4a085f7a2962421a70cef61db9489b4655f900f88d6ddc",
+      "schemas/board-enrichment-v1.schema.json": "b19a8c06b5bc4d17066b05ff7158c64d808d6b962b1c75075d48848e0acd77b1",
+      "extensions/odb-import/extension.py": "22a8549d79bce15286c0c6d739892e0c70d3b66894cdfbc564e60aaeca6dde46",
+      "python/spike_core/arc_legacy_projection.py": "ac80beed70089e90ff3184ec5482c7d778a95f64c9d26c488dd50f0b0b8ea047",
+      "python/spike_core/board_outline_geometry.py": "9ab3703d6906ca758c993b34c7d86972e5dea31e3e56242d0328f5d524af9634",
+      "python/spike_core/mcad_export_design.py": "ae1b150555f2de8a52cf13c02cfc28459679c6f7556bbb527eede7cf9e5c27a1",
+      "python/spike_core/mcad_export_contract.py": "f5815ca7d32598795e490234500191e11e466f9695197434a27249edfada13e0",
+      "python/spike_core/assembly_frames.py": "e718ccb2d75ae4370b37043f8fa60be144019fd1b3e459382f91ab2fe93b5c70",
+      "schemas/mcad-assembly-v1.schema.json": "26e8188fe4a7efd8fa0444caaf9f89f9c5fbee330dd466fd31c56db5c8666c71",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/pcb_volume_compiler.py": "41c939afc72275a87208a52f900c084794daeca40936f87bdb82a6331eb67cba",
+      "python/spike_core/geometry_arrow.py": "cf34e0c6e2259104317ef9b748d63589703f787d6f39523946ecf52917e854f6",
+      "python/spike_core/spikes_layout_geometry_handoff.py": "220fc2b515f16aaf792404c4cf0df487085a54dfe33652a9b1c74fe01691e537",
+      "scripts/parity_geometry_gate.py": "f3cf39867826203adf1459a4a8ec7e6a31e9a3761fede23a5b15aaeb7b7d9f8e",
+      "scripts/capture_parity_native_geometry.py": "0cda49f707aa5f38857a320650483381c22b2d94eb4cd8dc69135beea304eece",
+      "scripts/parity_native_geometry_gate.py": "1c91e5ecb40017fcae50f8247c0fe3724a6c11c99c53dcddf068bfcf76621f39",
+      "app/src/boardParser.ts": "6387d792de9370a3597a593a605fd376605aac59cdf20facf7d74576db4b28ef",
+      "app/src/normalizedBoard.ts": "aa10b18dec274718620d3d084099cd24de3114adc6498203519745673e280479",
+      "python/spike_core/mcad_component_models.py": "f72f3e769eafce15881c5444537c1e4210267ef6ae41379355fd98f5565f4de3",
+      "scripts/parity_component_model_gate.py": "4895069034032a71f9cc8eac4ef00c5dbd42d8b82a399ee5e29462fc6f80f1c2"
+    },
+    "runner_sources_after": {
+      "scripts/benchmark_board_corpus.py": "1df22dc7374af2c055395b36df59ac144758e7dc2ff60b8ded21f6125b98d6c3",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/contracts.py": "252a1d04297301d4a63615d118e29e6a5c7914936d3b255cf65eef0300d1314a",
+      "python/spike_core/importers.py": "248d48b2d8cf72fb11aedc360bdc860ef62967d3c5983baf6251078eddc17146",
+      "python/spike_core/source_package.py": "c57670b2882c30cd18b5963decfa51ee139a2b0aba20804fc0b22aaeb11f2cf9",
+      "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+      "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+      "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+      "python/core/filled_polygon_offset.py": "a349c830f77ec7c3b82f787a5e25875bbf2de63a2a958d7229a80a853a80e884",
+      "python/core/simple_polygon_union.py": "683ab0bbc74be4b8b8363f0090909781fa998a85e5325c7a453e0b4942801a0f",
+      "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+      "python/spike_core/odb_importer.py": "09fe71f2732eb95f5006f9dacdad9b094e14fd20f2fe91d3d6f0c9d7ea30cf1b",
+      "python/spike_core/odb_features.py": "393bbb3a4a2b027d8b291ad74863e5a12ea23ed242103f7d9ad28e2894c14edd",
+      "python/spike_core/odb_stackup.py": "7c51d02e64965435c7b700be24ef1b09501bbda59ce9932974daf9a7a0b7fba1",
+      "python/spike_core/odb_source_inspection.py": "93597ce95895dce3aa4a085f7a2962421a70cef61db9489b4655f900f88d6ddc",
+      "schemas/board-enrichment-v1.schema.json": "b19a8c06b5bc4d17066b05ff7158c64d808d6b962b1c75075d48848e0acd77b1",
+      "extensions/odb-import/extension.py": "22a8549d79bce15286c0c6d739892e0c70d3b66894cdfbc564e60aaeca6dde46",
+      "python/spike_core/arc_legacy_projection.py": "ac80beed70089e90ff3184ec5482c7d778a95f64c9d26c488dd50f0b0b8ea047",
+      "python/spike_core/board_outline_geometry.py": "9ab3703d6906ca758c993b34c7d86972e5dea31e3e56242d0328f5d524af9634",
+      "python/spike_core/mcad_export_design.py": "ae1b150555f2de8a52cf13c02cfc28459679c6f7556bbb527eede7cf9e5c27a1",
+      "python/spike_core/mcad_export_contract.py": "f5815ca7d32598795e490234500191e11e466f9695197434a27249edfada13e0",
+      "python/spike_core/assembly_frames.py": "e718ccb2d75ae4370b37043f8fa60be144019fd1b3e459382f91ab2fe93b5c70",
+      "schemas/mcad-assembly-v1.schema.json": "26e8188fe4a7efd8fa0444caaf9f89f9c5fbee330dd466fd31c56db5c8666c71",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/pcb_volume_compiler.py": "41c939afc72275a87208a52f900c084794daeca40936f87bdb82a6331eb67cba",
+      "python/spike_core/geometry_arrow.py": "cf34e0c6e2259104317ef9b748d63589703f787d6f39523946ecf52917e854f6",
+      "python/spike_core/spikes_layout_geometry_handoff.py": "220fc2b515f16aaf792404c4cf0df487085a54dfe33652a9b1c74fe01691e537",
+      "scripts/parity_geometry_gate.py": "f3cf39867826203adf1459a4a8ec7e6a31e9a3761fede23a5b15aaeb7b7d9f8e",
+      "scripts/capture_parity_native_geometry.py": "0cda49f707aa5f38857a320650483381c22b2d94eb4cd8dc69135beea304eece",
+      "scripts/parity_native_geometry_gate.py": "1c91e5ecb40017fcae50f8247c0fe3724a6c11c99c53dcddf068bfcf76621f39",
+      "app/src/boardParser.ts": "6387d792de9370a3597a593a605fd376605aac59cdf20facf7d74576db4b28ef",
+      "app/src/normalizedBoard.ts": "aa10b18dec274718620d3d084099cd24de3114adc6498203519745673e280479",
+      "python/spike_core/mcad_component_models.py": "f72f3e769eafce15881c5444537c1e4210267ef6ae41379355fd98f5565f4de3",
+      "scripts/parity_component_model_gate.py": "4895069034032a71f9cc8eac4ef00c5dbd42d8b82a399ee5e29462fc6f80f1c2"
+    },
+    "source_snapshot_stable": true,
+    "python_version": "3.12.9 (main, Feb  8 2026, 03:56:09) [MSC v.1950 64 bit (AMD64)]",
+    "manifest_sha256": "f4eeb8e9c9cb4e6776d7c8e0a81ec00dffc3f38a4f57748d854fdc200c2b342b",
+    "manifest_sha256_after": "f4eeb8e9c9cb4e6776d7c8e0a81ec00dffc3f38a4f57748d854fdc200c2b342b",
+    "production_qualified": false,
+    "scope": "CLI import status, canonical units/identity, pinned source and optional independent counts/entity values; no viewport or physics validation",
+    "boards": [
+      {
+        "fixture": "geometry-native-odb-qualified.zip",
+        "source_url": "repository:benchmarks/parity-import/geometry.kicad_pcb (KiCad 10.0.6 native ODB writer; generated font omitted)",
+        "license": "Apache-2.0",
+        "sha256": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+        "command": [
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\.venv\\Scripts\\python.exe",
+          "-m",
+          "python.spike_core.cli",
+          "--quiet",
+          "--output",
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\parity-refresh-wf01-s04b-20261018-r2\\000-import.json",
+          "import",
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\benchmarks\\parity-import\\geometry-native-odb-qualified.zip",
+          "--report",
+          "--format",
+          "odb++"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "counts": {
+          "materials": 4,
+          "layers": 8,
+          "nets": 1,
+          "tracks": 0,
+          "arcs": 1,
+          "zones": 0,
+          "pads": 1,
+          "vias": 0,
+          "drills": 0,
+          "castellations": 0,
+          "pins": 1,
+          "components": 1,
+          "regions": 0,
+          "models": 0
+        },
+        "mismatches": {},
+        "import_status": "completed_with_warnings",
+        "errors": [],
+        "diagnostics": [],
+        "source_issues": [
+          {
+            "code": "ODB_STACKUP_MISSING",
+            "severity": "warning",
+            "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          },
+          {
+            "code": "ODB_MODELS_MISSING",
+            "severity": "warning",
+            "message": "No explicit component 3D model assignments were supplied.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          }
+        ],
+        "inferred": [
+          {
+            "code": "ODB_STACKUP_MISSING",
+            "severity": "warning",
+            "message": "Physical stackup requires resolved thickness/material data; matrix order is retained.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          },
+          {
+            "code": "ODB_MODELS_MISSING",
+            "severity": "warning",
+            "message": "No explicit component 3D model assignments were supplied.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          }
+        ],
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving."
+            ]
+          },
+          "pi_ac": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          },
+          "si": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          },
+          "thermal": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving."
+            ]
+          },
+          "emi": {
+            "ready": false,
+            "reasons": [
+              "ODB++ copper requires explicit layer thickness before solving.",
+              "Stackup or dielectric material data is incomplete."
+            ]
+          }
+        },
+        "geometry_mismatches": [],
+        "entity_assertions_checked": 14,
+        "source_digest_checked": true,
+        "passed": true,
+        "source_sha256_after": "3f02f6b198854f817bd2b393cc91cf2993570d47ccf85f48afab1e21ac912d9e",
+        "elapsed_s": 6.937
+      }
+    ]
+  },
+  "scope": "KiCad 10.0.6 native ODB export/import fidelity for one exact arc, one pad/component/net and straight profile with one cutout; no material, model-composition or physics qualification.",
+  "history": "docs/validation/parity/WF01-S04B-progress.json",
+  "source_omissions": [
+    "Generated fonts/standard excluded from redistributed geometry-only archive.",
+    "Native export has no physical stackup/model assignment; missing data remain diagnostic and every solver-readiness flag false."
+  ],
+  "native_export_gate": {
+    "native_file": "docs/validation/parity/WF01-S04B-native-geometry.json",
+    "native_sha256": "b477a9a57c457ad76f1c02739d43cac73df1b812c044dbbc4f1d65695d85afdc",
+    "import_file": "docs/validation/parity/WF01-S04B-import-refresh-20261018.json",
+    "import_sha256": "6aadb46d1c4cda34f33021db1b3db60abe9a0344d619193eace3e6def09fde20",
+    "source": "benchmarks/parity-import/geometry.kicad_pcb",
+    "gate_runner_sha256": "1c91e5ecb40017fcae50f8247c0fe3724a6c11c99c53dcddf068bfcf76621f39"
+  },
+  "native_pad_frame_recheck": {
+    "native_pose_cases": 48,
+    "native_shape_cases": 8,
+    "point_tolerance_mm": 1e-06,
+    "bbox_tolerance_mm": 2e-06,
+    "note": "Native integer grid rounding; source angle/size assertions retain their original 1e-9 tolerances. Historical angle oracle error is preserved, not treated as qualification."
+  },
+  "verification": {
+    "native_geometry": {
+      "pose_cases": 48,
+      "supported_shape_cases": 8,
+      "status": "passed"
+    },
+    "native_odb_cli": {
+      "assertions": 14,
+      "status": "passed"
+    },
+    "focused_tests": {
+      "tests": 58,
+      "status": "passed",
+      "elapsed_s": 11.503,
+      "log": "build/parity-stage04b-native-final-focused.log"
+    },
+    "downstream_geometry_import_tests": {
+      "tests": 81,
+      "status": "passed",
+      "elapsed_s": 59.512,
+      "log": "build/parity-stage04b-post-frame-numerical.log"
+    },
+    "frontend": {
+      "status": "passed",
+      "checks": [
+        "test-board-parser.mjs",
+        "test-normalized-board.mjs",
+        "test-assembly-board-scene.mjs",
+        "tsc --noEmit"
+      ]
+    },
+    "architecture": "passed",
+    "backlog": "passed",
+    "documentation_files": 5,
+    "full_python_suite": {
+      "status": "failed",
+      "tests": 3761,
+      "failures": 2,
+      "errors": 1,
+      "skipped": 69,
+      "elapsed_s": 1599.904,
+      "log": "build/parity-stage04b-post-frame-full-python.log",
+      "reported_failures": [
+        "test_emerge_gerber.EMergeGerberTests.test_real_filebasedpcb_loads_units_clear_region_and_native_mesh: native subprocess exceeded its 60-second limit.",
+        "test_peec_volume_adapter.VolumeAdapterTests.test_optional_marble_ports_reflect_copper_connectivity: old isolation oracle contradicted native KiCad; subsequently corrected with native source-bound evidence and passing eight-test module.",
+        "test_python_debug.PythonDebugTest.test_parent_admits_design_bound_result: starting did not reach completed/failed within the 4-second deadline."
+      ],
+      "followup": "Native Gerber timeout reproduced unchanged earlier. Debug deadline failures remain unresolved. Marble oracle correction passed with no-zone separation controls. Full suite was not rerun after the test-only oracle correction; no zero-failure full-suite claim."
+    },
+    "historical_runtime_failures": "docs/validation/parity/WF01-S04B-progress.json",
+    "limitation": "Bounded import/source/display geometry acceptance only; no full-format, physical solver or release qualification.",
+    "marble_connectivity_oracle_correction": {
+      "native_file": "docs/validation/parity/WF01-S04B-marble-native-connectivity.json",
+      "native_sha256": "521cf825daa06cf0f0e5f98545933dee08480c53a3a42d523ab480dd0712e5ee",
+      "result": "Native saved copper connects C383.1, U37.18 and R195.1 through the shared B.Cu zone; old isolation assertion corrected.",
+      "negative_control": "Removing zones separates C383.1 and R195.1 from U37.18.",
+      "corrected_module": {
+        "tests": 8,
+        "status": "passed",
+        "elapsed_s": 13.347,
+        "log": "build/parity-stage04b-marble-corrected.log"
+      },
+      "historical_failure_log": "build/parity-stage04b-marble-connectivity.log"
+    },
+    "current_cli_replay": {
+      "status": "passed",
+      "output_directory": "build/parity-import-stage04b-s04c-reviewed",
+      "note": "Actual CLI replay after explicit component-solid handoff; previous broader-suite records remain historical."
+    }
+  },
+  "import_evidence": {
+    "file": "docs/validation/parity/WF01-S04B-import-refresh-20261018.json",
+    "sha256": "6aadb46d1c4cda34f33021db1b3db60abe9a0344d619193eace3e6def09fde20"
+  }
+}

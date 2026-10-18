@@ -1,3 +1,4 @@
+import { HideControlIcon, CloseControlIcon } from "./navigationIcons";
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useState } from "react";
 import { availableEMQuantities, emResultFrequencies, emViewportPayload, type EMViewportRecord, type EMViewportSettings, type EMViewportData } from "./emViewportResults";
@@ -37,7 +38,7 @@ export default function EMViewportResultManager({ records, activeRecordId, setti
   };
   if (minimized) return null;
   return <aside className="em-viewport-manager" aria-label="EM viewport result manager" onPointerDown={event => event.stopPropagation()} onWheel={event => event.stopPropagation()}>
-    <header><strong>EM RESULT MANAGER</strong><span className="em-manager-heading-actions"><button aria-label="Minimize EM result manager" title="Minimize to the bottom tool shelf" onClick={minimize}>−</button><button aria-label="Close EM result manager" onClick={onClose}>×</button></span></header>
+    <header><strong>EM RESULT MANAGER</strong><span className="em-manager-heading-actions"><button type="button" className="spike-control--icon" aria-label="Minimize EM result manager" title="Hide; restore with Show hidden tools" onClick={minimize}><HideControlIcon size={14}/></button><button type="button" className="spike-control--icon" aria-label="Close EM result manager" title="Close EM result manager" onClick={onClose}><CloseControlIcon size={14}/></button></span></header>
     <div className="em-manager-body">
       {!active ? <p className="em-manager-empty">Run a supported EM extension to add solved results to this viewport.</p> : <>
         <div className="em-manager-controls">

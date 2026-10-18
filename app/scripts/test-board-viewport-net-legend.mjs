@@ -27,10 +27,10 @@ assert.ok(m.viewportNetRows(many).length>=300);
 const compiled=ts.transpileModule(readFileSync(new URL('../src/ViewportNetViewer.tsx',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText;
 const require=createRequire(import.meta.url);
 const minimized=new Map(),minimizedApi={minimizeTool:item=>{minimized.set(item.id,item);return true;},removeMinimizedTool:id=>minimized.delete(id)};
-function loadPanel(react){const module={exports:{}};new Function('require','module','exports',compiled)(name=>name==='react'?react:name==='./viewportNetViewerModel'?m:name==='./minimizedTools'?minimizedApi:name.endsWith('.css')?{}:require(name),module,module.exports);return module.exports.default;}
+function loadPanel(react){const module={exports:{}};new Function('require','module','exports',compiled)(name=>name==='react'?react:name==='./icons'?require('lucide-react'):name==='./navigationIcons'?{ExpandControlIcon:require('lucide-react').ChevronDown,CollapseControlIcon:require('lucide-react').ChevronUp,HideControlIcon:require('lucide-react').EyeOff}:name==='./viewportNetViewerModel'?m:name==='./minimizedTools'?minimizedApi:name.endsWith('.css')?{}:require(name),module,module.exports);return module.exports.default;}
 const props={boardKey:'B',boardName:'Power B with a long occurrence name',rows,assembly:true,available:true,selectedIds:['n2'],onSelect:()=>{}};
 const markup=renderToStaticMarkup(React.createElement(loadPanel(React),props));
-assert.match(markup,/Search board nets/);assert.match(markup,/Minimize net viewer/);assert.doesNotMatch(markup,/ONLY_A/);assert.match(markup,/aria-pressed="true"/);
+assert.match(markup,/Search board nets/);assert.match(markup,/Hide net viewer/);assert.doesNotMatch(markup,/ONLY_A/);assert.match(markup,/aria-pressed="true"/);
 assert.doesNotMatch(markup,/n2|Selected board · B/,'canonical and occurrence IDs stay in callbacks and keys, not visible net-viewer text');
 let state=[],cursor=0;const chosen=[];
 const Panel=loadPanel({useState(initial){const i=cursor++;if(!(i in state))state[i]=initial;return[state[i],v=>state[i]=typeof v==='function'?v(state[i]):v];},useMemo:fn=>fn(),useEffect:()=>{}});
@@ -39,9 +39,14 @@ function nodes(tree){if(!tree||typeof tree!=='object')return[];return[tree,...Re
 let tree=render();nodes(tree).find(n=>n.type==='button'&&n.props.title?.startsWith('VCC')).props.onClick();assert.deepEqual(chosen,[{boardId:'B',netId:'n2'}]);
 nodes(tree).find(n=>n.type==='input').props.onChange({target:{value:'only_b'}});
 assert.deepEqual(nodes(render()).filter(n=>n.type==='button'&&n.props.title?.includes(' · ')).map(n=>n.props.title.split(' · ')[0]),['ONLY_B']);
-nodes(tree).find(n=>n.props['aria-label']==='Minimize net viewer').props.onClick();assert.equal(render(),null);
+nodes(render()).find(n=>n.props['aria-label']==='Collapse net viewer').props.onClick();
+assert.equal(nodes(render()).find(n=>n.props.className==='viewport-net-viewer__body').props.hidden,true);
+assert.equal(nodes(render()).find(n=>n.type==='input').props.value,'only_b','collapse retains the search input and query');
+nodes(render()).find(n=>n.props['aria-label']==='Expand net viewer').props.onClick();
+assert.equal(nodes(render()).find(n=>n.props.className==='viewport-net-viewer__body').props.hidden,false);
+nodes(tree).find(n=>n.props['aria-label']==='Hide net viewer').props.onClick();assert.equal(render(),null);
 assert.equal(minimized.get('viewport-board-nets').label,'Power B with a long occurrence name');
-minimized.get('viewport-board-nets').restore();assert.equal(nodes(render()).some(n=>n.type==='input'),true);
+minimized.get('viewport-board-nets').restore();assert.equal(nodes(render()).find(n=>n.type==='input').props.value,'only_b','shelf restore preserves the net query');
 const viewport=readFileSync(new URL('../src/BoardViewport.tsx',import.meta.url),'utf8');assert.match(viewport,/onAssemblyNetSelect\?\.\(netViewerScope\.occurrence\.id, row\.id\)/);
 console.log('Net viewer scoping, canonical IDs, complete inventory, search, row selection, bottom-shelf minimize/restore and accessible rendering passed');
 

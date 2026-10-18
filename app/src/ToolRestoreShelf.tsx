@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useMemo, useState } from "react";
-import { PanelTopOpen, X } from "./icons";
+import { ShowControlIcon as PanelTopOpen, CloseControlIcon as X } from "./navigationIcons";
 import {
   closeMinimizedTool,
   minimizedToolSnapshot,

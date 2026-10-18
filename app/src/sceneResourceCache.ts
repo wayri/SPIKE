@@ -10,12 +10,57 @@ const sharedGeometries = new WeakSet<THREE.BufferGeometry>();
 const sharedTextures = new WeakSet<THREE.Texture>();
 const releases = new WeakMap<THREE.Object3D, () => void>();
 
+function collectNestedTextures(value: unknown, textures: Set<THREE.Texture>, visited: Set<object>) {
+  if (value instanceof THREE.Texture) { textures.add(value); return; }
+  if (!value || typeof value !== "object" || visited.has(value)) return;
+  visited.add(value);
+  if (Array.isArray(value)) value.forEach(item => collectNestedTextures(item, textures, visited));
+  else Object.values(value).forEach(item => collectNestedTextures(item, textures, visited));
+}
+
+function restoreSharedNestedTextures(copy: unknown, source: unknown, visited: WeakMap<object, WeakSet<object>>): unknown {
+  if (source instanceof THREE.Texture) return source;
+  if (!copy || !source || typeof copy !== "object" || typeof source !== "object") return copy;
+  let destinations = visited.get(source);
+  if (destinations?.has(copy)) return copy;
+  if (!destinations) { destinations = new WeakSet<object>(); visited.set(source, destinations); }
+  destinations.add(copy);
+  if (Array.isArray(copy) && Array.isArray(source)) {
+    for (let index = 0; index < Math.min(copy.length, source.length); index++) {
+      const restored = restoreSharedNestedTextures(copy[index], source[index], visited);
+      if (restored !== copy[index]) copy[index] = restored;
+    }
+  } else {
+    for (const key of Object.keys(source)) if (key in copy) {
+      const target = copy as Record<string, unknown>;
+      const original = source as Record<string, unknown>;
+      const restored = restoreSharedNestedTextures(target[key], original[key], visited);
+      if (restored !== target[key]) target[key] = restored;
+    }
+  }
+  return copy;
+}
+
+function restoreSharedSceneTextures(copy: THREE.Object3D, source: THREE.Object3D) {
+  if (copy instanceof THREE.Scene && source instanceof THREE.Scene) {
+    if (source.background instanceof THREE.Texture) copy.background = source.background;
+    if (source.environment instanceof THREE.Texture) copy.environment = source.environment;
+  }
+  for (let index = 0; index < Math.min(copy.children.length, source.children.length); index++) {
+    restoreSharedSceneTextures(copy.children[index], source.children[index]);
+  }
+}
+
 function resourcesOf(root: THREE.Object3D): Resources {
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
   const textures = new Set<THREE.Texture>();
   const buffers = new Set<ArrayBufferLike>();
   root.traverse(object => {
+    if (object instanceof THREE.Scene) {
+      if (object.background instanceof THREE.Texture) textures.add(object.background);
+      if (object.environment instanceof THREE.Texture) textures.add(object.environment);
+    }
     if (object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Points) {
       geometries.add(object.geometry);
       for (const material of Array.isArray(object.material) ? object.material : [object.material]) materials.add(material);
@@ -28,8 +73,13 @@ function resourcesOf(root: THREE.Object3D): Resources {
   }
   let bytes = 0;
   buffers.forEach(buffer => { bytes += buffer.byteLength; });
-  for (const material of materials) for (const value of Object.values(material)) {
-    if (value instanceof THREE.Texture) textures.add(value);
+  for (const material of materials) {
+    for (const value of Object.values(material)) if (value instanceof THREE.Texture) textures.add(value);
+    if (material instanceof THREE.ShaderMaterial) {
+      const visited = new Set<object>();
+      collectNestedTextures(material.uniforms, textures, visited);
+      collectNestedTextures(material.uniformsGroups, textures, visited);
+    }
   }
   // Include decoded texture storage (plus mipmaps), rather than compressed GLB size.
   for (const texture of textures) {
@@ -142,10 +192,18 @@ export class SceneResourceCache {
     try {
       const source = await entry.loading;
       const clone = source.clone(true);
+      restoreSharedSceneTextures(clone, source);
       const materials = new Map<THREE.Material, THREE.Material>();
       const independent = (material: THREE.Material) => {
         let copy = materials.get(material);
-        if (!copy) { copy = material.clone(); materials.set(material, copy); }
+        if (!copy) {
+          copy = material.clone();
+          if (material instanceof THREE.ShaderMaterial && copy instanceof THREE.ShaderMaterial) {
+            restoreSharedNestedTextures(copy.uniforms, material.uniforms, new WeakMap<object, WeakSet<object>>());
+            restoreSharedNestedTextures(copy.uniformsGroups, material.uniformsGroups, new WeakMap<object, WeakSet<object>>());
+          }
+          materials.set(material, copy);
+        }
         return copy;
       };
       clone.traverse(object => {

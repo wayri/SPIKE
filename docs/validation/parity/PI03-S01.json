@@ -4,7 +4,7 @@
   "status": "passed",
   "production_qualified": false,
   "sources": {
-    "scripts/parity_pisi_gate.py": "4cdfed268d0a3ad4ddbe79eb564694cc36cdf805ee8b1e5780afea302e540289",
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
     "python/spike_core/pdn_decap_corners.py": "63f2bc5eb9b5e98366064f6a23c51fd2f4497301f4db0c78a64c19ec67ab7d7f",
     "python/spike_core/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
     "python/spike_core/service_pdn_network.py": "3252f731ef0cb4f586c7a1e64ef3a0300a43312e505c4af812b9823a9ff7c7ec",
@@ -35,6 +35,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/PI03-S01-capacitive-reverified.log",
-  "log_sha256": "9c06763ac73212440574d71d5c50c559813edc5e611888f3b0a46d8ba18e211a"
+  "log": "docs/validation/parity/PI03-S01-star-junction-20261019-reverified.log",
+  "log_sha256": "7ea8f3fc9d6c85a875b700a95f22db8e427656ca920bf049af65af3a83adbc54"
 }

@@ -14,6 +14,7 @@ bool near(double actual, double expected, double tolerance = 2.0e-12) {
 void c_abi_exposes_rc_transient_samples_and_diagnostics() {
   assert(spikes_abi_version() == 1u);
   assert(SPIKES_TRANSIENT_API_VERSION == 1u);
+  assert(SPIKES_INTEGRATION_RADAU_IIA3 == 3u);
   spikes_circuit *circuit = nullptr;
   assert(spikes_circuit_create(&circuit) == SPIKES_OK);
   assert(spikes_circuit_add_voltage_source(circuit, "V1", "vin", "0", 1.0) ==
@@ -90,6 +91,10 @@ void c_abi_exposes_rc_transient_samples_and_diagnostics() {
              result, &backward_euler_steps, &trapezoidal_steps) == SPIKES_OK);
   assert(backward_euler_steps == 10u);
   assert(trapezoidal_steps == 0u);
+  size_t radau_iia3_steps = 99u;
+  assert(spikes_transient_result_radau_iia3_steps(
+             result, &radau_iia3_steps) == SPIKES_OK);
+  assert(radau_iia3_steps == 0u);
 
   assert(spikes_transient_result_point_time(result, 10, &value) ==
          SPIKES_NOT_FOUND);
@@ -115,6 +120,31 @@ void c_abi_exposes_rc_transient_samples_and_diagnostics() {
   assert(reuses == 8u);
   assert(cache_entries == 2u);
   spikes_transient_result_destroy(result);
+
+  result = nullptr;
+  assert(spikes_solve_transient_with_method(
+             circuit, &options, SPIKES_INTEGRATION_RADAU_IIA3,
+             &result) == SPIKES_OK);
+  assert(result != nullptr);
+  assert(spikes_transient_result_status(result) == SPIKES_SOLVE_CONVERGED);
+  backward_euler_steps = 99u;
+  trapezoidal_steps = 99u;
+  radau_iia3_steps = 0u;
+  assert(spikes_transient_result_integration_diagnostics(
+             result, &backward_euler_steps, &trapezoidal_steps) == SPIKES_OK);
+  assert(spikes_transient_result_radau_iia3_steps(
+             result, &radau_iia3_steps) == SPIKES_OK);
+  assert(backward_euler_steps == 0u);
+  assert(trapezoidal_steps == 0u);
+  assert(radau_iia3_steps > 0u);
+  spikes_transient_result_destroy(result);
+
+  result = reinterpret_cast<spikes_transient_result *>(1);
+  assert(spikes_solve_transient_adaptive(
+             circuit, &options, SPIKES_INTEGRATION_RADAU_IIA3, 1u,
+             1.0e-8, 1.0e-6, 1.0e-3, 100u, &result) ==
+         SPIKES_INVALID_ARGUMENT);
+  assert(result == nullptr);
 
   result = reinterpret_cast<spikes_transient_result *>(1);
   assert(spikes_solve_transient_with_method(circuit, &options, 99u, &result) ==

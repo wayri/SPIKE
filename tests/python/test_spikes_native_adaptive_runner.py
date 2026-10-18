@@ -156,6 +156,28 @@ class AdaptiveRunnerForwardingTests(unittest.TestCase):
         self.assertEqual(options["minimum_time_step_s"], 1.0e-15)
         self.assertEqual(options["max_rejected_steps"], 10_000)
 
+    def test_radau_breakpoint_sampling_provenance_is_method_specific(self):
+        project = parse_netlist("V1 out 0 1\nR1 out 0 1k\n.tran .1 .2\n")
+        for method, reported_method, expected in (
+            (" RADAU_IIA3 ", "radau_iia3", "left_limit_at_actual_source_jumps"),
+            ("hybrid_trapezoidal", "hybrid_trapezoidal", None),
+        ):
+            library = _FakeLibrary()
+            with patch(
+                "python.spikes.native_runner.load_native_library",
+                return_value=library,
+            ):
+                result = run_native_project(
+                    project, library.path, integration_method=method
+                )
+            controls = result.provenance["transient_controls"]
+            self.assertEqual(result.data["integration"], reported_method)
+            self.assertEqual(result.provenance["integration"], reported_method)
+            if expected is None:
+                self.assertNotIn("source_breakpoint_samples", controls)
+            else:
+                self.assertEqual(controls["source_breakpoint_samples"], expected)
+
     def test_rejects_malformed_or_inapplicable_adaptive_controls_before_loading(self):
         transient = parse_netlist("V1 out 0 1\nR1 out 0 1k\n.tran .1 .2\n")
         operating_point = parse_netlist("V1 out 0 1\nR1 out 0 1k\n.op\n")

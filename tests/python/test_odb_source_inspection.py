@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
+import gzip
 import tempfile
 import unittest
 import zipfile
 
 from python.spike_core.extensions import ExtensionRegistry
+from python.spike_core.importers import ImportPolicy
 from python.spike_core.odb_source_inspection import inspect_odb_source
 
 
@@ -30,6 +32,44 @@ def write_folder(parent: Path, text: str, *, root: str = "job") -> Path:
 
 
 class OdbSourceInspectionTests(unittest.TestCase):
+    def test_gzip_matrix_uses_same_step_selection_and_rejects_ambiguous_roots(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            archive = Path(temporary) / "compressed.zip"
+            data = gzip.compress(matrix("Panel", "BOARD", layers=4).encode(), mtime=0)
+            with zipfile.ZipFile(archive, "w") as output:
+                output.writestr("release/job/matrix/matrix.gz", data)
+            result = inspect_odb_source(archive)
+            self.assertEqual(result["steps"], ["panel", "board"])
+            self.assertEqual(result["layer_count"], 4)
+            self.assertNotIn("default_step", result)
+            with zipfile.ZipFile(archive, "a") as output:
+                output.writestr("other/matrix/matrix", matrix("other"))
+            with self.assertRaisesRegex(ValueError, "found 2"):
+                inspect_odb_source(archive)
+
+    def test_gzip_matrix_ambiguity_and_resource_limits_are_enforced(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            source = write_folder(Path(temporary), matrix("board"))
+            member = source / "matrix/matrix"
+            compressed = member.with_name("matrix.gz")
+            compressed.write_bytes(gzip.compress(member.read_bytes(), mtime=0))
+            with self.assertRaisesRegex(ValueError, "Ambiguous plain/compressed"):
+                inspect_odb_source(source)
+            member.unlink()
+            with self.assertRaisesRegex(ValueError, "Nested gzip members are disabled"):
+                inspect_odb_source(source, policy=ImportPolicy(max_archive_depth=0))
+            compressed.write_bytes(gzip.compress((matrix("board") + "#" * 10000).encode(), mtime=0))
+            with self.assertRaisesRegex(ValueError, "Nested gzip member exceeds"):
+                inspect_odb_source(source, policy=ImportPolicy(max_compression_ratio=2))
+
+    def test_unix_compress_matrix_has_actionable_unsupported_encoding_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            source = write_folder(Path(temporary), matrix("board"))
+            member = source / "matrix/matrix"
+            member.rename(member.with_name("matrix.Z"))
+            with self.assertRaisesRegex(ValueError, "Unix compress.*Re-export with gzip"):
+                inspect_odb_source(source)
+
     def test_single_step_folder_has_import_compatible_default(self):
         with tempfile.TemporaryDirectory() as temporary:
             source = write_folder(Path(temporary), matrix("Main", layers=3))

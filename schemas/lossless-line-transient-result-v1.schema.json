@@ -1,0 +1,415 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/lossless-line-transient-result/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "source_request",
+    "characteristic_impedance_ohm",
+    "one_way_delay_s",
+    "propagation_speed_m_per_s",
+    "reflection_coefficient_by_boundary",
+    "points",
+    "diagnostics"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/lossless-line-transient-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "length_m",
+        "inductance_h_per_m",
+        "capacitance_f_per_m",
+        "left_boundary",
+        "right_boundary",
+        "probes",
+        "output_times_s"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/lossless-line-transient-request/v1"
+        },
+        "length_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "inductance_h_per_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "capacitance_f_per_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "left_boundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resistance_ohm",
+            "voltage_points"
+          ],
+          "properties": {
+            "resistance_ohm": {
+              "type": "number",
+              "minimum": 0
+            },
+            "voltage_points": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 1024,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "time_s",
+                  "voltage_v"
+                ],
+                "properties": {
+                  "time_s": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "voltage_v": {
+                    "type": "number"
+                  }
+                }
+              },
+              "prefixItems": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "time_s",
+                    "voltage_v"
+                  ],
+                  "properties": {
+                    "time_s": {
+                      "const": 0
+                    },
+                    "voltage_v": {
+                      "const": 0
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "right_boundary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "resistance_ohm",
+            "voltage_points"
+          ],
+          "properties": {
+            "resistance_ohm": {
+              "type": "number",
+              "minimum": 0
+            },
+            "voltage_points": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 1024,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "time_s",
+                  "voltage_v"
+                ],
+                "properties": {
+                  "time_s": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "voltage_v": {
+                    "type": "number"
+                  }
+                }
+              },
+              "prefixItems": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "time_s",
+                    "voltage_v"
+                  ],
+                  "properties": {
+                    "time_s": {
+                      "const": 0
+                    },
+                    "voltage_v": {
+                      "const": 0
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "probes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "fractional_position"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "fractional_position": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "output_times_s": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1024,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "characteristic_impedance_ohm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "one_way_delay_s": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "propagation_speed_m_per_s": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "reflection_coefficient_by_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "left",
+        "right"
+      ],
+      "properties": {
+        "left": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "right": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        }
+      }
+    },
+    "points": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "time_s",
+          "boundary_values",
+          "probe_values"
+        ],
+        "properties": {
+          "time_s": {
+            "type": "number",
+            "minimum": 0
+          },
+          "boundary_values": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "left",
+              "right"
+            ],
+            "properties": {
+              "left": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "source_voltage_v",
+                  "voltage_v",
+                  "current_into_line_a",
+                  "resistor_power_w",
+                  "kvl_residual_v"
+                ],
+                "properties": {
+                  "source_voltage_v": {
+                    "type": "number"
+                  },
+                  "voltage_v": {
+                    "type": "number"
+                  },
+                  "current_into_line_a": {
+                    "type": "number"
+                  },
+                  "resistor_power_w": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "kvl_residual_v": {
+                    "type": "number"
+                  }
+                }
+              },
+              "right": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "source_voltage_v",
+                  "voltage_v",
+                  "current_into_line_a",
+                  "resistor_power_w",
+                  "kvl_residual_v"
+                ],
+                "properties": {
+                  "source_voltage_v": {
+                    "type": "number"
+                  },
+                  "voltage_v": {
+                    "type": "number"
+                  },
+                  "current_into_line_a": {
+                    "type": "number"
+                  },
+                  "resistor_power_w": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "kvl_residual_v": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "probe_values": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "fractional_position",
+                "forward_voltage_v",
+                "backward_voltage_v",
+                "voltage_v",
+                "current_left_to_right_a",
+                "transported_power_w",
+                "energy_density_j_per_m"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
+                "fractional_position": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "forward_voltage_v": {
+                  "type": "number"
+                },
+                "backward_voltage_v": {
+                  "type": "number"
+                },
+                "voltage_v": {
+                  "type": "number"
+                },
+                "current_left_to_right_a": {
+                  "type": "number"
+                },
+                "transported_power_w": {
+                  "type": "number"
+                },
+                "energy_density_j_per_m": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_count",
+        "probe_count",
+        "maximum_bounce_depth",
+        "estimated_work",
+        "maximum_kvl_residual_v"
+      ],
+      "properties": {
+        "sample_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1024
+        },
+        "probe_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32
+        },
+        "maximum_bounce_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "estimated_work": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000000
+        },
+        "maximum_kvl_residual_v": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

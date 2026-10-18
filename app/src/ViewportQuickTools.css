@@ -19,7 +19,7 @@
 @media(max-width:1100px) { .quick-tools-context { max-width:95px; }.quick-tools-actions button span { display:none; }.quick-tools-actions button { min-width:29px;padding-inline:6px; } }
 
 /* One reserved viewport row: the floating bar replaces duplicate Fit/Layer buttons. */
-.app-shell.focus-shell .canvas-toolbar { height:40px;min-height:40px; }
+.app-shell.focus-shell .canvas-toolbar { height:32px;min-height:32px; }
 .app-shell.focus-shell .canvas-toolbar .command-strip-viewport > .viewport-quick-tools-slot { flex:1 1 0;min-width:120px;align-self:center;container:quick-tools/inline-size;padding:0 6px; }
 .canvas-toolbar .viewport-quick-tools { padding:3px 5px; }
 .canvas-toolbar .viewport-quick-tools button { min-height:24px; }

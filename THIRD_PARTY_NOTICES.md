@@ -1,5 +1,19 @@
 # Third-party notices and example sources
 
+## Optional SPIKES firmware runtime
+
+Renode 1.17.0 is an optional separately installed, unmodified upstream runtime,
+not SPIKE-owned source and not included in the Studio application installer.
+Official Windows portable archive:
+https://github.com/renode/renode/releases/download/v1.17.0/renode-1.17.0.windows-portable.zip
+(SHA-256 `18bcf145422039e8702c3e5f9864c7787561bfd5deb7a3ee6e168ecf19e2b9db`).
+Renode core is MIT; tlib includes LGPL-2.1 material and other bundled libraries
+retain their individual terms. Preserve the upstream runtime's complete
+`licenses` directory and obtain source/redistribution information from upstream.
+Local runtime installation does not transfer ownership or establish a reviewed
+commercial redistribution package. Vendor SVD metadata may be fetched by Renode
+on initial platform load and remains governed by its source terms.
+
 SPIKE uses open-source libraries and can connect to separately installed tools. Their own license files govern those components. This page also records the sources of boards and images shown in SPIKE documentation.
 
 SPIKE's Apache-2.0 license covers its own code; it does not relicense these

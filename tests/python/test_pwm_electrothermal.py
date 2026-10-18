@@ -14,6 +14,22 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class AdmissionTests(unittest.TestCase):
+    def test_optional_radau_counter_preserves_strict_diagnostics(self):
+        import jsonschema
+        schema = json.loads((ROOT / "schemas/pwm-electrothermal-result-v1.schema.json").read_text())
+        validator = jsonschema.Draft202012Validator(
+            schema["properties"]["runtime"]["properties"]["diagnostics"]
+        )
+        legacy = {"completed_steps": 1, "matrix_factorizations": 1,
+                  "total_newton_iterations": 1, "residual_inf_norm": 0.0}
+        validator.validate(legacy)  # Older ABI builds do not expose this counter.
+        validator.validate({**legacy, "radau_iia3_steps": 0})
+        for invalid in (-1, 0.5, True, "0"):
+            with self.subTest(invalid=invalid), self.assertRaises(jsonschema.ValidationError):
+                validator.validate({**legacy, "radau_iia3_steps": invalid})
+        with self.assertRaises(jsonschema.ValidationError):
+            validator.validate({**legacy, "unknown_counter": 0})
+
     def test_defaults_and_resource_budget(self):
         value = validate_pwm_electrothermal({"contract": REQUEST, "parameters": {}})
         self.assertEqual(value["status"], "accepted")

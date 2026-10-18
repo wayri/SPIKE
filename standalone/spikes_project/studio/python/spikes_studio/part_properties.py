@@ -9,8 +9,81 @@ OPTIONS = {
     'voltage_source': [('dc','DC voltage'),('pulse','PULSE voltage'),('pwl','PWL voltage')],
     'current_source': [('dc','DC current'),('pulse','PULSE current'),('pwl','PWL current')],
     'diode': [('named_model','Existing .MODEL D'),('shockley','Custom Shockley diode')],
+    'npn_ebers_moll': [('existing_model','Existing .MODEL NPN'),('custom_model','Custom NPN parameters')],
+    'nmos_level1': [('existing_model','Existing .MODEL NMOS'),('custom_model','Custom level-1 NMOS parameters')],
+    'gan_hemt': [('existing_model','Existing .MODEL SPK_GAN'),('custom_model','Custom SPK_GAN parameters')],
+    'sic_mosfet': [('existing_model','Existing .MODEL SPK_SIC'),('custom_model','Custom SPK_SIC parameters')],
+    'bsim_bulk': [('existing_model','Existing .MODEL BSIMBULK')],
+    'bsim_cmg': [('existing_model','Existing .MODEL BSIMCMG')],
     'voltage_controlled_switch': [('smooth_switch','Smooth voltage-controlled switch')],
 }
+
+_COMPACT_FAMILIES = {
+    'npn_ebers_moll': 'NPN', 'nmos_level1': 'NMOS',
+    'gan_hemt': 'SPK_GAN', 'sic_mosfet': 'SPK_SIC',
+    'bsim_bulk': 'BSIMBULK', 'bsim_cmg': 'BSIMCMG',
+}
+_COMPACT_DEFAULTS = {
+    'NPN': {'is':'1e-15','bf':'99','br':'1','nf':'1','cbe':'0','cbc':'0','tf':'0','tr':'0'},
+    'NMOS': {'level':'1','vto':'1','kp':'.001','lambda':'0','gamma':'0','phi':'.6',
+             'cgs':'0','cgd':'0','cds':'0'},
+}
+_COMPACT_LABELS = {
+    'IS':'Saturation current IS [A]', 'BF':'Forward current gain BF',
+    'BR':'Reverse current gain BR', 'NF':'Emission coefficient NF',
+    'CBE':'Base-emitter capacitance CBE [F]', 'CBC':'Base-collector capacitance CBC [F]',
+    'TF':'Forward transit time TF [s]', 'TR':'Reverse transit time TR [s]',
+    'LEVEL':'MOS model level', 'VTO':'Threshold voltage VTO [V]',
+    'KP':'Transconductance parameter KP [A/V^2]',
+    'LAMBDA':'Channel-length modulation LAMBDA [1/V]',
+    'GAMMA':'Body-effect coefficient GAMMA [sqrt(V)]',
+    'PHI':'Surface potential PHI [V]', 'CGS':'Gate-source capacitance CGS [F]',
+    'CGD':'Gate-drain capacitance CGD [F]', 'CDS':'Drain-source capacitance CDS [F]',
+}
+
+
+def _compact_label(key):
+    if key in _COMPACT_LABELS:return _COMPACT_LABELS[key]
+    units = (('_A_PER_V2',' [A/V^2]'),('_V_PER_K',' [V/K]'),('_K_PER_W',' [K/W]'),
+             ('_J_PER_K',' [J/K]'),('_PER_V',' [1/V]'),('_K',' [K]'),('_V',' [V]'),
+             ('_A',' [A]'),('_S',' [S]'),('_F',' [F]'))
+    stem=key;unit=''
+    for suffix,label in units:
+        if key.endswith(suffix):stem=key[:-len(suffix)];unit=label;break
+    return stem.replace('_',' ').title()+unit
+
+
+def _compact_specs(kind):
+    """Return exactly the parameters admitted by the native netlist binding."""
+    family = _COMPACT_FAMILIES[kind]
+    if family in {'BSIMBULK','BSIMCMG'}:return []
+    from python.spikes.semiconductor_cards import ALLOWED
+    preferred = {
+        'NPN': ('IS','BF','BR','NF','CBE','CBC','TF','TR'),
+        'NMOS': ('LEVEL','VTO','KP','LAMBDA','GAMMA','PHI','CGS','CGD','CDS'),
+    }.get(family, tuple(sorted(ALLOWED[family])))
+    defaults = _COMPACT_DEFAULTS.get(family, {})
+    return [(key.lower(), _compact_label(key), defaults.get(key.lower(),'')) for key in preferred]
+
+
+def _model_cards(source):
+    """Read top-level model cards without evaluating their parameter expressions."""
+    from python.spikes.netlist import _parse_assignments
+    logical = re.sub(r'\n[ \t]*\+[ \t]*',' ',source)
+    cards = {}
+    pattern = r'(?i)^\s*\.model\s+([\w.$+-]+)\s+(D|NPN|NMOS|SPK_GAN|SPK_SIC|BSIMBULK|BSIMCMG)\s*\((.*)\)\s*$'
+    depth=0
+    for text in logical.splitlines():
+        token=text.strip().split(maxsplit=1)[0].lower() if text.strip() else ''
+        if token=='.subckt':depth+=1;continue
+        if token=='.ends':depth=max(0,depth-1);continue
+        if depth:continue
+        match=re.fullmatch(pattern,text)
+        if match is None:continue
+        name, family, body = match.groups()
+        assignments = _parse_assignments(body, 0, '<property form>') if body.strip() else ()
+        cards[name.upper()] = (family.upper(), tuple((key.upper(), value) for key,value in assignments))
+    return cards
 VALUE_LABELS = {'resistor':'Resistance [ohm]', 'capacitor':'Capacitance [F]',
                 'inductor':'Inductance [H]', 'voltage_source':'DC / initial voltage [V]',
                 'current_source':'DC / initial current [A]', 'diode':'Model-defined value',
@@ -67,6 +140,14 @@ def form(source,ref,project=None):
         if card:
             tnom=re.search(r'(?i)\bTNOM\s*=\s*([^\s,)]+)',card[1])
             if tnom:result['fields']['tnom']=tnom[1]
+    if kind in _COMPACT_FAMILIES:
+        family = _COMPACT_FAMILIES[kind]
+        card = _model_cards(source).get(element.model_name.upper())
+        result['mode'] = ('custom_model' if element.model_name.upper().startswith('SPIKES_'+ref.upper())
+                          else 'existing_model')
+        result['fields'] = {'model_name': element.model_name}
+        if card and card[0] == family:
+            result['fields'].update((key.lower(),value) for key,value in card[1])
     if kind=='voltage_controlled_switch':
         model=element.switch_model;result['mode']='smooth_switch'
         result['fields']=dict(zip(('ron','roff','vt','transition'),map(number,(model.on_resistance_ohm,
@@ -105,12 +186,17 @@ def form(source,ref,project=None):
 def field_specs(kind,mode):
     if mode=='ideal':
         return [('ic','Initial capacitor voltage [V]' if kind=='capacitor' else 'Initial inductor current [A]','0')] if kind in ('capacitor','inductor') else []
+    if kind in _COMPACT_FAMILIES:
+        if mode == 'existing_model':return [('model_name',f'{_COMPACT_FAMILIES[kind]} model name','')]
+        if mode == 'custom_model':return _compact_specs(kind)
     return FIELDS.get(mode,[])
 
 
-def model_names(source):
-    return sorted({e.model_name for e in parse(source).elements if e.model_name} |
-                  {m[1].upper() for m in re.finditer(r'(?im)^\s*\.model\s+([\w.$+-]+)\s+D\b',source)})
+def model_names(source,kind='diode'):
+    """List only model cards compatible with the selected element family."""
+    family = 'D' if kind == 'diode' else _COMPACT_FAMILIES.get(kind)
+    if family is None:return []
+    return sorted(name for name,(card_family,_) in _model_cards(source).items() if card_family == family)
 
 
 def rewrite_nodes(source, ref, nodes):
@@ -190,6 +276,27 @@ def rewrite(source,ref,changes,model=None):
         while name in names:name=f'{base}_{index}';index+=1
         addition=f'.model {name} D('+ ' '.join(f'{key.upper()}={scalar(fields[key])}' for key,_,_ in specs)+')'
         line=f'{prefix} {name}'
+    elif mode in {'existing_model','custom_model'} and current['kind'] in _COMPACT_FAMILIES:
+        family = _COMPACT_FAMILIES[current['kind']]
+        cards = _model_cards(source)
+        if mode == 'existing_model':
+            name = scalar(fields['model_name']).upper()
+            if name not in cards or cards[name][0] != family:
+                raise ValueError(f'No existing {family} model named {name}')
+        else:
+            original = cards.get(current['fields']['model_name'].upper())
+            if original is None or original[0] != family:
+                raise ValueError(f'Cannot locate the existing {family} model card to clone')
+            assignments = dict(original[1])
+            assignments.update((key.upper(),scalar(value)) for key,value in supplied.items())
+            names = set(cards);base='SPIKES_'+ref.upper();name=base;index=1
+            while name in names:name=f'{base}_{index}';index+=1
+            addition=f'.model {name} {family}('+ ' '.join(f'{key}={value}' for key,value in assignments.items())+')'
+        # The compact-model instance tail (including MOS W/L expressions) is
+        # source syntax, not form state. Patch only terminals and model token.
+        physical=list(nodes)
+        if current['kind'] in _COMPACT_FAMILIES:physical=[nodes[0],nodes[2],nodes[1],*nodes[3:]]
+        line=None
     else:
         line=prefix+' '+' '.join(scalar(fields[key]) for key,_,_ in specs)
     lines=source.splitlines();matches=[];depth=0
@@ -202,7 +309,16 @@ def rewrite(source,ref,changes,model=None):
     if len(matches)!=1:raise ValueError('Edit included/hierarchical source at its definition; no unique top-level instance found')
     start=matches[0];end=start+1
     while end<len(lines) and lines[end].lstrip().startswith('+'):end+=1
-    lines[start:end]=[line]
+    if line is None:
+        if end != start+1:raise ValueError('Compact-model instance continuation requires explicit source editing')
+        spans=list(re.finditer(r'\S+',lines[start]))
+        count=len(physical)
+        if len(spans)<count+2:raise ValueError('Compact-model instance is incomplete')
+        replacements=[*zip(spans[1:1+count],physical),(spans[1+count],name)]
+        for span,text in reversed(replacements):
+            lines[start]=lines[start][:span.start()]+text+lines[start][span.end():]
+    else:
+        lines[start:end]=[line]
     if addition:
         endline=next((i for i,text in enumerate(lines) if text.strip().lower()=='.end'),len(lines))
         lines.insert(endline,addition)

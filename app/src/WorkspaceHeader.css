@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.app-shell .workspace-header { display:grid;grid-template-rows:52px minmax(0,1fr);align-items:stretch;height:var(--ui-title-height);min-width:0;padding:0 10px;gap:0; }
+.app-shell .workspace-header-main { display:grid;grid-template-columns:auto minmax(130px,230px) minmax(260px,1fr) auto;align-items:center;gap:12px;min-width:0; }
+.workspace-header-brand { display:flex;align-items:center;gap:8px;min-width:0; }
+.app-shell .workspace-header .workspace-project-trigger { width:100%;max-width:none;min-width:0;height:34px;flex:none;border:1px solid var(--spike-table-border);border-radius:5px; }
+.app-shell .workspace-header .workspace-project-trigger b { flex:1;text-align:left; }
+.app-shell .workspace-header .workspace-header-search { display:flex;align-items:center;gap:10px;width:100%;height:36px;min-width:0;padding:0 12px;color:var(--spike-table-muted);background:var(--spike-table-surface);border:1px solid var(--spike-table-border-strong);border-radius:6px; }
+.workspace-header-search>span { display:block;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left; }
+.workspace-header-search>kbd { flex:none; }
+.workspace-header-utilities { display:flex;align-items:center;gap:5px;min-width:0; }
+.workspace-header-utilities .toolbar-menu-trigger { max-width:180px; }
+.workspace-header-utilities .toolbar-menu-trigger>span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.workspace-header-navigation { min-width:0;border-top:1px solid var(--spike-table-border); }
+.app-shell .workspace-header .workspace-quick-switch { height:34px;min-height:0;padding:0;gap:3px;border:0;background:transparent; }
+.workspace-quick-switch button { display:inline-flex;align-items:center;gap:5px;flex:none;min-height:27px;padding:3px 9px;font-size:11px;white-space:nowrap; }
+.workspace-quick-switch button[aria-pressed="true"] { color:var(--spike-table-text-strong);background:var(--spike-table-choice-bg);border-color:var(--spike-table-choice-border); }
+@media(max-width:1180px) {
+  .app-shell .workspace-header-main { grid-template-columns:auto minmax(120px,190px) minmax(240px,1fr) auto;gap:8px; }
+  .workspace-header-brand .brand-mark { display:none; }
+  .workspace-header-utilities .workspace-switcher { display:none; }
+  .workspace-header-utilities .interface-mode-control>svg { display:none; }
+}
+@media(max-width:900px) {
+  .app-shell .workspace-header-main { grid-template-columns:auto minmax(110px,150px) minmax(190px,1fr) auto;gap:6px; }
+  .workspace-header-utilities>.avatar { display:none; }
+  .workspace-header-search>kbd { display:none; }
+  .app-shell .workspace-header .workspace-header-search>span { display:block; }
+}
+
+.app-shell.focus-shell .workspace-header:not(.has-workspace-shortcuts) { grid-template-rows:minmax(0,1fr); }

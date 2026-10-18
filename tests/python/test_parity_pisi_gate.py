@@ -7,6 +7,38 @@ from scripts.parity_pisi_gate import ROOT, validate_receipt
 
 
 class PiSiGateTests(unittest.TestCase):
+    def test_retained_distortionless_line_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI02-S02.json').read_text())
+        validate_receipt(receipt, stage='SI02-S02')
+
+    def test_retained_lossless_line_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI02-S01.json').read_text())
+        validate_receipt(receipt, stage='SI02-S01')
+
+    def test_retained_network_reflectometry_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI07-S10.json').read_text())
+        validate_receipt(receipt, stage='SI07-S10')
+
+    def test_retained_crosstalk_timing_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI07-S09.json').read_text())
+        validate_receipt(receipt, stage='SI07-S09')
+
+    def test_retained_multi_aggressor_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI07-S08.json').read_text())
+        validate_receipt(receipt, stage='SI07-S08')
+
+    def test_retained_rlc_energy_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI07-S07.json').read_text())
+        validate_receipt(receipt, stage='SI07-S07')
+
+    def test_retained_rlc_initial_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI07-S06.json').read_text())
+        validate_receipt(receipt, stage='SI07-S06')
+
+    def test_retained_rlc_network_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI07-S05.json').read_text())
+        validate_receipt(receipt, stage='SI07-S05')
+
     def test_retained_capacitive_network_execution(self):
         receipt=json.loads((ROOT/'docs/validation/parity/SI07-S04.json').read_text())
         validate_receipt(receipt, stage='SI07-S04')
@@ -56,6 +88,22 @@ class PiSiGateTests(unittest.TestCase):
     def test_retained_si_execution(self):
         receipt=json.loads((ROOT/'docs/validation/parity/SI08-S01.json').read_text())
         validate_receipt(receipt, stage='SI08-S01')
+
+    def test_retained_rlgc_line_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI02-S03.json').read_text())
+        validate_receipt(receipt, stage='SI02-S03')
+
+    def test_retained_rlgc_fields_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI02-S04.json').read_text())
+        validate_receipt(receipt, stage='SI02-S04')
+
+    def test_retained_rlgc_cascade_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI02-S05.json').read_text())
+        validate_receipt(receipt, stage='SI02-S05')
+
+    def test_retained_rlgc_junction_execution(self):
+        receipt=json.loads((ROOT/'docs/validation/parity/SI02-S06.json').read_text())
+        validate_receipt(receipt, stage='SI02-S06')
 
     def test_corrupted_evidence_rejected(self):
         baseline=json.loads((ROOT/'docs/validation/parity/SI08-S01.json').read_text())

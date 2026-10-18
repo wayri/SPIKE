@@ -156,11 +156,18 @@ class SourcePackage:
             return data.decode("latin-1")
 
     def root_for(self, marker: str) -> str:
-        roots = [name[:-len(marker)] for name in self.members
-                 if name == marker or name.endswith("/" + marker)]
+        # Locate the logical text member, just as text() does. ODB jobs may
+        # compress the matrix itself, not only their feature files. Keep the
+        # original member names in the index for provenance and let text()
+        # enforce ambiguity, decompression limits and unsupported encodings.
+        roots = set()
+        for name in self.members:
+            logical = name[:-3] if name.endswith(".gz") else name[:-2] if name.endswith(".Z") else name
+            if logical == marker or logical.endswith("/" + marker):
+                roots.add(logical[:-len(marker)])
         if len(roots) != 1:
             raise ValueError(f"Expected one package root containing {marker}; found {len(roots)}.")
-        return roots[0]
+        return next(iter(roots))
 
     def close(self):
         if self.archive is not None:

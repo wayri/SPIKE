@@ -38,3 +38,25 @@ the known buck stress failure are recorded in
 [adaptive switching foundation](../SPIKES_ADAPTIVE_SWITCHING_FOUNDATION.md).
 No installer, competitive-parity claim or hardware qualification follows from
 these source checks; knowledgeable human numerical review remains required.
+
+## Addendum — explicit linear Radau IIA3 (2026-10-18)
+
+Owner-approved decision: add `radau_iia3` (integration code 3), retaining all
+legacy defaults and methods. CLI spelling is `--method radau-iia3` (the
+underscore alias is accepted). This fixed-step two-stage method admits the
+linear independent-source RLC/index-one subset only; unsupported topology,
+nonlinear devices and adaptive requests fail explicitly. Additive optional ABI
+exports expose Radau step counters without changing existing structure layouts.
+Older DLLs reject this method rather than silently substituting another one.
+Physical `matrix_order` diagnostics retain their existing meaning; the coupled
+stage factorization has twice that order. On-grid accepted source corners now
+count in the breakpoint diagnostic as well as shortened corner steps.
+The PWM result schema admits the optional nonnegative integer Radau counter
+from a newer DLL, while retaining strict unknown-field rejection and its fixed
+backward-Euler integration contract; this does not enable Radau PWM coupling.
+
+Derivation, primary references, jump/sample convention, resource limits and
+executed 42-case frozen-budget evidence are recorded in
+[numerical method evidence](../NUMERICAL_METHOD_EVIDENCE.md#native-linear-radau-iia3--18-october-2026).
+This decision does not reclassify historical failed trapezoidal reports, qualify
+nonlinear switching, or remove human numerical review before release.

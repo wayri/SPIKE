@@ -13,7 +13,11 @@ export function classifyBoardSurface(material: THREE.MeshStandardMaterial, name:
   const { r, g, b } = material.color;
   if (material.metalness >= .75) return "copper";
   if (r >= .75 && g >= .75 && b >= .75 && material.opacity <= .95) return "silkscreen";
-  if (material.opacity <= .93 && g > r * 1.45 && g > b * 1.18) return "soldermask";
+  // KiCad exports colored masks without semantic material names. Their hue is
+  // configurable (including blue/red), while silk is neutral and copper is
+  // metallic. Preserve the exporter alpha/chroma evidence across mask colors.
+  const brightest = Math.max(r, g, b), darkest = Math.min(r, g, b);
+  if (material.opacity <= .93 && brightest - darkest > brightest * .25) return "soldermask";
   if (material.opacity >= .94 && material.roughness >= .7) return "substrate";
   return "unknown";
 }

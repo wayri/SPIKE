@@ -493,7 +493,8 @@ TransientResult solve_transient(const Circuit &circuit,
            TransientIntegrationMethod::backward_euler &&
        options.integration_method !=
            TransientIntegrationMethod::hybrid_trapezoidal &&
-       options.integration_method != TransientIntegrationMethod::bdf2)) {
+       options.integration_method != TransientIntegrationMethod::bdf2 &&
+       options.integration_method != TransientIntegrationMethod::radau_iia3)) {
     output.message_ = "invalid transient solver options";
     return output;
   }
@@ -585,7 +586,61 @@ TransientResult solve_transient(const Circuit &circuit,
                element.type == Circuit::ElementType::voltage_controlled_switch;
       });
   const bool use_sparse_transient = options.sparse_linear_threshold > 0 &&
-                                    order >= options.sparse_linear_threshold;
+      order * (options.integration_method == TransientIntegrationMethod::radau_iia3 ? 2u : 1u)
+          >= options.sparse_linear_threshold;
+  const bool radau_step = options.integration_method == TransientIntegrationMethod::radau_iia3;
+  const std::size_t solve_order = radau_step ? 2 * order : order;
+  if (radau_step) {
+    if (has_nonlinear_element || options.adaptive_time_step ||
+        std::any_of(circuit.elements_.begin(), circuit.elements_.end(),
+                    [](const auto &element) { return element.dependent; })) {
+      output.message_ = "Radau IIA3 requires fixed-step independent-source linear RLC circuits";
+      return output;
+    }
+    // Conservative index-one admission: no C/V loops or L/I cutsets.
+    // These excluded ideal constraints require differentiated algebraic data
+    // and, at a jump, may require impulses rather than finite current samples.
+    std::vector<std::size_t> parent(circuit.node_names_.size());
+    for (std::size_t i = 0; i < parent.size(); ++i) parent[i] = i;
+    const auto root = [&](std::size_t node) {
+      while (parent[node] != node) {
+        parent[node] = parent[parent[node]];
+        node = parent[node];
+      }
+      return node;
+    };
+    const auto join = [&](NodeId a, NodeId b) { parent[root(a)] = root(b); };
+    for (const auto &element : circuit.elements_)
+      if (element.type == Circuit::ElementType::capacitor)
+        join(element.positive_node, element.negative_node);
+    for (const auto &element : circuit.elements_) {
+      if (element.type != Circuit::ElementType::voltage_source) continue;
+      if (root(element.positive_node) == root(element.negative_node)) {
+        output.message_ = "Radau IIA3 does not admit ideal capacitor/voltage-source loops";
+        return output;
+      }
+      join(element.positive_node, element.negative_node);
+    }
+    for (const auto &element : circuit.elements_)
+      if (element.type == Circuit::ElementType::resistor)
+        join(element.positive_node, element.negative_node);
+    for (std::size_t node = 1; node < parent.size(); ++node) {
+      if (root(node) != root(ground_node)) {
+        output.message_ = "Radau IIA3 does not admit inductor/current-source cutsets or floating islands";
+        return output;
+      }
+    }
+    if (solve_order > static_cast<std::size_t>(std::numeric_limits<int>::max())) {
+      output.message_ = "Radau IIA3 stage matrix exceeds the sparse index bound";
+      return output;
+    }
+    constexpr std::size_t maximum_dense_stage_bytes = 64u * 1024u * 1024u;
+    if (!use_sparse_transient && solve_order >
+        std::sqrt(static_cast<double>(maximum_dense_stage_bytes / (2 * sizeof(double))))) {
+      output.message_ = "Radau IIA3 dense stage matrix/factor exceeds 64 MiB; enable sparse assembly";
+      return output;
+    }
+  }
   const bool use_sparse_nonlinear =
       has_nonlinear_element && use_sparse_transient;
   std::vector<std::uint64_t> structural_signature;
@@ -900,6 +955,46 @@ TransientResult solve_transient(const Circuit &circuit,
     }
   }
 
+  if (radau_step && !options.initialize_from_operating_point && !has_persistent_history) {
+    // Capacitor ICs specify potential differences, including in floating C
+    // components. Reject inconsistent loop sums instead of silently averaging
+    // mutually incompatible initial stored charges in the first stage solve.
+    using PotentialEdge = std::pair<NodeId, long double>;
+    std::vector<std::vector<PotentialEdge>> edges(circuit.node_names_.size());
+    for (const auto &element : circuit.elements_) {
+      if (element.type != Circuit::ElementType::capacitor) continue;
+      edges[element.positive_node].push_back({element.negative_node, -element.initial_condition});
+      edges[element.negative_node].push_back({element.positive_node, element.initial_condition});
+    }
+    std::vector<bool> visited(edges.size(), false);
+    std::vector<long double> potential(edges.size(), 0.0L);
+    std::vector<NodeId> queue;
+    for (std::size_t start = 0; start < edges.size(); ++start) {
+      if (visited[start]) continue;
+      queue.clear();
+      queue.push_back(static_cast<NodeId>(start));
+      visited[start] = true;
+      for (std::size_t cursor = 0; cursor < queue.size(); ++cursor) {
+        const NodeId node = queue[cursor];
+        for (const auto &[other, difference] : edges[node]) {
+          const long double expected = potential[node] + difference;
+          if (!visited[other]) {
+            visited[other] = true;
+            potential[other] = expected;
+            queue.push_back(other);
+          } else {
+            const long double scale = std::max({std::abs(expected), std::abs(potential[other]),
+                std::abs(difference), static_cast<long double>(std::numeric_limits<double>::min())});
+            if (std::abs(expected - potential[other]) >
+                64.0L * edges.size() * std::numeric_limits<double>::epsilon() * scale) {
+              output.message_ = "Radau IIA3 requires consistent capacitor initial-condition loop voltages";
+              return output;
+            }
+          }
+        }
+      }
+    }
+  }
   if (options.initialize_from_operating_point) {
     const auto initial = solve_operating_point(circuit, nonlinear);
     if (!initial.converged()) {
@@ -960,15 +1055,39 @@ TransientResult solve_transient(const Circuit &circuit,
 
   double time = 0.0;
   double proposed_step_s = options.time_step_s;
-  auto source_value = [](const Circuit::Element &element, double at_time) {
+  auto source_value = [](const Circuit::Element &element, double at_time,
+                         bool left_limit = false) {
     if (element.waveform_type == Circuit::WaveformType::sine) {
       return sine_value_at(element.sine, at_time + element.waveform_time_offset_s);
     }
     if (element.waveform_type == Circuit::WaveformType::pulse) {
-      return pulse_value(element.pulse, at_time);
+      const double global_time = at_time + element.waveform_time_offset_s;
+      const auto &pulse = element.pulse;
+      const auto at_edge = [&](double first) {
+        const double cycles = std::round((global_time - first) / pulse.period_s);
+        if (cycles < 0.0) return false;
+        const double edge = first + cycles * pulse.period_s;
+        return std::abs(global_time - edge) <= 32.0 *
+            std::numeric_limits<double>::epsilon() *
+            std::max({std::abs(global_time), std::abs(edge),
+                      std::numeric_limits<double>::min()});
+      };
+      if (left_limit && pulse.initial_value != pulse.pulsed_value) {
+        if (pulse.rise_time_s == 0.0 && at_edge(pulse.delay_s)) {
+          // A full-duty pulse has no repeated jump: the preceding period
+          // remains high up to its endpoint. Only its first edge starts low.
+          const bool repeated = global_time - pulse.delay_s >= 0.5 * pulse.period_s;
+          return repeated && pulse.pulse_width_s == pulse.period_s
+              ? pulse.pulsed_value : pulse.initial_value;
+        }
+        if (pulse.fall_time_s == 0.0 &&
+            at_edge(pulse.delay_s + pulse.rise_time_s + pulse.pulse_width_s))
+          return pulse.pulsed_value;
+      }
+      return pulse_value(pulse, global_time);
     }
     if (element.waveform_type == Circuit::WaveformType::pwl) {
-      return pwl_value(element.pwl, at_time);
+      return pwl_value(element.pwl, at_time + element.waveform_time_offset_s);
     }
     return element.value;
   };
@@ -978,18 +1097,23 @@ TransientResult solve_transient(const Circuit &circuit,
         64.0 * std::numeric_limits<double>::epsilon() * std::abs(after),
         std::numeric_limits<double>::infinity());
     for (const auto &element : circuit.elements_) {
+      const double source_strictly_after = radau_step
+          ? std::nextafter(after + 64.0 * std::numeric_limits<double>::epsilon() *
+                std::max(std::abs(after), std::abs(element.waveform_time_offset_s)),
+                std::numeric_limits<double>::infinity())
+          : strictly_after;
       if (element.waveform_type == Circuit::WaveformType::sine) {
         const double boundary = element.sine.delay_s - element.waveform_time_offset_s;
-        if (boundary >= strictly_after) next = std::min(next, boundary);
+        if (boundary >= source_strictly_after) next = std::min(next, boundary);
       }
       if (element.waveform_type == Circuit::WaveformType::pwl) {
         const auto found = std::lower_bound(
-            element.pwl.begin(), element.pwl.end(), strictly_after,
+            element.pwl.begin(), element.pwl.end(), source_strictly_after + element.waveform_time_offset_s,
             [](const PwlPoint &point, double value) {
               return point.time_s < value;
             });
         if (found != element.pwl.end()) {
-          next = std::min(next, found->time_s);
+          next = std::min(next, found->time_s - element.waveform_time_offset_s);
         }
       } else if (element.waveform_type == Circuit::WaveformType::pulse) {
         const auto &pulse = element.pulse;
@@ -998,13 +1122,13 @@ TransientResult solve_transient(const Circuit &circuit,
                                   pulse.rise_time_s + pulse.pulse_width_s +
                                       pulse.fall_time_s};
         for (const double offset : offsets) {
-          const double first = pulse.delay_s + offset;
+          const double first = pulse.delay_s + offset - element.waveform_time_offset_s;
           double candidate = first;
-          if (candidate < strictly_after) {
+          if (candidate < source_strictly_after) {
             const double cycles =
-                std::ceil((strictly_after - first) / pulse.period_s);
+                std::ceil((source_strictly_after - first) / pulse.period_s);
             candidate = first + std::max(0.0, cycles) * pulse.period_s;
-            if (candidate < strictly_after) {
+            if (candidate < source_strictly_after) {
               candidate += pulse.period_s;
             }
           }
@@ -1019,8 +1143,8 @@ TransientResult solve_transient(const Circuit &circuit,
   constexpr std::size_t maximum_factorization_cache_bytes =
       64u * 1024u * 1024u;
   const std::size_t factorization_entry_bytes =
-      std::max<std::size_t>(1, 2 * order * order * sizeof(double) +
-                                  order * sizeof(std::size_t));
+      std::max<std::size_t>(1, 2 * solve_order * solve_order * sizeof(double) +
+                                  solve_order * sizeof(std::size_t));
   const std::size_t maximum_factorization_cache_entries =
       std::min<std::size_t>(16, maximum_factorization_cache_bytes /
                                     factorization_entry_bytes);
@@ -1105,9 +1229,6 @@ TransientResult solve_transient(const Circuit &circuit,
         history_depth >= 2 && previous_step_s > 0.0 &&
         std::isfinite(previous_step_s) && !lands_on_breakpoint &&
         (target_time - time) <= 2.0 * previous_step_s;
-    if (use_breakpoint) {
-      ++output.diagnostics_.source_breakpoint_steps;
-    }
     const double h = target_time - time;
     if (!(h > 0.0) || !std::isfinite(h)) {
       output.status_ = SolveStatus::numerical_failure;
@@ -1126,11 +1247,11 @@ TransientResult solve_transient(const Circuit &circuit,
     for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
       const auto &element = circuit.elements_[index];
       if (element.type == Circuit::ElementType::current_source) {
-        const double value = source_value(element, target_time);
+        const double value = source_value(element, target_time, radau_step && lands_on_breakpoint);
         stamp_rhs(excitation_rhs, element.positive_node, -value);
         stamp_rhs(excitation_rhs, element.negative_node, value);
       } else if (element.type == Circuit::ElementType::voltage_source) {
-        excitation_rhs[branch_index[index]] += source_value(element, target_time);
+        excitation_rhs[branch_index[index]] += source_value(element, target_time, radau_step && lands_on_breakpoint);
       }
     }
     std::vector<double> rhs = excitation_rhs;
@@ -1212,9 +1333,67 @@ TransientResult solve_transient(const Circuit &circuit,
       }
     }
 
+    std::vector<double> radau_first_stage;
+    if (radau_step) {
+      // E x' + G x = b. Radau IIA has c=(1/3,1),
+      // A^-1=((3/2,1/2),(-9/2,5/2)). Solve both stage states
+      // together; the last stage is the accepted state (stiff accuracy).
+      constexpr double inverse_a[2][2]{{1.5, 0.5}, {-4.5, 2.5}};
+      matrix.assign(use_sparse_transient ? 0 : solve_order * solve_order, 0.0);
+      sparse_triplets.clear();
+      rhs.assign(solve_order, 0.0);
+      const auto stage_stamp = [&](std::size_t row, std::size_t column, double value) {
+        if (use_sparse_transient) stamp_sparse_index(sparse_triplets, row, column, value);
+        else matrix[at(row, column, solve_order)] += value;
+      };
+      for (std::size_t stage = 0; stage < 2; ++stage) {
+        const std::size_t offset = stage * order;
+        if (use_sparse_transient) {
+          for (const auto &entry : base_sparse_triplets)
+            stage_stamp(offset + entry.row(), offset + entry.col(), entry.value());
+        } else {
+          for (std::size_t row = 0; row < order; ++row)
+            for (std::size_t column = 0; column < order; ++column)
+              stage_stamp(offset + row, offset + column, base_matrix[at(row, column, order)]);
+        }
+        std::vector<double> stage_rhs = base_rhs;
+        const double stage_time = stage == 0 ? time + h / 3.0 : target_time;
+        for (std::size_t index = 0; index < circuit.elements_.size(); ++index) {
+          const auto &element = circuit.elements_[index];
+          const double value = source_value(element, stage_time,
+              stage == 1 && lands_on_breakpoint);
+          if (element.type == Circuit::ElementType::current_source) {
+            stamp_rhs(stage_rhs, element.positive_node, -value);
+            stamp_rhs(stage_rhs, element.negative_node, value);
+          } else if (element.type == Circuit::ElementType::voltage_source) {
+            stage_rhs[branch_index[index]] += value;
+          }
+          for (std::size_t other = 0; other < 2; ++other) {
+            const double coefficient = inverse_a[stage][other] * element.value / h;
+            if (element.type == Circuit::ElementType::capacitor) {
+              const NodeId nodes[]{element.positive_node, element.negative_node};
+              for (std::size_t row = 0; row < 2; ++row) {
+                if (nodes[row] == ground_node) continue;
+                const double sign = row == 0 ? 1.0 : -1.0;
+                stage_rhs[nodes[row] - 1] += sign * coefficient * capacitor_voltage[index];
+                for (std::size_t column = 0; column < 2; ++column) {
+                  if (nodes[column] != ground_node)
+                    stage_stamp(offset + nodes[row] - 1, other * order + nodes[column] - 1,
+                        sign * (column == 0 ? 1.0 : -1.0) * coefficient);
+                }
+              }
+            } else if (element.type == Circuit::ElementType::inductor) {
+              stage_stamp(offset + branch_index[index], other * order + branch_index[index], -coefficient);
+              stage_rhs[branch_index[index]] -= coefficient * inductor_current[index];
+            }
+          }
+        }
+        std::copy(stage_rhs.begin(), stage_rhs.end(), rhs.begin() + offset);
+      }
+    }
     SparseMatrix sparse_matrix;
     if (use_sparse_transient) {
-      sparse_matrix.resize(static_cast<int>(order), static_cast<int>(order));
+      sparse_matrix.resize(static_cast<int>(solve_order), static_cast<int>(solve_order));
       sparse_matrix.setFromTriplets(sparse_triplets.begin(), sparse_triplets.end());
       sparse_matrix.makeCompressed();
       ++output.diagnostics_.sparse_assemblies;
@@ -1654,7 +1833,7 @@ TransientResult solve_transient(const Circuit &circuit,
           solved = solve_factorized(cached->factorization, rhs);
           ++output.diagnostics_.factorization_reuses;
         } else {
-          auto factorization = factor_dense(matrix, order);
+          auto factorization = factor_dense(matrix, solve_order);
           output.diagnostics_.pivot_swaps += factorization.swaps;
           ++output.diagnostics_.matrix_factorizations;
           solved = solve_factorized(factorization, rhs);
@@ -1673,9 +1852,21 @@ TransientResult solve_transient(const Circuit &circuit,
           return output;
         }
         state = std::move(solved.values);
-        final_residual =
-            inf_norm(evaluate(matrix, nullptr, rhs, state, bdf_a0, bdf_a1,
-                              bdf_a2, trapezoidal_step).residual);
+        if (radau_step) {
+          for (std::size_t row = 0; row < solve_order; ++row) {
+            double residual = -rhs[row];
+            for (std::size_t column = 0; column < solve_order; ++column)
+              residual += matrix[at(row, column, solve_order)] * state[column];
+            final_residual = std::max(final_residual, std::abs(residual));
+          }
+        } else {
+          final_residual = inf_norm(evaluate(matrix, nullptr, rhs, state,
+              bdf_a0, bdf_a1, bdf_a2, trapezoidal_step).residual);
+        }
+      }
+      if (radau_step) {
+        radau_first_stage.assign(state.begin(), state.begin() + order);
+        state.erase(state.begin(), state.begin() + order);
       }
     } else {
       // Grounded independent voltage sources prescribe their endpoint exactly.
@@ -2185,6 +2376,14 @@ TransientResult solve_transient(const Circuit &circuit,
 
     const auto capacitor_step_current = [&](std::size_t index, double across) {
       const auto &element = circuit.elements_[index];
+      if (radau_step) {
+        const auto stage_voltage = [&](NodeId node) {
+          return node == ground_node ? 0.0 : radau_first_stage[node - 1];
+        };
+        const double first = stage_voltage(element.positive_node) - stage_voltage(element.negative_node);
+        return element.value / h * (-4.5 * (first - capacitor_voltage[index]) +
+                                    2.5 * (across - capacitor_voltage[index]));
+      }
       const auto node_increment = [&](NodeId node) {
         return node == ground_node ? 0.0 : state_increment[node - 1];
       };
@@ -2224,7 +2423,7 @@ TransientResult solve_transient(const Circuit &circuit,
       if (element.type == Circuit::ElementType::resistor) {
         current = across / element.value;
       } else if (element.type == Circuit::ElementType::current_source) {
-        current = element.behavioral ? circuit.behavioral_point(element,state,target_time).first : element.dependent ? circuit.control_value(element,state) : source_value(element, target_time);
+        current = element.behavioral ? circuit.behavioral_point(element,state,target_time).first : element.dependent ? circuit.control_value(element,state) : source_value(element, target_time, radau_step && lands_on_breakpoint);
       } else if (element.type == Circuit::ElementType::voltage_source ||
                  element.type == Circuit::ElementType::inductor ||
                  element.type == Circuit::ElementType::saturating_inductor) {
@@ -2395,7 +2594,14 @@ TransientResult solve_transient(const Circuit &circuit,
                         ? 1
                         : std::min<std::size_t>(2, history_depth + 1);
     ++output.diagnostics_.completed_steps;
-    if (bdf2_step) {
+    // Count accepted corner landings, including corners already on the grid.
+    // An attempted/rejected step is not a completed breakpoint step.
+    if (lands_on_breakpoint) {
+      ++output.diagnostics_.source_breakpoint_steps;
+    }
+    if (radau_step) {
+      ++output.diagnostics_.radau_iia3_steps;
+    } else if (bdf2_step) {
       ++output.diagnostics_.bdf2_steps;
     } else if (trapezoidal_step) {
       ++output.diagnostics_.trapezoidal_steps;
@@ -2449,6 +2655,7 @@ TransientResult solve_transient(const Circuit &circuit,
   workspace.impl_->integration_history.capacitor_voltage_changes = capacitor_voltage_change;
   workspace.impl_->integration_history.inductor_current_changes = inductor_current_change;
   output.message_ =
+      radau_step ? "breakpoint-aware linear Radau IIA3 transient completed" :
       options.integration_method == TransientIntegrationMethod::bdf2
           ? "breakpoint-aware variable-step BDF2 transient completed"
           : options.integration_method ==

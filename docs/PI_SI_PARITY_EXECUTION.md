@@ -34,6 +34,17 @@ parity gate. General solver-suite expansion remains separately qualified.
 | 5e | SI07-S02: resistively terminated transients | [Explicit Thevenin feedback](TERMINATED_NETWORK_TRANSIENT.md), loop/stability admission and physical RC/divider references. |
 | 5f | SI07-S03: mixed resistive/series-inductive transients | [Referenced R/L state boundaries](INDUCTIVE_NETWORK_TRANSIENT.md), physical RLC/multiport and energy checks, actual derivative/loss/storage outputs and regular stable closure admission. |
 | 5g | SI07-S04: mixed resistive/shunt-capacitive transients | [Referenced R/shunt-C boundaries](CAPACITIVE_NETWORK_TRANSIENT.md), distinct source/network current, KCL and actual resistor-loss/capacitor-energy checks with independent parallel-RLC references. |
+| 5h | SI07-S05: combined series-R/L and shunt-C transients | [Referenced combined states](RLC_NETWORK_TRANSIENT.md), simultaneous KVL/KCL, independent loaded-RLC/coupled-port and energy checks. |
+| 5i | SI07-S06: supplied initial states and continuation | [Referenced initial-value model](RLC_INITIAL_STATES.md), charged/energized physical references, nonzero fitted memory and explicitly resliced PWL split-run checks. |
+| 5j | SI07-S07: continuous work/heat/storage ledger | [Referenced covariance integration](RLC_ENERGY_LEDGER.md), analytic heat/work, signed power, interval/total balance and split/refinement checks for future conservative coupling. |
+| 5k | SI07-S08: sampled multi-aggressor crosstalk | [Biased linear attribution](MULTI_AGGRESSOR_CROSSTALK.md), finite signed-family voltage envelopes and two direct fixed-pattern witnesses; sampled-only coverage. |
+| 5l | SI07-S09: supplied timing/skew corners | [Endpoint-held shifted PWL sources](CROSSTALK_TIMING_CORNERS.md), same-state finite corner/polarity envelopes and directly verified global witnesses; aggregate pre-fit budgets. |
+| 5m | SI07-S10: initialized network-port reflectometry | [Actual port waves and current](NETWORK_REFLECTOMETRY.md), apparent reflection/impedance with explicit unresolved floors and signed transported power; analytic/physical references. |
+| 5n | SI02-S01: distributed lossless TEM line transient | [Causal traveling waves](LOSSLESS_LINE_TRANSIENT.md), supplied uniform L/C/length, explicit resistive ends, repeated reflections and named interior V/I/power/energy probes. |
+| 5o | SI02-S02: distortionless distributed line losses | [Explicit Heaviside model](DISTORTIONLESS_LINE_TRANSIENT.md), delayed attenuation, conductor/dielectric W/m loss channels, stored-energy distinction and independent PDE/energy checks. |
+| 5p | SI02-S03: supplied uniform sampled RLGC network | [Independent R/G frequency samples](RLGC_LINE_NETWORK.md), stable two-port evaluation, explicit DC, sampled passivity/reciprocity and compatible network handoff. |
+| 5q | SI02-S04: driven sampled RLGC fields and loss ledger | [Coherent RMS two-end fields](RLGC_LINE_FIELDS.md), named local V/I/storage/loss probes, analytic conductor/dielectric integrals and whole-line power balance. |
+| 5r | SI02-S05: supplied piecewise RLGC cascade | [Ideal series junctions and coherent local fields](RLGC_LINE_CASCADE.md), interface continuity/flux, external two-port and section-resolved loss without double counting. |
 | 6 | SI08 remaining network quality | Explicit frequency/DC policies, causality evidence, fixture removal and passive causal fitting. |
 | 7 | SI04–SI06 | Nonlinear IBIS, statistical/AMI and complete DDR workflows with applicable model and normative evidence. |
 | 8 | PI05–PI06 and stack closure | Close every declared gap and accept family benchmarks before calling the PI/SI stack complete. |
@@ -270,3 +281,174 @@ references, numerical errors and review limits. Distinct source/network currents
 make supplied resistor heating and capacitor storage explicit for future coupling.
 General combined RLC/descriptor/nonlinear boundaries, thermal execution and
 measured qualification remain open; SI07 and complete PI/SI parity remain open.
+
+## SI07-S05 combined series-R/L and shunt-C feedback
+
+[Combined RLC boundary transients](RLC_NETWORK_TRANSIENT.md) are **Done** for ten
+source-bound analytic damping, nonzero fitted-memory, coupled multiport, energy,
+precision/resource/failure and worker/schema/example checks. All sixteen earlier
+PI/SI suites were actually reexecuted; 258 broader focused regression tests passed
+with zero skips. [Verification evidence](validation/SI07_RLC_NETWORK_TRANSIENT.md)
+retains primary references, numerical errors and independent review limits.
+Separate source/network currents, KVL/KCL, resistor watts and L/C joules preserve
+physical ownership for future coupled studies. General topology/DAE, nonlinear
+models, thermal transfer and measured qualification remain open. SI07 and full
+PI/SI parity remain incomplete.
+
+## SI07-S06 supplied initial states and continuation
+
+[Initialized RLC transients](RLC_INITIAL_STATES.md) are **Done** for eleven
+source-bound analytic free/forced damping, nonzero fitted-memory/energy, multiport,
+genuine nonzero-ramp and knot continuation, admission and worker/schema/example
+checks. All seventeen earlier PI/SI suites were actually reexecuted; 270 broader
+focused regressions passed with zero skips.
+[Verification evidence](validation/SI07_RLC_INITIAL_STATES.md) retains primary
+references, numerical errors, corrected ramp coverage and independent review.
+Typed fit-bound state enables stateless local-time handoffs with explicit source
+slicing; final state is at source horizon. Managed sessions, general DAE, thermal
+transfer and measured qualification remain open. SI07 and full parity remain open.
+
+## SI07-S07 integrated work, heat and storage
+
+[Continuous RLC energy ledgers](RLC_ENERGY_LEDGER.md) are **Done** for eleven
+source-bound analytic/physical integration, mixed-boundary/reference/unit, stiff
+doubling, signed-power, split/refinement, admission and worker/schema/example
+checks. All eighteen earlier PI/SI suites were actually reexecuted; 282 broader
+focused regressions passed with zero skips.
+[Verification evidence](validation/SI07_RLC_ENERGY_LEDGER.md) retains reviewed
+primary mathematics/physics, numerical errors and independent review. Resistor
+heat, signed source/network work and supplied L/C storage keep ownership and
+units for later coupling. Generic fitted-network heat, thermal transfer and
+measured qualification remain open. SI07 and full PI/SI parity remain incomplete.
+
+## SI07-S08 sampled multi-aggressor crosstalk
+
+[Biased signed-waveform attribution](MULTI_AGGRESSOR_CROSSTALK.md) is **Done**
+for nine source-bound analytic/physical, common-state/fixed-driver, finite-family
+envelope, direct witness, reference/time-unit, admission and worker/schema/example
+checks. All nineteen earlier PI/SI suites were actually reexecuted; 292 broader
+focused regressions passed with zero skips. Independent review separately passed
+31 numerical/contract checks without an actionable issue.
+[Verification evidence](validation/SI07_MULTI_AGGRESSOR_CROSSTALK.md) retains
+primary references, error probe, strict schema correction and bounded claims.
+Source/state identity supports future coupling, but quadratic heat requires a
+full pattern solve. Intersample peaks, timing/BER, nonlinear drivers, thermal
+transfer and measured qualification remain open. SI07 and full parity remain open.
+
+## SI07-S09 supplied timing/skew corners
+
+[Explicit delayed aggressor waveforms](CROSSTALK_TIMING_CORNERS.md) are **Done**
+for nine source-bound shifted-PWL, physical finite-corner/polarity enumeration,
+common-state/fixed-driver, reference/time-unit, observation/set refinement,
+admission and worker/schema/example checks. All twenty earlier PI/SI numerical
+suites were actually rerun; 302 broader focused regressions passed with zero
+skips. Independent review passed 29 numerical/contract checks with no actionable
+issue. [Verification evidence](validation/SI07_CROSSTALK_TIMING_CORNERS.md)
+retains primary references, numerical errors and exact bounded semantics.
+Each corner preserves supplied local-zero state and explicit endpoint holds;
+source prehistory is not inferred. Quadratic energy needs a full corner/pattern
+solve. Continuous timing search, intersample peaks, probabilistic jitter/BER,
+nonlinear drivers and physical correlation remain open. SI07 and full PI/SI
+parity remain incomplete.
+
+## SI07-S10 initialized network-port reflectometry
+
+[Actual network-port wave diagnostics](NETWORK_REFLECTOMETRY.md) are **Done**
+for nine source-bound analytic/physical V/I/power, source/network-current,
+fitted-memory/multiport/state, floor/open/active, reference/time/refinement,
+admission and worker/schema/example checks. All twenty-one earlier PI/SI
+numerical suites were actually rerun; 312 broader focused regressions passed
+with zero skips. Independent review passed 31 numerical/contract checks with no
+actionable issue. [Verification evidence](validation/SI07_NETWORK_REFLECTOMETRY.md)
+retains reviewed primary physics, numerical errors and exact bounded semantics.
+Signed network power preserves the coupling plane but does not define heat.
+Instantaneous loaded ratios are not isolated S11 or reconstructed spatial
+impedance. Instrument calibration, measured correlation, uncertainty and thermal
+deposition remain open. SI07 and full PI/SI parity remain incomplete.
+
+## SI02-S01 causal distributed lossless line transients
+
+[Uniform lossless TEM line execution](LOSSLESS_LINE_TRANSIENT.md) is **Done**
+for ten source-bound matched delay, geometric multiple reflections, two-end
+excitation/zero-R, local energy/injected-work, unit/refinement, admission and
+worker/schema/example checks. All twenty-two earlier PI/SI numerical suites were
+actually rerun; 323 broader focused regressions passed with zero skips.
+[Verification evidence](validation/SI02_LOSSLESS_LINE_TRANSIENT.md) retains
+reviewed primary equations, independently derived causal waves, numerical
+errors and independent review. Distributed delay is executed without a fitted
+rational approximation or time mesh. Supplied constitutive parameters and probe
+positions preserve later coupling identity; stored field energy is not heat.
+Lossy/dispersive/coupled/branched extraction, arbitrary initial line history and
+physical correlation remain open. SI02 and full PI/SI parity remain incomplete.
+
+## SI02-S02 distortionless distributed line losses
+
+[Constant Heaviside lossy line execution](DISTORTIONLESS_LINE_TRANSIENT.md) is
+**Done** for nine source-bound numerical and worker/schema/example checks.
+All 23 earlier PI/SI numerical stages were actually rerun; 333 broader focused
+regressions passed with zero skips. [Verification evidence](validation/SI02_DISTORTIONLESS_LINE_TRANSIENT.md)
+retains primary equations, independent wave/PDE/energy references and numerical
+review. Separate conductor/dielectric W/m channels preserve later coupling
+identity; stored J/m and signed transported watts remain distinct. Thermal
+deposition, temperature feedback, arbitrary/frequency-dependent RLGC, coupled
+geometry extraction and measured qualification remain open. SI02 and full
+PI/SI parity remain incomplete.
+
+## SI02-S03 supplied uniform sampled RLGC networks
+
+[Uniform sampled RLGC execution](RLGC_LINE_NETWORK.md) is **Done** for eighteen
+source-bound numerical and worker/schema/example/handoff checks. All 24 earlier
+PI/SI numerical stages were actually rerun; 352 broader focused regressions
+passed with zero skips. [Verification evidence](validation/SI02_RLGC_LINE_NETWORK.md)
+retains primary phasor telegrapher physics, the independent scaled two-port
+derivation, spatial boundary-solve references, finite-ladder convergence and
+independent numerical review. Explicit independent sampled R/G removes the
+Heaviside constraint for this frequency-domain path. Original constitutive
+tables remain attached for later material/coupling work. Sampled passivity is
+not broadband causality; geometry extraction, general complex dispersion,
+coupled topology, heat deposition and measured qualification remain open.
+SI02 and full PI/SI parity remain incomplete.
+
+## SI02-S04 driven sampled RLGC fields and loss ledger
+
+[Coherent RMS field/loss execution](RLGC_LINE_FIELDS.md) is **Done** for fifteen
+source-bound numerical and worker/schema/example checks. All 25 earlier PI/SI
+numerical stages were actually rerun; 407 broader focused regressions passed
+with zero skips. [Verification evidence](validation/SI02_RLGC_LINE_FIELDS.md)
+retains primary telegrapher/RMS loss physics, independently derived coherent
+waves and analytic spatial integrals, independent spatial/quadrature references,
+refinement and numerical review. Probe density does not determine integrated
+heat. Separate conductor/dielectric loss and nominal L/C storage retain later
+coupling ownership; thermal deposition, feedback, causal material laws,
+coupled geometry and measured qualification remain open. SI02 and full PI/SI
+parity remain incomplete.
+
+## SI02-S05 supplied piecewise RLGC cascades
+
+[Piecewise supplied line execution](RLGC_LINE_CASCADE.md) is **Done** for
+fourteen source-bound numerical and actual worker/CLI/schema/example checks.
+All 26 earlier PI/SI numerical stages were actually rerun; 483 broader focused
+checks passed with zero skips. The nine runnable SI/PI workflows passed both
+before progression and after integration. [Verification evidence](validation/SI02_RLGC_LINE_CASCADE.md)
+retains primary interface/phasor physics, the independent connection derivation,
+spatial-chain/quadrature oracles, segmentation/impedance-step checks and numerical
+review. Complete child fields and separate section heat preserve later thermal
+ownership without counting internal transfer as dissipation. Physical branches,
+launch/via/bend/return parasitics, geometry/material extraction, thermal mapping
+and measured qualification remain open. SI02 and full parity remain incomplete.
+
+## SI02-S06 supplied ideal RLGC star junctions
+
+[Supplied scalar star execution](RLGC_LINE_JUNCTION.md) is **Done** for fifteen
+source-bound numerical/worker/CLI/schema/example checks. All 27 earlier PI/SI
+numerical stages were rerun, 99 broader regressions passed with zero skips,
+and all nine runnable SI/PI cases passed before and after integration.
+Independent numerical review ran 15 tests and found no actionable defect.
+[Verification](validation/SI02_RLGC_LINE_JUNCTION.md) retains referenced math,
+independent physical nodal/spatial and quadrature oracles, strong attenuation,
+port/sign invariants and exact bounded scope. Each leg owns its conductor and
+dielectric heat; the ideal node adds none. Geometry-derived junction/return
+parasitics, arbitrary graphs, coupled conductors, broadband causal materials,
+thermal mapping and measured qualification remain open. SI02 and full PI/SI
+parity remain incomplete. [Actual-board evidence](validation/BOARD_PISI_READINESS_20261019.md)
+retains separate EBrake/Marble limitations and the corrected current Marble DC audit.

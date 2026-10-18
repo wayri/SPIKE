@@ -8,7 +8,7 @@ PRIMITIVES=(('Resistor','resistor','R'),('Capacitor','capacitor','C'),('Inductor
 MONITORS=('Voltage meter','Current meter','Power meter','Mini scope')
 
 
-def suggestions(query,records=(),manufacturers=(),nets=(),refs=(),category='All',limit=48):
+def suggestions(query,records=(),manufacturers=(),nets=(),refs=(),category='All',limit=48,*,favorites=(),recent=(),component_index=None,manufacturer_index=None):
     if not isinstance(query,str) or len(query)>8192:raise ValueError('Search text limit is 8192 characters')
     if type(limit) is not int or not 1<=limit<=100:raise ValueError('Suggestion limit must be 1..100')
     q=query.strip();rows=[]
@@ -19,15 +19,29 @@ def suggestions(query,records=(),manufacturers=(),nets=(),refs=(),category='All'
             token='.'+spec.key
             if not q or (q.startswith('.') and ' ' not in q and token.startswith(q.casefold())) or not q.startswith('.') and match(spec.label+' '+token):
                 add('complete',token+' - '+spec.label,new_form(spec.key).render(),'analysis','Fill a template; Enter again to validate/place',True)
-    if category in ('All','Components'):
-        for name,family,alias in PRIMITIVES:
+    library_categories={r['category'] for r in records}
+    library_scope=category in ('Favorites','Recent','Circuit-ready','Bench only') or category in library_categories
+    if category in ('All','Components') or library_scope:
+        for name,family,alias in (() if library_scope else PRIMITIVES):
             if match(name) or q.casefold()==alias.casefold():add('component',name,'generic.'+family+'.001',family,'Configure values and pins before placement')
-        if q and not q.startswith('.'):
-            for record in ranked(manufacturers,q,text=lambda r:r['manufacturer']+' '+r['mpn']+' '+r['category']+' '+r['description']):
+        if not q.startswith('.'):
+            for record in ((manufacturer_index.query(manufacturers,q,limit) if manufacturer_index is not None else ranked(manufacturers,q,text=lambda r:r['manufacturer']+' '+r['mpn']+' '+r['category']+' '+r['description'])[:limit]) if q and not library_scope else ()):
                 if match(record['manufacturer']+' '+record['mpn']+' '+record['category']+' '+record['description']):
                     ready=record['model']['readiness']=='placeable_ideal_nominal'
                     add('manufacturer' if ready else 'manufacturer_review',record['manufacturer']+' '+record['mpn'],record['id'],record['category'],'Ideal nominal approximation' if ready else 'Review only - no runnable model installed')
-            for record in ranked(records,q,text=lambda r:r['id']+' '+r['name']+' '+r['family']+' '+r['category'])[:limit]:
+            candidates=records
+            if category in library_categories:candidates=[r for r in candidates if r['category']==category]
+            elif category=='Favorites':candidates=[r for r in candidates if r['id'] in favorites]
+            elif category=='Recent':
+                by_id={r['id']:r for r in candidates};candidates=[by_id[i] for i in dict.fromkeys(recent) if i in by_id]
+            elif category in ('Circuit-ready','Bench only'):
+                candidates=[r for r in candidates if (r['status']=='native_subcircuit')==(category=='Circuit-ready')]
+            if not q and category not in ('Favorites','Recent'):
+                # Browse archetypes rather than pages of near-identical value variants.
+                families={}
+                for record in candidates:families.setdefault(record['family'],record)
+                candidates=list(families.values())
+            for record in (component_index.query(candidates,q,limit) if component_index is not None else ranked(candidates,q,text=lambda r:r['id']+' '+r['name']+' '+r['family']+' '+r['category'])[:limit]):
                 if match(record['id']+' '+record['name']+' '+record['family']+' '+record['category']):
                     if record['id'] in {r['payload'] for r in rows}:continue
                     ready=record['status']=='native_subcircuit'
@@ -49,8 +63,8 @@ def suggestions(query,records=(),manufacturers=(),nets=(),refs=(),category='All'
         if q.endswith(')') and '(' in q and not q.startswith('.'):
             name='Current meter' if q.upper().startswith('I(') else 'Power meter' if q.upper().startswith('P(') else 'Voltage meter'
             rows.insert(0,dict(kind='monitor',label='Add meter for '+q,payload=name,icon='probe',detail='Review signal / mathematical expression',completion=False,expression=q))
-    if not q:rows.sort(key=lambda r:{'component':0,'monitor':1,'complete':2}.get(r['kind'],3))
-    else:
+    if not q and category!='Recent':rows.sort(key=lambda r:{'component':0,'monitor':1,'complete':2}.get(r['kind'],3))
+    elif q:
         # Explicit text/directive actions stay where authored; only discovery rows rank.
         discovery=[r for r in rows if r['kind'] not in ('spice','text')]
         def relevance(row):
@@ -60,4 +74,8 @@ def suggestions(query,records=(),manufacturers=(),nets=(),refs=(),category='All'
         iterator=iter(discovery);rows=[r if r['kind'] in ('spice','text') else next(iterator) for r in rows]
         exact={'generic.'+family+'.001' for name,family,alias in PRIMITIVES if q.casefold() in (name.casefold(),alias.casefold())}
         if exact:rows.sort(key=lambda r:r['payload'] not in exact)
+        if q.upper().startswith(('V(','I(','P(')):
+            # A typed signal must remain reachable even when a large component
+            # catalog fills the discovery page with incidental fuzzy matches.
+            rows.sort(key=lambda r:not (r['completion'] and r['payload'].casefold().startswith(q.casefold()) or r['kind']=='monitor'))
     return rows[:limit]

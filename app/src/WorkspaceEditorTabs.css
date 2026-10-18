@@ -1,0 +1,11 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.workspace-editor-tabs { grid-area:documents;min-width:0;background:var(--spike-table-surface);border-bottom:1px solid var(--spike-table-border); }
+.workspace-editor-tabs [role="tablist"] { display:flex;gap:3px;padding:4px 6px;overflow-x:auto;scrollbar-width:thin; }
+.workspace-editor-tabs [role="tab"] { display:flex;align-items:center;gap:5px;flex:none;min-height:28px;padding:4px 9px;max-width:240px;font-size:12px; }
+.workspace-editor-tabs [role="tab"] span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.workspace-editor-tabs [aria-selected="true"] { border-color:var(--spike-control-focus);color:var(--spike-accent-text); }
+.app-shell.focus-shell .workspace.focus-workspace.has-editor-tabs { grid-template-rows:auto minmax(0,1fr);grid-template-areas:"documents documents" "viewport focus-tool"; }
+.app-shell.focus-shell .workspace.focus-workspace.has-editor-tabs.workspace-document-open { grid-template-columns:0px minmax(0,1fr); }
+.workspace-document-open > .canvas-area { visibility:hidden;pointer-events:none; }
+.workspace-document-open .focus-panel-resizer { display:none; }
+.focus-tool-deck-host[data-presentation="document"] { border-left:0; }

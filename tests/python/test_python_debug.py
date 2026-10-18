@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import json
 import os
+import subprocess
+import sys
 import tempfile
 import time
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
+from python.spike_core import script_debug
 from python.spike_core.script_debug import (
     python_debug_command,
     python_debug_status,
@@ -42,6 +46,10 @@ class PythonDebugTest(unittest.TestCase):
                 state = python_debug_status({"session_id": session_id})
                 if state["status"] in {"starting", "running", "paused"}:
                     python_debug_command({"session_id": session_id, "command": "stop"})
+                # Terminal publication precedes OS exit; release the test's
+                # owned process/CWD before removing its temporary workspace.
+                directory = self.sessions / session_id
+                script_debug._terminate_process(script_debug._state_pid(directory, state))
             except (OSError, ValueError):
                 pass
         self.environment.stop()
@@ -117,6 +125,8 @@ class PythonDebugTest(unittest.TestCase):
         stopped = python_debug_command({"session_id": session_id, "command": "stop"})
         self.assertEqual(stopped["status"], "stopped")
         self.assertIn("stopped", stopped["reason"])
+        pid = int((self.sessions / session_id / "pid.txt").read_text(encoding="ascii"))
+        self.assertFalse(script_debug._process_alive(pid))
 
     def test_pause_and_breakpoint_update_are_acknowledged(self):
         started = self.start(
@@ -140,9 +150,179 @@ class PythonDebugTest(unittest.TestCase):
             "timeout_seconds": 1,
         })
         self.session_ids.append(str(result["session_id"]))
+        deadline = time.monotonic() + 4
         failed = self.await_status(str(result["session_id"]), {"failed"}, timeout=4)
         self.assertEqual(failed["return_code"], 124)
         self.assertIn("time limit", failed["reason"])
+        directory = self.sessions / str(result["session_id"])
+        pid = int((directory / "pid.txt").read_text(encoding="ascii"))
+        while script_debug._process_alive(pid) and time.monotonic() < deadline:
+            time.sleep(0.01)
+        self.assertFalse(script_debug._process_alive(pid))
+
+    def test_original_deadline_terminates_child_before_watchdog_initializes(self):
+        real_popen = subprocess.Popen
+
+        def stalled_startup(command, **kwargs):
+            return real_popen([sys.executable, "-c", "import time; time.sleep(60)"], **kwargs)
+
+        began = time.monotonic()
+        with patch.object(script_debug.subprocess, "Popen", side_effect=stalled_startup):
+            result = self.start("print('must not run')\n", timeout_seconds=1)
+        session_id = str(result["session_id"])
+        directory = self.sessions / session_id
+        request = script_debug._read_json(directory / "request.json")
+        self.assertEqual(request["deadline"] - request["created_at"], 1)
+        failed = self.await_status(session_id, {"failed"}, timeout=4)
+        self.assertEqual(failed["return_code"], 124)
+        self.assertIn("time limit", failed["reason"])
+        self.assertEqual(failed["stdout"], "")
+        self.assertLess(time.monotonic() - began, 4)
+        self.assertFalse(script_debug._process_alive(int((directory / "pid.txt").read_text())))
+
+    def test_liveness_probe_preserves_running_child_and_detects_exit(self):
+        with subprocess.Popen(
+            [sys.executable, "-c", "import time; time.sleep(60)"],
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        ) as child:
+            try:
+                for _ in range(5):
+                    self.assertTrue(script_debug._process_alive(child.pid))
+                    time.sleep(0.01)
+                    self.assertIsNone(child.poll())
+            finally:
+                child.terminate()
+                child.wait(timeout=3)
+            # Popen still holds its Windows handle: PID existence is not liveness.
+            self.assertFalse(script_debug._process_alive(child.pid))
+        with subprocess.Popen(
+            [sys.executable, "-c", "raise SystemExit(259)"],
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        ) as child:
+            child.wait(timeout=3)
+            # 259 is also STILL_ACTIVE; a signaled handle is authoritative.
+            self.assertFalse(script_debug._process_alive(child.pid))
+
+    @unittest.skipUnless(os.name == "nt", "Windows process wait semantics")
+    def test_windows_liveness_probe_fails_conservatively_and_closes_handles(self):
+        for invalid_pid in (0, -1, True, "123", 1.5, 0x100000000):
+            with self.subTest(invalid_pid=invalid_pid), patch("ctypes.WinDLL") as library:
+                self.assertFalse(script_debug._process_alive(invalid_pid))
+                library.assert_not_called()
+        for handle, error, wait_status, alive in (
+            (0, 87, 0, False), (0, 5, 0, True),
+            (0x100000001, 0, 0, False), (0x100000001, 0, 258, True),
+            (0x100000001, 0, 0xFFFFFFFF, True),
+        ):
+            with self.subTest(handle=handle, error=error, wait_status=wait_status):
+                kernel = Mock()
+                kernel.OpenProcess.return_value = handle
+                kernel.WaitForSingleObject.return_value = wait_status
+                with patch("ctypes.WinDLL", return_value=kernel), \
+                        patch("ctypes.get_last_error", return_value=error):
+                    self.assertEqual(script_debug._process_alive(123), alive)
+                kernel.OpenProcess.assert_called_once_with(0x00100000, False, 123)
+                if handle:
+                    kernel.WaitForSingleObject.assert_called_once_with(handle, 0)
+                    kernel.CloseHandle.assert_called_once_with(handle)
+                else:
+                    kernel.WaitForSingleObject.assert_not_called()
+                    kernel.CloseHandle.assert_not_called()
+
+    def test_exit_during_status_read_preserves_child_terminal_state(self):
+        request = {"session_id": "exit-race", "token": "test-token", "deadline": time.time() + 60}
+        state = {
+            "contract": script_debug.CONTRACT, **request, "status": "running",
+            "revision": 2, "pid": 123, "command_ack": 0, "frames": [],
+        }
+        (self.root / "request.json").write_text(json.dumps(request), encoding="utf-8")
+        for status, return_code, reason in (
+            ("failed", 124, "Python debug session exceeded its time limit."),
+            ("completed", 0, "finished"),
+            ("stopped", 0, "stopped by user"),
+        ):
+            with self.subTest(status=status):
+                script_debug._atomic_json(self.root / "state.json", state)
+                terminal = {**state, "status": status, "return_code": return_code,
+                            "reason": reason, "revision": 3}
+                published = False
+
+                def exit_after_state_read(pid):
+                    # Child publication/exit occurs after the parent's initial read.
+                    nonlocal published
+                    if not published:
+                        script_debug._atomic_json(self.root / "state.json", terminal)
+                        published = True
+                    return False
+
+                with patch.object(script_debug, "_process_alive", side_effect=exit_after_state_read):
+                    result = script_debug._snapshot(self.root, touch=False)
+                self.assertEqual(result["status"], status)
+                self.assertEqual(result["return_code"], return_code)
+                self.assertEqual(result["reason"], reason)
+                self.assertEqual(result["revision"], 3)
+                self.assertEqual(script_debug._read_json(self.root / "state.json"), terminal)
+
+    def test_dead_child_without_terminal_publication_still_fails(self):
+        request = {"session_id": "unexpected-exit", "token": "test-token", "deadline": time.time() + 60}
+        state = {"contract": script_debug.CONTRACT, **request,
+                 "status": "running", "revision": 2, "pid": 123}
+        (self.root / "request.json").write_text(json.dumps(request), encoding="utf-8")
+        script_debug._atomic_json(self.root / "state.json", state)
+        with patch.object(script_debug, "_process_alive", return_value=False):
+            result = script_debug._snapshot(self.root, touch=False)
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["return_code"], 1)
+        self.assertIn("exited unexpectedly", result["reason"])
+
+    def test_terminal_state_reread_must_pass_identity_validation(self):
+        request = {"session_id": "exit-race", "token": "test-token", "deadline": time.time() + 60}
+        state = {"contract": script_debug.CONTRACT, **request,
+                 "status": "running", "revision": 2, "pid": 123}
+        for key in ("contract", "session_id", "token"):
+            with self.subTest(key=key):
+                terminal = {**state, "status": "completed", key: "wrong"}
+                with patch.object(script_debug, "_read_json", side_effect=[request, state, terminal]), \
+                        patch.object(script_debug, "_process_alive", return_value=False):
+                    with self.assertRaisesRegex(ValueError, "token validation"):
+                        script_debug._snapshot(self.root, touch=False)
+
+    def test_invalid_deadline_cannot_authorize_process_termination(self):
+        for deadline in (None, True, "expired", float("nan"), float("inf"), 10 ** 1000):
+            with self.subTest(deadline=deadline):
+                request = {"session_id": "deadline", "token": "token", "deadline": deadline}
+                state = {"contract": script_debug.CONTRACT, **request,
+                         "status": "starting", "pid": 123}
+                with patch.object(script_debug, "_read_json", side_effect=[request, state]), \
+                        patch.object(script_debug, "_terminate_process") as terminate:
+                    with self.assertRaisesRegex(ValueError, "deadline must be finite"):
+                        script_debug._snapshot(self.root, touch=False)
+                terminate.assert_not_called()
+
+    def test_expired_poll_preserves_terminal_state_and_discards_partial_output(self):
+        request = {"session_id": "deadline", "token": "token", "deadline": time.time() - 1}
+        (self.root / "request.json").write_text(json.dumps(request), encoding="utf-8")
+        active = {"contract": script_debug.CONTRACT, **request, "status": "starting",
+                  "pid": 123, "frames": [{"partial": True}], "published_result": {"partial": True},
+                  "ui_actions": [{"partial": True}]}
+        for terminal_status in (None, "completed", "stopped"):
+            with self.subTest(terminal_status=terminal_status):
+                script_debug._atomic_json(self.root / "state.json", active)
+
+                def settle_child(pid):
+                    if terminal_status is not None:
+                        script_debug._atomic_json(self.root / "state.json", {
+                            "contract": script_debug.CONTRACT, **request,
+                            "status": terminal_status, "return_code": 0,
+                        })
+
+                with patch.object(script_debug, "_terminate_process", side_effect=settle_child), \
+                        patch.object(script_debug, "_process_alive", return_value=False):
+                    result = script_debug._snapshot(self.root, touch=False)
+                self.assertEqual(result["status"], terminal_status or "failed")
+                self.assertEqual(result["return_code"], 0 if terminal_status else 124)
+                self.assertNotIn("published_result", result)
+                self.assertEqual(result["ui_actions"], [])
 
     def test_exception_and_nonfinite_publication_fail_cleanly(self):
         raised = self.start("print('before')\nraise ValueError('bad debug script')\n")

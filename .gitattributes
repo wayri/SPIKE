@@ -230,3 +230,92 @@ schemas/mcad-session-v1.schema.json text eol=lf
 schemas/mcad-feedback-v1.schema.json text eol=lf
 integrations/freecad/SPIKEWorkbench/Resources/schemas/mcad-session-v1.schema.json text eol=lf
 integrations/freecad/SPIKEWorkbench/Resources/schemas/mcad-feedback-v1.schema.json text eol=lf
+
+# SI07-S05 numerical receipts bind these LF source bytes.
+python/spike_core/sparameter_rlc_terminated.py text eol=lf
+tests/python/test_sparameter_rlc_terminated.py text eol=lf
+tests/python/test_sparameter_rlc_contract.py text eol=lf
+examples/rlc_network_transient/run_loaded_rlc.py text eol=lf
+schemas/rlc-network-transient-request-v1.schema.json text eol=lf
+schemas/rlc-network-transient-result-v1.schema.json text eol=lf
+docs/RLC_NETWORK_TRANSIENT.md text eol=lf
+docs/validation/parity/SI07-S05*.json text eol=lf
+
+# SI07-S06 source-bound initialization/continuation evidence.
+python/spike_core/sparameter_rlc_initial.py text eol=lf
+tests/python/test_sparameter_rlc_initial.py text eol=lf
+tests/python/test_sparameter_rlc_initial_contract.py text eol=lf
+examples/rlc_network_initial/run_free_decay.py text eol=lf
+schemas/rlc-initial-state-v1.schema.json text eol=lf
+schemas/rlc-network-transient-request-v2.schema.json text eol=lf
+schemas/rlc-network-transient-result-v2.schema.json text eol=lf
+docs/RLC_INITIAL_STATES.md text eol=lf
+docs/validation/parity/SI07-S06*.json text eol=lf
+
+# SI07-S07 source-bound continuous RLC energy evidence.
+python/spike_core/sparameter_rlc_energy.py text eol=lf
+tests/python/test_sparameter_rlc_energy.py text eol=lf
+tests/python/test_sparameter_rlc_energy_contract.py text eol=lf
+examples/rlc_energy_ledger/run_energy.py text eol=lf
+schemas/rlc-energy-ledger-request-v1.schema.json text eol=lf
+schemas/rlc-energy-ledger-result-v1.schema.json text eol=lf
+docs/RLC_ENERGY_LEDGER.md text eol=lf
+docs/validation/parity/SI07-S07*.json text eol=lf
+
+# SI07-S08 source-bound numerical evidence
+python/spike_core/sparameter_multi_aggressor.py text eol=lf
+tests/python/test_sparameter_multi_aggressor*.py text eol=lf
+examples/multi_aggressor_crosstalk/*.py text eol=lf
+schemas/multi-aggressor-crosstalk-*.schema.json text eol=lf
+docs/MULTI_AGGRESSOR_CROSSTALK.md text eol=lf
+docs/validation/parity/SI07-S08*.json text eol=lf
+
+# SI07-S09 source-bound numerical evidence
+python/spike_core/sparameter_crosstalk_timing.py text eol=lf
+tests/python/test_sparameter_crosstalk_timing*.py text eol=lf
+examples/crosstalk_timing_corners/*.py text eol=lf
+schemas/crosstalk-timing-corners-*.schema.json text eol=lf
+docs/CROSSTALK_TIMING_CORNERS.md text eol=lf
+docs/validation/parity/SI07-S09*.json text eol=lf
+
+# SI07-S10 source-bound numerical evidence
+python/spike_core/sparameter_reflectometry.py text eol=lf
+tests/python/test_sparameter_reflectometry*.py text eol=lf
+examples/network_reflectometry/*.py text eol=lf
+schemas/network-reflectometry-*.schema.json text eol=lf
+docs/NETWORK_REFLECTOMETRY.md text eol=lf
+docs/validation/parity/SI07-S10*.json text eol=lf
+
+# SI02-S01 source-bound numerical evidence
+python/spike_core/lossless_line_transient.py text eol=lf
+tests/python/test_lossless_line_transient*.py text eol=lf
+examples/lossless_line_transient/*.py text eol=lf
+schemas/lossless-line-transient-*.schema.json text eol=lf
+docs/LOSSLESS_LINE_TRANSIENT.md text eol=lf
+docs/validation/parity/SI02-S01*.json text eol=lf
+
+# SI02-S02 source-bound numerical evidence
+python/spike_core/distortionless_line_transient.py text eol=lf
+tests/python/test_distortionless_line_transient*.py text eol=lf
+examples/distortionless_line_transient/*.py text eol=lf
+schemas/distortionless-line-transient-*.schema.json text eol=lf
+docs/DISTORTIONLESS_LINE_TRANSIENT.md text eol=lf
+docs/validation/parity/SI02-S02*.json text eol=lf
+
+python/spike_core/rlgc_line_network.py text eol=lf
+tests/python/test_rlgc_line_network*.py text eol=lf
+examples/rlgc_line_network/*.py text eol=lf
+schemas/rlgc-line-network-*.schema.json text eol=lf
+docs/RLGC_LINE_NETWORK.md text eol=lf
+
+python/spike_core/rlgc_line_fields.py text eol=lf
+tests/python/test_rlgc_line_fields*.py text eol=lf
+examples/rlgc_line_fields/*.py text eol=lf
+schemas/rlgc-line-fields-*.schema.json text eol=lf
+docs/RLGC_LINE_FIELDS.md text eol=lf
+
+python/spike_core/rlgc_line_cascade.py text eol=lf
+tests/python/test_rlgc_line_cascade*.py text eol=lf
+examples/rlgc_line_cascade/* text eol=lf
+schemas/rlgc-line-cascade-*.schema.json text eol=lf
+docs/RLGC_LINE_CASCADE.md text eol=lf

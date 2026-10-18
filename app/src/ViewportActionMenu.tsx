@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Activity, ArrowLeft, Box, ChevronRight, CircuitBoard, ClipboardCheck, Eye, Focus, FolderOpen, Layers3, Magnet, Network, Play, Search, SlidersHorizontal, Target, Thermometer, X, type LucideIcon } from "./icons";
 import { usePanelPresentation } from "./panelPresentation";
@@ -8,7 +8,7 @@ import "./ViewportActionMenu.css";
 
 export type ContextMenuAction = { id: string; label: string; description?: string; disabledReason?: string; run: () => void };
 export type ContextMenuGroup = { id: string; label: string; actions: ContextMenuAction[] };
-export type ViewportActionMenuProps = { x: number; y: number; title: string; summary: string[]; groups: ContextMenuGroup[]; onClose: () => void };
+export type ViewportActionMenuProps = { x: number; y: number; title: string; summary: string[]; groups: ContextMenuGroup[]; onClose: () => void; essentialTools?: ReactNode };
 
 function actionIcon(id:string):LucideIcon {
   if(id.startsWith("pi-") || id.includes("power"))return Activity;
@@ -29,7 +29,7 @@ function actionIcon(id:string):LucideIcon {
 function ContextActionIcon({id}:{id:string}) { const Icon=actionIcon(id);return <Icon size={15} aria-hidden="true"/>; }
 
 /** Presentation only: the workspace owns availability, summaries, and command callbacks. */
-export default function ViewportActionMenu({ x, y, title, summary, groups, onClose }: ViewportActionMenuProps) {
+export default function ViewportActionMenu({ x, y, title, summary, groups, onClose, essentialTools }: ViewportActionMenuProps) {
   const { ownerDocument, ownerWindow } = usePanelPresentation();
   const panel = useRef<HTMLDivElement>(null), menu = useRef<HTMLDivElement>(null), search = useRef<HTMLInputElement>(null);
   const originalFocus = useRef<HTMLElement | null>((ownerDocument?.activeElement as HTMLElement | null) ?? null), closeHandler = useRef(onClose);
@@ -89,7 +89,7 @@ export default function ViewportActionMenu({ x, y, title, summary, groups, onClo
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     event.stopPropagation();
     if (event.isDefaultPrevented() || event.nativeEvent.isComposing) return;
-    if (event.key === "Tab") { close(false); return; }
+    if (event.key === "Tab") { if (!essentialTools) close(false); return; }
     const target = event.target as HTMLElement;
     if (target === search.current) {
       if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); focusAt(event.key === "ArrowDown" ? 0 : -1); }
@@ -121,6 +121,7 @@ export default function ViewportActionMenu({ x, y, title, summary, groups, onClo
     onBlur={event => { if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) close(false); }}>
     <div className="viewport-action-menu__heading"><strong id={`${identity}-title`}>{title}</strong>
       <button type="button" className="spike-control--icon spike-control--bare" aria-label="Close viewport actions" onClick={() => close()}><X size={14} aria-hidden="true" /></button></div>
+    {essentialTools}
     {summary.length > 0 && <div className="viewport-action-menu__summary">{summary.map((line, index) => <span key={index}>{line}</span>)}</div>}
     <label className="viewport-action-menu__search"><Search size={14} aria-hidden="true" /><input ref={search} type="search" aria-label="Search viewport actions" placeholder="Find an action…" value={query} onChange={event => { setQuery(event.target.value); setGroupId(null); }} /></label>
     {activeGroup && !term && <button type="button" className="viewport-action-menu__back spike-control--bare" onClick={back}><ArrowLeft size={14} aria-hidden="true" />{activeGroup.label}</button>}

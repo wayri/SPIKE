@@ -281,7 +281,7 @@
 .app-shell.focus-shell.board-first.dock-maximized,
 .app-shell.focus-shell.board-first.ribbon-hidden.dock-maximized {
   --ui-dock-height: 0px;
-  grid-template-rows: 40px minmax(0, 1fr) 28px;
+  grid-template-rows: var(--ui-title-height, 40px) minmax(0, 1fr) 28px;
 }
 .app-shell.focus-shell .workspace.focus-workspace {
   visibility: visible;
@@ -435,7 +435,8 @@
 .focus-tool-heading,.focus-command-header { cursor:grab;user-select:none; }
 .focus-tool-heading h2,.focus-command-header strong { min-width:70px; }
 .panel-dragging { cursor:grabbing;outline:2px solid var(--spike-control-focus);outline-offset:-2px; }
-.focus-panel-scale select { max-width:68px;min-width:0;height:26px; }
+.focus-panel-scale { display:inline-flex;align-items:center;flex:0 0 80px;min-width:80px; }
+.focus-panel-scale select { box-sizing:border-box;width:80px;min-width:80px;max-width:none;height:28px;padding:2px 8px;font:var(--spike-control-font);font-size:12px;appearance:auto; }
 .floating-panel-notice { padding:6px;margin:0;color:var(--spike-table-danger-text); }
 .focus-tool-content { container-type:inline-size; }
 .focus-tool-content :is(input,select,textarea) { max-width:100%;min-width:0; }
@@ -452,7 +453,7 @@
 .focus-tool-deck-host > .focus-floating-slot { flex:1;min-height:0; }
 
 /* Short command flows remain soft popups; deep editors retain the reserved dock. */
-.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"] { position:absolute;inset:8px auto auto 8px;width:min(380px,calc(100% - 16px));height:min(640px,calc(100% - 16px));z-index:45;border:1px solid var(--spike-popup-border);border-radius:var(--spike-popup-radius);overflow:hidden;background:var(--spike-popup-surface);box-shadow:var(--spike-popup-shadow); }
+.app-shell.focus-shell .workspace.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"] { grid-area:auto;position:absolute;inset:var(--focus-command-top,8px) auto auto 8px;width:min(380px,calc(100% - 16px));height:min(640px,calc(100% - var(--focus-command-top,8px) - 8px));z-index:45;border:1px solid var(--spike-popup-border);border-radius:var(--spike-popup-radius);overflow:hidden;background:var(--spike-popup-surface);box-shadow:var(--spike-popup-shadow); }
 .focus-workspace > .focus-floating-slot[data-panel-id="command-menu"] .focus-command-panel { border:0; }
 .focus-shell :is(.topbar,.canvas-toolbar,.focus-tool-heading,.focus-command-header) { user-select:none; }
 
@@ -464,9 +465,16 @@
   .focus-tool-heading h2 { min-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
   .focus-tool-heading button span { display:none; }
   .focus-tool-heading button { min-width:26px;padding-inline:5px; }
-  .focus-panel-scale select { width:58px; }
 }
 .focus-tool-content [data-spike-duplicate-title="true"] { display:none; }
 
 /* The dock header already supplies Hide; keep embedded close controls out of form rows. */
 .focus-tool-content [data-spike-inner-dismiss="true"] { display:none !important; }
+
+/* Keep editor tab labels bounded while preserving their icons and scroll access. */
+.focus-shell .workspace-editor-tabs [role="tablist"] { min-width:0;scroll-padding-inline:6px; }
+.focus-shell .workspace-editor-tabs [role="tab"] { min-width:0; }
+.focus-shell .workspace-editor-tabs [role="tab"] > svg { flex:none; }
+.focus-shell .workspace-editor-tabs [role="tab"] > span { min-width:0; }
+
+.app-shell.focus-shell .workspace.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"][hidden] { display:none !important; }

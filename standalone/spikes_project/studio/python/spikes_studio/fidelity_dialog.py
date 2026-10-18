@@ -1,5 +1,4 @@
 """Scoped model policy editor and transparent preflight preview."""
-import json
 from copy import deepcopy
 import wx
 from .model_fidelity import TIERS, descriptor, inherited, resolve
@@ -10,25 +9,28 @@ def show(owner, ref=None):
     parts = owner.doc.data['components']
     scopes = ['schematic'] + sorted({':'.join(p['ref'].upper().split(':')[:i])
         for p in parts for i in range(1, len(p['ref'].split(':')))}) + [p['ref'].upper() for p in parts]
-    with wx.Dialog(owner, title='Model fidelity and inheritance', size=(850,700), style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER) as dialog:
+    with wx.Dialog(owner, title='Model fidelity and inheritance', size=(850,760), style=wx.DEFAULT_DIALOG_STYLE|wx.RESIZE_BORDER) as dialog:
+        dialog.SetMinSize((600,560))
         box = wx.BoxSizer(wx.VERTICAL)
         choice = wx.Choice(dialog, choices=scopes); choice.SetSelection(scopes.index(ref.upper()) if ref and ref.upper() in scopes else 0)
         box.Add(choice,0,wx.EXPAND|wx.ALL,8)
         reason = wx.StaticText(dialog); box.Add(reason,0,wx.ALL,8)
         radios = []
-        row = wx.BoxSizer(wx.HORIZONTAL)
+        row = wx.WrapSizer(wx.HORIZONTAL)
+        labels=dict(source='Source-defined',ideal='Ideal',simplified='Simplified',
+                    behavioral='Behavioral',physics='Physics-based',validated='Validated (evidence required)')
         for i, tier in enumerate(TIERS):
-            control = wx.RadioButton(dialog,label=tier,style=wx.RB_GROUP if i==0 else 0)
+            control = wx.RadioButton(dialog,label=labels[tier],style=wx.RB_GROUP if i==0 else 0)
             radios.append(control); row.Add(control,0,wx.ALL,5)
         box.Add(row)
         enforce = wx.CheckBox(dialog,label='Enforce on children'); box.Add(enforce,0,wx.ALL,8)
         box.Add(wx.StaticText(dialog,label='Required implicit parasitics (comma separated; unavailable bindings block the run):'),0,wx.ALL,8)
         parasitics = wx.TextCtrl(dialog); box.Add(parasitics,0,wx.EXPAND|wx.ALL,8)
-        parameter_row=wx.BoxSizer(wx.HORIZONTAL);parameter_fields={}
+        parameter_row=wx.FlexGridSizer(cols=2,hgap=8,vgap=6);parameter_row.AddGrowableCol(1);parameter_fields={}
         for key,label in (('esr_ohm','ESR [ohm]'),('esl_h','ESL [H]'),('leakage_ohm','Leakage [ohm]')):
-            parameter_row.Add(wx.StaticText(dialog,label=label),0,wx.ALL,4)
-            control=wx.TextCtrl(dialog,size=(85,-1));parameter_fields[key]=control;parameter_row.Add(control,0,wx.ALL,4)
-        box.Add(parameter_row)
+            parameter_row.Add(wx.StaticText(dialog,label=label),0,wx.ALIGN_CENTER_VERTICAL)
+            control=wx.TextCtrl(dialog);parameter_fields[key]=control;parameter_row.Add(control,1,wx.EXPAND)
+        box.Add(parameter_row,0,wx.EXPAND|wx.ALL,8)
         from .model_preview import ModelPreview
         graph=ModelPreview(dialog);box.Add(graph,1,wx.EXPAND|wx.ALL,5)
         preview = wx.TextCtrl(dialog,style=wx.TE_MULTILINE|wx.TE_READONLY); box.Add(preview,1,wx.EXPAND|wx.ALL,8)
@@ -63,12 +65,25 @@ def show(owner, ref=None):
             graph.update_model(single,effective.get('parasitic_values',{}),owner.doc.data['source'])
             apply.Enable(not lock);clear.Enable(not lock and scope!='schematic')
             doc=deepcopy(owner.doc.data);doc['model_policy']=policy
-            preview.SetValue(json.dumps(resolve(doc),indent=2))
+            report=resolve(doc)
+            lines=[f"Analysis: {report['analysis']}", 'Resolved component models', '']
+            for item in report['components']:
+                lines.extend([f"{item['ref']} — {labels[item['selection']['tier']]}",
+                              f"  Defined by: {item['origin']}",
+                              f"  Pins: {', '.join(item['model']['pins'])}",
+                              f"  Qualification: {item['model']['qualification']}"])
+                for key,value in item['model']['parasitics'].items():
+                    lines.append(f"  {dict(esr_ohm='ESR [ohm]',esl_h='ESL [H]',leakage_ohm='Leakage [ohm]').get(key,key)}: {value:.8g}")
+                if item['locked_by']:lines.append(f"  Enforced by: {item['locked_by']}")
+            if report['errors']:lines.extend(['','Cannot run:',*report['errors']])
+            if report['warnings']:lines.extend(['','Model assumptions:',*report['warnings']])
+            preview.SetValue('\n'.join(lines))
         def save(event):
             scope, section=target()
             entry=dict(tier=next(t for t,c in zip(TIERS,radios) if c.GetValue()),enforce=enforce.GetValue(),
                        required_parasitics=[p.strip() for p in parasitics.GetValue().split(',') if p.strip()])
-            entry['parasitic_values']={key:float(control.GetValue()) for key,control in parameter_fields.items() if control.IsEnabled() and control.GetValue().strip()}
+            from python.spikes.netlist import parse_spice_number
+            entry['parasitic_values']={key:parse_spice_number(control.GetValue(),'scalar') for key,control in parameter_fields.items() if control.IsEnabled() and control.GetValue().strip()}
             if scope=='schematic':policy['schematic']=entry
             else:policy[section][scope]=entry
             owner.doc.commit(lambda data:data.__setitem__('model_policy',deepcopy(policy)))

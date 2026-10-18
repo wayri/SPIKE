@@ -8,6 +8,32 @@ It found and regression-tested additional parser fixes, and records unresolved
 geometry and project-size failures. The synthetic checks below do not supersede
 those observed limitations.
 
+## Compressed job-root regression, 2026-10-19
+
+Local import-quality record: `IQ-ODB-COMPRESSED-ROOT`. Previously, a valid job
+whose matrix was stored as `matrix/matrix.gz` failed root discovery before
+inspection or normalization. The regression is repaired by the bounded logical
+member lookup and the fixtures below; no external issue was filed by this task.
+
+The independently authored minimal job in
+`tests/python/test_odb_harness_extensions.py` now exercises gzip compression of
+every text member, including the matrix root marker, as a folder, ZIP and TGZ.
+Assertions compare exact layers, nets, tracks, pads, zones and components against
+the plain job; separately check object counts, endpoints, width and board bounds
+in millimetres; and verify original member names and the source digest. A
+negative-copper fixture verifies that unsupported geometry remains diagnostic
+and blocks readiness after compressed-root discovery.
+
+`tests/python/test_odb_source_inspection.py` covers compressed multi-step
+selection, ambiguous roots and plain/gzip members, disabled nested gzip,
+decompression ratio limits and the explicit unsupported Unix compress error.
+The ODB inspection/harness slice passed 42 tests; parity-candidate and
+public-board import regressions passed 11 tests. Architecture checks passed.
+Tests used the repository `.venv` with `TEMP` and `TMP` directed to
+`build/odb-import-test-temp` because the execution sandbox denied its default
+temporary directory. These are package compatibility checks; no new vendor
+conformance, panel expansion or solver qualification is claimed.
+
 ## Executed checks
 
 - Broad Python suite: 1,356 tests, no failures, one skip. Native ABI tests used

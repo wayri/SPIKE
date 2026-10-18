@@ -24,6 +24,7 @@ from .project_design_artifacts import validate_design_source_artifacts as _valid
 from .project_geometry_index import build_geometry_members, validate_geometry_index
 from .project_package_limits import PackageLimits
 from .project_parallel_state import admit_payload_parallel, admit_archive_parallel
+from .project_member_metadata import media_type as _media_type, member_role as _member_role
 
 
 PROJECT_FORMAT_V3 = "spike-project-package/v3"
@@ -42,6 +43,9 @@ _PAYLOAD_MEMBER_NAMES = {
     "geometry/index.json", "extensions/index.json", "audit/events.jsonl",
 }
 _CONTROL_PLANE_JSON_MEMBER_NAMES = frozenset(name for name in _PAYLOAD_MEMBER_NAMES if name.endswith(".json"))
+_DESIGN_IR_JSON_MEMBER_NAMES = frozenset({
+    "design/design-ir.json", "design/assembly-designs.json",
+})
 
 
 class ProjectPackageError(ValueError):
@@ -134,27 +138,6 @@ def _safe_member_path(value: str, *, max_depth: int = 12) -> str:
     ):
         raise ProjectPackageError(f"Unsafe package member path: {value!r}")
     return normalized
-
-
-def _media_type(path: str) -> str:
-    suffix = Path(path).suffix.lower()
-    return {
-        ".json": "application/json",
-        ".jsonl": "application/x-ndjson",
-        ".arrow": "application/vnd.apache.arrow.file",
-        ".html": "text/html",
-        ".pdf": "application/pdf",
-        ".csv": "text/csv",
-        ".step": "model/step",
-        ".stp": "model/step",
-        ".gltf": "model/gltf+json",
-        ".glb": "model/gltf-binary",
-        ".spkshape": "application/vnd.spike.package-shape",
-    }.get(suffix, "application/octet-stream")
-
-
-def _member_role(path: str) -> str:
-    return path.split("/", 1)[0]
 
 
 def _zip_info(path: str) -> zipfile.ZipInfo:
@@ -260,20 +243,30 @@ def _minimal_v2_design(legacy: Mapping[str, Any]) -> SpiDeRV2:
     return SpiDeRV2.from_v1(legacy_design, source_digest=digest)
 
 
-def migrate_legacy_payload(raw: Mapping[str, Any], *, validate_parallel: bool = True) -> Dict[str, Any]:
+def migrate_legacy_payload(
+    raw: Mapping[str, Any], *, validate_parallel: bool = True,
+    canonical_design: Mapping[str, Any] | None = None,
+) -> Dict[str, Any]:
     """Migrate a v1/v2 JSON package in memory without discarding unknown data."""
 
     source_format = str(raw.get("format", ""))
     if source_format not in LEGACY_FORMATS:
         raise ProjectPackageError(f"Unsupported legacy SPIKE project format: {source_format or 'missing'}")
     project = dict(raw.get("project", {}))
-    design = _minimal_v2_design(raw)
+    if canonical_design is not None:
+        SpiDeRV2.from_dict(canonical_design)
+        # Preserve the already canonical JSON representation exactly. Hydrating
+        # and re-emitting it converts nested JSON arrays to in-memory tuples,
+        # which can make its duplicate retained assembly record compare unequal.
+        design_payload = dict(canonical_design)
+    else:
+        design_payload = _minimal_v2_design(raw).to_dict()
     project_name = str(project.get("name") or "migrated.spike")
     project_id = str(project.get("id") or canonical_uuid("spike", content_digest(raw), "project", project_name))
     payload = {
         "project": {**project, "id": project_id, "name": project_name},
         "workspace": raw.get("workspace"),
-        "design_ir": design.to_dict(),
+        "design_ir": design_payload,
         "assembly_ir": raw.get("assembly"),
         "analyses": raw.get("analysis", {}),
         "results": raw.get("results", raw.get("analysis", {}).get("latest_result", {})),
@@ -641,7 +634,7 @@ def read_spike_package(
                     raise ProjectPackageError(f"Package manifest member is duplicate or missing: {name}")
                 expected_size = int(record.get("size", -1))
                 expected_sha256 = str(record.get("sha256", ""))
-                json_limit = (limits.max_design_ir_json_bytes if name == "design/design-ir.json"
+                json_limit = (limits.max_design_ir_json_bytes if name in _DESIGN_IR_JSON_MEMBER_NAMES
                               else limits.max_control_plane_json_bytes)
                 if name in _CONTROL_PLANE_JSON_MEMBER_NAMES and (
                     infos[name].file_size > json_limit
@@ -788,11 +781,8 @@ def read_geometry_arrow_artifact(
                           signature_verifier=signature_verifier,
                           require_signature=require_signature)
 def read_project(
-    path: str | Path,
-    *,
-    limits: PackageLimits | None = None,
-    include_members: bool = False,
-    signature_verifier: ManifestVerifier | None = None,
+    path: str | Path, *, limits: PackageLimits | None = None,
+    include_members: bool = False, signature_verifier: ManifestVerifier | None = None,
     require_signature: bool = False,
 ) -> PackageReadResult:
     from .project_package_access import read_project as implementation

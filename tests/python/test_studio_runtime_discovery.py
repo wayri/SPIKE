@@ -2,6 +2,8 @@
 """Inert launch discovery and strict worker dispatch regression checks."""
 import unittest
 from pathlib import Path
+import sys
+from types import ModuleType
 from unittest.mock import patch
 from python.spike_core.studio_bridge import studio_runtime_capabilities, handle_studio_bridge_request
 
@@ -29,6 +31,18 @@ class StudioRuntimeDiscoveryTests(unittest.TestCase):
             self.assertFalse(rejected["ok"])
             spawn.assert_not_called()
         self.assertIsNone(handle_studio_bridge_request("unrelated", {}, Path.cwd()))
+
+    def test_discovery_treats_metadata_free_gui_stub_as_unavailable(self):
+        wx_stub = ModuleType("wx")
+        self.assertIsNone(wx_stub.__spec__)
+        with patch.dict(sys.modules, {"wx": wx_stub}), \
+                patch("python.spike_core.studio_bridge.subprocess.Popen") as spawn:
+            response = handle_studio_bridge_request(
+                "studio_runtime_capabilities", {}, Path.cwd())
+        self.assertTrue(response["ok"])
+        self.assertFalse(response["result"]["can_launch"])
+        self.assertIn("wxPython", response["result"]["reason"])
+        spawn.assert_not_called()
 
 if __name__ == "__main__":
     unittest.main()

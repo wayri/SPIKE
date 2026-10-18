@@ -1,0 +1,52 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI07-S04",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "6724546babeec74efec851b7ee0f89c4f9a48e70f3de4a2ca6dc6120da8a8c07",
+    "python/spike_core/sparameter_terminated.py": "20508afc27dc35401d94cee3c6d0a24b0d30dd5423f3ee83fc245c8898d2a574",
+    "python/spike_core/sparameter_transient.py": "df92677d5f36da656efde8f5b20985942278c2d1120ef442e95e6c3a23b6a500",
+    "python/spike_core/sparameter_rational.py": "9498d2e9ce2768fe0aff462457ac774652850aa3530071a1c0aa546c3ba53b56",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "0629b152c4aa3e43c98c01d8aad69c2b36edcfd4503eba4629542f0f7cdefbc7",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_sparameter_terminated.py": "ecfe004d7db268a8def6bca3b74ff22c127340eaf9ac8e33586ecfe8983cee48",
+    "tests/python/test_sparameter_terminated_contract.py": "9a6307c5b42d2fb460d6b3829d1585e94fecdd153deda031eb12ed9b1b0b4226",
+    "schemas/sparameter-rational-fit-request-v1.schema.json": "268bf209ca7a54887481a21b05b218c6f0ecf3fa8e44c9dd1b47011f000533c3",
+    "schemas/sparameter-rational-fit-result-v1.schema.json": "f75c0c2b53f0749275cb21c5f6e412097d00c1594f3010b34cf7a02225e65f7b",
+    "schemas/terminated-network-transient-request-v1.schema.json": "a56e65942c70b98a515cc947803535853f9291cdaccffb6de6bd7f246945c29c",
+    "schemas/terminated-network-transient-result-v1.schema.json": "e1cc7c9fd566709e456952bf8dd9beb12fae6241acb6ef40dc45e796b34f5c4c",
+    "python/spike_core/sparameter_capacitive_terminated.py": "63420cce23c2884eff0f43b572769e101b6215b83561ba53a1780a30a350d331",
+    "tests/python/test_sparameter_capacitive_terminated.py": "1ed0941403faba6a81fc854c1caa18dc578bfc321032a8a66d9ff7100cc6a97d",
+    "tests/python/test_sparameter_capacitive_contract.py": "7655e7eb62c5fa64261ee52bb0d4ca5eb16dbe058e34adfd6bf203d4d799b9f5",
+    "tests/python/test_sparameter_transient.py": "7cee3d969702aa9a89776df092e833ec558ca16180a6ca51888513aeb3bc4b0d",
+    "examples/capacitive_network_transient/run_rc.py": "1b632584a9ad5207d36e0e044f3d078ed541d78a78168c6d78a9e9515da70e0b",
+    "schemas/capacitive-network-transient-request-v1.schema.json": "493acb4d2f6998d54b7fdbd52f79f923ba2eeddd1f0863a4c31899f6e41b9900",
+    "schemas/capacitive-network-transient-result-v1.schema.json": "9dac6c4bf9b22b1744dca80c0bfba09191c530c02a40144e9f324a5986194ebd",
+    "docs/CAPACITIVE_NETWORK_TRANSIENT.md": "3d4195b51619341bbf55fc03c08f756446a6e41c697fbf570104b5df2292b544"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_example_runs_and_public_contracts_are_registered",
+      "tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_worker_and_schema_fail_closed_on_unsupported_capacitive_boundaries",
+      "tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_worker_rc_source_split_energy_power_and_original_provenance",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_active_stable_singular_unstable_marginal_and_extremes",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_analytic_parallel_rlc_damping_current_split_and_energy_balance",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_invalid_preflight_total_state_limits_and_cancellation",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_mixed_two_port_coupling_source_order_and_ideal_resistor_row",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_pwl_physical_state_reference_and_output_grid_invariance",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_reference_impedance_and_physical_time_scaling",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_resistor_network_rc_step_and_initial_current_split",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_two_shunt_capacitors_coupled_conductance_and_source_order"
+    ],
+    "run": 11,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI07-S04-rlgc-fields-reverified.log",
+  "log_sha256": "c45e308a0cb8cb2405fee2739283d2d7a1b21f6d49a9bf2a4a5d115ba6d237d5"
+}

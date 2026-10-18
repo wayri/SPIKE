@@ -1,0 +1,51 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "PI02-S03",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "8bdc97d52ba45f1fb6c2a19b29d2ac54ac36d0f8b78260e881bbd851e9b1fdb0",
+    "python/spike_core/pdn_dielectric_ac.py": "06be9774d53d488a8ca7ee850c9b06c4903908f7fa4be9c2add00b860480af83",
+    "python/spike_core/pdn_electrostatic.py": "e081542abe3f915a64b6816fbe9ed95e0546e8daefe35e72b2500d0d4b39b521",
+    "python/spike_core/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
+    "python/spike_core/assembly_tetra_thermal_validation.py": "54ad05eaedbb4a47f5a866af7df97e94e25f871e4ada2aa3f8daa07db3ff4bd3",
+    "python/spike_core/tetra_aabb_candidates.py": "f7bcba55ced57a7c5104a73afaede5b4e26f9c1a871d281905f3b46e54cb6870",
+    "python/spike_core/service_pdn_network.py": "3252f731ef0cb4f586c7a1e64ef3a0300a43312e505c4af812b9823a9ff7c7ec",
+    "tests/python/test_pdn_dielectric_ac.py": "ea7633a766f0530494a8c039e6061a0a05af70b7bb422d47d03f11ef57c38b32",
+    "tests/python/test_pdn_dielectric_ac_contract.py": "9ee8906dc030845cadce595aca26b4309814564f7ef1972e44f9f31966f10e07",
+    "tests/python/test_pdn_electrostatic.py": "ea77b8053989c106c045101207aaf93ef34a21a553d4b25173ff26921b5fdf6e",
+    "tests/python/test_assembly_tetra_thermal.py": "27f6fad65ae1e92eb87ff25251be6ee15414b66b7e548efc0c1d29896ac93347",
+    "schemas/pdn-dielectric-ac-request-v1.schema.json": "9df2b8ec3f2edb14648fc235e6616b64f51069e8753968fa1b9e05321a7ebc1c",
+    "schemas/pdn-dielectric-ac-result-v1.schema.json": "1925bc76732ae4bb75f7ae383c10e9b9bb3ea8ec5833aaea99f15b87c9746186",
+    "python/spike_core/pdn_dielectric_thermal.py": "536d58b1833a9aa363c17844f537114f7fa4e59c3e6aa9332a7817d94bac50f5",
+    "python/spike_core/assembly_tetra_thermal.py": "080af44da4775116163483f80de1ede3054ed99ea9ff6a4f0ff5f647bc1a4fc2",
+    "python/spike_core/assembly_tetra_radiation.py": "d770ef77e954af97a12739a7e5324b546704f4ec416c1f12e284efa4f155daaf",
+    "tests/python/test_pdn_dielectric_thermal.py": "aa9dbf865de07b5257e238c3ea71c2fbfdf180f938b82853bdd0c291e5611c54",
+    "tests/python/test_pdn_dielectric_thermal_contract.py": "b0881082664f6eb15326bde42d3532947ebf1d72f06222c360b1820923e596d8",
+    "examples/pdn_dielectric_thermal/run_slab.py": "6f82811d161e9b2eb87f0b9d79d236dffcea0caa323c421b8ae793d8b494d54a",
+    "schemas/pdn-dielectric-thermal-request-v1.schema.json": "8d1d2f0c5e0d39e788078e684d8fdae84841203fc7ce5ddbaf2f5e0ca884a524",
+    "schemas/pdn-dielectric-thermal-result-v1.schema.json": "6db73622b3940f5d6daff4a69c895628eac44a6cf3b76d795339ff06d2931c21"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_corrupted_fields_fail_conservation_before_thermal_solve",
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_heterogeneous_loss_with_coherent_multielectrode_cross_terms",
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_mesh_double_heat_drive_and_material_admission",
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_phase_invariance_quadratic_amplitude_and_zero_loss",
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_resource_preflight_and_cancelled_thermal_result_not_published",
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_rms_plate_cell_loads_and_independent_power_balance",
+      "tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_uniform_heated_slab_p1_refinement_against_parabolic_solution",
+      "tests.python.test_pdn_dielectric_thermal_contract.DielectricThermalContractTests.test_reproducible_example_actual_worker",
+      "tests.python.test_pdn_dielectric_thermal_contract.DielectricThermalContractTests.test_schema_and_actual_worker_power_to_temperature",
+      "tests.python.test_pdn_dielectric_thermal_contract.DielectricThermalContractTests.test_worker_rejects_mismatched_mesh_and_ambiguous_drives"
+    ],
+    "run": 10,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI02-S03-rlgc-cascade-reverified.log",
+  "log_sha256": "2b1d82e8985c931355379cbdad84ae005262160d9a25cb93cb0c62a0fb060c62"
+}

@@ -6,6 +6,48 @@ controls and explicit hidden-wire RLC. See the complete
 [workflow and limits](../../../../docs/SPIKES_SOURCED_PARTS_WORKBENCH.md).
 It does not update the installed beta or qualify all vendor device families.
 
+## Schematic editing and model-library increment (2026-10-18)
+
+Use **Duplicate** in the schematic toolbar or **Ctrl+Shift+D** with selected top-level
+components. **Ctrl+C / Ctrl+V** copies and previews a selected fragment on the
+same sheet. Click to place, Space to rotate, click again to repeat, and Escape
+to finish or cancel an uncommitted preview. Each placement has one undo step.
+Nonzero nets are isolated from the original; ground remains ground. Unsupported
+dependent-source, junction-route and cross-sheet cases produce explicit errors.
+See [editing contracts and boundaries](SCHEMATIC_EDITING.md).
+
+The **Physics models** collection adds configurable NMOS4, NPN4, substrate
+resistor, feedthrough capacitor and Kelvin-shunt builders to normal discovery
+and insertion. Values use labeled SI fields; every terminal must be mapped.
+See [exact models, pin order and limits](LUMPED_PHYSICS_LIBRARY.md).
+
+Quick insert builds one bounded search index per opened palette. Repeated
+queries reuse ranked pages while signal completions and project collections
+remain current. Full model availability still comes from the installed records.
+The [advancement/evidence plan](../../../../docs/SPIKES_STUDIO_ADVANCEMENT.md)
+separates these UI improvements from future whole-simulator comparison targets.
+
+## Library discovery and quick insertion
+
+Double-click empty schematic space to open the insertion palette. Browse
+Components without typing to see distinct families instead of repeated value
+variants. Choose a catalog category, Circuit-ready, Bench only, Favorites, or
+Recent. Type a name, family or exact preset ID to find specific installed values.
+Favorites and recent insertions use the current project's saved library lists;
+an empty collection shows recovery guidance and leaves the document unchanged.
+
+Up/Down selects, Page Up/Down moves eight rows, Tab completes a directive or
+signal, Enter configures/places, and Escape cancels. Refresh retains selection
+when it still matches. Full library opens the browser with the query for value,
+connection and model review. Placement uses the existing undoable component
+editor; choosing a result alone never starts a simulation.
+
+This discovery surface reuses the installed catalog. Native recipes, ideal
+nominal manufacturer approximations and equation-bench/review-only records
+retain separate availability labels. More icons and visible families do not
+add or qualify semiconductor models. No external artwork or vendor models are
+bundled by this UI change.
+
 ## Clean workspaces and appearance
 
 ### Analysis forms and canvas text (T)
@@ -221,7 +263,9 @@ armed move without changing the document.
 Click a terminal marker, optional grid-snapped corners, then the destination
 terminal. The dashed orthogonal preview follows the pointer. **/** flips its
 horizontal-first or vertical-first bend posture, and **Backspace** retracts the
-last explicit corner. The first **Escape** cancels the wire in progress while
+last explicit corner. **Right-click** also retracts a corner; with no corners it
+cancels the current segment, then closes idle Wire on the next right-click.
+The first **Escape** cancels the wire in progress while
 leaving Wire active; a second **Escape** exits the tool. After a wire is committed,
 Wire remains active for the next connection. This is an electrical net merge, not
 a decorative line: the destination net is renamed to the first net, except that
@@ -230,6 +274,14 @@ same route that will be committed. For terminal-to-terminal connections, if the
 selected no-corner posture would enter an endpoint symbol body, both preview and
 commit use the body-avoiding autoroute.
 Undo restores both the drawing and source in one step.
+
+While Wire is active, the canvas shows the current **H → V** or **V → H** bend
+posture and the toggle, backtrack and cancel keys. Hovering a terminal shows a
+snap halo with its reference, pin and node. During a wire, hovering an existing
+route shows the exact branch point. The bounded target label chooses a position
+with the least overlap with component and annotation bodies; a crowded sheet
+can still require moving the pointer to read all text. Otherwise a cross marks the next snapped
+corner. These marks are previews only and do not change connectivity.
 
 To create a deliberate branch, start **Wire** at the new branch terminal and
 finish on the interior of an existing wire. Studio first checks whether its
@@ -1220,4 +1272,3 @@ Only bindings already marked `reviewed` by the source workspace and supported as
 Studio primitives become executable records. Unavailable parts and reviewed
 subcircuits without an admitted implementation remain visible and inert with an
 explicit reason. Studio never infers a model from a reference or displayed value.
-

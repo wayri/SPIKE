@@ -1,15 +1,210 @@
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "type":"object",
-  "required":["contract","version","records","counts","archetype_count","notice"],
-  "properties":{
-    "contract":{"const":"spikes/component-catalog/v1"},"version":{"type":"string"},
-    "archetype_count":{"type":"integer","minimum":1},"counts":{"type":"object"},"notice":{"type":"string"},
-    "records":{"type":"array","items":{"type":"object","required":["id","category","family","name","parameters","status","fidelity","limitations","qualification"],"properties":{
-      "id":{"type":"string"},"category":{"type":"string"},"family":{"type":"string"},"name":{"type":"string"},"parameters":{"type":"object"},
-      "model_type":{"const":"lumped_passive_rlc_v1"},"passive_kind":{"enum":["resistor","capacitor","inductor","kelvin_shunt"]},
-      "package_code":{"type":"string"},"construction":{"type":"string"},
-      "status":{"enum":["native_subcircuit","equation_bench_only"]},"fidelity":{"const":"generic_reduced_order"},"qualification":{"const":"unqualified_presets"},"limitations":{"type":"string"}
-    }}}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "finiteNumber": {"type": "number"},
+    "capacitance": {"$ref": "#/$defs/finiteNumber", "minimum": 0, "maximum": 1},
+    "positiveCapacitance": {"$ref": "#/$defs/finiteNumber", "minimum": 1e-18, "maximum": 1},
+    "resistance": {"$ref": "#/$defs/finiteNumber", "minimum": 1e-9, "maximum": 1e15},
+    "contactResistance": {"$ref": "#/$defs/finiteNumber", "minimum": 0, "maximum": 1e15},
+    "transitTime": {"$ref": "#/$defs/finiteNumber", "minimum": 0, "maximum": 1},
+    "saturationCurrent": {"$ref": "#/$defs/finiteNumber", "minimum": 1e-30, "maximum": 1},
+    "emissionCoefficient": {"$ref": "#/$defs/finiteNumber", "minimum": 0.1, "maximum": 10},
+    "pin3": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "string"}},
+    "pin4": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "string"}},
+    "nmos4": {
+      "properties": {
+        "id": {"const": "physics.lumped.nmos4"}, "family": {"const": "nmos4"}, "builder_kind": {"const": "nmos4"},
+        "primary_parameter": {"const": "threshold_voltage_v"}, "parameter_unit": {"const": "V"},
+        "symbol_id": {"const": "mosfet.n_channel.4_terminal"},
+        "pins": {"$ref": "#/$defs/pin4", "prefixItems": [{"const": "D"}, {"const": "G"}, {"const": "S"}, {"const": "B"}]},
+        "parameters": {
+          "type": "object",
+          "required": ["threshold_voltage_v", "transconductance_a_per_v2", "channel_length_modulation_per_v", "body_effect_sqrt_v", "surface_potential_v", "width_over_length", "junction_saturation_current_a", "junction_emission_coefficient", "cgs_f", "cgd_f", "cds_f", "cgb_f", "cbd_f", "cbs_f"],
+          "properties": {
+            "threshold_voltage_v": {"type": "number", "minimum": -100, "maximum": 100},
+            "transconductance_a_per_v2": {"type": "number", "minimum": 1e-12, "maximum": 1e6},
+            "channel_length_modulation_per_v": {"type": "number", "minimum": 0, "maximum": 100},
+            "body_effect_sqrt_v": {"type": "number", "minimum": 0, "maximum": 100},
+            "surface_potential_v": {"type": "number", "minimum": 1e-6, "maximum": 100},
+            "width_over_length": {"type": "number", "minimum": 1e-6, "maximum": 1e6},
+            "junction_saturation_current_a": {"$ref": "#/$defs/saturationCurrent"}, "junction_emission_coefficient": {"$ref": "#/$defs/emissionCoefficient"},
+            "cgs_f": {"$ref": "#/$defs/capacitance"}, "cgd_f": {"$ref": "#/$defs/capacitance"}, "cds_f": {"$ref": "#/$defs/capacitance"},
+            "cgb_f": {"$ref": "#/$defs/capacitance"}, "cbd_f": {"$ref": "#/$defs/capacitance"}, "cbs_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "npn4": {
+      "properties": {
+        "id": {"const": "physics.lumped.npn4"}, "family": {"const": "npn4"}, "builder_kind": {"const": "npn4"},
+        "primary_parameter": {"const": "forward_beta"}, "parameter_unit": {"const": "1"},
+        "symbol_id": {"const": "bjt.npn.4_terminal"},
+        "pins": {"$ref": "#/$defs/pin4", "prefixItems": [{"const": "C"}, {"const": "B"}, {"const": "E"}, {"const": "SUB"}]},
+        "parameters": {
+          "type": "object",
+          "required": ["saturation_current_a", "forward_beta", "reverse_beta", "emission_coefficient", "cbe_f", "cbc_f", "forward_transit_time_s", "reverse_transit_time_s", "junction_saturation_current_a", "junction_emission_coefficient", "csub_f"],
+          "properties": {
+            "saturation_current_a": {"$ref": "#/$defs/saturationCurrent"}, "forward_beta": {"type": "number", "minimum": 0.01, "maximum": 1e6},
+            "reverse_beta": {"type": "number", "minimum": 0.01, "maximum": 1e6}, "emission_coefficient": {"$ref": "#/$defs/emissionCoefficient"},
+            "cbe_f": {"$ref": "#/$defs/capacitance"}, "cbc_f": {"$ref": "#/$defs/capacitance"},
+            "forward_transit_time_s": {"$ref": "#/$defs/transitTime"}, "reverse_transit_time_s": {"$ref": "#/$defs/transitTime"},
+            "junction_saturation_current_a": {"$ref": "#/$defs/saturationCurrent"}, "junction_emission_coefficient": {"$ref": "#/$defs/emissionCoefficient"},
+            "csub_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "resistor3": {
+      "properties": {
+        "id": {"const": "physics.lumped.resistor3"}, "family": {"const": "resistor3"}, "builder_kind": {"const": "resistor3"},
+        "primary_parameter": {"const": "resistance_ohm"}, "parameter_unit": {"const": "ohm"},
+        "symbol_id": {"const": "resistor.substrate.3_terminal"},
+        "pins": {"$ref": "#/$defs/pin3", "prefixItems": [{"const": "P"}, {"const": "N"}, {"const": "SUB"}]},
+        "parameters": {
+          "type": "object", "required": ["resistance_ohm", "substrate_capacitance_f", "substrate_leakage_resistance_ohm"],
+          "properties": {"resistance_ohm": {"$ref": "#/$defs/resistance"}, "substrate_capacitance_f": {"$ref": "#/$defs/capacitance"}, "substrate_leakage_resistance_ohm": {"$ref": "#/$defs/resistance"}},
+          "additionalProperties": false
+        }
+      }
+    },
+    "feedthroughCapacitor3": {
+      "properties": {
+        "id": {"const": "physics.lumped.feedthrough_capacitor3"}, "family": {"const": "feedthrough_capacitor3"}, "builder_kind": {"const": "feedthrough_capacitor3"},
+        "primary_parameter": {"const": "capacitance_f"}, "parameter_unit": {"const": "F"},
+        "symbol_id": {"const": "capacitor.feedthrough.3_terminal"},
+        "pins": {"$ref": "#/$defs/pin3", "prefixItems": [{"const": "IN"}, {"const": "OUT"}, {"const": "GND"}]},
+        "parameters": {
+          "type": "object", "required": ["series_resistance_ohm", "series_inductance_h", "capacitance_f"],
+          "properties": {"series_resistance_ohm": {"$ref": "#/$defs/resistance"}, "series_inductance_h": {"type": "number", "minimum": 0, "maximum": 1000}, "capacitance_f": {"$ref": "#/$defs/positiveCapacitance"}},
+          "additionalProperties": false
+        }
+      }
+    },
+    "kelvinShunt4": {
+      "properties": {
+        "id": {"const": "physics.lumped.kelvin_shunt4"}, "family": {"const": "kelvin_shunt4"}, "builder_kind": {"const": "kelvin_shunt4"},
+        "primary_parameter": {"const": "resistance_ohm"}, "parameter_unit": {"const": "ohm"},
+        "symbol_id": {"const": "resistor.kelvin.4_terminal"},
+        "pins": {"$ref": "#/$defs/pin4", "prefixItems": [{"const": "FP"}, {"const": "FN"}, {"const": "SP"}, {"const": "SN"}]},
+        "parameters": {
+          "type": "object", "required": ["resistance_ohm", "contact_resistance_ohm"],
+          "properties": {"resistance_ohm": {"$ref": "#/$defs/resistance"}, "contact_resistance_ohm": {"$ref": "#/$defs/contactResistance"}},
+          "additionalProperties": false
+        }
+      }
+    },
+    "packagedNmos4": {
+      "properties": {
+        "id": {"const": "physics.packaged.nmos4"}, "family": {"const": "packaged_nmos4"}, "builder_kind": {"const": "packaged_nmos4"},
+        "core_builder_kind": {"const": "nmos4"}, "package_builder": {"const": "device_parasitics"},
+        "primary_parameter": {"const": "series_inductance_h"}, "parameter_unit": {"const": "H"},
+        "symbol_id": {"const": "mosfet.n_channel.4_terminal"},
+        "pins": {"$ref": "#/$defs/pin4", "prefixItems": [{"const": "D"}, {"const": "G"}, {"const": "S"}, {"const": "B"}]},
+        "parameters": {
+          "type": "object",
+          "required": ["threshold_voltage_v", "transconductance_a_per_v2", "channel_length_modulation_per_v", "body_effect_sqrt_v", "surface_potential_v", "width_over_length", "junction_saturation_current_a", "junction_emission_coefficient", "cgs_f", "cgd_f", "cds_f", "cgb_f", "cbd_f", "cbs_f", "series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"],
+          "properties": {
+            "threshold_voltage_v": {"type": "number", "minimum": -100, "maximum": 100},
+            "transconductance_a_per_v2": {"type": "number", "minimum": 1e-12, "maximum": 1e6},
+            "channel_length_modulation_per_v": {"type": "number", "minimum": 0, "maximum": 100},
+            "body_effect_sqrt_v": {"type": "number", "minimum": 0, "maximum": 100},
+            "surface_potential_v": {"type": "number", "minimum": 1e-6, "maximum": 100},
+            "width_over_length": {"type": "number", "minimum": 1e-6, "maximum": 1e6},
+            "junction_saturation_current_a": {"$ref": "#/$defs/saturationCurrent"}, "junction_emission_coefficient": {"$ref": "#/$defs/emissionCoefficient"},
+            "cgs_f": {"$ref": "#/$defs/capacitance"}, "cgd_f": {"$ref": "#/$defs/capacitance"}, "cds_f": {"$ref": "#/$defs/capacitance"},
+            "cgb_f": {"$ref": "#/$defs/capacitance"}, "cbd_f": {"$ref": "#/$defs/capacitance"}, "cbs_f": {"$ref": "#/$defs/capacitance"},
+            "series_resistance_ohm": {"$ref": "#/$defs/contactResistance"}, "series_inductance_h": {"type": "number", "minimum": 0, "maximum": 1000},
+            "parallel_capacitance_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "packagedNpn4": {
+      "properties": {
+        "id": {"const": "physics.packaged.npn4"}, "family": {"const": "packaged_npn4"}, "builder_kind": {"const": "packaged_npn4"},
+        "core_builder_kind": {"const": "npn4"}, "package_builder": {"const": "device_parasitics"},
+        "primary_parameter": {"const": "series_inductance_h"}, "parameter_unit": {"const": "H"},
+        "symbol_id": {"const": "bjt.npn.4_terminal"},
+        "pins": {"$ref": "#/$defs/pin4", "prefixItems": [{"const": "C"}, {"const": "B"}, {"const": "E"}, {"const": "SUB"}]},
+        "parameters": {
+          "type": "object",
+          "required": ["saturation_current_a", "forward_beta", "reverse_beta", "emission_coefficient", "cbe_f", "cbc_f", "forward_transit_time_s", "reverse_transit_time_s", "junction_saturation_current_a", "junction_emission_coefficient", "csub_f", "series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"],
+          "properties": {
+            "saturation_current_a": {"$ref": "#/$defs/saturationCurrent"}, "forward_beta": {"type": "number", "minimum": 0.01, "maximum": 1e6},
+            "reverse_beta": {"type": "number", "minimum": 0.01, "maximum": 1e6}, "emission_coefficient": {"$ref": "#/$defs/emissionCoefficient"},
+            "cbe_f": {"$ref": "#/$defs/capacitance"}, "cbc_f": {"$ref": "#/$defs/capacitance"},
+            "forward_transit_time_s": {"$ref": "#/$defs/transitTime"}, "reverse_transit_time_s": {"$ref": "#/$defs/transitTime"},
+            "junction_saturation_current_a": {"$ref": "#/$defs/saturationCurrent"}, "junction_emission_coefficient": {"$ref": "#/$defs/emissionCoefficient"},
+            "csub_f": {"$ref": "#/$defs/capacitance"},
+            "series_resistance_ohm": {"$ref": "#/$defs/contactResistance"}, "series_inductance_h": {"type": "number", "minimum": 0, "maximum": 1000},
+            "parallel_capacitance_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": ["contract", "version", "records", "counts", "archetype_count", "notice"],
+  "properties": {
+    "contract": {"const": "spikes/component-catalog/v1"}, "version": {"type": "string"},
+    "archetype_count": {"type": "integer", "minimum": 1}, "counts": {"type": "object"}, "notice": {"type": "string"},
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "family", "name", "parameters", "status", "fidelity", "limitations", "qualification"],
+        "properties": {
+          "id": {"type": "string"}, "category": {"type": "string"}, "family": {"type": "string"}, "name": {"type": "string"},
+          "parameters": {"type": "object"}, "parameter_unit": {"type": "string"},
+          "model_type": {"enum": ["lumped_passive_rlc_v1", "lumped_physics_part_v1", "packaged_lumped_device_v1"]},
+          "passive_kind": {"enum": ["resistor", "capacitor", "inductor", "kelvin_shunt"]}, "package_code": {"type": "string"}, "construction": {"type": "string"},
+          "builder_kind": {"type": "string"}, "core_builder_kind": {"type": "string"}, "package_builder": {"type": "string"}, "primary_parameter": {"type": "string"}, "pins": {"type": "array", "items": {"type": "string"}}, "symbol_id": {"type": "string"},
+          "model_status": {"type": "string"}, "backend": {"type": "string"}, "supported_analyses": {"type": "array", "items": {"type": "string"}},
+          "manufacturer": {"type": ["string", "null"]}, "origin": {"type": "string"},
+          "status": {"enum": ["native_subcircuit", "equation_bench_only"]}, "fidelity": {"const": "generic_reduced_order"},
+          "qualification": {"enum": ["unqualified_presets", "generic_unqualified"]}, "limitations": {"type": "string"}
+        },
+        "allOf": [
+          {
+            "if": {"required": ["model_type"], "properties": {"model_type": {"const": "lumped_physics_part_v1"}}},
+            "then": {
+              "required": ["builder_kind", "primary_parameter", "parameter_unit", "pins", "symbol_id", "model_status", "backend", "supported_analyses", "manufacturer", "origin"],
+              "properties": {
+                "category": {"const": "Physics models"}, "status": {"const": "native_subcircuit"}, "fidelity": {"const": "generic_reduced_order"},
+                "qualification": {"const": "generic_unqualified"}, "model_status": {"const": "generic_unqualified"}, "backend": {"const": "native"},
+                "manufacturer": {"type": "null"}, "origin": {"const": "python.spikes.lumped_physics_parts established builder"},
+                "supported_analyses": {"type": "array", "minItems": 3, "maxItems": 3, "prefixItems": [{"const": "op"}, {"const": "transient_be"}, {"const": "transient_bdf2"}]}
+              },
+              "oneOf": [{"$ref": "#/$defs/nmos4"}, {"$ref": "#/$defs/npn4"}, {"$ref": "#/$defs/resistor3"}, {"$ref": "#/$defs/feedthroughCapacitor3"}, {"$ref": "#/$defs/kelvinShunt4"}]
+            }
+          },
+          {
+            "if": {"required": ["model_type"], "properties": {"model_type": {"const": "lumped_passive_rlc_v1"}}},
+            "then": {"required": ["passive_kind", "package_code", "construction"], "properties": {"qualification": {"const": "unqualified_presets"}}}
+          },
+          {
+            "if": {"required": ["model_type"], "properties": {"model_type": {"const": "packaged_lumped_device_v1"}}},
+            "then": {
+              "required": ["builder_kind", "core_builder_kind", "package_builder", "primary_parameter", "parameter_unit", "pins", "symbol_id", "model_status", "backend", "supported_analyses", "manufacturer", "origin"],
+              "properties": {
+                "category": {"const": "Physics models"}, "status": {"const": "native_subcircuit"}, "fidelity": {"const": "generic_reduced_order"},
+                "qualification": {"const": "generic_unqualified"}, "model_status": {"const": "generic_unqualified"}, "backend": {"const": "native"},
+                "manufacturer": {"type": "null"}, "origin": {"const": "python.spikes.lumped_physics_parts + python.spikes.device_parasitics established composition"},
+                "supported_analyses": {"type": "array", "minItems": 3, "maxItems": 3, "prefixItems": [{"const": "op"}, {"const": "transient_be"}, {"const": "transient_bdf2"}]}
+              },
+              "oneOf": [{"$ref": "#/$defs/packagedNmos4"}, {"$ref": "#/$defs/packagedNpn4"}]
+            }
+          },
+          {
+            "if": {"not": {"required": ["model_type"]}},
+            "then": {"properties": {"qualification": {"const": "unqualified_presets"}}}
+          }
+        ]
+      }
+    }
   }
 }

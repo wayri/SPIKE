@@ -7,9 +7,9 @@ import json
 from pathlib import Path
 
 if __package__:
-    from .benchmark_board_corpus import validate_entry
+    from .benchmark_board_corpus import validate_entry, validate_source_snapshots
 else:
-    from benchmark_board_corpus import validate_entry
+    from benchmark_board_corpus import validate_entry, validate_source_snapshots
 
 
 def _path(root: Path, name: object) -> Path:
@@ -34,7 +34,7 @@ def validate_done_import_stage(stage: dict, root: Path) -> None:
             from parity_structural_gate import validate_receipt
         validate_receipt(receipt, root, stage['id'])
         return
-    if stage['id'] in ('SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'SI07-S03', 'SI07-S04'):
+    if stage['id'] in ('SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'SI07-S03', 'SI07-S04', 'SI07-S05', 'SI07-S06', 'SI07-S07', 'SI07-S08', 'SI07-S09', 'SI07-S10', 'SI02-S01', 'SI02-S02', 'SI02-S03', 'SI02-S04', 'SI02-S05', 'SI02-S06'):
         if __package__:
             from .parity_pisi_gate import validate_receipt
         else:
@@ -76,30 +76,20 @@ def validate_done_import_stage(stage: dict, root: Path) -> None:
             from parity_component_admission_gate import validate_receipt
         validate_receipt(receipt, root)
         return
-    if (receipt.get('contract') != 'spike/parity-stage-evidence/v1'
+    if (receipt.get('contract') != 'spike/parity-stage-evidence/v2'
             or receipt.get('stage_id') != stage['id']):
         raise ValueError('stage receipt identity mismatch')
     manifest_path = _path(root, receipt.get('manifest'))
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     summary = receipt.get('summary')
-    if (not isinstance(summary, dict) or summary.get('contract') != 'spike/board-corpus-benchmark/v1'
+    if (not isinstance(summary, dict) or summary.get('contract') != 'spike/board-corpus-benchmark/v2'
             or summary.get('status') != 'passed' or summary.get('production_qualified') is not False):
         raise ValueError('done stage requires a passed bounded import summary')
-    if summary.get('manifest_sha256') != _digest(manifest_path):
+    if (summary.get('manifest_sha256') != _digest(manifest_path)
+            or summary.get('manifest_sha256_after') != summary.get('manifest_sha256')
+            or summary.get('source_snapshot_stable') is not True):
         raise ValueError('stage manifest evidence is stale')
-    sources = summary.get('runner_sources')
-    required = {'scripts/benchmark_board_corpus.py', 'scripts/board_corpus_assertions.py',
-                'python/spike_core/kicad_importer.py', 'python/core/board_parser.py',
-                'python/spike_core/spider_v2.py', 'python/spike_core/arc_legacy_projection.py',
-                'python/spike_core/board_outline_geometry.py', 'python/spike_core/mcad_export_design.py',
-                'python/spike_core/assembly_thermal_meshing.py', 'python/spike_core/pcb_volume_compiler.py'}
-    required.add('python/core/kicad_model_sources.py')
-    required.update({'python/spike_core/mcad_component_models.py', 'scripts/parity_component_model_gate.py'})
-    if not isinstance(sources, dict) or not required.issubset(sources):
-        raise ValueError('stage runner source bindings are missing')
-    for name, digest in sources.items():
-        if digest != _digest(_path(root, name)):
-            raise ValueError('stage runner evidence is stale')
+    validate_source_snapshots(summary, root)
     entries, rows = manifest.get('boards'), summary.get('boards')
     if not isinstance(entries, list) or not entries or not isinstance(rows, list) or len(rows) != len(entries):
         raise ValueError('stage fixture coverage differs from manifest')
@@ -107,12 +97,20 @@ def validate_done_import_stage(stage: dict, root: Path) -> None:
         fixture = validate_entry(entry, manifest_path.parent)
         if (not isinstance(row, dict) or row.get('passed') is not True or row.get('fixture') != entry['path']
                 or row.get('import_status') not in ('completed', 'completed_with_warnings')
-                or row.get('sha256') != _digest(fixture) or row.get('source_digest_checked') is not True
+                or row.get('sha256') != _digest(fixture) or row.get('source_sha256_after') != row.get('sha256')
+                or row.get('source_digest_checked') is not True
                 or any(row.get(field) != [] for field in ('geometry_mismatches', 'errors'))
                 or row.get('mismatches') != {}
                 or row.get('entity_assertions_checked') != len(entry.get('expected_entities', []))
                 or any(row.get('counts', {}).get(key) != value for key, value in entry.get('expected_counts', {}).items())):
             raise ValueError('done stage retains failed or incomplete fixture evidence')
+    retained = receipt.get('import_evidence', {})
+    retained_path = _path(root, retained.get('file'))
+    if len(entries) != 1 or retained.get('sha256') != _digest(retained_path):
+        raise ValueError('retained import evidence is stale or ambiguous')
+    retained_payload = json.loads(retained_path.read_text(encoding='utf-8'))
+    if retained_payload.get('report', {}).get('source_sha256') != entries[0]['sha256']:
+        raise ValueError('retained import source differs from stage fixture')
     if stage['id'] == 'WF01-S04C1' and 'component_model_gate' not in receipt:
         raise ValueError('Explicit component-solid stage requires native mechanical evidence.')
     if 'component_model_gate' in receipt:

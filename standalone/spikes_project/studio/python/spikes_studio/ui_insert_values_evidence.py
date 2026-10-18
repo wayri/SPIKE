@@ -15,9 +15,10 @@ def verify(frame,destination):
         try:
             dialog=next(w for w in wx.GetTopLevelWindows() if isinstance(w,wx.Dialog) and w.GetTitle()=='Add component')
             check(dialog.book.GetSelection()==0,'value and parameters are the default insertion tab')
-            check(all(c.GetParent()==dialog.book.GetPage(1) for c in dialog.pins.values()),'pin mappings are confined to the separate connections tab')
+            pin_page=next(i for i in range(dialog.book.GetPageCount()) if dialog.book.GetPageText(i)=='Pins & connections')
+            check(all(c.GetParent()==dialog.book.GetPage(pin_page) for c in dialog.pins.values()),'pin mappings are confined to the separate connections tab')
             dialog.parameter_fields['r'].SetValue('4.7k');dialog.Layout();wx.Yield();capture_window(dialog,directory/'values-first.png')
-            dialog.book.SetSelection(1);dialog.Layout();wx.Yield();capture_window(dialog,directory/'pins-separate.png')
+            dialog.book.SetSelection(pin_page);dialog.Layout();wx.Yield();capture_window(dialog,directory/'pins-separate.png')
             dialog.book.SetSelection(0);dialog.accept()
         except Exception as error:
             frame._insert_test_error=error

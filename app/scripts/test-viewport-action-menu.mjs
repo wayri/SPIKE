@@ -75,6 +75,9 @@ listeners.get("pointerdown")({ target: {} }); assert.equal(closed, 3, "outside p
 assert.equal(origin.focused, 3);
 key("Tab", searchElement); assert.equal(closed, 4, "Tab dismisses while letting browser focus move"); assert.equal(origin.focused, 3, "Tab does not force focus back");
 presentationWindow.innerWidth = 400; windowListeners.get("resize")(); assert.equal(style.left, "40px");
+props.essentialTools = jsx("div", { "aria-label": "Viewport camera and selection" }); render();
+assert.ok(nodes(tree).some(node => node === props.essentialTools), "context camera controls are rendered");
+key("Tab", searchElement); assert.equal(closed, 4, "Tab reaches context camera controls without dismissal");
 effects.forEach(effect => effect?.cleanup?.()); layouts.forEach(effect => effect?.cleanup?.());
 assert.equal(listeners.size, 0); assert.equal(windowListeners.size, 0);
 console.log("Viewport action menu: keyboard submenus, focus return, disabled actions, grouped search, stable updates and bounded positioning passed.");

@@ -19,3 +19,7 @@
 .action-menu-check { width: 14px; flex: 0 0 14px; color: var(--spike-table-focus); }
 .action-menu-section { padding: 7px 8px 3px; border-top: 1px solid var(--spike-table-border); font-size: 10px; font-weight: 600; color: var(--spike-table-muted); }
 .action-menu-row:first-of-type .action-menu-section { border-top: 0; }
+
+.spike-action-context-menu .action-menu-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;padding:2px 2px 5px 8px}
+.action-menu-heading>strong{min-width:0;overflow-wrap:anywhere;font-size:12px}
+.action-menu-heading>.spike-control--icon{flex:none;width:26px;height:26px;min-height:26px;padding:4px}

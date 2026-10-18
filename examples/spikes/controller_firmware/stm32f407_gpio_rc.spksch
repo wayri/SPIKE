@@ -1,0 +1,2138 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "86f41a758037436985f96b42f27abe56",
+  "title": "Firmware GPIO-controlled RC",
+  "source": "Firmware GPIO-controlled RC\nVSENSE sense 0 0\nVDRIVE drive 0 0\nR1 drive out 1k\nC1 out 0 1u\n.tran 100u 10m uic\n.end\n",
+  "components": [
+    {
+      "id": "ab536c2f51ea463c83d27fe23af2a6d2",
+      "ref": "VSENSE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "sense",
+        "0"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "4c7c083afdfb4ceda53b965126ebd18b",
+      "ref": "VDRIVE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "drive",
+        "0"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "1a4632ca038b46708a6ba7980e6649a0",
+      "ref": "R1",
+      "kind": "resistor",
+      "value": "1000",
+      "nodes": [
+        "drive",
+        "out"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "71ae2d36f9c840bbadf796f6dc83f91c",
+      "ref": "C1",
+      "kind": "capacitor",
+      "value": "1e-06",
+      "nodes": [
+        "out",
+        "0"
+      ],
+      "x": 740,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    }
+  ],
+  "probes": [],
+  "expressions": [],
+  "metadata": {},
+  "revision": 1,
+  "wires": [],
+  "junctions": [],
+  "labels": [],
+  "power_symbols": [],
+  "model_policy": {
+    "schematic": {
+      "tier": "source",
+      "enforce": false
+    },
+    "subsheets": {},
+    "components": {}
+  },
+  "simulation_sequences": [],
+  "annotations": [],
+  "dashboard": {
+    "version": 1,
+    "widgets": []
+  },
+  "thermal_setup": {
+    "contract": "spikes/thermal-setup/v1",
+    "solver_binding": "not_coupled",
+    "board": {
+      "length_mm": 100.0,
+      "width_mm": 80.0,
+      "thickness_mm": 1.6,
+      "material": "FR4 (assumption)",
+      "orientation": "horizontal",
+      "layers": [
+        {
+          "name": "L1",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L2",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L3",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L4",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        }
+      ]
+    },
+    "enclosure": {
+      "type": "open_air",
+      "material": "Unspecified",
+      "length_mm": 150.0,
+      "width_mm": 120.0,
+      "height_mm": 50.0,
+      "wall_mm": 2.0,
+      "vent_area_mm2": 0.0
+    },
+    "environment": {
+      "ambient_c": 25.0,
+      "airflow": "natural",
+      "air_speed_m_s": 0.0,
+      "direction": "parallel_to_board",
+      "convection_w_m2k": null,
+      "altitude_m": 0.0
+    },
+    "notes": "Initial authoring assumptions; replace with actual board/environment data."
+  },
+  "run_profile": {
+    "contract": "spikes/run-profile/v1",
+    "name": "Default",
+    "backend": "native",
+    "execution": "batch",
+    "analysis": "from_netlist",
+    "time_step": "10u",
+    "stop_time": "5m",
+    "uic": true,
+    "method": "hybrid_trapezoidal",
+    "capture_samples": 20000,
+    "speed_ratio": 1.0,
+    "electrical_temperature_c": null
+  },
+  "plot_layout": {
+    "mode": "units",
+    "panes": {},
+    "heights": {}
+  },
+  "instruments": [],
+  "controller_setup": null,
+  "controller_boards": [
+    {
+      "id": "controller-board-ca1665a6a9ae4efb8540bc3bb61b719f",
+      "ref": "MCU1",
+      "board": {
+        "id": "st-stm32f407g-disc1-mb997",
+        "name": "STM32F407G-DISC1",
+        "manufacturer": "STMicroelectronics",
+        "family": "STM32 Discovery",
+        "revision": "MB997 / UM1472 Rev 9",
+        "mcu": "STM32F407VGT6",
+        "source_urls": [
+          "https://www.st.com/en/evaluation-tools/stm32f4discovery.html",
+          "https://www.st.com/resource/en/user_manual/um1472-stm32f4-discovery-stmicroelectronics.pdf"
+        ],
+        "logic_voltage_v": 3.0,
+        "pins": [
+          {
+            "id": "P1_1",
+            "label": "GND",
+            "header": "P1",
+            "position": 1,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P1_2",
+            "label": "GND",
+            "header": "P1",
+            "position": 2,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P1_3",
+            "label": "VDD",
+            "header": "P1",
+            "position": 3,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P1_4",
+            "label": "VDD",
+            "header": "P1",
+            "position": 4,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P1_5",
+            "label": "NRST",
+            "header": "P1",
+            "position": 5,
+            "role": "reset",
+            "aliases": [],
+            "capabilities": [
+              "system"
+            ]
+          },
+          {
+            "id": "P1_6",
+            "label": "PB3",
+            "header": "P1",
+            "position": 6,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_7",
+            "label": "PC1",
+            "header": "P1",
+            "position": 7,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_8",
+            "label": "PC0",
+            "header": "P1",
+            "position": 8,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_9",
+            "label": "PC3",
+            "header": "P1",
+            "position": 9,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_10",
+            "label": "PC2",
+            "header": "P1",
+            "position": 10,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_11",
+            "label": "PA1",
+            "header": "P1",
+            "position": 11,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_12",
+            "label": "PA0",
+            "header": "P1",
+            "position": 12,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_13",
+            "label": "PA3",
+            "header": "P1",
+            "position": 13,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_14",
+            "label": "PA2",
+            "header": "P1",
+            "position": 14,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_15",
+            "label": "PA5",
+            "header": "P1",
+            "position": 15,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_16",
+            "label": "PA4",
+            "header": "P1",
+            "position": 16,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_17",
+            "label": "PA7",
+            "header": "P1",
+            "position": 17,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_18",
+            "label": "PA6",
+            "header": "P1",
+            "position": 18,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_19",
+            "label": "PC5",
+            "header": "P1",
+            "position": 19,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_20",
+            "label": "PC4",
+            "header": "P1",
+            "position": 20,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_21",
+            "label": "PB1",
+            "header": "P1",
+            "position": 21,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_22",
+            "label": "VDD",
+            "header": "P1",
+            "position": 22,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P1_23",
+            "label": "GND",
+            "header": "P1",
+            "position": 23,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P1_24",
+            "label": "PB2",
+            "header": "P1",
+            "position": 24,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_25",
+            "label": "PE7",
+            "header": "P1",
+            "position": 25,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_26",
+            "label": "PE8",
+            "header": "P1",
+            "position": 26,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_27",
+            "label": "PE9",
+            "header": "P1",
+            "position": 27,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_28",
+            "label": "PE10",
+            "header": "P1",
+            "position": 28,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_29",
+            "label": "PE11",
+            "header": "P1",
+            "position": 29,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_30",
+            "label": "PE12",
+            "header": "P1",
+            "position": 30,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_31",
+            "label": "PE13",
+            "header": "P1",
+            "position": 31,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_32",
+            "label": "PE14",
+            "header": "P1",
+            "position": 32,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_33",
+            "label": "PE15",
+            "header": "P1",
+            "position": 33,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_34",
+            "label": "PB10",
+            "header": "P1",
+            "position": 34,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_35",
+            "label": "PB11",
+            "header": "P1",
+            "position": 35,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_36",
+            "label": "PB12",
+            "header": "P1",
+            "position": 36,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_37",
+            "label": "PB13",
+            "header": "P1",
+            "position": 37,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_38",
+            "label": "PB14",
+            "header": "P1",
+            "position": 38,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_39",
+            "label": "PB15",
+            "header": "P1",
+            "position": 39,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_40",
+            "label": "PD8",
+            "header": "P1",
+            "position": 40,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_41",
+            "label": "PD9",
+            "header": "P1",
+            "position": 41,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_42",
+            "label": "PD10",
+            "header": "P1",
+            "position": 42,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_43",
+            "label": "PD11",
+            "header": "P1",
+            "position": 43,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_44",
+            "label": "PD12",
+            "header": "P1",
+            "position": 44,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_45",
+            "label": "PD13",
+            "header": "P1",
+            "position": 45,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_46",
+            "label": "PD14",
+            "header": "P1",
+            "position": 46,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_47",
+            "label": "PD15",
+            "header": "P1",
+            "position": 47,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_48",
+            "label": "PC6",
+            "header": "P1",
+            "position": 48,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P1_49",
+            "label": "GND",
+            "header": "P1",
+            "position": 49,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P1_50",
+            "label": "GND",
+            "header": "P1",
+            "position": 50,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P2_1",
+            "label": "GND",
+            "header": "P2",
+            "position": 1,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P2_2",
+            "label": "GND",
+            "header": "P2",
+            "position": 2,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P2_3",
+            "label": "5V",
+            "header": "P2",
+            "position": 3,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P2_4",
+            "label": "5V",
+            "header": "P2",
+            "position": 4,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P2_5",
+            "label": "3V",
+            "header": "P2",
+            "position": 5,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P2_6",
+            "label": "3V",
+            "header": "P2",
+            "position": 6,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P2_7",
+            "label": "PH0",
+            "header": "P2",
+            "position": 7,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_8",
+            "label": "PH1",
+            "header": "P2",
+            "position": 8,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_9",
+            "label": "PC14",
+            "header": "P2",
+            "position": 9,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_10",
+            "label": "PC15",
+            "header": "P2",
+            "position": 10,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_11",
+            "label": "PE6",
+            "header": "P2",
+            "position": 11,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_12",
+            "label": "PC13",
+            "header": "P2",
+            "position": 12,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_13",
+            "label": "PE4",
+            "header": "P2",
+            "position": 13,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_14",
+            "label": "PE5",
+            "header": "P2",
+            "position": 14,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_15",
+            "label": "PE2",
+            "header": "P2",
+            "position": 15,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_16",
+            "label": "PE3",
+            "header": "P2",
+            "position": 16,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_17",
+            "label": "PE0",
+            "header": "P2",
+            "position": 17,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_18",
+            "label": "PE1",
+            "header": "P2",
+            "position": 18,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_19",
+            "label": "PB8",
+            "header": "P2",
+            "position": 19,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_20",
+            "label": "PB9",
+            "header": "P2",
+            "position": 20,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_21",
+            "label": "BOOT0",
+            "header": "P2",
+            "position": 21,
+            "role": "reserved",
+            "aliases": [],
+            "capabilities": [
+              "system"
+            ]
+          },
+          {
+            "id": "P2_22",
+            "label": "VDD",
+            "header": "P2",
+            "position": 22,
+            "role": "power",
+            "aliases": [],
+            "capabilities": [
+              "power"
+            ]
+          },
+          {
+            "id": "P2_23",
+            "label": "PB6",
+            "header": "P2",
+            "position": 23,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_24",
+            "label": "PB7",
+            "header": "P2",
+            "position": 24,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_25",
+            "label": "PB4",
+            "header": "P2",
+            "position": 25,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_26",
+            "label": "PB5",
+            "header": "P2",
+            "position": 26,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_27",
+            "label": "PD7",
+            "header": "P2",
+            "position": 27,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_28",
+            "label": "PB3",
+            "header": "P2",
+            "position": 28,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_29",
+            "label": "PD5",
+            "header": "P2",
+            "position": 29,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_30",
+            "label": "PD6",
+            "header": "P2",
+            "position": 30,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_31",
+            "label": "PD3",
+            "header": "P2",
+            "position": 31,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_32",
+            "label": "PD4",
+            "header": "P2",
+            "position": 32,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_33",
+            "label": "PD1",
+            "header": "P2",
+            "position": 33,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_34",
+            "label": "PD2",
+            "header": "P2",
+            "position": 34,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_35",
+            "label": "PC12",
+            "header": "P2",
+            "position": 35,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_36",
+            "label": "PD0",
+            "header": "P2",
+            "position": 36,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_37",
+            "label": "PC10",
+            "header": "P2",
+            "position": 37,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_38",
+            "label": "PC11",
+            "header": "P2",
+            "position": 38,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_39",
+            "label": "PA14",
+            "header": "P2",
+            "position": 39,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_40",
+            "label": "PA15",
+            "header": "P2",
+            "position": 40,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_41",
+            "label": "PA10",
+            "header": "P2",
+            "position": 41,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_42",
+            "label": "PA13",
+            "header": "P2",
+            "position": 42,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_43",
+            "label": "PA8",
+            "header": "P2",
+            "position": 43,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_44",
+            "label": "PA9",
+            "header": "P2",
+            "position": 44,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_45",
+            "label": "PC8",
+            "header": "P2",
+            "position": 45,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_46",
+            "label": "PC9",
+            "header": "P2",
+            "position": 46,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_47",
+            "label": "PC6",
+            "header": "P2",
+            "position": 47,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_48",
+            "label": "PC7",
+            "header": "P2",
+            "position": 48,
+            "role": "gpio",
+            "aliases": [],
+            "capabilities": [
+              "digital_io"
+            ]
+          },
+          {
+            "id": "P2_49",
+            "label": "GND",
+            "header": "P2",
+            "position": 49,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          },
+          {
+            "id": "P2_50",
+            "label": "GND",
+            "header": "P2",
+            "position": 50,
+            "role": "ground",
+            "aliases": [],
+            "capabilities": [
+              "ground"
+            ]
+          }
+        ],
+        "connector_scope": "target expansion headers P1 and P2; ST-LINK CN2/CN3, power jumper, USB, and onboard peripherals excluded",
+        "execution_status": "pinout_template_only",
+        "emulation_scope": "No binary, peripheral, timing, electrical, or RF emulation."
+      },
+      "x": 1000.0,
+      "y": 100.0,
+      "scope": "",
+      "bindings": {
+        "P1_1": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_1_GND"
+        },
+        "P1_2": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_2_GND"
+        },
+        "P1_3": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_3_VDD"
+        },
+        "P1_4": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_4_VDD"
+        },
+        "P1_5": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_5_NRST"
+        },
+        "P1_6": {
+          "mode": "DO",
+          "node": "",
+          "reference": "",
+          "source": "VDRIVE",
+          "vdd": 3.0,
+          "code_name": "P1_6_PB3"
+        },
+        "P1_7": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_7_PC1"
+        },
+        "P1_8": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_8_PC0"
+        },
+        "P1_9": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_9_PC3"
+        },
+        "P1_10": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_10_PC2"
+        },
+        "P1_11": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_11_PA1"
+        },
+        "P1_12": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_12_PA0"
+        },
+        "P1_13": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_13_PA3"
+        },
+        "P1_14": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_14_PA2"
+        },
+        "P1_15": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_15_PA5"
+        },
+        "P1_16": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_16_PA4"
+        },
+        "P1_17": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_17_PA7"
+        },
+        "P1_18": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_18_PA6"
+        },
+        "P1_19": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_19_PC5"
+        },
+        "P1_20": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_20_PC4"
+        },
+        "P1_21": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_21_PB1"
+        },
+        "P1_22": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_22_VDD"
+        },
+        "P1_23": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_23_GND"
+        },
+        "P1_24": {
+          "mode": "DI",
+          "node": "sense",
+          "reference": "0",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_24_PB2"
+        },
+        "P1_25": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_25_PE7"
+        },
+        "P1_26": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_26_PE8"
+        },
+        "P1_27": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_27_PE9"
+        },
+        "P1_28": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_28_PE10"
+        },
+        "P1_29": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_29_PE11"
+        },
+        "P1_30": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_30_PE12"
+        },
+        "P1_31": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_31_PE13"
+        },
+        "P1_32": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_32_PE14"
+        },
+        "P1_33": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_33_PE15"
+        },
+        "P1_34": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_34_PB10"
+        },
+        "P1_35": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_35_PB11"
+        },
+        "P1_36": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_36_PB12"
+        },
+        "P1_37": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_37_PB13"
+        },
+        "P1_38": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_38_PB14"
+        },
+        "P1_39": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_39_PB15"
+        },
+        "P1_40": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_40_PD8"
+        },
+        "P1_41": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_41_PD9"
+        },
+        "P1_42": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_42_PD10"
+        },
+        "P1_43": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_43_PD11"
+        },
+        "P1_44": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_44_PD12"
+        },
+        "P1_45": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_45_PD13"
+        },
+        "P1_46": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_46_PD14"
+        },
+        "P1_47": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_47_PD15"
+        },
+        "P1_48": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_48_PC6"
+        },
+        "P1_49": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_49_GND"
+        },
+        "P1_50": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P1_50_GND"
+        },
+        "P2_1": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_1_GND"
+        },
+        "P2_2": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_2_GND"
+        },
+        "P2_3": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_3_5V"
+        },
+        "P2_4": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_4_5V"
+        },
+        "P2_5": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_5_3V"
+        },
+        "P2_6": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_6_3V"
+        },
+        "P2_7": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_7_PH0"
+        },
+        "P2_8": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_8_PH1"
+        },
+        "P2_9": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_9_PC14"
+        },
+        "P2_10": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_10_PC15"
+        },
+        "P2_11": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_11_PE6"
+        },
+        "P2_12": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_12_PC13"
+        },
+        "P2_13": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_13_PE4"
+        },
+        "P2_14": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_14_PE5"
+        },
+        "P2_15": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_15_PE2"
+        },
+        "P2_16": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_16_PE3"
+        },
+        "P2_17": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_17_PE0"
+        },
+        "P2_18": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_18_PE1"
+        },
+        "P2_19": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_19_PB8"
+        },
+        "P2_20": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_20_PB9"
+        },
+        "P2_21": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_21_BOOT0"
+        },
+        "P2_22": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_22_VDD"
+        },
+        "P2_23": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_23_PB6"
+        },
+        "P2_24": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_24_PB7"
+        },
+        "P2_25": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_25_PB4"
+        },
+        "P2_26": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_26_PB5"
+        },
+        "P2_27": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_27_PD7"
+        },
+        "P2_28": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_28_PB3"
+        },
+        "P2_29": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_29_PD5"
+        },
+        "P2_30": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_30_PD6"
+        },
+        "P2_31": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_31_PD3"
+        },
+        "P2_32": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_32_PD4"
+        },
+        "P2_33": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_33_PD1"
+        },
+        "P2_34": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_34_PD2"
+        },
+        "P2_35": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_35_PC12"
+        },
+        "P2_36": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_36_PD0"
+        },
+        "P2_37": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_37_PC10"
+        },
+        "P2_38": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_38_PC11"
+        },
+        "P2_39": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_39_PA14"
+        },
+        "P2_40": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_40_PA15"
+        },
+        "P2_41": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_41_PA10"
+        },
+        "P2_42": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_42_PA13"
+        },
+        "P2_43": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_43_PA8"
+        },
+        "P2_44": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_44_PA9"
+        },
+        "P2_45": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_45_PC8"
+        },
+        "P2_46": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_46_PC9"
+        },
+        "P2_47": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_47_PC6"
+        },
+        "P2_48": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_48_PC7"
+        },
+        "P2_49": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_49_GND"
+        },
+        "P2_50": {
+          "mode": "NC",
+          "node": "",
+          "reference": "",
+          "source": "",
+          "vdd": 3.0,
+          "code_name": "P2_50_GND"
+        }
+      }
+    }
+  ],
+  "power_tree": {
+    "contract": "spikes/power-tree/v1",
+    "stages": []
+  },
+  "analytics_extensions": [],
+  "directives": [
+    {
+      "id": "2a92e564f34c4e31a1c2188ba6fd0057",
+      "group": "Simulation",
+      "title": "",
+      "visible": true,
+      "x": 100.0,
+      "y": 420.0,
+      "text": ".tran 100u 10m uic",
+      "enabled": true,
+      "line": 6,
+      "end_line": 6
+    }
+  ]
+}

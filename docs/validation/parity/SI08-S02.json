@@ -4,9 +4,9 @@
   "status": "passed",
   "production_qualified": false,
   "sources": {
-    "scripts/parity_pisi_gate.py": "4cdfed268d0a3ad4ddbe79eb564694cc36cdf805ee8b1e5780afea302e540289",
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
     "python/spike_core/sparameter_deembedding.py": "9eae4073816c9e1a34dc32b4300386e2b82abb8335ed545c0e61e9cbe3f494bd",
-    "python/spike_core/service_sparameter_processing.py": "a0ab3898725ae370fe32824cab24c36728af0f9cbf25f170380ac1c2089bab70",
+    "python/spike_core/service_sparameter_processing.py": "d79edcdd35c3e33ab47a309bb2b6dda6af7933c5592c4a3537346441b2803df8",
     "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
     "tests/python/test_sparameter_deembedding.py": "4bdcadc7a866e2b6a501c980d9063e628d915322712c5d9f645a438ce543fcdc",
     "tests/python/test_sparameter_deembedding_contract.py": "e7836e4b9475f930ed6bc7b3f31136ea4c05270920f5e4181c96341ad6b0961c",
@@ -33,6 +33,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/SI08-S02-capacitive-reverified.log",
-  "log_sha256": "0ecabb8eba135b03930fe095aa9b84971df1428cee8ef2887ff835756798061e"
+  "log": "docs/validation/parity/SI08-S02-star-junction-20261019-reverified.log",
+  "log_sha256": "7a251c6088319a9f80ecd7ee7f3323cdb798d4b01f4c27d8309c32f4ba780fcd"
 }

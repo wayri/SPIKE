@@ -18,6 +18,8 @@ class ControllerPanel(wx.Panel):
         self.enabled=wx.CheckBox(self,label='Attach compiled controller to the next Continuous run (not batch F5)');box.Add(self.enabled,0,wx.ALL,5)
         row=wx.WrapSizer(wx.HORIZONTAL)
         from .controller_pin_dialog import edit_pins
+        from .controller_board_browser import show as show_boards
+        b=wx.Button(self,label='Arduino / MCU board library…');b.SetToolTip('Browse sourced labeled pinouts and configure explicit sampled I/O; not firmware emulation.');b.Bind(wx.EVT_BUTTON,lambda e:owner.guarded(lambda:show_boards(owner)));row.Add(b,0,wx.ALL,3)
         b=wx.Button(self,label='Block library…');b.SetToolTip('Load a parameterized sampled PWM/PI block or import your own C/C++ library. Does not execute code.');b.Bind(wx.EVT_BUTTON,lambda e:owner.guarded(self.choose_block));row.Add(b,0,wx.ALL,3)
         b=wx.Button(self,label='Pin properties…');b.Bind(wx.EVT_BUTTON,lambda e:owner.guarded(lambda:edit_pins(self)));row.Add(b,0,wx.ALL,3)
         for label,fn in [('Apply / save setup',self.apply),('Compile trusted C/C++',self.compile),('Run closed loop',self.run),('Pause / resume',owner.pause_run),('Stop',owner.stop_run),('Restore saved setup',self.reflect)]:
@@ -71,6 +73,8 @@ class ControllerPanel(wx.Panel):
 
     def attached(self):
         if not self.enabled.GetValue():return None
+        from .controller_board_blocks import validate_attachment
+        validate_attachment(self.config(),self.owner.doc.data['controller_boards'])
         if self.compiled is None or self.compiled.config!=self.config():raise ValueError('Compile the current controller setup before enabling coupling')
         if not self.trust.GetValue():raise ValueError('Trusted-code consent was cleared')
         return self.compiled

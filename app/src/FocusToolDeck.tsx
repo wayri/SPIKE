@@ -1,7 +1,9 @@
 import FloatingPanel, { FloatingPanelControls, useFloatingPanel } from "./FloatingPanel";
 // SPDX-License-Identifier: Apache-2.0
 import { createContext, useCallback, useEffect, useLayoutEffect, useRef, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
-import { GripVertical, Maximize2, Minimize2, PanelRightClose } from "./icons";
+import { GripVertical, Maximize2, Minimize2 } from "./icons";
+import { HideControlIcon } from "./navigationIcons";
+import { minimizeTool, removeMinimizedTool } from "./minimizedTools";
 
 export const FocusDockContext = createContext<{ embedded: boolean; hide: () => void } | null>(null);
 const useFocusLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -22,6 +24,7 @@ export type FocusToolPanel = {
   title: string;
   open: boolean;
   content: ReactNode;
+  presentation?: "panel" | "document";
 };
 
 export function activeFocusPanel(panels: readonly FocusToolPanel[], id: string | null): FocusToolPanel | undefined {
@@ -56,21 +59,24 @@ function ToolPresentation({panel,active,expanded,setExpanded,hide}: {panel:Focus
     };
     adapt();const observer=new MutationObserver(adapt);observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:["aria-modal"]});return()=>observer.disconnect();
   },[]);
-  return <section ref={container} className="focus-tool-deck" aria-label={panel.title}>
-    <header className="focus-tool-heading" onPointerDown={floating?.onHeaderPointerDown} title="Drag this header outside the main window to detach"><h2>{panel.title}</h2><FloatingPanelControls/>{!floating?.detached&&<><button type="button" className="spike-control--compact" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?"Restore tool panel":"Expand tool panel"} aria-pressed={expanded} title={expanded?"Restore viewport beside this tool":"Expand tool to workspace"}>{expanded?<Minimize2 size={14}/>:<Maximize2 size={14}/>}<span>{expanded?"Restore":"Expand"}</span></button><button type="button" className="spike-control--compact" onClick={hide} aria-label="Hide panel" title="Hide panel and keep its current inputs"><PanelRightClose size={14}/><span>Hide</span></button></>}</header>
+  return <section ref={container} className="focus-tool-deck" id={`workspace-editor-panel-${panel.id}`} role={panel.presentation==="document"?"tabpanel":undefined} aria-label={panel.title}>
+    <header className="focus-tool-heading" onPointerDown={floating?.onHeaderPointerDown} title="Drag this header outside the main window to detach"><h2>{panel.title}</h2><FloatingPanelControls/>{panel.presentation!=="document"&&!floating?.detached&&<><button type="button" className="spike-control--compact" onClick={()=>setExpanded(value=>!value)} aria-label={expanded?"Restore tool panel":"Expand tool panel"} aria-pressed={expanded} title={expanded?"Restore viewport beside this tool":"Expand tool to workspace"}>{expanded?<Minimize2 size={14}/>:<Maximize2 size={14}/>}<span>{expanded?"Restore":"Expand"}</span></button></>}<button type="button" className="spike-control--compact" onClick={()=>{if(floating?.detached)floating.dock();hide();}} aria-label="Hide panel" title="Hide panel and keep its current inputs"><HideControlIcon size={14}/><span>Hide</span></button></header>
     <FocusDockContext.Provider value={{embedded:true,hide}}><div className="focus-tool-content" style={{zoom:floating?.scale ?? 1}}>{panel.content}</div></FocusDockContext.Provider>
   </section>;
 }
 export default function FocusToolDeck({panels,activeId,commandsOpen,onActivate}: {panels:readonly FocusToolPanel[];activeId:string|null;commandsOpen:boolean;onActivate:Dispatch<SetStateAction<string|null>>}) {
   const active=commandsOpen?undefined:activeFocusPanel(panels,activeId);
-  const [expanded,setExpanded]=useState(false),[notice,setNotice]=useState("");
+  const [expandedPanels,setExpandedPanels]=useState<Record<string,boolean>>({}),[notice,setNotice]=useState("");
+  const expanded = active ? expandedPanels[active.id] === true : false;
+  const setExpanded: Dispatch<SetStateAction<boolean>> = next => { if(active)setExpandedPanels(current=>({...current,[active.id]:typeof next==="function"?next(current[active.id]===true):next})); };
   const container=useRef<HTMLElement>(null),width=useRef(FOCUS_PANEL_DEFAULT_WIDTH);
   useEffect(()=>{try{const saved=localStorage.getItem("spike.focus.panel.width");if(saved!==null)width.current=normalizeFocusPanelWidth(saved);}catch{/* Optional preference. */}container.current?.closest<HTMLElement>(".workspace")?.style.setProperty("--focus-panel-width",`${width.current}px`);},[]);
-  useEffect(()=>{setExpanded(false);},[active?.id]);
   useEffect(()=>{const workspace=container.current?.closest<HTMLElement>(".workspace");workspace?.classList.toggle("focus-panel-expanded",expanded&&Boolean(active));return()=>workspace?.classList.remove("focus-panel-expanded");},[expanded,active?.id]);
-  const hide=()=>{onActivate(null);document.getElementById("focus-menu-toggle")?.focus();};
+  const hide=()=>{if(active)minimizeTool({id:`focus:${active.id}`,label:active.title,restore:()=>onActivate(active.id)});onActivate(null);document.getElementById("focus-menu-toggle")?.focus();};
+  useEffect(()=>{if(active)removeMinimizedTool(`focus:${active.id}`);for(const panel of panels)if(!panel.open)removeMinimizedTool(`focus:${panel.id}`);},[active?.id,panels]);
+  useEffect(()=>()=>{for(const panel of panels)removeMinimizedTool(`focus:${panel.id}`);},[]);
   const resize=(next:number)=>{width.current=normalizeFocusPanelWidth(next);container.current?.closest<HTMLElement>(".workspace")?.style.setProperty("--focus-panel-width",`${width.current}px`);try{localStorage.setItem("spike.focus.panel.width",String(width.current));}catch{/* Optional preference. */}};
-  return <aside ref={container} className="focus-tool-deck-host" hidden={!active} aria-label={active?.title??"Tool panel"}>
+  return <aside ref={container} className="focus-tool-deck-host" data-presentation={active?.presentation??"panel"} hidden={!active} aria-label={active?.title??"Tool panel"}>
     {notice&&<p role="alert">{notice}</p>}
     {panels.filter(panel=>panel.open).map(panel=><FloatingPanel key={panel.id} id={panel.id} title={panel.title} active={panel.id===active?.id} onDetached={()=>{onActivate(current=>current===panel.id||panel.aliases?.includes(current??"")?null:current);}} onDocked={()=>onActivate(panel.id)} onError={setNotice}><ToolPresentation panel={panel} active={panel.id===active?.id} expanded={expanded} setExpanded={setExpanded} hide={hide}/></FloatingPanel>)}
     <button type="button" className="focus-panel-resizer spike-control--bare" aria-label="Resize tool panel" title="Drag or use arrow keys to resize; double-click to reset" onDoubleClick={()=>resize(FOCUS_PANEL_DEFAULT_WIDTH)} onKeyDown={event=>{const next=event.key==="Home"?FOCUS_PANEL_MAX_WIDTH:event.key==="End"?FOCUS_PANEL_MIN_WIDTH:event.key==="ArrowLeft"?width.current+20:event.key==="ArrowRight"?width.current-20:null;if(next!==null){event.preventDefault();resize(next);}}} onPointerDown={event=>{if(event.button!==0||!event.isPrimary)return;event.preventDefault();const target=event.currentTarget,start=event.clientX,initial=width.current;target.setPointerCapture(event.pointerId);const move=(pointer:PointerEvent)=>resize(initial+start-pointer.clientX);const stop=(pointer:PointerEvent)=>{if(target.hasPointerCapture(pointer.pointerId))target.releasePointerCapture(pointer.pointerId);target.removeEventListener("pointermove",move);target.removeEventListener("pointerup",stop);target.removeEventListener("pointercancel",stop);target.removeEventListener("lostpointercapture",stop);};target.addEventListener("pointermove",move);target.addEventListener("pointerup",stop);target.addEventListener("pointercancel",stop);target.addEventListener("lostpointercapture",stop);}}><GripVertical size={14} aria-hidden="true"/></button>

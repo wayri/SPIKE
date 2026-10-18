@@ -1,8 +1,9 @@
+import { viewportBackgroundColor } from "./viewportEnvironment";
 import { assemblyNetLabels } from "./assemblyNetLabels";
 import { navigationPanFraction } from "./viewportKeyboardCamera";
 import type { ViewportNetTuneHandler } from "./viewportNetTune";
 // SPDX-License-Identifier: Apache-2.0
-import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import type { BoardObject, ViewportContextRequest } from "./BoardViewport";
 import type { ParsedBoard } from "./boardParser";
 import type { VirtualBoardVisual, VirtualHarnessVisual } from "./harnessVisualization";
@@ -70,12 +71,15 @@ function svgGraphicBounds(element: SVGGraphicsElement, svg: SVGSVGElement): Asse
   }
 }
 
+const EMPTY_LINKED_NETS: string[] = [];
+const EMPTY_LAYER_RECORDS = {};
+
 function NetShape({ board, visual, net, onNetSelect, onFocus, selectable = true, children }: { board: ParsedBoard; visual: VirtualBoardVisual; net?: string; onNetSelect: AssemblyLayoutViewportProps["onNetSelect"]; onFocus?: (boardId: string, element: SVGGraphicsElement) => void; selectable?: boolean; children: ReactElement }) {
   const id = canonicalNetId(board, visual.netIdsByName, net, visual.netNamesById);
   return <g data-canonical-net-id={id ?? undefined} onClick={id && selectable ? event => { event.stopPropagation(); onFocus?.(visual.id, event.currentTarget); onNetSelect(visual.id, id); } : undefined} style={{ cursor: id && selectable ? "pointer" : undefined }}>{children}</g>;
 }
 
-function BoardFallback({ board, visual, visibleLayers, layerOpacity, showVias, onNetSelect, onFocus, netSelectable }: { board: ParsedBoard; visual: VirtualBoardVisual; onFocus: (boardId: string, element: SVGGraphicsElement) => void; netSelectable: boolean } & Pick<AssemblyLayoutViewportProps, "visibleLayers" | "layerOpacity" | "showVias" | "onNetSelect">) {
+const BoardFallback = memo(function BoardFallback({ board, visual, visibleLayers, layerOpacity, showVias, onNetSelect, onFocus, netSelectable }: { board: ParsedBoard; visual: VirtualBoardVisual; onFocus: (boardId: string, element: SVGGraphicsElement) => void; netSelectable: boolean } & Pick<AssemblyLayoutViewportProps, "visibleLayers" | "layerOpacity" | "showVias" | "onNetSelect">) {
   const color = (layer: string) => layerCssColor(layer, Math.max(0, board.layers.indexOf(layer)));
   const opacity = (layer: string) => renderedLayerOpacity(layer, layerOpacity);
   return <>
@@ -85,9 +89,9 @@ function BoardFallback({ board, visual, visibleLayers, layerOpacity, showVias, o
     {showVias && board.vias.filter(item => item.layers.some(layer => visible(layer, visibleLayers))).map((item, i) => <NetShape key={`v:${item.id}:${i}`} board={board} visual={visual} net={item.net} onNetSelect={onNetSelect} onFocus={onFocus} selectable={netSelectable}><circle cx={item.at[0]} cy={item.at[1]} r={item.size / 2} fill="#d9b45c" stroke="#fff1b8" strokeWidth={.08} /></NetShape>)}
     {board.pads.filter(item => item.layers.some(layer => visible(layer, visibleLayers))).map((item, i) => <NetShape key={`p:${item.id}:${i}`} board={board} visual={visual} net={item.net} onNetSelect={onNetSelect} onFocus={onFocus} selectable={netSelectable}><rect x={item.at[0] - item.width / 2} y={item.at[1] - item.height / 2} width={item.width} height={item.height} rx={Math.min(item.width, item.height) * .16} fill="#d8a944" transform={`rotate(${item.rotation} ${item.at[0]} ${item.at[1]})`} /></NetShape>)}
   </>;
-}
+});
 
-function ComponentShapes({ board, visual, sourceLayers, onBoardSelect, onComponentSelect, onFocus }: { board: ParsedBoard; visual: VirtualBoardVisual; sourceLayers: boolean; onFocus: (boardId: string, element: SVGGraphicsElement) => void } & Pick<AssemblyLayoutViewportProps, "onBoardSelect" | "onComponentSelect">) {
+const ComponentShapes = memo(function ComponentShapes({ board, visual, sourceLayers, onBoardSelect, onComponentSelect, onFocus }: { board: ParsedBoard; visual: VirtualBoardVisual; sourceLayers: boolean; onFocus: (boardId: string, element: SVGGraphicsElement) => void } & Pick<AssemblyLayoutViewportProps, "onBoardSelect" | "onComponentSelect">) {
   return <>{board.components.map((item, i) => <g
     key={`c:${item.id}:${i}`}
     data-component-id={item.id}
@@ -103,9 +107,9 @@ function ComponentShapes({ board, visual, sourceLayers, onBoardSelect, onCompone
     <rect x={-item.width / 2} y={-item.height / 2} width={item.width} height={item.height} fill={sourceLayers ? "transparent" : "none"} stroke={sourceLayers ? "transparent" : "#e6e9ef"} strokeWidth={sourceLayers ? 0 : .12} pointerEvents="all"><title>{item.ref}</title></rect>
     {!sourceLayers && <text fontSize={Math.max(.8, Math.min(item.width / 4, 1.8))} textAnchor="middle" dominantBaseline="central" fill="#f4f5f7" pointerEvents="none">{item.ref}</text>}
   </g>)}</>;
-}
+});
 
-function NetHitShapes({ board, visual, linked, visibleLayers, layerOpacity, showVias, onNetSelect, onFocus }: { board: ParsedBoard; visual: VirtualBoardVisual; linked: string[]; onFocus: (boardId: string, element: SVGGraphicsElement) => void } & Pick<AssemblyLayoutViewportProps, "visibleLayers" | "layerOpacity" | "showVias" | "onNetSelect">) {
+const NetHitShapes = memo(function NetHitShapes({ board, visual, linked, visibleLayers, layerOpacity, showVias, onNetSelect, onFocus }: { board: ParsedBoard; visual: VirtualBoardVisual; linked: string[]; onFocus: (boardId: string, element: SVGGraphicsElement) => void } & Pick<AssemblyLayoutViewportProps, "visibleLayers" | "layerOpacity" | "showVias" | "onNetSelect">) {
   const selected = (net?: string) => assemblyNetIsSelected(board, visual.netIdsByName, linked, net, visual.netNamesById);
   const rendered = (layer: string) => assemblyLayerIsRendered(layer, visibleLayers, layerOpacity);
   return <g className="assembly-layout-net-hits">
@@ -114,9 +118,9 @@ function NetHitShapes({ board, visual, linked, visibleLayers, layerOpacity, show
     {showVias && board.vias.filter(item => item.layers.some(rendered)).map((item, i) => { const isSelected = selected(item.net); return <NetShape key={`vh:${item.id}:${i}`} board={board} visual={visual} net={item.net} onNetSelect={onNetSelect} onFocus={onFocus}><g>{isSelected && <circle cx={item.at[0]} cy={item.at[1]} r={item.size / 2} fill="#55e5d5" fillOpacity={.86} pointerEvents="none" />}<circle cx={item.at[0]} cy={item.at[1]} r={Math.max(item.size / 2, .5)} fill="transparent" pointerEvents="all" /></g></NetShape>; })}
     {board.pads.filter(item => item.layers.some(rendered)).map((item, i) => <NetShape key={`ph:${item.id}:${i}`} board={board} visual={visual} net={item.net} onNetSelect={onNetSelect} onFocus={onFocus}><rect x={item.at[0] - item.width / 2} y={item.at[1] - item.height / 2} width={item.width} height={item.height} rx={Math.min(item.width, item.height) * .16} fill={selected(item.net) ? "#55e5d5" : "transparent"} fillOpacity={selected(item.net) ? .76 : 0} transform={`rotate(${item.rotation} ${item.at[0]} ${item.at[1]})`} pointerEvents="all" /></NetShape>)}
   </g>;
-}
+});
 
-export default function AssemblyLayoutViewport({ designs, boards, harnesses, selectedBoardId, linkedNets, visibleLayers, assemblyLayerVisibility = {}, assemblyLayerOpacity = {}, focusedLayerByBoard, onLayerFocus, layerOpacity, showVias, showNetNames = false, viewportBackground = "dark", showWorldGrid = true, selectionFilter = "all", onBoardSelect, onShowAllBoards, onComponentSelect, onNetSelect, onNetTune, onContextMenu, cameraCommand = "", snapTargets = [], selectedSnapTargetId = null, onSnapTarget }: AssemblyLayoutViewportProps) {
+export default function AssemblyLayoutViewport({ designs, boards, harnesses, selectedBoardId, linkedNets, visibleLayers, assemblyLayerVisibility = EMPTY_LAYER_RECORDS, assemblyLayerOpacity = EMPTY_LAYER_RECORDS, focusedLayerByBoard, onLayerFocus, layerOpacity, showVias, showNetNames = false, viewportBackground = "dark", showWorldGrid = true, selectionFilter = "all", onBoardSelect, onShowAllBoards, onComponentSelect, onNetSelect, onNetTune, onContextMenu, cameraCommand = "", snapTargets = [], selectedSnapTargetId = null, onSnapTarget }: AssemblyLayoutViewportProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const drag = useRef<{ pointerId: number; x: number; y: number; view: AssemblyViewBox; panning: boolean } | null>(null);
   const suppressClick = useRef(false);
@@ -154,6 +158,27 @@ export default function AssemblyLayoutViewport({ designs, boards, harnesses, sel
   const offsets = useMemo(() => displayOffsetByBoard(placements), [placements]);
   const placementById = useMemo(() => Object.fromEntries(placements.map(item => [item.visual.id, item])), [placements]);
   const fit = useMemo(() => displayContentBounds(placements, harnesses), [placements, harnesses]);
+  // Immutable source artwork and occurrence layers do not change while panning.
+  // Keep their props stable so React reuses the full geometry/hit-target trees.
+  const presentationById = useMemo(() => new Map(boards.flatMap(visual => {
+    const board = designs[visual.designId];
+    if (!board) return [];
+    const savedLayers = assemblyLayerVisibility[visual.id] ?? visibleLayers;
+    const boardOpacity = assemblyLayerOpacity[visual.id] ?? layerOpacity;
+    const layerFocus = resolveAssemblyLayerFocus(board, layerFocusByBoard[visual.id]);
+    const allLayerNames = new Set([...board.layerDefinitions.map(layer => layer.name), ...board.layers,
+      ...board.drawings.map(item => item.layer), ...board.tracks.map(item => item.layer),
+      ...board.zones.map(item => item.layer), ...Object.keys(board.layoutLayerUrls ?? {})]);
+    const boardLayers = layerFocus === "All" ? savedLayers : Object.fromEntries([...allLayerNames].map(layer =>
+      [layer, visible(layer, savedLayers) && (layerFocus === "Overview" ? board.layers.includes(layer) : layer === layerFocus)]));
+    const sourceLayers = Object.entries(board.layoutLayerUrls ?? {}).filter(([, url]) => safeLayerImage(url));
+    const sourceOffset = sourceOffsetsByDesign[visual.designId];
+    const hasAlignedSource = sourceLayers.length > 0 && sourceOffset != null;
+    const useFallback = !hasAlignedSource;
+    const layers = hasAlignedSource ? sourceLayers.filter(([layer]) => assemblyLayerIsRendered(layer, boardLayers, boardOpacity)) : [];
+    const sourceFrame = assemblyLayoutSourceFrame(board, sourceOffset ?? undefined);
+    return [[visual.id, { layerFocus, boardLayers, hasAlignedSource, useFallback, layers, sourceFrame, boardOpacity }] as const];
+  })), [boards, designs, assemblyLayerVisibility, assemblyLayerOpacity, visibleLayers, layerOpacity, layerFocusByBoard, sourceOffsetsByDesign]);
   const [view, setView] = useState(fit);
   const viewportRect = (): AssemblyViewportRect => {
     const rect = svgRef.current?.getBoundingClientRect();
@@ -168,10 +193,10 @@ export default function AssemblyLayoutViewport({ designs, boards, harnesses, sel
     const boardBounds = selectedBoardId ? placementById[selectedBoardId]?.bounds : null;
     if (remembered ?? boardBounds) setView(frame((remembered ?? boardBounds)!));
   };
-  const rememberGraphic = (boardId: string, element: SVGGraphicsElement) => {
+  const rememberGraphic = useCallback((boardId: string, element: SVGGraphicsElement) => {
     const bounds = svgRef.current ? svgGraphicBounds(element, svgRef.current) : null;
     if (bounds) lastFocus.current = { boardId, bounds };
-  };
+  }, []);
   useEffect(() => setView(frame(fit, .03)), [fit.x, fit.y, fit.width, fit.height]);
   const netTuneRef = useRef(onNetTune);
   netTuneRef.current = onNetTune;
@@ -216,12 +241,12 @@ export default function AssemblyLayoutViewport({ designs, boards, harnesses, sel
   const selectedDesign = selected ? designs[selected.designId] : null;
   const selectedLayerFocus = resolveAssemblyLayerFocus(selectedDesign, selected ? layerFocusByBoard[selected.id] : undefined);
   const drawOrder = selected ? [...sorted.filter(board => board.id !== selected.id), selected] : sorted;
-  return <div className="assembly-layout-viewport" style={{ background: viewportBackground === "amoled" ? "#000000" : "#0b141a" }} >
+  return <div className="assembly-layout-viewport" style={{ background: viewportBackgroundColor(viewportBackground) }} >
     <div className="assembly-layout-controls" role="toolbar" aria-label="Assembly layout controls"><select aria-label="Visible assembly board" value={selectedBoardId ?? ""} onChange={event => { if (!event.target.value) { lastFocus.current = null; onShowAllBoards?.(); setView(frame(fit, .03)); return; } const board = boards.find(item => item.id === event.target.value); if (board) { const bounds = placementById[board.id]?.bounds; lastFocus.current = bounds ? { boardId: board.id, bounds } : null; onBoardSelect(board); } }}><option value="">All boards</option>{boards.map(board => <option key={board.id} value={board.id}>{board.name} (Z {boardAssemblyZ(board).toFixed(2)} mm)</option>)}</select><select className="assembly-layout-layer-focus" aria-label="Focused board layer" disabled={!selected || !selectedDesign} value={selectedLayerFocus} onChange={event => { if (!selected) return; const layer = event.target.value; setLocalFocusedLayerByBoard(current => ({ ...current, [selected.id]: layer })); onLayerFocus?.(selected.id, layer); }}><option value="All">All layers</option><option value="Overview">Copper overview</option>{selectedDesign?.layers.map(layer => <option key={layer} value={layer}>{layer}</option>)}</select><button type="button" onClick={() => setView(frame(fit, .03))}>Fit</button><button type="button" disabled={!selectedBoardId} onClick={focusSelection}>Focus</button></div>
     <svg ref={svgRef} className="assembly-layout-drawing" aria-label="2D multi-board assembly" viewBox={`${view.x} ${view.y} ${view.width} ${view.height}`} width="100%" height="100%" onClickCapture={event => { if (!suppressClick.current) return; suppressClick.current = false; event.preventDefault(); event.stopPropagation(); }} onDoubleClick={event => { event.preventDefault(); setView(frame(fit, .03)); }} onPointerDown={event => { if (event.button === 0 && event.isPrimary) drag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, view, panning: false }; }} onPointerMove={event => { keyboardPointer.current={clientX:event.clientX,clientY:event.clientY};const current = drag.current; if (!current || current.pointerId !== event.pointerId) return; const dx = event.clientX - current.x, dy = event.clientY - current.y; if (!current.panning) { if (!assemblyPanStarted(dx, dy)) return; current.panning = true; event.currentTarget.setPointerCapture(event.pointerId); event.currentTarget.style.cursor = "grabbing"; } event.preventDefault(); setView(panAssemblyViewBox(current.view, event.currentTarget.getBoundingClientRect(), dx, dy)); }} onPointerUp={event => { const current = drag.current; if (current?.pointerId !== event.pointerId) return; if (current.panning) { suppressClick.current = true; window.setTimeout(() => { suppressClick.current = false; }, 0); } drag.current = null; event.currentTarget.style.cursor = ""; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerCancel={event => { if (drag.current?.pointerId !== event.pointerId) return; drag.current = null; suppressClick.current = false; event.currentTarget.style.cursor = ""; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }} onPointerLeave={() => { keyboardPointer.current=null;if (drag.current && !drag.current.panning) drag.current = null; }} onLostPointerCapture={event => { if (drag.current?.pointerId === event.pointerId) drag.current = null; event.currentTarget.style.cursor = ""; }}>
-      <defs><pattern id="assembly-world-grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="#344a54" strokeWidth="0.15" /></pattern></defs>
+      <defs><pattern id="assembly-world-grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke={viewportBackground === "light" ? "#9aadb6" : "#344a54"} strokeWidth="0.15" /></pattern></defs>
       {showWorldGrid && <rect x={view.x} y={view.y} width={view.width} height={view.height} fill="url(#assembly-world-grid)" opacity={0.5} pointerEvents="none" />}
-      {drawOrder.map(visual => { const board = designs[visual.designId]; const savedLayers = assemblyLayerVisibility[visual.id] ?? visibleLayers; const boardOpacity = assemblyLayerOpacity[visual.id] ?? layerOpacity; const placement = placementById[visual.id]; if (!board || !placement) return null; const isSelected = visual.id === selectedBoardId; const layerFocus = resolveAssemblyLayerFocus(board, layerFocusByBoard[visual.id]); const allLayerNames = new Set([...board.layerDefinitions.map(layer => layer.name), ...board.layers, ...board.drawings.map(item => item.layer), ...board.tracks.map(item => item.layer), ...board.zones.map(item => item.layer), ...Object.keys(board.layoutLayerUrls ?? {})]); const boardLayers = layerFocus === "All" ? savedLayers : Object.fromEntries([...allLayerNames].map(layer => [layer, visible(layer, savedLayers) && (layerFocus === "Overview" ? board.layers.includes(layer) : layer === layerFocus)])); const sourceLayers = Object.entries(board.layoutLayerUrls ?? {}).filter(([, url]) => safeLayerImage(url)); const sourceOffset = sourceOffsetsByDesign[visual.designId]; const hasAlignedSource = sourceLayers.length > 0 && sourceOffset != null; const useFallback = !hasAlignedSource; const layers = hasAlignedSource ? sourceLayers.filter(([layer]) => assemblyLayerIsRendered(layer, boardLayers, boardOpacity)) : []; const sourceFrame = assemblyLayoutSourceFrame(board, sourceOffset ?? undefined); return <g key={visual.id} data-board-id={visual.id} onContextMenu={event => {
+      {drawOrder.map(visual => { const board = designs[visual.designId]; const placement = placementById[visual.id]; const prepared = presentationById.get(visual.id); if (!board || !placement || !prepared) return null; const isSelected = visual.id === selectedBoardId; const { layerFocus, boardLayers, hasAlignedSource, useFallback, layers, sourceFrame, boardOpacity } = prepared; return <g key={visual.id} data-board-id={visual.id} onContextMenu={event => {
         event.preventDefault(); event.stopPropagation();
         const frame = event.currentTarget.querySelector<SVGGElement>("[data-layout-board-frame]");
         const matrix = frame?.getScreenCTM(); if (!matrix) return;
@@ -249,7 +274,7 @@ export default function AssemblyLayoutViewport({ designs, boards, harnesses, sel
           <g data-layout-board-frame transform={`translate(${sourceFrame.boardToSourceOffset[0]} ${sourceFrame.boardToSourceOffset[1]})`}>
             <rect x={board.bounds.minX} y={board.bounds.minY} width={board.width} height={board.height} fill="transparent" pointerEvents="all" />
             {useFallback && <g opacity={netFocusActive ? .32 : 1} style={netFocusStyle}><BoardFallback board={board} visual={visual} visibleLayers={boardLayers} layerOpacity={boardOpacity} showVias={showVias} onNetSelect={onNetSelect} onFocus={rememberGraphic} netSelectable={selectionFilter !== "part"} /></g>}
-            {selectionFilter !== "part" && <NetHitShapes board={board} visual={visual} linked={linkedNets[visual.id] ?? []} visibleLayers={boardLayers} layerOpacity={boardOpacity} showVias={showVias} onNetSelect={onNetSelect} onFocus={rememberGraphic} />}
+            {selectionFilter !== "part" && <NetHitShapes board={board} visual={visual} linked={linkedNets[visual.id] ?? EMPTY_LINKED_NETS} visibleLayers={boardLayers} layerOpacity={boardOpacity} showVias={showVias} onNetSelect={onNetSelect} onFocus={rememberGraphic} />}
             {selectionFilter !== "net" && <ComponentShapes board={board} visual={visual} sourceLayers={hasAlignedSource} onBoardSelect={onBoardSelect} onComponentSelect={onComponentSelect} onFocus={rememberGraphic} />}
             {showNetNames && <g className="assembly-net-labels" pointerEvents="none" fill="#eaf5fa" stroke="#101820" strokeWidth={.16} paintOrder="stroke" textAnchor="middle" dominantBaseline="central">
               {assemblyNetLabels(board,visual,boardLayers,boardOpacity,view.width / Math.max(svgRef.current?.clientWidth ?? 800,1)).map(label => <text key={`${label.layer}:${label.kind}:${label.id}`} data-net-label={label.canonicalNetId} data-occurrence-id={visual.id} x={label.x} y={label.y} fontSize={label.fontSize} transform={`rotate(${label.angle} ${label.x} ${label.y})`}><title>{`${visual.name}: ${label.net} (${label.layer})`}</title>{label.net}</text>)}

@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Clean mode keeps setup and secondary actions behind a native disclosure. */
+.simulation-workspace.simulation-workspace-compact { min-width: 0; display: flex; align-items: flex-start; gap: 4px; margin: 0 8px; background: var(--spike-table-toolbar); border-radius: 4px; }
+.simulation-workspace-disclosure { flex: 1; min-width: 0; }
+.simulation-workspace-disclosure > summary { min-width: 0; min-height: 30px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 3px 8px; color: var(--spike-table-text); font: var(--spike-control-font); font-size: 12px; cursor: pointer; list-style: none; }
+.simulation-workspace-disclosure > summary::-webkit-details-marker { display: none; }
+.simulation-workspace-disclosure > summary::before { content: ""; flex: none; width: 5px; height: 5px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(-45deg); }
+.simulation-workspace-disclosure[open] > summary::before { transform: rotate(45deg) translateY(-2px); }
+.simulation-workspace-disclosure > summary:focus-visible { outline: 2px solid var(--spike-control-focus); outline-offset: -2px; border-radius: 3px; }
+.simulation-workspace-disclosure > summary:hover { background: var(--spike-table-hover); }
+.simulation-workspace-disclosure > summary > b { flex: none; font-weight: 600; color: var(--spike-table-text-strong); }
+.simulation-compact-context { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--spike-table-muted); }
+.simulation-compact-hint { flex: none; font-size: 11px; color: var(--spike-table-muted); }
+.simulation-workspace-compact > .simulation-workspace-run { flex: none; min-height: 28px; margin: 1px 2px 1px 0; padding: 2px 8px; gap: 5px; }
+.simulation-workspace.simulation-workspace-details-body { min-width: 0; margin: 0; border: 0; border-top: 1px solid var(--spike-table-border); background: var(--spike-table-surface); }
+.simulation-workspace-details-body > header { flex-wrap: wrap; gap: 10px; padding: 10px; }
+.simulation-workspace-details-body > header > div { min-width: 0; }
+.simulation-workspace-details-body .simulation-workspace-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+.simulation-workspace-details-body .simulation-workspace-grid article { padding: 8px 10px; }
+.simulation-workspace-details-body .simulation-workspace-actions { gap: 5px; padding: 8px 10px; }
+.simulation-workspace-details-body .simulation-workspace-actions button { min-height: 28px; padding: 4px 8px; font-size: 11px; }

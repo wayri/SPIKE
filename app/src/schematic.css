@@ -1,36 +1,40 @@
-.schematic-editor.topology-editor { grid-template-rows: 50px auto minmax(0, 1fr); }
-.schematic-editor.topology-editor.pi { grid-template-rows: 50px auto 54px minmax(0, 1fr); }
-.schematic-editor .topology-toolbar { flex-wrap: wrap; padding: 8px; }
-.schematic-editor .topology-toolbar > button, .schematic-editor .topology-toolbar > label { font-size: 11px; min-height: 32px; }
+.schematic-editor.topology-editor { container-type: inline-size; grid-template-rows: 44px auto minmax(0, 1fr); }
+.schematic-editor.topology-editor.pi { grid-template-rows: 44px auto 54px minmax(0, 1fr); }
+.schematic-editor .topology-toolbar { flex-wrap: wrap; gap: 4px; padding: 5px 8px; }
+.schematic-editor .topology-toolbar > button, .schematic-editor .topology-toolbar > label { height: 28px; min-height: 28px; padding: 0 7px; font-size: 11px; }
 .schematic-editor .topology-toolbar > button:first-child { color: var(--spike-table-text); background: var(--spike-table-toolbar); font-weight: 600; }
-.schematic-editor .topology-canvas:not(.data-view) { background-color: #f6f5ed; background-image: radial-gradient(#c9d1c6 0.8px, transparent 0.8px); background-size: 20px 20px; }
-.schematic-editor .topology-node { display: block; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #245c4a; overflow: visible; }
-.schematic-editor .topology-node::before { content: ""; position: absolute; inset: 8px 48px; border: 1.5px solid #426354; background: #f6f5ed; }
-.schematic-editor .topology-node:hover, .schematic-editor .topology-node.selected { background: #268dba0c; box-shadow: 0 0 0 1.5px var(--spike-accent); }
-.schematic-editor .topology-node.link-source { box-shadow: 0 0 0 2px #35866b; }
-.schematic-editor .topology-node.overloaded { box-shadow: 0 0 0 2px #bc3f38; }
-.schematic-editor .topology-node > .circuit-symbol { position: absolute; left: 74px; top: calc(50% - 31px); color: #245c4a; }
+.schematic-editor .topology-canvas:not(.data-view) { background-color: var(--spike-table-surface); background-image: radial-gradient(var(--spike-table-border) 0.8px, transparent 0.8px); background-size: 20px 20px; }
+.schematic-editor .topology-node { display: block; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: var(--spike-table-choice); overflow: visible; }
+.schematic-editor .topology-node::before { content: ""; position: absolute; inset: 8px 48px; border: 1.5px solid var(--spike-table-choice-border); background: var(--spike-table-toolbar); }
+.schematic-editor .topology-node:hover, .schematic-editor .topology-node.selected { background: var(--spike-table-row-focus); box-shadow: 0 0 0 1.5px var(--spike-accent); }
+.schematic-editor .topology-node.link-source { box-shadow: 0 0 0 2px var(--spike-table-choice); }
+.schematic-editor .topology-node.overloaded { box-shadow: 0 0 0 2px var(--spike-table-danger-border); }
+.schematic-editor .topology-node > .circuit-symbol { position: absolute; left: 74px; top: calc(50% - 31px); color: var(--spike-table-choice); }
 .schematic-editor .topology-node > .topology-node-copy { position: absolute; left: 0; top: -29px; width: 210px; display: grid; gap: 2px; text-align: center; }
-.schematic-editor .topology-node-copy b { color: #263d35; font: 600 12px ui-monospace, monospace; }
-.schematic-editor .topology-node-copy small { color: #596b61; font: 10px ui-monospace, monospace; text-transform: none; }
+.schematic-editor .topology-node-copy b { color: var(--spike-table-text-strong); font: 600 12px ui-monospace, monospace; }
+.schematic-editor .topology-node-copy small { color: var(--spike-table-muted); font: 10px ui-monospace, monospace; text-transform: none; }
 .schematic-editor .topology-node-copy em { display: none; }
 .schematic-editor .topology-port-stack { position: absolute; top: 0; bottom: 0; width: 48px; margin: 0; display: block !important; }
 .schematic-editor .topology-port-stack.input { left: 0; margin: 0; }
 .schematic-editor .topology-port-stack.output { right: 0; margin: 0; }
 .schematic-editor .topology-port { position: absolute; left: 0; width: 48px; height: 20px; transform: translateY(-50%); display: block !important; border-top: 0; }
-.schematic-editor .topology-port::before { content: ""; position: absolute; top: 10px; width: 48px; height: 1.5px; background: #426354; }
-.schematic-editor .topology-port i { position: absolute; left: -3px; top: 7px; width: 6px; height: 6px; border: 1px solid #426354; background: #f6f5ed; border-radius: 0; }
+.schematic-editor .topology-port::before { content: ""; position: absolute; top: 10px; width: 48px; height: 1.5px; background: var(--spike-table-choice-border); }
+.schematic-editor .topology-port i { position: absolute; left: -3px; top: 7px; width: 6px; height: 6px; border: 1px solid var(--spike-table-choice-border); background: var(--spike-table-surface); border-radius: 0; }
 .schematic-editor .topology-port.output i { left: auto; right: -3px; }
-.schematic-editor .topology-port small { position: absolute; top: -3px; left: 6px; max-width: 40px; color: #4a6559; font: 8px ui-monospace, monospace; }
-.schematic-editor .topology-port:hover small, .schematic-editor .topology-port:focus-visible small { color: #134d90; }
+.schematic-editor .topology-port small { position: absolute; top: -3px; left: 6px; max-width: 40px; color: var(--spike-table-text); font: 8px ui-monospace, monospace; }
+.schematic-editor .topology-port:hover small, .schematic-editor .topology-port:focus-visible small { color: var(--spike-table-choice); }
 .schematic-editor .topology-port:focus-visible { outline: 2px solid var(--spike-accent); }
-.schematic-editor .topology-edge { color: #2c7154; }
-.schematic-editor .topology-edge path { stroke: #2c7154; stroke-width: 1.5; }
-.schematic-editor .topology-edge.signal path { stroke: #346d9a; }
-.schematic-editor .topology-edge text { fill: #446657; font: 10px ui-monospace, monospace; paint-order: stroke; stroke: #f6f5ed; stroke-width: 4px; stroke-linejoin: round; }
-.schematic-editor .topology-pending-wire { stroke: #2580a1; filter: none; }
-.schematic-editor .topology-empty { color: #52685f; }
-.schematic-editor .topology-empty button { padding: 10px 18px; border: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); color: var(--spike-table-text); }
+.schematic-editor .topology-edge { color: var(--spike-table-choice); }
+.schematic-editor .topology-edge path { stroke: var(--spike-table-choice); stroke-width: 1.5; }
+.schematic-editor .topology-edge.signal path { stroke: var(--spike-table-text); }
+.schematic-editor .topology-edge.return path { stroke: var(--spike-table-muted); }
+.schematic-editor .topology-edge.control path { stroke: var(--spike-table-text-strong); }
+.schematic-editor .topology-edge text { fill: var(--spike-table-text); font: 10px ui-monospace, monospace; paint-order: stroke; stroke: var(--spike-table-surface); stroke-width: 4px; stroke-linejoin: round; }
+.schematic-editor .topology-pending-wire { stroke: var(--spike-table-choice); filter: none; }
+.schematic-editor .topology-empty { color: var(--spike-table-muted); padding: 24px; text-align: center; }
+.schematic-editor .topology-empty b { color: var(--spike-table-text-strong); font-size: 14px; }
+.schematic-editor .topology-empty span { max-width: 420px; font-size: 12px; line-height: 1.5; }
+.schematic-editor .topology-empty button { pointer-events: auto; padding: 10px 18px; border: 1px solid var(--spike-table-border); background: var(--spike-table-toolbar); color: var(--spike-table-text); }
 .topology-generator { position: absolute; z-index: 35; top: 14px; left: 14px; width: min(460px, calc(100% - 28px)); max-height: calc(100% - 28px); overflow: auto; padding: 18px; border: 1px solid var(--spike-table-border); border-radius: 6px; background: var(--spike-table-toolbar); color: var(--spike-table-text); box-shadow: var(--spike-popup-shadow); cursor: default; box-sizing: border-box; }
 .topology-generator header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
 .topology-generator p { font-size: 12px; line-height: 1.5; color: var(--spike-table-text); }
@@ -41,18 +45,60 @@
 .topology-generator pre { max-height: 220px; overflow: auto; padding: 12px; background: var(--spike-table-toolbar); color: var(--spike-table-text); font-size: 11px; white-space: pre-wrap; }
 .topology-generator [role="alert"] { color: var(--spike-table-text); }
 .topology-generator-values { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.schematic-editor .topology-layout.inspector-closed { grid-template-columns: 176px minmax(0, 1fr); }
+.schematic-editor .topology-layout { grid-template-columns: 144px minmax(0, 1fr) 264px; }
+.schematic-editor .topology-layout.inspector-closed { grid-template-columns: 144px minmax(0, 1fr); }
 .schematic-editor .inspector-closed .topology-inspector { display: none; }
-.topology-preview > svg { display: block; width: 100%; min-height: 170px; max-height: 280px; background: #f6f5ed; }
-.topology-preview path { fill: none; stroke: #367355; stroke-width: 1.5; }
-.topology-preview rect { fill: #f6f5ed; stroke: #426354; }
-.topology-preview .circuit-symbol { color: #245c4a; }
-.topology-preview text { fill: #263d35; font: 13px ui-monospace, monospace; }
+.topology-preview > svg { display: block; width: 100%; min-height: 170px; max-height: 280px; background: var(--spike-table-surface); }
+.topology-preview path { fill: none; stroke: var(--spike-table-choice); stroke-width: 1.5; }
+.topology-preview rect { fill: var(--spike-table-surface); stroke: var(--spike-table-choice-border); }
+.topology-preview .circuit-symbol { color: var(--spike-table-choice); }
+.topology-preview text { fill: var(--spike-table-text-strong); font: 13px ui-monospace, monospace; }
 .topology-preview details { padding: 10px 0; font-size: 12px; line-height: 1.5; }
 .topology-preview ul { padding-left: 20px; }
 .topology-connection-list { margin-top: 14px; font-size: 10px; }
-.topology-connection-list > div { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 8px 0; border-bottom: 1px solid #3b515d; }
-.topology-connection-list small { display: block; margin-top: 4px; color: #89a5ae; }
-.topology-connection-list button { padding: 5px; color: #e3a39c; background: #283942; border: 1px solid #607079; }
-@media (max-width: 1100px) { .schematic-editor .topology-layout { grid-template-columns: 135px minmax(0, 1fr) 250px; } .schematic-editor .topology-palette > button > span small { display: none; } }
-@media (max-width: 900px) { .schematic-editor .topology-layout { grid-template-columns: 48px minmax(0, 1fr) 240px; } .schematic-editor .topology-layout.inspector-closed { grid-template-columns: 48px minmax(0, 1fr); } .schematic-editor .topology-palette { padding: 5px; } .schematic-editor .topology-palette > button { display: flex; justify-content: center; } .schematic-editor .topology-palette > button > span, .schematic-editor .topology-palette > button > svg:last-child, .schematic-editor .topology-palette > label, .schematic-editor .topology-help { display: none; } }
+.topology-connection-list > div { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 8px 0; border-bottom: 1px solid var(--spike-table-border); }
+.topology-connection-list small { display: block; margin-top: 4px; color: var(--spike-table-muted); }
+.topology-connection-list button { padding: 5px; color: var(--spike-table-danger-text); background: var(--spike-table-action-bg); border: 1px solid var(--spike-table-action-border); }
+/* Contextual source and edit commands keep the sheet toolbar compact. */
+.schematic-editor .topology-tool-menu { position: relative; flex: 0 0 auto; }
+.schematic-editor .topology-tool-menu > summary { display: flex; align-items: center; gap: 6px; height: 28px; box-sizing: border-box; padding: 0 9px; border: 1px solid var(--spike-border-subtle); border-radius: 4px; background: var(--spike-surface-raised); color: var(--spike-text-strong); cursor: pointer; font: var(--spike-control-font); list-style: none; }
+.schematic-editor .topology-tool-menu > summary::-webkit-details-marker { display: none; }
+.schematic-editor .topology-tool-menu > summary::after { content: ""; width: 5px; height: 5px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(45deg) translateY(-2px); }
+.schematic-editor .topology-tool-menu[open] > summary { border-color: var(--spike-accent); color: var(--spike-accent-text); }
+.schematic-editor .topology-tool-menu > summary:focus-visible, .schematic-editor .topology-tool-popover > label:focus-visible { outline: 2px solid var(--spike-accent); outline-offset: 2px; }
+.schematic-editor .topology-tool-popover { position: absolute; z-index: 50; top: calc(100% + 5px); left: 0; width: 248px; max-height: min(360px, 55vh); overflow: auto; display: grid; gap: 3px; padding: 6px; border: 1px solid var(--spike-popup-border); border-radius: var(--spike-popup-radius); background: var(--spike-popup-surface); box-shadow: var(--spike-popup-shadow); }
+.schematic-editor .topology-tool-popover > button, .schematic-editor .topology-tool-popover > label { display: flex; align-items: center; gap: 8px; width: 100%; box-sizing: border-box; min-height: 30px; padding: 5px 8px; border: 0; color: var(--spike-text-strong); background: transparent; text-align: left; font: var(--spike-control-font); cursor: pointer; }
+.schematic-editor .topology-tool-popover > button:hover:not(:disabled), .schematic-editor .topology-tool-popover > label:hover { background: var(--spike-surface-hover); }
+.schematic-editor .topology-tool-popover > button:disabled { opacity: .4; cursor: not-allowed; }
+.schematic-editor .topology-tool-popover > button.active { color: var(--spike-accent-text); background: var(--spike-surface-selected); }
+.schematic-editor .topology-tool-popover > button.danger-confirm { color: var(--spike-status-error); background: var(--spike-table-danger-bg); }
+.schematic-editor .topology-tool-popover input[type="file"] { display: none; }
+.schematic-editor .topology-tool-popover input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--spike-accent); }
+.schematic-editor .topology-toolbar .topology-use { color: var(--spike-control-primary-text); background: var(--spike-control-primary-surface); border-color: var(--spike-control-primary-border); }
+.schematic-editor .topology-toolbar .topology-use:hover { color: var(--spike-control-primary-text); background: var(--spike-table-choice-hover); }
+.schematic-editor .topology-toolbar .topology-filter { min-width: 110px; max-width: 260px; }
+.schematic-editor .topology-filter input { min-width: 0; font-size: 11px; }
+.schematic-editor .topology-palette { padding: 7px; }
+.schematic-editor .topology-palette > button { min-height: 36px; padding: 5px; font-size: 11px; }
+.schematic-editor .topology-palette > button > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.schematic-editor .topology-help { padding: 7px; font-size: 10px; }
+.schematic-editor .topology-budget { overflow-x: auto; scrollbar-width: thin; }
+.schematic-editor .topology-budget > label { width: 140px; box-sizing: border-box; }
+.schematic-editor .topology-budget > label + label { width: 86px; }
+.schematic-editor .topology-budget > div { min-width: 82px; padding: 5px 10px; }
+.schematic-editor .topology-inspector { overflow-x: hidden; }
+.schematic-editor .topology-inspector input, .schematic-editor .topology-inspector select { min-width: 0; box-sizing: border-box; font-size: 11px; }
+@container (max-width: 1000px) {
+  .schematic-editor .topology-layout { grid-template-columns: 48px minmax(0, 1fr) 240px; }
+  .schematic-editor .topology-layout.inspector-closed { grid-template-columns: 48px minmax(0, 1fr); }
+  .schematic-editor .topology-palette { padding: 5px; }
+  .schematic-editor .topology-palette > button { display: flex; justify-content: center; }
+  .schematic-editor .topology-palette > button > span, .schematic-editor .topology-palette > button > svg:last-child, .schematic-editor .topology-palette > label, .schematic-editor .topology-help { display: none; }
+}
+@container (max-width: 760px) {
+  .schematic-editor .topology-layout { grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 180px); }
+  .schematic-editor .topology-layout.inspector-closed { grid-template-rows: minmax(0, 1fr); }
+  .schematic-editor .topology-inspector { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--spike-border-subtle); }
+  .schematic-editor .topology-toolbar .topology-filter { order: 2; flex-basis: 100%; max-width: none; }
+  .schematic-editor.topology-editor > header small { max-width: 55ch; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+}

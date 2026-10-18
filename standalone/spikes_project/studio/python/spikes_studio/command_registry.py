@@ -31,6 +31,8 @@ class Command:
 
 
 LABELS = {
+    'view.controller_boards': ('Controller board library…', 'Search sourced board pinouts, place labeled blocks and map sampled C/C++ I/O explicitly.'),
+    'view.firmware': ('Firmware emulation…', 'Load approved Cortex-M binaries into an explicitly selected native Renode board model.'),
     'view.hierarchy': ('Schematic hierarchy…', 'Navigate actual native subcircuit instances and their declared port mappings.'),
     'view.flat_schematic': ('Flat schematic (all instances)', 'Return to the complete flattened source-backed schematic.'),
     'view.parent_sheet': ('Parent sheet', 'Go to the parent native subcircuit instance or flat view.'),
@@ -49,6 +51,7 @@ LABELS = {
     'edit.box_select': ('Select', 'Drag empty canvas to select an area. Ctrl adds to the selection; drag a selected symbol to move it.'),
     'edit.wire': ('Draw wire', 'Click a terminal to start; click corners and the destination terminal. Escape cancels.'),
     'edit.rotate': ('Rotate selection', 'Select a component first; rotate it by 90 degrees.'),
+    'edit.duplicate': ('Duplicate selection', 'Preview an electrically isolated copy at the cursor; click repeatedly, rotate with Space, and finish with Escape.'),
     'edit.properties': ('Component properties', 'Select a component first; edit its values, models, pins and declared limits.'),
     'probe.voltage': ('Voltage probe', 'Click a terminal connection point to save a voltage probe. Run the circuit to acquire values.'),
     'view.component_catalog': ('Component catalog', 'Open the floating component selector; choose a part, review values, then click the schematic to place it.'),
@@ -71,7 +74,7 @@ LABELS = {
     'edit.wire_bend': ('Flip wire bend posture', 'Switch the active wire preview between horizontal-first and vertical-first bends.'),
 }
 
-SELECTION = {'edit.properties', 'edit.properties_standard', 'edit.rotate', 'edit.move', 'edit.drag',
+SELECTION = {'edit.properties', 'edit.properties_standard', 'edit.rotate', 'edit.move', 'edit.drag', 'edit.duplicate',
              'edit.rotate_standard', 'edit.mirror_horizontal', 'edit.mirror_vertical'}
 SCHEMATIC = SELECTION | {'edit.wire','edit.wire_bend','edit.box_select','edit.lasso_select','edit.select_all',
                         'edit.create_subsheet','probe.voltage','probe.differential','probe.current','probe.power','view.fit_schematic','edit.canvas_text','edit.net_label'}

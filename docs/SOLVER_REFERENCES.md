@@ -2,6 +2,48 @@
 <!-- Copyright (c) 2026 SigHarmonic -->
 # Solver research, standards and validation references
 
+SI02-S06 [supplied RLGC ideal star junctions](RLGC_LINE_JUNCTION.md) use
+Staelin, *Electromagnetics and Applications* (2011), section 8.1.2, printed
+pages 232 and 234 (multiple-line junctions and interface continuity), and
+section 8.3.1, equations (8.3.3)-(8.3.4)/(8.3.16), printed pages 249-251
+([official MIT text](https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/f52f07ed81b664331bee2fec67df7db6_MIT6_013S09_chap08.pdf)),
+reviewed 19 October 2026. The multi-leg RMS connection law and independent
+physical boundary/quadrature oracles are original derivations. This citation
+does not establish physical junction parasitics or measured validation.
+
+
+SI02-S05 [supplied piecewise RLGC cascade](RLGC_LINE_CASCADE.md) uses
+Staelin, *Electromagnetics and Applications* (2011), section 8.1.2, equations
+(8.1.14)-(8.1.16) and interface continuity discussion, printed pages 232-234;
+section 8.3.1, equations (8.3.3)-(8.3.12)/(8.3.16), printed pages 249-251
+([official MIT text](https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/f52f07ed81b664331bee2fec67df7db6_MIT6_013S09_chap08.pdf)),
+reviewed 18 October 2026. The finite wave-connection derivation and original
+implementation use these foundations without external code. Ideal electrical
+continuity does not model physical fringing/launch/via discontinuities.
+
+
+SI02-S04 [driven sampled RLGC fields and loss ledger](RLGC_LINE_FIELDS.md)
+uses Staelin, *Electromagnetics and Applications* (2011), chapter 8 section
+8.3.1, equations (8.3.3)-(8.3.12) and (8.3.16), printed pages 249-251
+([official MIT text](https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/f52f07ed81b664331bee2fec67df7db6_MIT6_013S09_chap08.pdf)),
+reviewed 18 October 2026 for phasor propagation and dissipative power. RMS
+normalization, coherent two-end constraints and positive analytic spatial
+integrals are independently derived and implemented; no external code/data was
+used. Circuit storage is not a general dispersive-material energy law, and
+electrical loss does not establish thermal ownership or deposition.
+
+
+SI02-S03 [supplied uniform sampled RLGC networks](RLGC_LINE_NETWORK.md)
+uses Staelin, *Electromagnetics and Applications* (2011), chapter 8 section
+8.3.1, equations (8.3.3)-(8.3.12), printed pages 249-250
+([official MIT text](https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/f52f07ed81b664331bee2fec67df7db6_MIT6_013S09_chap08.pdf)),
+reviewed 18 October 2026 for lossy phasor telegrapher propagation and Heaviside
+comparison. The scaled two-port derivation, code, fixtures and tests are original;
+no external implementation was used. The source's longitudinal-field/modest-loss
+warning limits physical applicability. Sampled passivity is not broadband
+causality or measured validation.
+
+
 Curated 2026-09-20. Read alongside the [solver handbook](SOLVER_HANDBOOK.md)
 and [mathematical methods reference](SOLVER_MATHEMATICS.md).
 This ledger identifies sources already recorded in the public repository, not
@@ -26,6 +68,79 @@ explicit rather than guessed. Older foundational work is retained honestly;
 newer publication dates do not retroactively change development provenance.
 
 ## Conductor and network methods
+
+SI02-S02 [distortionless distributed line losses](DISTORTIONLESS_LINE_TRANSIENT.md)
+record 18 October 2026 review of Staelin (2011), chapter 8 section 8.3.1,
+equations (8.3.1)–(8.3.12), printed pages 249–250, for lossy telegrapher laws
+and the Heaviside condition; equation (8.3.16), page 251, identifies conductor/
+leakage loss in phasor notation. The independent time-domain derivation uses
+instantaneous Rp*I²+Gp*V² without a phasor half factor, and local storage/loss
+balance. The method records the effective quasi-TEM applicability caveat and
+separates mathematical verification from measured/thermal qualification.
+
+
+SI02-S01 [distributed lossless line transients](LOSSLESS_LINE_TRANSIENT.md)
+record 18 October 2026 review of Staelin (2011), chapter 8 section 8.1.1,
+equations (8.1.1)–(8.1.12), and section 8.1.2 equations (8.1.14)–(8.1.16) and
+reflected-transient discussion on printed pages 232–233. Chapter 7 section
+7.1.2 supplies instantaneous power/local energy identities. The method ledger
+links official chapters and independently derives two driven-end recursions,
+finite causal expansion and signed boundary/probe quantities. This is a supplied
+uniform lossless TEM model, not qualified post-layout extraction.
+
+
+SI07-S10 [network-port reflectometry](NETWORK_REFLECTOMETRY.md) records
+18 October 2026 review of Staelin (2011), chapter 7, section 7.1.2,
+equations (7.1.6)–(7.1.7)/(7.1.16)–(7.1.18), and section 7.2.2,
+equations (7.2.1)–(7.2.8), for instantaneous wave/current/power and time-domain
+junction reflection. The method ledger links the official chapter and derives
+the fixed-plane apparent ratios and resolution policy independently. Real
+instantaneous power is transported energy per time, not automatically heat;
+this is not phasor, isolated-S11 or spatial TDR qualification.
+
+
+SI07-S09 [supplied timing corners](CROSSTALK_TIMING_CORNERS.md) record
+18 October 2026 review of Oppenheim, MIT RES.6-007 Lecture 2, PDF pages 1–3
+and transparency 2.2, for continuous-time translation, and Freeman, MIT 6.003
+Lecture 1 (8 September 2011), PDF pages 14–18, for sampling and PWL signal
+reconstruction. The method ledger links official notes and independently derives
+clipped endpoint-held waveforms, unchanged-state corner experiments and finite
+union envelopes. Parent physical KCL/KVL and linearity remain unchanged.
+
+
+SI07-S08 [sampled multi-aggressor crosstalk](MULTI_AGGRESSOR_CROSSTALK.md)
+records 18 October 2026 review of Agarwal/Lang, MIT 6.002 Lecture 3, PDF pages
+3–13 (slides marked Fall 2000, hosted Spring 2007), for linear independent-source
+superposition, and Staelin (2011), section 3.4.2 for linear circuit equations.
+The method ledger links primary sources and independently derives the biased
+common-state decomposition, finite signed-family envelopes and fixed witness
+checks. These references do not establish intersample or measured qualification.
+
+
+SI07-S07 [RLC energy ledgers](RLC_ENERGY_LEDGER.md) record 18 October 2026
+review of Van Loan (1978), *Computing Integrals Involving the Matrix Exponential*,
+mathematical sections II-III, pp.395-397: block-integral identities and doubling.
+The method ledger links the official DOI and actually reviewed published-paper
+scan, distinguishes mathematical review from unreviewed external program source
+and global error bounds, and records the independently derived covariance/work
+formulation. Staelin capacitor/inductor energy and installed SciPy `expm`
+documentation support physical/numerical lineage; measured qualification remains
+separate.
+
+SI07-S06 [supplied RLC initial states](RLC_INITIAL_STATES.md) record
+18 October 2026 review of Staelin (2011), section 3.5.1, equations (3.5.1)-(3.5.15)
+and initial-condition selection following (3.5.9), plus SciPy 1.17.0 `expm` API
+documentation. The initialized mixed-state and split-run derivations are original.
+Analytic free/forced and physical nonzero fitted-memory references include
+initial stored energy; generic fitted-state physical energy remains unspecified.
+
+SI07-S05 [combined R/L and shunt-C boundaries](RLC_NETWORK_TRANSIENT.md) record
+18 October 2026 review of Staelin's *Electromagnetics and Applications* (2011),
+sections 3.1.3, 3.2.1/3.2.3, 3.4.1 and 3.5.1, and installed SciPy 1.17.0 `expm`
+API documentation. The method ledger locates the capacitor/inductor laws and
+energies, KVL/KCL and RLC damping. Mixed wave/state closure, loaded-RLC and
+coupled physical references are independently authored; library algorithm-paper
+full-text review and measured qualification are not claimed.
 
 SI07-S04 [shunt-capacitive boundaries](CAPACITIVE_NETWORK_TRANSIENT.md) record
 18 October 2026 review of David H. Staelin's *Electromagnetics and Applications*
@@ -290,3 +405,10 @@ reproduced here. Follow [clean-room policy](RESEARCH_AND_CLEAN_ROOM_ENGINEERING.
 and [licensing](../LICENSING.md). New reference records should include author,
 title, publication/revision, DOI/official URL, retrieval evidence, status of use,
 independent derivation, implementation/test paths and unresolved validation gates.
+
+For the new opt-in linear Radau IIA3 method, the exact reviewed portions of
+Hairer's June 2011 lecture, Betcke/Salles/Smigaj (2017) Appendix A and
+Ho/Ruehli/Brennan (1975) section II, with DOI/access links, independent
+derivation and executed verification, are recorded in
+[numerical method evidence](NUMERICAL_METHOD_EVIDENCE.md#native-linear-radau-iia3--18-october-2026).
+The later corroborating sources are not asserted as lineage for older kernels.

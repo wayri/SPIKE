@@ -1,0 +1,34 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "PI04-S02",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "b4fa9baf934c53c8f8bbf82d740843b89de5490afd89d7a5241cb2cb524e8cba",
+    "python/spike_core/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
+    "tests/python/test_pdn_multiload.py": "f7d43877dc5dfb15045e73a6f56ab2d2c556cf5af08a5411186aecd1621d948b",
+    "tests/python/test_pdn_multiload_contract.py": "0a2ea2ee509a57328b042ed7a29a09aa8925b2585d9fa2ce17207a1abcdf2637",
+    "python/spike_core/service_pdn_network.py": "3252f731ef0cb4f586c7a1e64ef3a0300a43312e505c4af812b9823a9ff7c7ec",
+    "schemas/pdn-network-request-v1.schema.json": "89fc9091507d0d04500a64358c1621754e8e1de67ae35985da14ff11012e28cf"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_pdn_multiload.PdnMultiLoadTests.test_asynchronous_shared_return_rl_and_energy_at_refinements",
+      "tests.python.test_pdn_multiload.PdnMultiLoadTests.test_linear_superposition_on_identical_grids_with_shared_energy_cross_term",
+      "tests.python.test_pdn_multiload.PdnMultiLoadTests.test_load_order_and_legacy_envelopes",
+      "tests.python.test_pdn_multiload.PdnMultiLoadTests.test_multiload_mid_solve_cancellation_is_atomic",
+      "tests.python.test_pdn_multiload.PdnMultiLoadTests.test_strict_multiload_admission",
+      "tests.python.test_pdn_multiload.PdnMultiLoadTests.test_union_grid_resource_limit_is_checked_before_solving",
+      "tests.python.test_pdn_multiload_contract.MultiLoadContractTests.test_schema_and_owned_worker_shared_return",
+      "tests.python.test_pdn_multiload_contract.MultiLoadContractTests.test_schema_rejects_ambiguous_forms_and_typed_admission_rejects_identity"
+    ],
+    "run": 8,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI04-S02-aggressor-reverified.log",
+  "log_sha256": "2f48aa5abbb64495d4f1cdb072e01c03a8c0b2b107a267abb7d6662b08f1d4f0"
+}

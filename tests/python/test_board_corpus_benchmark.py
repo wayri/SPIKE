@@ -4,10 +4,35 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from scripts.benchmark_board_corpus import inspect_import, validate_entry
+from scripts.benchmark_board_corpus import (
+    RUNNER_SOURCE_PATHS,
+    inspect_import,
+    source_snapshot,
+    validate_entry,
+    validate_source_snapshots,
+)
 
 
 class CorpusBenchmarkTests(unittest.TestCase):
+    def test_complete_before_and_after_source_snapshots_are_required(self):
+        before = source_snapshot()
+        self.assertEqual(tuple(before), RUNNER_SOURCE_PATHS)
+        summary = {'runner_sources': before, 'runner_sources_after': dict(before)}
+        validate_source_snapshots(summary)
+        for mutation in ('missing', 'extra', 'changed_after', 'stale'):
+            damaged = copy.deepcopy(summary)
+            if mutation == 'missing':
+                damaged['runner_sources'].pop(next(iter(before)))
+            elif mutation == 'extra':
+                damaged['runner_sources_after']['unbounded.py'] = '0' * 64
+            elif mutation == 'changed_after':
+                damaged['runner_sources_after'][next(iter(before))] = '0' * 64
+            else:
+                damaged['runner_sources'][next(iter(before))] = '0' * 64
+                damaged['runner_sources_after'] = dict(damaged['runner_sources'])
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                validate_source_snapshots(damaged)
+
     def payload(self):
         return {'design': {'contract': 'spike/design-ir/v2',
                            'frame': {'units': 'mm', 'handedness': 'right'},

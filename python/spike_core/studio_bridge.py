@@ -8,6 +8,18 @@ from pathlib import Path
 import subprocess
 import sys
 
+
+def _module_available(name):
+    """Return optional-module availability without importing the module."""
+    try:
+        return importlib.util.find_spec(name) is not None
+    except (ImportError, ValueError):
+        # ``find_spec`` raises ValueError when another in-process consumer has
+        # installed a module without import metadata (for example a GUI stub).
+        # Such a module is not evidence that a fresh Studio process can import it.
+        return False
+
+
 def studio_runtime_capabilities():
     """Discover fixed local launch prerequisites without importing GUI modules."""
     repository = Path(__file__).resolve().parents[2]
@@ -15,7 +27,7 @@ def studio_runtime_capabilities():
     prepare = all((source / name).is_file() for name in ("document.py", "studio_handoff.py"))
     launcher = repository / "scripts" / "launch_spikes_studio.py"
     frozen = bool(getattr(sys, "frozen", False))
-    wx_available = importlib.util.find_spec("wx") is not None
+    wx_available = _module_available("wx")
     launch = prepare and not frozen and launcher.is_file() and wx_available
     reason = ("Source Studio launch prerequisites found; numerical library readiness is checked by Studio."
               if launch else "This worker package does not include the standalone Studio launcher."
@@ -51,7 +63,7 @@ def handle_prepare_spikes_studio_handoff(params, workspace_root):
 
 def handle_launch_spikes_studio(params, workspace_root):
     path=prepare_spikes_studio_handoff(params["request"],workspace_root)
-    if importlib.util.find_spec("wx") is None:
+    if not _module_available("wx"):
         return {"status":"unavailable","path":str(path),"message":"SPIKES Studio requires the optional wxPython runtime"}
     repository = Path(__file__).resolve().parents[2]
     launcher = repository / "scripts" / "launch_spikes_studio.py"

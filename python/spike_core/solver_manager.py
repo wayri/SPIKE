@@ -6,6 +6,7 @@ import math
 from typing import Any, Dict, Iterable, List
 
 from .acceleration import acceleration_catalog
+from .solver_blocks import solver_blocks_catalog
 from .external_engines import external_engine_catalog
 from .spikes_runtime import engine_status
 from .solver_state import (
@@ -234,6 +235,7 @@ def solver_manager_catalog(internal_solvers: List[Dict[str, Any]], *, refresh: b
         })
     return {
         "contract": SOLVER_MANAGER_CONTRACT,
+        "blocks": solver_blocks_catalog(),
         "selection_policy": "capability_then_validity_then_declared_priority",
         "installation": {
             "managed_downloads": False,

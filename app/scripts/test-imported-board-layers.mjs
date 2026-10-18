@@ -7,7 +7,17 @@ const names = ["importedBoardLayers", "boardSurfaceMaterials"];
 try {
   for (const name of names) writeFileSync(new URL(`./.test-${name}.mjs`, import.meta.url), ts.transpileModule(readFileSync(new URL(`../src/${name}.ts`, import.meta.url), "utf8"), {compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText.replaceAll('"./boardSurfaceMaterials"','"./.test-boardSurfaceMaterials.mjs"'));
   const {tagImportedBoardLayers, importedBoardLayerVisible} = await import("./.test-importedBoardLayers.mjs");
-  const {configureImportedMaterial} = await import("./.test-boardSurfaceMaterials.mjs");
+  const {configureImportedMaterial, classifyBoardSurface} = await import("./.test-boardSurfaceMaterials.mjs");
+  for (const rgb of [[.0062745097,.1850980371,.5082352757], [.5,.03,.02]]) {
+    const material = new THREE.MeshStandardMaterial({color:new THREE.Color(...rgb),opacity:.83,transparent:true,roughness:.6});
+    assert.equal(classifyBoardSurface(material,"=>0117"),"soldermask","unnamed colored KiCad masks retain their surface identity");
+    const maskRoot = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(.02,.0016,.01),new THREE.MeshStandardMaterial({roughness:.8})); body.name="substrate";
+    const mask = new THREE.Mesh(new THREE.PlaneGeometry(.02,.01),material); mask.rotation.x=Math.PI/2; mask.position.y=.00085;
+    maskRoot.add(body,mask);
+    assert.ok(tagImportedBoardLayers(maskRoot).has("F.Mask"),"colored mask stays addressable for visibility and opacity controls");
+  }
+  assert.equal(classifyBoardSurface(new THREE.MeshStandardMaterial({color:0x808080,opacity:.83,roughness:.6}),"unnamed"),"unknown","neutral translucent surfaces do not imply soldermask");
   const root = new THREE.Group();
   const copperMaterial = new THREE.MeshStandardMaterial({metalness:1});
   const surface = (name,y,material,height=.00004) => {

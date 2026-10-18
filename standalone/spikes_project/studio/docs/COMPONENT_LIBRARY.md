@@ -40,12 +40,27 @@ debounced by 140 ms, with a bounded cache of 32 queries.
 - Favorites and recent insertions are saved in the circuit project. Right-click
   a result for insertion, favorite, export, preset-ID copy or shortcut assignment.
 
-Select a preset to see a conventional symbol/pin preview and editable parameter
-JSON. Native functional blocks show their external pins; bench blocks explicitly
+Select a preset to see a conventional symbol/pin preview and labeled value/unit
+fields. Ordinary value entry does not expose JSON. Native functional blocks show their external pins; bench blocks explicitly
 are not electrical pinouts. These previews are not a claim of symbol-standard
 certification. Parameter drafts survive browsing within the session; the SPICE
 tab reflects the edited parameters. Unknown parameter names are rejected.
 Drafts become durable when exported or inserted, not merely by browsing.
+
+For standard R/L/C parts, **Electrical model** selects **Ideal nominal** or
+**Non-ideal (lumped parasitics)**. Enter the nominal value on the first tab;
+ESR/DCR, ESL, leakage, tolerance and static temperature coefficients are on
+**Parasitics & temperature**. Switching modes retains the draft but ideal
+placement intentionally omits non-ideal coefficients. Package/construction
+labels never invent parasitics. Manufacturer rows without a runnable model
+remain blocked; selecting an MPN does not qualify an approximation.
+
+Component properties separate **Parameters**, **Pins**, **Limits**, **Details**,
+model evidence and the applied-model equivalent circuit/curves. Pins and limits
+use labeled inputs rather than serialized arrays/objects. The top-level
+capacitor package selector reuses the existing ESR/ESL/leakage policy and
+honors enforced parents. Value and policy changes apply in one undo transaction.
+Other unsupported detailed bindings remain unavailable, not silently replaced.
 
 ![Actual searchable catalog and native pin preview](media/reliability/library-browser-preview.png)
 
@@ -252,6 +267,35 @@ Missing data never becomes a zero measurement or a fabricated failure prediction
 ![Actual native feedback run with measured limit marker](media/reliability/catalog-alert.png)
 
 ## Verification and remaining work
+
+### Semiconductor and IC parameter editing (October 2026 preview)
+
+Select a placed diode, native NPN, level-1 NMOS, SPK_GAN or SPK_SIC device
+and press **E**. Choose an existing same-family model or a private custom
+model. Electrical coefficients have descriptive labels and units; supported
+charge/parasitic coefficients and thermal coefficients have separate tabs.
+Changing a private model never changes another instance's shared card. MOS
+geometry expressions and existing source expressions are preserved. BSIMBULK
+and BSIMCMG offer same-family existing-model selection, not a guessed set of
+editable BSIM defaults. Pin remapping remains in the separate Pins tab.
+
+**Thermal assessment** supplies labeled inputs to Analytics → Thermal margins:
+maximum junction rating, warning headroom, supplied temperature, effective
+thermal resistance, steady dissipated power, ambient and conditions evidence.
+These are screening inputs, not automatic electrothermal feedback. Recorded
+temperatures take priority; supplied temperature takes priority over the
+explicit steady-state estimate. Unknown values stay blank.
+
+The floating Component library's **Edit SPICE model library…** opens a local
+`.MODEL` or `.SUBCKT` entry. Its categorized fields preserve expressions and
+unknown vendor parameters; the Source preview is SPICE, not JSON. IC/op-amp
+subcircuit `PARAMS:` defaults can be edited without altering the body or pins.
+Use **Export .lib…** to save the result. Unsafe headers remain read-only.
+Pasted `.MODEL` cards use this same review before the placement/pin review.
+Only parser-supported families can be placed; an exported IGBT, PNP, PMOS or
+other unsupported card is not made runnable by this editor. Native IGBT and
+universal vendor-model qualification remain open. No model tier silently
+substitutes a simpler semiconductor implementation.
 
 Automated tests evaluate all 5,000 presets, verify all 650 native recipe decks
 parse and complete a native DC smoke solve, test representative physical relations,

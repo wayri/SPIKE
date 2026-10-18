@@ -26,7 +26,7 @@ class AnalyticsPanel(wx.Panel):
         button('Load analytics extension…',self.load);button('Run selected extension',self.run_extension);button('Remove selected',self.remove)
         button('Export extension template…',self.template);button('Export report…',self.export);box.Add(row,0,wx.EXPAND)
         note=wx.StaticText(self,label='Analytics uses actual recorded time-domain results. User extensions are bounded expression recipes (x = selected signal), not executable Python/C code. Importing never runs a recipe.');note.Wrap(1000);box.Add(note,0,wx.ALL,7)
-        self.SetSizer(box);ax=self.figure.add_subplot();ax.set_title('Run a circuit, then analyze its recorded signals');self.plot.draw()
+        self.SetSizer(box);ax=self.figure.add_subplot();ax.set_title('Run a circuit, then analyze its recorded signals');self.plot.draw_idle()
     def refresh(self):
         selected=self.extensions.GetStringSelection();self.extensions.Set([e['name'] for e in self.owner.doc.data['analytics_extensions']])
         if not self.extensions.SetStringSelection(selected) and self.extensions.GetCount():self.extensions.SetSelection(0)

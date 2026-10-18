@@ -9,7 +9,7 @@
     "python/spike_core/assembly_thermomechanical.py": "7c2c1f25637e5dab8c4a98640893e3772bc559165b95b5c1139635130f5b9d74",
     "python/spike_core/service_structural.py": "9027ee0643417028daa7840c2a29c9c19b4886e112098d92b1864ef28f4e1501",
     "python/spike_core/service_assembly_field.py": "67f48d8fecacf8f74cefced7b07ca326571daa42308e330ac94296cec810b70c",
-    "python/spike_core/service.py": "ab12c06cae1ddcc6c178580c183e14992488a810d6b686e01893372a6916a2e8",
+    "python/spike_core/service.py": "d52da717f771d04a539e8c4b6ecaa0ecc91c917d72c42615f2d885384791eed9",
     "python/spike_core/service_helpers.py": "9d7f6c88c1716000c3b023f31969da8651c0ce123ff5ff2159ea0c3cb808e2de",
     "python/spike_core/assembly_tetra_thermal.py": "080af44da4775116163483f80de1ede3054ed99ea9ff6a4f0ff5f647bc1a4fc2",
     "python/spike_core/assembly_tetra_thermal_validation.py": "54ad05eaedbb4a47f5a866af7df97e94e25f871e4ada2aa3f8daa07db3ff4bd3",
@@ -50,6 +50,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/GP07-S01-lf-reverified.log",
-  "log_sha256": "520dbd39db9c8388bb879d07a947b233e26a4ca3f0d7cc4a3f1f63754266e15a"
+  "log": "docs/validation/parity/GP07-S01-aggressor-shared-worker.log",
+  "log_sha256": "47ec34aae241cc1c05a1db64fa158b5ff1c616ac93056b7fc9fa8bc502387285"
 }

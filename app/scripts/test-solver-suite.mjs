@@ -32,10 +32,10 @@ assert.ok(filterSolverSuite("  conservative CHARGE  ").some(item => item.id === 
 assert.ok(filterSolverSuite("admittance", "Power integrity", "experimental").every(item => item.group === "Power integrity" && item.status === "experimental"));
 assert.equal(filterSolverSuite("not-a-capability-xyz").length, 0);
 assert.ok(filterSolverSuite("", "all", "planned").length > 0);
-const bundle = await build({ entryPoints: [fileURLToPath(new URL("../src/SolverSuitePanel.tsx", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node", external: ["react", "react/jsx-runtime"], loader: { ".css": "empty" }, plugins: [{ name: "catalog-icons", setup(build) { build.onResolve({ filter: /\/icons$/ }, () => ({ path: "icons", namespace: "stub" })); build.onLoad({ filter: /.*/, namespace: "stub" }, () => ({ contents: "export const Search = () => null; export const X = () => null;" })); } }] });
+const bundle = await build({ entryPoints: [fileURLToPath(new URL("../src/SolverSuitePanel.tsx", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node", external: ["react", "react/jsx-runtime"], loader: { ".css": "empty" }, plugins: [{ name: "catalog-icons", setup(build) { build.onResolve({ filter: /\/icons$/ }, () => ({ path: "icons", namespace: "stub" })); build.onLoad({ filter: /.*/, namespace: "stub" }, () => ({ contents: "export const Search = () => null; export const X = () => null; export const Boxes = () => null; export const GitBranch = () => null; export const Package = () => null;" })); } }] });
 const code = bundle.outputFiles[0].text.replaceAll('from "react"', `from ${JSON.stringify(new URL("../node_modules/react/index.js", import.meta.url).href)}`).replaceAll('from "react/jsx-runtime"', `from ${JSON.stringify(new URL("../node_modules/react/jsx-runtime.js", import.meta.url).href)}`);
 const { default: SolverSuitePanel } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
-const html = renderToStaticMarkup(React.createElement(SolverSuitePanel, { onClose() {}, onOpenWorkflow() {} }));
+const html = renderToStaticMarkup(React.createElement(SolverSuitePanel, { onClose() {}, onOpenWorkflow() {}, initialView: "capabilities" }));
 for (const label of ["Runtime availability has not been probed here", "Search solver capabilities", "Filter solver domain", "Filter solver status", "Evidence reference", "Scope limit:", "Open circuit / Studio handoff", "Open Python workspace", "Unavailable"]) assert.ok(html.includes(label), `Missing user state: ${label}`);
 assert.equal((html.match(/class="solver-suite-card"/g) ?? []).length, catalog.length);
 assert.equal((html.match(/disabled="">Unavailable/g) ?? []).length, catalog.filter(item => item.status === "planned").length);
@@ -51,7 +51,7 @@ assert.equal(manager.runtimeWorkflow({ id: "spike.peec_2_5d" }).action, "pi");
 assert.equal(new Set(catalog.map(manager.solverDisplayName)).size, catalog.length, "Unique user-facing names");
 for (const text of ["SPIKE 3D PI - DC conduction", "SPIKE 3D Structural", "SPIKE Thermoelastic", "Filter solver provider", "Worker registry", "Internal solvers and models / Power integrity", "External engine adapters / Electromagnetics"]) assert.ok(html.includes(text), text);
 const probedHtml = renderToStaticMarkup(React.createElement(SolverSuitePanel, {
-  onClose() {}, onOpenWorkflow() {}, runtimeProbed: true,
+  onClose() {}, onOpenWorkflow() {}, initialView: "capabilities", runtimeProbed: true,
   runtimeSolvers: [{ id: "spike.peec_2_5d", name: "Legacy name", state: "unavailable", model_status: "unsupported", runnable: false, reason: "Runtime missing" },
                    { id: "external.new-engine", name: "New adapter", state: "unavailable", model_status: "unsupported" }],
 }));

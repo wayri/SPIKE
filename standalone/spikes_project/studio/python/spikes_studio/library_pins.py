@@ -6,6 +6,12 @@ import math
 
 
 def pin_contract(record):
+    if record.get('model_type')=='packaged_lumped_device_v1':
+        from .packaged_device_library import pin_contract as packaged_device_pin_contract
+        return packaged_device_pin_contract(record)
+    if record.get('model_type')=='lumped_physics_part_v1':
+        from .lumped_physics_library import pin_contract as lumped_physics_pin_contract
+        return lumped_physics_pin_contract(record)
     if record.get('passive_kind')=='kelvin_shunt':
         return {'pins':[{'number':str(i+1),'name':name,'role':'force' if name.startswith('F') else 'sense','side':'west' if name.endswith('P') else 'east'} for i,name in enumerate(('FP','FN','SP','SN'))],
                 'numbering':'Generic Kelvin force/sense terminals; NOT a vendor package pinout',

@@ -13,7 +13,7 @@ def build(canvas,event,point):
         title=menu.menu.Append(-1,f"{selected['ref']} - {len(canvas.selected)} selected");title.Enable(False)
         command(menu,'edit.properties');menu.separator()
     edit=menu.submenu('Edit / selection')
-    for ident in ('edit.undo','edit.redo','edit.copy','edit.paste','edit.select_all','edit.box_select','edit.lasso_select'):command(edit,ident)
+    for ident in ('edit.undo','edit.redo','edit.copy','edit.paste','edit.duplicate','edit.select_all','edit.box_select','edit.lasso_select'):command(edit,ident)
     transform=menu.submenu('Move / transform')
     for ident in ('edit.move','edit.drag','edit.rotate','edit.mirror_horizontal','edit.mirror_vertical'):command(transform,ident)
     place=menu.submenu('Place / annotate')

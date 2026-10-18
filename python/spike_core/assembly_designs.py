@@ -17,26 +17,20 @@ class AssemblyDesignError(ValueError):
     """Raised when retained SpiDeR records do not own the assembly boards."""
 
 
-def _same_active_design(left: Any, right: Any) -> bool:
-    """Compare duplicate active records across JSON/in-memory frame encoding."""
+def _same_json_value(left: Any, right: Any) -> bool:
+    """Compare JSON values before and after typed tuple hydration."""
 
-    if left == right:
-        return True
-    if not isinstance(left, Mapping) or not isinstance(right, Mapping):
-        return False
-    if {key: value for key, value in left.items() if key != "frame"} != {
-        key: value for key, value in right.items() if key != "frame"
-    }:
-        return False
-    left_frame = left.get("frame")
-    right_frame = right.get("frame")
-    if not isinstance(left_frame, Mapping) or not isinstance(right_frame, Mapping):
-        return left_frame == right_frame
-    normalized_left = dict(left_frame)
-    normalized_right = dict(right_frame)
-    normalized_left["transform"] = tuple(normalized_left.get("transform", ()))
-    normalized_right["transform"] = tuple(normalized_right.get("transform", ()))
-    return normalized_left == normalized_right
+    if isinstance(left, Mapping) and isinstance(right, Mapping):
+        return set(left) == set(right) and all(_same_json_value(left[key], right[key]) for key in left)
+    if isinstance(left, (list, tuple)) and isinstance(right, (list, tuple)):
+        return len(left) == len(right) and all(_same_json_value(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def _same_active_design(left: Any, right: Any) -> bool:
+    """Compare exact duplicate active records across JSON/in-memory encoding."""
+
+    return _same_json_value(left, right)
 
 
 def canonicalize_assembly_designs(

@@ -1,0 +1,1436 @@
+{
+  "contract": "spike/solver-blocks/v1",
+  "catalog_version": "0.3.12-gamma.1",
+  "packaging_mode": "bundled_all",
+  "managed_downloads": false,
+  "groups": [
+    {
+      "id": "core",
+      "name": "Base and shared services"
+    },
+    {
+      "id": "pcb",
+      "name": "PCB"
+    },
+    {
+      "id": "harness",
+      "name": "Harness"
+    },
+    {
+      "id": "mcad",
+      "name": "MCAD collaboration"
+    },
+    {
+      "id": "circuits",
+      "name": "Circuits and SPIKES Studio"
+    },
+    {
+      "id": "pi",
+      "name": "Power integrity"
+    },
+    {
+      "id": "si",
+      "name": "Signal integrity"
+    },
+    {
+      "id": "cfd",
+      "name": "CFD"
+    },
+    {
+      "id": "cht",
+      "name": "CHT"
+    },
+    {
+      "id": "thermal",
+      "name": "Thermal"
+    },
+    {
+      "id": "electromagnetics",
+      "name": "Electromagnetics"
+    },
+    {
+      "id": "mechanics",
+      "name": "Structural mechanics"
+    },
+    {
+      "id": "execution",
+      "name": "Execution and coupling"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "core",
+      "name": "Base contracts and worker",
+      "groups": [
+        "core"
+      ],
+      "requires": [],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Mandatory contracts, worker transport, diagnostics and project services."
+    },
+    {
+      "id": "geometry",
+      "name": "Shared geometry and identity",
+      "groups": [
+        "core",
+        "mcad",
+        "pcb"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "materials",
+      "name": "Shared material evidence",
+      "groups": [
+        "core",
+        "thermal",
+        "mechanics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "mesh",
+      "name": "Shared mesh contracts and admission",
+      "groups": [
+        "core",
+        "mcad"
+      ],
+      "requires": [
+        "geometry"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Mesh data/admission; a mesh generator remains optional."
+    },
+    {
+      "id": "pcb-adapter",
+      "name": "PCB geometry adapters",
+      "groups": [
+        "pcb"
+      ],
+      "requires": [
+        "geometry"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "harness-adapter",
+      "name": "Harness conductor and network workflows",
+      "groups": [
+        "harness"
+      ],
+      "requires": [
+        "geometry",
+        "materials",
+        "si-networks"
+      ],
+      "optional": [
+        "pi-dc"
+      ],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Explicit wire DC and supplied conductor SI; no arbitrary shield or radiation qualification."
+    },
+    {
+      "id": "mcad-adapter",
+      "name": "MCAD collaboration and retained-solid handoff",
+      "groups": [
+        "mcad"
+      ],
+      "requires": [
+        "geometry"
+      ],
+      "optional": [
+        "mesh",
+        "mcad-freecad"
+      ],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Occurrence-bound geometry exchange, not general MCAD authoring."
+    },
+    {
+      "id": "mcad-freecad",
+      "name": "FreeCAD export and collaboration adapter",
+      "groups": [
+        "mcad"
+      ],
+      "requires": [
+        "geometry",
+        "external-freecad"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bundled explicit export adapter; FreeCAD is a separately licensed application/runtime."
+    },
+    {
+      "id": "thermal-calculix",
+      "name": "CalculiX solid thermal adapter",
+      "groups": [
+        "thermal",
+        "mechanics"
+      ],
+      "requires": [
+        "mesh",
+        "materials",
+        "external-calculix"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bundled bounded solid thermal adapter; separately admitted CalculiX runtime required."
+    },
+    {
+      "id": "thermal-openfoam",
+      "name": "OpenFOAM cooling and CHT adapter",
+      "groups": [
+        "cfd",
+        "cht",
+        "thermal"
+      ],
+      "requires": [
+        "mesh",
+        "materials",
+        "external-openfoam"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bundled cooling adapter; separately admitted OpenFOAM runtime and case required."
+    },
+    {
+      "id": "cht-assembly",
+      "name": "Assembly solid/fluid CHT adapter",
+      "groups": [
+        "cht",
+        "cfd",
+        "thermal",
+        "mcad"
+      ],
+      "requires": [
+        "thermal-solids",
+        "mesh",
+        "materials",
+        "thermal-openfoam"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "bundled",
+      "description": "Bounded assembly case preparation and admitted external execution; no general CHT qualification."
+    },
+    {
+      "id": "pi-solid-dc",
+      "name": "Retained-volume 3D DC conduction",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-solid-dc"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-transient",
+      "name": "Geometry PEEC RLC transient",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "pi-peec",
+        "circuit-native"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-transient"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "mechanics-static",
+      "name": "Static tetrahedral structural mechanics",
+      "groups": [
+        "mechanics",
+        "mcad"
+      ],
+      "requires": [
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "mechanics-static"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "mechanics-thermoelastic",
+      "name": "Same-mesh thermal-to-mechanical coupling",
+      "groups": [
+        "mechanics",
+        "mcad"
+      ],
+      "requires": [
+        "mechanics-static",
+        "thermal-solids"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "mechanics-thermoelastic"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "planned-mom",
+      "name": "Surface method of moments",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "planned-mom"
+      ],
+      "delivery": "planned",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-native",
+      "name": "Native circuit OP, AC and transient",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-native"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-adaptive",
+      "name": "Adaptive BDF2 and trapezoidal transient",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "circuit-native"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-adaptive"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-equations",
+      "name": "Electrical I/Q equations and package parasitics",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "circuit-native"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-equations"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-physics-parts",
+      "name": "Supplied multi-terminal physics parts",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "circuit-equations"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-physics-parts"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-smps",
+      "name": "Ideal CCM SMPS and control-loop stability",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-smps"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-battery",
+      "name": "One-RC battery reference study",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-battery"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-libraries",
+      "name": "Passive, digital and compiled controller models",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "circuit-native"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-libraries"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "circuit-pdk",
+      "name": "Open-PDK inventory and ngspice circuit studies",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core",
+        "external-ngspice"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-pdk"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "circuit-asic",
+      "name": "IC/ASIC preflight and KLayout inspection",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core",
+        "external-klayout"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-asic"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "circuit-tcad",
+      "name": "Native 1D equilibrium semiconductor field",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-tcad"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-dc",
+      "name": "Board DC resistance and source-capacity screening",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "pcb-adapter",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-dc"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-peec",
+      "name": "PEEC R/L and approximate RLCG extraction",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "pi-dc"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-peec"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-pdn",
+      "name": "Explicit PDN/filter and simultaneous load transients",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-pdn"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-capacitance",
+      "name": "Finite-dielectric electrostatic capacitance",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-capacitance"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-dielectric-ac",
+      "name": "Finite-dielectric AC admittance",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "pi-capacitance"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-dielectric-ac"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-reduction",
+      "name": "Passive sampled port reduction",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "pi-dielectric-ac"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-reduction"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "pi-engineering",
+      "name": "Converter, copper and capacitor screening",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-engineering"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "si-networks",
+      "name": "Touchstone and sampled network processing",
+      "groups": [
+        "si",
+        "pcb"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "si-networks"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "si-channels",
+      "name": "Single and coupled quasi-TEM channel extraction",
+      "groups": [
+        "si",
+        "pcb"
+      ],
+      "requires": [
+        "pcb-adapter",
+        "si-networks",
+        "materials"
+      ],
+      "optional": [
+        "thermal-board"
+      ],
+      "capability_ids": [
+        "si-channels"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "si-eye",
+      "name": "Eye masks and protocol suite input review",
+      "groups": [
+        "si",
+        "pcb"
+      ],
+      "requires": [
+        "si-networks"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "si-eye"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "thermal-board",
+      "name": "Object networks and layered board thermal",
+      "groups": [
+        "thermal"
+      ],
+      "requires": [
+        "pcb-adapter",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "thermal-board"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "thermal-solids",
+      "name": "Retained tetrahedral solid thermal",
+      "groups": [
+        "thermal"
+      ],
+      "requires": [
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "thermal-solids"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "thermal-electrothermal",
+      "name": "Assembly and multiboard electrothermal feedback",
+      "groups": [
+        "thermal"
+      ],
+      "requires": [
+        "thermal-solids",
+        "pi-solid-dc",
+        "pi-pdn"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "thermal-electrothermal"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "thermal-pwm",
+      "name": "Native PWM and retained-volume electrothermal",
+      "groups": [
+        "thermal"
+      ],
+      "requires": [
+        "thermal-solids",
+        "circuit-native"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "thermal-pwm"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "thermal-channel",
+      "name": "Laminar channel and fan-system screening",
+      "groups": [
+        "thermal"
+      ],
+      "requires": [
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "thermal-channel"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "cfd-native",
+      "name": "Native laminar 2D CFD cavity",
+      "groups": [
+        "cfd"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "cfd-native"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "cfd-su2",
+      "name": "SU2 cavity and three-zone CHT references",
+      "groups": [
+        "cfd",
+        "cht",
+        "thermal"
+      ],
+      "requires": [
+        "core",
+        "external-su2",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "cfd-su2"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "thermal-external",
+      "name": "CalculiX solid thermal and OpenFOAM cooling",
+      "groups": [
+        "thermal",
+        "cht",
+        "cfd",
+        "mcad"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [
+        "thermal-calculix",
+        "thermal-openfoam"
+      ],
+      "capability_ids": [
+        "thermal-external"
+      ],
+      "delivery": "bundled",
+      "description": "External thermal workflow index; select one concrete backend adapter. Each backend has separate runtime admission."
+    },
+    {
+      "id": "em-magnetic",
+      "name": "Planar nonlinear magnetic FEM machines",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-magnetic"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "em-lumped",
+      "name": "Lumped PM DC motor and electromagnet",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-lumped"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "em-openems",
+      "name": "openEMS board and retained-volume fields",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core",
+        "external-openems",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-openems"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "em-palace",
+      "name": "PALACE native configuration and field inspection",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core",
+        "external-palace",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-palace"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "circuit-xyce",
+      "name": "Xyce bounded circuit workbench",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core",
+        "external-xyce"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "circuit-xyce"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "execution-cosim",
+      "name": "Scalar co-simulation and recorded digital twins",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [
+        "circuit-native",
+        "thermal-solids",
+        "cfd-native"
+      ],
+      "capability_ids": [
+        "execution-cosim"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "execution-workers",
+      "name": "Parallel jobs and enrolled remote workers",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "execution-workers"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "execution-extensions",
+      "name": "Meshing, optional engines and acceleration",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "execution-extensions"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "em-emerge",
+      "name": "EMerge multilayer SI and radiation FEM",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core",
+        "external-emerge",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-emerge"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "execution-gmsh",
+      "name": "Gmsh PCB and retained assembly volume meshes",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core",
+        "external-gmsh",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "execution-gmsh"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "execution-sparselizard",
+      "name": "sparseLizard case preparation and qualification gates",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core",
+        "external-sparselizard",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "execution-sparselizard"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled adapter; requires separately licensed runtime and workflow-specific admission."
+    },
+    {
+      "id": "planned-elmer",
+      "name": "Elmer FEM solver integration",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "planned-elmer"
+      ],
+      "delivery": "planned",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "planned-fullwave",
+      "name": "Owned arbitrary-PCB full-wave solver",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "planned-fullwave"
+      ],
+      "delivery": "planned",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "planned-tcad",
+      "name": "Full TCAD and ASIC physical closure",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "planned-tcad"
+      ],
+      "delivery": "planned",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "external-calculix",
+      "name": "External calculix runtime",
+      "groups": [
+        "thermal",
+        "mechanics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed calculix runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-emerge",
+      "name": "External emerge runtime",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed emerge runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-freecad",
+      "name": "External FreeCAD application/runtime",
+      "groups": [
+        "mcad"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed FreeCAD runtime; platform and export admission required."
+      ]
+    },
+    {
+      "id": "external-gmsh",
+      "name": "External gmsh runtime",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed gmsh runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-klayout",
+      "name": "External klayout runtime",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed klayout runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-ngspice",
+      "name": "External ngspice runtime",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed ngspice runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-openems",
+      "name": "External openems runtime",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed openems runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-openfoam",
+      "name": "External openfoam runtime",
+      "groups": [
+        "cfd",
+        "cht",
+        "thermal"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed openfoam runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-palace",
+      "name": "External palace runtime",
+      "groups": [
+        "electromagnetics"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed palace runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-sparselizard",
+      "name": "External sparselizard runtime",
+      "groups": [
+        "execution"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed sparselizard runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-su2",
+      "name": "External su2 runtime",
+      "groups": [
+        "cfd",
+        "cht"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed su2 runtime; platform/runtime and case admission required."
+      ]
+    },
+    {
+      "id": "external-xyce",
+      "name": "External xyce runtime",
+      "groups": [
+        "circuits"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [],
+      "delivery": "external",
+      "description": "Not bundled or automatically installed; this preview does not probe local availability.",
+      "external_requirements": [
+        "Separately licensed xyce runtime; platform/runtime and case admission required."
+      ]
+    }
+  ],
+  "plan": {
+    "requested_blocks": [
+      "core",
+      "geometry",
+      "materials",
+      "mesh",
+      "pcb-adapter",
+      "harness-adapter",
+      "mcad-adapter",
+      "mcad-freecad",
+      "thermal-calculix",
+      "thermal-openfoam",
+      "cht-assembly",
+      "pi-solid-dc",
+      "pi-transient",
+      "mechanics-static",
+      "mechanics-thermoelastic",
+      "circuit-native",
+      "circuit-adaptive",
+      "circuit-equations",
+      "circuit-physics-parts",
+      "circuit-smps",
+      "circuit-battery",
+      "circuit-libraries",
+      "circuit-pdk",
+      "circuit-asic",
+      "circuit-tcad",
+      "pi-dc",
+      "pi-peec",
+      "pi-pdn",
+      "pi-capacitance",
+      "pi-dielectric-ac",
+      "pi-reduction",
+      "pi-engineering",
+      "si-networks",
+      "si-channels",
+      "si-eye",
+      "thermal-board",
+      "thermal-solids",
+      "thermal-electrothermal",
+      "thermal-pwm",
+      "thermal-channel",
+      "cfd-native",
+      "cfd-su2",
+      "thermal-external",
+      "em-magnetic",
+      "em-lumped",
+      "em-openems",
+      "em-palace",
+      "circuit-xyce",
+      "execution-cosim",
+      "execution-workers",
+      "execution-extensions",
+      "em-emerge",
+      "execution-gmsh",
+      "execution-sparselizard"
+    ],
+    "required_blocks": [
+      "external-freecad",
+      "external-calculix",
+      "external-openfoam",
+      "external-ngspice",
+      "external-klayout",
+      "external-su2",
+      "external-openems",
+      "external-palace",
+      "external-xyce",
+      "external-emerge",
+      "external-gmsh",
+      "external-sparselizard"
+    ],
+    "ordered_blocks": [
+      "core",
+      "geometry",
+      "materials",
+      "mesh",
+      "pcb-adapter",
+      "si-networks",
+      "harness-adapter",
+      "mcad-adapter",
+      "external-freecad",
+      "mcad-freecad",
+      "external-calculix",
+      "thermal-calculix",
+      "external-openfoam",
+      "thermal-openfoam",
+      "thermal-solids",
+      "cht-assembly",
+      "pi-solid-dc",
+      "pi-dc",
+      "pi-peec",
+      "circuit-native",
+      "pi-transient",
+      "mechanics-static",
+      "mechanics-thermoelastic",
+      "circuit-adaptive",
+      "circuit-equations",
+      "circuit-physics-parts",
+      "circuit-smps",
+      "circuit-battery",
+      "circuit-libraries",
+      "external-ngspice",
+      "circuit-pdk",
+      "external-klayout",
+      "circuit-asic",
+      "circuit-tcad",
+      "pi-pdn",
+      "pi-capacitance",
+      "pi-dielectric-ac",
+      "pi-reduction",
+      "pi-engineering",
+      "si-channels",
+      "si-eye",
+      "thermal-board",
+      "thermal-electrothermal",
+      "thermal-pwm",
+      "thermal-channel",
+      "cfd-native",
+      "external-su2",
+      "cfd-su2",
+      "thermal-external",
+      "em-magnetic",
+      "em-lumped",
+      "external-openems",
+      "em-openems",
+      "external-palace",
+      "em-palace",
+      "external-xyce",
+      "circuit-xyce",
+      "execution-cosim",
+      "execution-workers",
+      "execution-extensions",
+      "external-emerge",
+      "em-emerge",
+      "external-gmsh",
+      "execution-gmsh",
+      "external-sparselizard",
+      "execution-sparselizard"
+    ],
+    "blocked_blocks": [
+      "external-freecad",
+      "mcad-freecad",
+      "external-calculix",
+      "thermal-calculix",
+      "external-openfoam",
+      "thermal-openfoam",
+      "cht-assembly",
+      "external-ngspice",
+      "circuit-pdk",
+      "external-klayout",
+      "circuit-asic",
+      "external-su2",
+      "cfd-su2",
+      "external-openems",
+      "em-openems",
+      "external-palace",
+      "em-palace",
+      "external-xyce",
+      "circuit-xyce",
+      "external-emerge",
+      "em-emerge",
+      "external-gmsh",
+      "execution-gmsh",
+      "external-sparselizard",
+      "execution-sparselizard"
+    ],
+    "warnings": [
+      "Logical blocks share the current monolithic payload; selection does not change installed files.",
+      "Bundled code does not establish runtime readiness or numerical qualification.",
+      "External runtimes and planned blocks are unresolved; dependent workflows remain gated. No availability probe or installation was performed."
+    ],
+    "action": "preview_only"
+  }
+}

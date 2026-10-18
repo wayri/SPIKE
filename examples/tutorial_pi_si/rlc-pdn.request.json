@@ -1,0 +1,18 @@
+{
+  "contract": "spike/pdn-network-request/v1",
+  "reference": "GND",
+  "nodes": ["VCC"],
+  "elements": [
+    {"id": "source-small-signal-output", "type": "source_output_impedance", "positive": "VCC", "negative": "GND", "resistance_ohm": 0.02, "inductance_h": 1e-8, "provenance": {"kind": "supplied", "source_id": "original-assumed-RLC-tutorial"}},
+    {"id": "bulk-decap", "type": "decap", "positive": "VCC", "negative": "GND", "capacitance_f": 1e-4, "esr_ohm": 0.005, "esl_h": 1e-9, "provenance": {"kind": "supplied", "source_id": "original-assumed-RLC-tutorial"}},
+    {"id": "high-frequency-decap", "type": "decap", "positive": "VCC", "negative": "GND", "capacitance_f": 1e-7, "esr_ohm": 0.02, "esl_h": 5e-10, "provenance": {"kind": "supplied", "source_id": "original-assumed-RLC-tutorial"}}
+  ],
+  "ports": [{"id": "load", "mode": "single", "positive": "VCC", "negative": "GND"}],
+  "frequencies_hz": [1000, 10000, 100000, 1000000, 10000000, 100000000],
+  "load_transient": {
+    "port_id": "load",
+    "points": [{"time_s": 0, "current_a": 0}, {"time_s": 1e-7, "current_a": 2}, {"time_s": 2e-6, "current_a": 2}, {"time_s": 2.1e-6, "current_a": 0}, {"time_s": 4e-6, "current_a": 0}],
+    "output_times_s": [0, 1e-7, 5e-7, 1e-6, 2e-6, 2.1e-6, 3e-6, 4e-6],
+    "max_step_s": 5e-10
+  }
+}

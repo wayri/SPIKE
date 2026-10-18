@@ -419,6 +419,14 @@ class NativeLibrary:
                 pointer, ctypes.POINTER(ctypes.c_size_t),
             )
             lib.spikes_transient_result_bdf2_steps.restype = ctypes.c_int
+        self.radau_iia3_available = hasattr(
+            lib, "spikes_transient_result_radau_iia3_steps"
+        )
+        if self.radau_iia3_available:
+            lib.spikes_transient_result_radau_iia3_steps.argtypes = (
+                pointer, ctypes.POINTER(ctypes.c_size_t),
+            )
+            lib.spikes_transient_result_radau_iia3_steps.restype = ctypes.c_int
         self.lte_diagnostics_available = hasattr(
             lib, "spikes_transient_result_lte_diagnostics"
         )
@@ -473,6 +481,7 @@ class NativeLibrary:
         self.session_integration_method_available = False
         self.session_integration_diagnostics_available = False
         self.session_bdf2_available = False
+        self.session_radau_iia3_available = False
         self.session_element_voltage_available = False
         fault_symbols = (
             "spikes_transient_session_set_resistance",
@@ -569,6 +578,14 @@ class NativeLibrary:
                     pointer, ctypes.POINTER(ctypes.c_size_t),
                 )
                 lib.spikes_transient_session_bdf2_steps.restype = ctypes.c_int
+            self.session_radau_iia3_available = hasattr(
+                lib, "spikes_transient_session_radau_iia3_steps"
+            )
+            if self.session_radau_iia3_available:
+                lib.spikes_transient_session_radau_iia3_steps.argtypes = (
+                    pointer, ctypes.POINTER(ctypes.c_size_t),
+                )
+                lib.spikes_transient_session_radau_iia3_steps.restype = ctypes.c_int
             lib.spikes_transient_session_checkpoint_create.argtypes = (
                 pointer, ctypes.POINTER(pointer),
             )
@@ -1158,14 +1175,21 @@ class NativeCircuit:
         if isinstance(max_rejected_steps, bool) or int(max_rejected_steps) != max_rejected_steps or max_rejected_steps <= 0:
             raise ValueError("max_rejected_steps must be a positive integer.")
         normalized_method = str(integration_method).strip().lower()
-        method_codes = {"backward_euler": 0, "hybrid_trapezoidal": 1, "bdf2": 2}
+        method_codes = {
+            "backward_euler": 0, "hybrid_trapezoidal": 1, "bdf2": 2,
+            "radau_iia3": 3,
+        }
         if normalized_method not in method_codes:
             raise ValueError(
-                "integration_method must be backward_euler, hybrid_trapezoidal, or bdf2."
+                "integration_method must be backward_euler, hybrid_trapezoidal, bdf2, or radau_iia3."
             )
         if normalized_method == "bdf2" and not self.library.bdf2_available:
             raise NativeABIError(
                 "Loaded SPIKES library does not expose BDF2 transient integration."
+            )
+        if normalized_method == "radau_iia3" and not self.library.radau_iia3_available:
+            raise NativeABIError(
+                "Loaded SPIKES library does not expose Radau IIA3 transient integration."
             )
         if normalized_method != "backward_euler" and not self.library.integration_method_available:
             raise NativeABIError(
@@ -1175,6 +1199,8 @@ class NativeCircuit:
             raise NativeABIError(
                 "Loaded SPIKES library does not expose adaptive transient integration."
             )
+        if adaptive_time_step and normalized_method == "radau_iia3":
+            raise ValueError("Radau IIA3 does not support adaptive time stepping.")
         options = _TransientOptions()
         self.library._check(
             self.library._library.spikes_transient_options_init(ctypes.byref(options)),
@@ -1229,7 +1255,7 @@ class NativeCircuit:
         absolute_tolerance: float = 1.0e-12,
         relative_tolerance: float = 1.0e-9,
     ) -> "NativeTransientSession":
-        """Create an independent persistent BE, hybrid, or BDF2 session snapshot."""
+        """Create an independent persistent BE, hybrid, BDF2, or Radau IIA3 snapshot."""
 
         if not self.library.transient_session_available:
             raise NativeABIError(
@@ -1238,14 +1264,22 @@ class NativeCircuit:
         if not isinstance(initialize_from_operating_point, bool):
             raise ValueError("initialize_from_operating_point must be boolean.")
         normalized_method = str(integration_method).strip().lower()
-        method_codes = {"backward_euler": 0, "hybrid_trapezoidal": 1, "bdf2": 2}
+        method_codes = {
+            "backward_euler": 0, "hybrid_trapezoidal": 1, "bdf2": 2,
+            "radau_iia3": 3,
+        }
         if normalized_method not in method_codes:
             raise ValueError(
-                "integration_method must be backward_euler, hybrid_trapezoidal, or bdf2."
+                "integration_method must be backward_euler, hybrid_trapezoidal, bdf2, or radau_iia3."
             )
         if normalized_method == "bdf2" and not self.library.session_bdf2_available:
             raise NativeABIError(
                 "Loaded SPIKES library does not expose persistent BDF2 integration."
+            )
+        if (normalized_method == "radau_iia3" and
+                not self.library.session_radau_iia3_available):
+            raise NativeABIError(
+                "Loaded SPIKES library does not expose persistent Radau IIA3 integration."
             )
         if (normalized_method != "backward_euler" and
                 not self.library.session_integration_method_available):
@@ -1536,6 +1570,15 @@ class NativeTransientResult:
                 "querying transient BDF2 diagnostics",
             )
             result["bdf2_steps"] = int(bdf2.value)
+        if self.library.radau_iia3_available:
+            radau_iia3 = ctypes.c_size_t()
+            self.library._check(
+                self.library._library.spikes_transient_result_radau_iia3_steps(
+                    self._open_handle(), ctypes.byref(radau_iia3)
+                ),
+                "querying transient Radau IIA3 diagnostics",
+            )
+            result["radau_iia3_steps"] = int(radau_iia3.value)
         if self.library.lte_diagnostics_available:
             rejected = ctypes.c_size_t()
             last_ratio = ctypes.c_double()
@@ -1815,6 +1858,15 @@ class NativeTransientSession:
                 "querying persistent BDF2 diagnostics",
             )
             result["bdf2_steps"] = int(bdf2.value)
+        if self.library.session_radau_iia3_available:
+            radau_iia3 = ctypes.c_size_t()
+            self.library._check(
+                self.library._library.spikes_transient_session_radau_iia3_steps(
+                    self._open_handle(), ctypes.byref(radau_iia3)
+                ),
+                "querying persistent Radau IIA3 diagnostics",
+            )
+            result["radau_iia3_steps"] = int(radau_iia3.value)
         return result
 
     def checkpoint(self) -> NativeTransientCheckpoint:

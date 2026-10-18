@@ -1,3 +1,4 @@
+import { viewportBackgroundColor } from "./viewportEnvironment";
 import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { navigationPanFraction, zoomViewBoxAt } from "./viewportKeyboardCamera";
@@ -1044,7 +1045,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         return <g key={`highlight-${via.id}`}>
           {netFocusActive && <circle cx={point[0]} cy={point[1]} r={via.size / 2 + 0.24} fill="#061116" />}
           <circle cx={point[0]} cy={point[1]} r={via.size / 2} fill={exactSelection ? "#ffc04f" : netColor} />
-          <circle cx={point[0]} cy={point[1]} r={via.drill / 2} fill={viewportBackground === "amoled" ? "#000000" : "#0b141a"} />
+          <circle cx={point[0]} cy={point[1]} r={via.drill / 2} fill={viewportBackgroundColor(viewportBackground)} />
         </g>;
       })}
     </g>;
@@ -1141,7 +1142,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     return <line key={`result-vector-${sample.element_id ?? index}`} x1={point[0]} y1={point[1]} x2={point[0] + sample.vector[0] / norm * vectorLength} y2={point[1] + sample.vector[1] / norm * vectorLength} stroke="#f7d15e" strokeWidth={Math.max(view.width * 0.00045, 0.055)} markerEnd="url(#result-vector-arrow)" vectorEffect="non-scaling-stroke" opacity="0.9" pointerEvents="none" />;
   })), [resultVisualization?.showVectors, resultVisualization?.vectorScale, resultVectors, resultVectorMaximum, resultCellSize, view.width, projectionKey]);
 
-  return <div style={{ background: viewportBackground === "amoled" ? "#000000" : "#0b141a" }} className={`layout-viewport ${dragging ? "dragging" : ""} ${isolatedNet ? "net-isolated" : ""} ${netFocusActive ? "net-focused" : ""} ${activeCopperLayer === "Overview" ? "overview-active" : ""}`} data-highlighted-net={highlightedNetNames.join(" ")}>
+  return <div style={{ background: viewportBackgroundColor(viewportBackground) }} className={`layout-viewport ${dragging ? "dragging" : ""} ${isolatedNet ? "net-isolated" : ""} ${netFocusActive ? "net-focused" : ""} ${activeCopperLayer === "Overview" ? "overview-active" : ""}`} data-highlighted-net={highlightedNetNames.join(" ")}>
     {navigationStatus && <div role="status" className="viewport-navigation-status">{navigationStatus}</div>}
     <svg
       ref={svgRef}

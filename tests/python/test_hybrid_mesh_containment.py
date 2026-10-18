@@ -59,6 +59,35 @@ def _inside_track_union(point, tracks, tolerance=1e-7):
 
 class HybridMeshContainmentTests(unittest.TestCase):
 
+    def test_via_volume_faces_preserve_circular_drill_void_and_layer_span(self):
+        for drill, plating in ((0.3, 0.025), (3.0, 0.005)):
+            with self.subTest(drill=drill, plating=plating):
+                design = SpiDeR(
+                    layers=[{"name": "F.Cu"}, {"name": "In1.Cu"}, {"name": "B.Cu"}],
+                    nets=[{"id": 1, "name": "VCC"}],
+                    vias=[{"id": "v", "at": [3, 2], "drill": drill,
+                           "plating_thickness_mm": plating, "size": drill + 0.5,
+                           "layers": ["F.Cu", "In1.Cu"], "net_name": "VCC"}],
+                )
+                mesh = build_mesh(design, AnalysisSpec(
+                    mode="dc", net_names=["VCC"],
+                    mesh={"target_size_mm": 10.0, "dimension": VOLUME_3D},
+                ))
+                cells = [cell for cell in mesh["cells"] if cell["source_kind"] == "via"]
+                self.assertGreater(len(cells), 0)
+                self.assertEqual({cell["layer"] for cell in cells}, {"F.Cu->In1.Cu"})
+                for cell in cells:
+                    self.assertEqual(cell["topology"], "hex8_barrel")
+                    outer, inner = cell["vertices_mm"][:4], cell["vertices_mm"][4:]
+                    # Independent shortest-distance oracle for each chord;
+                    # checking only its endpoints misses drill intrusion.
+                    for face in (outer, inner):
+                        self.assertGreaterEqual(_distance_to_segment(
+                            (3, 2), face[0][:2], face[1][:2]), drill / 2 - 1e-10)
+                    for outside, inside in zip(outer, inner):
+                        self.assertGreater(hypot(outside[0]-3, outside[1]-2),
+                                           hypot(inside[0]-3, inside[1]-2))
+
     def test_physical_pad_cells_expose_valid_owning_node_metadata(self):
         pads = [
             {

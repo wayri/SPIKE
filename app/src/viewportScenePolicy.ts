@@ -172,10 +172,12 @@ export function adaptivePerspectiveClip({ radius, cameraDistance, cameraToBounds
   const safeRadius = Math.max(radius, 0.25);
   const safeDistance = Math.max(cameraDistance, safeRadius * 0.1, 0.01);
   const sceneDistance = Math.max(cameraToBoundsCenter ?? safeDistance, 0.01);
-  // Auxiliary thermal/EMI volumes can be orders of magnitude larger than the
-  // board. Do not let their size push the near plane through a close board
-  // inspection; logarithmic depth handles the resulting broader range.
-  const near = Math.max(0.005, Math.min(safeDistance / 2400, safeRadius / 1600, 0.25));
+  // Outside the visible bounding sphere, spend the empty foreground interval
+  // on depth precision. Inside it retain the conservative close-inspection
+  // plane, so a distant chamber cannot clip a nearby board. No source moves.
+  const closeNear = Math.max(0.005, Math.min(safeDistance / 2400, safeRadius / 1600, 0.25));
+  const emptyForeground = Math.max(0, sceneDistance - safeRadius * 1.05);
+  const near = Math.max(closeNear, emptyForeground * 0.25);
   const far = Math.max(
     near + 250,
     sceneDistance + safeRadius * 6,

@@ -1,5 +1,12 @@
 # SPIKE Command-Line Interface
 
+For verified SI/PI commands and desktop task paths, see
+[Run SI and PI now](RUN_SI_PI_NOW.md). `pdn-network request.json` executes the
+same explicit lumped AC/load-transient PDN worker used by the desktop;
+`si-workflow request.json` executes the loaded channel/waveform/eye/TDR path.
+Both retain the underlying models' limitations and return errors on failed
+admission. A successful example is not automatic user-board qualification.
+
 Packaged Linux and macOS launch commands are in the
 [platform installation guide](PLATFORM_PACKAGES.md#command-line).
 
@@ -301,3 +308,9 @@ Exit codes:
 Every machine-facing result is JSON by default. Solver provenance, model
 status, assumptions, issues, and geometry counts remain present for CI and
 auditability.
+
+## Supplied ideal RLGC star
+
+`rlgc-junction request.json` executes the owned `run_rlgc_line_junction` worker.
+See [the input, ordered ports and physical limits](RLGC_LINE_JUNCTION.md).
+Requests are limited to 8 MiB and retain the experimental result status.

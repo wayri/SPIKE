@@ -19,6 +19,107 @@ else:
     from board_corpus_assertions import COLLECTIONS, inspect_geometry, validate_assertions
 
 ROOT = Path(__file__).resolve().parents[1]
+RUNNER_SOURCE_PATHS = (
+    'scripts/benchmark_board_corpus.py',
+    'scripts/board_corpus_assertions.py',
+    'python/spike_core/contracts.py',
+    'python/spike_core/importers.py',
+    'python/spike_core/source_package.py',
+    'python/spike_core/spider_v2.py',
+    'python/spike_core/kicad_importer.py',
+    'python/core/board_parser.py',
+    'python/core/filled_polygon_offset.py',
+    'python/core/simple_polygon_union.py',
+    'python/core/kicad_model_sources.py',
+    'python/spike_core/odb_importer.py',
+    'python/spike_core/odb_features.py',
+    'python/spike_core/odb_stackup.py',
+    'python/spike_core/odb_source_inspection.py',
+    'schemas/board-enrichment-v1.schema.json',
+    'extensions/odb-import/extension.py',
+    'python/spike_core/arc_legacy_projection.py',
+    'python/spike_core/board_outline_geometry.py',
+    'python/spike_core/mcad_export_design.py',
+    'python/spike_core/mcad_export_contract.py',
+    'python/spike_core/assembly_frames.py',
+    'schemas/mcad-assembly-v1.schema.json',
+    'python/spike_core/assembly_thermal_meshing.py',
+    'python/spike_core/pcb_volume_compiler.py',
+    'python/spike_core/geometry_arrow.py',
+    'python/spike_core/spikes_layout_geometry_handoff.py',
+    'scripts/parity_geometry_gate.py',
+    'scripts/capture_parity_native_geometry.py',
+    'scripts/parity_native_geometry_gate.py',
+    'app/src/boardParser.ts',
+    'app/src/normalizedBoard.ts',
+    'python/spike_core/mcad_component_models.py',
+    'scripts/parity_component_model_gate.py',
+)
+
+
+def source_snapshot(root: Path = ROOT) -> dict[str, str]:
+    """Hash the complete bounded import/gate source set in stable path order."""
+
+    return {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+            for name in RUNNER_SOURCE_PATHS}
+
+
+def validate_source_snapshots(summary: dict, root: Path = ROOT) -> None:
+    """Reject incomplete, mixed-revision, or stale importer evidence."""
+
+    before = summary.get('runner_sources')
+    after = summary.get('runner_sources_after')
+    required = set(RUNNER_SOURCE_PATHS)
+    if (not isinstance(before, dict) or not isinstance(after, dict)
+            or set(before) != required or set(after) != required):
+        raise ValueError('stage runner source coverage differs')
+    if before != after:
+        raise ValueError('stage runner sources changed during import')
+    if before != source_snapshot(root):
+        raise ValueError('stage runner evidence is stale')
+
+
+def _write_json_new(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('x', encoding='utf-8', newline='\n') as stream:
+        json.dump(payload, stream, indent=2)
+        stream.write('\n')
+
+
+def _write_receipt(args: argparse.Namespace, summary: dict, imported: Path) -> None:
+    requested = (args.stage_id, args.receipt_template, args.receipt_output, args.receipt_import_output)
+    if not any(requested):
+        return
+    if not all(requested):
+        raise ValueError('receipt generation requires stage, template, receipt, and retained import paths')
+    template = args.receipt_template.resolve()
+    receipt_path = args.receipt_output.resolve()
+    import_path = args.receipt_import_output.resolve()
+    for path in (template, receipt_path, import_path):
+        if not path.is_relative_to(ROOT):
+            raise ValueError('receipt paths must stay inside the project')
+    if receipt_path.exists() or import_path.exists():
+        raise ValueError('receipt outputs must be new paths')
+    receipt = json.loads(template.read_text(encoding='utf-8'))
+    if receipt.get('stage_id') != args.stage_id:
+        raise ValueError('receipt template stage differs')
+    receipt['contract'] = 'spike/parity-stage-evidence/v2'
+    receipt['manifest'] = args.manifest.resolve().relative_to(ROOT).as_posix()
+    receipt['summary'] = summary
+    import_relative = import_path.relative_to(ROOT).as_posix()
+    import_bytes = imported.read_bytes()
+    import_digest = hashlib.sha256(import_bytes).hexdigest()
+    receipt['import_evidence'] = {'file': import_relative, 'sha256': import_digest}
+    for name in ('geometry_gate', 'native_source_gate', 'native_export_gate',
+                 'model_gate', 'component_model_gate'):
+        gate = receipt.get(name)
+        if isinstance(gate, dict) and 'import_file' in gate:
+            gate['import_file'] = import_relative
+            gate['import_sha256'] = import_digest
+    import_path.parent.mkdir(parents=True, exist_ok=True)
+    with import_path.open('xb') as stream:
+        stream.write(import_bytes)
+    _write_json_new(receipt_path, receipt)
 
 
 def validate_entry(entry: dict, corpus: Path) -> Path:
@@ -82,27 +183,17 @@ def main() -> int:
     parser.add_argument('--corpus', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--timeout-s', type=float, default=60)
+    parser.add_argument('--stage-id')
+    parser.add_argument('--receipt-template', type=Path)
+    parser.add_argument('--receipt-output', type=Path)
+    parser.add_argument('--receipt-import-output', type=Path)
     args = parser.parse_args()
     if not 1 <= args.timeout_s <= 300:
         parser.error('timeout must be between 1 and 300 seconds')
-    manifest = json.loads(args.manifest.read_text(encoding='utf-8-sig'))
-    provenance = {str(path.relative_to(ROOT)).replace('\\', '/'): hashlib.sha256(path.read_bytes()).hexdigest()
-                  for path in (Path(__file__).resolve(), Path(__file__).with_name('board_corpus_assertions.py').resolve(),
-                               ROOT / 'python/spike_core/kicad_importer.py', ROOT / 'python/core/board_parser.py',
-                               ROOT / 'python/spike_core/spider_v2.py', ROOT / 'python/spike_core/arc_legacy_projection.py',
-                               ROOT / 'python/spike_core/board_outline_geometry.py', ROOT / 'python/spike_core/mcad_export_design.py',
-                               ROOT / 'python/spike_core/assembly_thermal_meshing.py', ROOT / 'python/spike_core/pcb_volume_compiler.py',
-                               ROOT / 'python/spike_core/geometry_arrow.py', ROOT / 'python/spike_core/spikes_layout_geometry_handoff.py',
-                               ROOT / 'scripts/parity_geometry_gate.py')}
-    model_source = ROOT / 'python/core/kicad_model_sources.py'
-    provenance[model_source.relative_to(ROOT).as_posix()] = hashlib.sha256(model_source.read_bytes()).hexdigest()
-    for name in ('python/spike_core/odb_importer.py', 'python/spike_core/odb_features.py',
-                 'python/spike_core/odb_stackup.py', 'python/spike_core/source_package.py',
-                 'python/spike_core/importers.py', 'extensions/odb-import/extension.py',
-                 'scripts/capture_parity_native_geometry.py', 'scripts/parity_native_geometry_gate.py',
-                 'app/src/boardParser.ts', 'app/src/normalizedBoard.ts',
-                 'python/spike_core/mcad_component_models.py', 'scripts/parity_component_model_gate.py'):
-        provenance[name] = hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+    manifest_bytes = args.manifest.read_bytes()
+    manifest = json.loads(manifest_bytes.decode('utf-8-sig'))
+    manifest_digest = hashlib.sha256(manifest_bytes).hexdigest()
+    provenance = source_snapshot()
     entries = manifest.get('boards', [])
     if not isinstance(entries, list) or not 1 <= len(entries) <= 100:
         parser.error('manifest requires 1–100 explicit board entries')
@@ -128,18 +219,32 @@ def main() -> int:
                 raise ValueError('import CLI returned nonzero exit code')
             row.update(inspect_import(json.loads(result_path.read_text(encoding='utf-8')),
                                       entry.get('expected_counts', {}), entry.get('expected_entities', []), entry['sha256'].lower()))
+            after_digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            row['source_sha256_after'] = after_digest
+            if after_digest != entry['sha256'].lower():
+                raise ValueError('fixture changed while it was being imported')
         except (ValueError, OSError, subprocess.TimeoutExpired) as error:
             row.update(passed=False, error=str(error))
         row['elapsed_s'] = round(time.monotonic() - started, 3)
         rows.append(row)
         print(json.dumps({k: row.get(k) for k in ('fixture', 'passed', 'elapsed_s', 'error')}), flush=True)
-    passed = all(row['passed'] for row in rows)
-    summary = {'contract': 'spike/board-corpus-benchmark/v1', 'status': 'passed' if passed else 'failed',
-               'runner_sources': provenance, 'python_version': sys.version,
-               'manifest_sha256': hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
+    provenance_after = source_snapshot()
+    manifest_digest_after = hashlib.sha256(args.manifest.read_bytes()).hexdigest()
+    stable = provenance == provenance_after and manifest_digest == manifest_digest_after
+    passed = all(row['passed'] for row in rows) and stable
+    summary = {'contract': 'spike/board-corpus-benchmark/v2', 'status': 'passed' if passed else 'failed',
+               'runner_sources': provenance, 'runner_sources_after': provenance_after,
+               'source_snapshot_stable': stable, 'python_version': sys.version,
+               'manifest_sha256': manifest_digest, 'manifest_sha256_after': manifest_digest_after,
                'production_qualified': False, 'scope': 'CLI import status, canonical units/identity, pinned source and optional independent counts/entity values; no viewport or physics validation',
                'boards': rows}
-    (args.output / 'summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
+    _write_json_new(args.output / 'summary.json', summary)
+    if passed and rows:
+        try:
+            _write_receipt(args, summary, args.output / '000-import.json')
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            print(f'Receipt generation failed: {error}', file=sys.stderr)
+            return 2
     return 0 if passed else 2
 
 

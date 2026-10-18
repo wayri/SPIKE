@@ -3,6 +3,10 @@
 
 # PI and SI: seven guided, executable cases
 
+For the current tested entrypoints, explicit RLC PDN pulse example and
+one-command readiness check, start with [Run SI and PI now](RUN_SI_PI_NOW.md).
+The historical captures below retain their original execution scope.
+
 This casebook is for a source checkout. It pairs each input with a command,
 returned fields, and a browser screenshot of the *executed artifact view*.
 The captures are not screenshots of the SPIKE desktop and do not certify a

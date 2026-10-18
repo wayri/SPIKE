@@ -5,16 +5,19 @@ import { filterSolverSuite, solverSuiteCatalog, solverSuiteGroups, solverSuiteSt
 import { capabilitySolverIds, filterManagerCapabilities, runtimeSolverName, runtimeSolverOrigin, runtimeWorkflow, solverDisplayName, solverOrigin, solverOriginLabels, type RuntimeSolver, type SolverOrigin } from "./solverManagerModel";
 import "./buttonStandard.css";
 import "./SolverSuitePanel.css";
+import SolverBlockPanel from "./SolverBlockPanel";
 
 type Props = {
   initialQuery?: string;
+  initialView?: "capabilities" | "blocks";
   runtimeSolvers?: readonly RuntimeSolver[];
   runtimeProbed?: boolean;
   onManageEngines?: () => void;
   onClose: () => void;
   onOpenWorkflow: (action: SolverSuiteAction, extensionId?: string, capabilityId?: string) => void;
 };
-export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngines, initialQuery = "", runtimeSolvers = [], runtimeProbed = false }: Props) {
+export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngines, initialQuery = "", initialView = "blocks", runtimeSolvers = [], runtimeProbed = false }: Props) {
+  const [view, setView] = useState(initialView);
   const [query, setQuery] = useState(initialQuery);
   const [group, setGroup] = useState<SolverSuiteGroup | "all">("all");
   const [status, setStatus] = useState<SolverSuiteStatus | "all">("all");
@@ -24,6 +27,8 @@ export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngi
   const clear = () => { setQuery(""); setGroup("all"); setStatus("all"); setOrigin("all"); };
   return <section className="solver-suite-panel" aria-label="SPIKE solver manager">
     <header><div className="solver-suite-brand"><img src="/spike-solver-suite.png" alt="" aria-hidden="true" width="56" height="56" /><div><h2>Solver manager</h2><p>Named internal solvers, bounded models and external engine adapters, with their setup workflows.</p></div></div><button type="button" className="spike-control--icon" onClick={onClose} aria-label="Close solver manager" title="Close solver manager"><X size={16} /></button></header>
+    <nav className="solver-suite-tabs" aria-label="Solver manager views"><button type="button" className="spike-control--compact" aria-pressed={view === "blocks"} onClick={() => setView("blocks")}>Blocks and install groups</button><button type="button" className="spike-control--compact" aria-pressed={view === "capabilities"} onClick={() => setView("capabilities")}>Capabilities and evidence</button></nav>
+    {view === "blocks" ? <SolverBlockPanel initialQuery={initialQuery} /> : <>
     <p className="solver-suite-notice"><strong>{runtimeProbed ? "Worker catalog loaded; execution remains separately gated." : "Runtime availability has not been probed here."}</strong> Names organize existing capabilities and preserve stable IDs. This index opens setup only. Each workflow checks its own worker, model, extension trust and runtime before execution. Implemented workflows and external adapters retain the limits shown below.</p>
     {onManageEngines && <button type="button" className="spike-control--compact" onClick={onManageEngines}>Engine registration and tuning</button>}
     <div className="solver-suite-filters">
@@ -47,5 +52,6 @@ export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngi
         <footer>{item.action ? <button type="button" className="spike-control--compact" onClick={() => onOpenWorkflow(item.action!, item.extensionId, item.id)} aria-label={`${item.entryLabel ?? "Open setup workflow"}: ${solverDisplayName(item)}`}>{item.entryLabel ?? "Open setup workflow"}</button> : <button type="button" className="spike-control--compact" disabled>Unavailable</button>}<small>{item.extensionId ?? (item.status === "planned" ? "No executable route" : "Availability checked in workflow")}</small></footer>
       </article>)}</div></section> : null;
     }))}</div>
+    </>}
   </section>;
 }

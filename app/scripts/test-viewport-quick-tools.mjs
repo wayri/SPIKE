@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { build } from "esbuild";
-import { unlinkSync } from "node:fs";
+import { readFileSync, unlinkSync } from "node:fs";
 import { fileURLToPath,pathToFileURL } from "node:url";
+import ts from "typescript";
 const output=fileURLToPath(new URL(".quick-tools-test.mjs",import.meta.url));
 try {
   await build({entryPoints:[fileURLToPath(new URL("../src/quickToolModel.ts",import.meta.url))],outfile:output,bundle:true,platform:"node",format:"esm",logLevel:"silent"});
@@ -37,5 +38,14 @@ try {
   assert.equal(await runQuickTool("removed",groups,message=>errors.push(message)),false);assert.equal(runs,1);
   const failed=[{id:"bad",label:"Bad",actions:[{id:"bad",label:"Bad",run:()=>{throw Error("Worker rejected preflight");}}]}];
   assert.equal(await runQuickTool("bad",failed,message=>errors.push(message)),false);assert.equal(errors.at(-1),"Worker rejected preflight");
+  const jsx=(type,props)=>({type,props:props??{}}),module={exports:{}};
+  const compiled=ts.transpileModule(readFileSync(new URL("../src/ViewportQuickTools.tsx",import.meta.url),"utf8"),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+  new Function("require","module","exports",compiled)(name=>name==="react/jsx-runtime"?{jsx,jsxs:jsx}:name==="react"?{useState:initial=>[typeof initial==="function"?initial():initial,()=>{}],useRef:initial=>({current:initial}),useEffect:()=>{}}:name==="./quickToolModel"?{quickToolActions:()=>[]}:name==="./icons"?new Proxy({},{get:()=>()=>null}):{},module,module.exports);
+  const flatten=node=>!node||typeof node!=="object"?[]:[node,...[node.props?.children].flat(Infinity).flatMap(flatten)];
+  let hidden=0;
+  const tree=module.exports.default({groups,context,selectionLabel:"Long selected board",summary:[],onError:()=>{},onHide:()=>hidden++});
+  const hide=flatten(tree).find(node=>node.props["aria-label"]==="Hide quick tools");
+  assert.match(hide.props.title,/show again from View or Settings/);
+  hide.props.onClick();assert.equal(hidden,1,"hide delegates to the authoritative persisted opt-in preference");
   console.log("Quick tools: context changes, jobs, result admission, exact target callbacks, disabled/stale actions and recovery passed.");
 } finally {try{unlinkSync(output);}catch{}}

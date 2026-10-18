@@ -15,7 +15,7 @@ class PassiveEditorTests(unittest.TestCase):
         from spikes_studio.passive_catalog import make_record,model
         app=wx.GetApp() or wx.App(False);frame=Studio();dialog=None
         try:
-            frame.Show();self.assertEqual(len(frame.catalog_panel.catalog['records']),7908)
+            frame.Show();self.assertEqual(len(frame.catalog_panel.catalog['records']),7915)
             dialog=InsertDialog(frame.catalog_panel,make_record('resistor',100))
             dialog.package_choice.SetStringSelection('01005');dialog.construction_choice.SetStringSelection('Thin film')
             for key,value in {'r':'1.234k','tolerance_percent':'.05','corner':'1','temperature_c':'125','tc1_per_k':'50u'}.items():dialog.parameter_fields[key].SetValue(value)

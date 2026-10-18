@@ -4,6 +4,11 @@
 .viewport-net-viewer header strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--spike-text-strong); font-size: 12px; }
 .viewport-net-viewer button, .viewport-net-viewer input { box-sizing: border-box; border: 1px solid var(--spike-border-subtle); border-radius: 4px; color: inherit; background: var(--spike-surface-field); font: 12px/1.35 system-ui, sans-serif; }
 .viewport-net-viewer header button { flex: 0 0 26px; height: 26px; padding: 0; cursor: pointer; }
+.viewport-net-viewer__controls { display: flex; flex: none; gap: 4px; }
+.viewport-net-viewer__controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; }
+.viewport-net-viewer--collapsed { min-height: 36px; }
+.viewport-net-viewer__body { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; }
+.viewport-net-viewer__body[hidden] { display: none; }
 .viewport-net-viewer input { flex: 0 0 auto; min-width: 0; width: calc(100% - 16px); height: 30px; margin: 4px 8px; padding: 4px 6px; }
 .viewport-net-viewer :is(button,input):focus-visible { outline: 2px solid var(--spike-accent); outline-offset: -2px; }
 .viewport-net-viewer__scope, .viewport-net-viewer__count { flex: 0 0 auto; margin: 0 8px 4px; color: var(--spike-text-muted); overflow: hidden; text-overflow: ellipsis; }

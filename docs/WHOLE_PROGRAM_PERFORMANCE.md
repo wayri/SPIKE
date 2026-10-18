@@ -140,6 +140,12 @@ Log: `output/optimization-stage2-python-tests-20261012.log`. Reproduce the exact
 
 ## Remaining work
 
+The [gamma viewport pass](validation/VIEWPORT_GAMMA_OPTIMIZATION_20261018.md)
+removes full source-array traversal from warm indexed picks, reuses assembly 2D
+artwork through camera changes, and repairs shader/nested-Scene texture ownership
+and accounting. It records allocation/lifecycle checks separately from pending
+native frame/event and capacity evidence. The work targets `0.3.12-gamma.1`.
+
 1. Run the baseline native workloads with real board/model fixtures and retained
    counter/event traces. Locate the next bottleneck from those profiles.
 2. Profile per-occurrence procedural geometry and imported batch preparation;

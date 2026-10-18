@@ -7,6 +7,25 @@ menu categories now open on demand in one reserved panel. Hide preserves
 inputs, and Tools > Open panels restores a hidden editor. Expand provides
 room for large tables and plots.
 
+The gamma workspace header also provides a permanent workspace shortcut row.
+Use the project-name dropdown for New, Open, Import, Save, Save As and exports;
+these actions use the existing project dialogs and unsaved-change handling.
+Ctrl+K opens the wider command search. Type a partial command, part, net or
+workspace name, use Tab to complete the highlighted suggestion, and Enter to
+execute. Pin useful actions beside their results. The compact Recent/Most used
+switch displays at most five available actions and learns usage locally.
+
+For parallel assembly inspection, choose a board occurrence or mechanical part
+from **+ Add view** above the viewport. Each tab keeps its own camera, mode,
+selection and filter. Return to **Main assembly** for the complete scene and
+existing engineering tools. Use the tab's detach button or drag it outside the
+SPIKE window for a separate view; **Dock back** returns it to the owner. Closing
+a detached window redocks its tab. Up to eight scoped views can be open; inactive
+docked renderers release their graphics resources. Layer edits and analysis
+navigation still use the owning project's state and gates. Loading a different
+project closes previous scoped views. Native multi-window acceptance remains
+pending; see the validation record before treating that workflow as qualified.
+
 This guide turns the integrated-help workflows into reviewable task sequences.
 It uses only screenshots shipped in `app/public/help/`; captions describe what
 is visible and do not claim unshown behavior. Missing screenshots are marked

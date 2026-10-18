@@ -1,5 +1,123 @@
 # SPIKE Solver Status
 
+The [optional-runtime qualification audit](validation/SKIPPED_TEST_CLOSURE_20261019.md)
+has executed passing real-runtime cases for 66 of the previous 69 skip records.
+EBrake still fails AC support/passivity and DC current-density convergence;
+CUDA remains owner-blocked for hardware and Xyce needs an admitted runtime.
+These results and isolated development-package smoke do not qualify a release.
+
+Experimental [supplied RLGC star junctions](RLGC_LINE_JUNCTION.md) connect two
+through eight scalar legs at one ideal common node. A multiport frequency
+response, coherent per-leg fields and separate conductor/dielectric heat
+retain raw node and global conservation residuals. Physical junction geometry,
+return transitions, geometry-derived extraction, thermal mapping and measured
+qualification remain open. SI02 and full PI/SI parity remain incomplete.
+
+
+Experimental [piecewise supplied RLGC cascades](RLGC_LINE_CASCADE.md)
+compose scalar uniform sections with different supplied parameters using
+ideal adjacent electrical junctions and coherent RMS excitation. Complete
+section fields/losses and raw interface/global balance remain explicit.
+Physical branches, vias/launches/bends, geometry/material extraction, thermal
+deposition and measured/production qualification remain open. SI02 and full
+PI/SI parity remain incomplete.
+
+
+[Runnable SI/PI workflows](RUN_SI_PI_NOW.md) now have an executed nine-case
+CLI readiness check, including explicit RLC PI with timestep refinement and
+native routed-copper examples. The SI workbench corrects the simple default
+four-to-two-port receiver mapping and blocks invalid custom assignments.
+This establishes bounded workflow execution, not unrestricted PCB extraction,
+native visual acceptance, physical validation or whole-tool parity.
+
+Opt-in native `radau_iia3` now passes the frozen 42-case signed/zero RC/RL
+startup/ramp amplitude corpus without changing tolerances or legacy defaults.
+It supports fixed-step linear independent-source RLC/index-one systems only.
+See [method, evidence and limits](NUMERICAL_METHOD_EVIDENCE.md#native-linear-radau-iia3--18-october-2026).
+The [local regression record](SOLVER_IMPROVEMENT_ACTION_PLAN.md#startupcorner-and-importer-refresh-18-october-2026)
+now records 4,293 tests with zero failures/errors and 69 explicit skips, plus
+unchanged guarded input/DLL hashes. This is not release or hardware qualification.
+
+Experimental [driven sampled RLGC fields](RLGC_LINE_FIELDS.md) execute
+coherent two-end RMS excitation on explicit positive frequency grids, returning
+complex interior V/I, signed power, nominal L/C stored energy, local losses and
+analytically integrated conductor/dielectric loss with checked power balance.
+DC fields, broadband causal material laws, geometry extraction, thermal
+deposition/feedback and measured/production qualification remain open.
+SI02 and full PI/SI parity remain incomplete.
+
+
+Experimental [supplied uniform sampled RLGC networks](RLGC_LINE_NETWORK.md)
+evaluate independent nonnegative R/G and positive constant L/C/length at explicit
+frequencies, including analytic DC limits. Named two-port output enters the
+existing sampled-network path with passivity/reciprocity admission. Broadband
+causality, extracted geometry/material laws, fields/heat and measured/production
+qualification remain open. SI02 and full PI/SI parity remain incomplete.
+
+
+Experimental [distortionless lossy line transients](DISTORTIONLESS_LINE_TRANSIENT.md)
+execute the explicit Heaviside condition R/L=G/C with causal delayed attenuation,
+repeated reflections and separate conductor/dielectric W/m loss densities.
+Local energy and signed transport retain their units and meaning; zero rate
+recovers the lossless points exactly. General frequency-dependent/non-Heaviside
+RLGC, geometry extraction, thermal mapping and measured qualification remain
+open. SI02 and full PI/SI parity remain incomplete.
+
+
+Experimental [distributed lossless TEM line transients](LOSSLESS_LINE_TRANSIENT.md)
+execute supplied uniform L/C/length models with finite resistive PWL drives,
+causal propagation, repeated reflections and named interior probes. Terminal
+orientation, signed power and local stored energy remain explicit for coupling.
+Zero initial line state and lossless nondispersive parameters bound this stage;
+lossy/coupled/branched geometry extraction and measured qualification remain open.
+SI02 and full PI/SI parity remain incomplete.
+
+
+Experimental [initialized network-port reflectometry](NETWORK_REFLECTOMETRY.md)
+reports actual incident/reflected voltage, loaded apparent reflection/impedance
+and signed transported power at an explicit probe plane. Positive caller floors
+retain unresolved ratios as null. Common state, other drives and external
+boundaries remain present; isolated S11, spatial TDR, calibration, measured
+qualification and thermal deposition remain open. Full PI/SI parity is incomplete.
+
+
+Experimental [supplied crosstalk timing corners](CROSSTALK_TIMING_CORNERS.md)
+evaluate explicit signed aggressor delays, with endpoint-held PWL sources and
+unchanged supplied initial state. Complete actual corner results support finite
+sampled envelopes and directly verified worst corner/polarity traces. Continuous
+skew, intersample peaks, probabilistic jitter/BER and physical qualification
+remain open; SI07 and the full PI/SI stack remain incomplete.
+
+
+Experimental [multi-aggressor sampled crosstalk](MULTI_AGGRESSOR_CROSSTALK.md)
+adds biased signed-waveform attribution, requested-time voltage envelopes and
+two actual extreme-pattern witness solves. Source/state identity and explicit
+units support later coupling; quadratic energy needs a full pattern solve.
+Intersample extrema, timing/BER, nonlinear drivers and measured qualification
+remain open. This bounded stage does not complete SI07 or PI/SI parity.
+
+
+Experimental [continuous RLC energy ledgers](RLC_ENERGY_LEDGER.md) integrate
+supplied resistor heat, signed source/network work and endpoint L/C storage
+from actual initialized-transient intervals. Scaled covariance integration and
+raw balance diagnostics retain units and ownership for future thermal handoffs.
+Generic fitted-network dissipation, thermal mesh transfer and measured
+qualification remain open.
+
+Experimental [supplied RLC initial states](RLC_INITIAL_STATES.md) add precharged
+capacitor, energized inductor and explicitly bound fitted-memory initialization.
+Stateless continuation reuses the existing propagator with source-horizon final
+state and caller-managed PWL slicing/local time. No managed session, generic
+fitted-state energy, DAE or thermal transfer is implied; physical qualification
+and complete SI/PI parity remain open.
+
+Experimental [combined series-R/L and shunt-C boundaries](RLC_NETWORK_TRANSIENT.md)
+support zero-state fitted-network transients with mixed R, RL, RC and RLC ports.
+Separate source/network currents, KVL/KCL and component derivatives/loss/storage
+retain physical units and identity. Regular resolved stable closure is required;
+general topology/descriptor/nonlinear models, thermal integration and measured
+broadband qualification remain open.
+
 Experimental [shunt-capacitive fitted-network boundaries](CAPACITIVE_NETWORK_TRANSIENT.md)
 add zero-initial-state capacitor voltage/derivative and distinguish source from
 network current. Actual resistor loss uses source current; capacitor energy and

@@ -1687,10 +1687,19 @@ class _Builder:
                 )
                 radius = drill / 2 + plating
                 sides = max(8, min(24, int(ceil(2 * pi * radius / self.target))))
+                # Tangent bore faces preserve the drill void. Refine until
+                # their corner radius fits inside the plated outer cylinder.
+                while drill / (2 * cos(pi / sides)) >= radius:
+                    if sides >= 384:
+                        raise ValueError(
+                            f"Via {source_id} plating is too thin for a bounded barrel discretization."
+                        )
+                    sides = min(384, sides * 2)
+                inner_profile = _circumscribed_shape_polygon("circle", drill, drill, sides)
                 top, bottom = self.mesh.nodes[a].z_mm, self.mesh.nodes[b].z_mm
                 for side in range(sides):
-                    angle_a, angle_b = 2 * pi * side / sides, 2 * pi * (side + 1) / sides
-                    inner_radius = drill / 2
+                    inner_a, inner_b = inner_profile[side], inner_profile[(side + 1) % sides]
+                    angle_a, angle_b = atan2(inner_a[1], inner_a[0]), atan2(inner_b[1], inner_b[0])
                     self.add_cell(
                         f"{branch_id}:face:{side + 1}",
                         "via",
@@ -1705,10 +1714,10 @@ class _Builder:
                         ],
                         metadata={
                             "inner_vertices_mm": [
-                                [point[0] + inner_radius * cos(angle_a), point[1] + inner_radius * sin(angle_a), top],
-                                [point[0] + inner_radius * cos(angle_b), point[1] + inner_radius * sin(angle_b), top],
-                                [point[0] + inner_radius * cos(angle_b), point[1] + inner_radius * sin(angle_b), bottom],
-                                [point[0] + inner_radius * cos(angle_a), point[1] + inner_radius * sin(angle_a), bottom],
+                                [point[0] + inner_a[0], point[1] + inner_a[1], top],
+                                [point[0] + inner_b[0], point[1] + inner_b[1], top],
+                                [point[0] + inner_b[0], point[1] + inner_b[1], bottom],
+                                [point[0] + inner_a[0], point[1] + inner_a[1], bottom],
                             ],
                             "plating_thickness_mm": plating,
                         },

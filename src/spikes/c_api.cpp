@@ -839,8 +839,13 @@ spikes_error_code spikes_solve_transient_adaptive(
   }
   if (integration_method != SPIKES_INTEGRATION_BACKWARD_EULER &&
       integration_method != SPIKES_INTEGRATION_HYBRID_TRAPEZOIDAL &&
-      integration_method != SPIKES_INTEGRATION_BDF2) {
+      integration_method != SPIKES_INTEGRATION_BDF2 &&
+      integration_method != SPIKES_INTEGRATION_RADAU_IIA3) {
     return invalid("unsupported transient integration method");
+  }
+  if (adaptive_time_step != 0u &&
+      integration_method == SPIKES_INTEGRATION_RADAU_IIA3) {
+    return invalid("Radau IIA3 does not support adaptive time stepping");
   }
   spikes::TransientOptions native;
   native.time_step_s = options->time_step_s;
@@ -853,7 +858,9 @@ spikes_error_code spikes_solve_transient_adaptive(
           ? spikes::TransientIntegrationMethod::hybrid_trapezoidal
           : integration_method == SPIKES_INTEGRATION_BDF2
                 ? spikes::TransientIntegrationMethod::bdf2
-                : spikes::TransientIntegrationMethod::backward_euler;
+                : integration_method == SPIKES_INTEGRATION_RADAU_IIA3
+                      ? spikes::TransientIntegrationMethod::radau_iia3
+                      : spikes::TransientIntegrationMethod::backward_euler;
   native.adaptive_time_step = adaptive_time_step != 0u;
   native.minimum_time_step_s = minimum_time_step_s;
   native.lte_absolute_tolerance = lte_absolute_tolerance;
@@ -1035,6 +1042,16 @@ spikes_error_code spikes_transient_result_bdf2_steps(
   return SPIKES_OK;
 }
 
+spikes_error_code spikes_transient_result_radau_iia3_steps(
+    const spikes_transient_result *result, size_t *out_radau_iia3_steps) {
+  if (result == nullptr || out_radau_iia3_steps == nullptr) {
+    return invalid("transient result and Radau-IIA3-step output are required");
+  }
+  *out_radau_iia3_steps = result->value.diagnostics().radau_iia3_steps;
+  last_error.clear();
+  return SPIKES_OK;
+}
+
 spikes_error_code spikes_transient_result_lte_diagnostics(
     const spikes_transient_result *result, size_t *out_rejected_steps,
     double *out_last_lte_ratio, double *out_minimum_accepted_step_s,
@@ -1110,7 +1127,8 @@ spikes_error_code spikes_transient_session_create_with_method(
   }
   if (integration_method != SPIKES_INTEGRATION_BACKWARD_EULER &&
       integration_method != SPIKES_INTEGRATION_HYBRID_TRAPEZOIDAL &&
-      integration_method != SPIKES_INTEGRATION_BDF2) {
+      integration_method != SPIKES_INTEGRATION_BDF2 &&
+      integration_method != SPIKES_INTEGRATION_RADAU_IIA3) {
     return invalid("unsupported persistent transient integration method");
   }
   spikes::TransientOptions native;
@@ -1124,7 +1142,9 @@ spikes_error_code spikes_transient_session_create_with_method(
           ? spikes::TransientIntegrationMethod::hybrid_trapezoidal
           : integration_method == SPIKES_INTEGRATION_BDF2
                 ? spikes::TransientIntegrationMethod::bdf2
-                : spikes::TransientIntegrationMethod::backward_euler;
+                : integration_method == SPIKES_INTEGRATION_RADAU_IIA3
+                      ? spikes::TransientIntegrationMethod::radau_iia3
+                      : spikes::TransientIntegrationMethod::backward_euler;
   native.nonlinear.max_newton_iterations = options->max_newton_iterations;
   native.nonlinear.max_backtracks = options->max_backtracks;
   native.nonlinear.absolute_tolerance = options->absolute_tolerance;
@@ -1295,6 +1315,16 @@ spikes_error_code spikes_transient_session_bdf2_steps(
     return invalid("session and BDF2-step output are required");
   }
   *out_bdf2_steps = session->value.diagnostics().bdf2_steps;
+  last_error.clear();
+  return SPIKES_OK;
+}
+
+spikes_error_code spikes_transient_session_radau_iia3_steps(
+    const spikes_transient_session *session, size_t *out_radau_iia3_steps) {
+  if (session == nullptr || out_radau_iia3_steps == nullptr) {
+    return invalid("session and Radau-IIA3-step output are required");
+  }
+  *out_radau_iia3_steps = session->value.diagnostics().radau_iia3_steps;
   last_error.clear();
   return SPIKES_OK;
 }

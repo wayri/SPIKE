@@ -1,0 +1,304 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "fit_request",
+    "terminations",
+    "output_times_s",
+    "initial_state"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlc-network-transient-request/v2"
+    },
+    "fit_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "source",
+        "pole_rates_rad_s",
+        "max_absolute_error"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/sparameter-rational-fit-request/v1"
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "port_names",
+            "reference_impedance_ohm",
+            "frequencies_hz",
+            "s_parameters"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "port_names": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            },
+            "reference_impedance_ohm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frequencies_hz": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2048,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "s_parameters": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2048,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "real",
+                      "imag"
+                    ],
+                    "properties": {
+                      "real": {
+                        "type": "number"
+                      },
+                      "imag": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "pole_rates_rad_s": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "uniqueItems": true
+        },
+        "max_absolute_error": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$comment": "SPDX-License-Identifier: Apache-2.0; finite values, real DC, exact dimensions, full rank, conditioning, fit residual and work resources additionally checked by runtime."
+    },
+    "terminations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "port_name",
+          "resistance_ohm",
+          "voltage_points",
+          "capacitance_f",
+          "inductance_h"
+        ],
+        "properties": {
+          "port_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "resistance_ohm": {
+            "type": "number",
+            "minimum": 0
+          },
+          "voltage_points": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 1024,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "time_s",
+                "voltage_v"
+              ],
+              "properties": {
+                "time_s": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "voltage_v": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "capacitance_f": {
+            "type": "number",
+            "minimum": 0
+          },
+          "inductance_h": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "capacitance_f": {
+                  "exclusiveMinimum": 0
+                },
+                "inductance_h": {
+                  "const": 0
+                }
+              },
+              "required": [
+                "capacitance_f",
+                "inductance_h"
+              ]
+            },
+            "then": {
+              "properties": {
+                "resistance_ohm": {
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          }
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "inductance_h"
+            ],
+            "properties": {
+              "inductance_h": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": [
+              "capacitance_f"
+            ],
+            "properties": {
+              "capacitance_f": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "minContains": 1
+        }
+      ]
+    },
+    "output_times_s": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "initial_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "fit_request_digest",
+        "fit_state_sqrt_w",
+        "inductor_current_a_by_port",
+        "capacitor_voltage_v_by_port"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/rlc-initial-state/v1"
+        },
+        "fit_request_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "fit_state_sqrt_w": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "inductor_current_a_by_port": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 8,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        },
+        "capacitor_voltage_v_by_port": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 8,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/rlc-network-transient-request/v2",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; supplied RLC initial states bound to the fit request, exact normalized state continuation. Runtime validates finite values, dimensions, port subsets and precision. Restart state is at common source horizon, not last observation; caller reslices sources and resets local time. Not a general DAE/co-simulation or physical fitted-state energy claim."
+}

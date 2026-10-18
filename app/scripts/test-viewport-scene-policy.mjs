@@ -182,7 +182,10 @@ assert.ok(closeClip.far > closeClip.near * 100, "perspective range must remain v
 
 const assemblyClip = adaptivePerspectiveClip({ radius: 5_000, cameraDistance: 20_000, cameraToBoundsCenter: 24_000 });
 assert.ok(assemblyClip.far > 50_000, "large offset assemblies must remain inside the far plane");
-assert.ok(assemblyClip.near <= 0.25, "logarithmic depth must preserve close inspection in a large scene");
+assert.ok(assemblyClip.near < 24_000 - 5_000, "near plane stays before the entire offset assembly");
+assert.ok(assemblyClip.near > 1, "empty foreground improves conventional depth precision");
+const insideAssemblyClip = adaptivePerspectiveClip({radius:5000,cameraDistance:18,cameraToBoundsCenter:18});
+assert.ok(insideAssemblyClip.near <= .25, "inside a large chamber the nearby board remains unclipped");
 assert.ok(adaptiveMaximumCameraDistance(5_000) >= 800_000, "large scenes need a proportional dolly range");
 
 const standardProfile = viewportRenderProfile(500, 2);

@@ -128,7 +128,7 @@ assert.match(viewportSource, /const useFallback = !hasAlignedSource/, "retained 
 assert.match(viewportSource, /<ComponentShapes[^>]+sourceLayers=\{hasAlignedSource\}/, "component art switches to transparent hit geometry only after source SVG alignment succeeds");
 assert.match(viewportSource, /addEventListener\("wheel", onWheel, \{ passive: false \}\)/, "wheel cancellation is installed on a native non-passive listener");
 assert.match(viewportSource, /selectionFilter !== "net"/, "Net selection mode removes component hitboxes that would occlude pads and tracks");
-assert.match(viewportSource, /linked=\{linkedNets\[visual\.id\] \?\? \[\]\}/, "equal net IDs and names remain scoped to each board occurrence");
+assert.match(viewportSource, /linked=\{linkedNets\[visual\.id\] \?\? EMPTY_LINKED_NETS\}/, "equal net IDs and names remain scoped to each board occurrence");
 assert.match(viewportSource, /useFallback && <g[^>]*><BoardFallback/, "hiding every retained source layer does not draw a fallback ghost board");
 assert.match(viewportSource, /data-layout-source-frame[\s\S]*data-layout-board-frame/, "source SVG and normalized hit geometry use explicit inverse frames");
 assert.match(viewportSource, /stroke="#55e5d5"/, "selected assembly nets use the SPIKE teal highlight");

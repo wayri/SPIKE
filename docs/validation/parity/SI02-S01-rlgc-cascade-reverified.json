@@ -1,0 +1,41 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI02-S01",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "8bdc97d52ba45f1fb6c2a19b29d2ac54ac36d0f8b78260e881bbd851e9b1fdb0",
+    "python/spike_core/lossless_line_transient.py": "8024494fb5b63831b7110b0b242919a06d58ff0fe44d0f65920134c041c44588",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "4c28ffb8c8079cdbbb20e5f32087dd119a79a655bdb38453166d5ceb7861d198",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_lossless_line_transient.py": "c0522c9d40c9ee9e92084fb651998b59dc063caa8e8cee8f8d0eaccaddedda85",
+    "tests/python/test_lossless_line_transient_contract.py": "8329e4e831f21ff60c7525547bb86c2b039720a02e0d468b67dd71951ed6a75b",
+    "examples/lossless_line_transient/run_line.py": "432ebf4aeb75c73c871cfd9c3dd197295bbd537d869ae43645ac040938a5dce7",
+    "schemas/lossless-line-transient-request-v1.schema.json": "8bc3301e04813e0de1684c41a85730c0f0a2a056a6fa489f8caf0ccf1660fc42",
+    "schemas/lossless-line-transient-result-v1.schema.json": "235573d6e0dc09879ddb6892f56f9b4917b54ce841d5dc39aa0e5e0aa3e5bd43",
+    "docs/LOSSLESS_LINE_TRANSIENT.md": "ac6ffda048f7591cf3b9d3ad7ad040ba36745eae2c6933058e7aeb7874681172"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_cancellation_before_and_during_bounces_and_final_return",
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_ideal_zero_resistance_full_reflections_remain_finite",
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_invalid_fields_times_initial_history_precision_resources",
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_matched_finite_pulse_spatial_energy_equals_injected_network_work",
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_matched_finite_ramp_exact_delays_and_prearrival_zeros",
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_observation_refinement_and_distributed_parameter_length_time_scaling",
+      "tests.python.test_lossless_line_transient.LosslessLineTests.test_resistive_first_echo_multiple_bounces_and_both_ends_driven",
+      "tests.python.test_lossless_line_transient_contract.LosslessLineContractTests.test_example_executes_and_contracts_are_registered",
+      "tests.python.test_lossless_line_transient_contract.LosslessLineContractTests.test_worker_against_independent_geometric_reflection_series",
+      "tests.python.test_lossless_line_transient_contract.LosslessLineContractTests.test_worker_and_schema_reject_invalid_physics_contracts"
+    ],
+    "run": 10,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI02-S01-rlgc-cascade-reverified.log",
+  "log_sha256": "b82721a47d61a683d499b5aac1384fc028ab9a24bee70f6a8bbd0f0f59cd4465"
+}

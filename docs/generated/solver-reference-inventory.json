@@ -8,7 +8,7 @@
     "tests/python",
     "benchmarks"
   ],
-  "files_scanned": 1694,
+  "files_scanned": 1808,
   "scope": "Recorded links and DOIs only; not proof of reading, adoption, accuracy or license permission. Includes non-paper links.",
   "excluded": [
     "private repositories",
@@ -328,7 +328,7 @@
       "occurrences": [
         {
           "file": "docs/SI_WORKFLOW.md",
-          "line": 255
+          "line": 261
         }
       ]
     },
@@ -595,6 +595,15 @@
       ]
     },
     {
+      "url": "https://comptes-rendus.academie-sciences.fr/mathematique/item/10.1016/j.crma.2004.08.004.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md",
+          "line": 298
+        }
+      ]
+    },
+    {
       "url": "https://creativecommons.org/licenses/by/4.0/",
       "occurrences": [
         {
@@ -689,7 +698,25 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 13
+          "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://discord.gg/UCmeR9ypzQ",
+      "occurrences": [
+        {
+          "file": "docs/COMMUNITY_SETUP.md",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "url": "https://discovery.ucl.ac.uk/1522190/1/Betcke_Overresolving_Laplace_domain_VoR.pdf",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 119
         }
       ]
     },
@@ -898,6 +925,15 @@
       ]
     },
     {
+      "url": "https://docs-be.nordicsemi.com/bundle/nRF52840_PS_v1.8/raw/resource/enus/nRF52840_PS_v1.8.pdf",
+      "occurrences": [
+        {
+          "file": "docs/adr/0110-explicit-native-firmware-backend.md",
+          "line": 38
+        }
+      ]
+    },
+    {
       "url": "https://docs.amd.com/r/en-US/xapp1392-pcb-chan-design-guidelines/Via-Impedance-Optimization",
       "occurrences": [
         {
@@ -965,7 +1001,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 441
+          "line": 464
         }
       ]
     },
@@ -974,7 +1010,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 439
+          "line": 462
         }
       ]
     },
@@ -983,7 +1019,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 440
+          "line": 463
         }
       ]
     },
@@ -1011,6 +1047,15 @@
         {
           "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
           "line": 136
+        }
+      ]
+    },
+    {
+      "url": "https://docs.nordicsemi.com/r/bundle/ps_nrf52840/page/gpio.html",
+      "occurrences": [
+        {
+          "file": "docs/adr/0110-explicit-native-firmware-backend.md",
+          "line": 37
         }
       ]
     },
@@ -1201,6 +1246,15 @@
       ]
     },
     {
+      "url": "https://docs.python.org/3.14/library/os.html#os.kill",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
+          "line": 481
+        }
+      ]
+    },
+    {
       "url": "https://docs.scipy.org/doc/scipy-1.17.0/reference/generated/scipy.linalg.expm.html",
       "occurrences": [
         {
@@ -1210,6 +1264,18 @@
         {
           "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
           "line": 142
+        },
+        {
+          "file": "docs/RLC_ENERGY_LEDGER.md",
+          "line": 158
+        },
+        {
+          "file": "docs/RLC_INITIAL_STATES.md",
+          "line": 134
+        },
+        {
+          "file": "docs/RLC_NETWORK_TRANSIENT.md",
+          "line": 168
         }
       ]
     },
@@ -1271,6 +1337,10 @@
       "url": "https://doi.org/10.1016/j.crma.2004.08.004",
       "occurrences": [
         {
+          "file": "docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md",
+          "line": 298
+        },
+        {
           "file": "python/spike_core/peec_conforming_dc.py",
           "line": 12
         }
@@ -1304,6 +1374,15 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1109/TAC.1978.1101743",
+      "occurrences": [
+        {
+          "file": "docs/RLC_ENERGY_LEDGER.md",
+          "line": 156
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1109/TAP.1982.1142818",
       "occurrences": [
         {
@@ -1322,6 +1401,15 @@
         {
           "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
           "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1109/TCS.1975.1084079",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 123
         }
       ]
     },
@@ -1361,6 +1449,23 @@
         {
           "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
           "line": 142
+        },
+        {
+          "file": "docs/RLC_INITIAL_STATES.md",
+          "line": 134
+        },
+        {
+          "file": "docs/RLC_NETWORK_TRANSIENT.md",
+          "line": 168
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1137/16M106474X",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 118
         }
       ]
     },
@@ -1583,7 +1688,7 @@
       "occurrences": [
         {
           "file": "tests/python/test_board_corpus_benchmark.py",
-          "line": 25
+          "line": 50
         }
       ]
     },
@@ -1628,7 +1733,7 @@
       "occurrences": [
         {
           "file": "docs/PLATFORM_PACKAGES.md",
-          "line": 13
+          "line": 23
         }
       ]
     },
@@ -1699,7 +1804,7 @@
         },
         {
           "file": "docs/PI_SI_WORKED_CASEBOOK.md",
-          "line": 158
+          "line": 162
         },
         {
           "file": "docs/SI_USER_GUIDE.md",
@@ -2081,11 +2186,20 @@
       ]
     },
     {
-      "url": "https://github.com/wayri/SPIKE-Main/releases/tag/v0.3.2",
+      "url": "https://github.com/wayri/SPIKE/releases/tag/v0.3.12-gamma.1",
       "occurrences": [
         {
           "file": "docs/PLATFORM_PACKAGES.md",
-          "line": 9
+          "line": 6
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/wayri/SPIKE/releases/tag/v0.3.5",
+      "occurrences": [
+        {
+          "file": "docs/PLATFORM_PACKAGES.md",
+          "line": 19
         }
       ]
     },
@@ -2160,7 +2274,7 @@
       "occurrences": [
         {
           "file": "docs/PI_SI_PARITY_EXECUTION.md",
-          "line": 74
+          "line": 85
         }
       ]
     },
@@ -2187,7 +2301,7 @@
       "occurrences": [
         {
           "file": "docs/SI_WORKFLOW.md",
-          "line": 249
+          "line": 255
         }
       ]
     },
@@ -2257,6 +2371,24 @@
       ]
     },
     {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-openprocess",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
+          "line": 479
+        }
+      ]
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject",
+      "occurrences": [
+        {
+          "file": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
+          "line": 477
+        }
+      ]
+    },
+    {
       "url": "https://libceed.org/en/latest/gettingstarted/",
       "occurrences": [
         {
@@ -2271,6 +2403,22 @@
         {
           "file": "docs/CAPACITIVE_NETWORK_TRANSIENT.md",
           "line": 140
+        },
+        {
+          "file": "docs/MULTI_AGGRESSOR_CROSSTALK.md",
+          "line": 76
+        },
+        {
+          "file": "docs/RLC_ENERGY_LEDGER.md",
+          "line": 157
+        },
+        {
+          "file": "docs/RLC_INITIAL_STATES.md",
+          "line": 133
+        },
+        {
+          "file": "docs/RLC_NETWORK_TRANSIENT.md",
+          "line": 167
         }
       ]
     },
@@ -2302,6 +2450,15 @@
         {
           "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
           "line": 99
+        }
+      ]
+    },
+    {
+      "url": "https://mathcs.clarku.edu/~djoyce/elements/bookIII/propIII18.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/VIA_BARREL_DRILL_CONTAINMENT_20261018.md",
+          "line": 16
         }
       ]
     },
@@ -2471,6 +2628,15 @@
       ]
     },
     {
+      "url": "https://ngspice.sourceforge.io/extras.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 61
+        }
+      ]
+    },
+    {
       "url": "https://ngspice.sourceforge.io/ngspice-electrothermal-tutorial.html",
       "occurrences": [
         {
@@ -2538,6 +2704,15 @@
       ]
     },
     {
+      "url": "https://ntrs.nasa.gov/citations/20110004137",
+      "occurrences": [
+        {
+          "file": "docs/SHEET_FOLDING.md",
+          "line": 154
+        }
+      ]
+    },
+    {
       "url": "https://numpy.org/doc/stable/reference/routines.fft.html",
       "occurrences": [
         {
@@ -2565,11 +2740,96 @@
       ]
     },
     {
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/5ec9a8524891d6940e4572e1c97b0cf1_6002_l3.pdf",
+      "occurrences": [
+        {
+          "file": "docs/MULTI_AGGRESSOR_CROSSTALK.md",
+          "line": 70
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/012675925c0f652bb179b6a33cd3d13b_MIT6_003F11_lec01.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CROSSTALK_TIMING_CORNERS.md",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/790b8f65328723ec194cb440b303f8fb_MIT6_013S09_chap07.pdf",
+      "occurrences": [
+        {
+          "file": "docs/LOSSLESS_LINE_TRANSIENT.md",
+          "line": 93
+        },
+        {
+          "file": "docs/NETWORK_REFLECTOMETRY.md",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/f52f07ed81b664331bee2fec67df7db6_MIT6_013S09_chap08.pdf",
+      "occurrences": [
+        {
+          "file": "docs/DISTORTIONLESS_LINE_TRANSIENT.md",
+          "line": 86
+        },
+        {
+          "file": "docs/LOSSLESS_LINE_TRANSIENT.md",
+          "line": 89
+        },
+        {
+          "file": "docs/RLGC_LINE_CASCADE.md",
+          "line": 19
+        },
+        {
+          "file": "docs/RLGC_LINE_FIELDS.md",
+          "line": 18
+        },
+        {
+          "file": "docs/RLGC_LINE_JUNCTION.md",
+          "line": 23
+        },
+        {
+          "file": "docs/RLGC_LINE_NETWORK.md",
+          "line": 17
+        },
+        {
+          "file": "docs/validation/SI02_DISTORTIONLESS_LINE_TRANSIENT.md",
+          "line": 10
+        },
+        {
+          "file": "docs/validation/SI02_RLGC_LINE_CASCADE.md",
+          "line": 11
+        },
+        {
+          "file": "docs/validation/SI02_RLGC_LINE_FIELDS.md",
+          "line": 10
+        },
+        {
+          "file": "docs/validation/SI02_RLGC_LINE_NETWORK.md",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/res-6-007-signals-and-systems-spring-2011/b061322022d65a4bc2ed2e2d3c54d3c5_MITRES_6_007S11_lec02.pdf",
+      "occurrences": [
+        {
+          "file": "docs/CROSSTALK_TIMING_CORNERS.md",
+          "line": 70
+        }
+      ]
+    },
+    {
       "url": "https://odbplusplus.com/design/odb-design-format-specification/",
       "occurrences": [
         {
           "file": "docs/ODB_AND_HARNESS_EXTENSIONS.md",
-          "line": 88
+          "line": 97
         }
       ]
     },
@@ -2824,6 +3084,24 @@
       ]
     },
     {
+      "url": "https://qucs-s-help.readthedocs.io/en/latest/overview/choosing-a-sim-backend.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "url": "https://qucs.sourceforge.net/tech/technical.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 66
+        }
+      ]
+    },
+    {
       "url": "https://quicksearch.dla.mil/qsDocDetails.aspx?ident_number=35789",
       "occurrences": [
         {
@@ -2894,6 +3172,24 @@
       "occurrences": [
         {
           "file": "docs/SPIKES_FIRMWARE_EMULATION.md",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/basic/monitor-syntax.html",
+      "occurrences": [
+        {
+          "file": "docs/adr/0110-explicit-native-firmware-backend.md",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/basic/running.html",
+      "occurrences": [
+        {
+          "file": "docs/adr/0110-explicit-native-firmware-backend.md",
           "line": 35
         }
       ]
@@ -3003,6 +3299,15 @@
         {
           "file": "tests/python/test_multiboard_volume_electrothermal.py",
           "line": 144
+        }
+      ]
+    },
+    {
+      "url": "https://spinningnumbers.org/assets/MNA75.pdf",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 124
         }
       ]
     },
@@ -3150,7 +3455,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 447
+          "line": 470
         }
       ]
     },
@@ -3159,7 +3464,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 443
+          "line": 466
         }
       ]
     },
@@ -3168,7 +3473,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 444
+          "line": 467
         }
       ]
     },
@@ -3177,7 +3482,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 442
+          "line": 465
         }
       ]
     },
@@ -3186,7 +3491,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 446
+          "line": 469
         }
       ]
     },
@@ -3195,7 +3500,7 @@
       "occurrences": [
         {
           "file": "docs/COMMUNITY_SETUP.md",
-          "line": 445
+          "line": 468
         }
       ]
     },
@@ -3333,6 +3638,15 @@
         {
           "file": "python/spike_core/harness_rlgc_geometry.py",
           "line": 13
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter7/7.2.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md",
+          "line": 166
         }
       ]
     },
@@ -3529,6 +3843,15 @@
         {
           "file": "python/spikes/manufacturer_model_catalog.py",
           "line": 199
+        }
+      ]
+    },
+    {
+      "url": "https://www.analog.com/en/resources/simulation-models.html",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 64
         }
       ]
     },
@@ -3836,7 +4159,7 @@
       "occurrences": [
         {
           "file": "docs/SI_WORKFLOW.md",
-          "line": 251
+          "line": 257
         }
       ]
     },
@@ -3854,7 +4177,7 @@
       "occurrences": [
         {
           "file": "docs/PI_SI_WORKED_CASEBOOK.md",
-          "line": 136
+          "line": 140
         }
       ]
     },
@@ -3863,7 +4186,7 @@
       "occurrences": [
         {
           "file": "docs/PI_SI_WORKED_CASEBOOK.md",
-          "line": 139
+          "line": 143
         }
       ]
     },
@@ -4069,7 +4392,7 @@
       "occurrences": [
         {
           "file": "docs/PI_SI_PARITY_EXECUTION.md",
-          "line": 75
+          "line": 86
         }
       ]
     },
@@ -4079,6 +4402,15 @@
         {
           "file": "docs/VISUALIZATION_ARCHITECTURE.md",
           "line": 18
+        }
+      ]
+    },
+    {
+      "url": "https://www.klayout.de/build.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/SKIPPED_TEST_CLOSURE_20261019.md",
+          "line": 66
         }
       ]
     },
@@ -4176,7 +4508,7 @@
       "occurrences": [
         {
           "file": "docs/SI_WORKFLOW.md",
-          "line": 257
+          "line": 263
         }
       ]
     },
@@ -4505,6 +4837,15 @@
       ]
     },
     {
+      "url": "https://www.olemartin.no/artikler/vanloan.pdf",
+      "occurrences": [
+        {
+          "file": "docs/RLC_ENERGY_LEDGER.md",
+          "line": 156
+        }
+      ]
+    },
+    {
       "url": "https://www.openfoam.com/",
       "occurrences": [
         {
@@ -4546,6 +4887,15 @@
         {
           "file": "docs/TRANSMISSION_RF_HVDC_SCOPE.md",
           "line": 96
+        }
+      ]
+    },
+    {
+      "url": "https://www.qorvo.com/design-hub/calculators-simulation/qspice",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 70
         }
       ]
     },
@@ -4627,6 +4977,24 @@
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
           "line": 93
+        }
+      ]
+    },
+    {
+      "url": "https://www.simplistechnologies.com/documentation/simplis/simplis_reference/topics/simplis_pop_overview.htm",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "url": "https://www.simplistechnologies.com/documentation/simplis/what_is_simplis/topics/what_is_simplis.htm",
+      "occurrences": [
+        {
+          "file": "docs/SPIKES_STUDIO_ADVANCEMENT.md",
+          "line": 72
         }
       ]
     },
@@ -5376,6 +5744,15 @@
       ]
     },
     {
+      "url": "https://www.unige.ch/~hairer/poly-sde-mani.pdf",
+      "occurrences": [
+        {
+          "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+          "line": 114
+        }
+      ]
+    },
+    {
       "url": "https://www.usb.org/document-library/usb-20-specification",
       "occurrences": [
         {
@@ -5416,7 +5793,7 @@
       "occurrences": [
         {
           "file": "docs/SI_WORKFLOW.md",
-          "line": 259
+          "line": 265
         }
       ]
     },
@@ -5489,6 +5866,15 @@
         {
           "file": "docs/ACTIVE_ENGINEERING_QUEUE.md",
           "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://xyce.sandia.gov/downloads/executables/",
+      "occurrences": [
+        {
+          "file": "docs/validation/SKIPPED_TEST_CLOSURE_20261019.md",
+          "line": 77
         }
       ]
     },

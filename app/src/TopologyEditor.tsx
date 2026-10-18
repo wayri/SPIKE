@@ -108,7 +108,7 @@ const designForTopology = (board: ParsedBoard) => ({
 });
 
 export default function TopologyEditor({
-  domain, board, model, setModel, onClose, onUseForAnalysis, onStatus, onUndo, onRedo,
+  domain, board, model, setModel, onClose, onUseForAnalysis, onStatus, onUndo, onRedo, onOpenStudio,
 }: {
   domain: TopologyDomain;
   board: ParsedBoard | null;
@@ -116,6 +116,7 @@ export default function TopologyEditor({
   setModel: (model: TopologyModel, record?: boolean) => void;
   onUndo?: () => void;
   onRedo?: () => void;
+  onOpenStudio?: () => void;
   onClose: () => void;
   onUseForAnalysis: (model: TopologyModel, scenarioId: string, plan: PowerTreeAnalysisPlan) => void;
   onStatus: (message: string) => void;
@@ -505,6 +506,7 @@ export default function TopologyEditor({
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") { event.preventDefault(); selectNodes(visibleNodes.map(node => node.id)); return; }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "d") { event.preventDefault(); duplicateSelected(); return; }
       if (event.key === "Delete" || event.key === "Backspace") { event.preventDefault(); deleteSelected(); return; }
+      if (event.key === "Escape" && target?.closest(".topology-tool-menu")) return;
       if (event.key === "Escape") { setContextMenu(null); setLinkFrom(null); setWirePointer(null); setPendingDestructive(null); selectNodes([]); }
     };
     view.addEventListener("keydown", onKey, true);
@@ -527,21 +529,32 @@ export default function TopologyEditor({
   return <div className="modal-shade topology-shade"><div className={`topology-editor schematic-editor ${domain === "pi" ? "pi" : ""}`}>
     <header>
       <div><b>{domain === "pi" ? "POWER SCHEMATIC" : "SIGNAL SCHEMATIC"}</b><small>Define inputs → Review wiring → Assign models → {domain === "pi" ? "Use for analysis" : "Save channel setup"}</small></div>
-      <button onClick={onClose} title="Close topology editor"><X size={17} /></button>
+      <button onClick={onClose} aria-label="Close topology editor" title="Close topology editor"><X size={17} /></button>
     </header>
-    <div className="topology-toolbar">
-      {domain === "pi" && <button type="button" onClick={() => setAcPdnOpen(value => !value)}>AC PDN / CM–DM filters</button>}
-      <button onClick={() => { setGeneratorOpen(true); setView("diagram"); }}><Plus size={14} /> Generate from inputs</button>
+    <div className="topology-toolbar" aria-label="Schematic tools">
+      <button onClick={() => { setGeneratorOpen(true); setView("diagram"); }}><Plus size={14} /> Generate</button>
       <button onClick={onUndo} disabled={!onUndo} title="Undo (Ctrl+Z)"><Undo2 size={14} /></button>
       <button onClick={onRedo} disabled={!onRedo} title="Redo (Ctrl+Shift+Z)"><Redo2 size={14} /></button>
+      <details className="topology-tool-menu" onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.open = false; }}>
+        <summary>Sources</summary>
+        <div className="topology-tool-popover">
       <button onClick={autoExtract}><RefreshCw size={14} /> Extract from board</button>
-      <label><FileInput size={14} /> Import schematic / netlist<input type="file" accept=".kicad_sch,.xml,.net" onChange={event => { const file = event.target.files?.[0]; if (file) importSource(file); event.target.value = ""; }} /></label>
+      <label tabIndex={0} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.querySelector("input")?.click(); } }}><FileInput size={14} /> Import schematic / netlist<input type="file" accept=".kicad_sch,.xml,.net" onChange={event => { const file = event.target.files?.[0]; if (file) importSource(file); event.target.value = ""; }} /></label>
       {domain === "pi" && <button className={pathWizardOpen ? "active" : ""} onClick={() => setPathWizardOpen(value => !value)} title="Manage source-to-load paths across multiple copper nets and series components"><Route size={14} /> Power paths</button>}
+      {domain === "pi" && <button type="button" onClick={() => setAcPdnOpen(value => !value)}>AC PDN / CM–DM filters</button>}
+      {domain === "pi" && <label className="topology-check"><input type="checkbox" checked={showReturns} onChange={event => setShowReturns(event.target.checked)} /> Ground returns</label>}
+        </div>
+      </details>
+      <details className="topology-tool-menu" onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.open = false; }}>
+        <summary>Edit</summary>
+        <div className="topology-tool-popover">
       <button onClick={arrangeDiagram} title="Arrange source-to-load"><LayoutGrid size={14} /> Arrange</button>
       <button disabled={selectedIds.size !== 2} onClick={connectSelected} title="Connect the first selected element to the most recently selected element"><Link2 size={14} /> Connect selected</button>
       <button className={linkFrom ? "active" : ""} disabled={!selectedId} onClick={() => linkFrom ? (setLinkFrom(null), setWirePointer(null), onStatus("Pending wire cancelled")) : startWire(selectedId)} title={linkFrom ? "Cancel the pending wire" : "Start a wire at the selected element; then click a compatible destination port"}><GitBranch size={14} /> {linkFrom ? "Cancel wire" : "Wire from selected"}</button>
       <button className={pendingDestructive === "reset" ? "danger-confirm" : ""} onClick={() => runDestructive("reset")} title="Reset to the topology opened in this workbench"><RotateCcw size={14} /> {pendingDestructive === "reset" ? "Confirm reset" : "Reset"}</button>
       <button className={pendingDestructive === "clear" ? "danger-confirm" : ""} onClick={() => runDestructive("clear")} title="Delete every element and connection from this sheet"><Trash2 size={14} /> {pendingDestructive === "clear" ? "Confirm clear" : "Clear"}</button>
+        </div>
+      </details>
       <div className="topology-view-switch">
         <button className={view === "diagram" ? "active" : ""} onClick={() => setView("diagram")} title="Block diagram"><GitBranch size={14} /></button>
         <button className={view === "text" ? "active" : ""} onClick={() => setView("text")} title="Synchronized text description"><FileText size={14} /></button>
@@ -550,12 +563,11 @@ export default function TopologyEditor({
         <button className={view === "rails" ? "active" : ""} onClick={() => setView("rails")} title="Rail summary"><BarChart3 size={14} /></button>
         </>}
       </div>
-      <span className="topology-divider" />
-      <label className="topology-filter"><Search size={13} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Filter node, net, reference" /></label>
-      {domain === "pi" && <label className="topology-check"><input type="checkbox" checked={showReturns} onChange={event => setShowReturns(event.target.checked)} /> Ground returns</label>}
-      <button onClick={() => { setInspectorOpen(value => !value); setFitPending(true); }}><Settings2 size={14} /> {inspectorOpen ? "Hide properties" : "Properties"}</button>
-      <button className="topology-use" onClick={useForAnalysis}><Save size={14} /> {domain === "pi" ? "Use for analysis" : "Save channel setup"}</button>
-      <button className={helpOpen ? "active" : ""} onClick={() => setHelpOpen(value => !value)} title={`${treeName} workflow help`}><CircleHelp size={14} /> Help</button>
+      <label className="topology-filter" aria-label="Filter schematic elements"><Search size={13} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Filter node, net, reference" /></label>
+      <button aria-pressed={inspectorOpen} onClick={() => { setInspectorOpen(value => !value); setFitPending(true); }}><Settings2 size={14} /> {inspectorOpen ? "Hide properties" : "Properties"}</button>
+      {onOpenStudio && <button className="spike-control--compact" onClick={onOpenStudio} title="Open the circuit workspace in SPIKES Studio to review models and explicit circuit bindings"><Network size={14} /> Circuit</button>}
+      <button className="topology-use spike-control--primary" onClick={useForAnalysis}><Save size={14} /> {domain === "pi" ? "Use for analysis" : "Save channel setup"}</button>
+      <button className={helpOpen ? "active" : ""} onClick={() => setHelpOpen(value => !value)} title={`${treeName} workflow help`}><CircleHelp size={14} /></button>
     </div>
     {domain === "pi" && <div className={`topology-budget ${budget.status}`}>
       <label>OPERATING CASE<select value={scenario.id} onChange={event => setScenarioId(event.target.value)}>{scenarios.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</select></label>
@@ -569,7 +581,7 @@ export default function TopologyEditor({
     </div>}
     <div className={`topology-layout ${inspectorOpen ? "" : "inspector-closed"}`}>
       <aside className="topology-palette"><label>ADD ELEMENT</label>{kinds[domain].map(item => {
-        return <button key={item.kind} onClick={() => addNode(item.kind)} title={`${item.label}: ${item.help}`} aria-label={`Add ${item.label}. ${item.help}`}>{paletteSymbol(item.kind)}<span>{item.label}<small>{item.help}</small></span><Plus size={12} /></button>;
+        return <button key={item.kind} onClick={() => addNode(item.kind)} title={`${item.label}: ${item.help}`} aria-label={`Add ${item.label}. ${item.help}`}>{paletteSymbol(item.kind)}<span>{item.label}</span><Plus size={12} /></button>;
       })}<div className="topology-help"><b>CONNECT</b><p>Click a compatible source port, move the pending wire, then click the exact destination port. Escape cancels. Two selected blocks can also use <strong>Connect selected</strong> when their canonical ports are unambiguous.</p><button onClick={() => setHelpOpen(true)}><CircleHelp size={12} /> Full {treeName} workflow help</button></div></aside>
       <main ref={canvasRef} className={`topology-canvas ${view !== "diagram" ? "data-view" : ""}`}
         tabIndex={0}
@@ -587,7 +599,7 @@ export default function TopologyEditor({
         }}
         onPointerDown={event => {
           if (event.button !== 0 && event.button !== 1) return;
-          if ((event.target as HTMLElement).closest(".topology-node, .topology-camera, .topology-path-wizard, .topology-generator")) return;
+          if ((event.target as HTMLElement).closest(".topology-node, .topology-camera, .topology-path-wizard, .topology-generator, .topology-empty button")) return;
           event.currentTarget.setPointerCapture(event.pointerId);
           setContextMenu(null); setPendingDestructive(null);
           if (linkFrom && event.button === 0 && !event.altKey) {
@@ -669,7 +681,7 @@ export default function TopologyEditor({
           <button className="danger" onClick={() => { runDestructive("clear"); setContextMenu(null); }}><Trash2 size={13} /> Clear canvas</button>
           <button onClick={() => { setHelpOpen(true); setContextMenu(null); }}><CircleHelp size={13} /> {treeName} workflow help</button>
         </div>}
-        {view === "diagram" ? <div className="topology-surface" style={{ width, height, transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.zoom})` }}>
+        {view === "diagram" ? <><div className="topology-surface" style={{ width, height, transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.zoom})` }}>
           <svg width={width} height={height}><defs><marker id="topology-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" /></marker></defs>{visibleEdges.map(edge => {
             const route = schematicWire(edge, visibleNodes, domain);
             if (!route) return null;
@@ -695,8 +707,9 @@ export default function TopologyEditor({
               <span className="topology-port-stack output">{topologyPorts(node, domain).filter(port => port.side === "right").map((port, index, ports) => <span key={port.id} style={{ top: `${(index + 1) * 100 / (ports.length + 1)}%` }} data-topology-port="output" data-port-id={port.id} role="button" tabIndex={0} className={`topology-port output ${port.direction}`} onPointerDown={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); linkFrom ? finishWire(node.id, port.id) : startWire(node.id, port.id); }} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") linkFrom ? finishWire(node.id, port.id) : startWire(node.id, port.id); }} title={`${port.label}: ${port.direction} ${port.kind} port on ${node.label}`}><i /><small>{port.label}</small></span>)}</span>
             </button>;
           })}
+        </div>
           {!visibleNodes.length && <div className="topology-empty"><Network size={28} /><b>No topology nodes</b><span>Generate a schematic from your inputs, extract the board, or place a symbol.</span><button onClick={() => setGeneratorOpen(true)}>Generate from inputs</button></div>}
-        </div> : view === "text" ? <section className="topology-text-panel" aria-label={`${domain === "pi" ? "Power Tree" : "Channel Tree"} text equivalent`}>
+        </> : view === "text" ? <section className="topology-text-panel" aria-label={`${domain === "pi" ? "Power Tree" : "Channel Tree"} text equivalent`}>
           <header><div><b>READ-ONLY TEXT EQUIVALENT</b><span>Synchronized from the authoritative topology JSON; intended for review, accessibility, copying, and diffs.</span></div><div><button onClick={() => void copyTopology("text")}><Copy size={13} /> Copy text</button><button onClick={exportTopologyText}><Download size={13} /> Export text</button><button onClick={() => void copyTopology("json")}><Copy size={13} /> Copy JSON</button></div></header>
           <pre tabIndex={0}>{textEquivalent}</pre>
           <details><summary>Accessible topology outline</summary><ol>{[...model.nodes].sort((a, b) => a.label.localeCompare(b.label)).map(node => <li key={node.id}><b>{node.label}</b> — {node.kind}. Ports: {topologyPorts(node, domain).map(port => `${port.label} (${port.direction} ${port.kind})`).join(", ")}.</li>)}</ol><h4>Connections</h4><ol>{model.edges.map(edge => { const from = model.nodes.find(node => node.id === edge.from); const to = model.nodes.find(node => node.id === edge.to); const fromPort = from ? topologyPorts(from, domain).find(port => port.id === edge.fromPort) : undefined; const toPort = to ? topologyPorts(to, domain).find(port => port.id === edge.toPort) : undefined; return <li key={edge.id}>{from?.label ?? edge.from}.{fromPort?.label ?? "unspecified"} to {to?.label ?? edge.to}.{toPort?.label ?? "unspecified"}, {edge.kind}{edge.net ? ` on ${edge.net}` : ""}.</li>; })}</ol></details>

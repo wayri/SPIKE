@@ -9,7 +9,9 @@ from scripts.parity_component_admission_gate import ROOT, validate_receipt
 
 class ComponentAdmissionGateTests(unittest.TestCase):
     def setUp(self):
-        self.receipt = json.loads((ROOT / 'docs/validation/parity/WF01-S04C2.json').read_text())
+        backlog = json.loads((ROOT / 'docs/parity-capability-backlog-v1.json').read_text())
+        stage = next(item for item in backlog['stages'] if item['id'] == 'WF01-S04C2')
+        self.receipt = json.loads((ROOT / stage['evidence']).read_text())
 
     def test_current_native_receipt(self):
         validate_receipt(self.receipt)
@@ -35,10 +37,12 @@ class ComponentAdmissionGateTests(unittest.TestCase):
                 validate_receipt(receipt)
 
     def test_stale_runner_or_log_and_foreign_path_rejected(self):
-        for mutation in ('source', 'log', 'path'):
+        for mutation in ('source', 'metadata_source', 'log', 'path'):
             receipt = copy.deepcopy(self.receipt)
             if mutation == 'source':
                 receipt['sources']['scripts/parity_component_admission_gate.py'] = '0' * 64
+            elif mutation == 'metadata_source':
+                receipt['sources']['python/spike_core/project_member_metadata.py'] = '0' * 64
             elif mutation == 'log':
                 receipt['log_sha256'] = '0' * 64
             else:

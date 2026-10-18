@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import * as THREE from "three";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const { appendProceduralDrillHoles, proceduralPadDrillPoints, proceduralPadDrillPath } = await importTestTypescript("proceduralDrillGeometry");
+const localSlot = proceduralPadDrillPath({drill:1,drill_size:[3,1],drill_shape:"oval"},2).getPoints();
+assert.equal(Math.max(...localSlot.map(p=>p.x))-Math.min(...localSlot.map(p=>p.x)),6);
+assert.equal(Math.max(...localSlot.map(p=>p.y))-Math.min(...localSlot.map(p=>p.y)),2);
+assert.ok(Math.abs(localSlot[0].y-1)<1e-9,"pad-local hole reflects source Y and leaves mesh rotation to the caller");
+const localRound=proceduralPadDrillPath({drill:1},2).getPoints();
+assert.equal(Math.max(...localRound.map(p=>p.x))-Math.min(...localRound.map(p=>p.x)),2);
+for(const input of [{drill:0},{drill:-1},{drill:NaN},{drill:1,drill_size:[1,NaN],drill_shape:"oval"},{drill:1,drill_size:[1,0],drill_shape:"oval"}]) assert.equal(proceduralPadDrillPath(input,1),null);
+for(const scale of [0,-1,NaN,Infinity]) assert.equal(proceduralPadDrillPath({drill:1},scale),null);
+const project = ([x,y]) => new THREE.Vector2(x,-y);
+const shape = () => new THREE.Shape([[0,0],[20,0],[20,-20],[0,-20]].map(([x,y])=>new THREE.Vector2(x,y)));
+const pad = (id,at,drill=1,extras={}) => ({id,at,drill,rotation:0,...extras});
+const via = (id,at,layers) => ({id,at,drill:.5,layers});
+const board = {pads:[pad("round",[5,5]),pad("slot",[10,10],1,{drill_size:[3,1],drill_shape:"oval",rotation:90}),pad("duplicate",[5,5])],vias:[via("through",[15,15],["F.Cu","B.Cu"]),via("blind",[16,16],["F.Cu","In1.Cu"]),via("buried",[17,17],["In1.Cu","In2.Cu"])]};
+const target=shape(), result=appendProceduralDrillHoles(target,board,project);
+assert.deepEqual(result,{added:3,duplicates:1,diagnostics:[]});
+assert.equal(target.holes.length,3,"only complete through bores pierce laminate");
+const slot=proceduralPadDrillPoints([10,10],3,1,90);
+assert.ok(Math.abs(Math.max(...slot.map(p=>p[0]))-Math.min(...slot.map(p=>p[0]))-1)<1e-9);
+assert.ok(Math.abs(Math.max(...slot.map(p=>p[1]))-Math.min(...slot.map(p=>p[1]))-3)<1e-9,"slot follows pad rotation");
+const geometry=new THREE.ShapeGeometry(target,16), positions=geometry.attributes.position, index=geometry.index;
+let area=0;
+for(let i=0;i<index.count;i+=3){const a=new THREE.Vector2().fromBufferAttribute(positions,index.getX(i)),b=new THREE.Vector2().fromBufferAttribute(positions,index.getX(i+1)),c=new THREE.Vector2().fromBufferAttribute(positions,index.getX(i+2));area+=Math.abs((b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x))/2;}
+assert.ok(Math.abs(area-(400-Math.PI*.5**2-(2+Math.PI*.5**2)-Math.PI*.25**2))<.02,"triangulation removes round and routed slot areas");
+const cutout=shape();cutout.holes.push(new THREE.Path([[3,-3],[7,-3],[7,-7],[3,-7]].map(([x,y])=>new THREE.Vector2(x,y))));
+assert.equal(appendProceduralDrillHoles(cutout,{pads:[pad("in-cutout",[5,5])],vias:[]},project).duplicates,1);
+const overlap=appendProceduralDrillHoles(shape(),{pads:[pad("a",[5,5],2),pad("b",[6,5],2),pad("edge",[0,10],2)],vias:[]},project);
+assert.equal(overlap.added,1);assert.deepEqual(overlap.diagnostics.map(row=>row.reason).sort(),["outline-intersection","overlapping-drill"]);
+const invalid=appendProceduralDrillHoles(shape(),{pads:[pad("bad",[2,2],1,{drill_size:[1,NaN],drill_shape:"oval"})],vias:[]},project);
+assert.equal(invalid.diagnostics[0].reason,"invalid-drill");
+const dense=new THREE.Shape([[0,0],[202,0],[202,-102],[0,-102]].map(([x,y])=>new THREE.Vector2(x,y)));
+const denseResult=appendProceduralDrillHoles(dense,{pads:Array.from({length:5000},(_,i)=>pad(String(i),[2+i%100*2,2+Math.floor(i/100)*2],.4)),vias:[]},project);
+assert.equal(denseResult.added,5000,"dense drills have no silent count cap");assert.equal(denseResult.diagnostics.length,0);
+console.log("Procedural drill geometry passed: circular/rotated slot area, through span, duplicates, outline/overlap diagnostics, and 5000 bores");

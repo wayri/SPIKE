@@ -107,6 +107,10 @@ out, pause, and stop apply to the supervised child session. Values can be
 truncated by the debug protocol. Locals are bounded string representations; the
 debugger does not expand or evaluate object properties. A debug session ending
 unexpectedly is reported as failed rather than as a completed analysis.
+The timeout includes child startup and keeps its original deadline. Status
+polling enforces that deadline with bounded process-tree cleanup while startup
+imports run, before the child's watchdog initializes. This startup fallback
+requires polling; it is not an OS-enforced guarantee for an unobserved startup.
 
 Line breakpoints apply to the script that started the session. Step into can
 enter local Python modules under that script's working directory; stack frame

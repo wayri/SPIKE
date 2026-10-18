@@ -22,8 +22,10 @@ class ComponentInsertDialogTests(unittest.TestCase):
         a=InsertDialog(parent,record);b=InsertDialog(parent,record)
         try:
             self.assertEqual(a.book.GetPageText(a.book.GetSelection()),'Value & parameters')
-            self.assertEqual(a.book.GetPageText(1),'Pins & connections')
-            self.assertTrue(all(c.GetParent()==a.book.GetPage(1) for c in a.pins.values()))
+            pages=[a.book.GetPageText(index) for index in range(a.book.GetPageCount())]
+            self.assertEqual(pages,['Value & parameters','Parasitics & temperature','Pins & connections'])
+            pin_page=a.book.GetPage(pages.index('Pins & connections'))
+            self.assertTrue(all(c.GetParent()==pin_page for c in a.pins.values()))
             self.assertTrue(all(c.GetValue()!='0' for c in a.pins.values()))
             self.assertNotEqual(a.pins['P'].GetValue(),b.pins['P'].GetValue())
             a.parameter_fields['r'].SetValue('4.7k');edited=a.edited_record();self.assertEqual(edited['parameters']['r'],4700)
@@ -38,6 +40,41 @@ class ComponentInsertDialogTests(unittest.TestCase):
             a.parameter_fields['r'].SetValue('not a value')
             with self.assertRaises(ValueError):a.edited_record()
         finally:a.Destroy();b.Destroy();parent.Destroy()
+
+    def test_ideal_nonideal_draft_transition_and_inserted_netlist(self):
+        import wx
+        from spikes_studio.component_panel import InsertDialog
+        from spikes_studio.component_catalog import catalog
+        from spikes_studio.document import Document,RC_DECK
+        from spikes_studio.library_browser import insertion_plan,apply_insertion
+        from spikes_studio.themes import PALETTES
+        app=wx.GetApp() or wx.App(False);parent=wx.Frame(None)
+        owner=SimpleNamespace(palette=PALETTES['Light'],doc=Document.from_netlist(RC_DECK));parent.owner=owner
+        record=next(r for r in catalog()['records'] if r['family']=='resistor');dialog=InsertDialog(parent,record)
+        try:
+            self.assertEqual(dialog.mode_choice.GetStringSelection(),'Ideal nominal')
+            dialog.mode_choice.SetSelection(1);dialog.update_fidelity_controls()
+            dialog.parameter_fields['r'].SetValue('100')
+            dialog.parameter_fields['series_resistance_ohm'].SetValue('2')
+            nonideal=dialog.edited_record()
+            self.assertEqual(nonideal['model_type'],'lumped_passive_rlc_v1')
+            plan=insertion_plan(owner.doc,nonideal,{'P':'source','N':'0'},primitive=True)
+            apply_insertion(owner.doc,plan,nonideal['id'])
+            self.assertIn('RSER P INT1 2',owner.doc.data['source'])
+            self.assertIn('RBODY INT1 N 100',owner.doc.data['source'])
+            self.assertIn('XCAT1 source 0',owner.doc.data['source'])
+            dialog.mode_choice.SetSelection(0);dialog.update_fidelity_controls()
+            ideal=dialog.edited_record()
+            self.assertNotIn('model_type',ideal)
+            self.assertEqual(ideal['parameters'],{'r':100})
+            self.assertEqual(dialog.parameter_fields['series_resistance_ohm'].GetValue(),'2')
+            dialog.parameter_fields['series_resistance_ohm'].SetValue('unfinished draft')
+            self.assertEqual(dialog.edited_record()['parameters'],{'r':100})
+            dialog.mode_choice.SetSelection(1);dialog.update_fidelity_controls()
+            with self.assertRaises(ValueError):dialog.edited_record()
+            dialog.parameter_fields['series_resistance_ohm'].SetValue('2')
+            self.assertEqual(dialog.edited_record()['parameters']['series_resistance_ohm'],2)
+        finally:dialog.Destroy();parent.Destroy()
 
     def test_manufacturer_selection_and_custom_draft_are_preserved(self):
         import wx

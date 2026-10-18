@@ -95,3 +95,15 @@ const inheritedGate = searchableFocusCommands([{ id: "offline", label: "Offline 
   { id: "offline-run", label: "Run offline action", run: () => { throw new Error("must remain gated"); } },
 ] }]);
 assert.equal(inheritedGate[0].disabled, true, "a disabled parent gates descendants projected into universal search");
+
+// The retained menu is an overlay, independent of editor grid rows and visibility.
+const shell = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
+const focusCss = readFileSync(new URL("../src/focusWorkspace.css", import.meta.url), "utf8");
+assert.match(focusCss, /\.app-shell\.focus-shell \.workspace\.focus-workspace > \.focus-floating-slot\[data-panel-id="command-menu"\]\s*\{\s*grid-area:auto;/, "menu height must use the full workspace, never the document-tab track");
+assert.ok(shell.includes('commandMenuMounted.current && <FloatingPanel'), "hiding must not unmount menu search, navigation or scroll state");
+assert.ok(shell.includes('active={commandMenuOpen&&!commandPanelDetached}'), "the retained menu hides without destruction");
+assert.ok(shell.includes('commandsOpen={false} onActivate={setFocusTool}'), "opening an overlay must preserve the visible editor behind it");
+assert.ok(shell.includes('showWorkspaceBar={false}'), "Clean chrome must not duplicate the workspace dropdown with a permanent tabs row");
+
+assert.ok(shell.includes('compact={appSettings.interfaceMode==="clean"}'), "Clean layout must select the compact workspace presentation");
+assert.ok(focusCss.includes('--focus-command-top'), "menu placement must leave its View toggle reachable");

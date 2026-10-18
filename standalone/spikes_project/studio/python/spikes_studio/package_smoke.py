@@ -31,6 +31,9 @@ def run(library,destination):
             result=job.result
             check(result['status']=='completed','packaged solver reports completion')
             check(bool(result['data']),'packaged native waveform exists')
+            measurement=result.get('measurements',{}).get('startup_probe',{})
+            check(measurement.get('status')=='completed','spawned worker loads lightweight measurement reducer')
+            check(__import__('math').isfinite(measurement['value']),'spawned measurement returns a finite recorded voltage')
             finish()
         except Exception:finish(traceback.format_exc())
     def begin():
@@ -56,6 +59,42 @@ def run(library,destination):
             actual={row['id'] for row in panel.visible}
             check(bool(expected) and actual==expected and len(actual)==len(panel.visible),
                   'catalog search works')
+            from .part_form_checks import verify as verify_part_forms
+            verify_part_forms(frame,check)
+            from .controller_boards import records
+            from .firmware_image import TARGETS
+            from .firmware_window import FirmwareWindow
+            check(len(records())==17,'expanded sourced controller board library bundled')
+            manager=FirmwareWindow(frame)
+            check(set(manager.target_ids)==set(TARGETS),'native firmware manager exposes only admitted board targets')
+            check(manager.session is None and not manager.trust.GetValue(),'opening firmware manager never executes or grants trust')
+            manager.close()
+            hub=frame.manufacturer_hub
+            check(len(hub.products.catalog['records'])==108,'sourced manufacturer product catalog bundled separately from generic presets')
+            hub.products.search.SetValue('AD620');hub.products.refresh()
+            check(any(row['part_number']=='AD620' for row in hub.products.listing.rows),'manufacturer product search uses real product identities')
+            from .ltspice_local_library import index_library,read_model_declaration
+            import tempfile
+            with tempfile.TemporaryDirectory() as folder:
+                sample=Path(folder)/'own-fixture.mod'
+                sample.write_bytes('.model PACKAGECHECK D(Is=1p)\n* retained comment\n+ N=1.5\n'.encode('utf-16-le'))
+                inventory=index_library(folder);card=read_model_declaration(inventory,inventory['models'][0]['id'])
+                check('N=1.5' in card,'local model index preserves UTF16 comment-separated continuations')
+                check('original_source' not in inventory['models'][0],'metadata index does not embed vendor model bodies')
+            import os
+            if os.environ.get('SPIKES_TEST_FIRMWARE')=='1':
+                from .renode_process import find_runtime
+                from .firmware_session import FirmwareSession
+                image=resource_dir('docs').parents[1]/'examples/controller_firmware/nrf52840_gpio_echo.bin'
+                with FirmwareSession(find_runtime(),image,'nordic-nrf52840-dk-pca10056-r3-0-2',trusted=True) as firmware:
+                    firmware.run_for(.0001);firmware.set_gpio('0',2,True);firmware.run_for(.0001)
+                    check(firmware.output_level('0',3),'packaged native firmware executes GPIO instructions')
+                    firmware.uart_send(b'K');firmware.run_for(.01)
+                    check(firmware.uart_read()==b'K','packaged native UARTE EasyDMA echo')
+            from .workflow_package_checks import verify as verify_workflow
+            verify_workflow(frame,check)
+            from .wiring_package_checks import verify as verify_wiring
+            verify_wiring(frame,check,destination.parent/(destination.stem+'-ui'))
             frame.pin_browser(True);check(panel.GetParent() is frame.browser_side,'browser pins')
             frame.canvas.selected={frame.doc.data['components'][1]['id']};frame.pin_properties(True)
             check(frame.properties_editor is not None,'editable properties pin')
@@ -67,7 +106,8 @@ def run(library,destination):
             preview.figure.savefig(destination.with_suffix('.preview.png'))
             check(len(preview.figure.axes)==2,'graphical model and analytical curve render')
             preview.Destroy()
-            job=BatchRun(RC_DECK,str(library));wx.CallLater(100,poll)
+            measured=RC_DECK.replace('.end','.meas tran startup_probe FIND V(out) AT=1m\n.end')
+            job=BatchRun(measured,str(library));wx.CallLater(100,poll)
         except Exception:finish(traceback.format_exc())
     wx.CallLater(400,begin);app.MainLoop()
     return 0 if destination.is_file() and json.loads(destination.read_text())['passed'] else 1
