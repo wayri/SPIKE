@@ -6,9 +6,9 @@ external approvals.
 
 ## Applied state (2026-10-18)
 
-- Public welcome-channel invite: [Join SPIKE](https://discord.gg/EvGh3cXtk).
-  Discord reports a 30-day expiration and unlimited uses. A permanent invite
-  remains pending owner approval; do not imply this link never expires.
+- Public welcome-channel invite: [Join SPIKE](https://discord.gg/UCmeR9ypzQ).
+  Verified permanent invite: no expiration, unlimited uses, landing in
+  read-only `welcome-and-rules`. Temporary membership is off.
 
 - GitHub's public repository description and Discord's saved server description
   now use the PCB-focused, board-to-complete-assembly positioning. The welcome
@@ -46,8 +46,19 @@ external approvals.
 - Existing text channels `general`, `updates`, `bugs`, `help`, and `show-case`,
   and the existing `General` voice channel, were preserved. No messages were
   posted. The public invite is recorded above; no role, bot, token, or administrator grant was created.
-- Optional AutoMod, Onboarding, moderator roles, and the remaining channel plan
-  below were not configured and remain proposals.
+- Native AutoMod is enabled: **Block Mention Spam** (5 unique mentions) and
+  **Block Suspected Spam Content** block messages and send alerts to private
+  `moderation-alerts` (`1561396325952524388`). Only the owner can currently see
+  that channel; it is excluded from these filters to avoid alert loops. No
+  automatic timeout or ban was enabled. Discord notes English-language spam
+  support and administrator/Manage Server exemptions.
+- Verification is **Medium** (verified email and account older than 5 minutes);
+  sensitive image filtering applies to all members in non-age-restricted
+  channels. Requiring 2FA for moderator actions remains pending: the owner must
+  enable 2FA on their own account first.
+- Onboarding, moderator roles, additional filters, and the remaining channel
+  plan below remain proposals. Saved settings were inspected; a non-privileged
+  end-to-end moderation test has not been performed.
 - GitHub ruleset `25144029` is now **Protect main**, active on the default
   branch, with PRs, resolved conversations, zero required approvals, linear
   history, deletion protection, force-push protection, and no bypass actors.
