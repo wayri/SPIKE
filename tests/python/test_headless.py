@@ -33,8 +33,18 @@ class HeadlessTests(unittest.TestCase):
 
     def test_interruption_and_supervisor_start_failure_reap_worker(self):
         popen = subprocess.Popen
-        for target, exception, expected in (
-            ('python.spike_core.headless.time.sleep', KeyboardInterrupt(), 'SPIKE-HEADLESS-CANCELLED'),
+        real_sleep = time.sleep
+        interrupted = False
+
+        def interrupt_once(delay):
+            nonlocal interrupted
+            if not interrupted:
+                interrupted = True
+                raise KeyboardInterrupt()
+            return real_sleep(delay)
+
+        for target, effect, expected in (
+            ('python.spike_core.headless.time.sleep', interrupt_once, 'SPIKE-HEADLESS-CANCELLED'),
             ('python.spike_core.headless.threading.Thread.start', RuntimeError('thread unavailable'), 'SPIKE-HEADLESS-START'),
         ):
             with self.subTest(expected=expected):
@@ -46,7 +56,7 @@ class HeadlessTests(unittest.TestCase):
                     return process
 
                 with patch('python.spike_core.headless.subprocess.Popen', side_effect=capture), \
-                        patch(target, side_effect=exception):
+                        patch(target, side_effect=effect):
                     result = self.child('import time; time.sleep(30)')
                 self.assertEqual(result['error_code'], expected)
                 self.assertNotIn('cleanup_warning', result)

@@ -37046,10 +37046,10 @@
     },
     {
       "path": "tests/python/test_headless.py",
-      "git_blob": "c50fcf3841ed869469cbcbc259b3d5b7ec25038f",
+      "git_blob": "beefbbb78c6baf35065399c8309b2ab98d10147b",
       "mode": "100644",
-      "bytes": 14232,
-      "sha256": "404dbcfe19835e982e6a78997163f88eab5a0a9a3aec8a6eb1a952f4b18e4c69"
+      "bytes": 14497,
+      "sha256": "463ccaca171a427e4679d9aadfe4c632f02f06642dedeadd4683e6039985be08"
     },
     {
       "path": "tests/python/test_high_layer_import.py",
