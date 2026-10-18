@@ -44,8 +44,8 @@
       "icons/icon.ico"
     ],
     "licenseFile": "../../LICENSE",
-    "shortDescription": "Electronic systems integrity analysis workbench",
-    "longDescription": "Offline-first electronic systems integrity workbench for PCB power integrity, signal integrity, thermal, and EMI workflows.",
+    "shortDescription": "PCB-focused multiphysics simulation workbench",
+    "longDescription": "Local-first multiphysics workbench focused on PCBs and complete assemblies, with electrical, circuit, thermal, airflow, selected EM/RF and bounded mechanical workflows.",
     "fileAssociations": [
       {
         "ext": [
