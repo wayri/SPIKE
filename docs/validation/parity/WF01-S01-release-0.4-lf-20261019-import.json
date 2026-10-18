@@ -1,0 +1,591 @@
+{
+  "design": {
+    "design_id": "db6cd98f-e218-5630-9a94-80e7cd0dd375",
+    "name": "coupon",
+    "source": {
+      "source_format": "kicad",
+      "source_digest": "0d1722147daa4de7c63e64a7c2a2970c679dca42926efde6651328663eb8c05a",
+      "native_id": "kicad-0d1722147daa4de7c63e64a7",
+      "artifact_path": "C:\\Users\\yawar\\.codex\\worktrees\\spike-release-0-4\\SPIKE\\benchmarks\\parity-import\\coupon.kicad_pcb"
+    },
+    "frame": {
+      "frame_id": "board",
+      "parent_frame_id": "",
+      "units": "mm",
+      "handedness": "right",
+      "transform": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "contract": "spike/design-ir/v2",
+    "materials": [
+      {
+        "id": "794c7c01-9a26-5145-983c-7a15d88bd4a8",
+        "source_id": "material:copper:4e3c290712aabb51",
+        "name": "copper",
+        "extensions": {
+          "spike.v1": {
+            "name": "F.Cu",
+            "type": "copper",
+            "thickness": 0.035
+          }
+        },
+        "material_class": "copper",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": null,
+        "loss_tangent": null,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      },
+      {
+        "id": "0188d517-7052-5c84-8a82-827794230ebb",
+        "source_id": "44",
+        "name": "user",
+        "extensions": {
+          "spike.v1": {
+            "id": 44,
+            "name": "Edge.Cuts",
+            "type": "user",
+            "user_name": ""
+          }
+        },
+        "material_class": "user",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": null,
+        "loss_tangent": null,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      },
+      {
+        "id": "2321030e-6a34-5ac9-925d-23293133f3ad",
+        "source_id": "material:FR4:b71f9e472c87bc77",
+        "name": "FR4",
+        "extensions": {
+          "spike.v1": {
+            "name": "dielectric 1",
+            "type": "core",
+            "thickness": 1.53,
+            "material": "FR4",
+            "epsilon_r": 4.2,
+            "loss_tangent": 0.02
+          }
+        },
+        "material_class": "core",
+        "conductivity_s_per_m": null,
+        "relative_permittivity": 4.2,
+        "loss_tangent": 0.02,
+        "thermal_conductivity_w_per_mk": null,
+        "density_kg_per_m3": null,
+        "heat_capacity_j_per_kgk": null
+      }
+    ],
+    "layers": [
+      {
+        "id": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+        "source_id": "0",
+        "name": "F.Cu",
+        "extensions": {
+          "spike.v1": {
+            "id": 0,
+            "name": "F.Cu",
+            "type": "signal",
+            "user_name": ""
+          },
+          "spike.v1.stackup": {
+            "name": "F.Cu",
+            "type": "copper",
+            "thickness": 0.035
+          }
+        },
+        "layer_type": "copper",
+        "order": 0,
+        "z_mm": 0.0,
+        "thickness_mm": 0.035,
+        "material_id": "794c7c01-9a26-5145-983c-7a15d88bd4a8",
+        "region_ids": []
+      },
+      {
+        "id": "4e3149af-9fd2-5fcd-afb9-0a4ed2e851f2",
+        "source_id": "source:b2b59fbfffbca2362aef37bff5b5f040c2676e22f3fb13810115b27cdc0e2880",
+        "name": "dielectric 1",
+        "extensions": {
+          "spike.v1.stackup": {
+            "name": "dielectric 1",
+            "type": "core",
+            "thickness": 1.53,
+            "material": "FR4",
+            "epsilon_r": 4.2,
+            "loss_tangent": 0.02
+          }
+        },
+        "layer_type": "core",
+        "order": 1,
+        "z_mm": 0.035,
+        "thickness_mm": 1.53,
+        "material_id": "2321030e-6a34-5ac9-925d-23293133f3ad",
+        "region_ids": []
+      },
+      {
+        "id": "cba342a3-fef5-5810-9dff-b41c9e9d0b9b",
+        "source_id": "31",
+        "name": "B.Cu",
+        "extensions": {
+          "spike.v1": {
+            "id": 31,
+            "name": "B.Cu",
+            "type": "signal",
+            "user_name": ""
+          },
+          "spike.v1.stackup": {
+            "name": "B.Cu",
+            "type": "copper",
+            "thickness": 0.035
+          }
+        },
+        "layer_type": "copper",
+        "order": 2,
+        "z_mm": 1.565,
+        "thickness_mm": 0.035,
+        "material_id": "794c7c01-9a26-5145-983c-7a15d88bd4a8",
+        "region_ids": []
+      },
+      {
+        "id": "7ac364bb-afa0-5c7a-96c9-8daf09de1bda",
+        "source_id": "44",
+        "name": "Edge.Cuts",
+        "extensions": {
+          "spike.v1": {
+            "id": 44,
+            "name": "Edge.Cuts",
+            "type": "user",
+            "user_name": ""
+          }
+        },
+        "layer_type": "user",
+        "order": 3,
+        "z_mm": 1.5999999999999999,
+        "thickness_mm": null,
+        "material_id": "0188d517-7052-5c84-8a82-827794230ebb",
+        "region_ids": []
+      }
+    ],
+    "nets": [
+      {
+        "id": "57ea7e11-5731-507f-b322-1d11cead2c53",
+        "source_id": "1",
+        "name": "SIGNAL",
+        "extensions": {
+          "spike.v1": {
+            "id": 1,
+            "name": "SIGNAL"
+          }
+        },
+        "net_class": "signal",
+        "aliases": []
+      }
+    ],
+    "tracks": [
+      {
+        "id": "223f5561-4aaa-5e04-a50a-3d434c23574f",
+        "source_id": "11111111-1111-4111-8111-111111111111",
+        "name": "",
+        "extensions": {
+          "spike.v1": {
+            "start": [
+              2.5,
+              -3.0
+            ],
+            "end": [
+              12.5,
+              -3.0
+            ],
+            "width": 0.25,
+            "layer": "F.Cu",
+            "net_id": 1,
+            "net_name": "SIGNAL",
+            "id": "11111111-1111-4111-8111-111111111111",
+            "uuid": "11111111-1111-4111-8111-111111111111"
+          }
+        },
+        "net_id": "57ea7e11-5731-507f-b322-1d11cead2c53",
+        "layer_id": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+        "start_mm": [
+          2.5,
+          -3.0
+        ],
+        "end_mm": [
+          12.5,
+          -3.0
+        ],
+        "width_mm": 0.25
+      },
+      {
+        "id": "bb63da69-e639-555c-9270-b1306c14316f",
+        "source_id": "33333333-3333-4333-8333-333333333333",
+        "name": "",
+        "extensions": {
+          "spike.v1": {
+            "start": [
+              12.5,
+              -3.0
+            ],
+            "end": [
+              12.5,
+              7.0
+            ],
+            "width": 0.5,
+            "layer": "B.Cu",
+            "net_id": 1,
+            "net_name": "SIGNAL",
+            "id": "33333333-3333-4333-8333-333333333333",
+            "uuid": "33333333-3333-4333-8333-333333333333"
+          }
+        },
+        "net_id": "57ea7e11-5731-507f-b322-1d11cead2c53",
+        "layer_id": "cba342a3-fef5-5810-9dff-b41c9e9d0b9b",
+        "start_mm": [
+          12.5,
+          -3.0
+        ],
+        "end_mm": [
+          12.5,
+          7.0
+        ],
+        "width_mm": 0.5
+      }
+    ],
+    "arcs": [],
+    "zones": [],
+    "pads": [],
+    "vias": [
+      {
+        "id": "ad7342ba-7deb-5a50-8034-48b7b3dd72a5",
+        "source_id": "22222222-2222-4222-8222-222222222222",
+        "name": "",
+        "extensions": {
+          "spike.v1": {
+            "at": [
+              12.5,
+              -3.0
+            ],
+            "size": 0.8,
+            "drill": 0.4,
+            "layers": [
+              "F.Cu",
+              "B.Cu"
+            ],
+            "start_layer": "F.Cu",
+            "end_layer": "B.Cu",
+            "type": "through",
+            "net_id": 1,
+            "net_name": "SIGNAL",
+            "id": "22222222-2222-4222-8222-222222222222",
+            "uuid": "22222222-2222-4222-8222-222222222222"
+          }
+        },
+        "net_id": "57ea7e11-5731-507f-b322-1d11cead2c53",
+        "center_mm": [
+          12.5,
+          -3.0
+        ],
+        "diameter_mm": 0.8,
+        "drill_mm": 0.4,
+        "start_layer_id": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+        "end_layer_id": "cba342a3-fef5-5810-9dff-b41c9e9d0b9b",
+        "plating_mm": null,
+        "via_type": "through"
+      }
+    ],
+    "drills": [],
+    "castellations": [],
+    "pins": [],
+    "components": [],
+    "component_bonds": [],
+    "connectors": [],
+    "regions": [],
+    "bends": [],
+    "models": [],
+    "constraints": [],
+    "variants": [],
+    "simulation_models": [],
+    "issues": [],
+    "vendor_extensions": {},
+    "metadata": {
+      "board_outline_drawings": [
+        {
+          "id": "44444444-4444-4444-8444-444444444444",
+          "type": "rect",
+          "points": [
+            [
+              0.0,
+              -5.0
+            ],
+            [
+              15.0,
+              -5.0
+            ],
+            [
+              15.0,
+              10.0
+            ],
+            [
+              0.0,
+              10.0
+            ],
+            [
+              0.0,
+              -5.0
+            ]
+          ],
+          "layer": "Edge.Cuts",
+          "width": 0.1
+        }
+      ],
+      "arcs": [],
+      "model_references": [],
+      "board_outline_rings": [
+        {
+          "role": "outer",
+          "start_mm": [
+            0.0,
+            -5.0
+          ],
+          "segments": [
+            {
+              "kind": "line",
+              "end_mm": [
+                0.0,
+                10.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                15.0,
+                10.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                15.0,
+                -5.0
+              ]
+            },
+            {
+              "kind": "line",
+              "end_mm": [
+                0.0,
+                -5.0
+              ]
+            }
+          ]
+        }
+      ],
+      "board_bbox": {
+        "min_x": 0.0,
+        "max_x": 15.0,
+        "min_y": -5.0,
+        "max_y": 10.0
+      },
+      "board_bounds_mm": [
+        0.0,
+        -5.0,
+        15.0,
+        10.0
+      ],
+      "parser": "KicadParser",
+      "parser_revision": "kicad-pad-frame-v3",
+      "parser_log": [
+        "Parsing coupon.kicad_pcb with S-Exp parser...",
+        "Parsed: 1 nets, 2 tracks, 0 pads, 0 zones. Board: 20.0x20.0mm"
+      ],
+      "parser_diagnostics": [],
+      "footprint_models": 0,
+      "rigid_flex_region_count": 0,
+      "bend_count": 0,
+      "copper_layer_count": 2,
+      "stackup_missing_copper_layers": [],
+      "source_sha256": "0d1722147daa4de7c63e64a7c2a2970c679dca42926efde6651328663eb8c05a",
+      "importer_id": "kicad-pcb",
+      "importer_contract": "spike/importer-descriptor/v1",
+      "legacy_design_id": "kicad-0d1722147daa4de7c63e64a7",
+      "technology": "rigid",
+      "spike.v1.stackup": [
+        {
+          "name": "F.Cu",
+          "type": "copper",
+          "thickness": 0.035
+        },
+        {
+          "name": "dielectric 1",
+          "type": "core",
+          "thickness": 1.53,
+          "material": "FR4",
+          "epsilon_r": 4.2,
+          "loss_tangent": 0.02
+        },
+        {
+          "name": "B.Cu",
+          "type": "copper",
+          "thickness": 0.035
+        }
+      ],
+      "import_report": {
+        "importer_id": "kicad-pcb",
+        "source_format": "kicad",
+        "source_sha256": "0d1722147daa4de7c63e64a7c2a2970c679dca42926efde6651328663eb8c05a",
+        "source_size_bytes": 1002,
+        "status": "completed",
+        "contract": "spike/import-report/v1",
+        "coverage": {
+          "layers": 4,
+          "nets": 1,
+          "tracks": 2,
+          "arcs": 0,
+          "zones": 0,
+          "pads": 0,
+          "vias": 1,
+          "drills": 0,
+          "castellations": 0,
+          "components": 0,
+          "models": 0
+        },
+        "inferred": [],
+        "unsupported": [],
+        "geometry_errors": [],
+        "object_map": {
+          "material:copper:4e3c290712aabb51": "794c7c01-9a26-5145-983c-7a15d88bd4a8",
+          "44": "7ac364bb-afa0-5c7a-96c9-8daf09de1bda",
+          "material:FR4:b71f9e472c87bc77": "2321030e-6a34-5ac9-925d-23293133f3ad",
+          "0": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+          "source:b2b59fbfffbca2362aef37bff5b5f040c2676e22f3fb13810115b27cdc0e2880": "4e3149af-9fd2-5fcd-afb9-0a4ed2e851f2",
+          "31": "cba342a3-fef5-5810-9dff-b41c9e9d0b9b",
+          "1": "57ea7e11-5731-507f-b322-1d11cead2c53",
+          "11111111-1111-4111-8111-111111111111": "223f5561-4aaa-5e04-a50a-3d434c23574f",
+          "33333333-3333-4333-8333-333333333333": "bb63da69-e639-555c-9270-b1306c14316f",
+          "22222222-2222-4222-8222-222222222222": "ad7342ba-7deb-5a50-8034-48b7b3dd72a5"
+        },
+        "layer_order": [
+          "F.Cu",
+          "dielectric 1",
+          "B.Cu",
+          "Edge.Cuts"
+        ],
+        "model_resolution": {
+          "declared": 0,
+          "resolved": 0
+        },
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": true,
+            "reasons": []
+          },
+          "pi_ac": {
+            "ready": true,
+            "reasons": []
+          },
+          "si": {
+            "ready": true,
+            "reasons": []
+          },
+          "thermal": {
+            "ready": true,
+            "reasons": []
+          },
+          "emi": {
+            "ready": true,
+            "reasons": []
+          }
+        },
+        "diagnostics": []
+      }
+    }
+  },
+  "report": {
+    "importer_id": "kicad-pcb",
+    "source_format": "kicad",
+    "source_sha256": "0d1722147daa4de7c63e64a7c2a2970c679dca42926efde6651328663eb8c05a",
+    "source_size_bytes": 1002,
+    "status": "completed",
+    "contract": "spike/import-report/v1",
+    "coverage": {
+      "layers": 4,
+      "nets": 1,
+      "tracks": 2,
+      "arcs": 0,
+      "zones": 0,
+      "pads": 0,
+      "vias": 1,
+      "drills": 0,
+      "castellations": 0,
+      "components": 0,
+      "models": 0
+    },
+    "inferred": [],
+    "unsupported": [],
+    "geometry_errors": [],
+    "object_map": {
+      "material:copper:4e3c290712aabb51": "794c7c01-9a26-5145-983c-7a15d88bd4a8",
+      "44": "7ac364bb-afa0-5c7a-96c9-8daf09de1bda",
+      "material:FR4:b71f9e472c87bc77": "2321030e-6a34-5ac9-925d-23293133f3ad",
+      "0": "1da98068-7c2c-5bba-b01e-eeec4ec094ce",
+      "source:b2b59fbfffbca2362aef37bff5b5f040c2676e22f3fb13810115b27cdc0e2880": "4e3149af-9fd2-5fcd-afb9-0a4ed2e851f2",
+      "31": "cba342a3-fef5-5810-9dff-b41c9e9d0b9b",
+      "1": "57ea7e11-5731-507f-b322-1d11cead2c53",
+      "11111111-1111-4111-8111-111111111111": "223f5561-4aaa-5e04-a50a-3d434c23574f",
+      "33333333-3333-4333-8333-333333333333": "bb63da69-e639-555c-9270-b1306c14316f",
+      "22222222-2222-4222-8222-222222222222": "ad7342ba-7deb-5a50-8034-48b7b3dd72a5"
+    },
+    "layer_order": [
+      "F.Cu",
+      "dielectric 1",
+      "B.Cu",
+      "Edge.Cuts"
+    ],
+    "model_resolution": {
+      "declared": 0,
+      "resolved": 0
+    },
+    "solver_readiness": {
+      "pi_dc": {
+        "ready": true,
+        "reasons": []
+      },
+      "pi_ac": {
+        "ready": true,
+        "reasons": []
+      },
+      "si": {
+        "ready": true,
+        "reasons": []
+      },
+      "thermal": {
+        "ready": true,
+        "reasons": []
+      },
+      "emi": {
+        "ready": true,
+        "reasons": []
+      }
+    },
+    "diagnostics": []
+  }
+}

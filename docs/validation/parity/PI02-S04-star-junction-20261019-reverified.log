@@ -1,0 +1,14 @@
+test_cancel_after_actual_subsolve_and_invalid_result (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_cancel_after_actual_subsolve_and_invalid_result) ... ok
+test_original_material_mapping_ownership_and_generated_identity (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_original_material_mapping_ownership_and_generated_identity) ... ok
+test_positive_and_negative_feedback_against_independent_discrete_system (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_positive_and_negative_feedback_against_independent_discrete_system) ... ok
+test_range_exhaustion_and_resource_failures_publish_no_success (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_range_exhaustion_and_resource_failures_publish_no_success) ... ok
+test_strict_law_and_iteration_admission (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_strict_law_and_iteration_admission) ... ok
+test_underrelaxation_checks_raw_residual_and_reported_material_state (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_underrelaxation_checks_raw_residual_and_reported_material_state) ... ok
+test_zero_coefficient_and_zero_loss_equivalence (tests.python.test_pdn_dielectric_feedback.PdnDielectricFeedbackTests.test_zero_coefficient_and_zero_loss_equivalence) ... ok
+test_schema_and_actual_feedback_worker (tests.python.test_pdn_dielectric_feedback_contract.DielectricFeedbackContractTests.test_schema_and_actual_feedback_worker) ... ok
+test_worker_rejects_uncovered_materials_ranges_and_bad_iteration (tests.python.test_pdn_dielectric_feedback_contract.DielectricFeedbackContractTests.test_worker_rejects_uncovered_materials_ranges_and_bad_iteration) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 4.292s
+
+OK

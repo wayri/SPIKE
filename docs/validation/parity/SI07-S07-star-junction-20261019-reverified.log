@@ -1,0 +1,16 @@
+test_analytic_free_forced_damping_each_integral_and_boundary_storage (tests.python.test_sparameter_rlc_energy.EnergyTests.test_analytic_free_forced_damping_each_integral_and_boundary_storage) ... ok
+test_coupled_pwl_physical_quadrature_and_nonzero_ramp_chunk_additivity (tests.python.test_sparameter_rlc_energy.EnergyTests.test_coupled_pwl_physical_quadrature_and_nonzero_ramp_chunk_additivity) ... ok
+test_invalid_precision_work_and_cancellation_admissions (tests.python.test_sparameter_rlc_energy.EnergyTests.test_invalid_precision_work_and_cancellation_admissions) ... ok
+test_mixed_rl_rc_resistive_analytic_integrals_reference_and_time_scaling (tests.python.test_sparameter_rlc_energy.EnergyTests.test_mixed_rl_rc_resistive_analytic_integrals_reference_and_time_scaling) ... ok
+test_nonzero_fit_memory_work_equals_known_network_heat_and_storage (tests.python.test_sparameter_rlc_energy.EnergyTests.test_nonzero_fit_memory_work_equals_known_network_heat_and_storage) ... ok
+test_one_fit_exact_trajectory_preservation_and_private_hook_copies (tests.python.test_sparameter_rlc_energy.EnergyTests.test_one_fit_exact_trajectory_preservation_and_private_hook_copies) ... ok
+test_signed_source_network_work_and_exact_zero_resistance_heat (tests.python.test_sparameter_rlc_energy.EnergyTests.test_signed_source_network_work_and_exact_zero_resistance_heat) ... ok
+test_stiff_interval_scaled_gramian_avoids_unstable_block_overflow (tests.python.test_sparameter_rlc_energy.EnergyTests.test_stiff_interval_scaled_gramian_avoids_unstable_block_overflow) ... ok
+test_example_executes_and_contracts_are_registered (tests.python.test_sparameter_rlc_energy_contract.RlcEnergyContractTests.test_example_executes_and_contracts_are_registered) ... ok
+test_worker_and_schema_fail_closed_on_invalid_energy_requests (tests.python.test_sparameter_rlc_energy_contract.RlcEnergyContractTests.test_worker_and_schema_fail_closed_on_invalid_energy_requests) ... ok
+test_worker_integrated_energy_against_analytic_scalar_reference (tests.python.test_sparameter_rlc_energy_contract.RlcEnergyContractTests.test_worker_integrated_energy_against_analytic_scalar_reference) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 2.392s
+
+OK

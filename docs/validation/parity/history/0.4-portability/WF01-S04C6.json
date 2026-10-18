@@ -1,0 +1,38 @@
+{
+  "contract": "spike/scaled-review-stage/v1",
+  "stage_id": "WF01-S04C6",
+  "status": "passed",
+  "production_qualified": false,
+  "material_qualified": false,
+  "source_projection_enabled": false,
+  "sources": {
+    "scripts/parity_scaled_review_gate.py": "f14aa5e892a16d44827e3eb9b44fc83478847c67bf3d8c46003951adb2a2b16a",
+    "python/spike_core/scaled_component_review.py": "bbe3029398aed6437711e704bf3beb390ac02f8d7a3cdb982b1fe8764d3169c1",
+    "python/spike_core/component_placement_review.py": "640b9e59eb255deffdf8e035e3c428d5fb0ca72e33e83c2b8d6f911de4a76423",
+    "tests/python/test_scaled_component_review.py": "3b0db5bc908ec1b46726a1ab185b2521cd87adde314fa14d7532c68ff399bba7",
+    "tests/python/test_component_placement_review.py": "88648d7180c633f5b979ed13e1f296b2c9290f217aa29dfc65dc016aa8109da2",
+    "scripts/parity_step_scale_gate.py": "7e553edb8cfeea13132777ee2de1984e8940044ffda9c8bd6e7ef16f5a64c3cf",
+    "docs/validation/parity/WF01-S04C4.json": "e9c97d50208540d2bb9eed33a618961a800b4b638b1e18bef242ac0a62e16e12",
+    "docs/validation/parity/WF01-S04C5.json": "b50ace113d79c2288b873561cc151d7342d9b32908f373fb6af8edec69fa2fd2",
+    "docs/validation/parity/WF01-S04C3-native-step.json": "699de5e073ba7aaa5acd2c1a721b13c169395527859eadfc7c544906e145f464"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_scaled_component_review.NativeScaledReviewTests.test_four_actual_baked_placements_match_native_corners",
+      "tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_cancellation_and_failure_propagate_without_proposal",
+      "tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_invalid_source_baseline_and_unit_control_never_start_native",
+      "tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_oversized_control_is_rejected_before_native",
+      "tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_snapshot_rejects_design_changed_during_job"
+    ],
+    "run": 5,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/WF01-S04C6-verified.log",
+  "log_sha256": "263eaa51de3010279c77d12f3c81b81f6197a05bd08407b870f16f29de401eec",
+  "native_evidence": "docs/validation/parity/WF01-S04C6-verified-native.json",
+  "native_evidence_sha256": "8595d569ad0b030d97b5d1d4196b223572c03db1d085dda19f0cb93b94b459cf"
+}

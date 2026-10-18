@@ -1,0 +1,14 @@
+test_affine_complex_multiport_exactness_and_interpolation_mapping (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_affine_complex_multiport_exactness_and_interpolation_mapping) ... ok
+test_convex_passive_preservation_and_active_samples_retained (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_convex_passive_preservation_and_active_samples_retained) ... ok
+test_delayed_line_cartesian_interpolation_second_order_refinement (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_delayed_line_cartesian_interpolation_second_order_refinement) ... ok
+test_exact_source_copy_snapshot_identity_and_one_sample_support (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_exact_source_copy_snapshot_identity_and_one_sample_support) ... ok
+test_resources_extreme_frequencies_and_cancellation_discard_partial (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_resources_extreme_frequencies_and_cancellation_discard_partial) ... ok
+test_strict_dc_shapes_ranges_grids_and_finite_admission (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_strict_dc_shapes_ranges_grids_and_finite_admission) ... ok
+test_supplied_real_filter_dc_and_no_inferred_zero_frequency (tests.python.test_sparameter_sampling.SParameterSamplingTests.test_supplied_real_filter_dc_and_no_inferred_zero_frequency) ... ok
+test_actual_worker_rejects_extrapolation_implicit_dc_and_invalid_policy (tests.python.test_sparameter_sampling_contract.SamplingContractTests.test_actual_worker_rejects_extrapolation_implicit_dc_and_invalid_policy) ... ok
+test_actual_worker_schema_dc_provenance_and_exact_samples (tests.python.test_sparameter_sampling_contract.SamplingContractTests.test_actual_worker_schema_dc_provenance_and_exact_samples) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.039s
+
+OK

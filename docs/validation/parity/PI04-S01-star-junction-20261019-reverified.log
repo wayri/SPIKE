@@ -1,0 +1,13 @@
+test_floating_capacitor_island_keeps_its_differential_state (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_floating_capacitor_island_keeps_its_differential_state) ... ok
+test_nonzero_initial_current_and_nonfinite_slopes_rejected (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_nonzero_initial_current_and_nonfinite_slopes_rejected) ... ok
+test_parallel_damped_rlc_converges_to_independent_state_exponential (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_parallel_damped_rlc_converges_to_independent_state_exponential) ... ok
+test_rc_retains_second_order_transient_convergence (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_rc_retains_second_order_transient_convergence) ... ok
+test_rl_consistency_across_si_time_scales (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_rl_consistency_across_si_time_scales) ... ok
+test_rl_ramp_hold_fall_exact_at_all_refinements (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_rl_ramp_hold_fall_exact_at_all_refinements) ... ok
+test_series_rlc_preserves_charge_and_energy_at_voltage_jumps (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_series_rlc_preserves_charge_and_energy_at_voltage_jumps) ... ok
+test_signed_mutual_inductance_and_unexcited_winding_voltage (tests.python.test_pdn_transient_consistency.PdnTransientConsistencyTests.test_signed_mutual_inductance_and_unexcited_winding_voltage) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.366s
+
+OK

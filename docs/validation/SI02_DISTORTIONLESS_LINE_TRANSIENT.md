@@ -1,6 +1,10 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S02 verification: distortionless lossy line transient
 
+*Evidence availability:* Paths to local-only evidence are written as code below;
+these files are not included in this checkout. This documentation check does
+not reverify their contents or the historical results cited here.
+
 Verified 18 October 2026. **Done for this bounded stage; experimental,
 production-unqualified.** SI02 and full PI/SI parity remain open.
 The [method ledger](../DISTORTIONLESS_LINE_TRANSIENT.md) retains reviewed primary
@@ -14,7 +18,7 @@ Instantaneous loss has no phasor time-average factor of one half.
 
 [Canonical source-bound receipt](parity/SI02-S02.json): **9 tests, zero skips**,
 six numerical and three actual worker/schema/example checks. Its
-[actual execution log](parity/SI02-S02-distortionless-line-reverified.log)
+actual execution log (`parity/SI02-S02-distortionless-line-reverified.log`)
 retains the executed names. Reproduce into fresh output paths:
 
 ```powershell

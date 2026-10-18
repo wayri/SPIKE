@@ -1,0 +1,15 @@
+test_all_constraint_reasons_and_zero_admissible_failure (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_all_constraint_reasons_and_zero_admissible_failure) ... ok
+test_cancel_or_later_numerical_failure_discards_earlier_winner (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_cancel_or_later_numerical_failure_discards_earlier_winner) ... ok
+test_excluded_invalid_options_and_strict_money_count_domain (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_excluded_invalid_options_and_strict_money_count_domain) ... ok
+test_location_dependent_twoport_nodal_oracle (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_location_dependent_twoport_nodal_oracle) ... ok
+test_manual_enumeration_scalar_oracle_and_lexicographic_winner (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_manual_enumeration_scalar_oracle_and_lexicographic_winner) ... ok
+test_part_identity_order_invariance_and_collision_safe_mapping (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_part_identity_order_invariance_and_collision_safe_mapping) ... ok
+test_resource_preflight_and_aggregate_work_before_solving (tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_resource_preflight_and_aggregate_work_before_solving) ... ok
+test_actual_worker_complete_search_schema_and_independent_ranking (tests.python.test_pdn_decap_selection_contract.DecapSelectionContractTests.test_actual_worker_complete_search_schema_and_independent_ranking) ... ok
+test_schema_and_worker_reject_unknown_boolean_inconsistent_and_missing_part (tests.python.test_pdn_decap_selection_contract.DecapSelectionContractTests.test_schema_and_worker_reject_unknown_boolean_inconsistent_and_missing_part) ... ok
+test_unsatisfied_targets_retained_and_no_constraint_feasible_error (tests.python.test_pdn_decap_selection_contract.DecapSelectionContractTests.test_unsatisfied_targets_retained_and_no_constraint_feasible_error) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.203s
+
+OK

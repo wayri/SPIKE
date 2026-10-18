@@ -1,0 +1,49 @@
+{
+  "contract": "spike/component-admission-evidence/v1",
+  "stage_id": "WF01-S04C2",
+  "status": "passed",
+  "production_qualified": false,
+  "material_qualified": false,
+  "limitation": "Synthetic solids and supplied materials verify software admission only; native KiCad composition, conditioned package material laws and physics qualification remain open.",
+  "sources": {
+    "scripts/parity_component_admission_gate.py": "2ea4b51602b25a6ce2299a6c9802f87071be6e03ec9cb2d51b8688c36c9c78e8",
+    "tests/python/test_thermal_component_promotion.py": "6b105e95d98b0d32c055c421caa085b4e759b66c033296f9f7d9849ed1c48e92",
+    "tests/python/test_assembly_thermal_meshing.py": "c61d29a23f9d55b6dde5c172e73162b12856b90244d276ac7e52fdfe46f67680",
+    "tests/python/test_project_assembly_field.py": "46eabfacc18ed53b06e3e8e30272156c6c45721c4c908b6f012dc7ba5f621935",
+    "examples/assembly_field/run_examples.py": "8bad990369d674c0fbdffd5033300319b740fb7a4824938caa384594141769a2",
+    "python/spike_core/assembly_thermal_components.py": "f52e5b5fea2c22b36c82839ce5962aadb3f8ee73520b7c761e4827a7d485371d",
+    "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+    "python/spike_core/assembly_field_handoff.py": "1fb5bf347f5bf50dee540aac66297a996526d7de59247e2c90508bff9fc8a722",
+    "python/spike_core/assembly_frames.py": "3db8c3b7674957fd3ad5467a53c3556662f7b498fe4819ba7e63a3bd0a40d42a",
+    "python/spike_core/gmsh_occ_runtime.py": "c434aea9386fa62eda2a5a68940c3a98e839d2e44da3a95e0ea40f7dfa069c3e",
+    "python/spike_core/gmsh_occ_mesher.py": "61afa526fc2f96fed9078e9c6a6f12f73975e2ad07db17d4e8559772d87ecf59",
+    "python/spike_core/service_project_thermal_mesh.py": "cf8e11581e52326d5d5bf12d4b4059ca8291cba4d396bb67ab29096c4a76a9cb",
+    "python/spike_core/project_package.py": "5f4fdba7af8b044483c163c6584d4c90e71e1ee718e46d5ae6722ffcb75eef03",
+    "python/spike_core/project_member_metadata.py": "972b26390dd4e470288320bc4b9e84e50a545e16b2bf4da32b4eeff0a5aca3a4",
+    "schemas/thermal-component-promotion-v1.schema.json": "aa6050c84aaf3f4a1cd90a9e8f6e003ad1d2492e94415299fd4a6218dc918f80",
+    "schemas/assembly-thermal-mesh-assignments-v1.schema.json": "111c82ff94fb8ee8b11b388a91b0e20552ddb980257ffcd43e1bd50fa61e9c52"
+  },
+  "runtime": {
+    "implementation": "CPython",
+    "python": "3.11.9"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_thermal_component_promotion.RealPromotedStepTests.test_real_component_step_meshed_with_retained_component_and_model_transforms",
+      "tests.python.test_thermal_component_promotion.ThermalComponentPromotionTests.test_changed_source_component_and_model_block_subsequent_mesh",
+      "tests.python.test_thermal_component_promotion.ThermalComponentPromotionTests.test_duplicate_board_components_get_distinct_occurrences_and_world_placement",
+      "tests.python.test_thermal_component_promotion.ThermalComponentPromotionTests.test_explicit_promotion_preserves_source_identity_and_board_frame",
+      "tests.python.test_thermal_component_promotion.ThermalComponentPromotionTests.test_package_promotion_preserves_step_and_saved_materials_and_rejects_stale_manifest",
+      "tests.python.test_thermal_component_promotion.ThermalComponentPromotionTests.test_rejects_unreviewed_placement_nonrigid_missing_material_and_display_model",
+      "tests.python.test_thermal_component_promotion.ThermalComponentPromotionTests.test_source_conflict_and_parameter_schema"
+    ],
+    "run": 7,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/WF01-S04C2-release-0.4-portable-20261019.log",
+  "log_sha256": "f7afd33622c8bb679f54b71f436e7560e1f280daf151e8ad219a05178ebac916"
+}

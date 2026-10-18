@@ -1,0 +1,16 @@
+test_active_stable_singular_unstable_marginal_and_extremes (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_active_stable_singular_unstable_marginal_and_extremes) ... ok
+test_analytic_parallel_rlc_damping_current_split_and_energy_balance (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_analytic_parallel_rlc_damping_current_split_and_energy_balance) ... ok
+test_invalid_preflight_total_state_limits_and_cancellation (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_invalid_preflight_total_state_limits_and_cancellation) ... ok
+test_mixed_two_port_coupling_source_order_and_ideal_resistor_row (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_mixed_two_port_coupling_source_order_and_ideal_resistor_row) ... ok
+test_pwl_physical_state_reference_and_output_grid_invariance (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_pwl_physical_state_reference_and_output_grid_invariance) ... ok
+test_reference_impedance_and_physical_time_scaling (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_reference_impedance_and_physical_time_scaling) ... ok
+test_resistor_network_rc_step_and_initial_current_split (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_resistor_network_rc_step_and_initial_current_split) ... ok
+test_two_shunt_capacitors_coupled_conductance_and_source_order (tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_two_shunt_capacitors_coupled_conductance_and_source_order) ... ok
+test_example_runs_and_public_contracts_are_registered (tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_example_runs_and_public_contracts_are_registered) ... ok
+test_worker_and_schema_fail_closed_on_unsupported_capacitive_boundaries (tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_worker_and_schema_fail_closed_on_unsupported_capacitive_boundaries) ... ok
+test_worker_rc_source_split_energy_power_and_original_provenance (tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_worker_rc_source_split_energy_power_and_original_provenance) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 3.297s
+
+OK

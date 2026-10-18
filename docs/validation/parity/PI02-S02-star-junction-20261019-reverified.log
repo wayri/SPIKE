@@ -1,0 +1,14 @@
+test_complete_circuit_reference_with_crosscoupled_complex_termination (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_complete_circuit_reference_with_crosscoupled_complex_termination) ... ok
+test_complex_nonreciprocal_passive_source_without_symmetry_repair (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_complex_nonreciprocal_passive_source_without_symmetry_repair) ... ok
+test_dielectric_projection_binding_and_copies (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_dielectric_projection_binding_and_copies) ... ok
+test_malformed_partition_complex_values_frequency_and_status (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_malformed_partition_complex_values_frequency_and_status) ... ok
+test_resistor_ladder_floating_and_terminated_auxiliary (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_resistor_ladder_floating_and_terminated_auxiliary) ... ok
+test_resource_bounds_before_solve_and_atomic_cancellation (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_resource_bounds_before_solve_and_atomic_cancellation) ... ok
+test_singular_conditioning_active_and_corrupted_solve_rejections (tests.python.test_pdn_admittance_reduction.PdnAdmittanceReductionTests.test_singular_conditioning_active_and_corrupted_solve_rejections) ... ok
+test_actual_extraction_worker_and_schema (tests.python.test_pdn_reduction_contract.ReductionContractTests.test_actual_extraction_worker_and_schema) ... ok
+test_owned_worker_rejects_bad_partition_and_active_load (tests.python.test_pdn_reduction_contract.ReductionContractTests.test_owned_worker_rejects_bad_partition_and_active_load) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.312s
+
+OK

@@ -1496,7 +1496,7 @@
         "Real CLI import passes count, unit, source-digest and identity gates.",
         "All 24 independently specified geometry/reference assertions pass."
       ],
-      "evidence": "docs/validation/parity/WF01-S01-refresh-20261018.json"
+      "evidence": "docs/validation/parity/WF01-S01-release-0.4-lf-20261019.json"
     },
     {
       "id": "WF01-S02",
@@ -1510,7 +1510,7 @@
         "Native KiCad parses and renders the source; DRC findings are retained without claiming DRC cleanliness.",
         "All 12 rotated-pad, native-origin, model-value and reference assertions pass real CLI import."
       ],
-      "evidence": "docs/validation/parity/WF01-S02-refresh-20261018.json"
+      "evidence": "docs/validation/parity/WF01-S02-release-0.4-lf-20261019.json"
     },
     {
       "id": "WF01-S03",
@@ -1524,7 +1524,7 @@
         "Preserve and qualify exact curved-source geometry without duplicate conductor representations.",
         "Verify cutout topology through canonical geometry consumers and independent source oracles."
       ],
-      "evidence": "docs/validation/parity/WF01-S03-refresh-20261018.json",
+      "evidence": "docs/validation/parity/WF01-S03-release-0.4-lf-20261019.json",
       "failure_evidence": "docs/validation/parity/WF01-S03-failed-arc.json",
       "verification": {
         "focused_geometry_tests": 48,
@@ -1571,7 +1571,7 @@
         "Native pcbnew confirms all paths and declared offset/scale/rotation vectors; JSON and legacy round-trip preserve occurrence identity and component links.",
         "Unapplied source placement remains explicit; malformed vectors are retained with diagnostics without losing the component or pad."
       ],
-      "evidence": "docs/validation/parity/WF01-S04A-refresh-20261018.json",
+      "evidence": "docs/validation/parity/WF01-S04A-release-0.4-lf-20261019.json",
       "verification": {
         "focused_tests": 39,
         "architecture": "passed",
@@ -1610,7 +1610,7 @@
         "Native source/export gates recompute byte bindings, arc/pad/component geometry, cutout area/topology and net ownership; missing stackup/models and omitted generated font are explicit.",
         "All 48 native pose and eight supported custom-pad/slot cases agree with current source import and geometry consumers; solver readiness stays false."
       ],
-      "evidence": "docs/validation/parity/WF01-S04B-refresh-20261018.json",
+      "evidence": "docs/validation/parity/WF01-S04B-release-0.4-lf-20261019.json",
       "failure_evidence": "docs/validation/parity/WF01-S04B-progress.json",
       "verification": {
         "native_geometry": {
@@ -1706,7 +1706,7 @@
         "Reject stale/foreign/duplicate/nonrigid handoffs; partial model coverage stays diagnostic and source transforms remain unapplied.",
         "Three native solids match independently specified 24 mm3 volumes and transformed cuboid bounds; STEP round trips pass without material or solver readiness promotion."
       ],
-      "evidence": "docs/validation/parity/WF01-S04C1-refresh-20261018.json",
+      "evidence": "docs/validation/parity/WF01-S04C1-release-0.4-lf-20261019.json",
       "verification": {
         "focused": {
           "status": "passed",
@@ -1750,7 +1750,7 @@
         "Verify actual component volumes and SI bounds, repeated occurrence identity, supplied conductivity/provenance transfer, package retention and stale-source rejection.",
         "Bind current implementation, fixture and schema digests to execution evidence; keep synthetic materials and software admission separate from conditioned package material and physics qualification."
       ],
-      "evidence": "docs/validation/parity/WF01-S04C2-member-metadata-refresh-20261018.json"
+      "evidence": "docs/validation/parity/WF01-S04C2-release-0.4-portable-20261019.json"
     },
     {
       "id": "WF01-S04C3",

@@ -1,0 +1,17 @@
+test_anisotropic_directional_admittance (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_anisotropic_directional_admittance) ... ok
+test_bounded_work_fields_mesh_and_frequency_before_linear_solve (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_bounded_work_fields_mesh_and_frequency_before_linear_solve) ... ok
+test_conditioning_rejection_and_frequency_loop_cancellation (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_conditioning_rejection_and_frequency_loop_cancellation) ... ok
+test_corrupt_free_solution_and_electrode_currents_are_rejected (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_corrupt_free_solution_and_electrode_currents_are_rejected) ... ok
+test_differing_loss_layers_actual_complex_fields_at_refinements (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_differing_loss_layers_actual_complex_fields_at_refinements) ... ok
+test_extreme_finite_operator_norm_is_rejected (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_extreme_finite_operator_norm_is_rejected) ... ok
+test_homogeneous_plate_refinements_and_full_fields (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_homogeneous_plate_refinements_and_full_fields) ... ok
+test_lossless_limit_and_si_mesh_digest_binding (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_lossless_limit_and_si_mesh_digest_binding) ... ok
+test_multielectrode_coupling_conjugate_power_and_reference_order (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_multielectrode_coupling_conjugate_power_and_reference_order) ... ok
+test_strict_material_frequency_and_geometry_admission (tests.python.test_pdn_dielectric_ac.PdnDielectricAcTests.test_strict_material_frequency_and_geometry_admission) ... ok
+test_actual_plate_worker_and_offline_schema (tests.python.test_pdn_dielectric_ac_contract.DielectricAcContractTests.test_actual_plate_worker_and_offline_schema) ... ok
+test_schema_rejections_and_worker_error_boundary (tests.python.test_pdn_dielectric_ac_contract.DielectricAcContractTests.test_schema_rejections_and_worker_error_boundary) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 2.195s
+
+OK

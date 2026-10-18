@@ -50,6 +50,10 @@ class Project:
 
 
 class ControllerBoardBlockTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        (ROOT / ".tmp").mkdir(parents=True, exist_ok=True)
+
     def test_create_snapshots_every_pin_unbound_with_stable_names(self):
         source = board()
         first = blocks.create(source, 1, 2, scope="XTOP:XADC")

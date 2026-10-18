@@ -1,0 +1,11 @@
+test_contradictory_declarations_and_unknown_physical_layers_reject (tests.python.test_component_placement_review.PlacementReviewTests.test_contradictory_declarations_and_unknown_physical_layers_reject) ... ok
+test_eight_drafts_match_actual_native_corners_and_do_not_mutate (tests.python.test_component_placement_review.PlacementReviewTests.test_eight_drafts_match_actual_native_corners_and_do_not_mutate) ... ok
+test_explicit_handoff_can_use_reviewed_draft_and_remains_partial (tests.python.test_component_placement_review.PlacementReviewTests.test_explicit_handoff_can_use_reviewed_draft_and_remains_partial) ... ok
+test_missing_conflicting_and_nonfinite_source_facts_reject (tests.python.test_component_placement_review.PlacementReviewTests.test_missing_conflicting_and_nonfinite_source_facts_reject) ... ok
+test_native_origin_is_used_instead_of_pad_centroid (tests.python.test_component_placement_review.PlacementReviewTests.test_native_origin_is_used_instead_of_pad_centroid) ... ok
+test_scope_stale_and_scaled_controls_reject (tests.python.test_component_placement_review.PlacementReviewTests.test_scope_stale_and_scaled_controls_reject) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.193s
+
+OK

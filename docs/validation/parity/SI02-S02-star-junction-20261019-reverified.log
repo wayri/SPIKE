@@ -1,0 +1,14 @@
+test_finite_pulse_source_storage_terminal_and_distributed_heat_balance (tests.python.test_distortionless_line_transient.DistortionlessTests.test_finite_pulse_source_storage_terminal_and_distributed_heat_balance) ... ok
+test_geometric_multiple_echoes_both_drives_and_ideal_source_boundaries (tests.python.test_distortionless_line_transient.DistortionlessTests.test_geometric_multiple_echoes_both_drives_and_ideal_source_boundaries) ... ok
+test_invalid_loss_exponent_precision_resources_and_cancellation (tests.python.test_distortionless_line_transient.DistortionlessTests.test_invalid_loss_exponent_precision_resources_and_cancellation) ... ok
+test_matched_ramp_analytic_attenuation_and_smooth_pde_identity (tests.python.test_distortionless_line_transient.DistortionlessTests.test_matched_ramp_analytic_attenuation_and_smooth_pde_identity) ... ok
+test_time_length_units_and_exact_shared_sample_refinement (tests.python.test_distortionless_line_transient.DistortionlessTests.test_time_length_units_and_exact_shared_sample_refinement) ... ok
+test_zero_loss_exact_parent_points_provenance_and_nonzero_coefficients (tests.python.test_distortionless_line_transient.DistortionlessTests.test_zero_loss_exact_parent_points_provenance_and_nonzero_coefficients) ... ok
+test_example_executes_and_contracts_are_registered (tests.python.test_distortionless_line_transient_contract.DistortionlessLineContractTests.test_example_executes_and_contracts_are_registered) ... ok
+test_worker_against_independent_attenuated_echo_and_loss_reference (tests.python.test_distortionless_line_transient_contract.DistortionlessLineContractTests.test_worker_against_independent_attenuated_echo_and_loss_reference) ... ok
+test_worker_and_schema_reject_invalid_loss_contracts (tests.python.test_distortionless_line_transient_contract.DistortionlessLineContractTests.test_worker_and_schema_reject_invalid_loss_contracts) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 3.893s
+
+OK

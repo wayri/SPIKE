@@ -1,6 +1,10 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Solver improvement feedback and action plan
 
+*Evidence availability:* Paths to local-only evidence are written as code below;
+these files are not included in this checkout. This documentation check does
+not reverify their contents or the historical results cited here.
+
 SPIKE should first strengthen error control and comparison semantics, then
 expand predictive coverage, and finally optimize runtime at fixed accuracy.
 The benchmark evidence supports useful bounded thermal, PI, SI, EM and coupled
@@ -16,7 +20,7 @@ and reference-tool availability are known.
 
 Evidence: [accuracy program](SOLVER_ACCURACY_PROGRAM.md),
 [initial baseline](validation/SOLVER_ACCURACY_BASELINE_20261012.md), and the
-[comprehensive report](../output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf).
+comprehensive report (`../output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf`).
 The [action backlog](solver-improvement-actions-v1.json) is the execution
 register. Its IDs are engineering task references, not capability flags.
 

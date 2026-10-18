@@ -1,0 +1,21 @@
+test_affine_patch_rotated_mesh_stress_energy_and_lineage (tests.python.test_assembly_tetra_structural.StructuralTests.test_affine_patch_rotated_mesh_stress_energy_and_lineage) ... ok
+test_bar_traction_reactions_energy_and_millimetres (tests.python.test_assembly_tetra_structural.StructuralTests.test_bar_traction_reactions_energy_and_millimetres) ... ok
+test_free_expansion_minimal_constraints_and_full_clamping (tests.python.test_assembly_tetra_structural.StructuralTests.test_free_expansion_minimal_constraints_and_full_clamping) ... ok
+test_manufactured_quadratic_field_refinement (tests.python.test_assembly_tetra_structural.StructuralTests.test_manufactured_quadratic_field_refinement) ... ok
+test_multimaterial_reference_temperature_and_null_semantics (tests.python.test_assembly_tetra_structural.StructuralTests.test_multimaterial_reference_temperature_and_null_semantics) ... ok
+test_resources_cancel_and_finite_result (tests.python.test_assembly_tetra_structural.StructuralTests.test_resources_cancel_and_finite_result) ... ok
+test_rigid_modes_geometry_material_and_input_refusals (tests.python.test_assembly_tetra_structural.StructuralTests.test_rigid_modes_geometry_material_and_input_refusals) ... ok
+test_cancel_before_and_after_blocking_heat (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_cancel_before_and_after_blocking_heat) ... ok
+test_executed_gradient_to_clamped_stress_and_energy (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_executed_gradient_to_clamped_stress_and_energy) ... ok
+test_mismatch_temperature_and_nonfinite_rejected_before_heat (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_mismatch_temperature_and_nonfinite_rejected_before_heat) ... ok
+test_real_uniform_heating_free_expansion (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_real_uniform_heating_free_expansion) ... ok
+test_unanchored_solid_and_thermal_failure_do_not_return_success (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_unanchored_solid_and_thermal_failure_do_not_return_success) ... ok
+test_unicode_ownership_uses_identical_canonical_digests (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_unicode_ownership_uses_identical_canonical_digests) ... ok
+test_worker_dispatch_and_exact_admission (tests.python.test_assembly_thermomechanical.ThermomechanicalTests.test_worker_dispatch_and_exact_admission) ... ok
+test_public_schemas_and_actual_top_level_worker (tests.python.test_assembly_structural_contract.StructuralContractTests.test_public_schemas_and_actual_top_level_worker) ... ok
+test_worker_bad_material_unknown_parameter_and_mesh_rejected (tests.python.test_assembly_structural_contract.StructuralContractTests.test_worker_bad_material_unknown_parameter_and_mesh_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.365s
+
+OK

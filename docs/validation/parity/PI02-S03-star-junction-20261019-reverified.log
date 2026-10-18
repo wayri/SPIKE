@@ -1,0 +1,15 @@
+test_corrupted_fields_fail_conservation_before_thermal_solve (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_corrupted_fields_fail_conservation_before_thermal_solve) ... ok
+test_heterogeneous_loss_with_coherent_multielectrode_cross_terms (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_heterogeneous_loss_with_coherent_multielectrode_cross_terms) ... ok
+test_mesh_double_heat_drive_and_material_admission (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_mesh_double_heat_drive_and_material_admission) ... ok
+test_phase_invariance_quadratic_amplitude_and_zero_loss (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_phase_invariance_quadratic_amplitude_and_zero_loss) ... ok
+test_resource_preflight_and_cancelled_thermal_result_not_published (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_resource_preflight_and_cancelled_thermal_result_not_published) ... ok
+test_rms_plate_cell_loads_and_independent_power_balance (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_rms_plate_cell_loads_and_independent_power_balance) ... ok
+test_uniform_heated_slab_p1_refinement_against_parabolic_solution (tests.python.test_pdn_dielectric_thermal.PdnDielectricThermalTests.test_uniform_heated_slab_p1_refinement_against_parabolic_solution) ... ok
+test_reproducible_example_actual_worker (tests.python.test_pdn_dielectric_thermal_contract.DielectricThermalContractTests.test_reproducible_example_actual_worker) ... ok
+test_schema_and_actual_worker_power_to_temperature (tests.python.test_pdn_dielectric_thermal_contract.DielectricThermalContractTests.test_schema_and_actual_worker_power_to_temperature) ... ok
+test_worker_rejects_mismatched_mesh_and_ambiguous_drives (tests.python.test_pdn_dielectric_thermal_contract.DielectricThermalContractTests.test_worker_rejects_mismatched_mesh_and_ambiguous_drives) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 3.793s
+
+OK

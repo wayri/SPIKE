@@ -1,6 +1,6 @@
 {
   "contract": "spike/solver-blocks/v1",
-  "catalog_version": "0.3.12-gamma.1",
+  "catalog_version": "0.4.0-alpha.1",
   "packaging_mode": "bundled_all",
   "managed_downloads": false,
   "groups": [

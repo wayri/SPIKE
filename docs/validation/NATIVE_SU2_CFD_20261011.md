@@ -1,5 +1,9 @@
 # Native CFD and SU2 comparison, 2026-10-11
 
+*Evidence availability:* Paths to local-only evidence are written as code below;
+these files are not included in this checkout. This documentation check does
+not reverify their contents or the historical results cited here.
+
 ## Executed case and gate
 
 Independently authored square cavity: L=1 m, moving top-wall speed U=1 m/s,
@@ -26,9 +30,9 @@ with refinement, so this gate is not a continuum error estimate.
 
 ## Evidence and reproduction
 
-The [HTML report](../../output/cfd-su2-20261011/comparison/index.html) includes
+The HTML report (`../../output/cfd-su2-20261011/comparison/index.html`) includes
 unit-labeled velocity plots and interpretation. The
-[full comparison](../../output/cfd-su2-20261011/comparison/comparison.json)
+full comparison (`../../output/cfd-su2-20261011/comparison/comparison.json`)
 retains executable/input hashes, convergence and per-grid profiles. Each grid
 also has native and SU2 result JSON, and managed SU2 mesh/config/solution logs.
 The separate local runtime has download provenance under

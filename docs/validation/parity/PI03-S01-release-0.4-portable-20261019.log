@@ -1,0 +1,15 @@
+test_cancel_numerical_failure_and_nonfinite_ratio_publish_no_partial_result (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_cancel_numerical_failure_and_nonfinite_ratio_publish_no_partial_result) ... ok
+test_malformed_corner_topology_and_value_admission_before_solves (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_malformed_corner_topology_and_value_admission_before_solves) ... ok
+test_multiport_shared_return_against_direct_nodal_admittance (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_multiport_shared_return_against_direct_nodal_admittance) ... ok
+test_order_invariance_metadata_mapping_and_collision_avoidance (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_order_invariance_metadata_mapping_and_collision_avoidance) ... ok
+test_parallel_source_rlc_oracle_and_exact_worst_sample (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_parallel_source_rlc_oracle_and_exact_worst_sample) ... ok
+test_resource_preflight_and_aggregate_work_bound (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_resource_preflight_and_aggregate_work_bound) ... ok
+test_target_failure_is_valid_and_target_change_does_not_change_network (tests.python.test_pdn_decap_corners.PdnDecapCornersTests.test_target_failure_is_valid_and_target_change_does_not_change_network) ... ok
+test_actual_worker_rejects_incomplete_corner_and_unknown_fields (tests.python.test_pdn_decap_corners_contract.DecapCornerContractTests.test_actual_worker_rejects_incomplete_corner_and_unknown_fields) ... ok
+test_actual_worker_schema_and_failed_target_retention (tests.python.test_pdn_decap_corners_contract.DecapCornerContractTests.test_actual_worker_schema_and_failed_target_retention) ... ok
+test_documented_example_matches_independent_parallel_impedance (tests.python.test_pdn_decap_corners_contract.DecapCornerContractTests.test_documented_example_matches_independent_parallel_impedance) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.174s
+
+OK

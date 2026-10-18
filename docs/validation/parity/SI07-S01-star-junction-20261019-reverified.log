@@ -1,0 +1,16 @@
+test_cancellation_and_corrupt_fitted_identity_discard_trajectory (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_cancellation_and_corrupt_fitted_identity_discard_trajectory) ... ok
+test_multiport_asynchronous_inputs_superposition_and_voltage_current_identity (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_multiport_asynchronous_inputs_superposition_and_voltage_current_identity) ... ok
+test_nonzero_initial_step_feedthrough_and_exact_relaxation (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_nonzero_initial_step_feedthrough_and_exact_relaxation) ... ok
+test_one_pole_ramp_hold_against_augmented_matrix_exponential (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_one_pole_ramp_hold_against_augmented_matrix_exponential) ... ok
+test_output_grid_invariance_and_final_horizon_without_final_output (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_output_grid_invariance_and_final_horizon_without_final_output) ... ok
+test_small_large_and_overflowed_rate_time_products (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_small_large_and_overflowed_rate_time_products) ... ok
+test_strict_waveform_coverage_horizon_times_and_resources_before_fit (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_strict_waveform_coverage_horizon_times_and_resources_before_fit) ... ok
+test_union_precision_collapse_fraction_collapse_and_rate_time_underflow (tests.python.test_sparameter_transient.RationalNetworkTransientTests.test_union_precision_collapse_fraction_collapse_and_rate_time_underflow) ... ok
+test_actual_worker_rejects_port_time_boolean_unknown_and_failed_fit (tests.python.test_sparameter_transient_contract.TransientContractTests.test_actual_worker_rejects_port_time_boolean_unknown_and_failed_fit) ... ok
+test_actual_worker_schema_step_feedthrough_voltage_current_and_snapshot (tests.python.test_sparameter_transient_contract.TransientContractTests.test_actual_worker_schema_step_feedthrough_voltage_current_and_snapshot) ... ok
+test_actual_worker_simultaneous_inputs_preserve_source_port_order (tests.python.test_sparameter_transient_contract.TransientContractTests.test_actual_worker_simultaneous_inputs_preserve_source_port_order) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.095s
+
+OK

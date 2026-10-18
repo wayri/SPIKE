@@ -1,0 +1,13 @@
+test_asynchronous_shared_return_rl_and_energy_at_refinements (tests.python.test_pdn_multiload.PdnMultiLoadTests.test_asynchronous_shared_return_rl_and_energy_at_refinements) ... ok
+test_linear_superposition_on_identical_grids_with_shared_energy_cross_term (tests.python.test_pdn_multiload.PdnMultiLoadTests.test_linear_superposition_on_identical_grids_with_shared_energy_cross_term) ... ok
+test_load_order_and_legacy_envelopes (tests.python.test_pdn_multiload.PdnMultiLoadTests.test_load_order_and_legacy_envelopes) ... ok
+test_multiload_mid_solve_cancellation_is_atomic (tests.python.test_pdn_multiload.PdnMultiLoadTests.test_multiload_mid_solve_cancellation_is_atomic) ... ok
+test_strict_multiload_admission (tests.python.test_pdn_multiload.PdnMultiLoadTests.test_strict_multiload_admission) ... ok
+test_union_grid_resource_limit_is_checked_before_solving (tests.python.test_pdn_multiload.PdnMultiLoadTests.test_union_grid_resource_limit_is_checked_before_solving) ... ok
+test_schema_and_owned_worker_shared_return (tests.python.test_pdn_multiload_contract.MultiLoadContractTests.test_schema_and_owned_worker_shared_return) ... ok
+test_schema_rejects_ambiguous_forms_and_typed_admission_rejects_identity (tests.python.test_pdn_multiload_contract.MultiLoadContractTests.test_schema_rejects_ambiguous_forms_and_typed_admission_rejects_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.130s
+
+OK

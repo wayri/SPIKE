@@ -1,0 +1,40 @@
+{
+  "contract": "spike/component-review-stage/v1",
+  "stage_id": "WF01-S04C4",
+  "status": "passed",
+  "production_qualified": false,
+  "material_qualified": false,
+  "source_projection_enabled": false,
+  "sources": {
+    "scripts/parity_component_review_gate.py": "bb846a83840ac4188e2ac93fbd9c20939fb4ae1037eca5468741b3f8433bef93",
+    "python/spike_core/component_placement_review.py": "640b9e59eb255deffdf8e035e3c428d5fb0ca72e33e83c2b8d6f911de4a76423",
+    "tests/python/test_component_placement_review.py": "88648d7180c633f5b979ed13e1f296b2c9290f217aa29dfc65dc016aa8109da2",
+    "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+    "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+    "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+    "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+    "python/spike_core/spider_v2_schema.py": "f588f5cadab7344481e023190ada44a7024d3f4db9cbb470a6a778e905861f97",
+    "python/spike_core/mcad_export_contract.py": "f5815ca7d32598795e490234500191e11e466f9695197434a27249edfada13e0",
+    "python/spike_core/mcad_component_models.py": "f72f3e769eafce15881c5444537c1e4210267ef6ae41379355fd98f5565f4de3",
+    "python/spike_core/mcad_export_design.py": "ae1b150555f2de8a52cf13c02cfc28459679c6f7556bbb527eede7cf9e5c27a1"
+  },
+  "native_receipt_sha256": "ebd5c84466f8a543024e1d9c8693199e547c7738f8e885f1605b3cd27a275ffc",
+  "tests": {
+    "names": [
+      "tests.python.test_component_placement_review.PlacementReviewTests.test_contradictory_declarations_and_unknown_physical_layers_reject",
+      "tests.python.test_component_placement_review.PlacementReviewTests.test_eight_drafts_match_actual_native_corners_and_do_not_mutate",
+      "tests.python.test_component_placement_review.PlacementReviewTests.test_explicit_handoff_can_use_reviewed_draft_and_remains_partial",
+      "tests.python.test_component_placement_review.PlacementReviewTests.test_missing_conflicting_and_nonfinite_source_facts_reject",
+      "tests.python.test_component_placement_review.PlacementReviewTests.test_native_origin_is_used_instead_of_pad_centroid",
+      "tests.python.test_component_placement_review.PlacementReviewTests.test_scope_stale_and_scaled_controls_reject"
+    ],
+    "run": 6,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/WF01-S04C4-c6-final.log",
+  "log_sha256": "a64f0066d814e684d1196725c72e9cff70f7f0ed14c8ed8e24e44a6c7a89a435"
+}

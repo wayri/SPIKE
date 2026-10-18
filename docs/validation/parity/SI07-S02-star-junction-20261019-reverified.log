@@ -1,0 +1,16 @@
+test_extreme_normalization_forcing_and_interval_underflow_reject (tests.python.test_sparameter_terminated.TerminatedTests.test_extreme_normalization_forcing_and_interval_underflow_reject) ... ok
+test_loop_singular_unstable_marginal_and_unresolved_cancellation (tests.python.test_sparameter_terminated.TerminatedTests.test_loop_singular_unstable_marginal_and_unresolved_cancellation) ... ok
+test_malformed_inputs_and_precision_collapse (tests.python.test_sparameter_terminated.TerminatedTests.test_malformed_inputs_and_precision_collapse) ... ok
+test_output_grid_invariance (tests.python.test_sparameter_terminated.TerminatedTests.test_output_grid_invariance) ... ok
+test_physical_capacitor_ramp_hold_signed_source_and_identity (tests.python.test_sparameter_terminated.TerminatedTests.test_physical_capacitor_ramp_hold_signed_source_and_identity) ... ok
+test_resource_preflight_generator_limits_and_cancellation (tests.python.test_sparameter_terminated.TerminatedTests.test_resource_preflight_generator_limits_and_cancellation) ... ok
+test_step_initial_feedthrough_and_matched_equivalence (tests.python.test_sparameter_terminated.TerminatedTests.test_step_initial_feedthrough_and_matched_equivalence) ... ok
+test_through_two_port_simultaneous_thevenins_and_order (tests.python.test_sparameter_terminated.TerminatedTests.test_through_two_port_simultaneous_thevenins_and_order) ... ok
+test_actual_worker_capacitor_charging_current_boundary_and_provenance (tests.python.test_sparameter_terminated_contract.TerminatedContractTests.test_actual_worker_capacitor_charging_current_boundary_and_provenance) ... ok
+test_actual_worker_rejects_invalid_resistance_port_time_and_unsupported_loop (tests.python.test_sparameter_terminated_contract.TerminatedContractTests.test_actual_worker_rejects_invalid_resistance_port_time_and_unsupported_loop) ... ok
+test_actual_worker_through_resistive_divider_and_well_posed_ideal_source (tests.python.test_sparameter_terminated_contract.TerminatedContractTests.test_actual_worker_through_resistive_divider_and_well_posed_ideal_source) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.119s
+
+OK

@@ -319,3 +319,195 @@ tests/python/test_rlgc_line_cascade*.py text eol=lf
 examples/rlgc_line_cascade/* text eol=lf
 schemas/rlgc-line-cascade-*.schema.json text eol=lf
 docs/RLGC_LINE_CASCADE.md text eol=lf
+
+# Receipt-bound test logs retain their exact verified bytes on every platform.
+docs/validation/parity/*.log -text
+benchmarks/parity-import/component-models-placed-release-0.4-20261019.step -text
+
+# Canonical LF bytes for import-stage runner evidence.
+python/spike_core/contracts.py text eol=lf
+python/core/filled_polygon_offset.py text eol=lf
+python/core/simple_polygon_union.py text eol=lf
+python/spike_core/odb_source_inspection.py text eol=lf
+schemas/board-enrichment-v1.schema.json text eol=lf
+
+python/spike_core/assembly_frames.py text eol=lf
+schemas/mcad-assembly-v1.schema.json text eol=lf
+
+# Exact receipt evidence and canonical sources for portable release validation.
+examples/rlgc_line_junction/run_line.py text eol=lf
+examples/rlgc_line_junction/three-legs.request.json text eol=lf
+python/spike_core/gmsh_occ_mesher.py text eol=lf
+python/spike_core/mcad_importer.py text eol=lf
+python/spike_core/rlgc_line_junction.py text eol=lf
+python/spike_core/service.py text eol=lf
+python/spike_core/spider_v2_schema.py text eol=lf
+schemas/assembly-thermal-mesh-assignments-v1.schema.json text eol=lf
+schemas/rlgc-line-junction-request-v1.schema.json text eol=lf
+schemas/rlgc-line-junction-result-v1.schema.json text eol=lf
+tests/python/test_scaled_component_review.py text eol=lf
+benchmarks/parity-import/arc-fidelity-manifest.json -text
+benchmarks/parity-import/component-solid.step -text
+benchmarks/parity-import/geometry-manifest.json -text
+benchmarks/parity-import/manifest.json -text
+benchmarks/parity-import/models-manifest.json -text
+benchmarks/parity-import/native-odb-manifest.json -text
+benchmarks/parity-import/odb-candidate-manifest.json -text
+benchmarks/parity-import/step-scale/cylinder.step -text
+benchmarks/parity-import/step-scale/cylinder_failure_evidence.json -text
+benchmarks/parity-import/step-scale/probe_native.py -text
+benchmarks/parity-import/step-scale/report.json -text
+docs/CAPACITIVE_NETWORK_TRANSIENT.md -text
+docs/CROSSTALK_TIMING_CORNERS.md -text
+docs/DISTORTIONLESS_LINE_TRANSIENT.md -text
+docs/INDUCTIVE_NETWORK_TRANSIENT.md -text
+docs/LOSSLESS_LINE_TRANSIENT.md -text
+docs/MULTI_AGGRESSOR_CROSSTALK.md -text
+docs/NETWORK_REFLECTOMETRY.md -text
+docs/RLC_ENERGY_LEDGER.md -text
+docs/RLC_INITIAL_STATES.md -text
+docs/RLC_NETWORK_TRANSIENT.md -text
+docs/RLGC_LINE_CASCADE.md -text
+docs/RLGC_LINE_FIELDS.md -text
+docs/RLGC_LINE_JUNCTION.md -text
+docs/RLGC_LINE_NETWORK.md -text
+docs/validation/parity/GP07-S01-aggressor-shared-worker.log -text
+docs/validation/parity/GP07-S01.json -text
+docs/validation/parity/PI02-S01-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI02-S01.json -text
+docs/validation/parity/PI02-S02-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI02-S02.json -text
+docs/validation/parity/PI02-S03-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI02-S03.json -text
+docs/validation/parity/PI02-S04-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI02-S04.json -text
+docs/validation/parity/PI03-S01-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI03-S01.json -text
+docs/validation/parity/PI03-S02-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI03-S02.json -text
+docs/validation/parity/PI04-S01-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI04-S01.json -text
+docs/validation/parity/PI04-S02-star-junction-20261019-reverified.log -text
+docs/validation/parity/PI04-S02.json -text
+docs/validation/parity/SI02-S01-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI02-S01.json -text
+docs/validation/parity/SI02-S02-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI02-S02.json -text
+docs/validation/parity/SI02-S03-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI02-S03.json -text
+docs/validation/parity/SI02-S04-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI02-S04.json -text
+docs/validation/parity/SI02-S05-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI02-S05.json -text
+docs/validation/parity/SI02-S06-star-junction-20261019.log -text
+docs/validation/parity/SI02-S06.json -text
+docs/validation/parity/SI07-S01-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S01.json -text
+docs/validation/parity/SI07-S02-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S02.json -text
+docs/validation/parity/SI07-S03-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S03.json -text
+docs/validation/parity/SI07-S04-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S04.json -text
+docs/validation/parity/SI07-S05-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S05.json -text
+docs/validation/parity/SI07-S06-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S06.json -text
+docs/validation/parity/SI07-S07-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S07.json -text
+docs/validation/parity/SI07-S08-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S08.json -text
+docs/validation/parity/SI07-S09-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S09.json -text
+docs/validation/parity/SI07-S10-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI07-S10.json -text
+docs/validation/parity/SI08-S01-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI08-S01.json -text
+docs/validation/parity/SI08-S02-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI08-S02.json -text
+docs/validation/parity/SI08-S03-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI08-S03.json -text
+docs/validation/parity/SI08-S04-star-junction-20261019-reverified.log -text
+docs/validation/parity/SI08-S04.json -text
+docs/validation/parity/WF01-S01-release-0.4-lf-20261019-import.json -text
+docs/validation/parity/WF01-S01-release-0.4-lf-20261019.json -text
+docs/validation/parity/WF01-S02-native-angle-failure.json -text
+docs/validation/parity/WF01-S02-native-geometry.json -text
+docs/validation/parity/WF01-S02-release-0.4-lf-20261019-import.json -text
+docs/validation/parity/WF01-S02-release-0.4-lf-20261019.json -text
+docs/validation/parity/WF01-S03-release-0.4-lf-20261019-import.json -text
+docs/validation/parity/WF01-S03-release-0.4-lf-20261019.json -text
+docs/validation/parity/WF01-S04A-native-geometry.json -text
+docs/validation/parity/WF01-S04A-native.json -text
+docs/validation/parity/WF01-S04A-release-0.4-lf-20261019-import.json -text
+docs/validation/parity/WF01-S04A-release-0.4-lf-20261019.json -text
+docs/validation/parity/WF01-S04A-rlgc-line-import.json -text
+docs/validation/parity/WF01-S04A.json -text
+docs/validation/parity/WF01-S04B-candidate-import.json -text
+docs/validation/parity/WF01-S04B-marble-native-connectivity.json -text
+docs/validation/parity/WF01-S04B-native-geometry.json -text
+docs/validation/parity/WF01-S04B-progress.json -text
+docs/validation/parity/WF01-S04B-release-0.4-lf-20261019-import.json -text
+docs/validation/parity/WF01-S04B-release-0.4-lf-20261019.json -text
+docs/validation/parity/WF01-S04B-rlgc-line-import.json -text
+docs/validation/parity/WF01-S04B.json -text
+docs/validation/parity/WF01-S04C-progress.json -text
+docs/validation/parity/WF01-S04C1-release-0.4-20261019-native-solids.json -text
+docs/validation/parity/WF01-S04C1-release-0.4-lf-20261019-import.json -text
+docs/validation/parity/WF01-S04C1-release-0.4-lf-20261019.json -text
+docs/validation/parity/WF01-S04C2-member-metadata-refresh-20261018.json -text
+docs/validation/parity/WF01-S04C2-member-metadata-refresh-20261018.log -text
+docs/validation/parity/WF01-S04C2-rlgc-fields-native-reverified.log -text
+docs/validation/parity/WF01-S04C2.json -text
+docs/validation/parity/WF01-S04C3.json -text
+docs/validation/parity/WF01-S04C4-c6-final.log -text
+docs/validation/parity/WF01-S04C4.json -text
+docs/validation/parity/WF01-S04C5-final-native.json -text
+docs/validation/parity/WF01-S04C5-final.log -text
+docs/validation/parity/WF01-S04C5.json -text
+docs/validation/parity/WF01-S04C6-verified-native.json -text
+docs/validation/parity/WF01-S04C6-verified.log -text
+docs/validation/parity/WF01-S04C6.json -text
+docs/validation/parity/history/0.4-portability/WF01-S04C4.json -text
+docs/validation/parity/history/0.4-portability/WF01-S04C5.json -text
+docs/validation/parity/history/0.4-portability/WF01-S04C6.json -text
+docs/validation/parity/history/0.4-portability/PI04-S02.json -text
+docs/validation/parity/history/0.4-portability/PI03-S01.json -text
+docs/validation/parity/history/0.4-portability/PI03-S02.json -text
+docs/validation/parity/history/0.4-portability/GP07-S01.json -text
+docs/validation/parity/history/0.4-portability/SI02-S06.json -text
+docs/validation/parity/WF01-S04C2-release-0.4-portable-20261019.json -text
+docs/validation/parity/WF01-S04C2-release-0.4-portable-20261019.log -text
+docs/validation/parity/WF01-S04C4.json -text
+docs/validation/parity/WF01-S04C4-release-0.4-portable-20261019.log -text
+docs/validation/parity/WF01-S04C5.json -text
+docs/validation/parity/WF01-S04C5-release-0.4-portable-20261019.log -text
+docs/validation/parity/WF01-S04C5-release-0.4-portable-20261019-native.json -text
+docs/validation/parity/WF01-S04C6.json -text
+docs/validation/parity/WF01-S04C6-release-0.4-portable-20261019.log -text
+docs/validation/parity/WF01-S04C6-release-0.4-portable-20261019-native.json -text
+docs/validation/parity/PI04-S02.json -text
+docs/validation/parity/PI04-S02-release-0.4-portable-20261019.log -text
+docs/validation/parity/PI03-S01.json -text
+docs/validation/parity/PI03-S01-release-0.4-portable-20261019.log -text
+docs/validation/parity/PI03-S02.json -text
+docs/validation/parity/PI03-S02-release-0.4-portable-20261019.log -text
+docs/validation/parity/GP07-S01.json -text
+docs/validation/parity/GP07-S01-release-0.4-portable-20261019.log -text
+docs/validation/parity/SI02-S06.json -text
+docs/validation/parity/SI02-S06-release-0.4-portable-20261019.log -text
+
+python/spike_core/cli.py text eol=lf
+python/spike_core/project_member_metadata.py text eol=lf
+schemas/manifest.json text eol=lf
+tests/python/test_rlgc_line_junction.py text eol=lf
+tests/python/test_rlgc_line_junction_contract.py text eol=lf
+
+docs/parity-capability-backlog-v1.json text eol=lf
+docs/validation/parity/history/0.4-portability/index.json text eol=lf
+
+# Deterministic generated application inventories.
+app/src/helpControls.generated.json text eol=lf
+app/src/helpReference.generated.json text eol=lf
+app/src/solverBlockCatalogSnapshot.json text eol=lf
+RELEASE_SOURCE_MANIFEST.json text eol=lf

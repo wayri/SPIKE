@@ -1,0 +1,14 @@
+test_all_finite_corners_and_polarities_independent_physics_with_memory (tests.python.test_sparameter_crosstalk_timing.CrosstalkTimingTests.test_all_finite_corners_and_polarities_independent_physics_with_memory) ... ok
+test_cancellation_before_between_corners_and_after_final_output (tests.python.test_sparameter_crosstalk_timing.CrosstalkTimingTests.test_cancellation_before_between_corners_and_after_final_output) ... ok
+test_declared_corner_ties_reference_and_physical_time_units (tests.python.test_sparameter_crosstalk_timing.CrosstalkTimingTests.test_declared_corner_ties_reference_and_physical_time_units) ... ok
+test_exact_shift_knots_endpoint_hold_clipping_and_zero_identity (tests.python.test_sparameter_crosstalk_timing.CrosstalkTimingTests.test_exact_shift_knots_endpoint_hold_clipping_and_zero_identity) ... ok
+test_invalid_maps_precision_and_aggregate_preflight_before_any_fit (tests.python.test_sparameter_crosstalk_timing.CrosstalkTimingTests.test_invalid_maps_precision_and_aggregate_preflight_before_any_fit) ... ok
+test_observation_refinement_and_finite_corner_enlargement (tests.python.test_sparameter_crosstalk_timing.CrosstalkTimingTests.test_observation_refinement_and_finite_corner_enlargement) ... ok
+test_example_and_registered_contracts (tests.python.test_sparameter_crosstalk_timing_contract.CrosstalkTimingContractTests.test_example_and_registered_contracts) ... ok
+test_worker_and_schema_reject_invalid_corner_contracts (tests.python.test_sparameter_crosstalk_timing_contract.CrosstalkTimingContractTests.test_worker_and_schema_reject_invalid_corner_contracts) ... ok
+test_worker_schemas_and_hand_shifted_physical_corner_enumeration (tests.python.test_sparameter_crosstalk_timing_contract.CrosstalkTimingContractTests.test_worker_schemas_and_hand_shifted_physical_corner_enumeration) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 6.391s
+
+OK

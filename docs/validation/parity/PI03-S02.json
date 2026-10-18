@@ -11,7 +11,7 @@
     "tests/python/test_pdn_decap_corners.py": "0ae90e771e6615664a9f8f25843603d5cd814335357168c0981a6273dd331626",
     "tests/python/test_pdn_decap_corners_contract.py": "9a6f797e9bf1204e0cb25094f57d58638054aef335ac3408abd87097fd6be7ee",
     "examples/pdn_decap_corners/run_corners.py": "0050ef2daaa7f97368dbec15b794c0b5ccb14e5ff70f36f0d886f87a852bfa7e",
-    "schemas/pdn-network-request-v1.schema.json": "89fc9091507d0d04500a64358c1621754e8e1de67ae35985da14ff11012e28cf",
+    "schemas/pdn-network-request-v1.schema.json": "cb5cb74b4aa35de3167bd82003e9af50a3746e0ecf935a884639ce15c8fa6f7c",
     "schemas/pdn-decap-corners-request-v1.schema.json": "5da61873067460fbee862ecc0232507158810f7e9edb64bbb9ac59b037a01d9d",
     "schemas/pdn-decap-corners-result-v1.schema.json": "a015a5a17b848a9a9856bd19b3bd6b07b80fc569facba23a36ef11f64d2f8905",
     "python/spike_core/pdn_decap_selection.py": "f349259345ee59d7a392f40152f2598631c15442e4de6800537b0171ab7f65f2",
@@ -40,6 +40,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/PI03-S02-star-junction-20261019-reverified.log",
-  "log_sha256": "727331a516093214873359cbd39433e12a05ffcbb06b3f5ac1ffcc275cb4f85d"
+  "log": "docs/validation/parity/PI03-S02-release-0.4-portable-20261019.log",
+  "log_sha256": "6566359205f9cc121c6c33fe1b3f403f840e34f0ef66c4c8b425d96bc91b305a"
 }

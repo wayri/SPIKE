@@ -9,7 +9,7 @@
     "tests/python/test_pdn_multiload.py": "f7d43877dc5dfb15045e73a6f56ab2d2c556cf5af08a5411186aecd1621d948b",
     "tests/python/test_pdn_multiload_contract.py": "0a2ea2ee509a57328b042ed7a29a09aa8925b2585d9fa2ce17207a1abcdf2637",
     "python/spike_core/service_pdn_network.py": "3252f731ef0cb4f586c7a1e64ef3a0300a43312e505c4af812b9823a9ff7c7ec",
-    "schemas/pdn-network-request-v1.schema.json": "89fc9091507d0d04500a64358c1621754e8e1de67ae35985da14ff11012e28cf"
+    "schemas/pdn-network-request-v1.schema.json": "cb5cb74b4aa35de3167bd82003e9af50a3746e0ecf935a884639ce15c8fa6f7c"
   },
   "tests": {
     "names": [
@@ -29,6 +29,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/PI04-S02-star-junction-20261019-reverified.log",
-  "log_sha256": "d9aa3b48dd0510f852c67dd065b660df3f76e95862af2a5b3e308739dbb8d0b3"
+  "log": "docs/validation/parity/PI04-S02-release-0.4-portable-20261019.log",
+  "log_sha256": "e2c89b480f896d6c94d3d5efa2598048563267c6ad0b3ebfb3f0388301d9f32b"
 }

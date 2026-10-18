@@ -1,0 +1,12 @@
+test_active_network_is_not_repaired (tests.python.test_sparameter_modes.MixedModeTests.test_active_network_is_not_repaired) ... ok
+test_invalid_data_rejected (tests.python.test_sparameter_modes.MixedModeTests.test_invalid_data_rejected) ... ok
+test_invalid_partition_rejected (tests.python.test_sparameter_modes.MixedModeTests.test_invalid_partition_rejected) ... ok
+test_nonadjacent_polarity_and_order_analytic (tests.python.test_sparameter_modes.MixedModeTests.test_nonadjacent_polarity_and_order_analytic) ... ok
+test_original_preserved_and_z_input (tests.python.test_sparameter_modes.MixedModeTests.test_original_preserved_and_z_input) ... ok
+test_power_reciprocity_and_legacy (tests.python.test_sparameter_modes.MixedModeTests.test_power_reciprocity_and_legacy) ... ok
+test_voltage_current_impedance_oracle (tests.python.test_sparameter_modes.MixedModeTests.test_voltage_current_impedance_oracle) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.035s
+
+OK

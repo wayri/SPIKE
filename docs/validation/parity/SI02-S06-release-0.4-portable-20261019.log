@@ -1,0 +1,20 @@
+test_analytic_matched_three_port_and_maximum_eight_legs (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_analytic_matched_three_port_and_maximum_eight_legs) ... ok
+test_cancellation_and_callback_failure (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_cancellation_and_callback_failure) ... ok
+test_coherent_permutation_scaling_and_probe_independence (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_coherent_permutation_scaling_and_probe_independence) ... ok
+test_condition_residual_and_float_failure (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_condition_residual_and_float_failure) ... ok
+test_corrupt_child_fails_closed (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_corrupt_child_fails_closed) ... ok
+test_independent_physical_fields_and_owned_quadrature (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_independent_physical_fields_and_owned_quadrature) ... ok
+test_quadrature_refinement (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_quadrature_refinement) ... ok
+test_resource_preflight_before_any_leaf_solve (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_resource_preflight_before_any_leaf_solve) ... ok
+test_strict_admission (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_strict_admission) ... ok
+test_strongly_attenuating_matched_legs_analytic_heat (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_strongly_attenuating_matched_legs_analytic_heat) ... ok
+test_two_leg_cascade_with_reversed_second_orientation (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_two_leg_cascade_with_reversed_second_orientation) ... ok
+test_zero_drives_exact_zero_fields_and_losses (tests.python.test_rlgc_line_junction.JunctionNumericalTests.test_zero_drives_exact_zero_fields_and_losses) ... ok
+test_actual_worker_physical_nodal_oracle_and_provenance (tests.python.test_rlgc_line_junction_contract.JunctionContractTests.test_actual_worker_physical_nodal_oracle_and_provenance) ... ok
+test_example_cli_and_manifest (tests.python.test_rlgc_line_junction_contract.JunctionContractTests.test_example_cli_and_manifest) ... ok
+test_strict_schemas_and_worker_failure (tests.python.test_rlgc_line_junction_contract.JunctionContractTests.test_strict_schemas_and_worker_failure) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 3.010s
+
+OK

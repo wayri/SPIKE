@@ -1,0 +1,10 @@
+test_four_actual_baked_placements_match_native_corners (tests.python.test_scaled_component_review.NativeScaledReviewTests.test_four_actual_baked_placements_match_native_corners) ... ok
+test_cancellation_and_failure_propagate_without_proposal (tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_cancellation_and_failure_propagate_without_proposal) ... ok
+test_invalid_source_baseline_and_unit_control_never_start_native (tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_invalid_source_baseline_and_unit_control_never_start_native) ... ok
+test_oversized_control_is_rejected_before_native (tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_oversized_control_is_rejected_before_native) ... ok
+test_snapshot_rejects_design_changed_during_job (tests.python.test_scaled_component_review.ScaledReviewAdmissionTests.test_snapshot_rejects_design_changed_during_job) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 4.760s
+
+OK

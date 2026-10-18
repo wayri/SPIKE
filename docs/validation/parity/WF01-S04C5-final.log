@@ -1,0 +1,11 @@
+test_actual_curved_conversion_fails_closed (tests.python.test_component_step_scale.NativeStepScaleTests.test_actual_curved_conversion_fails_closed) ... ok
+test_actual_native_cube_factors_and_reimported_vertices (tests.python.test_component_step_scale.NativeStepScaleTests.test_actual_native_cube_factors_and_reimported_vertices) ... ok
+test_constant_volume_does_not_hide_changed_bounds (tests.python.test_component_step_scale.ScaleAdmissionTests.test_constant_volume_does_not_hide_changed_bounds) ... ok
+test_failed_process_produces_no_asset (tests.python.test_component_step_scale.ScaleAdmissionTests.test_failed_process_produces_no_asset) ... ok
+test_native_failures_cannot_be_admitted (tests.python.test_component_step_scale.ScaleAdmissionTests.test_native_failures_cannot_be_admitted) ... ok
+test_source_and_bad_factors_reject_before_native_execution (tests.python.test_component_step_scale.ScaleAdmissionTests.test_source_and_bad_factors_reject_before_native_execution) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 3.488s
+
+OK
