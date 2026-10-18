@@ -13,6 +13,9 @@ from unittest.mock import patch
 
 from python.spike_core import wave1_packaged_acceptance as acceptance
 from python.spike_core import wave1_packaged_mutation as mutation
+from python.spike_core.contracts import SpiDeR
+from python.spike_core.project_package import write_spike_package
+from python.spike_core.spider_v2 import AssemblyIRV1, SpiDeRV2
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +23,52 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _write_mutation_fixture(path: Path) -> Path:
+    """Write the smallest package that exercises the packaged mutation contract."""
+
+    model_artifact = b"ISO-10303-21;END-ISO-10303-21;"
+    design = SpiDeRV2.from_v1(SpiDeR(
+        design_id="mutation-fixture", name="Mutation fixture", source_format="spike-fixture",
+    )).to_dict()
+    assembly = AssemblyIRV1.from_dict({
+        "assembly_id": "mutation-fixture", "name": "Mutation fixture",
+        "frame": {"frame_id": "assembly"},
+        "boards": [
+            {
+                "id": "board-a", "design_id": "mutation-fixture",
+                "frame": {"frame_id": "board-a-frame", "parent_frame_id": "assembly"},
+            },
+            {
+                "id": "board-b", "design_id": "mutation-fixture",
+                "frame": {
+                    "frame_id": "board-b-frame", "parent_frame_id": "assembly",
+                    "transform": [1, 0, 0, 40, 0, 1, 0, 0, 0, 0, 1, 5, 0, 0, 0, 1],
+                },
+            },
+        ],
+        "parts": [{
+            "id": "case", "source_id": "case-source", "name": "Case",
+            "part_type": "enclosure", "model_id": "case-model", "material_id": "aluminium",
+            "frame": {"frame_id": "case-frame", "parent_frame_id": "assembly"},
+            "placement_policy": {
+                "contract": "spike/assembly-placement-policy/v1",
+                "translation_snap_mm": 1.0, "rotation_snap_deg": 15.0,
+            },
+        }],
+    }).to_dict()
+    write_spike_package(path, {
+        "project": {"id": "mutation-fixture", "name": path.name},
+        "design_ir": design,
+        "assembly_ir": assembly,
+        "models": {"contract": "spike/model-index/v1", "models": [{
+            "id": "case-model", "source_id": "case-source", "name": "Case",
+            "model_type": "step", "uri": "package:models/artifacts/case.step",
+            "digest": hashlib.sha256(model_artifact).hexdigest(), "transform": [], "extensions": {},
+        }]},
+    }, model_artifacts={"case.step": model_artifact}, application_version="test")
+    return path
 
 
 class Wave1PackagedAcceptanceTests(unittest.TestCase):
@@ -351,11 +400,12 @@ class Wave1PackagedAcceptanceTests(unittest.TestCase):
             opened = read_project(str(params["path"]))
             return {"canonical": opened.payload, "manifest": opened.manifest}
 
-        fixture = ROOT / "artifacts" / "wave1-assembly-acceptance" / "wave1-assembly-acceptance.spike"
-        with patch.object(mutation, "_invoke_worker_request", side_effect=invoke):
-            check = acceptance.probe_packaged_worker_mutation_roundtrip(
-                ROOT / "spike-worker.exe", cwd=ROOT, fixture=fixture,
-            )
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = _write_mutation_fixture(Path(directory) / "mutation-fixture.spike")
+            with patch.object(mutation, "_invoke_worker_request", side_effect=invoke):
+                check = acceptance.probe_packaged_worker_mutation_roundtrip(
+                    ROOT / "spike-worker.exe", cwd=ROOT, fixture=fixture,
+                )
 
         self.assertEqual(check["status"], "passed", check)
         self.assertEqual(calls, ["update_mcad_part_in_project", "reparent_mcad_part_in_project", "read_project_package"])
@@ -364,14 +414,15 @@ class Wave1PackagedAcceptanceTests(unittest.TestCase):
         self.assertTrue(check["evidence"]["artifacts_unchanged"])
 
     def test_packaged_mutation_probe_fails_closed_on_stale_manifest(self) -> None:
-        fixture = ROOT / "artifacts" / "wave1-assembly-acceptance" / "wave1-assembly-acceptance.spike"
-        with patch.object(
-            mutation, "_invoke_worker_request",
-            side_effect=mutation.Wave1MutationAcceptanceError("stale manifest identity"),
-        ):
-            check = acceptance.probe_packaged_worker_mutation_roundtrip(
-                ROOT / "spike-worker.exe", cwd=ROOT, fixture=fixture,
-            )
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = _write_mutation_fixture(Path(directory) / "mutation-fixture.spike")
+            with patch.object(
+                mutation, "_invoke_worker_request",
+                side_effect=mutation.Wave1MutationAcceptanceError("stale manifest identity"),
+            ):
+                check = acceptance.probe_packaged_worker_mutation_roundtrip(
+                    ROOT / "spike-worker.exe", cwd=ROOT, fixture=fixture,
+                )
         self.assertEqual(check["status"], "failed")
         self.assertIn("stale manifest identity", check["evidence"]["error"])
 
