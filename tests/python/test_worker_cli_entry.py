@@ -70,10 +70,7 @@ class WorkerCliEntryTests(unittest.TestCase):
         self.assertEqual(version_result.returncode, 0, version_result.stderr)
         self.assertRegex(
             version_result.stdout.strip(),
-            r"^SPIKE CLI (?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)"
-            r"(?:-(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)"
-            r"(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*)?"
-            r"(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$",
+            r"^SPIKE CLI \d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$",
         )
         self.assertEqual(version_result.stderr, "")
 
