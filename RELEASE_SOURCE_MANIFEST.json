@@ -184,10 +184,10 @@
     },
     {
       "path": "README.md",
-      "git_blob": "785062296295548403d8cc7d039c22947ff553ae",
+      "git_blob": "ade2cb6617dd0c63e7dec2c545afd3b30a491a75",
       "mode": "100644",
-      "bytes": 18024,
-      "sha256": "7c179b772b28058f9828fcba2fa39b732e59c80a59b9149cc776e208def40f50"
+      "bytes": 17923,
+      "sha256": "d0eb638a375891c6e032c051beb9db5c2144d7092e771517f5510c53f6517284"
     },
     {
       "path": "RELEASE_NOTES.md",
@@ -8136,10 +8136,10 @@
     },
     {
       "path": "docs/COMMUNITY_SETUP.md",
-      "git_blob": "f00e85455514c69aa122784ede4cce8e1f5705ba",
+      "git_blob": "46f7666d123fd24389f2c3989d639faea623b94b",
       "mode": "100644",
-      "bytes": 24119,
-      "sha256": "77a01490898d16ac8a4d2f443b9c6725d5c4b4c6deb850312f6dc2c0e1aa9291"
+      "bytes": 24895,
+      "sha256": "fe4945090acb02e95896eeafa9e60639175ab07fefe75220570bdfaaf92b9d77"
     },
     {
       "path": "docs/COMPILED_BOARD_LIBRARY.md",
@@ -42323,7 +42323,7 @@
     }
   ],
   "runtime_notices": {
-    "payloads": 888,
+    "payloads": 953,
     "digest_basis": "Exact bytes (-text)",
     "legal_review": "pending"
   }
