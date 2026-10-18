@@ -55,6 +55,10 @@ class ScriptWorkspaceWorktreesTest(unittest.TestCase):
         self.assertRegex(by_path[str(linked.resolve())]["head"], r"^[0-9a-f]{40,64}$")
 
     def test_non_repository_is_reported_as_unavailable(self):
+        # TEMP may intentionally live inside the repository during release
+        # checks. A malformed local .git marker prevents Git from walking up
+        # to that enclosing checkout, keeping this fixture a non-repository.
+        (self.base / ".git").write_text("gitdir: missing-git-directory\n", encoding="utf-8")
         result = self.call(self.base)
 
         self.assertFalse(result["available"])
