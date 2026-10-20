@@ -57,6 +57,15 @@ Then run `python -m unittest tests.python.test_board_terminal_contacts -v`.
 The check establishes the stated source geometry facts only; it does not
 qualify full-board PI/SI physics or a hardware result.
 
+The annular-contact gate test also runs its existing acceptance generator in
+a fresh `.local/test-temp/annular-gate-*` directory. This executes the numerical
+suite and solves, validates their new source-bound receipt, and checks rejected
+completion and corrupted-evidence cases. Native source bindings contain
+absolute file paths, so a new checkout needs its own execution. Historical
+receipts retain their original paths and hashes. Temporary test outputs are
+removed when the test finishes; the generator's preceding finite-contact and
+land-transition receipt checks remain required.
+
 ## E-brake fixture
 
 The e-brake driver board is a useful real-world KiCad regression fixture. It contains routed copper, internal layers, vias, zones, stackup data, components, manufacturing outputs, STEP models, and schematics.

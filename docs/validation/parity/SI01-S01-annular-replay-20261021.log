@@ -1,0 +1,27 @@
+test_aggregate_budget_stops_before_remaining_children (tests.python.test_si_candidate_study.CandidateStudyTests.test_aggregate_budget_stops_before_remaining_children) ... ok
+test_band_validation_and_common_grid (tests.python.test_si_candidate_study.CandidateStudyTests.test_band_validation_and_common_grid) ... ok
+test_cancellation_after_child_does_not_return_passing_partial (tests.python.test_si_candidate_study.CandidateStudyTests.test_cancellation_after_child_does_not_return_passing_partial) ... ok
+test_cancellation_before_work (tests.python.test_si_candidate_study.CandidateStudyTests.test_cancellation_before_work) ... ok
+test_equal_bound_is_inclusive (tests.python.test_si_candidate_study.CandidateStudyTests.test_equal_bound_is_inclusive) ... ok
+test_extrema_witnesses_and_case_permutation (tests.python.test_si_candidate_study.CandidateStudyTests.test_extrema_witnesses_and_case_permutation) ... ok
+test_forged_child_provenance_cannot_pass (tests.python.test_si_candidate_study.CandidateStudyTests.test_forged_child_provenance_cannot_pass) ... ok
+test_lossy_dc_voltage_divider (tests.python.test_si_candidate_study.CandidateStudyTests.test_lossy_dc_voltage_divider) ... ok
+test_maximum_trace_preserves_every_sample (tests.python.test_si_candidate_study.CandidateStudyTests.test_maximum_trace_preserves_every_sample) ... ok
+test_nonfinite_child_cannot_yield_feasible_candidate (tests.python.test_si_candidate_study.CandidateStudyTests.test_nonfinite_child_cannot_yield_feasible_candidate) ... ok
+test_partial_or_incomplete_child_trace_cannot_pass (tests.python.test_si_candidate_study.CandidateStudyTests.test_partial_or_incomplete_child_trace_cannot_pass) ... ok
+test_preflight_rejects_missing_duplicate_and_unknown_cells (tests.python.test_si_candidate_study.CandidateStudyTests.test_preflight_rejects_missing_duplicate_and_unknown_cells) ... ok
+test_preflight_rejects_unsupported_scope_and_bad_grid (tests.python.test_si_candidate_study.CandidateStudyTests.test_preflight_rejects_unsupported_scope_and_bad_grid) ... ok
+test_real_child_failure_is_retained_and_cannot_pass (tests.python.test_si_candidate_study.CandidateStudyTests.test_real_child_failure_is_retained_and_cannot_pass) ... ok
+test_real_solver_against_independent_lossless_abcd (tests.python.test_si_candidate_study.CandidateStudyTests.test_real_solver_against_independent_lossless_abcd) ... ok
+test_resource_caps_before_solving (tests.python.test_si_candidate_study.CandidateStudyTests.test_resource_caps_before_solving) ... ok
+test_supplied_resistor_temperature_corner_matches_dc_reference (tests.python.test_si_candidate_study.CandidateStudyTests.test_supplied_resistor_temperature_corner_matches_dc_reference) ... ok
+test_actual_cli_example_and_catalog (tests.python.test_si_candidate_study_contract.CandidateContractTests.test_actual_cli_example_and_catalog) ... ok
+test_actual_results_validate_strict_contracts_and_digests (tests.python.test_si_candidate_study_contract.CandidateContractTests.test_actual_results_validate_strict_contracts_and_digests) ... ok
+test_actual_temperature_conflict_retained_with_valid_wire_result (tests.python.test_si_candidate_study_contract.CandidateContractTests.test_actual_temperature_conflict_retained_with_valid_wire_result) ... ok
+test_registered_worker_rejects_bad_population (tests.python.test_si_candidate_study_contract.CandidateContractTests.test_registered_worker_rejects_bad_population) ... ok
+test_schema_rejects_scope_unknowns_and_bad_status (tests.python.test_si_candidate_study_contract.CandidateContractTests.test_schema_rejects_scope_unknowns_and_bad_status) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 17.054s
+
+OK

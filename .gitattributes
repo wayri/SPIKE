@@ -384,3 +384,22 @@ tests/python/test_rlgc_coupled_star.py -text -eol
 tests/python/test_rlgc_terminated_pair.py -text -eol
 tests/python/test_rlgc_terminated_pair_contract.py -text -eol
 tests/python/test_terminated_pair_stage_evidence.py -text -eol
+
+# Additional verified active SI receipt sources preserve their original bytes.
+examples/rlgc_reactive_pair/run_pair.py -text -eol
+examples/si_candidate_study/run_study.py -text -eol
+python/spike_core/rlgc_loaded_cascade.py -text -eol
+python/spike_core/rlgc_reactive_pair.py -text -eol
+python/spike_core/si_clock_recovery.py -text -eol
+python/spike_core/si_ibis.py -text -eol
+python/spike_core/si_impedance.py -text -eol
+python/spike_core/si_passives.py -text -eol
+python/spike_core/si_symbol_clock.py -text -eol
+python/spike_core/si_workflow.py -text -eol
+python/spike_core/si_workflow_resonance.py -text -eol
+schemas/si-workflow-request-v1.schema.json -text -eol
+schemas/si-workflow-result-v1.schema.json -text -eol
+scripts/parity_si_candidate_gate.py -text -eol
+tests/python/test_rlgc_loaded_cascade.py -text -eol
+tests/python/test_rlgc_reactive_pair.py -text -eol
+tests/python/test_si_candidate_stage_evidence.py -text -eol

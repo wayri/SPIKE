@@ -1,7 +1,7 @@
 {
   "contract": "spike/release-source-manifest/v1",
   "version": "0.4.0-alpha.1",
-  "parent_commit": "cd623666ee1082d05fcc7dceef01c73b839d6e4f",
+  "parent_commit": "ba14882c4c628c1f1220dc7910587a6a99bc078b",
   "selection": "Current development overlay on the existing 0.4 release branch; retained published fixes; generated/private/download caches and unresolved third-party export assets excluded.",
   "self_excluded": true,
   "review_status": {
@@ -86,10 +86,10 @@
   "files": [
     {
       "path": ".gitattributes",
-      "git_blob": "716b0aab46c8e2712339b189797c3ec5baa40c7e",
+      "git_blob": "b3ab4e855ddcf20648ec8c0e7285549e5114dfea",
       "mode": "100644",
-      "bytes": 19620,
-      "sha256": "028d78e0d028e3e22f101e8bf4ee53d46a7cc02fb161cfb75c7d4cff471ba46c"
+      "bytes": 20548,
+      "sha256": "7df42002d2984314851743e4f77d08549cf68adda20d16d95e7b415ebe0e56c0"
     },
     {
       "path": ".githooks/pre-push",
@@ -10712,10 +10712,10 @@
     },
     {
       "path": "docs/TEST_FIXTURES.md",
-      "git_blob": "1b2be5fbfe12159b9fd94c385af9426e67a999ab",
+      "git_blob": "bf9923c994fc918b42e6466a2aba47bc244dd62f",
       "mode": "100644",
-      "bytes": 7215,
-      "sha256": "0ef5a12b69ca7b73322cd5532b95df9577bfc8c314e61f0a72f3a540f2f118e9"
+      "bytes": 7802,
+      "sha256": "ec6505960b97dc7a2e3466736b82f5563d7122de1583815dbb549bd6c33f3e97"
     },
     {
       "path": "docs/TETRAHEDRAL_MESH_WORKSPACE.md",
@@ -16332,6 +16332,13 @@
       "sha256": "0210adfa6c3fde050659984b8f0ae2da40aab668d439906ab3c42174fda7238c"
     },
     {
+      "path": "docs/validation/parity/SI01-S01-annular-replay-20261021.log",
+      "git_blob": "14bd0bcf3898a400353f31f5d3337cbae6d839ec",
+      "mode": "100644",
+      "bytes": 3723,
+      "sha256": "032e09d75a060faa5ff7e451daed1e3fe5e63c47a0d1d2db8e6256a6f2cb9940"
+    },
+    {
       "path": "docs/validation/parity/SI01-S01-coupled-cascade-20261020.json",
       "git_blob": "34a90871da505b1fd818689adef419fd8f9b6ea2",
       "mode": "100644",
@@ -17151,6 +17158,13 @@
       "sha256": "abc54765abbb599a04e919acf090bafd9e78d0db76a71840cd457533d68393ec"
     },
     {
+      "path": "docs/validation/parity/SI02-S08-annular-replay-20261021.log",
+      "git_blob": "8d62376045fd41b6e4f83a83c7304f90674c6683",
+      "mode": "100644",
+      "bytes": 2242,
+      "sha256": "6eeb6353d67b8340a585fea5437c0db50fd5e8b7184c802c141d74acd8f5c939"
+    },
+    {
       "path": "docs/validation/parity/SI02-S08-coupled-cascade-20261020.json",
       "git_blob": "7602a2c02579550b3c7964e528a473b49ccc4aea",
       "mode": "100644",
@@ -17198,6 +17212,13 @@
       "mode": "100644",
       "bytes": 11986,
       "sha256": "d5721ad1612f5d2f1b68eb102f1fcbcb3db611c88ed31fb17213020ab5fb26c4"
+    },
+    {
+      "path": "docs/validation/parity/SI02-S09-annular-replay-20261021.log",
+      "git_blob": "1b53220e0de6a67a00992c1e738c7ea4c576ebcc",
+      "mode": "100644",
+      "bytes": 2053,
+      "sha256": "f2b3a0f94b24bffa0811fb2f687907357eab4b56eaf4a469219255200cd11e66"
     },
     {
       "path": "docs/validation/parity/SI02-S09-coupled-cascade-20261020.json",
@@ -17291,6 +17312,13 @@
       "sha256": "c34e65c9e0a841021712f8a6c9b1ef832801fcea18b405adc44d4a7bf26d30d0"
     },
     {
+      "path": "docs/validation/parity/SI02-S11-annular-replay-20261021.log",
+      "git_blob": "722db432778d19693ff2d9876b6137f9df942409",
+      "mode": "100644",
+      "bytes": 1894,
+      "sha256": "766cb0504d5e5fb3bda37c81dea617937171c6e3e051b7b1a67d889a7e1a267c"
+    },
+    {
       "path": "docs/validation/parity/SI02-S11-coupled-star-20261020.json",
       "git_blob": "ad9038eb2217fccd0ca360387a9468bfad3a16c5",
       "mode": "100644",
@@ -17345,6 +17373,13 @@
       "mode": "100644",
       "bytes": 22609,
       "sha256": "7138920145cceeb538168c37a07db6dd051b3c6fb2126dfe692a2ee1da244b48"
+    },
+    {
+      "path": "docs/validation/parity/SI02-S13-annular-replay-20261021.log",
+      "git_blob": "7c87f65234a04371ee749fa49474e82ca8b9e73d",
+      "mode": "100644",
+      "bytes": 2312,
+      "sha256": "410c4412e527b89b2e36c49da769c6172338011860aaf4193e21b767eb04a8a1"
     },
     {
       "path": "docs/validation/parity/SI02-S13-qualified-20261021.json",
@@ -39230,10 +39265,10 @@
     },
     {
       "path": "schemas/si-workflow-request-v1.schema.json",
-      "git_blob": "e7af6c1b0bc72a6ab6b4ba5eec3f7702e159075f",
+      "git_blob": "2b263ef44cc89a5d4372f698810a1f75bc928cb5",
       "mode": "100644",
-      "bytes": 19439,
-      "sha256": "1b09cb6f49d478d7e3ece89e2ae0252af2b7f4a5bc227f1ba429403deef1934c"
+      "bytes": 20126,
+      "sha256": "9ca03411009fb4e5d2a27e7a5dd14d3f9b2ec9a6488bfe2c409c0d49bccc99f8"
     },
     {
       "path": "schemas/si-workflow-result-v1.schema.json",
@@ -47007,10 +47042,10 @@
     },
     {
       "path": "tests/python/test_annular_contact_gate.py",
-      "git_blob": "0b36ebf31df49b76758cf6e03be287b741930895",
+      "git_blob": "7ce141b74baef0939add818ab316fe429c2526bc",
       "mode": "100644",
-      "bytes": 1898,
-      "sha256": "aced30884867904d59f23c9f1370f3fe0104da2b1c45527c3d85a4a4ee2dfaf3"
+      "bytes": 3022,
+      "sha256": "b3f8afa575351150751eff4e2f1b13be441848511b8119d51cc1d264a31fb02c"
     },
     {
       "path": "tests/python/test_antenna_measured_comparison.py",

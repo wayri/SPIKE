@@ -1,0 +1,18 @@
+test_absorbing_source_and_signed_work (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_absorbing_source_and_signed_work) ... ok
+test_cancel_during_bare_network_and_callback_failure (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_cancel_during_bare_network_and_callback_failure) ... ok
+test_cancellation_and_forged_child (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_cancellation_and_forged_child) ... ok
+test_conductor_permutation_and_line_reversal (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_conductor_permutation_and_line_reversal) ... ok
+test_feedback_condition_and_resource_limits (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_feedback_condition_and_resource_limits) ... ok
+test_invalid_inputs_rejected_before_solves (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_invalid_inputs_rejected_before_solves) ... ok
+test_matched_uncoupled_lossless_divider_and_phase (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_matched_uncoupled_lossless_divider_and_phase) ... ok
+test_order_scaling_zero_and_probe_independence (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_order_scaling_zero_and_probe_independence) ... ok
+test_physical_boundary_fields_and_heat_oracle (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_physical_boundary_fields_and_heat_oracle) ... ok
+test_split_preserving_heat_and_interior_field_forgery_rejected (tests.python.test_rlgc_terminated_pair.TerminatedPairTests.test_split_preserving_heat_and_interior_field_forgery_rejected) ... ok
+test_actual_worker_physics_schema_and_provenance (tests.python.test_rlgc_terminated_pair_contract.TerminatedPairContractTests.test_actual_worker_physics_schema_and_provenance) ... ok
+test_saved_example_cli_and_catalog (tests.python.test_rlgc_terminated_pair_contract.TerminatedPairContractTests.test_saved_example_cli_and_catalog) ... ok
+test_strict_schemas_and_coded_worker_rejection (tests.python.test_rlgc_terminated_pair_contract.TerminatedPairContractTests.test_strict_schemas_and_coded_worker_rejection) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 7.382s
+
+OK

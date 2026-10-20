@@ -1,0 +1,15 @@
+test_admission_resources_condition_and_cancellation (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_admission_resources_condition_and_cancellation) ... ok
+test_child_provenance_network_field_ledger_forgery_and_late_cancellation (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_child_provenance_network_field_ledger_forgery_and_late_cancellation) ... ok
+test_homogeneous_subdivision_and_physical_resistive_limit (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_homogeneous_subdivision_and_physical_resistive_limit) ... ok
+test_large_storage_and_absorbing_source_keep_j_var_w_separate (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_large_storage_and_absorbing_source_keep_j_var_w_separate) ... ok
+test_physical_chain_endpoints_fields_heat_and_energy (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_physical_chain_endpoints_fields_heat_and_energy) ... ok
+test_single_section_equivalence_to_reactive_pair (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_single_section_equivalence_to_reactive_pair) ... ok
+test_zero_scaling_record_order_permutation_and_reversal (tests.python.test_rlgc_loaded_cascade.LoadedCascadeTests.test_zero_scaling_record_order_permutation_and_reversal) ... ok
+test_actual_worker_physics_schema_and_provenance (tests.python.test_rlgc_loaded_cascade_contract.LoadedCascadeContractTests.test_actual_worker_physics_schema_and_provenance) ... ok
+test_saved_example_cli_and_catalog (tests.python.test_rlgc_loaded_cascade_contract.LoadedCascadeContractTests.test_saved_example_cli_and_catalog) ... ok
+test_strict_schemas_and_coded_worker_rejection (tests.python.test_rlgc_loaded_cascade_contract.LoadedCascadeContractTests.test_strict_schemas_and_coded_worker_rejection) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 10.991s
+
+OK

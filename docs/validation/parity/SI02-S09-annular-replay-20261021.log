@@ -1,0 +1,17 @@
+test_absorbing_source_and_cancellation_after_propagation (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_absorbing_source_and_cancellation_after_propagation) ... ok
+test_cancellation_and_split_preserving_child_corruption (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_cancellation_and_split_preserving_child_corruption) ... ok
+test_conductor_permutation_and_reversal (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_conductor_permutation_and_reversal) ... ok
+test_independent_lossless_abcd_loaded_transfer (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_independent_lossless_abcd_loaded_transfer) ... ok
+test_invalid_admission_condition_and_resource (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_invalid_admission_condition_and_resource) ... ok
+test_order_scaling_zero (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_order_scaling_zero) ... ok
+test_physical_boundary_complex_power_and_storage_oracle (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_physical_boundary_complex_power_and_storage_oracle) ... ok
+test_stored_energy_is_not_heat_and_cap_current_is_distinct (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_stored_energy_is_not_heat_and_cap_current_is_distinct) ... ok
+test_zero_lc_reduces_to_resistive_producer (tests.python.test_rlgc_reactive_pair.ReactivePairTests.test_zero_lc_reduces_to_resistive_producer) ... ok
+test_actual_worker_physics_schema_and_provenance (tests.python.test_rlgc_reactive_pair_contract.ReactivePairContractTests.test_actual_worker_physics_schema_and_provenance) ... ok
+test_saved_example_cli_and_catalog (tests.python.test_rlgc_reactive_pair_contract.ReactivePairContractTests.test_saved_example_cli_and_catalog) ... ok
+test_strict_schemas_and_coded_worker_rejection (tests.python.test_rlgc_reactive_pair_contract.ReactivePairContractTests.test_strict_schemas_and_coded_worker_rejection) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 9.628s
+
+OK
