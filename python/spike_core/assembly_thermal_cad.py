@@ -63,5 +63,9 @@ scaling is requested. OCC reads STEP units and returns millimetres.
     _require(import_surfaces <= boundary, 'STEP_SOURCE_SURFACE: source contains unattached/open surfaces.')
     _require(occ.getMass(3, volumes[0]) > 0, 'STEP_SOURCE_VOLUME: source lacks positive volume.')
     if apply_transform:
-        occ.affineTransform([(3, volumes[0])], shape['transform'])
+        # General OCC affine transforms convert analytic surfaces to splines,
+        # even for identity. This contract admits only proper rigid placement.
+        import numpy as np
+        from .assembly_thermal_encapsulation_occ import rigid_place
+        rigid_place(occ, (3, volumes[0]), np.asarray(shape['transform'], dtype=float).reshape(4, 4))
     return volumes[0]

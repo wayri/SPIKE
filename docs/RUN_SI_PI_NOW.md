@@ -139,3 +139,11 @@ uses the complete pinned designs and public CLI paths. Read its admission,
 material, contact/return and mesh limits before interpreting a board result.
 Marble's corrected RT0 diagnostic passes the narrow DC refinement gate;
 full-board SI/PI remains unqualified for both boards.
+
+The [owned-pad DC increment](OWNED_DRILLED_PAD_DC.md) removes the actual
+EBrake J11.1 and U2.35/U2.39 shape blockers when explicitly selecting
+`mesh.pad_zone_coupling: owned_shared_faces`. The full 3Vin diagnostic now
+executes, but its current-density convergence still fails. Use
+`scripts/check_ebrake_owned_dc.py --output-dir build/NEW-owned-study` to retain
+the complete CLI request/result and unchanged convergence gate. A nonzero
+exit from this study remains a failed sign-off even when the CLI completed.

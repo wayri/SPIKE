@@ -1,10 +1,6 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S05 verification: supplied piecewise RLGC cascade
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 Verified 18 October 2026. **Done for this bounded stage; experimental,
 production-unqualified.** SI02 and full PI/SI parity remain incomplete.
 The [method ledger](../RLGC_LINE_CASCADE.md) retains independent derivation,
@@ -19,7 +15,7 @@ No external implementation, data, figures or prose were copied.
 
 The [canonical source-bound receipt](parity/SI02-S05.json) retains **14 tests,
 zero skips**: eleven numerical and three actual worker/schema/example/CLI
-checks. Its actual log (`parity/SI02-S05-rlgc-cascade-reverified.log`) records names.
+checks. Its [actual log](parity/SI02-S05-rlgc-cascade-reverified.log) records names.
 Reproduce into fresh repository paths:
 
 ```powershell

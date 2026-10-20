@@ -314,3 +314,56 @@ auditability.
 `rlgc-junction request.json` executes the owned `run_rlgc_line_junction` worker.
 See [the input, ordered ports and physical limits](RLGC_LINE_JUNCTION.md).
 Requests are limited to 8 MiB and retain the experimental result status.
+
+## Experimental reactive coupled-line source/load boundary
+
+`rlgc-reactive-pair REQUEST.json` solves sampled physical series-R/L and
+node-shunt-C terminations around a supplied symmetric coupled line pair.
+Use global `--output RESULT.json`; a runnable request is
+`examples/rlgc_reactive_pair/rlc.request.json`. The RF worker method is
+`run_rlgc_reactive_pair` with exactly `{ "request": ... }`.
+See [model, units, primary references and limits](RLGC_REACTIVE_PAIR.md).
+Mean reactive energy is reported separately from electrical heat; geometry,
+transient and board qualification remain separate.
+
+## Experimental supplied coupled-line cascade
+
+`rlgc-coupled-cascade REQUEST.json` composes ordered supplied coupled-pair
+sections with ideal conductor-continuous interfaces. Use global `--output` for
+the result. A runnable request is `examples/rlgc_coupled_cascade/piecewise.request.json`;
+the RF worker method is `run_rlgc_coupled_cascade` with exactly `{ "request": ... }`.
+See [units, primary references, failure behavior and limits](RLGC_COUPLED_CASCADE.md).
+Outputs retain composite S, internal fields and section-owned heat; physical
+discontinuity parasitics, thermal deposition and board qualification are separate.
+
+## Experimental physical RLC loaded coupled channel
+
+`rlgc-loaded-cascade REQUEST.json` drives supplied coupled sections with physical
+series-R/L and node-shunt-C Thevenin source/load models. Use global `--output`
+for the result. Example:`examples/rlgc_loaded_cascade/physical.request.json`.
+RF worker:`run_rlgc_loaded_cascade` with exactly `{ "request": ... }`.
+[Model, units, references and limits](RLGC_LOADED_CASCADE.md) define the
+experimental envelope. Complete internal fields and separate heat W/mean J/var
+are returned; physical thermal allocation and board qualification remain open.
+
+## Experimental coupled-line star
+
+`rlgc-coupled-star REQUEST.json` joins 2–8 supplied coupled legs at two distinct
+ideal conductor nodes. Exterior ports follow leg order, then conductor order.
+Use global `--output` for the result. Example:
+`examples/rlgc_coupled_star/three-leg.request.json`. The RF worker method is
+`run_rlgc_coupled_star` with exactly `{ "request": ... }`.
+[Model, units, references and limits](RLGC_COUPLED_STAR.md) define the experimental
+envelope. Coherent fields and branch heat are returned without junction or
+thermal-cell inference; physical qualification remains separate.
+
+## Experimental physical RLC loaded coupled star
+
+`rlgc-loaded-star REQUEST.json` drives 2–8 coupled branches using physical RLC
+sources/loads on every exterior port. Port order is leg then conductor; zero
+source voltage denotes an inactive but explicitly loaded terminal. Example:
+`examples/rlgc_loaded_star/physical.request.json`. Use global `--output` for
+the result. RF worker: `run_rlgc_loaded_star` with exactly `{ "request": ... }`.
+[Units, sources, numerical limits and unresolved scope](RLGC_LOADED_STAR.md)
+include separate terminal/branch heat W, mean J and reactive var; physical thermal
+allocation and full-board qualification remain separate.

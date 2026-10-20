@@ -95,6 +95,8 @@ class FirmwareSession:
         valid='ABCDEFGHI' if self.is_stm else '01'
         if str(port) not in valid or len(str(port))!=1 or type(pin) is not int or not 0<=pin<(16 if self.is_stm else 32):
             raise ValueError('GPIO port / pin out of range')
+        if not self.is_stm and str(port)=='1' and pin>15:
+            raise ValueError('nRF52840 implements P1.00..P1.15 only')
         return 'gpioPort'+port if self.is_stm else 'gpio'+port
 
     def read32(self,address):
@@ -117,6 +119,17 @@ class FirmwareSession:
         if not self.is_stm and (self.read32(0x50000700+0x300*int(port)+4*pin)>>8)&7>=4:
             raise ValueError('Disconnected / open-drain drive modes cannot directly drive a circuit source')
         return bool(state['output']&(1<<pin))
+
+    def pad_configuration(self,port,pin):
+        """Decode electrical mode; never derive R/C values from drive registers."""
+        self._gpio_device(port,pin)
+        from .firmware_pad_state import decode_stm32,decode_nrf
+        if self.is_stm:
+            base=0x40020000+0x400*(ord(port)-ord('A'))
+            return decode_stm32(self.read32(base),self.read32(base+4),
+                self.read32(base+0xc),self.read32(base+8),self.read32(base+0x14),pin)
+        return decode_nrf(self.read32(0x50000700+0x300*int(port)+4*pin),
+                          self.read32(0x50000504+0x300*int(port)),pin)
 
     def uart_read(self):
         if not self.uart_path.exists():return b''

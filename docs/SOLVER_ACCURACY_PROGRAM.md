@@ -101,7 +101,8 @@ endpoint evidence: its stricter pointwise envelope fails at nonzero excitation,
 including 1 mV and 1 uV. Error scales proportionally rather than flattening at a
 floor. Independent recurrence reproduces the recorded startup/ramp-corner
 backward-Euler defects, so endpoint agreement must not imply whole-waveform
-qualification. Retain `output/acc01-20261013-rerun-1/report.json` as failed,
+qualification. Retain the unbundled local `acc01-20261013-rerun-1/report.json`
+record as failed,
 source-bound evidence; use [the action register](SOLVER_IMPROVEMENT_ACTION_PLAN.md)
 for the integration/event discriminator and unchanged acceptance gates.
 

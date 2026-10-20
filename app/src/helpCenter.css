@@ -6,7 +6,7 @@
 .help-browser button:disabled { opacity: .35; cursor: default; }
 .help-browser :focus-visible { outline: 2px solid var(--spike-accent); outline-offset: 3px; }
 .help-browser button { color: var(--spike-text); }
-.help-browser .help-layout { grid-template-columns: 300px minmax(0, 1fr); }
+.help-browser .help-layout { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
 .help-browser .help-sidebar { display: grid; grid-template-rows: 60px 35px 32px minmax(0, 1fr); }
 .help-browser .help-search { margin: 12px; border-radius: 6px; }
 .help-browser .help-search input { font-size: 12px; height: 34px; }

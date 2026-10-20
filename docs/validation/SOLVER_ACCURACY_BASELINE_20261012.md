@@ -100,8 +100,8 @@ Reproduce from the repository root with the matching runtimes available:
 
 ```powershell
 python -c "import json; from python.spike_core.benchmarks import run_solver_benchmarks; print(json.dumps(run_solver_benchmarks(), indent=2, allow_nan=False))"
-python scripts/run_spikes_competitive_benchmarks.py --library build-spikes-sine-20261012/Release/spikes_c_api.dll --repetitions 1 --output output/new-circuit-comparison.json
-python scripts/benchmark_circuit_timestep_accuracy.py --library build-spikes-sine-20261012/Release/spikes_c_api.dll --output output/new-timestep-run
+python scripts/run_spikes_competitive_benchmarks.py --library build-spikes-sine-20261012/Release/spikes_c_api.dll --repetitions 1 --output "$env:TEMP/spike-new-circuit-comparison.json"
+python scripts/benchmark_circuit_timestep_accuracy.py --library build-spikes-sine-20261012/Release/spikes_c_api.dll --output "$env:TEMP/spike-new-timestep-run"
 build/qualification-py311/Scripts/python.exe -m unittest tests.python.test_assembly_tetra_thermal tests.python.test_structured_solid_thermal tests.python.test_laminar_channel_cht tests.python.test_magnetic_fem tests.python.test_em_machines tests.python.test_si_channel -q
 build/qualification-py311/Scripts/python.exe -m unittest tests.python.test_benchmarks tests.python.test_spikes_competitive_benchmark tests.python.test_spikes_public_benchmark tests.python.test_circuit_timestep_accuracy -q
 python scripts/check_architecture.py
@@ -112,7 +112,8 @@ the first fixture title needed an explicit comment marker; sandbox restrictions
 blocked native-library access and temporary-file operations; the default Python
 lacked jsonschema for broader regressions. Corrected runs used the qualification
 environment and authorized native execution, without changing solver code or gates.
-Local raw evidence and logs remain under `output/solver-accuracy-20261012/`.
+Raw evidence and logs are unbundled local records under `solver-accuracy-20261012`;
+see [the release evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
 
 Historical SU2, CalculiX and openEMS comparisons are audited in the program
 register but were not rerun here. No new hardware correlation, magnetic external

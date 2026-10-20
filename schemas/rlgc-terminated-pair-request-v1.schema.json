@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-terminated-pair-request-v1.schema.json",
+  "title": "SPIKE physical resistive source/load coupled pair request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "pair",
+    "terminations",
+    "sources"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-terminated-pair-request/v1"
+    },
+    "pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conductor_ids",
+        "modes",
+        "probes"
+      ],
+      "properties": {
+        "conductor_ids": {
+          "$ref": "rlgc-coupled-pair-request-v1.schema.json#/properties/conductor_ids"
+        },
+        "modes": {
+          "$ref": "rlgc-coupled-pair-request-v1.schema.json#/properties/modes"
+        },
+        "probes": {
+          "$ref": "rlgc-coupled-pair-request-v1.schema.json#/properties/probes"
+        }
+      }
+    },
+    "terminations": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "port",
+          "resistance_ohm"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "resistance_ohm": {
+            "type": "number",
+            "minimum": 1e-06,
+            "maximum": 1000000000000.0
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "voltage_v"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "voltage_v": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "real",
+                "imag"
+              ],
+              "properties": {
+                "real": {
+                  "type": "number"
+                },
+                "imag": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "description": "Runtime requires unique termination IDs, a complete port partition and exact source/modal frequency agreement; inherited scalar/pair validity, representability, cancellation and aggregate resource checks remain authoritative."
+}

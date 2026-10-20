@@ -27,6 +27,13 @@ formats rather than additional product implementation languages.
 
 ## Mandatory rules
 
+Owner-directed native/HPC work follows [the migration roadmap](NATIVE_HPC_MIGRATION.md):
+C++20 for measured computational kernels, shared-memory parallelism and native
+MPI for distributed physical solves, retaining Python contracts/control and
+independent reference oracles. WASM is an optional same-source target, not a
+replacement cluster backend. This does not add a language or claim an executed
+native/MPI migration; numerical equivalence and human maintainability are gates.
+
 1. No new implementation language may enter a production source root without
    an accepted ADR that includes ownership, toolchain, security, packaging,
    test, and retirement analysis.

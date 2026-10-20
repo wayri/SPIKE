@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
-// Standalone opt-in verification, no production registration:
-// g++ -std=c++20 -O2 -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off
-//   -I src src/peec/affine_triangle_basis.cpp tests/test_affine_triangle_basis.cpp
-//   -o build/test_affine_triangle_basis
+// Isolated verification, no production registration. From an existing CMake
+// build configured with tests enabled:
+// cmake --build <build-dir> --target test_affine_triangle_basis --config Release
+// ctest --test-dir <build-dir> -C Release -R ^test_affine_triangle_basis$ --output-on-failure
 #include "peec/affine_triangle_basis.hpp"
+#include "peec/affine_slab_inductance.hpp"
+#include "peec/volume_inductance.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -320,10 +322,128 @@ void unsupported_and_invalid() {
   options={};options.relative_tolerance=1;
   rejects([&]{separated_mutual(p,triangle(1,10),options);},"Invalid tolerance");
 }
+void same_slab_integrals() {
+  // A completely independent volume kernel sees ONE rectangle, whereas the
+  // candidate sees self and touching integrals of two triangular supports.
+  for(double thickness:{1e-3,35e-6,1e-6}) {
+    const double side=1e-3;
+    const Vector density{1/(side*thickness),0,0};
+    TrianglePrism a{{Point{0,0},Point{side,0},Point{0,side}},0,thickness,
+                     {density,density,density}};
+    TrianglePrism b{{Point{side,side},Point{0,side},Point{side,0}},0,thickness,a.density_per_a};
+    SlabOptions o;o.relative_tolerance=1e-7;o.absolute_tolerance_h=1e-20;
+    o.maximum_evaluations=1000000;
+    const auto aa=same_slab_mutual(a,a,o),ab=same_slab_mutual(a,b,o),bb=same_slab_mutual(b,b,o);
+    require(aa.converged&&ab.converged&&bb.converged,"Same-slab self/touching convergence");
+    spike::peec::volume::RectangularVolume square;
+    square.center_m={side/2,side/2,thickness/2};
+    square.length_m=side;square.width_m=side;square.thickness_m=thickness;
+    spike::peec::volume::IntegrationOptions reference_options;
+    reference_options.relative_tolerance=1e-9;
+    reference_options.absolute_tolerance_h=1e-20;
+    reference_options.max_potential_evaluations=10000000;
+    reference_options.max_cells=16384;
+    const auto reference=spike::peec::volume::rectangular_inductance(square,square,reference_options);
+    std::cout<<"rectangle converged="<<reference.converged<<" value="<<reference.inductance_h
+             <<" error="<<reference.estimated_error_h<<" evaluations="<<reference.potential_evaluations<<'\n';
+    require(reference.converged,"Independent rectangular kernel convergence");
+    const double total=aa.inductance_h+2*ab.inductance_h+bb.inductance_h;
+    const double error=aa.estimated_error_h+2*ab.estimated_error_h+bb.estimated_error_h;
+    require(std::abs(total-reference.inductance_h)<=error+reference.estimated_error_h,
+            "Square subdivision matches independent rectangle kernel within estimates");
+    near(total,reference.inductance_h,2e-7,"Square independent accuracy gate");
+    std::cout<<"same-slab thickness="<<thickness<<" total="<<total
+             <<" rectangle="<<reference.inductance_h<<" error="<<error
+             <<" evaluations="<<aa.evaluations+2*ab.evaluations+bb.evaluations<<'\n';
+    if(thickness==35e-6) {
+      const auto rt=unit_face_basis(a.vertices_m,0,thickness,0);
+      const auto self=same_slab_mutual(rt,rt,o);
+      require(self.converged && self.inductance_h>0,"Thin RT0 self admission");
+      auto tighter=o;tighter.relative_tolerance=1e-8;tighter.absolute_tolerance_h=1e-20;
+      const auto refined=same_slab_mutual(rt,rt,tighter);
+      require(refined.converged,"Thin RT0 tighter integration admission");
+      require(std::abs(self.inductance_h-refined.inductance_h)<=
+              self.estimated_error_h+refined.estimated_error_h,"Thin RT0 integration sensitivity");
+      near(self.inductance_h,-same_slab_mutual(rt,reverse(rt),o).inductance_h,1e-12,
+           "Same-slab orientation reversal");
+      near(self.inductance_h,same_slab_mutual(rotate_translate(rt),rotate_translate(rt),o).inductance_h,
+           3e-10,"Same-slab rigid transform");
+      auto doubled=rt;
+      for(auto& p:doubled.vertices_m)for(auto& x:p)x*=2;
+      doubled.upper_z_m*=2;
+      for(auto& v:doubled.density_per_a)for(auto& x:v)x/=4;
+      near(2*self.inductance_h,same_slab_mutual(doubled,doubled,o).inductance_h,3e-8,
+           "Same-slab SI inductance scaling");
+      std::cout<<"thin RT0 self="<<self.inductance_h<<" error="<<self.estimated_error_h
+               <<" evaluations="<<self.evaluations<<" refined="<<refined.inductance_h<<'\n';
+    }
+  }
+  TrianglePrism a{{Point{0,0},Point{1,0},Point{0,1}},0,1,
+                   {Vector{0,0,0},Vector{1,0,0},Vector{0,1,0}}};
+  TrianglePrism b{{Point{1,1},Point{0,1},Point{1,0}},0,1,
+                   {Vector{1,1,0},Vector{0,1,0},Vector{1,0,0}}};
+  SlabOptions o;o.relative_tolerance=1e-7;
+  const auto aa=same_slab_mutual(a,a,o),ab=same_slab_mutual(a,b,o),bb=same_slab_mutual(b,b,o);
+  require(aa.converged&&ab.converged&&bb.converged,"Affine cube slab convergence");
+  const double reference=affine_cube_oracle(16);
+  near(aa.inductance_h+2*ab.inductance_h+bb.inductance_h,reference,2e-7,
+       "Independent affine cube correlation oracle");
+  require(std::abs(aa.inductance_h+2*ab.inductance_h+bb.inductance_h-reference)<=
+          aa.estimated_error_h+2*ab.estimated_error_h+bb.estimated_error_h,
+          "Affine cube reference within estimated error");
+  near(ab.inductance_h,same_slab_mutual(b,a,o).inductance_h,1e-14,"Same-slab reciprocity");
+  auto overlap=a;for(auto& p:overlap.vertices_m)p[0]+=0.25;
+  require(same_slab_mutual(a,overlap,o).converged,"Same-slab overlap convergence");
+  auto zero=a;zero.density_per_a={};
+  require(same_slab_mutual(a,zero,o).converged && same_slab_mutual(a,zero,o).inductance_h==0,
+          "Same-slab exact zero field");
+  o.maximum_evaluations=1;
+  require(!same_slab_mutual(a,b,o).converged,"Same-slab exhausted budget fails closed");
+  o={};o.maximum_cells=1;
+  require(!same_slab_mutual(a,b,o).converged,"Same-slab exhausted memory fails closed");
+  o={};o.relative_tolerance=-1;
+  rejects([&]{same_slab_mutual(a,b,o);},"Same-slab invalid tolerance");
+  auto invalid=a;invalid.density_per_a[0][0]=std::numeric_limits<double>::quiet_NaN();
+  rejects([&]{same_slab_mutual(invalid,a);},"Same-slab nonfinite field rejection");
+  invalid=a;std::swap(invalid.vertices_m[1],invalid.vertices_m[2]);
+  rejects([&]{same_slab_mutual(invalid,a);},"Same-slab inverted support rejection");
+  b.upper_z_m=2;
+  rejects([&]{same_slab_mutual(a,b);},"Unequal z slabs remain unsupported");
+  const auto first=triangle(),second=triangle(1,3);
+  const auto separated=same_slab_mutual(first,second);
+  require(separated.converged,"Same-slab separated convergence");
+  near(separated.inductance_h,mutual_oracle(first,second,8),2e-6,
+       "Independent six-dimensional separated oracle");
+  double matrix[3][3]{};
+  for(std::size_t i=0;i<3;++i)for(std::size_t j=0;j<=i;++j) {
+    const auto fi=unit_face_basis(first.vertices_m,0,0.1,i);
+    const auto fj=unit_face_basis(first.vertices_m,0,0.1,j);
+    const auto entry=same_slab_mutual(fi,fj);
+    require(entry.converged,"All local RT0 magnetic matrix entries converge");
+    matrix[i][j]=matrix[j][i]=entry.inductance_h;
+  }
+  const double scale=std::max({matrix[0][0],matrix[1][1],matrix[2][2]});
+  double lower[3][3]{};
+  require(scale>0,"Local magnetic matrix has a positive scale");
+  for(std::size_t i=0;i<3;++i)for(std::size_t j=0;j<=i;++j) {
+    double value=matrix[i][j]/scale;
+    for(std::size_t k=0;k<j;++k)value-=lower[i][k]*lower[j][k];
+    if(i==j) {
+      require(value>1e-10,"Unmodified local magnetic matrix positive Cholesky pivot");
+      lower[i][j]=std::sqrt(value);
+    }else lower[i][j]=value/lower[j][j];
+  }
+  for(int i=-2;i<=2;++i)for(int j=-2;j<=2;++j)for(int k=-2;k<=2;++k) {
+    const double q[]={double(i),double(j),double(k)};double energy=0;
+    for(std::size_t m=0;m<3;++m)for(std::size_t n=0;n<3;++n)energy+=q[m]*matrix[m][n]*q[n];
+    require(energy>=0,"Unprojected RT0 magnetic energy must remain nonnegative");
+  }
+}
 } // namespace
 int main() {
   try {
     moments_and_flux();separated_integrals();singular_integrals();unsupported_and_invalid();
+    same_slab_integrals();
     std::cout<<"Affine triangular-prism bounded-subset checks passed\n";
     return 0;
   }catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;}

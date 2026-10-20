@@ -3,12 +3,12 @@
   "baseline_date": "2026-10-12",
   "purpose": "Implementation feedback and proposed acceptance gates; does not enable or qualify runtime capabilities.",
   "plan_document": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
-  "baseline_report": "output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf",
+  "baseline_report": "local-only:solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf",
   "all_solver_qualified": false,
   "accuracy_refresh_20261018": {
     "method": "radau_iia3",
     "scope": "Opt-in fixed-step independent-source linear RLC/index-one systems; legacy methods/defaults retained.",
-    "report": "output/acc01-radau-20261018/report.json",
+    "report": "local-only:acc01-radau-20261018/report.json",
     "runs": 42,
     "passed": 42,
     "binding_status": "conclusive",
@@ -31,7 +31,7 @@
     },
     "full_suite_attempts": [
       {
-        "log": "output/acc01-radau-20261018/full-python-suite-20261018.log",
+        "log": "local-only:acc01-radau-20261018/full-python-suite-20261018.log",
         "tests": 4235,
         "failures": 1,
         "errors": 5,
@@ -39,7 +39,7 @@
         "status": "failed; original evidence retained"
       },
       {
-        "log": "output/acc01-radau-20261018/full-python-suite-final-20261018.log",
+        "log": "local-only:acc01-radau-20261018/full-python-suite-final-20261018.log",
         "tests": 4250,
         "failures": 0,
         "errors": 4,
@@ -47,7 +47,7 @@
         "status": "failed; concurrent PI/SI gate edits after module loading caused stale-evidence rejection; retained without reclassification"
       },
       {
-        "log": "output/acc01-radau-20261018/full-python-suite-stable-20261018.log",
+        "log": "local-only:acc01-radau-20261018/full-python-suite-stable-20261018.log",
         "tests": 4270,
         "failures": 1,
         "errors": 0,
@@ -56,7 +56,7 @@
         "status": "failed; debugger remained starting beyond the existing four-second observation budget for its one-second deadline; no gate weakening"
       },
       {
-        "log": "output/acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
+        "log": "local-only:acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
         "tests": 4293,
         "failures": 0,
         "errors": 0,
@@ -66,8 +66,8 @@
         "status": "passed locally; optional skips remain explicit, not release qualification"
       }
     ],
-    "stable_full_suite_log": "output/acc01-radau-20261018/full-python-suite-stable-20261018.log",
-    "latest_full_suite_log": "output/acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
+    "stable_full_suite_log": "local-only:acc01-radau-20261018/full-python-suite-stable-20261018.log",
+    "latest_full_suite_log": "local-only:acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
     "latest_full_suite_log_sha256": "a823b67ab2325ba961cd94d074e078d7033184590ac0a8e791838ab8a5620c96",
     "accuracy_report_sha256": "7de3e08ed748eacd1b8ec3708764d4f09f0dfaeea14038c17b44873403653645",
     "qualification_inputs_sha256_before_and_after": "5fc39942f0a21fc5cb310fb20724d903f355e57cb7875ba01ec394c4c60ceab6",
@@ -93,7 +93,7 @@
     "architecture_check": "passed",
     "remaining_integration_issues": [
       "Python-debug startup failure passed in isolated rerun; original broad-run failure is retained.",
-      "WF01-S01/S02 import receipts lack newly required source bindings; fresh actual s01/s02 corpus runs passed in output/first-batch-parity-replay-20261013 but concurrent receipts/backlog were not overwritten."
+        "WF01-S01/S02 import receipts lack newly required source bindings; fresh actual s01/s02 corpus runs passed in the unbundled local first-batch-parity-replay-20261013 record but concurrent receipts/backlog were not overwritten."
     ]
   },
   "queue_reconciliation": {
@@ -139,7 +139,7 @@
         "python/spikes/transient_controls.py"
       ],
       "instructions_and_completion_gates": "Owner: circuit numerics. Extend\n`scripts/benchmark_circuit_timestep_accuracy.py` into an amplitude/timestep\nmatrix. Run original linear RC/RL cases at scales 1, 1e-3 and 1e-6 with steps\n1, 0.5 and 0.25 us. Retain volts and amperes as separate observables, raw\nwaveforms and unit-correct normalized errors. Include zero input and sign\nreversal. Do not subtract fitted delay or rescale output after execution.\n\nFor the finest linear fixture, propose\n`abs(error) <= atol + 5e-6*abs(reference)`, with declared initial floors\n`atol_V=1e-12 V` and `atol_I=1e-15 A`. These are tests of a proposed envelope,\nnot an assertion that SPIKE already meets it. Compare error divided by the\nexcitation scale; if it stops scaling, locate tolerances, conditioning,\nintegration, interpolation or serialization as separate causes. Change\nsolver tolerance handling only when the discriminating test identifies it.\nCompletion: publish the minimum verified amplitude and error floor per\nobservable; every failing stratum stays failed.",
-      "execution_evidence": ["output/acc01-20261013-rerun-1/report.json: historical conclusive hybrid-trapezoidal sweep; 36 nonzero strata failed, six zero strata passed. Retained without reclassification.", "output/acc01-20261013/report.json: original run retained with inconclusive source binding.", "output/acc01-radau-20261018/report.json: owner-approved explicit radau_iia3 method; all 42 signed/zero RC/RL strata passed unchanged all-time voltage/current budgets with conclusive source/binary/input bindings. Lowest tested input 1e-6 V, not a universal floor; no nonlinear or measured qualification."]
+      "execution_evidence": ["local-only:acc01-20261013-rerun-1/report.json: historical conclusive hybrid-trapezoidal sweep; 36 nonzero strata failed, six zero strata passed. Retained without reclassification.", "local-only:acc01-20261013/report.json: original run retained with inconclusive source binding.", "local-only:acc01-radau-20261018/report.json: owner-approved explicit radau_iia3 method; all 42 signed/zero RC/RL strata passed unchanged all-time voltage/current budgets with conclusive source/binary/input bindings. Lowest tested input 1e-6 V, not a universal floor; no nonlinear or measured qualification."]
     },
     {
       "id": "ACC02",
@@ -171,7 +171,7 @@
         "scripts/validate_retained_assembly_em.py"
       ],
       "instructions_and_completion_gates": "Owner: retained EM adapter. In `assembly_em.py` and the owned openEMS driver,\nreturn execution status, requested/observed decay, final timestep, cap hit,\nstopping reason and observable-sensitivity status independently. Use a\nsupported public runtime result when available; otherwise use a bounded,\ntested log parser with runtime identity and an explicit unknown state.\nAbsence of the cap warning must not become proof of decay success.\n\nRename the duration-only metric without deleting its historical key meaning.\nAdd synthetic log/parser cases for reached decay, cap hit, timeout, malformed\nand missing evidence. Re-run the retained plate study. Completion: the\n80000-step case remains stopping-failed unless an actual changed run reaches\n-90 dB; accepted S11 sensitivity remains a separate result. No automatic cap\nincrease, softened decay request or new production-qualified flag.",
-      "execution_evidence": ["output/retained-assembly-em-acc03-20261013/validation-summary.json: fresh stopping and sensitivity evidence; -90 dB/80000-step case remains stopping-failed.", "output/retained-assembly-em-acc03-20261013/stopping-reparse-v2.json: reviewed bounded parser corrections preserve all actual run statuses. Full integration checks pending."]
+      "execution_evidence": ["local-only:retained-assembly-em-acc03-20261013/validation-summary.json: fresh stopping and sensitivity evidence; -90 dB/80000-step case remains stopping-failed.", "local-only:retained-assembly-em-acc03-20261013/stopping-reparse-v2.json: reviewed bounded parser corrections preserve all actual run statuses. Full integration checks pending."]
     },
     {
       "id": "ACC04",
@@ -186,7 +186,7 @@
         "scripts/validate_transient_thermal.py"
       ],
       "instructions_and_completion_gates": "Owner: runtime orchestration. Fix declared CAD/mesher environment selection\nand dependency preflight in the existing bounded child-process route. The\nisolated child must import its declared NumPy/native dependencies without\nad hoc injection from unrelated installations. Retain resolved interpreter,\ndependency versions and error diagnostics. Preserve the original failed run.\nCompletion: the retained STEP transient workflow passes in a fresh process\nwith no manual package-path override; a deliberately incomplete environment\nfails preflight with the missing dependency, while isolation and path admission\nchecks still pass.",
-      "execution_evidence": ["output/acc04-20261013/validation.json: actual unchanged qualification-venv retained STEP/transient/package workflow passed without path overrides; source identity unchanged.", "output/acc04-20261013/artifacts/mesh-execution/case-joint/environment.json: actual isolated interpreter and dependency identity retained. Global qualification checks remain open."]
+      "execution_evidence": ["local-only:acc04-20261013/validation.json: actual unchanged qualification-venv retained STEP/transient/package workflow passed without path overrides; source identity unchanged.", "local-only:acc04-20261013/artifacts/mesh-execution/case-joint/environment.json: actual isolated interpreter and dependency identity retained. Global qualification checks remain open."]
     },
     {
       "id": "ACC05",
@@ -219,7 +219,7 @@
         "src/spikes/transient_solver.hpp",
         "python/spikes/native_abi.py"
       ],
-      "instructions_and_completion_gates": "Owner: SPIKES native transient. After ACC01, evaluate the current adaptive LTE\ncontroller across voltage and branch-current scales. Define tolerances for\neach physical quantity and state group, preserving existing ABI behavior or\nintroducing an explicitly versioned option. Do not compare volts, amperes and\ntemperature in an unscaled norm. Distinguish internal stepping from output\nsampling and keep event breakpoints exact.\n\nCompletion: independent RC/RL/RLC and supported diode/switch cases meet the\npredeclared absolute-plus-relative budgets; rejected steps restore all state;\nsource breakpoints, persistent/batch equivalence and failure recovery pass.\nThe small-amplitude sweep must be re-run. Choose an adaptive preset only after\nits achieved error and cost are measured; do not merely tighten all defaults.",
+      "instructions_and_completion_gates": "Owner: SPIKES native transient. After ACC01, evaluate the current adaptive LTE\ncontroller across voltage and branch-current scales. Define tolerances for\neach physical quantity and state group, preserving existing ABI behavior or\nintroducing an explicitly versioned option. Do not compare volts, amperes and\ntemperature in an unscaled norm. Distinguish internal stepping from saved\nsampling and keep event breakpoints exact.\n\nCompletion: independent RC/RL/RLC and supported diode/switch cases meet the\npredeclared absolute-plus-relative budgets; rejected steps restore all state;\nsource breakpoints, persistent/batch equivalence and failure recovery pass.\nThe small-amplitude sweep must be re-run. Choose an adaptive preset only after\nits achieved error and cost are measured; do not merely tighten all defaults.",
       "execution_evidence": []
     },
     {

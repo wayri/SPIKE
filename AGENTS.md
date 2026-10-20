@@ -70,8 +70,11 @@ justifies it. Never start separate user-visible tasks unless requested.
 
 SPIKE is a general multiphysics simulation platform. PCB/ECAD and MCAD are
 geometry/identity inputs; simulation geometry preparation is in scope, building
-a general MCAD authoring product is not. Chemical-engineering expansion remains
-outside active scope. Follow `docs/MULTIPHYSICS_PLATFORM_STRATEGY.md` and preserve
+a general MCAD authoring product is not. General chemical-engineering expansion
+remains outside active scope. On 21 October 2026 the owner explicitly authorized
+propulsion-specific jet/gas-turbine combustion only; follow the narrow boundary
+in `docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md`, without enabling unverified
+reacting-flow capability. Follow `docs/MULTIPHYSICS_PLATFORM_STRATEGY.md` and preserve
 the existing execution gates when evaluating recommended future directions.
 
 All future physics-affecting changes require established governing mathematics,

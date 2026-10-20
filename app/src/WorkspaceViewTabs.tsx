@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { Plus, Boxes } from "./icons";
+import ActionContextMenu from "./ActionContextMenu";
 import type { WorkspaceViewCandidate, WorkspaceViewDescriptor } from "./workspaceViewModel";
 import "./buttonStandard.css";
 import "./WorkspaceViewTabs.css";
@@ -46,8 +48,7 @@ export default function WorkspaceViewTabs({ views, activeViewId, candidates, onM
   onClose: (viewId: string) => void;
   onDetach: (viewId: string, point?: { x: number; y: number }) => void;
 }) {
-  const [candidateId, setCandidateId] = useState("");
-  const choose = (id: string) => { const candidate = candidates.find(item => item.id === id); if (candidate) onAdd(candidate); setCandidateId(""); };
+  const [addAnchor, setAddAnchor] = useState<{x:number;y:number}|null>(null);
   const keyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault(); const ids: Array<string | null> = [null, ...views.map(view => view.id)];
@@ -57,6 +58,7 @@ export default function WorkspaceViewTabs({ views, activeViewId, candidates, onM
     event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
   };
   return <nav className="workspace-view-tabs" aria-label="Assembly views"><div role="tablist" onKeyDown={keyDown}><button type="button" role="tab" aria-selected={activeViewId === null} tabIndex={activeViewId === null ? 0 : -1} className={activeViewId === null ? "workspace-view-main-tab active" : "workspace-view-main-tab"} onClick={onMain}>Main assembly</button>{views.map(view => <WorkspaceTab key={view.id} view={view} active={view.id === activeViewId} onActive={() => onActive(view.id)} onClose={() => onClose(view.id)} onDetach={point => onDetach(view.id, point)}/>)}</div>
-    <label className="workspace-view-add"><span className="sr-only">Add assembly view</span><select aria-label="Add assembly view" value={candidateId} onChange={event => choose(event.target.value)}><option value="">+ Add view</option>{candidates.map(candidate => <option key={candidate.id} value={candidate.id}>{candidate.title}</option>)}</select></label>
+    <button type="button" className="workspace-view-add spike-control--icon" aria-label="Add assembly view" title="Add assembly view" aria-haspopup="menu" aria-expanded={Boolean(addAnchor)} disabled={!candidates.length} onClick={event=>{const rect=event.currentTarget.getBoundingClientRect();setAddAnchor(addAnchor?null:{x:rect.left,y:rect.bottom+4});}}><Plus size={15}/></button>
+    {addAnchor && <ActionContextMenu {...addAnchor} title="Add assembly view" actions={candidates.map(candidate=>({label:candidate.title,icon:Boxes,run:()=>onAdd(candidate)}))} onClose={()=>setAddAnchor(null)}/>}
   </nav>;
 }

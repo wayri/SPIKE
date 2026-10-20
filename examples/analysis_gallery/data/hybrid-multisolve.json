@@ -1,0 +1,145 @@
+{
+  "domain": "hybrid_multisolve",
+  "limitations": [
+    "supplied conforming tetra volumes, not automatic arbitrary PCB CAD extraction",
+    "steady DC scalar conductivity; no AC/full-wave current extraction",
+    "spectral and waveform/table sources are averaged heat, not transient switching circuit solves",
+    "caller-declared nonoverlapping loss data, not arbitrary SPICE/IBIS semiconductor coverage",
+    "exact matched bonds/thermal contacts only; no unrepresented connector/harness/flex links",
+    "experimental, no measured/production qualification"
+  ],
+  "metrics": {
+    "coupled_power_defect_w": 1.5130140751384857e-09,
+    "final_power_relative_defect": 5.485178182352482e-10,
+    "final_temperature_defect_k": 4.095999770470371e-07,
+    "iterations": 13,
+    "thermal_imbalance_w": 1.8474111129762605e-13
+  },
+  "model_status": "experimental",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "3418296fd735af289b7e1185790654bd40c3a5e98c4b0d1dd240638dfe0a09a0",
+    "result_sha256": "0339b6db146b21636ae5995ce0c1472233cd95ab4a2f4001213afd65e1e792ea",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "examples/assembly_field/run_electrothermal.py",
+        "sha256": "bcc2f5f9b4980639d1d53be56a5715d0a72b02fa485449d0ea5b528e1f366171"
+      },
+      {
+        "path": "python/spike_core/assembly_electrothermal.py",
+        "sha256": "155d1b383ed94ddcd338174cc75b917588b93d1665c249729209680a44087e6a"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "deposited_heat_w": 3.1999999999999997,
+      "iteration": 1,
+      "power_relative_defect": 0.13808957286500678,
+      "thermal_result_digest": "33291db7afd7e733e33729b2bbe5a1052ae240b8ae50bb73e0724e55d4e2cd58",
+      "unrelaxed_temperature_defect_k": 100.0
+    },
+    {
+      "deposited_heat_w": 2.8362652950607186,
+      "iteration": 2,
+      "power_relative_defect": 0.027480383918280945,
+      "thermal_result_digest": "502b9815cb8fa37d9ebef884ee3fd31e0dcad089a10582862d1b9b6d8a227e28",
+      "unrelaxed_temperature_defect_k": 20.0
+    },
+    {
+      "deposited_heat_w": 2.7735611695685045,
+      "iteration": 3,
+      "power_relative_defect": 0.005480929942771971,
+      "thermal_result_digest": "aa0519331b6f9f039e00e9b83a61dbcc2f1723734bb427f005ce3702f1b7c8e3",
+      "unrelaxed_temperature_defect_k": 4.0
+    },
+    {
+      "deposited_heat_w": 2.7613862282081674,
+      "iteration": 4,
+      "power_relative_defect": 0.00109358423467659,
+      "thermal_result_digest": "3a6b38364721d6426ef7cda56e7c4cdd7bdb541fc3bec013fd4184dd62add7bb",
+      "unrelaxed_temperature_defect_k": 0.8000000000000114
+    },
+    {
+      "deposited_heat_w": 2.7589698434230425,
+      "iteration": 5,
+      "power_relative_defect": 0.00021821403717613483,
+      "thermal_result_digest": "4be2c48081286c21def8e738ca73f7bcd679aee20e94c11ff74491ad8905ac15",
+      "unrelaxed_temperature_defect_k": 0.160000000000025
+    },
+    {
+      "deposited_heat_w": 2.758488185263725,
+      "iteration": 6,
+      "power_relative_defect": 4.354312878453774e-05,
+      "thermal_result_digest": "24443526a046c5c62affb30ac4b84b444e2ba6b0a9212be990e3528d4b6b7100",
+      "unrelaxed_temperature_defect_k": 0.031999999999982265
+    },
+    {
+      "deposited_heat_w": 2.758392093846684,
+      "iteration": 7,
+      "power_relative_defect": 8.688762505416487e-06,
+      "thermal_result_digest": "f79b7b1fec160cedfcae86f6d7d080760433a8e524bb16dcd15bf7ac9515f5a9",
+      "unrelaxed_temperature_defect_k": 0.006399999999985084
+    },
+    {
+      "deposited_heat_w": 2.758372920201718,
+      "iteration": 8,
+      "power_relative_defect": 1.733790175576384e-06,
+      "thermal_result_digest": "0deae60c88f3f949c087f2f3826389917fab775c03f6525086efb3b01ff47e43",
+      "unrelaxed_temperature_defect_k": 0.0012800000000083855
+    },
+    {
+      "deposited_heat_w": 2.7583690942484718,
+      "iteration": 9,
+      "power_relative_defect": 3.4596746474351534e-07,
+      "thermal_result_digest": "60d31d09c8ae6e7ab16713edea9e04281bc6cc2e0235671d51021d4e2153a113",
+      "unrelaxed_temperature_defect_k": 0.00025599999997893974
+    },
+    {
+      "deposited_heat_w": 2.7583683308036475,
+      "iteration": 10,
+      "power_relative_defect": 6.90357504260972e-08,
+      "thermal_result_digest": "15311221eee1d24cf6229cc2a8f5a509ae3dcdddaa4df7101eaa0dea6382f52f",
+      "unrelaxed_temperature_defect_k": 5.119999997305058e-05
+    },
+    {
+      "deposited_heat_w": 2.758368178462823,
+      "iteration": 11,
+      "power_relative_defect": 1.3775675440544979e-08,
+      "thermal_result_digest": "b4a8077d05be09e7e5ff3f6037cafa6bac13879f130e6de2bca9a52ac2b174b3",
+      "unrelaxed_temperature_defect_k": 1.0239999994610116e-05
+    },
+    {
+      "deposited_heat_w": 2.7583681480641156,
+      "iteration": 12,
+      "power_relative_defect": 2.748854859958784e-09,
+      "thermal_result_digest": "729f5c178865c3ba9f3908c127cd5522e3e87fd4864c9dd27f95b595066f6a96",
+      "unrelaxed_temperature_defect_k": 2.0479999989220232e-06
+    },
+    {
+      "deposited_heat_w": 2.758368141998232,
+      "iteration": 13,
+      "power_relative_defect": 5.485178182352482e-10,
+      "thermal_result_digest": "d2b219fb9b56655d7ae91df4426c7b6a0ba6bf28506060d30e67b9f9159b10b3",
+      "unrelaxed_temperature_defect_k": 4.095999770470371e-07
+    }
+  ],
+  "title": "DC conduction and steady thermal feedback",
+  "units": {
+    "deposited_heat_w": "W",
+    "power_relative_defect": "dimensionless",
+    "unrelaxed_temperature_defect_k": "K"
+  }
+}

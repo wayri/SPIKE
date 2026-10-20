@@ -81,6 +81,68 @@ The current result does not establish mechanical contact, failure/lifetime,
 modal/dynamic response, moving 3D motors, Hall transport or coupled deformation
 feedback. All outputs remain experimental, `production_qualified: false`.
 
+## Thermal bending, alloys and actuator requirements — 21 October 2026
+
+The owner explicitly requested bimetallic strips, alloys, bending under heat,
+thermal actuators and electrical actuators. These extend the existing material,
+layered-mechanics, field/circuit and mechanism stages; they are not new enabled
+capabilities. In particular, the current small-strain isotropic tetra interface
+above is a foundation, not a qualified bimetal/SMA or general actuator workflow.
+
+| Family | Required model and observables | Verification/validation before promotion |
+|---|---|---|
+| Bimetallic and multilayer strips | Distinct bonded layers, thickness/orientation, stress-free reference state, layer-specific expansion/stiffness and actual temperature fields; curvature, tip displacement, stress, free stroke and blocked force | Independently derived bonded-beam/laminate reference, layer-reversal and equal-expansion controls, force/moment balance and thickness/length mesh convergence; measured curvature/temperature or force/stroke data |
+| Thermal bending of ordinary alloys | Supplied alloy-specific temperature-dependent elasticity, expansion, conductivity, heat capacity and resistivity; gradients, constraints and residual stresses explicit | Free/constrained bar and through-thickness-gradient beam references; distinguish material mismatch from gradient-driven bending; check property interpolation/ranges and independent stress/displacement convergence |
+| Thermal and electrothermal actuators | Expansion-driven beams, bimorphs, buckled structures and electrically heated elements, with cooling, preload, attached loads and mechanical constraints | Actual heating and thermal solve feeding mechanics, heat/storage/loss and mechanical work accounting, free-stroke/blocked-force curves and heating/cooling transients. Snap-through, contact/end stops and large rotations require their separately verified nonlinear models |
+| Shape-memory alloys, when selected | Explicit phase/transformation state, heating/cooling hysteresis, stress dependence, transformation heat, history and calibration; not a large constant expansion coefficient | Independent material-point paths, major/minor thermal/load cycles, dissipation/energy and consistent tangent checks, rate/ambient sensitivity and measured device histories. Ordinary alloy support does not imply SMA support |
+| Electrical actuators | Solenoids, voice coils and motor-driven mechanisms; electrostatic, piezoelectric and magnetostrictive families through their own constitutive/field models | Force/torque and reciprocal electrical response, stored field energy/coenergy, drive-circuit/back-EMF and motion consistency, stroke/pull-in/contact limits, mesh/time/coupling refinement and matched measurements |
+
+Materials need supplied or admitted physical properties, reference temperature,
+valid temperature/stress/rate ranges, units, tensor axes where applicable,
+source/uncertainty and constitutive model identity. An alloy name or composition
+does not supply those laws. Temperature-dependent expansion requires consistent
+thermal-strain integration under the selected convention, not silently treating
+the current constant-alpha law as universal. Plasticity, creep, fatigue and
+transformation history need explicit state and applicability.
+
+Bonding must be declared: the first laminate reference assumes a perfect bond;
+finite thermal/contact resistance, slip, delamination and cohesive failure need
+their own interfaces. Thin-layer mesh resolution/locking and beam/shell versus
+solid assumptions require separate checks. A display-only deformation cannot
+change electrical gaps, resistance, cooling geometry or contact automatically.
+
+For electrothermal actuation, conserve every mapped electrical loss in the
+retained heating volumes, including temperature-dependent resistance and any
+qualified field/core losses. If motion changes electrical or thermal behavior,
+solve the declared feedback at one accepted state with convergence and rollback.
+One-way temperature-to-displacement output must remain labeled one-way.
+For dynamic devices, retain mechanical inertia/damping, heating/cooling times,
+drive timing and actual histories rather than extrapolating a static stroke.
+
+The first benchmark should be an independently authored, constant-property,
+perfectly bonded two-layer cantilever under uniform temperature change: check
+zero change, identical-expansion zero-curvature control, layer-order reflection,
+heating/cooling reversal, curvature and blocked-force equilibrium. Then add a
+thermal gradient, actual Joule heating/cooling, and separately qualified
+large-deflection/contact or SMA history. Predeclare case-specific tolerances
+and reference applicability before running; no such new benchmark is claimed
+as executed by this requirements update.
+
+Native implementation follows [the C++/HPC roadmap](NATIVE_HPC_MIGRATION.md),
+with independent reference oracles, reusable states and existing numerical/
+release gates. Compact actuator laws, supplied-map motion and geometry-derived
+coupled fields remain distinct fidelity levels.
+
+Planning sources checked21October2026: Timoshenko's1925
+[Analysis of Bi-Metal Thermostats, DOI10.1364/JOSA.11.000233](https://opg.optica.org/josa/abstract.cfm?uri=josa-11-3-233)
+is a candidate classical reference; publisher metadata was checked, but no
+full-text derivation is claimed reviewed/adopted here. NIST's2011
+[SMA thermo-mechanical characterization abstract](https://www.nist.gov/publications/tips-and-tricks-characterizing-shape-memory-alloy-wire-part-4-150-thermo-mechanical)
+was reviewed for its experimentally described coupling, loading-rate, ambient
+and transformation-heat effects. Neither reference establishes an implemented
+SPIKE material law. Future numerical changes still require the precise primary
+method review, independent derivation, executed evidence and human review.
+
 ## Shared materials, libraries and evidence
 
 LB01 must bind mechanical elasticity/expansion/yield/damage, temperature laws,

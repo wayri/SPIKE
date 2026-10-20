@@ -144,7 +144,7 @@ monitored with a 32 MiB aggregate cap; elapsed time and CPU thread count are
 bounded. Completion requires zero exit status, no `*ERROR`, a solver completion
 marker, a final end-time-1 temperature table, and exactly one finite nonnegative
 temperature for every admitted node. Prescribed temperatures must agree within
-the documented decimal output precision. Input/output/log/executable SHA-256
+the documented decimal output precision. Input, output, log and executable SHA-256
 hashes are retained, along with the actual solver version and log tail.
 
 Run the deterministic and executable tests with:

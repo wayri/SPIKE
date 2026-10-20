@@ -12,7 +12,9 @@ CONTRACT = 'spikes/manufacturer-discovery/v1'
 ALIASES = {'Analog Devices': 'ADI Linear Technology Maxim', 'Texas Instruments': 'TI',
            'Monolithic Power Systems': 'MPS', 'Wolfspeed': 'Cree',
            'Nordic Semiconductor': 'nRF Nordic', 'STMicroelectronics': 'ST STMicro',
-           'Lattice Semiconductor': 'Lattice CPLD FPGA'}
+           'Lattice Semiconductor': 'Lattice CPLD FPGA',
+           'onsemi': 'ON Semiconductor Fairchild', 'Nexperia': 'NXP discrete logic',
+           'ROHM Semiconductor': 'ROHM'}
 
 
 def validate(payload):
@@ -35,6 +37,13 @@ def validate(payload):
             value = row.get(field)
             if value is None and field == 'model_url':
                 continue
+            parsed = urlparse(value) if isinstance(value, str) else None
+            if not parsed or parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password:
+                raise ValueError('Discovery links must be HTTPS URLs without credentials')
+        source_urls = row.get('source_urls', [])
+        if not isinstance(source_urls, list) or len(source_urls) > 20:
+            raise ValueError('Discovery source links must be a bounded list')
+        for value in source_urls:
             parsed = urlparse(value) if isinstance(value, str) else None
             if not parsed or parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password:
                 raise ValueError('Discovery links must be HTTPS URLs without credentials')

@@ -78,12 +78,12 @@ export function loadAppSettings(): AppSettings {
     return {
       ...DEFAULT_SETTINGS,
       ...known,
-      // Migrate the old always-expanded ribbon once; retain subsequent user choices.
+      // The legacy command ribbon belongs exclusively to Classic layout.
       theme: saved.theme === "light" || saved.theme === "high-contrast" || saved.theme === "system" ? saved.theme : "professional-dark",
       interfaceMode: saved.interfaceMode === "classic" ? "classic" : "clean",
       quickToolsVisible: saved.chromeVersion === 3 && saved.quickToolsVisible === true,
       chromeVersion: 3,
-      ribbonVisible: (saved.chromeVersion === 3 || saved.interfaceMode === "classic") && saved.ribbonVisible === true,
+      ribbonVisible: saved.interfaceMode === "classic" && saved.ribbonVisible === true,
       uiScale: typeof saved.uiScale === "number" && Number.isFinite(saved.uiScale) ? Math.max(.65, Math.min(1.5, saved.uiScale)) : 1,
       viewportBackground: saved.viewportBackground === "amoled" ? "amoled" : saved.viewportBackground === "light" ? "light" : "dark",
       viewportGrid: typeof saved.viewportGrid === "boolean" ? saved.viewportGrid : true,
@@ -98,6 +98,10 @@ export function loadAppSettings(): AppSettings {
   } catch {
     return DEFAULT_SETTINGS;
   }
+}
+
+export function toggleLegacyRibbon(settings: AppSettings): AppSettings {
+  return { ...settings, ribbonVisible: settings.interfaceMode === "classic" && !settings.ribbonVisible };
 }
 
 export function saveAppSettings(settings: AppSettings): void {

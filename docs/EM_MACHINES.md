@@ -41,9 +41,9 @@ the single gap. Declared engineering mu0 approximation: 4 pi times 1e-7 H/m.
 From the repository root with the project Python environment:
 
 ~~~powershell
-.venv/Scripts/python.exe -m python.spike_core.cli --output output/em-machines/motor.json em-machine --request examples/em_machines/motor.json
-.venv/Scripts/python.exe -m python.spike_core.cli --output output/em-machines/generator.json em-machine --request examples/em_machines/generator.json
-.venv/Scripts/python.exe -m python.spike_core.cli --output output/em-machines/electromagnet.json em-machine --request examples/em_machines/electromagnet.json
+.venv/Scripts/python.exe -m python.spike_core.cli --output "$env:TEMP/spike-em-machines/motor.json" em-machine --request examples/em_machines/motor.json
+.venv/Scripts/python.exe -m python.spike_core.cli --output "$env:TEMP/spike-em-machines/generator.json" em-machine --request examples/em_machines/generator.json
+.venv/Scripts/python.exe -m python.spike_core.cli --output "$env:TEMP/spike-em-machines/electromagnet.json" em-machine --request examples/em_machines/electromagnet.json
 ~~~
 
 Worker: run_em_machine with exactly one request object. Unknown fields,

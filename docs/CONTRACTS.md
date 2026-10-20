@@ -1,5 +1,14 @@
 # Versioned Data Contracts
 
+Experimental offline annular DC uses `spike/dc-annular-land-request/v1` and
+`spike/dc-annular-stack-request/v1`; corresponding results preserve unit/final
+fields and explicit port incidence. `spike/source-annular-pad/v1` authenticates
+one native circular pad; the source-run wrapper pins files separately from pure
+numerical admission. See [field contract](DC_ANNULAR_LAND.md),
+[circuit/source contract](DC_ANNULAR_CIRCUIT.md) and
+[verified limits](validation/PI01_ANNULAR_CONTACT_20261021.md). These contracts
+are not registered desktop solver routes or whole-board qualification.
+
 Supplied piecewise line execution uses `spike/rlgc-line-cascade-request/v1`
 and `spike/rlgc-line-cascade-result/v1`, worker `run_rlgc_line_cascade` and CLI
 `rlgc-cascade request.json`. Named sections share an exact positive-frequency

@@ -1,0 +1,255 @@
+{
+  "contract": "spike/parity-stage-evidence/v2",
+  "stage_id": "WF01-S04A",
+  "manifest": "benchmarks/parity-import/models-manifest.json",
+  "summary": {
+    "contract": "spike/board-corpus-benchmark/v2",
+    "status": "passed",
+    "runner_sources": {
+      "scripts/benchmark_board_corpus.py": "1df22dc7374af2c055395b36df59ac144758e7dc2ff60b8ded21f6125b98d6c3",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/contracts.py": "252a1d04297301d4a63615d118e29e6a5c7914936d3b255cf65eef0300d1314a",
+      "python/spike_core/importers.py": "248d48b2d8cf72fb11aedc360bdc860ef62967d3c5983baf6251078eddc17146",
+      "python/spike_core/source_package.py": "6e3b6e6b4f088e5ab44fd3b70fdde6e629cda9a70dc83bf6ab7c663cb7b1439d",
+      "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+      "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+      "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+      "python/core/filled_polygon_offset.py": "a349c830f77ec7c3b82f787a5e25875bbf2de63a2a958d7229a80a853a80e884",
+      "python/core/simple_polygon_union.py": "683ab0bbc74be4b8b8363f0090909781fa998a85e5325c7a453e0b4942801a0f",
+      "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+      "python/spike_core/odb_importer.py": "09fe71f2732eb95f5006f9dacdad9b094e14fd20f2fe91d3d6f0c9d7ea30cf1b",
+      "python/spike_core/odb_features.py": "393bbb3a4a2b027d8b291ad74863e5a12ea23ed242103f7d9ad28e2894c14edd",
+      "python/spike_core/odb_stackup.py": "7c51d02e64965435c7b700be24ef1b09501bbda59ce9932974daf9a7a0b7fba1",
+      "python/spike_core/odb_source_inspection.py": "93597ce95895dce3aa4a085f7a2962421a70cef61db9489b4655f900f88d6ddc",
+      "schemas/board-enrichment-v1.schema.json": "b19a8c06b5bc4d17066b05ff7158c64d808d6b962b1c75075d48848e0acd77b1",
+      "extensions/odb-import/extension.py": "22a8549d79bce15286c0c6d739892e0c70d3b66894cdfbc564e60aaeca6dde46",
+      "python/spike_core/arc_legacy_projection.py": "ac80beed70089e90ff3184ec5482c7d778a95f64c9d26c488dd50f0b0b8ea047",
+      "python/spike_core/board_outline_geometry.py": "9ab3703d6906ca758c993b34c7d86972e5dea31e3e56242d0328f5d524af9634",
+      "python/spike_core/mcad_export_design.py": "ae1b150555f2de8a52cf13c02cfc28459679c6f7556bbb527eede7cf9e5c27a1",
+      "python/spike_core/mcad_export_contract.py": "f5815ca7d32598795e490234500191e11e466f9695197434a27249edfada13e0",
+      "python/spike_core/assembly_frames.py": "e718ccb2d75ae4370b37043f8fa60be144019fd1b3e459382f91ab2fe93b5c70",
+      "schemas/mcad-assembly-v1.schema.json": "26e8188fe4a7efd8fa0444caaf9f89f9c5fbee330dd466fd31c56db5c8666c71",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/pcb_volume_compiler.py": "41c939afc72275a87208a52f900c084794daeca40936f87bdb82a6331eb67cba",
+      "python/spike_core/geometry_arrow.py": "cf34e0c6e2259104317ef9b748d63589703f787d6f39523946ecf52917e854f6",
+      "python/spike_core/spikes_layout_geometry_handoff.py": "220fc2b515f16aaf792404c4cf0df487085a54dfe33652a9b1c74fe01691e537",
+      "scripts/parity_geometry_gate.py": "f3cf39867826203adf1459a4a8ec7e6a31e9a3761fede23a5b15aaeb7b7d9f8e",
+      "scripts/capture_parity_native_geometry.py": "0cda49f707aa5f38857a320650483381c22b2d94eb4cd8dc69135beea304eece",
+      "scripts/parity_native_geometry_gate.py": "1c91e5ecb40017fcae50f8247c0fe3724a6c11c99c53dcddf068bfcf76621f39",
+      "app/src/boardParser.ts": "6387d792de9370a3597a593a605fd376605aac59cdf20facf7d74576db4b28ef",
+      "app/src/normalizedBoard.ts": "aa10b18dec274718620d3d084099cd24de3114adc6498203519745673e280479",
+      "python/spike_core/mcad_component_models.py": "f72f3e769eafce15881c5444537c1e4210267ef6ae41379355fd98f5565f4de3",
+      "scripts/parity_component_model_gate.py": "4895069034032a71f9cc8eac4ef00c5dbd42d8b82a399ee5e29462fc6f80f1c2"
+    },
+    "runner_sources_after": {
+      "scripts/benchmark_board_corpus.py": "1df22dc7374af2c055395b36df59ac144758e7dc2ff60b8ded21f6125b98d6c3",
+      "scripts/board_corpus_assertions.py": "1861ac6c326dd680d6fd68fda2dbe6f2b63a52e6dc279f2387ca3c572729ba60",
+      "python/spike_core/contracts.py": "252a1d04297301d4a63615d118e29e6a5c7914936d3b255cf65eef0300d1314a",
+      "python/spike_core/importers.py": "248d48b2d8cf72fb11aedc360bdc860ef62967d3c5983baf6251078eddc17146",
+      "python/spike_core/source_package.py": "6e3b6e6b4f088e5ab44fd3b70fdde6e629cda9a70dc83bf6ab7c663cb7b1439d",
+      "python/spike_core/spider_v2.py": "f664c03f1d37cd912ed0b2b091ba1e317b5c9882064e8f38869bd479a5d06e59",
+      "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+      "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+      "python/core/filled_polygon_offset.py": "a349c830f77ec7c3b82f787a5e25875bbf2de63a2a958d7229a80a853a80e884",
+      "python/core/simple_polygon_union.py": "683ab0bbc74be4b8b8363f0090909781fa998a85e5325c7a453e0b4942801a0f",
+      "python/core/kicad_model_sources.py": "94614d75fe15fd5858baa93c5063f57a5570e7eb94e518b128fedd5fd7022a92",
+      "python/spike_core/odb_importer.py": "09fe71f2732eb95f5006f9dacdad9b094e14fd20f2fe91d3d6f0c9d7ea30cf1b",
+      "python/spike_core/odb_features.py": "393bbb3a4a2b027d8b291ad74863e5a12ea23ed242103f7d9ad28e2894c14edd",
+      "python/spike_core/odb_stackup.py": "7c51d02e64965435c7b700be24ef1b09501bbda59ce9932974daf9a7a0b7fba1",
+      "python/spike_core/odb_source_inspection.py": "93597ce95895dce3aa4a085f7a2962421a70cef61db9489b4655f900f88d6ddc",
+      "schemas/board-enrichment-v1.schema.json": "b19a8c06b5bc4d17066b05ff7158c64d808d6b962b1c75075d48848e0acd77b1",
+      "extensions/odb-import/extension.py": "22a8549d79bce15286c0c6d739892e0c70d3b66894cdfbc564e60aaeca6dde46",
+      "python/spike_core/arc_legacy_projection.py": "ac80beed70089e90ff3184ec5482c7d778a95f64c9d26c488dd50f0b0b8ea047",
+      "python/spike_core/board_outline_geometry.py": "9ab3703d6906ca758c993b34c7d86972e5dea31e3e56242d0328f5d524af9634",
+      "python/spike_core/mcad_export_design.py": "ae1b150555f2de8a52cf13c02cfc28459679c6f7556bbb527eede7cf9e5c27a1",
+      "python/spike_core/mcad_export_contract.py": "f5815ca7d32598795e490234500191e11e466f9695197434a27249edfada13e0",
+      "python/spike_core/assembly_frames.py": "e718ccb2d75ae4370b37043f8fa60be144019fd1b3e459382f91ab2fe93b5c70",
+      "schemas/mcad-assembly-v1.schema.json": "26e8188fe4a7efd8fa0444caaf9f89f9c5fbee330dd466fd31c56db5c8666c71",
+      "python/spike_core/assembly_thermal_meshing.py": "15a70e093268f073e698265d5169eaaf6566d08d1b67c238f9fd5d498dfdd984",
+      "python/spike_core/pcb_volume_compiler.py": "41c939afc72275a87208a52f900c084794daeca40936f87bdb82a6331eb67cba",
+      "python/spike_core/geometry_arrow.py": "cf34e0c6e2259104317ef9b748d63589703f787d6f39523946ecf52917e854f6",
+      "python/spike_core/spikes_layout_geometry_handoff.py": "220fc2b515f16aaf792404c4cf0df487085a54dfe33652a9b1c74fe01691e537",
+      "scripts/parity_geometry_gate.py": "f3cf39867826203adf1459a4a8ec7e6a31e9a3761fede23a5b15aaeb7b7d9f8e",
+      "scripts/capture_parity_native_geometry.py": "0cda49f707aa5f38857a320650483381c22b2d94eb4cd8dc69135beea304eece",
+      "scripts/parity_native_geometry_gate.py": "1c91e5ecb40017fcae50f8247c0fe3724a6c11c99c53dcddf068bfcf76621f39",
+      "app/src/boardParser.ts": "6387d792de9370a3597a593a605fd376605aac59cdf20facf7d74576db4b28ef",
+      "app/src/normalizedBoard.ts": "aa10b18dec274718620d3d084099cd24de3114adc6498203519745673e280479",
+      "python/spike_core/mcad_component_models.py": "f72f3e769eafce15881c5444537c1e4210267ef6ae41379355fd98f5565f4de3",
+      "scripts/parity_component_model_gate.py": "4895069034032a71f9cc8eac4ef00c5dbd42d8b82a399ee5e29462fc6f80f1c2"
+    },
+    "source_snapshot_stable": true,
+    "python_version": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+    "manifest_sha256": "8e7dcb631b3dfb6807dc25763d8c009ec6154379284cba9df3dda53dc53178b2",
+    "manifest_sha256_after": "8e7dcb631b3dfb6807dc25763d8c009ec6154379284cba9df3dda53dc53178b2",
+    "production_qualified": false,
+    "scope": "CLI import status, canonical units/identity, pinned source and optional independent counts/entity values; no viewport or physics validation",
+    "boards": [
+      {
+        "fixture": "models.kicad_pcb",
+        "source_url": "repository:benchmarks/parity-import/models.kicad_pcb",
+        "license": "Apache-2.0",
+        "sha256": "84cccc5d0b59a17dfdf35ffd162c5a50574d5520eb386a91c4dc2f3bbf5a2211",
+        "command": [
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\qualification-py311\\Scripts\\python.exe",
+          "-m",
+          "python.spike_core.cli",
+          "--quiet",
+          "--output",
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\build\\import-refresh-20261019-live\\WF01-S04A\\000-import.json",
+          "import",
+          "C:\\Users\\yawar\\Documents\\agws\\KiCAD_plugins\\SPIKE\\benchmarks\\parity-import\\models.kicad_pcb",
+          "--report"
+        ],
+        "exit_code": 0,
+        "stderr": "",
+        "counts": {
+          "materials": 3,
+          "layers": 4,
+          "nets": 1,
+          "tracks": 0,
+          "arcs": 1,
+          "zones": 0,
+          "pads": 1,
+          "vias": 0,
+          "drills": 0,
+          "castellations": 0,
+          "pins": 1,
+          "components": 1,
+          "regions": 0,
+          "models": 3
+        },
+        "mismatches": {},
+        "import_status": "completed_with_warnings",
+        "errors": [],
+        "diagnostics": [
+          {
+            "code": "KICAD_ARC_LINEARIZED",
+            "severity": "warning",
+            "source_id": "77777777-7777-4777-8777-777777777777",
+            "segment_count": 8,
+            "exact_source_retained": true,
+            "message": "Legacy solver projection uses straight chords; nondegenerate exact source arcs are retained separately."
+          }
+        ],
+        "source_issues": [
+          {
+            "code": "IMPORT_OBJECT_DIAGNOSTICS",
+            "severity": "warning",
+            "message": "The KiCad importer recorded 1 recoverable object diagnostics.",
+            "path": "",
+            "suggestion": "Review importer diagnostics before relying on geometry completeness.",
+            "status": "open"
+          },
+          {
+            "code": "KICAD_ARC_LINEARIZED",
+            "severity": "warning",
+            "message": "1 source copper arcs use straight chords in the legacy solver projection.",
+            "path": "",
+            "suggestion": "Use retained canonical arcs for exact geometry; qualify chord error before relying on legacy curved-source accuracy.",
+            "status": "open"
+          },
+          {
+            "code": "KICAD_MODEL_PLACEMENT_UNAPPLIED",
+            "severity": "warning",
+            "message": "J1: all model declarations retained; local placement composition and solid geometry remain unqualified.",
+            "path": "",
+            "suggestion": "",
+            "status": "open"
+          }
+        ],
+        "inferred": [],
+        "solver_readiness": {
+          "pi_dc": {
+            "ready": true,
+            "reasons": []
+          },
+          "pi_ac": {
+            "ready": true,
+            "reasons": []
+          },
+          "si": {
+            "ready": true,
+            "reasons": []
+          },
+          "thermal": {
+            "ready": true,
+            "reasons": []
+          },
+          "emi": {
+            "ready": true,
+            "reasons": []
+          }
+        },
+        "geometry_mismatches": [],
+        "entity_assertions_checked": 30,
+        "source_digest_checked": true,
+        "passed": true,
+        "source_sha256_after": "84cccc5d0b59a17dfdf35ffd162c5a50574d5520eb386a91c4dc2f3bbf5a2211",
+        "elapsed_s": 2.813
+      }
+    ]
+  },
+  "model_gate": {
+    "import_file": "docs/validation/parity/WF01-S04A-import-refresh-20261019.json",
+    "import_sha256": "d2f36449572beb3306044da02141b2f8041adb806f81a39a9f1a50f1535114d5",
+    "native_file": "docs/validation/parity/WF01-S04A-native.json",
+    "native_sha256": "2597cbddbb3dde915972f42c3b59f088fe43424d1643717ed88c18217870bcc8",
+    "runner_sha256": "d2305e008a474c671961805fe362ee0c393ad8896eec570ea756427ba00831e4"
+  },
+  "native_validation": {
+    "tool": "KiCad 10.0.6 pcbnew and kicad-cli",
+    "render": "build/parity-native/models-s04a.png",
+    "drc": "build/parity-native/models-s04a-drc.json",
+    "violations": 2,
+    "unconnected_items": 1,
+    "limits": "Model paths are intentionally unresolved; native parsing and declared vector agreement do not validate solids, composed placements or physics."
+  },
+  "verification": {
+    "focused_tests": 39,
+    "architecture": "passed",
+    "documentation_files": 3,
+    "backlog": "passed",
+    "cli_assertions": 30,
+    "native_model_occurrences": 3,
+    "full_python_suite": {
+      "tests": 3706,
+      "failures": 1,
+      "skipped": 69,
+      "elapsed_s": 1031.175,
+      "log": "build/parity-stage04a-full-python.log",
+      "failure": "test_python_debug.PythonDebugTest.test_parent_admits_design_bound_result: session stayed starting past the 4-second test deadline."
+    },
+    "unchanged_module_rerun": {
+      "module": "tests.python.test_python_debug",
+      "tests": 8,
+      "status": "passed",
+      "elapsed_s": 22.517,
+      "log": "build/parity-stage04a-debug-rerun.log"
+    },
+    "limitation": "Timeout did not reproduce in the module rerun; root cause is not established. This is not a zero-failure full-suite claim or a physics/release qualification.",
+    "current_cli_replay": {
+      "status": "passed",
+      "output_directory": "build/parity-import-stage04a-s04c-reviewed",
+      "note": "Actual CLI replay after explicit component-solid handoff; previous broader-suite records remain historical."
+    }
+  },
+  "native_source_gate": {
+    "native_file": "docs/validation/parity/WF01-S04A-native-geometry.json",
+    "native_sha256": "286ba1296f865d00c62c762c42f35341bfd247d2b3ce6f5a4e744e0ddb45612b",
+    "import_file": "docs/validation/parity/WF01-S04A-import-refresh-20261019.json",
+    "import_sha256": "d2f36449572beb3306044da02141b2f8041adb806f81a39a9f1a50f1535114d5",
+    "source": "benchmarks/parity-import/models.kicad_pcb",
+    "gate_runner_sha256": "1c91e5ecb40017fcae50f8247c0fe3724a6c11c99c53dcddf068bfcf76621f39"
+  },
+  "native_pad_frame_recheck": {
+    "native_pose_cases": 48,
+    "native_shape_cases": 8,
+    "point_tolerance_mm": 1e-06,
+    "bbox_tolerance_mm": 2e-06,
+    "note": "Native integer grid rounding; source angle/size assertions retain their original 1e-9 tolerances. Historical angle oracle error is preserved, not treated as qualification."
+  },
+  "import_evidence": {
+    "file": "docs/validation/parity/WF01-S04A-import-refresh-20261019.json",
+    "sha256": "d2f36449572beb3306044da02141b2f8041adb806f81a39a9f1a50f1535114d5"
+  }
+}

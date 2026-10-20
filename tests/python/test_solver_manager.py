@@ -185,7 +185,8 @@ class SolverManagerTests(unittest.TestCase):
         ready_status = {
             "available": True,
             "abi_version": "test-abi",
-            "features": {"transient": True},
+            "runtime_version": "abi-1+sha256.0123456789ab",
+            "features": {"transient": True, "persistent_sessions": True},
         }
         with patch("python.spike_core.solver_manager.engine_status", return_value=ready_status):
             catalog = solver_manager_catalog(self.solvers, refresh=True)
@@ -201,6 +202,10 @@ class SolverManagerTests(unittest.TestCase):
         self.assertEqual(owned["recommended"]["id"], "spike.owned_spice_workspace")
         self.assertEqual(selection["status"], "selected")
         self.assertEqual(selection["selected"]["execution"], "owned_workspace_contract")
+        self.assertEqual(selection["selected"]["version"], "abi-1+sha256.0123456789ab")
+        self.assertEqual(selection["selected"]["solver_block"], "circuit-native")
+        self.assertEqual(selection["selected"]["requires_blocks"], ["core", "circuit-native"])
+        self.assertTrue(selection["selected"]["runtime_features"]["persistent_sessions"])
         self.assertEqual(selection["selected"]["request_contract"], "spike/owned-spice-workspace-request/v1")
         self.assertIn("No raw netlist", selection["selected"]["scope"])
         self.assertEqual(cosim["status"], "blocked")

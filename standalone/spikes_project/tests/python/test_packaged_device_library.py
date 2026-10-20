@@ -22,6 +22,16 @@ LIBRARY = os.environ.get("SPIKES_TEST_LIBRARY", os.environ.get("SPIKES_TEST_NATI
 EXPECTED_PINS = {
     "packaged_nmos4": ["D", "G", "S", "B"],
     "packaged_npn4": ["C", "B", "E", "SUB"],
+    "packaged_resistor3": ["P", "N", "SUB"],
+    "packaged_kelvin_shunt4": ["FP", "FN", "SP", "SN"],
+    "packaged_feedthrough_capacitor3": ["IN", "OUT", "GND"],
+}
+EXACT_PINS = {
+    "packaged_nmos4": ["B"],
+    "packaged_npn4": ["SUB"],
+    "packaged_resistor3": ["SUB"],
+    "packaged_kelvin_shunt4": ["SP", "SN"],
+    "packaged_feedthrough_capacitor3": ["GND"],
 }
 
 
@@ -34,17 +44,19 @@ class PackagedDeviceLibraryTests(unittest.TestCase):
     def test_opt_in_is_bounded_and_primary_index_uses_explicit_package_inductance(self):
         self.assertEqual(len(catalog()["records"]), 5000)
         payload = catalog(include_packaged_devices=True)
-        self.assertEqual(len(payload["records"]), 5002)
-        self.assertEqual(payload["counts"]["Physics models"], 2)
-        self.assertEqual(payload["archetype_count"], 102)
+        self.assertEqual(len(payload["records"]), 5005)
+        self.assertEqual(payload["counts"]["Physics models"], 5)
+        self.assertEqual(payload["archetype_count"], 105)
         combined = catalog(include_passives=True, include_lumped_physics=True,
                            include_packaged_devices=True)
-        self.assertEqual(len(combined["records"]), 7915)
+        self.assertEqual(len(combined["records"]), 7918)
         index = CatalogIndex(payload["records"])
         rows = index.query(category="Physics models", sort="Primary value")
-        self.assertEqual([row["id"] for row in rows], [
+        self.assertEqual({row["id"] for row in rows}, {
             "physics.packaged.nmos4", "physics.packaged.npn4",
-        ])
+            "physics.packaged.resistor3", "physics.packaged.kelvin_shunt4",
+            "physics.packaged.feedthrough_capacitor3",
+        })
         for record in rows:
             validate_record(record)
             self.assertEqual(index.values[record["id"]], 1e-9)
@@ -78,6 +90,12 @@ class PackagedDeviceLibraryTests(unittest.TestCase):
                 weakened["records"][index][field] = replacement
             with self.subTest(field=field), self.assertRaises(ValidationError):
                 validator.validate(weakened)
+        feedthrough_index = next(i for i, record in enumerate(payload["records"])
+                                 if record.get("id") == "physics.packaged.feedthrough_capacitor3")
+        leaked_core_parameter = deepcopy(payload)
+        leaked_core_parameter["records"][feedthrough_index]["parameters"]["capacitance_f"] = 2e-9
+        with self.assertRaises(ValidationError):
+            validator.validate(leaked_core_parameter)
 
     def test_sources_compose_core_and_package_with_exact_topology_and_pin_order(self):
         from python.spikes.netlist import parse_netlist
@@ -94,8 +112,10 @@ class PackagedDeviceLibraryTests(unittest.TestCase):
             self.assertIn("RPKG1", recipe["source"])
             self.assertIn("LPKG1", recipe["source"])
             self.assertIn("CPKG1", recipe["source"])
-            self.assertIn(f"VPKG4 {pins[3]} __SPK_CORE_4 0", recipe["source"])
-            nodes = [f"n{i}" for i in range(4)]
+            for exact_pin in EXACT_PINS[record["family"]]:
+                index = pins.index(exact_pin) + 1
+                self.assertIn(f"VPKG{index} {exact_pin} __SPK_CORE_{index} 0", recipe["source"])
+            nodes = [f"n{i}" for i in range(len(pins))]
             project = parse_netlist(
                 recipe["source"] + "X1 " + " ".join(nodes) + " " + recipe["name"]
                 + "\nVREF n0 0 0\n.op\n.end\n", native_extensions=True,
@@ -105,25 +125,42 @@ class PackagedDeviceLibraryTests(unittest.TestCase):
             contract = pin_contract(record)
             self.assertEqual([pin["name"] for pin in contract["pins"]], pins)
             self.assertIn("NOT a manufacturer package pinout", contract["numbering"])
-            self.assertIn("fourth terminal is exact-linked", contract["power_behavior"])
+            self.assertIn("exact-linked", contract["power_behavior"])
+
+        feedthrough = next(record for record in packaged_records()
+                           if record["family"] == "packaged_feedthrough_capacitor3")
+        self.assertEqual(set(feedthrough["parameters"]), {
+            "series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f",
+        })
+        feedthrough_source = native_recipe(feedthrough)["source"]
+        self.assertIn("RSER IN MID 0.01", feedthrough_source)
+        self.assertIn("CBODY MID GND 1.0000000000000001e-09", feedthrough_source)
+        self.assertIn("inner core uses its established illustrative defaults", feedthrough["limitations"])
+        invalid = deepcopy(feedthrough)
+        invalid["parameters"]["capacitance_f"] = 2e-9
+        with self.assertRaises(ValueError):
+            validate_record(invalid)
 
     def test_zero_package_uses_only_exact_links_and_rejected_edits_are_atomic(self):
         from python.spikes.netlist import parse_netlist
 
+        for record in packaged_records():
+            zero = deepcopy(record)
+            for name in ("series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"):
+                zero["parameters"][name] = 0.0
+            recipe = native_recipe(zero)
+            wrapper = recipe["source"].split("* Original SPIKE generic unqualified constant package-parasitic wrapper", 1)[1]
+            self.assertNotIn("\nRPKG", wrapper)
+            self.assertNotIn("\nLPKG", wrapper)
+            self.assertNotIn("\nCPKG", wrapper)
+            self.assertEqual(wrapper.count("\nVPKG"), len(recipe["pins"]))
+            nodes = ["n" + str(index) for index in range(len(recipe["pins"]))]
+            self.assertTrue(parse_netlist(
+                recipe["source"] + "X1 " + " ".join(nodes) + f" {recipe['name']}\nV1 n0 0 1\n.op\n.end\n",
+                native_extensions=True,
+            ).elements)
+
         record = packaged_records()[0]
-        zero = deepcopy(record)
-        for name in ("series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"):
-            zero["parameters"][name] = 0.0
-        recipe = native_recipe(zero)
-        wrapper = recipe["source"].split("* Original SPIKE generic unqualified constant package-parasitic wrapper", 1)[1]
-        self.assertNotIn("\nRPKG", wrapper)
-        self.assertNotIn("\nLPKG", wrapper)
-        self.assertNotIn("\nCPKG", wrapper)
-        self.assertEqual(wrapper.count("\nVPKG"), 4)
-        self.assertTrue(parse_netlist(
-            recipe["source"] + f"X1 d 0 0 0 {recipe['name']}\nV1 d 0 1\n.op\n.end\n",
-            native_extensions=True,
-        ).elements)
 
         document = Document.from_netlist("No mutation\nV1 d 0 1\n.op\n.end\n")
         before = deepcopy(document.data)
@@ -143,14 +180,14 @@ class PackagedDeviceLibraryTests(unittest.TestCase):
             validate_record(wrong_builder)
 
     def test_placement_persists_composition_provenance_and_round_trips_undo(self):
-        record = next(record for record in packaged_records() if record["family"] == "packaged_npn4")
+        record = next(record for record in packaged_records() if record["family"] == "packaged_kelvin_shunt4")
         record["parameters"]["series_resistance_ohm"] = 0.25
-        document = Document.from_netlist("Packaged device\nV1 c 0 1\n.op\n.end\n")
+        document = Document.from_netlist("Packaged device\nV1 fp 0 1\n.op\n.end\n")
         before = deepcopy(document.data)
-        plan = insertion_plan(document, record, {"C": "c", "B": "b", "E": "0", "SUB": "0"})
+        plan = insertion_plan(document, record, {"FP": "fp", "FN": "0", "SP": "sp", "SN": "sn"})
         evidence = plan["packaged_device_model"]
-        self.assertEqual(evidence["pins"], ["C", "B", "E", "SUB"])
-        self.assertEqual(evidence["core_builder_kind"], "npn4")
+        self.assertEqual(evidence["pins"], ["FP", "FN", "SP", "SN"])
+        self.assertEqual(evidence["core_builder_kind"], "kelvin_shunt4")
         self.assertEqual(evidence["package_builder"], "device_parasitics")
         self.assertEqual(evidence["record"]["parameters"]["series_resistance_ohm"], 0.25)
         self.assertEqual(evidence["compiled_source_sha256"], hashlib.sha256(
@@ -235,7 +272,7 @@ class PackagedDevicePanelTests(unittest.TestCase):
         panel = ComponentPanel(owner, host)
         dialog = None
         try:
-            self.assertEqual(len(panel.catalog["records"]), 7915)
+            self.assertEqual(len(panel.catalog["records"]), 7918)
             panel.search.ChangeValue("id:physics.packaged.nmos4")
             panel.filter()
             panel.list.SetSelection(0)
@@ -314,6 +351,67 @@ class NativePackagedDeviceLibraryTests(unittest.TestCase):
         self.assertLess(packaged_current, zero_current)
         self.assertLess(packaged_core_drain, 4.0)
         self.assertAlmostEqual(4.0 - packaged_core_drain, 100.0 * packaged_current, delta=1e-8)
+
+    def test_resistor_and_kelvin_force_lead_packages_execute_with_solved_drop(self):
+        from python.spikes.native_runner import _populate
+        from python.spikes.netlist import parse_netlist
+
+        wiring = {
+            "packaged_resistor3": "X1 p 0 0 {name}\nVP p 0 1",
+            "packaged_kelvin_shunt4": "X1 p 0 sp sn {name}\nVP p 0 1",
+        }
+        for record in packaged_records():
+            if record["family"] not in wiring:
+                continue
+            edited = deepcopy(record)
+            edited["parameters"]["series_resistance_ohm"] = 10.0
+            edited["parameters"]["series_inductance_h"] = 1e-6
+            edited["parameters"]["parallel_capacitance_f"] = 1e-9
+            recipe = native_recipe(edited)
+            project = parse_netlist(
+                recipe["source"] + wiring[record["family"]].format(name=recipe["name"])
+                + "\n.op\n.end\n", native_extensions=True,
+            )
+            self.assertTrue(any(element.kind == "inductor" for element in project.elements))
+            self.assertTrue(any(element.kind == "capacitor" for element in project.elements))
+            circuit = self.library.circuit()
+            self.addCleanup(circuit.close)
+            _populate(circuit, project)
+            with circuit.solve_operating_point() as result:
+                self.assertEqual(result.status, "converged", (record["id"], result.message))
+                current = -result.element_current("VP")
+                core_positive = result.node_voltage("x1:__spk_core_1")
+                self.assertGreater(current, 0)
+                self.assertLess(core_positive, 1.0)
+                self.assertAlmostEqual(1.0 - core_positive, 10.0 * current, delta=1e-9)
+
+    def test_feedthrough_package_executes_fixed_core_and_configurable_outer_leads(self):
+        from python.spikes.native_runner import _populate
+        from python.spikes.netlist import parse_netlist
+
+        record = next(record for record in packaged_records()
+                      if record["family"] == "packaged_feedthrough_capacitor3")
+        edited = deepcopy(record)
+        edited["parameters"].update(series_resistance_ohm=10.0,
+                                    series_inductance_h=1e-6,
+                                    parallel_capacitance_f=1e-9)
+        recipe = native_recipe(edited)
+        project = parse_netlist(
+            recipe["source"] + f"X1 p out 0 {recipe['name']}\nVP p 0 1\nRLOAD out 0 1\n.op\n.end\n",
+            native_extensions=True,
+        )
+        self.assertTrue(any(element.kind == "inductor" for element in project.elements))
+        self.assertGreaterEqual(sum(element.kind == "capacitor" for element in project.elements), 2)
+        circuit = self.library.circuit()
+        self.addCleanup(circuit.close)
+        _populate(circuit, project)
+        with circuit.solve_operating_point() as result:
+            self.assertEqual(result.status, "converged", result.message)
+            current = -result.element_current("VP")
+            core_input = result.node_voltage("x1:__spk_core_1")
+            self.assertGreater(current, 0)
+            self.assertAlmostEqual(1.0 - core_input, 10.0 * current, delta=1e-9)
+            self.assertAlmostEqual(result.node_voltage("out"), current, delta=1e-9)
 
 
 if __name__ == "__main__":

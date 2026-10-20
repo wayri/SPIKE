@@ -148,7 +148,7 @@ The original synthetic tests cover:
   and independent RK4 integration refined from 2 to 4 to 8 intervals. The error
   decreases by more than a factor of 12 on each refinement, consistent with
   fourth-order convergence. These checks include the worst admitted RL decay.
-- Independent input/output/loss balance with finite resistance, ripple,
+- Independent input, output and loss balance with finite resistance, ripple,
   transition and gate losses for all three topologies; series/parallel loss
   allocation and unlocated gate-drive energy.
 - Rejection of DCM, zero load, invalid voltage polarity/ratio, unresolved duty,

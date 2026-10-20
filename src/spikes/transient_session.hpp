@@ -43,6 +43,9 @@ public:
   [[nodiscard]] double time_s() const noexcept { return time_s_; }
   [[nodiscard]] std::size_t step_index() const noexcept { return step_index_; }
   [[nodiscard]] bool has_point() const noexcept { return has_point_; }
+  [[nodiscard]] bool initializes_from_operating_point() const noexcept {
+    return options_.initialize_from_operating_point;
+  }
   [[nodiscard]] double node_voltage(std::string_view name) const;
   [[nodiscard]] double element_voltage(std::string_view id) const;
   [[nodiscard]] double element_current(std::string_view id) const;

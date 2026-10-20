@@ -1,0 +1,64 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1000" viewBox="0 0 1120 1000" role="img" aria-labelledby="title desc">
+  <title id="title">SPIKE Clean UI: navigation and workflow</title>
+  <desc id="desc">Two persistent command rows surround the workspace. Header controls manage the project and workflow; tabs and compact icons manage the visible document and camera. Contextual panels open when needed. Search bypasses menu browsing. A study progresses through import, setup, mesh, solve, results and save.</desc>
+  <style>
+    text{font-family:Segoe UI,Arial,sans-serif;fill:#e8eff0;font-size:17px}
+    .title{font-size:28px;font-weight:650}.heading{font-size:21px;font-weight:600}
+    .small{font-size:15px}.muted{fill:#a8bdc1}.teal{fill:#62d5c7}.bold{font-weight:600}
+    .box{fill:#242e35;stroke:#51646d;stroke-width:1.5}.soft{fill:#192329;stroke:#3b5059}
+    .line{stroke:#62d5c7;stroke-width:2;fill:none}
+  </style>
+  <rect width="1120" height="1000" rx="16" fill="#131b20"/>
+  <text x="32" y="45" class="title">SPIKE · Find the task, keep the canvas clear</text>
+  <text x="32" y="74" class="muted small">Current development Clean layout · explanatory map, not a screenshot</text>
+
+  <text x="32" y="118" class="heading">1  Where things live</text>
+  <rect x="32" y="135" width="1056" height="57" rx="7" class="box"/>
+  <text x="48" y="159" class="teal small bold">ROW 1 · GLOBAL</text>
+  <text x="48" y="182" class="small">Menu   |   Project files   |   Search · Ctrl+K   |   Workspaces   |   Hidden tools   |   Layout   |   Help</text>
+  <rect x="32" y="201" width="1056" height="57" rx="7" class="box"/>
+  <text x="48" y="225" class="teal small bold">ROW 2 · CURRENT DOCUMENT / VIEW</text>
+  <text x="48" y="248" class="small">Editor / assembly tabs   |   Add view   |   2D / 3D   ·   Orbit   ·   Pan   ·   Fit   ·   Camera   ·   Filter   ·   Tools</text>
+  <rect x="32" y="269" width="730" height="174" rx="7" class="soft"/>
+  <text x="54" y="304" class="heading">Viewport or active editor</text>
+  <text x="54" y="335" class="muted">Board / assembly / results, power tree or another document</text>
+  <text x="54" y="366" class="small">Pick an object → its identity and editable properties appear.</text>
+  <text x="54" y="395" class="small">Open an icon → a small contextual menu or focused tool.</text>
+  <text x="54" y="423" class="muted small">Camera icons are present when the viewport is visible.</text>
+  <rect x="776" y="269" width="312" height="174" rx="7" class="box"/>
+  <text x="796" y="303" class="heading">Contextual panel</text>
+  <text x="796" y="334" class="small">Selection · setup · layers · results</text>
+  <text x="796" y="365" class="muted small">Resize / scale · expand · hide</text>
+  <text x="796" y="395" class="muted small">Detach supported desktop tools</text>
+  <text x="796" y="423" class="teal small">Restore via Hidden tools or search</text>
+  <rect x="32" y="453" width="1056" height="35" rx="5" class="soft"/>
+  <text x="48" y="477" class="muted small">Status / diagnostics / resource information · opened tool headers are local to their content</text>
+
+  <text x="32" y="535" class="heading">2  Choose how to reach an action</text>
+  <rect x="32" y="554" width="338" height="143" rx="8" class="box"/>
+  <text x="50" y="584" class="teal bold">Know the task? Search.</text>
+  <text x="50" y="615" class="small">Ctrl+K → action / net / part / solver</text>
+  <text x="50" y="645" class="small">Review target → open setup / execute</text>
+  <text x="50" y="675" class="muted small">Missing engineering inputs need review.</text>
+  <rect x="386" y="554" width="338" height="143" rx="8" class="box"/>
+  <text x="404" y="584" class="teal bold">Know the domain? Workspace.</text>
+  <text x="404" y="615" class="small">Workspace icon → PI / SI / EM / …</text>
+  <text x="404" y="645" class="small">Then contextual setup and tools</text>
+  <text x="404" y="675" class="muted small">Editors use tabs; panels use docks.</text>
+  <rect x="740" y="554" width="348" height="143" rx="8" class="box"/>
+  <text x="758" y="584" class="teal bold">Exploring? Menu.</text>
+  <text x="758" y="615" class="small">Section → group → action</text>
+  <text x="758" y="645" class="small">Back / Escape returns one level.</text>
+  <text x="758" y="675" class="muted small">All actions / Menu search skips groups.</text>
+  <text x="32" y="733" class="small">Depth examples below Menu:</text>
+  <text x="32" y="763" class="small teal">Project → New project   (2 choices)</text>
+  <text x="32" y="792" class="small">Analyze → Power integrity → DC PI setup   (3 choices)</text>
+  <text x="32" y="821" class="small">Design &amp; view → Viewport tools → Navigate → Orientation grid   (4 choices)</text>
+  <text x="32" y="850" class="muted small">Some workspace browsing adds a tool-group level. Two rows does not mean every command is two clicks away.</text>
+
+  <text x="32" y="894" class="heading">3  Follow the study loop</text>
+  <rect x="32" y="912" width="1056" height="54" rx="8" class="box"/>
+  <text x="53" y="946" class="bold">Import → Review → Setup → Mesh / preflight → Solve → Inspect results → Save / report</text>
+  <text x="32" y="986" class="muted small">Warnings or missing inputs return you to setup. Visible controls and plots do not establish solver validation.</text>
+</svg>

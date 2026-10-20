@@ -1,9 +1,5 @@
 # Native CFD and SU2 comparison, 2026-10-11
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 ## Executed case and gate
 
 Independently authored square cavity: L=1 m, moving top-wall speed U=1 m/s,
@@ -30,9 +26,11 @@ with refinement, so this gate is not a continuum error estimate.
 
 ## Evidence and reproduction
 
-The HTML report (`../../output/cfd-su2-20261011/comparison/index.html`) includes
+The local HTML report described in the
+[release evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md) includes
 unit-labeled velocity plots and interpretation. The
-full comparison (`../../output/cfd-su2-20261011/comparison/comparison.json`)
+full comparison JSON. Neither generated artifact is shipped; use the reproduction
+commands below and retain a reviewed sanitized result before citing it as public evidence.
 retains executable/input hashes, convergence and per-grid profiles. Each grid
 also has native and SU2 result JSON, and managed SU2 mesh/config/solution logs.
 The separate local runtime has download provenance under
@@ -40,10 +38,10 @@ The separate local runtime has download provenance under
 
 ```powershell
 python scripts/build_native_airflow.py --generator "Visual Studio 18 2026"
-python scripts/benchmark_su2_airflow.py --cells 16 32 64 --output output/cfd-su2-20261011/comparison
-python scripts/render_cfd_benchmark.py output/cfd-su2-20261011/comparison/comparison.json
+python scripts/benchmark_su2_airflow.py --cells 16 32 64 --output "$env:TEMP/spike-cfd-su2-comparison"
+python scripts/render_cfd_benchmark.py "$env:TEMP/spike-cfd-su2-comparison/comparison.json"
 python scripts/run_cfd.py --capabilities
-python scripts/run_cfd.py --engine native --request tests/fixtures/cfd/native-cavity.json --output output/native-cavity.json
+python scripts/run_cfd.py --engine native --request tests/fixtures/cfd/native-cavity.json --output "$env:TEMP/spike-native-cavity.json"
 ```
 
 ## Checks actually performed

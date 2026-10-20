@@ -1488,6 +1488,37 @@ class NativeTransientResult:
     def element_power(self, point_index: int, element_id: str) -> float:
         return self._indexed_value("spikes_transient_result_element_power", point_index, element_id)
 
+    def time_values(self) -> list[float]:
+        return self._series_values("spikes_transient_result_point_time")
+
+    def node_voltage_values(self, name: str) -> list[float]:
+        return self._series_values("spikes_transient_result_node_voltage", name)
+
+    def element_current_values(self, element_id: str) -> list[float]:
+        return self._series_values("spikes_transient_result_element_current", element_id)
+
+    def element_power_values(self, element_id: str) -> list[float]:
+        return self._series_values("spikes_transient_result_element_power", element_id)
+
+    def _series_values(self, function_name: str, name: str | None = None) -> list[float]:
+        """Read an immutable channel with one handle/name validation per series.
+
+        Uses the same scalar C ABI and checks every return code. No native
+        result storage is exposed or retained after this method returns.
+        """
+        handle = self._open_handle()
+        function = getattr(self.library._library, function_name)
+        output = ctypes.c_double()
+        pointer = ctypes.byref(output)
+        suffix = () if name is None else (_text(name, "result name"),)
+        values: list[float] = []
+        for index in range(self.point_count):
+            code = function(handle, index, *suffix, pointer)
+            if code:
+                self.library._check(code, f"querying transient point {index}")
+            values.append(float(output.value))
+        return values
+
     def _indexed_value(self, function_name: str, point_index: int, name: str | None = None) -> float:
         if isinstance(point_index, bool) or int(point_index) != point_index or point_index < 0:
             raise ValueError("point index must be a non-negative integer.")

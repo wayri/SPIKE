@@ -1,0 +1,125 @@
+{
+  "domain": "si",
+  "limitations": [
+    "Supplied uniform RLGC only; no geometry extraction or broadband causal material law.",
+    "No DC fields, thermal deposition, or measured qualification."
+  ],
+  "metrics": {
+    "line_length_m": 5.0,
+    "maximum_absolute_power_balance_residual_w": 2.7755575615628914e-16
+  },
+  "model_status": "experimental",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "1c10007088e2d4ba8b67cff3c6f97084ba677fe114969fbc1f4c89ab7946e46f",
+    "result_sha256": "90dc96aa5a26a6e1c87ebd8b6ab30ebc70c985e5d62c1cb23bc1c9854655a0fa",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "examples/rlgc_line_fields/run_line.py",
+        "sha256": "75e2ec82653d8d34b83119ab725a8e4bbf7541b6b5cd47f4207fac05341b2fa9"
+      },
+      {
+        "path": "examples/rlgc_line_network/run_line.py",
+        "sha256": "e1aabd46b2e3970e9835425bade52df09053e6f5d7e1e5a0eb15a3c594c8d044"
+      },
+      {
+        "path": "python/spike_core/rlgc_line_fields.py",
+        "sha256": "3724afa64878190ad6a3af6e260a5ad02a3f978a91d1fa39ab3be6201c587257"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "frequency_hz": 1000000.0,
+      "position_m": 0.0,
+      "probe_id": "left",
+      "s21_db": -1.10380277215305,
+      "total_loss_w_per_m": 0.05301705813570312,
+      "transported_power_w": 0.8141229739766698
+    },
+    {
+      "frequency_hz": 1000000.0,
+      "position_m": 2.5,
+      "probe_id": "midpoint",
+      "s21_db": -1.10380277215305,
+      "total_loss_w_per_m": 0.04559269262588783,
+      "transported_power_w": 0.6910403413993975
+    },
+    {
+      "frequency_hz": 1000000.0,
+      "position_m": 5.0,
+      "probe_id": "right",
+      "s21_db": -1.10380277215305,
+      "total_loss_w_per_m": 0.039021585499978514,
+      "transported_power_w": 0.5854486549185801
+    },
+    {
+      "frequency_hz": 10000000.0,
+      "position_m": 0.0,
+      "probe_id": "left",
+      "s21_db": -1.6065164747015472,
+      "total_loss_w_per_m": 0.1262779259087308,
+      "transported_power_w": 0.847216551077794
+    },
+    {
+      "frequency_hz": 10000000.0,
+      "position_m": 2.5,
+      "probe_id": "midpoint",
+      "s21_db": -1.6065164747015472,
+      "total_loss_w_per_m": 0.06270501269303817,
+      "transported_power_w": 0.606543178709229
+    },
+    {
+      "frequency_hz": 10000000.0,
+      "position_m": 5.0,
+      "probe_id": "right",
+      "s21_db": -1.6065164747015472,
+      "total_loss_w_per_m": 0.04023424735737691,
+      "transported_power_w": 0.49655450273724666
+    },
+    {
+      "frequency_hz": 100000000.0,
+      "position_m": 0.0,
+      "probe_id": "left",
+      "s21_db": -2.714003652816414,
+      "total_loss_w_per_m": 0.17057142814859746,
+      "transported_power_w": 0.9080532577755485
+    },
+    {
+      "frequency_hz": 100000000.0,
+      "position_m": 2.5,
+      "probe_id": "midpoint",
+      "s21_db": -2.714003652816414,
+      "total_loss_w_per_m": 0.09382109492933846,
+      "transported_power_w": 0.5639692715844786
+    },
+    {
+      "frequency_hz": 100000000.0,
+      "position_m": 5.0,
+      "probe_id": "right",
+      "s21_db": -2.714003652816414,
+      "total_loss_w_per_m": 0.1252685699058382,
+      "transported_power_w": 0.30856187722988926
+    }
+  ],
+  "title": "Coherent two-end supplied RLGC line",
+  "units": {
+    "frequency_hz": "Hz",
+    "position_m": "m",
+    "s21_db": "dB",
+    "total_loss_w_per_m": "W/m",
+    "transported_power_w": "W"
+  }
+}

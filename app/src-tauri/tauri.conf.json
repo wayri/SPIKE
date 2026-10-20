@@ -13,7 +13,7 @@
       {
         "label": "main",
         "create": false,
-        "title": "SPIKE | Electronic Systems Integrity Workbench",
+        "title": "SPIKE | Multiphysics Simulation Workbench",
         "width": 1440,
         "height": 920,
         "minWidth": 900,
@@ -94,7 +94,7 @@
         "startMenuFolder": "SPIKE"
       },
       "wix": {
-        "version": "0.4.0.1"
+        "version": "0.3.12.1"
       }
     }
   }

@@ -27,6 +27,12 @@ def ordered_nodes(element):
 
 def pins(part):
     count = len(part.get('nodes', (None, None)))
+    custom=part.get('parameters',{}).get('component_symbol')
+    if custom:
+        from .symbol_validation import validate_symbol
+        validate_symbol(custom)
+        if len(custom['terminals'])!=count:raise ValueError('Component symbol pin count differs from native terminals')
+        return [Pin(i,p['name'],tuple(p['at']),tuple(p['leg_endpoint'])) for i,p in enumerate(custom['terminals'])]
     labels = {
         'diode': ('A', 'K'), 'npn_ebers_moll': ('C', 'E', 'B'),
         'nmos_level1': ('D', 'S', 'G', 'B'), 'bsim_bulk': ('D', 'S', 'G', 'B'),
@@ -55,6 +61,11 @@ def pin_id(part, index):
 
 def bounds(part):
     terminals = pins(part)
+    custom=part.get('parameters',{}).get('component_symbol')
+    if custom:
+        low=custom['body_keepout']['min'];high=custom['body_keepout']['max']
+        return (min([low[0]-8]+[p.anchor[0]-8 for p in terminals]),min([low[1]-8]+[p.anchor[1]-8 for p in terminals]),
+                max([high[0]+8]+[p.anchor[0]+8 for p in terminals]),max([high[1]+8]+[p.anchor[1]+8 for p in terminals]))
     return (min([-62] + [p.anchor[0] - 8 for p in terminals]),
             min([-45] + [p.anchor[1] - 8 for p in terminals]),
             max([62] + [p.anchor[0] + 8 for p in terminals]),

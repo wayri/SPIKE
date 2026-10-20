@@ -42,6 +42,8 @@
 .python-template-search { display: flex; align-items: center; gap: 5px; margin: 8px; }
 .python-template-search > input { width: 100%; }
 .python-template-library > select { width: calc(100% - 16px); margin: 0 8px 8px; }
+.python-template-summary { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 0 8px 7px; color: var(--spike-table-muted); font-size: 10px; }
+.python-workspace .python-template-summary button { min-height: 22px; padding: 2px 6px; }
 .python-template-cards article { margin: 0 8px 9px; padding: 9px; border: 1px solid var(--spike-table-border); border-radius: 4px; background: var(--spike-table-surface); }
 .python-template-cards article > small { color: var(--spike-table-edit); font-size: 10px; }
 .python-template-cards h3 { margin: 4px 0; font-size: 12px; color: var(--spike-table-text); }

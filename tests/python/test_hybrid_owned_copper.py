@@ -10,7 +10,7 @@ from scipy.sparse.linalg import spsolve
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
 from python.spike_core.hybrid_mesh import _Builder, _point_in_polygon
-from python.spike_core.hybrid_owned_copper import area, difference, hull
+from python.spike_core.hybrid_owned_copper import area, centroid, difference, hull
 from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
 
 
@@ -125,9 +125,126 @@ class OwnedCopperTests(unittest.TestCase):
         self.assertLess(errors[-1],.01)
         self.assertLess(errors[-1],errors[0])
 
+    def test_angular_annulus_resistance_converges_on_actual_owned_mesh(self):
+        # Independent steady-conduction solution: the two insulated annular
+        # sectors conduct in parallel between complete radial electrodes.
+        # Production widths, centroids and resistance are used without edits.
+        errors=[]
+        for target in (.5,.25,.125,.0625,.05):
+            mesh=builder({"shape":"circle","size":[2,2],"drill":1,
+                          "drill_size":[1,1]},target,zone=False).build()
+            self.assertFalse([i for i in mesh.issues if i.severity=="error"])
+            cells=[c for c in mesh.cells if c["source_kind"]=="pad"]
+            columns={c["node_id"]:int(c["id"].split(":")[-1]) for c in cells}
+            sides=max(columns.values())+1
+            opposite=sides//2
+            theta=2*math.pi*opposite/sides
+            expected=theta*(2*math.pi-theta)/(2*math.pi*5.8e7*.035e-3*math.log(2))
+            high=[n for n,s in columns.items() if s==0]
+            low=[n for n,s in columns.items() if s==opposite]
+            fixed=high+low
+            free=sorted(set(columns)-set(fixed))
+            rows=[];cols=[];values=[]
+            for edge in mesh.branches:
+                self.assertEqual(edge.kind,"pad")
+                a,b,g=edge.node_p,edge.node_n,1/edge.resistance_ohm
+                rows.extend((a,b,a,b));cols.extend((a,b,b,a));values.extend((g,g,-g,-g))
+            matrix=coo_matrix((values,(rows,cols)),shape=(len(mesh.nodes),)*2).tocsr()
+            voltage=np.zeros(len(mesh.nodes));voltage[high]=1
+            voltage[free]=spsolve(matrix[free,:][:,free],-matrix[free,:][:,high].sum(axis=1).A.ravel())
+            current=float((matrix@voltage)[high].sum())
+            error=abs(1/current/expected-1)
+            errors.append(error)
+            self.assertLess(abs(float((matrix@voltage).sum())),1e-7)
+        self.assertTrue(all(b<a for a,b in zip(errors,errors[1:])),errors)
+        self.assertLess(errors[-1],.02,errors)
+
     def test_unsupported_shape_fails_closed(self):
         mesh=builder({"shape":"custom","size":[2,2]}).build()
         self.assertTrue(any(i.severity=="error" and i.status=="unsupported" for i in mesh.issues))
+
+    def test_convex_custom_source_partition_contacts_and_centroids(self):
+        polygon=[[-1,-1],[1,-1],[1,1],[0,1.5],[-1,1]]
+        for rotation in (0,31):
+            b=builder({"shape":"custom","size":[1,1],"rotation":rotation,
+                       "custom_geometry":{"status":"supported","coordinate_space":"pad_local_mm","mirror_x":False,
+                                          "positive_filled_polygon":polygon}},.5)
+            mesh=b.build()
+            self.assertFalse([i for i in mesh.issues if i.severity=="error"],mesh.issues)
+            cells=[c for c in mesh.cells if c["source_kind"]=="pad"]
+            self.assertAlmostEqual(sum(area([p[:2] for p in c["vertices_mm"]]) for c in cells),4.5,places=9)
+            self.assertAlmostEqual(sum(area([p[:2] for p in c["vertices_mm"]]) for c in mesh.cells),36,places=8)
+            profile=b.owned_pad_profiles[("F.Cu","VCC")]["pad"]
+            for index,(node,poly) in enumerate(profile["cells"]):
+                self.assertAlmostEqual(area(poly)-sum(map(area,difference(poly,profile["outline"]))),area(poly),places=9)
+                for _,other in profile["cells"][:index]:
+                    self.assertAlmostEqual(area(poly)-sum(map(area,difference(poly,hull(other)))),0,places=9)
+                point=centroid(poly)
+                self.assertAlmostEqual(mesh.nodes[node].x_mm,point[0],places=9)
+                self.assertAlmostEqual(mesh.nodes[node].y_mm,point[1],places=9)
+            audit=mesh.branch_admission["owned_copper"]
+            self.assertAlmostEqual(audit["pad_void_area_mm2"],0,places=9)
+            self.assertGreater(audit["contacts"][0]["face_count"],4)
+            self.assertAlmostEqual(audit["contacts"][0]["face_length_mm"],6+math.sqrt(5),places=7)
+            from python.spike_core.hybrid_mesh import _shared_polygon_face_length
+            polygons=dict(profile["cells"])
+            for edge in mesh.branches:
+                if edge.kind=="pad":
+                    expected=_shared_polygon_face_length(polygons[edge.node_p],polygons[edge.node_n],1e-8)
+                    self.assertGreater(expected,1e-7)
+                    self.assertAlmostEqual(edge.width_mm,expected,places=9)
+
+    def test_asymmetric_custom_mirror_preserves_area_and_reflected_source(self):
+        from python.spike_core.hybrid_mesh import _pad_world_to_local
+        polygon=[[-1,-1],[2,-1],[1.5,.5],[-.5,1]]
+        reflected=[(-x,y) for x,y in polygon]
+        for rotation in (0,31):
+            b=builder({"shape":"custom","size":[1,1],"rotation":rotation,
+                       "custom_geometry":{"status":"supported","coordinate_space":"pad_local_mm","mirror_x":True,
+                                          "positive_filled_polygon":polygon}},.25,zone=False)
+            mesh=b.build()
+            self.assertFalse([i for i in mesh.issues if i.severity=="error"],mesh.issues)
+            cells=[c for c in mesh.cells if c["source_kind"]=="pad"]
+            self.assertTrue(cells)
+            self.assertAlmostEqual(sum(area([p[:2] for p in c["vertices_mm"]]) for c in cells),4.375,places=9)
+            vertices=[_pad_world_to_local(b.design.pads[0],p[:2]) for c in cells for p in c["vertices_mm"]]
+            self.assertAlmostEqual(min(p[0] for p in vertices),-2,places=9)
+            self.assertAlmostEqual(max(p[0] for p in vertices),1,places=9)
+            # Reflection reverses orientation: every convex cell vertex must
+            # lie on the right of each reflected source edge. Convexity then
+            # proves containment of the entire cell, including every edge.
+            for x,y in vertices:
+                for a,c in zip(reflected,reflected[1:]+reflected[:1]):
+                    self.assertLessEqual((c[0]-a[0])*(y-a[1])-(c[1]-a[1])*(x-a[0]),1e-9)
+
+    def test_custom_admission_rejects_nonconvex_holed_drilled_or_malformed_sources(self):
+        from copy import deepcopy
+        good={"shape":"custom","size":[2,2],"custom_geometry":{
+            "status":"supported","coordinate_space":"pad_local_mm","mirror_x":False,
+            "positive_filled_polygon":[[-1,-1],[1,-1],[1,1],[-1,1]]}}
+        for case in ("concave","holes","drilled","invalid_drill","nan","boolean","unresolved","wrong_frame",
+                     "self_intersection","duplicate","degenerate","mirror_missing","mirror_string","mirror_integer"):
+            pad=deepcopy(good)
+            geometry=pad["custom_geometry"]
+            if case=="concave": geometry["positive_filled_polygon"]=[[-1,-1],[1,-1],[0,0],[1,1],[-1,1]]
+            elif case=="holes": geometry["holes"]=[[[-.1,-.1],[.1,-.1],[0,.1]]]
+            elif case=="drilled": pad["drill"]=.4
+            elif case=="invalid_drill": pad["drill_size"]=[float("nan"),0]
+            elif case=="nan": geometry["positive_filled_polygon"][0][0]=float("nan")
+            elif case=="boolean": geometry["positive_filled_polygon"][0][0]=False
+            elif case=="unresolved": geometry["status"]="unsupported"
+            elif case=="self_intersection": geometry["positive_filled_polygon"]=[[-1,-1],[1,1],[-1,1],[1,-1]]
+            elif case=="duplicate": geometry["positive_filled_polygon"].insert(1,[-1,-1])
+            elif case=="degenerate": geometry["positive_filled_polygon"]=[[0,0],[1,0],[1,1e-13],[0,1e-13]]
+            elif case=="mirror_missing": geometry.pop("mirror_x")
+            elif case=="mirror_string": geometry["mirror_x"]="true"
+            elif case=="mirror_integer": geometry["mirror_x"]=1
+            else: geometry["coordinate_space"]="board_mm"
+            with self.subTest(case=case):
+                mesh=builder(pad,zone=False).build()
+                self.assertFalse(mesh.branches)
+                self.assertFalse(mesh.cells)
+                self.assertTrue(any(i.code=="OWNED_COPPER_UNSUPPORTED" for i in mesh.issues))
 
     def test_missing_source_fill_and_invalid_thermal_policy_fail_closed(self):
         for mutation in ("fill","thermal"):

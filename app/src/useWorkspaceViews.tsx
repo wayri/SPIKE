@@ -15,6 +15,7 @@ import {
 export type WorkspaceViewPartCandidate = Readonly<{ partId: string; title: string }>;
 
 export type UseWorkspaceViewsOptions = {
+  toolbarHost?: HTMLElement | null;
   projectSession: string;
   revision: string;
   viewportRevision: string;
@@ -58,6 +59,10 @@ type DerivedWorkspaceView = Pick<WorkspaceViewSnapshot, "targetBoards" | "source
 export function deriveWorkspaceViewScope(options: Omit<UseWorkspaceViewsOptions, "onAction" | "onError">, view: WorkspaceViewDescriptor): DerivedWorkspaceView {
   const scope = view.scope;
   const occurrence = scope.kind === "board-occurrence" ? options.occurrences.find(item => item.id === scope.occurrenceId && item.designId === scope.designId) : undefined;
+  // A fixed board view renders its source board through BoardViewport's
+  // primary scene. Mark the projected occurrence active so the assembly scene
+  // does not render a second copy of that same design in 3D.
+  const targetOccurrence = occurrence ? { ...occurrence, active: true } : undefined;
   const part = scope.kind === "assembly-part" ? options.parts.find(item => item.partId === scope.partId) : undefined;
   const valid = scope.kind === "board-occurrence" ? Boolean(occurrence && options.boards[scope.designId])
     : Boolean(part || options.assemblyModels.some(model => model.partId === scope.partId));
@@ -65,7 +70,7 @@ export function deriveWorkspaceViewScope(options: Omit<UseWorkspaceViewsOptions,
   const revision = `${options.viewportRevision.slice(0, 400)}:${scope.kind}:${safe(identity).slice(0, 60)}:${hash(identity)}`;
   return {
     valid, invalidReason: valid ? undefined : scope.kind === "board-occurrence" ? "This board occurrence no longer exists in the active project." : "This assembly part no longer exists in the active project.",
-    targetBoards: occurrence ? [occurrence] : [], sourceDesignId: occurrence?.designId,
+    targetBoards: targetOccurrence ? [targetOccurrence] : [], sourceDesignId: occurrence?.designId,
     visibility: occurrence ? { [occurrence.id]: options.visibility[occurrence.id] !== false } : {},
     layerVisibility: pick(options.layerVisibility, occurrence?.id), layerOpacity: pick(options.layerOpacity, occurrence?.id), layerFocus: pick(options.layerFocus, occurrence?.id),
     linkedNets: linkedFor(options.linkedNets, occurrence?.id),
@@ -160,7 +165,7 @@ export function useWorkspaceViews(options: UseWorkspaceViewsOptions): WorkspaceV
   const active = presentedViews.find(view => view.id === presentedActiveId) ?? null;
   const activeData = active ? build(active) : null;
   const tabs = <WorkspaceViewTabs views={presentedViews} activeViewId={presentedActiveId} candidates={sessionReady ? candidates : []} onMain={() => setActiveViewId(null)} onActive={setActiveViewId} onAdd={addView} onClose={closeView} onDetach={(id) => detachView(id)}/>;
-  const activeRenderer = active && !active.detached && activeData ? <ScopedWorkspaceView key={`${options.projectSession}:${active.id}`} snapshot={activeData.snapshot} viewport={activeData.viewport} onAction={action => act(active, action)}/> : null;
+  const activeRenderer = active && !active.detached && activeData ? <ScopedWorkspaceView key={`${options.projectSession}:${active.id}`} toolbarHost={options.toolbarHost} snapshot={activeData.snapshot} viewport={activeData.viewport} onAction={action => act(active, action)}/> : null;
   const hosts = <>{presentedViews.filter(view => view.detached).map(view => { const data = build(view); return <WorkspaceViewHost key={`${options.projectSession}:${view.id}`} descriptor={view} snapshot={data.snapshot} viewportData={data.viewport} onAction={action => act(view, action)} onDock={() => dockView(view.id)} onError={options.onError}/>; })}</>;
   return { views: presentedViews, activeViewId: presentedActiveId, setActiveViewId, candidates: sessionReady ? candidates : [], tabs, activeRenderer, hosts, addView, closeView, detachView };
 }

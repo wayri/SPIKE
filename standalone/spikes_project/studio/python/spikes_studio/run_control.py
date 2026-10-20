@@ -257,6 +257,11 @@ class InteractiveRun:
                            ('element_current_a', names), ('element_power_w', names)]
             with library.circuit() as circuit:
                 _populate(circuit, self.project)
+                if self.controller is not None and hasattr(self.controller,'configure_circuit'):
+                    extra=self.controller.configure_circuit(circuit,self.project)
+                    names=names+tuple(extra)
+                    self.tables=[('node_voltage_v',_nodes(self.project)),
+                                 ('element_current_a',names),('element_power_w',names)]
                 with circuit.transient_session(
                     initialize_from_operating_point=not self.project.analysis.use_initial_conditions,
                     integration_method=self.method) as session:
@@ -267,6 +272,18 @@ class InteractiveRun:
                                tuple(session.element_power(n) for n in names))
                         with self.condition:
                             self.rows.append(row); self.total_samples += 1
+                    def boundary_control():
+                        # Instruction masters may yield inside a report interval.
+                        # At this boundary both CPU and plant have caught up.
+                        with self.condition:
+                            while self.pause_requested and not self.stop_requested:
+                                self.state = 'paused'
+                                self.condition.wait()
+                            if self.stop_requested:return False
+                            self.state = 'running'
+                            return True
+                    if self.controller is not None and hasattr(self.controller,'set_boundary_control'):
+                        self.controller.set_boundary_control(boundary_control)
                     deadline = time.monotonic()
                     while True:
                         with self.condition:
@@ -281,14 +298,19 @@ class InteractiveRun:
                         for name, value in changes.items():
                             session.set_source_value(name, value)
                             with self.condition:
-                                self.control_events.append({'time_s': session.time_s, 'source': name, 'value': value})
+                                metadata=(self.controller.source_control_metadata(session.time_s)
+                                          if self.controller is not None and hasattr(self.controller,'source_control_metadata') else {})
+                                self.control_events.append({'time_s': session.time_s, 'source': name, 'value': value, **metadata})
                         step = self.project.analysis.time_step_s
                         if self.controller is not None:
                             changes=self.controller.advance(session)
                             with self.condition:
                                 for name,value in changes.items():self.control_events.append({'time_s':session.time_s,'source':name,'value':value,'origin':getattr(self.controller,'event_origin','compiled_controller')})
-                        if not session.step(step): raise RuntimeError(session.message)
-                        record()
+                        if self.controller is not None and hasattr(self.controller,'step_plant'):
+                            self.controller.step_plant(session,step,record)
+                        else:
+                            if not session.step(step): raise RuntimeError(session.message)
+                            record()
                         deadline += step / self.speed_ratio
                         with self.condition:
                             remaining = deadline-time.monotonic()

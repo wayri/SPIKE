@@ -1,0 +1,10 @@
+{
+  "contract": "spike/dc-land-transition-request/v1",
+  "axes_mm": [[0, 0.25, 0.5, 0.75, 1], [0, 0.5, 1], [0, 0.05, 0.1, 0.15, 0.2]],
+  "conductivity_s_m": 58000000,
+  "contacts": [
+    {"id": "barrel-in-face", "attachment_id": "incoming-barrel", "face": "z_min", "rectangle_mm": [[0, 0.25], [0, 0.5]], "current_a": 1},
+    {"id": "upper-out-face", "attachment_id": "shared-external-label", "face": "z_max", "rectangle_mm": [[0.5, 1], [0.5, 1]], "current_a": -0.6},
+    {"id": "side-out-face", "attachment_id": "shared-external-label", "face": "x_max", "rectangle_mm": [[0, 0.5], [0.1, 0.2]], "current_a": -0.4}
+  ]
+}

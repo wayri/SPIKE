@@ -107,7 +107,8 @@ endif()
 # Isolated affine-prism verification kernel. It is not wired into the board
 # extractor until touching bases, contacts, and mixed annular terms are solved.
 add_library(spike_peec_affine_triangle STATIC
-    src/peec/affine_triangle_basis.cpp)
+    src/peec/affine_triangle_basis.cpp
+    src/peec/affine_slab_inductance.cpp)
 target_include_directories(spike_peec_affine_triangle PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if(MSVC)
@@ -182,10 +183,21 @@ target_link_libraries(spike_math INTERFACE
 add_library(spikes_core STATIC
     src/spikes/smps_stability.cpp
     src/spikes/dc_solver.cpp
+    src/spikes/io_pad.cpp
+    src/spikes/io_pad_events.cpp
+    src/spikes/peripheral_timing.cpp
+    src/spikes/peripheral_registers.cpp
     src/spikes/osdi_device.cpp
     src/spikes/transient_solver.cpp
     src/spikes/transient_session.cpp
 )
+if(MSVC)
+    set_source_files_properties(src/spikes/io_pad.cpp PROPERTIES
+        COMPILE_OPTIONS "/W4;/WX")
+else()
+    set_source_files_properties(src/spikes/io_pad.cpp PROPERTIES
+        COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
+endif()
 target_link_libraries(spikes_core PRIVATE Eigen3::Eigen OpenMP::OpenMP_CXX)
 target_include_directories(spikes_core PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -210,6 +222,7 @@ endif()
 # versioned shared library without exposing C++ ABI types.
 add_library(spikes_c_api SHARED
     src/spikes/c_api.cpp
+    src/spikes/peripheral_c_api.cpp
 )
 
 target_include_directories(spikes_c_api PUBLIC
@@ -286,6 +299,8 @@ install(FILES
     src/peec/reference_plane_antipad_mesh_input.hpp
     src/geometry/planar_topology.hpp
     src/spikes/dc_solver.hpp
+    src/spikes/io_pad.hpp
+    src/spikes/io_pad_events.hpp
     src/spikes/osdi_device.hpp
     src/spikes/transient_solver.hpp
     src/spikes/transient_session.hpp
@@ -366,7 +381,7 @@ if(BUILD_TESTING)
     add_test(NAME test_annular_inductance COMMAND test_annular_inductance)
 
     add_executable(test_affine_triangle_basis tests/test_affine_triangle_basis.cpp)
-    target_link_libraries(test_affine_triangle_basis PRIVATE spike_peec_affine_triangle)
+    target_link_libraries(test_affine_triangle_basis PRIVATE spike_peec_affine_triangle spike_peec_volume)
     add_test(NAME test_affine_triangle_basis COMMAND test_affine_triangle_basis)
 
     add_executable(test_sparse_magnetic_energy tests/test_sparse_magnetic_energy.cpp)
@@ -431,6 +446,16 @@ if(BUILD_TESTING)
     add_test(NAME test_spikes_transient_session
         COMMAND test_spikes_transient_session)
 
+    add_executable(test_spikes_io_pad tests/cpp/test_spikes_io_pad.cpp)
+    target_link_libraries(test_spikes_io_pad PRIVATE spikes_core)
+    add_test(NAME test_spikes_io_pad COMMAND test_spikes_io_pad)
+    add_executable(test_spikes_peripheral_timing tests/cpp/test_spikes_peripheral_timing.cpp)
+    target_link_libraries(test_spikes_peripheral_timing PRIVATE spikes_core)
+    add_test(NAME test_spikes_peripheral_timing COMMAND test_spikes_peripheral_timing)
+    add_executable(test_spikes_peripheral_registers tests/cpp/test_spikes_peripheral_registers.cpp)
+    target_link_libraries(test_spikes_peripheral_registers PRIVATE spikes_core)
+    add_test(NAME test_spikes_peripheral_registers COMMAND test_spikes_peripheral_registers)
+
     add_executable(test_spikes_electrothermal_reference
         tests/test_spikes_electrothermal_reference.cpp)
     target_link_libraries(test_spikes_electrothermal_reference PRIVATE spikes_core)
@@ -478,7 +503,7 @@ if(BUILD_TESTING)
     foreach(SPIKE_ASSERT_TEST IN ITEMS
             test_peec test_via_transition_mesh_input test_reference_plane_antipad_mesh_input test_generalized_reference_plane_mesh_input test_planar_topology test_spikes_core
             test_spikes_c_api test_spikes_transient test_spikes_transient_c_api
-            test_spikes_transient_session test_spikes_transient_session_c_api
+            test_spikes_transient_session test_spikes_io_pad test_spikes_transient_session_c_api
             test_spikes_console_dashboard)
         if(MSVC)
             target_compile_options(${SPIKE_ASSERT_TEST} PRIVATE /UNDEBUG)

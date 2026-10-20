@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/native-cht-result-v1.schema.json",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "status", "model_status", "production_qualified", "settings", "scales", "diagnostics", "fields", "interfaces", "limitations", "provenance"],
+  "properties": {
+    "contract": {"const": "spike/native-cht-result/v1"},
+    "status": {"enum": ["converged", "failed_to_converge"]}, "model_status": {"const": "experimental"},
+    "production_qualified": {"const": false},
+    "settings": {"type": "object", "additionalProperties": false, "minProperties": 16, "maxProperties": 16,
+      "patternProperties": {"^(n|length_m|span_m|lid_velocity_m_s|density_kg_m3|dynamic_viscosity_pa_s|specific_heat_j_kgk|fluid_conductivity_w_mk|solid_conductivity_w_mk|hot_temperature_k|cold_temperature_k|max_flow_steps|steady_tolerance|thermal_tolerance|max_thermal_iterations|timeout_s)$": {"type": "number"}}},
+    "scales": {"type": "object", "additionalProperties": false,
+      "required": ["velocity_scale_m_s", "actual_reynolds", "kernel_reynolds", "peclet", "solid_k_ratio", "lid"],
+      "patternProperties": {"^(velocity_scale_m_s|actual_reynolds|kernel_reynolds|peclet|solid_k_ratio|lid)$": {"type": "number", "minimum": 0}}},
+    "diagnostics": {"type": "object", "additionalProperties": false,
+      "required": ["flow_steps", "thermal_iterations", "thermal_residual_linf", "balance_relative"],
+      "properties": {"interface_heat_flow_w": {"type": "object", "additionalProperties": false, "required": ["bottom", "top"], "properties": {"bottom": {"type": "number"}, "top": {"type": "number"}}}},
+      "patternProperties": {"^(flow_time|flow_dt|divergence_linf|steady_rate_linf|poisson_residual_linf|thermal_residual_linf|hot_flux|cold_flux|balance_raw|balance_relative|theta_min|theta_max|flow_steps|thermal_iterations|independent_thermal_residual_linf|hot_input_w|cold_output_w|raw_energy_balance_w|maximum_temperature_k|minimum_temperature_k)$": {"type": "number"}}},
+    "fields": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["thermal", "fluid"],
+      "properties": {
+        "thermal": {"type": "object", "additionalProperties": false, "required": ["n", "rows", "x_m", "y_m", "region", "temperature_k"],
+          "properties": {"n": {"type": "integer", "minimum": 8, "maximum": 64}, "rows": {"type": "integer", "minimum": 12, "maximum": 96},
+            "x_m": {"$ref": "#/$defs/array"}, "y_m": {"$ref": "#/$defs/array"}, "temperature_k": {"$ref": "#/$defs/array"},
+            "region": {"type": "array", "maxItems": 6144, "items": {"enum": ["hot_solid", "fluid", "cold_solid"]}}}},
+        "fluid": {"type": "object", "additionalProperties": false, "required": ["u_m_s", "v_m_s", "gauge_pressure_pa"],
+          "properties": {"u_m_s": {"$ref": "#/$defs/array"}, "v_m_s": {"$ref": "#/$defs/array"}, "gauge_pressure_pa": {"$ref": "#/$defs/array"}}}}}]},
+    "interfaces": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["bottom", "top"],
+      "properties": {"bottom": {"$ref": "#/$defs/interface"}, "top": {"$ref": "#/$defs/interface"}}}]},
+    "limitations": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"type": "string", "maxLength": 512}},
+    "provenance": {"type": "object", "additionalProperties": false,
+      "required": ["engine", "executable_sha256", "request_sha256", "raw_result_sha256", "memory_limit_mb", "stream_limit_bytes", "process_containment"],
+      "properties": {"engine": {"type": "string"}, "executable_sha256": {"$ref": "#/$defs/digest"}, "request_sha256": {"$ref": "#/$defs/digest"}, "raw_result_sha256": {"$ref": "#/$defs/digest"},
+        "memory_limit_mb": {"const": 512}, "stream_limit_bytes": {"const": 8388608},
+        "process_containment": {"type": "object", "additionalProperties": false,
+          "required": ["memory_limit_enforced", "suspended_before_job_assignment", "job_assignment_race_closed"],
+          "properties": {"memory_limit_enforced": {"type": "boolean"}, "suspended_before_job_assignment": {"type": "boolean"}, "job_assignment_race_closed": {"type": "boolean"}}}}}
+  },
+  "allOf": [{"if": {"properties": {"status": {"const": "failed_to_converge"}}}, "then": {"properties": {"fields": {"type": "null"}, "interfaces": {"type": "null"}}},
+    "else": {"properties": {"fields": {"type": "object"}, "interfaces": {"type": "object"}}}}],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "array": {"type": "array", "maxItems": 6144, "items": {"type": "number"}},
+    "interface": {"type": "object", "additionalProperties": false, "required": ["x_m", "y_m", "face_area_m2", "temperature_k", "heat_flux_positive_y_w_m2"],
+      "properties": {"x_m": {"$ref": "#/$defs/array"}, "y_m": {"type": "number"}, "face_area_m2": {"type": "number", "exclusiveMinimum": 0}, "temperature_k": {"$ref": "#/$defs/array"}, "heat_flux_positive_y_w_m2": {"$ref": "#/$defs/array"}}}
+  }
+}

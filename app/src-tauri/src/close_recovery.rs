@@ -13,12 +13,12 @@ pub(crate) struct CloseRecoveryState(Mutex<CloseGate>);
 struct CloseGate {
     sequence: u64,
     pending: Option<u64>,
-    dialog: bool,
+    dialog: Option<u64>,
     closing: bool,
 }
 impl CloseGate {
     fn request(&mut self) -> Option<(u64, bool)> {
-        if self.closing || self.dialog {
+        if self.closing || self.dialog.is_some() {
             return None;
         }
         if let Some(id) = self.pending {
@@ -28,23 +28,38 @@ impl CloseGate {
         self.pending = Some(self.sequence);
         Some((self.sequence, true))
     }
-    fn respond(&mut self, id: u64) -> bool {
-        if self.pending != Some(id) || self.dialog || self.closing {
+    fn acknowledge(&mut self, generation: u64) -> bool {
+        if self.closing {
             return false;
         }
-        self.pending = None;
-        true
+        if self.pending == Some(generation) {
+            self.pending = None;
+            return true;
+        }
+        if self.dialog == Some(generation) {
+            self.dialog = None;
+            return true;
+        }
+        false
     }
     fn recover(&mut self, id: u64) -> bool {
-        if self.pending != Some(id) || self.dialog || self.closing {
+        if self.pending != Some(id) || self.dialog.is_some() || self.closing {
             return false;
         }
         self.pending = None;
-        self.dialog = true;
+        self.dialog = Some(id);
         true
     }
-    fn keep_open(&mut self) {
-        self.dialog = false;
+    fn keep_open(&mut self, generation: u64) {
+        if self.dialog == Some(generation) {
+            self.dialog = None;
+        }
+    }
+    fn force_close(&mut self, generation: u64) -> bool {
+        if self.dialog != Some(generation) || self.closing {
+            return false;
+        }
+        self.close()
     }
     fn close(&mut self) -> bool {
         if self.closing {
@@ -52,7 +67,7 @@ impl CloseGate {
         }
         self.closing = true;
         self.pending = None;
-        self.dialog = false;
+        self.dialog = None;
         true
     }
 }
@@ -69,29 +84,24 @@ pub(crate) fn main_close_recovery_supported(window: tauri::Window) -> Result<boo
     Ok(true)
 }
 #[tauri::command]
-pub(crate) fn respond_main_close(
+pub(crate) fn acknowledge_desktop_close(
     window: tauri::Window,
     app: tauri::AppHandle,
-    request_id: u64,
-    decision: String,
-) -> Result<(), String> {
+    generation: u64,
+) -> Result<bool, String> {
     main_only(&window)?;
-    if !matches!(decision.as_str(), "defer" | "close") {
-        return Err("Invalid close response".into());
+    if generation == 0 {
+        return Ok(false);
     }
-    let accepted = app
+    Ok(app
         .state::<CloseRecoveryState>()
         .0
         .lock()
         .unwrap_or_else(|e| e.into_inner())
-        .respond(request_id);
-    if accepted && decision == "close" {
-        commit_shutdown(&app);
-    }
-    Ok(())
+        .acknowledge(generation))
 }
 #[tauri::command]
-pub(crate) fn close_main_application(
+pub(crate) fn close_desktop_app(
     window: tauri::Window,
     app: tauri::AppHandle,
 ) -> Result<(), String> {
@@ -118,8 +128,8 @@ pub(crate) fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent
         return;
     };
     let _ = window.emit(
-        "spike:main-close-requested",
-        serde_json::json!({"requestId":id}),
+        "spike://desktop-close-requested",
+        serde_json::json!({"generation":id}),
     );
     if !start_timer {
         return;
@@ -140,13 +150,17 @@ pub(crate) fn on_window_event(window: &tauri::Window, event: &tauri::WindowEvent
    .set_level(rfd::MessageLevel::Warning)
    .set_buttons(rfd::MessageButtons::OkCancelCustom("Force close SPIKE".into(),"Keep open".into())).show();
         if response == rfd::MessageDialogResult::Custom("Force close SPIKE".into()) {
-            commit_shutdown(&app);
+            let accepted = app.state::<CloseRecoveryState>()
+                .0.lock().unwrap_or_else(|e| e.into_inner()).force_close(id);
+            if accepted {
+                super::desktop_lifecycle::begin_shutdown(app.clone());
+            }
         } else {
             app.state::<CloseRecoveryState>()
                 .0
                 .lock()
                 .unwrap_or_else(|e| e.into_inner())
-                .keep_open();
+                .keep_open(id);
         }
     });
 }
@@ -313,7 +327,8 @@ mod tests {
         assert_eq!(gate.request(), Some((id, false)));
         assert!(gate.recover(id));
         assert!(gate.request().is_none());
-        assert!(!gate.respond(id));
+        assert!(gate.acknowledge(id));
+        assert!(!gate.force_close(id));
         assert!(gate.close());
         assert!(!gate.close());
     }
@@ -321,14 +336,23 @@ mod tests {
     fn healthy_defer_and_stale_responses_do_not_close_another_request() {
         let mut gate = CloseGate::default();
         let (id, _) = gate.request().unwrap();
-        assert!(gate.respond(id));
+        assert!(gate.acknowledge(id));
         assert!(!gate.recover(id));
         let (next, _) = gate.request().unwrap();
         assert!(next > id);
-        assert!(!gate.respond(id));
+        assert!(!gate.acknowledge(id));
         assert!(gate.recover(next));
-        gate.keep_open();
+        gate.keep_open(next);
         assert!(gate.request().unwrap().0 > next);
+    }
+    #[test]
+    fn stale_force_response_cannot_bypass_renderer_acknowledgement() {
+        let mut gate = CloseGate::default();
+        let (generation, _) = gate.request().unwrap();
+        assert!(gate.recover(generation));
+        assert!(gate.acknowledge(generation));
+        assert!(!gate.force_close(generation));
+        assert!(!gate.closing);
     }
     #[test]
     fn shutdown_is_idempotent_and_invalidates_pending_timeout() {

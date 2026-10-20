@@ -1,0 +1,107 @@
+{
+  "contract": "spike/owned-pad-stage-evidence/v1",
+  "stage_id": "PI01-S01",
+  "status": "passed",
+  "production_qualified": false,
+  "sources_before": {
+    "scripts/parity_owned_pad_gate.py": "f5822dd1c6d5fc8d9eacddf688458e57c1476c85a87de2366bd15138bc103842",
+    "scripts/check_ebrake_owned_dc.py": "222390a395e8a15d163f219e0f757ec040f5ea9ca15145fc83cdf87fb80bf343",
+    "python/spike_core/convergence.py": "ef8d2ed9e1e42342ec7827d99b33d088037ded6b7b216a33b43e2801c1b224a3",
+    "python/spike_core/cli.py": "33ad1924afe3628e3a299c2267ccc08bf5a36323e794b8f88a5a615c86a45d66",
+    "python/spike_core/hybrid_drilled_roundrect.py": "8ddc49076fbf1c88fd6b8be206623ab176edc4c38a3d2cff62a772b5d5d7395e",
+    "python/spike_core/hybrid_mesh.py": "9b4b6fa492c91f536da1258235002f768806f3d828609202b79dd610a80fbc2e",
+    "python/spike_core/hybrid_owned_copper.py": "aec35042f41cfc95d4ebd5850084eefdb8758236259bfc6c0a4048fefee1e86e",
+    "python/spike_core/hybrid_dc_solver.py": "d8f2047f114436dc5a217e182ad02603097aac78829be5203f4aababce3ac372",
+    "python/spike_core/dc_result_utils.py": "1bb6a005791e4453492c4c8d8fa2e88ed77f425c3001a2ef9e2180fa23e7dc68",
+    "python/spike_core/quasistatic_copper_area.py": "a844529ecb1d3bdebd7b8230205397f55446e128ff6453d275f7aa1121cae514",
+    "python/spike_core/contracts.py": "252a1d04297301d4a63615d118e29e6a5c7914936d3b255cf65eef0300d1314a",
+    "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+    "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+    "tests/python/test_hybrid_owned_copper.py": "36df32429549f42e17346a507e97ec6d1c7cb75d7287a8c75418749ced2a6ccf",
+    "tests/python/test_hybrid_drilled_roundrect.py": "8d6f6eb5b76f17c0aa4a0b06dd47e02ecb888e0b02dc0e2d13431fa4a10c8a4c",
+    "tests/python/test_custom_pad_drill.py": "ac1793e4b6cc648ef001aface96de355bddc9e151228c41e2f4a678cb55d1f5c",
+    "app/public/demo/ebrake1.kicad_pcb": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca",
+    "docs/OWNED_DRILLED_PAD_DC.md": "084380026983847963ec0e2680b5a7868e91a51945d9b0176edabcf49a626ec8"
+  },
+  "sources_after": {
+    "scripts/parity_owned_pad_gate.py": "f5822dd1c6d5fc8d9eacddf688458e57c1476c85a87de2366bd15138bc103842",
+    "scripts/check_ebrake_owned_dc.py": "222390a395e8a15d163f219e0f757ec040f5ea9ca15145fc83cdf87fb80bf343",
+    "python/spike_core/convergence.py": "ef8d2ed9e1e42342ec7827d99b33d088037ded6b7b216a33b43e2801c1b224a3",
+    "python/spike_core/cli.py": "33ad1924afe3628e3a299c2267ccc08bf5a36323e794b8f88a5a615c86a45d66",
+    "python/spike_core/hybrid_drilled_roundrect.py": "8ddc49076fbf1c88fd6b8be206623ab176edc4c38a3d2cff62a772b5d5d7395e",
+    "python/spike_core/hybrid_mesh.py": "9b4b6fa492c91f536da1258235002f768806f3d828609202b79dd610a80fbc2e",
+    "python/spike_core/hybrid_owned_copper.py": "aec35042f41cfc95d4ebd5850084eefdb8758236259bfc6c0a4048fefee1e86e",
+    "python/spike_core/hybrid_dc_solver.py": "d8f2047f114436dc5a217e182ad02603097aac78829be5203f4aababce3ac372",
+    "python/spike_core/dc_result_utils.py": "1bb6a005791e4453492c4c8d8fa2e88ed77f425c3001a2ef9e2180fa23e7dc68",
+    "python/spike_core/quasistatic_copper_area.py": "a844529ecb1d3bdebd7b8230205397f55446e128ff6453d275f7aa1121cae514",
+    "python/spike_core/contracts.py": "252a1d04297301d4a63615d118e29e6a5c7914936d3b255cf65eef0300d1314a",
+    "python/spike_core/kicad_importer.py": "0ecf3dfa91937f8ba59deb9f78b94de00541bb79b819e4cb4cb0b157fcd9990e",
+    "python/core/board_parser.py": "2187d7fb80a6fd60bcb3192c31d84a492dcd2c2a19dbcaeefa6339401411ed3a",
+    "tests/python/test_hybrid_owned_copper.py": "36df32429549f42e17346a507e97ec6d1c7cb75d7287a8c75418749ced2a6ccf",
+    "tests/python/test_hybrid_drilled_roundrect.py": "8d6f6eb5b76f17c0aa4a0b06dd47e02ecb888e0b02dc0e2d13431fa4a10c8a4c",
+    "tests/python/test_custom_pad_drill.py": "ac1793e4b6cc648ef001aface96de355bddc9e151228c41e2f4a678cb55d1f5c",
+    "app/public/demo/ebrake1.kicad_pcb": "d0117300c730688ce2311c2908cec041c537689f59aa4527ffa6bdec68a2edca",
+    "docs/OWNED_DRILLED_PAD_DC.md": "084380026983847963ec0e2680b5a7868e91a51945d9b0176edabcf49a626ec8"
+  },
+  "board_artifacts": {
+    "report.json": {
+      "path": "build/ebrake-repair-20261019/owned-custom-reverified/report.json",
+      "sha256": "16e3f9f8e235edc4336a45f267bac4679d28ef79fb58f177104999a51d5dddfc"
+    },
+    "request.json": {
+      "path": "build/ebrake-repair-20261019/owned-custom-reverified/request.json",
+      "sha256": "9022a5db97068b7ef598b3046e76b08002430106ba8256466c575bb2509d88a5"
+    },
+    "cli-result.json": {
+      "path": "build/ebrake-repair-20261019/owned-custom-reverified/cli-result.json",
+      "sha256": "3b0c3cbf54a5f251d198b7615d0220178fdbdeb93b0060c1f5caade145b1afd0"
+    },
+    "cli.log": {
+      "path": "build/ebrake-repair-20261019/owned-custom-reverified/cli.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "convergence.json": {
+      "path": "build/ebrake-repair-20261019/owned-custom-reverified/convergence.json",
+      "sha256": "5ab158e48530c29a7316dc2bc1449442e3efbba405b0ba0bab4eadf750c44469"
+    }
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_custom_pad_drill.CustomPadDrillTests.test_circle_and_oval_drills_subtract_from_synthetic_custom_pad_surface",
+      "tests.python.test_custom_pad_drill.CustomPadDrillTests.test_drill_plating_envelope_crossing_resolved_source_boundary_is_solver_blocked",
+      "tests.python.test_custom_pad_drill.CustomPadDrillTests.test_multilayer_plated_custom_pad_generates_owned_barrel_volume",
+      "tests.python.test_custom_pad_drill.CustomPadDrillTests.test_parser_design_ir_and_schema_round_trip_centered_circle_drill",
+      "tests.python.test_custom_pad_drill.CustomPadDrillTests.test_parser_rejects_offset_smd_npth_and_anchor_sized_custom_drills",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_budget_failure_precedes_cell_allocation",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_corner_track_attachment_does_not_use_rectangular_fallback",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_invalid_metadata_and_narrow_ligament_fail_closed",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_j11_area_void_faces_and_rotation",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_oval_drill_and_extreme_valid_radius_ratios",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_owned_ac_guard_remains_closed",
+      "tests.python.test_hybrid_drilled_roundrect.DrilledRoundrectTests.test_zone_ownership_and_void_area_balance",
+      "tests.python.test_hybrid_drilled_roundrect.NativeEBrakeDrilledRoundrectTests.test_native_j11_source_geometry_and_barrel_resistance",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_angular_annulus_resistance_converges_on_actual_owned_mesh",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_branch_limit_reports_explicit_error",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_concave_zone_centroids_remain_in_copper_without_dropping_area",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_convex_custom_source_partition_contacts_and_centroids",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_convex_difference_area_and_disjoint_pieces",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_custom_admission_rejects_nonconvex_holed_drilled_or_malformed_sources",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_missing_source_fill_and_invalid_thermal_policy_fail_closed",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_none_policy_cannot_gain_a_shared_face_contact",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_owned_dc_kcl_and_dissipation_balance",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_pad_drill_has_no_zone_copper_and_union_area_is_conserved",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_radial_annulus_resistance_and_area_converge",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_rotated_pad_owns_overlap_and_has_distributed_faces",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_roundrect_outline_survives_grid_clipping",
+      "tests.python.test_hybrid_owned_copper.OwnedCopperTests.test_unsupported_shape_fails_closed"
+    ],
+    "run": 27,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI01-S01-20261019.log",
+  "log_sha256": "5ded65e97ad7655d61758a58addb62718d63ddb19855572268c22921af3eeafc"
+}

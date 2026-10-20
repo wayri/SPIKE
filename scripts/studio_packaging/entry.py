@@ -11,6 +11,12 @@ def main():
     library=root/'native'/('spikes_c_api.dll' if os.name=='nt' else 'libspikes_c_api.so')
     cache=Path(os.environ.get('LOCALAPPDATA',os.environ.get('XDG_CACHE_HOME',str(Path.home()/'.cache'))))/'SPIKES Studio'/'matplotlib'
     os.environ.setdefault('MPLCONFIGDIR',str(cache))
+    if '--component-self-test' in sys.argv:
+        from spikes_studio.component_smoke import run
+        return run(library,Path(sys.argv[sys.argv.index('--component-self-test')+1]))
+    if '--peripheral-smoke' in sys.argv:
+        from spikes_studio.peripheral_package_checks import run
+        return run(library,Path(sys.argv[sys.argv.index('--peripheral-smoke')+1]))
     if '--package-smoke' in sys.argv:
         from spikes_studio.package_smoke import run
         return run(library,Path(sys.argv[sys.argv.index('--package-smoke')+1]))

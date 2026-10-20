@@ -22,7 +22,7 @@ omitted components, respectively. There are 464 retained cutouts in total.
 The two other selected components are ordinary simple polygons.
 
 Durable baseline evidence is
-`output/mesher-fix-20261013/baseline-after-import-fix.json` and its phase,
+the unbundled local `baseline-after-import-fix.json` and its phase,
 raw-stack and selected-polygon sidecars. All five actual warnings were
 `SPIKE-BE-MESH-W-0002: <source_id> has no usable simple filled copper polygon.`
 The baseline returned only two zones, so its 136.705-second mesh timing is a
@@ -97,7 +97,7 @@ The first integrated run represented all seven selected zones and conserved
 their areas, but still failed the overall gate because board-wide contact
 evidence unnecessarily invoked the new mesh validator on unrelated roughly
 102,000-vertex GND paths. That result is preserved as
-`output/mesher-fix-20261013/fixed-marble-profile.json` and is not accepted as a
+the unbundled local `fixed-marble-profile.json` and is not accepted as a
 successful benchmark. The separate source-observation view fixes that coupling.
 
 Two complete runs now retain all 122 tracks, seven zones, 58 vias and 43 pads:
@@ -159,7 +159,7 @@ regressions establish that capacity.
 ```powershell
 .venv\Scripts\python.exe scripts\profile_retained_board_mesher.py `
   --no-faulthandler --timeout-s 300 --process-memory-limit-mb 4096 `
-  --output output\mesher-fix-20261013\fresh-marble-profile.json
+--output "$env:TEMP\spike-fresh-marble-profile.json"
 .venv\Scripts\python.exe -m unittest discover -s tests\python -v
 .venv\Scripts\python.exe scripts\check_architecture.py
 ```

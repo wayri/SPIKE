@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/enclosure-cht-request-v2.schema.json",
+  "title": "Experimental refined-grid obstacle-inertial enclosure CHT request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "grid", "materials", "material_ids", "flow", "boundaries", "heat_sources_w_m3", "study"],
+  "properties": {
+    "contract": {"const": "spike/enclosure-cht-request/v2"},
+    "grid": {
+      "type": "object", "additionalProperties": false,
+      "required": ["shape", "spacing_m", "origin_m", "local_refinement"],
+      "properties": {
+        "shape": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 1, "maximum": 32}},
+        "spacing_m": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number", "exclusiveMinimum": 0}},
+        "origin_m": {"$ref": "#/$defs/vector"},
+        "local_refinement": {
+          "type": "array", "maxItems": 64,
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["bounds_m", "split_factor"],
+            "properties": {
+              "bounds_m": {"type": "array", "minItems": 3, "maxItems": 3,
+                "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}},
+              "split_factor": {"type": "integer", "minimum": 2, "maximum": 4}
+            }
+          }
+        }
+      }
+    },
+    "materials": {
+      "type": "array", "minItems": 1, "maxItems": 64,
+      "items": {"oneOf": [{"$ref": "#/$defs/fluidMaterial"}, {"$ref": "#/$defs/solidMaterial"}]},
+      "contains": {"type": "object", "required": ["phase"], "properties": {"phase": {"const": "fluid"}}},
+      "minContains": 1, "maxContains": 1
+    },
+    "material_ids": {"type": "array", "minItems": 1, "maxItems": 32,
+      "items": {"type": "array", "minItems": 1, "maxItems": 32,
+        "items": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/materialId"}}}},
+    "flow": {
+      "type": "object", "additionalProperties": false,
+      "required": ["model", "body_force_n_m3", "nonlinear_controls"],
+      "properties": {
+        "model": {"const": "rectilinear_laminar"},
+        "body_force_n_m3": {"$ref": "#/$defs/force"},
+        "nonlinear_controls": {
+          "type": "object", "additionalProperties": false,
+          "required": ["max_iterations", "relaxation", "relative_tolerance"],
+          "properties": {
+            "max_iterations": {"type": "integer", "minimum": 1, "maximum": 100},
+            "relaxation": {"type": "number", "minimum": 0.1, "maximum": 1},
+            "relative_tolerance": {"type": "number", "minimum": 1e-12, "maximum": 1e-7}
+          }
+        }
+      }
+    },
+    "boundaries": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x_min", "x_max", "y_min", "y_max", "z_min", "z_max"],
+      "properties": {
+        "x_min": {"$ref": "#/$defs/boundary"}, "x_max": {"$ref": "#/$defs/boundary"},
+        "y_min": {"$ref": "#/$defs/boundary"}, "y_max": {"$ref": "#/$defs/boundary"},
+        "z_min": {"$ref": "#/$defs/boundary"}, "z_max": {"$ref": "#/$defs/boundary"}
+      }
+    },
+    "heat_sources_w_m3": {"$ref": "#/$defs/scalarCells"},
+    "study": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["type"], "properties": {"type": {"const": "steady"}}},
+        {"type": "object", "additionalProperties": false,
+          "required": ["type", "time_step_s", "steps", "initial_temperature_k", "output_stride"],
+          "properties": {
+            "type": {"const": "transient"},
+            "time_step_s": {"type": "number", "minimum": 1e-9, "maximum": 1e9},
+            "steps": {"type": "integer", "minimum": 1, "maximum": 256},
+            "initial_temperature_k": {"type": "number", "minimum": 1, "maximum": 10000},
+            "output_stride": {"type": "integer", "minimum": 1, "maximum": 256}
+          }}
+      ]
+    }
+  },
+  "allOf": [{
+    "if": {"properties": {"study": {"properties": {"type": {"const": "steady"}}}}},
+    "then": {"properties": {"boundaries": {"anyOf": [
+      {"properties": {"x_min": {"properties": {"type": {"enum": ["temperature", "convection"]}}}}},
+      {"properties": {"x_max": {"properties": {"type": {"enum": ["temperature", "convection"]}}}}},
+      {"properties": {"y_min": {"properties": {"type": {"enum": ["temperature", "convection"]}}}}},
+      {"properties": {"y_max": {"properties": {"type": {"enum": ["temperature", "convection"]}}}}},
+      {"properties": {"z_min": {"properties": {"type": {"enum": ["temperature", "convection"]}}}}},
+      {"properties": {"z_max": {"properties": {"type": {"enum": ["temperature", "convection"]}}}}}
+    ]}}}
+  }],
+  "$defs": {
+    "materialId": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"},
+    "vector": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}},
+    "boundedNumber": {"type": "number", "minimum": -1e12, "maximum": 1e12},
+    "scalarCells": {"type": "array", "minItems": 1, "maxItems": 32,
+      "items": {"type": "array", "minItems": 1, "maxItems": 32,
+        "items": {"type": "array", "minItems": 1, "maxItems": 32, "items": {"$ref": "#/$defs/boundedNumber"}}}},
+    "force": {"type": "array", "minItems": 1, "maxItems": 32,
+      "items": {"type": "array", "minItems": 1, "maxItems": 32,
+        "items": {"type": "array", "minItems": 1, "maxItems": 32,
+          "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/boundedNumber"}}}}},
+    "materialBase": {
+      "type": "object",
+      "required": ["id", "phase", "density_kg_m3", "specific_heat_j_kgk", "conductivity_w_mk"],
+      "properties": {
+        "id": {"$ref": "#/$defs/materialId"},
+        "phase": {"enum": ["fluid", "solid"]},
+        "density_kg_m3": {"type": "number", "minimum": 1e-6, "maximum": 1e6},
+        "specific_heat_j_kgk": {"type": "number", "minimum": 1e-6, "maximum": 1e7},
+        "conductivity_w_mk": {"type": "number", "minimum": 1e-9, "maximum": 1e5}
+      }
+    },
+    "fluidMaterial": {
+      "allOf": [{"$ref": "#/$defs/materialBase"}],
+      "type": "object", "unevaluatedProperties": false, "required": ["dynamic_viscosity_pa_s"],
+      "properties": {"phase": {"const": "fluid"},
+        "dynamic_viscosity_pa_s": {"type": "number", "minimum": 1e-12, "maximum": 1e4}}
+    },
+    "solidMaterial": {
+      "allOf": [{"$ref": "#/$defs/materialBase"}],
+      "type": "object", "unevaluatedProperties": false,
+      "properties": {"phase": {"const": "solid"}}
+    },
+    "temperature": {"type": "number", "minimum": 1e-12, "maximum": 10000},
+    "boundary": {
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["type"],
+          "properties": {"type": {"const": "adiabatic"}}},
+        {"type": "object", "additionalProperties": false, "required": ["type", "temperature_k"],
+          "properties": {"type": {"const": "temperature"}, "temperature_k": {"$ref": "#/$defs/temperature"}}},
+        {"type": "object", "additionalProperties": false, "required": ["type", "inward_heat_flux_w_m2"],
+          "properties": {"type": {"const": "heat_flux"}, "inward_heat_flux_w_m2": {"$ref": "#/$defs/boundedNumber"}}},
+        {"type": "object", "additionalProperties": false, "required": ["type", "ambient_temperature_k", "heat_transfer_coefficient_w_m2k"],
+          "properties": {"type": {"const": "convection"},
+            "ambient_temperature_k": {"$ref": "#/$defs/temperature"},
+            "heat_transfer_coefficient_w_m2k": {"type": "number", "minimum": 1e-12, "maximum": 1e9}}}
+      ]
+    }
+  },
+  "$comment": "Structural validation is not solver admission. Runtime also enforces finite JSON/8 MiB bounds, exact array shapes and material coverage, solid-force exclusion, representable refined metrics, resource limits, nonlinear convergence, Reynolds and conservation gates."
+}

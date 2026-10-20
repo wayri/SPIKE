@@ -32,13 +32,82 @@ def _pdk_output_is_model(report, output):
     return False
 
 
-def _parser() -> argparse.ArgumentParser:
+def _registration_formatter(prog):
+    # Registration needs only action metadata. Probe the terminal width only
+    # when actually rendering help/usage, avoiding shutil/compression imports.
+    return argparse.HelpFormatter(prog, width=80)
+
+
+def _add_native_run_parser(commands, *, defer_help: bool = False):
+    native_run = commands.add_parser(
+        "native-run",
+        help="Run .op, .dc, or .tran through an explicitly selected owned SPIKES library.",
+        formatter_class=_registration_formatter if defer_help else argparse.HelpFormatter,
+    )
+    native_run.add_argument("netlist", type=Path)
+    native_run.add_argument("--library", type=Path, required=True)
+    native_run.add_argument(
+        "--method",
+        choices=(
+            "trap", "hybrid_trapezoidal", "be", "bdf2",
+            "radau-iia3", "radau_iia3",
+        ),
+        default="trap",
+        help=(
+            "Transient integration: event-aware hybrid trapezoidal (trap, "
+            "default), backward Euler (be), variable-step BDF2 (bdf2), or "
+            "fixed-step third-order Radau IIA (radau-iia3)."
+        ),
+    )
+    native_run.add_argument(
+        "--adaptive",
+        action="store_true",
+        help="Enable adaptive LTE-controlled stepping for trap or BDF2 transient runs.",
+    )
+    native_run.add_argument(
+        "--lte-absolute-tolerance",
+        type=float,
+        default=1.0e-6,
+        metavar="VALUE",
+    )
+    native_run.add_argument(
+        "--lte-relative-tolerance",
+        type=float,
+        default=1.0e-3,
+        metavar="VALUE",
+    )
+    native_run.add_argument(
+        "--minimum-time-step",
+        type=float,
+        default=1.0e-15,
+        metavar="SECONDS",
+    )
+    native_run.add_argument(
+        "--max-rejected-steps",
+        type=int,
+        default=10_000,
+        metavar="COUNT",
+    )
+    native_run.add_argument("--probe", action="append", default=[], metavar="EXPR")
+    native_run.add_argument("-o", "--output", type=Path)
+    native_run.add_argument("--pretty", action="store_true", help="Indent native JSON on stdout; files remain indented by default.")
+    native_run.formatter_class = argparse.HelpFormatter
+
+
+def _parser(*, native_only: bool = False) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="spikes",
         description="Strict CLI for the experimental SPIKES linear RLC circuit kernel.",
+        formatter_class=_registration_formatter if native_only else argparse.HelpFormatter,
     )
     parser.add_argument("--version", action="version", version=f"SPIKES {CLI_VERSION}")
     commands = parser.add_subparsers(dest="command", required=True)
+    if native_only:
+        # Root-level errors still show the complete public command usage.
+        parser.error = lambda message: _parser().error(message)
+        _add_native_run_parser(commands, defer_help=True)
+        parser.formatter_class = argparse.HelpFormatter
+        return parser
     asic=commands.add_parser('asic-plan',help='Preflight a revision-bound two-application IC/ASIC flow; no tool execution.')
     asic.add_argument('project',type=Path);asic.add_argument('--root',type=Path);asic.add_argument('-o','--output',type=Path)
     layout=commands.add_parser('layout-inspect',help='Inspect actual layout geometry using explicitly selected KLayout.')
@@ -87,56 +156,7 @@ def _parser() -> argparse.ArgumentParser:
         )
         command.add_argument("-o", "--output", type=Path, help="Write JSON to this file instead of stdout.")
 
-    native_run = commands.add_parser(
-        "native-run",
-        help="Run .op, .dc, or .tran through an explicitly selected owned SPIKES library.",
-    )
-    native_run.add_argument("netlist", type=Path)
-    native_run.add_argument("--library", type=Path, required=True)
-    native_run.add_argument(
-        "--method",
-        choices=(
-            "trap", "hybrid_trapezoidal", "be", "bdf2",
-            "radau-iia3", "radau_iia3",
-        ),
-        default="trap",
-        help=(
-            "Transient integration: event-aware hybrid trapezoidal (trap, "
-            "default), backward Euler (be), variable-step BDF2 (bdf2), or "
-            "fixed-step third-order Radau IIA (radau-iia3)."
-        ),
-    )
-    native_run.add_argument(
-        "--adaptive",
-        action="store_true",
-        help="Enable adaptive LTE-controlled stepping for trap or BDF2 transient runs.",
-    )
-    native_run.add_argument(
-        "--lte-absolute-tolerance",
-        type=float,
-        default=1.0e-6,
-        metavar="VALUE",
-    )
-    native_run.add_argument(
-        "--lte-relative-tolerance",
-        type=float,
-        default=1.0e-3,
-        metavar="VALUE",
-    )
-    native_run.add_argument(
-        "--minimum-time-step",
-        type=float,
-        default=1.0e-15,
-        metavar="SECONDS",
-    )
-    native_run.add_argument(
-        "--max-rejected-steps",
-        type=int,
-        default=10_000,
-        metavar="COUNT",
-    )
-    native_run.add_argument("--probe", action="append", default=[], metavar="EXPR")
-    native_run.add_argument("-o", "--output", type=Path)
+    _add_native_run_parser(commands)
 
     for name, help_text in (
         ("ac", "Run a bounded linear complex AC sweep with an explicit source."),
@@ -252,8 +272,10 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _emit(value: Any, output: Path | None) -> None:
-    rendered = json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n"
+def _emit(value: Any, output: Path | None, *, compact: bool = False) -> None:
+    rendered = json.dumps(value, indent=None if compact else 2,
+                          separators=(",", ":") if compact else None,
+                          sort_keys=True, allow_nan=False) + "\n"
     if output is None:
         sys.stdout.write(rendered)
     else:
@@ -336,7 +358,10 @@ def _run_benchmark(arguments: argparse.Namespace) -> tuple[int, dict[str, Any]]:
 
 
 def main(argv: Iterable[str] | None = None) -> int:
-    arguments = _parser().parse_args(list(argv) if argv is not None else None)
+    tokens = list(argv) if argv is not None else sys.argv[1:]
+    # A native solve needs only its own options. Global help and all other
+    # commands retain the complete parser; both paths share one definition.
+    arguments = _parser(native_only=bool(tokens and tokens[0] == "native-run")).parse_args(tokens)
     error_output = arguments.output
     try:
         if arguments.command=='asic-plan':
@@ -616,7 +641,7 @@ def main(argv: Iterable[str] | None = None) -> int:
                 minimum_time_step_s=arguments.minimum_time_step,
                 max_rejected_steps=arguments.max_rejected_steps,
             ).to_dict()
-            _emit(result, arguments.output)
+            _emit(result, arguments.output, compact=arguments.output is None and not arguments.pretty)
             return EXIT_OK if result["status"] == "completed" else EXIT_SOLVE
         from .runner import compile_project, run_project
         compiled = compile_project(project)

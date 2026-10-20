@@ -62,15 +62,14 @@ not an established diagnosis. Separate module rechecks passed all **14 parity
 backlog** and **8 debugger** tests. No receipt, debugger code or test threshold
 was changed in this UI pass.
 
-Logs: `output/workspace-ui-python-validation.log`,
-`output/workspace-ui-parity-recheck.log`, and
-`output/workspace-ui-debug-recheck.log`. Rechecks demonstrate current focused
+The raw `workspace-ui-python-validation.log`, `workspace-ui-parity-recheck.log`
+and `workspace-ui-debug-recheck.log` are unbundled local records. Rechecks demonstrate current focused
 behavior; they do not turn the earlier full run into a pass.
 
 ## Native observations and acceptance limits
 
 Continuation used the exact repository gamma debug host with a frozen production
-frontend (manifest under `output/native-gamma-verification-20261018-session2`).
+frontend (manifest in the unbundled local `native-gamma-verification-20261018-session2` run).
 This prevented concurrent Vite edits from resetting the native test session.
 
 Executed against the retained three-eBrake assembly:
@@ -120,7 +119,7 @@ Marble retains its exact 44,993,740-byte source, 997 components, 37,380 tracks,
 packages reopen through production readers with exact occurrence ownership.
 The 76,570,879-byte retained design member now uses the existing 512 MiB design
 budget; ordinary control JSON remains capped at 64 MiB and digest validation
-remains enforced. See `output/large-board-memory-benchmark/fixtures/manifest.json`.
+remains enforced. See the unbundled local `large-board-memory-benchmark/fixtures/manifest.json` record.
 
 Captured loose Marble GLBs lack authenticated package binding metadata and were
 not fabricated into artifacts. These fixtures alone do not qualify complete
@@ -155,7 +154,7 @@ board import and workspace shell isolation tests: all passed. Native inspection
 still used the earlier frozen frontend; it does not verify this new fix in a
 renderer. TypeScript and production build passed (existing mixed-import and
 large-chunk warnings remain). The updated immutable frontend is
-`output/native-export-followup-20261018/frontend`, with a SHA-256 manifest alongside
+the unbundled local `native-export-followup-20261018/frontend` record, with a SHA-256 manifest alongside
 it; use that snapshot for the next native acceptance run.
 
 Further export review reproduced the same rejection for a project whose only
@@ -168,7 +167,7 @@ binding and validation remain authoritative. Snapshot, persistence, import and
 workspace shell checks pass. Native confirmation remains blocked: even a fresh
 helper session reports another active request before input can be sent.
 Production build passed with existing warnings; the updated immutable frontend
-is `output/native-export-followup-20261018/multiboard-frontend`, with SHA-256
+is the unbundled local `native-export-followup-20261018/multiboard-frontend` record, with SHA-256
 manifest `multiboard-frontend-manifest.json` alongside it.
 
 ## Architecture and operator guidance

@@ -9,17 +9,30 @@ from . import symbol_design as design
 
 class SymbolCanvas(wx.Panel):
     def __init__(self,parent):
-        super().__init__(parent);self.editor=parent;self.scale=3.;self.drag=None
+        super().__init__(parent);self.editor=parent;self.scale=3.;self.drag=None;self.shape_start=None;self.auto_fit=True
         self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
         self.Bind(wx.EVT_PAINT,self.paint);self.Bind(wx.EVT_LEFT_DOWN,self.down)
         self.Bind(wx.EVT_MOTION,self.motion);self.Bind(wx.EVT_LEFT_UP,self.up)
         self.Bind(wx.EVT_MOUSE_CAPTURE_LOST,lambda e:setattr(self,'drag',None))
         self.Bind(wx.EVT_MOUSEWHEEL,self.wheel)
+        self.Bind(wx.EVT_SIZE,self.on_size)
     def point(self,p):
         w,h=self.GetClientSize();return (round(w/2+p[0]*self.scale),round(h/2+p[1]*self.scale))
     def local(self,p):
         w,h=self.GetClientSize();return ((p.x-w/2)/self.scale,(p.y-h/2)/self.scale)
-    def wheel(self,e):self.scale=max(.5,min(8,self.scale*(1.15 if e.GetWheelRotation()>0 else 1/1.15)));self.Refresh()
+    def fit(self):
+        symbol=self.editor.symbol;points=[symbol['body_keepout']['min'],symbol['body_keepout']['max']]
+        for pin in symbol['terminals']:points.extend([pin['at'],pin['leg_endpoint']])
+        for shape in symbol['primitives']:
+            points.extend(shape.get('points',[]))
+            if shape['kind']=='circle':
+                x,y=shape['center'];r=shape['radius'];points.extend([(x-r,y-r),(x+r,y+r)])
+        width,height=self.GetClientSize();extent_x=max(abs(p[0]) for p in points)*2;extent_y=max(abs(p[1]) for p in points)*2
+        self.scale=max(.1,min(3.,max(1,width-80)/max(1,extent_x),max(1,height-60)/max(1,extent_y)));self.auto_fit=True;self.Refresh()
+    def on_size(self,event):
+        if self.auto_fit:self.fit()
+        event.Skip()
+    def wheel(self,e):self.auto_fit=False;self.scale=max(.1,min(8,self.scale*(1.15 if e.GetWheelRotation()>0 else 1/1.15)));self.Refresh()
     def paint(self,e):
         dc=wx.AutoBufferedPaintDC(self);p=getattr(self.editor.owner,'palette',{})
         dc.SetBackground(wx.Brush(p.get('canvas','#171f26')));dc.Clear();dc.SetTextForeground(p.get('fg','#e5edf3'))
@@ -37,6 +50,14 @@ class SymbolCanvas(wx.Panel):
             dc.DrawText(pin['id']+' '+pin['name'],a[0]+5,a[1]-19)
         high=self.point(self.editor.symbol['body_keepout']['max']);dc.SetBrush(wx.Brush('#71c9d8'));dc.DrawRectangle(high[0]-5,high[1]-5,10,10)
     def down(self,e):
+        tool=getattr(self.editor,'drawing_tool','Select')
+        if tool!='Select':
+            point=self.local(e.GetPosition())
+            if self.shape_start is None:
+                self.shape_start=point;self.editor.status.SetLabel('Click the second point to complete '+tool.lower()+'. Select tool cancels.');return
+            try:self.editor.commit(design.add_shape(self.editor.symbol,tool.lower(),self.shape_start,point))
+            except ValueError as error:self.editor.status.SetLabel(str(error))
+            self.shape_start=None;return
         for i,p in enumerate(self.editor.symbol['terminals']):
             x,y=self.point(p['at'])
             if abs(x-e.x)<12 and abs(y-e.y)<12:
@@ -59,28 +80,48 @@ class SymbolCanvas(wx.Panel):
 
 
 class SymbolDesignerPanel(wx.Panel):
-    def __init__(self,parent,owner=None):
-        super().__init__(parent);self.owner=owner or parent;self.symbol=design.new_symbol();self.selected=0;self.history=[]
-        root=wx.BoxSizer(wx.VERTICAL);bar=wx.BoxSizer(wx.HORIZONTAL)
-        for label,handler in [('New IC',self.new),('Open…',self.load),('Save symbol…',self.save),('Add to library',self.publish),('Undo',self.undo)]:
+    def __init__(self,parent,owner=None,*,embedded=False):
+        super().__init__(parent);self.owner=owner or parent;self.symbol=design.new_symbol();self.selected=0;self.history=[];self.drawing_tool='Select'
+        root=wx.BoxSizer(wx.VERTICAL);bar=wx.WrapSizer(wx.HORIZONTAL)
+        actions=[('New IC',self.new),('Open…',self.load),('Save symbol…',self.save),('Add to library',self.publish),('Undo',self.undo)]
+        if embedded:actions=[('Import geometry…',self.load),('Undo geometry',self.undo)]
+        actions.append(('Fit drawing',lambda:self.canvas.fit()))
+        for label,handler in actions:
             b=wx.Button(self,label=label);b.Bind(wx.EVT_BUTTON,lambda e,h=handler:self.guard(h));bar.Add(b,0,wx.RIGHT,6)
         root.Add(bar,0,wx.ALL,10)
+        tools=wx.BoxSizer(wx.HORIZONTAL)
+        tools.Add(wx.StaticText(self,label='Draw'),0,wx.ALIGN_CENTER_VERTICAL|wx.RIGHT,6)
+        self.tool_choice=wx.Choice(self,choices=['Select','Line','Rectangle','Circle']);self.tool_choice.SetSelection(0)
+        self.tool_choice.SetToolTip('Select: move pins and resize body. Shapes: click two points on the drawing.')
+        self.tool_choice.Bind(wx.EVT_CHOICE,self.choose_tool);tools.Add(self.tool_choice,0,wx.RIGHT,8)
+        self.pin_mode=wx.Choice(self,choices=['AI','DI','AO','DO']);self.pin_mode.SetSelection(0)
+        self.pin_mode.SetToolTip('Selected pin role for sampled blocks: analog/digital input/output. SPICE pins remain bidirectional electrical terminals.')
+        self.pin_mode.Bind(wx.EVT_CHOICE,self.set_mode);tools.Add(wx.StaticText(self,label='Sampled pin role'),0,wx.ALIGN_CENTER_VERTICAL|wx.RIGHT,6);tools.Add(self.pin_mode)
+        root.Add(tools,0,wx.LEFT|wx.BOTTOM,10)
         root.Add(wx.StaticText(self,label='Drag pin circles onto an edge. Lower-right handle rebuilds a rectangular IC body. Mouse wheel zooms.'),0,wx.LEFT|wx.BOTTOM,10)
         middle=wx.BoxSizer(wx.HORIZONTAL);self.canvas=SymbolCanvas(self);middle.Add(self.canvas,1,wx.EXPAND|wx.ALL,8)
+        form_panel=wx.ScrolledWindow(self);form_panel.SetScrollRate(0,16);form_panel.SetMinSize((180,-1))
         form=wx.BoxSizer(wx.VERTICAL);self.fields={}
         for key,label,value in [('id','Library ID','user.ic'),('name','Part name','Custom IC'),('number','Pin number','1'),('pin_name','Pin name','IN')]:
-            form.Add(wx.StaticText(self,label=label),0,wx.TOP,6);field=wx.TextCtrl(self,value=value);self.fields[key]=field;form.Add(field,0,wx.EXPAND)
-        form.Add(wx.StaticText(self,label='Pin side'),0,wx.TOP,6);self.side=wx.Choice(self,choices=['west','east','north','south']);self.side.SetSelection(0);form.Add(self.side,0,wx.EXPAND)
-        form.Add(wx.StaticText(self,label='Position along edge (grid units)'),0,wx.TOP,6);self.position=wx.SpinCtrl(self,min=-10000,max=10000);form.Add(self.position,0,wx.EXPAND)
+            field=wx.TextCtrl(form_panel,value=value);self.fields[key]=field
+            if embedded and key in ('id','name'):field.Hide();continue
+            form.Add(wx.StaticText(form_panel,label=label),0,wx.TOP,6);form.Add(field,0,wx.EXPAND)
+        form.Add(wx.StaticText(form_panel,label='Pin side'),0,wx.TOP,6);self.side=wx.Choice(form_panel,choices=['west','east','north','south']);self.side.SetSelection(0);form.Add(self.side,0,wx.EXPAND)
+        form.Add(wx.StaticText(form_panel,label='Position along edge (grid units)'),0,wx.TOP,6);self.position=wx.SpinCtrl(form_panel,min=-10000,max=10000);form.Add(self.position,0,wx.EXPAND)
         for label,handler in [('Apply pin',self.apply_pin),('Add pin',self.add_pin),('Remove pin',self.remove_pin)]:
-            b=wx.Button(self,label=label);b.Bind(wx.EVT_BUTTON,lambda e,h=handler:self.guard(h));form.Add(b,0,wx.EXPAND|wx.TOP,6)
-        self.pins=wx.ListBox(self);self.pins.Bind(wx.EVT_LISTBOX,lambda e:self.select(e.GetSelection()));form.Add(self.pins,1,wx.EXPAND|wx.TOP,8)
-        middle.Add(form,0,wx.EXPAND|wx.ALL,10);root.Add(middle,1,wx.EXPAND)
-        self.status=wx.StaticText(self,label='Geometry only: attach and qualify an electrical model separately. Pin order does not create a simulation model.')
+            b=wx.Button(form_panel,label=label);b.Bind(wx.EVT_BUTTON,lambda e,h=handler:self.guard(h));form.Add(b,0,wx.EXPAND|wx.TOP,6)
+        self.pins=wx.ListBox(form_panel);self.pins.Bind(wx.EVT_LISTBOX,lambda e:self.select(e.GetSelection()));form.Add(self.pins,1,wx.EXPAND|wx.TOP,8)
+        form_panel.SetSizer(form);form_panel.FitInside();middle.Add(form_panel,0,wx.EXPAND|wx.ALL,10);root.Add(middle,1,wx.EXPAND)
+        self.status=wx.StaticText(self,label='Edit geometry here; define behavior in Model / code.' if embedded else 'Geometry only: attach and qualify an electrical model separately. Pin order does not create a simulation model.')
         root.Add(self.status,0,wx.ALL,10);self.SetSizer(root);self.refresh()
     def guard(self,fn):
         try:fn()
         except (ValueError,KeyError,TypeError,OSError) as error:wx.MessageBox(str(error),'Symbol designer',wx.OK|wx.ICON_WARNING,self)
+    def choose_tool(self,event):
+        self.drawing_tool=self.tool_choice.GetStringSelection();self.canvas.shape_start=None
+        self.status.SetLabel('Select pins or click two points to draw '+self.drawing_tool.lower()+'.')
+    def set_mode(self,event):
+        value=self.draft();value['terminals'][self.selected]['mode']=self.pin_mode.GetStringSelection();self.commit(value)
     def commit(self,value):self.history.append(deepcopy(self.symbol));self.symbol=value;self.refresh()
     def refresh(self):
         self.fields['id'].ChangeValue(self.symbol['id']);self.fields['name'].ChangeValue(self.symbol['name'])
@@ -89,6 +130,7 @@ class SymbolDesignerPanel(wx.Panel):
         self.selected=index;p=self.symbol['terminals'][index];self.pins.SetSelection(index)
         self.fields['number'].ChangeValue(p['id']);self.fields['pin_name'].ChangeValue(p['name']);side=p.get('direction','west');self.side.SetStringSelection(side)
         self.position.SetValue(round(p['at'][1 if side in ('west','east') else 0]/self.symbol['grid']));self.canvas.Refresh()
+        self.pin_mode.SetStringSelection(p.get('mode','AI'))
     def draft(self):
         s=deepcopy(self.symbol)
         for key in ('id','name'):

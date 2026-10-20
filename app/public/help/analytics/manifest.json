@@ -1,0 +1,125 @@
+{
+  "artifact_class": "executed_numerical_analytics_not_application_screenshots",
+  "entries": [
+    {
+      "data": "data/pi.json",
+      "data_sha256": "6584be2a591355284a49404a9ecbee934219c7d1634e51d68610469639115d6b",
+      "figure": "figures/pi-dielectric-admittance.png",
+      "figure_sha256": "6986a9c7b8ced9b27a40f1fbeea74950698a02988c6afe8b953245d03b6ec688",
+      "id": "pi",
+      "metrics": {
+        "maximum_relative_power_identity_error": 4.103238583253369e-15,
+        "mesh_cells": 162,
+        "mesh_nodes": 64
+      },
+      "status": "experimental"
+    },
+    {
+      "data": "data/si.json",
+      "data_sha256": "5a44dcd92396097a6eb3c63d914e1cd7d1b4fa851de1eadec911f051bd6a9a17",
+      "figure": "figures/si-rlgc-line-fields.png",
+      "figure_sha256": "b3da594b7749f6c3239f99fe6793ee249ff643acffe1ee7e228e72d08bfe9f3c",
+      "id": "si",
+      "metrics": {
+        "line_length_m": 5.0,
+        "maximum_absolute_power_balance_residual_w": 2.7755575615628914e-16
+      },
+      "status": "experimental"
+    },
+    {
+      "data": "data/em.json",
+      "data_sha256": "3a08e2855ba897c831403aa8713d3a8629f2e2cdb398aa40453241cd4f1c6f1d",
+      "figure": "figures/em-huygens-far-field.png",
+      "figure_sha256": "bc56f2b4239aac58bb77e1128e49c36770a81806a0f56583b36a0b5dcc8e6dec",
+      "id": "em",
+      "metrics": {
+        "direction_count": 181,
+        "peak_intensity_w_per_sr": 47.689829928678876,
+        "surface_samples": 216
+      },
+      "status": "postprocessor_only"
+    },
+    {
+      "data": "data/thermal.json",
+      "data_sha256": "af6441eeb80b0eadabe545ef2c90f62097d4c63fa342f5577505f051857fe7b9",
+      "figure": "figures/thermal-two-solid-conduction.png",
+      "figure_sha256": "6e4be7fdf476f45e8188ce5d10124ffaf1d5e54e94506805b715ba9846c52792",
+      "id": "thermal",
+      "metrics": {
+        "heat_balance_acceptance_tolerance_w": 1.600639488462186e-06,
+        "heat_balance_imbalance_w": -1.7053025658242404e-13,
+        "maximum_temperature_k": 400.0,
+        "minimum_temperature_k": 300.0
+      },
+      "status": "experimental"
+    },
+    {
+      "data": "data/hybrid-multisolve.json",
+      "data_sha256": "c7786b0ad210bd7620bb8bccf0fa2bbced51e154d74faff90da728945cda492b",
+      "figure": "figures/hybrid-electrothermal-convergence.png",
+      "figure_sha256": "4f0bd1d0dd791f2592c0c5c3b5c45e548496afd7f44baa7a91c6d7098806cf85",
+      "id": "hybrid_multisolve",
+      "metrics": {
+        "coupled_power_defect_w": 1.5130140751384857e-09,
+        "final_power_relative_defect": 5.485178182352482e-10,
+        "final_temperature_defect_k": 4.095999770470371e-07,
+        "iterations": 13,
+        "thermal_imbalance_w": 1.8474111129762605e-13
+      },
+      "status": "experimental"
+    },
+    {
+      "data": "data/cfd.json",
+      "data_sha256": "d006ee61a6a4ce034d7b71ed59e1e23c9afe04e8e879255aaa0ca16c80feaa8e",
+      "figure": "figures/cfd-native-cavity.png",
+      "figure_sha256": "09d302503b73eb1124e83f24ba5b424f56f7664f3ac1128e2d10197330c33af3",
+      "id": "cfd",
+      "metrics": {
+        "divergence_linf": 3.2159275242804597e-12,
+        "dt": 0.004166666666666667,
+        "grid": 24,
+        "poisson_residual_linf": 7.720978417450748e-10,
+        "steady_rate_linf": 9.780331877706772e-08,
+        "steps": 6342,
+        "time": 26.42499999999882
+      },
+      "status": "experimental"
+    },
+    {
+      "data": "data/cht.json",
+      "data_sha256": "a652cfa42d033352f7b3717076423f19f90fddc2864029044e47028dc34babcf",
+      "figure": "figures/cht-laminar-channel.png",
+      "figure_sha256": "a8eb539c504ade86a96468e0071830feb9e5d39e0246914b58511b70cc84d172",
+      "id": "cht",
+      "metrics": {
+        "energy_residual_w": -5.350234144607668e-13,
+        "flow_m3_s": 9.194958847736628e-06,
+        "maximum_temperature_k": 305.88774029689466,
+        "minimum_temperature_k": 300.031748277358,
+        "reynolds": 61.72839506172839,
+        "thermal_relative_residual": 1.5521928782417868e-13
+      },
+      "status": "bounded_laminar_channel_reference"
+    },
+    {
+      "data": "data/multiboard.json",
+      "data_sha256": "c39b96c1540ee5efb45154e8a704a5121383ad768ca19ca55ecc0dd5da86a686",
+      "figure": "figures/multiboard-coupled-networks.png",
+      "figure_sha256": "98d8251e0b44096e1eddd9cda67c389d3608c71cbd4f4774f18f2b8511ab3d29",
+      "id": "multiboard",
+      "metrics": {
+        "board_count": 2,
+        "circuit_relative_residual_max": 8.613198011399327e-16,
+        "maximum_thermal_energy_balance_residual_w": 7.105427357601002e-15
+      },
+      "status": "mixed_experimental_approximate"
+    }
+  ],
+  "generator": {
+    "path": "scripts/generate_analysis_gallery.py",
+    "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+  },
+  "production_qualified": false,
+  "rerun_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+  "schema": "spike/analysis-gallery-manifest/v1"
+}

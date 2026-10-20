@@ -21,3 +21,38 @@
 
 .app-shell.focus-shell .canvas-area:has(> .workspace-view-topbar) { grid-template-rows:auto minmax(0,1fr) auto !important; }
 .workspace-view-topbar { min-width:0; }
+
+/* Clean has one command row below the application header. Tabs may scroll
+   horizontally; controls never wrap into a third navigation row. */
+.app-shell.interface-clean .workspace.focus-workspace {
+  grid-template-rows:36px minmax(0,1fr)!important;
+  grid-template-areas:"commands commands" "viewport focus-tool"!important;
+}
+.workspace-command-row { grid-area:commands;display:flex;align-items:center;gap:6px;min-width:0;height:36px;padding:0 6px;box-sizing:border-box;border-bottom:1px solid var(--spike-table-border);background:var(--spike-table-toolbar); }
+.workspace-command-row > .workspace-view-tabs { flex:1 1 160px;min-width:70px;border:0;padding:0;background:transparent;gap:3px; }
+.workspace-command-row .workspace-view-tabs > [role="tablist"] { flex:1;min-width:0;scrollbar-width:thin; }
+.workspace-command-row .workspace-view-main-tab,.workspace-command-row .workspace-view-tab { height:26px;max-width:170px;font-size:11px; }
+.workspace-command-row .workspace-view-tab-action { height:26px;width:22px; }
+.workspace-command-row .workspace-view-add { width:26px;min-width:26px;height:26px;padding:3px; }
+.workspace-command-row .workspace-editor-tabs { flex:0 1 35%;min-width:0;border:0; }
+.workspace-command-row .workspace-editor-tabs [role="tablist"] { padding:0;flex-wrap:nowrap; }
+.workspace-command-row .workspace-editor-tabs [role="tab"] { min-height:26px;max-width:170px;font-size:11px; }
+.workspace-viewport-tools { display:flex;align-items:center;min-width:0;flex:0 1 auto;max-width:70%; }
+.workspace-command-row .canvas-toolbar,.workspace-command-row .workspace-view-toolbar { display:flex;flex-wrap:nowrap;align-items:center;gap:3px;min-height:28px;height:28px;padding:0;border:0;background:transparent; }
+.workspace-command-row .workspace-view-toolbar > span { display:none; }
+.workspace-command-row .toolbar-menu-trigger { min-width:26px;width:26px;min-height:26px;height:26px;padding:3px; }
+.workspace-command-row .toolbar-menu-trigger > span,.workspace-command-row .toolbar-menu-trigger > svg:last-child { display:none; }
+.app-shell.interface-clean .canvas-area { grid-template-rows:minmax(0,1fr) auto!important; }
+.app-shell.interface-clean .workspace-document-open .workspace-view-tabs,
+.app-shell.interface-clean .workspace-document-open .workspace-viewport-tools { display:none; }
+.app-shell.interface-clean .workspace-document-open .workspace-editor-tabs { flex:1; }
+.app-shell.interface-clean .workspace-header-utilities .toolbar-menu-trigger { width:28px;min-width:28px;height:28px;padding:4px; }
+.app-shell.interface-clean .workspace-header-utilities .toolbar-menu-trigger > span,
+.app-shell.interface-clean .workspace-header-utilities .toolbar-menu-trigger > svg:last-child { display:none; }
+.workspace-view { position:relative; }
+.workspace-view-layers > header { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+@media(max-width:850px) { .workspace-command-row .workspace-view-tab { max-width:120px; }.workspace-viewport-tools { max-width:80%; }.workspace-command-row .workspace-editor-tabs { flex-basis:25%; } }
+
+.workspace-command-row .workspace-view-tabs > [role="tablist"] { scrollbar-width:none; }
+.workspace-command-row .workspace-view-tabs > [role="tablist"]::-webkit-scrollbar { display:none; }
+.workspace-command-row .workspace-viewport-tools { border-inline-start:1px solid var(--spike-table-border-strong);padding-inline-start:8px; }

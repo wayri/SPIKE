@@ -18,10 +18,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ExactArcProjectionTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        (ROOT / "build/parity-test-temp").mkdir(parents=True, exist_ok=True)
-
     def design(self, source=None):
         if source is None:
             return import_kicad_design(str(ROOT / 'benchmarks/parity-import/geometry.kicad_pcb'))

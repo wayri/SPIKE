@@ -490,7 +490,7 @@ non-finite, and unindexed topology claims fail package write or reopen.
 
 The bounded exact STEP-to-`.spkshape` path is implemented as a separate
 manifest-bound transaction. It reads only the retained digest-verified STEP
-owner, runs a fixed FreeCAD/OCC helper with source/output/report/entity,
+owner, runs a fixed FreeCAD/OCC helper with source, output, report and entity,
 time, memory, and stream limits, writes the raw OCC BREP plus deterministic
 selector inventory and validated local-mm analytic descriptors, and independently rechecks report, source, artifact,
 kernel, and selector identities before package mutation. Re-extraction replaces

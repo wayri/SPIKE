@@ -8,7 +8,7 @@
     "tests/python",
     "benchmarks"
   ],
-  "files_scanned": 1808,
+  "files_scanned": 2056,
   "scope": "Recorded links and DOIs only; not proof of reading, adoption, accuracy or license permission. Includes non-paper links.",
   "excluded": [
     "private repositories",
@@ -225,7 +225,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 141
+          "line": 144
         }
       ]
     },
@@ -368,7 +368,7 @@
       "occurrences": [
         {
           "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
-          "line": 122
+          "line": 125
         }
       ]
     },
@@ -427,6 +427,15 @@
       ]
     },
     {
+      "url": "https://arxiv.org/abs/2411.00272v3",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 41
+        }
+      ]
+    },
+    {
       "url": "https://arxiv.org/abs/2507.18339",
       "occurrences": [
         {
@@ -472,6 +481,42 @@
         {
           "file": "docs/MULTIPHYSICS_RESEARCH_FRONTIER.md",
           "line": 28
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2608.25146v1",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 53
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/abs/2610.09249v2",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/html/1603.02720v5",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_OPTICS_REFERENCE_20261021.md",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "url": "https://arxiv.org/html/1708.04666",
+      "occurrences": [
+        {
+          "file": "docs/validation/PEEC_AFFINE_SLAB_KERNEL_20261019.md",
+          "line": 16
         }
       ]
     },
@@ -529,6 +574,15 @@
       ]
     },
     {
+      "url": "https://assets.nexperia.com/documents/data-sheet/BAS316.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_EXECUTABLE_APPROXIMATIONS.md",
+          "line": 63
+        }
+      ]
+    },
+    {
       "url": "https://assets.nexperia.com/documents/selection-guide/Nexperia_Selection_Guide_2025.pdf",
       "occurrences": [
         {
@@ -568,11 +622,20 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 34
+          "line": 37
         },
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 111
+          "line": 114
+        }
+      ]
+    },
+    {
+      "url": "https://bpb-us-e1.wpmucdn.com/sites.mit.edu/dist/1/2096/files/2026/03/ji-2026.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 39
         }
       ]
     },
@@ -598,8 +661,29 @@
       "url": "https://comptes-rendus.academie-sciences.fr/mathematique/item/10.1016/j.crma.2004.08.004.pdf",
       "occurrences": [
         {
+          "file": "docs/DC_RT0_DENSITY.md",
+          "line": 22
+        },
+        {
+          "file": "docs/PI_FINITE_CONTACT_BENCHMARK.md",
+          "line": 43
+        },
+        {
+          "file": "docs/validation/CFD_TETRA_ENERGY_20261021.md",
+          "line": 31
+        },
+        {
           "file": "docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md",
           "line": 298
+        }
+      ]
+    },
+    {
+      "url": "https://content-animation.org.uk/htmls/harlow_welch.htm",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_LAMINAR_METHOD_20261020.md",
+          "line": 29
         }
       ]
     },
@@ -631,8 +715,21 @@
       ]
     },
     {
+      "url": "https://dev-docs.kicad.org/en/file-formats/sexpr-intro/",
+      "occurrences": [
+        {
+          "file": "docs/validation/PI01_ANNULAR_CONTACT_20261021.md",
+          "line": 29
+        }
+      ]
+    },
+    {
       "url": "https://dev-docs.kicad.org/en/file-formats/sexpr-intro/index.html",
       "occurrences": [
+        {
+          "file": "docs/DC_RT0_DENSITY.md",
+          "line": 104
+        },
         {
           "file": "docs/validation/PEEC_REFINEMENT_REPAIR.md",
           "line": 157
@@ -672,6 +769,15 @@
         {
           "file": "docs/SHAPE_PRESERVATION_AND_NATIVE_COMPUTE_PLAN.md",
           "line": 138
+        }
+      ]
+    },
+    {
+      "url": "https://developer.blender.org/docs/release_notes/2.83/volumes/",
+      "occurrences": [
+        {
+          "file": "docs/BLENDER_RENDER_PLAN.md",
+          "line": 63
         }
       ]
     },
@@ -716,7 +822,7 @@
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 119
+          "line": 249
         }
       ]
     },
@@ -786,6 +892,24 @@
       ]
     },
     {
+      "url": "https://dlmf.nist.gov/3.3.E1",
+      "occurrences": [
+        {
+          "file": "docs/validation/FIELD_STREAM_PRESENTATION_20261021.md",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "url": "https://dlmf.nist.gov/3.7.v",
+      "occurrences": [
+        {
+          "file": "docs/validation/FIELD_STREAM_PRESENTATION_20261021.md",
+          "line": 47
+        }
+      ]
+    },
+    {
       "url": "https://doc.cgal.org/latest/Triangulation_2/classCGAL_1_1Constrained__Delaunay__triangulation__2.html",
       "occurrences": [
         {
@@ -808,11 +932,38 @@
       ]
     },
     {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.cfd/cfd_ug_fluidflow_single.06.138.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.cfd/cfd_ug_fluidflow_single.06.139.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 74
+        }
+      ]
+    },
+    {
       "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.heat/heat_ug_theory.07.054.html",
       "occurrences": [
         {
           "file": "docs/MULTIBOARD_RADIATION.md",
           "line": 67
+        }
+      ]
+    },
+    {
+      "url": "https://doc.comsol.com/6.4/doc/com.comsol.help.models.mfl.rotating_channel/rotating_channel.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 80
         }
       ]
     },
@@ -839,7 +990,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 256
+          "line": 259
         }
       ]
     },
@@ -848,7 +999,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 254
+          "line": 257
         }
       ]
     },
@@ -857,7 +1008,25 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 78
+          "line": 103
+        }
+      ]
+    },
+    {
+      "url": "https://doc.modelica.org/Modelica%204.0.0/Resources/helpDymola/Modelica_Electrical_Machines.html",
+      "occurrences": [
+        {
+          "file": "docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md",
+          "line": 128
+        }
+      ]
+    },
+    {
+      "url": "https://doc.modelica.org/Modelica%204.0.0/Resources/helpDymola/Modelica_Fluid_UsersGuide_ComponentDefinition.html",
+      "occurrences": [
+        {
+          "file": "docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md",
+          "line": 127
         }
       ]
     },
@@ -866,7 +1035,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 80
+          "line": 105
         }
       ]
     },
@@ -925,6 +1094,15 @@
       ]
     },
     {
+      "url": "https://docs-be.nordicsemi.com/bundle/nRF52-Series-PS/raw/resource/enus/nRF52840_PS_v1.1.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+          "line": 56
+        }
+      ]
+    },
+    {
       "url": "https://docs-be.nordicsemi.com/bundle/nRF52840_PS_v1.8/raw/resource/enus/nRF52840_PS_v1.8.pdf",
       "occurrences": [
         {
@@ -966,6 +1144,24 @@
         {
           "file": "docs/validation/ARDUINO_RPI_MULTIBOARD_ACCEPTANCE_20261002.md",
           "line": 24
+        }
+      ]
+    },
+    {
+      "url": "https://docs.blender.org/manual/en/3.6/addons/import_export/scene_gltf2.html",
+      "occurrences": [
+        {
+          "file": "docs/BLENDER_RENDER_PLAN.md",
+          "line": 61
+        }
+      ]
+    },
+    {
+      "url": "https://docs.blender.org/manual/en/4.2/render/cycles/gpu_rendering.html",
+      "occurrences": [
+        {
+          "file": "docs/BLENDER_RENDER_PLAN.md",
+          "line": 62
         }
       ]
     },
@@ -1056,6 +1252,10 @@
         {
           "file": "docs/adr/0110-explicit-native-firmware-backend.md",
           "line": 37
+        },
+        {
+          "file": "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+          "line": 56
         }
       ]
     },
@@ -1111,7 +1311,7 @@
       "occurrences": [
         {
           "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
-          "line": 142
+          "line": 143
         }
       ]
     },
@@ -1129,7 +1329,7 @@
       "occurrences": [
         {
           "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
-          "line": 138
+          "line": 139
         }
       ]
     },
@@ -1192,7 +1392,7 @@
       "occurrences": [
         {
           "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
-          "line": 140
+          "line": 141
         }
       ]
     },
@@ -1246,11 +1446,20 @@
       ]
     },
     {
+      "url": "https://docs.python.org/3.11/library/stdtypes.html#float.as_integer_ratio",
+      "occurrences": [
+        {
+          "file": "docs/DC_RT0_DENSITY.md",
+          "line": 83
+        }
+      ]
+    },
+    {
       "url": "https://docs.python.org/3.14/library/os.html#os.kill",
       "occurrences": [
         {
           "file": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
-          "line": 481
+          "line": 483
         }
       ]
     },
@@ -1276,6 +1485,24 @@
         {
           "file": "docs/RLC_NETWORK_TRANSIENT.md",
           "line": 168
+        }
+      ]
+    },
+    {
+      "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.minres.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_STOKES_20261021.md",
+          "line": 304
+        }
+      ]
+    },
+    {
+      "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.splu.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_CHT_METHOD_20261020.md",
+          "line": 101
         }
       ]
     },
@@ -1307,6 +1534,15 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1007/BFb0064470",
+      "occurrences": [
+        {
+          "file": "docs/ENCLOSURE_REFINEMENT.md",
+          "line": 138
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1007/s001900000116",
       "occurrences": [
         {
@@ -1325,6 +1561,15 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1016/S0045-7825(97)00216-8",
+      "occurrences": [
+        {
+          "file": "docs/COUPLED_SURFACE_EXCHANGE.md",
+          "line": 140
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1016/j.cma.2024.116975",
       "occurrences": [
         {
@@ -1334,8 +1579,29 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1016/j.compfluid.2025.106627",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 40
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1016/j.crma.2004.08.004",
       "occurrences": [
+        {
+          "file": "docs/DC_RT0_DENSITY.md",
+          "line": 22
+        },
+        {
+          "file": "docs/PI_FINITE_CONTACT_BENCHMARK.md",
+          "line": 43
+        },
+        {
+          "file": "docs/validation/CFD_TETRA_ENERGY_20261021.md",
+          "line": 31
+        },
         {
           "file": "docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md",
           "line": 298
@@ -1356,11 +1622,83 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1016/j.jcp.2025.113927",
+      "occurrences": [
+        {
+          "file": "docs/CHARGED_PARTICLE_VACUUM_PLAN.md",
+          "line": 122
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.jcp.2025.114135",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.jcp.2025.114334",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1016/j.jcp.2026.114806",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1038/s41597-023-02898-2",
+      "occurrences": [
+        {
+          "file": "docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md",
+          "line": 82
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1049/pel2.12667",
       "occurrences": [
         {
           "file": "docs/RESEARCH_AND_CLEAN_ROOM_ENGINEERING.md",
           "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1051/m2an/197307R300331",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_STOKES_20261021.md",
+          "line": 293
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1063/1.1761178",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_LAMINAR_METHOD_20261020.md",
+          "line": 27
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1088/2515-7647/ae0384",
+      "occurrences": [
+        {
+          "file": "docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md",
+          "line": 116
         }
       ]
     },
@@ -1409,7 +1747,19 @@
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 123
+          "line": 253
+        },
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 58
+        },
+        {
+          "file": "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md",
+          "line": 36
+        },
+        {
+          "file": "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+          "line": 53
         }
       ]
     },
@@ -1423,6 +1773,15 @@
         {
           "file": "docs/INDUCTIVE_NETWORK_TRANSIENT.md",
           "line": 143
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1111/j.1745-6584.1988.tb00425.x",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_FLOW_ANALYSIS_20261021.md",
+          "line": 233
         }
       ]
     },
@@ -1461,11 +1820,29 @@
       ]
     },
     {
+      "url": "https://doi.org/10.1137/0914050",
+      "occurrences": [
+        {
+          "file": "docs/RLGC_LOADED_STAR.md",
+          "line": 92
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.1137/16M106474X",
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 118
+          "line": 248
+        }
+      ]
+    },
+    {
+      "url": "https://doi.org/10.1137/23M1568946",
+      "occurrences": [
+        {
+          "file": "docs/CHARGED_PARTICLE_VACUUM_PLAN.md",
+          "line": 121
         }
       ]
     },
@@ -1523,6 +1900,15 @@
       ]
     },
     {
+      "url": "https://doi.org/10.2514/3.12149",
+      "occurrences": [
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 69
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.2514/3.8890",
       "occurrences": [
         {
@@ -1554,6 +1940,15 @@
       ]
     },
     {
+      "url": "https://doi.org/10.6028/NIST.NSRDS.64-2023",
+      "occurrences": [
+        {
+          "file": "docs/CHARGED_PARTICLE_VACUUM_PLAN.md",
+          "line": 120
+        }
+      ]
+    },
+    {
       "url": "https://doi.org/10.6028/bulletin.185",
       "occurrences": [
         {
@@ -1576,7 +1971,16 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 122
+          "line": 125
+        }
+      ]
+    },
+    {
+      "url": "https://emscripten.org/docs/porting/pthreads.html",
+      "occurrences": [
+        {
+          "file": "docs/NATIVE_HPC_MIGRATION.md",
+          "line": 197
         }
       ]
     },
@@ -1595,6 +1999,24 @@
         {
           "file": "docs/AC_POWER_INTEGRITY_EFFECTS.md",
           "line": 43
+        }
+      ]
+    },
+    {
+      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Microwave_and_RF_Design_II_-_Transmission_Lines_(Steer)/05:_Coupled_Lines_and_Applications/5.03:_Coupled_Transmission_Line_Theory",
+      "occurrences": [
+        {
+          "file": "docs/RLGC_COUPLED_PAIR.md",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Microwave_and_RF_Design_II_-_Transmission_Lines_(Steer)/05:_Coupled_Lines_and_Applications/5.05:_Symmetric_Coupled_Transmission_Lines",
+      "occurrences": [
+        {
+          "file": "docs/RLGC_COUPLED_PAIR.md",
+          "line": 28
         }
       ]
     },
@@ -1746,7 +2168,7 @@
         },
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 99
+          "line": 124
         }
       ]
     },
@@ -1774,6 +2196,15 @@
         {
           "file": "docs/library/MANUFACTURER_MODEL_ACQUISITION.md",
           "line": 107
+        }
+      ]
+    },
+    {
+      "url": "https://gamma.cs.unc.edu/SSV/obb.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_MESH_20261021.md",
+          "line": 82
         }
       ]
     },
@@ -1924,6 +2355,15 @@
         {
           "file": "tests/python/test_spikes_pdk_inventory.py",
           "line": 33
+        }
+      ]
+    },
+    {
+      "url": "https://github.com/KhronosGroup/glTF-Blender-IO",
+      "occurrences": [
+        {
+          "file": "docs/BLENDER_RENDER_PLAN.md",
+          "line": 60
         }
       ]
     },
@@ -2270,11 +2710,38 @@
       ]
     },
     {
+      "url": "https://gmsh.info/doc/texinfo/gmsh.html#index-gmsh_002fmodel_002focc_002faffineTransform",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_MESH_20261021.md",
+          "line": 237
+        }
+      ]
+    },
+    {
+      "url": "https://gradst.unist.hr/Portals/9/docs/katedre/Privredna%20hidrotehnika/DSG%20Modeliranje%20toka/Pollock_1988.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_FLOW_ANALYSIS_20261021.md",
+          "line": 236
+        }
+      ]
+    },
+    {
       "url": "https://helpfiles.keysight.com/csg/e5071c/measurement/fixture_simulator/evaluating_balanced_devices_balance_unbalance_conversion.htm",
       "occurrences": [
         {
           "file": "docs/PI_SI_PARITY_EXECUTION.md",
-          "line": 85
+          "line": 93
+        }
+      ]
+    },
+    {
+      "url": "https://henke.lbl.gov/optical_constants/",
+      "occurrences": [
+        {
+          "file": "docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md",
+          "line": 83
         }
       ]
     },
@@ -2302,6 +2769,10 @@
         {
           "file": "docs/SI_WORKFLOW.md",
           "line": 255
+        },
+        {
+          "file": "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+          "line": 54
         }
       ]
     },
@@ -2375,7 +2846,7 @@
       "occurrences": [
         {
           "file": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
-          "line": 479
+          "line": 481
         }
       ]
     },
@@ -2384,7 +2855,7 @@
       "occurrences": [
         {
           "file": "docs/SOLVER_IMPROVEMENT_ACTION_PLAN.md",
-          "line": 477
+          "line": 479
         }
       ]
     },
@@ -2445,8 +2916,29 @@
       ]
     },
     {
+      "url": "https://locationtech.github.io/jts/javadoc/org/locationtech/jts/noding/snapround/SnapRoundingNoder.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_PRECISION_PARTITION.md",
+          "line": 27
+        }
+      ]
+    },
+    {
       "url": "https://m-selig.web.engr.illinois.edu/props/propDB.html",
       "occurrences": [
+        {
+          "file": "docs/INTERNAL_CFD_AND_FSI_PLAN.md",
+          "line": 134
+        },
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 25
+        },
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 93
+        },
         {
           "file": "docs/VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md",
           "line": 99
@@ -2489,7 +2981,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 45
+          "line": 68
         }
       ]
     },
@@ -2561,7 +3053,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 45
+          "line": 68
         }
       ]
     },
@@ -2659,6 +3151,24 @@
       ]
     },
     {
+      "url": "https://nhigham.com/2020/03/19/what-is-a-condition-number/",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_CHT_METHOD_20261020.md",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "url": "https://nhigham.com/wp-content/uploads/2023/10/high93s.pdf",
+      "occurrences": [
+        {
+          "file": "docs/RLGC_LOADED_STAR.md",
+          "line": 91
+        }
+      ]
+    },
+    {
       "url": "https://nsis.sourceforge.io/Which_command_line_parameters_can_be_used_to_configure_installers",
       "occurrences": [
         {
@@ -2673,6 +3183,15 @@
         {
           "file": "docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
           "line": 209
+        }
+      ]
+    },
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/19990064096/downloads/19990064096.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 87
         }
       ]
     },
@@ -2713,11 +3232,38 @@
       ]
     },
     {
+      "url": "https://ntrs.nasa.gov/citations/20220017824",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_CFD_AND_FSI_PLAN.md",
+          "line": 138
+        }
+      ]
+    },
+    {
       "url": "https://numpy.org/doc/stable/reference/routines.fft.html",
       "occurrences": [
         {
           "file": "docs/SPIKES_ANALYSIS_PLOTS.md",
           "line": 54
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/ans7870/18/18.013a/textbook/HTML/chapter22/section03.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_MESH_20261021.md",
+          "line": 81
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/16-07-dynamics-fall-2009/1b1825352e94d42461eb576b540b2f23_MIT16_07F09_Lec08.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_ROTATING_FRAME_20261020.md",
+          "line": 40
         }
       ]
     },
@@ -2740,6 +3286,15 @@
       ]
     },
     {
+      "url": "https://ocw.mit.edu/courses/5-62-physical-chemistry-ii-spring-2008/f90a4c878e68f44e42b85dbbd4d18751_31_562ln08.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_PARTICLE_REFERENCE_20261021.md",
+          "line": 85
+        }
+      ]
+    },
+    {
       "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/5ec9a8524891d6940e4572e1c97b0cf1_6002_l3.pdf",
       "occurrences": [
         {
@@ -2754,6 +3309,15 @@
         {
           "file": "docs/CROSSTALK_TIMING_CORNERS.md",
           "line": 75
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/6-012-microelectronic-devices-and-circuits-spring-2009/5075c569d72924227b6a36d40ca37898_MIT6_012S09_lec15.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+          "line": 55
         }
       ]
     },
@@ -2782,6 +3346,14 @@
           "line": 89
         },
         {
+          "file": "docs/RLGC_COUPLED_CASCADE.md",
+          "line": 65
+        },
+        {
+          "file": "docs/RLGC_COUPLED_STAR.md",
+          "line": 63
+        },
+        {
           "file": "docs/RLGC_LINE_CASCADE.md",
           "line": 19
         },
@@ -2796,6 +3368,26 @@
         {
           "file": "docs/RLGC_LINE_NETWORK.md",
           "line": 17
+        },
+        {
+          "file": "docs/RLGC_LOADED_CASCADE.md",
+          "line": 68
+        },
+        {
+          "file": "docs/RLGC_LOADED_STAR.md",
+          "line": 82
+        },
+        {
+          "file": "docs/RLGC_REACTIVE_PAIR.md",
+          "line": 56
+        },
+        {
+          "file": "docs/RLGC_TERMINATED_PAIR.md",
+          "line": 26
+        },
+        {
+          "file": "docs/SI_CANDIDATE_STUDY.md",
+          "line": 51
         },
         {
           "file": "docs/validation/SI02_DISTORTIONLESS_LINE_TRANSIENT.md",
@@ -2816,6 +3408,24 @@
       ]
     },
     {
+      "url": "https://ocw.mit.edu/courses/8-033-relativity-fall-2006/e05effec399aa480b6452ad9ca2ecabc_dynamics.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_PARTICLE_REFERENCE_20261021.md",
+          "line": 84
+        }
+      ]
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/res-12-001-topics-in-fluid-dynamics-fall-2024/mitres_12_001_f24_essay3_pt1.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_ROTATING_FRAME_20261020.md",
+          "line": 47
+        }
+      ]
+    },
+    {
       "url": "https://ocw.mit.edu/courses/res-6-007-signals-and-systems-spring-2011/b061322022d65a4bc2ed2e2d3c54d3c5_MITRES_6_007S11_lec02.pdf",
       "occurrences": [
         {
@@ -2830,6 +3440,62 @@
         {
           "file": "docs/ODB_AND_HARNESS_EXTENSIONS.md",
           "line": 97
+        }
+      ]
+    },
+    {
+      "url": "https://openfast.readthedocs.io/en/main/source/user/aerodyn/index.html",
+      "occurrences": [
+        {
+          "file": "docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md",
+          "line": 123
+        }
+      ]
+    },
+    {
+      "url": "https://opg.optica.org/josa/abstract.cfm?uri=josa-11-3-233",
+      "occurrences": [
+        {
+          "file": "docs/COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md",
+          "line": 137
+        }
+      ]
+    },
+    {
+      "url": "https://pages.nist.gov/fipy/en/stable/numerical/discret.html",
+      "occurrences": [
+        {
+          "file": "docs/ENCLOSURE_REFINEMENT.md",
+          "line": 131
+        },
+        {
+          "file": "docs/validation/CFD_TETRA_ENERGY_20261021.md",
+          "line": 36
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_CHT_METHOD_20261020.md",
+          "line": 88
+        },
+        {
+          "file": "docs/validation/NATIVE_CHT_METHOD_20261020.md",
+          "line": 41
+        }
+      ]
+    },
+    {
+      "url": "https://pages.nist.gov/fipy/en/stable/numerical/scheme.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_ENERGY_20261021.md",
+          "line": 37
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_CHT_METHOD_20261020.md",
+          "line": 90
+        },
+        {
+          "file": "docs/validation/NATIVE_CHT_METHOD_20261020.md",
+          "line": 42
         }
       ]
     },
@@ -2866,6 +3532,10 @@
         {
           "file": "docs/CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md",
           "line": 723
+        },
+        {
+          "file": "docs/validation/CFD_TETRA_MESH_20261021.md",
+          "line": 83
         }
       ]
     },
@@ -2883,11 +3553,20 @@
       ]
     },
     {
+      "url": "https://petsc.org/release/manual/performance/",
+      "occurrences": [
+        {
+          "file": "docs/NATIVE_HPC_MIGRATION.md",
+          "line": 194
+        }
+      ]
+    },
+    {
       "url": "https://petsc.org/release/overview/gpu_roadmap/",
       "occurrences": [
         {
           "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
-          "line": 121
+          "line": 124
         }
       ]
     },
@@ -2897,6 +3576,10 @@
         {
           "file": "docs/COMPONENT_THERMAL.md",
           "line": 156
+        },
+        {
+          "file": "docs/validation/NATIVE_PARTICLE_REFERENCE_20261021.md",
+          "line": 86
         }
       ]
     },
@@ -3002,8 +3685,21 @@
       "url": "https://precice.org/configuration-acceleration",
       "occurrences": [
         {
+          "file": "docs/INTERNAL_CFD_AND_FSI_PLAN.md",
+          "line": 130
+        },
+        {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 101
+          "line": 126
+        }
+      ]
+    },
+    {
+      "url": "https://precice.org/configuration-coupling",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_CFD_AND_FSI_PLAN.md",
+          "line": 129
         }
       ]
     },
@@ -3011,8 +3707,12 @@
       "url": "https://precice.org/configuration-mapping",
       "occurrences": [
         {
+          "file": "docs/COUPLED_SURFACE_EXCHANGE.md",
+          "line": 141
+        },
+        {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 102
+          "line": 127
         }
       ]
     },
@@ -3168,6 +3868,45 @@
       ]
     },
     {
+      "url": "https://renode.readthedocs.io/en/latest/advanced/time_framework.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 59
+        },
+        {
+          "file": "docs/validation/NATIVE_FIRMWARE_SYNC_20261020.md",
+          "line": 43
+        },
+        {
+          "file": "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/api-description/external-control.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 61
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/basic/control.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 60
+        },
+        {
+          "file": "docs/validation/NATIVE_FIRMWARE_SYNC_20261020.md",
+          "line": 34
+        }
+      ]
+    },
+    {
       "url": "https://renode.readthedocs.io/en/latest/basic/machines.html",
       "occurrences": [
         {
@@ -3191,6 +3930,15 @@
         {
           "file": "docs/adr/0110-explicit-native-firmware-backend.md",
           "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://renode.readthedocs.io/en/latest/basic/using-python.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_FIRMWARE_SYNC_20261020.md",
+          "line": 39
         }
       ]
     },
@@ -3258,6 +4006,33 @@
       ]
     },
     {
+      "url": "https://shapely.readthedocs.io/en/2.1.2/reference/shapely.set_precision.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_PRECISION_PARTITION.md",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "url": "https://shapely.readthedocs.io/en/2.1.2/reference/shapely.unary_union.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_PRECISION_PARTITION.md",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://shapely.readthedocs.io/en/stable/reference/shapely.constrained_delaunay_triangles.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_RT0_DENSITY.md",
+          "line": 27
+        }
+      ]
+    },
+    {
       "url": "https://spike.local/schemas/",
       "occurrences": [
         {
@@ -3307,7 +4082,11 @@
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 124
+          "line": 254
+        },
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 58
         }
       ]
     },
@@ -3419,7 +4198,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 76
+          "line": 101
         }
       ]
     },
@@ -3532,6 +4311,15 @@
       ]
     },
     {
+      "url": "https://tmbwg.github.io/turbmodels/",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 12
+        }
+      ]
+    },
+    {
       "url": "https://tmbwg.github.io/turbmodels/Backstep_validation/cf.exp.dat",
       "occurrences": [
         {
@@ -3550,6 +4338,71 @@
         {
           "file": "docs/SOLVER_ACCURACY_PROGRAM.md",
           "line": 85
+        },
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 92
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/flatplate.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 18
+        },
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/implementrans.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_RANS_RESEARCH_20261021.md",
+          "line": 30
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_SYMMETRIC_STRESS_20261020.md",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/nasahump_val.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/spalart.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_RANS_RESEARCH_20261021.md",
+          "line": 25
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_SA_TRANSPORT_20261020.md",
+          "line": 18
+        },
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 57
+        }
+      ]
+    },
+    {
+      "url": "https://tmbwg.github.io/turbmodels/sst.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 65
         }
       ]
     },
@@ -3590,11 +4443,33 @@
       ]
     },
     {
+      "url": "https://vtk.org/doc/release/7.1/html/classvtkStreamTracer.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/FIELD_STREAM_PRESENTATION_20261021.md",
+          "line": 37
+        }
+      ]
+    },
+    {
       "url": "https://wakefieldthermal.com/content/data_sheets/2021_data_sheets/Wakefield-Thermal-DC-Fans-Data-Sheet.pdf",
       "occurrences": [
         {
           "file": "docs/ASSEMBLY_ELECTROTHERMAL.md",
           "line": 296
+        }
+      ]
+    },
+    {
+      "url": "https://web.engr.oregonstate.edu/~karti/ece521/mna.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md",
+          "line": 36
+        },
+        {
+          "file": "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+          "line": 53
         }
       ]
     },
@@ -3642,11 +4517,98 @@
       ]
     },
     {
+      "url": "https://web.mit.edu/6.013_book/www/chapter5/5.10.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_LAND_TRANSITION.md",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter5/5.4.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_LAND_TRANSITION.md",
+          "line": 34
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter5/5.7.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_ANNULAR_LAND.md",
+          "line": 166
+        }
+      ]
+    },
+    {
       "url": "https://web.mit.edu/6.013_book/www/chapter7/7.2.html",
       "occurrences": [
         {
+          "file": "docs/DC_ANNULAR_CIRCUIT.md",
+          "line": 22
+        },
+        {
+          "file": "docs/DC_AXIAL_OWNERSHIP.md",
+          "line": 14
+        },
+        {
+          "file": "docs/DC_LAND_TRANSITION.md",
+          "line": 32
+        },
+        {
+          "file": "docs/DC_RT0_DENSITY.md",
+          "line": 15
+        },
+        {
+          "file": "docs/OWNED_DRILLED_PAD_DC.md",
+          "line": 10
+        },
+        {
+          "file": "docs/PI_FINITE_CONTACT_BENCHMARK.md",
+          "line": 38
+        },
+        {
           "file": "docs/validation/EBRAKE_FIXTURE_QUALIFICATION_20261019.md",
           "line": 166
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter7/7.3.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_AXIAL_OWNERSHIP.md",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter7/7.4.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_ANNULAR_CIRCUIT.md",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter7/7.5.html",
+      "occurrences": [
+        {
+          "file": "docs/DC_ANNULAR_LAND.md",
+          "line": 163
+        }
+      ]
+    },
+    {
+      "url": "https://web.mit.edu/6.013_book/www/chapter8/8.1.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/PEEC_AFFINE_SLAB_KERNEL_20261019.md",
+          "line": 23
         }
       ]
     },
@@ -3687,6 +4649,24 @@
         {
           "file": "docs/CALCULIX_THERMAL.md",
           "line": 180
+        }
+      ]
+    },
+    {
+      "url": "https://web.stanford.edu/group/SOL/software/minres/",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_STOKES_20261021.md",
+          "line": 302
+        }
+      ]
+    },
+    {
+      "url": "https://webapps.math.uci.edu/~chenlong/226/Ch2FEM.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_MESH_20261021.md",
+          "line": 80
         }
       ]
     },
@@ -3748,7 +4728,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 42
+          "line": 65
         }
       ]
     },
@@ -3757,7 +4737,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 125
+          "line": 128
         }
       ]
     },
@@ -3865,11 +4845,20 @@
       ]
     },
     {
+      "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_EXECUTABLE_APPROXIMATIONS.md",
+          "line": 46
+        }
+      ]
+    },
+    {
       "url": "https://www.ansys.com/de-DE/products/electronics/ansys-hfss",
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 124
+          "line": 127
         }
       ]
     },
@@ -3878,7 +4867,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 41
+          "line": 64
         }
       ]
     },
@@ -3887,7 +4876,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 41
+          "line": 64
         }
       ]
     },
@@ -3905,7 +4894,7 @@
       "occurrences": [
         {
           "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
-          "line": 136
+          "line": 137
         }
       ]
     },
@@ -3923,7 +4912,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 142
+          "line": 145
         }
       ]
     },
@@ -3932,7 +4921,7 @@
       "occurrences": [
         {
           "file": "docs/RETAINED_EM_INDEPENDENT_REFERENCE.md",
-          "line": 134
+          "line": 135
         }
       ]
     },
@@ -3941,11 +4930,11 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 40
+          "line": 63
         },
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 136
+          "line": 161
         }
       ]
     },
@@ -3954,7 +4943,7 @@
       "occurrences": [
         {
           "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
-          "line": 146
+          "line": 149
         }
       ]
     },
@@ -3963,7 +4952,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 40
+          "line": 63
         }
       ]
     },
@@ -3972,7 +4961,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 87
+          "line": 112
         }
       ]
     },
@@ -3981,7 +4970,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 158
+          "line": 161
         }
       ]
     },
@@ -3990,7 +4979,7 @@
       "occurrences": [
         {
           "file": "docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md",
-          "line": 147
+          "line": 150
         }
       ]
     },
@@ -4022,6 +5011,15 @@
         {
           "file": "python/spike_core/external_engine_discovery.py",
           "line": 174
+        }
+      ]
+    },
+    {
+      "url": "https://www.energy.gov/sites/default/files/2026-04/DOE-HDBK-1012-92_VOL2.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_CHT_METHOD_20261020.md",
+          "line": 40
         }
       ]
     },
@@ -4093,6 +5091,41 @@
       ]
     },
     {
+      "url": "https://www.grc.nasa.gov/WWW/wind/valid/tutorial/spatconv.html",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_CFD_AND_FSI_PLAN.md",
+          "line": 125
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_CHT_METHOD_20261020.md",
+          "line": 94
+        }
+      ]
+    },
+    {
+      "url": "https://www.grc.nasa.gov/WWW/wind/valid/tutorial/valassess.html",
+      "occurrences": [
+        {
+          "file": "docs/INTERNAL_CFD_AND_FSI_PLAN.md",
+          "line": 124
+        }
+      ]
+    },
+    {
+      "url": "https://www.grc.nasa.gov/www/k-12/airplane/nseqs.html",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_LAMINAR_METHOD_20261020.md",
+          "line": 36
+        },
+        {
+          "file": "docs/validation/NATIVE_CHT_METHOD_20261020.md",
+          "line": 43
+        }
+      ]
+    },
+    {
       "url": "https://www.grc.nasa.gov/www/wind/valid/tutorial/spatconv.html",
       "occurrences": [
         {
@@ -4106,6 +5139,14 @@
         {
           "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
           "line": 224
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_LAMINAR_METHOD_20261020.md",
+          "line": 40
+        },
+        {
+          "file": "docs/validation/NATIVE_CHT_METHOD_20261020.md",
+          "line": 44
         }
       ]
     },
@@ -4114,7 +5155,7 @@
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 48
+          "line": 169
         }
       ]
     },
@@ -4392,7 +5433,7 @@
       "occurrences": [
         {
           "file": "docs/PI_SI_PARITY_EXECUTION.md",
-          "line": 86
+          "line": 94
         }
       ]
     },
@@ -4410,7 +5451,7 @@
       "occurrences": [
         {
           "file": "docs/validation/SKIPPED_TEST_CLOSURE_20261019.md",
-          "line": 66
+          "line": 95
         }
       ]
     },
@@ -4486,6 +5527,19 @@
       ]
     },
     {
+      "url": "https://www.math.rug.nl/~veldman/Colleges/CFD/CFDdictaat1314.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/ENCLOSURE_RECTILINEAR_MOMENTUM_20261020.md",
+          "line": 26
+        },
+        {
+          "file": "docs/validation/ENCLOSURE_SYMMETRIC_STRESS_20261020.md",
+          "line": 21
+        }
+      ]
+    },
+    {
       "url": "https://www.mathworks.com/help/simrf/gs/circuit-envelope-basics.html",
       "occurrences": [
         {
@@ -4499,7 +5553,16 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 44
+          "line": 67
+        }
+      ]
+    },
+    {
+      "url": "https://www.mpi-forum.org/docs/",
+      "occurrences": [
+        {
+          "file": "docs/NATIVE_HPC_MIGRATION.md",
+          "line": 191
         }
       ]
     },
@@ -4522,11 +5585,46 @@
       ]
     },
     {
+      "url": "https://www.nasa.gov/centers-and-facilities/glenn/combustor-facilities/",
+      "occurrences": [
+        {
+          "file": "docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md",
+          "line": 131
+        }
+      ]
+    },
+    {
+      "url": "https://www.nasa.gov/nasa-turbulence-modeling-resource/",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_CHT_RESEARCH_REVIEW_20261021.md",
+          "line": 14
+        },
+        {
+          "file": "docs/validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md",
+          "line": 54
+        }
+      ]
+    },
+    {
       "url": "https://www.nasa.gov/smallsat-institute/sst-soa/thermal-control/",
       "occurrences": [
         {
           "file": "docs/THERMAL_RESEARCH_ROADMAP.md",
           "line": 99
+        }
+      ]
+    },
+    {
+      "url": "https://www.nature.com/articles/s41597-023-02898-2",
+      "occurrences": [
+        {
+          "file": "docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md",
+          "line": 82
+        },
+        {
+          "file": "docs/validation/NATIVE_OPTICS_REFERENCE_20261021.md",
+          "line": 55
         }
       ]
     },
@@ -4787,7 +5885,29 @@
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 51
+          "line": 172
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/pml/special-publication-811/nist-guide-si-chapter-4-two-classes-si-units-and-si-prefixes",
+      "occurrences": [
+        {
+          "file": "docs/PART_LIMITS.md",
+          "line": 63
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/programs-projects/extreme-ultraviolet-optical-constants",
+      "occurrences": [
+        {
+          "file": "docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md",
+          "line": 84
+        },
+        {
+          "file": "docs/validation/NATIVE_OPTICS_REFERENCE_20261021.md",
+          "line": 56
         }
       ]
     },
@@ -4828,6 +5948,15 @@
       ]
     },
     {
+      "url": "https://www.nist.gov/publications/tips-and-tricks-characterizing-shape-memory-alloy-wire-part-4-150-thermo-mechanical",
+      "occurrences": [
+        {
+          "file": "docs/COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md",
+          "line": 140
+        }
+      ]
+    },
+    {
       "url": "https://www.nist.gov/srd/nist-standard-reference-database-10",
       "occurrences": [
         {
@@ -4837,11 +5966,78 @@
       ]
     },
     {
+      "url": "https://www.nobelprize.org/uploads/2016/04/broglie-lecture.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_PARTICLE_REFERENCE_20261021.md",
+          "line": 87
+        }
+      ]
+    },
+    {
+      "url": "https://www.numdam.org/item/M2AN_1973__7_3_33_0.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/CFD_TETRA_STOKES_20261021.md",
+          "line": 294
+        }
+      ]
+    },
+    {
+      "url": "https://www.nxp.com/docs/en/application-note/AN991.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_PERIPHERAL_TIMING_20261020.md",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "url": "https://www.nxp.com/docs/en/user-guide/UM10204.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 63
+        },
+        {
+          "file": "docs/validation/NATIVE_PERIPHERAL_TIMING_20261020.md",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "url": "https://www.ocw.mit.edu/courses/6-974-fundamentals-of-photonics-quantum-electronics-spring-2006/fafcb9e36b7749f4eeb099d666bdf70a_electr_wav_inter.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_OPTICS_REFERENCE_20261021.md",
+          "line": 53
+        }
+      ]
+    },
+    {
       "url": "https://www.olemartin.no/artikler/vanloan.pdf",
       "occurrences": [
         {
           "file": "docs/RLC_ENERGY_LEDGER.md",
           "line": 156
+        }
+      ]
+    },
+    {
+      "url": "https://www.onsemi.com/download/data-sheet/pdf/2n7002l-d.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_EXECUTABLE_APPROXIMATIONS.md",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "url": "https://www.onsemi.com/download/data-sheet/pdf/mmbt3904lt1-d.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_EXECUTABLE_APPROXIMATIONS.md",
+          "line": 52
         }
       ]
     },
@@ -4927,11 +6123,20 @@
       ]
     },
     {
+      "url": "https://www.sciencedirect.com/science/article/pii/S0030401826006425",
+      "occurrences": [
+        {
+          "file": "docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md",
+          "line": 117
+        }
+      ]
+    },
+    {
       "url": "https://www.siemens.com/en-gb/products/pcb/hyperlynx/signal-integrity/",
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 76
+          "line": 79
         }
       ]
     },
@@ -4940,7 +6145,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 140
+          "line": 143
         }
       ]
     },
@@ -4949,7 +6154,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 43
+          "line": 66
         }
       ]
     },
@@ -4958,7 +6163,7 @@
       "occurrences": [
         {
           "file": "docs/MULTIPHYSICS_PLATFORM_STRATEGY.md",
-          "line": 43
+          "line": 66
         }
       ]
     },
@@ -4967,7 +6172,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 95
+          "line": 98
         }
       ]
     },
@@ -4976,7 +6181,7 @@
       "occurrences": [
         {
           "file": "docs/HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md",
-          "line": 93
+          "line": 96
         }
       ]
     },
@@ -5228,6 +6433,33 @@
       ]
     },
     {
+      "url": "https://www.st.com/resource/en/application_note/an4013-introduction-to-timers-for-stm32-mcus-stmicroelectronics.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_PERIPHERAL_TIMING_20261020.md",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/application_note/an4013-stm32-crossseries-timer-overview-stmicroelectronics.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/NATIVE_FIRMWARE_SYNC_20261020.md",
+          "line": 47
+        }
+      ]
+    },
+    {
+      "url": "https://www.st.com/resource/en/application_note/an4899-stm32-microcontroller-gpio-hardware-settings-and-lowpower-consumption-stmicroelectronics.pdf",
+      "occurrences": [
+        {
+          "file": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
+          "line": 62
+        }
+      ]
+    },
+    {
       "url": "https://www.st.com/resource/en/user_manual/dm00064632.pdf",
       "occurrences": [
         {
@@ -5339,6 +6571,15 @@
         {
           "file": "python/spikes/logic_portfolio.py",
           "line": 259
+        }
+      ]
+    },
+    {
+      "url": "https://www.ti.com/lit/ds/symlink/lm358.pdf",
+      "occurrences": [
+        {
+          "file": "docs/library/MANUFACTURER_EXECUTABLE_APPROXIMATIONS.md",
+          "line": 41
         }
       ]
     },
@@ -5748,7 +6989,7 @@
       "occurrences": [
         {
           "file": "docs/NUMERICAL_METHOD_EVIDENCE.md",
-          "line": 114
+          "line": 244
         }
       ]
     },
@@ -5870,11 +7111,29 @@
       ]
     },
     {
+      "url": "https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/enginesim/",
+      "occurrences": [
+        {
+          "file": "docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md",
+          "line": 119
+        }
+      ]
+    },
+    {
+      "url": "https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/thrust-force/",
+      "occurrences": [
+        {
+          "file": "docs/PROPULSION_MACHINES_FLUID_POWER_PLAN.md",
+          "line": 120
+        }
+      ]
+    },
+    {
       "url": "https://xyce.sandia.gov/downloads/executables/",
       "occurrences": [
         {
           "file": "docs/validation/SKIPPED_TEST_CLOSURE_20261019.md",
-          "line": 77
+          "line": 106
         }
       ]
     },

@@ -1,0 +1,156 @@
+{
+  "domain": "cfd",
+  "limitations": [
+    "2D constant-density laminar square cavity only",
+    "No thermal, turbulence, fan, solid coupling or CAD geometry",
+    "Knowledgeable numerical human review required before release"
+  ],
+  "metrics": {
+    "divergence_linf": 3.2159275242804597e-12,
+    "dt": 0.004166666666666667,
+    "grid": 24,
+    "poisson_residual_linf": 7.720978417450748e-10,
+    "steady_rate_linf": 9.780331877706772e-08,
+    "steps": 6342,
+    "time": 26.42499999999882
+  },
+  "model_status": "experimental",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "native_executable": {
+      "path": "build-native-airflow/Release/spike_native_airflow.exe",
+      "sha256": "4e9e949dccda57f21be6526f4e72b5dfb18d4837ca1f6605d1f2ddc6d182249a"
+    },
+    "request_sha256": "29c261c2f8eaa349d59e269bef7cc539fd4e63665c81d237c0e149368fbd91e2",
+    "result_sha256": "b72751cf253fff337538bf6ad07fc141d14e8f6a59aa45b9934dd6e38b9abfe0",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "scripts/run_cfd.py",
+        "sha256": "5d7b42b5b2b7bf122e46617f5f5d6dd393fb5aa00198f399da7f8683daba784a"
+      },
+      {
+        "path": "python/spike_core/native_airflow.py",
+        "sha256": "5ddca2cd04d3884fa3bbedc500cbac3bc4bc1456e2abf1ad3aa04caa22864df2"
+      },
+      {
+        "path": "src/airflow/main.cpp",
+        "sha256": "0969e29aa12fc6416e95bebe5932c86097198f290935ea48f1fa08cfe74dc031"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "coordinate_fraction": 0.05,
+      "horizontal_v_m_s": 0.07498403101763906,
+      "vertical_u_m_s": -0.033557372436672846
+    },
+    {
+      "coordinate_fraction": 0.1,
+      "horizontal_v_m_s": 0.12521388252631854,
+      "vertical_u_m_s": -0.06209820959639891
+    },
+    {
+      "coordinate_fraction": 0.15,
+      "horizontal_v_m_s": 0.15441655070460694,
+      "vertical_u_m_s": -0.08786749785927545
+    },
+    {
+      "coordinate_fraction": 0.2,
+      "horizontal_v_m_s": 0.168038253492818,
+      "vertical_u_m_s": -0.11246996017529994
+    },
+    {
+      "coordinate_fraction": 0.25,
+      "horizontal_v_m_s": 0.17078383062676877,
+      "vertical_u_m_s": -0.13650858301115223
+    },
+    {
+      "coordinate_fraction": 0.3,
+      "horizontal_v_m_s": 0.16468873192020786,
+      "vertical_u_m_s": -0.15957392690570427
+    },
+    {
+      "coordinate_fraction": 0.35,
+      "horizontal_v_m_s": 0.15066103609239787,
+      "vertical_u_m_s": -0.18034408117302758
+    },
+    {
+      "coordinate_fraction": 0.4,
+      "horizontal_v_m_s": 0.1282435805948345,
+      "vertical_u_m_s": -0.1960760525180759
+    },
+    {
+      "coordinate_fraction": 0.45,
+      "horizontal_v_m_s": 0.09708044152186922,
+      "vertical_u_m_s": -0.203321281228331
+    },
+    {
+      "coordinate_fraction": 0.5,
+      "horizontal_v_m_s": 0.05745842889077318,
+      "vertical_u_m_s": -0.19947492249585666
+    },
+    {
+      "coordinate_fraction": 0.55,
+      "horizontal_v_m_s": 0.00953242627021789,
+      "vertical_u_m_s": -0.18229671728657315
+    },
+    {
+      "coordinate_fraction": 0.6,
+      "horizontal_v_m_s": -0.04569130521148,
+      "vertical_u_m_s": -0.15086599148430999
+    },
+    {
+      "coordinate_fraction": 0.65,
+      "horizontal_v_m_s": -0.10581038045004283,
+      "vertical_u_m_s": -0.10494450120890236
+    },
+    {
+      "coordinate_fraction": 0.7,
+      "horizontal_v_m_s": -0.16492102875221915,
+      "vertical_u_m_s": -0.04641945825946285
+    },
+    {
+      "coordinate_fraction": 0.75,
+      "horizontal_v_m_s": -0.2143338012892085,
+      "vertical_u_m_s": 0.023406597606022178
+    },
+    {
+      "coordinate_fraction": 0.8,
+      "horizontal_v_m_s": -0.24273700377882879,
+      "vertical_u_m_s": 0.10885307414952616
+    },
+    {
+      "coordinate_fraction": 0.85,
+      "horizontal_v_m_s": -0.23778615484242865,
+      "vertical_u_m_s": 0.22332662733716058
+    },
+    {
+      "coordinate_fraction": 0.9,
+      "horizontal_v_m_s": -0.18834363942177987,
+      "vertical_u_m_s": 0.39832677540347305
+    },
+    {
+      "coordinate_fraction": 0.95,
+      "horizontal_v_m_s": -0.10103021088660538,
+      "vertical_u_m_s": 0.6649859925070285
+    }
+  ],
+  "title": "Native Re=100 lid-driven cavity",
+  "units": {
+    "coordinate_fraction": "dimensionless",
+    "horizontal_v_m_s": "m/s",
+    "vertical_u_m_s": "m/s"
+  }
+}

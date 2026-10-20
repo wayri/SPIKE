@@ -209,7 +209,7 @@ class LumpedPhysicsPanelTests(unittest.TestCase):
         panel = ComponentPanel(owner, host)
         dialog = None
         try:
-            self.assertEqual(len(panel.catalog["records"]), 7915)
+            self.assertEqual(len(panel.catalog["records"]), 7918)
             panel.search.ChangeValue("id:physics.lumped.nmos4")
             panel.filter()
             panel.list.SetSelection(0)

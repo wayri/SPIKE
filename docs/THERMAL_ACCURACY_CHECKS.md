@@ -33,7 +33,7 @@ energy residual alone says nothing about discretization error.
   change threshold. This is not a global error bound.
 - `refinement_required`: reduce dt and repeat; investigate load events and
   nonlinear response if differences do not decrease.
-- `event_grid_limited`: output/source events prevented independent refinement.
+- `event_grid_limited`: output or source events prevented independent refinement.
   Choose smaller nominal steps. Identical event-clipped grids cannot pass.
 
 An empirical L2 order is reported only for uniform halved grids with resolved,

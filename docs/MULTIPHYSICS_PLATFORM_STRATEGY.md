@@ -1,9 +1,25 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SPIKE general multiphysics platform strategy
 
+On21October2026 the owner added [propulsion, electric/wind/industrial machines
+and hydraulic/pneumatic applications](PROPULSION_MACHINES_FLUID_POWER_PLAN.md),
+including complete small jet-engine studies up to the5 kN thrust class.
+The owner explicitly approved **propulsion combustion only** as a narrow
+exception to the chemistry exclusion below. General chemical-process expansion
+remains paused; no new executable or qualified capability follows from scope.
+
+On 20 October 2026 the owner authorized active internal CFD, CHT, enclosure,
+liquid/gas, aerodynamics, rotating-machine and mechanical/FSI development.
+[The bounded implementation and staged plan](INTERNAL_CFD_AND_FSI_PLAN.md)
+supersede development deferral for that scope, not its numerical/physical or
+release gates. Unimplemented turbulence, rotor and flutter capabilities remain
+unavailable; the later narrow propulsion exception above does not authorize
+general chemical-engineering expansion.
+
 Research snapshot: 18 October 2026. Product direction: **multiphysics simulation**,
-with PCB/electronics as an initial application and import domain. Chemical
-engineering is outside the active expansion. This is a recommended coverage and
+with PCB/electronics as an initial application and import domain. General chemical
+engineering remains outside the active expansion, apart from the later explicit
+propulsion-combustion exception above. This is a recommended coverage and
 architecture assessment; it does not promote runtime capabilities, establish
 commercial parity or supersede the existing execution gates.
 
@@ -14,6 +30,13 @@ and [vibration/vehicle/mechanism stages](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.
 for implemented bounds and authorized delivery order.
 
 ## Product boundary
+
+The21October2026 follow-up explicitly adds bimetallic/multilayer strips,
+alloy-dependent thermal bending, thermal/electrothermal and electrical
+actuators. [Requirements and staged benchmarks](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md#thermal-bending-alloys-and-actuator-requirements--21-october-2026)
+separate ordinary thermoelasticity, transformation/SMA behavior and each
+electrical actuation family. This does not promote current static mechanics
+or supplied-force-map motion to qualified coupled actuator capability.
 
 The central objects are a physical study, admitted domains/interfaces, governing
 equations, materials, initial/boundary conditions, discretizations, solver state,
@@ -48,8 +71,10 @@ any parity claim. Different suites emphasize different levels of fidelity.
 
 Priority here is a recommendation: **foundation** serves every current domain;
 **adjacent** extends authorized applications after prerequisites; **horizon** is
-separate future scope. Existing optics, general CFD/acoustics and other deferred
-families retain their explicit execution policy. Research experiments never
+separate future scope. The 21 October owner request authorizes the
+[optics/materials development track](OPTICS_PHOTONICS_MATERIALS_PLAN.md), without
+promoting runtime/release claims. Other deferred families retain their explicit
+execution policy. Research experiments never
 become a production capability merely by appearing in this table.
 
 | Coverage | What SPIKE should include | Mathematical and validation boundary | Existing owner/scope |
@@ -67,8 +92,8 @@ become a production capability merely by appearing in this table.
 | Adjacent: hydraulics, pneumatics and tribology | Pumps/valves/lines/accumulators, hydraulic actuators, seals, lubricating films, elastohydrodynamic bearings/gears and wear. | Mass/momentum/energy network DAEs plus local flow/contact models; cavitation, leakage, friction/heating and wear laws need calibrated bounds. | GP14/05/06; additional application stages proposed. |
 | Adjacent: nonlinear/multiscale materials | Composites, visco/hyperelasticity, plasticity/creep, cohesive interfaces, fracture/damage, homogenized lattices and metamaterials. | Frame objectivity, dissipation, tangent checks, length-scale/mesh dependence, irreversibility and measurements; microstructure-to-continuum transfer needs uncertainty. | GP07/11/13, LB01; distinguish constitutive physics from material appearance. |
 | Adjacent/later: particles and large-deformation methods | DEM grain/contact dynamics, SPH fluids and MPM solid/particle-grid formulations for selected impact, granular and free-surface problems. | Conservation, particle/kernel consistency, contact calibration, boundary support, stress integration, instability and resolution/convergence checks. BEM surface discretization and particle methods have different equations and applicability. | New bounded method stages proposed under GP02/05/07/14; not a generic meshless-solver claim. |
-| Adjacent/later: optics and photonics | Ray and wave optics, polarization/coatings, coherent propagation, optical resonators, optomechanics and structural-thermal-optical performance. | Maxwell/scalar-wave approximations, diffraction, aperture/sampling and energy/phase references. Semiconductor optics is a distinct coupled device model. | OP01-05 remain under their previous gate. |
-| Horizon: vacuum, charged particles and radiation | Rarefied/molecular flow, collisionless particle/beam tracking, PIC where applicable, spacecraft charging and radiation-to-heat/device effects. | Knudsen/regime checks, particle noise, charge/energy balance, cross-section/environment provenance and measured dose/device evidence. Collisional/reactive plasma chemistry is separate paused scope. | New scope evaluation, reusing EM/GP10/16; no capability claim. |
+| Authorized development: optics and photonics | Ray and wave optics, polarization/coatings, coherent propagation, optical resonators, optomechanics and structural-thermal-optical performance. | Maxwell/scalar-wave approximations, diffraction, aperture/sampling and energy/phase references. Semiconductor optics is a distinct coupled device model. | [21 October scope](OPTICS_PHOTONICS_MATERIALS_PLAN.md); OP01–05 qualification and runtime gates remain. |
+| Authorized bounded development: electron/ion optics and vacuum; other radiation remains horizon | [21 October scope](CHARGED_PARTICLE_VACUUM_PLAN.md): beam optics, TEM/SEM/sensors, rarefied/pressure environments and kinetic diagnostics. Spacecraft charging/radiation remain separate. | Regime checks, particle noise, charge/energy balance, cross-section/environment provenance, imaging and measured evidence. Reactive plasma chemistry remains separate paused scope. | Reuse EM/GP10/16 and native kernels; scalar references do not establish full workflows. |
 | Horizon: manufacturing physics | Nonreactive laser/weld heat transfer, melting/solidification, residual stress, forming, machining/contact and distortion. | Process/material applicability, phase-change/strain history, mesh/time and measured distortion; reaction-dependent curing is excluded for now. | Shared GP06/07/11; process stages proposed. |
 | Horizon: biomechanical, civil and geophysical physics | Bioheat/ultrasound/implants, porous flow/poroelasticity, soil/rock and seismic waves, renewable/ocean/atmospheric applications. | Separate constitutive laws, boundary scales, physical validation and use-specific acceptance; generic PDE availability does not qualify an application. | Future scope after the common core and relevant references. |
 
@@ -134,7 +159,8 @@ reactors; reactive multiphase flow/combustion; electrochemistry and detailed
 battery/fuel-cell/electrolyzer models; corrosion/electrodeposition; separations,
 membranes, catalysis and process-flow networks. These align with identifiable
 families in the [COMSOL product taxonomy](https://www.comsol.com/products), but
-are not selected for active SPIKE implementation.
+are not selected for active SPIKE implementation, except for the explicitly
+authorized propulsion-specific combustion application described above.
 
 Current electrical battery equivalent circuits, supplied aging laws and thermal
 cooling do not imply an electrochemical cell solver. Physical latent heat,
@@ -142,6 +168,11 @@ nonreacting multiphase transport, hydraulic working fluids and material creep
 may support present goals without adding reaction chemistry. State this boundary
 per model; a reactive plasma/combustion/process model cannot be admitted merely
 by relabeling it as electrical or fluid physics.
+
+The propulsion exception must carry its own species/thermochemistry, total-
+energy, turbulence–chemistry and validation evidence. It does not extend to
+general reactors/process chemistry or silently qualify an engine from a
+prescribed heat source.
 
 ## Recommended execution order
 

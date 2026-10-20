@@ -1,0 +1,53 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI02-S04",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
+    "python/spike_core/rlgc_line_network.py": "696d7a4c0984111a7fd75a5a24322b7ae07d4d128493299397ea5a130f4f7a3e",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "3eafdc40628a17357ee9f74942af1b89a70ff3721c701534be298f140ea8e275",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_rlgc_line_network.py": "be1662a78856b495e9e762300dcd4d8f40a7a7b30c38b4898a6f02ab9f58642f",
+    "tests/python/test_rlgc_line_network_contract.py": "e653e2bb9079e627ed7efefa6fb58679e6a22174645ab07870a418d07c6e3c86",
+    "examples/rlgc_line_network/run_line.py": "e1aabd46b2e3970e9835425bade52df09053e6f5d7e1e5a0eb15a3c594c8d044",
+    "schemas/rlgc-line-network-request-v1.schema.json": "48ec45d9304748e7532c3be44f81a57366804028ff32818f82b7759667f54378",
+    "schemas/rlgc-line-network-result-v1.schema.json": "597599f0a39930597a1c6326ee1b234f21da117713ef3625fff724f13fed4833",
+    "docs/RLGC_LINE_NETWORK.md": "a497ef9fd5114b86d6ac9c09cbdb4fad40043abacaf7094311d627a089a2b60f",
+    "python/spike_core/rlgc_line_fields.py": "3724afa64878190ad6a3af6e260a5ad02a3f978a91d1fa39ab3be6201c587257",
+    "tests/python/test_rlgc_line_fields.py": "6d5653a2ddd031c04f30052bb73089ec75e985a61579f9f827c42a80de93bd27",
+    "tests/python/test_rlgc_line_fields_contract.py": "ddce3db3d44b620b8d85716ad567eb5b74fa5d5f62ca3c977140dcc808b0b7ba",
+    "examples/rlgc_line_fields/run_line.py": "75e2ec82653d8d34b83119ab725a8e4bbf7541b6b5cd47f4207fac05341b2fa9",
+    "schemas/rlgc-line-fields-request-v1.schema.json": "0b17963c9d814acafc04abf47a7767daee56934c960cf1138debf5d2f9f03553",
+    "schemas/rlgc-line-fields-result-v1.schema.json": "73562f97f85a47d54f939a29e4ea385aee897732f98d41510fd0847142375947",
+    "docs/RLGC_LINE_FIELDS.md": "68beaa4608cc08a423a9ccd1d687f21bfc38087b81145d9b77a623b7e3cdf884"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_excitation_scaling_and_probe_refinement_do_not_change_integrals",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_fields_storage_loss_and_boundaries_against_spatial_exponential",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_integrated_ledger_against_independent_spatial_quadrature",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_lossless_two_sided_standing_wave_and_exact_zero_heat",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_matched_single_wave_rms_power_and_equal_heat_split",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_numerical_failure_and_invariant_failure_are_not_repaired",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_relative_excitation_phase_changes_interference_loss",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_resource_preflight_and_cancellation",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_short_antiphase_line_retains_small_positive_dielectric_loss",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_spatial_loss_quadrature_refines_to_analytic_ledger",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_strict_grid_type_and_probe_admission",
+      "tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_zero_drive_and_provenance_snapshot",
+      "tests.python.test_rlgc_line_fields_contract.RLGCFieldsContractTests.test_example_executes_and_schemas_registered",
+      "tests.python.test_rlgc_line_fields_contract.RLGCFieldsContractTests.test_schema_worker_rejects_dc_unknown_or_malformed_drives",
+      "tests.python.test_rlgc_line_fields_contract.RLGCFieldsContractTests.test_worker_independent_spatial_fields_quadrature_and_identity"
+    ],
+    "run": 15,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI02-S04-loaded-cascade-20261020.log",
+  "log_sha256": "068b03df62665dcf012f9b77fe5a1490e7d064deeeb72b19fae2fb302736f3ea"
+}

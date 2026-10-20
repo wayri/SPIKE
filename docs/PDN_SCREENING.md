@@ -192,7 +192,7 @@ that physical copper, grounds on different boards, or return paths are connected
    intended bias, temperature, frequency and small-signal operating conditions.
 5. Enter current-versus-time points and output times. A pulse starts at zero
    perturbation, includes finite rise/fall and can return to zero. Requested
-   output/PWL events are included exactly in the integration grid.
+Output and PWL events are included exactly in the integration grid.
 6. **Save AC setup to tree** retains the request in `piTopology.acPdnRequest`.
    Run, inspect driving-point and named-node transfer impedance, then port/net
    voltage deviations during the load spike. Existing immutable project history

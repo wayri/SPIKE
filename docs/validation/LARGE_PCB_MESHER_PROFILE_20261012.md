@@ -129,7 +129,7 @@ now be independently rehashed. Exact partial-mesh node, branch, and cell counts
 that appeared only in truncated console output are deliberately not
 reconstructed.
 
-`output/mesher-pass2-20261012/marble-profile/evidence-status.json` records this
+The unbundled local `marble-profile/evidence-status.json` record documents this
 artifact absence and the known run identifiers. The adjacent `manifest.json`
 binds the retained status, this report, and the profiler source to SHA-256
 values. There is no file presented as the missing final result or raw stack
@@ -138,7 +138,7 @@ log.
 | Artifact | Retained SHA-256 or status |
 | --- | --- |
 | `scripts/profile_retained_board_mesher.py` | `1ef270d0e7f759a713d8bb9cc066ccb5e193dee48fdd7edb42aa11f824af10e2` |
-| `output/mesher-pass2-20261012/marble-profile/evidence-status.json` | `cc839990277d30e19ccf112bc4f2541ad1242f2b068f2b40b6a32bad7ed96603` |
+| Unbundled local `marble-profile/evidence-status.json` | `cc839990277d30e19ccf112bc4f2541ad1242f2b068f2b40b6a32bad7ed96603` |
 | Final structured JSON | Not retained; no hash available |
 | Raw stack log | Not retained; returned summary reported `76b072cab5d63c9c9f0f36fe64fa6736797077342efa78f13888049e950f7ab4` |
 

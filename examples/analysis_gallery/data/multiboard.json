@@ -1,0 +1,223 @@
+{
+  "domain": "multiboard",
+  "limitations": [
+    "Circuit result is an explicit reduced R/L harness and load model, not field-extracted interconnect.",
+    "Thermal result is a lumped RC network without geometry spreading, radiation, airflow, or CHT.",
+    "Board identity and coupling execute, but neither result qualifies hardware."
+  ],
+  "metrics": {
+    "board_count": 2,
+    "circuit_relative_residual_max": 8.613198011399327e-16,
+    "maximum_thermal_energy_balance_residual_w": 7.105427357601002e-15
+  },
+  "model_status": "mixed_experimental_approximate",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "230182dcf9ad6d728618455479dcb55ed8fd2753f5eabbefbb59f671191b3734",
+    "result_sha256": "2ee51e4bf2993fccd63f81322a629858e9ab84b154a3a11f61f895cf90b8d0fa",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "tests/python/test_multiboard_circuit.py",
+        "sha256": "d5a8471344318df9cefe56e1f333d29f15eb2863fcfc9c55c31bb936242a29e4"
+      },
+      {
+        "path": "tests/python/test_multiboard_thermal.py",
+        "sha256": "4ebb89836c4c372d9d6177bd983f025b33d3fba3d4d3f5f0e0b9901ac98e8e76"
+      },
+      {
+        "path": "python/spike_core/multiboard_circuit.py",
+        "sha256": "eb4b3f76f4a53b712843a606a48ba00e2737954bd779840b15f73e0238ea5db9"
+      },
+      {
+        "path": "python/spike_core/multiboard_thermal.py",
+        "sha256": "f64bf9eefc933db8f2e5a02879ecf928e4887e07dc7a296d180b5a76bb79c420"
+      },
+      {
+        "path": "scripts/build_multiboard_acceptance.py",
+        "sha256": "7fc0934115cf0965b6bd84b923562fcf64e4437a881de3e1f245c079a2aef108"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": {
+    "electrical": [
+      {
+        "board_b_load_voltage_magnitude_v": 0.9523335907176437,
+        "board_b_load_voltage_phase_deg": -0.5714096264806087,
+        "frequency_hz": 100.0
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9522967349994311,
+        "board_b_load_voltage_phase_deg": -0.7619673234854237,
+        "frequency_hz": 133.3521432163324
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9522312058035558,
+        "board_b_load_voltage_phase_deg": -1.0160531413525586,
+        "frequency_hz": 177.82794100389228
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9521147099929717,
+        "board_b_load_voltage_phase_deg": -1.3548181236880343,
+        "frequency_hz": 237.13737056616552
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9519076534688787,
+        "board_b_load_voltage_phase_deg": -1.8064170355062579,
+        "frequency_hz": 316.22776601683796
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9515397825759222,
+        "board_b_load_voltage_phase_deg": -2.4082750557606003,
+        "frequency_hz": 421.6965034285823
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9508866575703258,
+        "board_b_load_voltage_phase_deg": -3.210016203111806,
+        "frequency_hz": 562.341325190349
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9497285335740823,
+        "board_b_load_voltage_phase_deg": -4.27714697909229,
+        "frequency_hz": 749.8942093324558
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9476794768998466,
+        "board_b_load_voltage_phase_deg": -5.695451908998897,
+        "frequency_hz": 1000.0
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9440682126733457,
+        "board_b_load_voltage_phase_deg": -7.575665108652538,
+        "frequency_hz": 1333.521432163324
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9377470934216372,
+        "board_b_load_voltage_phase_deg": -10.057021610702005,
+        "frequency_hz": 1778.2794100389228
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9268132647212113,
+        "board_b_load_voltage_phase_deg": -13.30621128835678,
+        "frequency_hz": 2371.373705661655
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.9082797229726955,
+        "board_b_load_voltage_phase_deg": -17.504427862575838,
+        "frequency_hz": 3162.2776601683795
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.8778991258565612,
+        "board_b_load_voltage_phase_deg": -22.81021003770507,
+        "frequency_hz": 4216.965034285822
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.8306603264253647,
+        "board_b_load_voltage_phase_deg": -29.285470848150826,
+        "frequency_hz": 5623.413251903491
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.7626755013556596,
+        "board_b_load_voltage_phase_deg": -36.79254780113971,
+        "frequency_hz": 7498.942093324558
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.6743343272175907,
+        "board_b_load_voltage_phase_deg": -44.923436686700406,
+        "frequency_hz": 10000.0
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.5723542830643734,
+        "board_b_load_voltage_phase_deg": -53.060456417357585,
+        "frequency_hz": 13335.21432163324
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.46776361163068336,
+        "board_b_load_voltage_phase_deg": -60.58368631799455,
+        "frequency_hz": 17782.794100389227
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.37089827924761715,
+        "board_b_load_voltage_phase_deg": -67.08014230378376,
+        "frequency_hz": 23713.737056616552
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.28785200991521764,
+        "board_b_load_voltage_phase_deg": -72.40753037701724,
+        "frequency_hz": 31622.776601683792
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.2203075250638522,
+        "board_b_load_voltage_phase_deg": -76.62503101199962,
+        "frequency_hz": 42169.65034285822
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.16717650814861118,
+        "board_b_load_voltage_phase_deg": -79.8901872907208,
+        "frequency_hz": 56234.13251903491
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.12621864012484782,
+        "board_b_load_voltage_phase_deg": -82.38420882665605,
+        "frequency_hz": 74989.42093324558
+      },
+      {
+        "board_b_load_voltage_magnitude_v": 0.09501653149322528,
+        "board_b_load_voltage_phase_deg": -84.2742259173618,
+        "frequency_hz": 100000.0
+      }
+    ],
+    "thermal": [
+      {
+        "board_a_temperature_c": 34.166666666666664,
+        "board_b_temperature_c": 25.833333333333332,
+        "contact_conductance_w_per_k": 0.1,
+        "contact_heat_flow_w": 0.8333333333333333
+      },
+      {
+        "board_a_temperature_c": 33.125,
+        "board_b_temperature_c": 26.875,
+        "contact_conductance_w_per_k": 0.3,
+        "contact_heat_flow_w": 1.875
+      },
+      {
+        "board_a_temperature_c": 31.666666666666668,
+        "board_b_temperature_c": 28.333333333333332,
+        "contact_conductance_w_per_k": 1.0,
+        "contact_heat_flow_w": 3.3333333333333357
+      },
+      {
+        "board_a_temperature_c": 30.714285714285715,
+        "board_b_temperature_c": 29.285714285714285,
+        "contact_conductance_w_per_k": 3.0,
+        "contact_heat_flow_w": 4.285714285714292
+      },
+      {
+        "board_a_temperature_c": 30.238095238095234,
+        "board_b_temperature_c": 29.76190476190476,
+        "contact_conductance_w_per_k": 10.0,
+        "contact_heat_flow_w": 4.761904761904745
+      }
+    ]
+  },
+  "title": "Two-board harness and thermal contact",
+  "units": {
+    "board_b_load_voltage_magnitude_v": "V",
+    "board_b_load_voltage_phase_deg": "degree",
+    "board_temperature_c": "deg C",
+    "contact_conductance_w_per_k": "W/K",
+    "contact_heat_flow_w": "W",
+    "frequency_hz": "Hz"
+  }
+}

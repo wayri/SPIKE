@@ -6,9 +6,10 @@ Open **Libraries → Manufacturer library** or the generic workbench's
 **Manufacturer library** button. The window opens on real-product discovery,
 not a parameter grid of generic presets.
 
-The dated catalog contains 108 sourced product identities across 16
+The dated catalog contains 208 sourced product identities across 19
 manufacturers: ADI, TI, Infineon, MPS, Wolfspeed/Cree, Vishay, Nordic, Arduino,
-Microchip/legacy Atmel, Littelfuse, ST, Allegro, NXP, Renesas and Lattice.
+Microchip/legacy Atmel, Littelfuse, ST, Allegro, NXP, Renesas, Lattice, onsemi,
+Nexperia and ROHM.
 It is not an exhaustive ordering-code portfolio. Use manufacturer/category
 filters, fuzzy search, sortable headings, symbols and official source links.
 Search aliases include ADI, TI, MPS, Cree and nRF. Lattice entries do not
@@ -48,6 +49,41 @@ compatible merely because their files can be indexed.
 Contracts: `spikes/manufacturer-discovery/v1` and
 `spikes/ltspice-local-library/v1`. Broad executable manufacturer-model
 qualification remains incomplete.
+
+## 2026-10-20 source-provenance expansion
+
+The 100 records dated `2026-10-20` were checked against official manufacturer
+product pages, datasheets or product-selector tables. Each record retains the
+official URL and independently authored category/description fact metadata.
+The source supports the product identity and the narrow description only. It
+does not establish current stock, lifecycle suitability, package interchange,
+pin compatibility, electrical-model availability or simulation accuracy.
+
+| Manufacturer | Added | Official source basis |
+| --- | ---: | --- |
+| Analog Devices | 7 | [Product pages and data sheets](https://www.analog.com/en/products.html) |
+| Texas Instruments | 7 | [Product pages and data sheets](https://www.ti.com/product-category/overview.html) |
+| Monolithic Power Systems | 5 | [Power product pages and selector tables](https://www.monolithicpower.com/en/products.html) |
+| Infineon | 6 | [Part pages and data sheets](https://www.infineon.com/products) |
+| STMicroelectronics | 7 | [Product pages and data sheets](https://www.st.com/content/st_com/en/products.html) |
+| onsemi | 7 | [Official data sheets](https://www.onsemi.com/design/resources/technical-documentation) |
+| Nexperia | 7 | [Product pages and product tables](https://www.nexperia.com/products) |
+| NXP Semiconductors | 6 | [Product pages and family tables](https://www.nxp.com/products) |
+| Renesas | 6 | [Product pages and selectors](https://www.renesas.com/en/products) |
+| Microchip | 7 | [Product pages and data sheets](https://www.microchip.com/en-us/products) |
+| Nordic Semiconductor | 5 | [Product pages and product guide](https://www.nordicsemi.com/Products) |
+| Allegro MicroSystems | 5 | [Product pages and selection guides](https://www.allegromicro.com/en/products) |
+| Wolfspeed | 5 | [SiC and RF product tables](https://www.wolfspeed.com/products/) |
+| ROHM Semiconductor | 7 | [Product pages and data sheets](https://www.rohm.com/products) |
+| Vishay | 6 | [Product pages and data sheets](https://www.vishay.com/en/products/) |
+| Littelfuse | 7 | [Protection product pages and selection tables](https://www.littelfuse.com/products) |
+
+No vendor SPICE, IBIS, firmware, encrypted model, or other executable payload
+was downloaded or redistributed. All 100 additions are `model_not_reviewed`.
+An official page mentioning a model does not change that state. A future model
+intake must separately establish license, exact device/package/pin applicability,
+parser and dependency compatibility, numerical behavior and qualification
+evidence before execution can be enabled.
 
 The project-local manufacturer shelf is an import/review workflow, not a
 prequalified executable parts catalog. It retains user-supplied source,

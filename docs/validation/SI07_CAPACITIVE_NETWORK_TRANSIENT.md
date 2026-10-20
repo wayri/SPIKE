@@ -1,10 +1,6 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI07-S04 verification: mixed resistive/shunt-capacitive network transients
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 Verified 18 October 2026. **Done for the bounded stage; experimental,
 production-unqualified.** SI07 and complete PI/SI parity remain open.
 The [method record](../CAPACITIVE_NETWORK_TRANSIENT.md) contains the independent
@@ -13,7 +9,7 @@ derivation, reviewed primary sources, API, units and admission limits.
 ## Executed evidence
 
 The [canonical source-bound receipt](parity/SI07-S04.json) retains **11 tests,
-zero skips** and the actual execution log (`parity/SI07-S04-capacitive-reverified.log`).
+zero skips** and the [actual execution log](parity/SI07-S04-capacitive-reverified.log).
 Eight numerical tests and three actual worker/schema/example tests executed.
 Reproduce into new repository paths:
 

@@ -1,0 +1,330 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.dev/schemas/part-limit-report-v1.schema.json",
+  "title": "Captured-input part operating-limit report",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contract": {
+      "const": "spike/part-limit-report/v1"
+    },
+    "overall_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "INCOMPLETE"
+      ]
+    },
+    "statement": {
+      "type": "string"
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "PASS",
+        "FAIL",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "properties": {
+        "PASS": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "FAIL": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "UNKNOWN": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "NOT_APPLICABLE": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "maxItems": 20000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "occurrence_id",
+          "component_id",
+          "label",
+          "quantity",
+          "unit",
+          "lower",
+          "upper",
+          "reference",
+          "value",
+          "rating_source",
+          "measurement_source",
+          "evidence_status",
+          "reference_designator",
+          "status",
+          "comparison_status",
+          "stress_percent",
+          "headroom_percent",
+          "percentage_note",
+          "notes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "occurrence_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "component_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "quantity": {
+            "enum": [
+              "voltage",
+              "current",
+              "temperature",
+              "power",
+              "stress",
+              "frequency"
+            ]
+          },
+          "unit": {
+            "enum": [
+              "V",
+              "A",
+              "degC",
+              "K",
+              "W",
+              "Pa",
+              "MPa",
+              "Hz"
+            ]
+          },
+          "lower": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rating_source": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "measurement_source": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "evidence_status": {
+            "enum": [
+              "reviewed",
+              "unreviewed"
+            ]
+          },
+          "reference_designator": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNKNOWN",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "comparison_status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNKNOWN"
+            ]
+          },
+          "stress_percent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "headroom_percent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "percentage_note": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "unchecked_components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "occurrence_id",
+          "component_id",
+          "reference"
+        ],
+        "properties": {
+          "occurrence_id": {
+            "type": "string"
+          },
+          "component_id": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "fitted_components": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "covered_components": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "part_summary": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "occurrence_id",
+          "component_id",
+          "reference",
+          "status",
+          "declared_checks",
+          "stress_percent",
+          "headroom_percent"
+        ],
+        "properties": {
+          "occurrence_id": {
+            "type": "string"
+          },
+          "component_id": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "UNKNOWN",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "declared_checks": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "stress_percent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "headroom_percent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "contract",
+    "overall_status",
+    "statement",
+    "counts",
+    "rows",
+    "unchecked_components",
+    "fitted_components",
+    "covered_components",
+    "part_summary"
+  ]
+}

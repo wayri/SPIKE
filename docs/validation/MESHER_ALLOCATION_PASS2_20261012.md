@@ -14,7 +14,7 @@ The first-pass baseline source is SHA-256
 `773708649885455223e6543ad80fecddc274c9c7d1150515ba756c26926be1d5`;
 the new source is
 `47ba7c465816d38f622d98d0b9f39b09599706951a45b1041cf80d890f69d3a1`.
-The baseline is retained at `output/mesher-pass2-20261012/baseline-generation.py`.
+The baseline generator is an unbundled local record named `baseline-generation.py`.
 
 ## Exactness and timing
 
@@ -32,7 +32,7 @@ process, with one warmup and five timed samples per backend. Every invocation
 requires equal complete candidates or equal rejection type/message, plus
 unchanged input bytes. Generation timing includes mandatory certification;
 result comparison is outside the timed interval. The artifact is
-`output/mesher-pass2-20261012/allocation-benchmark.json`.
+the unbundled local `allocation-benchmark.json` record.
 
 | Fixture | First pass median (ms) | Second pass median (ms) | Speedup |
 | --- | ---: | ---: | ---: |
@@ -63,7 +63,7 @@ the original source. Accepted outputs retained identical geometry hashes and
 passed the independent audits; all three backends rejected the thin fixture.
 Small kernel/full-API ordering differences are sample variation, not evidence
 that extra API validation is faster. The artifact is
-`output/mesher-pass2-20261012/original-comparison/benchmark.json`, SHA-256
+the unbundled local `original-comparison/benchmark.json`, SHA-256
 `77d4f0b5ae33d8e6181b100d9b5b8ef53d84e749bc235ba42cae9cb57e852db8`.
 Worker process memory counters do not demonstrate mesh-only RAM savings.
 
@@ -85,14 +85,14 @@ External engines were not rebenchmarked or adopted in this allocation pass.
 
 ```powershell
 .venv\Scripts\python.exe scripts\benchmark_tetra_allocation_pass2.py `
-  --output output\mesher-pass2-20261012\allocation-benchmark-fresh.json
+--output "$env:TEMP\spike-allocation-benchmark-fresh.json"
 .venv\Scripts\python.exe -m unittest discover -s tests\python -v
 .venv\Scripts\python.exe scripts\check_architecture.py
 ```
 
 The benchmark refuses to overwrite evidence and requires the pinned baseline.
 Architecture and Python compilation checks passed. Full integration results
-are recorded in `output/mesher-pass2-python-final-tests-20261012.log`: 3,495 tests
+are recorded in the unbundled local `mesher-pass2-python-final-tests-20261012.log`: 3,495 tests
 in 912.026 seconds, one failure, nine errors and 51 skips. All 20 tests in the
 predicate-allocation, mesher-benchmark and hybrid-equivalence modules passed.
 The broad repository gate remains failing:

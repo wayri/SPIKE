@@ -32,18 +32,18 @@ Run from the repository root on Windows:
 
 ```powershell
 .venv\Scripts\python.exe scripts\benchmark_pcb_mesher.py `
-  --output output\pcb-mesher-benchmark-20261012 `
+--output "$env:TEMP\spike-pcb-mesher-benchmark" `
   --gmsh-python C:\Users\yawar\AppData\Local\Programs\Python\Python311\python.exe
 ```
 
 The benchmark refuses to overwrite its output directory. The recorded result
-is `output/pcb-mesher-benchmark-20261012/benchmark.json`, SHA-256
+is the unbundled local `pcb-mesher-benchmark/benchmark.json`, SHA-256
 `3c8a64a41054a463e90187febadf3162c55e4dda85c6e67bdbaa89d6eb06a866`.
 The optimized `hybrid_mesh.py` SHA-256 during the run was
 `c60b6d5e45e808db406ad53cd77a6e8293fbce77339e82a370bcbac0fcc0764c`.
 
 The internal fixture is the retained shield board
-`output/arduino-em-20261011/prepared-final/shield/shield-source.kicad_pcb`.
+the unbundled local `arduino-em-20261011/prepared-final/shield-source.kicad_pcb`.
 The curated source workflow and third-party provenance are documented in
 `examples/multiboard/arduino/README.md` and `THIRD_PARTY_NOTICES.md`. The run
 selected GND with `target_size_mm=1.0`, `zone_cell_mm=0.5`,

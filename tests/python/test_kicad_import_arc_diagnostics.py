@@ -10,10 +10,6 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ArcImportDiagnosticsTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        (ROOT / "build/parity-test-temp").mkdir(parents=True, exist_ok=True)
-
     def test_arc_chords_are_reported_with_native_source_lineage(self):
         design = import_kicad_design(str(ROOT / 'benchmarks/parity-import/geometry.kicad_pcb'))
         self.assertIn('KICAD_ARC_LINEARIZED', [issue.code for issue in design.issues])

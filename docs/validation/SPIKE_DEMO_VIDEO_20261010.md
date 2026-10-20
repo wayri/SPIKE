@@ -1,7 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SPIKE capabilities demo — 10 October 2026
 
-Deliverables are in `output/demo-video-20261010/`. The captioned MP4 uses
+Deliverables are unbundled local records under `demo-video-20261010`. The
+captioned MP4 uses
 native desktop captures and retained executed analysis artifacts. The edit
 manifest identifies each source, its SHA-256, timestamps and scope.
 
@@ -66,7 +67,7 @@ Still artifact views must not be interpreted as native UI execution footage.
 
 ## Product promo teaser
 
-The separate `output/demo-video-20261010/SPIKE-product-teaser.mp4` is a
+The separate unbundled local `SPIKE-product-teaser.mp4` is a
 29-second, 1920 × 1080, 30 fps motion edit. It uses recorded native board
 orbits, thermal setup and execution, colored 3D layers, a saved-cell probe,
 result hovering and a 2D PCB zoom. Animated typography, short transitions,

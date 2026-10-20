@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import replace
-from math import ceil, hypot, pi, floor
+from math import ceil, hypot, pi, floor, isfinite
 
 from .contracts import ValidationIssue
 
@@ -99,6 +99,53 @@ def fail(builder, message):
         status="unsupported", suggestion="Use admitted convex pads with retained source-filled contact evidence."))
 
 
+def custom_outline(pad):
+    """Admit only a resolved convex undrilled SMD source, without hull filling."""
+    from .hybrid_mesh import _custom_pad_local_polygon, _polygon_is_simple
+    message = "Owned custom pads require a finite resolved convex SMD polygon without holes or drills"
+    geometry = pad.get("custom_geometry")
+    if (not isinstance(geometry, dict) or geometry.get("status") != "supported"
+            or geometry.get("coordinate_space") != "pad_local_mm"
+            or not isinstance(geometry.get("mirror_x"), bool)
+            or pad.get("pad_kind", pad.get("type")) != "smd"
+            or any(item.get(key) for item in (pad, geometry)
+                   for key in ("holes", "cutouts", "negative_filled_polygons"))):
+        raise ValueError(message)
+    try:
+        raw = geometry.get("positive_filled_polygon")
+        if not isinstance(raw, list) or not 3 <= len(raw) <= 4096:
+            raise ValueError(message)
+        values = [v for point in raw if isinstance(point, (list, tuple)) and len(point) == 2 for v in point]
+        if len(values) != 2*len(raw) or any(isinstance(v, bool) or not isfinite(float(v)) for v in values):
+            raise ValueError(message)
+        points = [tuple(float(v) for v in point) for point in raw]
+        if len(set(points)) != len(points) or not _polygon_is_simple(points) or area(points) <= 1e-12:
+            raise ValueError(message)
+        at = pad.get("at", (0, 0))
+        values = [*at, pad.get("rotation", 0)]
+        if len(at) != 2 or any(isinstance(v, bool) or not isfinite(float(v)) for v in values):
+            raise ValueError(message)
+        for key in ("drill", "drill_size", "drill_size_mm"):
+            value = pad.get(key, 0)
+            if isinstance(value, dict):
+                value = (value.get("x", value.get("width")), value.get("y", value.get("height")))
+            values = value if isinstance(value, (list, tuple)) else [value]
+            if not values or any(isinstance(v, bool) or not isfinite(float(v)) or float(v) != 0 for v in values):
+                raise ValueError(message)
+        polygon = _custom_pad_local_polygon(pad)
+    except (TypeError, ValueError, KeyError) as error:
+        raise ValueError(message) from error
+    if not polygon:
+        raise ValueError(message)
+    orientation = 1 if sum(cross(polygon[0], a, b) for a, b in zip(polygon[1:], polygon[2:])) > 0 else -1
+    scale = max(area(polygon), 1.0)
+    if (any(orientation*cross(polygon[i-1], polygon[i], polygon[(i+1)%len(polygon)]) < -1e-12*scale
+            for i in range(len(polygon)))
+            or abs(area(hull(polygon))-area(polygon)) > 1e-10*scale):
+        raise ValueError(message)
+    return polygon
+
+
 def prepare(builder):
     """Read actual pad cells, validate ownership, and replace pad branch widths."""
     from .hybrid_mesh import (_shared_polygon_face_length, _pad_size, _pad_has_drill,
@@ -126,13 +173,16 @@ def prepare(builder):
             width,height = _pad_size(pad)
             expected_void = 0.0
             if _pad_has_drill(pad):
-                cells,_ = _annular_pad_local_cells(pad,builder.target)
+                cells,_ = _annular_pad_local_cells(pad,builder.target,builder.max_pad_cells,
+                    preserve_roundrect=True)
                 expected = hull([_pad_local_to_world(pad,*p) for poly in cells for p in poly])
                 sides = max(24,min(192,int(ceil(pi*max(width,height)/max(builder.target,.01)))))
                 expected_void = area(_circumscribed_shape_polygon(_pad_drill_shape(pad),*_pad_drill_size(pad),sides))
             elif str(pad.get("shape","rect")) in {"circle","oval"}:
                 sides = max(24,min(96,int(ceil(pi*max(width,height)/max(builder.target,.01)))))
                 expected = _pad_boundary_polygon(pad,sides)
+            elif str(pad.get("shape", "rect")) == "custom":
+                expected = [_pad_local_to_world(pad, *p) for p in custom_outline(pad)]
             else:
                 expected = _source_polygon("pad",pad)
             outside = sum(area(p) for p in difference(profile["outline"],hull(expected)))

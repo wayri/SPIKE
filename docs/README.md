@@ -13,6 +13,11 @@ directions, and keeps chemical engineering outside active scope. Read the
 [required numerical evidence policy](NUMERICAL_METHOD_EVIDENCE.md) before adding
 physics, material laws, coupling, surrogates or acceleration.
 
+- [Current UI quick start](UI_QUICKSTART.md): Clean/Classic, contextual tools, tabs, search and themes.
+- [Analysis gallery](ANALYSIS_GALLERY.md): reproducible PI, SI, EM, Thermal, hybrid, CFD, CHT and multiboard visuals.
+- [Solver modules and suite](SOLVER_SUITE.md): named families, setup routes, dependencies and current/future delivery.
+- [Solver blocks](SOLVER_BLOCKS.md): complete dependency catalog and bulk selection contract.
+- [Solver manager](SOLVER_MANAGER.md): runtime selection, registration and tuning.
 - [Interface layouts](INTERFACE_LAYOUTS.md): Clean and Classic controls.
 - [Command and panel access](COMMAND_ACCESS.md): flat action browsing, live search and editable docks.
 - [Sheet and flex folding](SHEET_FOLDING.md): bounded rectangular sheet import and finite-radius fold previews.

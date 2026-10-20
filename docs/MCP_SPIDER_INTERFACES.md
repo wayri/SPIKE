@@ -61,7 +61,7 @@ The CLI offers spider-capabilities, spider-validate, spider-normalize,
 spider-query and spider-compare. All except capabilities take --request pointing
 to a JSON object containing the same operation arguments. Validation failure
 returns the existing validation exit code. CLI argument files are bounded to
-16 MiB; per-document service limits still apply. Existing output/quiet flags apply.
+16 MiB; per-document service limits still apply. Existing output and quiet flags apply.
 For example:
 
 ```powershell

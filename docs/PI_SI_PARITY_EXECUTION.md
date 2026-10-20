@@ -45,6 +45,14 @@ parity gate. General solver-suite expansion remains separately qualified.
 | 5p | SI02-S03: supplied uniform sampled RLGC network | [Independent R/G frequency samples](RLGC_LINE_NETWORK.md), stable two-port evaluation, explicit DC, sampled passivity/reciprocity and compatible network handoff. |
 | 5q | SI02-S04: driven sampled RLGC fields and loss ledger | [Coherent RMS two-end fields](RLGC_LINE_FIELDS.md), named local V/I/storage/loss probes, analytic conductor/dielectric integrals and whole-line power balance. |
 | 5r | SI02-S05: supplied piecewise RLGC cascade | [Ideal series junctions and coherent local fields](RLGC_LINE_CASCADE.md), interface continuity/flux, external two-port and section-resolved loss without double counting. |
+| 5s | SI01-S01: finite pre-layout candidate/corner comparison | [Explicit supplied scalar lines](SI_CANDIDATE_STUDY.md), complete case coverage, sampled gain limits and exact witnesses; editor, geometry and layout constraints remain open. |
+| 5t | SI02-S07: supplied symmetric coupled pair | [Orthogonal even/odd composition](RLGC_COUPLED_PAIR.md), four-port crosstalk, coherent conductor fields and conservative pair loss; geometric extraction and thermal ownership remain open. |
+| 5u | SI02-S08: physical source/load termination of a supplied pair | [Conditioned resistive feedback](RLGC_TERMINATED_PAIR.md), loaded V/I and separate source/resistor/line power; reactive/ideal endpoints and physical thermal allocation remain open. |
+| 5v | SI02-S09: physical reactive source/load termination of a supplied pair | [Sampled series-R/L and shunt-C closure](RLGC_REACTIVE_PAIR.md), independent physical-state/ABCD references and separate heat W, mean energy J and reactive var; general topology and physical thermal allocation remain open. |
+| 5w | SI02-S10: supplied piecewise coupled-line cascades | [Physical conductor-continuous connection](RLGC_COUPLED_CASCADE.md), actual section fields and conservative section heat; independent spatial-chain/quadrature references. |
+| 5x | SI02-S11: physical RLC loaded coupled cascades | [Explicit source/load voltage closure](RLGC_LOADED_CASCADE.md), actual section fields and separate terminal/section heat, mean energy and reactive power. |
+| 5y | SI02-S12: ideal supplied coupled-line stars | [Two-conductor branch continuity](RLGC_COUPLED_STAR.md), coherent leg fields, separate branch heat and node power/KCL residuals. |
+| 5z | SI02-S13: physical RLC loaded coupled stars | [Complete physical endpoint closure](RLGC_LOADED_STAR.md), branch fields, separate terminal/branch heat and mean/reactive energy, with a verified cancellation-integrity correction. |
 | 6 | SI08 remaining network quality | Explicit frequency/DC policies, causality evidence, fixture removal and passive causal fitting. |
 | 7 | SI04–SI06 | Nonlinear IBIS, statistical/AMI and complete DDR workflows with applicable model and normative evidence. |
 | 8 | PI05–PI06 and stack closure | Close every declared gap and accept family benchmarks before calling the PI/SI stack complete. |
@@ -452,3 +460,97 @@ parasitics, arbitrary graphs, coupled conductors, broadband causal materials,
 thermal mapping and measured qualification remain open. SI02 and full PI/SI
 parity remain incomplete. [Actual-board evidence](validation/BOARD_PISI_READINESS_20261019.md)
 retains separate EBrake/Marble limitations and the corrected current Marble DC audit.
+
+## PI01-S01 owned pad DC geometry
+
+[Conservative pad support](OWNED_DRILLED_PAD_DC.md) is **Done** for its
+bounded opt-in DC geometry envelope: 28 source-bound numerical/native checks,
+67 impacted regressions, and independent geometry/numerical review. Actual
+full EBrake 3Vin now executes through the public CLI with all four refinement
+levels. The retained source-stable report still fails required p95 density
+convergence; original default EBrake density and AC tests also remain failed.
+[Evidence](validation/PI01_OWNED_PAD_DC_20261019.md) distinguishes stage
+verification from board sign-off. Defaults, thresholds, barrel law and AC
+guards are unchanged. PI01-S02 is planned for conservative vector current and
+unique-volume density evidence; PI01 and full-board SI/PI remain incomplete.
+
+## SI02-S09: physical reactive source/load boundaries
+
+[Series-R/L and node-shunt-C physical endpoints](RLGC_REACTIVE_PAIR.md) extend
+the unchanged supplied symmetric pair. Real resistor/line heat W remains
+separate from mean stored energy J, reactive var and signed source VA.
+[Verification record](validation/SI02_REACTIVE_PAIR_20261020.md) binds independent
+physical-state and scalar ABCD checks, actual worker/CLI/schema/example execution,
+review and genuine affected prior replays. General endpoint topology, transient
+and causal models, geometry extraction, thermal allocation and original-board
+qualification remain open; SI02 and full PI/SI parity remain in progress.
+
+## SI02-S10 supplied piecewise coupled propagation
+
+[Ideal coupled-section composition](RLGC_COUPLED_CASCADE.md) connects supplied
+symmetric sections with differing properties, conserving physical conductor
+voltage/current and interface power while retaining actual fields and section heat.
+[Verification](validation/SI02_COUPLED_CASCADE_20261020.md) records independent
+physical spatial-chain/quadrature checks, actual worker/CLI/schema execution and
+source-bound promotion. Geometric discontinuity/return parasitics, general
+asymmetry/topology, external terminal feedback, causal/transient, thermal mapping
+and board qualification remain open. SI02 and full PI/SI parity remain incomplete.
+
+## SI02-S11 physically loaded piecewise coupled channels
+
+[Physical RLC loaded cascades](RLGC_LOADED_CASCADE.md) accept exterior source
+voltages and explicit loads around supplied coupled sections. Actual internal
+fields, terminal/source currents and section/terminal heat remain distinct from
+mean reactive energy. [Verification](validation/SI02_LOADED_CASCADE_20261020.md)
+records independent physical RLC/spatial-chain equations, individual heat
+quadrature, strict public execution, review and genuine source-bound replays.
+General topology/asymmetry, geometric parasitics, ideal/nonlinear/lossy endpoints,
+transient/causal, thermal mapping and original-board qualification remain open.
+SI02 and full PI/SI parity remain incomplete.
+
+## SI02-S12 supplied coupled star branches
+
+[Ideal coupled stars](RLGC_COUPLED_STAR.md) extend supplied coupled propagation
+to 2–8 uniform branches. Two distinct conductor nodes conserve voltage, current
+and signed power; actual leg fields and separately owned loss remain explicit.
+[Verification](validation/SI02_COUPLED_STAR_20261020.md) records independent
+physical boundary/KCL equations, analytic matched stars, quadrature, strict
+dimensions, review and genuine source-bound replays. General graphs, asymmetric
+or piecewise legs, RLC star endpoints, geometric parasitics, transient/thermal
+and original-board qualification remain open. SI02 and full parity are incomplete.
+
+## SI02-S13 physical source/load closure on coupled branches
+
+[Loaded coupled stars](RLGC_LOADED_STAR.md) assign explicit RLC sources/loads
+to all exterior ports and retain actual branch fields and separate terminal/branch
+heat, mean energy and reactive work. [Verification](validation/SI02_LOADED_STAR_20261021.md)
+records physical RLC/node equations, quadratic heat references, strict dimensions,
+independent review and genuine replays. A standing-wave false integrity rejection
+was corrected with a limited operand roundoff allowance, without changing raw
+fields, power checks or original-board gates. Full SI02/PI-SI parity remains open.
+
+## PI01-S02A finite-contact planar DC acceptance
+
+The [analytical benchmark](PI_FINITE_CONTACT_BENCHMARK.md) executes three fixed
+refinement levels for four distributed-contact sheet cases, checking resistance,
+physical-volume density percentiles and conserved Joule/terminal work. Its
+[verification](validation/PI01_FINITE_CONTACT_20261021.md) marks this bounded
+offline prerequisite done. Full PI01-S02 remains planned: general rotated
+polygon-overlay admission, landing/barrel ownership, original board convergence
+and EBrake's unspecified physical contact are unresolved. No new production
+solver or board qualification is inferred.
+
+The subsequent [PI01-S02 increment](validation/PI01_GEOMETRY_OWNERSHIP_20261021.md)
+verifies explicit precision-grid admission of the actual rotated polygons,
+preserving net/contact topology and geometry uncertainty. Supplied coaxial
+land/gap ownership now creates fresh face-to-face barrel branches and is checked
+with a new reduced DC solve. PI01-S02 is **in progress**, not done: transition
+fields, general face patch mappings, physical EBrake electrodes and original
+board density/AC qualification remain open.
+
+The next [PI01-S02 land-field increment](validation/PI01_LAND_TRANSITION_20261021.md)
+resolves a supplied 3-D rectangular land with independent finite current patches
+on all six sides, vector fields, exact reconstructed Joule loss and distinct
+conjugate potentials. Harmonic and cosine-series/Gauss references pass. Automatic
+annular/source-backed geometry, external circuit coupling, full-board percentiles
+and original board qualification still prevent whole-stage completion.

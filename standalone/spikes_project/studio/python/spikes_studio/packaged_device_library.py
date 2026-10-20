@@ -31,7 +31,7 @@ _PROFILES = {
         "parameter_unit": "H",
         "active_pins": ("D", "G", "S"),
         "shunt_pair": ("G", "S"),
-        "fourth_pin": "B",
+        "exact_pins": ("B",),
         "roles": ("terminal", "control", "terminal", "bulk"),
         "sides": ("east", "west", "east", "east"),
     },
@@ -43,9 +43,46 @@ _PROFILES = {
         "parameter_unit": "H",
         "active_pins": ("C", "B", "E"),
         "shunt_pair": ("B", "E"),
-        "fourth_pin": "SUB",
+        "exact_pins": ("SUB",),
         "roles": ("terminal", "control", "terminal", "substrate"),
         "sides": ("east", "west", "east", "east"),
+    },
+    "resistor3": {
+        "id": "physics.packaged.resistor3",
+        "family": "packaged_resistor3",
+        "name": "Packaged substrate resistor · terminal-lead R/L",
+        "primary_parameter": "series_inductance_h",
+        "parameter_unit": "H",
+        "active_pins": ("P", "N"),
+        "shunt_pair": ("P", "N"),
+        "exact_pins": ("SUB",),
+        "roles": ("terminal", "terminal", "substrate"),
+        "sides": ("west", "east", "east"),
+    },
+    "kelvin_shunt4": {
+        "id": "physics.packaged.kelvin_shunt4",
+        "family": "packaged_kelvin_shunt4",
+        "name": "Packaged Kelvin shunt · force-lead R/L",
+        "primary_parameter": "series_inductance_h",
+        "parameter_unit": "H",
+        "active_pins": ("FP", "FN"),
+        "shunt_pair": ("FP", "FN"),
+        "exact_pins": ("SP", "SN"),
+        "roles": ("force", "force", "sense", "sense"),
+        "sides": ("west", "east", "west", "east"),
+    },
+    "feedthrough_capacitor3": {
+        "id": "physics.packaged.feedthrough_capacitor3",
+        "family": "packaged_feedthrough_capacitor3",
+        "name": "Packaged feedthrough capacitor · terminal-lead R/L",
+        "primary_parameter": "series_inductance_h",
+        "parameter_unit": "H",
+        "active_pins": ("IN", "OUT"),
+        "shunt_pair": ("IN", "OUT"),
+        "exact_pins": ("GND",),
+        "roles": ("terminal", "terminal", "reference"),
+        "sides": ("west", "east", "east"),
+        "fixed_core_defaults": True,
     },
 }
 
@@ -55,17 +92,23 @@ def _cores():
 
 
 def records():
-    """Return two independent records composed only from established builders."""
+    """Return independent records composed only from established builders."""
     result = []
     cores = _cores()
     for core_kind, profile in _PROFILES.items():
         core = cores[core_kind]
-        parameters = deepcopy(core["defaults"])
+        parameters = {} if profile.get("fixed_core_defaults") else deepcopy(core["defaults"])
         parameters.update(PACKAGE_PARAMETERS)
+        exact = ", ".join(profile["exact_pins"])
         topology = (
             f"Package R/L is applied uniformly to {', '.join(profile['active_pins'])}; "
-            f"{profile['fourth_pin']} uses an exact zero-volt link. Optional package capacitance "
+            f"{exact} {'use' if len(profile['exact_pins']) > 1 else 'uses'} exact zero-volt links. Optional package capacitance "
             f"is placed across {'-'.join(profile['shunt_pair'])}."
+        )
+        fixed_core = (
+            " The inner core uses its established illustrative defaults; edit the standalone "
+            "lumped feedthrough record when different core ESR, ESL, or capacitance is required."
+            if profile.get("fixed_core_defaults") else ""
         )
         result.append({
             "id": profile["id"],
@@ -92,8 +135,8 @@ def records():
             "origin": ORIGIN,
             "limitations": (
                 "Model status: generic_unqualified. Defaults are illustrative inputs, not inferred "
-                "package properties. " + topology + " " + " ".join(core["limitations"]) +
-                " Avoid double counting capacitance already present in the core. Mutual coupling, "
+                "package properties. " + topology + fixed_core + " " + " ".join(core["limitations"]) +
+                " Avoid double counting capacitance, lead resistance, or contact resistance already present in the core. Mutual coupling, "
                 "self-heating, distributed package behavior, and vendor qualification are absent."
             ),
         })
@@ -134,10 +177,11 @@ def validate_record(record):
     if not isinstance(record.get("limitations"), str) or "unqualified" not in record["limitations"].casefold():
         raise ValueError("Packaged device limitations must retain unqualified status")
     parameters = record.get("parameters")
-    expected = set(core["defaults"]) | set(PACKAGE_PARAMETERS)
+    expected = (set() if profile.get("fixed_core_defaults") else set(core["defaults"])) | set(PACKAGE_PARAMETERS)
     if not isinstance(parameters, dict) or set(parameters) != expected:
         raise ValueError("Packaged device parameters must exactly match the core and package contract")
-    core_parameters = {key: parameters[key] for key in core["defaults"]}
+    core_parameters = (deepcopy(core["defaults"]) if profile.get("fixed_core_defaults") else
+                       {key: parameters[key] for key in core["defaults"]})
     build_core(core_kind, core_parameters, name=_model_name(record) + "_CORE")
     _compose(record, profile, core_parameters)
 
@@ -166,8 +210,10 @@ def _compose(record, profile, core_parameters):
 def model(record):
     validate_record(record)
     core = _cores()[record["core_builder_kind"]]
-    core_parameters = {key: record["parameters"][key] for key in core["defaults"]}
-    return _compose(record, _PROFILES[record["core_builder_kind"]], core_parameters)
+    profile = _PROFILES[record["core_builder_kind"]]
+    core_parameters = (deepcopy(core["defaults"]) if profile.get("fixed_core_defaults") else
+                       {key: record["parameters"][key] for key in core["defaults"]})
+    return _compose(record, profile, core_parameters)
 
 
 def primary_value(record):
@@ -188,7 +234,7 @@ def pin_contract(record):
         "execution": record["status"],
         "power_behavior": (
             "Native generic_unqualified core plus explicit uniform active-lead package R/L; "
-            "the fourth terminal is exact-linked."
+            f"{', '.join(profile['exact_pins'])} {'are' if len(profile['exact_pins']) > 1 else 'is'} exact-linked."
         ),
     }
 

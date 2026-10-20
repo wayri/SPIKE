@@ -1,5 +1,6 @@
 import { useWorkspaceViews } from "./useWorkspaceViews";
 import WorkspaceHeader from "./WorkspaceHeader";
+import { Move, Link2 } from "./icons";
 import "./interfaceLayout.css";
 import {defaultStudioFeedback} from "./studioFeedback";
 import WorkspaceIntentReviewPanel, {type WorkspaceReviewedIntent} from "./WorkspaceIntentReviewPanel";
@@ -16,6 +17,8 @@ import SupportReportPreview from "./SupportReportPreview";
 import { solverDisplayName } from "./solverManagerModel";
 import { solverSuiteCatalog, type SolverSuiteAction } from "./solverSuiteCatalog";
 import NativeCfdWorkbench from "./NativeCfdWorkbench";
+import MainFieldControls from "./MainFieldControls";
+import { useMainFieldViewport } from "./mainFieldViewport";
 import { HideControlIcon } from "./navigationIcons";
 import FileDropImport from "./FileDropImport";
 import type { DroppedImport } from "./dropImportModel";
@@ -48,6 +51,9 @@ import { XyceExtension } from "./XyceExtension";
 import { isExternalSolverId, restoreExternalSolverWorkflows, type ExternalSolverWorkflows } from "./externalSolverWorkspace";
 import { encodeResultScreenshot, resultScreenshotFormats, type ResultScreenshotFormat } from "./resultScreenshot";
 import { MenuBar, MenuButton, MenuItem, MenuSubmenu } from "./ApplicationMenu";
+import { useModalFocusScope } from "./modalFocusScope";
+import { createDesktopCloseHandler } from "./desktopClose";
+import { DesktopCloseDraftDialog } from "./DesktopCloseDraftDialog";
 import PiQuickTuneBar from "./PiQuickTuneBar";
 import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { bindAssistantWindow, openAssistantWindow, closeOwnedAssistantWindow } from "./assistantWindow";
@@ -157,7 +163,7 @@ import { extractNetGeometry } from "./netGeometry";
 import { emptyProcessResources, ProcessResources, sampleProcessResources, systemMemoryPercent } from "./resourceMonitor";
 import { planResourceCapacity, ResourceCapacityPlan } from "./resourceCapacity";
 import { assemblyAdmissionParams, assemblyAnalysisScope, requireAdmittedAssembly, requireSupportedAssemblyPhysics, type AssemblyAnalysisScope, type AssemblyWorkload } from "./assemblyAdmission";
-import { cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
+import { acknowledgeDesktopClose, cancelLocalWorker, cancelLocalWorkerCleanup, closeDesktopWindow, isDesktopShell, openNativeTextFile, readApprovedResultFile, runLocalWorker, runNativeProjectWorker, saveNativeTextFile, selectNativeProjectSavePath, subscribeDesktopCloseRequested, takeStartupProject, verifyNativeProjectManifestSignature, WorkerActivity } from "./workerBridge";
 import { emptyTopology, extractTopologyFromBoard, PowerTreeAnalysisPlan, TopologyDomain, TopologyModel, TopologyNode } from "./powerTree";
 import { compilePiPaths, compilePiSeriesSolveHandoff, PiPathTerminalAnchor } from "./piPath";
 import { attachPiPathComponentBridges, combinePiPathPreflights, combinePiPathSegmentExtractions, createPiPathSegmentExtractionRequests, PiPathAnalysisRequest } from "./piPathCircuit";
@@ -213,7 +219,7 @@ import {
   defaultEmiSetup, EmiDashboard, EmiFieldResult, EmiPreflight, EmiScreening, EmiSetup, EmiSetupPanel, EmiSetupSection,
   normalizeEmiFieldResult, normalizeEmiSetup,
 } from "./EmiWorkbench";
-import { AppSettings, loadAppSettings, saveAppSettings, translate } from "./appSettings";
+import { AppSettings, loadAppSettings, saveAppSettings, toggleLegacyRibbon, translate } from "./appSettings";
 import { createProjectPackage, parseProjectPackage, projectFileName } from "./projectPackage";
 import { DockTabId, normalizeWorkspaceState, Viewport2DState, Viewport3DCameraState, ViewportRestoreCommand, WorkspaceState } from "./workspaceState";
 import BondManager, { BondRecord, BondValidationResult } from "./BondManager";
@@ -1078,6 +1084,7 @@ export default function App() {
   const [sheetFoldingOpen, setSheetFoldingOpen] = useFocusToolState("sheetFoldingOpen", false, activateFocusTool);
   const [thermalOpen, setThermalOpen] = useFocusToolState("thermalOpen", false, activateFocusTool);
   const [nativeCfdOpen, setNativeCfdOpen] = useFocusToolState("nativeCfdOpen", false, activateFocusTool);
+  const [fieldVolumeOpen, setFieldVolumeOpen] = useState(false);
   const [solverSuiteQuery, setSolverSuiteQuery] = useState("");
   const [piSearchSetupOpen, setPiSearchSetupOpen] = useFocusToolState("piSearchSetupOpen", false, activateFocusTool);
   const [workspaceIntentOpen,setWorkspaceIntentOpen]=useFocusToolState("workspaceIntentOpen",false,activateFocusTool);
@@ -1236,6 +1243,7 @@ export default function App() {
   const [assemblyToolDraftOwner, setAssemblyToolDraftOwner] = useState<AssemblyToolKind | null>(null);
   const assemblyToolDraftOwnerRef = useRef<AssemblyToolKind | null>(null);
   assemblyToolDraftOwnerRef.current = assemblyToolDraftOwner;
+  const [assemblyCloseBlocked, setAssemblyCloseBlocked] = useState<AssemblyToolKind | null>(null);
   useEffect(() => {
     const slot = assemblyHandlingRef.current;
     if (!slot) { setAssemblyHandlingHeight(0); return; }
@@ -1368,6 +1376,8 @@ export default function App() {
     catch { return []; }
   });
   const [appSettings, setAppSettings] = useState<AppSettings>(loadAppSettings);
+  const [viewportToolbarHost, setViewportToolbarHost] = useState<HTMLDivElement | null>(null);
+  const legacyRibbonVisible = appSettings.interfaceMode === "classic" && appSettings.ribbonVisible;
   const [extensionsOpen, setExtensionsOpen] = useFocusToolState("extensionsOpen", false, activateFocusTool);
   const [selectedToolbarExtensionId, setSelectedToolbarExtensionId] = useState("");
   const [extensionCatalog, setExtensionCatalog] = useState<ExtensionCatalogEntry[]>(fallbackExtensionCatalog);
@@ -2621,6 +2631,16 @@ export default function App() {
     setIsolatedAssemblyPartId(null);
     setAssemblySection({ ...DEFAULT_ASSEMBLY_SECTION });
   }, [projectPath]);
+  const finishDesktopClose = async () => {
+    if (allowWindowCloseRef.current) return;
+    allowWindowCloseRef.current = true;
+    setStatus("Closing SPIKE and stopping its workers...");
+    try { await closeDesktopWindow(closeOwnedAssistantWindow); }
+    catch (error) {
+      allowWindowCloseRef.current = false;
+      setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}. Retry Close; your project remains open.`);
+    }
+  };
   const resolveUnsavedPrompt = async (choice: "save" | "discard" | "cancel") => {
     const pending = unsavedPrompt;
     if (!pending) return;
@@ -2629,13 +2649,7 @@ export default function App() {
     if (choice === "discard" && !pending.preserveDirtyUntilApplied) setProjectClean();
     setUnsavedPrompt(null);
     if (pending.closeWindow) {
-      allowWindowCloseRef.current = true;
-      try {
-        await closeDesktopWindow(closeOwnedAssistantWindow);
-      } catch (error) {
-        allowWindowCloseRef.current = false;
-        setStatus(`Could not close SPIKE: ${error instanceof Error ? error.message : String(error)}`);
-      }
+      await finishDesktopClose();
       return;
     }
     await pending.action?.();
@@ -2646,15 +2660,22 @@ export default function App() {
       event.preventDefault();
       event.returnValue = "";
     };
-    window.addEventListener("beforeunload", onBeforeUnload);
+    if (!desktopShell) window.addEventListener("beforeunload", onBeforeUnload);
     let disposed = false;
     let unlisten: (() => void) | undefined;
-    if (desktopShell) void subscribeDesktopCloseRequested(preventDefault => {
-      if (disposed) return;
-      if (assemblyToolDraftOwnerRef.current) { preventDefault(); setStatus(`Save or discard the assembly ${assemblyToolDraftOwnerRef.current} tool draft before closing SPIKE.`); return; }
-      if ((!projectDirtyRef.current && !assistantChatOpenRef.current) || allowWindowCloseRef.current) return;
-      preventDefault();
-      setUnsavedPrompt({ actionLabel: assistantChatOpenRef.current ? "close SPIKE and discard assistant chats" : "close SPIKE", action: null, closeWindow: true });
+    const handleClose = createDesktopCloseHandler({
+      isClosing: () => disposed || allowWindowCloseRef.current,
+      draftOwner: () => assemblyToolDraftOwnerRef.current,
+      isDirty: () => projectDirtyRef.current || assistantChatOpenRef.current,
+      showDraft: owner => setAssemblyCloseBlocked(owner as AssemblyToolKind),
+      showUnsaved: () => setUnsavedPrompt({ actionLabel: assistantChatOpenRef.current ? "close SPIKE and discard assistant chats" : "close SPIKE", action: null, closeWindow: true }),
+      close: () => { void finishDesktopClose(); },
+    });
+    if (desktopShell) void subscribeDesktopCloseRequested((preventDefault, generation) => {
+      // Let the host distinguish a live save/discard guard from a dead renderer.
+      void acknowledgeDesktopClose(generation).then(accepted => {
+        if (accepted && !disposed) handleClose(preventDefault);
+      }).catch(error => setStatus(`Close recovery acknowledgement failed: ${String(error)}`));
     }).then(closeListener => {
       if (disposed) closeListener();
       else unlisten = closeListener;
@@ -3077,7 +3098,7 @@ export default function App() {
         break;
     }
   };
-  const toggleRibbonVisibility = () => { setAppSettings(current => ({...current, ribbonVisible: !current.ribbonVisible})); setMenu(null); };
+  const toggleRibbonVisibility = () => { setAppSettings(toggleLegacyRibbon); setMenu(null); };
   const assignShortcut = (action:ShortcutAction,raw:string) => {
     const issue=shortcutBindingIssue(raw);if(issue){setStatus(issue);return;}
     const key=raw.trim()?normalizedShortcutKey(raw):"";
@@ -5333,7 +5354,7 @@ export default function App() {
     { id: "view:3d", label: "Switch to 3D board view", category: "View", description: "Use the native Three.js board scene", icon: Cuboid, run: () => setViewMode("3D") },
     { id: "view:fit", label: "Fit board to viewport", category: "View", description: "Frame the active board or analysis geometry", keywords: "zoom all", icon: Focus, run: () => commandCamera("fit") },
     { id: "view:quick-tools", label: appSettings.quickToolsVisible ? "Hide optional quick-tools bar" : "Show optional quick-tools bar", category: "View", keywords: "floating toolbar contextual optional", icon: SlidersHorizontal, run: () => setAppSettings(current=>({...current,quickToolsVisible:!current.quickToolsVisible})) },
-    { id: "view:ribbon", label: appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon", category: "View", description: "Show or hide advanced commands; the workspace selector stays available", icon: PanelTop, run: toggleRibbonVisibility },
+    ...(appSettings.interfaceMode === "classic" ? [{ id: "view:ribbon", label: appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon", category: "View", description: "Show or hide advanced commands; the workspace selector stays available", icon: PanelTop, run: toggleRibbonVisibility }] : []),
     { id: "view:navigator", label: leftOpen ? "Hide design navigator" : "Show design navigator", category: "View", icon: PanelLeft, run: () => setLeftOpen(current => !current) },
     { id: "view:analysis", label: rightOpen ? "Hide analysis setup" : "Show analysis setup", category: "View", keywords: "sidebar inspector panel settings setup", icon: PanelRight, run: () => setRightOpen(current => !current) },
     { id: "view:console", label: "Open application console", category: "View", description: "Show commands, warnings, errors, and operation status", icon: SquareTerminal, run: () => { setBottomOpen(true); setDock("Console"); } },
@@ -5483,6 +5504,7 @@ export default function App() {
   const workspaceViewOwner = useRef(crypto.randomUUID());
   const workspaceViewParts = useMemo(() => (assemblyIr?.parts ?? []).map(part => ({partId:part.id,title:part.name})), [assemblyIr?.parts]);
   const workspaceViews = useWorkspaceViews({
+    toolbarHost: appSettings.interfaceMode === "clean" ? viewportToolbarHost : null,
     projectSession: `${workspaceViewOwner.current}:${projectGeneration.current}`,
     revision: assemblyToolRevision, viewportRevision: assemblyWorkspaceViewportRevision,
     boards: assemblyBoardVisuals.boards, occurrences: virtualBoardProjection.visuals,
@@ -5512,6 +5534,10 @@ export default function App() {
     },
   });
 
+  const fieldViewport = useMainFieldViewport(`${workspaceViewOwner.current}:${projectGeneration.current}`, newData => {
+    setViewMode("3D"); setFocusTool(null); workspaceViews.setActiveViewId(null); setScriptViewport(null); setFieldVolumeOpen(true);
+    if (newData) setCameraCommand(`fit:${Date.now()}`);
+  }, setStatus);
   const scopedViewportActive = Boolean(workspaceViews.activeRenderer);
   const previousScopedViewport = useRef(false);
   useEffect(() => {
@@ -5929,7 +5955,7 @@ export default function App() {
           <MenuItem icon={SlidersHorizontal} label={rightOpen ? "Hide analysis setup" : "Show analysis setup"} onClick={() => { setRightOpen(value => !value); setMenu(null); }} />
           <MenuItem icon={PanelBottom} label={bottomOpen ? "Hide results dock" : "Show results dock"} onClick={() => { setBottomOpen(value => !value); setMenu(null); }} />
           <MenuItem icon={sidePanelsPinned && bottomPinned ? PinOff : Pin} label={sidePanelsPinned && bottomPinned ? "Unpin docks for auto-hide" : "Pin all docks"} onClick={() => { const next = !(sidePanelsPinned && bottomPinned); setSidePanelsPinned(next); setBottomPinned(next); if (next) { setLeftOpen(true); setRightOpen(true); setBottomOpen(true); } setMenu(null); }} />
-          <MenuItem icon={PanelTop} label={appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon"} shortcut={shortcuts.toggleRibbon} onClick={toggleRibbonVisibility} />
+          {appSettings.interfaceMode === "classic" && <MenuItem icon={PanelTop} label={appSettings.ribbonVisible ? "Minimize command ribbon" : "Expand command ribbon"} shortcut={shortcuts.toggleRibbon} onClick={toggleRibbonVisibility} />}
         </MenuSubmenu>
       </MenuButton>
 
@@ -5969,7 +5995,7 @@ export default function App() {
 
 <MenuButton mnemonic="T" label="Tools" open={menu === "Tools"} onClick={() => setMenu(menu === "Tools" ? null : "Tools")}>
         <MenuItem icon={Layers3} label="Retained assembly EM · OpenEMS" disabled={!assemblyIr||projectDirty} onClick={() => { setAssemblyEmOpen(true); setMenu(null); }} />
-        <MenuItem icon={BookOpenCheck} label="Engineering review · BoM, checks & quick tools" onClick={() => { setEngineeringReviewOpen(true); setMenu(null); }} />
+        <MenuItem icon={BookOpenCheck} label="Engineering review · BoM, part limits & checks" onClick={() => { setEngineeringReviewOpen(true); setMenu(null); }} />
         <MenuItem icon={Keyboard} label="Shortcut manager" onClick={() => { setShortcutsOpen(true); setMenu(null); }} />
         <MenuSubmenu label="Automation">
           {desktopShell && <MenuItem icon={BookOpenCheck} label="SPIKE Assistant" onClick={() => { void launchAssistantChat(); setMenu(null); }} />}
@@ -6060,7 +6086,7 @@ export default function App() {
 
 <button className="plain-btn" onClick={() => openAssemblyWorkspace()} title="Import boards, connect pins and configure coupled assembly studies"><Boxes size={14} /> Assembly</button>
 
-<button className="plain-btn" onClick={toggleRibbonVisibility} aria-expanded={appSettings.ribbonVisible} aria-controls="workspace-ribbon-tools" title="Show or hide advanced workspace commands"><SlidersHorizontal size={14} /> Tools</button>
+{appSettings.interfaceMode === "classic" && <button className="plain-btn" onClick={toggleRibbonVisibility} aria-expanded={legacyRibbonVisible} aria-controls="workspace-ribbon-tools" title="Show or hide advanced workspace commands"><SlidersHorizontal size={14} /> Tools</button>}
 
 {boardData?.technology && boardData.technology !== "rigid" && <button className="board-technology" onClick={() => setFlexBoardOpen(true)} title="Review flex regions and bend definitions">{boardData.technology === "rigid-flex" ? "RIGID-FLEX" : "FLEX"}</button>}
 
@@ -6179,7 +6205,7 @@ export default function App() {
             : selectedHarness
               ? <HarnessInspector harness={selectedHarness} onClear={() => setSelectedHarnessId(null)} />
             : selectedBoardInstance
-              ? <><BoardInstanceInspector board={selectedBoardInstance} onClear={() => setSelectedBoardInstanceId(null)} /><div className="panel-block"><strong>Board placement</strong><p>Use the assembly handling bar for move, rotation, numeric angles, and hole or edge alignment. Display explosion keeps physical placement unchanged.</p></div></>
+              ? <BoardInstanceInspector board={selectedBoardInstance} onClear={() => setSelectedBoardInstanceId(null)} />
             : <SetupPanel analysisMode={analysisMode} setAnalysisMode={setAnalysisMode} solverId={solverId} setSolverId={setSolverId} formulation={formulation} setFormulation={setFormulation} solverCatalog={solverCatalog} powerNets={powerNets} limits={limits} setLimits={setLimits} piSetup={piSetup} onNetManager={() => openBoardManager("nets")} onConfigure={() => setDcRunOpen(true)} onStackup={() => setStackupOpen(true)} />)}
       </aside> },
 { id: "studyNavigatorOpen", title: "Studies & saved runs", open: studyNavigatorOpen, content: studyNavigator },
@@ -6371,6 +6397,7 @@ export default function App() {
       { id: "inspector", label: "Analysis & selection", run: () => setRightOpen(true) },
       { id: "solver-suite", label: "Solver manager", icon: Boxes, run: () => {setSolverSuiteQuery("");setSolverSuiteOpen(true);} },
       { id: "native-cfd", label: "Native CFD cavity benchmark", icon: Wind, run: () => {setTab("Thermal");setNativeCfdOpen(true);} },
+      { id: "field-volume", label: "Volume and airflow visualizer", icon: Box, run: () => fieldViewport.present() },
       ...dockTabs.map(target => ({ id: "dock:" + target, label: target, run: () => { setDock(target); setBottomOpen(true); } })),
     ] },
     { id: "hide-panels", label: "Hide all panels", run: () => setFocusTool(null) },
@@ -6393,7 +6420,15 @@ export default function App() {
   const commandMenuOpen = menu !== null && !(appSettings.interfaceMode === "classic" && Object.prototype.hasOwnProperty.call(focusMenuSections, menu));
   if (commandMenuOpen) { lastCommandRoute.current = menu!; commandMenuMounted.current = true; }
 
-  return <div className={`app-shell board-first focus-shell interface-${appSettings.interfaceMode} ${dockMaximized ? "dock-maximized" : ""} ${bottomOpen ? "bottom-open" : "bottom-closed"} ${appSettings.ribbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} data-interface-mode={appSettings.interfaceMode} style={shellStyle}>
+  const mainViewportToolbar = <CommandStrip className="canvas-toolbar" label="Viewport">{viewportEssentials}{assemblyIr && assemblyIr.boards.length > 1 && <ToolbarMenu label="Assembly actions" icon={Boxes} actions={[
+      ...virtualBoardProjection.visuals.map(visual=>({label:visual.name,icon:Boxes,checked:selectedBoardInstanceId===visual.id,radio:true,section:"Board occurrence",run:()=>handleBoardInstanceSelect(visual)})),
+      {label:"Placement settings",icon:Move,section:"Assembly tools",run:()=>openAssemblyPlacement()},
+      {label:"Layers",icon:Layers3,run:()=>openBoardManager("layers")},{label:"Nets",icon:Network,run:()=>openBoardManager("nets")},
+      {label:"Connector links",icon:Link2,run:()=>openBoardManager("links")},{label:"Assembly workspace",icon:Boxes,run:()=>openAssemblyWorkspace()}
+    ]}/> }{appSettings.quickToolsVisible&&<ViewportQuickTools onHide={()=>setAppSettings(current=>({...current,quickToolsVisible:false}))} groups={viewportContextGroups} context={{workspace:tab,kind:clickedObject?.type,hasNet:smartContext.hasNet,hasResult:smartContext.resultScoped,hasBoard:Boolean(boardData),busy:universalRunning}} selectionLabel={clickedObject?.net ?? clickedObject?.ref ?? clickedObject?.name ?? (boardData?tab:"No design")} summary={smartContext.summary} onError={setStatus}/>}<button type="button" className="spike-control--icon" aria-label="Viewport tools" title="Viewport tools" aria-expanded={commandMenuOpen&&lastCommandRoute.current==="Viewport tools"} aria-controls="focus-command-panel" onClick={event => {if(commandPanelDetached&&focusFloatingPanel("command-menu"))return;const workspace=event.currentTarget.closest(".workspace");if(workspace)setCommandMenuTop(Math.max(8,event.currentTarget.getBoundingClientRect().bottom-workspace.getBoundingClientRect().top+4));setMenu(current=>current==="Viewport tools"?null:"Viewport tools");}}><SlidersHorizontal size={14} /></button></CommandStrip>;
+
+  const fieldControls = <MainFieldControls view={fieldViewport.view} open={fieldVolumeOpen} onOpen={setFieldVolumeOpen} onPresent={fieldViewport.present} onOptions={fieldViewport.options} onVisible={fieldViewport.visible} onClear={fieldViewport.clear}/>;
+  return <div className={`app-shell board-first focus-shell interface-${appSettings.interfaceMode} ${dockMaximized ? "dock-maximized" : ""} ${bottomOpen ? "bottom-open" : "bottom-closed"} ${legacyRibbonVisible ? "ribbon-visible" : "ribbon-hidden"}`} data-interface-mode={appSettings.interfaceMode} style={shellStyle}>
     <SchematicHost open={schematicOpen} snapshot={{ document: schematicView, linked: schematicLinked, boardName: schematicBinding?.boardName ?? "", selected: schematicSelected, busy: schematicBusy, status: schematicStatus }} onAction={handleSchematicAction} onError={error => { setStatus(`Schematic viewer: ${error}`); setSchematicOpen(false); }} />
     {workspaceViews.hosts}
     <WorkspaceHeader projectName={projectName} activeWorkspace={tab} workspaces={tabs} showWorkspaceBar={false} workspaceSwitcher={workspaceSwitcher}
@@ -6415,13 +6450,13 @@ export default function App() {
       utilities={<><HiddenToolsMenu items={[...toolRestoreItems,
         ...focusPanels.filter(panel=>panel.open&&panel.id!==activeFocusPanel(focusPanels,focusTool)?.id).map(panel=>({id:`focus:${panel.id}`,label:panel.title,restore:()=>setFocusTool(panel.id)})),
         ...(!appSettings.quickToolsVisible?[{id:"quick-tools",label:"Quick tools",restore:()=>setAppSettings(current=>({...current,quickToolsVisible:true}))}]:[]),
-      ]} onError={setStatus}/><label className="interface-mode-control" title="Switch interface layout without changing project or solver inputs"><PanelTop size={14}/><select aria-label="Interface layout" value={appSettings.interfaceMode} onChange={event=>setInterfaceMode(event.target.value as AppSettings["interfaceMode"])}><option value="clean">Clean</option><option value="classic">Classic</option></select></label><ViewportNotifications {...notificationProps} mode="button"/><button type="button" className="icon-btn" title="Help and user guide" onClick={()=>{setMenu(null);setHelpOpen(true);}}><CircleHelp size={17}/></button><button type="button" className="avatar" title={appSettings.profile.displayName} onClick={()=>{setMenu(null);setPreferencesOpen(true);}}>{appSettings.profile.initials}</button></>}/>
+      ]} onError={setStatus}/><ToolbarMenu label="Interface layout" icon={PanelTop} actions={[{label:"Clean",icon:PanelTop,checked:appSettings.interfaceMode==="clean",radio:true,run:()=>setInterfaceMode("clean")},{label:"Classic",icon:PanelTop,checked:appSettings.interfaceMode==="classic",radio:true,run:()=>setInterfaceMode("classic")}]}/><ViewportNotifications {...notificationProps} mode="button"/><button type="button" className="icon-btn" title="Help and user guide" onClick={()=>{setMenu(null);setHelpOpen(true);}}><CircleHelp size={17}/></button><button type="button" className="avatar" title={appSettings.profile.displayName} onClick={()=>{setMenu(null);setPreferencesOpen(true);}}>{appSettings.profile.initials}</button></>}/>
 
 
     {appSettings.interfaceMode==="classic"&&<><MenuBar open={menu!==null} onClose={()=>setMenu(null)}>{applicationMenus}</MenuBar><nav className="classic-workspace-tabs" aria-label="Workspaces">{tabs.map(item=><button type="button" key={item.name} aria-pressed={tab===item.name} onClick={()=>selectWorkspace(item.name)}><item.icon size={14}/><span>{item.name}</span></button>)}</nav></>}
     <>
 
-      {appSettings.ribbonVisible && <CommandStrip id="workspace-ribbon-tools" label="Ribbon" className={`ribbon-tools ribbon-${tab.toLowerCase().replace(/[^a-z]+/g, "-")}`} trailing={<div className="workspace-ribbon-tools">{workspaceSwitcher}        <div className={`ribbon-status ${workerAvailable ? "" : "preview"}`}><span className="status-dot" /> {workerHealth === "ready" ? "Desktop worker ready" : workerHealth === "starting" ? "Checking desktop worker" : workerHealth === "degraded" ? "Desktop worker unavailable" : "Preview only - desktop worker required"}<small>spike/v1</small></div></div>}>
+      {legacyRibbonVisible && <CommandStrip id="workspace-ribbon-tools" label="Ribbon" className={`ribbon-tools ribbon-${tab.toLowerCase().replace(/[^a-z]+/g, "-")}`} trailing={<div className="workspace-ribbon-tools">{workspaceSwitcher}        <div className={`ribbon-status ${workerAvailable ? "" : "preview"}`}><span className="status-dot" /> {workerHealth === "ready" ? "Desktop worker ready" : workerHealth === "starting" ? "Checking desktop worker" : workerHealth === "degraded" ? "Desktop worker unavailable" : "Preview only - desktop worker required"}<small>spike/v1</small></div></div>}>
         <BoardViewRibbon
           viewMode={viewMode}
           modelsVisible={showModels && resultVisualization.showComponentModels}
@@ -6465,11 +6500,15 @@ export default function App() {
 
 
 
-      <WorkspaceEditorTabs panels={focusPanels} activeId={focusTool} onActivate={setFocusTool}/>
+      {appSettings.interfaceMode === "clean" ? <div className="workspace-command-row" role="group" aria-label="Workspace tabs and viewport tools">
+        <WorkspaceEditorTabs panels={focusPanels} activeId={focusTool} onActivate={setFocusTool}/>
+        {workspaceViews.tabs}
+        <div className="workspace-viewport-tools" ref={setViewportToolbarHost}>{!workspaceViews.activeRenderer && mainViewportToolbar}{fieldControls}</div>
+      </div> : <WorkspaceEditorTabs panels={focusPanels} activeId={focusTool} onActivate={setFocusTool}/>}
       <section id="workspace-board-content" className="canvas-area">
         {workspaceRequestNotice?.version===workspaceIntentVersion&&<aside className="workspace-request-notice" aria-label="Applied workspace request"><div><strong>{workspaceRequestNotice.text}</strong><p>{workspaceRequestNotice.details}</p></div><button type="button" aria-label="Dismiss request summary" onClick={()=>setWorkspaceRequestNotice(null)}><X size={14}/></button></aside>}
 
-        <div className="workspace-view-topbar">{workspaceViews.tabs}{!workspaceViews.activeRenderer&&<CommandStrip className="canvas-toolbar" label="Viewport">{viewportEssentials}{appSettings.quickToolsVisible&&<ViewportQuickTools onHide={()=>setAppSettings(current=>({...current,quickToolsVisible:false}))} groups={viewportContextGroups} context={{workspace:tab,kind:clickedObject?.type,hasNet:smartContext.hasNet,hasResult:smartContext.resultScoped,hasBoard:Boolean(boardData),busy:universalRunning}} selectionLabel={clickedObject?.net ?? clickedObject?.ref ?? clickedObject?.name ?? (boardData?tab:"No design")} summary={smartContext.summary} onError={setStatus}/>}<button type="button" className="plain-btn" aria-expanded={commandMenuOpen&&lastCommandRoute.current==="Viewport tools"} aria-controls="focus-command-panel" onClick={event => {if(commandPanelDetached&&focusFloatingPanel("command-menu"))return;const workspace=event.currentTarget.closest(".workspace");if(workspace)setCommandMenuTop(Math.max(8,event.currentTarget.getBoundingClientRect().bottom-workspace.getBoundingClientRect().top+4));setMenu(current=>current==="Viewport tools"?null:"Viewport tools");}}><SlidersHorizontal size={14} /> View</button></CommandStrip>}</div>
+        {appSettings.interfaceMode === "classic" && <div className="workspace-view-topbar">{workspaceViews.tabs}{!workspaceViews.activeRenderer && mainViewportToolbar}{fieldControls}</div>}
 
         {(tab === "Mesh" || tab === "Solve") && <SimulationWorkspace compact={appSettings.interfaceMode==="clean"}
           tab={tab} domain={simulationDomain}
@@ -6495,8 +6534,8 @@ export default function App() {
               onStudy={machine_study => { markProjectDirty(); setEmiSetup(current => ({ ...current, machine_study })); }} />
           </div> : <>
 
-          {assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1 && <div ref={assemblyHandlingRef} className="assembly-handling-slot">
-            <AssemblyQuickBar compact={appSettings.interfaceMode==="clean"} boards={virtualBoardProjection.visuals} selectedId={selectedBoardInstanceId} visibility={assemblyBoardVisibility} expanded={assemblyHandlingExpanded}
+          {appSettings.interfaceMode === "classic" && assemblyIr && assemblyDesigns && assemblyIr.boards.length > 1 && <div ref={assemblyHandlingRef} className="assembly-handling-slot">
+            <AssemblyQuickBar compact={false} boards={virtualBoardProjection.visuals} selectedId={selectedBoardInstanceId} visibility={assemblyBoardVisibility} expanded={assemblyHandlingExpanded}
               onSelect={id => { const visual = virtualBoardProjection.visuals.find(board => board.id === id); if (visual) handleBoardInstanceSelect(visual); }}
               onVisibility={(id, value) => { recordChange(); setAssemblyBoardVisibility(current => ({ ...current, [id]: value })); }}
               moveMode={assemblyMoveMode} onMoveMode={selectAssemblyMoveMode}
@@ -6506,6 +6545,8 @@ export default function App() {
           {scriptViewport && <div className="main-script-result-surface"><Suspense fallback={<div role="status">Loading simulation results…</div>}><ScriptResultViewport views={scriptViewport.views} runLabel={scriptViewport.label} onClose={() => setScriptViewport(null)}/></Suspense></div>}
           {!scriptViewport && ["PI", "Results"].includes(tab) && <PiQuickTuneBar setup={piSetup} scope={viewportPiScope} occurrenceId={virtualBoardProjection.visuals.length > 1 ? piAnalysisOccurrenceId : ""} available={workerAvailable && Boolean(boardData) && !solverSelections.extension_pi && analysisMode === "DC IR Drop" && analysisSetupWorkflow === "single" && !dcRunOpen && (!selectedPiOccurrence || selectedPiOccurrence.designId === activeDesignId) && (virtualBoardProjection.visuals.length <= 1 || Boolean(selectedPiOccurrence))} busy={analysisRunning || Boolean(viewportPiRun)} onHandler={bindViewportPiTune} onChange={next => { markProjectDirty(); setPiSetup(next); setResultDisplay("none"); setResultVisualization(current => ({ ...current, visible: false })); setStatus("PI current changed; displayed results require a rerun."); }} onRun={runViewportPi} onStatus={setStatus}/>}
           {!scriptViewport && <BoardViewport
+            fieldVolume={fieldViewport.view?.visible ? fieldViewport.view : null}
+            onFieldError={setStatus}
             onNetTune={event => viewportPiTuneHandler.current?.(event) ?? false}
             qualityTarget={viewportQualityHost}
             onEmiScene={tab === "EM" ? handleEmiScene : undefined}
@@ -6720,13 +6761,8 @@ export default function App() {
     </Suspense>
 
 
-    {unsavedPrompt && <div className="modal-backdrop unsaved-project-backdrop" role="presentation">
-      <section className="modal unsaved-project-dialog" role="alertdialog" aria-modal="true" aria-labelledby="unsaved-project-title" aria-describedby="unsaved-project-description">
-        <header><div><small>UNSAVED PROJECT</small><h2 id="unsaved-project-title">Save changes before you {unsavedPrompt.actionLabel}?</h2></div><AlertTriangle size={22} /></header>
-        <div className="unsaved-project-content"><p id="unsaved-project-description">Changes to <b>{projectName}</b> have not been saved. Saving writes the current project package before continuing.</p><small>Cancel keeps the project open. Discard continues without saving these changes.</small></div>
-        <footer><button className="secondary-btn" onClick={() => void resolveUnsavedPrompt("cancel")}>Cancel</button><button className="danger-btn" onClick={() => void resolveUnsavedPrompt("discard")}>Discard changes</button><button className="run-btn" autoFocus onClick={() => void resolveUnsavedPrompt("save")}><Save size={14} /> Save and continue</button></footer>
-      </section>
-    </div>}
+    {assemblyCloseBlocked && <DesktopCloseDraftDialog owner={assemblyCloseBlocked} onCancel={() => setAssemblyCloseBlocked(null)} onReview={async () => { await restoreAssemblyTool(assemblyCloseBlocked); return true; }} />}
+    {unsavedPrompt && <UnsavedProjectDialog prompt={unsavedPrompt} projectName={projectName} onResolve={resolveUnsavedPrompt} />}
     {projectUpgradeOffer && !unsavedPrompt && <ProjectUpgradeDialog fileName={projectUpgradeOffer.fileName} sourceFormat={projectUpgradeOffer.sourceFormat} onUpgrade={upgradeProjectNow} onLater={() => setProjectUpgradeOffer(null)} />}
     <input ref={projectInputRef} className="hidden-input" type="file" accept=".spike,.spike.json,.spike-results.json,.json" onChange={loadProject} />
     <input ref={browserBoardInputRef} className="hidden-input" type="file" accept=".kicad_pcb,.spike-design.json" onChange={importBoard} />
@@ -6759,6 +6795,21 @@ export default function App() {
 
 
     {viewportContext && <ViewportActionMenu x={viewportContext.clientX} y={viewportContext.clientY} title={viewportContext.object?.name ?? "Viewport"} summary={smartContext.summary} groups={viewportContextGroups} essentialTools={viewportEssentials} onClose={() => setViewportContext(null)} />}
+  </div>;
+}
+
+function UnsavedProjectDialog({ prompt, projectName, onResolve }: {
+  prompt: { actionLabel: string };
+  projectName: string;
+  onResolve: (choice: "save" | "discard" | "cancel") => Promise<void>;
+}) {
+  const modal = useModalFocusScope(() => void onResolve("cancel"));
+  return <div className="modal-backdrop unsaved-project-backdrop" role="presentation">
+    <section ref={modal.scopeRef} onKeyDown={modal.onKeyDown} className="modal unsaved-project-dialog" role="alertdialog" aria-modal="true" aria-labelledby="unsaved-project-title" aria-describedby="unsaved-project-description">
+      <header><div><small>UNSAVED PROJECT</small><h2 id="unsaved-project-title">Save changes before you {prompt.actionLabel}?</h2></div><AlertTriangle size={22} /></header>
+      <div className="unsaved-project-content"><p id="unsaved-project-description">Changes to <b>{projectName}</b> have not been saved. Saving writes the current project package before continuing.</p><small>Cancel keeps the project open. Discard continues without saving these changes.</small></div>
+      <footer><button className="secondary-btn" data-modal-initial-focus onClick={() => void onResolve("cancel")}>Cancel</button><button className="danger-btn" onClick={() => void onResolve("discard")}>Discard changes</button><button className="run-btn" onClick={() => void onResolve("save")}><Save size={14} /> Save and continue</button></footer>
+    </section>
   </div>;
 }
 
@@ -6940,7 +6991,7 @@ function BoardInstanceInspector({ board, onClear }: { board: VirtualBoardVisual;
     ["Scene detail", "Retained geometry with available KiCad models; missing models use placeholders"],
     ["Physics status", "Placement visual only; no cross-board PI/SI coupling is inferred"],
   ];
-  return <div className="inspector"><div className="selection-badge"><span className="status-dot" /> BOARD<button onClick={onClear} title="Clear board selection"><X size={14} /></button></div><h3>{board.name}</h3><MetadataSection title="ASSEMBLY BOARD" rows={rows} /></div>;
+  return <div className="inspector"><div className="selection-badge"><span className="status-dot" /> BOARD<button onClick={onClear} title="Clear board selection"><X size={14} /></button></div><h3>{board.name}</h3><MetadataSection title="ASSEMBLY BOARD" rows={rows} /><section className="inspector-guidance" aria-label="Board placement guidance"><h4>Board placement</h4><p>Open Assembly actions for move, rotation, numeric angles, and hole or edge alignment. Display explosion keeps physical placement unchanged.</p></section></div>;
 }
 
 function StackupManager({ stackup, onClose }: { stackup: ParsedStackupLayer[]; onClose: () => void }) {

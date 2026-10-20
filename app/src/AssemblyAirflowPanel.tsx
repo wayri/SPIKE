@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { cancelLocalWorker, runNativeProjectWorker, type WorkerResponse } from "./workerBridge";
 import { runSerializedAutomaticWorker } from "./automaticWorkerQueue";
 import type { FieldObject } from "./assemblyFieldStudyPresentation";
+import { showFieldInMainViewport } from "./mainFieldViewport";
+import { assemblyAirflowFieldVolume } from "./fieldVolumeAdapters";
 import "./buttonStandard.css";
 import "./AssemblyAirflowPanel.css";
 
@@ -48,6 +50,7 @@ export function AirflowFieldView({ result }: { result: FieldObject }) {
   const [slice, setSlice] = useState(false);
   const [position, setPosition] = useState(50);
   const [yaw, setYaw] = useState(35);
+  const volume = useMemo(() => assemblyAirflowFieldVolume(result), [result]);
   const source = result.fields?.[field];
   const all = (source?.samples || []).filter((s: FieldObject) => Array.isArray(s.point_mm) && s.point_mm.length === 3
     && s.point_mm.every(Number.isFinite) && (Array.isArray(s.value) ? s.value.length === 3 && s.value.every(Number.isFinite) : Number.isFinite(s.value)));
@@ -68,6 +71,7 @@ export function AirflowFieldView({ result }: { result: FieldObject }) {
   const projected = rows.map(project);
   const extent = projected.reduce((r: number[], p: number[]) => [Math.min(r[0], p[0]), Math.max(r[1], p[0]), Math.min(r[2], p[1]), Math.max(r[3], p[1])], [Infinity, -Infinity, Infinity, -Infinity]);
   return <section className="assembly-airflow-fields" aria-label="Computed airflow fields">
+    {volume && <button type="button" onClick={() => showFieldInMainViewport(volume)}>Show fields in main viewport</button>}
     <div className="assembly-airflow-toolbar"><label>Field <select value={field} onChange={e => setField(e.target.value)}><option value="temperature_k">Temperature (K)</option><option value="velocity_m_s">Speed (m/s)</option></select></label>
       <label>View <select value={plane} onChange={e => setPlane(e.target.value)}>{["xy", "xz", "yz", "3d"].map(p => <option key={p}>{p}</option>)}</select></label>
       <label>Region <select value={region} onChange={e => setRegion(e.target.value)}><option value="all">All regions</option>{Array.from(new Set<string>(all.map((s: FieldObject) => s.region))).map(r => <option key={r}>{r}</option>)}</select></label>

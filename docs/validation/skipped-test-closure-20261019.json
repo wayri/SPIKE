@@ -1,0 +1,113 @@
+{
+  "format": "spike/skip-closure-audit/v1",
+  "date_local": "2026-10-19",
+  "release_qualified": false,
+  "all_solver_qualified": false,
+  "gates_weakened": false,
+  "source_snapshot": "build/qualification-20261019-frozen-source",
+  "original_baseline": {
+      "path": "local-only:acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log",
+    "sha256": "a823b67ab2325ba961cd94d074e078d7033184590ac0a8e791838ab8a5620c96",
+    "skip_records": 69,
+    "passing_reexecuted_records": 66,
+    "failed_class_records": 1,
+    "owner_deferred_records": 2
+  },
+  "final_profile_coverage": {
+    "distinct_passing_skip_records": 73,
+    "distinct_passing_test_cases": 86,
+    "additional_records_beyond_original_baseline": 7,
+    "latest_run_non_deferred_skip_records_covered": 54,
+    "all_profiles_have_zero_failure_categories": true,
+    "all_profiles_have_equal_before_after_inputs_runtime_artifacts": true
+  },
+  "profiles": [
+    {
+      "path": "build/qualification-20261019-native/frozen-native-003.json",
+      "sha256": "98a921fae02e76a161e37b61b4ba58fc2a4523d60921380105b3d741c4cf15e9",
+      "records": 31,
+      "tests": 31
+    },
+    {
+      "path": "build/qualification-20261019-native/frozen-extra-firmware-001.json",
+      "sha256": "3db9d6488612294dd8e20daae9817e623fdf5b74ee42aae3b0e3a1f192d8093a",
+      "records": 7,
+      "tests": 7
+    },
+    {
+      "path": "build/qualification-20261019-optional/frozen-occ-em-004.json",
+      "sha256": "e4a60a22d2ea5b6e6987d343ff92de4df688ff0648486131e42345da07489d8b",
+      "records": 27,
+      "tests": 27
+    },
+    {
+      "path": "build/qualification-20261019-optional/frozen-reference-solvers-004.json",
+      "sha256": "e02c3d5582c5b076f18317b1b9a50a7aa0402014509c8d141d3d29075e26552d",
+      "records": 3,
+      "tests": 3
+    },
+    {
+      "path": "build/qualification-20261019-optional/frozen-linux-symlink-004.json",
+      "sha256": "2077c1a46881839d642949543b3bc01d276de0f78b49113ce393dce8dda97a4b",
+      "records": 1,
+      "tests": 1
+    },
+    {
+      "path": "build/qualification-20261019-native/frozen-extra-pwm-smooth-002.json",
+      "sha256": "ef038953bd024a8019197ee74a011bab03a0bd2c7e1f586da12bd7870f19bf4c",
+      "records": 4,
+      "tests": 17
+    }
+  ],
+  "owner_deferred": [
+    {
+      "test": "tests.python.test_compute_acceleration.ComputeAccelerationTests.test_real_cuda_solver_matches_original_real_and_complex_systems",
+      "reason": "Owner: keep CUDA blocked until NVIDIA hardware is available.",
+      "qualified": false
+    },
+    {
+      "test": "tests.python.test_xyce_extension.XyceAdapterTests.test_actual_xyce_independent_divider",
+      "reason": "Owner: skip Xyce for now. Downloaded XyceNF was not executed.",
+      "qualified": false
+    }
+  ],
+  "remaining_numerical_failures": [
+    "tests.python.test_kicad_fixture.KicadFixtureTests.test_hybrid_net_runs_through_native_peec",
+    "tests.python.test_kicad_fixture.KicadFixtureTests.test_routed_dc_mesh_convergence_signs_off"
+  ],
+  "last_broad_live_run": {
+    "path": "build/qualification-20261019-optional/full-python-suite-final-v2.log",
+    "sha256": "f064ce2e0ac8f49e9405f04daca6bc333f67c118523a59002a4ff60acd4df2d5",
+    "tests": 4327,
+    "failures": 2,
+    "errors": 4,
+    "skips": 56,
+    "source_before_sha256": "5b3f5856f77b690cbad53cb809fe89d3cd289419af8dfa9cadfb6a342de50b52",
+    "source_after_sha256": "a89158835b8fb941b4495c94f079d633afa89fe33b088dc8e57f427b2d21d77a",
+    "coherent_source_qualified": false,
+    "four_receipt_errors_subsequently_fixed": true,
+    "post_repair_full_suite_pass_claimed": false
+  },
+  "importer_repair": {
+    "actual_live_cli_replays": 6,
+    "bound_runner_sources_stable": 34,
+    "prior_evidence_preserved": true,
+    "focused_odb_source_corpus_tests_passed": 68,
+    "focused_tracking_pisi_tests_passed": 43,
+    "logs": "build/import-refresh-20261019-live"
+  },
+  "development_package": {
+    "sha256": "30bd84715dcadabb9228d9d190bca2d57bdeef564111421c78ac852ab4135f11",
+    "manifested_files": 726,
+    "isolated_smoke": "passed",
+    "retained_original_unchanged": true,
+    "rebuilt_all_native_from_current_source": false,
+    "production_qualified": false,
+    "public_gate": "BLOCKED_EXTERNAL"
+  },
+  "required_remaining": [
+    "Repair and qualify EBrake copper support/passivity and physical current-density convergence.",
+    "Run coherent full-suite qualification after the mathematical repairs.",
+    "Complete current-source platform artifacts, dependency/human review, clean-machine qualification, auditable CI and applicable release signing."
+  ]
+}

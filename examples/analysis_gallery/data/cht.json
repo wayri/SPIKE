@@ -1,0 +1,248 @@
+{
+  "domain": "cht",
+  "limitations": [
+    "Fully developed plane channel only; no general enclosure, fan, buoyancy or turbulence.",
+    "Constant properties; no radiation or transient flow; first-order upwind thermal advection.",
+    "Not integrated with desktop geometry or private distributed runtime; no measured qualification."
+  ],
+  "metrics": {
+    "energy_residual_w": -5.350234144607668e-13,
+    "flow_m3_s": 9.194958847736628e-06,
+    "maximum_temperature_k": 305.88774029689466,
+    "minimum_temperature_k": 300.031748277358,
+    "reynolds": 61.72839506172839,
+    "thermal_relative_residual": 1.5521928782417868e-13
+  },
+  "model_status": "bounded_laminar_channel_reference",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "830e0626efc22a07a8135bbfb5c9ab286c4c5e46edee4e106ca5b8625650a7fe",
+    "result_sha256": "50e8e4331765a2e52fd117976492f9d9d2463b54988e36f1796ac489121e686e",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "examples/thermal/laminar_channel_cht_request.json",
+        "sha256": "8de527ebde1e156002d7136e14229eb3df69dfa7c06eb2281f1271f9cca9c6ff"
+      },
+      {
+        "path": "scripts/run_structured_solid_thermal.py",
+        "sha256": "c14e2230e9275887fb734300b0eb43de046bc89a79384b3d157031a3792295c2"
+      },
+      {
+        "path": "python/spike_core/laminar_channel_cht.py",
+        "sha256": "a7349180ca2763790c25acc7adc265440a9690866151035b44130764eca2745d"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "fluid_mean_temperature_k": 300.4358425204401,
+      "lower_wall_mean_temperature_k": 303.0679735387193,
+      "upper_wall_mean_temperature_k": 300.5676982527784,
+      "x_m": 0.0015625
+    },
+    {
+      "fluid_mean_temperature_k": 300.6551462009632,
+      "lower_wall_mean_temperature_k": 303.1424079308852,
+      "upper_wall_mean_temperature_k": 300.58287850581047,
+      "x_m": 0.004687500000000001
+    },
+    {
+      "fluid_mean_temperature_k": 300.81596289646063,
+      "lower_wall_mean_temperature_k": 303.2414817193128,
+      "upper_wall_mean_temperature_k": 300.60692551905873,
+      "x_m": 0.0078125
+    },
+    {
+      "fluid_mean_temperature_k": 300.95650358988775,
+      "lower_wall_mean_temperature_k": 303.35272291675034,
+      "upper_wall_mean_temperature_k": 300.63809204136436,
+      "x_m": 0.010937500000000001
+    },
+    {
+      "fluid_mean_temperature_k": 301.0870996781905,
+      "lower_wall_mean_temperature_k": 303.47064922708927,
+      "upper_wall_mean_temperature_k": 300.67541157594,
+      "x_m": 0.0140625
+    },
+    {
+      "fluid_mean_temperature_k": 301.21177982673674,
+      "lower_wall_mean_temperature_k": 303.5922328333797,
+      "upper_wall_mean_temperature_k": 300.7181415298674,
+      "x_m": 0.0171875
+    },
+    {
+      "fluid_mean_temperature_k": 301.3324082196057,
+      "lower_wall_mean_temperature_k": 303.7156052120477,
+      "upper_wall_mean_temperature_k": 300.76562252814466,
+      "x_m": 0.0203125
+    },
+    {
+      "fluid_mean_temperature_k": 301.44994573024206,
+      "lower_wall_mean_temperature_k": 303.83953009677873,
+      "upper_wall_mean_temperature_k": 300.81723652557196,
+      "x_m": 0.0234375
+    },
+    {
+      "fluid_mean_temperature_k": 301.5649317266969,
+      "lower_wall_mean_temperature_k": 303.9631466863156,
+      "upper_wall_mean_temperature_k": 300.87239573299536,
+      "x_m": 0.026562500000000003
+    },
+    {
+      "fluid_mean_temperature_k": 301.6776901815441,
+      "lower_wall_mean_temperature_k": 304.0858296676959,
+      "upper_wall_mean_temperature_k": 300.93054087136835,
+      "x_m": 0.029687500000000002
+    },
+    {
+      "fluid_mean_temperature_k": 301.78842401760267,
+      "lower_wall_mean_temperature_k": 304.20710648377377,
+      "upper_wall_mean_temperature_k": 300.99114118011795,
+      "x_m": 0.0328125
+    },
+    {
+      "fluid_mean_temperature_k": 301.89726055116125,
+      "lower_wall_mean_temperature_k": 304.32660522592124,
+      "upper_wall_mean_temperature_k": 301.0536937234668,
+      "x_m": 0.035937500000000004
+    },
+    {
+      "fluid_mean_temperature_k": 302.00427446977733,
+      "lower_wall_mean_temperature_k": 304.44402002834255,
+      "upper_wall_mean_temperature_k": 301.11772148970186,
+      "x_m": 0.0390625
+    },
+    {
+      "fluid_mean_temperature_k": 302.1095000747851,
+      "lower_wall_mean_temperature_k": 304.559086989203,
+      "upper_wall_mean_temperature_k": 301.1827704557891,
+      "x_m": 0.0421875
+    },
+    {
+      "fluid_mean_temperature_k": 302.2129381670522,
+      "lower_wall_mean_temperature_k": 304.6715666786292,
+      "upper_wall_mean_temperature_k": 301.2484059529122,
+      "x_m": 0.045312500000000006
+    },
+    {
+      "fluid_mean_temperature_k": 302.314560100661,
+      "lower_wall_mean_temperature_k": 304.7812308898424,
+      "upper_wall_mean_temperature_k": 301.3142086417534,
+      "x_m": 0.0484375
+    },
+    {
+      "fluid_mean_temperature_k": 302.41431021544093,
+      "lower_wall_mean_temperature_k": 304.8878521744471,
+      "upper_wall_mean_temperature_k": 301.37977032607637,
+      "x_m": 0.051562500000000004
+    },
+    {
+      "fluid_mean_temperature_k": 302.5121072439039,
+      "lower_wall_mean_temperature_k": 304.99119521526984,
+      "upper_wall_mean_temperature_k": 301.4446897523682,
+      "x_m": 0.0546875
+    },
+    {
+      "fluid_mean_temperature_k": 302.60784499498635,
+      "lower_wall_mean_temperature_k": 305.0910093979838,
+      "upper_wall_mean_temperature_k": 301.5085684786568,
+      "x_m": 0.0578125
+    },
+    {
+      "fluid_mean_temperature_k": 302.7013924742,
+      "lower_wall_mean_temperature_k": 305.1870221331713,
+      "upper_wall_mean_temperature_k": 301.5710068493782,
+      "x_m": 0.060937500000000006
+    },
+    {
+      "fluid_mean_temperature_k": 302.7925935277375,
+      "lower_wall_mean_temperature_k": 305.27893260096954,
+      "upper_wall_mean_temperature_k": 301.6316000823201,
+      "x_m": 0.06406250000000001
+    },
+    {
+      "fluid_mean_temperature_k": 302.88126605964607,
+      "lower_wall_mean_temperature_k": 305.3664056677698,
+      "upper_wall_mean_temperature_k": 301.6899344544024,
+      "x_m": 0.0671875
+    },
+    {
+      "fluid_mean_temperature_k": 302.9672008489052,
+      "lower_wall_mean_temperature_k": 305.44906577425314,
+      "upper_wall_mean_temperature_k": 301.74558356174435,
+      "x_m": 0.0703125
+    },
+    {
+      "fluid_mean_temperature_k": 303.0501599788559,
+      "lower_wall_mean_temperature_k": 305.52649062576717,
+      "upper_wall_mean_temperature_k": 301.7981046234999,
+      "x_m": 0.0734375
+    },
+    {
+      "fluid_mean_temperature_k": 303.12987488086435,
+      "lower_wall_mean_temperature_k": 305.59820453548326,
+      "upper_wall_mean_temperature_k": 301.8470347962855,
+      "x_m": 0.0765625
+    },
+    {
+      "fluid_mean_temperature_k": 303.20604398413235,
+      "lower_wall_mean_temperature_k": 305.66367128153826,
+      "upper_wall_mean_temperature_k": 301.8918874653872,
+      "x_m": 0.07968750000000001
+    },
+    {
+      "fluid_mean_temperature_k": 303.278329940112,
+      "lower_wall_mean_temperature_k": 305.72228634386835,
+      "upper_wall_mean_temperature_k": 301.93214847952737,
+      "x_m": 0.08281250000000001
+    },
+    {
+      "fluid_mean_temperature_k": 303.3463562165743,
+      "lower_wall_mean_temperature_k": 305.77336838698864,
+      "upper_wall_mean_temperature_k": 301.9672722977391,
+      "x_m": 0.0859375
+    },
+    {
+      "fluid_mean_temperature_k": 303.40970112888175,
+      "lower_wall_mean_temperature_k": 305.8161498616828,
+      "upper_wall_mean_temperature_k": 301.99667802541956,
+      "x_m": 0.0890625
+    },
+    {
+      "fluid_mean_temperature_k": 303.4678696064877,
+      "lower_wall_mean_temperature_k": 305.84976670371094,
+      "upper_wall_mean_temperature_k": 302.0197453895491,
+      "x_m": 0.0921875
+    },
+    {
+      "fluid_mean_temperature_k": 303.5200399653998,
+      "lower_wall_mean_temperature_k": 305.87324821629994,
+      "upper_wall_mean_temperature_k": 302.0358114054998,
+      "x_m": 0.09531250000000001
+    },
+    {
+      "fluid_mean_temperature_k": 303.5625029217399,
+      "lower_wall_mean_temperature_k": 305.88551890079333,
+      "upper_wall_mean_temperature_k": 302.0441750946746,
+      "x_m": 0.09843750000000001
+    }
+  ],
+  "title": "Bounded conjugate laminar channel",
+  "units": {
+    "temperature": "K",
+    "velocity": "m/s",
+    "x_m": "m"
+  }
+}

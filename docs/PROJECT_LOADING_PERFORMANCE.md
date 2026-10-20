@@ -40,7 +40,8 @@ project/parser and architecture checks passed. The exact ESP32 canonical IR was
 also restored in the frontend and compared with an independent Node zlib decode.
 The broad Python discovery run was interrupted before completion during resource
 pressure; its partial log is not a full-suite pass. Machine-specific detailed
-results are in `output/project-loading-*`.
+results are unbundled local records named `project-loading-*`; see the
+[release evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
 
 Mesh/Solve layout no longer imposes a 180-pixel setup-panel cap. Controls use their
 natural height, summary cards stack below a 600-pixel canvas width, and constrained

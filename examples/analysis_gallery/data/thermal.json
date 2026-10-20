@@ -1,0 +1,144 @@
+{
+  "domain": "thermal",
+  "limitations": [
+    "Caller-supplied volumes; CAD/source and stack digest authenticity not verified.",
+    "Separate occurrence nodes; no implicit welding or thermal/electrical bonds.",
+    "Bounded floating-point intersection tests are not exact CAD certification.",
+    "Prescribed ambient radiation only; no automatic airflow, enclosure radiosity, transient or full-wave execution."
+  ],
+  "metrics": {
+    "heat_balance_acceptance_tolerance_w": 1.600639488462186e-06,
+    "heat_balance_imbalance_w": -1.7053025658242404e-13,
+    "maximum_temperature_k": 400.0,
+    "minimum_temperature_k": 300.0
+  },
+  "model_status": "experimental",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "4ad0833c0e79800f2df5d3412de07e55a9c503dd2f123132ad6ede59f321972d",
+    "result_sha256": "3e1c8bc96336b27e95b07a39ce5d417cefe45b90da8a165d0bb0667b18505e14",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "examples/assembly_field/run_examples.py",
+        "sha256": "8bad990369d674c0fbdffd5033300319b740fb7a4824938caa384594141769a2"
+      },
+      {
+        "path": "python/spike_core/assembly_field_thermal.py",
+        "sha256": "cd2e5236dcd29697276d818ad2ee3be750841f20f72cf54de283545a6d4dd66e"
+      },
+      {
+        "path": "python/spike_core/assembly_tetra_thermal.py",
+        "sha256": "080af44da4775116163483f80de1ede3054ed99ea9ff6a4f0ff5f647bc1a4fc2"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "occurrence_id": "board",
+      "temperature_k": 300.0,
+      "x_m": 0.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 300.0,
+      "x_m": 0.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 300.0,
+      "x_m": 0.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 300.0,
+      "x_m": 0.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 340.0000000000001,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 340.0,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 340.0,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 340.0,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "board",
+      "temperature_k": 320.00000000000006,
+      "x_m": 0.5
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 360.00000000000017,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 360.00000000000006,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 360.00000000000006,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 360.0,
+      "x_m": 1.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 400.0,
+      "x_m": 2.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 400.0,
+      "x_m": 2.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 400.0,
+      "x_m": 2.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 400.0,
+      "x_m": 2.0
+    },
+    {
+      "occurrence_id": "case",
+      "temperature_k": 380.00000000000006,
+      "x_m": 1.5
+    }
+  ],
+  "title": "Two-solid steady P1 conduction",
+  "units": {
+    "temperature_k": "K",
+    "x_m": "m"
+  }
+}

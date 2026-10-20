@@ -31,7 +31,7 @@ const api = module.exports;
 
 const boardScope = { kind: "board-occurrence", occurrenceId: "occ-A", designId: "design-A" };
 const partScope = { kind: "assembly-part", partId: "case-lid" };
-const target = { id: "occ-A", designId: "design-A", name: "Power board", active: true, widthMm: 20, heightMm: 10, localCenterMm: [10, 5, 0], transform: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] };
+const target = { id: "occ-A", designId: "design-A", name: "Power board", active: false, widthMm: 20, heightMm: 10, localCenterMm: [10, 5, 0], transform: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] };
 const snapshot = (id, scope, projectSession = "project-1", revision = "state-1") => ({
   viewId: id, projectSession, revision, viewportRevision: "viewport-1",
   descriptor: { id, title: id, scope, viewMode: "3D", detached: true }, valid: true,
@@ -105,6 +105,8 @@ const scopeOptions = {
 const boardDescriptor = snapshot("board-view", boardScope).descriptor;
 const scopedBoard = hookModule.exports.deriveWorkspaceViewScope(scopeOptions, boardDescriptor);
 assert.deepEqual(Object.keys(scopedBoard.viewport.boards), ["design-A"]); assert.deepEqual(scopedBoard.targetBoards.map(item => item.id), ["occ-A"]);
+assert.equal(scopedBoard.targetBoards[0].active, true, "a fixed board view uses the primary scene instead of rendering a duplicate assembly occurrence");
+assert.equal(target.active, false, "scope projection does not mutate the assembly occurrence");
 assert.deepEqual(Object.keys(scopedBoard.layerVisibility), ["occ-A"]); assert.deepEqual(Object.keys(scopedBoard.linkedNets), ["occ-A::GND"]);
 const partDescriptor = snapshot("part-view", partScope).descriptor;
 const scopedPart = hookModule.exports.deriveWorkspaceViewScope(scopeOptions, partDescriptor);

@@ -2,8 +2,7 @@
 /* Both layouts share mounted editors and the same responsive tool deck. */
 .interface-mode-control{display:flex;align-items:center;gap:4px;min-width:0;color:var(--spike-table-muted)}
 .interface-mode-control select{font:var(--spike-control-font);width:80px;min-width:0;max-width:90px;min-height:26px;padding:3px 5px}
-.app-shell.focus-shell.ribbon-visible{grid-template-rows:var(--ui-title-height,40px) auto minmax(0,1fr) 28px!important}
-.app-shell.focus-shell.ribbon-visible>.ribbon-tools{display:flex;min-width:0;max-height:112px;overflow:hidden;align-items:stretch}
+.app-shell.focus-shell.interface-classic.ribbon-visible>.ribbon-tools{display:flex;min-width:0;max-height:112px;overflow:hidden;align-items:stretch}
 .app-shell.focus-shell.interface-classic{grid-template-rows:var(--ui-title-height,40px) 28px 32px minmax(0,1fr) 28px!important}
 .app-shell.focus-shell.interface-classic.ribbon-visible{grid-template-rows:var(--ui-title-height,40px) 28px 32px auto minmax(0,1fr) 28px!important}
 .app-shell.focus-shell.interface-classic>.application-menu-bar{display:flex;min-width:0;height:28px;gap:2px;padding-inline:8px;border-bottom:1px solid var(--spike-table-border);background:var(--spike-table-toolbar)}

@@ -85,3 +85,13 @@ docs/_build/
 /.codex_emide_stage/
 /ccd_tracker.json
 /model-collections/*.spkindex
+
+# Local run state, installed model caches and separately generated source exports.
+# Keep canonical solver code and original fixtures in their source directories.
+/output/
+/SPIKES-Independent/
+/model-collections/
+/examples/upstream-emerge/source/
+/.vite/
+/em_help_staging/
+**/fltk.org/fltk.prefs

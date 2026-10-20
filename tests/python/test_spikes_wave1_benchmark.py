@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -14,7 +15,10 @@ from python.spikes.wave1_benchmark import (
 
 
 ROOT = Path(__file__).resolve().parents[2]
-LIBRARY = ROOT / "build-spikes-hybrid" / "spikes_c_api.dll"
+LIBRARY = Path(os.environ.get(
+    "SPIKES_TEST_NATIVE_LIBRARY",
+    str(ROOT / "build-spikes-hybrid" / "spikes_c_api.dll"),
+))
 
 
 class Wave1BenchmarkTests(unittest.TestCase):

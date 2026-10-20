@@ -19,7 +19,10 @@ find_package(OpenMP REQUIRED)
 set(SPIKES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine/src/spikes")
 
 add_library(spikes_core STATIC
+    ${SPIKES_SOURCE_DIR}/smps_stability.cpp
     ${SPIKES_SOURCE_DIR}/dc_solver.cpp
+    ${SPIKES_SOURCE_DIR}/io_pad.cpp
+    ${SPIKES_SOURCE_DIR}/io_pad_events.cpp
     ${SPIKES_SOURCE_DIR}/osdi_device.cpp
     ${SPIKES_SOURCE_DIR}/transient_solver.cpp
     ${SPIKES_SOURCE_DIR}/transient_session.cpp
@@ -31,6 +34,17 @@ set_target_properties(spikes_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(spikes_c_api SHARED ${SPIKES_SOURCE_DIR}/c_api.cpp)
 target_include_directories(spikes_c_api PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/engine/src")
 target_link_libraries(spikes_c_api PRIVATE spikes_core)
+
+if(BUILD_TESTING)
+    add_executable(test_spikes_io_pad tests/native/test_spikes_io_pad.cpp)
+    target_link_libraries(test_spikes_io_pad PRIVATE spikes_core)
+    if(MSVC)
+        target_compile_options(test_spikes_io_pad PRIVATE /UNDEBUG)
+    else()
+        target_compile_options(test_spikes_io_pad PRIVATE -UNDEBUG)
+    endif()
+    add_test(NAME test_spikes_io_pad COMMAND test_spikes_io_pad)
+endif()
 target_compile_definitions(spikes_c_api PUBLIC SPIKES_SHARED PRIVATE SPIKES_BUILDING_LIBRARY)
 
 add_library(spikes_dashboard STATIC ${SPIKES_SOURCE_DIR}/console_dashboard.cpp)

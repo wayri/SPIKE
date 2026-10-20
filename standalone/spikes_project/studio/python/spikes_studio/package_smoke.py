@@ -5,6 +5,11 @@ import time
 import traceback
 
 
+def worker_timed_out(worker_started,now):
+    """The spawned-worker budget excludes earlier, separately bounded fixtures."""
+    return worker_started is not None and now-worker_started>60
+
+
 def run(library,destination):
     import wx
     from .desktop import Studio
@@ -13,17 +18,20 @@ def run(library,destination):
     from .document import RC_DECK
     destination=Path(destination);destination.parent.mkdir(parents=True,exist_ok=True)
     app=wx.App(False);app.SetAssertMode(wx.APP_ASSERT_EXCEPTION)
-    frame=Studio(str(library));frame.Show();checks={};started=time.monotonic();job=None
+    frame=Studio(str(library));frame.Show();checks={};started=time.monotonic();job=None;worker_started=None
     def finish(error=None):
         if job and job.state=='running':job.stop()
-        destination.write_text(json.dumps({'passed':error is None,'checks':checks,'error':error,'platform':__import__('platform').platform(),'library':str(library)},indent=2)+'\n',encoding='utf-8')
+        now=time.monotonic()
+        destination.write_text(json.dumps({'passed':error is None,'checks':checks,'error':error,
+            'acceptance_elapsed_s':now-started,'worker_elapsed_s':None if worker_started is None else now-worker_started,
+            'worker_budget_s':60,'platform':__import__('platform').platform(),'library':str(library)},indent=2)+'\n',encoding='utf-8')
         frame.timer.Stop();frame.Destroy()
     def check(value,label):
         if not value:raise AssertionError(label)
         checks[label]=True
     def poll():
         try:
-            if time.monotonic()-started>60:raise TimeoutError('Packaged native worker exceeded 60 seconds')
+            if worker_timed_out(worker_started,time.monotonic()):raise TimeoutError('Packaged native worker exceeded 60 seconds')
             job.poll()
             if job.state=='running':wx.CallLater(100,poll);return
             if job.state!='completed':raise AssertionError('Spawned native transient failed: '+str(job.error))
@@ -37,9 +45,15 @@ def run(library,destination):
             finish()
         except Exception:finish(traceback.format_exc())
     def begin():
-        nonlocal job
+        nonlocal job,worker_started
         try:
             check(library.is_file(),'native engine bundled')
+            from .gpio_package_checks import verify as verify_gpio
+            verify_gpio(library,check)
+            from .peripheral_package_checks import verify as verify_peripheral
+            verify_peripheral(library,check)
+            from .gpio_package_checks import verify_ui as verify_gpio_ui
+            verify_gpio_ui(frame,check)
             if __import__('os').name=='nt':
                 from python.spikes.netlist import parse_netlist
                 from python.spikes.native_runner import run_native_project
@@ -59,6 +73,8 @@ def run(library,destination):
             actual={row['id'] for row in panel.visible}
             check(bool(expected) and actual==expected and len(actual)==len(panel.visible),
                   'catalog search works')
+            from .library_package_checks import verify as verify_library_packages
+            verify_library_packages(frame,library,check)
             from .part_form_checks import verify as verify_part_forms
             verify_part_forms(frame,check)
             from .controller_boards import records
@@ -70,9 +86,11 @@ def run(library,destination):
             check(manager.session is None and not manager.trust.GetValue(),'opening firmware manager never executes or grants trust')
             manager.close()
             hub=frame.manufacturer_hub
-            check(len(hub.products.catalog['records'])==108,'sourced manufacturer product catalog bundled separately from generic presets')
+            check(len(hub.products.catalog['records'])==208,'208 sourced manufacturer identities bundled separately from generic presets')
             hub.products.search.SetValue('AD620');hub.products.refresh()
             check(any(row['part_number']=='AD620' for row in hub.products.listing.rows),'manufacturer product search uses real product identities')
+            from .manufacturer_executable_package_checks import verify as verify_manufacturer_executables
+            verify_manufacturer_executables(library,check)
             from .ltspice_local_library import index_library,read_model_declaration
             import tempfile
             with tempfile.TemporaryDirectory() as folder:
@@ -91,6 +109,22 @@ def run(library,destination):
                     check(firmware.output_level('0',3),'packaged native firmware executes GPIO instructions')
                     firmware.uart_send(b'K');firmware.run_for(.01)
                     check(firmware.uart_read()==b'K','packaged native UARTE EasyDMA echo')
+                from .firmware_edge_transport import FirmwareEdgeTransport
+                with FirmwareSession(find_runtime(),image,'nordic-nrf52840-dk-pca10056-r3-0-2',trusted=True) as firmware:
+                    edges=FirmwareEdgeTransport(firmware,[('0',3)]).run_for_ns(1000)
+                    check(bool(edges) and all(e['time_ns']>0 for e in edges),
+                          'packaged timestamp collector records actual virtual GPIO changes')
+                from .firmware_sync_transport import FirmwareSyncTransport
+                image=image.with_name('nrf52840_gpio_only_echo.bin')
+                with FirmwareSession(find_runtime(),image,'nordic-nrf52840-dk-pca10056-r3-0-2',trusted=True) as firmware:
+                    sync=FirmwareSyncTransport(firmware,[('0',2),('0',3)])
+                    for level in (True,False):
+                        for _ in range(20):
+                            sync.set_inputs([('0',2,level)])
+                            sync.step()
+                        check(firmware.output_level('0',3)==level,
+                              'packaged instruction feedback observes input '+str(level))
+                    check(sync.time_ns==400,'packaged CPU advances exactly one instruction per feedback boundary')
             from .workflow_package_checks import verify as verify_workflow
             verify_workflow(frame,check)
             from .wiring_package_checks import verify as verify_wiring
@@ -107,6 +141,7 @@ def run(library,destination):
             check(len(preview.figure.axes)==2,'graphical model and analytical curve render')
             preview.Destroy()
             measured=RC_DECK.replace('.end','.meas tran startup_probe FIND V(out) AT=1m\n.end')
+            worker_started=time.monotonic()
             job=BatchRun(measured,str(library));wx.CallLater(100,poll)
         except Exception:finish(traceback.format_exc())
     wx.CallLater(400,begin);app.MainLoop()

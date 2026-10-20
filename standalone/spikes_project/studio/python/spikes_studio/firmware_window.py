@@ -9,8 +9,8 @@ from .firmware_image import TARGETS,inspect_image
 from .firmware_session import FirmwareSession,gpio_pin
 from .renode_process import find_runtime,runtime_digest
 LIMITS = (
-    "Functional Renode emulation only: not cycle accurate; no electrical, ADC, "
-    "SPI signal-integrity, RF, real-time, or HIL qualification. The emulator "
+    "Functional Renode instruction emulation; native electrical pads are generic/unqualified. "
+    "Timestamped mode captures software GPIO only, with held inputs—not cycle-accurate or qualified SI/PI, ADC, real-time or HIL. The emulator "
     "executes with your user permissions; process isolation is not a hostile-code sandbox."
 )
 _WINDOWS: "weakref.WeakKeyDictionary[wx.Window, FirmwareWindow]" = weakref.WeakKeyDictionary()
@@ -38,6 +38,7 @@ class FirmwareWindow(wx.Frame):
                          style=wx.DEFAULT_FRAME_STYLE | wx.FRAME_FLOAT_ON_PARENT)
         if owner.GetIcon().IsOk():self.SetIcon(owner.GetIcon())
         self.owner=owner;self.block=block;self.closed=False;self.busy=False;self.running=False
+        if hasattr(owner,'palette'):self.palette=owner.palette
         self.generation=0;self.session=None;self.inspected=None;self.approval=None;self.inputs={};self.pending=None
         self.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="spikes-firmware")
         self.records=[get_record(target_id) for target_id in TARGETS];self.target_ids=list(TARGETS)
@@ -83,6 +84,8 @@ class FirmwareWindow(wx.Frame):
         self.status=wx.StaticText(panel,label="Stopped - inspect an image to begin")
         actions.Add(self.status, 1, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 7)
         outer.Add(actions, 0, wx.EXPAND | wx.LEFT | wx.RIGHT, 4)
+        from .firmware_pin_workflow import build
+        build(self,panel,outer)
         self.gpio=wx.grid.Grid(panel);self.gpio.CreateGrid(0,5)
         for col, (label, width) in enumerate((("Physical pin", 230), ("MCU GPIO", 90),
                                                ("Firmware mode", 120), ("Sampled level", 105),
@@ -117,6 +120,8 @@ class FirmwareWindow(wx.Frame):
         return self.target_ids[self.target.GetSelection()]
     def select_block(self, block):
         target=_target_from_block(block);self.block=block
+        from .firmware_pin_workflow import MODES
+        self.coupling_mode.SetSelection(MODES.index(block.get('firmware_coupling_mode','legacy')))
         self.target.SetSelection(self.target_ids.index(target));self._configuration_changed()
     def attachment_context(self):
         """Return explicit data for a later circuit-coupling confirmation flow."""
@@ -388,6 +393,8 @@ class FirmwareWindow(wx.Frame):
             pass
     def _reflect(self):
         active = self.session is not None
+        editable=not self.busy and self.block is not None and not getattr(self.owner,'job_running',False)
+        self.pad_properties_button.Enable(editable);self.coupling_mode.Enable(editable)
         for row in range(self.gpio.GetNumberRows()):
             self.gpio.SetReadOnly(row, 4, not active or self.busy)
         self.inspect_button.Enable(not self.busy)

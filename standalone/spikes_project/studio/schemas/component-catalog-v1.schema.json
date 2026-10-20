@@ -145,6 +145,62 @@
           "additionalProperties": false
         }
       }
+    },
+    "packagedResistor3": {
+      "properties": {
+        "id": {"const": "physics.packaged.resistor3"}, "family": {"const": "packaged_resistor3"}, "builder_kind": {"const": "packaged_resistor3"},
+        "core_builder_kind": {"const": "resistor3"}, "package_builder": {"const": "device_parasitics"},
+        "primary_parameter": {"const": "series_inductance_h"}, "parameter_unit": {"const": "H"},
+        "symbol_id": {"const": "resistor.substrate.3_terminal"},
+        "pins": {"$ref": "#/$defs/pin3", "prefixItems": [{"const": "P"}, {"const": "N"}, {"const": "SUB"}]},
+        "parameters": {
+          "type": "object",
+          "required": ["resistance_ohm", "substrate_capacitance_f", "substrate_leakage_resistance_ohm", "series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"],
+          "properties": {
+            "resistance_ohm": {"$ref": "#/$defs/resistance"}, "substrate_capacitance_f": {"$ref": "#/$defs/capacitance"},
+            "substrate_leakage_resistance_ohm": {"$ref": "#/$defs/resistance"},
+            "series_resistance_ohm": {"$ref": "#/$defs/contactResistance"}, "series_inductance_h": {"type": "number", "minimum": 0, "maximum": 1000},
+            "parallel_capacitance_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "packagedKelvinShunt4": {
+      "properties": {
+        "id": {"const": "physics.packaged.kelvin_shunt4"}, "family": {"const": "packaged_kelvin_shunt4"}, "builder_kind": {"const": "packaged_kelvin_shunt4"},
+        "core_builder_kind": {"const": "kelvin_shunt4"}, "package_builder": {"const": "device_parasitics"},
+        "primary_parameter": {"const": "series_inductance_h"}, "parameter_unit": {"const": "H"},
+        "symbol_id": {"const": "resistor.kelvin.4_terminal"},
+        "pins": {"$ref": "#/$defs/pin4", "prefixItems": [{"const": "FP"}, {"const": "FN"}, {"const": "SP"}, {"const": "SN"}]},
+        "parameters": {
+          "type": "object",
+          "required": ["resistance_ohm", "contact_resistance_ohm", "series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"],
+          "properties": {
+            "resistance_ohm": {"$ref": "#/$defs/resistance"}, "contact_resistance_ohm": {"$ref": "#/$defs/contactResistance"},
+            "series_resistance_ohm": {"$ref": "#/$defs/contactResistance"}, "series_inductance_h": {"type": "number", "minimum": 0, "maximum": 1000},
+            "parallel_capacitance_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "packagedFeedthroughCapacitor3": {
+      "properties": {
+        "id": {"const": "physics.packaged.feedthrough_capacitor3"}, "family": {"const": "packaged_feedthrough_capacitor3"}, "builder_kind": {"const": "packaged_feedthrough_capacitor3"},
+        "core_builder_kind": {"const": "feedthrough_capacitor3"}, "package_builder": {"const": "device_parasitics"},
+        "primary_parameter": {"const": "series_inductance_h"}, "parameter_unit": {"const": "H"},
+        "symbol_id": {"const": "capacitor.feedthrough.3_terminal"},
+        "pins": {"$ref": "#/$defs/pin3", "prefixItems": [{"const": "IN"}, {"const": "OUT"}, {"const": "GND"}]},
+        "parameters": {
+          "type": "object", "required": ["series_resistance_ohm", "series_inductance_h", "parallel_capacitance_f"],
+          "properties": {
+            "series_resistance_ohm": {"$ref": "#/$defs/contactResistance"}, "series_inductance_h": {"type": "number", "minimum": 0, "maximum": 1000},
+            "parallel_capacitance_f": {"$ref": "#/$defs/capacitance"}
+          },
+          "additionalProperties": false
+        }
+      }
     }
   },
   "type": "object",
@@ -196,7 +252,7 @@
                 "manufacturer": {"type": "null"}, "origin": {"const": "python.spikes.lumped_physics_parts + python.spikes.device_parasitics established composition"},
                 "supported_analyses": {"type": "array", "minItems": 3, "maxItems": 3, "prefixItems": [{"const": "op"}, {"const": "transient_be"}, {"const": "transient_bdf2"}]}
               },
-              "oneOf": [{"$ref": "#/$defs/packagedNmos4"}, {"$ref": "#/$defs/packagedNpn4"}]
+              "oneOf": [{"$ref": "#/$defs/packagedNmos4"}, {"$ref": "#/$defs/packagedNpn4"}, {"$ref": "#/$defs/packagedResistor3"}, {"$ref": "#/$defs/packagedKelvinShunt4"}, {"$ref": "#/$defs/packagedFeedthroughCapacitor3"}]
             }
           },
           {

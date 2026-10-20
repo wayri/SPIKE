@@ -1,6 +1,11 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # EBrake1 and Marble board SI/PI audit, 2026-10-19
 
+The later [PI01-S01 verification](PI01_OWNED_PAD_DC_20261019.md) records the
+actual EBrake owned-pad repair, unchanged default acceptance failures, and
+fresh coarse/refined Marble RT0 replays. It preserves the limitations below;
+bounded geometry-stage completion is not full-board qualification.
+
 Neither board is qualified for full-board SI/PI. This audit uses the actual
 complete imported boards and public CLI paths, without replacing copper,
 ground planes, materials, or terminal coordinates with a synthetic fixture.

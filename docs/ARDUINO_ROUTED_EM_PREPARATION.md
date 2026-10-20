@@ -9,7 +9,7 @@ substitutes a mechanical board box for routed copper.
 Run the native OCC option with the supported installed CPython 3.11 runtime:
 
 ```powershell
-& "$env:LOCALAPPDATA/Programs/Python/Python311/python.exe" scripts/prepare_arduino_assembly_em.py --output output/new-arduino-em --mesh
+& "$env:LOCALAPPDATA/Programs/Python/Python311/python.exe" scripts/prepare_arduino_assembly_em.py --output "$env:TEMP/spike-new-arduino-em" --mesh
 ```
 
 Without `--mesh`, Python 3.12 can prepare the neutral jobs. KiCad 10.0.6 Python
@@ -23,8 +23,8 @@ The full Arduino geometry uses the original planar fallback, requiring Shapely
 2.1's constrained Delaunay triangulation:
 
 ```powershell
-.venv/Scripts/python.exe scripts/prepare_arduino_assembly_em.py --output output/new-arduino-em --planar-mesh
-.venv/Scripts/python.exe scripts/run_arduino_routed_em.py --prepared output/new-arduino-em --output output/new-arduino-study --run
+.venv/Scripts/python.exe scripts/prepare_arduino_assembly_em.py --output "$env:TEMP/spike-new-arduino-em" --planar-mesh
+.venv/Scripts/python.exe scripts/run_arduino_routed_em.py --prepared "$env:TEMP/spike-new-arduino-em" --output "$env:TEMP/spike-new-arduino-study" --run
 ```
 
 The second command writes an executable request and an importable study before
@@ -201,7 +201,8 @@ qualification. The strict default grid policy is unchanged.
 
 ## Executed diagnostic, 11 October 2026
 
-`output/arduino-em-20261011/full-study-executed/study.json` contains the actual
+The unbundled local `arduino-em-20261011/full-study-executed/study.json` record
+contains the actual
 completed request/result. The fresh saved `compiled.json` digest matches the
 native result. OpenEMS completed 20,000 iterations in 339.02 seconds, with
 717,024 Cartesian interval cells and finite 4,872-point E and H previews.

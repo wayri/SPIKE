@@ -11,7 +11,15 @@ set(SPIKES_TRANSIENT_SOURCE "${SPIKES_SRC}/transient_solver.cpp" CACHE FILEPATH
     "Transient implementation to compile (allows controlled numerical experiments)")
 add_library(spikes_core STATIC
     ${SPIKES_SRC}/dc_solver.cpp ${SPIKES_SRC}/osdi_device.cpp
-    ${SPIKES_TRANSIENT_SOURCE} ${SPIKES_SRC}/transient_session.cpp)
+    ${SPIKES_SRC}/io_pad.cpp ${SPIKES_TRANSIENT_SOURCE}
+    ${SPIKES_SRC}/transient_session.cpp)
+if(MSVC)
+    set_source_files_properties(${SPIKES_SRC}/io_pad.cpp PROPERTIES
+        COMPILE_OPTIONS "/W4;/WX")
+else()
+    set_source_files_properties(${SPIKES_SRC}/io_pad.cpp PROPERTIES
+        COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
+endif()
 set_target_properties(spikes_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(spikes_core PUBLIC "${SPIKES_ROOT}/src")
 target_link_libraries(spikes_core PUBLIC Eigen3::Eigen ${CMAKE_DL_LIBS})
@@ -45,6 +53,15 @@ foreach(test IN ITEMS dc c_api transient transient_c_api transient_session
     endif()
     add_test(NAME test_spikes_${test} COMMAND test_spikes_${test})
 endforeach()
+
+add_executable(test_spikes_io_pad "${SPIKES_ROOT}/tests/cpp/test_spikes_io_pad.cpp")
+target_link_libraries(test_spikes_io_pad PRIVATE spikes_core)
+if(MSVC)
+    target_compile_options(test_spikes_io_pad PRIVATE /UNDEBUG)
+else()
+    target_compile_options(test_spikes_io_pad PRIVATE -UNDEBUG)
+endif()
+add_test(NAME test_spikes_io_pad COMMAND test_spikes_io_pad)
 # Include the existing native callback fixtures when installed; availability is
 # explicit at configure time rather than silently omitting their checks.
 foreach(binding IN ITEMS

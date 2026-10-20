@@ -240,6 +240,25 @@ Tests for every adapter cover:
 Fixture expected values belong in tests or validation records. A screenshot is
 useful visual QA but is not sufficient geometry validation.
 
+### Source-authentication evidence adapter
+
+`python/spike_core/kicad_source_evidence.py` is an importer-owned auxiliary
+adapter for source-authenticated solver inputs. It uses the established KiCad
+S-expression reader internally and returns one bounded, JSON-compatible pad
+evidence record selected by the exact native UUID. Parser nodes and parser
+objects remain inside the adapter. It is not a second board importer and does
+not create simulation geometry.
+
+The initial annular-pad contract admits only circular plated through-hole pads
+with one circular coaxial drill and uniform implicit land geometry. Native
+drill offsets are read from the drill declaration. Per-layer `padstack`
+geometry, `keep_end_layers`, and enabled or malformed `remove_unused_layers`
+policies are rejected because the normalized importer does not yet retain
+enough per-layer land evidence to authenticate them. An absent policy or an
+explicit `remove_unused_layers no` is recorded. The source hash and native
+UUID, type, shape, dimensions, layers, and net are cross-checked against the
+normalized `SpiDeR` pad before a source binding is issued.
+
 ## Adding an adapter
 
 1. Add a focused module under `python/spike_core` or an external extension.

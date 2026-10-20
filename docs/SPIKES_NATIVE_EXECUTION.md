@@ -60,3 +60,13 @@ separation contains some failures but is not a hostile-code sandbox. Native
 implementation alone does not establish HIL deadlines or physical certification.
 Knowledgeable human numerical review is required before release. The installed
 application and installers have not been updated by this development pass.
+
+## Native CLI JSON output
+
+`native-run` emits compact JSON on stdout to reduce serialization, transport and
+parse overhead while retaining every field, channel and sample. Use `--pretty`
+for indented stdout. `-o result.json` remains indented by default. Help and error
+usage retain terminal-width formatting; successful native runs defer that work.
+Native transient channel extraction reuses its query handle/name/output buffer
+within each channel and checks every scalar ABI return code. It does not expose
+native storage, truncate outputs or alter the solver result.

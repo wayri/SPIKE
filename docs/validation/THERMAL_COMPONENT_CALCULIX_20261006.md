@@ -62,7 +62,7 @@ regressions pass. The complete discovery rerun passes after that repair.
 ## Limits
 
 One closed solid per retained STEP model; explicit material and mounting datum;
-64 joint source solids and existing output/process budgets. Shared curved,
+64 joint source solids and existing output and process budgets. Shared curved,
 concave or holed CAD faces are blocked by source-interface admission. Sub-roundoff
 separations cannot be distinguished; large coordinate scales that exceed the
 roundoff cap are rejected. Boards use reviewed effective layer materials.

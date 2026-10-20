@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.part-limits { display:grid;gap:12px;min-width:0; }
+.part-limit-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px 16px; }
+.part-limits label { display:flex;flex-direction:column;gap:5px;min-width:0; }
+.part-limits input,.part-limits select,.part-limits textarea { box-sizing:border-box;max-width:100%;min-width:0;font:inherit; }
+.part-limits input[type=checkbox] { align-self:flex-start; }
+.part-limit-wide { grid-column:1/-1; }
+.part-limit-actions { display:flex;flex-wrap:wrap;gap:8px;align-items:center; }
+.part-limit-actions button,.part-limits fieldset>button { display:inline-flex;align-items:center;gap:6px; }
+.part-limit-rule-list { list-style:none;padding:0;max-height:200px;overflow:auto; }
+.part-limit-rule-list li { display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--spike-table-border); }
+.part-limit-rule-list span { flex:1;min-width:0;overflow-wrap:anywhere; }
+.part-limit-rule-list button { padding:4px;width:28px;height:28px; }
+.part-limits fieldset { padding:12px;min-width:0; }
+.part-limits td { min-width:80px;overflow-wrap:anywhere; }
+.part-limits td small { display:block; }
+
+.part-limits p,.part-limit-rule-list { margin:0; }
+.part-limits h3 { margin:4px 0; }
+.part-limits [data-status=FAIL] { color:var(--spike-table-danger-text); }
+.part-limits [role=alert] { color:var(--spike-table-danger-text); }

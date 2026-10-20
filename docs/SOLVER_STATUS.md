@@ -1,10 +1,174 @@
 # SPIKE Solver Status
 
+Internal [charged-particle/kinetic references](validation/NATIVE_PARTICLE_REFERENCE_20261021.md)
+pass 209 active checks in Windows GNU Release and Debug: relativistic
+kinematics, signed electrostatic energy, dilute hard-sphere gas diagnostics and
+supplied stationary-target beam collision probabilities. These are **not**
+charged trajectories, focusing-ring fields, Brownian/stress/PSF calculations,
+SEM/TEM images or general high-pressure/rarefied flow. The
+[requested scope](CHARGED_PARTICLE_VACUUM_PLAN.md) records those separate stages.
+
+The new internal [native optics reference](validation/NATIVE_OPTICS_REFERENCE_20261021.md)
+passes 408 active checks in a standalone Windows GNU Release build: passive
+normal-incidence Fresnel/depth absorption and ideal coherent two-port algebra.
+No measured optical constants, diffraction/instrument workflow, emissivity,
+X-ray qualification or public optical runtime has been added. See the
+[authorized scope and remaining stages](OPTICS_PHOTONICS_MATERIALS_PLAN.md).
+
+[PI01-S02 annular contacts](validation/PI01_ANNULAR_CONTACT_20261021.md) now
+verify explicit axisymmetric land fields, source-authenticated circular-pad
+geometry and a fresh passive barrel/circuit solve. Thirty source-bound tests
+pass; retained unit/final fields, actual barrel vector density and separate
+losses preserve multiphysics identities. This closes the bounded annular/port
+reference work only. General board contact compilation, pointwise interfaces,
+full-board density and original EBrake/Marble DC/AC/SI acceptance remain open;
+PI01-S02 is still in progress with production qualification false.
+
+[PI01-S02 land fields](validation/PI01_LAND_TRANSITION_20261021.md) now solve a
+supplied rectangular 3-D land with distinct finite face patches, conservative
+vector current and integrated Joule heat. Separate patches retain their own
+conjugate potentials even when attachment labels repeat. Independent harmonic
+fields, Gauss integration and continuum resistance refinement verify this
+experimental reference. Annular/automatic board geometry, external circuit
+coupling and full-board PI01-S02 qualification remain open.
+
+New [tetrahedral CAD/open-flow foundations](CFD_TETRA_WORKFLOW.md) provide
+strict SI tetra geometry admission, explicit STEP surface mapping, creeping
+CR/P0 pseudo-traction flow and RT0/P0 steady energy. The
+[execution record](validation/CFD_CAD_OPEN_BOUNDARY_20261021.md) separates
+analytical tests, actual native STEP runs and retained failed attempts.
+This is **not completed general CAD CFD, engineering turbulence or turbulent
+CHT**, and no public runtime/production capability has been enabled by it.
+
+The [PI01-S02 increment](validation/PI01_GEOMETRY_OWNERSHIP_20261021.md) verifies
+opt-in fixed-grid admission for actual rotated source/contact polygons and
+explicit coaxial land/gap ownership with a fresh reduced DC solve. Geometry
+movement is audited; no shape or board gate is relaxed. Full PI01-S02 stays
+in progress: general face mappings, land transition fields, full-volume density
+and original EBrake/Marble qualification remain open.
+
+[PI01-S02A](validation/PI01_FINITE_CONTACT_20261021.md) is a verified offline
+analytical finite-contact DC acceptance benchmark for the existing experimental
+RT0 solver. Four three-level ladders check resistance, physical-volume plateau
+percentiles and separate conserved Joule work. No runtime capability promotion:
+full PI01-S02, general source-backed geometry and face/transition ownership,
+and original EBrake/Marble qualification remain open.
+
+The [21 October increment](validation/CFD_CAPABILITY_INCREMENT_20261021.md)
+adds same-state coupled mean/SA-noft2 **equation verification** at molecular
+Re<=20 and bounded flux-preserving probes/cell-exact traces of supplied fields.
+Both26-test source-bound benchmark runs pass on Python3.11/3.12, including
+actual retained-JSON replay. These remain isolated in-process APIs, not qualified
+engineering turbulence, general CAD aerodynamics or viewer integration.
+The [capability target](CFD_CHT_CAPABILITY_TARGET.md) defines that larger scope.
+
+Separate [flow research APIs](ENCLOSURE_FLOW_RESEARCH.md) now execute full
+prescribed-variable-viscosity symmetric stress, positive-branch SA-noft2
+transport at fixed velocity, and whole-frame Coriolis-coupled momentum with
+centrifugal pressure recovery. These are independently manufactured equation
+checks which alone do not establish joint RANS or rotating propellers. Engineering turbulence,
+blade/stator interfaces and propeller qualification remain unsupported.
+The [current-source benchmark record](validation/ENCLOSURE_FLOW_BENCHMARKS_20261020.md)
+reports 50 new tests on Python 3.11/3.12 and 129 separate legacy/worker checks;
+it explicitly retains the failed coarse-grid probe and unqualified workflows.
+
+Experimental [refined obstacle-inertial CHT v2](ENCLOSURE_CHT_REFINED.md) now
+re-solves momentum and sensible heat on shared selected-cut rectilinear cells,
+with stationary voxel obstacles and disconnected pressure gauges. This is
+tensor-plane sizing, not confined octree AMR. The
+[executed v2 evidence](validation/ENCLOSURE_CHT_V2_VALIDATION_20261020.md) records
+151 scoped passing tests, source-bound coupled runs and independent obstacle
+convergence. Re-entrant finest velocity error is still about 10.4%, not general
+2% accuracy or production qualification. Turbulence/rotors remain unsupported.
+
+Experimental [3-D enclosure CHT](ENCLOSURE_CHT_3D.md) composes supplied voxel
+solids with creeping flow, or one rectangular inertial laminar fluid region,
+and shared steady/transient fluid-solid energy. Manual nested **thermal** cuts
+preserve MAC face fluxes; momentum stays coarse uniform. Independent 3-D
+manufactured momentum, conduction, interface resistance and startup/time checks
+are documented in the [method record](validation/ENCLOSURE_CHT_METHOD_20261020.md).
+This does not enable general obstacle inertia, local momentum AMR, turbulence,
+fans, propellers, arbitrary CAD or production enclosure qualification.
+
+Experimental [physical resistive source/load boundaries](RLGC_TERMINATED_PAIR.md)
+now close the supplied symmetric coupled pair. Loaded conductor V/I, signed
+source work and separate terminal-resistor/conductor/dielectric heat retain
+source-bound field and modal provenance. Each frequency is an independent RMS
+operating case; no geometry, physical contact or thermal mapping is inferred.
+Reactive/ideal endpoints, causal/transient behavior and board qualification
+remain open.
+
+SPIKES Studio retains experimental [instruction-boundary firmware feedback](adr/0114-instruction-boundary-firmware-feedback.md)
+with finite owned-C++ GPIO pads and its narrowly admitted DMA2 output path.
+[Native execution evidence](validation/NATIVE_FIRMWARE_SYNC_20261020.md) and
+[independent bus/electrical verification](validation/BIDIRECTIONAL_GPIO_BUS_20261020.md)
+remain the evidence for that older mode.
+
+A separate experimental [owned-native peripheral mode](adr/0119-owned-native-peripheral-mmio-and-pads.md)
+replaces selected STM32F407 TIM2/SPI1/I2C1/GPIO MMIO with SPIKE state at fixed
+10/80/8 MHz clocks and a functional 1 us CPU-instruction cadence. It admits
+PA0 AF1, PA5/PA6/PA7 AF5 and open-drain PB6/PB7 AF4 only. Its bounded live suite
+passed four tests in 61.551 s: 400 ns PWM recurrence, physical SPI loopback
+`0xa5` across eight receiver barriers, no-target I2C `AF` NACK, and the native
+ABI event barrier. See the [timing record](validation/NATIVE_PERIPHERAL_TIMING_20261020.md).
+RCC/APB reset, IRQ, DMA in this new mode, arbitrary routes, vendor pad values,
+cycle accuracy, physical SI/PI and human qualification remain excluded. The
+five executable manufacturer approximations remain separate and do not qualify
+these MCU peripherals or establish ngspice parity.
+
+Experimental [native cavity CHT](validation/NATIVE_CHT_METHOD_20261020.md) now
+solves steady fluid/solid energy using accepted MAC face fluxes, with actual
+worker/CLI runs and [air/liquid-like numerical examples](../examples/internal_cfd/README.md).
+[Development verification](validation/INTERNAL_CFD_DEVELOPMENT_20261020.md)
+records 74 passing domain tests, two native CTests and the actual example runs;
+these are not whole-suite or physical qualification.
+[Conservative surface exchange](COUPLED_SURFACE_EXCHANGE.md) transfers supplied
+heat/traction maps with adjoint work/power checks. This is not general enclosure
+CFD, compressible liquids/gases, turbulence, rotating machinery, aeroelasticity,
+flutter or two-way FSI. Those remain staged in the
+[internal CFD plan](INTERNAL_CFD_AND_FSI_PLAN.md). Existing installed runtimes and
+the failed PEEC/release qualification are not promoted by this development.
+
+Experimental [supplied symmetric coupled pairs](RLGC_COUPLED_PAIR.md) now
+compose even/odd scalar line models into coherent four-port S data, physical
+conductor voltage/current and pair-owned loss/storage. Mutual terms are not
+assigned to invented thermal cells or counted twice. SI02 geometric extraction,
+general asymmetric coupling, physical-board accuracy and thermal feedback remain
+open; see the source-bound SI02-S07 stage evidence.
+
+SI01-S01 adds experimental [finite line/termination candidate and corner
+comparison](SI_CANDIDATE_STUDY.md) through the worker and CLI. Complete explicit
+populations retain child provenance, failed/partial cases and exact sampled
+channel-facing gain witnesses. This does not complete SI01 or qualify physical
+board SI, continuous-band limits, eyes, native layout constraints or multiphysics
+feedback. Stage promotion requires its source-bound verification receipt.
+
+The [PEEC repair follow-up](validation/PEEC_REPAIR_FOLLOWUP_20261019.md) retains
+the failed original EBrake gates and broader qualification failures separately
+from passing experimental numerical primitives and runtime compatibility fixes.
+
+Experimental [RT0 vector-density reconstruction](DC_RT0_DENSITY.md) now retains
+complete planar polygon/drill support, signed face currents, undriven volume
+and bounded physical-volume quantile intervals. A separate
+[same-slab affine magnetic kernel](validation/PEEC_AFFINE_SLAB_KERNEL_20261019.md)
+passes independent thin-copper self/touching reference checks. Neither is a
+production reroute or an EBrake convergence/AC fix. Original load geometry
+lies in a drill void and its physical contact remains unspecified; the owner
+has not authorized an inferred footprint. Original gates remain required.
+
 The [optional-runtime qualification audit](validation/SKIPPED_TEST_CLOSURE_20261019.md)
 has executed passing real-runtime cases for 66 of the previous 69 skip records.
 EBrake still fails AC support/passivity and DC current-density convergence;
 CUDA remains owner-blocked for hardware and Xyce needs an admitted runtime.
 These results and isolated development-package smoke do not qualify a release.
+
+PI01-S01 [owned pad DC geometry](OWNED_DRILLED_PAD_DC.md) is verified for
+drilled rounded rectangles and resolved convex non-drilled custom SMD sources
+in explicit opt-in mode. The complete EBrake 3Vin CLI study now executes
+approximately, including all four refinement levels, with unchanged source
+geometry and terminals. It still fails p95 density convergence; original
+default EBrake density and AC tests also fail. This bounded geometry stage
+does not qualify the board or complete PI01. See [executed evidence](validation/PI01_OWNED_PAD_DC_20261019.md).
 
 Experimental [supplied RLGC star junctions](RLGC_LINE_JUNCTION.md) connect two
 through eight scalar legs at one ideal common node. A multiport frequency
@@ -1166,7 +1330,7 @@ or buck stage. A selected LDO uses the user-specified input/output voltages
 and downstream output current for `(Vin - Vout) * Iout` loss, neglecting
 quiescent current. A buck uses a user-supplied efficiency for
 `Pout * (1/efficiency - 1)` loss and input-current estimate. The optional
-output/input voltage ratio propagates an output voltage when none is assigned;
+output-to-input voltage ratio propagates an output voltage when none is assigned;
 an inconsistent ratio or physically impossible LDO step-up is flagged. These
 algebraic budgets do not constitute a PCB circuit or switching solve. A
 physical inductor/MOSFET/IC model still needs the reviewed SPICE path below.
@@ -1769,3 +1933,68 @@ unstable connections fail explicitly; returned wave/V/I histories retain
 the boundary evidence. See [scope and verification](TERMINATED_NETWORK_TRANSIENT.md).
 Open/reactive/nonlinear connections, physical out-of-band accuracy, measured
 correlation and full SI07/PI-SI parity remain open.
+
+## SI02-S09: sampled reactive physical coupled-pair boundaries (20 October 2026)
+
+The [series-R/L and node-shunt-C wrapper](RLGC_REACTIVE_PAIR.md) closes explicit
+four-port Thevenin sources/loads around the unchanged supplied symmetric pair.
+It retains physical fields, separate source/line/capacitor currents, signed complex
+source work, resistor/conductor/dielectric heat W, mean stored L/C energy J and
+reactive var. The bounded development stage is experimental; general endpoint
+topologies, ideal open/short, nonlinear or lossy reactives, causal/transient
+models, geometry extraction, heat deposition and board qualification remain open.
+See [executed evidence](validation/SI02_REACTIVE_PAIR_20261020.md). SI02 and full
+PI/SI parity remain in progress.
+
+## SI02-S10: piecewise supplied coupled-line cascades (20 October 2026)
+
+The experimental [coupled cascade](RLGC_COUPLED_CASCADE.md) connects1..8 supplied
+symmetric pair sections with different RLGC/length using ideal physical conductor
+interfaces. It returns composite four-port S, actual section fields and separately
+owned conductor/dielectric heat. Interface voltage/current and signed power
+residuals remain explicit; mutual heat has no inferred conductor/cell allocation.
+[Executed evidence](validation/SI02_COUPLED_CASCADE_20261020.md) distinguishes
+this bounded stage from geometry-derived discontinuity/return parasitics, general
+asymmetry/branching, external terminal feedback, transient/causal behavior,
+thermal mapping, measurement correlation and full-board qualification. SI02 and
+full PI/SI parity remain in progress.
+
+## SI02-S11: physical RLC loaded coupled cascades (20 October2026)
+
+The experimental [loaded cascade](RLGC_LOADED_CASCADE.md) composes verified
+physical series-R/L and node-shunt-C endpoints with supplied piecewise symmetric
+coupled propagation. It returns loaded terminal V/I and source current, complete
+section fields, separate terminal/section heat W, mean stored J and reactive var.
+Both feedback systems retain conditioning/residual gates; each actual child
+drive/field/heat and canonical interface ledger is bound.
+[Evidence](validation/SI02_LOADED_CASCADE_20261020.md) defines the bounded stage;
+general topology/asymmetry, geometric discontinuity/contact parasitics, ideal or
+nonlinear/lossy endpoints, transient/causal, thermal mapping and original-board
+qualification remain open. SI02 and full PI/SI parity remain in progress.
+
+## SI02-S12: ideal branched coupled lines (20 October 2026)
+
+The experimental [coupled star](RLGC_COUPLED_STAR.md) connects 2–8 uniform
+supplied symmetric coupled legs at two distinct ideal conductor nodes. It returns
+4–16 exterior ports, coherent leg fields, per-node voltage/KCL/power residuals
+and separately owned conductor/dielectric heat. Child energy densities remain
+separate from heat; mutual terms have no inferred conductor or thermal-cell share.
+[Evidence](validation/SI02_COUPLED_STAR_20261020.md) covers the bounded stage.
+General graphs, asymmetric media, piecewise legs, RLC star endpoints, physical
+junction/contact/return parasitics, transient/causal, thermal mapping and board
+qualification remain open. SI02 and full PI/SI parity remain in progress.
+
+## SI02-S13: physically loaded coupled branches (21 October 2026)
+
+The experimental [loaded coupled star](RLGC_LOADED_STAR.md) assigns physical
+RLC sources/loads on 4–16 exterior ports, retaining actual branch fields and
+separate terminal/branch heat W, mean stored J and reactive var. Internal and
+endpoint feedback keep separate conditioning gates and full child provenance.
+A valid standing-wave cancellation case also repaired a boundary-integrity false
+rejection: a limited 64*eps local operand allowance preserves the existing relative
+criterion and all physical values, power and board gates. This is not a universal
+forward-error guarantee or near-zero relative-accuracy claim.
+[Evidence](validation/SI02_LOADED_STAR_20261021.md) records numerical/reference,
+corruption, public-contract and source-bound verification. General graph/geometry,
+piecewise/asymmetric legs, nonlinear/lossy/ideal endpoints, causal/transient,
+thermal mapping, measurements and board qualification remain open.

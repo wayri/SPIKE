@@ -88,6 +88,12 @@ deployable application firmware or hardware qualification evidence.
 
 ## Important limits and failure reporting
 
+The manager now exposes an explicitly selected [owned native electrical-pad workflow](GPIO_PIN_WORKFLOW.md)
+with labeled pin properties and separate sampled or timestamped-software-GPIO
+coupling. It composes finite drivers, internal pulls, rail currents and package
+R/L/C inside SPIKES. The limits below describe the legacy functional/ideal-source
+workflow; electrical modes have their own explicit timing and qualification limits.
+
 - Functional instruction/peripheral emulation is not cycle-accurate simulation,
   physical pin electronics, power consumption, thermal modeling, ADC accuracy,
   radio propagation, high-speed SPI/SI analysis or hard-real-time/HIL certification.

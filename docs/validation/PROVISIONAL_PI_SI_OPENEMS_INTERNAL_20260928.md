@@ -17,8 +17,8 @@ case. Port 1 and port 2 were excited separately, because the adapter allows
 one driven port per run. Both jobs completed on a 0.2 mm requested mesh over
 1–3 GHz with 11 samples. Raw normalized results and execution records are:
 
-- `build/validation/hforsten-rf-in-2port-p1-20260928/engine-output/normalized-result.json`
-- `build/validation/hforsten-rf-in-2port-p2-20260928/engine-output/normalized-result.json`
+- local generated engine result for `hforsten-rf-in-2port-p1-20260928`
+- local generated engine result for `hforsten-rf-in-2port-p2-20260928`
 - Corresponding `*-execution.json` files beside those case directories.
 
 `scripts/compare_provisional_openems.py` checks that the frequency grids and

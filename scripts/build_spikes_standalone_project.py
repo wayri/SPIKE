@@ -95,6 +95,11 @@ def build(version: str, output_root: Path) -> tuple[Path, Path, Path]:
     )
     for name in native_tests:
         copy_file(ROOT / "tests" / name, package / "tests/native" / name)
+    copy_file(ROOT / "tests/cpp/test_spikes_io_pad.cpp",package / "tests/native/test_spikes_io_pad.cpp")
+    copy_file(ROOT / "docs/validation/NATIVE_GPIO_PAD_20261019.md",
+              package / "docs/validation/NATIVE_GPIO_PAD_20261019.md")
+    copy_file(ROOT / "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md",
+              package / "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md")
     integration_only_tests = {
         "test_spikes_engine_version.py",
         "test_spikes_release_verifier.py",

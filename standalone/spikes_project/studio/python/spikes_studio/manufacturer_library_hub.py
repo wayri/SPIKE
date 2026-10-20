@@ -9,6 +9,14 @@ import wx
 
 from .flat_controls import ActionButton
 from .manufacturer_discovery import load_catalog, search
+from .manufacturer_executable import (
+    availability as executable_availability,
+    executable_record,
+    format_record as format_executable_record,
+    install as install_executable,
+    load_catalog as load_executable_catalog,
+)
+from .manufacturer_executable_dialog import ExecutablePlacementDialog
 from .manufacturer_parts_panel import ManufacturerPartsPanel
 from .themes import apply_window
 
@@ -58,6 +66,7 @@ class ProductList(wx.ListCtrl):
 class ProductCatalog(wx.Panel):
     def __init__(self, parent, owner):
         super().__init__(parent); self.owner = owner; self.catalog = load_catalog(); self.local_models = []
+        self.executable_ids = {row['discovery_id'] for row in load_executable_catalog()['records']}
         box = wx.BoxSizer(wx.VERTICAL)
         self.search = wx.SearchCtrl(self)
         self.search.SetDescriptiveText('Find real manufacturer, part number or function…')
@@ -66,7 +75,8 @@ class ProductCatalog(wx.Panel):
         rows = self.catalog['records']
         self.manufacturer = wx.Choice(self, choices=['All manufacturers'] + sorted({r['manufacturer'] for r in rows}))
         self.category = wx.Choice(self, choices=['All categories'] + sorted({r['category'] for r in rows}))
-        for control in (self.manufacturer, self.category):
+        self.execution = wx.Choice(self, choices=['All executable states', 'Executable approximation available', 'Identity only'])
+        for control in (self.manufacturer, self.category, self.execution):
             control.SetSelection(0); filters.Add(control, 0, wx.RIGHT, 8)
             control.Bind(wx.EVT_CHOICE, self.refresh)
         box.Add(filters, 0, wx.LEFT | wx.RIGHT | wx.BOTTOM, 8)
@@ -79,7 +89,9 @@ class ProductCatalog(wx.Panel):
         self.model_button = ActionButton(self, label='Manufacturer model source')
         self.review_button = ActionButton(self, label='Review a downloaded model…')
         self.local_button = ActionButton(self, label='Find installed local model')
-        for control in (self.product_button, self.model_button, self.local_button, self.review_button):
+        self.executable_button = ActionButton(self, label='Place executable approximation…')
+        for control in (self.product_button, self.model_button, self.local_button, self.review_button,
+                        self.executable_button):
             actions.Add(control, 0, wx.ALL, 4)
         box.Add(actions, 0, wx.ALL, 4); self.SetSizer(box)
         self.search.Bind(wx.EVT_TEXT, self.refresh)
@@ -88,24 +100,41 @@ class ProductCatalog(wx.Panel):
         self.model_button.Bind(wx.EVT_BUTTON, lambda event: self.open_link('model_url'))
         self.local_button.Bind(wx.EVT_BUTTON, lambda event: owner.manufacturer_hub.show_local_for(self.selected()))
         self.review_button.Bind(wx.EVT_BUTTON, lambda event: owner.guarded(owner.catalog_panel.vendor))
+        self.executable_button.Bind(wx.EVT_BUTTON, self.place_executable)
         self.refresh()
 
     def selected(self):
         index = self.listing.GetFirstSelected()
         return self.listing.rows[index] if 0 <= index < len(self.listing.rows) else None
 
+    def executable_state(self, row):
+        if row is None or row['id'] not in self.executable_ids:
+            return {
+                'executable': False,
+                'qualified': False,
+                'reason': 'No reviewed SPIKE executable approximation is bundled for this identity.',
+            }
+        return executable_availability(row['id'])
+
     def refresh(self, event=None):
         manufacturer = self.manufacturer.GetStringSelection() if self.manufacturer.GetSelection() else None
         category = self.category.GetStringSelection() if self.category.GetSelection() else None
         rows = search(self.catalog['records'], self.search.GetValue(), manufacturer, category)
+        execution = self.execution.GetSelection()
+        if execution:
+            want_executable = execution == 1
+            rows = [row for row in rows if (row['id'] in self.executable_ids) == want_executable]
         self.listing.set_rows(rows)
-        self.count.SetLabel(f'{len(rows):,} sourced products · listings are not executable or qualified models')
+        executable_count = sum(row['id'] in self.executable_ids for row in rows)
+        self.count.SetLabel(f'{len(rows):,} sourced products · {executable_count} native approximation(s) · none manufacturer-qualified')
         self.select()
 
     def select(self, event=None):
         row = self.selected()
         self.product_button.Enable(row is not None)
         self.model_button.Enable(bool(row and row.get('model_url')))
+        state = self.executable_state(row)
+        self.executable_button.Enable(bool(state and state['executable']))
         matches = [item for item in self.local_models if row and item['name'].casefold() == row['part_number'].casefold()]
         self.local_button.Enable(bool(matches))
         if not row:
@@ -117,7 +146,38 @@ class ProductCatalog(wx.Panel):
                              f"Source checked: {row['checked_on']}\n{row['product_url']}\n"
                              f"Model: {row.get('model_url') or 'Not reviewed / no model link recorded'}\n"
                              f"Exact-name declarations in your indexed local library: {len(matches)} (not qualified)\n"
-                             'Catalog identity only. Pin mapping, licensing, dialect compatibility, execution and electrical qualification require separate review.')
+                             f"\nExecutable approximation\n{format_executable_record(row['id']) if state['executable'] else state['reason']}\n\n"
+                             'Catalog identity and executable approximation are separate tiers. Qualified remains false; ratings are not enforced solver limits.')
+
+    def place_executable(self, event=None):
+        guarded = getattr(self.owner, 'guarded', None)
+        return guarded(self._place_executable) if guarded else self._place_executable()
+
+    def _place_executable(self):
+        row = self.selected()
+        if row is None: raise ValueError('Select an exact manufacturer product')
+        state = self.executable_state(row)
+        if not state['executable']: raise ValueError(state['reason'])
+        if self.owner.job_running: raise ValueError('Stop simulation before placing an executable approximation')
+        if hasattr(self.owner, 'require_clean_directive_source'):
+            self.owner.require_clean_directive_source()
+        elif hasattr(self.owner, 'source') and self.owner.source.GetText() != self.owner.doc.data['source']:
+            raise ValueError('Apply circuit text edits before placing an executable approximation')
+        record = executable_record(row['id'])
+        with ExecutablePlacementDialog(self, self.owner, record) as dialog:
+            if dialog.ShowModal() != wx.ID_OK: return None
+            count = dialog.count.GetValue()
+            mapping = dialog.mapping()
+            y = 180 + 160 * ((len(self.owner.doc.data['components']) + 3) // 4)
+            plan = install_executable(self.owner.doc, record, mapping, count=count, x=140, y=y)
+        self.owner.refresh_document()
+        if hasattr(self.owner, 'book') and hasattr(self.owner, 'editor_page'):
+            self.owner.book.SetSelection(self.owner.editor_page())
+        self.owner.SetStatusText(
+            f"Inserted {count} expanded native approximation(s): {', '.join(plan['refs'][:8])}; "
+            "full package mapping is retained in source, qualified=false"
+        )
+        return plan
 
     def open_link(self, key):
         row = self.selected()

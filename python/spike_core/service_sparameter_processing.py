@@ -4,7 +4,7 @@ from .service_helpers import error_response
 
 
 def handle_sparameter_processing_request(method, params):
-    if method not in ('deembed_two_port', 'resample_sparameter_network', 'fit_sparameter_rational',
+    if method not in ('run_rlgc_loaded_star', 'run_rlgc_coupled_star', 'run_rlgc_loaded_cascade', 'run_rlgc_coupled_cascade', 'run_rlgc_reactive_pair', 'run_rlgc_terminated_pair', 'run_rlgc_coupled_pair', 'run_si_candidate_study', 'deembed_two_port', 'resample_sparameter_network', 'fit_sparameter_rational',
                       'run_rational_network_transient', 'run_terminated_network_transient',
                       'run_inductive_network_transient', 'run_capacitive_network_transient',
                       'run_rlc_network_transient', 'run_initialized_rlc_network_transient',
@@ -15,7 +15,31 @@ def handle_sparameter_processing_request(method, params):
     try:
         if not isinstance(params, dict) or set(params) != {'request'}:
             raise ValueError('Exactly one network transformation request is required')
-        if method == 'run_rlgc_line_junction':
+        if method == 'run_rlgc_loaded_star':
+            from .rlgc_loaded_star import run_rlgc_loaded_star
+            result = run_rlgc_loaded_star(params['request'])
+        elif method == 'run_rlgc_coupled_star':
+            from .rlgc_coupled_star import run_rlgc_coupled_star
+            result = run_rlgc_coupled_star(params['request'])
+        elif method == 'run_rlgc_loaded_cascade':
+            from .rlgc_loaded_cascade import run_rlgc_loaded_cascade
+            result = run_rlgc_loaded_cascade(params['request'])
+        elif method == 'run_rlgc_coupled_cascade':
+            from .rlgc_coupled_cascade import run_rlgc_coupled_cascade
+            result = run_rlgc_coupled_cascade(params['request'])
+        elif method == 'run_rlgc_reactive_pair':
+            from .rlgc_reactive_pair import run_rlgc_reactive_pair
+            result = run_rlgc_reactive_pair(params['request'])
+        elif method == 'run_rlgc_terminated_pair':
+            from .rlgc_terminated_pair import run_rlgc_terminated_pair
+            result = run_rlgc_terminated_pair(params['request'])
+        elif method == 'run_rlgc_coupled_pair':
+            from .rlgc_coupled_pair import run_rlgc_coupled_pair
+            result = run_rlgc_coupled_pair(params['request'])
+        elif method == 'run_si_candidate_study':
+            from .si_candidate_study import run_si_candidate_study
+            result = run_si_candidate_study(params['request'])
+        elif method == 'run_rlgc_line_junction':
             from .rlgc_line_junction import run_rlgc_line_junction
             result = run_rlgc_line_junction(params['request'])
         elif method == 'run_rlgc_line_cascade':

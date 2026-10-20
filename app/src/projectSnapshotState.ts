@@ -51,7 +51,12 @@ export function withoutSavedResults(snapshot: Record<string, any>): Record<strin
   }
   if (copy.analysis) {
     if (copy.analysis.retained_assembly_em) copy.analysis.retained_assembly_em.result = null;
-    if (copy.analysis.engineering_review) copy.analysis.engineering_review.result = null;
+    if (copy.analysis.engineering_review) {
+      copy.analysis.engineering_review.result = null;
+      if (Array.isArray(copy.analysis.engineering_review.part_limits)) {
+        copy.analysis.engineering_review.part_limits = copy.analysis.engineering_review.part_limits.map((rule: Record<string, unknown>) => ({...rule, value:null,measurement_source:"",evidence_status:"unreviewed"}));
+      }
+    }
     const nativeSolvers = copy.analysis.extension_workflows?.native_solvers;
     if (nativeSolvers && typeof nativeSolvers === 'object') for (const entry of Object.values(nativeSolvers)) {
       if (entry && typeof entry === 'object') (entry as Record<string, unknown>).result = null;

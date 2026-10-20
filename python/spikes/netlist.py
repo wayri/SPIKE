@@ -11,7 +11,6 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Iterable, Mapping
 
-from .behavioral import compile_behavioral_expression
 
 from .contracts import (
     AnalysisDirective,
@@ -860,6 +859,7 @@ def _element(
             )
             for signal_index, signal_literal in enumerate(signal_literals):
                 resolved = resolved.replace(f"__behavior_signal_{signal_index}__", signal_literal)
+            from .behavioral import compile_behavioral_expression
             compiled = compile_behavioral_expression(resolved)
             stored_assignment = f"{output_kind.upper()}={{{resolved}}}"
             from .behavioral import structurally_affine

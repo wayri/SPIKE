@@ -1,0 +1,38 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI08-S02",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
+    "python/spike_core/sparameter_deembedding.py": "9eae4073816c9e1a34dc32b4300386e2b82abb8335ed545c0e61e9cbe3f494bd",
+    "python/spike_core/service_sparameter_processing.py": "76cd5fcdaef298239166d1c0bc16e48081ad67b6902bcd5015cefffb79776b61",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_sparameter_deembedding.py": "4bdcadc7a866e2b6a501c980d9063e628d915322712c5d9f645a438ce543fcdc",
+    "tests/python/test_sparameter_deembedding_contract.py": "e7836e4b9475f930ed6bc7b3f31136ea4c05270920f5e4181c96341ad6b0961c",
+    "schemas/two-port-deembedding-request-v1.schema.json": "84efc67adcf8888c525a43854c2a6dcbebce4b2b8950c59190c0a2b231dc2e06",
+    "schemas/two-port-deembedding-result-v1.schema.json": "e6388c4fe25686c238465403b5cb9e8ff3c9f73c0e528d21094ec256b4b777d8"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_analytic_matched_delay_attenuation_dc_and_nonuniform_grid",
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_reconstruction_detects_corrupt_solve_and_extreme_norms_fail",
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_reflective_nonreciprocal_active_dut_from_independent_connections",
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_representation_singular_and_product_condition_failures",
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_resources_and_cancellation_after_partial_sweep",
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_strict_shapes_names_grids_reference_and_finite_values",
+      "tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_unilateral_dut_and_forward_polarity_are_preserved",
+      "tests.python.test_sparameter_deembedding_contract.DeembeddingContractTests.test_actual_worker_rejects_orientation_grid_reference_and_unknown_fields",
+      "tests.python.test_sparameter_deembedding_contract.DeembeddingContractTests.test_actual_worker_schema_active_nonreciprocal_dut_and_source_preservation",
+      "tests.python.test_sparameter_deembedding_contract.DeembeddingContractTests.test_ideal_through_fixtures_need_no_impedance_conversion"
+    ],
+    "run": 10,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI08-S02-reactive-pair-20261020.log",
+  "log_sha256": "cff8d53331b7e846c01520b11308151bb0a6fb2c921fed87fde92e7b7cc660c7"
+}

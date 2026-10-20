@@ -5,7 +5,10 @@ from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 stage=Path(os.environ['SPIKES_STAGE'])
 library=Path(os.environ['SPIKES_LIBRARY'])
 a=Analysis([str(Path(SPECPATH)/'entry.py')],pathex=[str(stage)],
-    binaries=[(str(library),'native')],datas=[(str(stage/'share'),'share')]+collect_data_files('plotly',includes=['package_data/plotly.min.js']),
+    binaries=[(str(library),'native')],datas=[(str(stage/'share'),'share'),
+        (str(stage/'spikes_studio/renode_edge_hook.py'),'spikes_studio'),
+        (str(stage/'spikes_studio/renode_sync_hook.py'),'spikes_studio'),
+        (str(stage/'spikes_studio/renode_peripheral_hook.py'),'spikes_studio')]+collect_data_files('plotly',includes=['package_data/plotly.min.js']),
     hiddenimports=collect_submodules('spikes_studio')+collect_submodules('python.spikes'),
     hookspath=[],hooksconfig={'matplotlib':{'backends':['WXAgg']}},
     excludes=['tkinter','PyQt4','PyQt5','PyQt6','PySide','PySide2','PySide6','pyqtgraph','qtpy','pyvistaqt','vtkmodules.qt','torch','tensorflow','pandas','IPython'],

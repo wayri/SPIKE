@@ -53,6 +53,26 @@ assert.match(rendered, /#help\//);
 assert.ok(!rendered.includes('<script>'));
 assert.ok(!rendered.includes('href="javascript:'));
 assert.match(rendered, /&lt;unsafe&gt;/);
+assert.ok(!render('<!-- SPDX-License-Identifier: Apache-2.0 -->\n\n# Guide').includes('SPDX'));
+// Gallery documents must show their shipped figures offline, without admitting
+// remote image requests or arbitrary local paths from Markdown.
+const galleryAssets = [
+  'analytics/pi-dielectric-admittance.png', 'analytics/si-rlgc-line-fields.png',
+  'analytics/em-huygens-far-field.png', 'analytics/thermal-two-solid-conduction.png',
+  'analytics/hybrid-electrothermal-convergence.png', 'analytics/cfd-native-cavity.png',
+  'analytics/cht-laminar-channel.png', 'analytics/multiboard-coupled-networks.png',
+  'ui-current/clean-viewport.jpg', 'ui-current/universal-search.jpg', 'ui-current/navigation-map.svg',
+];
+for (const asset of galleryAssets) {
+  assert.ok(fs.statSync(path.join(root, 'public/help', asset)).size > 100, asset);
+  const image = render(`![Example](../app/public/help/${asset})`);
+  assert.ok(image.includes(`src="/help/${asset}"`), `Offline figure missing: ${asset}`);
+}
+assert.ok(!render('![Remote](https://example.invalid/analytics/cfd-native-cavity.png)').includes('<img'));
+assert.ok(!render('![Unknown](../app/public/help/analytics/not-shipped.png)').includes('<img'));
+for (const doc of ['UI_QUICKSTART.md', 'UI_NAVIGATION.md', 'ANALYSIS_GALLERY.md']) {
+  assert.ok(helpSource.includes(`../../docs/${doc}`), `${doc} must ship offline`);
+}
 for (const file of fs.readdirSync(path.join(root, '../docs')).filter(f => f.endsWith('.md'))) {
   const output = render(fs.readFileSync(path.join(root, '../docs', file), 'utf8'));
   assert.ok(output.length > 0, file);

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { performance } from "node:perf_hooks";
 import ts from "typescript";
 
 const source = readFileSync(new URL("../src/viewportResultFields.ts", import.meta.url), "utf8");
@@ -36,4 +37,18 @@ const thinned = fields.spatiallyThinSamples(orderedMeshRows, 100);
 assert.ok(thinned.length <= 100, "spatial thinning must honor its viewport budget");
 assert.ok(thinned.some(sample => sample.value === 100), "spatial thinning must retain a local hotspot");
 assert.ok(new Set(thinned.map(sample => sample.y_mm)).size > 1, "spatial thinning must not expose ordered mesh-row banding");
+const dense = Array.from({ length: 50_000 }, (_, index) => ({
+  id: index, x_mm: index%500, y_mm: Math.floor(index/500),
+  layer: index%2 ? "F.Cu" : "B.Cu", net: `N${index%8}`,
+  magnitude: index === 41_337 ? 1e6 : (index%101)/100,
+}));
+const denseStarted = performance.now();
+const denseThinned = fields.spatiallyThinSamples(dense, 4_000);
+const denseMs = performance.now()-denseStarted;
+assert.ok(denseThinned.length <= 4_000, "dense thinning honors the interaction display budget");
+assert.ok(denseThinned.some(sample => sample.id === 41_337), "dense thinning retains the strongest sample in its physical bin");
+assert.ok(denseMs < 500, `50k dense samples thinned in ${denseMs.toFixed(1)} ms`);
+assert.deepEqual(fields.spatiallyThinSamples(dense.slice(0,4_000),4_000),dense.slice(0,4_000),
+  "already bounded exact samples retain their original ordering and identity");
+console.log(`viewport result thinning performance: samples=${dense.length}; retained=${denseThinned.length}; ${denseMs.toFixed(1)}ms`);
 console.log("viewport result field assertions passed");

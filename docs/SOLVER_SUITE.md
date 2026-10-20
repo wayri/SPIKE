@@ -29,6 +29,67 @@ PDK, ASIC, TCAD and scalar co-simulation entries identify their CLI/Python or
 native console workflows and link to the existing Python workspace entry.
 Full TCAD and owned arbitrary-PCB full-wave remain unavailable.
 
+## Solver modules: a user's guide
+
+A **solver module** is a named logical block with a stable ID, domain membership,
+required/optional dependencies and links to its actual implementation or adapter.
+It can be a numerical solver, a model library, an import/geometry adapter or a
+shared execution service. A card is not necessarily a standalone C/C++ library,
+executable, or downloadable package. Friendly names do not change persisted IDs.
+
+### Find the right module
+
+1. Open **Solver manager** through universal search (**Ctrl+K**).
+2. Filter by domain and provider/role. Search a name such as **SPIKE 2.5D PI**,
+   a stable ID such as `pi-peec`, or an engineering task.
+3. Read scope, limitations, evidence and required inputs on the card. Inspect
+   the worker/runtime state separately; a bundled fallback catalog is unprobed.
+4. Open the supported setup route, provide the case-specific inputs and pass
+   preflight. Opening a module never starts a numerical run automatically.
+5. Consult the [analysis gallery](ANALYSIS_GALLERY.md) for reproducible outputs
+   and [solver status](SOLVER_STATUS.md) for the validation boundary.
+
+### Sections and dependencies
+
+| Section | Representative blocks | Dependency or integration boundary |
+| --- | --- | --- |
+| PCB / PI | `pi-dc`, `pi-peec`, `pi-solid-dc`, `pi-transient`, `pi-pdn` | PCB/material or reviewed solid-mesh inputs; transient PI requires PEEC and the native circuit block. |
+| SI / Harness | `si-networks`, `si-channels`, `si-eye`, `harness-adapter` | Explicit ports and terminations; harness workflows require geometry, materials and SI networks. |
+| Thermal | `thermal-board`, `thermal-solids`, `thermal-electrothermal`, `thermal-pwm` | Declared heat sources, boundaries and loss ownership; electrothermal coupling requires solid thermal and the relevant electrical blocks. |
+| CFD / CHT | `cfd-native`, `thermal-channel`, `cfd-su2`, `cht-assembly` | Native cavity and developed-channel models are bounded references. Assembly CHT has its own mesh/material/solid-thermal and external cooling dependencies. |
+| Electromagnetics / RF | `em-magnetic`, `em-lumped`, `em-openems`, `em-emerge`, `em-palace` | Internal magnetic models and distinct external field adapters; required engine availability and case admission are separate gates. |
+| Circuits / SPIKES Studio | `circuit-native`, `circuit-adaptive`, `circuit-equations`, `circuit-smps`, `circuit-libraries` | Circuit engine, model libraries and authoring routes have distinct scopes; Studio is a separate application. |
+| MCAD collaboration / Mechanics | `mcad-adapter`, `mcad-freecad`, `mechanics-static`, `mechanics-thermoelastic` | Geometry exchange or admitted meshes/materials; thermoelastic coupling requires static mechanics and solid thermal. FreeCAD is external. |
+| Execution / Shared base | `core`, `geometry`, `materials`, `mesh`, `execution-cosim`, `execution-workers` | Shared identity/contracts and explicit coupling or independent job scheduling; these do not imply a general simultaneous multiphysics solve. |
+
+These are representative families, not a second authoritative dependency graph.
+The [complete block catalog](SOLVER_BLOCKS.md#catalog-edges) and worker
+`solver_blocks` response give exact current edges. Required dependencies expand
+a selection transitively and are ordered before their consumers. Optional
+integrations stay optional. A group may share blocks with another group;
+dependency closure deduplicates them. Unsupported or planned prerequisites stay
+visible instead of silently substituting weaker physics.
+
+### What is installed today, and what is planned
+
+Current delivery is **bundled-all**: implemented first-party solver, support and
+adapter code ships in the common payload. Group/block selection is an inert
+composition preview, not install/uninstall or an enable/disable switch. It does
+not change a saved project. Separately licensed external runtimes are not made
+available simply by including their adapters.
+
+Future base-only installation plus optional per-module or bulk-domain downloads
+is planned. Before enabling it, modules need independent versions, dependency
+constraints, platform/ABI compatibility, exact file ownership, signed manifests,
+license/SBOM records, verified downloads, atomic activation and rollback. Logical
+blocks currently version with SPIKE; they are not independently versioned binary
+libraries. See [block packaging and future distribution](SOLVER_BLOCKS.md) and
+[engine registration](SOLVER_MANAGER.md).
+
+Always distinguish **code included**, **runtime available**, **request admitted**
+and **numerically qualified**. Planned MoM/full-wave entries, unavailable engines
+and experimental models keep those states even when their names appear in search.
+
 ## Ownership and extension
 
 `app/src/solverSuiteCatalog.ts` owns this presentation index: stable capability

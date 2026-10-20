@@ -37,7 +37,7 @@ def verify(frame, check):
           'lumped placement metadata survives serialization')
     doc.undo();check(doc.data==before,'lumped placement undoes atomically')
     packaged=[row for row in panel.catalog['records'] if row.get('model_type')=='packaged_lumped_device_v1']
-    check(len(packaged)==2,'two packaged transistor model families bundled')
+    check({row['builder_kind'] for row in packaged}=={'packaged_nmos4','packaged_npn4','packaged_resistor3','packaged_kelvin_shunt4','packaged_feedthrough_capacitor3'},'five packaged transistor and passive model families bundled')
     for record in packaged:
         family=record['builder_kind']
         dialog=InsertDialog(panel,record)
@@ -52,7 +52,9 @@ def verify(frame, check):
               edited['parameters']['parallel_capacitance_f']==3e-12,
               family+' labeled package parameters accept SI suffixes')
         recipe=native_recipe(edited)
-        pins=['D','G','S','B'] if family=='packaged_nmos4' else ['C','B','E','SUB']
+        pins={'packaged_nmos4':['D','G','S','B'],'packaged_npn4':['C','B','E','SUB'],
+              'packaged_resistor3':['P','N','SUB'],'packaged_kelvin_shunt4':['FP','FN','SP','SN'],
+              'packaged_feedthrough_capacitor3':['IN','OUT','GND']}[family]
         check(recipe['pins']==pins and all('\n'+prefix in recipe['source'] for prefix in ('RPKG','LPKG','CPKG')),
               family+' exports exact pins and explicit package R/L/C')
         document=Document.from_netlist(RC_DECK);before=deepcopy(document.data)

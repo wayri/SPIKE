@@ -32,7 +32,7 @@ Follow the [evidence policy](../NUMERICAL_METHOD_EVIDENCE.md) and
 
 ## Verification and validation plan versus executed evidence
 
-| Case and independent reference | Observable/unit/tolerance set before execution | Refinement/invariants/failure controls | Executed source/input/output/log binding and actual result | Remaining applicability gap |
+| Case and independent reference | Observable/unit/tolerance set before execution | Refinement/invariants/failure controls | Executed source, input, output and log binding and actual result | Remaining applicability gap |
 | --- | --- | --- | --- | --- |
 | Record actual case; do not reuse tuned data as held-out validation | Record quantitative limits | Record meaningful controls | Distinguish planned/unrun from executed | Preserve unknowns |
 

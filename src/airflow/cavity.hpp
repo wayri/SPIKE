@@ -16,6 +16,8 @@ struct Result {
     double time = 0, dt = 0, divergence = 0, steady_rate = 0;
     double poisson_residual = 0;
     std::vector<double> u, v, pressure;
+    // Accepted MAC faces: u[j*(n+1)+i], v[j*n+i], including zero wall normals.
+    std::vector<double> face_u, face_v;
 };
 // Cell-centred Neumann negative Laplacian, and zero-mean conjugate-gradient solve.
 std::vector<double> negative_laplacian(const std::vector<double>& p, int n);

@@ -122,7 +122,9 @@ class EMergeMeshTests(unittest.TestCase):
         config = json.loads((root/"examples/emerge/antenna_run.json").read_text())
         design = json.loads(json.dumps(import_kicad_design(str(root/config["board"])).to_dict()))
         params = config["parameters"]
-        params["python_executable"] = str(root/".venv-emerge3/Scripts/python.exe")
+        params["python_executable"] = os.environ.get(
+            "SPIKE_EMERGE_TEST_PYTHON", str(root/".venv-emerge3/Scripts/python.exe"),
+        )
         request = self.request()
         request["context"] = {"design": design, "parameters": params, "design_binding": design_digest(design)}
         preview = execute(request)

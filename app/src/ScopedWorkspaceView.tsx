@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
+import { createPortal } from "react-dom";
+import { Layers3, SlidersHorizontal, X } from "./icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BoardViewport, { type BoardObject, type SelectionFilter } from "./BoardViewport";
 import type { Viewport2DState, Viewport3DCameraState } from "./workspaceState";
@@ -11,10 +13,11 @@ import ViewportActionMenu from "./ViewportActionMenu";
 const EMPTY: Record<string, boolean> = {};
 const EMPTY_OPACITY: Record<string, number> = {};
 
-export default function ScopedWorkspaceView({ snapshot, viewport, connected = true, onAction }: {
+export default function ScopedWorkspaceView({ snapshot, viewport, connected = true, onAction, toolbarHost }: {
   snapshot: WorkspaceViewSnapshot;
   viewport: WorkspaceViewViewportData | null;
   connected?: boolean;
+  toolbarHost?: HTMLElement | null;
   onAction: (action: WorkspaceViewAction) => unknown | Promise<unknown>;
 }) {
   const initial = snapshot.descriptor.presentation;
@@ -26,6 +29,7 @@ export default function ScopedWorkspaceView({ snapshot, viewport, connected = tr
   const [selectedId, setSelectedId] = useState<string | null>(initial?.selectedObjectId ?? null);
   const [navigationMode, setNavigationMode] = useState<"orbit" | "pan">("orbit");
   const [context, setContext] = useState<{x:number;y:number}|null>(null);
+  const [layersOpen, setLayersOpen] = useState(false);
   const [actionError, setActionError] = useState("");
   const [cameraCommand, setCameraCommand] = useState("");
   const camera = useRef<Viewport3DCameraState | undefined>(initial?.camera3d);
@@ -84,20 +88,22 @@ export default function ScopedWorkspaceView({ snapshot, viewport, connected = tr
   const command = (name: string) => setCameraCommand(`${name}:${crypto.randomUUID()}`);
 
   const essentials = <ViewportEssentialTools viewMode={viewMode} navigationMode={navigationMode} selectionFilter={selectionFilter} onMode={changeMode} onNavigation={setNavigationMode} onFilter={changeFilter} onCamera={command}/>;
+  const toolbar = <header className="workspace-view-toolbar">
+      {essentials}
+      <button type="button" disabled={!connected} onClick={() => emit({ type: "open-analysis", domain: snapshot.analysisDomain ?? "results", ...(occurrenceId ? { occurrenceId } : { partId: scope.kind === "assembly-part" ? scope.partId : undefined }) })} className="spike-control--icon" aria-label="Analysis setup" title="Analysis setup"><SlidersHorizontal size={15}/></button>
+      {occurrenceId && layerNames.length > 0 && <button type="button" className="spike-control--icon" aria-label="Layer visibility" title="Layer visibility" aria-expanded={layersOpen} onClick={()=>setLayersOpen(value=>!value)}><Layers3 size={15}/></button>}
+      <span title={scope.kind === "board-occurrence" ? scope.occurrenceId : scope.partId}>{snapshot.descriptor.title}</span>
+    </header>;
   if (!snapshot.valid) return <section className="workspace-view-invalid" role="status"><b>View unavailable</b><span>{snapshot.invalidReason ?? "This assembly scope no longer exists in the active project."}</span></section>;
   return <section className="workspace-view" aria-label={snapshot.descriptor.title}>
     {!connected && <div className="workspace-view-disconnected" role="alert">The owning SPIKE workspace disconnected. This view is read-only; close it and reopen from the project.</div>}
     {actionError && <div className="workspace-view-disconnected" role="alert">{actionError}</div>}
-    <header className="workspace-view-toolbar">
-      {essentials}
-      <button type="button" disabled={!connected} onClick={() => emit({ type: "open-analysis", domain: snapshot.analysisDomain ?? "results", ...(occurrenceId ? { occurrenceId } : { partId: scope.kind === "assembly-part" ? scope.partId : undefined }) })}>Analysis setup</button>
-      <span title={scope.kind === "board-occurrence" ? scope.occurrenceId : scope.partId}>{snapshot.descriptor.title}</span>
-    </header>
-    {occurrenceId && layerNames.length > 0 && <details className="workspace-view-layers"><summary>Layers</summary>{layerNames.map(layer => <div key={layer}>
+    {toolbarHost ? createPortal(toolbar, toolbarHost) : toolbar}
+    {occurrenceId && layerNames.length > 0 && layersOpen && <section className="workspace-view-layers" aria-label="Layer visibility controls"><header><strong>Layers</strong><button type="button" className="spike-control--icon" aria-label="Close layer visibility" onClick={()=>setLayersOpen(false)}><X size={14}/></button></header>{layerNames.map(layer => <div key={layer}>
       <label><input type="checkbox" checked={layers[layer] !== false} disabled={!connected} onChange={event => emit({ type: "layer-visibility", occurrenceId, layer, value: event.target.checked })}/>{layer}</label>
       <input aria-label={`${layer} opacity`} type="range" min="0" max="1" step="0.05" value={opacity[layer] ?? 1} disabled={!connected} onChange={event => emit({ type: "layer-opacity", occurrenceId, layer, value: Number(event.target.value) })}/>
       <button type="button" disabled={!connected} onClick={() => emit({ type: "layer-focus", occurrenceId, layer })}>Focus</button>
-    </div>)}</details>}
+    </div>)}</section>}
     <div className="workspace-view-stage">{!viewport ? <div className="workspace-view-loading" role="status">Preparing scoped board graphics…</div> : <BoardViewport
       viewportBackground={appearance.viewportBackground} showWorldGrid={appearance.viewportGrid} renderingQuality={appearance.renderQuality} antialiasing={appearance.antialiasing} maximumFps={appearance.maximumFps}
       board={activeBoard} viewMode={viewMode} visibleLayers={layers} layerOpacity={opacity} layerSeparation={0}

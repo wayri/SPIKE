@@ -73,14 +73,16 @@ Reproduce the original retained STEP/package workflow without a package-path
 override, using fresh output paths:
 
 ```powershell
-build/qualification-py311/Scripts/python.exe scripts/validate_transient_thermal.py --retained-step-only --output output/acc04-new/validation.json --artifacts output/acc04-new/artifacts
+build/qualification-py311/Scripts/python.exe scripts/validate_transient_thermal.py --retained-step-only --output "$env:TEMP/spike-acc04/validation.json" --artifacts "$env:TEMP/spike-acc04/artifacts"
 build/qualification-py311/Scripts/python.exe -m unittest tests.python.test_gmsh_environment tests.python.test_gmsh_occ_runtime tests.python.test_assembly_thermal_meshing tests.python.test_gmsh_extension -q
 ```
 
-`output/acc04-20261013/validation.json` passed the actual 288-node, five-frame
+The unbundled local `acc04-20261013/validation.json` record passed the actual
+288-node, five-frame
 SPIKE/CalculiX comparison (maximum difference 0.0108044 K) and project save/read
 checks. Bound sources were unchanged before/after execution. The original
-failed environment evidence under `output/solver-comprehensive-20261012` is
+failed environment evidence in the unbundled local `solver-comprehensive-20261012`
+run is
 unchanged. The new artifacts retain the exact generated STEP, mesher inputs,
 mesh, native logs, environment, thermal histories and portable project.
 This rerun isolates the environment repair; it does not close the separate

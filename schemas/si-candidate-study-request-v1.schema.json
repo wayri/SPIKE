@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/si-candidate-study-request-v1.schema.json",
+  "title": "SPIKE experimental finite SI candidate/corner study request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "candidate_ids",
+    "corner_ids",
+    "cases",
+    "limits"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/si-candidate-study-request/v1"
+    },
+    "candidate_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+      },
+      "uniqueItems": true
+    },
+    "corner_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+      },
+      "uniqueItems": true
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "candidate_id",
+          "corner_id",
+          "request"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "corner_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "request": {
+            "allOf": [
+              {
+                "$ref": "si-workflow-request-v1.schema.json"
+              },
+              {
+                "required": [
+                  "contract",
+                  "channel",
+                  "sources",
+                  "receivers",
+                  "run_time_domain"
+                ],
+                "properties": {
+                  "run_time_domain": {
+                    "const": false
+                  },
+                  "edits": {
+                    "maxItems": 0
+                  },
+                  "resonance_requests": {
+                    "maxItems": 0
+                  },
+                  "channel": {
+                    "required": [
+                      "kind",
+                      "coupled",
+                      "length_m",
+                      "resistance_ohm_per_m",
+                      "inductance_h_per_m",
+                      "capacitance_f_per_m",
+                      "loss_tangent",
+                      "frequency_stop_hz",
+                      "frequency_points",
+                      "reference_impedance_ohm"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "const": "rlgc"
+                      },
+                      "coupled": {
+                        "const": false
+                      },
+                      "frequency_points": {
+                        "type": "integer",
+                        "minimum": 3,
+                        "maximum": 1024
+                      },
+                      "frequency_stop_hz": {
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 100000000000000.0
+                      }
+                    }
+                  },
+                  "sources": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                      "required": [
+                        "port",
+                        "resistance_ohm"
+                      ],
+                      "properties": {
+                        "port": {
+                          "const": 0
+                        }
+                      },
+                      "not": {
+                        "anyOf": [
+                          {
+                            "required": [
+                              "ibis"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "cdr"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "receivers": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                      "required": [
+                        "port",
+                        "resistance_ohm",
+                        "capacitance_f"
+                      ],
+                      "properties": {
+                        "port": {
+                          "const": 1
+                        }
+                      },
+                      "not": {
+                        "anyOf": [
+                          {
+                            "required": [
+                              "ibis"
+                            ]
+                          },
+                          {
+                            "required": [
+                              "cdr"
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "limits": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "metric",
+          "frequency_band_hz",
+          "bound"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "metric": {
+            "enum": [
+              "min_gain",
+              "max_gain"
+            ]
+          },
+          "frequency_band_hz": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "prefixItems": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "number",
+                "minimum": 0
+              }
+            ],
+            "items": false
+          },
+          "bound": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000000000000.0
+          }
+        }
+      }
+    }
+  },
+  "description": "Runtime additionally enforces full unique Cartesian case coverage, identical frequency grids, ordered nonempty in-grid bands and strict finite JSON/resource admission. Child domain errors are retained per case; schema validation does not replace numerical checks."
+}

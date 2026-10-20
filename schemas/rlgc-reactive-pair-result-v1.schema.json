@@ -1,0 +1,394 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-reactive-pair-result-v1.schema.json",
+  "title": "SPIKE sampled series R/L and shunt C coupled pair result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "source_request",
+    "pair_result",
+    "points",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-reactive-pair-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_request": {
+      "$ref": "rlgc-reactive-pair-request-v1.schema.json"
+    },
+    "pair_result": {
+      "$ref": "rlgc-coupled-pair-result-v1.schema.json"
+    },
+    "points": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "terminals",
+          "feedback_condition",
+          "feedback_residual",
+          "power_balance"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "terminals": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "port",
+                "resistance_ohm",
+                "inductance_h",
+                "capacitance_f",
+                "source_voltage_v",
+                "voltage_v",
+                "current_into_line_a",
+                "source_current_a",
+                "capacitor_current_a",
+                "source_power_va",
+                "line_power_va",
+                "kvl_residual_v",
+                "complex_power_residual_va",
+                "resistor_heat_w",
+                "inductor_average_energy_j",
+                "capacitor_average_energy_j",
+                "reactive_exchange_var"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80,
+                  "pattern": "\\S"
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 3
+                },
+                "resistance_ohm": {
+                  "type": "number",
+                  "minimum": 1e-06,
+                  "maximum": 1000000000000.0
+                },
+                "inductance_h": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000.0
+                },
+                "capacitance_f": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "source_voltage_v": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "voltage_v": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "current_into_line_a": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "source_current_a": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "capacitor_current_a": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "source_power_va": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "line_power_va": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "kvl_residual_v": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "complex_power_residual_va": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "real",
+                    "imag"
+                  ],
+                  "properties": {
+                    "real": {
+                      "type": "number"
+                    },
+                    "imag": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "resistor_heat_w": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "inductor_average_energy_j": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "capacitor_average_energy_j": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "reactive_exchange_var": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "feedback_condition": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000.0
+          },
+          "feedback_residual": {
+            "type": "number",
+            "minimum": 0
+          },
+          "power_balance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_power_va",
+              "line_power_va",
+              "terminal_resistor_heat_w",
+              "line_conductor_heat_w",
+              "line_dielectric_heat_w",
+              "total_heat_w",
+              "terminal_inductor_average_energy_j",
+              "terminal_capacitor_average_energy_j",
+              "terminal_reactive_exchange_var",
+              "source_residual_w",
+              "line_residual_w",
+              "terminal_complex_residual_va"
+            ],
+            "properties": {
+              "source_power_va": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              },
+              "line_power_va": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              },
+              "terminal_resistor_heat_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "line_conductor_heat_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "line_dielectric_heat_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "total_heat_w": {
+                "type": "number",
+                "minimum": 0
+              },
+              "terminal_inductor_average_energy_j": {
+                "type": "number",
+                "minimum": 0
+              },
+              "terminal_capacitor_average_energy_j": {
+                "type": "number",
+                "minimum": 0
+              },
+              "terminal_reactive_exchange_var": {
+                "type": "number"
+              },
+              "source_residual_w": {
+                "type": "number"
+              },
+              "line_residual_w": {
+                "type": "number"
+              },
+              "terminal_complex_residual_va": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

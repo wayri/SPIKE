@@ -1315,6 +1315,13 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("pdn-network", help="Solve an explicit lumped PI network: AC impedance and optional load transient").add_argument("request", type=Path)
     sub.add_parser("rlgc-cascade", help="Solve a supplied piecewise RLGC line, local fields and section losses").add_argument("request", type=Path)
     sub.add_parser("rlgc-junction", help="Solve supplied RLGC star legs, coherent fields and distributed losses").add_argument("request", type=Path)
+    sub.add_parser("rlgc-coupled-pair", help="Solve supplied symmetric coupled pair, coherent conductor fields and pair losses").add_argument("request", type=Path)
+    sub.add_parser("rlgc-terminated-pair", help="Load a supplied coupled pair with physical resistive sources and retain terminal/line heat").add_argument("request", type=Path)
+    sub.add_parser("rlgc-loaded-star", help="Drive a supplied coupled star with physical RLC sources and loads; retain branch fields and separate heat and storage").add_argument("request", type=Path)
+    sub.add_parser("rlgc-coupled-star", help="Connect supplied coupled legs at two ideal conductor nodes; retain branch fields and heat").add_argument("request", type=Path)
+    sub.add_parser("rlgc-loaded-cascade", help="Drive a supplied coupled cascade with physical R/L/C sources and loads; retain fields, heat and mean stored energy").add_argument("request", type=Path)
+    sub.add_parser("rlgc-coupled-cascade", help="Connect supplied coupled-line sections with ideal interfaces; retain section fields and heat").add_argument("request", type=Path)
+    sub.add_parser("rlgc-reactive-pair", help="Load a supplied coupled pair with series R/L and shunt C; retain heat, reactive power and stored energy separately").add_argument("request", type=Path)
     pdn = sub.add_parser("pdn-review", help="Check an AC result against a PDN target and screen lumped decoupling candidates")
     pdn.add_argument("result", type=Path)
     pdn.add_argument("--target-ohm", type=float, required=True)
@@ -1458,6 +1465,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     si_channel.add_argument("design", type=Path, help="SpiDeR v2 JSON or object containing design_ir")
     si_channel.add_argument("request", type=Path, help=f"{SI_CHANNEL_REQUEST_CONTRACT} JSON")
+    si_candidates = sub.add_parser("si-candidate-study", help="Compare explicit supplied-line SI candidates and corners (experimental)")
+    si_candidates.add_argument("request", type=Path, help="Finite SI candidate study request JSON")
     si_workflow = sub.add_parser("si-workflow", help="Run an experimental source/receiver/passive loaded SI study")
     si_workflow.add_argument("request", type=Path, help="SI workflow request JSON")
     si_workflow.add_argument("--design", type=Path, help="Optional canonical SpiDeR v2 JSON for geometry extraction")
@@ -1872,6 +1881,34 @@ def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
         if args.request.stat().st_size > 8 * 1024 * 1024:
             raise CliError("PDN network request exceeds 8 MiB.")
         result = _response("evaluate_pdn_network", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-loaded-star":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Loaded star request exceeds 8 MiB.")
+        result = _response("run_rlgc_loaded_star", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-coupled-star":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Coupled star request exceeds 8 MiB.")
+        result = _response("run_rlgc_coupled_star", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-loaded-cascade":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Loaded cascade request exceeds 8 MiB.")
+        result = _response("run_rlgc_loaded_cascade", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-coupled-cascade":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Coupled cascade request exceeds 8 MiB.")
+        result = _response("run_rlgc_coupled_cascade", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-reactive-pair":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Reactive pair request exceeds 8 MiB.")
+        result = _response("run_rlgc_reactive_pair", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-terminated-pair":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Terminated pair request exceeds 8 MiB.")
+        result = _response("run_rlgc_terminated_pair", {"request": _read_json(args.request)})["result"]
+    elif args.command == "rlgc-coupled-pair":
+        if args.request.stat().st_size > 8 * 1024 * 1024:
+            raise CliError("Coupled pair request exceeds 8 MiB.")
+        result = _response("run_rlgc_coupled_pair", {"request": _read_json(args.request)})["result"]
     elif args.command == "rlgc-junction":
         if args.request.stat().st_size > 8 * 1024 * 1024:
             raise CliError("RLGC junction request exceeds 8 MiB.")
@@ -2113,6 +2150,10 @@ def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
         if args.request.stat().st_size > 8 * 1024 * 1024:
             raise CliError("Harness analysis request exceeds 8 MiB.")
         result = _response("run_harness_si" if args.command == "harness-si" else "prepare_harness_em", {"request": _read_json(args.request)})["result"]
+    elif args.command == "si-candidate-study":
+        if args.request.stat().st_size > 2 * 1024 * 1024:
+            raise CliError("SI candidate study request exceeds 2 MiB.")
+        result = _response("run_si_candidate_study", {"request": _read_json(args.request)})["result"]
     elif args.command == "si-workflow":
         design_data = _read_json(args.design) if args.design else None
         if design_data and isinstance(design_data.get("design_ir"), dict):

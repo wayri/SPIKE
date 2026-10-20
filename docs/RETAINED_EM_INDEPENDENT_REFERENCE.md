@@ -75,13 +75,14 @@ actual values in `validation-summary.json`.
 
 ```powershell
 .venv/Scripts/python.exe -m unittest tests.python.test_retained_em_reference -v
-.venv/Scripts/python.exe scripts/validate_retained_assembly_em.py --output output/new-independent-em
-.venv/Scripts/python.exe scripts/validate_retained_em_field_scaling.py output/new-independent-em/spatial
+.venv/Scripts/python.exe scripts/validate_retained_assembly_em.py --output "$env:TEMP/spike-new-independent-em"
+.venv/Scripts/python.exe scripts/validate_retained_em_field_scaling.py "$env:TEMP/spike-new-independent-em/spatial"
 ```
 
 `--resume` retains completed cases and places one retry of an interrupted case
 in a separate directory. Failed/interrupted artifacts remain evidence.
-The 2026-10-11 run is in `output/retained-assembly-em-independent-20261011`.
+The 2026-10-11 run is an unbundled local record named
+`retained-assembly-em-independent-20261011`.
 The duration variant doubles the 40,000 timestep cap and tightens energy decay
 from 1e-6 to 1e-9. It reaches the 80,000 step cap at an approximately -81.74 dB
 energy floor, missing the requested -90 dB criterion. It must not be reported

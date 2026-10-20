@@ -3,6 +3,10 @@
 
 #include "spikes/dc_solver.hpp"
 #include "spikes/osdi_device.hpp"
+#include "spikes/io_pad.hpp"
+#include "spikes/io_pad_events.hpp"
+#include <unordered_map>
+#include <memory>
 #include <sstream>
 #include <cmath>
 #include "spikes/transient_solver.hpp"
@@ -17,6 +21,7 @@
 
 struct spikes_circuit {
   spikes::Circuit value;
+  std::unordered_map<std::string, spikes::IoPadBinding> pads;
 };
 
 struct spikes_smps_result {
@@ -73,6 +78,8 @@ struct spikes_transient_session {
         token(next_session_token.fetch_add(1, std::memory_order_relaxed)) {}
   spikes::TransientSession value;
   std::uint64_t token;
+  std::unordered_map<std::string, spikes::IoPadBinding> pads;
+  spikes::IoPadEventQueue pad_events;
 };
 
 struct spikes_transient_checkpoint {
@@ -81,6 +88,8 @@ struct spikes_transient_checkpoint {
       : value(std::move(checkpoint)), owner_token(session_token) {}
   spikes::TransientSessionCheckpoint value;
   std::uint64_t owner_token;
+  std::unordered_map<std::string, spikes::IoPadBinding> pads;
+  spikes::IoPadEventQueue pad_events;
 };
 
 namespace {
@@ -1150,7 +1159,9 @@ spikes_error_code spikes_transient_session_create_with_method(
   native.nonlinear.absolute_tolerance = options->absolute_tolerance;
   native.nonlinear.relative_tolerance = options->relative_tolerance;
   return guard([&] {
-    *out_session = new spikes_transient_session(circuit->value, native);
+    auto result = std::make_unique<spikes_transient_session>(circuit->value, native);
+    result->pads = circuit->pads;
+    *out_session = result.release();
   });
 }
 
@@ -1171,7 +1182,14 @@ spikes_error_code spikes_transient_session_set_resistance(
   if (session == nullptr || !valid_text(element_id)) {
     return invalid("session and resistor element id are required");
   }
-  return guard([&] { session->value.set_resistance(element_id, value); });
+  return guard([&] {
+    for (const auto &[prefix,pad] : session->pads) {
+      const auto ids=pad.element_ids();
+      if (std::find(ids.begin(),ids.end(),element_id)!=ids.end())
+        throw std::invalid_argument("owned GPIO branches must be updated through set_io_pad");
+    }
+    session->value.set_resistance(element_id, value);
+  });
 }
 
 spikes_error_code spikes_transient_session_set_mosfet_threshold(
@@ -1189,7 +1207,9 @@ spikes_error_code spikes_transient_session_step(
   }
   *out_accepted = 0u;
   return guard([&] {
-    *out_accepted = session->value.step(step_s) ? 1u : 0u;
+    *out_accepted = (session->pad_events.size()
+        ? session->pad_events.advance(session->value,session->pads,step_s)
+        : session->value.step(step_s)) ? 1u : 0u;
   });
 }
 
@@ -1337,8 +1357,11 @@ spikes_error_code spikes_transient_session_checkpoint_create(
   }
   *out_checkpoint = nullptr;
   return guard([&] {
-    *out_checkpoint = new spikes_transient_checkpoint(
+    auto result = std::make_unique<spikes_transient_checkpoint>(
         session->value.checkpoint(), session->token);
+    result->pads = session->pads;
+    result->pad_events = session->pad_events;
+    *out_checkpoint = result.release();
   });
 }
 
@@ -1356,7 +1379,115 @@ spikes_error_code spikes_transient_session_restore(
   if (session->token != checkpoint->owner_token) {
     return invalid("checkpoint belongs to a different persistent session");
   }
-  return guard([&] { session->value.restore(checkpoint->value); });
+  return guard([&] {
+    auto pads = checkpoint->pads;
+    auto events = checkpoint->pad_events;
+    session->value.restore(checkpoint->value);
+    session->pads.swap(pads);
+    session->pad_events=std::move(events);
+  });
+}
+
+extern "C++" { namespace {
+spikes::IoPadState io_pad_state(const spikes_io_pad_state &s) {
+  if (s.mode > 3 || s.output > 2 || s.drive_level > 1 || s.pull > 2)
+    throw std::invalid_argument("invalid GPIO pad state enum");
+  return {static_cast<spikes::IoPadDriveMode>(s.mode),
+          static_cast<spikes::IoPadOutputState>(s.output),
+          static_cast<spikes::IoPadDriveLevel>(s.drive_level),
+          static_cast<spikes::IoPadPull>(s.pull)};
+}
+} }
+
+spikes_error_code spikes_circuit_add_io_pad(
+    spikes_circuit *circuit, const char *prefix, const char *pad,
+    const char *vdd, const char *vss, const spikes_io_pad_config *c,
+    const spikes_io_pad_state *initial) {
+  if (!circuit || !valid_text(prefix) || !valid_text(pad) ||
+      !valid_text(vdd) || !valid_text(vss) || !c || !initial)
+    return invalid("circuit, pad terminals, config and initial state required");
+  if (c->struct_version != 1 || c->struct_size != sizeof(*c) ||
+      c->enable_clamp_to_vdd > 1 || c->enable_clamp_to_vss > 1)
+    return invalid("unsupported pad config size/version or clamp flag");
+  return guard([&] {
+    if (circuit->pads.contains(prefix))
+      throw std::invalid_argument("duplicate GPIO pad prefix");
+    spikes::IoPadConfig config;
+    config.high_strong_resistance_ohm=c->high_strong_resistance_ohm;
+    config.high_weak_resistance_ohm=c->high_weak_resistance_ohm;
+    config.low_strong_resistance_ohm=c->low_strong_resistance_ohm;
+    config.low_weak_resistance_ohm=c->low_weak_resistance_ohm;
+    config.pull_up_resistance_ohm=c->pull_up_resistance_ohm;
+    config.pull_down_resistance_ohm=c->pull_down_resistance_ohm;
+    config.off_resistance_ohm=c->off_resistance_ohm;
+    config.package_resistance_ohm=c->package_resistance_ohm;
+    config.package_inductance_h=c->package_inductance_h;
+    config.capacitance_to_vss_f=c->capacitance_to_vss_f;
+    config.capacitance_to_vdd_f=c->capacitance_to_vdd_f;
+    config.enable_clamp_to_vdd=c->enable_clamp_to_vdd!=0;
+    config.enable_clamp_to_vss=c->enable_clamp_to_vss!=0;
+    config.clamp_diode={c->clamp_saturation_current_a,
+                        c->clamp_emission_coefficient,c->clamp_temperature_k};
+    auto staged = circuit->value;
+    auto pads = circuit->pads;
+    pads.emplace(prefix, spikes::add_io_pad(staged,prefix,pad,vdd,vss,config,
+                                           io_pad_state(*initial)));
+    circuit->value = std::move(staged);
+    circuit->pads.swap(pads);
+  });
+}
+
+spikes_error_code spikes_transient_session_set_io_pad(
+    spikes_transient_session *session, const char *prefix,
+    const spikes_io_pad_state *state) {
+  if (!session || !valid_text(prefix) || !state)
+    return invalid("session, GPIO pad prefix and state required");
+  return guard([&] {
+    auto found=session->pads.find(prefix);
+    if (found==session->pads.end()) throw std::out_of_range("GPIO pad not in this session");
+    spikes::update_io_pad(session->value,found->second,io_pad_state(*state));
+  });
+}
+
+spikes_error_code spikes_io_pad_receive(
+    double pad_v, double vdd_v, double vss_v, double vil_ratio,
+    double vih_ratio, uint32_t previous, uint32_t *result) {
+  if (!result || previous>2) return invalid("receiver output and valid previous state required");
+  return guard([&] {
+    *result=static_cast<uint32_t>(spikes::receiver_voltage_state(
+        pad_v,vdd_v,vss_v,vil_ratio,vih_ratio,
+        static_cast<spikes::IoPadReceiverState>(previous)));
+  });
+}
+
+spikes_error_code spikes_transient_session_schedule_io_pad(
+    spikes_transient_session *session,const char *prefix,uint64_t time_ns,
+    const spikes_io_pad_state *state) {
+  if (!session || !valid_text(prefix) || !state) return invalid("session, GPIO prefix and state required");
+  return guard([&] { session->pad_events.schedule(session->value,session->pads,
+                                                 prefix,time_ns,io_pad_state(*state)); });
+}
+
+spikes_error_code spikes_transient_session_pending_io_pads(
+    const spikes_transient_session *session,size_t *count,uint64_t *next_ns) {
+  if (!session || !count || !next_ns) return invalid("session and GPIO queue outputs required");
+  *count=session->pad_events.size();*next_ns=session->pad_events.next_time_ns();
+  last_error.clear();return SPIKES_OK;
+}
+
+spikes_error_code spikes_transient_session_observe_io_pad(
+    const spikes_transient_session *session,const char *prefix,
+    double *values,size_t count) {
+  if (!session || !valid_text(prefix) || !values || count!=7)
+    return invalid("session, pad prefix and seven-double observation buffer required");
+  return guard([&] {
+    auto found=session->pads.find(prefix);
+    if (found==session->pads.end()) throw std::out_of_range("GPIO pad not in this session");
+    const auto o=spikes::observe_io_pad(session->value,found->second);
+    const std::array<double,7> fields{o.pad_voltage_v,o.die_voltage_v,
+      o.vdd_voltage_v,o.vss_voltage_v,o.pad_current_a,o.vdd_current_a,o.vss_current_a};
+    std::copy(fields.begin(),fields.end(),values);
+  });
 }
 
 spikes_error_code spikes_smps_analyze(const spikes_smps_config* input,spikes_smps_result** output) {

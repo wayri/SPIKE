@@ -97,7 +97,8 @@ Affected solid, transient, airflow admission, native exporter, project and MCP
 regression group: 66 tests passed. Encapsulation persistence group: 6 tests
 passed. TypeScript, airflow control tests, shared button standards and the
 architecture guard passed. Runtime evidence is in the local
-`output/assembly-capabilities-20261010` directory.
+unbundled local `assembly-capabilities-20261010` run directory. See the
+[release evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
 
 The prepared retained-board/case airflow mesh has 6,497 tetrahedra and 1,473
 vertices; maximum solid CAD/mesh volume discrepancy is 0.00355%. This is geometry

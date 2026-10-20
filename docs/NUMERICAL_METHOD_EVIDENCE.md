@@ -1,6 +1,127 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Numerical method evidence policy
 
+The [native particle reference](validation/NATIVE_PARTICLE_REFERENCE_20261021.md)
+derives relativistic kinematics, signed electrostatic work, dilute hard-sphere
+gas statistics and a distinct stationary-target beam attenuation model.
+It records SI constants, separate applicability limits and analytical oracles;
+it does not establish charged trajectories, PSF, Brownian, dense-fluid or
+SEM/TEM capability. See the [requested development scope](CHARGED_PARTICLE_VACUUM_PLAN.md).
+
+The [native planar optics reference](validation/NATIVE_OPTICS_REFERENCE_20261021.md)
+derives fixed-convention E/H continuity, Poynting entry power, depth absorption
+and ideal unitary coherent ports independently. Its Release-active analytical
+checks do not qualify a material dataset, spatial instrument, emissivity model
+or spectral band. The [development plan](OPTICS_PHOTONICS_MATERIALS_PLAN.md)
+preserves separate research, data-admission and release gates.
+
+The [annular contact/port record](validation/PI01_ANNULAR_CONTACT_20261021.md)
+links independently derived cylindrical RT0 conduction and passive circuit
+coupling to reviewed primary foundations, units, quadrature/condition limits,
+independent continuum/nodal oracles and executed source-bound evidence. Native
+source geometry authentication remains separate from supplied electrode and
+material assumptions. All results remain experimental; full PI01-S02 and human
+numerical release review stay open.
+
+[Part operating-limit reports](PART_LIMITS.md) use independently authored decimal
+comparison and declared reference-to-bound allowance ratios. They do not add a
+physics solver, manufacturer rating law or qualification claim. The documented
+SI temperature-interval foundation, offset-invariant derivation and independent
+scalar/boundary/coverage oracles remain distinct from pending human review.
+
+The [3-D land reference](DC_LAND_TRANSITION.md) derives explicit Cartesian face
+bases, exact Ohmic mass, gauge-inclusive conservation and conjugate patch work
+from reviewed primary conduction/separation foundations. Its
+[verification](validation/PI01_LAND_TRANSITION_20261021.md) retains independent
+harmonic fields, SI Gauss integration, cosine-series continuum refinement and
+arithmetic/forgery counterexamples. This qualifies a bounded mathematical
+reference, not automatic annular/board physics or physical measurements.
+
+The [tetrahedral CAD/open-boundary record](validation/CFD_CAD_OPEN_BOUNDARY_20261021.md)
+links independently derived geometry/robust predicates, CR/P0 creeping flow,
+and RT0/P0 sensible energy. Actual STEP examples exposed and repaired a rigid
+placement/analytic-volume defect; integrated energy qualification is recorded
+separately from the mathematical tests. These are bounded in-process research
+APIs, not qualified engineering turbulence or turbulent CHT. The
+[workflow](CFD_TETRA_WORKFLOW.md) retains prerequisite and transferred
+circuit/thermal/airflow work explicitly.
+
+The [PI01 geometry/ownership increment](validation/PI01_GEOMETRY_OWNERSHIP_20261021.md)
+records reviewed precision-noding API semantics, independently authored topology
+and uncertainty admission, and annular axial conservation/Ohm/Joule derivations.
+Clipped gap resistance is checked by a fresh reduced DC solve; old currents are
+never relabeled. Land transitions and whole-board density remain unresolved.
+
+The [finite-contact DC benchmark](PI_FINITE_CONTACT_BENCHMARK.md) independently
+derives conserved sheet current, area-average terminal resistance and integrated
+Joule work from reviewed steady conduction and mixed-flux foundations. Its
+[execution record](validation/PI01_FINITE_CONTACT_20261021.md) retains fixed
+refinement/error gates, raw ledgers and independent adversarial review. It tests
+existing experimental kernels; rotated polygon overlays and board qualification
+remain open.
+
+The [coupled mean/SA research record](validation/ENCLOSURE_RANS_RESEARCH_20261021.md)
+requires both equations at the same accepted velocity/pressure and updated
+closure, preserving molecular-Reynolds admission. Its independent continuum
+oracle is supplemented by polynomial/complex-step/covariance checks. The
+[field-analysis record](validation/ENCLOSURE_FLOW_ANALYSIS_20261021.md) derives
+RT0 normal-flux preservation and exact cell-local traces; these interrogate
+supplied fields, not the physical validity of a source solver. The
+[21 October review](validation/CFD_CHT_RESEARCH_REVIEW_20261021.md) records recent
+journal/preprint candidates separately from adopted methods.
+
+The [symmetric-stress record](validation/ENCLOSURE_SYMMETRIC_STRESS_20261020.md)
+derives a positive strain-energy operator with off-component coupling and an
+independent wrong-scalar-diffusion control. Its coarse quadratic order failure
+is retained separately from the finer asymptotic study. The
+[SA-noft2 record](validation/ENCLOSURE_SA_TRANSPORT_20261020.md) specifies the
+exact NASA variant/guard and nonlinear fixed-velocity transport balance. The
+[rotating-frame record](validation/ENCLOSURE_ROTATING_FRAME_20261020.md) derives
+weighted work-free Coriolis coupling and stable centrifugal gauge recovery.
+These are research prerequisites, not coupled turbulence or propeller validation;
+their [workflow](ENCLOSURE_FLOW_RESEARCH.md) retains those exclusions.
+
+The [refined obstacle momentum ledger](validation/ENCLOSURE_RECTILINEAR_MOMENTUM_20261020.md)
+derives integrated nonuniform primal/dual fluxes, the pressure adjoint and
+weighted kinetic balance from precisely reviewed Veldman sections. The
+[v2 execution record](validation/ENCLOSURE_CHT_V2_VALIDATION_20261020.md) retains
+independent re-entrant convergence, source-bound coupled results and repaired
+dimensional-underflow/derived-NaN counterexamples. Momentum is actually re-solved
+after tensor cuts; confined AMR, turbulence and rotating blades remain open.
+
+The [3-D enclosure CHT record](validation/ENCLOSURE_CHT_METHOD_20261020.md)
+derives shared sensible-energy fluxes, backward-Euler storage and a positive
+constant-vector conditioning diagnostic. It links separately derived staggered
+inertial momentum and conservative nested thermal transfer, exact reviewed
+source/version scopes, executed mathematical checks and two repaired accuracy
+counterexamples. Thermal refinement is not local momentum AMR. Turbulence,
+rotors, physical correlation and human numerical release review remain open.
+
+The 20 October 2026 [native CHT evidence](validation/NATIVE_CHT_METHOD_20261020.md) records the
+exact DOE/Fourier, NIST finite-volume/upwind and NASA conservation/refinement
+sources reviewed, independent discrete derivation, SI scaling, conditioning,
+actual native tests and remaining physical limits. The
+[surface-exchange record](COUPLED_SURFACE_EXCHANGE.md) derives conservative
+overlap loads and their adjoint reverse map, with precise primary-reference
+review scope, units/signs, cancellation and representability policy.
+Independent review found and the implementation fixed a tiny-area intermediate
+underflow; exact counterexamples and overflow/cancellation controls pass.
+Actual worker/CLI, malformed-result, interface energy and field-forgery tests
+remain distinct from physical validation. All these capabilities remain
+experimental and require knowledgeable human numerical review before release.
+
+The 20 October 2026
+[owned peripheral timing record](validation/NATIVE_PERIPHERAL_TIMING_20261020.md)
+records the reviewed timer/PWM, SPI and I2C sources; independent `ARR+1`,
+mode-0 edge and open-drain nine-clock formulations; exact integer-nanosecond
+admission; and the causal receiver rule. Timed receivers use the accepted
+electrical left limit before event outputs change. Native tests and a bounded
+four-test live STM32F407 adapter run establish only the declared fixed-clock,
+single-byte polled subset. They do not qualify vendor pads, RCC/reset/IRQ/DMA,
+cycle accuracy, whole-protocol compliance or physical SI/PI. See
+[ADR 0119](adr/0119-owned-native-peripheral-mmio-and-pads.md); knowledgeable
+human numerical and firmware review remains required.
+
 Applies to future physics-affecting implementation and changes across all SPIKE
 domains, including compact models, material laws, coupling, postprocessing,
 surrogates and acceleration. This implements the user's requirement for
@@ -53,6 +174,15 @@ as a reference for expression of measurement uncertainty. Neither document prove
 any particular SPIKE result or substitutes for domain-specific requirements.
 
 ## Research versus established use
+
+The 19 October 2026 follow-up records separately reviewed foundations,
+independent derivations and executed checks for
+[signed-flux RT0 density and complete planar support](DC_RT0_DENSITY.md) and
+[same-slab affine magnetic integration](validation/PEEC_AFFINE_SLAB_KERNEL_20261019.md).
+Both remain experimental. Neither replaces production branch statistics or
+qualifies the original EBrake request; unspecified physical contacts, axial
+support and full board AC integration remain open. Their primary-source scope,
+numerical tolerances and limitations are stated in those method records.
 
 Established governing laws do not automatically validate a new discretization,
 closure, constitutive fit or coupling algorithm. A research implementation must
@@ -153,7 +283,8 @@ independent held-out sinusoidal RC check had error ratios 7.92959 and 7.96398
 on halving h, consistent with third order. Independent review found a full-duty
 PULSE corner defect; the correction and session/batch equivalence were rerun.
 The source/binary/input-bound report
-`output/acc01-radau-20261018/report.json` passed all 42 signed/zero RC/RL runs,
+The unbundled local `acc01-radau-20261018/report.json` record passed all 42
+signed/zero RC/RL runs,
 at amplitudes 1, 1e-3 and 1e-6 V and steps 1, 0.5 and 0.25 us. Every accepted
 sample uses the unchanged `atol + 5e-6*abs(reference)` budget, with 1e-12 V and
 1e-15 A absolute floors. The independent finite-ramp oracle solves

@@ -1,6 +1,18 @@
 {
   "contract": "spike/schema-catalog/v1",
   "schemas": {
+    "spike/rlgc-reactive-pair-request/v1": "rlgc-reactive-pair-request-v1.schema.json",
+    "spike/rlgc-reactive-pair-result/v1": "rlgc-reactive-pair-result-v1.schema.json",
+    "spike/rlgc-terminated-pair-request/v1": "rlgc-terminated-pair-request-v1.schema.json",
+    "spike/rlgc-terminated-pair-result/v1": "rlgc-terminated-pair-result-v1.schema.json",
+    "spike/native-cht-request/v1": "native-cht-request-v1.schema.json",
+    "spike/native-cht-result/v1": "native-cht-result-v1.schema.json",
+    "spike/coupled-surface-exchange-request/v1": "coupled-surface-exchange-request-v1.schema.json",
+    "spike/coupled-surface-exchange-result/v1": "coupled-surface-exchange-result-v1.schema.json",
+    "spike/rlgc-coupled-pair-request/v1": "rlgc-coupled-pair-request-v1.schema.json",
+    "spike/rlgc-coupled-pair-result/v1": "rlgc-coupled-pair-result-v1.schema.json",
+    "spike/si-candidate-study-request/v1": "si-candidate-study-request-v1.schema.json",
+    "spike/si-candidate-study-result/v1": "si-candidate-study-result-v1.schema.json",
     "spike/assembly-em-request/v1": "assembly-em-request-v1.schema.json",
     "spike/assembly-em-result/v1": "assembly-em-result-v1.schema.json",
     "spike/magnetic-machine-study/v1": "magnetic-machine-study-v1.schema.json",
@@ -121,6 +133,20 @@
     "spike/rlgc-line-cascade-request/v1": "rlgc-line-cascade-request-v1.schema.json",
     "spike/rlgc-line-cascade-result/v1": "rlgc-line-cascade-result-v1.schema.json",
     "spike/rlgc-line-junction-request/v1": "rlgc-line-junction-request-v1.schema.json",
-    "spike/rlgc-line-junction-result/v1": "rlgc-line-junction-result-v1.schema.json"
+    "spike/rlgc-line-junction-result/v1": "rlgc-line-junction-result-v1.schema.json",
+    "spike/enclosure-cht-request/v1": "enclosure-cht-request-v1.schema.json",
+    "spike/enclosure-cht-result/v1": "enclosure-cht-result-v1.schema.json",
+    "spike/rlgc-coupled-cascade-request/v1": "rlgc-coupled-cascade-request-v1.schema.json",
+    "spike/rlgc-coupled-cascade-result/v1": "rlgc-coupled-cascade-result-v1.schema.json",
+    "spike/rlgc-loaded-cascade-request/v1": "rlgc-loaded-cascade-request-v1.schema.json",
+    "spike/rlgc-loaded-cascade-result/v1": "rlgc-loaded-cascade-result-v1.schema.json",
+    "spike/enclosure-cht-request/v2": "enclosure-cht-request-v2.schema.json",
+    "spike/enclosure-cht-result/v2": "enclosure-cht-result-v2.schema.json",
+    "spike/rlgc-coupled-star-request/v1": "rlgc-coupled-star-request-v1.schema.json",
+    "spike/rlgc-coupled-star-result/v1": "rlgc-coupled-star-result-v1.schema.json",
+    "spike/rlgc-loaded-star-request/v1": "rlgc-loaded-star-request-v1.schema.json",
+    "spike/rlgc-loaded-star-result/v1": "rlgc-loaded-star-result-v1.schema.json",
+    "spike/part-limits/v1": "part-limits-v1.schema.json",
+    "spike/part-limit-report/v1": "part-limit-report-v1.schema.json"
   }
 }

@@ -83,7 +83,7 @@ class PalaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'column count'):
             runtime.import_outputs(case['job_id'],self.binding)
     def test_safe_contained_command_and_cancellation(self):
-        self.params['runtime_path']=str(Path(__import__('sys').executable).resolve())
+        self.params['runtime_path']=str(Path(__import__('sys').executable))
         self.params['expected_mesh_sha256']=runtime.digest(self.mesh.read_bytes())
         event=threading.Event()
         event.set()

@@ -1,0 +1,157 @@
+{
+  "domain": "pi",
+  "limitations": [
+    "Finite retained conforming dielectric and insulating outer boundary only; no open/infinite boundary",
+    "Electroquasistatic RMS exp(+j*omega*t); no magnetic induction, propagation or radiation",
+    "Supplied constant permittivity, isotropic conductivity and loss tangent only; no inferred material dispersion",
+    "Zero-thickness equipotential electrode sheets; no electrode resistance or automatic PCB extraction",
+    "P1 geometry-specific refinement and independent/measured correlation remain required; no production qualification"
+  ],
+  "metrics": {
+    "maximum_relative_power_identity_error": 4.103238583253369e-15,
+    "mesh_cells": 162,
+    "mesh_nodes": 64
+  },
+  "model_status": "experimental",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "6d0f939171f7f912dd36a1810d96eb1ddeda0169b1aea047deddfade7a4f1115",
+    "result_sha256": "442e9843c1c2b26346efb508efce757ce7de384729a80662934a84d3b0bd0624",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "examples/pdn_dielectric_thermal/run_slab.py",
+        "sha256": "6f82811d161e9b2eb87f0b9d79d236dffcea0caa323c421b8ae793d8b494d54a"
+      },
+      {
+        "path": "python/spike_core/pdn_dielectric_ac.py",
+        "sha256": "06be9774d53d488a8ca7ee850c9b06c4903908f7fa4be9c2add00b860480af83"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "conductance_s": 0.5000314159265361,
+      "equivalent_capacitance_f": 9.999999999999985e-07,
+      "frequency_hz": 100.0,
+      "impedance_magnitude_ohm": 1.9998727653518313,
+      "relative_power_identity_error": 1.5542159093497784e-15,
+      "susceptance_s": 0.0006283185307179578
+    },
+    {
+      "conductance_s": 0.500067683561949,
+      "equivalent_capacitance_f": 9.999999999999985e-07,
+      "frequency_hz": 215.44346900318845,
+      "impedance_magnitude_ohm": 1.9997219757085303,
+      "relative_power_identity_error": 4.440446257577042e-16,
+      "susceptance_s": 0.001353671238968632
+    },
+    {
+      "conductance_s": 0.5001458198138062,
+      "equivalent_capacitance_f": 9.999999999999995e-07,
+      "frequency_hz": 464.15888336127773,
+      "impedance_magnitude_ohm": 1.9993828999490446,
+      "relative_power_identity_error": 2.2198505171922195e-15,
+      "susceptance_s": 0.0029163962761324623
+    },
+    {
+      "conductance_s": 0.500314159265358,
+      "equivalent_capacitance_f": 1.0000000000000002e-06,
+      "frequency_hz": 1000.0,
+      "impedance_magnitude_ohm": 1.9985865542687604,
+      "relative_power_identity_error": 6.657736343423434e-16,
+      "susceptance_s": 0.0062831853071795875
+    },
+    {
+      "conductance_s": 0.500676835619485,
+      "equivalent_capacitance_f": 9.999999999999993e-07,
+      "frequency_hz": 2154.4346900318824,
+      "impedance_magnitude_ohm": 1.996566715626474,
+      "relative_power_identity_error": 2.4390946380083695e-15,
+      "susceptance_s": 0.01353671238968632
+    },
+    {
+      "conductance_s": 0.5014581981380665,
+      "equivalent_capacitance_f": 1.0000000000000038e-06,
+      "frequency_hz": 4641.588833612777,
+      "impedance_magnitude_ohm": 1.9908201464908264,
+      "relative_power_identity_error": 3.5364676891629697e-15,
+      "susceptance_s": 0.02916396276132474
+    },
+    {
+      "conductance_s": 0.5031415926535894,
+      "equivalent_capacitance_f": 9.99999999999998e-07,
+      "frequency_hz": 10000.0,
+      "impedance_magnitude_ohm": 1.9721936198722791,
+      "relative_power_identity_error": 1.1164684457289843e-15,
+      "susceptance_s": 0.06283185307179574
+    },
+    {
+      "conductance_s": 0.506768356194842,
+      "equivalent_capacitance_f": 1.0000000000000012e-06,
+      "frequency_hz": 21544.346900318822,
+      "impedance_magnitude_ohm": 1.9064454209555233,
+      "relative_power_identity_error": 1.5408932088591804e-15,
+      "susceptance_s": 0.13536712389686345
+    },
+    {
+      "conductance_s": 0.5145819813806625,
+      "equivalent_capacitance_f": 9.99999999999999e-07,
+      "frequency_hz": 46415.888336127726,
+      "impedance_magnitude_ohm": 1.6906749716813239,
+      "relative_power_identity_error": 1.7305327242587552e-15,
+      "susceptance_s": 0.2916396276132457
+    },
+    {
+      "conductance_s": 0.5314159265358988,
+      "equivalent_capacitance_f": 1.0000000000000025e-06,
+      "frequency_hz": 100000.0,
+      "impedance_magnitude_ohm": 1.2151941597263787,
+      "relative_power_identity_error": 4.103238583253369e-15,
+      "susceptance_s": 0.6283185307179602
+    },
+    {
+      "conductance_s": 0.5676835619484322,
+      "equivalent_capacitance_f": 9.999999999999972e-07,
+      "frequency_hz": 215443.46900318822,
+      "impedance_magnitude_ohm": 0.6812516335011175,
+      "relative_power_identity_error": 5.294388743535075e-16,
+      "susceptance_s": 1.3536712389686292
+    },
+    {
+      "conductance_s": 0.6458198138066243,
+      "equivalent_capacitance_f": 9.999999999999983e-07,
+      "frequency_hz": 464158.8833612772,
+      "impedance_magnitude_ohm": 0.3347787836180218,
+      "relative_power_identity_error": 3.270987375310313e-15,
+      "susceptance_s": 2.9163962761324553
+    },
+    {
+      "conductance_s": 0.8141592653589793,
+      "equivalent_capacitance_f": 9.999999999999966e-07,
+      "frequency_hz": 1000000.0,
+      "impedance_magnitude_ohm": 0.1578354053301502,
+      "relative_power_identity_error": 1.2616740079097536e-15,
+      "susceptance_s": 6.283185307179565
+    }
+  ],
+  "title": "Retained dielectric electroquasistatic sweep",
+  "units": {
+    "conductance_s": "S",
+    "equivalent_capacitance_f": "F",
+    "frequency_hz": "Hz",
+    "impedance_magnitude_ohm": "ohm",
+    "susceptance_s": "S"
+  }
+}

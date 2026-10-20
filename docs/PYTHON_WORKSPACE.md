@@ -160,13 +160,17 @@ not validate the external method or infer quantities that were not supplied.
 
 ## Template catalog
 
-The template picker contains 53 scripts in 18 categories
+The template picker contains 59 scripts in 20 categories
 covering design inspection, PI DC and AC setup, circuits and parasitics, SI
 channels/crosstalk/protocol review, steady and transient thermal setup, board
 and assembly thermal review, EM/EMI, extensions, multiboard studies, result
-review, export, and bounded parameter sweeps.
+review, export, bounded parameter sweeps, and the existing SPIKES Studio runtime,
+handoff, and board-feedback contracts. Search also matches template IDs and
+requirements; category counts and the matching count make filtered scope explicit.
+The engineering-review runner accepts the checked request contract, including
+explicit saved part limits and supplied measurement/rating provenance when present.
 
-Eleven execution templates dispatch actual registered analysis methods. Set
+Sixteen execution templates dispatch actual registered analysis methods. Set
 `REQUEST_FILE` to a JSON request with the inputs required by the chosen method;
 an unset request path does not launch a solve. These templates reject a request
 that names a different loaded design. Review the returned status, issues, and

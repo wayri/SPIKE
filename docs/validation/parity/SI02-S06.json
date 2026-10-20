@@ -22,14 +22,14 @@
     "schemas/rlgc-line-fields-request-v1.schema.json": "0b17963c9d814acafc04abf47a7767daee56934c960cf1138debf5d2f9f03553",
     "schemas/rlgc-line-fields-result-v1.schema.json": "73562f97f85a47d54f939a29e4ea385aee897732f98d41510fd0847142375947",
     "docs/RLGC_LINE_FIELDS.md": "68beaa4608cc08a423a9ccd1d687f21bfc38087b81145d9b77a623b7e3cdf884",
-    "python/spike_core/rlgc_line_junction.py": "0e3499447b44ade35df7eea0e99e7c573f9ca1406d313e3fd3cf1829743f801b",
+    "python/spike_core/rlgc_line_junction.py": "a6414b52723a71c9bfe861326d31b0a3f47d945def0d9959596b83b12f721da0",
     "python/spike_core/cli.py": "33ad1924afe3628e3a299c2267ccc08bf5a36323e794b8f88a5a615c86a45d66",
     "tests/python/test_rlgc_line_junction.py": "d1bb5c7de467d883cbecbe82139791e945e00d876486c344c7844a76c4bfe4a9",
     "tests/python/test_rlgc_line_junction_contract.py": "bb91ec5df7290c07d8d39c611e20e09aafd21398c14578d21bb14feabd215aaf",
-    "examples/rlgc_line_junction/run_line.py": "057bc776dbcc098fbd828ee3eb13ab4592b6f7369598a0244158ee24183c6cf7",
-    "examples/rlgc_line_junction/three-legs.request.json": "ac867e902a0ee1da892a0fe66dba302c4b5abf5ff1557e92d049b49dbd4fc756",
-    "schemas/rlgc-line-junction-request-v1.schema.json": "bccc583db762f44dce849e4f592e42226a2cc5221063a7504df320d5ae4c5085",
-    "schemas/rlgc-line-junction-result-v1.schema.json": "209e8d83d3b0b1108686cbf2d61b3de87daeebf6b515f35d34a0575efb9b5138",
+    "examples/rlgc_line_junction/run_line.py": "9bd6e8711151bd90f5eb9a7cf3ed9497b5d33a914536417548d852eabd14cc0c",
+    "examples/rlgc_line_junction/three-legs.request.json": "314dfdc49e3ab302d4af24322f835b3c9777f11e1004d6263ac9f5c975f568f4",
+    "schemas/rlgc-line-junction-request-v1.schema.json": "c0c3f9afa8a7a3cb4dafb31c37a93374a2d6173d68593b9dac8ce3e16c49c588",
+    "schemas/rlgc-line-junction-result-v1.schema.json": "073bd051f028610499d236819c5b05610b2a5201ff4864b7987abc70c6e59b87",
     "schemas/manifest.json": "f214daeb7dfc2a7d472ab79b2913c6d06f3526caeb3d91af9930a98cbaa23535",
     "docs/RLGC_LINE_JUNCTION.md": "402cc234b2327ae0eb09e1d439e4d95d989e5531e8311a4a3a03d044a3b6f081"
   },
@@ -58,6 +58,6 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/SI02-S06-release-0.4-portable-20261019.log",
-  "log_sha256": "b387f85ecd2144b5ca5cddc721f84c08a819f70cfe6db78b1ce9e0fe11c7bc58"
+  "log": "docs/validation/parity/SI02-S06-star-junction-20261019.log",
+  "log_sha256": "17189148abafe80987fb5da4503352390932a475e6bd098183dfad0421d458ff"
 }

@@ -6,12 +6,38 @@ from pathlib import Path
 from types import SimpleNamespace
 import sys
 import unittest
+import numpy as np
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'studio/python'))
 
 
 @unittest.skipUnless(os.environ.get('SPIKES_TEST_WX')=='1','opt-in native wx')
 class WiringInteractionUiTests(unittest.TestCase):
+    def test_branch_snap_chooses_nearest_visible_route(self):
+        import wx
+        from spikes_studio.desktop import Studio
+        from spikes_studio.document import Document
+
+        app=wx.GetApp() or wx.App(False);frame=Studio()
+        try:
+            frame.Show();wx.Yield()
+            frame.doc=Document.from_netlist('Parallel routes\nV1 a 0 1\nR1 a 0 1k\nV2 b 0 2\nR2 b 0 2k\n.op\n.end\n')
+            for part,position in zip(frame.doc.data['components'],((100,100),(400,100),(100,108),(400,108))):
+                part['x'],part['y']=position
+            parts=frame.doc.data['components']
+            frame.doc.connect((parts[0]['id'],0),(parts[1]['id'],0),[[200,100]])
+            frame.doc.connect((parts[2]['id'],0),(parts[3]['id'],0),[[200,108]])
+            first,second=frame.doc.data['wires'];canvas=frame.canvas
+            canvas.zoom=1;canvas.offset=np.array([20.,15.]);canvas.wire_mode=True;canvas.wire_start=(parts[3]['id'],1)
+            nearest_first=canvas.wire_snap_target(canvas.point(200,100))
+            nearest_second=canvas.wire_snap_target(canvas.point(200,108))
+            tie=canvas.wire_snap_target(canvas.point(200,104))
+            self.assertEqual((nearest_first['wire_id'],nearest_first['label'].split(' · ')[0]),(first['id'],'a'))
+            self.assertEqual((nearest_second['wire_id'],nearest_second['label'].split(' · ')[0]),(second['id'],'b'))
+            self.assertEqual(tie['wire_id'],second['id'])
+        finally:
+            frame.timer.Stop();frame.autosave_timer.Stop();frame.Destroy();wx.Yield()
+
     def test_snap_bend_backtrack_and_two_stage_escape_do_not_mutate(self):
         import wx
         from spikes_studio.desktop import Studio
@@ -24,6 +50,8 @@ class WiringInteractionUiTests(unittest.TestCase):
             canvas.board_tools.pending={'board':{'name':'pending','pins':[]}}
             canvas.board_tools.drag={'id':'stale drag'}
             frame.start_wire();canvas.Refresh();canvas.Update();wx.Yield()
+            wire_control=next(control for control,command in frame.command_controls if command=='edit.wire')
+            self.assertTrue(wire_control.GetValue())
             self.assertIsNone(canvas.board_tools.pending)
             self.assertIsNone(canvas.board_tools.drag)
             component_pins=[row for row in canvas.wire_pins if row[2] is not None]
@@ -95,12 +123,17 @@ class WiringInteractionUiTests(unittest.TestCase):
             canvas.motion(event(branch_point));self.assertEqual(canvas.wire_target['kind'],'branch')
             self.assertTrue(canvas.wire_target['label'].endswith(' · existing wire route'))
             self.assertIn('Backspace',frame.GetStatusBar().GetStatusText())
+            dragged=wx.Point(branch_point.x+40,branch_point.y+30);canvas.drag_start=branch_point
+            canvas.motion(event(dragged));canvas.drag_start=None
+            self.assertEqual(canvas.wire_target['kind'],'branch')
+            self.assertLess(np.linalg.norm(np.asarray(canvas.wire_target['world'])-np.asarray(canvas.world(dragged))),1e-9)
             canvas.Refresh();canvas.Update();wx.Yield()
 
             canvas.placement_key(SimpleNamespace(GetKeyCode=lambda:wx.WXK_ESCAPE))
             self.assertTrue(canvas.wire_mode);self.assertIsNone(canvas.wire_start)
             canvas.placement_key(SimpleNamespace(GetKeyCode=lambda:wx.WXK_ESCAPE))
             self.assertFalse(canvas.wire_mode);self.assertEqual(frame.doc.data,before)
+            self.assertFalse(wire_control.GetValue())
         finally:
             frame.timer.Stop();frame.autosave_timer.Stop();frame.Destroy();wx.Yield()
 

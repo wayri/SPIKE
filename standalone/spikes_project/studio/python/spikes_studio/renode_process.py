@@ -20,6 +20,10 @@ import uuid
 EXE_SHA256 = '67c2c21eb977181a50a19acbf582c4204d8177d2b4ae0bac4c3d3d51da7a7b4e'
 ARCHIVE_SHA256 = '18bcf145422039e8702c3e5f9864c7787561bfd5deb7a3ee6e168ecf19e2b9db'
 SOURCE_URL = 'https://github.com/renode/renode/releases/download/v1.17.0/renode-1.17.0.windows-portable.zip'
+# The native console briefly exclusively opens its history file at startup.
+# Serialize constructors inside Studio; separate processes must also serialize
+# integration tests until the backend offers per-process history isolation.
+_STARTUP_LOCK = threading.Lock()
 
 
 def find_runtime():
@@ -50,14 +54,15 @@ class RenodeProcess:
         self.history=deque(maxlen=1000);self.overflow=threading.Event();self.closed=False
         self.directory=tempfile.TemporaryDirectory(prefix='spikes-firmware-')
         self.work=Path(self.directory.name)
-        self.process=subprocess.Popen([str(self.path),'--disable-gui','--console','--plain','-P','-1',
-            '--config',str(self.work/'renode.config')],cwd=self.path.parent,stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
-        self.reader=threading.Thread(target=self._read,daemon=True,name='spikes-renode-reader');self.reader.start()
-        try:
-            version=self.command('version')
-            if 'version 1.17.0' not in version:raise ValueError('Renode version handshake mismatch')
-        except BaseException:self.close();raise
+        with _STARTUP_LOCK:
+            self.process=subprocess.Popen([str(self.path),'--disable-gui','--console','--plain','-P','-1',
+                '--config',str(self.work/'renode.config')],cwd=self.path.parent,stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+            self.reader=threading.Thread(target=self._read,daemon=True,name='spikes-renode-reader');self.reader.start()
+            try:
+                version=self.command('version')
+                if 'version 1.17.0' not in version:raise ValueError('Renode version handshake mismatch')
+            except BaseException:self.close();raise
 
     def _read(self):
         try:

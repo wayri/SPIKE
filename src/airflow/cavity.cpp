@@ -139,6 +139,11 @@ Result solve_cavity(const Settings& s) {
     // Only converged fields can escape the solver's accepted-result boundary.
     if(result.converged) {
         result.u.resize(n*n);result.v.resize(n*n);result.pressure=p;
+        result.face_u.resize(n*(n+1));result.face_v.resize((n+1)*n);
+        for(int j=0;j<n;++j) for(int i=0;i<=n;++i)
+            result.face_u[j*(n+1)+i]=u[ix(i,j+1)];
+        for(int j=0;j<=n;++j) for(int i=0;i<n;++i)
+            result.face_v[j*n+i]=v[ix(i+1,j)];
         for(int j=1;j<=n;++j) for(int i=1;i<=n;++i) {
             const int k=(j-1)*n+i-1;
             result.u[k]=.5*(u[ix(i,j)]+u[ix(i-1,j)]);

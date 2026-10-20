@@ -3,6 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import InteractivePlot from "./InteractivePlot";
 import { runLocalWorker } from "./workerBridge";
 import { admitCavityResult, cavityHeatmap, type CavityRequest, type CavityResult } from "./nativeCfdPresentation";
+import { showFieldInMainViewport } from "./mainFieldViewport";
+import { nativeCavityFieldVolume } from "./fieldVolumeAdapters";
 import "./buttonStandard.css";
 import "./NativeCfdWorkbench.css";
 
@@ -18,6 +20,7 @@ export default function NativeCfdWorkbench({ workerAvailable = true, onStatus }:
   const valid = Number.isFinite(Number(reynolds)) && reynolds.trim() !== "" && Number(reynolds) >= 1 && Number(reynolds) <= 400;
   const stale = Boolean(result && (result.settings.n !== n || result.settings.reynolds !== Number(reynolds)));
   const plot = useMemo(() => result?.fields ? cavityHeatmap(result, field) : [], [result, field]);
+  const volume = useMemo(() => result ? nativeCavityFieldVolume(result) : null, [result]);
   const checkRuntime = async () => {
     setRuntime("checking"); setError("");
     try {
@@ -55,6 +58,7 @@ export default function NativeCfdWorkbench({ workerAvailable = true, onStatus }:
     {result && <><div className="native-cfd__diagnostics"><strong>{result.status === "converged" ? "Converged" : "Failed to converge - no fields accepted"}</strong><span>{result.diagnostics.steps} steps</span><span>Max divergence: {result.diagnostics.divergence_linf.toExponential(3)} U/L</span><span>Steady rate: {result.diagnostics.steady_rate_linf.toExponential(3)} U^2/L</span></div>
       {result.fields && <><label className="native-cfd__field">Returned field<select value={field} onChange={event => setField(event.target.value as "speed" | "pressure")}><option value="speed">Velocity magnitude (m/s)</option><option value="pressure">Gauge pressure (Pa)</option></select></label><div className="native-cfd__plot"><InteractivePlot title={field === "speed" ? "Native cavity velocity magnitude" : "Native cavity gauge pressure"} data={plot} revision={`${result.settings.n}:${result.settings.reynolds}:${field}`} layout={{ xaxis: { title: { text: "x (m)" } }, yaxis: { title: { text: "y (m)" }, scaleanchor: "x", scaleratio: 1 }, margin: { l: 55, r: 45, t: 15, b: 45 } }} /></div></>}
     </>}
+    {volume && <button type="button" onClick={() => showFieldInMainViewport(volume)}>Show fields in main viewport</button>}
     <small>Convergence is a solver stopping condition. This experimental benchmark is not production qualified; pressure has zero mean and no absolute-pressure interpretation.</small>
   </section>;
 }

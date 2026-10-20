@@ -13,8 +13,21 @@ def run(owner,window):
     if current!=block:raise ValueError('Board bindings changed; reopen the firmware manager from the current block')
     from .firmware_window import _engineering_seconds
     step=_engineering_seconds(window.duration.GetValue());saved=deepcopy(block)
+    mode=saved.get('firmware_coupling_mode','legacy')
     document=owner.doc.data['id'];revision=owner.doc.data['revision'];window.running=False
     def prepare():
+        if mode!='legacy':
+            from .firmware_pad_settings import connections,settings_by_prefix
+            from .firmware_electrical import ElectricalFirmwareController
+            from .firmware_timestamped import TimestampedFirmwareController
+            from .firmware_synchronous import SynchronousFirmwareController
+            from .firmware_peripheral import PeripheralFirmwareController
+            cls={'timestamped':TimestampedFirmwareController,'electrical':ElectricalFirmwareController,
+                 'synchronous':SynchronousFirmwareController,'peripheral':PeripheralFirmwareController}[mode]
+            pads=saved.get('electrical_pads')
+            if pads is None:raise ValueError('Configure Electrical pin properties before choosing native electrical coupling')
+            return cls(context['runtime_path'],info['path'],saved['board']['id'],connections(pads,saved['board']),
+                pin_settings=settings_by_prefix(pads,saved['board']),step_s=step,trusted=True,expected_sha256=info['sha256'])
         return FirmwareController(saved,context['runtime_path'],info['path'],step_s=step,
                                   trusted=True,expected_sha256=info['sha256'])
     def complete(controller):
@@ -26,5 +39,5 @@ def run(owner,window):
             window.status.SetLabel('Firmware coupled to Continuous circuit run; use main Pause / Stop controls')
         except BaseException:
             window.executor.submit(controller.close);raise
-    window.status.SetLabel('Preparing fresh firmware session for sampled DI/DO circuit feedback…')
+    window.status.SetLabel('Preparing fresh firmware session: '+mode+' coupling…')
     window._submit(prepare,complete)

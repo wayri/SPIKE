@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-coupled-cascade-request-v1.schema.json",
+  "title": "SPIKE supplied coupled RLGC cascade request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "sections",
+    "excitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-coupled-cascade-request/v1"
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "pair"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "pair": {
+            "$ref": "rlgc-terminated-pair-request-v1.schema.json#/properties/pair"
+          }
+        }
+      }
+    },
+    "excitations": {
+      "$ref": "rlgc-coupled-pair-request-v1.schema.json#/properties/excitations"
+    }
+  }
+}

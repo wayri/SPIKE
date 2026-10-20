@@ -232,40 +232,22 @@ export async function getDesktopAppVersion(): Promise<string | null> {
   return getVersion();
 }
 
-async function mainCloseRecoverySupported(): Promise<boolean> {
-  try {
-    return await invoke<boolean>("main_close_recovery_supported");
-  } catch (error) {
-    // Only a host predating this command may use the legacy window API.
-    const message = errorMessage(error);
-    if (/command\s+[`'"]?main_close_recovery_supported[`'"]?\s+(?:not found|does not exist)/i.test(message)
-      || /unknown command[:\s]+[`'"]?main_close_recovery_supported/i.test(message)) return false;
-    throw error;
-  }
-}
-
 export async function subscribeDesktopCloseRequested(
-  onRequested: (preventDefault: () => void) => void,
+  onRequested: (preventDefault: () => void, generation: number) => void,
 ): Promise<() => void> {
   if (!isDesktopShell()) return () => undefined;
-  if (await mainCloseRecoverySupported()) {
-    return listen<{ requestId: number }>("spike:main-close-requested", event => {
-      const requestId = event.payload?.requestId;
-      if (!Number.isSafeInteger(requestId) || requestId < 1) return;
-      let prevented = false;
-      try {
-        onRequested(() => { prevented = true; });
-      } catch (error) {
-        // Leave the request pending so native recovery remains available.
-        console.error("SPIKE close handler failed; native close recovery remains active", error);
-        return;
-      }
-      void invoke<void>("respond_main_close", { requestId, decision: prevented ? "defer" : "close" })
-        .catch(error => console.error("SPIKE close response failed; native close recovery remains active", error));
-    });
-  }
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  return getCurrentWindow().onCloseRequested(event => onRequested(() => event.preventDefault()));
+  return getCurrentWindow().listen<{ generation: number }>("spike://desktop-close-requested", event => {
+    const generation = event.payload?.generation;
+    if (!Number.isSafeInteger(generation) || generation < 1) return;
+    onRequested(() => undefined, generation);
+  });
+}
+
+/** Confirm that the live renderer received exactly this native close request. */
+export async function acknowledgeDesktopClose(generation: number): Promise<boolean> {
+  if (!isDesktopShell() || !Number.isSafeInteger(generation) || generation < 1) return false;
+  return invoke<boolean>("acknowledge_desktop_close", { generation });
 }
 
 export async function closeDesktopWindow(closeChild?: () => Promise<void>): Promise<void> {
@@ -286,12 +268,7 @@ export async function closeDesktopWindow(closeChild?: () => Promise<void>): Prom
     }
   }
   // Called only after the main workspace's save/discard close decision.
-  if (await mainCloseRecoverySupported()) {
-    await invoke<void>("close_main_application");
-    return;
-  }
-  const { getCurrentWindow } = await import("@tauri-apps/api/window");
-  await getCurrentWindow().destroy();
+  await invoke<void>("close_desktop_app");
 }
 
 export async function runLocalWorker(request: Record<string, unknown>): Promise<WorkerResponse> {

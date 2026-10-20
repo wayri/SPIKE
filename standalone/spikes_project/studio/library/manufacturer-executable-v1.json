@@ -1,0 +1,268 @@
+{
+  "contract": "spikes/manufacturer-executable/v1",
+  "version": "1.0.0",
+  "generated_on": "2026-10-20",
+  "scope": "Five exact identities from manufacturer-discovery-v1 with independently authored, native-executable reduced approximations.",
+  "limitations": "These are part-specific engineering approximations derived from selected official data-sheet values. They are not vendor models, not manufacturer-qualified, not production-qualified, and do not turn the other discovery rows into executable models.",
+  "records": [
+    {
+      "discovery_id": "ti-lm358",
+      "manufacturer": "Texas Instruments",
+      "part_number": "LM358",
+      "category": "operational amplifier",
+      "model_status": "part_specific_approximation_unqualified",
+      "backend": "native",
+      "qualified": false,
+      "pins": [
+        {"number": "1", "name": "OUT_A", "role": "output"},
+        {"number": "2", "name": "IN_A_MINUS", "role": "input"},
+        {"number": "3", "name": "IN_A_PLUS", "role": "input"},
+        {"number": "4", "name": "V_MINUS", "role": "power"},
+        {"number": "5", "name": "IN_B_PLUS", "role": "input"},
+        {"number": "6", "name": "IN_B_MINUS", "role": "input"},
+        {"number": "7", "name": "OUT_B", "role": "output"},
+        {"number": "8", "name": "V_PLUS", "role": "power"}
+      ],
+      "model": {
+        "kind": "dual_opamp_one_pole_rail_clamped",
+        "parameters": {
+          "open_loop_gain": 100000.0,
+          "gain_bandwidth_hz": 700000.0,
+          "dominant_resistance_ohm": 1000.0,
+          "output_resistance_ohm": 300.0,
+          "positive_headroom_v": 1.5,
+          "negative_headroom_v": 0.02,
+          "nominal_clamp_drop_v": 0.7,
+          "clamp_saturation_current_a": 1e-12,
+          "clamp_emission_coefficient": 1.0
+        }
+      },
+      "source": {
+        "url": "https://www.ti.com/lit/ds/symlink/lm358.pdf",
+        "document": "LM158, LM158A, LM258, LM258A, LM2904, LM2904V, LM358, LM358A Industry-Standard Dual Operational Amplifiers",
+        "revision": "SLOS068AB, revised October 2024",
+        "reviewed_on": "2026-10-20",
+        "sections": ["pin functions", "5.7 electrical characteristics: LM358, LM358A"],
+        "fields": ["8-pin dual pinout", "typical open-loop gain", "typical gain-bandwidth product", "typical open-loop output resistance", "output swing under stated loads"]
+      },
+      "derivation": [
+        "Each channel uses A0/(1+s*A0/(2*pi*GBW)) followed by the stated output resistance.",
+        "The dominant capacitance is A0/(2*pi*GBW*Rdom); the two channels are independent except for shared supply pins.",
+        "Static diode clamps are offset so their nominal forward drop places the light-load output near the selected data-sheet rail headrooms."
+      ],
+      "validity": {
+        "analyses": ["op", "transient_backward_euler", "transient_bdf2"],
+        "operating_conditions": "Reduced small-signal voltage-amplifier use at 25 C, supply difference 5 V to 30 V, common-mode within the data-sheet range, and light external loading.",
+        "limitations": [
+          "Full dual 8-pin context is retained, but package ordering suffixes are not distinguished.",
+          "No slew-rate limiting, input offset/bias/noise, common-mode failure, supply current, output-current limit, overload recovery, temperature dependence, distortion, or channel coupling.",
+          "The diode rail clamps are numerical approximations and do not reproduce load-dependent output swing; operation at either clamp is qualitative only.",
+          "The native static-diode path does not provide small-signal AC linearization for this nonlinear macro."
+        ]
+      },
+      "license": "Original SPIKE equations and netlist text under Apache-2.0; factual parameters cited to the official data sheet; no TI model body is included."
+    },
+    {
+      "discovery_id": "adi-ad620",
+      "manufacturer": "Analog Devices",
+      "part_number": "AD620",
+      "category": "instrumentation amplifier",
+      "model_status": "part_specific_approximation_unqualified",
+      "backend": "native",
+      "qualified": false,
+      "pins": [
+        {"number": "1", "name": "RG1", "role": "gain"},
+        {"number": "2", "name": "IN_MINUS", "role": "input"},
+        {"number": "3", "name": "IN_PLUS", "role": "input"},
+        {"number": "4", "name": "V_MINUS", "role": "power"},
+        {"number": "5", "name": "REF", "role": "reference"},
+        {"number": "6", "name": "OUT", "role": "output"},
+        {"number": "7", "name": "V_PLUS", "role": "power"},
+        {"number": "8", "name": "RG2", "role": "gain"}
+      ],
+      "model": {
+        "kind": "instrumentation_amplifier_gain_resistor",
+        "parameters": {
+          "gain_resistance_ohm": 49400.0,
+          "unity_bandwidth_hz": 1000000.0,
+          "dominant_resistance_ohm": 1000.0,
+          "output_resistance_ohm": 1.0,
+          "positive_headroom_v": 1.4,
+          "negative_headroom_v": 1.2,
+          "nominal_clamp_drop_v": 0.7,
+          "rg_bias_resistance_ohm": 1000000000000000.0,
+          "clamp_saturation_current_a": 1e-12,
+          "clamp_emission_coefficient": 1.0
+        }
+      },
+      "source": {
+        "url": "https://www.analog.com/media/en/technical-documentation/data-sheets/AD620.pdf",
+        "document": "AD620 Low Cost, Low Power Instrumentation Amplifier",
+        "revision": "Rev. H",
+        "reviewed_on": "2026-10-20",
+        "sections": ["connection diagram", "Table 2 specifications", "gain selection"],
+        "fields": ["8-pin pinout", "G = 1 + 49.4 kohm/RG", "G=1 bandwidth", "output swing at 10 kohm load", "supply range"]
+      },
+      "derivation": [
+        "A native voltage-controlled source places VIN+ - VIN- across RG1/RG2; a current-controlled voltage source multiplies the resulting external RG current by 49.4 kohm.",
+        "Adding the direct differential term gives VOUT - VREF = (1 + 49.4 kohm/RG)*(VIN+ - VIN-) in DC.",
+        "A single RC pole uses the G=1 one-megahertz data-sheet bandwidth; it is not a gain-dependent AD620 frequency model."
+      ],
+      "validity": {
+        "analyses": ["op", "transient_backward_euler", "transient_bdf2"],
+        "operating_conditions": "DC gain formula for finite positive RG or open RG, 25 C, plus G=1 small-signal transient screening with supplies in the data-sheet operating range.",
+        "limitations": [
+          "All eight package pins are retained; open RG requires distinct unconnected RG1 and RG2 nets, not both pins shorted to one node.",
+          "No gain error, offset, bias current, noise, CMRR/PSRR, input common-mode envelope, reference input loading, supply current, output-current limit, slew, settling, temperature, or distortion.",
+          "The one-megahertz pole is only the G=1 value; G=10, 100, and 1000 bandwidths are not modeled.",
+          "The rail clamps are qualitative outside light-load operation, and nonlinear AC analysis is not claimed."
+        ]
+      },
+      "license": "Original SPIKE equations and netlist text under Apache-2.0; factual parameters cited to the official data sheet; no ADI model body is included."
+    },
+    {
+      "discovery_id": "onsemi-mmbt3904lt1g",
+      "manufacturer": "onsemi",
+      "part_number": "MMBT3904LT1G",
+      "category": "bipolar transistor",
+      "model_status": "part_specific_approximation_unqualified",
+      "backend": "native",
+      "qualified": false,
+      "pins": [
+        {"number": "1", "name": "B", "role": "base"},
+        {"number": "2", "name": "E", "role": "emitter"},
+        {"number": "3", "name": "C", "role": "collector"}
+      ],
+      "model": {
+        "kind": "npn_ebers_moll_reduced",
+        "parameters": {
+          "saturation_current_a": 5.342746796539795e-17,
+          "forward_beta": 100.0,
+          "reverse_beta": 1.0,
+          "emission_coefficient": 1.0,
+          "base_emitter_capacitance_f": 8e-12,
+          "base_collector_capacitance_f": 4e-12,
+          "forward_transit_time_s": 5e-10,
+          "reverse_transit_time_s": 0.0
+        }
+      },
+      "source": {
+        "url": "https://www.onsemi.com/download/data-sheet/pdf/mmbt3904lt1-d.pdf",
+        "document": "MMBT3904L, SMMBT3904L General Purpose Transistors NPN Silicon",
+        "revision": "MMBT3904LT1/D, current official repository copy reviewed",
+        "reviewed_on": "2026-10-20",
+        "sections": ["electrical characteristics", "SOT-23 style 6 pinout"],
+        "fields": ["minimum hFE at 10 mA", "maximum VBE(sat) at 10 mA", "minimum fT", "maximum Cibo", "maximum Cobo", "pinout"]
+      },
+      "derivation": [
+        "BF is the specified minimum 100 at IC=10 mA and VCE=1 V; reverse beta is an explicit unsourced numerical assumption.",
+        "IS is chosen so the forward-active Shockley term reaches 10 mA at the 0.85 V maximum saturated VBE; that conservative proxy is not a direct forward-active data-sheet fit.",
+        "CBE and CBC use the 8 pF and 4 pF maxima; TF is rounded from 1/(2*pi*300 MHz) after recognizing the capacitance contribution is operating-point dependent."
+      ],
+      "validity": {
+        "analyses": ["op", "transient_backward_euler", "transient_bdf2"],
+        "operating_conditions": "25 C screening near the 10 mA characterization point, forward-active NPN operation, and voltages safely below published limits.",
+        "limitations": [
+          "Ebers-Moll approximation only: no Early effect, high injection, avalanche, self-heating, temperature sweep, package parasitics, statistical spread, or reliable saturation/storage-time prediction.",
+          "IS and reverse beta are approximation choices, not manufacturer model parameters; the VBE source datum is a saturated-device maximum.",
+          "Constant capacitances use data-sheet maxima at their stated bias conditions and are not voltage dependent."
+        ]
+      },
+      "license": "Original SPIKE parameter reduction and netlist text under Apache-2.0; factual limits cited to the official data sheet; no onsemi model body is included."
+    },
+    {
+      "discovery_id": "onsemi-2n7002l",
+      "manufacturer": "onsemi",
+      "part_number": "2N7002L",
+      "category": "power MOSFET",
+      "model_status": "part_specific_approximation_unqualified",
+      "backend": "native",
+      "qualified": false,
+      "pins": [
+        {"number": "1", "name": "G", "role": "gate"},
+        {"number": "2", "name": "S", "role": "source"},
+        {"number": "3", "name": "D", "role": "drain"}
+      ],
+      "model": {
+        "kind": "nmos_level1_source_tied_bulk",
+        "parameters": {
+          "threshold_voltage_v": 1.75,
+          "transconductance_a_per_v2": 0.016,
+          "channel_length_modulation_per_v": 0.0,
+          "gate_source_capacitance_f": 45e-12,
+          "gate_drain_capacitance_f": 5e-12,
+          "drain_source_capacitance_f": 20e-12,
+          "body_diode_saturation_current_a": 2.934600258489636e-14,
+          "body_diode_emission_coefficient": 2.0
+        }
+      },
+      "source": {
+        "url": "https://www.onsemi.com/download/data-sheet/pdf/2n7002l-d.pdf",
+        "document": "2N7002L, 2V7002L MOSFET - N-Channel, Small Signal, SOT-23",
+        "revision": "2N7002L/D Rev. 11, June 2024",
+        "reviewed_on": "2026-10-20",
+        "sections": ["maximum ratings", "electrical characteristics", "SOT-23 style 21 pinout"],
+        "fields": ["threshold range", "minimum forward transconductance", "Ciss/Coss/Crss maxima", "body-diode forward-voltage maximum", "pinout"]
+      },
+      "derivation": [
+        "VTO is the explicit midpoint assumption of the 1.0 V to 2.5 V threshold range; it is not a typical value.",
+        "For the Level-1 saturation law ID=KP*(VGS-VTO)^2/2, KP=gfs^2/(2*ID)=0.016 A/V^2 from the 80 mS minimum at 200 mA.",
+        "CGD=Crss=5 pF, CGS=Ciss-Crss=45 pF, and CDS=Coss-Crss=20 pF use published maxima; the body-diode IS is chosen to reach 115 mA at 1.5 V with N=2."
+      ],
+      "validity": {
+        "analyses": ["op", "transient_backward_euler", "transient_bdf2"],
+        "operating_conditions": "25 C, source-tied bulk, first-quadrant screening around the 200 mA transconductance condition, with voltages and power below published limits.",
+        "limitations": [
+          "Level-1 square-law approximation only; it does not reproduce RDS(on), subthreshold, mobility degradation, velocity saturation, leakage, avalanche, temperature, self-heating, SOA, or switching charge.",
+          "Threshold midpoint, zero channel-length modulation, and body-diode emission coefficient are explicit modeling assumptions, not manufacturer typical values.",
+          "Constant capacitances combine maxima specified at one bias and therefore are deliberately conservative but not a charge-conserving nonlinear capacitance model."
+        ]
+      },
+      "license": "Original SPIKE parameter reduction and netlist text under Apache-2.0; factual limits cited to the official data sheet; no onsemi model body is included."
+    },
+    {
+      "discovery_id": "nexperia-bas316",
+      "manufacturer": "Nexperia",
+      "part_number": "BAS316",
+      "category": "switching diode",
+      "model_status": "part_specific_approximation_unqualified",
+      "backend": "native",
+      "qualified": false,
+      "pins": [
+        {"number": "1", "name": "K", "role": "cathode"},
+        {"number": "2", "name": "A", "role": "anode"}
+      ],
+      "model": {
+        "kind": "shockley_two_point_upper_curve",
+        "parameters": {
+          "saturation_current_a": 7.813707376518093e-9,
+          "emission_coefficient": 2.3507211259269805,
+          "temperature_k": 300.15
+        }
+      },
+      "source": {
+        "url": "https://assets.nexperia.com/documents/data-sheet/BAS316.pdf",
+        "document": "BAS316 High-speed switching diode",
+        "revision": "Rev. 7, 1 July 2022",
+        "reviewed_on": "2026-10-20",
+        "sections": ["pinning information", "limiting values", "Table 7 characteristics"],
+        "fields": ["pinout", "maximum forward voltage at 1 mA and 10 mA", "maximum diode capacitance", "maximum reverse-recovery time", "voltage/current limits"]
+      },
+      "derivation": [
+        "At 300.15 K, solving I=IS*exp(V/(N*VT)) through the two published maximum points (1 mA, 0.715 V) and (10 mA, 0.855 V) gives N=2.3507211259 and IS=7.8137073765 nA.",
+        "The native static Shockley primitive omits the minus-one term only negligibly at those forward currents; tests use the exact native expm1 convention.",
+        "The fit is an upper-limit curve through two guaranteed maxima, not a typical measured I-V curve or a conservative bound between/away from those points."
+      ],
+      "validity": {
+        "analyses": ["op", "transient_backward_euler", "transient_bdf2"],
+        "operating_conditions": "25 C static forward-conduction screening from approximately 1 mA to 10 mA, below published voltage, current, and power limits.",
+        "limitations": [
+          "No series resistance, reverse leakage law, breakdown, temperature dependence, self-heating, junction capacitance, forward recovery, reverse recovery, package parasitics, or statistical spread.",
+          "The data-sheet forward-voltage values are maxima, not typical samples; this two-point curve is not manufacturer qualification or validation.",
+          "The 1.5 pF and 4 ns limits are retained as evidence only because the native static diode card cannot represent them."
+        ]
+      },
+      "license": "Original SPIKE two-point reduction and netlist text under Apache-2.0; factual limits cited to the official data sheet; no Nexperia model body is included."
+    }
+  ]
+}

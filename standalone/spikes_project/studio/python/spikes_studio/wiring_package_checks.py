@@ -11,6 +11,7 @@ def verify(frame,check,capture_dir=None):
     from .schematic_symbol_renderer import label_positions
 
     original=frame.doc;selected=set(frame.canvas.selected);size=frame.GetSize()
+    zoom=frame.canvas.zoom;offset=frame.canvas.offset.copy()
     try:
         frame.doc=Document.from_netlist(RC_DECK);startup_layout(frame.doc)
         frame.refresh_document(force_source=True);canvas=frame.canvas
@@ -47,12 +48,27 @@ def verify(frame,check,capture_dir=None):
         canvas.placement_key(SimpleNamespace(GetKeyCode=lambda:wx.WXK_ESCAPE))
         check(canvas.wire_mode and canvas.wire_start is None,'first Escape cancels the active wire segment')
         canvas.placement_key(SimpleNamespace(GetKeyCode=lambda:wx.WXK_ESCAPE))
+        wire_control=next(control for control,command in frame.command_controls if command=='edit.wire')
+        check(not wire_control.GetValue(),'closing Wire immediately clears its toolbar toggle')
         check(not canvas.wire_mode and frame.doc.data==before,
               'second Escape closes Wire without changing the document')
         anchors=label_positions(dict(x=0,y=0,rotation=90))
         check(all(x>28 for x,y in anchors) and len({y for x,y in anchors})==3,
               'rotated component identity text stacks beside the body')
+        frame.doc=Document.from_netlist('Parallel routes\nV1 a 0 1\nR1 a 0 1k\nV2 b 0 2\nR2 b 0 2k\n.op\n.end\n')
+        for part,position in zip(frame.doc.data['components'],((100,100),(400,100),(100,108),(400,108))):
+            part['x'],part['y']=position
+        parts=frame.doc.data['components']
+        frame.doc.connect((parts[0]['id'],0),(parts[1]['id'],0),[[200,100]])
+        frame.doc.connect((parts[2]['id'],0),(parts[3]['id'],0),[[200,108]])
+        first,second=frame.doc.data['wires']
+        canvas.zoom=1;canvas.offset=offset*0+[20.,15.]
+        canvas.wire_mode=True;canvas.wire_start=(parts[3]['id'],1)
+        near_a=canvas.wire_snap_target(canvas.point(200,100))
+        near_b=canvas.wire_snap_target(canvas.point(200,108))
+        check(near_a['wire_id']==first['id'] and near_b['wire_id']==second['id'],
+              'parallel wire targets resolve to the nearest visible net')
     finally:
         canvas=frame.canvas;canvas.wire_mode=False;canvas.wire_start=None
         canvas.wire_corners=[];canvas.wire_hover=None;canvas.wire_target=None
-        frame.doc=original;canvas.selected=selected;frame.SetSize(size);frame.refresh_document(force_source=True)
+        frame.doc=original;canvas.selected=selected;canvas.zoom=zoom;canvas.offset=offset;frame.SetSize(size);frame.refresh_document(force_source=True)

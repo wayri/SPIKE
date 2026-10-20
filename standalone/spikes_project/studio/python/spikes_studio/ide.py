@@ -11,6 +11,9 @@ import tempfile
 
 
 def find_tool(name):
+    from .toolchains import configured
+    selected=configured(name)
+    if selected:return selected
     found = shutil.which(name)
     if found: return found
     if name=="cl" and os.name=="nt":

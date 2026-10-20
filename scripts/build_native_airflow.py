@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Build and test SPIKE's standalone native cavity kernel using CMake."""
+"""Build and test SPIKE's standalone native cavity and CHT kernels with CMake."""
 from __future__ import annotations
 import argparse
 from pathlib import Path

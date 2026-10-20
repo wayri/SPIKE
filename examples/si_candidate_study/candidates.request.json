@@ -1,0 +1,169 @@
+{
+  "contract": "spike/si-candidate-study-request/v1",
+  "candidate_ids": [
+    "short",
+    "long"
+  ],
+  "corner_ids": [
+    "matched",
+    "mismatched"
+  ],
+  "cases": [
+    {
+      "id": "short_matched",
+      "candidate_id": "short",
+      "corner_id": "matched",
+      "request": {
+        "contract": "spike/si-workflow-request/v1",
+        "run_time_domain": false,
+        "channel": {
+          "kind": "rlgc",
+          "coupled": false,
+          "length_m": 0.02,
+          "resistance_ohm_per_m": 0.0,
+          "inductance_h_per_m": 2.5e-07,
+          "capacitance_f_per_m": 1e-10,
+          "loss_tangent": 0.0,
+          "frequency_stop_hz": 2000000000.0,
+          "frequency_points": 65,
+          "reference_impedance_ohm": 50.0
+        },
+        "sources": [
+          {
+            "port": 0,
+            "resistance_ohm": 50.0
+          }
+        ],
+        "receivers": [
+          {
+            "port": 1,
+            "resistance_ohm": 50.0,
+            "capacitance_f": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "short_mismatched",
+      "candidate_id": "short",
+      "corner_id": "mismatched",
+      "request": {
+        "contract": "spike/si-workflow-request/v1",
+        "run_time_domain": false,
+        "channel": {
+          "kind": "rlgc",
+          "coupled": false,
+          "length_m": 0.02,
+          "resistance_ohm_per_m": 0.0,
+          "inductance_h_per_m": 2.5e-07,
+          "capacitance_f_per_m": 1e-10,
+          "loss_tangent": 0.0,
+          "frequency_stop_hz": 2000000000.0,
+          "frequency_points": 65,
+          "reference_impedance_ohm": 50.0
+        },
+        "sources": [
+          {
+            "port": 0,
+            "resistance_ohm": 100.0
+          }
+        ],
+        "receivers": [
+          {
+            "port": 1,
+            "resistance_ohm": 125.0,
+            "capacitance_f": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "long_matched",
+      "candidate_id": "long",
+      "corner_id": "matched",
+      "request": {
+        "contract": "spike/si-workflow-request/v1",
+        "run_time_domain": false,
+        "channel": {
+          "kind": "rlgc",
+          "coupled": false,
+          "length_m": 0.12,
+          "resistance_ohm_per_m": 0.0,
+          "inductance_h_per_m": 2.5e-07,
+          "capacitance_f_per_m": 1e-10,
+          "loss_tangent": 0.0,
+          "frequency_stop_hz": 2000000000.0,
+          "frequency_points": 65,
+          "reference_impedance_ohm": 50.0
+        },
+        "sources": [
+          {
+            "port": 0,
+            "resistance_ohm": 50.0
+          }
+        ],
+        "receivers": [
+          {
+            "port": 1,
+            "resistance_ohm": 50.0,
+            "capacitance_f": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "long_mismatched",
+      "candidate_id": "long",
+      "corner_id": "mismatched",
+      "request": {
+        "contract": "spike/si-workflow-request/v1",
+        "run_time_domain": false,
+        "channel": {
+          "kind": "rlgc",
+          "coupled": false,
+          "length_m": 0.12,
+          "resistance_ohm_per_m": 0.0,
+          "inductance_h_per_m": 2.5e-07,
+          "capacitance_f_per_m": 1e-10,
+          "loss_tangent": 0.0,
+          "frequency_stop_hz": 2000000000.0,
+          "frequency_points": 65,
+          "reference_impedance_ohm": 50.0
+        },
+        "sources": [
+          {
+            "port": 0,
+            "resistance_ohm": 100.0
+          }
+        ],
+        "receivers": [
+          {
+            "port": 1,
+            "resistance_ohm": 125.0,
+            "capacitance_f": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "limits": [
+    {
+      "id": "floor",
+      "metric": "min_gain",
+      "frequency_band_hz": [
+        0.0,
+        2000000000.0
+      ],
+      "bound": 0.4
+    },
+    {
+      "id": "ceiling",
+      "metric": "max_gain",
+      "frequency_band_hz": [
+        0.0,
+        2000000000.0
+      ],
+      "bound": 0.75
+    }
+  ]
+}

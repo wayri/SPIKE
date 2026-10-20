@@ -9,7 +9,7 @@ import struct
 import sys
 
 
-def gpio_echo(stm=False):
+def gpio_echo(stm=False, *, uart=True):
     flash=0x08000000 if stm else 0
     data=bytearray(0x100);literals=[];labels={};branches=[]
     struct.pack_into('<II',data,0,0x20020000 if stm else 0x20040000,flash+0x101)
@@ -26,6 +26,7 @@ def gpio_echo(stm=False):
     write(base if stm else base+0x14,64 if stm else 8)
     if not stm:
         write(0x50000708,0);write(0x5000070c,1)  # connected input / push-pull output
+    if not stm and uart:
         # UART register datapath only: this engine does not model pad pin-mux.
         # Do not claim the UART capture establishes physical routed-pin behavior.
         write(0x40002524,0x00275000)  # BAUDRATE 9600
@@ -44,7 +45,7 @@ def gpio_echo(stm=False):
         labels['low']=len(data);write(base+0x18,0x80000)
     else:
         literal(0,base+4);emit(0x6002)  # store OUT
-    if not stm:
+    if not stm and uart:
         literal(0,0x40002110);emit(0x6801);emit(0x2900)  # ENDRX; cmp r1,#0
         branch('loop',True)
         emit(0x2100);emit(0x6001)  # clear event
@@ -67,6 +68,7 @@ def main():
     target=Path(__file__).resolve().parents[1]/'examples/spikes/controller_firmware'
     target.mkdir(parents=True,exist_ok=True)
     (target/'nrf52840_gpio_echo.bin').write_bytes(gpio_echo())
+    (target/'nrf52840_gpio_only_echo.bin').write_bytes(gpio_echo(uart=False))
     (target/'stm32f407_gpio_echo.bin').write_bytes(gpio_echo(True))
     sys.path.insert(0,str(target.parents[2]/'standalone/spikes_project/studio/python'))
     sys.path.insert(0,str(target.parents[2]))

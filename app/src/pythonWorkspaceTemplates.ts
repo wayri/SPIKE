@@ -586,6 +586,27 @@ else:
   entry("run-multiboard-si-request", "Run multiboard SI batch from request file", "Multiboard", "Run the independent per-board SI batch contract from a reviewed request.", ["Reviewed independent SI batch request JSON", "Per-board designs and cases"], requestRunner("run_multiboard_si_independent_batch", { requiredKey: "request" })),
   entry("run-multiboard-thermal-request", "Run multiboard thermal from request file", "Thermal - assembly", "Run the reduced multiboard thermal contract from reviewed occurrence and interface inputs.", ["Reviewed multiboard thermal request JSON", "Occurrence power and thermal interfaces"], requestRunner("run_multiboard_thermal", { requiredKey: "request" })),
   entry("run-multiboard-em-request", "Run multiboard EM from request file", "Multiboard", "Run the supported reduced multiboard EM contract without implying full-wave qualification.", ["Reviewed multiboard EM request JSON", "Explicit excitation and occurrence mapping", "Accepted model limitations"], requestRunner("run_multiboard_em", { requiredKey: "request" })),
+  entry("spikes-studio-runtime", "SPIKES Studio runtime check", "SPIKES Studio", "Inspect whether this installation can prepare or launch a standalone SPIKES Studio handoff.", [], `# Discovery reads fixed first-party prerequisites; it does not launch Studio or qualify a solver.
+runtime = spike.call("studio_runtime_capabilities")
+if not isinstance(runtime, dict):
+    raise RuntimeError("Unexpected Studio runtime response.")
+for key in ("contract", "can_prepare", "can_launch", "reason", "transfer", "live_sync"):
+    print(f"{key}:", runtime.get(key))
+`),
+  entry("prepare-spikes-studio-handoff", "Prepare SPIKES Studio handoff", "SPIKES Studio", "Stage a reviewed board-circuit snapshot for the standalone Studio without launching its GUI.", ["Reviewed board-circuit handoff JSON", "Confirmed model and physical-pad pin mappings"], requestRunner("prepare_spikes_studio_handoff", { requiredKey: "request" })),
+  entry("run-studio-board-feedback", "Run SPIKES board feedback", "SPIKES Studio", "Run the existing approximate lumped electrical/thermal feedback contract from a reviewed request file.", ["Loaded matching design", "Reviewed studio-board-feedback-request-v1 JSON", "Explicit thermal, conductor and control inputs"], requestRunner("run_studio_board_cosimulation", { attachDesign: true, requiredKey: "request" }) + `
+if params is not None and isinstance(result, dict):
+    print("Converged windows:", result.get("completed_windows", result.get("accepted_window_count")))
+    print("Approximation:", result.get("model_status", "unknown"))
+`),
+  entry("run-engineering-review", "Run engineering and part-limit review", "Design inspection", "Run the existing read-only engineering review, including explicit saved part limits when present in its reviewed request.", ["Reviewed spike/engineering-review-request/v1 JSON", "Explicit component measurements, ratings and evidence status for any part limits"], requestRunner("review_engineering", { requiredKey: "request" }) + `
+if params is not None and isinstance(result, dict):
+    report = result.get("part_limit_report")
+    if isinstance(report, dict):
+        print("Part-limit summary:", report.get("summary", report))
+    else:
+        print("No part-limit report was returned by this request.")
+`),
   entry("working-directory", "Working directory and packages", "Basics", "Inspect the child process working directory and optional package availability.", [], `# Scripts run as local Python; package availability depends on the SPIKE runtime environment.
 import importlib.util
 from pathlib import Path

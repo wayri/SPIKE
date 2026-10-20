@@ -1,10 +1,6 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI07-S09 verification: supplied crosstalk timing corners
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 Verified 18 October 2026. **Done for the bounded stage; experimental,
 production-unqualified.** SI07 and complete PI/SI parity remain open.
 The [method ledger](../CROSSTALK_TIMING_CORNERS.md) retains reviewed primary
@@ -14,7 +10,7 @@ semantics, units, conditioning, work limits and multiphysics ownership.
 ## Executed evidence
 
 The [canonical source-bound receipt](parity/SI07-S09.json) retains **9 tests,
-zero skips**, and its actual execution log (`parity/SI07-S09-timing-reverified.log`).
+zero skips**, and its [actual execution log](parity/SI07-S09-timing-reverified.log).
 Six numerical and three actual worker/schema/example tests executed. Reproduce
 into new repository paths:
 

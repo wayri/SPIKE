@@ -7,15 +7,15 @@
 [Setup]
 AppId={{D6B4AC2E-5173-4FE7-AD87-B3E752602C5A}
 AppName=SPIKES Studio
-AppVersion=0.3.0-beta.6
-AppVerName=SPIKES Studio 0.3.0-beta.6 Engineering Preview
+AppVersion=0.3.0-beta.7
+AppVerName=SPIKES Studio 0.3.0-beta.7 Engineering Preview
 DefaultDirName={localappdata}\Programs\SPIKES Studio
 DefaultGroupName=SPIKES Studio
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir={#Output}
-OutputBaseFilename=SPIKES-Studio-0.3.0-beta.6-windows-x64-setup
+OutputBaseFilename=SPIKES-Studio-0.3.0-beta.7-windows-x64-setup
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern

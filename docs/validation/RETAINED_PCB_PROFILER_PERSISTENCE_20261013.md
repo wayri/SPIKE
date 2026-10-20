@@ -50,8 +50,8 @@ retried.
 
 | Retained artifact | SHA-256 |
 | --- | --- |
-| `output/mesher-fix-20261013/baseline-profile.json` | `66bcf863fe3e2893193c7ae6560336ec773a94415e12289a125e2c596ee4570d` |
-| `output/mesher-fix-20261013/baseline-profile.phase.json` | `8369cf568f69cd6fe6070d5227e65febd8239556b856843244cdf690934a7170` |
+| Unbundled local `baseline-profile.json` | `66bcf863fe3e2893193c7ae6560336ec773a94415e12289a125e2c596ee4570d` |
+| Unbundled local `baseline-profile.phase.json` | `8369cf568f69cd6fe6070d5227e65febd8239556b856843244cdf690934a7170` |
 
 The phase marker records `controller_started` at `2026-10-12T19:06:06Z`.
 The result records failure at `2026-10-12T19:06:14Z`. No raw stack or selected
@@ -66,10 +66,10 @@ untruncated partial mesh with 1,572 nodes, 1,586 branches, and 6,387 cells.
 
 | Post-fix artifact | SHA-256 |
 | --- | --- |
-| `output/mesher-fix-20261013/baseline-after-import-fix.json` | `283edb56f846dbfc5867124222f4fecc9d158cc7f1509bb36bb9491691edaac9` |
-| `output/mesher-fix-20261013/baseline-after-import-fix.phase.json` | `d97c5108f3d8a6e8f6216d15ca53ed602cddb4a991ffa7109393d1b61a6ad650` |
-| `output/mesher-fix-20261013/baseline-after-import-fix.mesh-wall-stacks.log` | `d1ee732d3358a2473ad6fe3445139416e4cee71ffe9d395e21f5a80206c3f34d` |
-| `output/mesher-fix-20261013/baseline-after-import-fix.selected-zone-polygons.json` | `bb0fd8887cf45135211c9334132eb737d947bc9c74615e059b214c0d8bdd7df5` |
+| Unbundled local `baseline-after-import-fix.json` | `283edb56f846dbfc5867124222f4fecc9d158cc7f1509bb36bb9491691edaac9` |
+| Unbundled local `baseline-after-import-fix.phase.json` | `d97c5108f3d8a6e8f6216d15ca53ed602cddb4a991ffa7109393d1b61a6ad650` |
+| Unbundled local `baseline-after-import-fix.mesh-wall-stacks.log` | `d1ee732d3358a2473ad6fe3445139416e4cee71ffe9d395e21f5a80206c3f34d` |
+| Unbundled local `baseline-after-import-fix.selected-zone-polygons.json` | `bb0fd8887cf45135211c9334132eb737d947bc9c74615e059b214c0d8bdd7df5` |
 
 The selected-zone artifact contains seven source polygons and 20,866 total
 points. It is bound to Marble source SHA-256

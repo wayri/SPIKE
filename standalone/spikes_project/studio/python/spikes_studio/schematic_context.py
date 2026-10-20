@@ -9,9 +9,14 @@ def build(canvas,event,point):
         spec=owner.commands.commands[ident];reason=owner.commands.reason(ident);key=owner.keymap.bindings.get(ident,'')
         target.add(spec.label+('\t'+key if key else ''),lambda:owner.commands.execute(ident),not reason,reason or spec.description)
     selected=next((p for p in owner.doc.data['components'] if p['id'] in canvas.selected),None)
+    selected_block=next((p for p in canvas.reusable_blocks() if p['id'] in canvas.selected),None)
     if selected:
         title=menu.menu.Append(-1,f"{selected['ref']} - {len(canvas.selected)} selected");title.Enable(False)
         command(menu,'edit.properties');menu.separator()
+    elif selected_block:
+        title=menu.menu.Append(-1,f"{selected_block['ref']} - reusable block selected");title.Enable(False)
+        from .hierarchy_views import open_sheet
+        menu.add('Enter native hierarchy',lambda:open_sheet(owner,selected_block['ref']));menu.separator()
     edit=menu.submenu('Edit / selection')
     for ident in ('edit.undo','edit.redo','edit.copy','edit.paste','edit.duplicate','edit.select_all','edit.box_select','edit.lasso_select'):command(edit,ident)
     transform=menu.submenu('Move / transform')
@@ -41,9 +46,16 @@ def build(canvas,event,point):
     if selected:
         from .schematic_feedback import configure_control
         menu.add('Configure direct click control…',lambda:configure_control(owner,selected))
-    from .editor_geometry import nearest_route_point,route
+    components=menu.submenu('Components / compile circuit')
+    command(components,'view.component_maker')
+    command(components,'edit.make_component')
+    from .component_maker import capture as capture_component
+    components.add('Make reusable component from this subsheet…',lambda:capture_component(owner,True),
+                   bool(getattr(canvas,'sheet_scope',None)) and not owner.job_running,
+                   'Enter an existing subsheet and stop simulation first. Capture preserves SPICE, not a binary compilation.')
+    from .editor_geometry import nearest_route_point
     parts={p['id']:p for p in owner.doc.data['components']};junctions={j['id']:j for j in owner.doc.data['junctions']}
-    wire=next((w for w in canvas.visible_wires() if nearest_route_point(route(parts,w,junctions),point)[2]<=10/canvas.zoom),None)
+    wire=next((w for w in canvas.visible_wires() if nearest_route_point(canvas.display_route(w,parts,junctions),point)[2]<=10/canvas.zoom),None)
     if wire:
         from .junction_edit import show as add_junction
         menu.add('Add junction on clicked wire',lambda:add_junction(owner,wire,point),not owner.job_running,'Stop simulation before editing wiring')

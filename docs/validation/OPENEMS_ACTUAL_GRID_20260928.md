@@ -77,7 +77,8 @@ The finest-pair resonance and peak-directivity changes were 1.724% and
 normalized S11, positive radiated power, and positive directivity. These
 checks are narrower than complex multiport S-parameter, reciprocity,
 passivity, or measured-correlation qualification. The local result JSONs are
-`build/validation/openems-patch-adapter-134/mesh-{5,4,3}mm/engine-output/normalized-result.json`;
+the local `build/validation/openems-patch-adapter-134/mesh-{5,4,3}mm` engine
+result records; these generated files are not shipped;
 their respective SHA-256 digests are:
 
 - 5 mm: `aa8d450898f70fa7f09d5c0b43bdf7925bac61741f4e880be55829ea28c6b39b`

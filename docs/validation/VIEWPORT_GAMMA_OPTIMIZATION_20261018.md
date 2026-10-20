@@ -85,7 +85,8 @@ Implementation source hashes remain unchanged from
 `source-provenance.json`, which records the gamma versions and Three.js 0.171.0.
 
 Logs and retained before-source snapshots are under
-`output/viewport-optimization-20261018/`.
+the unbundled local `viewport-optimization-20261018` run. See the
+[release evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
 
 ## Native acceptance remains pending
 

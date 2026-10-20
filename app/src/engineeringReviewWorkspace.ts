@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
+import { admitPartLimits, type PartLimitRule } from "./partLimitsModel";
 export type EngineeringReviewWorkspace = {
   contract: "spike/engineering-review-workspace/v1";
   scope_sha256: string;
   overrides: Record<string, unknown>[];
   result: Record<string, unknown> | null;
+  part_limits?: PartLimitRule[];
 };
 
 function canonical(value: unknown): string {
@@ -35,5 +37,7 @@ export function restoreEngineeringReviewWorkspace(value: unknown): EngineeringRe
     || new TextEncoder().encode(JSON.stringify(raw)).length > 8 * 1024 * 1024) {
     throw new Error("Saved engineering review is invalid or exceeds its storage limits.");
   }
-  return structuredClone(raw);
+  const restored = structuredClone(raw);
+  if (raw.part_limits !== undefined) restored.part_limits = admitPartLimits(raw.part_limits);
+  return restored;
 }

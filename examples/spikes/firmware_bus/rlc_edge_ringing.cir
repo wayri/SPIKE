@@ -1,0 +1,7 @@
+.title Finite RLC edge ringing - synthetic teaching values, not a vendor pad
+V1 source 0 PULSE(0 3.3 1n 1p 1p 1u 2u)
+R1 source package 20
+L1 package bus 100n
+C1 bus 0 100p
+.tran 25p 50n uic
+.end

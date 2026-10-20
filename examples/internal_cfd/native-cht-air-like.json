@@ -1,0 +1,14 @@
+{
+  "contract": "spike/native-cht-request/v1",
+  "n": 16,
+  "length_m": 0.1,
+  "span_m": 0.05,
+  "lid_velocity_m_s": 0.002,
+  "density_kg_m3": 1.2,
+  "dynamic_viscosity_pa_s": 0.000018,
+  "specific_heat_j_kgk": 1005,
+  "fluid_conductivity_w_mk": 0.026,
+  "solid_conductivity_w_mk": 0.3,
+  "hot_temperature_k": 310,
+  "cold_temperature_k": 300
+}

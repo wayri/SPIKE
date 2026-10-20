@@ -35,11 +35,12 @@ class ManufacturerDiscoveryTests(unittest.TestCase):
         self.assertEqual(search(rows, 'ADI'), [rows[1]])
 
     def test_duplicate_identity_and_execution_approval_are_rejected(self):
-        for mutation in ('duplicate', 'approved', 'bad_url', 'missing_link'):
+        for mutation in ('duplicate', 'approved', 'bad_url', 'bad_source_url', 'missing_link'):
             data = deepcopy(fixture())
             if mutation == 'duplicate': data['records'].append(deepcopy(data['records'][0]))
             elif mutation == 'approved': data['records'][0]['model_status'] = 'qualified'
             elif mutation == 'bad_url': data['records'][0]['product_url'] = 'file:///model'
+            elif mutation == 'bad_source_url': data['records'][0]['source_urls'] = ['file:///datasheet']
             else: data['records'][0]['model_status'] = 'source_identified_not_qualified'
             with self.subTest(mutation=mutation), self.assertRaises(ValueError): validate(data)
 

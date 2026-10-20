@@ -1,0 +1,647 @@
+{
+  "imposed_ownership": {
+    "contract": "spike/dc-axial-ownership-result/v1",
+    "model_status": "experimental",
+    "production_qualified": false,
+    "input_digest": "6220ddf5f04ed0b74798f3cbd5d8d38ca49bccc6222cc23f2e5892b3e548afcf",
+    "source_request": {
+      "contract": "spike/dc-axial-ownership-request/v1",
+      "center_xy_mm": [
+        3.0,
+        -2.0
+      ],
+      "net": "N",
+      "bore_radius_mm": 0.15,
+      "lands": [
+        {
+          "id": "bottom",
+          "layer": "B.Cu",
+          "node": 5,
+          "z_min_mm": -0.05,
+          "z_max_mm": 0.05,
+          "outer_radius_mm": 0.4,
+          "conductivity_s_m": 58000000.0
+        },
+        {
+          "id": "middle",
+          "layer": "In1.Cu",
+          "node": 9,
+          "z_min_mm": 0.95,
+          "z_max_mm": 1.05,
+          "outer_radius_mm": 0.4,
+          "conductivity_s_m": 58000000.0
+        },
+        {
+          "id": "top",
+          "layer": "F.Cu",
+          "node": 17,
+          "z_min_mm": 1.95,
+          "z_max_mm": 2.05,
+          "outer_radius_mm": 0.4,
+          "conductivity_s_m": 58000000.0
+        }
+      ],
+      "segments": [
+        {
+          "id": "barrel0",
+          "kind": "via",
+          "source_land": "bottom",
+          "target_land": "middle",
+          "start_z_mm": 0.0,
+          "end_z_mm": 1.0,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0,
+          "current_a": 2.0,
+          "source_contact": {
+            "id": "barrel0-source",
+            "land_id": "bottom",
+            "node": 5,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          },
+          "target_contact": {
+            "id": "barrel0-target",
+            "land_id": "middle",
+            "node": 9,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          }
+        },
+        {
+          "id": "barrel1",
+          "kind": "via",
+          "source_land": "middle",
+          "target_land": "top",
+          "start_z_mm": 1.0,
+          "end_z_mm": 2.0,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0,
+          "current_a": 3.0,
+          "source_contact": {
+            "id": "barrel1-source",
+            "land_id": "middle",
+            "node": 9,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          },
+          "target_contact": {
+            "id": "barrel1-target",
+            "land_id": "top",
+            "node": 17,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          }
+        }
+      ]
+    },
+    "geometry_ownership": "disjoint_explicit_coaxial_land_prisms_and_gap_annuli",
+    "complete_physical_volume": false,
+    "requires_resolve": true,
+    "current_status": "supplied_imposed_values_not_a_coupled_solution",
+    "land_transition_fields_status": "unresolved",
+    "land_transition_heat_w": null,
+    "lands": [
+      {
+        "id": "bottom",
+        "layer": "B.Cu",
+        "node": 5,
+        "z_min_mm": -0.05,
+        "z_max_mm": 0.05,
+        "outer_radius_mm": 0.4,
+        "conductivity_s_m": 58000000.0,
+        "volume_mm3": 0.04319689898685966,
+        "center_z_mm": 0.0,
+        "net_current_to_barrels_a": 2.0
+      },
+      {
+        "id": "middle",
+        "layer": "In1.Cu",
+        "node": 9,
+        "z_min_mm": 0.95,
+        "z_max_mm": 1.05,
+        "outer_radius_mm": 0.4,
+        "conductivity_s_m": 58000000.0,
+        "volume_mm3": 0.0431968989868597,
+        "center_z_mm": 1.0,
+        "net_current_to_barrels_a": 1.0
+      },
+      {
+        "id": "top",
+        "layer": "F.Cu",
+        "node": 17,
+        "z_min_mm": 1.95,
+        "z_max_mm": 2.05,
+        "outer_radius_mm": 0.4,
+        "conductivity_s_m": 58000000.0,
+        "volume_mm3": 0.043196898986859605,
+        "center_z_mm": 2.0,
+        "net_current_to_barrels_a": -3.0
+      }
+    ],
+    "segments": [
+      {
+        "id": "barrel0",
+        "kind": "via",
+        "source_land": "bottom",
+        "target_land": "middle",
+        "node_p": 5,
+        "node_n": 9,
+        "layer": "B.Cu->In1.Cu",
+        "net": "N",
+        "start_mm": [
+          3.0,
+          -2.0,
+          0.05
+        ],
+        "end_mm": [
+          3.0,
+          -2.0,
+          0.95
+        ],
+        "inner_radius_mm": 0.15,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "face_contact_area_mm2": 0.02552544031041706,
+        "source_contact": {
+          "id": "barrel0-source",
+          "land_id": "bottom",
+          "node": 5,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "target_contact": {
+          "id": "barrel0-target",
+          "land_id": "middle",
+          "node": 9,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "length_mm": 0.8999999999999999,
+        "original_center_span_mm": 1.0,
+        "removed_land_span_mm": 0.10000000000000009,
+        "original_center_span_resistance_ohm": 0.0006754586444218373,
+        "gap_resistance_ohm": 0.0006079127799796534,
+        "resistance_change_ohm": -6.754586444218387e-05,
+        "volume_mm3": 0.022972896279375352,
+        "imposed_current_a": 2.0,
+        "current_density_a_mm2": [
+          0.0,
+          0.0,
+          78.35320275293311
+        ],
+        "imposed_current_joule_heat_w": 0.0024316511199186136,
+        "requires_resolve": true
+      },
+      {
+        "id": "barrel1",
+        "kind": "via",
+        "source_land": "middle",
+        "target_land": "top",
+        "node_p": 9,
+        "node_n": 17,
+        "layer": "In1.Cu->F.Cu",
+        "net": "N",
+        "start_mm": [
+          3.0,
+          -2.0,
+          1.05
+        ],
+        "end_mm": [
+          3.0,
+          -2.0,
+          1.95
+        ],
+        "inner_radius_mm": 0.15,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "face_contact_area_mm2": 0.02552544031041706,
+        "source_contact": {
+          "id": "barrel1-source",
+          "land_id": "middle",
+          "node": 9,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "target_contact": {
+          "id": "barrel1-target",
+          "land_id": "top",
+          "node": 17,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "length_mm": 0.8999999999999999,
+        "original_center_span_mm": 1.0,
+        "removed_land_span_mm": 0.10000000000000009,
+        "original_center_span_resistance_ohm": 0.0006754586444218373,
+        "gap_resistance_ohm": 0.0006079127799796534,
+        "resistance_change_ohm": -6.754586444218387e-05,
+        "volume_mm3": 0.022972896279375352,
+        "imposed_current_a": 3.0,
+        "current_density_a_mm2": [
+          0.0,
+          0.0,
+          117.52980412939968
+        ],
+        "imposed_current_joule_heat_w": 0.0054712150198168805,
+        "requires_resolve": true
+      }
+    ],
+    "land_volume_mm3": 0.12959069696057895,
+    "axial_gap_volume_mm3": 0.045945792558750705,
+    "axial_imposed_current_heat_w": 0.007902866139735494,
+    "limitations": [
+      "One explicitly supplied coaxial stack; no source/board/electrode inference.",
+      "Uniform axial DC current in each gap only; land spreading and through-thickness transition fields remain unresolved.",
+      "Clipped gap resistance requires a fresh coupled solve; supplied currents do not establish KCL/work for land fields.",
+      "No complete-volume density percentile, planar-field merge, thermal mapping, AC or board qualification."
+    ]
+  },
+  "fresh_ownership": {
+    "contract": "spike/dc-axial-ownership-result/v1",
+    "model_status": "experimental",
+    "production_qualified": false,
+    "input_digest": "20213352936b3f570f891f4c1e22cfc2b8f63d422c02f46a45e278017d287f7c",
+    "source_request": {
+      "contract": "spike/dc-axial-ownership-request/v1",
+      "center_xy_mm": [
+        3.0,
+        -2.0
+      ],
+      "net": "N",
+      "bore_radius_mm": 0.15,
+      "lands": [
+        {
+          "id": "bottom",
+          "layer": "B.Cu",
+          "node": 0,
+          "z_min_mm": -0.05,
+          "z_max_mm": 0.05,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0
+        },
+        {
+          "id": "middle",
+          "layer": "In1.Cu",
+          "node": 1,
+          "z_min_mm": 0.95,
+          "z_max_mm": 1.05,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0
+        },
+        {
+          "id": "top",
+          "layer": "F.Cu",
+          "node": 2,
+          "z_min_mm": 1.95,
+          "z_max_mm": 2.05,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0
+        }
+      ],
+      "segments": [
+        {
+          "id": "barrel0",
+          "kind": "via",
+          "source_land": "bottom",
+          "target_land": "middle",
+          "start_z_mm": 0.0,
+          "end_z_mm": 1.0,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0,
+          "current_a": 2.0,
+          "source_contact": {
+            "id": "barrel0-source",
+            "land_id": "bottom",
+            "node": 0,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          },
+          "target_contact": {
+            "id": "barrel0-target",
+            "land_id": "middle",
+            "node": 1,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          }
+        },
+        {
+          "id": "barrel1",
+          "kind": "via",
+          "source_land": "middle",
+          "target_land": "top",
+          "start_z_mm": 1.0,
+          "end_z_mm": 2.0,
+          "outer_radius_mm": 0.175,
+          "conductivity_s_m": 58000000.0,
+          "current_a": 3.0,
+          "source_contact": {
+            "id": "barrel1-source",
+            "land_id": "middle",
+            "node": 1,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          },
+          "target_contact": {
+            "id": "barrel1-target",
+            "land_id": "top",
+            "node": 2,
+            "inner_radius_mm": 0.15,
+            "outer_radius_mm": 0.175
+          }
+        }
+      ]
+    },
+    "geometry_ownership": "disjoint_explicit_coaxial_land_prisms_and_gap_annuli",
+    "complete_physical_volume": false,
+    "requires_resolve": true,
+    "current_status": "supplied_imposed_values_not_a_coupled_solution",
+    "land_transition_fields_status": "unresolved",
+    "land_transition_heat_w": null,
+    "lands": [
+      {
+        "id": "bottom",
+        "layer": "B.Cu",
+        "node": 0,
+        "z_min_mm": -0.05,
+        "z_max_mm": 0.05,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "volume_mm3": 0.002552544031041706,
+        "center_z_mm": 0.0,
+        "net_current_to_barrels_a": 2.0
+      },
+      {
+        "id": "middle",
+        "layer": "In1.Cu",
+        "node": 1,
+        "z_min_mm": 0.95,
+        "z_max_mm": 1.05,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "volume_mm3": 0.002552544031041708,
+        "center_z_mm": 1.0,
+        "net_current_to_barrels_a": 1.0
+      },
+      {
+        "id": "top",
+        "layer": "F.Cu",
+        "node": 2,
+        "z_min_mm": 1.95,
+        "z_max_mm": 2.05,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "volume_mm3": 0.0025525440310417025,
+        "center_z_mm": 2.0,
+        "net_current_to_barrels_a": -3.0
+      }
+    ],
+    "segments": [
+      {
+        "id": "barrel0",
+        "kind": "via",
+        "source_land": "bottom",
+        "target_land": "middle",
+        "node_p": 0,
+        "node_n": 1,
+        "layer": "B.Cu->In1.Cu",
+        "net": "N",
+        "start_mm": [
+          3.0,
+          -2.0,
+          0.05
+        ],
+        "end_mm": [
+          3.0,
+          -2.0,
+          0.95
+        ],
+        "inner_radius_mm": 0.15,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "face_contact_area_mm2": 0.02552544031041706,
+        "source_contact": {
+          "id": "barrel0-source",
+          "land_id": "bottom",
+          "node": 0,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "target_contact": {
+          "id": "barrel0-target",
+          "land_id": "middle",
+          "node": 1,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "length_mm": 0.8999999999999999,
+        "original_center_span_mm": 1.0,
+        "removed_land_span_mm": 0.10000000000000009,
+        "original_center_span_resistance_ohm": 0.0006754586444218373,
+        "gap_resistance_ohm": 0.0006079127799796534,
+        "resistance_change_ohm": -6.754586444218387e-05,
+        "volume_mm3": 0.022972896279375352,
+        "imposed_current_a": 2.0,
+        "current_density_a_mm2": [
+          0.0,
+          0.0,
+          78.35320275293311
+        ],
+        "imposed_current_joule_heat_w": 0.0024316511199186136,
+        "requires_resolve": true
+      },
+      {
+        "id": "barrel1",
+        "kind": "via",
+        "source_land": "middle",
+        "target_land": "top",
+        "node_p": 1,
+        "node_n": 2,
+        "layer": "In1.Cu->F.Cu",
+        "net": "N",
+        "start_mm": [
+          3.0,
+          -2.0,
+          1.05
+        ],
+        "end_mm": [
+          3.0,
+          -2.0,
+          1.95
+        ],
+        "inner_radius_mm": 0.15,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "face_contact_area_mm2": 0.02552544031041706,
+        "source_contact": {
+          "id": "barrel1-source",
+          "land_id": "middle",
+          "node": 1,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "target_contact": {
+          "id": "barrel1-target",
+          "land_id": "top",
+          "node": 2,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "length_mm": 0.8999999999999999,
+        "original_center_span_mm": 1.0,
+        "removed_land_span_mm": 0.10000000000000009,
+        "original_center_span_resistance_ohm": 0.0006754586444218373,
+        "gap_resistance_ohm": 0.0006079127799796534,
+        "resistance_change_ohm": -6.754586444218387e-05,
+        "volume_mm3": 0.022972896279375352,
+        "imposed_current_a": 3.0,
+        "current_density_a_mm2": [
+          0.0,
+          0.0,
+          117.52980412939968
+        ],
+        "imposed_current_joule_heat_w": 0.0054712150198168805,
+        "requires_resolve": true
+      }
+    ],
+    "land_volume_mm3": 0.007657632093125116,
+    "axial_gap_volume_mm3": 0.045945792558750705,
+    "axial_imposed_current_heat_w": 0.007902866139735494,
+    "limitations": [
+      "One explicitly supplied coaxial stack; no source/board/electrode inference.",
+      "Uniform axial DC current in each gap only; land spreading and through-thickness transition fields remain unresolved.",
+      "Clipped gap resistance requires a fresh coupled solve; supplied currents do not establish KCL/work for land fields.",
+      "No complete-volume density percentile, planar-field merge, thermal mapping, AC or board qualification."
+    ]
+  },
+  "fresh_result": {
+    "model_status": "experimental",
+    "production_qualified": false,
+    "current_density_observable": {
+      "method": "RT0_signed_flux_vector_unique_planar_volume",
+      "scope": "all represented planar copper, including undriven components",
+      "p95": {
+        "quantile": 0.95,
+        "lower_a_mm2": 2.937717206855163e-11,
+        "upper_a_mm2": 3.152160191650804e-11,
+        "enclosure_width_a_mm2": 2.1444298479564066e-12,
+        "physical_volume_mm3": 0.007654557195077216,
+        "original_triangle_count": 768,
+        "quadrature_subcell_count": 768,
+        "converged": true
+      },
+      "p99": {
+        "quantile": 0.99,
+        "lower_a_mm2": 3.8221368150063306e-11,
+        "upper_a_mm2": 4.002703899928088e-11,
+        "enclosure_width_a_mm2": 1.805670849217576e-12,
+        "physical_volume_mm3": 0.007654557195077216,
+        "original_triangle_count": 768,
+        "quadrature_subcell_count": 768,
+        "converged": true
+      },
+      "physical_planar_volume_mm3": 0.007654557195077216,
+      "undriven_planar_volume_mm3": 0.0,
+      "planar_dissipation_w": 3.8792499384451234e-29,
+      "axial_barrel_count": 2,
+      "complete_physical_volume": false,
+      "complete_planar_polygon_partition": true,
+      "axial_support_status": "unresolved_landing_overlap",
+      "qualification": "experimental; not the production branch p95 replacement"
+    },
+    "method": "conforming_triangle_RT0_hybridized_DC",
+    "contact_model": "uniform finite-area current injection; area-average potential",
+    "resistance_ohm": 0.0012158255599590186,
+    "dissipation_w_at_one_ampere": 0.0012158255599587346,
+    "maximum_cell_kcl_error_a": 1.509903313490213e-14,
+    "maximum_face_kcl_error_a": 1.5742339204948106e-13,
+    "relative_residual": 3.049491478490604e-12,
+    "relative_energy_error": 2.3363628677190903e-13,
+    "triangle_count": 768,
+    "global_unknown_count": 1537,
+    "uncondensed_global_unknown_count": 1537,
+    "eliminated_spoke_trace_count": 0,
+    "rectangle_spoke_condensation": false,
+    "global_trace_count": 1536,
+    "uncondensed_global_trace_count": 1536,
+    "via_current_unknown_count": 2,
+    "system_nonzeros": 10233,
+    "factor_nonzeros": 15564,
+    "local_triangle_budget": 150000,
+    "global_unknown_budget": 150000,
+    "geometry_snap_tolerance_mm": 5e-13,
+    "limitations": [
+      "DC only; no PEEC L/C or field qualification",
+      "finite-area distributed contacts and uniform axial via current",
+      "boundary copper omission and contact model need separate convergence",
+      "sparse LU fill and runtime are not tightly bounded"
+    ]
+  },
+  "center_span_result": {
+    "model_status": "experimental",
+    "production_qualified": false,
+    "current_density_observable": {
+      "method": "RT0_signed_flux_vector_unique_planar_volume",
+      "scope": "all represented planar copper, including undriven components",
+      "p95": {
+        "quantile": 0.95,
+        "lower_a_mm2": 3.283532334507831e-11,
+        "upper_a_mm2": 3.5202686408143624e-11,
+        "enclosure_width_a_mm2": 2.367363063065313e-12,
+        "physical_volume_mm3": 0.007654557195077216,
+        "original_triangle_count": 768,
+        "quadrature_subcell_count": 768,
+        "converged": true
+      },
+      "p99": {
+        "quantile": 0.99,
+        "lower_a_mm2": 3.9002808081925654e-11,
+        "upper_a_mm2": 4.567190808995631e-11,
+        "enclosure_width_a_mm2": 6.669100008030656e-12,
+        "physical_volume_mm3": 0.007654557195077216,
+        "original_triangle_count": 768,
+        "quadrature_subcell_count": 768,
+        "converged": true
+      },
+      "physical_planar_volume_mm3": 0.007654557195077216,
+      "undriven_planar_volume_mm3": 0.0,
+      "planar_dissipation_w": 4.7462703383508955e-29,
+      "axial_barrel_count": 2,
+      "complete_physical_volume": false,
+      "complete_planar_polygon_partition": true,
+      "axial_support_status": "unresolved_landing_overlap",
+      "qualification": "experimental; not the production branch p95 replacement"
+    },
+    "method": "conforming_triangle_RT0_hybridized_DC",
+    "contact_model": "uniform finite-area current injection; area-average potential",
+    "resistance_ohm": 0.0013509172888433237,
+    "dissipation_w_at_one_ampere": 0.0013509172888429683,
+    "maximum_cell_kcl_error_a": 2.0872192862952943e-14,
+    "maximum_face_kcl_error_a": 1.7452358836325945e-13,
+    "relative_residual": 3.2179195761976673e-12,
+    "relative_energy_error": 2.63081592837596e-13,
+    "triangle_count": 768,
+    "global_unknown_count": 1537,
+    "uncondensed_global_unknown_count": 1537,
+    "eliminated_spoke_trace_count": 0,
+    "rectangle_spoke_condensation": false,
+    "global_trace_count": 1536,
+    "uncondensed_global_trace_count": 1536,
+    "via_current_unknown_count": 2,
+    "system_nonzeros": 10233,
+    "factor_nonzeros": 15564,
+    "local_triangle_budget": 150000,
+    "global_unknown_budget": 150000,
+    "geometry_snap_tolerance_mm": 5e-13,
+    "limitations": [
+      "DC only; no PEEC L/C or field qualification",
+      "finite-area distributed contacts and uniform axial via current",
+      "boundary copper omission and contact model need separate convergence",
+      "sparse LU fill and runtime are not tightly bounded"
+    ]
+  },
+  "contact_polygon_approximation": {
+    "contact_polygon_area_mm2": 0.025515190650257466,
+    "exact_annular_face_area_mm2": 0.02552544031041706,
+    "relative_contact_area_discrepancy": 0.0004015468503166808
+  }
+}

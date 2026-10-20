@@ -12,8 +12,8 @@ The request and result are retained in the existing project EM setup.
 From the repository root:
 
 ~~~powershell
-.venv/Scripts/python.exe -m python.spike_core.cli --output output/em-machines/planar-pm-fem-result.json magnetic-machine --request examples/em_machines/planar_pm_fem.json
-.venv/Scripts/python.exe -m python.spike_core.cli --output output/em-machines/planar-solenoid-fem-result.json magnetic-machine --request examples/em_machines/planar_solenoid_fem.json
+.venv/Scripts/python.exe -m python.spike_core.cli --output "$env:TEMP/spike-em-machines/planar-pm-fem-result.json" magnetic-machine --request examples/em_machines/planar_pm_fem.json
+.venv/Scripts/python.exe -m python.spike_core.cli --output "$env:TEMP/spike-em-machines/planar-solenoid-fem-result.json" magnetic-machine --request examples/em_machines/planar_solenoid_fem.json
 ~~~
 
 The first example rotates a supplied-current PM machine using a field solve at

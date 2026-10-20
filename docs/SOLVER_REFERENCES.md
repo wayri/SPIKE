@@ -2,6 +2,90 @@
 <!-- Copyright (c) 2026 SigHarmonic -->
 # Solver research, standards and validation references
 
+The [21 October CFD/CHT research review](validation/CFD_CHT_RESEARCH_REVIEW_20261021.md)
+pins a 2026 fourth-order sharp-immersed journal candidate, 2025 adaptive/CHT/GCL
+work and current-version 2026 entropy-stable-wall preprints. Review scope and
+access limitations are explicit. These are candidate evaluations, not imported
+implementations or claims that high-order/immersed/ALE methods already execute.
+
+Current research adoption is narrowly recorded in the
+[symmetric-stress](validation/ENCLOSURE_SYMMETRIC_STRESS_20261020.md),
+[SA-noft2](validation/ENCLOSURE_SA_TRANSPORT_20261020.md) and
+[whole-frame rotation](validation/ENCLOSURE_ROTATING_FRAME_20261020.md) ledgers.
+They distinguish reviewed equations/variants from unreviewed original texts,
+independent derivations from external implementations, and manufactured
+verification from physical turbulence or propeller validation. SA's precise
+NASA/TMBWG noft2 and modified-vorticity guard are identified; no claim of
+novelty, state-of-the-art superiority or general model qualification follows.
+
+The [rectilinear momentum ledger](validation/ENCLOSURE_RECTILINEAR_MOMENTUM_20261020.md)
+records A. E. P. Veldman's author-hosted CFD notes (2012-2013 cover, January2014
+preface), sections1.5.3-1.5.4,2.2-2.3,2.5.1 and exact reviewed pages/equations.
+The integrated obstacle closure and original continuum polynomial oracles are
+independently derived. The [separate turbulence/rotor review](validation/TURBULENCE_ROTOR_REQUIREMENTS_20261020.md)
+records the moved official TMR host and exact SA/SST variants, rotating-frame
+and GCL sources, and candidate reference cases; these are requirements, not
+implemented or executed turbulence/propeller validation.
+
+The [3-D CHT evidence ledger](validation/ENCLOSURE_CHT_METHOD_20261020.md)
+records NIST FiPy4.0.3 mathematical FV/upwind sections, NASA grid-convergence
+guidance, Higham's author-written conditioning explanation, and the distinction
+between reviewed current SciPy1.18 documentation and executed SciPy1.17.1.
+Its independent derivation is linked to the separately scoped MAC/RT0 sources;
+no external implementation was adapted and no turbulence/rotor adoption is claimed.
+
+[Resistively loaded coupled pairs](RLGC_TERMINATED_PAIR.md) use D. H. Staelin,
+*Electromagnetics and Applications*, MIT OCW text (2011), chapter 8 sections
+8.1.1–8.1.2, equations 8.1.1–8.1.16, printed pp. 229–232. Relevant full text
+reviewed on 20 October 2026 for Thevenin excitation and resistive reflection.
+The sampled multiport feedback, signed source-work split and independent physical
+boundary oracle are original derivations; no external implementation or data
+was copied. Coupled and lossy line foundations remain separately recorded.
+
+The 20 October 2026 [native CHT source ledger](validation/NATIVE_CHT_METHOD_20261020.md)
+records the precise DOE handbook, NIST finite-volume/upwind documentation and
+NASA portions reviewed for this increment. The
+[surface-exchange ledger](COUPLED_SURFACE_EXCHANGE.md) records its
+Farhat/Lesoinne/Le Tallec reference and actual access extent, independent
+overlap/adjoint derivation and numerical tests. These records do not supply
+missing lineage or qualification for earlier/general CFD/FSI implementations.
+
+[Supplied coupled-pair composition](RLGC_COUPLED_PAIR.md) records Michael
+Steer's author-attributed *Microwave and RF Design II: Transmission Lines*,
+online sections5.3 equations1–10,18–23 and5.5 equations1–20, reviewed20October2026.
+These supply lossless quasi-TEM matrix/even-odd foundations; the lossy orthogonal
+composition, power normalization and independent physical-coordinate oracles
+are original derivations. Scalar loss provenance remains separately recorded.
+No external implementation, example data or figures were copied.
+
+[Finite SI candidate/corner comparison](SI_CANDIDATE_STUDY.md) references D. H.
+Staelin, *Electromagnetics and Applications*, MIT OCW online text (2011), chapter
+8 §§8.1.1–8.1.2, printed pp.229–232, equations8.1.1–8.1.16. Reviewed relevant
+full text on 2026-10-19: telegrapher/traveling-wave and Thevenin loading foundation.
+Original ABCD and DC-divider oracles verify the unchanged loaded-line solver;
+no external code or test data copied. Sampled synthetic checks establish no
+physical board or continuous-band qualification.
+
+The experimental [RT0 density method](DC_RT0_DENSITY.md) records the reviewed
+Haus/Melcher section 7.2 and Vohralik (2004), equations (1)-(3), oriented face
+basis and independent observable/energy derivation. The experimental
+[same-slab magnetic kernel](validation/PEEC_AFFINE_SLAB_KERNEL_20261019.md)
+records Reid, arXiv:1708.04666v1, sections I and II-A--C, and the reviewed
+Haus/Melcher section 8.1 prose. Exact reviewed portions, original derivations,
+executable oracles and unsupported regimes are linked in the method records.
+No external implementation was copied; these references do not establish
+physical board accuracy, production readiness or human numerical approval.
+
+PI01-S01 [owned pad geometry](OWNED_DRILLED_PAD_DC.md) uses Haus and Melcher,
+*Electromagnetic Fields and Energy*, online section 7.2,
+[Steady Ohmic Conduction](https://web.mit.edu/6.013_book/www/chapter7/7.2.html).
+The steady-current, continuity, insulating-boundary and conductance prose
+was reviewed on 19 October 2026; displayed equation GIFs were not transcribed.
+Conservative polygon bounds and angular/radial annulus oracles are original
+derivations. This is a governing-physics foundation; no external algorithm,
+implementation, text or figure was copied. No measured board validation is
+established by this reference.
+
 SI02-S06 [supplied RLGC ideal star junctions](RLGC_LINE_JUNCTION.md) use
 Staelin, *Electromagnetics and Applications* (2011), section 8.1.2, printed
 pages 232 and 234 (multiple-line junctions and interface continuity), and
@@ -412,3 +496,54 @@ Ho/Ruehli/Brennan (1975) section II, with DOI/access links, independent
 derivation and executed verification, are recorded in
 [numerical method evidence](NUMERICAL_METHOD_EVIDENCE.md#native-linear-radau-iia3--18-october-2026).
 The later corroborating sources are not asserted as lineage for older kernels.
+
+## SI02-S09 reactive coupled-line endpoint laws
+
+[Method record](RLGC_REACTIVE_PAIR.md) records full-text review on 20 October 2026
+of D. H. Staelin, MIT *Electromagnetics and Applications* (2011), chapter 8,
+section 8.1.4 pp.237-239 and section 8.3.1 eqs.8.3.1-8.3.9 pp.249-250.
+It derives the sampled Norton/wave closure and RMS mean energy identity in
+project notation, with exact primary URL, units, numerical assumptions and
+clean-room provenance. No measurement or broader solver qualification follows
+from this citation.
+
+## SI02-S10 physical coupled-section continuity and loss
+
+[Method/source ledger](RLGC_COUPLED_CASCADE.md) records actual full-text review
+of Staelin, MIT *Electromagnetics and Applications* (2011), chapter8 section8.1.2
+printedpp232-234 (especially p234 physical continuity), section8.3.1
+eqs8.3.1-8.3.9 pp249-250 and eq8.3.16 p251. It independently derives the
+common-reference multiport connection, RMS conversion and loss ledger, with
+physical spatial-chain/heat-quadrature oracles and explicit clean-room provenance.
+Citations establish physics lineage, not measured accuracy or imported code.
+
+## SI02-S11 composed physical endpoints and section fields
+
+[Method/source ledger](RLGC_LOADED_CASCADE.md) derives two-level physical
+RLC/coupled-channel closure from independently authored constituent methods.
+It records actual MIT Staelin(2011) chapter8 review: junction continuity
+section8.1.2 pp232-234, reactive/Thevenin treatment section8.1.4 pp236-237, and
+complex line laws/dissipation section8.3.1 eqs8.3.1-8.3.9 pp249-250 plus
+eq8.3.16 p251. RMS mean-energy/power identities, units, numerical envelope,
+independent oracle and clean-room rights are explicit; no unreviewed lineage,
+measurement correlation or thermal qualification is inferred.
+
+## SI02-S12 coupled branch continuity and conservation
+
+[Method/source ledger](RLGC_COUPLED_STAR.md) independently extends physical
+continuity and KCL to a symmetric lossless star map for each conductor. It records
+actual Staelin, MIT *Electromagnetics and Applications* (2011), chapter 8 review:
+section 8.1.2 pp.232–234 and section 8.3.1 eqs.8.3.1–8.3.9 pp.249–250 plus
+eq.8.3.16 p.251. The multi-leg projector proof, physical oracle and RMS treatment
+are independently authored; no external implementation or geometric junction
+validation is inferred.
+
+## SI02-S13 physical branch endpoints and cancellation
+
+[Method/source ledger](RLGC_LOADED_STAR.md) records Staelin's exact reviewed
+MIT 2011 line/interface/reactive sections and independently derives the variable-
+port physical RLC closure. It additionally records full-text review of Higham,
+*The Accuracy of Floating Point Summation*, SIAM JSC 14(4), 783–799 (1993),
+model (1.2) p.784 and bound (2.6)/conditioning p.785. Operand-scaled cancellation
+analysis does not prove the specific 64*eps implementation factor or full-path
+accuracy. No external implementation is adapted or measurement inferred.

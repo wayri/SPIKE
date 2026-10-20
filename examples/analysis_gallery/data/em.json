@@ -1,0 +1,958 @@
+{
+  "domain": "em",
+  "limitations": [
+    "Closed-box Huygens postprocessor only; it does not solve Maxwell fields.",
+    "The original dipole boundary fixture is synthetic and analytically generated.",
+    "No total radiated power, directivity, geometry extraction, or compliance verdict is inferred."
+  ],
+  "metrics": {
+    "direction_count": 181,
+    "peak_intensity_w_per_sr": 47.689829928678876,
+    "surface_samples": 216
+  },
+  "model_status": "postprocessor_only",
+  "production_qualified": false,
+  "provenance": {
+    "executed_command": ".\\.venv\\Scripts\\python.exe scripts\\generate_analysis_gallery.py",
+    "generator": {
+      "path": "scripts/generate_analysis_gallery.py",
+      "sha256": "e2d6cee6927ce0a4dcffc4facfc83490cb2ac9220704bb7eb45887c37fd76bab"
+    },
+    "request_sha256": "49c1191c8b8d675ae87e5a611381899f69a53613464993abc3aec57cfbe04f53",
+    "result_sha256": "13b54af6da2dd3b2db3b0242ea473642c60fa0b767eadad932bcdc1721930caf",
+    "runtime": {
+      "matplotlib": "3.10.8",
+      "numpy": "2.4.2",
+      "platform": "Windows-11-10.0.26300-SP0",
+      "python": "3.12.9"
+    },
+    "sources": [
+      {
+        "path": "examples/em/huygens_dipole_request.json",
+        "sha256": "b6f5ba592d4ada09fbdab82cd26cd170edbb6d5ed2bb57d0873bcb279e498ce7"
+      },
+      {
+        "path": "scripts/run_huygens_far_field.py",
+        "sha256": "ceee206abdefa479e075e7142451930b6cafac0c228233b30a24724bc97d2f26"
+      },
+      {
+        "path": "python/spike_core/huygens_far_field.py",
+        "sha256": "f5684ea4ade79871de9b64287e65fc1554d3b6f9ee651428b51af5589e54e991"
+      }
+    ]
+  },
+  "schema": "spike/analysis-gallery-series/v1",
+  "series": [
+    {
+      "angle_deg": 0.0,
+      "radiation_intensity_w_per_sr": 2.23351504965974e-31,
+      "relative_intensity_db": -40.0
+    },
+    {
+      "angle_deg": 1.988950276243094,
+      "radiation_intensity_w_per_sr": 0.05757392342984071,
+      "relative_intensity_db": -29.181999477823783
+    },
+    {
+      "angle_deg": 3.977900552486188,
+      "radiation_intensity_w_per_sr": 0.2300147807229928,
+      "relative_intensity_db": -23.166700290299378
+    },
+    {
+      "angle_deg": 5.966850828729282,
+      "radiation_intensity_w_per_sr": 0.5164812991971074,
+      "relative_intensity_db": -19.653711724916704
+    },
+    {
+      "angle_deg": 7.955801104972376,
+      "radiation_intensity_w_per_sr": 0.9155762353840673,
+      "relative_intensity_db": -17.1673126201745
+    },
+    {
+      "angle_deg": 9.94475138121547,
+      "radiation_intensity_w_per_sr": 1.4253536565046687,
+      "relative_intensity_db": -15.245031394791518
+    },
+    {
+      "angle_deg": 11.933701657458563,
+      "radiation_intensity_w_per_sr": 2.0433290646345905,
+      "relative_intensity_db": -13.680874611376662
+    },
+    {
+      "angle_deg": 13.922651933701658,
+      "radiation_intensity_w_per_sr": 2.7664922940744816,
+      "relative_intensity_db": -12.36496308810656
+    },
+    {
+      "angle_deg": 15.911602209944752,
+      "radiation_intensity_w_per_sr": 3.5913230932667375,
+      "relative_intensity_db": -11.23171295484199
+    },
+    {
+      "angle_deg": 17.900552486187845,
+      "radiation_intensity_w_per_sr": 4.513809284096664,
+      "relative_intensity_db": -10.238825681873585
+    },
+    {
+      "angle_deg": 19.88950276243094,
+      "radiation_intensity_w_per_sr": 5.5294673738665185,
+      "relative_intensity_db": -9.357424737684342
+    },
+    {
+      "angle_deg": 21.878453038674035,
+      "radiation_intensity_w_per_sr": 6.633365478979467,
+      "relative_intensity_db": -8.56691847347439
+    },
+    {
+      "angle_deg": 23.867403314917127,
+      "radiation_intensity_w_per_sr": 7.820148404791568,
+      "relative_intensity_db": -7.852107788106588
+    },
+    {
+      "angle_deg": 25.85635359116022,
+      "radiation_intensity_w_per_sr": 9.08406471356892,
+      "relative_intensity_db": -7.20145554246948
+    },
+    {
+      "angle_deg": 27.845303867403317,
+      "radiation_intensity_w_per_sr": 10.418995602386477,
+      "relative_intensity_db": -6.605999189320617
+    },
+    {
+      "angle_deg": 29.834254143646408,
+      "radiation_intensity_w_per_sr": 11.818485405433378,
+      "relative_intensity_db": -6.058639504290061
+    },
+    {
+      "angle_deg": 31.823204419889503,
+      "radiation_intensity_w_per_sr": 13.275773530766566,
+      "relative_intensity_db": -5.553659384152757
+    },
+    {
+      "angle_deg": 33.812154696132595,
+      "radiation_intensity_w_per_sr": 14.783827640181736,
+      "relative_intensity_db": -5.086388830489997
+    },
+    {
+      "angle_deg": 35.80110497237569,
+      "radiation_intensity_w_per_sr": 16.335377882511136,
+      "relative_intensity_db": -4.652965882957476
+    },
+    {
+      "angle_deg": 37.790055248618785,
+      "radiation_intensity_w_per_sr": 17.92295199511862,
+      "relative_intensity_db": -4.250162320805649
+    },
+    {
+      "angle_deg": 39.77900552486188,
+      "radiation_intensity_w_per_sr": 19.5389110952961,
+      "relative_intensity_db": -3.875254168577577
+    },
+    {
+      "angle_deg": 41.767955801104975,
+      "radiation_intensity_w_per_sr": 21.175485992182754,
+      "relative_intensity_db": -3.5259238717842
+    },
+    {
+      "angle_deg": 43.75690607734807,
+      "radiation_intensity_w_per_sr": 22.82481386011178,
+      "relative_intensity_db": -3.200185291749274
+    },
+    {
+      "angle_deg": 45.745856353591165,
+      "radiation_intensity_w_per_sr": 24.47897512523975,
+      "relative_intensity_db": -2.8963254264960665
+    },
+    {
+      "angle_deg": 47.73480662983425,
+      "radiation_intensity_w_per_sr": 26.13003042817973,
+      "relative_intensity_db": -2.6128585819747308
+    },
+    {
+      "angle_deg": 49.72375690607735,
+      "radiation_intensity_w_per_sr": 27.77005753539723,
+      "relative_intensity_db": -2.3484899411274958
+    },
+    {
+      "angle_deg": 51.71270718232044,
+      "radiation_intensity_w_per_sr": 29.39118808064001,
+      "relative_intensity_db": -2.1020863173421023
+    },
+    {
+      "angle_deg": 53.70165745856354,
+      "radiation_intensity_w_per_sr": 30.985644024065923,
+      "relative_intensity_db": -1.8726524644253617
+    },
+    {
+      "angle_deg": 55.69060773480663,
+      "radiation_intensity_w_per_sr": 32.54577372055793,
+      "relative_intensity_db": -1.6593117304183935
+    },
+    {
+      "angle_deg": 57.67955801104973,
+      "radiation_intensity_w_per_sr": 34.06408748969551,
+      "relative_intensity_db": -1.4612901412585093
+    },
+    {
+      "angle_deg": 59.668508287292816,
+      "radiation_intensity_w_per_sr": 35.53329257792161,
+      "relative_intensity_db": -1.2779032180602914
+    },
+    {
+      "angle_deg": 61.65745856353591,
+      "radiation_intensity_w_per_sr": 36.946327398739676,
+      "relative_intensity_db": -1.1085449925453297
+    },
+    {
+      "angle_deg": 63.646408839779006,
+      "radiation_intensity_w_per_sr": 38.29639492965117,
+      "relative_intensity_db": -0.9526788051997783
+    },
+    {
+      "angle_deg": 65.6353591160221,
+      "radiation_intensity_w_per_sr": 39.57699513553493,
+      "relative_intensity_db": -0.8098295613619444
+    },
+    {
+      "angle_deg": 67.62430939226519,
+      "radiation_intensity_w_per_sr": 40.78195627798583,
+      "relative_intensity_db": -0.6795771895455581
+    },
+    {
+      "angle_deg": 69.61325966850829,
+      "radiation_intensity_w_per_sr": 41.90546495958429,
+      "relative_intensity_db": -0.5615510995026869
+    },
+    {
+      "angle_deg": 71.60220994475138,
+      "radiation_intensity_w_per_sr": 42.94209474206783,
+      "relative_intensity_db": -0.45542547885338514
+    },
+    {
+      "angle_deg": 73.59116022099448,
+      "radiation_intensity_w_per_sr": 43.886833168823024,
+      "relative_intensity_db": -0.3609152994864827
+    },
+    {
+      "angle_deg": 75.58011049723757,
+      "radiation_intensity_w_per_sr": 44.7351070159025,
+      "relative_intensity_db": -0.2777729305156919
+    },
+    {
+      "angle_deg": 77.56906077348067,
+      "radiation_intensity_w_per_sr": 45.48280559268234,
+      "relative_intensity_db": -0.20578527495328436
+    },
+    {
+      "angle_deg": 79.55801104972376,
+      "radiation_intensity_w_per_sr": 46.12630191396758,
+      "relative_intensity_db": -0.14477136363665621
+    },
+    {
+      "angle_deg": 81.54696132596685,
+      "radiation_intensity_w_per_sr": 46.662471570315994,
+      "relative_intensity_db": -0.09458035321823127
+    },
+    {
+      "angle_deg": 83.53591160220995,
+      "radiation_intensity_w_per_sr": 47.088709132853005,
+      "relative_intensity_db": -0.05508988590445754
+    },
+    {
+      "angle_deg": 85.52486187845304,
+      "radiation_intensity_w_per_sr": 47.40294194295593,
+      "relative_intensity_db": -0.026204777647173706
+    },
+    {
+      "angle_deg": 87.51381215469614,
+      "radiation_intensity_w_per_sr": 47.60364115571925,
+      "relative_intensity_db": -0.007856009079994977
+    },
+    {
+      "angle_deg": 89.50276243093923,
+      "radiation_intensity_w_per_sr": 47.68982992867885,
+      "relative_intensity_db": -2.410818666383218e-15
+    },
+    {
+      "angle_deg": 91.49171270718233,
+      "radiation_intensity_w_per_sr": 47.66108867328168,
+      "relative_intensity_db": -0.0026181539062277103
+    },
+    {
+      "angle_deg": 93.48066298342542,
+      "radiation_intensity_w_per_sr": 47.517557315262266,
+      "relative_intensity_db": -0.015716664264934954
+    },
+    {
+      "angle_deg": 95.4696132596685,
+      "radiation_intensity_w_per_sr": 47.25993454053092,
+      "relative_intensity_db": -0.03932657899090068
+    },
+    {
+      "angle_deg": 97.45856353591161,
+      "radiation_intensity_w_per_sr": 46.88947403439354,
+      "relative_intensity_db": -0.07350412431105828
+    },
+    {
+      "angle_deg": 99.4475138121547,
+      "radiation_intensity_w_per_sr": 46.40797775287977,
+      "relative_intensity_db": -0.11833129390112439
+    },
+    {
+      "angle_deg": 101.4364640883978,
+      "radiation_intensity_w_per_sr": 45.81778629463644,
+      "relative_intensity_db": -0.17391671414916876
+    },
+    {
+      "angle_deg": 103.42541436464089,
+      "radiation_intensity_w_per_sr": 45.121766469288666,
+      "relative_intensity_db": -0.2403968018067989
+    },
+    {
+      "angle_deg": 105.41436464088397,
+      "radiation_intensity_w_per_sr": 44.3232961825455,
+      "relative_intensity_db": -0.3179372363653124
+    },
+    {
+      "angle_deg": 107.40331491712708,
+      "radiation_intensity_w_per_sr": 43.42624677893959,
+      "relative_intensity_db": -0.40673477650357565
+    },
+    {
+      "angle_deg": 109.39226519337016,
+      "radiation_intensity_w_per_sr": 42.43496299944414,
+      "relative_intensity_db": -0.5070194582100878
+    },
+    {
+      "angle_deg": 111.38121546961327,
+      "radiation_intensity_w_per_sr": 41.35424072302354,
+      "relative_intensity_db": -0.6190572220679986
+    },
+    {
+      "angle_deg": 113.37016574585635,
+      "radiation_intensity_w_per_sr": 40.189302668383554,
+      "relative_intensity_db": -0.7431530291908592
+    },
+    {
+      "angle_deg": 115.35911602209946,
+      "radiation_intensity_w_per_sr": 38.945772234967514,
+      "relative_intensity_db": -0.8796545400220988
+    },
+    {
+      "angle_deg": 117.34806629834256,
+      "radiation_intensity_w_per_sr": 37.62964566097396,
+      "relative_intensity_db": -1.0289564484574318
+    },
+    {
+      "angle_deg": 119.33701657458563,
+      "radiation_intensity_w_per_sr": 36.24726267142839,
+      "relative_intensity_db": -1.1915055865568578
+    },
+    {
+      "angle_deg": 121.32596685082872,
+      "radiation_intensity_w_per_sr": 34.80527578185203,
+      "relative_intensity_db": -1.3678069438618157
+    },
+    {
+      "angle_deg": 123.31491712707182,
+      "radiation_intensity_w_per_sr": 33.310618413681624,
+      "relative_intensity_db": -1.558430781872027
+    },
+    {
+      "angle_deg": 125.30386740331494,
+      "radiation_intensity_w_per_sr": 31.77047196720551,
+      "relative_intensity_db": -1.7640210710715933
+    },
+    {
+      "angle_deg": 127.29281767955801,
+      "radiation_intensity_w_per_sr": 30.19223198730882,
+      "relative_intensity_db": -1.9853055384553318
+    },
+    {
+      "angle_deg": 129.2817679558011,
+      "radiation_intensity_w_per_sr": 28.583473547626696,
+      "relative_intensity_db": -2.2231076925448203
+    },
+    {
+      "angle_deg": 131.2707182320442,
+      "radiation_intensity_w_per_sr": 26.951915970560336,
+      "relative_intensity_db": -2.4783612970513325
+    },
+    {
+      "angle_deg": 133.25966850828732,
+      "radiation_intensity_w_per_sr": 25.305386994639637,
+      "relative_intensity_db": -2.752127903069595
+    },
+    {
+      "angle_deg": 135.24861878453038,
+      "radiation_intensity_w_per_sr": 23.651786497367475,
+      "relative_intensity_db": -3.045618236510072
+    },
+    {
+      "angle_deg": 137.23756906077347,
+      "radiation_intensity_w_per_sr": 21.99904988120223,
+      "relative_intensity_db": -3.3602184921033236
+    },
+    {
+      "angle_deg": 139.22651933701658,
+      "radiation_intensity_w_per_sr": 20.355111232759437,
+      "relative_intensity_db": -3.697522936848242
+    },
+    {
+      "angle_deg": 141.2154696132597,
+      "radiation_intensity_w_per_sr": 18.727866370467076,
+      "relative_intensity_db": -4.059374717924458
+    },
+    {
+      "angle_deg": 143.20441988950276,
+      "radiation_intensity_w_per_sr": 17.125135903430053,
+      "relative_intensity_db": -4.4479174695967485
+    },
+    {
+      "angle_deg": 145.19337016574585,
+      "radiation_intensity_w_per_sr": 15.554628433613837,
+      "relative_intensity_db": -4.865661324429944
+    },
+    {
+      "angle_deg": 147.18232044198896,
+      "radiation_intensity_w_per_sr": 14.023904044002089,
+      "relative_intensity_db": -5.315568421416553
+    },
+    {
+      "angle_deg": 149.17127071823205,
+      "radiation_intensity_w_per_sr": 12.540338226385138,
+      "relative_intensity_db": -5.801165236159241
+    },
+    {
+      "angle_deg": 151.16022099447514,
+      "radiation_intensity_w_per_sr": 11.11108641314461,
+      "relative_intensity_db": -6.326692484545654
+    },
+    {
+      "angle_deg": 153.14917127071823,
+      "radiation_intensity_w_per_sr": 9.743049287083943,
+      "relative_intensity_db": -6.8973087413969045
+    },
+    {
+      "angle_deg": 155.13812154696134,
+      "radiation_intensity_w_per_sr": 8.442839051348612,
+      "relative_intensity_db": -7.519372634051653
+    },
+    {
+      "angle_deg": 157.12707182320443,
+      "radiation_intensity_w_per_sr": 7.216746847230962,
+      "relative_intensity_db": -8.200843024979388
+    },
+    {
+      "angle_deg": 159.11602209944752,
+      "radiation_intensity_w_per_sr": 6.070711510738337,
+      "relative_intensity_db": -8.951861786149603
+    },
+    {
+      "angle_deg": 161.1049723756906,
+      "radiation_intensity_w_per_sr": 5.010289858951707,
+      "relative_intensity_db": -9.785629219411051
+    },
+    {
+      "angle_deg": 163.0939226519337,
+      "radiation_intensity_w_per_sr": 4.040628694299511,
+      "relative_intensity_db": -10.719768300259867
+    },
+    {
+      "angle_deg": 165.0828729281768,
+      "radiation_intensity_w_per_sr": 3.1664387089532644,
+      "relative_intensity_db": -11.778546876164341
+    },
+    {
+      "angle_deg": 167.0718232044199,
+      "radiation_intensity_w_per_sr": 2.3919704627815936,
+      "relative_intensity_db": -12.996699611877032
+    },
+    {
+      "angle_deg": 169.060773480663,
+      "radiation_intensity_w_per_sr": 1.7209925969459459,
+      "relative_intensity_db": -14.426467714947325
+    },
+    {
+      "angle_deg": 171.04972375690608,
+      "radiation_intensity_w_per_sr": 1.1567724316236292,
+      "relative_intensity_db": -16.151778437553165
+    },
+    {
+      "angle_deg": 173.0386740331492,
+      "radiation_intensity_w_per_sr": 0.7020590808805827,
+      "relative_intensity_db": -18.320521124947845
+    },
+    {
+      "angle_deg": 175.02762430939228,
+      "radiation_intensity_w_per_sr": 0.3590692007704506,
+      "relative_intensity_db": -21.232476186258626
+    },
+    {
+      "angle_deg": 177.01657458563534,
+      "radiation_intensity_w_per_sr": 0.1294754686699337,
+      "relative_intensity_db": -25.662382819230793
+    },
+    {
+      "angle_deg": 179.00552486187846,
+      "radiation_intensity_w_per_sr": 0.014397872989968965,
+      "relative_intensity_db": -35.2012743551657
+    },
+    {
+      "angle_deg": 180.99447513812157,
+      "radiation_intensity_w_per_sr": 0.014397872989969251,
+      "relative_intensity_db": -35.201274355165616
+    },
+    {
+      "angle_deg": 182.98342541436466,
+      "radiation_intensity_w_per_sr": 0.12947546866993256,
+      "relative_intensity_db": -25.662382819230828
+    },
+    {
+      "angle_deg": 184.97237569060772,
+      "radiation_intensity_w_per_sr": 0.3590692007704494,
+      "relative_intensity_db": -21.232476186258644
+    },
+    {
+      "angle_deg": 186.96132596685084,
+      "radiation_intensity_w_per_sr": 0.7020590808805854,
+      "relative_intensity_db": -18.320521124947827
+    },
+    {
+      "angle_deg": 188.95027624309395,
+      "radiation_intensity_w_per_sr": 1.1567724316236334,
+      "relative_intensity_db": -16.15177843755315
+    },
+    {
+      "angle_deg": 190.939226519337,
+      "radiation_intensity_w_per_sr": 1.7209925969459432,
+      "relative_intensity_db": -14.42646771494733
+    },
+    {
+      "angle_deg": 192.9281767955801,
+      "radiation_intensity_w_per_sr": 2.39197046278159,
+      "relative_intensity_db": -12.996699611877036
+    },
+    {
+      "angle_deg": 194.91712707182322,
+      "radiation_intensity_w_per_sr": 3.166438708953271,
+      "relative_intensity_db": -11.778546876164333
+    },
+    {
+      "angle_deg": 196.9060773480663,
+      "radiation_intensity_w_per_sr": 4.040628694299518,
+      "relative_intensity_db": -10.71976830025986
+    },
+    {
+      "angle_deg": 198.8950276243094,
+      "radiation_intensity_w_per_sr": 5.010289858951699,
+      "relative_intensity_db": -9.785629219411058
+    },
+    {
+      "angle_deg": 200.88397790055248,
+      "radiation_intensity_w_per_sr": 6.07071151073833,
+      "relative_intensity_db": -8.951861786149607
+    },
+    {
+      "angle_deg": 202.8729281767956,
+      "radiation_intensity_w_per_sr": 7.216746847230968,
+      "relative_intensity_db": -8.200843024979385
+    },
+    {
+      "angle_deg": 204.86187845303868,
+      "radiation_intensity_w_per_sr": 8.442839051348622,
+      "relative_intensity_db": -7.519372634051647
+    },
+    {
+      "angle_deg": 206.85082872928177,
+      "radiation_intensity_w_per_sr": 9.743049287083938,
+      "relative_intensity_db": -6.897308741396907
+    },
+    {
+      "angle_deg": 208.83977900552486,
+      "radiation_intensity_w_per_sr": 11.111086413144605,
+      "relative_intensity_db": -6.3266924845456565
+    },
+    {
+      "angle_deg": 210.82872928176795,
+      "radiation_intensity_w_per_sr": 12.540338226385147,
+      "relative_intensity_db": -5.801165236159238
+    },
+    {
+      "angle_deg": 212.81767955801106,
+      "radiation_intensity_w_per_sr": 14.02390404400211,
+      "relative_intensity_db": -5.315568421416547
+    },
+    {
+      "angle_deg": 214.80662983425415,
+      "radiation_intensity_w_per_sr": 15.554628433613829,
+      "relative_intensity_db": -4.865661324429945
+    },
+    {
+      "angle_deg": 216.79558011049724,
+      "radiation_intensity_w_per_sr": 17.125135903430042,
+      "relative_intensity_db": -4.447917469596751
+    },
+    {
+      "angle_deg": 218.78453038674033,
+      "radiation_intensity_w_per_sr": 18.7278663704671,
+      "relative_intensity_db": -4.059374717924452
+    },
+    {
+      "angle_deg": 220.77348066298345,
+      "radiation_intensity_w_per_sr": 20.355111232759448,
+      "relative_intensity_db": -3.69752293684824
+    },
+    {
+      "angle_deg": 222.76243093922653,
+      "radiation_intensity_w_per_sr": 21.99904988120222,
+      "relative_intensity_db": -3.360218492103325
+    },
+    {
+      "angle_deg": 224.75138121546962,
+      "radiation_intensity_w_per_sr": 23.651786497367457,
+      "relative_intensity_db": -3.0456182365100757
+    },
+    {
+      "angle_deg": 226.7403314917127,
+      "radiation_intensity_w_per_sr": 25.305386994639655,
+      "relative_intensity_db": -2.7521279030695913
+    },
+    {
+      "angle_deg": 228.72928176795583,
+      "radiation_intensity_w_per_sr": 26.951915970560343,
+      "relative_intensity_db": -2.4783612970513307
+    },
+    {
+      "angle_deg": 230.7182320441989,
+      "radiation_intensity_w_per_sr": 28.58347354762669,
+      "relative_intensity_db": -2.223107692544822
+    },
+    {
+      "angle_deg": 232.70718232044197,
+      "radiation_intensity_w_per_sr": 30.1922319873088,
+      "relative_intensity_db": -1.985305538455334
+    },
+    {
+      "angle_deg": 234.69613259668512,
+      "radiation_intensity_w_per_sr": 31.770471967205545,
+      "relative_intensity_db": -1.7640210710715885
+    },
+    {
+      "angle_deg": 236.6850828729282,
+      "radiation_intensity_w_per_sr": 33.31061841368164,
+      "relative_intensity_db": -1.5584307818720253
+    },
+    {
+      "angle_deg": 238.67403314917127,
+      "radiation_intensity_w_per_sr": 34.80527578185203,
+      "relative_intensity_db": -1.3678069438618157
+    },
+    {
+      "angle_deg": 240.66298342541435,
+      "radiation_intensity_w_per_sr": 36.24726267142837,
+      "relative_intensity_db": -1.1915055865568598
+    },
+    {
+      "angle_deg": 242.65193370165744,
+      "radiation_intensity_w_per_sr": 37.62964566097394,
+      "relative_intensity_db": -1.028956448457433
+    },
+    {
+      "angle_deg": 244.6408839779006,
+      "radiation_intensity_w_per_sr": 38.94577223496752,
+      "relative_intensity_db": -0.8796545400220981
+    },
+    {
+      "angle_deg": 246.62983425414365,
+      "radiation_intensity_w_per_sr": 40.189302668383554,
+      "relative_intensity_db": -0.7431530291908592
+    },
+    {
+      "angle_deg": 248.61878453038673,
+      "radiation_intensity_w_per_sr": 41.354240723023516,
+      "relative_intensity_db": -0.6190572220680008
+    },
+    {
+      "angle_deg": 250.60773480662988,
+      "radiation_intensity_w_per_sr": 42.43496299944412,
+      "relative_intensity_db": -0.50701945821009
+    },
+    {
+      "angle_deg": 252.59668508287294,
+      "radiation_intensity_w_per_sr": 43.42624677893959,
+      "relative_intensity_db": -0.40673477650357565
+    },
+    {
+      "angle_deg": 254.58563535911603,
+      "radiation_intensity_w_per_sr": 44.323296182545505,
+      "relative_intensity_db": -0.31793723636531185
+    },
+    {
+      "angle_deg": 256.5745856353591,
+      "radiation_intensity_w_per_sr": 45.12176646928865,
+      "relative_intensity_db": -0.24039680180679993
+    },
+    {
+      "angle_deg": 258.5635359116022,
+      "radiation_intensity_w_per_sr": 45.817786294636456,
+      "relative_intensity_db": -0.17391671414916776
+    },
+    {
+      "angle_deg": 260.5524861878453,
+      "radiation_intensity_w_per_sr": 46.40797775287978,
+      "relative_intensity_db": -0.1183312939011239
+    },
+    {
+      "angle_deg": 262.5414364640884,
+      "radiation_intensity_w_per_sr": 46.88947403439354,
+      "relative_intensity_db": -0.07350412431105828
+    },
+    {
+      "angle_deg": 264.5303867403315,
+      "radiation_intensity_w_per_sr": 47.25993454053094,
+      "relative_intensity_db": -0.039326578990898725
+    },
+    {
+      "angle_deg": 266.51933701657464,
+      "radiation_intensity_w_per_sr": 47.517557315262295,
+      "relative_intensity_db": -0.015716664264932532
+    },
+    {
+      "angle_deg": 268.5082872928177,
+      "radiation_intensity_w_per_sr": 47.66108867328168,
+      "relative_intensity_db": -0.0026181539062277103
+    },
+    {
+      "angle_deg": 270.49723756906076,
+      "radiation_intensity_w_per_sr": 47.689829928678876,
+      "relative_intensity_db": 0.0
+    },
+    {
+      "angle_deg": 272.48618784530385,
+      "radiation_intensity_w_per_sr": 47.60364115571925,
+      "relative_intensity_db": -0.007856009079994977
+    },
+    {
+      "angle_deg": 274.47513812154693,
+      "radiation_intensity_w_per_sr": 47.40294194295594,
+      "relative_intensity_db": -0.026204777647172252
+    },
+    {
+      "angle_deg": 276.4640883977901,
+      "radiation_intensity_w_per_sr": 47.088709132852976,
+      "relative_intensity_db": -0.05508988590445998
+    },
+    {
+      "angle_deg": 278.45303867403317,
+      "radiation_intensity_w_per_sr": 46.662471570316015,
+      "relative_intensity_db": -0.09458035321822932
+    },
+    {
+      "angle_deg": 280.44198895027625,
+      "radiation_intensity_w_per_sr": 46.1263019139676,
+      "relative_intensity_db": -0.14477136363665422
+    },
+    {
+      "angle_deg": 282.4309392265194,
+      "radiation_intensity_w_per_sr": 45.48280559268232,
+      "relative_intensity_db": -0.2057852749532864
+    },
+    {
+      "angle_deg": 284.41988950276243,
+      "radiation_intensity_w_per_sr": 44.735107015902514,
+      "relative_intensity_db": -0.2777729305156904
+    },
+    {
+      "angle_deg": 286.4088397790055,
+      "radiation_intensity_w_per_sr": 43.88683316882302,
+      "relative_intensity_db": -0.3609152994864837
+    },
+    {
+      "angle_deg": 288.3977900552486,
+      "radiation_intensity_w_per_sr": 42.94209474206782,
+      "relative_intensity_db": -0.4554254788533857
+    },
+    {
+      "angle_deg": 290.3867403314917,
+      "radiation_intensity_w_per_sr": 41.90546495958431,
+      "relative_intensity_db": -0.5615510995026852
+    },
+    {
+      "angle_deg": 292.37569060773484,
+      "radiation_intensity_w_per_sr": 40.781956277985806,
+      "relative_intensity_db": -0.6795771895455603
+    },
+    {
+      "angle_deg": 294.3646408839779,
+      "radiation_intensity_w_per_sr": 39.57699513553495,
+      "relative_intensity_db": -0.8098295613619421
+    },
+    {
+      "angle_deg": 296.353591160221,
+      "radiation_intensity_w_per_sr": 38.29639492965117,
+      "relative_intensity_db": -0.9526788051997783
+    },
+    {
+      "angle_deg": 298.3425414364641,
+      "radiation_intensity_w_per_sr": 36.946327398739655,
+      "relative_intensity_db": -1.1085449925453321
+    },
+    {
+      "angle_deg": 300.3314917127072,
+      "radiation_intensity_w_per_sr": 35.5332925779216,
+      "relative_intensity_db": -1.2779032180602927
+    },
+    {
+      "angle_deg": 302.3204419889503,
+      "radiation_intensity_w_per_sr": 34.06408748969552,
+      "relative_intensity_db": -1.4612901412585086
+    },
+    {
+      "angle_deg": 304.30939226519337,
+      "radiation_intensity_w_per_sr": 32.545773720557946,
+      "relative_intensity_db": -1.6593117304183913
+    },
+    {
+      "angle_deg": 306.29834254143645,
+      "radiation_intensity_w_per_sr": 30.98564402406596,
+      "relative_intensity_db": -1.8726524644253564
+    },
+    {
+      "angle_deg": 308.2872928176796,
+      "radiation_intensity_w_per_sr": 29.391188080639996,
+      "relative_intensity_db": -2.102086317342104
+    },
+    {
+      "angle_deg": 310.2762430939227,
+      "radiation_intensity_w_per_sr": 27.770057535397246,
+      "relative_intensity_db": -2.3484899411274927
+    },
+    {
+      "angle_deg": 312.2651933701657,
+      "radiation_intensity_w_per_sr": 26.130030428179758,
+      "relative_intensity_db": -2.6128585819747263
+    },
+    {
+      "angle_deg": 314.25414364640886,
+      "radiation_intensity_w_per_sr": 24.478975125239746,
+      "relative_intensity_db": -2.8963254264960674
+    },
+    {
+      "angle_deg": 316.24309392265195,
+      "radiation_intensity_w_per_sr": 22.82481386011177,
+      "relative_intensity_db": -3.200185291749276
+    },
+    {
+      "angle_deg": 318.23204419889504,
+      "radiation_intensity_w_per_sr": 21.17548599218275,
+      "relative_intensity_db": -3.525923871784201
+    },
+    {
+      "angle_deg": 320.2209944751381,
+      "radiation_intensity_w_per_sr": 19.538911095296108,
+      "relative_intensity_db": -3.8752541685775754
+    },
+    {
+      "angle_deg": 322.2099447513812,
+      "radiation_intensity_w_per_sr": 17.922951995118645,
+      "relative_intensity_db": -4.250162320805643
+    },
+    {
+      "angle_deg": 324.19889502762436,
+      "radiation_intensity_w_per_sr": 16.33537788251113,
+      "relative_intensity_db": -4.652965882957478
+    },
+    {
+      "angle_deg": 326.1878453038674,
+      "radiation_intensity_w_per_sr": 14.783827640181737,
+      "relative_intensity_db": -5.086388830489997
+    },
+    {
+      "angle_deg": 328.1767955801105,
+      "radiation_intensity_w_per_sr": 13.27577353076658,
+      "relative_intensity_db": -5.553659384152753
+    },
+    {
+      "angle_deg": 330.1657458563536,
+      "radiation_intensity_w_per_sr": 11.818485405433371,
+      "relative_intensity_db": -6.058639504290063
+    },
+    {
+      "angle_deg": 332.1546961325967,
+      "radiation_intensity_w_per_sr": 10.418995602386467,
+      "relative_intensity_db": -6.605999189320622
+    },
+    {
+      "angle_deg": 334.1436464088398,
+      "radiation_intensity_w_per_sr": 9.084064713568932,
+      "relative_intensity_db": -7.201455542469475
+    },
+    {
+      "angle_deg": 336.1325966850829,
+      "radiation_intensity_w_per_sr": 7.820148404791573,
+      "relative_intensity_db": -7.852107788106585
+    },
+    {
+      "angle_deg": 338.121546961326,
+      "radiation_intensity_w_per_sr": 6.633365478979484,
+      "relative_intensity_db": -8.566918473474377
+    },
+    {
+      "angle_deg": 340.11049723756906,
+      "radiation_intensity_w_per_sr": 5.529467373866512,
+      "relative_intensity_db": -9.357424737684347
+    },
+    {
+      "angle_deg": 342.09944751381215,
+      "radiation_intensity_w_per_sr": 4.513809284096663,
+      "relative_intensity_db": -10.238825681873585
+    },
+    {
+      "angle_deg": 344.08839779005524,
+      "radiation_intensity_w_per_sr": 3.5913230932667433,
+      "relative_intensity_db": -11.231712954841983
+    },
+    {
+      "angle_deg": 346.0773480662984,
+      "radiation_intensity_w_per_sr": 2.7664922940744727,
+      "relative_intensity_db": -12.364963088106574
+    },
+    {
+      "angle_deg": 348.0662983425415,
+      "radiation_intensity_w_per_sr": 2.0433290646345865,
+      "relative_intensity_db": -13.680874611376673
+    },
+    {
+      "angle_deg": 350.05524861878456,
+      "radiation_intensity_w_per_sr": 1.42535365650467,
+      "relative_intensity_db": -15.245031394791512
+    },
+    {
+      "angle_deg": 352.04419889502765,
+      "radiation_intensity_w_per_sr": 0.9155762353840724,
+      "relative_intensity_db": -17.167312620174474
+    },
+    {
+      "angle_deg": 354.0331491712707,
+      "radiation_intensity_w_per_sr": 0.5164812991971125,
+      "relative_intensity_db": -19.65371172491666
+    },
+    {
+      "angle_deg": 356.0220994475138,
+      "radiation_intensity_w_per_sr": 0.23001478072299264,
+      "relative_intensity_db": -23.166700290299378
+    },
+    {
+      "angle_deg": 358.0110497237569,
+      "radiation_intensity_w_per_sr": 0.057573923429841245,
+      "relative_intensity_db": -29.181999477823744
+    }
+  ],
+  "title": "Closed-box Huygens far field cut",
+  "units": {
+    "angle_deg": "degree",
+    "radiation_intensity_w_per_sr": "W/sr",
+    "relative_intensity_db": "dB"
+  }
+}

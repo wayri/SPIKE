@@ -1,0 +1,6 @@
+{
+  "contract": "spike/native-cht-request/v1",
+  "n": 16,
+  "lid_velocity_m_s": 0,
+  "thermal_tolerance": 1e-10
+}

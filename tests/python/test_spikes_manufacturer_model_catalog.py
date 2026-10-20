@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from spikes.manufacturer_model_catalog import (
+from python.spikes.manufacturer_model_catalog import (
     CANONICAL_CATEGORIES,
     ManufacturerCatalogError,
     catalog,

@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-coupled-star-request-v1.schema.json",
+  "title": "SPIKE supplied coupled-line ideal star request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "legs",
+    "excitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-coupled-star-request/v1"
+    },
+    "legs": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 8,
+      "items": {
+        "$ref": "rlgc-coupled-cascade-request-v1.schema.json#/properties/sections/items"
+      }
+    },
+    "excitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "incident_waves"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "incident_waves": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "real",
+                "imag"
+              ],
+              "properties": {
+                "real": {
+                  "type": "number"
+                },
+                "imag": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 4,
+                  "maxItems": 4
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 3,
+            "maxItems": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 6,
+                  "maxItems": 6
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 4,
+            "maxItems": 4
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 8,
+                  "maxItems": 8
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 5,
+            "maxItems": 5
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 10,
+                  "maxItems": 10
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 6,
+            "maxItems": 6
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 12,
+                  "maxItems": 12
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 7,
+            "maxItems": 7
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 14,
+                  "maxItems": 14
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 8,
+            "maxItems": 8
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "excitations": {
+            "items": {
+              "properties": {
+                "incident_waves": {
+                  "minItems": 16,
+                  "maxItems": 16
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -31,7 +31,7 @@ tolerance was relaxed, coordinate jitter introduced or admission check removed.
 The baseline source SHA-256 is
 `4906644b110a1e024d011836537ed5042f9518f46bd20b6df199906c6fd0adec`.
 The complete baseline candidates and known failure are retained in
-`output/internal-mesher-benchmark-20261012/baseline-internal-preoptimization.json`.
+the unbundled local `baseline-internal-preoptimization.json` record.
 
 ## Correctness evidence
 
@@ -87,11 +87,11 @@ Times below include SPIKE's unchanged certification; import/startup is separate.
 Every successful kernel output hash matches the baseline. The thin-conditioned
 failure type/message is unchanged. Complete kernel and worker-boundary candidates
 also match the pre-edit baseline on all twelve recorded rows in
-`output/internal-mesher-benchmark-20261012/exact-equivalence.json`.
+the unbundled local `exact-equivalence.json` record.
 Small-process memory counters do not establish whole-application RAM savings.
 
 Authoritative internal/external results and SHA-256 values are indexed by
-`output/internal-mesher-benchmark-20261012/ARTIFACT_STATUS.json`. Earlier
+the unbundled local `ARTIFACT_STATUS.json` record. Earlier
 exploratory reports remain preserved and are explicitly superseded: some
 mistakenly sampled the Windows venv launcher rather than the actual worker.
 Only worker self-counters are used in the final internal report. Peak resident
@@ -105,7 +105,7 @@ Reproduce current cross-engine measurements in a new output directory:
 
 ```powershell
 .venv\Scripts\python.exe scripts\benchmark_internal_mesher.py --samples 5 --warmups 1 `
-  --output output\internal-mesher-comparison-new `
+--output "$env:TEMP\spike-internal-mesher-comparison" `
   --backends internal_kernel internal_fullrun scipy_qhull gmsh_4_15_2
 ```
 
@@ -142,7 +142,7 @@ overlap; their counts must not be summed into a unique-test total.
 
 Full Python discovery completed 3,460 tests in 888.342 seconds: two failures,
 nine errors and 51 skips. Log:
-`output/mesher-optimization-python-final-tests-20261012.log`. All nineteen new
+the unbundled local `mesher-optimization-python-final-tests-20261012.log`. All nineteen new
 mesher/benchmark tests passed in this full run. The repository gate is not green:
 
 - The public-release check still rejects the absent/duplicate schema ID in

@@ -53,7 +53,11 @@ def owned_library_path() -> Path:
     else:
         root = Path(__file__).resolve().parents[2]
         candidates = (
+            # Newest checked development artifact first. Packaged builds never
+            # use these paths: PyInstaller supplies the release-owned DLL above.
+            root / "build-spikes-io-pad-20261019" / "Release" / _library_name(),
             root / "build-spikes-native-analysis-20261013" / "Release" / _library_name(),
+            root / "build-spikes-hybrid" / "Release" / _library_name(),
             root / "build-spikes-hybrid" / _library_name(),
         )
         candidate = next((path for path in candidates if path.is_file()), candidates[-1])
@@ -84,22 +88,41 @@ def engine_status() -> dict[str, Any]:
             "hil_qualified": False,
         }
     library_bytes = library.path.read_bytes()
+    digest = hashlib.sha256(library_bytes).hexdigest()
+    native = library._library
     return {
         "contract": ENGINE_CONTRACT,
         "status": "ready",
         "available": True,
         "abi_version": SPIKES_ABI_VERSION,
+        "runtime_version": f"abi-{SPIKES_ABI_VERSION}+sha256.{digest[:12]}",
         "library": str(library.path),
         "library_bytes": len(library_bytes),
-        "library_sha256": hashlib.sha256(library_bytes).hexdigest(),
+        "library_sha256": digest,
         "features": {
             "transient": library.transient_available,
             "persistent_sessions": library.transient_session_available,
             "interactive_source_updates": library.transient_session_available,
             "checkpoints": library.transient_session_available,
             "selectable_integration": library.session_integration_method_available,
+            "adaptive_time_step": library.adaptive_transient_available,
             "waveform_sources": library.waveform_sources_available,
             "sparse_linear_solvers": library.linear_solver_options_available,
+            "dynamic_diode": library.dynamic_diode_available,
+            "electrothermal_resistor": library.electrothermal_resistor_available,
+            "saturating_inductor": library.saturating_inductor_available,
+            "mosfet_level1": library.mosfet_level1_available,
+            "bjt_ebers_moll": library.bjt_ebers_moll_available,
+            "electrothermal_wbg_fet": library.wbg_fet_electrothermal_available,
+            "dependent_sources": hasattr(native, "spikes_circuit_add_dependent_source"),
+            "behavioral_sources": hasattr(native, "spikes_circuit_add_behavioral_source"),
+            "interactive_fault_parameters": library.session_fault_parameters_available,
+            "interactive_element_voltage": library.session_element_voltage_available,
+            # These additive symbols are discovered for UI/manager reporting.
+            # The public worker has no pad-authoring operation yet and therefore
+            # does not advertise them as runnable workspace capabilities.
+            "experimental_io_pads": hasattr(native, "spikes_circuit_add_io_pad"),
+            "scheduled_io_pad_edges": hasattr(native, "spikes_transient_session_schedule_io_pad"),
         },
         "execution_class": "soft_realtime",
         "model_status": "experimental",

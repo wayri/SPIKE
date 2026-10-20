@@ -1,0 +1,160 @@
+{
+  "contract": "spike/rlgc-terminated-pair-request/v1",
+  "pair": {
+    "conductor_ids": [
+      "P",
+      "N"
+    ],
+    "modes": {
+      "even": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.08,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 3.5e-07,
+        "capacitance_f_per_m": 8e-11,
+        "samples": [
+          {
+            "frequency_hz": 20000000.0,
+            "resistance_ohm_per_m": 4.0,
+            "conductance_s_per_m": 0.0005
+          },
+          {
+            "frequency_hz": 300000000.0,
+            "resistance_ohm_per_m": 4.0,
+            "conductance_s_per_m": 0.0005
+          },
+          {
+            "frequency_hz": 1000000000.0,
+            "resistance_ohm_per_m": 4.0,
+            "conductance_s_per_m": 0.0005
+          }
+        ]
+      },
+      "odd": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.08,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 2.5e-07,
+        "capacitance_f_per_m": 1.2e-10,
+        "samples": [
+          {
+            "frequency_hz": 20000000.0,
+            "resistance_ohm_per_m": 7.0,
+            "conductance_s_per_m": 0.0007
+          },
+          {
+            "frequency_hz": 300000000.0,
+            "resistance_ohm_per_m": 7.0,
+            "conductance_s_per_m": 0.0007
+          },
+          {
+            "frequency_hz": 1000000000.0,
+            "resistance_ohm_per_m": 7.0,
+            "conductance_s_per_m": 0.0007
+          }
+        ]
+      }
+    },
+    "probes": [
+      {
+        "id": "left",
+        "fractional_position": 0.0
+      },
+      {
+        "id": "middle",
+        "fractional_position": 0.37
+      },
+      {
+        "id": "right",
+        "fractional_position": 1.0
+      }
+    ]
+  },
+  "terminations": [
+    {
+      "id": "source_P",
+      "port": 0,
+      "resistance_ohm": 25.0
+    },
+    {
+      "id": "source_N",
+      "port": 1,
+      "resistance_ohm": 75.0
+    },
+    {
+      "id": "load_P",
+      "port": 2,
+      "resistance_ohm": 50.0
+    },
+    {
+      "id": "load_N",
+      "port": 3,
+      "resistance_ohm": 120.0
+    }
+  ],
+  "sources": [
+    {
+      "frequency_hz": 20000000.0,
+      "voltage_v": [
+        {
+          "real": 1.0,
+          "imag": 0.0
+        },
+        {
+          "real": 0.0,
+          "imag": 0.4
+        },
+        {
+          "real": 0.0,
+          "imag": 0.0
+        },
+        {
+          "real": 0.2,
+          "imag": -0.1
+        }
+      ]
+    },
+    {
+      "frequency_hz": 300000000.0,
+      "voltage_v": [
+        {
+          "real": 1.0,
+          "imag": 0.0
+        },
+        {
+          "real": 0.0,
+          "imag": 0.4
+        },
+        {
+          "real": 0.0,
+          "imag": 0.0
+        },
+        {
+          "real": 0.2,
+          "imag": -0.1
+        }
+      ]
+    },
+    {
+      "frequency_hz": 1000000000.0,
+      "voltage_v": [
+        {
+          "real": 1.0,
+          "imag": 0.0
+        },
+        {
+          "real": 0.0,
+          "imag": 0.4
+        },
+        {
+          "real": 0.0,
+          "imag": 0.0
+        },
+        {
+          "real": 0.2,
+          "imag": -0.1
+        }
+      ]
+    }
+  ]
+}

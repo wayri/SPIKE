@@ -1,0 +1,34 @@
+{
+  "artifact_class": "actual_browser_development_ui_capture_not_solver_results",
+  "captured_date": "2026-10-19",
+  "frontend": "http://127.0.0.1:1421/",
+  "native_desktop_acceptance": false,
+  "source": {
+    "path": "examples/esp32/source/iot-esp-eth-ind.kicad_pcb",
+    "sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33"
+  },
+  "steps": [
+    "Open isolated browser preview tab",
+    "Project files > Import board / CAD",
+    "Choose public ESP32 board",
+    "Fit scene",
+    "Capture Clean UI with existing light appearance",
+    "Ctrl+K; type run PI; capture suggestions without executing"
+  ],
+  "images": [
+    {
+      "file": "clean-viewport.jpg",
+      "sha256": "ea8efa0519759360f58b58d80babff6659444f5a91837b166007a1a57e7974f1"
+    },
+    {
+      "file": "universal-search.jpg",
+      "sha256": "19f3cd2eaba8b4c2b02b904f9bd0e10be96c0e230b50d012593f25b5929119be"
+    }
+  ],
+  "limitations": [
+    "Component bodies include stand-ins",
+    "No analysis was executed in capture tab",
+    "No native multi-window or packaged application acceptance claim"
+  ],
+  "source_provenance": "examples/esp32/README.md; THIRD_PARTY_NOTICES.md"
+}

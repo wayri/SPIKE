@@ -10,7 +10,10 @@ experimental and chemical engineering remains outside active scope.
 Scope notes: 14 October 2026; scoped parallel authorization: 18 October 2026.
 The [coupled mechanics/magnetics/devices track](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md)
 may proceed now alongside primary PI/SI work. Remaining broad expansion and
-wave optics retain the parity gate. This plan does not establish delivered
+wave optics originally retained the parity gate. The 21 October owner request
+now authorizes the [optics/materials development track](OPTICS_PHOTONICS_MATERIALS_PLAN.md)
+in parallel; numerical/release gates and individual stage acceptance remain.
+This plan does not establish delivered
 solver coverage. This extends the [existing parity program](HYPERLYNX_PARITY_AND_MULTIPHYSICS_PLAN.md)
 and its machine-readable backlog. Existing Done stages remain Done for their
 bounded evidence; WF01-S04C remains in progress.
@@ -185,7 +188,7 @@ when no supported affordable formulation meets the requested accuracy.
 | VF01-S01 | Planned; authorized coupled foundation | Original dipole/current-loop fields through that contract and actual slices/glyphs/streamlines; analytical sample checks, singular masks and trace-step refinement |
 | LB01-S01 | Planned; authorized coupled foundation | Versioned conditioned property laws and materials/model asset typing; incompatible units, missing laws, rights and out-of-range requests remain explicit |
 | GP03-S01 | Planned; authorized coupled foundation | Stationary linear 3D coil/core/air problem with mesh/exterior refinement, flux/energy and analytical/independent references; nonlinear/motion comes later |
-| OP02-S01 | Deferred until parity | Coherent scalar Gaussian/aperture/lens phase-plane benchmark with sampling/window refinement and power/phase checks; no general vector/lens claim yet |
+| OP02-S01 | Planned; owner-authorized optical development, prerequisites/evidence pending | Coherent scalar Gaussian/aperture/lens phase-plane benchmark with sampling/window refinement and power/phase checks; planar interface/port algebra is not this stage |
 | AX01-S01 | Planned; authorized coupled foundation | Profile those exact reference workloads; qualify one acceleration backend against unchanged CPU cases, including memory limits and failure/fallback provenance |
 | Later domain stages | Deferred until parity | Incremental 3D machines, building fields, CFD/CHT, structural/acoustic, vector optics and conservative multiphysics after their prerequisites pass |
 
@@ -193,8 +196,11 @@ The original parity program retains PI/SI priority. The 18 October request
 opens only the coupled track and its declared foundations in the machine policy.
 GP01-S01, VF01-S01, LB01-S01, GP03-S01 and AX01-S01 remain planned but may now
 start for that track. The follow-up [vehicle/mechanism plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md)
-adds GP12-GP16 and vehicle aerodynamics within GP05. Optics, unrelated fluids/acoustics,
-system radio and utility infrastructure retain their parity gate.
+adds GP12-GP16 and vehicle aerodynamics within GP05. The 21 October optics
+request separately authorizes development in the new optical plan; legacy
+machine-policy stages remain planned pending their prerequisites and evidence.
+Unrelated fluids/acoustics, system radio and utility infrastructure retain
+their existing policy.
 Each domain has its own mesh, material, excitation and measured/reference gates.
 Planning completion is not a solver Done stage. Continue marking bounded
 implementation stages Done only after their declared source-bound acceptance

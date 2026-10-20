@@ -15,6 +15,8 @@ function load(hooks, worker) {
     if (name.endsWith(".css")) return {};
     if (name === "./workerBridge") return { runNativeProjectWorker: worker, cancelLocalWorker: async () => true };
     if (name === "./automaticWorkerQueue") return { runSerializedAutomaticWorker: async fn => fn() };
+    if (name === "./mainFieldViewport") return { showFieldInMainViewport: () => {} };
+    if (name === "./fieldVolumeAdapters") return { assemblyAirflowFieldVolume: () => null };
     return require(name);
   }, module, module.exports);
   return module.exports;

@@ -1,0 +1,32 @@
+{
+  "contract": "spikes/component-package/v1",
+  "id": "examples.rc_lowpass",
+  "name": "RC low-pass",
+  "version": "1.0.0",
+  "license": "Original SPIKES example; Apache-2.0",
+  "description": "Ideal 1 kohm / 1 microfarad low-pass. Explicit reference pin. No parasitics or component qualification.",
+  "symbol": {
+    "id": "examples.rc_lowpass.symbol",
+    "name": "RC low-pass",
+    "family": "user",
+    "standard": "common-convention",
+    "conformance": "unverified",
+    "label_keepouts": [],
+    "grid": 10,
+    "body_keepout": {"min": [-50, -40], "max": [50, 40]},
+    "primitives": [
+      {"kind": "polygon", "points": [[-50, -40], [50, -40], [50, 40], [-50, 40], [-50, -40]]}
+    ],
+    "terminals": [
+      {"id": "1", "name": "IN", "at": [-70, -20], "leg_endpoint": [-50, -20], "direction": "west", "mode": "AI", "connection_indicator": true},
+      {"id": "2", "name": "OUT", "at": [70, -20], "leg_endpoint": [50, -20], "direction": "east", "mode": "AO", "connection_indicator": true},
+      {"id": "3", "name": "REF", "at": [-70, 20], "leg_endpoint": [-50, 20], "direction": "west", "mode": "AI", "connection_indicator": true}
+    ]
+  },
+  "implementation": {
+    "language": "SPICE",
+    "entry": "ExampleRC",
+    "prefix": "X",
+    "source": ".subckt ExampleRC IN OUT REF\nR1 IN OUT 1k\nC1 OUT REF 1u\n.ends ExampleRC\n"
+  }
+}

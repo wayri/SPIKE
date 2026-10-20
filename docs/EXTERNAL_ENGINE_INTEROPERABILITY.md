@@ -80,7 +80,7 @@ artifacts.json
 engine-input/
   run_openems.py
   spike-openems.xml        # after setup execution
-engine-output/
+engine result directory
   normalized-result.json  # after successful setup/run
   simulation/              # raw openEMS artifacts after a full run
 logs/

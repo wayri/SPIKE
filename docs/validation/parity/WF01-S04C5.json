@@ -10,7 +10,7 @@
     "python/spike_core/component_step_scale.py": "6cae861ea71572306b6dad1cdd24e3b36cc03e3a1d6a72b46a320090d276de1c",
     "python/spike_core/freecad_scale_step.py": "4a8812b02639f88856b080db73d8dd0ebab83a1245e292cd835aa402c5470aa7",
     "tests/python/test_component_step_scale.py": "6e0b6dcea312a70faff83c334f5bc4d4145b1330d6258fdf38ba20813b32c653",
-    "python/spike_core/mcad_importer.py": "eb38a7ac3493e3ffd61020988ca29a2504ab9dc79e5a3197c9bd21b340d4db96",
+    "python/spike_core/mcad_importer.py": "fb317e118a411c70e84f881bba1b9d819041e0f022f7ab59bf8f353b14804cab",
     "python/spike_core/mcad_tessellation.py": "5be098392ca17b544cf50557341d720cbce4f6d8bd5c9b8fd69d00f09d0354dd",
     "python/spike_core/sparselizard_process.py": "4a7e2ca2844c5fdd83df946c44bf50040a739e55cc3b40a057e6ae84973337e0",
     "scripts/parity_native_step_placement_gate.py": "0cc6f5fe77270aa6ceff65ae7eee5530ffea6578db6246342e6c65da4491242c",
@@ -36,8 +36,8 @@
     "expected_failures": [],
     "unexpected_successes": []
   },
-  "log": "docs/validation/parity/WF01-S04C5-release-0.4-portable-20261019.log",
-  "log_sha256": "5ecfd6f60f88fa5d7233cebc34c781803581c0f4ac36cbbf3f1918552b615b1b",
-  "native_evidence": "docs/validation/parity/WF01-S04C5-release-0.4-portable-20261019-native.json",
-  "native_evidence_sha256": "bb788efd55835cb26684472d124a65953ffc8397bc0617e690af1034d57e1e64"
+  "log": "docs/validation/parity/WF01-S04C5-final.log",
+  "log_sha256": "a64ea9e2812e7715d7cec2314e35cc5287fabb682610d935be49a96976697fd1",
+  "native_evidence": "docs/validation/parity/WF01-S04C5-final-native.json",
+  "native_evidence_sha256": "e67f2025c78951ca71a19454652b673abaee8ccb9137af7ebc6d441d9369878e"
 }

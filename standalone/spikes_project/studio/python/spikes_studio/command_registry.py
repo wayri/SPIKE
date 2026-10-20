@@ -31,6 +31,9 @@ class Command:
 
 
 LABELS = {
+    'view.component_maker': ('Component maker / user library…', 'Design symbols and pins, edit SPICE/C++/Verilog, and manage versioned source components.'),
+    'edit.make_component': ('Make component from selected circuit…', 'Capture a portable source-backed subcircuit; opens the component maker without altering the circuit.'),
+    'edit.make_subsheet_component': ('Make component from current subsheet…', 'Capture the actual subsheet definition and dependencies for reuse.'),
     'view.controller_boards': ('Controller board library…', 'Search sourced board pinouts, place labeled blocks and map sampled C/C++ I/O explicitly.'),
     'view.firmware': ('Firmware emulation…', 'Load approved Cortex-M binaries into an explicitly selected native Renode board model.'),
     'view.hierarchy': ('Schematic hierarchy…', 'Navigate actual native subcircuit instances and their declared port mappings.'),
@@ -75,12 +78,13 @@ LABELS = {
 }
 
 SELECTION = {'edit.properties', 'edit.properties_standard', 'edit.rotate', 'edit.move', 'edit.drag', 'edit.duplicate',
-             'edit.rotate_standard', 'edit.mirror_horizontal', 'edit.mirror_vertical'}
+             'edit.rotate_standard', 'edit.mirror_horizontal', 'edit.mirror_vertical','edit.make_component'}
 SCHEMATIC = SELECTION | {'edit.wire','edit.wire_bend','edit.box_select','edit.lasso_select','edit.select_all',
-                        'edit.create_subsheet','probe.voltage','probe.differential','probe.current','probe.power','view.fit_schematic','edit.canvas_text','edit.net_label'}
+                        'edit.create_subsheet','edit.make_subsheet_component','probe.voltage','probe.differential','probe.current','probe.power','view.fit_schematic','edit.canvas_text','edit.net_label'}
 
 
 def disabled_reason(command, context):
+    if command in ('edit.make_component','edit.make_subsheet_component') and context.busy:return 'Stop active work before capturing components.'
     if command=='view.back' and not context.history_back:return 'No previous section.'
     if command=='view.forward' and not context.history_forward:return 'No next section.'
     if command in SCHEMATIC and not context.schematic:return 'Open the schematic or split schematic/plot view.'

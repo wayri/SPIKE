@@ -66,7 +66,8 @@ for the indexed predicate, or 96.96x for this candidate-query kernel. The full
 contact evidence, meshing, solver work, and process-memory effects were excluded.
 Raw configuration, samples, source hashes, fixture provenance, and qualification
 are retained in
-`output/mesher-fix-20261013/boundary-index-microbenchmark.json`.
+the unbundled local `boundary-index-microbenchmark.json` record. See the
+[release evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
 
 ## Declared bounds
 

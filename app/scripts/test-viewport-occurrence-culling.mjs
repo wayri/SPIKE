@@ -73,6 +73,21 @@ const invalidated = culler.begin(camera, [{ root: outside, geometryRevision: 1 }
 assert.equal(invalidated.cacheMisses, 1, "explicit invalidation rebuilds bounds even at the same revision");
 invalidated.restore();
 
+const sibling = occurrence(0);
+scene.add(sibling);
+const primed = culler.begin(camera, [
+  { root: outside, geometryRevision: 1 },
+  { root: sibling, geometryRevision: 0 },
+]);
+primed.restore();
+const oneOccurrenceChanged = culler.begin(camera, [
+  { root: outside, geometryRevision: 2 },
+  { root: sibling, geometryRevision: 0 },
+]);
+assert.deepEqual({ hits: oneOccurrenceChanged.cacheHits, misses: oneOccurrenceChanged.cacheMisses },
+  { hits: 1, misses: 1 }, "a late model invalidates only its owning occurrence bounds");
+oneOccurrenceChanged.restore();
+
 const animated = occurrence(100);
 animated.clear();
 animated.add(new THREE.SkinnedMesh(geometry, material));

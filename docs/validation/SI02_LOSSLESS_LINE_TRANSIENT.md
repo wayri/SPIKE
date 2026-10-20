@@ -1,10 +1,6 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S01 verification: distributed lossless TEM line transient
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 Verified 18 October 2026. **Done for the bounded stage; experimental,
 production-unqualified.** SI02 and complete PI/SI parity remain open.
 The [method ledger](../LOSSLESS_LINE_TRANSIENT.md) retains reviewed primary
@@ -14,7 +10,7 @@ units, zero-history assumptions, conditioning/resources and coupling ownership.
 ## Executed evidence
 
 The [canonical source-bound receipt](parity/SI02-S01.json) retains **10 tests,
-zero skips**, and its actual log (`parity/SI02-S01-lossless-line-reverified.log`).
+zero skips**, and its [actual log](parity/SI02-S01-lossless-line-reverified.log).
 Seven numerical and three actual worker/schema/example tests executed.
 Reproduce into new repository paths:
 

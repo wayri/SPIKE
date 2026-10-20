@@ -205,7 +205,7 @@ probe-independent integrated heat, and matched legs with attenuation 40 Np
 each. The latter uses binary-exact matching to isolate very small propagation
 from impedance roundoff. It checks S near exp(-80) at 2e-12 relative plus
 1e-47 absolute, and analytic per-leg absorbed watts. Rejection tests cover
-malformed identity/grids/references/probes/waves, output/work preflight,
+malformed identity/grids/references/probes/waves, output and work preflight,
 cancellation, excessive condition, injected solve error, floating range and
 corrupted child identity/boundaries/heat/residuals. Worker, CLI, example and
 strict schema tests exercise the real registered path.

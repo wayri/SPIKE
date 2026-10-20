@@ -59,9 +59,9 @@ def catalog(*,include_passives=False,include_lumped_physics=False,include_packag
     if include_packaged_devices:
         from .packaged_device_library import records as packaged_device_records
         records.extend(packaged_device_records())
-    return {'contract':CONTRACT,'version':'1.3.0' if include_packaged_devices else '1.2.0' if include_lumped_physics else '1.1.0' if include_passives else '1.0.0','records':records,
+    return {'contract':CONTRACT,'version':'1.5.0' if include_packaged_devices else '1.2.0' if include_lumped_physics else '1.1.0' if include_passives else '1.0.0','records':records,
             'counts':dict(Counter(r['category'] for r in records)),
-            'archetype_count':sum(map(len,FAMILIES.values()))+(5 if include_lumped_physics else 0)+(2 if include_packaged_devices else 0),
+            'archetype_count':sum(map(len,FAMILIES.values()))+(5 if include_lumped_physics else 0)+(5 if include_packaged_devices else 0),
             'notice':'Original presets plus optional configurable native model libraries; NOT distinct validated manufacturer component models.' if include_passives or include_lumped_physics or include_packaged_devices else '500 presets per category from 10 archetypes each; NOT 500 distinct validated component models per category.'}
 
 

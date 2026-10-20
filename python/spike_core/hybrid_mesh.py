@@ -953,6 +953,8 @@ def _annular_pad_local_cells(
     pad: Dict[str, Any],
     target_mm: float,
     max_custom_cells: int | None = None,
+    *,
+    preserve_roundrect: bool = False,
 ) -> tuple[List[List[Point2D]], List[tuple[int, int]]]:
     """Create conformal annular sectors that do not cross a pad drill void."""
 
@@ -966,6 +968,9 @@ def _annular_pad_local_cells(
     ):
         return [], []
     shape = str(pad.get("shape", "rect")).lower()
+    if shape == "roundrect" and preserve_roundrect:
+        from .hybrid_drilled_roundrect import local_cells
+        return local_cells(pad, target_mm, max_custom_cells)
     custom_polygon = _custom_pad_local_polygon(pad) if shape == "custom" else []
     if shape == "custom" and (
         not custom_polygon or not _point_in_polygon((0.0, 0.0), custom_polygon, 1e-9)
@@ -2098,8 +2103,25 @@ class _Builder:
             if shape == "custom":
                 local_boundary = custom_boundary
             elif shape == "roundrect" and self.owned_shared_faces:
-                from .quasistatic_copper_area import _source_polygon
-                local_boundary = [_pad_world_to_local(pad, p) for p in _source_polygon("pad", pad)]
+                from .hybrid_drilled_roundrect import outer_boundary
+                local_boundary = outer_boundary(pad)
+                if drilled and _pad_is_plated(pad):
+                    raw_plating = pad.get("plating_thickness", self.spec.mesh.get(
+                        "via_plating_thickness_mm", DEFAULT_VIA_PLATING_MM))
+                    try:
+                        plating = float(raw_plating)
+                    except (TypeError, ValueError) as error:
+                        raise ValueError("Owned roundrect requires finite positive plating thickness") from error
+                    if isinstance(raw_plating, bool) or not isfinite(plating) or plating < .005:
+                        raise ValueError("Owned roundrect requires finite plating thickness >= .005 mm")
+                    envelope = _circumscribed_shape_polygon(
+                        _pad_drill_shape(pad), drill_width + 2 * plating,
+                        drill_height + 2 * plating, 96,
+                    )
+                    if (not _polygon_is_contained_in(envelope, local_boundary, 1e-9)
+                            or any(_distance_to_segment(p, a, b) <= 1e-9
+                                   for p in envelope for a, b in _segments(local_boundary))):
+                        raise ValueError("Owned roundrect drill/plating envelope crosses its copper boundary")
             elif shape in {"circle", "oval"}:
                 side_count = max(24, min(96, int(ceil(pi * max(width, height) / max(self.target, 0.01)))))
                 local_boundary = [
@@ -2122,7 +2144,9 @@ class _Builder:
             annular_indices: List[tuple[int, int]] = []
             if drilled:
                 annular_cells, annular_indices = _annular_pad_local_cells(
-                    pad, self.target, self.max_pad_cells if shape == "custom" else None,
+                    pad, self.target,
+                    self.max_pad_cells if shape == "custom" or (shape == "roundrect" and self.owned_shared_faces) else None,
+                    preserve_roundrect=self.owned_shared_faces,
                 )
                 if not annular_cells:
                     self.mesh.issues.append(ValidationIssue(
@@ -2225,12 +2249,12 @@ class _Builder:
                                     y0,
                                     min(x0 + dx, max_x),
                                     min(y0 + dy, max_y),
-                                    self.containment_tolerance,
+                                    1e-10 if self.owned_shared_faces else self.containment_tolerance,
                                 )
                                 for fragment_index, clipped_local in enumerate(fragments):
                                     if _polygon_area(clipped_local) <= max(1e-12, dx * dy * 1e-10):
                                         continue
-                                    local = _interior_polygon_point(clipped_local)
+                                    local = self.cell_center(clipped_local)
                                     if local is None:
                                         continue
                                     point = _pad_local_to_world(pad, *local)
@@ -2557,9 +2581,23 @@ class _Builder:
                 if self.requested and _net(pad) not in self.requested:
                     continue
                 shape = str(pad.get("shape", "rect")).lower()
-                if shape not in {"rect", "circle", "oval", "roundrect"} or pad.get("chamfer") or (_pad_has_drill(pad) and shape == "roundrect"):
+                if shape not in {"rect", "circle", "oval", "roundrect", "custom"} or pad.get("chamfer"):
                     fail(self, f"Owned pad-zone coupling does not admit pad shape {shape}")
                     return self.mesh
+                if shape == "custom":
+                    from .hybrid_owned_copper import custom_outline
+                    try:
+                        custom_outline(pad)
+                    except ValueError as error:
+                        fail(self, str(error))
+                        return self.mesh
+                if shape == "roundrect":
+                    from .hybrid_drilled_roundrect import validate_metadata
+                    try:
+                        validate_metadata(pad)
+                    except ValueError as error:
+                        fail(self, str(error))
+                        return self.mesh
                 offset = pad.get("drill_offset",pad.get("drill_offset_mm",(0,0))) or (0,0)
                 if _pad_has_drill(pad) and (any(abs(float(v))>1e-12 for v in offset) or pad.get("drill_shape") not in {None,"","none","circle","oval"}):
                     fail(self, "Owned pad-zone coupling requires a centered circular/oval pad drill")

@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/si-candidate-study-result-v1.schema.json",
+  "title": "SPIKE experimental finite SI candidate/corner study result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "status",
+    "model_status",
+    "production_qualified",
+    "assessment_status",
+    "source_request",
+    "input_digest",
+    "frequencies_hz",
+    "cases",
+    "candidates",
+    "feasible_candidate_ids",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/si-candidate-study-result/v1"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "partial"
+      ]
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "assessment_status": {
+      "enum": [
+        "passed",
+        "failed",
+        "incomplete"
+      ]
+    },
+    "source_request": {
+      "$ref": "si-candidate-study-request-v1.schema.json"
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "frequencies_hz": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 1024,
+      "items": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "candidate_id",
+          "corner_id",
+          "request_digest",
+          "status",
+          "result",
+          "issue"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "corner_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "request_digest": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "partial",
+              "failed"
+            ]
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "si-workflow-result-v1.schema.json"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "issue": {
+            "anyOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_id",
+          "status",
+          "case_ids",
+          "limits"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+          },
+          "status": {
+            "enum": [
+              "passed",
+              "failed",
+              "incomplete"
+            ]
+          },
+          "case_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+            }
+          },
+          "limits": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "metric",
+                "frequency_band_hz",
+                "bound",
+                "status",
+                "coverage_complete",
+                "minimum",
+                "maximum",
+                "worst",
+                "margin",
+                "evaluated_case_ids"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                },
+                "metric": {
+                  "enum": [
+                    "min_gain",
+                    "max_gain"
+                  ]
+                },
+                "frequency_band_hz": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "prefixItems": [
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    {
+                      "type": "number",
+                      "minimum": 0
+                    }
+                  ],
+                  "items": false
+                },
+                "bound": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000.0
+                },
+                "status": {
+                  "enum": [
+                    "passed",
+                    "failed",
+                    "incomplete"
+                  ]
+                },
+                "coverage_complete": {
+                  "type": "boolean"
+                },
+                "minimum": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "case_id",
+                        "corner_id",
+                        "frequency_hz",
+                        "real",
+                        "imag",
+                        "gain"
+                      ],
+                      "properties": {
+                        "case_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "corner_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "frequency_hz": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "real": {
+                          "type": "number"
+                        },
+                        "imag": {
+                          "type": "number"
+                        },
+                        "gain": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "maximum": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "case_id",
+                        "corner_id",
+                        "frequency_hz",
+                        "real",
+                        "imag",
+                        "gain"
+                      ],
+                      "properties": {
+                        "case_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "corner_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "frequency_hz": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "real": {
+                          "type": "number"
+                        },
+                        "imag": {
+                          "type": "number"
+                        },
+                        "gain": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "worst": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "case_id",
+                        "corner_id",
+                        "frequency_hz",
+                        "real",
+                        "imag",
+                        "gain"
+                      ],
+                      "properties": {
+                        "case_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "corner_id": {
+                          "type": "string",
+                          "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                        },
+                        "frequency_hz": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "real": {
+                          "type": "number"
+                        },
+                        "imag": {
+                          "type": "number"
+                        },
+                        "gain": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "margin": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                },
+                "evaluated_case_ids": {
+                  "type": "array",
+                  "minItems": 0,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+                  }
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "coverage_complete": {
+                        "const": false
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "status": {
+                        "const": "incomplete"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "feasible_candidate_ids": {
+      "type": "array",
+      "minItems": 0,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"
+      },
+      "uniqueItems": true
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

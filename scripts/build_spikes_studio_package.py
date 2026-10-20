@@ -34,6 +34,14 @@ def main():
     if (args.iscc or args.appimagetool) and not args.release_evidence and not args.candidate:
         raise ValueError('Release creation requires --release-evidence; use --candidate only for unqualified local package tests')
     if out.exists():raise FileExistsError('Choose a fresh output directory; existing releases are never overwritten')
+    # Studio exposes the electrical-pad workflow. Reject an older or partial
+    # DLL before staging, rather than producing a mismatched installation.
+    sys.path.insert(0,str(ROOT))
+    from python.spikes.native_abi import load_native_library
+    from python.spikes.native_io_pad import IO_PAD_SYMBOLS,require_io_pad_api
+    require_io_pad_api(load_native_library(library))
+    from python.spikes.native_peripheral import PERIPHERAL_SYMBOLS,require_peripheral_api
+    require_peripheral_api(load_native_library(library))
     out.mkdir(parents=True);stage=out/'source';stage.mkdir()
     copy_tree(TEMPLATE/'python',stage/'python') if TEMPLATE!=ROOT else copy_tree(ROOT/'python',stage/'python')
     copy_tree(ROOT/'python/spikes',stage/'python/spikes')
@@ -44,6 +52,7 @@ def main():
     for folder in ('docs','schemas','library'):
         copy_tree(TEMPLATE/'studio'/folder,stage/'share/spikes/studio'/folder)
     copy_tree(ROOT/'examples/spikes',stage/'share/spikes/examples')
+    copy_tree(TEMPLATE/'examples/components',stage/'share/spikes/examples/components')
     if os.name=='nt':
         sys.path.insert(0,str(ROOT))
         from python.spikes.bundled_bsim import MODELS,resolve
@@ -89,18 +98,19 @@ def main():
     if os.name=='nt' and args.iscc:
         with (out/'installer.log').open('w',encoding='utf-8') as log:
             subprocess.run([str(args.iscc.resolve()),'/DPayload='+str(payload),'/DOutput='+str(out),str(ASSETS/'windows.iss')],check=True,stdout=log,stderr=subprocess.STDOUT)
-        artifact=out/'SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe'
+        artifact=out/'SPIKES-Studio-0.3.0-beta.7-windows-x64-setup.exe'
     elif os.name!='nt' and args.appimagetool:
         appdir=out/'SPIKES-Studio.AppDir';copy_tree(payload,appdir/'usr/bin')
         for name in ('AppRun','spikes-studio.desktop','spikes-studio.svg','spikes-studio.png'):shutil.copy2(ASSETS/name,appdir/name)
         (appdir/'AppRun').chmod(0o755)
-        artifact=out/'SPIKES-Studio-0.3.0-beta.6-linux-x86_64.AppImage'
+        artifact=out/'SPIKES-Studio-0.3.0-beta.7-linux-x86_64.AppImage'
         env.update(ARCH='x86_64',APPIMAGE_EXTRACT_AND_RUN='1')
         with (out/'appimage.log').open('w',encoding='utf-8') as log:
             runtime=['--runtime-file',str(args.appimage_runtime.resolve(strict=True))] if args.appimage_runtime else []
             subprocess.run([str(args.appimagetool.resolve()),*runtime,str(appdir),str(artifact)],env=env,check=True,stdout=log,stderr=subprocess.STDOUT)
-    report={'product':'SPIKES Studio','version':'0.3.0-beta.6','channel':'unsigned-engineering-preview','signed':False,'dependencies':dependencies,'native_sha256':digest(library),'source_manifest_sha256':digest(out/'source-manifest.json'),'artifact':None}
+    report={'product':'SPIKES Studio','version':'0.3.0-beta.7','channel':'unsigned-engineering-preview','signed':False,'dependencies':dependencies,'native_sha256':digest(library),'source_manifest_sha256':digest(out/'source-manifest.json'),'artifact':None}
     if artifact:report['artifact']={'name':artifact.name,'bytes':artifact.stat().st_size,'sha256':digest(artifact)}
+    report['required_native_symbols']=list((*IO_PAD_SYMBOLS,*PERIPHERAL_SYMBOLS))
     report['releasable']=bool(args.release_evidence)
     report['qualification']='reviewed evidence accepted' if args.release_evidence else 'unqualified development candidate; do not distribute as a release'
     (out/'package-manifest.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')

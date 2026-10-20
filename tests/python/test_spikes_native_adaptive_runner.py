@@ -61,6 +61,20 @@ class _FakeTransientResult:
     def element_power(self, index, _name):
         return self._values[index]
 
+    # Match the native result's additive channel-reader interface while keeping
+    # this fixture's nonuniform times/values and all forwarding assertions.
+    def time_values(self):
+        return list(self._times)
+
+    def node_voltage_values(self, name):
+        return [self.node_voltage(i, name) for i in range(self.point_count)]
+
+    def element_current_values(self, name):
+        return [self.element_current(i, name) for i in range(self.point_count)]
+
+    def element_power_values(self, name):
+        return [self.element_power(i, name) for i in range(self.point_count)]
+
 
 class _FakeCircuit:
     def __init__(self):

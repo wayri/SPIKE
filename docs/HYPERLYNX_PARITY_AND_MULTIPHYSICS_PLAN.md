@@ -21,8 +21,11 @@ SI/field/cooling coverage and establish the original parity program first.
 On 18 October 2026 the user explicitly activated a parallel coupled mechanics,
 magnetics, failure and semiconductor-device track. Its bounded scope and stages
 are defined in [the coupled suite plan](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md).
-PI/SI remains the primary parity program; unrelated general physics and optics
-additions retain their post-parity gate.
+PI/SI remains the primary parity program. The 21 October owner request separately
+authorizes [optics/materials development](OPTICS_PHOTONICS_MATERIALS_PLAN.md)
+in parallel. Legacy OP01–OP05 backlog stages remain planned pending their own
+prerequisites/evidence; this scheduling exception does not open production or
+parity-completion gates. Unrelated expansion retains its existing policy.
 Adding solver names or controls alone
 does not achieve parity.
 

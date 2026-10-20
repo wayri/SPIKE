@@ -7,7 +7,7 @@ is 32 GB RAM; the optimization baseline remains 16 GB with 10 GB available.
 ## Automated stage-one gate
 
 The focused Python gate passed 96 tests in 25.704 seconds, with no failures,
-errors or skips. Log: `output/optimization-stage2-multiboard-verification.log`.
+errors or skips. The raw `optimization-stage2-multiboard-verification.log` is an unbundled local record.
 It includes retained design/package reopen, exact manifest and result bindings,
 scoped explicit net links, missing/conflicting mappings, stale and malformed
 requests, atomic rejection, field-study and electrothermal worker execution,
@@ -32,7 +32,7 @@ rerun. No product behavior was changed to satisfy that check.
 
 After the user's resume, the rebuilt current-source native host opened a
 disposable copy of the retained Arduino UNO R4 Minima / 4 Relays Shield assembly.
-Captures are under `output/optimization-stage2-native/`. Images 01–06 show both
+Captures are unbundled local records under `optimization-stage2-native`. Images 01–06 show both
 populated 3D boards, independent selection, scoped layer/net managers and three
 explicit connector mappings. Image 07 is a top camera view in **3D**, despite
 its filename; it does not establish 2D rendering. Images 08 and 09 capture the
@@ -88,7 +88,7 @@ and the production build passed. Native Cargo tests: 54 passed, one ignored.
 Independent read-only batching review found no actionable issue.
 
 Broad Python discovery: 3,434 tests in 995.826 seconds, one failure, five errors,
-50 skips. Log: `output/optimization-stage2-python-tests-20261012.log`. The same
+50 skips. The raw `optimization-stage2-python-tests-20261012.log` is an unbundled local record. The same
 public-schema and four SI fixture problems described in the performance record
 remain; the complete release gate is not green. No numerical implementation was
 changed in this optimization pass.

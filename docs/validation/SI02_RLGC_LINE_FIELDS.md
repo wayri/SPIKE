@@ -1,10 +1,6 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S04 verification: driven sampled RLGC fields and loss ledger
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 Verified 18 October 2026. **Done for this bounded stage; experimental,
 production-unqualified.** SI02 and full PI/SI parity remain open.
 The [method ledger](../RLGC_LINE_FIELDS.md) retains independent derivation,
@@ -20,7 +16,7 @@ warning limits pure-TEM physical applicability. No external code/data was used.
 
 The [canonical source-bound receipt](parity/SI02-S04.json) retains **15 tests,
 zero skips**, twelve numerical and three actual worker/schema/example checks.
-Its actual log (`parity/SI02-S04-rlgc-fields-reverified.log`) records executed names.
+Its [actual log](parity/SI02-S04-rlgc-fields-reverified.log) records executed names.
 Reproduce into new repository paths:
 
 ```powershell

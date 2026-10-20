@@ -31,6 +31,9 @@ EXPECTED_MANUFACTURERS = {
     "NXP Semiconductors",
     "Renesas",
     "Lattice Semiconductor",
+    "onsemi",
+    "Nexperia",
+    "ROHM Semiconductor",
 }
 
 OFFICIAL_HOSTS = {
@@ -50,6 +53,9 @@ OFFICIAL_HOSTS = {
     "NXP Semiconductors": {"www.nxp.com"},
     "Renesas": {"www.renesas.com"},
     "Lattice Semiconductor": {"www.latticesemi.com"},
+    "onsemi": {"www.onsemi.com"},
+    "Nexperia": {"www.nexperia.com"},
+    "ROHM Semiconductor": {"www.rohm.com"},
 }
 
 
@@ -61,7 +67,7 @@ class ManufacturerDiscoveryDataTests(unittest.TestCase):
 
     def test_versioned_contract_and_explicit_boundaries(self) -> None:
         self.assertEqual(self.catalog["contract"], "spikes/manufacturer-discovery/v1")
-        self.assertEqual(self.catalog["generated_on"], "2026-10-19")
+        self.assertEqual(self.catalog["generated_on"], "2026-10-20")
         self.assertIn("product identities", self.catalog["scope"])
         self.assertIn("not electrical models", self.catalog["scope"])
         limitations = " ".join(self.catalog["limitations"]).casefold()
@@ -69,7 +75,7 @@ class ManufacturerDiscoveryDataTests(unittest.TestCase):
             self.assertIn(boundary, limitations)
 
     def test_catalog_has_broad_requested_coverage(self) -> None:
-        self.assertGreaterEqual(len(self.records), 100)
+        self.assertGreaterEqual(len(self.records), 200)
         manufacturers = {record["manufacturer"] for record in self.records}
         self.assertEqual(manufacturers, EXPECTED_MANUFACTURERS)
         counts = {
@@ -103,7 +109,7 @@ class ManufacturerDiscoveryDataTests(unittest.TestCase):
             for key in required - {"model_url"}:
                 self.assertIsInstance(record[key], str)
                 self.assertTrue(record[key].strip(), (record["id"], key))
-            self.assertEqual(record["checked_on"], "2026-10-19")
+            self.assertIn(record["checked_on"], {"2026-10-19", "2026-10-20"})
             self.assertLessEqual(len(record["description"]), 160)
             self.assertNotIn(record["id"], ids)
             ids.add(record["id"])
@@ -171,8 +177,20 @@ class ManufacturerDiscoveryDataTests(unittest.TestCase):
             ("Microchip", "PIC16F877A"),
             ("STMicroelectronics", "STM32F407VG"),
             ("Lattice Semiconductor", "LFE5U-45F-6BG381C"),
+            ("onsemi", "CAT24C256"),
+            ("Nexperia", "BAS316"),
+            ("ROHM Semiconductor", "BH2220FVM"),
         }:
             self.assertIn(identity, identities)
+
+    def test_dated_expansion_is_real_identity_metadata_not_renamed_models(self) -> None:
+        added = [record for record in self.records if record["checked_on"] == "2026-10-20"]
+        self.assertGreaterEqual(len(added), 100)
+        self.assertGreaterEqual(len({record["manufacturer"] for record in added}), 16)
+        for record in added:
+            self.assertEqual(record["model_status"], "model_not_reviewed")
+            self.assertIsNone(record["model_url"])
+            self.assertIn("identity", record["description"].casefold())
 
 
 if __name__ == "__main__":

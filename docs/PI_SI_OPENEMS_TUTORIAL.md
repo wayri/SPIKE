@@ -286,7 +286,7 @@ The headless path for a reviewed analysis request is:
 The request schema and CLI examples are in
 [external-engine interoperability](EXTERNAL_ENGINE_INTEROPERABILITY.md).
 The prepared directory contains `job.json`, `geometry.json`, `object-map.json`,
-`artifacts.json`, `engine-input/`, and later `engine-output/normalized-result.json`
+`artifacts.json`, the engine input directory, and later the normalized engine result
 and `logs/openems.log`. Keep this directory and the original board revision
 together for reproduction.
 

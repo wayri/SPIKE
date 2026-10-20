@@ -1,0 +1,26 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.main-field-tools { display:flex;align-items:center;gap:3px;min-width:0;flex:0 0 auto; }
+.main-field-tools button { width:26px;height:26px;min-width:26px;padding:3px;display:inline-flex;align-items:center;justify-content:center;gap:5px; }
+.main-field-tools .main-field-trigger { width:auto; }
+.main-field-trigger span { display:block;max-width:0;overflow:hidden;opacity:0;transition:max-width .16s,opacity .16s; }
+.main-field-tools:is(:hover,:focus-within) .main-field-trigger span { max-width:48px;opacity:1; }
+.main-field-scrubber { width:64px;max-width:120px;height:22px;transition:width .16s; }
+.main-field-tools:is(:hover,:focus-within) .main-field-scrubber { width:100px; }
+.main-field-tools small { font-size:10px;white-space:nowrap;color:var(--spike-table-muted); }
+.main-field-popover { position:fixed;z-index:1100;width:min(340px,calc(100vw - 16px));max-height:75vh;overflow:auto;box-sizing:border-box;padding:12px;border:1px solid var(--spike-table-border-strong);border-radius:8px;background:var(--spike-table-surface);color:var(--spike-table-text);box-shadow:0 8px 24px var(--spike-popup-backdrop);font:12px/1.5 'Segoe UI',sans-serif;display:grid;gap:12px; }
+.main-field-popover header { display:flex;align-items:center;justify-content:space-between;gap:8px; }
+.main-field-popover header > div,.main-field-transport { display:flex;align-items:center;gap:5px;flex-wrap:wrap; }
+.main-field-popover header button,.main-field-transport button { min-width:26px;width:26px;height:26px;padding:3px; }
+.main-field-popover p { margin:0;overflow-wrap:anywhere; }
+.main-field-name { color:var(--spike-table-muted); }
+.main-field-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
+.main-field-grid label { display:flex;flex-wrap:wrap;gap:5px;min-width:0;align-items:center; }
+.main-field-grid select,.main-field-grid input[type=range] { width:100%;max-width:100%;min-width:0; }
+.main-field-popover select { font-size:11px;min-height:26px;padding:3px 5px; }
+.main-field-transport,.main-field-popover details { border-top:1px solid var(--spike-table-border);padding-top:10px; }
+.main-field-popover summary { cursor:pointer;color:var(--spike-table-muted); }
+.main-field-popover details p { margin-top:8px; }
+.main-field-popover [role=alert] { color:var(--spike-table-danger-text); }
+.main-field-popover .main-field-remove { justify-self:start;font-size:11px; }
+@media(prefers-reduced-motion:reduce) { .main-field-trigger span,.main-field-scrubber { transition:none; } }
+@media(pointer:coarse) { .main-field-trigger span { max-width:48px;opacity:1; }.main-field-tools button { min-width:32px;min-height:32px; } }

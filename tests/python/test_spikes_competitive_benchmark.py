@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import unittest
 
@@ -15,7 +16,10 @@ from python.spikes.competitive_benchmark import (
 
 
 ROOT = Path(__file__).resolve().parents[2]
-LIBRARY = ROOT / "build-spikes-hybrid" / "spikes_c_api.dll"
+LIBRARY = Path(os.environ.get(
+    "SPIKES_TEST_NATIVE_LIBRARY",
+    str(ROOT / "build-spikes-hybrid" / "spikes_c_api.dll"),
+))
 
 
 class CompetitiveBenchmarkTests(unittest.TestCase):

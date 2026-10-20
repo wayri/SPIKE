@@ -478,3 +478,20 @@
 .focus-shell .workspace-editor-tabs [role="tab"] > span { min-width:0; }
 
 .app-shell.focus-shell .workspace.focus-workspace > .focus-floating-slot[data-panel-id="command-menu"][hidden] { display:none !important; }
+
+/* Keep inspector sections on one inset; explanatory content is a section,
+   not an unpadded sibling inheriting presentation-sized typography. */
+.focus-tool-heading { gap:8px;padding:8px 12px; }
+.focus-tool-content .inspector { box-sizing:border-box;padding:16px;min-width:0; }
+.focus-tool-content .inspector .selection-badge { gap:8px;min-height:28px;margin-bottom:12px; }
+.focus-tool-content .inspector h3 { margin:0 0 20px;line-height:1.4; }
+.focus-tool-content .inspector .metadata-section { margin-top:20px; }
+.focus-tool-content .inspector .metadata-section h4 { margin:0 0 10px;font-size:10px;line-height:1.4; }
+.focus-tool-content .inspector .property-row { gap:14px;padding:9px 0;align-items:start;grid-template-columns:minmax(90px,.8fr) minmax(0,1.6fr); }
+.focus-tool-content .inspector .property-row :is(span,b) { font-size:11px;line-height:1.6;white-space:normal;overflow:visible;overflow-wrap:anywhere; }
+.inspector-guidance { margin-top:22px;padding-top:16px;border-top:1px solid var(--spike-table-border-strong); }
+.inspector-guidance h4 { margin:0 0 8px;font-size:12px;font-weight:600;line-height:1.4;color:var(--spike-table-text-strong); }
+.inspector-guidance p { margin:0;font-size:12px;line-height:1.65;color:var(--spike-table-muted);overflow-wrap:anywhere; }
+.focus-tool-content .inspector .setup-block { display:grid;gap:10px;margin-bottom:18px; }
+.focus-tool-content .inspector .inspector-actions { display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-bottom:0; }
+@media(max-width:850px) { .focus-tool-content .inspector { padding:12px; }.focus-tool-content .inspector .property-row { gap:10px;grid-template-columns:minmax(80px,.8fr) minmax(0,1.4fr); } }

@@ -1,6 +1,15 @@
 import { Fragment, useState } from "react";
 import { helpSlug, resolveHelpLink } from "./helpModel";
 
+// Explicit local assets only: do not fetch arbitrary Markdown image URLs.
+const galleryImages = [
+  "analytics/pi-dielectric-admittance.png", "analytics/si-rlgc-line-fields.png",
+  "analytics/em-huygens-far-field.png", "analytics/thermal-two-solid-conduction.png",
+  "analytics/hybrid-electrothermal-convergence.png", "analytics/cfd-native-cavity.png",
+  "analytics/cht-laminar-channel.png", "analytics/multiboard-coupled-networks.png",
+  "ui-current/clean-viewport.jpg", "ui-current/universal-search.jpg", "ui-current/navigation-map.svg",
+];
+
 export function CopyCode({ text }: { text: string }) {
   const [status, setStatus] = useState("");
   return <div className="help-code"><button onClick={() => void navigator.clipboard.writeText(text).then(() => setStatus("Copied"), () => setStatus("Select the text below to copy"))}>{status || "Copy"}</button><pre><code>{text}</code></pre><span className="help-sr" role="status">{status}</span></div>;
@@ -15,6 +24,10 @@ export default function HelpMarkdown({ text, source, navigate, hasTopic }: Props
       if (link) {
         const [, image, label, href] = link;
         if (image) {
+          const local = href.replace(/^(?:\.\.\/)+/, "").replace(/^app\/public\/help\//, "");
+          if (!/^[a-z]+:/i.test(href) && galleryImages.includes(local)) {
+            return <figure key={index}><a href={`/help/${local}`} target="_blank" rel="noreferrer"><img loading="lazy" src={`/help/${local}`} alt={label} /></a><figcaption>{label} · Select to enlarge</figcaption></figure>;
+          }
           const filename = href.split("/").pop() ?? "";
           const allowed = ["marble-workspace-3d.png", "marble-layout-layers.png", "marble-net-names.png", "marble-report-preview.png", "marble-v1.4.4-top.png", "marble-v1.4.4-f-cu.svg", "workspace-3d.png", "layout-selection.png", "report-preview.png", "external-solver-center.png", "solver-extension-manager.png", "solver-manager-selection.png"];
           return allowed.includes(filename) ? <figure key={index}><a href={`/help/${filename}`} target="_blank" rel="noreferrer"><img loading="lazy" src={`/help/${filename}`} alt={label} /></a><figcaption>{label} · Select to enlarge</figcaption></figure> : <span key={index}>{label} (see source artifact: {href})</span>;
@@ -35,6 +48,7 @@ export default function HelpMarkdown({ text, source, navigate, hasTopic }: Props
   for (let i = 0; i < lines.length;) {
     const line = lines[i];
     if (!line.trim()) { i++; continue; }
+    if (/^\s*<!--.*-->\s*$/.test(line)) { i++; continue; }
     if (/^```/.test(line)) {
       const code: string[] = []; i++;
       while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]);

@@ -75,3 +75,27 @@ Yes. Topics, controls, CLI help, diagnostics and shipped evidence are bundled wi
 ## How do I navigate help quickly?
 
 Use search for a symptom, button label, command or full diagnostic code. Select a category to narrow the results. Use Back/Forward for article history, bookmark useful pages, and use the article contents links for long references. Ctrl+F focuses help search, Escape closes help, and Tab moves through controls. Copy link produces an internal help address that can be pasted into help search. Screenshots can be enlarged. Use Print for the current article.
+
+## Where did the ribbon and familiar workspace tabs go?
+
+Clean is the default interface. It keeps the command ribbon and optional quick-tools bar hidden until requested. Use **Workspaces: ...** to change workspaces, **Menu** for categorized commands, or **Search commands, parts, nets...** (Ctrl+K) for global search. Choose **Classic** from the interface selector or **Settings > Interface > Interface layout** to restore the menu bar, workspace tabs and ribbon. The layout change retains project and solver inputs.
+
+## How do I restore a tool that I hid or minimized?
+
+Use the eye-shaped **Show hidden tools** control. The same tools are available under **Menu > Tools > Open panels** or **Windows & tools**. Editors may also be open as document tabs beside **Board & results**. A hidden panel or inactive document tab retains its draft; it has not been applied merely because it remains open.
+
+## Can the workspace and viewport use different colors?
+
+Yes. **Settings > Interface > Theme** controls the application chrome: Graphite + Teal, Light + Teal, High contrast or Follow system. **Viewport background** independently selects Graphite, Light or AMOLED true black. These settings change presentation only and do not change result values.
+
+## Which analysis workflow should I start with?
+
+Search Help for **Analysis workflows and evidence**. It links the authored PI, SI, EM, Thermal, hybrid/multi-solve, CHT, CFD and multi-board workflows. Each topic states prerequisites, returned outputs, diagnostics, convergence or conservation checks and current model limits. The analysis gallery distinguishes workflow diagrams, observed browser screenshots and plots from executed results.
+
+## Does a prepared CHT or CFD case prove that the solver ran?
+
+No. Runtime discovery, preflight, case preparation, execution and result admission are separate states. Interpret only worker-imported output with the matching run identity, solver/version provenance, fields, residuals and limitations. The compact thermal Screen action is an RC estimate, not CFD. Current native/SU2 cavity and SU2 CHT evidence is bounded reference-case evidence rather than general assembly, turbulence or production qualification.
+
+## Is multi-solve the same as a distributed coupled solve?
+
+No. Parallel workers schedule independent bounded jobs under concurrency and resource limits. They do not provide single-solve MPI or automatically couple physics. A hybrid study must explicitly map quantities between domains, preserve geometry and revision identity, and pass each domain's residual plus the declared coupling and energy-balance checks.

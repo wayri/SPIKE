@@ -1,0 +1,1191 @@
+{
+  "contract": "spike/pi-finite-contact-benchmark/v1",
+  "production_qualified": false,
+  "fixed": {
+    "length_mm": 2.0,
+    "width_mm": 1.0,
+    "contact_length_mm": 0.5,
+    "thickness_mm": 0.035,
+    "current_a": 1.0,
+    "contact_ids": [
+      "source",
+      "load"
+    ],
+    "contact_areas_mm2": [
+      0.5,
+      0.5
+    ],
+    "contact_model": "uniform finite-area current injection; area-average potential"
+  },
+  "limits": {
+    "resistance_relative": 0.002,
+    "density_relative": 0.02,
+    "volume_absolute_mm3": 1e-10,
+    "kcl_absolute_a": 1e-08,
+    "residual_relative": 1e-07,
+    "energy_relative": 1e-07
+  },
+  "cases": [
+    {
+      "fixture": {
+        "id": "base",
+        "angle_rad": 0.0,
+        "conductivity_s_m": 58000000.0,
+        "inactive_area_mm2": 0.0
+      },
+      "reference": {
+        "resistance_ohm": 0.0006568144499178982,
+        "dissipation_w": 0.0006568144499178982,
+        "p95_a_mm2": 28.57142857142857,
+        "p99_a_mm2": 28.57142857142857,
+        "volume_mm3": 0.07,
+        "inactive_volume_mm3": 0.0
+      },
+      "levels": [
+        {
+          "target_mm": 0.5,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571428314,
+                "upper_a_mm2": 28.571428571428367,
+                "enclosure_width_a_mm2": 5.3290705182007514e-14,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 44,
+                "quadrature_subcell_count": 56,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571428314,
+                "upper_a_mm2": 28.571428571428367,
+                "enclosure_width_a_mm2": 5.3290705182007514e-14,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 44,
+                "quadrature_subcell_count": 2252,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0006664357553366028,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.00066643575533661,
+            "dissipation_w_at_one_ampere": 0.0006664357553366021,
+            "maximum_cell_kcl_error_a": 2.6645352591003757e-15,
+            "maximum_face_kcl_error_a": 1.1043249648068354e-14,
+            "relative_residual": 1.9275842530059827e-14,
+            "relative_energy_error": 1.1876127287238e-14,
+            "triangle_count": 44,
+            "global_unknown_count": 71,
+            "uncondensed_global_unknown_count": 71,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 72,
+            "uncondensed_global_trace_count": 72,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 327,
+            "factor_nonzeros": 638,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.25,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.57142857142724,
+                "upper_a_mm2": 28.571428571427454,
+                "enclosure_width_a_mm2": 2.1316282072803006e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 176,
+                "quadrature_subcell_count": 176,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571427344,
+                "upper_a_mm2": 28.571428571427724,
+                "enclosure_width_a_mm2": 3.801403636316536e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 176,
+                "quadrature_subcell_count": 440,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0006592197762725011,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006592197762725395,
+            "dissipation_w_at_one_ampere": 0.0006592197762725013,
+            "maximum_cell_kcl_error_a": 1.7763568394002505e-15,
+            "maximum_face_kcl_error_a": 6.452737649764728e-14,
+            "relative_residual": 9.550402485086448e-14,
+            "relative_energy_error": 5.78925539632351e-14,
+            "triangle_count": 176,
+            "global_unknown_count": 275,
+            "uncondensed_global_unknown_count": 275,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 276,
+            "uncondensed_global_trace_count": 276,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 1323,
+            "factor_nonzeros": 3918,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.125,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571424796,
+                "upper_a_mm2": 28.571428571425116,
+                "enclosure_width_a_mm2": 3.197442310920451e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 704,
+                "quadrature_subcell_count": 704,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571425116,
+                "upper_a_mm2": 28.571428571425727,
+                "enclosure_width_a_mm2": 6.110667527536862e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 704,
+                "quadrature_subcell_count": 896,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0006574157815063411,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006574157815064546,
+            "dissipation_w_at_one_ampere": 0.0006574157815063436,
+            "maximum_cell_kcl_error_a": 2.6645352591003757e-15,
+            "maximum_face_kcl_error_a": 1.9403272391582682e-13,
+            "relative_residual": 4.3000798152293345e-13,
+            "relative_energy_error": 1.6871192533758508e-13,
+            "triangle_count": 704,
+            "global_unknown_count": 1079,
+            "uncondensed_global_unknown_count": 1079,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 1080,
+            "uncondensed_global_trace_count": 1080,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 5295,
+            "factor_nonzeros": 22558,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "errors": [
+          {
+            "target_mm": 0.5,
+            "resistance_relative": 0.014648437499988676,
+            "heat_relative": 0.014648437499977796,
+            "p95_relative": 8.992806499463768e-15,
+            "p99_relative": 8.992806499463768e-15
+          },
+          {
+            "target_mm": 0.25,
+            "resistance_relative": 0.0036621093749413802,
+            "heat_relative": 0.0036621093748829825,
+            "p95_relative": 4.651834473179406e-14,
+            "p99_relative": 4.285460875053104e-14
+          },
+          {
+            "target_mm": 0.125,
+            "resistance_relative": 0.0009155273435770273,
+            "heat_relative": 0.0009155273434042766,
+            "p95_relative": 1.3200551762793111e-13,
+            "p99_relative": 1.2090328738167955e-13
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "rotated",
+        "angle_rad": 0.61,
+        "conductivity_s_m": 58000000.0,
+        "inactive_area_mm2": 0.0
+      },
+      "reference": {
+        "resistance_ohm": 0.0006568144499178982,
+        "dissipation_w": 0.0006568144499178982,
+        "p95_a_mm2": 28.57142857142857,
+        "p99_a_mm2": 28.57142857142857,
+        "volume_mm3": 0.07,
+        "inactive_volume_mm3": 0.0
+      },
+      "levels": [
+        {
+          "target_mm": 0.5,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.57142857142863,
+                "upper_a_mm2": 28.571428571428704,
+                "enclosure_width_a_mm2": 7.460698725481052e-14,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 44,
+                "quadrature_subcell_count": 56,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571428676,
+                "upper_a_mm2": 28.571428571428704,
+                "enclosure_width_a_mm2": 2.842170943040401e-14,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 44,
+                "quadrature_subcell_count": 2252,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0006664357553366185,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006664357553366181,
+            "dissipation_w_at_one_ampere": 0.0006664357553366188,
+            "maximum_cell_kcl_error_a": 2.706168622523819e-15,
+            "maximum_face_kcl_error_a": 2.067790383364354e-15,
+            "relative_residual": 2.0648256741640916e-14,
+            "relative_energy_error": 1.1388067261734932e-15,
+            "triangle_count": 44,
+            "global_unknown_count": 71,
+            "uncondensed_global_unknown_count": 71,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 72,
+            "uncondensed_global_trace_count": 72,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 327,
+            "factor_nonzeros": 636,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.25,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571429582,
+                "upper_a_mm2": 28.571428571429763,
+                "enclosure_width_a_mm2": 1.8118839761882555e-13,
+                "physical_volume_mm3": 0.07,
+                "original_triangle_count": 176,
+                "quadrature_subcell_count": 176,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571429763,
+                "upper_a_mm2": 28.571428571429863,
+                "enclosure_width_a_mm2": 9.947598300641403e-14,
+                "physical_volume_mm3": 0.07,
+                "original_triangle_count": 176,
+                "quadrature_subcell_count": 440,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0006592197762726206,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006592197762725993,
+            "dissipation_w_at_one_ampere": 0.000659219776272621,
+            "maximum_cell_kcl_error_a": 1.8214596497756474e-15,
+            "maximum_face_kcl_error_a": 3.278974314291361e-14,
+            "relative_residual": 1.0586710505823109e-13,
+            "relative_energy_error": 3.289349657001695e-14,
+            "triangle_count": 176,
+            "global_unknown_count": 275,
+            "uncondensed_global_unknown_count": 275,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 276,
+            "uncondensed_global_trace_count": 276,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 1323,
+            "factor_nonzeros": 3911,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.125,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571428125,
+                "upper_a_mm2": 28.571428571428342,
+                "enclosure_width_a_mm2": 2.1671553440683056e-13,
+                "physical_volume_mm3": 0.07,
+                "original_triangle_count": 704,
+                "quadrature_subcell_count": 704,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571428324,
+                "upper_a_mm2": 28.571428571428743,
+                "enclosure_width_a_mm2": 4.192202140984591e-13,
+                "physical_volume_mm3": 0.07,
+                "original_triangle_count": 704,
+                "quadrature_subcell_count": 896,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0006574157815065368,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006574157815065526,
+            "dissipation_w_at_one_ampere": 0.0006574157815065392,
+            "maximum_cell_kcl_error_a": 2.6680047060523293e-15,
+            "maximum_face_kcl_error_a": 2.9694129100032995e-14,
+            "relative_residual": 4.0852162959206065e-13,
+            "relative_energy_error": 2.0285011550850315e-14,
+            "triangle_count": 704,
+            "global_unknown_count": 1079,
+            "uncondensed_global_unknown_count": 1079,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 1080,
+            "uncondensed_global_trace_count": 1080,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 5295,
+            "factor_nonzeros": 22532,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "errors": [
+          {
+            "target_mm": 0.5,
+            "resistance_relative": 0.014648437500000888,
+            "heat_relative": 0.014648437500001554,
+            "p95_relative": 4.6629367034256575e-15,
+            "p99_relative": 4.6629367034256575e-15
+          },
+          {
+            "target_mm": 0.25,
+            "resistance_relative": 0.0036621093750324185,
+            "heat_relative": 0.003662109375064837,
+            "p95_relative": 4.1744385725905886e-14,
+            "p99_relative": 4.529709940470639e-14
+          },
+          {
+            "target_mm": 0.125,
+            "resistance_relative": 0.0009155273437262412,
+            "heat_relative": 0.0009155273437022604,
+            "p95_relative": 1.554312234475219e-14,
+            "p99_relative": 8.548717289613705e-15
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "double_conductivity",
+        "angle_rad": 0.0,
+        "conductivity_s_m": 116000000.0,
+        "inactive_area_mm2": 0.0
+      },
+      "reference": {
+        "resistance_ohm": 0.0003284072249589491,
+        "dissipation_w": 0.0003284072249589491,
+        "p95_a_mm2": 28.57142857142857,
+        "p99_a_mm2": 28.57142857142857,
+        "volume_mm3": 0.07,
+        "inactive_volume_mm3": 0.0
+      },
+      "levels": [
+        {
+          "target_mm": 0.5,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571428314,
+                "upper_a_mm2": 28.571428571428367,
+                "enclosure_width_a_mm2": 5.3290705182007514e-14,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 44,
+                "quadrature_subcell_count": 56,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571428314,
+                "upper_a_mm2": 28.571428571428367,
+                "enclosure_width_a_mm2": 5.3290705182007514e-14,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 44,
+                "quadrature_subcell_count": 2252,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0003332178776683014,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.000333217877668305,
+            "dissipation_w_at_one_ampere": 0.00033321787766830106,
+            "maximum_cell_kcl_error_a": 2.6645352591003757e-15,
+            "maximum_face_kcl_error_a": 1.1043249648068354e-14,
+            "relative_residual": 1.9275842530059827e-14,
+            "relative_energy_error": 1.1876127287238e-14,
+            "triangle_count": 44,
+            "global_unknown_count": 71,
+            "uncondensed_global_unknown_count": 71,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 72,
+            "uncondensed_global_trace_count": 72,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 327,
+            "factor_nonzeros": 638,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.25,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.57142857142724,
+                "upper_a_mm2": 28.571428571427454,
+                "enclosure_width_a_mm2": 2.1316282072803006e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 176,
+                "quadrature_subcell_count": 176,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571427344,
+                "upper_a_mm2": 28.571428571427724,
+                "enclosure_width_a_mm2": 3.801403636316536e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 176,
+                "quadrature_subcell_count": 440,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.00032960988813625055,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.00032960988813626974,
+            "dissipation_w_at_one_ampere": 0.00032960988813625065,
+            "maximum_cell_kcl_error_a": 1.7763568394002505e-15,
+            "maximum_face_kcl_error_a": 6.452737649764728e-14,
+            "relative_residual": 9.550402485086448e-14,
+            "relative_energy_error": 5.78925539632351e-14,
+            "triangle_count": 176,
+            "global_unknown_count": 275,
+            "uncondensed_global_unknown_count": 275,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 276,
+            "uncondensed_global_trace_count": 276,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 1323,
+            "factor_nonzeros": 3918,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.125,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571424796,
+                "upper_a_mm2": 28.571428571425116,
+                "enclosure_width_a_mm2": 3.197442310920451e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 704,
+                "quadrature_subcell_count": 704,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571425116,
+                "upper_a_mm2": 28.571428571425727,
+                "enclosure_width_a_mm2": 6.110667527536862e-13,
+                "physical_volume_mm3": 0.07000000000000002,
+                "original_triangle_count": 704,
+                "quadrature_subcell_count": 896,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.07000000000000002,
+              "undriven_planar_volume_mm3": 0.0,
+              "planar_dissipation_w": 0.0003287078907531706,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0003287078907532273,
+            "dissipation_w_at_one_ampere": 0.0003287078907531718,
+            "maximum_cell_kcl_error_a": 2.6645352591003757e-15,
+            "maximum_face_kcl_error_a": 1.9403272391582682e-13,
+            "relative_residual": 4.3000798152293345e-13,
+            "relative_energy_error": 1.6871192533758508e-13,
+            "triangle_count": 704,
+            "global_unknown_count": 1079,
+            "uncondensed_global_unknown_count": 1079,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 1080,
+            "uncondensed_global_trace_count": 1080,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 5295,
+            "factor_nonzeros": 22558,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "errors": [
+          {
+            "target_mm": 0.5,
+            "resistance_relative": 0.014648437499988676,
+            "heat_relative": 0.014648437499977796,
+            "p95_relative": 8.992806499463768e-15,
+            "p99_relative": 8.992806499463768e-15
+          },
+          {
+            "target_mm": 0.25,
+            "resistance_relative": 0.0036621093749413802,
+            "heat_relative": 0.0036621093748829825,
+            "p95_relative": 4.651834473179406e-14,
+            "p99_relative": 4.285460875053104e-14
+          },
+          {
+            "target_mm": 0.125,
+            "resistance_relative": 0.0009155273435770273,
+            "heat_relative": 0.0009155273434042766,
+            "p95_relative": 1.3200551762793111e-13,
+            "p99_relative": 1.2090328738167955e-13
+          }
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "id": "inactive_island",
+        "angle_rad": 0.0,
+        "conductivity_s_m": 58000000.0,
+        "inactive_area_mm2": 0.5
+      },
+      "reference": {
+        "resistance_ohm": 0.0006568144499178982,
+        "dissipation_w": 0.0006568144499178982,
+        "p95_a_mm2": 28.57142857142857,
+        "p99_a_mm2": 28.57142857142857,
+        "volume_mm3": 0.08750000000000001,
+        "inactive_volume_mm3": 0.0175
+      },
+      "levels": [
+        {
+          "target_mm": 0.5,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.5714285714284,
+                "upper_a_mm2": 28.571428571428466,
+                "enclosure_width_a_mm2": 6.750155989720952e-14,
+                "physical_volume_mm3": 0.08750000000000002,
+                "original_triangle_count": 58,
+                "quadrature_subcell_count": 58,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571428417,
+                "upper_a_mm2": 28.571428571428466,
+                "enclosure_width_a_mm2": 4.973799150320701e-14,
+                "physical_volume_mm3": 0.08750000000000002,
+                "original_triangle_count": 58,
+                "quadrature_subcell_count": 958,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.08750000000000002,
+              "undriven_planar_volume_mm3": 0.017500000000000005,
+              "planar_dissipation_w": 0.0006664357553366078,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006664357553366126,
+            "dissipation_w_at_one_ampere": 0.000666435755336608,
+            "maximum_cell_kcl_error_a": 2.220446049250313e-15,
+            "maximum_face_kcl_error_a": 5.547645676173829e-15,
+            "relative_residual": 1.5727024255287066e-14,
+            "relative_energy_error": 6.9955270322086575e-15,
+            "triangle_count": 44,
+            "global_unknown_count": 71,
+            "uncondensed_global_unknown_count": 71,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 72,
+            "uncondensed_global_trace_count": 72,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 327,
+            "factor_nonzeros": 638,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.25,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.571428571427173,
+                "upper_a_mm2": 28.57142857142735,
+                "enclosure_width_a_mm2": 1.7763568394002505e-13,
+                "physical_volume_mm3": 0.08750000000000004,
+                "original_triangle_count": 232,
+                "quadrature_subcell_count": 232,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571427344,
+                "upper_a_mm2": 28.571428571427724,
+                "enclosure_width_a_mm2": 3.801403636316536e-13,
+                "physical_volume_mm3": 0.08750000000000004,
+                "original_triangle_count": 232,
+                "quadrature_subcell_count": 496,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.08750000000000004,
+              "undriven_planar_volume_mm3": 0.0175,
+              "planar_dissipation_w": 0.0006592197762725009,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006592197762725395,
+            "dissipation_w_at_one_ampere": 0.0006592197762725013,
+            "maximum_cell_kcl_error_a": 1.7763568394002505e-15,
+            "maximum_face_kcl_error_a": 6.452737649764728e-14,
+            "relative_residual": 9.550402485086448e-14,
+            "relative_energy_error": 5.78925539632351e-14,
+            "triangle_count": 176,
+            "global_unknown_count": 275,
+            "uncondensed_global_unknown_count": 275,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 276,
+            "uncondensed_global_trace_count": 276,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 1323,
+            "factor_nonzeros": 3918,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        },
+        {
+          "target_mm": 0.125,
+          "contacts": [
+            {
+              "id": "source",
+              "node": 0,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            },
+            {
+              "id": "load",
+              "node": 1,
+              "layer": "F.Cu",
+              "net": "N",
+              "area_mm2": 0.5
+            }
+          ],
+          "result": {
+            "model_status": "experimental",
+            "production_qualified": false,
+            "current_density_observable": {
+              "method": "RT0_signed_flux_vector_unique_planar_volume",
+              "scope": "all represented planar copper, including undriven components",
+              "p95": {
+                "quantile": 0.95,
+                "lower_a_mm2": 28.5714285714247,
+                "upper_a_mm2": 28.57142857142506,
+                "enclosure_width_a_mm2": 3.588240815588506e-13,
+                "physical_volume_mm3": 0.08750000000000004,
+                "original_triangle_count": 928,
+                "quadrature_subcell_count": 928,
+                "converged": true
+              },
+              "p99": {
+                "quantile": 0.99,
+                "lower_a_mm2": 28.571428571425116,
+                "upper_a_mm2": 28.571428571425727,
+                "enclosure_width_a_mm2": 6.110667527536862e-13,
+                "physical_volume_mm3": 0.08750000000000004,
+                "original_triangle_count": 928,
+                "quadrature_subcell_count": 976,
+                "converged": true
+              },
+              "physical_planar_volume_mm3": 0.08750000000000004,
+              "undriven_planar_volume_mm3": 0.01750000000000001,
+              "planar_dissipation_w": 0.0006574157815063411,
+              "axial_barrel_count": 0,
+              "complete_physical_volume": false,
+              "complete_planar_polygon_partition": true,
+              "axial_support_status": "not_present",
+              "qualification": "experimental; not the production branch p95 replacement"
+            },
+            "method": "conforming_triangle_RT0_hybridized_DC",
+            "contact_model": "uniform finite-area current injection; area-average potential",
+            "resistance_ohm": 0.0006574157815064546,
+            "dissipation_w_at_one_ampere": 0.0006574157815063436,
+            "maximum_cell_kcl_error_a": 2.6645352591003757e-15,
+            "maximum_face_kcl_error_a": 1.9403272391582682e-13,
+            "relative_residual": 4.3000798152293345e-13,
+            "relative_energy_error": 1.6871192533758508e-13,
+            "triangle_count": 704,
+            "global_unknown_count": 1079,
+            "uncondensed_global_unknown_count": 1079,
+            "eliminated_spoke_trace_count": 0,
+            "rectangle_spoke_condensation": false,
+            "global_trace_count": 1080,
+            "uncondensed_global_trace_count": 1080,
+            "via_current_unknown_count": 0,
+            "system_nonzeros": 5295,
+            "factor_nonzeros": 22558,
+            "local_triangle_budget": 20000,
+            "global_unknown_budget": 50000,
+            "geometry_snap_tolerance_mm": 5e-13,
+            "limitations": [
+              "DC only; no PEEC L/C or field qualification",
+              "finite-area distributed contacts and uniform axial via current",
+              "boundary copper omission and contact model need separate convergence",
+              "sparse LU fill and runtime are not tightly bounded"
+            ]
+          }
+        }
+      ],
+      "assessment": {
+        "status": "passed",
+        "errors": [
+          {
+            "target_mm": 0.5,
+            "resistance_relative": 0.014648437499992673,
+            "heat_relative": 0.014648437499985345,
+            "p95_relative": 5.995204332975845e-15,
+            "p99_relative": 5.329070518200751e-15
+          },
+          {
+            "target_mm": 0.25,
+            "resistance_relative": 0.0036621093749413802,
+            "heat_relative": 0.0036621093748825384,
+            "p95_relative": 4.884981308350689e-14,
+            "p99_relative": 4.285460875053104e-14
+          },
+          {
+            "target_mm": 0.125,
+            "resistance_relative": 0.0009155273435770273,
+            "heat_relative": 0.0009155273434042766,
+            "p95_relative": 1.354472090042691e-13,
+            "p99_relative": 1.2090328738167955e-13
+          }
+        ]
+      }
+    }
+  ],
+  "status": "passed"
+}

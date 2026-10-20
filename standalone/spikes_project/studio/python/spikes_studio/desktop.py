@@ -345,7 +345,7 @@ class SchematicCanvas(wx.Panel):
             if self.wire_start is not None:
                 self.wire_start=None;self.wire_corners=[];self.wire_hover=None;self.wire_target=None;self.wire_status_key=None;self.Refresh()
                 self.owner.SetStatusText('Wire segment cancelled. Click a terminal to start another; Escape exits Wire.');return
-            self.wire_mode=False;self.wire_target=None;self.SetCursor(wx.NullCursor);self.owner.SetStatusText('Wire tool closed');return
+            self.close_wire();return
         if event.GetKeyCode()==wx.WXK_BACK and self.wire_mode and self.wire_start is not None:
             self.backtrack_wire();return
         if event.GetKeyCode()==wx.WXK_ESCAPE and self.owner.pending_library_placement:
@@ -357,17 +357,44 @@ class SchematicCanvas(wx.Panel):
 
     def visible_parts(self):
         from .hierarchy_views import members
-        return members(self.owner.doc.data['components'],getattr(self,'sheet_scope',None))
+        scope=getattr(self,'sheet_scope',None)
+        parts=members(self.owner.doc.data['components'],scope)
+        if scope:return parts
+        hidden={ident for block in self.reusable_blocks() for ident in block['member_ids']}
+        return [part for part in parts if part['id'] not in hidden]
+
+    def reusable_blocks(self):
+        if getattr(self,'sheet_scope',None):return []
+        from .reusable_block_projection import projection_report
+        key=(self.owner.doc.data['id'],self.owner.doc.data['revision'])
+        if getattr(self,'_reusable_block_cache_key',None)!=key:
+            self._reusable_block_cache_key=key
+            report=projection_report(self.owner.doc.data)
+            self._reusable_block_cache=report['blocks'];self.projection_diagnostics=report['diagnostics']
+        return self._reusable_block_cache
+
+    def display_route(self,wire,parts=None,junctions=None,blocks=None):
+        from .reusable_block_projection import pin_overrides,projected_route
+        parts=parts or {part['id']:part for part in self.owner.doc.data['components']}
+        junctions=junctions or {item['id']:item for item in self.owner.doc.data['junctions']}
+        return projected_route(parts,wire,junctions,pin_overrides(blocks if blocks is not None else self.reusable_blocks()))
 
     def visible_wires(self):
-        if not getattr(self,'sheet_scope',None):return self.owner.doc.data['wires']
+        scope=getattr(self,'sheet_scope',None)
         ids={p['id'] for p in self.visible_parts()};junctions={j['id']:j for j in self.owner.doc.data['junctions']}
+        public=set()
+        blocks=[]
+        if not scope:
+            blocks=self.reusable_blocks()
+            public={tuple(endpoint) for block in blocks for aliases in block['pin_aliases'] for endpoint in aliases}
         def visible(end):
             if not isinstance(end,(list,tuple)) or not end:return False
-            if len(end)==2:return end[0] in ids
+            if len(end)==2:return end[0] in ids or tuple(end) in public
             junction=junctions.get(end[0]);source=junction.get('source_terminal',()) if junction else ()
-            return bool(source and source[0] in ids)
-        return [w for w in self.owner.doc.data['wires'] if visible(w['a']) and visible(w['b'])]
+            return bool(source and (source[0] in ids or tuple(source) in public))
+        if scope:return [w for w in self.owner.doc.data['wires'] if visible(w['a']) and visible(w['b'])]
+        from .reusable_block_projection import internal_block_wire
+        return [w for w in self.owner.doc.data['wires'] if visible(w['a']) and visible(w['b']) and not internal_block_wire(w,blocks,junctions)]
 
     def wire_snap_target(self,position):
         """Resolve the exact UI target used for wire preview and the next click."""
@@ -382,6 +409,13 @@ class SchematicCanvas(wx.Panel):
                 world=terminal(part,pin.index);screen=self.point(*world)
                 candidates.append((np.hypot(position.x-screen.x,position.y-screen.y),
                                    (part['id'],pin.index),world,part,pin))
+        from .editor_geometry import transform
+        for block in self.reusable_blocks():
+            for pin,endpoint in zip(component_pins(block),block['pin_bindings']):
+                if endpoint is None:continue
+                world=transform(block,*pin.anchor);screen=self.point(*world)
+                candidates.append((np.hypot(position.x-screen.x,position.y-screen.y),
+                                   tuple(endpoint),world,block,pin))
         for junction in junctions.values():
             source=junction.get('source_terminal',())
             if getattr(self,'sheet_scope',None) and (not source or source[0] not in visible_ids):continue
@@ -397,16 +431,20 @@ class SchematicCanvas(wx.Panel):
             return dict(kind='terminal',endpoint=endpoint,world=world,label=label)
         if self.wire_start is not None:
             world=self.world(position)
-            for wire in reversed(self.visible_wires()):
+            branch_candidates=[]
+            for priority,wire in enumerate(reversed(self.visible_wires())):
                 try:
-                    point,segment,distance=nearest_route_point(route(parts,wire,junctions),world)
+                    point,segment,distance=nearest_route_point(self.display_route(wire,parts,junctions),world)
                     endpoint=wire['a']
                     if len(endpoint)==2:node=parts[endpoint[0]]['nodes'][endpoint[1]]
                     else:node=junctions[endpoint[0]]['source_node']
                 except (KeyError,IndexError,TypeError,ValueError):
                     continue
                 if distance<=12/self.zoom:
-                    return dict(kind='branch',wire_id=wire['id'],world=point,label=node+' · existing wire route')
+                    branch_candidates.append((distance,priority,wire['id'],point,node))
+            if branch_candidates:
+                _,_,wire_id,point,node=min(branch_candidates,key=lambda row:(row[0],row[1]))
+                return dict(kind='branch',wire_id=wire_id,world=point,label=node+' · existing wire route')
             point=snap(world)
             return dict(kind='corner',world=point,label=f'grid {point[0]:g}, {point[1]:g}')
         return None
@@ -430,6 +468,25 @@ class SchematicCanvas(wx.Panel):
             message='Wire segment cancelled; Wire remains active'
         self.wire_status_key=None;self.Refresh();self.owner.SetStatusText(message)
         return True
+
+    def close_wire(self):
+        """Close Wire and immediately reconcile its canvas and toolbar state."""
+        self.wire_mode=False;self.wire_start=None;self.wire_corners=[]
+        self.wire_hover=None;self.wire_target=None;self.wire_status_key=None
+        self.SetCursor(wx.NullCursor);self.Refresh();self.owner.SetStatusText('Wire tool closed')
+        self.owner.context_tools()
+
+    def update_wire_target(self,position):
+        """Re-resolve transient feedback after pointer or viewport movement."""
+        target=self.wire_snap_target(position);self.wire_target=target
+        if self.wire_start is not None:
+            self.wire_hover=target['endpoint'] if target and target['kind']=='terminal' else None
+            self.wire_tip=list(target['world']) if target else list(self.world(position))
+        key=(self.wire_bend,bool(self.wire_start),len(self.wire_corners),
+             target['kind'] if target else None,target['label'] if target else None)
+        if key!=self.wire_status_key:
+            self.wire_status_key=key;self.owner.SetStatusText(self.wire_target_status(target))
+        return target
 
     @staticmethod
     def _fit_canvas_text(dc,text,max_width):
@@ -469,6 +526,9 @@ class SchematicCanvas(wx.Panel):
             from .net_labels import show
             self.owner.guarded(lambda:show(self.owner,None,label['id']));return
         part=next((part for rect,part in reversed(self.hits) if rect.Contains(event.GetPosition())),None)
+        if part and part.get('_reusable_block'):
+            from .hierarchy_views import open_sheet
+            self.owner.guarded(lambda:open_sheet(self.owner,part['ref']));return
         if part and enter(self.owner,part['ref']):return
         annotation=next((item for rect,item in self.annotation_hits if rect.Contains(event.GetPosition())),None)
         if annotation:self.owner.guarded(lambda:self.owner.edit_canvas_annotation(annotation));return
@@ -479,9 +539,9 @@ class SchematicCanvas(wx.Panel):
             self.owner.guarded(self.owner.manage_instruments)
         elif part:self.owner.guarded(self.owner.properties)
         else:
-            from .editor_geometry import nearest_route_point,route
+            from .editor_geometry import nearest_route_point
             parts={p['id']:p for p in self.owner.doc.data['components']};junctions={j['id']:j for j in self.owner.doc.data['junctions']}
-            if any(nearest_route_point(route(parts,w,junctions),self.world(event.GetPosition()))[2]<=10/self.zoom for w in self.visible_wires()):return
+            if any(nearest_route_point(self.display_route(w,parts,junctions),self.world(event.GetPosition()))[2]<=10/self.zoom for w in self.visible_wires()):return
             from .quick_insert_popup import show
             self.owner.guarded(lambda:show(self.owner,self.world(event.GetPosition()),self.ClientToScreen(event.GetPosition())))
 
@@ -508,6 +568,9 @@ class SchematicCanvas(wx.Panel):
         original={part['id']:part for part in self.owner.doc.data['components']}
         junctions={item['id']:item for item in self.owner.doc.data['junctions']}
         positions={part['id']:dict(part,x=part['x']+(self.move_delta[0] if part['id'] in self.move_positions else 0),y=part['y']+(self.move_delta[1] if part['id'] in self.move_positions else 0)) for part in self.owner.doc.data['components']}
+        blocks=[dict(block,x=block['x']+(self.move_delta[0] if block['id'] in self.move_positions else 0),
+                     y=block['y']+(self.move_delta[1] if block['id'] in self.move_positions else 0))
+                for block in self.reusable_blocks()]
         moving_deltas={ident:tuple(self.move_delta) for ident in self.move_positions}
         labelled_terminals={tuple(v['terminal']) for v in self.owner.doc.data.get('labels',[]) if not v.get('wire_id')}
         visible_ids={p['id'] for p in self.visible_parts()}
@@ -524,11 +587,11 @@ class SchematicCanvas(wx.Panel):
             dc.SetPen(wx.Pen(net_color(node),4 if node.casefold() in referenced else 2))
             display=wire
             if getattr(self,'moving_wire',None)==wire['id']:
-                display=dict(wire,waypoints=[[x+float(self.move_delta[0]),y+float(self.move_delta[1])] for x,y in route(positions,wire,junctions)])
+                display=dict(wire,waypoints=[[x+float(self.move_delta[0]),y+float(self.move_delta[1])] for x,y in self.display_route(wire,positions,junctions,blocks)])
             elif moving_deltas and (wire['a'][0] in moving_deltas or wire['b'][0] in moving_deltas):
                 waypoints=[] if self.keyboard_move_mode=='move' else dragged_waypoints(original,wire,moving_deltas,junctions)
                 display=dict(wire,waypoints=waypoints)
-            points=route(positions,display,junctions);visual_routes.append(dict(id=wire['id'],node=node,points=points,draw_order=wire.get('draw_order',len(visual_routes))))
+            points=self.display_route(display,positions,junctions,blocks);visual_routes.append(dict(id=wire['id'],node=node,points=points,draw_order=wire.get('draw_order',len(visual_routes))))
             dc.DrawLines([self.point(*at) for at in points])
         from .wire_visuals import paint_markers
         try:
@@ -536,9 +599,12 @@ class SchematicCanvas(wx.Panel):
             self.auto_junctions=paint_markers(self,dc,visual_routes,colors,net_color,referenced,self.owner.doc.data['metadata'].get('wire_hops',False),cache_key)
         except ValueError as error:self.owner.SetStatusText(str(error));self.auto_junctions=[]
         if self.wire_mode and self.wire_start:
-            from .editor_geometry import endpoint_position,wire_preview
-            start=endpoint_position(positions,junctions,self.wire_start)
-            points=wire_preview(positions,self.wire_start,self.wire_corners,getattr(self,'wire_tip',start),self.wire_bend,self.wire_hover,junctions)
+            from .editor_geometry import endpoint_position,orthogonal_path
+            from .reusable_block_projection import pin_overrides
+            overrides=pin_overrides(blocks);start=overrides.get(tuple(self.wire_start),endpoint_position(positions,junctions,self.wire_start))
+            tip=getattr(self,'wire_tip',start)
+            if self.wire_hover is not None:tip=overrides.get(tuple(self.wire_hover),endpoint_position(positions,junctions,self.wire_hover))
+            points=orthogonal_path(start,[*self.wire_corners,tip],self.wire_bend)
             dc.SetPen(wx.Pen(colors['accent'],2,wx.PENSTYLE_SHORT_DASH))
             if len(points)>1:dc.DrawLines([self.point(*at) for at in points])
         if self.fragment_plan is not None and self.fragment_anchor is not None:
@@ -565,8 +631,8 @@ class SchematicCanvas(wx.Panel):
                     dc.SetTextForeground(colors['accent'])
                     dc.DrawText((pin.label+': ' if len(part['nodes'])>2 else '')+node,position.x+8,position.y+8)
         self.wire_pins=[]
-        for part in self.visible_parts():
-            x, y = np.array([part["x"], part["y"]]) + (self.move_delta if part['id'] in self.move_positions else 0)
+        for part in [*blocks,*self.visible_parts()]:
+            x, y = np.array([part["x"], part["y"]]) + (self.move_delta if part['id'] in self.move_positions and not part.get('_reusable_block') else 0)
             geometry=dict(part,x=x,y=y)
             p = lambda a, b: self.point(*transform(geometry,a,b))
             lo,top,hi,bottom=pin_bounds(part)
@@ -581,7 +647,7 @@ class SchematicCanvas(wx.Panel):
             result_binding=self.owner.result_source or {}
             current_binding=(result_binding.get('id')==self.owner.doc.data['id'] and
                              result_binding.get('revision')==self.owner.doc.data['revision'])
-            findings=self.owner.part_alerts.get(part['id'],{}).get('findings',[]) if current_binding and self.owner.limit_indicators else []
+            findings=[] if part.get('_reusable_block') else self.owner.part_alerts.get(part['id'],{}).get('findings',[]) if current_binding and self.owner.limit_indicators else []
             indication=badge(findings)
             symbol_color=colors['danger'] if indication and indication['severity']=='exceeded' else colors['accent'] if indication else colors['fg']
             from .schematic_symbol_renderer import paint_body
@@ -596,16 +662,22 @@ class SchematicCanvas(wx.Panel):
                     dc.DrawCircle(p(55,-9),4);dc.DrawLine(p(55,-13),p(55,-30));dc.DrawLine(p(50,-30),p(60,-30))
                     dc.DrawText('T!',p(64,-25))
             dc.SetPen(wx.Pen(colors['accent'],2)); dc.SetBrush(wx.Brush(colors['canvas']))
+            bindings=part.get('pin_bindings')
             for pin,node in zip(component_pins(part),part['nodes']):
                 position=p(*pin.anchor)
-                dc.SetPen(wx.Pen(net_color(node),2))
-                self.wire_pins.append((position,part['id'],pin.index))
-                dc.DrawCircle(position,4); self.pins.append((position,node,part["id"]))
+                endpoint=bindings[pin.index] if bindings is not None else [part['id'],pin.index]
+                pin_color=colors['muted'] if endpoint is None else net_color(node);dc.SetPen(wx.Pen(pin_color,2))
+                if endpoint is not None:
+                    self.wire_pins.append((position,endpoint[0],endpoint[1]));self.pins.append((position,node,endpoint[0]))
+                dc.DrawCircle(position,4)
+                if endpoint is None:
+                    dc.DrawLine(position.x-4,position.y-4,position.x+4,position.y+4)
                 if node.casefold() in referenced:
                     dc.DrawCircle(position,8)
                 if (part['id'],pin.index) not in labelled_terminals:
-                    dc.DrawText((pin.label+': ' if len(part['nodes'])>2 else '')+node,position.x+8,position.y+8)
-            for probe in self.owner.doc.data["probes"]:
+                    suffix=' [unused]' if endpoint is None else ''
+                    dc.DrawText((pin.label+': ' if len(part['nodes'])>2 else '')+node+suffix,position.x+8,position.y+8)
+            for probe in self.owner.doc.data["probes"] if not part.get('_reusable_block') else []:
                 if probe.get("anchor") == part["id"]:
                     dc.SetTextForeground(colors['accent']); dc.DrawText(probe["expression"],p(-45,60))
         self.controller_hit=None
@@ -844,21 +916,23 @@ class SchematicCanvas(wx.Panel):
         for rect,part in reversed(self.hits):
             if rect.Contains(position):
                 if self.probe_mode in ("current", "power"):
+                    if part.get('_reusable_block'):
+                        self.owner.SetStatusText('Enter the reusable block and select a native primitive for current or power.');return
                     self.owner.doc.add_probe(f"{'I' if self.probe_mode=='current' else 'P'}({part['ref']})", part["id"])
                     self.probe_mode=None; self.owner.refresh_document(); return
                 if event.ControlDown():
                     self.selected.symmetric_difference_update({part["id"]})
                 else: self.selected = {part["id"]}
                 self.move_origin=self.world(position)
-                self.move_positions={p['id']:(p['x'],p['y']) for p in self.owner.doc.data['components'] if p['id'] in self.selected}
+                if part.get('_reusable_block'):self.move_positions={part['id']:(part['x'],part['y'])}
+                else:self.move_positions={p['id']:(p['x'],p['y']) for p in self.owner.doc.data['components'] if p['id'] in self.selected}
                 self.move_delta=np.zeros(2)
                 if self.move_positions and not self.HasCapture():self.CaptureMouse()
                 self.owner.refresh_inspector(); self.Refresh(); return
-        from .editor_geometry import route
         parts={p['id']:p for p in self.owner.doc.data['components']}
         junctions={j['id']:j for j in self.owner.doc.data['junctions']}
         for wire in reversed(self.visible_wires()):
-            points=[np.array(tuple(self.point(*p)),dtype=float) for p in route(parts,wire,junctions)]
+            points=[np.array(tuple(self.point(*p)),dtype=float) for p in self.display_route(wire,parts,junctions)]
             for a,b in zip(points,points[1:]):
                 delta=b-a;length=float(delta@delta)
                 closest=a+np.clip((np.array(tuple(position))-a)@delta/length,0,1)*delta if length else a
@@ -876,7 +950,8 @@ class SchematicCanvas(wx.Panel):
         if self.selection_path:
             from .editor_geometry import select_box,select_lasso
             end=self.world(event.GetPosition())
-            chosen=select_lasso(self.visible_parts(),[*self.selection_path,end]) if self.selection_tool=='lasso' else select_box(self.visible_parts(),self.selection_path[0],end)
+            selectable=[*self.visible_parts(),*self.reusable_blocks()]
+            chosen=select_lasso(selectable,[*self.selection_path,end]) if self.selection_tool=='lasso' else select_box(selectable,self.selection_path[0],end)
             self.selected=(self.selected|set(chosen)) if self.selection_add else set(chosen)
             self.selection_path=[]
             if self.HasCapture():self.ReleaseMouse()
@@ -898,7 +973,10 @@ class SchematicCanvas(wx.Panel):
                 self.owner.guarded(lambda:self.owner.doc.organize_directives([item['id']],x=float(item['x']+self.move_delta[0]),y=float(item['y']+self.move_delta[1])))
             else:
                 positions={ident:np.array(at)+self.move_delta for ident,at in self.move_positions.items()}
-                self.owner.guarded(lambda:self.owner.doc.move(positions,preserve_routes=True))
+                if any(ident.startswith('component-instance:') for ident in positions):
+                    from .reusable_block_projection import move_selected
+                    self.owner.guarded(lambda:move_selected(self.owner.doc,set(positions),self.move_delta,preserve_routes=True))
+                else:self.owner.guarded(lambda:self.owner.doc.move(positions,preserve_routes=True))
         self.capture_lost()
         if self.HasCapture():self.ReleaseMouse()
         self.owner.refresh_document()
@@ -914,7 +992,9 @@ class SchematicCanvas(wx.Panel):
         if mode not in ('move','drag'):raise ValueError('Unknown move mode')
         if not self.selected:raise ValueError('Select components first')
         self.wire_mode=False;self.wire_start=None;self.wire_corners=[];self.wire_hover=None
-        self.move_positions={p['id']:(p['x'],p['y']) for p in self.owner.doc.data['components'] if p['id'] in self.selected}
+        native={p['id']:(p['x'],p['y']) for p in self.owner.doc.data['components'] if p['id'] in self.selected}
+        blocks={p['id']:(p['x'],p['y']) for p in self.reusable_blocks() if p['id'] in self.selected}
+        self.move_positions=native|blocks
         point=self.ScreenToClient(wx.GetMousePosition())
         self.move_origin=self.world(point) if self.GetClientRect().Contains(point) else np.mean(list(self.move_positions.values()),axis=0)
         self.move_delta=np.zeros(2);self.keyboard_move_mode=mode
@@ -933,13 +1013,18 @@ class SchematicCanvas(wx.Panel):
         self.keyboard_move_mode=None
         completed=True
         if changed:
-            completed=bool(self.owner.guarded(lambda:(self.owner.doc.move(positions,preserve_routes=mode=='drag'),True)[1]))
+            if any(ident.startswith('component-instance:') for ident in positions):
+                from .reusable_block_projection import move_selected
+                completed=bool(self.owner.guarded(lambda:(move_selected(self.owner.doc,set(positions),self.move_delta,preserve_routes=mode=='drag'),True)[1]))
+            else:completed=bool(self.owner.guarded(lambda:(self.owner.doc.move(positions,preserve_routes=mode=='drag'),True)[1]))
         self.capture_lost();self.SetCursor(wx.NullCursor);self.owner.refresh_document()
         if completed:self.owner.SetStatusText(f'{mode.title()} complete' if changed else f'{mode.title()} cancelled: position unchanged')
 
     def wheel(self,event):
         at=self.world(event.GetPosition()); self.zoom=max(.25,min(4,self.zoom*(1.2 if event.GetWheelRotation()>0 else 1/1.2)))
-        self.offset=np.array([event.GetX(),event.GetY()])-at*self.zoom; self.Refresh()
+        self.offset=np.array([event.GetX(),event.GetY()])-at*self.zoom
+        if self.wire_mode:self.update_wire_target(event.GetPosition())
+        self.Refresh()
 
     def pan_start(self,event): self.drag_start=event.GetPosition(); self.CaptureMouse()
     def pan_end(self,event):
@@ -957,12 +1042,7 @@ class SchematicCanvas(wx.Panel):
             self.plot_drop['preview']=list(self.world(event.GetPosition()));self.Refresh()
         if self.wire_mode:
             position=event.GetPosition()
-            target=self.wire_snap_target(position);self.wire_target=target
-            if self.wire_start:
-                self.wire_hover=target['endpoint'] if target and target['kind']=='terminal' else None
-                self.wire_tip=list(target['world']) if target else list(self.world(position))
-            key=(self.wire_bend,bool(self.wire_start),len(self.wire_corners),target['kind'] if target else None,target['label'] if target else None)
-            if key!=self.wire_status_key:self.wire_status_key=key;self.owner.SetStatusText(self.wire_target_status(target))
+            self.update_wire_target(position)
             self.Refresh()
         if self.selection_path and event.LeftIsDown():
             point=self.world(event.GetPosition())
@@ -974,7 +1054,9 @@ class SchematicCanvas(wx.Panel):
             from .editor_geometry import snap
             self.move_delta=np.array(snap(self.world(event.GetPosition())-self.move_origin));self.Refresh()
         elif self.drag_start is not None:
-            point=event.GetPosition(); self.offset+=np.array([point.x-self.drag_start.x,point.y-self.drag_start.y]); self.drag_start=point; self.Refresh()
+            point=event.GetPosition(); self.offset+=np.array([point.x-self.drag_start.x,point.y-self.drag_start.y]); self.drag_start=point
+            if self.wire_mode:self.update_wire_target(point)
+            self.Refresh()
     def keyboard_context(self,event):
         if event.GetPosition()!=wx.DefaultPosition:event.Skip();return
         hit=next((rect for rect,part in self.hits if part['id'] in self.selected),None)
@@ -984,8 +1066,7 @@ class SchematicCanvas(wx.Panel):
     def context(self,event):
         if self.wire_mode:
             if self.backtrack_wire():return
-            self.wire_mode=False;self.wire_target=None;self.SetCursor(wx.NullCursor);self.Refresh()
-            self.owner.SetStatusText('Wire tool closed');return
+            self.close_wire();return
         point=self.world(event.GetPosition())
         label=next((item for rect,item in getattr(self,'label_hits',[]) if rect.Contains(event.GetPosition())),None)
         if label:
@@ -1036,15 +1117,20 @@ class SchematicCanvas(wx.Panel):
 
     def plot_attachment(self,position):
         """Resolve a click to a semantic pin or an exact point on a net route."""
-        from .editor_geometry import terminal,route,nearest_route_point
+        from .editor_geometry import terminal,transform,nearest_route_point
         parts={p['id']:p for p in self.visible_parts()}
         candidates=[(np.linalg.norm(np.array(tuple(self.point(*terminal(p,i))))-np.array(tuple(position))),p['id'],i)
                     for p in parts.values() for i in range(len(p['nodes']))]
+        from .pin_geometry import pins as component_pins
+        for block in self.reusable_blocks():
+            for pin,endpoint in zip(component_pins(block),block['pin_bindings']):
+                if endpoint is not None:candidates.append((np.linalg.norm(np.array(tuple(self.point(*transform(block,*pin.anchor))))-np.array(tuple(position))),endpoint[0],endpoint[1]))
         if candidates and min(candidates)[0]<=14:
             _,ident,index=min(candidates);return dict(part_id=ident,pin_index=index)
         junctions={j['id']:j for j in self.owner.doc.data['junctions']}
         for wire in reversed(self.visible_wires()):
-            point,segment,distance=nearest_route_point(route(parts,wire,junctions),self.world(position))
+            all_parts={p['id']:p for p in self.owner.doc.data['components']}
+            point,segment,distance=nearest_route_point(self.display_route(wire,all_parts,junctions),self.world(position))
             if distance>10/self.zoom:continue
             endpoint=next((wire[key] for key in ('a','b') if len(wire[key])==2),None)
             if endpoint:return dict(part_id=endpoint[0],pin_index=endpoint[1],attach_point=list(point),wire_id=wire['id'])
@@ -1208,10 +1294,12 @@ class Studio(wx.Frame):
         if not force and signature==getattr(self,'properties_signature',None):return
         self.properties_signature=signature
         if editor:self.properties_side.GetSizer().Detach(editor);editor.Destroy();self.properties_editor=None
-        valid=set(p['id'] for p in self.doc.data['components']);self.canvas.selected.intersection_update(valid)
-        self.properties_notice.SetLabel('Selection follows the canvas · edits require Apply' if self.canvas.selected else 'Select a component on the schematic.')
+        block_ids={p['id'] for p in self.canvas.reusable_blocks()}
+        valid=set(p['id'] for p in self.doc.data['components'])|block_ids;self.canvas.selected.intersection_update(valid)
+        has_block=bool(self.canvas.selected&block_ids)
+        self.properties_notice.SetLabel('Reusable block geometry is edited on the canvas; double-click to enter its native hierarchy.' if has_block else 'Selection follows the canvas · edits require Apply' if self.canvas.selected else 'Select a component on the schematic.')
         self.properties_notice.Wrap(340)
-        if self.canvas.selected:
+        if self.canvas.selected and not has_block:
             try:
                 self.properties_editor=DockedProperties(self,self.properties_side);self.properties_side.GetSizer().Add(self.properties_editor,1,wx.EXPAND)
             except Exception as exc:self.properties_notice.SetLabel(str(exc))
@@ -1283,6 +1371,8 @@ class Studio(wx.Frame):
             self.closing=True;self.stop_run();return
         if self.job_running:
             wx.MessageBox("A simulation or build is still running. Wait for its result before closing.","Work in progress",parent=self); return
+        from .component_maker import prepare_owner_close
+        if not prepare_owner_close(self):return
         if not self.confirm_replace():return
         self.timer.Stop()
         self.autosave_timer.Stop()
@@ -1423,6 +1513,10 @@ class Studio(wx.Frame):
         self.actions['help.examples']=lambda:browse_examples(self)
         from .subsheet import create as create_subsheet
         self.actions['edit.create_subsheet']=lambda:create_subsheet(self)
+        from .component_maker import show as show_component_maker,capture as capture_component
+        self.actions['view.component_maker']=lambda:show_component_maker(self)
+        self.actions['edit.make_component']=lambda:capture_component(self)
+        self.actions['edit.make_subsheet_component']=lambda:capture_component(self,True)
         self.actions.update({'edit.copy':self.copy_circuit,'edit.duplicate':self.duplicate_selection,'edit.select_all':self.select_all_parts,
             'edit.properties_standard':self.properties,'edit.rotate_standard':self.rotate_parts,
             'edit.redo_alternative':self.actions['edit.redo'],
@@ -1467,6 +1561,7 @@ class Studio(wx.Frame):
         self.commands=CommandRegistry.from_actions(self.actions,self.command_context)
         grouped={command:group for group,commands in TOOL_COMMANDS.items() for command in commands}
         grouped['view.controller_boards']='Libraries'
+        grouped['view.component_maker']='Libraries'
         grouped['view.firmware']='Simulation'
         for title,prefixes in (("File",("file.",)),("Edit",("edit.",)),("Probes",("probe.",)),("View",("view.",)),('Libraries',()),('Analysis',()),('Tools',()),("Simulation",("run.",)),("Help",("help.",))):
             menu=wx.Menu()
@@ -1546,7 +1641,11 @@ class Studio(wx.Frame):
         if self.canvas.fragment_plan is not None:
             self.rotate_fragment_placement();return
         if self.canvas.keyboard_move_mode:self.canvas.capture_lost();self.canvas.SetCursor(wx.NullCursor)
-        self.doc.rotate(self.canvas.selected);self.canvas.Refresh();self.refresh_inspector();self.update_title()
+        if any(ident.startswith('component-instance:') for ident in self.canvas.selected):
+            from .reusable_block_projection import rotate_selected
+            rotate_selected(self.doc,self.canvas.selected)
+        else:self.doc.rotate(self.canvas.selected)
+        self.canvas.Refresh();self.refresh_inspector();self.update_title()
 
     def start_wire(self):
         self.cancel_fragment_placement(None)
@@ -1612,6 +1711,8 @@ class Studio(wx.Frame):
 
     def mirror_parts(self,axis):
         if self.canvas.keyboard_move_mode:self.canvas.capture_lost();self.canvas.SetCursor(wx.NullCursor)
+        if any(ident.startswith('component-instance:') for ident in self.canvas.selected):
+            raise ValueError('Reusable block mirroring is not supported; rotate it or enter the native hierarchy.')
         self.doc.mirror(self.canvas.selected,axis);self.refresh_document()
 
     def selection_tool(self,kind):
@@ -1706,7 +1807,9 @@ class Studio(wx.Frame):
         self.probes.Set([p["expression"] for p in self.doc.data["probes"]])
         self.probes.Show(bool(self.doc.data['probes']));self.probes_heading.Show(bool(self.doc.data['probes']))
         self.canvas.Refresh();self.refresh_inspector()
-        self.SetStatusText(f"Revision {self.doc.data['revision']} · {len(self.doc.data['components'])} parts · {len(self.doc.data['probes'])} probes")
+        diagnostic=getattr(self.canvas,'projection_diagnostics',[])
+        recovery=(' · reusable blocks shown flattened: '+diagnostic[0]) if diagnostic else ''
+        self.SetStatusText(f"Revision {self.doc.data['revision']} · {len(self.doc.data['components'])} parts · {len(self.doc.data['probes'])} probes"+recovery)
         self.update_title()
         self.manager.reflect_document()
         self.directives.refresh()
@@ -1767,8 +1870,12 @@ class Studio(wx.Frame):
 
     def refresh_inspector(self):
         selected=[p for p in self.doc.data["components"] if p["id"] in self.canvas.selected]
-        for control in (self.inspector,self.selection_properties_button,self.selection_pin_button):control.Show(bool(selected))
-        self.inspector.SetValue("\n\n".join(f"{p['ref']} · {p['kind']}\nValue: {p['value']}\nNodes: {', '.join(p['nodes'])}\nPackage: {p['package'] or 'unspecified'}\nDeclared limits: "+('; '.join(f'{key.replace("_", " ")}: {value:g}' for key,value in p['limits'].items()) or 'unspecified') for p in selected))
+        blocks=[p for p in self.canvas.reusable_blocks() if p['id'] in self.canvas.selected]
+        for control in (self.inspector,):control.Show(bool(selected or blocks))
+        for control in (self.selection_properties_button,self.selection_pin_button):control.Show(bool(selected))
+        native_text=[f"{p['ref']} · {p['kind']}\nValue: {p['value']}\nNodes: {', '.join(p['nodes'])}\nPackage: {p['package'] or 'unspecified'}\nDeclared limits: "+('; '.join(f'{key.replace("_", " ")}: {value:g}' for key,value in p['limits'].items()) or 'unspecified') for p in selected]
+        block_text=[f"{p['ref']} · reusable native hierarchy\nComponent: {p['value']}\nPublic nets: {', '.join(p['nodes'])}\nDouble-click to enter flattened source primitives." for p in blocks]
+        self.inspector.SetValue("\n\n".join(native_text+block_text))
         if getattr(self,'properties_pinned',False):wx.CallAfter(self.sync_properties)
         if hasattr(self,'commands'):self.context_tools()
         self.project_sidebar.Layout()
@@ -1777,6 +1884,10 @@ class Studio(wx.Frame):
         if self.canvas.selected_directive:self.edit_directive(self.canvas.selected_directive);return
         self.apply_source()
         if not self.canvas.selected:self.SetStatusText("Select a component first");return
+        block=next((p for p in self.canvas.reusable_blocks() if p['id'] in self.canvas.selected),None)
+        if block:
+            from .hierarchy_views import open_sheet
+            open_sheet(self,block['ref']);return
         if self.properties_pinned:self.sync_properties();self.properties_side.SetFocus();return
         with Properties(self) as dialog:dialog.ShowModal()
 
@@ -1790,7 +1901,7 @@ class Studio(wx.Frame):
         self.context_tools()
 
     def fit(self):
-        parts=self.canvas.visible_parts()
+        parts=[*self.canvas.visible_parts(),*self.canvas.reusable_blocks()]
         directives=[v for v in self.doc.data['directives'] if v['visible']]
         instruments=self.doc.data['instruments']
         boards=self.canvas.board_tools.visible()
@@ -1881,13 +1992,15 @@ class Studio(wx.Frame):
     def select_all_parts(self):
         focus=wx.Window.FindFocus()
         if isinstance(focus,(wx.TextCtrl,wx.ComboBox,wx.stc.StyledTextCtrl)):focus.SelectAll();return
-        self.canvas.selected={p['id'] for p in self.canvas.visible_parts()}
+        self.canvas.selected={p['id'] for p in [*self.canvas.visible_parts(),*self.canvas.reusable_blocks()]}
         self.canvas.Refresh();self.refresh_inspector()
 
     def copy_circuit(self):
         focus=wx.Window.FindFocus()
         if isinstance(focus,(wx.TextCtrl,wx.ComboBox,wx.stc.StyledTextCtrl)):focus.Copy();return
         if self.canvas.selected:
+            if any(ident.startswith('component-instance:') for ident in self.canvas.selected):
+                raise ValueError('Copying a reusable block is not supported; place another instance from the component library.')
             from .schematic_clipboard import copy_fragment
             payload=copy_fragment(self.doc,self.canvas.selected)
             message=f"Copied {len(payload['components'])} component(s). Ctrl+V previews an isolated duplicate at the cursor."
@@ -1899,6 +2012,8 @@ class Studio(wx.Frame):
         self.SetStatusText(message)
 
     def duplicate_selection(self):
+        if any(ident.startswith('component-instance:') for ident in self.canvas.selected):
+            raise ValueError('Duplicating a reusable block is not supported; place another instance from the component library.')
         from .schematic_clipboard import copy_fragment
         self.begin_fragment_placement(copy_fragment(self.doc,self.canvas.selected))
 

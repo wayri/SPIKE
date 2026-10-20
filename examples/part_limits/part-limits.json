@@ -1,0 +1,50 @@
+{
+  "contract": "spike/part-limits/v1",
+  "rules": [
+    {
+      "id": "rail-u1",
+      "occurrence_id": "board-a",
+      "component_id": "u1",
+      "label": "Supply at U1",
+      "quantity": "voltage",
+      "unit": "V",
+      "lower": null,
+      "upper": "5",
+      "reference": "0",
+      "value": "4",
+      "rating_source": "Authored test operating rating, not manufacturer data",
+      "measurement_source": "Authored scalar test observation",
+      "evidence_status": "reviewed"
+    },
+    {
+      "id": "thermal-u1",
+      "occurrence_id": "board-a",
+      "component_id": "u1",
+      "label": "Case temperature / declared ambient",
+      "quantity": "temperature",
+      "unit": "degC",
+      "lower": null,
+      "upper": "125",
+      "reference": "25",
+      "value": "100",
+      "rating_source": "Authored test operating rating, not manufacturer data",
+      "measurement_source": "Authored scalar test observation",
+      "evidence_status": "reviewed"
+    },
+    {
+      "id": "current-u1",
+      "occurrence_id": "board-a",
+      "component_id": "u1",
+      "label": "Supply-current budget",
+      "quantity": "current",
+      "unit": "A",
+      "lower": null,
+      "upper": "2",
+      "reference": "0",
+      "value": "2.4",
+      "rating_source": "Authored test operating rating, not manufacturer data",
+      "measurement_source": "Authored scalar test observation",
+      "evidence_status": "reviewed"
+    }
+  ]
+}

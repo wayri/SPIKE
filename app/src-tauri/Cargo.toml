@@ -1,9 +1,9 @@
 [package]
 name = "spike-desktop"
 version = "0.4.0-alpha.1"
-description = "SPIKE Electronic Systems Integrity Workbench"
+description = "SPIKE PCB-focused multiphysics simulation workbench"
 license = "Apache-2.0"
-authors = ["SPIKE contributors"]
+authors = ["wayri"]
 edition = "2021"
 default-run = "spike-desktop"
 

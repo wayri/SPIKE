@@ -55,7 +55,9 @@ const transform = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 const occurrence = { id: "occ-A", designId: "design-A", name: "Power board", active: true, widthMm: 20, heightMm: 10, localCenterMm: [10, 5, 0], transform };
 const board = { nets: { "net-1": "GND" }, tracks: [], pads: [], vias: [], zones: [], components: [] };
 const errors = [], actions = [];
+const sharedToolbarHost = {};
 const base = {
+  toolbarHost: sharedToolbarHost,
   projectSession: "project-1", revision: "state-1", viewportRevision: "viewport-1",
   boards: { "design-A": board }, occurrences: [occurrence], assemblyModels: [{ id: "model-lid", partId: "lid" }],
   parts: [{ partId: "lid", title: "Lid" }], visibility: { "occ-A": true }, layerVisibility: { "occ-A": { "F.Cu": true } },
@@ -72,6 +74,7 @@ const boardView = ui.views.find(view => view.scope.kind === "board-occurrence");
 const partView = ui.views.find(view => view.scope.kind === "assembly-part");
 ui.setActiveViewId(boardView.id); ui = runner.render(base);
 assert.equal(ui.activeRenderer.type, ScopedWorkspaceView);
+assert.equal(ui.activeRenderer.props.toolbarHost,sharedToolbarHost,"scoped controls use the shared row without changing view ownership");
 assert.equal(ui.activeRenderer.props.snapshot.targetBoards[0].id, "occ-A");
 ui.tabs.props.onMain(); ui = runner.render(base);
 assert.equal(ui.activeViewId, null); assert.equal(ui.activeRenderer, null, "Main unmounts the scoped WebGL renderer");

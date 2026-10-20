@@ -462,6 +462,12 @@ export function normalizeSolverResult(raw: unknown): SolverResultBundle | null {
         power_loss_w: Array.isArray(directScalars.power_loss_w) ? directScalars.power_loss_w : [],
         via_current_density_a_mm2: Array.isArray(directScalars.via_current_density_a_mm2) ? directScalars.via_current_density_a_mm2 : [],
       },
+      vector_fields: {
+        current_density: Array.isArray(directVectors.current_density) ? directVectors.current_density : [],
+        electric_field: Array.isArray(directVectors.electric_field) ? directVectors.electric_field : [],
+        magnetic_field: Array.isArray(directVectors.magnetic_field) ? directVectors.magnetic_field : [],
+      },
+      mesh: Array.isArray(result.mesh) ? result.mesh as MeshCell[] : [],
       component_bridges: componentBridges(result.component_bridges),
       time_series: {
         contract: directSeries.contract,
@@ -473,6 +479,10 @@ export function normalizeSolverResult(raw: unknown): SolverResultBundle | null {
         vector_directions: directSeries.vector_directions,
       },
       component_stress: Array.isArray(result.component_stress) ? result.component_stress as ComponentStress[] : [],
+      probes: Array.isArray(result.probes) ? result.probes as SolverResultBundle["probes"] : [],
+      issues: Array.isArray(result.issues) ? result.issues as SolverResultBundle["issues"] : [],
+      provenance: result.provenance && typeof result.provenance === "object" && !Array.isArray(result.provenance)
+        ? result.provenance as Record<string, unknown> : {},
       source_to_load: directNetworks.source_to_load ?? result.source_to_load,
       parasitics: directParasitics,
       pdn_multiports: Array.isArray(result.pdn_multiports)

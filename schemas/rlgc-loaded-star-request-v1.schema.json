@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-loaded-star-request-v1.schema.json",
+  "title": "SPIKE physical RLC loaded coupled star request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "legs",
+    "terminations",
+    "sources"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-loaded-star-request/v1"
+    },
+    "terminations": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "port",
+          "resistance_ohm",
+          "inductance_h",
+          "capacitance_f"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 15
+          },
+          "resistance_ohm": {
+            "type": "number",
+            "minimum": 1e-06,
+            "maximum": 1000000000000.0
+          },
+          "inductance_h": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1000.0
+          },
+          "capacitance_f": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "voltage_v"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "voltage_v": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 16,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "real",
+                "imag"
+              ],
+              "properties": {
+                "real": {
+                  "type": "number"
+                },
+                "imag": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "legs": {
+      "$ref": "rlgc-coupled-star-request-v1.schema.json#/properties/legs"
+    }
+  },
+  "description": "Series R/L from Thevenin source to node and ideal shunt C from node to reference. Runtime enforces exact grids, unique IDs/complete ports, conditioning, finite arithmetic and resource limits.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 4,
+            "maxItems": 4
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 4,
+                  "maxItems": 4
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 3,
+            "maxItems": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 6,
+            "maxItems": 6
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 6,
+                  "maxItems": 6
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 4,
+            "maxItems": 4
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 8,
+            "maxItems": 8
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 8,
+                  "maxItems": 8
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 5,
+            "maxItems": 5
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 10,
+            "maxItems": 10
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 10,
+                  "maxItems": 10
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 6,
+            "maxItems": 6
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 12,
+            "maxItems": 12
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 12,
+                  "maxItems": 12
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 7,
+            "maxItems": 7
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 14,
+            "maxItems": 14
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 14,
+                  "maxItems": 14
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "legs": {
+            "minItems": 8,
+            "maxItems": 8
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "terminations": {
+            "minItems": 16,
+            "maxItems": 16
+          },
+          "sources": {
+            "items": {
+              "properties": {
+                "voltage_v": {
+                  "minItems": 16,
+                  "maxItems": 16
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

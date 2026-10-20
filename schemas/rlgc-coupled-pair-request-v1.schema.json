@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/rlgc-coupled-pair-request-v1.schema.json",
+  "title": "SPIKE supplied symmetric coupled RLGC pair request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "conductor_ids",
+    "modes",
+    "excitations",
+    "probes"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/rlgc-coupled-pair-request/v1"
+    },
+    "conductor_ids": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 64,
+        "pattern": "\\S"
+      },
+      "uniqueItems": true
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "even",
+        "odd"
+      ],
+      "properties": {
+        "even": {
+          "$ref": "rlgc-line-network-request-v1.schema.json"
+        },
+        "odd": {
+          "$ref": "rlgc-line-network-request-v1.schema.json"
+        }
+      }
+    },
+    "excitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1024,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "incident_waves"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "incident_waves": {
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "real",
+                "imag"
+              ],
+              "properties": {
+                "real": {
+                  "type": "number"
+                },
+                "imag": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "probes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "fractional_position"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          },
+          "fractional_position": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    }
+  },
+  "description": "Runtime enforces identical positive grids, lengths/references, unique probe IDs and co-directed Maxwell modal ordering; aggregate byte/work bounds and inherited scalar numerical checks are authoritative."
+}

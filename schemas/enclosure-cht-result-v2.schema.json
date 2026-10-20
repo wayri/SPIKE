@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/enclosure-cht-result-v2.schema.json",
+  "title": "Experimental refined-grid obstacle-inertial enclosure CHT result",
+  "oneOf": [{"$ref": "#/$defs/completed"}, {"$ref": "#/$defs/unsuccessful"}],
+  "$defs": {
+    "identity": {
+      "type": "object", "required": ["contract", "status", "model_status", "production_qualified"],
+      "properties": {
+        "contract": {"const": "spike/enclosure-cht-result/v2"},
+        "status": {"enum": ["completed", "blocked", "cancelled"]},
+        "model_status": {"const": "experimental"}, "production_qualified": {"const": false}
+      }
+    },
+    "completed": {
+      "allOf": [{"$ref": "#/$defs/identity"}, {
+        "if": {"properties": {"energy_diagnostics": {"properties": {"time_s": {"type": "null"}}}}},
+        "then": {"properties": {
+          "history": {"maxItems": 1, "items": {"properties": {"time_s": {"type": "null"}}}},
+          "temperature_frames": {"maxItems": 0}
+        }},
+        "else": {"properties": {
+          "history": {"items": {"properties": {"time_s": {"type": "number"}}}},
+          "temperature_frames": {"minItems": 1}
+        }}
+      }],
+      "type": "object", "unevaluatedProperties": false,
+      "required": ["request_sha256", "grid", "fields", "flow_diagnostics", "independent_mass_diagnostics", "energy_diagnostics", "history", "temperature_frames", "interfaces", "limitations"],
+      "properties": {
+        "status": {"const": "completed"},
+        "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "grid": {
+          "type": "object", "additionalProperties": false,
+          "required": ["axes_m", "shape", "coarse_shape", "momentum_grid", "momentum_locally_refined", "confined_patch_amr"],
+          "properties": {
+            "axes_m": {"type": "array", "minItems": 3, "maxItems": 3,
+              "items": {"type": "array", "minItems": 2, "maxItems": 65, "items": {"type": "number"}}},
+            "shape": {"$ref": "#/$defs/fineShape"},
+            "coarse_shape": {"type": "array", "minItems": 3, "maxItems": 3,
+              "items": {"type": "integer", "minimum": 1, "maximum": 32}},
+            "momentum_grid": {"const": "resolved_nested_tensor_planes"},
+            "momentum_locally_refined": {"type": "boolean"},
+            "confined_patch_amr": {"const": false}
+          }
+        },
+        "fields": {
+          "type": "object", "additionalProperties": false,
+          "required": ["temperature_k", "material_ids", "face_velocity_m_s", "gauge_pressure_pa"],
+          "properties": {
+            "temperature_k": {"$ref": "#/$defs/temperatures"},
+            "material_ids": {"type": "array", "minItems": 1, "maxItems": 64,
+              "items": {"type": "array", "minItems": 1, "maxItems": 64,
+                "items": {"type": "array", "minItems": 1, "maxItems": 64,
+                  "items": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$"}}}},
+            "face_velocity_m_s": {"type": "array", "minItems": 3, "maxItems": 3,
+              "prefixItems": [{"$ref": "#/$defs/xFaces"}, {"$ref": "#/$defs/yFaces"}, {"$ref": "#/$defs/zFaces"}], "items": false},
+            "gauge_pressure_pa": {"$ref": "#/$defs/scalarCells"}
+          }
+        },
+        "flow_diagnostics": {"$ref": "#/$defs/flowDiagnostics"},
+        "independent_mass_diagnostics": {"$ref": "#/$defs/independentMassDiagnostics"},
+        "energy_diagnostics": {"$ref": "#/$defs/energyDiagnostics"},
+        "history": {"type": "array", "minItems": 1, "maxItems": 256, "items": {"$ref": "#/$defs/history"}},
+        "temperature_frames": {"type": "array", "maxItems": 256,
+          "items": {"type": "object", "additionalProperties": false, "required": ["time_s", "temperature_k"],
+            "properties": {"time_s": {"type": "number", "exclusiveMinimum": 0},
+              "temperature_k": {"$ref": "#/$defs/temperatures"}}}},
+        "interfaces": {"type": "array", "maxItems": 24576,
+          "items": {"type": "object", "additionalProperties": false,
+            "required": ["cell_p", "cell_n", "area_m2", "heat_p_to_n_w", "temperature_k"],
+            "properties": {
+              "cell_p": {"type": "integer", "minimum": 0, "maximum": 262143},
+              "cell_n": {"type": "integer", "minimum": 0, "maximum": 262143},
+              "area_m2": {"type": "number", "exclusiveMinimum": 0},
+              "heat_p_to_n_w": {"type": "number"},
+              "temperature_k": {"type": "number", "exclusiveMinimum": 0}
+            }}},
+        "limitations": {"type": "array", "minItems": 8, "maxItems": 8,
+          "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "unsuccessful": {
+      "allOf": [{"$ref": "#/$defs/identity"}],
+      "type": "object", "unevaluatedProperties": false, "required": ["issues"],
+      "properties": {
+        "status": {"enum": ["blocked", "cancelled"]},
+        "issues": {"type": "array", "minItems": 1,
+          "items": {"type": "object", "additionalProperties": false,
+            "required": ["code", "message"],
+            "properties": {"code": {"type": "string", "minLength": 1}, "message": {"type": "string"}}}}
+      }
+    },
+    "nonnegative": {"type": "number", "minimum": 0},
+    "fineShape": {"type": "array", "minItems": 3, "maxItems": 3,
+      "items": {"type": "integer", "minimum": 1, "maximum": 64}},
+    "scalarCells": {"type": "array", "minItems": 1, "maxItems": 64,
+      "items": {"type": "array", "minItems": 1, "maxItems": 64,
+        "items": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "number"}}}},
+    "temperatures": {"type": "array", "minItems": 1, "maxItems": 64,
+      "items": {"type": "array", "minItems": 1, "maxItems": 64,
+        "items": {"type": "array", "minItems": 1, "maxItems": 64,
+          "items": {"type": "number", "exclusiveMinimum": 0}}}},
+    "xFaces": {"type": "array", "minItems": 2, "maxItems": 65,
+      "items": {"type": "array", "minItems": 1, "maxItems": 64,
+        "items": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "number"}}}},
+    "yFaces": {"type": "array", "minItems": 1, "maxItems": 64,
+      "items": {"type": "array", "minItems": 2, "maxItems": 65,
+        "items": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "number"}}}},
+    "zFaces": {"type": "array", "minItems": 1, "maxItems": 64,
+      "items": {"type": "array", "minItems": 1, "maxItems": 64,
+        "items": {"type": "array", "minItems": 2, "maxItems": 65, "items": {"type": "number"}}}},
+    "flowDiagnostics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["iterations", "momentum_residual_history", "momentum_relative_residual", "maximum_divergence_s_inv", "reynolds_upper_bound", "scaled_condition_estimate", "force_work_w", "viscous_dissipation_w", "advective_power_w", "pressure_power_w", "relative_energy_defect", "fluid_cells", "velocity_unknowns", "fluid_components", "momentum_grid_shape", "momentum_grid_kind"],
+      "properties": {
+        "iterations": {"type": "integer", "minimum": 0, "maximum": 100},
+        "momentum_residual_history": {"type": "array", "minItems": 1, "maxItems": 100,
+          "items": {"$ref": "#/$defs/nonnegative"}},
+        "momentum_relative_residual": {"$ref": "#/$defs/nonnegative"},
+        "maximum_divergence_s_inv": {"$ref": "#/$defs/nonnegative"},
+        "reynolds_upper_bound": {"type": "number", "minimum": 0, "maximum": 20},
+        "scaled_condition_estimate": {"type": "number", "minimum": 0, "maximum": 1e10},
+        "force_work_w": {"type": "number"},
+        "viscous_dissipation_w": {"$ref": "#/$defs/nonnegative"},
+        "advective_power_w": {"type": "number"},
+        "pressure_power_w": {"type": "number"},
+        "relative_energy_defect": {"$ref": "#/$defs/nonnegative"},
+        "fluid_cells": {"type": "integer", "minimum": 1, "maximum": 4096},
+        "velocity_unknowns": {"type": "integer", "minimum": 0, "maximum": 12288},
+        "fluid_components": {"type": "integer", "minimum": 1, "maximum": 4096},
+        "momentum_grid_shape": {"$ref": "#/$defs/fineShape"},
+        "momentum_grid_kind": {"const": "tensor_plane_rectilinear_not_octree"}
+      }
+    },
+    "independentMassDiagnostics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["independent_maximum_divergence_s_inv", "independent_divergence_budget_s_inv"],
+      "properties": {
+        "independent_maximum_divergence_s_inv": {"$ref": "#/$defs/nonnegative"},
+        "independent_divergence_budget_s_inv": {"$ref": "#/$defs/nonnegative"}
+      }
+    },
+    "outwardHeat": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x_min", "x_max", "y_min", "y_max", "z_min", "z_max"],
+      "properties": {"x_min": {"type": "number"}, "x_max": {"type": "number"},
+        "y_min": {"type": "number"}, "y_max": {"type": "number"},
+        "z_min": {"type": "number"}, "z_max": {"type": "number"}}
+    },
+    "historyBase": {
+      "type": "object",
+      "required": ["time_s", "generated_heat_w", "outward_heat_w", "stored_energy_rate_w", "raw_energy_balance_w", "relative_energy_balance", "row_scaled_residual_k", "minimum_temperature_k", "maximum_temperature_k", "interface_signed_heat_w", "interface_absolute_heat_w", "maximum_interface_temperature_jump_k"],
+      "properties": {
+        "time_s": {"oneOf": [{"type": "null"}, {"type": "number", "exclusiveMinimum": 0}]},
+        "generated_heat_w": {"type": "number"}, "outward_heat_w": {"$ref": "#/$defs/outwardHeat"},
+        "stored_energy_rate_w": {"type": "number"}, "raw_energy_balance_w": {"type": "number"},
+        "relative_energy_balance": {"$ref": "#/$defs/nonnegative"},
+        "row_scaled_residual_k": {"$ref": "#/$defs/nonnegative"},
+        "minimum_temperature_k": {"type": "number", "exclusiveMinimum": 0},
+        "maximum_temperature_k": {"type": "number", "exclusiveMinimum": 0},
+        "interface_signed_heat_w": {"type": "number"},
+        "interface_absolute_heat_w": {"$ref": "#/$defs/nonnegative"},
+        "maximum_interface_temperature_jump_k": {"$ref": "#/$defs/nonnegative"}
+      }
+    },
+    "history": {"allOf": [{"$ref": "#/$defs/historyBase"}], "unevaluatedProperties": false},
+    "energyDiagnostics": {
+      "allOf": [{"$ref": "#/$defs/historyBase"}],
+      "type": "object", "unevaluatedProperties": false,
+      "required": ["maximum_row_scaled_residual_k", "solid_fluid_faces", "factorizations", "constant_mode_condition_indicator", "constant_mode_solve_residual"],
+      "properties": {
+        "maximum_row_scaled_residual_k": {"$ref": "#/$defs/nonnegative"},
+        "solid_fluid_faces": {"type": "integer", "minimum": 0, "maximum": 24576},
+        "factorizations": {"const": 1},
+        "constant_mode_condition_indicator": {"type": "number", "exclusiveMinimum": 0, "maximum": 1e10},
+        "constant_mode_solve_residual": {"type": "number", "minimum": 0, "maximum": 1e-6},
+        "stored_energy_change_j": {"type": "number"},
+        "integrated_generated_heat_j": {"type": "number"},
+        "integrated_outward_heat_j": {"type": "number"},
+        "raw_integrated_energy_balance_j": {"type": "number"}
+      },
+      "if": {"properties": {"time_s": {"type": "number"}}},
+      "then": {"required": ["stored_energy_change_j", "integrated_generated_heat_j", "integrated_outward_heat_j", "raw_integrated_energy_balance_j"]},
+      "else": {"not": {"anyOf": [
+        {"required": ["stored_energy_change_j"]}, {"required": ["integrated_generated_heat_j"]},
+        {"required": ["integrated_outward_heat_j"]}, {"required": ["raw_integrated_energy_balance_j"]}
+      ]}}
+    }
+  },
+  "$comment": "Schema describes strict JSON structure, not qualification. Runtime remains authoritative for exact field/grid shapes, increasing axes, request binding, finite serialization, topology, balances, residuals and physical admission."
+}

@@ -27,6 +27,76 @@ def _digest(path: Path) -> str:
 
 def validate_done_import_stage(stage: dict, root: Path) -> None:
     receipt = json.loads(_path(root, stage.get('evidence')).read_text(encoding='utf-8'))
+    if stage['id'] == 'PI01-S02A':
+        if __package__:
+            from .parity_finite_contact_gate import validate_receipt
+        else:
+            from parity_finite_contact_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S13':
+        if __package__:
+            from .parity_loaded_star_gate import validate_receipt
+        else:
+            from parity_loaded_star_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S12':
+        if __package__:
+            from .parity_coupled_star_gate import validate_receipt
+        else:
+            from parity_coupled_star_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S11':
+        if __package__:
+            from .parity_loaded_cascade_gate import validate_receipt
+        else:
+            from parity_loaded_cascade_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S10':
+        if __package__:
+            from .parity_coupled_cascade_gate import validate_receipt
+        else:
+            from parity_coupled_cascade_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S09':
+        if __package__:
+            from .parity_reactive_pair_gate import validate_receipt
+        else:
+            from parity_reactive_pair_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S08':
+        if __package__:
+            from .parity_terminated_pair_gate import validate_receipt
+        else:
+            from parity_terminated_pair_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI02-S07':
+        if __package__:
+            from .parity_coupled_pair_gate import validate_receipt
+        else:
+            from parity_coupled_pair_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'SI01-S01':
+        if __package__:
+            from .parity_si_candidate_gate import validate_receipt
+        else:
+            from parity_si_candidate_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
+    if stage['id'] == 'PI01-S01':
+        if __package__:
+            from .parity_owned_pad_gate import validate_receipt
+        else:
+            from parity_owned_pad_gate import validate_receipt
+        validate_receipt(receipt, root)
+        return
     if stage['id'] == 'GP07-S01':
         if __package__:
             from .parity_structural_gate import validate_receipt

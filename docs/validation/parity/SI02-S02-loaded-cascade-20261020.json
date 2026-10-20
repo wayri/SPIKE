@@ -1,0 +1,47 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI02-S02",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "8b66cd2825803eadbbdc739d7a58e69835952f46f8eedc6eec51530911d617cd",
+    "python/spike_core/lossless_line_transient.py": "8024494fb5b63831b7110b0b242919a06d58ff0fe44d0f65920134c041c44588",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "3eafdc40628a17357ee9f74942af1b89a70ff3721c701534be298f140ea8e275",
+    "python/spike_core/service_simulation_handlers.py": "2376a19ae83d562d4f3419672c7faf3b85b598f6f0773c2c71e9791968796b48",
+    "tests/python/test_lossless_line_transient.py": "c0522c9d40c9ee9e92084fb651998b59dc063caa8e8cee8f8d0eaccaddedda85",
+    "tests/python/test_lossless_line_transient_contract.py": "8329e4e831f21ff60c7525547bb86c2b039720a02e0d468b67dd71951ed6a75b",
+    "examples/lossless_line_transient/run_line.py": "432ebf4aeb75c73c871cfd9c3dd197295bbd537d869ae43645ac040938a5dce7",
+    "schemas/lossless-line-transient-request-v1.schema.json": "8bc3301e04813e0de1684c41a85730c0f0a2a056a6fa489f8caf0ccf1660fc42",
+    "schemas/lossless-line-transient-result-v1.schema.json": "235573d6e0dc09879ddb6892f56f9b4917b54ce841d5dc39aa0e5e0aa3e5bd43",
+    "docs/LOSSLESS_LINE_TRANSIENT.md": "ac6ffda048f7591cf3b9d3ad7ad040ba36745eae2c6933058e7aeb7874681172",
+    "python/spike_core/distortionless_line_transient.py": "3a8ab2bda5f433698b20f84546bac13911912a019b7bd7f61aa528bf2f4f7711",
+    "tests/python/test_distortionless_line_transient.py": "06a0642e8245cc593581a010e15939acb01045873f31140bd8bed3df62171b34",
+    "tests/python/test_distortionless_line_transient_contract.py": "7830a6213f842870fc13febaa4f87f870c0f36321eaed121802647d8e5d76164",
+    "examples/distortionless_line_transient/run_line.py": "e1d7f36eadd4a57ed2d1742db5984d82d35d270edd3a24be3982ae78c576f580",
+    "schemas/distortionless-line-transient-request-v1.schema.json": "c86337ee344625203a22f0d476e1a1be495876ac12128de1f374c0787c839119",
+    "schemas/distortionless-line-transient-result-v1.schema.json": "705dd33b5305c12aa8e290aadeaffd9ab1e2176df4cd62b3217df543542fa906",
+    "docs/DISTORTIONLESS_LINE_TRANSIENT.md": "9c85446d9be7678368169288915eb3f3975ff6acba85f0e7fbc937e970b7b7a2"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_distortionless_line_transient.DistortionlessTests.test_finite_pulse_source_storage_terminal_and_distributed_heat_balance",
+      "tests.python.test_distortionless_line_transient.DistortionlessTests.test_geometric_multiple_echoes_both_drives_and_ideal_source_boundaries",
+      "tests.python.test_distortionless_line_transient.DistortionlessTests.test_invalid_loss_exponent_precision_resources_and_cancellation",
+      "tests.python.test_distortionless_line_transient.DistortionlessTests.test_matched_ramp_analytic_attenuation_and_smooth_pde_identity",
+      "tests.python.test_distortionless_line_transient.DistortionlessTests.test_time_length_units_and_exact_shared_sample_refinement",
+      "tests.python.test_distortionless_line_transient.DistortionlessTests.test_zero_loss_exact_parent_points_provenance_and_nonzero_coefficients",
+      "tests.python.test_distortionless_line_transient_contract.DistortionlessLineContractTests.test_example_executes_and_contracts_are_registered",
+      "tests.python.test_distortionless_line_transient_contract.DistortionlessLineContractTests.test_worker_against_independent_attenuated_echo_and_loss_reference",
+      "tests.python.test_distortionless_line_transient_contract.DistortionlessLineContractTests.test_worker_and_schema_reject_invalid_loss_contracts"
+    ],
+    "run": 9,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI02-S02-loaded-cascade-20261020.log",
+  "log_sha256": "fb25f0ec343002da46941e5124f41e8b1de1c187f2bde83809d00c4e9292e6c4"
+}

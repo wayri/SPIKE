@@ -32,6 +32,7 @@ def checked(symbol):
 
 def set_pin(symbol,index,number,name,side,position):
     result=deepcopy(symbol);p=pin(number,name,side,position,result['body_keepout'],result['grid'])
+    if index is not None and 'mode' in symbol['terminals'][index]:p['mode']=symbol['terminals'][index]['mode']
     if index is None:result['terminals'].append(p)
     else:result['terminals'][index]=p
     return checked(result)
@@ -54,4 +55,18 @@ def resize(symbol,width,height):
     for i,p in enumerate(symbol['terminals']):
         side=p.get('direction','west');position=p['at'][1] if side in ('west','east') else p['at'][0]
         result['terminals'][i]=pin(p['id'],p['name'],side,position,result['body_keepout'],g)
+        if 'mode' in p:result['terminals'][i]['mode']=p['mode']
     return checked(result)
+
+
+def add_shape(symbol,kind,start,end):
+    """Two-click original geometry editing; no model or terminal changes."""
+    if kind not in ('line','rectangle','circle'):raise ValueError('Unknown drawing tool')
+    result=deepcopy(symbol);g=result['grid']
+    a=[round(x/g)*g for x in start];b=[round(x/g)*g for x in end]
+    if a==b:raise ValueError('Draw a nonzero shape')
+    if len(result['primitives'])>=1024:raise ValueError('Shape limit reached')
+    if kind=='line':item={'kind':'line','points':[a,b]}
+    elif kind=='circle':item={'kind':'circle','center':a,'radius':((a[0]-b[0])**2+(a[1]-b[1])**2)**.5}
+    else:item={'kind':'polygon','points':[a,[b[0],a[1]],b,[a[0],b[1]],a]}
+    result['primitives'].append(item);return checked(result)

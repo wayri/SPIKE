@@ -56,6 +56,8 @@ class RT0System:
     local_edges: np.ndarray
     local_resistance: np.ndarray
     triangle_rectangles: np.ndarray
+    thickness_mm: np.ndarray
+    conductivity_s_m: np.ndarray
 
 
 def triangle_resistance(vertices_mm: np.ndarray, sheet_conductance_s: float) -> np.ndarray:
@@ -65,9 +67,12 @@ def triangle_resistance(vertices_mm: np.ndarray, sheet_conductance_s: float) -> 
         raise ValueError("RT0 requires three finite planar vertices")
     if not np.isfinite(sheet_conductance_s) or sheet_conductance_s <= 0:
         raise ValueError("RT0 sheet conductance must be finite and positive")
-    a, b = vertices[1] - vertices[0], vertices[2] - vertices[0]
-    twice_area = float(a[0]*b[1] - a[1]*b[0])
-    if twice_area <= 0 or max(float(a@a), float(b@b)) / twice_area > 1e5:
+    with np.errstate(over="ignore",invalid="ignore",under="ignore"):
+        a, b = vertices[1] - vertices[0], vertices[2] - vertices[0]
+        twice_area = float(a[0]*b[1] - a[1]*b[0])
+        maximum_edge_squared = max(float(a@a),float(b@b))
+    if (not np.isfinite(twice_area) or not np.isfinite(maximum_edge_squared)
+            or twice_area <= 0 or maximum_edge_squared / twice_area > 1e5):
         raise ValueError("RT0 triangle is reversed, degenerate or ill-shaped")
     # Translation-free degree-two quadrature avoids subtracting large moments.
     relative = vertices - vertices[0]
@@ -77,6 +82,44 @@ def triangle_resistance(vertices_mm: np.ndarray, sheet_conductance_s: float) -> 
 
 
 def _triangulate(mesh: HybridMesh, max_triangles: int):
+    if mesh.branch_admission.get("complete_triangle_partition") is True:
+        from shapely.geometry import Polygon
+        from shapely.ops import unary_union
+        triangles, owners, keys = [], [], []
+        groups,prisms = {},{}
+        if not mesh.cells or len(mesh.cells) > max_triangles:
+            raise ValueError("Complete RT0 partition triangle budget exceeded")
+        for cell in mesh.cells:
+            vertices = np.asarray(cell.get("vertices_mm"),dtype=float)
+            if (vertices.shape != (3,3) or not np.isfinite(vertices).all()
+                    or np.ptp(vertices[:,2]) > 1e-12):
+                raise ValueError("Complete RT0 partition requires finite constant-z triangles")
+            key = (cell["layer"],cell["net"])
+            thickness = float(cell["thickness_mm"])
+            support = (float(vertices[0,2]),thickness)
+            if not np.isfinite(thickness) or thickness <= 0 or (key in prisms and prisms[key] != support):
+                raise ValueError("Complete RT0 layer has inconsistent physical support")
+            prisms[key] = support
+            triangles.append(vertices[:,:2])
+            owners.append(int(cell["control_node"]))
+            keys.append(key)
+            groups.setdefault(key,[]).append(Polygon(vertices[:,:2]))
+        if not triangles or len(triangles) > max_triangles:
+            raise ValueError("Complete RT0 partition triangle budget exceeded")
+        prior = []
+        if len(groups) > 1024:
+            raise ValueError("Complete RT0 group work budget exceeded")
+        for key,polygons in groups.items():
+            area = sum(p.area for p in polygons)
+            shape = unary_union(polygons)
+            if area-shape.area > max(1e-11,1e-11*area):
+                raise ValueError("Complete RT0 triangles overlap")
+            z,t = prisms[key]
+            for other,other_z,other_t in prior:
+                if min(z+t/2,other_z+other_t/2)>max(z-t/2,other_z-other_t/2) and shape.intersection(other).area>1e-12:
+                    raise ValueError("Complete RT0 copper prisms overlap across layer/net groups")
+            prior.append((shape,z,t))
+        return np.asarray(triangles),np.asarray(owners),keys,np.arange(len(triangles))
     groups: dict[tuple[str, str], list[tuple[int, tuple[float, ...]]]] = {}
     for cell in mesh.cells:
         if cell.get("kind") != "surface":
@@ -148,12 +191,25 @@ def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
         raise ValueError("RT0 local triangle budget must be an integer in 4..250000")
     if condense_spokes and not hybridized:
         raise ValueError("RT0 spoke condensation requires hybridized assembly")
+    if condense_spokes and mesh.branch_admission.get("complete_triangle_partition"):
+        raise ValueError("Complete RT0 triangles have no rectangle spokes to condense")
     triangles, owners, keys, rectangle_ids = _triangulate(
         mesh, max_triangles if hybridized else max_unknowns//2)
-    materials = {}
+    materials, thicknesses, conductivities = {}, {}, {}
+    if mesh.branch_admission.get("complete_triangle_partition"):
+        for cell in mesh.cells:
+            key = (cell["layer"],cell["net"])
+            thickness = float(cell["thickness_mm"])
+            conductivity = float(cell["conductivity_s_m"])
+            if not np.isfinite(thickness) or not np.isfinite(conductivity) or min(thickness,conductivity) <= 0:
+                raise ValueError("Complete RT0 requires finite positive material data")
+            if key in materials and (thicknesses[key] != thickness or conductivities[key] != conductivity):
+                raise ValueError("Complete RT0 requires uniform material per layer/net")
+            thicknesses[key],conductivities[key] = thickness,conductivity
+            materials[key] = thickness*conductivity*1e-3
     vias = []
     for branch in mesh.branches:
-        if branch.kind == "via":
+        if branch.kind in {"via", "pad_barrel"}:
             vias.append(branch)
             continue
         if not branch.id.startswith("conforming:"):
@@ -163,6 +219,8 @@ def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
         if key in materials and not np.isclose(materials[key], conductance, rtol=1e-12, atol=0):
             raise ValueError("RT0 requires uniform isotropic sheet conductance per layer/net")
         materials[key] = conductance
+        thicknesses[key] = branch.thickness_mm
+        conductivities[key] = branch.conductivity_s_m
     edge_map, edges, counts = {}, [], []
     local_edges, local_signs, masses, areas = [], [], [], []
     for triangle, key in zip(triangles, keys):
@@ -233,7 +291,8 @@ def assemble_conforming_dc(mesh: HybridMesh, *, max_unknowns: int = 150000,
     incidence = coo_matrix((bv,(br,bc)), shape=(triangle_count,current_count)).tocsr()
     return RT0System(resistance, incidence, triangles, owners, areas, np.asarray(edges),
         np.flatnonzero(np.asarray(counts) == 1), contacts, edge_count, local_edges,
-        local_masses, rectangle_ids)
+        local_masses, rectangle_ids,np.asarray([thicknesses[key] for key in keys]),
+        np.asarray([conductivities[key] for key in keys]))
 
 
 def solve_conforming_dc(mesh: HybridMesh, source_node: int, load_node: int,
@@ -370,7 +429,8 @@ def _condense_rectangle_spokes(matrix, rhs, system, free):
 def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node: int,
                                   *, max_unknowns: int = 150000,
                                   max_triangles: int = 150000,
-                                  condense_spokes: bool = True) -> dict[str, Any]:
+                                  condense_spokes: bool = True,
+                                  include_density: bool = False) -> dict[str, Any]:
     """Equivalent RT0 probe with local flux/pressure static condensation.
 
     Write v=M^-1*1, d=1.T*v, a=1/d, b=v/d, H=M^-1-v*v.T/d.
@@ -388,6 +448,8 @@ def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node
     """
     if source_node == load_node:
         raise ValueError("RT0 source and load must be distinct finite contacts")
+    if mesh.branch_admission.get("complete_triangle_partition"):
+        condense_spokes = False
     system = assemble_conforming_dc(mesh, max_unknowns=max_unknowns,
         hybridized=True, max_triangles=max_triangles, condense_spokes=condense_spokes)
     if source_node not in system.contacts or load_node not in system.contacts:
@@ -476,7 +538,34 @@ def solve_hybridized_conforming_dc(mesh: HybridMesh, source_node: int, load_node
             or resistance <= 0 or energy_error > 1e-7):
         raise ValueError(f"Hybrid RT0 checks failed: residual={residual:g}, cell KCL={cell_kcl:g}, "
             f"face KCL={face_kcl:g}, energy={energy_error:g}")
-    return {"model_status":"experimental", "production_qualified":False,
+    density = {}
+    if include_density:
+        from .dc_rt0_density import reconstruct_rt0_density, rt0_dissipation_w, volume_percentile_enclosure
+        # Disconnected, undriven domains are not an arbitrary potential choice:
+        # their homogeneous Neumann problem has identically zero current.
+        all_flux = np.zeros_like(flux)
+        all_flux[cells] = flux[cells]
+        vectors = reconstruct_rt0_density(system.triangles_mm,all_flux,system.thickness_mm)
+        volume = system.areas_mm2*system.thickness_mm
+        field_loss = float(rt0_dissipation_w(system.triangles_mm,all_flux,
+            system.thickness_mm,system.conductivity_s_m).sum())
+        expected_planar_loss = float(np.einsum("ti,tij,tj->",all_flux,system.local_resistance,all_flux))
+        if abs(field_loss-expected_planar_loss) > 1e-9*max(expected_planar_loss,1e-20):
+            raise ValueError("RT0 field dissipation differs from solved local flux work")
+        density = {"current_density_observable":{
+            "method":"RT0_signed_flux_vector_unique_planar_volume",
+            "scope":"all represented planar copper, including undriven components",
+            "p95":volume_percentile_enclosure(vectors,volume),
+            "p99":volume_percentile_enclosure(vectors,volume,.99),
+            "physical_planar_volume_mm3":float(volume.sum()),
+            "undriven_planar_volume_mm3":float(volume[labels[:nt] != component].sum()),
+            "planar_dissipation_w":field_loss,
+            "axial_barrel_count":nv,
+            "complete_physical_volume":False,
+            "complete_planar_polygon_partition":bool(mesh.branch_admission.get("complete_triangle_partition")),
+            "axial_support_status":"not_present" if nv == 0 else "unresolved_landing_overlap",
+            "qualification":"experimental; not the production branch p95 replacement"}}
+    return {"model_status":"experimental", "production_qualified":False, **density,
         "method":"conforming_triangle_RT0_hybridized_DC",
         "contact_model":"uniform finite-area current injection; area-average potential",
         "resistance_ohm":resistance, "dissipation_w_at_one_ampere":loss,

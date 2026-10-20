@@ -334,6 +334,11 @@ class Document:
             ids = [p[key] for p in parts]
             if len(ids) != len(set(ids)): raise ValueError(f"Duplicate component {key}")
         for part in parts:
+            custom=part.get('parameters',{}).get('component_symbol')
+            if custom:
+                from .component_package import _symbol
+                _symbol(custom)
+                if len(custom['terminals'])!=len(part['nodes']):raise ValueError('Custom symbol pin count must match the native component')
             if any(type(part.get(key)) is not bool for key in ('mirror_x','mirror_y')):raise ValueError('Mirror flags must be boolean')
             if type(part.get('rotation')) is not int or part['rotation'] not in (0,90,180,270):raise ValueError('Rotation must be 0, 90, 180 or 270 degrees')
             if any(not math.isfinite(float(part[k])) for k in ("x", "y", "temperature_k")): raise ValueError("Nonfinite component property")

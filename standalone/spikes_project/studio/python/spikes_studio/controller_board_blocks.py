@@ -173,6 +173,11 @@ def validate(blocks):
         if not _finite_coordinate(block.get("x")) or not _finite_coordinate(block.get("y")):
             raise ValueError("Controller-board coordinates must be finite and bounded")
         pins = _validate_board(block.get("board"))
+        if block.get('firmware_coupling_mode','legacy') not in ('legacy','electrical','timestamped','synchronous','peripheral'):
+            raise ValueError('Unknown firmware coupling mode')
+        if 'electrical_pads' in block:
+            from .firmware_pad_settings import validate as validate_pads
+            validate_pads(block['electrical_pads'],block['board'])
         pin_by_id = {pin["id"]: pin for pin in pins}
         bindings = block.get("bindings")
         if not isinstance(bindings, dict) or set(bindings) != set(pin_by_id):

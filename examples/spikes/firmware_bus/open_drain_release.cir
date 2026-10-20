@@ -1,0 +1,9 @@
+.title Open drain finite sink release - synthetic switch and bus, not MCU firmware
+VDD vdd 0 3.3
+RPULL vdd bus 2.2k
+CBUS bus 0 100p
+VGATE gate 0 PULSE(1 0 1u 1p 1p 5u 10u)
+* Explicit native smooth-switch syntax: Ron Roff Vthreshold Vtransition
+SLOW bus 0 gate 0 30 1e15 0.5 1m
+.tran 1n 2u
+.end

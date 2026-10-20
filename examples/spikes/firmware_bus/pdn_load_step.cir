@@ -1,0 +1,7 @@
+.title Finite PDN load step - synthetic teaching values, no MCU core power model
+VDD source 0 3.3
+RS source rail 0.5
+CDECOUPLE rail 0 1u
+ILOAD rail 0 PULSE(0 20m 1u 1n 1n 10u 20u)
+.tran 10n 5u
+.end

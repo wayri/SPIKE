@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 from typing import Any
+from .part_limits import evaluate_part_limits
 
 
 REVIEW_REQUEST = "spike/engineering-review-request/v1"
@@ -113,7 +114,7 @@ def _canonical_digest(value: Any) -> str:
 def review_engineering(request: Any) -> dict[str, Any]:
     request = _object(request, "request")
     request_digest = hashlib.sha256(_canonical_bytes(request)).hexdigest()
-    _exact_keys(request, {"contract", "boards", "overrides"}, {"contract", "boards", "overrides"}, "request")
+    _exact_keys(request, {"contract", "boards", "overrides", "part_limits"}, {"contract", "boards", "overrides"}, "request")
     if request["contract"] != REVIEW_REQUEST:
         raise ValueError(f"contract must be {REVIEW_REQUEST}")
     boards = request["boards"]
@@ -302,6 +303,7 @@ def review_engineering(request: Any) -> dict[str, Any]:
                    "mass_g": metric("mass_g"), "power_w": metric("power_w")}
 
     return {"contract": REVIEW_RESULT, "snapshot_sha256": request_digest,
+            "part_limit_report": evaluate_part_limits(request.get("part_limits", []), rows),
             "limits": {"max_boards": MAX_BOARDS, "max_components": MAX_COMPONENTS},
             "component_rows": rows,
             "grouped_bom": sorted(grouped_bom, key=lambda g: (g["occurrence_id"], g["dnp"], g["value"], g["footprint"], g["mpn"])),

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from 'node:assert/strict';
-import { engineeringReviewScope, restoreEngineeringReviewWorkspace } from '../src/engineeringReviewWorkspace.ts';
+import { importTestTypescript } from './import-test-typescript.mjs';
+const { engineeringReviewScope, restoreEngineeringReviewWorkspace } = await importTestTypescript('engineeringReviewWorkspace');
 import { mergeProjectSnapshot, withoutSavedResults } from '../src/projectSnapshotState.ts';
 
 const boards = [{ id: 'a', design: { components: [{id:'r1',reference:'R1'}], metadata: {x:1,y:2} } }];

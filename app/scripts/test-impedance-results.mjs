@@ -42,6 +42,29 @@ const direct = results.normalizeSolverResult({
 assert.equal(direct.parasitics.length, 1, "direct plugin results must retain networks.parasitics");
 assert.equal(results.resultModeAvailable(direct, "impedance"), true);
 
+// Saved direct results from older workers can satisfy field admission without
+// serializing empty optional collections. Opening the Results analysis panel
+// must receive the complete collection contract rather than undefined fields.
+const sparseSaved = results.normalizeSolverResult({
+  contract: "spike/v1", analysis_id: "sparse-direct-legacy", mode: "dc",
+  status: "completed", model_status: "experimental", summary: { solved: true },
+  scalar_fields: { voltage_v: [], voltage_drop_v: [], current_density_a_mm2: [] },
+  vector_fields: {},
+});
+assert.ok(sparseSaved, "sparse admitted saved result normalizes");
+assert.deepEqual({
+  mesh: sparseSaved.mesh, currentDensity: sparseSaved.vector_fields.current_density,
+  electricField: sparseSaved.vector_fields.electric_field, magneticField: sparseSaved.vector_fields.magnetic_field,
+  probes: sparseSaved.probes, issues: sparseSaved.issues,
+}, { mesh: [], currentDensity: [], electricField: [], magneticField: [], probes: [], issues: [] },
+"analysis-panel collections are present for sparse saved direct results");
+assert.deepEqual([
+  sparseSaved.mesh.filter(() => true).length,
+  sparseSaved.vector_fields.electric_field.filter(() => true).length,
+  sparseSaved.probes.slice(0, 20).length,
+  sparseSaved.issues.map(issue => issue.code).length,
+], [0, 0, 0, 0], "analysis-panel collection operations remain safe after saved-result activation");
+
 const generic = results.normalizeSolverResult({
   contract: "spike/v1",
   analysis_id: "generic-ac",

@@ -82,8 +82,8 @@ remained in `starting` beyond the existing four-second deadline during that run.
 All eight debugger tests passed on isolated recheck in 29.794 s with unchanged
 thresholds. The aggregate run is therefore recorded as failed, not green;
 startup timing under concurrent workload remains an unresolved regression gate.
-Logs are local at `output/thermal-integration-python-tests.log` and
-`output/thermal-integration-debug-recheck.log`.
+The raw `thermal-integration-python-tests.log` and
+`thermal-integration-debug-recheck.log` are unbundled local records.
 
 The temperature legend shares the renderer's exact saved range and palette.
 The latest retained browser screenshot is local at

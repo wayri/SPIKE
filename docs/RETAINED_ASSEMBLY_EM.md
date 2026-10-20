@@ -31,8 +31,8 @@ digests and exact physical assembly before rendering. The CLI retains a new run
 directory:
 
 ```powershell
-.venv/Scripts/python.exe -m python.spike_core.cli assembly-em --request study.json --run-dir output/new-assembly-em
-.venv/Scripts/python.exe scripts/run_retained_assembly_em_benchmark.py --output output/new-enclosed-em-benchmark
+.venv/Scripts/python.exe -m python.spike_core.cli assembly-em --request study.json --run-dir "$env:TEMP/spike-new-assembly-em"
+.venv/Scripts/python.exe scripts/run_retained_assembly_em_benchmark.py --output "$env:TEMP/spike-new-enclosed-em-benchmark"
 ```
 
 Immutable trusted source and finite data go to the isolated runtime through
@@ -70,7 +70,7 @@ qualification statement. A single run's observable sensitivity is
 `not_assessed`; a paired validation reports its own sensitivity test separately.
 
 Fresh five-case evidence is retained under
-`output/retained-assembly-em-acc03-20261013`. Its duration run completes but fails
+The unbundled local `retained-assembly-em-acc03-20261013` run completes but fails
 the requested -90 dB stopping criterion at 80,000 steps (-81.74 dB observed).
 The corresponding maximum complex-S11 change passes independently:
 3.09834e-5 <= 1e-4. Corrected-parser reinterpretation is retained separately as

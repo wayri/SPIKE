@@ -1,11 +1,11 @@
 {
   "contract": "spikes/schematic/v1",
-  "id": "86f41a758037436985f96b42f27abe56",
+  "id": "7ef1643bd66247ab811046141ffe5fac",
   "title": "Firmware GPIO-controlled RC",
   "source": "Firmware GPIO-controlled RC\nVSENSE sense 0 0\nVDRIVE drive 0 0\nR1 drive out 1k\nC1 out 0 1u\n.tran 100u 10m uic\n.end\n",
   "components": [
     {
-      "id": "ab536c2f51ea463c83d27fe23af2a6d2",
+      "id": "617b2482eff24174bc06e59399c05813",
       "ref": "VSENSE",
       "kind": "voltage_source",
       "value": "0",
@@ -27,7 +27,7 @@
       "mirror_y": false
     },
     {
-      "id": "4c7c083afdfb4ceda53b965126ebd18b",
+      "id": "de0ea25bc89946079e900d6dc6fb781d",
       "ref": "VDRIVE",
       "kind": "voltage_source",
       "value": "0",
@@ -49,7 +49,7 @@
       "mirror_y": false
     },
     {
-      "id": "1a4632ca038b46708a6ba7980e6649a0",
+      "id": "736babc91a7849c48a37972860832332",
       "ref": "R1",
       "kind": "resistor",
       "value": "1000",
@@ -71,7 +71,7 @@
       "mirror_y": false
     },
     {
-      "id": "71ae2d36f9c840bbadf796f6dc83f91c",
+      "id": "c7d68e52c3fd4e1b888d5521e5241ca5",
       "ref": "C1",
       "kind": "capacitor",
       "value": "1e-06",
@@ -189,7 +189,7 @@
   "controller_setup": null,
   "controller_boards": [
     {
-      "id": "controller-board-ca1665a6a9ae4efb8540bc3bb61b719f",
+      "id": "controller-board-aa83521a910543e5a65340a1e8d51c24",
       "ref": "MCU1",
       "board": {
         "id": "st-stm32f407g-disc1-mb997",
@@ -2123,7 +2123,7 @@
   "analytics_extensions": [],
   "directives": [
     {
-      "id": "2a92e564f34c4e31a1c2188ba6fd0057",
+      "id": "1839949441b74fe29fe08420215f5d5a",
       "group": "Simulation",
       "title": "",
       "visible": true,

@@ -243,8 +243,30 @@ def run_native_project(
     minimum_time_step_s: float = 1.0e-15,
     max_rejected_steps: int = 10_000,
 ) -> CircuitResult:
-    """Run one operating-point or transient project through the owned kernel."""
+    """Run a project with one job-local ABI binding and fresh circuits per point."""
+    return _run_native_project(
+        project, library_path, integration_method=integration_method,
+        maximum_steps=maximum_steps, adaptive_time_step=adaptive_time_step,
+        lte_absolute_tolerance=lte_absolute_tolerance,
+        lte_relative_tolerance=lte_relative_tolerance,
+        minimum_time_step_s=minimum_time_step_s,
+        max_rejected_steps=max_rejected_steps, _library_state={},
+    )
 
+
+def _run_native_project(
+    project: CircuitProject,
+    library_path: str | Path,
+    *,
+    integration_method: str = "hybrid_trapezoidal",
+    maximum_steps: int = 1_000_000,
+    adaptive_time_step: bool = False,
+    lte_absolute_tolerance: float = 1.0e-6,
+    lte_relative_tolerance: float = 1.0e-3,
+    minimum_time_step_s: float = 1.0e-15,
+    max_rejected_steps: int = 10_000,
+    _library_state: dict[str, Any],
+) -> CircuitResult:
     if type(maximum_steps) is not int or not 1 <= maximum_steps <= 1_000_000:
         raise ValueError("maximum_steps must be an integer from 1 through 1000000")
     if not isinstance(adaptive_time_step, bool):
@@ -324,7 +346,7 @@ def run_native_project(
             point_project = replace(
                 project, elements=variant.elements, steps=(), step_variants=()
             )
-            point_result = run_native_project(
+            point_result = _run_native_project(
                 point_project,
                 library_path,
                 integration_method=integration_method,
@@ -334,6 +356,7 @@ def run_native_project(
                 lte_relative_tolerance=lte_relative_tolerance,
                 minimum_time_step_s=minimum_time_step_s,
                 max_rejected_steps=max_rejected_steps,
+                _library_state=_library_state,
             )
             parameters = {name: value for name, value in variant.parameters}
             if point_result.status != "completed":
@@ -428,7 +451,7 @@ def run_native_project(
                 analysis=AnalysisDirective(mode="operating_point"),
                 measurements=(),
             )
-            point_result = run_native_project(
+            point_result = _run_native_project(
                 point_project,
                 library_path,
                 integration_method=integration_method,
@@ -438,6 +461,7 @@ def run_native_project(
                 lte_relative_tolerance=lte_relative_tolerance,
                 minimum_time_step_s=minimum_time_step_s,
                 max_rejected_steps=max_rejected_steps,
+                _library_state=_library_state,
             )
             if point_result.status != "completed":
                 return CircuitResult(
@@ -484,7 +508,10 @@ def run_native_project(
                 "source_sha256": project.source_sha256,
             },
         )
-    library = load_native_library(library_path)
+    library = _library_state.get("library")
+    if library is None:
+        library = load_native_library(library_path)
+        _library_state["library"] = library
     node_names = _nodes(project)
     element_names = tuple(element.name for element in project.elements)
     with library.circuit() as circuit:
@@ -558,18 +585,18 @@ def run_native_project(
                 )
             integration_count = result.point_count
             integration_data = {
-                "time_s": [result.time(index) for index in range(integration_count)],
+                "time_s": result.time_values(),
                 "integration": reported_method,
                 "node_voltage_v": {
-                    name: [result.node_voltage(index, name) for index in range(integration_count)]
+                    name: result.node_voltage_values(name)
                     for name in node_names
                 },
                 "element_current_a": {
-                    name: [result.element_current(index, name) for index in range(integration_count)]
+                    name: result.element_current_values(name)
                     for name in element_names
                 },
                 "element_power_w": {
-                    name: [result.element_power(index, name) for index in range(integration_count)]
+                    name: result.element_power_values(name)
                     for name in element_names
                 },
             }

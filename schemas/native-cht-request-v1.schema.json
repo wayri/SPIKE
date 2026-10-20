@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/native-cht-request-v1.schema.json",
+  "title": "Experimental native square-cavity conjugate heat transfer",
+  "type": "object", "additionalProperties": false, "required": ["contract"],
+  "properties": {
+    "contract": {"const": "spike/native-cht-request/v1"},
+    "n": {"type": "integer", "minimum": 8, "maximum": 64, "multipleOf": 4},
+    "length_m": {"type": "number", "minimum": 0.000001, "maximum": 1000},
+    "span_m": {"type": "number", "minimum": 0.000001, "maximum": 1000},
+    "lid_velocity_m_s": {"type": "number", "minimum": 0, "maximum": 100},
+    "density_kg_m3": {"type": "number", "minimum": 0.000001, "maximum": 100000},
+    "dynamic_viscosity_pa_s": {"type": "number", "minimum": 1e-9, "maximum": 1000},
+    "specific_heat_j_kgk": {"type": "number", "minimum": 0.001, "maximum": 1000000},
+    "fluid_conductivity_w_mk": {"type": "number", "minimum": 0.000001, "maximum": 10000},
+    "solid_conductivity_w_mk": {"type": "number", "minimum": 0.000001, "maximum": 10000},
+    "hot_temperature_k": {"type": "number", "minimum": 1, "maximum": 10000},
+    "cold_temperature_k": {"type": "number", "minimum": 1, "maximum": 10000},
+    "max_flow_steps": {"type": "integer", "minimum": 1, "maximum": 200000},
+    "steady_tolerance": {"type": "number", "minimum": 1e-10, "maximum": 0.001},
+    "thermal_tolerance": {"type": "number", "minimum": 1e-12, "maximum": 0.0001},
+    "max_thermal_iterations": {"type": "integer", "minimum": 1, "maximum": 200000},
+    "timeout_s": {"type": "integer", "minimum": 1, "maximum": 1800}
+  },
+  "$comment": "Semantic admission also checks hot>=cold, Re=0 or1..400, reference Pe<=5000 and solid/fluid conductivity ratio .01..1e5. Bounds are software limits, not full-envelope validation."
+}

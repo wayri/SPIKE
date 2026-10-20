@@ -23,6 +23,12 @@ class SpikesWorkerRuntimeTests(unittest.TestCase):
         status = response["result"]
         self.assertEqual(status["status"], "ready")
         self.assertTrue(status["features"]["persistent_sessions"])
+        self.assertTrue(status["features"]["adaptive_time_step"])
+        self.assertTrue(status["features"]["dependent_sources"])
+        self.assertTrue(status["features"]["behavioral_sources"])
+        self.assertTrue(status["features"]["experimental_io_pads"])
+        self.assertTrue(status["features"]["scheduled_io_pad_edges"])
+        self.assertRegex(status["runtime_version"], r"^abi-1\+sha256\.[0-9a-f]{12}$")
         self.assertEqual(status["execution_class"], "soft_realtime")
         self.assertFalse(status["hard_realtime_qualified"])
 

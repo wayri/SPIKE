@@ -31,10 +31,13 @@ const categories = new Set(PYTHON_TEMPLATES.map(template => template.category));
 for (const expected of ["Basics", "Design inspection", "PI - DC", "PI - AC", "Circuits and parasitics",
   "SI - channels", "SI - crosstalk", "SI - protocols", "Thermal - steady", "Thermal - transient",
   "Thermal - board", "Thermal - assembly", "EM and EMI", "Extensions", "Multiboard", "Result review",
-  "Export", "Parameter sweeps"]) {
+  "Export", "Parameter sweeps", "Co-simulation and twins", "SPIKES Studio"]) {
   assert.ok(categories.has(expected), `missing category: ${expected}`);
 }
 assert.equal(PYTHON_STARTER, PYTHON_TEMPLATES[0].code);
+const picker = readFileSync(new URL("../src/PythonTemplateLibrary.tsx", import.meta.url), "utf8");
+assert.match(picker, /template\.id[\s\S]*template\.requirements/, "search includes stable IDs and workflow requirements");
+assert.match(picker, /matching template[\s\S]*Clear filters/, "filtered result count and reset remain visible");
 
 const python = process.env.PYTHON || (process.platform === "win32" ? "python" : "python3");
 for (const template of PYTHON_TEMPLATES) {
@@ -80,6 +83,9 @@ const executionMethods = new Map([
   ["run-multiboard-si-request", { method: "run_multiboard_si_independent_batch", key: "request", value: {} }],
   ["run-multiboard-thermal-request", { method: "run_multiboard_thermal", key: "request", value: {} }],
   ["run-multiboard-em-request", { method: "run_multiboard_em", key: "request", value: {} }],
+  ["prepare-spikes-studio-handoff", { method: "prepare_spikes_studio_handoff", key: "request", value: {} }],
+  ["run-studio-board-feedback", { method: "run_studio_board_cosimulation", key: "request", value: {} }],
+  ["run-engineering-review", { method: "review_engineering", key: "request", value: {} }],
 ]);
 const requestDirectory = mkdtempSync(join(tmpdir(), "spike-python-template-test-"));
 try {

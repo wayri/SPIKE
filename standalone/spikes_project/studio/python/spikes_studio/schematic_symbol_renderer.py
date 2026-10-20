@@ -16,6 +16,18 @@ def label_positions(part):
 
 def paint_body(dc, world_point, point, part, zoom, symbol_color, text_color, muted_color):
     """Paint one component body and its identity text without registering hits."""
+    custom=part.get('parameters',{}).get('component_symbol')
+    if custom:
+        dc.SetPen(wx.Pen(symbol_color,2));dc.SetBrush(wx.TRANSPARENT_BRUSH)
+        for primitive in custom['primitives']:
+            if primitive['kind']=='circle':dc.DrawCircle(point(*primitive['center']),max(1,round(primitive['radius']*zoom)))
+            else:dc.DrawLines([point(*p) for p in primitive['points']])
+        dc.SetTextForeground(text_color)
+        for terminal in custom['terminals']:
+            at=point(*terminal['at']);dc.DrawLine(at,point(*terminal['leg_endpoint']))
+            dc.DrawText(terminal['id']+' '+terminal['name'],at[0]+4,at[1]-15)
+        top=custom['body_keepout']['min'];dc.DrawText(part['ref'],point(top[0],top[1]-25))
+        dc.DrawText(part['value'],point(top[0],top[1]-12));return
     left, right = point(-55, 0), point(55, 0)
     dc.SetPen(wx.Pen(symbol_color, 2));dc.SetBrush(wx.TRANSPARENT_BRUSH)
     dc.DrawLine(left, point(-28, 0));dc.DrawLine(point(28, 0), right)

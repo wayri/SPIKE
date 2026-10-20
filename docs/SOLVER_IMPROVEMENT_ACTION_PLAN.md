@@ -1,10 +1,6 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Solver improvement feedback and action plan
 
-*Evidence availability:* Paths to local-only evidence are written as code below;
-these files are not included in this checkout. This documentation check does
-not reverify their contents or the historical results cited here.
-
 SPIKE should first strengthen error control and comparison semantics, then
 expand predictive coverage, and finally optimize runtime at fixed accuracy.
 The benchmark evidence supports useful bounded thermal, PI, SI, EM and coupled
@@ -20,7 +16,9 @@ and reference-tool availability are known.
 
 Evidence: [accuracy program](SOLVER_ACCURACY_PROGRAM.md),
 [initial baseline](validation/SOLVER_ACCURACY_BASELINE_20261012.md), and the
-comprehensive report (`../output/solver-comprehensive-20261012/SPIKE_solver_accuracy_and_performance_report.pdf`).
+[historical comprehensive report](validation/RELEASE_040_LOCAL_EVIDENCE.md) was a
+local generated artifact and is not shipped. Its claims remain provisional until
+the checked-in benchmark commands are rerun and reviewed.
 The [action backlog](solver-improvement-actions-v1.json) is the execution
 register. Its IDs are engineering task references, not capability flags.
 
@@ -313,7 +311,7 @@ Do not equate stationary planar magnetic heating with this capability.
 
 - ACC01 now has a signed/zero amplitude mode preserving the historical v1
   default. Its conclusive 42-run owned-C++ evidence is
-  `output/acc01-20261013-rerun-1/report.json`. All 36 nonzero strata fail the
+the unbundled local `acc01-20261013-rerun-1/report.json`. All 36 nonzero strata fail the
   frozen pointwise budgets; all six zero strata pass. Errors scale with
   excitation and peak at the ramp corner. No nonzero verified minimum amplitude
   is claimed. The initial run remains inconclusive because a bound source
@@ -325,14 +323,14 @@ Do not equate stationary planar magnetic heating with this capability.
   omit events exactly on the regular grid even though the integrator uses BE;
   this diagnostics nuance must be addressed in the subsequent control review.
 - ACC03 has fresh retained-plate stopping evidence under
-  `output/retained-assembly-em-acc03-20261013`. The 80,000-step duration run
+the unbundled local `retained-assembly-em-acc03-20261013` record. The 80,000-step duration run
   remains stopping-failed (-81.74 dB observed versus -90 dB requested), while
   its S11 sensitivity passes independently. Parser edge-case review repairs are
   tested, with separate `stopping-reparse-v2.json` evidence preserving all actual
   statuses. Full integration qualification remains pending.
 - ACC04's actual retained STEP/thermal/project workflow now runs without the
   historical path override. See [declared environment repair](ASSEMBLY_THERMAL_MESHING.md#declared-isolated-environment-repair-13-october-2026-acc04)
-  and `output/acc04-20261013/validation.json`. Sources were unchanged and the
+and the unbundled local `acc04-20261013/validation.json` record. Sources were unchanged and the
   288-node SPIKE/CalculiX comparison passes its existing gate. Fresh-process
   tests cover each missing dependency, `.pth`/`PYTHONPATH` isolation, venv
   precedence and poisoned executable-path environment variables.
@@ -351,7 +349,7 @@ run completed 3,666 tests with one failure, one error and 65 skips. Its unrelate
 Python-debug startup failure passed when isolated; import-stage receipt
 qualification remains failed because WF01-S01/S02 receipts lack newly required
 source bindings. Fresh actual imports under
-`output/first-batch-parity-replay-20261013/s01` and `/s02` pass, but this task did
+the unbundled local `first-batch-parity-replay-20261013` S01 and S02 records pass, but this task did
 not overwrite the other task's receipts or backlog. Full-suite qualification
 is therefore not green. The architecture and solver-plan checks pass.
 
@@ -425,7 +423,7 @@ The owner approved an explicitly named higher-order linear method rather than
 silently changing legacy behavior. `radau_iia3` now passes all 42 frozen ACC01
 signed/zero RC/RL cases with the same timestep grids and all-time pointwise
 voltage/current budgets. Source, binary and input bindings are conclusive in
-`output/acc01-radau-20261018/report.json`. The lowest tested input is 1e-6 V;
+the unbundled local `acc01-radau-20261018/report.json`. The lowest tested input is 1e-6 V;
 case-specific observed errors are not a universal accuracy floor. The October
 13 trapezoidal failures remain retained, not relabeled. Eight native regression
 executables passed; independent numerical review verified third-order sine
@@ -451,7 +449,7 @@ Studio discovery was reproduced failing after a metadata-free GUI stub was
 installed by another test module. Conservative inert module discovery fixes
 that case without launching/importing a GUI; the ordered regression passed
 15 tests and neighboring board integration/coupling passed 18. The original
-failed log remains at `output/acc01-radau-20261018/full-python-suite-20261018.log`.
+failed log remains an unbundled local record named `full-python-suite-20261018.log`.
 A fresh full rerun is retained separately; no failed run is relabeled green.
 
 That second run completed 4,250 tests with zero failures, four errors and 65
@@ -461,7 +459,7 @@ at 23:18. The formerly failing native PWM and Studio discovery tests passed.
 A fresh process passed all 42 affected parity tests. After that task completed
 and became idle, a third full run started, recording gate/receipt and native
 DLL SHA-256 identities before and after execution. Its log is
-`output/acc01-radau-20261018/full-python-suite-stable-20261018.log`; input drift
+the unbundled local `full-python-suite-stable-20261018.log` record; input drift
 must be reported inconclusive, not accepted as qualification.
 
 The guarded third run completed 4,270 tests with one failure, zero errors and
@@ -490,7 +488,7 @@ authored, not copied from examples.
 During startup the deadline fallback requires status polling until the child's
 watchdog initializes; this is not an OS-enforced guarantee for an unobserved
 startup or a security sandbox. The final fresh full run is retained at
-`output/acc01-radau-20261018/full-python-suite-post-timeout-fix-20261018.log`,
+the unbundled local `full-python-suite-post-timeout-fix-20261018.log` record,
 with debugger implementation/tests/guide included in its before/after hash guard.
 The final run completed on 19 October 2026: **4,293 tests, zero failures, zero
 errors, 69 skips**, in 994.704 seconds. All 16 debugger tests passed in that full

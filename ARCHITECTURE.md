@@ -1,5 +1,28 @@
 # SPIKE Architecture
 
+Studio reusable component packages remain inert on import. Visual symbol/pin
+editing, source capture and explicitly approved SPICE/C++/Verilog build paths
+are separate services; see [ADR 0125](docs/adr/0125-reusable-component-maker.md)
+and [the component maker workflow](standalone/spikes_project/studio/docs/COMPONENT_MAKER.md).
+
+The experimental STM32F407 owned-native peripheral mode replaces selected
+Renode MMIO blocks with SPIKE C++ TIM2/SPI1/I2C1/GPIO state and routes only
+PA0 AF1, PA5/PA6/PA7 AF5 and open-drain PB6/PB7 AF4 through finite native pads.
+Python is transport-only; timed receivers use the accepted electrical left
+limit before event outputs change. See [ADR 0119](docs/adr/0119-owned-native-peripheral-mmio-and-pads.md),
+the [timing evidence](docs/validation/NATIVE_PERIPHERAL_TIMING_20261020.md) and
+[pin workflow](standalone/spikes_project/studio/docs/GPIO_PIN_WORKFLOW.md).
+
+An explicit experimental instruction-boundary firmware feedback mode is
+separate from interval-held timestamp capture; see
+[ADR 0114](docs/adr/0114-instruction-boundary-firmware-feedback.md).
+
+Experimental GPIO pad properties persist with controller boards. Native C++
+pad-event queueing and the explicit virtual-timestamp software-GPIO capture
+adapter remain separate from the CPU backend; see
+[pin/edge workflow](standalone/spikes_project/studio/docs/GPIO_PIN_WORKFLOW.md)
+and [event formulation and limits](docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md).
+
 Manufacturer product discovery and local LTspice indexing are separate from
 generic presets and executable model qualification; see
 [ADR 0111](docs/adr/0111-manufacturer-discovery-and-local-model-index.md).

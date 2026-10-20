@@ -1,0 +1,245 @@
+{
+  "contract": "spike/dc-annular-stack-request/v1",
+  "ownership": {
+    "contract": "spike/dc-axial-ownership-request/v1",
+    "center_xy_mm": [
+      2.0,
+      -3.0
+    ],
+    "net": "explicit-net",
+    "bore_radius_mm": 0.15,
+    "lands": [
+      {
+        "id": "lower",
+        "layer": "B.Cu",
+        "node": 11,
+        "z_min_mm": 0.0,
+        "z_max_mm": 0.1,
+        "outer_radius_mm": 0.4,
+        "conductivity_s_m": 58000000.0
+      },
+      {
+        "id": "center",
+        "layer": "In1.Cu",
+        "node": 27,
+        "z_min_mm": 1.0,
+        "z_max_mm": 1.1,
+        "outer_radius_mm": 0.4,
+        "conductivity_s_m": 58000000.0
+      },
+      {
+        "id": "upper",
+        "layer": "F.Cu",
+        "node": 56,
+        "z_min_mm": 2.0,
+        "z_max_mm": 2.1,
+        "outer_radius_mm": 0.4,
+        "conductivity_s_m": 58000000.0
+      }
+    ],
+    "segments": [
+      {
+        "id": "gap0",
+        "kind": "via",
+        "source_land": "lower",
+        "target_land": "center",
+        "start_z_mm": 0.05,
+        "end_z_mm": 1.05,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "current_a": 7.0,
+        "source_contact": {
+          "id": "gap0-source",
+          "land_id": "lower",
+          "node": 11,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "target_contact": {
+          "id": "gap0-target",
+          "land_id": "center",
+          "node": 27,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        }
+      },
+      {
+        "id": "gap1",
+        "kind": "via",
+        "source_land": "center",
+        "target_land": "upper",
+        "start_z_mm": 1.05,
+        "end_z_mm": 2.05,
+        "outer_radius_mm": 0.175,
+        "conductivity_s_m": 58000000.0,
+        "current_a": -11.0,
+        "source_contact": {
+          "id": "gap1-source",
+          "land_id": "center",
+          "node": 27,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        },
+        "target_contact": {
+          "id": "gap1-target",
+          "land_id": "upper",
+          "node": 56,
+          "inner_radius_mm": 0.15,
+          "outer_radius_mm": 0.175
+        }
+      }
+    ]
+  },
+  "lands": [
+    {
+      "land_id": "lower",
+      "source_binding": null,
+      "request": {
+        "contract": "spike/dc-annular-land-request/v1",
+        "conductivity_s_m": 58000000.0,
+        "radial_planes_mm": [
+          0.15,
+          0.175,
+          0.25,
+          0.4
+        ],
+        "axial_planes_mm": [
+          0.0,
+          0.05,
+          0.1
+        ],
+        "contacts": [
+          {
+            "id": "drive",
+            "attachment_id": "drive",
+            "face": "z_min",
+            "interval_mm": [
+              0.25,
+              0.4
+            ],
+            "current_a": 0.0
+          },
+          {
+            "id": "gap0-source",
+            "attachment_id": "gap0-source",
+            "face": "z_max",
+            "interval_mm": [
+              0.15,
+              0.175
+            ],
+            "current_a": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "land_id": "center",
+      "source_binding": null,
+      "request": {
+        "contract": "spike/dc-annular-land-request/v1",
+        "conductivity_s_m": 58000000.0,
+        "radial_planes_mm": [
+          0.15,
+          0.175,
+          0.25,
+          0.4
+        ],
+        "axial_planes_mm": [
+          1.0,
+          1.05,
+          1.1
+        ],
+        "contacts": [
+          {
+            "id": "gap0-target",
+            "attachment_id": "gap0-target",
+            "face": "z_min",
+            "interval_mm": [
+              0.15,
+              0.175
+            ],
+            "current_a": 0.0
+          },
+          {
+            "id": "gap1-source",
+            "attachment_id": "gap1-source",
+            "face": "z_max",
+            "interval_mm": [
+              0.15,
+              0.175
+            ],
+            "current_a": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "land_id": "upper",
+      "source_binding": null,
+      "request": {
+        "contract": "spike/dc-annular-land-request/v1",
+        "conductivity_s_m": 58000000.0,
+        "radial_planes_mm": [
+          0.15,
+          0.175,
+          0.25,
+          0.4
+        ],
+        "axial_planes_mm": [
+          2.0,
+          2.05,
+          2.1
+        ],
+        "contacts": [
+          {
+            "id": "gap1-target",
+            "attachment_id": "gap1-target",
+            "face": "z_min",
+            "interval_mm": [
+              0.15,
+              0.175
+            ],
+            "current_a": 0.0
+          },
+          {
+            "id": "return",
+            "attachment_id": "return",
+            "face": "z_max",
+            "interval_mm": [
+              0.25,
+              0.4
+            ],
+            "current_a": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "segment_id": "gap0",
+      "source_contact_id": "gap0-source",
+      "target_contact_id": "gap0-target"
+    },
+    {
+      "segment_id": "gap1",
+      "source_contact_id": "gap1-source",
+      "target_contact_id": "gap1-target"
+    }
+  ],
+  "resistors": [],
+  "external_currents": {
+    "lower": {
+      "drive": 1.0,
+      "gap0-source": 0.0
+    },
+    "center": {
+      "gap0-target": 0.0,
+      "gap1-source": 0.0
+    },
+    "upper": {
+      "gap1-target": 0.0,
+      "return": -1.0
+    }
+  }
+}
