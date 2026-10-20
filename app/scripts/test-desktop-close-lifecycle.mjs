@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { register } from "node:module";
 
 globalThis.window = { __TAURI_INTERNALS__: {} };
+register("./desktop-close-mock-loader.mjs", import.meta.url);
 const bridge = await import("../src/workerBridge.ts");
 const calls = [];
 let nativeListener, legacyListener, unlistens = 0;

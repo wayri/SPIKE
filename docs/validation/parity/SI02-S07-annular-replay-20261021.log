@@ -1,0 +1,19 @@
+test_bad_modal_identity_and_admission (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_bad_modal_identity_and_admission) ... ok
+test_cancel_between_modes_and_callback_failure (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_cancel_between_modes_and_callback_failure) ... ok
+test_cancellation_and_resource_preflight (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_cancellation_and_resource_preflight) ... ok
+test_coherent_scaling_and_probe_independent_integrals (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_coherent_scaling_and_probe_independent_integrals) ... ok
+test_corrupt_child_coverage_and_qualification_rejected (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_corrupt_child_coverage_and_qualification_rejected) ... ok
+test_direct_coupled_spatial_boundary_and_quadratic_oracles (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_direct_coupled_spatial_boundary_and_quadratic_oracles) ... ok
+test_equal_modes_remove_crosstalk (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_equal_modes_remove_crosstalk) ... ok
+test_forged_child_identity_rejected (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_forged_child_identity_rejected) ... ok
+test_lossless_crosstalk_passivity_reciprocity (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_lossless_crosstalk_passivity_reciprocity) ... ok
+test_reversal_and_conductor_permutation (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_reversal_and_conductor_permutation) ... ok
+test_zero_and_pure_modes (tests.python.test_rlgc_coupled_pair.CoupledPairTests.test_zero_and_pure_modes) ... ok
+test_actual_worker_direct_physical_oracle_and_schemas (tests.python.test_rlgc_coupled_pair_contract.CoupledPairContractTests.test_actual_worker_direct_physical_oracle_and_schemas) ... ok
+test_example_cli_catalog_and_preserved_models (tests.python.test_rlgc_coupled_pair_contract.CoupledPairContractTests.test_example_cli_catalog_and_preserved_models) ... ok
+test_strict_wire_rejections_and_worker_failure (tests.python.test_rlgc_coupled_pair_contract.CoupledPairContractTests.test_strict_wire_rejections_and_worker_failure) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 7.435s
+
+OK

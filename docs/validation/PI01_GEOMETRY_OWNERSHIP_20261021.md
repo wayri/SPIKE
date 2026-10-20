@@ -21,7 +21,7 @@ are original; no external implementation or test data was incorporated.
 
 - Strengthened **PI01-S02A: 18 tests passed, no skips**, fresh source-bound
   [receipt](parity/PI01-S02A-geometry-replay-20261021.json),
-  log (unbundled local record: `parity/PI01-S02A-geometry-replay-20261021.log`), and
+  log ([bundled original execution log](parity/PI01-S02A-geometry-replay-20261021.log)), and
   [12-solve ladder](parity/PI01-S02A-geometry-ladder-20261021.json).
   The rotated case now rotates the actual source and contact polygons before
   meshing; it declares g=1e-12 mm. No original resistance/density tolerance

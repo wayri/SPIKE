@@ -19,7 +19,7 @@ const tree=module.exports.default({x:1,y:1,title:"Navigate",actions:[
  {label:"Axes",icon:"GridIcon",section:"View options",checked:false,run(){}},
 ],onClose:()=>closed++});
 const nodes=tree=>!tree||typeof tree!=="object"?[]:[tree,...[tree.props?.children].flat(Infinity).flatMap(nodes)];
-const buttons=nodes(tree).filter(x=>x.type==="button");
+const buttons=nodes(tree).filter(x=>x.type==="button"&&x.props.role?.startsWith("menuitem"));
 assert.equal(portalTarget,detachedDocument.body,"context menu portal follows its detached panel document");
 assert.equal(buttons[0].props.role,"menuitemradio");assert.equal(buttons[0].props["aria-checked"],true);
 assert.equal(buttons[2].props.role,"menuitemcheckbox");assert.equal(buttons[2].props["aria-checked"],false);

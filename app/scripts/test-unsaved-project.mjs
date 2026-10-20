@@ -8,8 +8,8 @@ const mainWindowCapability = JSON.parse(readFileSync(new URL("../src-tauri/capab
 for (const marker of [
   "projectDirtyRef", "markProjectDirty", "setProjectClean", "requestUnsavedAction",
   "subscribeDesktopCloseRequested", "preventDefault()", 'window.addEventListener("beforeunload"',
-  "resolveUnsavedPrompt", "Save changes before you", 'resolveUnsavedPrompt("save")',
-  'resolveUnsavedPrompt("discard")', 'resolveUnsavedPrompt("cancel")',
+  "resolveUnsavedPrompt", "Save changes before you", 'onResolve("save")',
+  'onResolve("discard")', 'onResolve("cancel")',
 ]) assert.ok(source.includes(marker), `Unsaved-project close handling is missing ${marker}`);
 
 assert.ok(styles.includes(".unsaved-project-dialog"), "Unsaved-project dialog styles are missing");

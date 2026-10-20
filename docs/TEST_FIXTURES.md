@@ -1,5 +1,64 @@
 # SPIKE Test Fixtures
 
+## Public Marble prerequisite for the full Python suite
+
+`test_board_terminal_contacts` checks native geometry from the public
+BerkeleyLab/Marble v1.4.4 source. Prepare its local cache before running the
+full Python suite. The test deliberately fails when the required source is
+missing or its SHA-256 differs; an absent fixture is not a passing audit.
+
+The pinned upstream commit is
+`a426777d92c0f22a546d4740b419a3937e0c1f90`. The upstream README credits
+The Regents of the University of California through Lawrence Berkeley National
+Laboratory, records CERN OHL v1.2, and includes the U.S. Government rights
+notice. Keep that README alongside the unchanged board. This preparation
+downloads inert data into ignored `build/`; it neither executes upstream code
+nor adds the upstream board to SPIKE's release archive. Source and license
+context are also recorded in [Help maintenance](HELP_MAINTENANCE.md) and
+[third-party notices](../THIRD_PARTY_NOTICES.md).
+
+Run the following Python from the repository root (save it to a temporary
+script or paste it into a Python interpreter). Existing cached files are
+verified before reuse. A hash mismatch stops preparation without replacing
+the existing file.
+
+```python
+import hashlib
+from pathlib import Path
+from urllib.request import Request, urlopen
+
+commit = "a426777d92c0f22a546d4740b419a3937e0c1f90"
+base = f"https://raw.githubusercontent.com/BerkeleyLab/Marble/{commit}/"
+cache = Path("build/marble-qualification/sources/Marble-v1.4.4")
+files = {
+    "README.md": "8cfd50651c0562e26380286b3c7f931c4f9d79af115675b224d6660a7b558533",
+    "design/Marble.kicad_pcb": "3304ba37c2bd891849fc36b500cd940934aaf1f2013a95639c03564fb925c512",
+}
+for name, expected in files.items():
+    target = cache / name
+    if target.exists():
+        payload = target.read_bytes()
+    else:
+        request = Request(base + name, headers={"User-Agent": "SPIKE-fixture-validation"})
+        with urlopen(request, timeout=60) as response:
+            payload = response.read(64 * 1024 * 1024 + 1)
+    if len(payload) > 64 * 1024 * 1024:
+        raise ValueError(f"Fixture exceeds size limit: {name}")
+    if hashlib.sha256(payload).hexdigest() != expected:
+        raise ValueError(f"Pinned fixture digest differs: {name}")
+    if not target.exists():
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open("xb") as stream:
+            stream.write(payload)
+    print(f"Verified {target}")
+```
+
+Then run `python -m unittest tests.python.test_board_terminal_contacts -v`.
+The check establishes the stated source geometry facts only; it does not
+qualify full-board PI/SI physics or a hardware result.
+
+## E-brake fixture
+
 The e-brake driver board is a useful real-world KiCad regression fixture. It contains routed copper, internal layers, vias, zones, stackup data, components, manufacturing outputs, STEP models, and schematics.
 
 Board under test:

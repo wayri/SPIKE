@@ -96,5 +96,5 @@ const appSource = fs.readFileSync(new URL('../src/App.tsx', import.meta.url), 'u
 const notificationTools = appSource.slice(appSource.indexOf('const notificationWorkspaceTools'), appSource.indexOf('return <div className={`app-shell'));
 assert.ok(!notificationTools.includes('emi-viewport-bar'), 'EM tools must not be rendered inside notifications');
 assert.match(appSource, /label: "EM tools", restore: \(\) => \{ setTab\("EM"\); setEmToolsMinimized\(false\); \}/, 'minimized EM controls restore from the bottom tool shelf');
-assert.match(appSource, /aria-label="Minimize EM tools to bottom bar"/);
+assert.match(appSource, /aria-label="Hide EM tools" title="Restore with Show hidden tools"/, 'EM tools expose their current hide action and restoration route');
 console.log("EMI chamber: rigid placement, snapshots, fields, layout reservation and bottom-bar EM tools passed");

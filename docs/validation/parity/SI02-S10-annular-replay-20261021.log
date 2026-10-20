@@ -1,0 +1,16 @@
+test_cancellation_callbacks_and_forged_child (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_cancellation_callbacks_and_forged_child) ... ok
+test_homogeneous_segmentation (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_homogeneous_segmentation) ... ok
+test_malformed_identity_reference_grid_and_resources (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_malformed_identity_reference_grid_and_resources) ... ok
+test_physical_spatial_chain_fields_and_individual_heat_quadrature (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_physical_spatial_chain_fields_and_individual_heat_quadrature) ... ok
+test_single_section_matches_unchanged_pair (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_single_section_matches_unchanged_pair) ... ok
+test_singular_connection_and_nonfinite_fail_closed (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_singular_connection_and_nonfinite_fail_closed) ... ok
+test_uncoupled_scalar_cascade_reduction (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_uncoupled_scalar_cascade_reduction) ... ok
+test_zero_scaling_reversal_and_conductor_permutation (tests.python.test_rlgc_coupled_cascade.CoupledCascadeTests.test_zero_scaling_reversal_and_conductor_permutation) ... ok
+test_actual_worker_physical_chain_and_provenance (tests.python.test_rlgc_coupled_cascade_contract.CoupledCascadeContractTests.test_actual_worker_physical_chain_and_provenance) ... ok
+test_saved_example_cli_and_catalog (tests.python.test_rlgc_coupled_cascade_contract.CoupledCascadeContractTests.test_saved_example_cli_and_catalog) ... ok
+test_strict_contracts_and_coded_worker_rejections (tests.python.test_rlgc_coupled_cascade_contract.CoupledCascadeContractTests.test_strict_contracts_and_coded_worker_rejections) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 9.839s
+
+OK

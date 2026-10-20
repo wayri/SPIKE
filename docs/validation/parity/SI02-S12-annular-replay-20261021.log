@@ -1,0 +1,17 @@
+test_cancellation_and_child_field_split_identity_forgery (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_cancellation_and_child_field_split_identity_forgery) ... ok
+test_closed_form_identical_uncoupled_matched_star (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_closed_form_identical_uncoupled_matched_star) ... ok
+test_collision_free_physical_port_identity (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_collision_free_physical_port_identity) ... ok
+test_eight_leg_upper_boundary (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_eight_leg_upper_boundary) ... ok
+test_independent_branched_physical_system_fields_and_heat (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_independent_branched_physical_system_fields_and_heat) ... ok
+test_malformed_resources_condition_and_unrepresentability (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_malformed_resources_condition_and_unrepresentability) ... ok
+test_two_leg_equivalence_to_cascade (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_two_leg_equivalence_to_cascade) ... ok
+test_zero_scaling_and_leg_conductor_permutation (tests.python.test_rlgc_coupled_star.CoupledStarTests.test_zero_scaling_and_leg_conductor_permutation) ... ok
+test_actual_worker_physical_chain_and_provenance (tests.python.test_rlgc_coupled_star_contract.CoupledStarContractTests.test_actual_worker_physical_chain_and_provenance) ... ok
+test_saved_example_cli_and_catalog (tests.python.test_rlgc_coupled_star_contract.CoupledStarContractTests.test_saved_example_cli_and_catalog) ... ok
+test_strict_contracts_and_coded_worker_rejections (tests.python.test_rlgc_coupled_star_contract.CoupledStarContractTests.test_strict_contracts_and_coded_worker_rejections) ... ok
+test_two_and_eight_leg_schema_dimensions (tests.python.test_rlgc_coupled_star_contract.CoupledStarContractTests.test_two_and_eight_leg_schema_dimensions) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 12.913s
+
+OK

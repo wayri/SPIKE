@@ -45,7 +45,7 @@ No passivity projection, current correction or board threshold relaxation occurs
 ## Executed verification
 
 - [Source-bound receipt](parity/PI01-S02-annular-contact-20261021.json),
-  log (unbundled local record: `parity/PI01-S02-annular-contact-20261021.log`) and
+  log ([bundled original execution log](parity/PI01-S02-annular-contact-20261021.log)) and
   [raw response/final field report](parity/PI01-S02-annular-fields-20261021.json):
   **30 tests, zero skips,33 hashed source files unchanged before/after/current.**
   Seven annular, seven integration, four independent circuit, six source-admission

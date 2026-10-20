@@ -1,0 +1,23 @@
+test_actual_cli_saved_report_and_no_overwrite (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_actual_cli_saved_report_and_no_overwrite) ... ok
+test_all_four_actual_three_level_ladders (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_all_four_actual_three_level_ladders) ... ok
+test_all_levels_retain_raw_conservation_and_heat_gates (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_all_levels_retain_raw_conservation_and_heat_gates) ... ok
+test_forged_pass_cannot_hide_bad_finest_solution (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_forged_pass_cannot_hide_bad_finest_solution) ... ok
+test_identity_volume_status_and_nan_forgeries_rejected (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_identity_volume_status_and_nan_forgeries_rejected) ... ok
+test_precision_geometry_audit_cannot_be_omitted_or_relaxed (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_precision_geometry_audit_cannot_be_omitted_or_relaxed) ... ok
+test_raw_terminal_work_cannot_be_hidden_by_saved_diagnostic (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_raw_terminal_work_cannot_be_hidden_by_saved_diagnostic) ... ok
+test_reference_against_independent_gauss_integration (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_reference_against_independent_gauss_integration) ... ok
+test_rotated_polygon_overlay_remains_explicitly_rejected (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_rotated_polygon_overlay_remains_explicitly_rejected) ... ok
+test_solved_rotation_conductivity_and_inactive_volume (tests.python.test_pi_finite_contact_benchmark.FiniteContactBenchmarkTests.test_solved_rotation_conductivity_and_inactive_volume) ... ok
+test_grid_origin_and_resource_bounds (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_grid_origin_and_resource_bounds) ... ok
+test_holes_and_inactive_components_preserved (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_holes_and_inactive_components_preserved) ... ok
+test_interior_contact_margin_cannot_be_snapped_to_exterior (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_interior_contact_margin_cannot_be_snapped_to_exterior) ... ok
+test_narrow_contact_separation_is_rejected (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_narrow_contact_separation_is_rejected) ... ok
+test_narrow_copper_and_holes_are_rejected_not_removed (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_narrow_copper_and_holes_are_rejected_not_removed) ... ok
+test_no_triangle_guard_relaxation_or_legacy_silent_snap (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_no_triangle_guard_relaxation_or_legacy_silent_snap) ... ok
+test_original_failure_fixed_with_explicit_measured_geometry (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_original_failure_fixed_with_explicit_measured_geometry) ... ok
+test_separate_copper_nets_cannot_be_snapped_into_contact (tests.python.test_dc_precision_partition.PrecisionPartitionTests.test_separate_copper_nets_cannot_be_snapped_into_contact) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 5.203s
+
+OK

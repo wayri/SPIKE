@@ -20,7 +20,7 @@ not edited.
 ## Executed numerical evidence
 
 - [Current partial receipt](parity/PI01-S02-land-transition-20261021.json),
-  raw log (unbundled local record: `parity/PI01-S02-land-transition-20261021.log`), and
+  raw log ([bundled original execution log](parity/PI01-S02-land-transition-20261021.log)), and
   [retained fields/refinement report](parity/PI01-S02-land-fields-20261021.json):
   **23 tests, zero skips**, with 36 source files hashed before/after/current.
   These are 14 new main/oracle tests and nine prior axial/integration tests
