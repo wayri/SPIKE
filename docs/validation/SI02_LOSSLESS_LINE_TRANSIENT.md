@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S01 verification: distributed lossless TEM line transient
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified 18 October 2026. **Done for the bounded stage; experimental,
 production-unqualified.** SI02 and complete PI/SI parity remain open.
 The [method ledger](../LOSSLESS_LINE_TRANSIENT.md) retains reviewed primary
@@ -10,7 +12,7 @@ units, zero-history assumptions, conditioning/resources and coupling ownership.
 ## Executed evidence
 
 The [canonical source-bound receipt](parity/SI02-S01.json) retains **10 tests,
-zero skips**, and its [actual log](parity/SI02-S01-lossless-line-reverified.log).
+zero skips**, and its actual log (unbundled local record: `parity/SI02-S01-lossless-line-reverified.log`).
 Seven numerical and three actual worker/schema/example tests executed.
 Reproduce into new repository paths:
 

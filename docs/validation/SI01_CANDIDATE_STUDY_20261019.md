@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI01-S01 finite supplied-line candidate/corner verification — 2026-10-19
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental stage**. SI01 remains in progress;
 whole PI/SI parity and physical-board qualification are not established.
 
@@ -12,7 +14,7 @@ records the unchanged-solver orchestration boundary.
 ## Executed evidence
 
 - [Source-bound stage receipt](parity/SI01-S01-verified-20261019.json) and
-  [raw test log](parity/SI01-S01-verified-20261019.log): **22 passed, 0 skipped**.
+  raw test log (unbundled local record: `parity/SI01-S01-verified-20261019.log`): **22 passed, 0 skipped**.
   Sources were hashed before execution and checked unchanged afterward.
   The receipt binds production bytes, reused solver dependencies, public routing,
   request/result schemas, example, method documentation and exact test identities.

@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # PI01-S02 geometry and axial ownership increment — 21 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 **PI01-S02 remains in progress.** This increment verifies opt-in precision
 admission for the previously failing rotated polygons and a bounded explicit
 annular land/gap ownership model with a fresh reduced DC solve. It does not
@@ -19,14 +21,14 @@ are original; no external implementation or test data was incorporated.
 
 - Strengthened **PI01-S02A: 18 tests passed, no skips**, fresh source-bound
   [receipt](parity/PI01-S02A-geometry-replay-20261021.json),
-  [log](parity/PI01-S02A-geometry-replay-20261021.log), and
+  log (unbundled local record: `parity/PI01-S02A-geometry-replay-20261021.log`), and
   [12-solve ladder](parity/PI01-S02A-geometry-ladder-20261021.json).
   The rotated case now rotates the actual source and contact polygons before
   meshing; it declares g=1e-12 mm. No original resistance/density tolerance
   changed. The old receipt/log remain historical; their hashes were not patched.
 - **9 axial helper/integration tests passed, no skips**, source-bound partial
   [receipt](parity/PI01-S02-blockers-20261021.json),
-  [log](parity/PI01-S02-blockers-20261021.log), and
+  log (unbundled local record: `parity/PI01-S02-blockers-20261021.log`), and
   [raw ownership and fresh-solve report](parity/PI01-S02-ownership-20261021.json).
   The receipt enforces `stage_complete=false`, `production_qualified=false` and
   revalidates the strengthened finite-contact receipt.

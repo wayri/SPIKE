@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SPIKES startup overhead and wiring — 19 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
+
 The installed Windows SPIKES Studio now contains the startup, simulation and
 wiring improvements described here. It was independently checked and opened
 normally with the saved Midnight theme. This remains version `0.3.0-beta.6`,
@@ -26,11 +28,11 @@ interactive workstation with other user work. Our heavy validation/build jobs
 finished before the after measurement. These are neither kernel-throughput
 nor GUI input-to-frame timings, and do not establish whole-product superiority.
 
-The [benchmark report](../artifacts/studio-performance-20261019/benchmark-report.md)
+The benchmark report (unbundled local record: `../artifacts/studio-performance-20261019/benchmark-report.md`)
 contains individual cases, errors, tolerances and limitations.
-[Before](../artifacts/studio-performance-20261019/competitive-before.json),
-[after](../artifacts/studio-performance-20261019/competitive-after.json) and
-[provenance](../artifacts/studio-performance-20261019/benchmark-provenance.json)
+Before (unbundled local record: `../artifacts/studio-performance-20261019/competitive-before.json`),
+after (unbundled local record: `../artifacts/studio-performance-20261019/competitive-after.json`) and
+provenance (unbundled local record: `../artifacts/studio-performance-20261019/benchmark-provenance.json`)
 retain repetitions, identities, input decks and wrapper hashes.
 
 ## Implementation
@@ -96,9 +98,9 @@ earlier clipboard mismatch is not proven; cross-document protection was retained
 Failed runs remain in the evidence directory.
 
 Visual acceptance used actual native windows. The
-[source narrow capture](../artifacts/studio-performance-20261019/source-smoke-ui/wire-narrow.png),
-[frozen wide capture](../artifacts/studio-performance-20261019/frozen-smoke-r3-ui/wire-wide.png)
-and [installed narrow capture](../artifacts/studio-performance-20261019/installed-smoke-ui/wire-narrow.png)
+source narrow capture (unbundled local record: `../artifacts/studio-performance-20261019/source-smoke-ui/wire-narrow.png`),
+frozen wide capture (unbundled local record: `../artifacts/studio-performance-20261019/frozen-smoke-r3-ui/wire-wide.png`)
+and installed narrow capture (unbundled local record: `../artifacts/studio-performance-20261019/installed-smoke-ui/wire-narrow.png`)
 show the new label position and guide. The frozen narrow capture had a black
 client area and is retained as unusable capture evidence; the installed narrow
 capture was inspected instead. The normal installed startup was additionally
@@ -108,7 +110,7 @@ three parts. The app is left running.
 ## Built and installed identities
 
 The independently built candidate is `studio-startup-wiring-20261019-r3`:
-[installer](../artifacts/studio-packages/20261019/windows-startup-wiring-preview-r3/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe),
+installer (unbundled local record: `../artifacts/studio-packages/20261019/windows-startup-wiring-preview-r3/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe`),
 111,653,571 bytes, SHA-256
 `33f12b34e93b848b916cca22360cb4083c20e71f4d0f62dd06aa1bbb38d8a05d`.
 Its immutable runtime derives from reviewed r2, with only one acceptance-helper
@@ -123,17 +125,17 @@ verified all installed files and repeated acceptance. Thus r3 was built and test
 but was not installed over the newer update.
 
 Actual installed directory: `C:\Users\yawar\AppData\Local\Programs\SPIKES Studio`.
-The preserved [installed-build installer](../artifacts/mfr19e/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe)
+The preserved installed-build installer (unbundled local record: `../artifacts/mfr19e/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe`)
 is 111,669,351 bytes, SHA-256
 `badf2548e680d6d79bfad69efda63721d65f4310692abec2b8803646da96e6cb`.
 Its source-manifest SHA-256 is
 `f3537127dd375e3386f605c43067a136cf8ce6b3e8be574f93f29c28b7896839`.
 
-[Source binding](../artifacts/studio-performance-20261019/installed-source-binding.json),
-[payload check](../artifacts/studio-performance-20261019/installed-payload.json),
-[validation receipt](../artifacts/studio-performance-20261019/startup-wiring-validation.json),
-[installed-build checksums](../artifacts/studio-performance-20261019/installed-build-SHA256SUMS)
-and [r3 manifest](../artifacts/studio-packages/20261019/windows-startup-wiring-preview-r3/package-manifest.json)
-and [checksums](../artifacts/studio-packages/20261019/windows-startup-wiring-preview-r3/SHA256SUMS)
+Source binding (unbundled local record: `../artifacts/studio-performance-20261019/installed-source-binding.json`),
+payload check (unbundled local record: `../artifacts/studio-performance-20261019/installed-payload.json`),
+validation receipt (unbundled local record: `../artifacts/studio-performance-20261019/startup-wiring-validation.json`),
+installed-build checksums (unbundled local record: `../artifacts/studio-performance-20261019/installed-build-SHA256SUMS`)
+and r3 manifest (unbundled local record: `../artifacts/studio-packages/20261019/windows-startup-wiring-preview-r3/package-manifest.json`)
+and checksums (unbundled local record: `../artifacts/studio-packages/20261019/windows-startup-wiring-preview-r3/SHA256SUMS`)
 retain exact artifact and verification identities. Previous application payload,
 recovery and appearance data were backed up; user project storage was preserved.

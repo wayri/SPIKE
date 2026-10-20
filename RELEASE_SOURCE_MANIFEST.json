@@ -1,7 +1,7 @@
 {
   "contract": "spike/release-source-manifest/v1",
   "version": "0.4.0-alpha.1",
-  "parent_commit": "87224dc8413efb8334afb4b40c625f9fa8f45bf7",
+  "parent_commit": "c621338326713648cf4335deb71503db1aff79ce",
   "selection": "Current development overlay on the existing 0.4 release branch; retained published fixes; generated/private/download caches and unresolved third-party export assets excluded.",
   "self_excluded": true,
   "review_status": {
@@ -23,7 +23,6 @@
     "examples/upstream-emerge/patch-antenna-gui.py"
   ],
   "retained_parent_paths": [
-    "app/scripts/run-ui-stability.mjs",
     "app/scripts/test-project-package.mjs",
     "benchmarks/parity-import/component-models-placed-release-0.4-20261019.step",
     "docs/SPIKE_EM_UI_BACKPORT.md",
@@ -82,8 +81,7 @@
     "tests/python/test_installed_python_runtime.py",
     "tests/python/test_publish_verified_windows.py",
     "tests/python/test_windows_desktop_path.py",
-    "tests/test_spikes_dc.cpp",
-    "tools/hdl/osdi_0_4.h"
+    "tests/test_spikes_dc.cpp"
   ],
   "files": [
     {
@@ -312,10 +310,10 @@
     },
     {
       "path": "app/package.json",
-      "git_blob": "a9867231dd20955b874ced0d958cd657859a9243",
+      "git_blob": "cfe14f4ebe9d6cbe7cfeb4ece03cc2ac74f70f88",
       "mode": "100644",
-      "bytes": 18640,
-      "sha256": "a8c5fac227215e6bd69255594da11a3aea431c665de3511342d671961f6ac69b"
+      "bytes": 18751,
+      "sha256": "8b1e3a7c4739f91387b69da12acb10d74ab85acc142e8aae7897c60b7485afa8"
     },
     {
       "path": "app/public/demo/ebrake1.kicad_pcb",
@@ -886,10 +884,10 @@
     },
     {
       "path": "app/scripts/generate-help-controls.mjs",
-      "git_blob": "15c30a6a6d747c0b3cc5725ba7a049fdc9549873",
+      "git_blob": "b786d45186aad539aaaa221a6c8eeda4c8257d39",
       "mode": "100644",
-      "bytes": 3824,
-      "sha256": "68dc2734f858805d02f9730d74f66c3345662b4ba6d50d15f659b761aaaeabaa"
+      "bytes": 3941,
+      "sha256": "b6021f4303d7a82fe4e12c9fe16b44f576b2b809a10dde417340d31ac9a333ef"
     },
     {
       "path": "app/scripts/harness-editor-preview.tsx",
@@ -6395,10 +6393,10 @@
     },
     {
       "path": "app/src/helpControls.generated.json",
-      "git_blob": "e2991a8e9b4e5e8bf1ae7067b6ea6d762fc70fae",
+      "git_blob": "df84d106971a29160c830c4b460179e253ee3044",
       "mode": "100644",
-      "bytes": 895958,
-      "sha256": "057e260d587888f7432b6127eedcf16b87028f867216154b4371507136de1833"
+      "bytes": 895951,
+      "sha256": "21cb7e3bbeb57ab7a07926587943153c3adb66c4468bd2356ea03892906be6fb"
     },
     {
       "path": "app/src/helpDemos.tsx",
@@ -10574,38 +10572,38 @@
     },
     {
       "path": "docs/SPIKES_STUDIO_COLD_GPIO_VALIDATION_20261019.md",
-      "git_blob": "45b029ee1d99d0748c8f7b03f81e621c6a034e84",
+      "git_blob": "61939f1887efe6c406d145f39738882d97cbded8",
       "mode": "100644",
-      "bytes": 9144,
-      "sha256": "de33c5f4ea73bd9fc6d00c2262f327ca407d869721796dd4add8fea833507b80"
+      "bytes": 9682,
+      "sha256": "ede89d10a1c2b86804c5564821e8801fd625229c129214ca0fcdf05b9dbfa40b"
     },
     {
       "path": "docs/SPIKES_STUDIO_STARTUP_VALIDATION_20261019.md",
-      "git_blob": "cdbecf584c7a1924e81870b06a1a068d58903ebd",
+      "git_blob": "70470fafcc45010d5628a6965a4eceb180182bb1",
       "mode": "100644",
-      "bytes": 8867,
-      "sha256": "aa127be838707d5a6df45496e094221c59263c4d22f6553d8d6ee1b343cea513"
+      "bytes": 9630,
+      "sha256": "e4fbe68c9f0cabdb5d5ae6791e51632612e49e25dd6f40b353d3739fca548bd9"
     },
     {
       "path": "docs/SPIKES_STUDIO_WIRING_MODELS_VALIDATION_20261019.md",
-      "git_blob": "db5522a0943df59abe39e9836c61eaa6d62ad3c7",
+      "git_blob": "c3e035ff2ac3565b282137dbffd294ddaf941740",
       "mode": "100644",
-      "bytes": 8523,
-      "sha256": "5bc3be0a6e5db535040ee33cc3d51df0f8aa9d49c90b088c93ef2ea0391f15ea"
+      "bytes": 9236,
+      "sha256": "430830cb8ecdadc3b613ee663a1868e7680aa94eae95a84b94c195f758ea20ea"
     },
     {
       "path": "docs/SPIKES_STUDIO_WORKFLOW_VALIDATION_20261018.md",
-      "git_blob": "50cda64f91e23aa5316cf659b0c39c7db630a85b",
+      "git_blob": "57735a8081652e79ea2be05c5c1847a76619d8a2",
       "mode": "100644",
-      "bytes": 7038,
-      "sha256": "f0890380c98aca73dc11072709807f1f62f1a2221c9446a89a944fe0c3055717"
+      "bytes": 7676,
+      "sha256": "74abf07a284b3ffdb2c3d3b187144d48fa9bce9436c572a342be15666cd9349a"
     },
     {
       "path": "docs/SPIKES_STUDIO_WORKFLOW_VALIDATION_20261019.md",
-      "git_blob": "bc1bcc64c545f3c5ed3feb0958333bfb8c021e1b",
+      "git_blob": "5ad36d4a97b7ef20f624cbef085b8542de022317",
       "mode": "100644",
-      "bytes": 6197,
-      "sha256": "f2fd6b434a9174c49c7ad932215cb158b1983a26db234e9058b52f69c5572b0b"
+      "bytes": 6660,
+      "sha256": "ef538754b95f7d1d7cde1477b46c36e40a37632694b1631bf729bdfd182aa3d4"
     },
     {
       "path": "docs/SPIKES_TCAD_EQUILIBRIUM.md",
@@ -12240,10 +12238,10 @@
     },
     {
       "path": "docs/validation/ASSEMBLY_THERMOELASTICITY.md",
-      "git_blob": "eca848d8c2f71c51c500e433d4d8791cb53abcd7",
+      "git_blob": "2d30a15026cc07e4634b1ac367f1a9e36a5eff01",
       "mode": "100644",
-      "bytes": 3383,
-      "sha256": "076717b0b5a739462ef9e26964f23e56c64fc996134d04f39979e16d3b50b824"
+      "bytes": 3785,
+      "sha256": "b1aad3ee2045d849a7a6dd2cd17c3011386d7d2c635a9b4b8647743d1aad4dfe"
     },
     {
       "path": "docs/validation/BIDIRECTIONAL_GPIO_BUS_20261020.md",
@@ -12779,31 +12777,31 @@
     },
     {
       "path": "docs/validation/PI01_ANNULAR_CONTACT_20261021.md",
-      "git_blob": "d4bd5bee4b13a6a6eab93b59cbe046c5a0a2961a",
+      "git_blob": "c49dd400bd60d2a24fd33c205a46a6a38af601cf",
       "mode": "100644",
-      "bytes": 8419,
-      "sha256": "ccd870b9880f8fec14cf818c295fcf9d53bd37c8b115308c7c06f6ac3c9c2e50"
+      "bytes": 8821,
+      "sha256": "26754bc488de43b99e3717ed8056ff5a85ef5b77c3f9ce803a9ab93668b4f4be"
     },
     {
       "path": "docs/validation/PI01_FINITE_CONTACT_20261021.md",
-      "git_blob": "6b36c3c29adcf7e73b873549f33e6c4b72ca72a6",
+      "git_blob": "b233968717e1ed511caf7beea5c8315aee7e39e5",
       "mode": "100644",
-      "bytes": 4612,
-      "sha256": "5e15aa0e6db4849b39c845ec1c8d365b1d8888e27389a950022725f9a47b812d"
+      "bytes": 5014,
+      "sha256": "16e344b6eae3324f4f137a9c707326f6248762bf84ddef5986a5f7287e866524"
     },
     {
       "path": "docs/validation/PI01_GEOMETRY_OWNERSHIP_20261021.md",
-      "git_blob": "6c191c180102dd3df26eae1dd03482cc6f3490ff",
+      "git_blob": "4f2a46dc27ffdf531570dcf0ea6a24aef4fef375",
       "mode": "100644",
-      "bytes": 5847,
-      "sha256": "c197a8f5feca99c08d5a1fc9f22251d92f1accb98e14ac4fa89fd8c66a106dc7"
+      "bytes": 6274,
+      "sha256": "8ec5008d64fdf3c626acc659ec70492fec5fe9d609fc6fafaffd6b35dec8a85c"
     },
     {
       "path": "docs/validation/PI01_LAND_TRANSITION_20261021.md",
-      "git_blob": "6d11f40bd4418e0b703f1bcd7ac520af8cb155ed",
+      "git_blob": "b38094fb40fbf8d033cacaebe1d7204243337ad6",
       "mode": "100644",
-      "bytes": 6165,
-      "sha256": "d93cd865f99d4e46f9caa2e011e0567f8ed5ae374f4651f71336aaba5f5fec33"
+      "bytes": 6567,
+      "sha256": "5a251d43d79efdc77a013ea4793353822f404d5abcb80be33194223264cc42e7"
     },
     {
       "path": "docs/validation/PI01_OWNED_PAD_DC_20261019.md",
@@ -12912,80 +12910,80 @@
     },
     {
       "path": "docs/validation/SI01_CANDIDATE_STUDY_20261019.md",
-      "git_blob": "5bbd2781a2a3c200ecb610bbafd2e954296257b9",
+      "git_blob": "4d45e9558fc9bc200721ca0ddf583e726a828a43",
       "mode": "100644",
-      "bytes": 4580,
-      "sha256": "965c4332ab1bb40c637e940d1432d0f253183cfdfec52dc263c25a73ffeca36c"
+      "bytes": 4982,
+      "sha256": "f89336ca3e91fe56ac1ca34522b7178cd5471526946aabb96fcc5f38e5a6e683"
     },
     {
       "path": "docs/validation/SI02_COUPLED_CASCADE_20261020.md",
-      "git_blob": "f201144b83783d547bc00f8901a3e4fe8c9a1424",
+      "git_blob": "0c8082c51ff3477d44761a2415891a632e0d30cf",
       "mode": "100644",
-      "bytes": 6194,
-      "sha256": "0f36addd1013cb65348457030a539f91234e589909f2a64da812f207a8adf672"
+      "bytes": 6596,
+      "sha256": "03c52bff29a08c5252a4590804185d7dfae8a612fcac7724cc94a45c94544f5e"
     },
     {
       "path": "docs/validation/SI02_COUPLED_PAIR_20261020.md",
-      "git_blob": "2e8ddf2456216ec7f5436a3edea19ee7731de05b",
+      "git_blob": "d8018821c8ce6efbb279d79abc051cb6764f4fec",
       "mode": "100644",
-      "bytes": 4787,
-      "sha256": "a7f221b500c9e1854658184eda61e4a8ba26820593f27b296c5b5e1ba7229a08"
+      "bytes": 5189,
+      "sha256": "d46814fa3fff2b513113da5aaefaa3e770f061b96ca03932b637aea5c4c34912"
     },
     {
       "path": "docs/validation/SI02_COUPLED_STAR_20261020.md",
-      "git_blob": "e22addb6c101a78ebc2889898498491172a2ba7f",
+      "git_blob": "05eddbf960f00f1d982085be3cf379c1fdb4a7eb",
       "mode": "100644",
-      "bytes": 6483,
-      "sha256": "46053ae35dee685bfa94eb2117d19229dba3c75e5912c397e7c8f6ae6cf9adb3"
+      "bytes": 6885,
+      "sha256": "ff90e1b7150fab2a88db71432697c2888cc3401c536bec22b84c739e2ed9f1f0"
     },
     {
       "path": "docs/validation/SI02_DISTORTIONLESS_LINE_TRANSIENT.md",
-      "git_blob": "ff0ec86b844c4bb6dc4920752412e9f1da95ea5a",
+      "git_blob": "7fee0c905449c14b9f4168dca0b7b89967302e57",
       "mode": "100644",
-      "bytes": 5620,
-      "sha256": "b30ff1fa53b31e1395dd6f8ca9b20822c9b7db7744999b34efdc691bf5f4d875"
+      "bytes": 6022,
+      "sha256": "9d5d386dcadf4c8a6072d3ef2878bada2f6725804e51e006ddf6f9e1aedc20d1"
     },
     {
       "path": "docs/validation/SI02_LOADED_CASCADE_20261020.md",
-      "git_blob": "616bb7490fd0575aac99b41a05f1a8b38bd3473a",
+      "git_blob": "bad8b7d61a068cd20d447e2720b8dff782e21566",
       "mode": "100644",
-      "bytes": 6466,
-      "sha256": "35f2b32377a7fe4861ac50aab264d3a7178e24eea89a718d16aacebd64a48f88"
+      "bytes": 6868,
+      "sha256": "b8725f33a24459b076c29bca3dd3e61af75cbde0a4ccf29898a0c30ccaa2cdd4"
     },
     {
       "path": "docs/validation/SI02_LOADED_STAR_20261021.md",
-      "git_blob": "355fc85b6d52edb21234ef40f2a0ee4e72b6683d",
+      "git_blob": "53a1765fa21878bd5f0a6dad77d92914fa629f66",
       "mode": "100644",
-      "bytes": 7377,
-      "sha256": "1934ff3748eb80444f6a87e3ee3e20c4f019f91b4904edcd7a15f97c8de50772"
+      "bytes": 7779,
+      "sha256": "b8056c62712e70a507b98e941a76b250d1e7893fd039374efb536fcbc9e45a2d"
     },
     {
       "path": "docs/validation/SI02_LOSSLESS_LINE_TRANSIENT.md",
-      "git_blob": "e5be077aa6c255f155b7ddfd6bd7a62006862882",
+      "git_blob": "a26ded0e7d13bb216d3bb76f57383eb6536e30fb",
       "mode": "100644",
-      "bytes": 5939,
-      "sha256": "91bec5eb0d27344c71ab87d259416a69b0c23ed5ba1f65711577f1dfcef7e646"
+      "bytes": 6341,
+      "sha256": "3fc0f73e8c1346baf444d0baf5c5c86ec9c0c1d13288ec81fe90fa454fb610e9"
     },
     {
       "path": "docs/validation/SI02_REACTIVE_PAIR_20261020.md",
-      "git_blob": "22155a24523c69604723885570395c303ad03ec8",
+      "git_blob": "ebdd9dbc16eefb30a1a1892a266049953816288a",
       "mode": "100644",
-      "bytes": 4951,
-      "sha256": "d65ea23f1b7b03959f4d54d544fad83888842652a8b8d59c4f14d4f348d7f183"
+      "bytes": 5353,
+      "sha256": "829cf36f7ec8652787de1530719bc5973378ad6aac28ca291cc34bbf39105726"
     },
     {
       "path": "docs/validation/SI02_RLGC_LINE_CASCADE.md",
-      "git_blob": "b55f6a5777c4aad80e76092759e57319b5a9837d",
+      "git_blob": "d0057249f0c76cd0e821096c41d8a3fedcef4801",
       "mode": "100644",
-      "bytes": 6932,
-      "sha256": "2a45bfb076b27a1e0fe19804e8e709408b33c94cb92c98a7660eb9d2b7bed0dc"
+      "bytes": 7334,
+      "sha256": "2ee7db320189e8101352488355d4554f3cab0c0a2ee3e32fa856725a86af8cd7"
     },
     {
       "path": "docs/validation/SI02_RLGC_LINE_FIELDS.md",
-      "git_blob": "7467ef0ecebc7dc24105e3da2872e0df9714a455",
+      "git_blob": "0f9fee4c90bbf1d0d07961ad6859dc3b983344b4",
       "mode": "100644",
-      "bytes": 7700,
-      "sha256": "cc1e5450ceb8b5192d3d0d7fb95d89db5eb4416380b68096811a5a1f96874346"
+      "bytes": 8102,
+      "sha256": "fe5633221b781996935121e119d5b84e4d20cfc8b9fdb89c6709bd3d089cec1b"
     },
     {
       "path": "docs/validation/SI02_RLGC_LINE_JUNCTION.md",
@@ -12996,73 +12994,73 @@
     },
     {
       "path": "docs/validation/SI02_RLGC_LINE_NETWORK.md",
-      "git_blob": "40e3de227408c569e40cc5a43ce65915459ee02a",
+      "git_blob": "ded4155b92485fd7b1f205f466d5fa4339ad833a",
       "mode": "100644",
-      "bytes": 6638,
-      "sha256": "088004567b9bafeefa40375bbf541863249ff1ddf466be11fd71001b354707c5"
+      "bytes": 7040,
+      "sha256": "c1d91d9ca69f4dbdba2c7d704a1dcbd33aeccfaa3ec378628c98fb56d9b67bf5"
     },
     {
       "path": "docs/validation/SI02_TERMINATED_PAIR_20261020.md",
-      "git_blob": "52c36bd351dc1829dbd4a9e50097c1e5e050eff5",
+      "git_blob": "3d83162aa6f12ce3d2505b2313a330e34e9a9d0b",
       "mode": "100644",
-      "bytes": 4720,
-      "sha256": "5978128f0b4d1271cfe621d6f19fabb1d0c82aef350f4adf2f7d409f0320389d"
+      "bytes": 5122,
+      "sha256": "4c00aec4c903fc5d53f08d8c17afbee3c3699952b2b47e4fa4f815e8cdc4f73f"
     },
     {
       "path": "docs/validation/SI07_CAPACITIVE_NETWORK_TRANSIENT.md",
-      "git_blob": "5cfd17be090f2fe81cde7bce09ee4eaca644a430",
+      "git_blob": "3c232d47657b53f4bbc8c4873ccdd4c836cef7e1",
       "mode": "100644",
-      "bytes": 5060,
-      "sha256": "e03481541e4799012d8b788f3e0201e7f682d598313fac222397e5a80de63289"
+      "bytes": 5462,
+      "sha256": "e1d430f9eef754d4c5f60c0840e2db53c3f158cfec4af6f4ac0a039c14552695"
     },
     {
       "path": "docs/validation/SI07_CROSSTALK_TIMING_CORNERS.md",
-      "git_blob": "1e2ce0100cb18ea110f1409af494c7330ab184a7",
+      "git_blob": "7adf777889c827d296254b7b750d19b9efa5b82f",
       "mode": "100644",
-      "bytes": 5922,
-      "sha256": "0d0fac02b1642f9d2a8d5a711fb754f62a34459cac6ee5c6b0d7d0f0177eb55f"
+      "bytes": 6324,
+      "sha256": "5aa4b684623c8159c2272d44f77531dfe53b121c55f3ac6cbcb6b1e4b4a400d1"
     },
     {
       "path": "docs/validation/SI07_INDUCTIVE_NETWORK_TRANSIENT.md",
-      "git_blob": "098caff3465ecc380641ec40c44657b553a57c4a",
+      "git_blob": "274fd5054209e3cf32f5cd69245364f5f36b5496",
       "mode": "100644",
-      "bytes": 4400,
-      "sha256": "c0f4e44c08813d0cab0172aff0ec3c5827db0da28881811103685cc89def0aa6"
+      "bytes": 4802,
+      "sha256": "48c2933aac6d66d8dbe0a8c98a953fb8f63c8e147fc437b6afd0b0ff297985f5"
     },
     {
       "path": "docs/validation/SI07_MULTI_AGGRESSOR_CROSSTALK.md",
-      "git_blob": "a3f0bd550cca9fb45f075ed99d1d4851ff3dd166",
+      "git_blob": "949f9ce87ff43b9c0021a3d2b437bae4dce9ba01",
       "mode": "100644",
-      "bytes": 6521,
-      "sha256": "362be7eaa47522b8dd72f5b20ff19d316fc5eb954b6960e292a3caea321a9273"
+      "bytes": 6923,
+      "sha256": "c6bc0e130dc9e77a065700c8ac57a4fe31c0863d9d0ba908763bb5b4c8128090"
     },
     {
       "path": "docs/validation/SI07_NETWORK_REFLECTOMETRY.md",
-      "git_blob": "e8f1c65d9e1e02adc04834b096da0948ef96c94b",
+      "git_blob": "e3114628306f1496aab5340f2d9c46ec7b6ca4a5",
       "mode": "100644",
-      "bytes": 5946,
-      "sha256": "65731d53dfc38c8ae141e731077ed6ffdb049b4b8e5c07fcea1a974cf165fed2"
+      "bytes": 6348,
+      "sha256": "cd8a67e0e4a9f5bdc9954f7766cbd1fc23470e38d376e471b8a7881ac5506391"
     },
     {
       "path": "docs/validation/SI07_RLC_ENERGY_LEDGER.md",
-      "git_blob": "825b4ed9309518f4b4fc74915dbf58c621cd62bc",
+      "git_blob": "9fdb07aaf6ba92c8f14811aef6f91befd890c09d",
       "mode": "100644",
-      "bytes": 4820,
-      "sha256": "097fe94e0bb16e91ffb3a4e84ad927229d4ecb1adde1ef1f0828c80d83db9af1"
+      "bytes": 5222,
+      "sha256": "42d0767dd162c4e397e59297a7f63b606ed826f48b7624787c0b17c6a64b8aa5"
     },
     {
       "path": "docs/validation/SI07_RLC_INITIAL_STATES.md",
-      "git_blob": "030885acc4b6e3806d5e2b168c6b9846c41d8322",
+      "git_blob": "9f1ca40571fefdc0651627a3274ae578fcc2ca01",
       "mode": "100644",
-      "bytes": 4778,
-      "sha256": "284319ce5107c276420d484956ff7d05b039d71c16f733e58f9dd4cc073fc279"
+      "bytes": 5180,
+      "sha256": "ae538e6e9264736db31fb9dc525f43dd6d478d895ae45e6daa30ef21726fde92"
     },
     {
       "path": "docs/validation/SI07_RLC_NETWORK_TRANSIENT.md",
-      "git_blob": "535c9a5eb9d7b721f7dbf47451c0a7f3cff1cbe4",
+      "git_blob": "ab1deca7070804af9a0696d87587850d23ad09aa",
       "mode": "100644",
-      "bytes": 4921,
-      "sha256": "d8234cccfb193b88648d41bf6c8aa7d661c5731a03ad45186c67fb4ead28383e"
+      "bytes": 5323,
+      "sha256": "2e72f50f65ae9f39d81c5b918b1eaadde48473af61adf0a47d72fb6da94db878"
     },
     {
       "path": "docs/validation/SI_CAPABILITY_VOLUME_PEEC_20260928.md",
@@ -13108,10 +13106,10 @@
     },
     {
       "path": "docs/validation/SPIKES_COMPONENT_MAKER_VALIDATION.md",
-      "git_blob": "32fb12bda72ab072255e5deee2b40536551e85a9",
+      "git_blob": "883729fcf8ec313ab91be22ab030ef134c498ed2",
       "mode": "100644",
-      "bytes": 3825,
-      "sha256": "0c9d7ce070303d1cf938cb6e2aebcc142c6bb4880e74b5ed9495ee6644d48e54"
+      "bytes": 4227,
+      "sha256": "04b50a40aa3fd5f67795e986e25f0f1362c3bed7b765029c7fe7187a5032dfbf"
     },
     {
       "path": "docs/validation/SPIKES_EQUATION_PARASITICS_20261013.md",
@@ -23188,10 +23186,10 @@
     },
     {
       "path": "examples/high_speed_si/README.md",
-      "git_blob": "013f487ba240d62831d14675a079d3632250dad6",
+      "git_blob": "26b6f4079121802f411ffcc7355b0a4b60126a93",
       "mode": "100644",
-      "bytes": 9961,
-      "sha256": "91c9797b50b780b41ce81e0187f6f0859fbb75c8507d6d955fec78d9059c6109"
+      "bytes": 10585,
+      "sha256": "9937aa722e5110c4b6ce26de68471e4a61eb28aaa6bc9e1f23a35aac8c75aa46"
     },
     {
       "path": "examples/high_speed_si/field/README.md",
@@ -25673,10 +25671,10 @@
     },
     {
       "path": "integrations/freecad/SPIKEWorkbench/.github/PULL_REQUEST_TEMPLATE.md",
-      "git_blob": "28ee4b2b44ac5744df009454d58e6b0759d4d573",
+      "git_blob": "102b0534e0e8954921c0f79441634c9499095192",
       "mode": "100644",
-      "bytes": 617,
-      "sha256": "53a0d825bf5ae4da6683282f370c50ff702b1cdaefea52cf14c697ef24a18dd7"
+      "bytes": 648,
+      "sha256": "10fdd8a2bc44c39dcf7d7c595aebf9ff55d959cefb47686729c6760548337562"
     },
     {
       "path": "integrations/freecad/SPIKEWorkbench/.github/workflows/ci.yml",

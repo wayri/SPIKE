@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # GP07-S01: Bounded static thermoelasticity
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified on 18 October 2026. Status: **Done for this bounded stage**;
 `production_qualified: false`. See the [scope and remaining stages](../COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md).
 
@@ -12,7 +14,7 @@ indexed mesh. It preserves original and generated input digests, ownership and
 caller context; it does not verify an external CAD revision.
 
 The [source-bound execution receipt](parity/GP07-S01.json) records **16 tests,
-zero skips**, with [actual execution log](parity/GP07-S01-lf-reverified.log).
+zero skips**, with actual execution log (unbundled local record: `parity/GP07-S01-lf-reverified.log`).
 Reproduce using new output paths:
 
 ```powershell

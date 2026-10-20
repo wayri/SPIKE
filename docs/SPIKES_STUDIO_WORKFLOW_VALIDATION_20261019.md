@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SPIKES job overhead, wiring and packaged models - 19 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
+
 This iteration targets SPIKES Studio, the separate native circuit workbench.
 It remains `0.3.0-beta.6`, an unsigned engineering preview. No public release
 or additional numerical qualification is claimed.
@@ -26,7 +28,7 @@ The native CLI constructs only its selected command parser. The complete parser
 remains available for global help and other commands. Shared option definitions
 and regression checks preserve native-run defaults, every integration alias,
 required arguments, help and error text. Fresh-process observations are retained
-in the [benchmark report](../artifacts/studio-iteration-20261019/benchmark-report.md).
+in the benchmark report (unbundled local record: `../artifacts/studio-iteration-20261019/benchmark-report.md`).
 All nine cases pass their unchanged tolerances for SPIKES, ngspice and LTspice.
 All three engines slowed in the final observed run on this busy workstation;
 these data do not establish a startup speed gain or simulator superiority.
@@ -91,9 +93,9 @@ result does not qualify or change the installed engine. The broad run therefore
 remains a failed gate with an explicit capability mismatch. Architecture,
 TypeScript, parser, button controls and Rust results above passed.
 
-The [bound validation receipt](../artifacts/studio-iteration-20261019/validation.json)
+The bound validation receipt (unbundled local record: `../artifacts/studio-iteration-20261019/validation.json`)
 records the installer/source identities, full-suite failures, installed payload,
 acceptance counts and limitations. The
-[independent ABI review](../artifacts/studio-iteration-20261019/abi-review.json)
+independent ABI review (unbundled local record: `../artifacts/studio-iteration-20261019/abi-review.json`)
 retains all three fixture sources, exact old/new result equality, per-point handle
 closure counts and reviewed input hashes. Its script is retained alongside it.

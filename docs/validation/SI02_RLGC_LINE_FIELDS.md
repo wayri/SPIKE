@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S04 verification: driven sampled RLGC fields and loss ledger
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified 18 October 2026. **Done for this bounded stage; experimental,
 production-unqualified.** SI02 and full PI/SI parity remain open.
 The [method ledger](../RLGC_LINE_FIELDS.md) retains independent derivation,
@@ -16,7 +18,7 @@ warning limits pure-TEM physical applicability. No external code/data was used.
 
 The [canonical source-bound receipt](parity/SI02-S04.json) retains **15 tests,
 zero skips**, twelve numerical and three actual worker/schema/example checks.
-Its [actual log](parity/SI02-S04-rlgc-fields-reverified.log) records executed names.
+Its actual log (unbundled local record: `parity/SI02-S04-rlgc-fields-reverified.log`) records executed names.
 Reproduce into new repository paths:
 
 ```powershell

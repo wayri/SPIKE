@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SPIKES Studio cold-path and GPIO validation - 19 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
+
 **Status: local engineering preview; public release qualification is incomplete.** This record covers the
 current source and bounded evidence in
 `artifacts/studio-cold-gpio-20261019`. SPIKES Studio remains a local, unsigned
@@ -14,13 +16,13 @@ defers unrelated command imports. Standard output is compact JSON by default;
 `--pretty` restores indented output, and file output remains indented. Native
 result extraction validates each channel once and reuses the ctypes output buffer,
 pointer and function lookup across samples. The scalar C ABI still receives one
-checked foreign call per point; no native bulk-transfer ABI was added. The retained [channel review](../artifacts/studio-cold-gpio-20261019/channel-review.json)
+checked foreign call per point; no native bulk-transfer ABI was added. The retained channel review (unbundled local record: `../artifacts/studio-cold-gpio-20261019/channel-review.json`)
 found complete old/new JSON and raw-channel equality for operating-point,
 fixed and adaptive transient, and nested STEP/DC fixtures. It also exercises
 invalid names, closed handles, and a mid-channel native error without returning
 partial data. The focused cold/contract regressions passed 27 tests.
 
-The solve-excluded [channel microbenchmark](../artifacts/studio-cold-gpio-20261019/channel-benchmark.json)
+The solve-excluded channel microbenchmark (unbundled local record: `../artifacts/studio-cold-gpio-20261019/channel-benchmark.json`)
 transferred nine channels of 1,000 points over ten paired repetitions. Median
 extraction time was 15.0476 ms through scalar calls and 5.7806 ms through the
 channel extraction helper, with all values equal. This is an ABI-transfer result from an
@@ -55,9 +57,9 @@ The final native candidate is
 `artifacts/studio-cold-gpio-20261019/engine-final/spikes_c_api.dll`, 810,496
 bytes, SHA-256
 `1ab15364ecf9ebd66ed48ec8e82be25d1a421b1d1654c8962959f67460373ba1`.
-The retained [native snapshot manifest](../artifacts/studio-cold-gpio-20261019/native-snapshot-manifest.json)
+The retained native snapshot manifest (unbundled local record: `../artifacts/studio-cold-gpio-20261019/native-snapshot-manifest.json`)
 binds copied source and test files by SHA-256; the manifest itself is bound in
-the [build review](../artifacts/studio-cold-gpio-20261019/native-build-review.json)
+the build review (unbundled local record: `../artifacts/studio-cold-gpio-20261019/native-build-review.json`)
 as `84418f5d2eb26c957885ad22e24b18bb4b2f7b189db8c722850caf4646e3380a`.
 The isolated Visual Studio 2026 x64 Release build reported no snapshot mutation.
 Seven selected CTest executables and 46 Python GPIO/ABI/job/startup tests passed
@@ -67,8 +69,8 @@ hermetic build or an installed-payload receipt.
 
 ## Controlled cold competitive observation
 
-The [before](../artifacts/studio-cold-gpio-20261019/competitive-before.json) and
-[after](../artifacts/studio-cold-gpio-20261019/competitive-after.json) reports
+The before (unbundled local record: `../artifacts/studio-cold-gpio-20261019/competitive-before.json`) and
+after (unbundled local record: `../artifacts/studio-cold-gpio-20261019/competitive-after.json`) reports
 used the same nine-case corpus, five isolated-process repetitions per case, and
 the same SPIKES DLL SHA-256
 `891211e317ca14282b778d29101b4021f3eb348f7be5f8c119e3a5e47ab2a889`.

@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S12 ideal coupled-star verification — 20 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental development stage**.
 The capability remains experimental with `production_qualified:false` regardless
 of development replay completion. SI02, full PI/SI parity, physical board
@@ -11,7 +13,7 @@ See [independent method/source ledger](../RLGC_COUPLED_STAR.md) and
 ## Executed evidence
 
 - [Source-bound receipt](parity/SI02-S12-qualified-20261020.json) and
-  [raw execution log](parity/SI02-S12-qualified-20261020.log): **12 passed,
+  raw execution log (unbundled local record: `parity/SI02-S12-qualified-20261020.log`): **12 passed,
   zero failures/errors/skips**. All 54 distinct bound source paths match current
   bytes and before/after execution hashes. The envelope includes own numerical
   kernel/tests/contracts/example/method/ADR, worker/CLI/catalog and unchanged

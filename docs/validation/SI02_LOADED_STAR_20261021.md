@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S13 physically loaded coupled-star verification — 21 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental development stage**.
 The capability remains experimental with `production_qualified:false` regardless
 of replay completion. SI02, full PI/SI parity, physical board qualification and
@@ -11,7 +13,7 @@ knowledgeable human numerical release review remain open. See
 ## Executed evidence
 
 - [Source-bound receipt](parity/SI02-S13-qualified-20261021.json) and
-  [raw log](parity/SI02-S13-qualified-20261021.log): **13 passed, zero
+  raw log (unbundled local record: `parity/SI02-S13-qualified-20261021.log`): **13 passed, zero
   failures/errors/skips**. All 87 distinct bound source hashes match current
   bytes and before/after execution, including the boundary-integrity repair,
   constituent methods, own numerical/contract tests, strict schemas, actual

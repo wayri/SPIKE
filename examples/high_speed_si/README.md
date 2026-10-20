@@ -1,14 +1,16 @@
 # High-speed SI and multiboard PI reference studies
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](../../docs/validation/RELEASE_040_LOCAL_EVIDENCE.md).
+
 Executed 2026-10-10 using SPIKE integrated workers and its configured openEMS extension. These are original numerical reference models. No board, harness model or PHY was supplied for hardware qualification.
 
 ## Reports and saved studies
 
-- [Interactive report with section navigation, 3D E/H samples and exact probes](../../output/high-speed-si/reports/index.html)
-- [Ethernet, LVDS and SerDes PDF](../../output/high-speed-si/reports/protocol-si.pdf)
-- [Harness and multiboard PI/SI PDF](../../output/high-speed-si/reports/harness-multiboard.pdf)
-- [Interboard field PDF](../../output/high-speed-si/reports/interboard-fields.pdf)
-- Native projects: [1G](../../output/high-speed-si/projects/ethernet_1g.spike), [10G](../../output/high-speed-si/projects/ethernet_10g.spike), [100G lane](../../output/high-speed-si/projects/ethernet_100g.spike), [LVDS](../../output/high-speed-si/projects/lvds_1g.spike), [SerDes](../../output/high-speed-si/projects/serdes_32g.spike).
+- Interactive report with section navigation, 3D E/H samples and exact probes (unbundled local record: `../../output/high-speed-si/reports/index.html`)
+- Ethernet, LVDS and SerDes PDF (unbundled local record: `../../output/high-speed-si/reports/protocol-si.pdf`)
+- Harness and multiboard PI/SI PDF (unbundled local record: `../../output/high-speed-si/reports/harness-multiboard.pdf`)
+- Interboard field PDF (unbundled local record: `../../output/high-speed-si/reports/interboard-fields.pdf`)
+- Native projects: 1G (unbundled local record: `../../output/high-speed-si/projects/ethernet_1g.spike`), 10G (unbundled local record: `../../output/high-speed-si/projects/ethernet_10g.spike`), 100G lane (unbundled local record: `../../output/high-speed-si/projects/ethernet_100g.spike`), LVDS (unbundled local record: `../../output/high-speed-si/projects/lvds_1g.spike`), SerDes (unbundled local record: `../../output/high-speed-si/projects/serdes_32g.spike`).
 
 Open a native project with File > Open file or project. Its retained `analysis.si.latest_channel_result` was verified through the actual project read handler. Alternatively load `protocol_results/<case>.json` from HF / SI > Source-to-receiver workflow > Load setup/result. Abstract differential artwork illustrates placement; it is not the geometry from which the supplied RLGC was extracted.
 

@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI07-S08 verification: sampled multi-aggressor crosstalk
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified 18 October 2026. **Done for the bounded stage; experimental,
 production-unqualified.** SI07 and complete PI/SI parity remain open.
 The [method ledger](../MULTI_AGGRESSOR_CROSSTALK.md) retains reviewed primary
@@ -9,7 +11,7 @@ references, original derivation, units, conditioning and multiphysics limits.
 ## Executed evidence
 
 The [canonical source-bound receipt](parity/SI07-S08.json) retains **9 tests,
-zero skips**, and the [actual execution log](parity/SI07-S08-schema-verified.log).
+zero skips**, and the actual execution log (unbundled local record: `parity/SI07-S08-schema-verified.log`).
 Six numerical and three actual worker/schema/example tests executed. Reproduce
 into new repository paths:
 

@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Studio workflow and library update — 2026-10-18
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
+
 The Windows per-user **SPIKES Studio** installation was updated successfully and
 opened normally with the user's saved Midnight theme. The component library was
 opened in the installed application. This is local build
@@ -63,17 +65,17 @@ closure, preview rotation/repetition/cancellation, undo, model serialization,
 BSIM gate-charge transients and a spawned RC transient worker. Independent
 read-only review checked clipboard handle ownership and bounded memory reads.
 
-The [discovery benchmark](../artifacts/studio-workflow-20261018/discovery-benchmark-final.json)
+The discovery benchmark (unbundled local record: `../artifacts/studio-workflow-20261018/discovery-benchmark-final.json`)
 compared result identity and order. Median repeated `r` search changed from
 36.58 ms to 2.14 ms; `resistor` changed from 62.99 ms to 1.87 ms. Index
 construction took 47.94 ms in that run. These are local search/model timings,
 including hot cached queries, excluding rendering and solver execution.
 
 Actual native source captures were inspected at wide and 1000 × 720 sizes:
-[schematic](../artifacts/studio-workflow-20261018/duplicate-wide.png),
-[wide library](../artifacts/studio-workflow-20261018/library-wide.png),
-[narrow library](../artifacts/studio-workflow-20261018/library-narrow.png) and
-[palette](../artifacts/studio-workflow-20261018/palette.png).
+schematic (unbundled local record: `../artifacts/studio-workflow-20261018/duplicate-wide.png`),
+wide library (unbundled local record: `../artifacts/studio-workflow-20261018/library-wide.png`),
+narrow library (unbundled local record: `../artifacts/studio-workflow-20261018/library-narrow.png`) and
+palette (unbundled local record: `../artifacts/studio-workflow-20261018/palette.png`).
 All ten retained visual/transaction checks passed. Installed-app startup and
 library opening were additionally observed through the native UI.
 
@@ -85,15 +87,15 @@ replacement; project and preference storage outside the install directory was
 preserved. The updated application is left open on the component library.
 
 Final installer:
-[SPIKES Studio Windows setup](../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe)
+SPIKES Studio Windows setup (unbundled local record: `../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe`)
 — 111,503,512 bytes.
 
 SHA-256: `2debf66e2f4cfa3e195865d30b3bfc4aaf4cd045a7f4766448c9ade1d6df5e8c`.
 
-[Package manifest](../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/package-manifest.json),
-[source manifest](../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/source-manifest.json),
-[checksums](../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/SHA256SUMS)
-and [validation receipt](../artifacts/studio-workflow-20261018/workflow-validation.json)
+Package manifest (unbundled local record: `../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/package-manifest.json`),
+source manifest (unbundled local record: `../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/source-manifest.json`),
+checksums (unbundled local record: `../artifacts/studio-packages/20261018/windows-workflow-library-preview-r3/SHA256SUMS`)
+and validation receipt (unbundled local record: `../artifacts/studio-workflow-20261018/workflow-validation.json`)
 retain the exact dependency, source, native-engine and installation evidence.
 
 The verified desktop snapshot has SHA-256

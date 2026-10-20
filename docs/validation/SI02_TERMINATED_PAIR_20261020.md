@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S08 physical resistive source/load verification — 20 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental stage**. The complete SI02 family,
 physical board qualification and release remain open. See the
 [method and primary-reference record](../RLGC_TERMINATED_PAIR.md) and
@@ -9,7 +11,7 @@ physical board qualification and release remain open. See the
 ## Executed evidence
 
 - [Current source-bound receipt](parity/SI02-S08-qualified-20261020.json) and
-  [raw log](parity/SI02-S08-qualified-20261020.log): **13 passed, 0 skipped**.
+  raw log (unbundled local record: `parity/SI02-S08-qualified-20261020.log`): **13 passed, 0 skipped**.
   All 32 bound sources match before/after execution and current bytes. The
   receipt includes actual worker/CLI, saved example, strict registered schemas,
   complete producer dependencies, test identities and method documentation.

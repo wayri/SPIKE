@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # PI01-S02A finite-contact planar DC verification — 21 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 The original execution below is historical. A genuine strengthened
 [geometry replay](PI01_GEOMETRY_OWNERSHIP_20261021.md) now uses actual rotated
 polygons with explicit precision admission and 18 tests. Its new source-bound
@@ -16,7 +18,7 @@ units, frozen tolerances and explicit limits.
 ## Executed evidence
 
 - [Source-bound receipt](parity/PI01-S02A-qualified-20261021.json),
-  [raw test log](parity/PI01-S02A-qualified-20261021.log), and
+  raw test log (unbundled local record: `parity/PI01-S02A-qualified-20261021.log`), and
   [complete retained ladder](parity/PI01-S02A-ladder-20261021.json): **9 tests,
   no skips**, all passing; 18 source files hashed before/after and checked
   against the current tree. The ladder additionally runs all 12 solves.

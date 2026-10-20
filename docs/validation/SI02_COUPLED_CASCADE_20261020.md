@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S10 supplied coupled-line cascade verification - 20 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental development stage**. SI02, full
 PI/SI parity, physical board qualification and knowledgeable human numerical
 release review remain open. The method retains `production_qualified:false`
@@ -11,7 +13,7 @@ and [ADR0120](../adr/0120-supplied-coupled-line-cascades.md).
 ## Executed evidence
 
 - [Final current source-bound receipt](parity/SI02-S10-final-20261020.json) and
-  [raw test log](parity/SI02-S10-final-20261020.log): **11 passed, zero
+  raw test log (unbundled local record: `parity/SI02-S10-final-20261020.log`): **11 passed, zero
   failures/errors/skips**. All43 distinct bound source hashes agree before/after
   execution and current bytes. Kernel, numerical/contract tests, nested strict
   schemas, actual worker/CLI, example, underlying producers, method and ADR are

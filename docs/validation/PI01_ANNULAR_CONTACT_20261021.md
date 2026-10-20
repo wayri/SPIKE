@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # PI01-S02 annular source contacts and coupled barrels — 21 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 **Bounded increment verified; full PI01-S02 remains in progress.** Explicit
 axisymmetric annular lands now support independent finite patches, authenticated
 native circular-pad geometry and a fresh passive barrel/circuit solution.
@@ -43,7 +45,7 @@ No passivity projection, current correction or board threshold relaxation occurs
 ## Executed verification
 
 - [Source-bound receipt](parity/PI01-S02-annular-contact-20261021.json),
-  [log](parity/PI01-S02-annular-contact-20261021.log) and
+  log (unbundled local record: `parity/PI01-S02-annular-contact-20261021.log`) and
   [raw response/final field report](parity/PI01-S02-annular-fields-20261021.json):
   **30 tests, zero skips,33 hashed source files unchanged before/after/current.**
   Seven annular, seven integration, four independent circuit, six source-admission

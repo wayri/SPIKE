@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S11 physical RLC loaded coupled-cascade verification -20 October2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental development stage**.
 The implemented capability remains experimental with `production_qualified:false`
 regardless of replay completion. SI02, full PI/SI parity, physical board
@@ -11,7 +13,7 @@ See [independent method/source ledger](../RLGC_LOADED_CASCADE.md) and
 ## Executed evidence
 
 - [Source-bound receipt](parity/SI02-S11-qualified-20261020.json) and
-  [raw test log](parity/SI02-S11-qualified-20261020.log): **10 passed, zero
+  raw test log (unbundled local record: `parity/SI02-S11-qualified-20261020.log`): **10 passed, zero
   failures/errors/skips**. All65 distinct bound source hashes match current
   bytes and before/after execution. The envelope includes both unchanged S09/S10
   constituent dependency envelopes, own kernel/tests/contracts/example/method/ADR,

@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S09 reactive physical coupled-line endpoints - 20 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Status: **Done for the bounded experimental development stage**. SI02, full
 PI/SI parity, physical board qualification and human numerical release review
 remain open. See [method and primary-reference derivation](../RLGC_REACTIVE_PAIR.md)
@@ -9,7 +11,7 @@ and [ADR 0118](../adr/0118-reactive-coupled-line-boundaries.md).
 ## Executed evidence
 
 - [Source-bound receipt](parity/SI02-S09-qualified-20261020.json) and
-  [raw execution log](parity/SI02-S09-qualified-20261020.log): **12 passed,
+  raw execution log (unbundled local record: `parity/SI02-S09-qualified-20261020.log`): **12 passed,
   zero failures/errors/skips**. All 43 distinct source paths match current
   bytes and their before/after execution hashes. The receipt binds the numerical
   kernel, tests, worker/CLI, example, strict schemas, method/ADR and underlying

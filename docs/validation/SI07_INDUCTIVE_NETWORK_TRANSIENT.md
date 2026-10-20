@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI07-S03 verification: mixed resistive/series-inductive network transients
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified 18 October 2026. **Done for the bounded stage; experimental,
 production-unqualified.** This does not complete SI07 or the PI/SI stack.
 The [method record](../INDUCTIVE_NETWORK_TRANSIENT.md) gives the independent
@@ -9,7 +11,7 @@ derivation, reviewed primary references, API and unsupported cases.
 ## Executed evidence
 
 The [canonical source-bound receipt](parity/SI07-S03.json) retains **11 tests,
-zero skips** and the [actual execution log](parity/SI07-S03-inductive-reverified.log).
+zero skips** and the actual execution log (unbundled local record: `parity/SI07-S03-inductive-reverified.log`).
 Eight numerical tests and three actual worker/schema/example tests executed.
 Reproduce into new repository paths:
 

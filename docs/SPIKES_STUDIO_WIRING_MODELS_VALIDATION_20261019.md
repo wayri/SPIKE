@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Studio wiring, packaged models and comparison — 2026-10-19
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](validation/RELEASE_040_LOCAL_EVIDENCE.md).
+
 The per-user Windows SPIKES Studio installation was rebuilt and updated to
 local build `studio-wiring-models-20261019`, version `0.3.0-beta.6`. This is an
 unsigned engineering preview, not a qualified public release. Work and
@@ -53,10 +55,10 @@ diagnostic measured 1.4213 ms for the divider and 18.4731 ms for the RC case;
 external engines were not measured in that scope, so those values are not a
 competitive comparison.
 
-The [benchmark report](../artifacts/studio-wiring-models-20261018/benchmark-report.md)
+The benchmark report (unbundled local record: `../artifacts/studio-wiring-models-20261018/benchmark-report.md`)
 contains case timings, errors, tolerances and limitations. The
-[raw report](../artifacts/studio-wiring-models-20261018/competitive-benchmark.json)
-and [input provenance](../artifacts/studio-wiring-models-20261018/benchmark-provenance.json)
+raw report (unbundled local record: `../artifacts/studio-wiring-models-20261018/competitive-benchmark.json`)
+and input provenance (unbundled local record: `../artifacts/studio-wiring-models-20261018/benchmark-provenance.json`)
 retain repetitions, executable identities, decks and wrapper hashes. Medium
 and large decks, AC/noise, compact-model parity, memory and scaling remain
 outside this corpus. Overall superiority over these or other simulators is
@@ -97,13 +99,13 @@ and exact staged-source checks therefore establish distinct facts. Frozen and
 installed acceptance exercise the final bundled implementation independently.
 
 Native frozen captures:
-[wide wiring](../artifacts/studio-wiring-models-20261018/frozen-smoke-ui/wire-wide.png),
-[narrow wiring](../artifacts/studio-wiring-models-20261018/frozen-smoke-ui/wire-narrow.png).
+wide wiring (unbundled local record: `../artifacts/studio-wiring-models-20261018/frozen-smoke-ui/wire-wide.png`),
+narrow wiring (unbundled local record: `../artifacts/studio-wiring-models-20261018/frozen-smoke-ui/wire-narrow.png`).
 The wide capture's bottom edge extends beyond its capture surface; the compact
 wire guide and target remain visible, and the narrow capture includes the
 status bar. Source library captures:
-[NMOS](../artifacts/studio-wiring-models-20261018/packaged-nmos-narrow.png),
-[NPN](../artifacts/studio-wiring-models-20261018/packaged-npn-narrow.png).
+NMOS (unbundled local record: `../artifacts/studio-wiring-models-20261018/packaged-nmos-narrow.png`),
+NPN (unbundled local record: `../artifacts/studio-wiring-models-20261018/packaged-npn-narrow.png`).
 
 ## Installation and artifact identity
 
@@ -121,15 +123,15 @@ computer-use helper's `foreground window did not report a process id` error.
 Installed library behavior passed through package acceptance; an interactive
 button click is not claimed as passed. The updated application is left running.
 
-Final [Windows installer](../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe):
+Final Windows installer (unbundled local record: `../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/SPIKES-Studio-0.3.0-beta.6-windows-x64-setup.exe`):
 111,622,734 bytes; SHA-256
 `eea854531c1d0ab7b3ba9b39b9951cc5d20f9af5b98e3b9c26883c3986c2dba0`.
 
-[Package manifest](../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/package-manifest.json),
-[source manifest](../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/source-manifest.json),
-[SBOM](../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/sbom.cdx.json),
-[checksums](../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/SHA256SUMS)
-and [validation receipt](../artifacts/studio-wiring-models-20261018/wiring-models-validation.json)
+Package manifest (unbundled local record: `../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/package-manifest.json`),
+source manifest (unbundled local record: `../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/source-manifest.json`),
+SBOM (unbundled local record: `../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/sbom.cdx.json`),
+checksums (unbundled local record: `../artifacts/studio-packages/20261018/windows-wiring-models-preview-final/SHA256SUMS`)
+and validation receipt (unbundled local record: `../artifacts/studio-wiring-models-20261018/wiring-models-validation.json`)
 bind the completed artifact to its checks. The first incomplete package directory
 is marked superseded and was never installed.
 

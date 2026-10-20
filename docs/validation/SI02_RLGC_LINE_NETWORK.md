@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S03 verification: supplied uniform sampled RLGC line networks
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified 18 October 2026. **Done for this bounded stage; experimental,
 production-unqualified.** SI02 and full PI/SI parity remain open.
 The [method ledger](../RLGC_LINE_NETWORK.md) retains primary references,
@@ -15,7 +17,7 @@ No external code, fixtures, figures or prose were imported.
 
 The [canonical source-bound receipt](parity/SI02-S03.json) retains **18 tests,
 zero skips**: fifteen numerical and three actual worker/schema/example/handoff
-checks. Its [actual log](parity/SI02-S03-rlgc-line-reverified.log) records names.
+checks. Its actual log (unbundled local record: `parity/SI02-S03-rlgc-line-reverified.log`) records names.
 Reproduce into fresh repository paths:
 
 ```powershell

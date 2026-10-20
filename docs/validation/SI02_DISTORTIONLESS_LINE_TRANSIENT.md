@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S02 verification: distortionless lossy line transient
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 Verified 18 October 2026. **Done for this bounded stage; experimental,
 production-unqualified.** SI02 and full PI/SI parity remain open.
 The [method ledger](../DISTORTIONLESS_LINE_TRANSIENT.md) retains reviewed primary
@@ -14,7 +16,7 @@ Instantaneous loss has no phasor time-average factor of one half.
 
 [Canonical source-bound receipt](parity/SI02-S02.json): **9 tests, zero skips**,
 six numerical and three actual worker/schema/example checks. Its
-[actual execution log](parity/SI02-S02-distortionless-line-reverified.log)
+actual execution log (unbundled local record: `parity/SI02-S02-distortionless-line-reverified.log`)
 retains the executed names. Reproduce into fresh output paths:
 
 ```powershell

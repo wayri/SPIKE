@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # SI02-S07 supplied symmetric coupled pair verification — 20October2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 This bounded experimental stage composes supplied even/odd scalar models into
 physical-conductor four-port scattering, coherent V/I and conservative pair
 loss/storage. The full SI02 family remains in progress. See the
@@ -14,7 +16,7 @@ current source-bound receipts and independent review passed.
 ## Executed evidence
 
 - [Source-bound receipt](parity/SI02-S07-qualified-20261020.json) and
-  [raw test log](parity/SI02-S07-qualified-20261020.log): **14 passed, 0 skipped**.
+  raw test log (unbundled local record: `parity/SI02-S07-qualified-20261020.log`): **14 passed, 0 skipped**.
   All22 source hashes match before/after execution and current source bytes.
   Actual worker, CLI and standalone example agree and satisfy strict registered
   request/result schemas. Child requests, digests and full modal results remain.

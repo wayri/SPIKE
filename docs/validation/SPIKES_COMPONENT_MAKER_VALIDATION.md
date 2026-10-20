@@ -1,5 +1,7 @@
 # Component maker verification
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 ## Scope
 
 This increment adds inert `.spkcmp` user packages, a wx component editor,
@@ -59,7 +61,7 @@ rollback artifacts retained.
 Earlier hidden-window GUI acceptance failures are preserved: pin targets require
 canvas paint, so GUI checks must be launched visibly. No assertions or native
 worker timeout were weakened. See
-[installation evidence](../../artifacts/component21/VERIFICATION.md).
+installation evidence (unbundled local record: `../../artifacts/component21/VERIFICATION.md`).
 
 Compact reusable SPICE symbols now project source-authoritative primitives;
 Verilog digital simulation is tested, but analog Verilog pin co-simulation is

@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # PI01-S02 land fields and explicit contact patches — 21 October 2026
 
+> **Public evidence boundary:** Paths marked as unbundled local records identify generated developer-run evidence that is not shipped in the public source. The historical observation remains provisional and does not establish release qualification; reproduce and review it before relying on the claim. See the [release local-evidence boundary](RELEASE_040_LOCAL_EVIDENCE.md).
+
 **Verified bounded increment; PI01-S02 remains in progress.** A supplied 3-D
 rectangular land now supports finite current patches on all six exterior sides,
 separate face potentials, conservative three-component fields and integrated
@@ -18,7 +20,7 @@ not edited.
 ## Executed numerical evidence
 
 - [Current partial receipt](parity/PI01-S02-land-transition-20261021.json),
-  [raw log](parity/PI01-S02-land-transition-20261021.log), and
+  raw log (unbundled local record: `parity/PI01-S02-land-transition-20261021.log`), and
   [retained fields/refinement report](parity/PI01-S02-land-fields-20261021.json):
   **23 tests, zero skips**, with 36 source files hashed before/after/current.
   These are 14 new main/oracle tests and nine prior axial/integration tests

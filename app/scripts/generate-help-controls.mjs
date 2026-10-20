@@ -15,7 +15,8 @@ const literal = n => {
   return '';
 };
 for (const file of fs.readdirSync(path.join(root, 'src')).filter(f => f.endsWith('.tsx') && !/^(Help|help)/.test(f)).sort()) {
-  const source = ts.createSourceFile(file, fs.readFileSync(path.join(root, 'src', file), 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  // Stable source offsets across Git's LF and Windows CRLF checkouts.
+  const source = ts.createSourceFile(file, fs.readFileSync(path.join(root, 'src', file), 'utf8').replace(/\r\n/g, '\n'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const visit = node => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const kind = node.tagName.getText(source);
@@ -51,6 +52,6 @@ for (const file of fs.readdirSync(path.join(root, 'src')).filter(f => f.endsWith
 const output = JSON.stringify(controls, null, 2) + '\n';
 const destination = path.join(root, 'src/helpControls.generated.json');
 if (process.argv.includes('--check')) {
-  if (!fs.existsSync(destination) || fs.readFileSync(destination, 'utf8') !== output) throw new Error('Help control inventory is stale; run npm run help:generate');
+  if (!fs.existsSync(destination) || fs.readFileSync(destination, 'utf8').replace(/\r\n/g, '\n') !== output) throw new Error('Help control inventory is stale; run npm run help:generate');
 } else fs.writeFileSync(destination, output);
 console.log(`${controls.length} control sites inventoried (${controls.filter(c => c.dynamic).length} require runtime context).`);
