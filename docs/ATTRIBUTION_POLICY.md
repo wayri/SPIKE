@@ -56,7 +56,9 @@ Before any release mutation, the guard verifies through GitHub that:
 - a local publisher is authenticated as `wayri`, or a GitHub Actions run was
   started and retriggered by `wayri` in that repository for the candidate SHA;
 - the candidate commit is linked to `wayri` and carries the canonical author
-  name and noreply email; and
+  name and noreply email, except that a GitHub-normalized display name is
+  accepted only with the same `wayri` account and canonical noreply email,
+  GitHub `web-flow` committer, and verified signature with reason `valid`; and
 - its committer is either the same canonical identity or GitHub's `web-flow`
   merge identity for a canonical `wayri` author.
 
@@ -78,3 +80,23 @@ signatures and releases, pass repository integrity checks, and receive an
 explicit publication decision. Removing an email from another GitHub account
 may change profile attribution after GitHub refreshes its contribution graph,
 but it does not change the author, committer, or DCO text stored in a commit.
+
+## Applied historical correction (2026-10-18)
+
+The owner approved and published the metadata-only correction across 11 affected
+public refs. The two work-account commits were attributed to canonical `wayri`;
+all 35 rewritten commits retain their original file-tree IDs. A full public
+bundle was independently restored and passed `git fsck --full` before the
+atomic, exact-lease push. Main protection was restored immediately.
+
+Affected release tags are v0.3.8, v0.3.9, v0.3.10 and v0.3.11-gamma.1. Their
+commit IDs and source-archive checksums changed; existing installer assets did
+not change. Four descendant commit signatures were invalidated by parent-ID
+changes and removed, rather than presented as valid signatures.
+
+Existing clones must reconcile with the corrected remote history before
+pushing. Preserve local work and branches; a fresh clone is the simplest
+reference. Do not merge or push the superseded history back into public refs.
+The contributor API reports only `wayri` after correction; GitHub may cache
+other historical views. Unreferenced objects and old PR views are subject to
+GitHub retention and cannot be removed by updating branch/tag refs.

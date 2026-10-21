@@ -198,6 +198,48 @@ class ReleaseAutomationTests(unittest.TestCase):
         with patch.dict(os.environ, {}, clear=True), patch.object(release, 'gh', side_effect=fake_gh):
             release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
 
+    def test_verified_github_display_name_normalization(self):
+        candidate = self._candidate(author_name='Yawar', committer_name='GitHub',
+                                    committer_email='noreply@github.com', committer_login='web-flow')
+        candidate['commit']['verification'] = {'verified': True, 'reason': 'valid'}
+        with patch.dict(os.environ, {}, clear=True), patch.object(
+                release, 'gh', side_effect=[json.dumps({'login': 'wayri'}), json.dumps(candidate)]):
+            release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
+
+    def test_github_display_name_exception_fails_closed_before_publication(self):
+        import copy
+        base = self._candidate(author_name='Yawar', committer_name='GitHub',
+                               committer_email='noreply@github.com', committer_login='web-flow')
+        base['commit']['verification'] = {'verified': True, 'reason': 'valid'}
+        mutations = [
+            ('author', 'login', 'y-w-r'), ('author', 'login', None),
+            ('commit.author', 'email', 'wrong@example.com'),
+            ('committer', 'login', 'wayri'), ('commit.committer', 'name', 'Other'),
+            ('commit.committer', 'email', 'wrong@example.com'),
+            ('commit.verification', 'verified', False),
+            ('commit.verification', 'verified', 1),
+            ('commit.verification', 'verified', 'true'),
+            ('commit.verification', 'verified', None),
+            ('commit.verification', 'reason', 'invalid'),
+        ]
+        for path, key, value in mutations:
+            candidate = copy.deepcopy(base)
+            target = candidate
+            for segment in path.split('.'):
+                target = target[segment]
+            target[key] = value
+            with self.subTest(path=path, key=key, value=value), \
+                    patch.dict(os.environ, {}, clear=True), patch.object(
+                        release, 'gh', side_effect=[json.dumps({'login': 'wayri'}), json.dumps(candidate)]) as github:
+                with self.assertRaises(ValueError):
+                    release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
+                self.assertTrue(all(call.args[0] == 'api' for call in github.call_args_list))
+        candidate = self._candidate(author_name='Yawar')
+        with patch.dict(os.environ, {}, clear=True), patch.object(
+                release, 'gh', side_effect=[json.dumps({'login': 'wayri'}), json.dumps(candidate)]):
+            with self.assertRaises(ValueError):
+                release.require_publication_identity(release.CANONICAL_REPOSITORY, 'a' * 40)
+
     def test_version_drift_is_rejected(self):
         paths = {
             'app/package.json': json.dumps({'version': '0.3.0'}),

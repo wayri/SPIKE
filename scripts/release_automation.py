@@ -99,9 +99,6 @@ def require_publication_identity(repo: str, commit: str) -> None:
         and author_record.get('name') == CANONICAL_NAME
         and author_record.get('email') == CANONICAL_EMAIL
     )
-    if not author_is_canonical:
-        raise ValueError('Release commit author must be wayri using the canonical noreply identity.')
-
     committer_record = candidate.get('commit', {}).get('committer') or {}
     committer_login = (candidate.get('committer') or {}).get('login')
     committer_is_canonical = (
@@ -114,6 +111,19 @@ def require_publication_identity(repo: str, commit: str) -> None:
         and committer_record.get('name') == 'GitHub'
         and committer_record.get('email') == 'noreply@github.com'
     )
+    # GitHub may normalize a merge author's display name to the account profile.
+    # Accept that only with canonical account/email and a verified GitHub signature.
+    verification = candidate.get('commit', {}).get('verification') or {}
+    author_is_verified_github = (
+        author_login == CANONICAL_LOGIN
+        and author_record.get('email') == CANONICAL_EMAIL
+        and committer_is_github_merge
+        and verification.get('verified') is True
+        and verification.get('reason') == 'valid'
+    )
+    if not author_is_canonical and not author_is_verified_github:
+        raise ValueError('Release commit author must be wayri using the canonical noreply identity.')
+
     if not committer_is_canonical and not committer_is_github_merge:
         raise ValueError('Release commit committer must be wayri or GitHub web-flow for a wayri-authored merge.')
 
