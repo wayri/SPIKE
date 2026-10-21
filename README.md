@@ -1,290 +1,210 @@
-<img src="app/public/spike-logo-tagline.png" alt="SPIKE — SI, PI, Thermal, EM" width="420">
+<p align="center">
+  <img src="app/public/spike-logo-tagline.png" alt="SPIKE — SI, PI, Thermal, EM" width="460">
+</p>
 
 # SPIKE - Multiphysics Simulation Workbench
 
-[![Latest prerelease](https://img.shields.io/github/v/release/wayri/SPIKE?include_prereleases)](https://github.com/wayri/SPIKE/releases)
-[![Experimental prerelease](https://img.shields.io/badge/status-experimental_reviews_pending-orange)](https://github.com/wayri/SPIKE/releases)
-[![Windows x64 downloads](https://img.shields.io/badge/downloads-Windows_x64-0078D4)](https://github.com/wayri/SPIKE/releases)
-[![Linux Flatpak download](https://img.shields.io/badge/download-Linux_Flatpak-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak)
-[![macOS Apple Silicon download](https://img.shields.io/badge/download-macOS_Apple_Silicon-orange)](https://github.com/wayri/SPIKE/releases/download/v0.3.5/SPIKE_0.3.5_macos-arm64_EXPERIMENTAL.dmg)
-[![Discord community](https://img.shields.io/badge/community-Discord-5865F2?logo=discord&logoColor=white)](https://discord.gg/UCmeR9ypzQ)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache_2.0-blue)](LICENSE)
+<p align="center"><strong>PCB-focused multiphysics, from board to complete assembly.</strong></p>
 
-[![Power integrity](https://img.shields.io/badge/analysis-power_integrity-476582)](#pcb-analysis-capabilities)
-[![Signal integrity](https://img.shields.io/badge/analysis-signal_integrity-476582)](#pcb-analysis-capabilities)
-[![Thermal analysis](https://img.shields.io/badge/analysis-thermal-476582)](#pcb-analysis-capabilities)
-[![EM and RF](https://img.shields.io/badge/analysis-EM_%26_RF-476582)](#pcb-analysis-capabilities)
-[![Circuit simulation](https://img.shields.io/badge/analysis-circuits-476582)](#circuit-simulation-choices)
+<p align="center">
+  <a href="https://github.com/wayri/SPIKE/releases/tag/v0.4.0-alpha.1"><img alt="Release 0.4.0-alpha.1" src="https://img.shields.io/badge/release-0.4.0--alpha.1-16a6a1"></a>
+  <a href="https://github.com/wayri/SPIKE/actions/runs/39572252308"><img alt="Four-platform CI passed" src="https://img.shields.io/badge/4--platform_CI-passed-238636"></a>
+  <a href="https://discord.gg/UCmeR9ypzQ"><img alt="Discord community" src="https://img.shields.io/badge/community-Discord-5865F2?logo=discord&amp;logoColor=white"></a>
+  <a href="LICENSE"><img alt="Apache 2.0 license" src="https://img.shields.io/badge/license-Apache_2.0-476582"></a>
+</p>
 
-**PCB-focused multiphysics, from board to complete assembly.**
+SPIKE is an open-source, local-first workbench for power integrity (PI), signal
+integrity (SI), circuits, thermal and airflow, selected EM/RF, and bounded
+mechanical workflows. It keeps PCB, assembly, material, study, and result
+evidence together for supported 2D and 3D workflows.
 
-SPIKE is an open-source, local-first multiphysics simulation workbench centered
-on PCBs and the systems built around them. It brings **power integrity (PI),
-signal integrity (SI), circuits, thermal and airflow, selected EM/RF, and bounded
-mechanical workflows** into a shared environment for boards, enclosures,
-interconnects and mechanical parts. Retain assembly geometry and material
-evidence, prepare studies, and inspect supported results in 2D or 3D.
+> [!WARNING]
+> **0.4.0-alpha.1 is an experimental development preview. Knowledgeable human
+> numerical and firmware review remains pending.** It is not a stable,
+> qualified, safety-assured, or production engineering release. Publication
+> does not qualify any method, model, package, or result. Read the
+> [release notes](docs/releases/v0.4.0-alpha.1.md) and
+> [solver evidence](docs/SOLVER_STATUS.md) before relying on an analysis.
 
-The product direction is end-to-end assembly preparation and simulation,
-including larger assemblies and coordinated cross-domain studies. Current
-coupling, CAD coverage and execution scale depend on the specific workflow;
-large-scale arbitrary-assembly simulation is a development target, not a
-blanket validated capability. See [product scope and assembly direction](docs/PRODUCT_SCOPE.md)
-and [current solver evidence](docs/SOLVER_STATUS.md).
-Optional **[EMerge](https://github.com/FennisRobert/EMerge)** and
-**[openEMS](https://openems.de/)** extensions add electromagnetic
-simulation workflows.
+## Contents
 
-SPIKE runs locally and includes a command-line interface. Use the release page
-for actual platform assets, versions, checksums and verification evidence. Older
-Windows Gamma and 0.3.5 Linux/macOS packages are historical artifacts; they do
-not include the current development source. Experimental availability does not
-establish numerical qualification or supported-platform packaging acceptance.
+| Start here | Explore | Reference | Participate |
+| --- | --- | --- | --- |
+| [Download 0.4.0-alpha.1](#download-040-alpha1) | [Interface](#current-ui-and-navigation) | [Capabilities](#pcb-analysis-capabilities) | [Report an issue](https://github.com/wayri/SPIKE/issues) |
+| [First workflow](#start-a-study) | [Analysis gallery](#analysis-gallery) | [Solver modules](#solver-modules-and-the-solver-suite) | [Contribute](CONTRIBUTING.md) |
+| [ESP32 walkthrough](docs/ESP32_QUICKSTART.md) | [Examples](examples/README.md) | [CLI and documentation](#cli-and-documentation) | [Discord](https://discord.gg/UCmeR9ypzQ) |
+| [Release notes](docs/releases/v0.4.0-alpha.1.md) | [Headroom and limits](#part-limits-and-operating-headroom) | [Extensions](#extensions) | [License](#license) |
 
-[Downloads and release notes](https://github.com/wayri/SPIKE/releases)
-· [Five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md)
-· [User guides](docs/README.md)
-· [Build from source](docs/DEVELOPER_GUIDE.md)
-· [Join the SPIKE Discord community](https://discord.gg/UCmeR9ypzQ)
+## Download 0.4.0-alpha.1
 
-The community invite does not expire and opens in the read-only welcome channel.
+Release candidate `4f550c0f` passed the four-platform CI run
+[`39572252308`](https://github.com/wayri/SPIKE/actions/runs/39572252308).
+Choose the asset for your platform and verify its adjacent SHA-256 file. Asset
+availability and CI success are packaging evidence; neither establishes
+numerical qualification or supported-platform acceptance.
 
-See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md).
+| Platform | Experimental package | SHA-256 |
+| --- | --- | --- |
+| Windows x64 | [**Download EXE**](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_x64-setup.exe) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_x64-setup.exe.sha256) |
+| Linux x86_64 | [**Download Flatpak**](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_linux-x86_64_EXPERIMENTAL.flatpak) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_linux-x86_64_EXPERIMENTAL.flatpak.sha256) |
+| macOS Apple silicon | [**Download DMG**](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-arm64_EXPERIMENTAL.dmg) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-arm64_EXPERIMENTAL.dmg.sha256) |
+| macOS Intel | [**Download DMG**](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-x86_64_EXPERIMENTAL.dmg) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-x86_64_EXPERIMENTAL.dmg.sha256) |
 
-**Disclaimer:** SPIKE is a work in progress and is provided **AS IS**, without
-warranty or guarantee of any kind, including accuracy, reliability, or fitness
-for a particular purpose. Use it at your own risk. To the extent permitted by
-applicable law, and unless otherwise agreed in writing, Yawar B (wayri) and
-the contributors are not liable for any damage, loss, or other consequences
-arising from using or being unable to use SPIKE, including incorrect results,
-design errors, equipment damage, data loss, or financial loss. You are
-responsible for checking inputs, assumptions, and results before relying on
-them. This summarizes the warranty and liability provisions in the
-[Apache License 2.0](LICENSE); the license terms govern.
+See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md). Older
+Windows Gamma and 0.3.5 Linux/macOS packages are historical artifacts and do
+not contain this candidate source.
 
-**Development disclosure:** SPIKE's development effort is largely LLM-driven
-under human review. Human direction and responsibility remain distinct from
-LLM-generated proposals, code, tests, and documentation. Passing tests and
-generated reports are engineering evidence, not independent physical
-validation. See
-[LLM-driven development](docs/LLM_DEVELOPMENT.md) for the scope of this
-acknowledgement and the review required before engineering reliance.
+## Start a study
 
-This is an early community preview and may contain instabilities, bugs, and
-incomplete behavior. The community is invited to test it and report
-[reproducible issues](https://github.com/wayri/SPIKE/issues), usability
-feedback, and numerical comparisons.
+| Step | In SPIKE | Check before continuing |
+| ---: | --- | --- |
+| 1 | Import a board or open a `.spike` project. | Read the import diagnostics; omitted objects and substituted 3D models remain explicit. |
+| 2 | Choose a workspace or press **Ctrl+K** for an action. | Select the intended physics and solver route. Similar plots may come from different models. |
+| 3 | Define nets, ports, materials, sources, loads, boundaries, and returns. | A footprint, geometry import, or prepared case does not supply missing engineering assumptions. |
+| 4 | Review model status, mesh, units, and prerequisites, then run. | External engines require separate compatible installations. A failed or incomplete result never becomes a pass. |
+| 5 | Inspect residuals, conservation checks, warnings, probes, and limits. | Plot appearance alone is not validation. Compare against an independent reference for the intended use. |
+| 6 | Save the project and export a report with provenance. | Keep inputs, engine/source versions, diagnostics, and limitations with shared results. |
 
-Current limits are summarized below and described in
-[Solver Status](docs/SOLVER_STATUS.md).
+Fast entry points: [five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md) ·
+[UI quick start](docs/UI_QUICKSTART.md) · [task sequences](docs/USER_TASK_SEQUENCES.md) ·
+[runnable examples](examples/README.md)
 
+## Current UI and navigation
 
-**0.4.0-alpha.1 is an experimental development preview** with part-limit reports,
-current SPIKES runtime integration, Python IDE/templates and the integrated main
-field viewport. Knowledgeable human numerical/firmware review remains pending.
-Publication was requested explicitly with that disclaimer; no capability becomes
-qualified through the release. Actual downloadable platforms and verification
-evidence are defined by each release’s attached assets.
-See [candidate release notes](docs/releases/v0.4.0-alpha.1.md).
+![SPIKE navigation map showing the two command rows, contextual panels, and study loop](app/public/help/ui-current/navigation-map.svg)
 
-## Part limits and operating headroom
+Clean mode keeps a global header plus document and assembly tabs. Open a domain
+from **Workspaces**, choose **Menu > All actions**, or press **Ctrl+K**. Selecting
+an object opens its properties; **Show hidden tools** restores closed panels.
+The six menu sections are **Project**, **Design & view**, **Analyze**, **Results
+& reports**, **Tools**, and **Help**. The [visual navigation guide](docs/UI_NAVIGATION.md)
+maps section ownership, menu depth, keyboard navigation, and the import -> setup
+-> mesh -> solve -> results -> save loop.
 
-[Engineering review → Part limits & stress](docs/PART_LIMITS.md) records part-specific
-voltage/current windows, thermal limits, power, mechanical stress and frequency
-budgets. Captured observations produce stress/headroom percentages, per-part
-summaries and pass/fail/incomplete JSON/CSV reports, with rating sources, reviewed
-observation provenance and unchecked-part coverage. Rules are bound to board
-occurrences and component IDs; missing evidence never becomes a pass. Temperature
-percentages use an explicit reference such as ambient. This is declared-limit
-comparison, not automatic datasheet qualification or a reliability prediction.
+| Actual development UI, 19 October 2026 | Actual command search, 19 October 2026 |
+| --- | --- |
+| ![Clean UI showing the public ESP32 board in the light viewport](app/public/help/ui-current/clean-viewport.jpg) | ![Universal command search showing PI suggestions](app/public/help/ui-current/universal-search.jpg) |
+| Imported geometry and component stand-ins; no analysis was executed. | Search suggestions only; no command or analysis was executed. |
 
-## Current UI and analysis gallery
+These are actual local **browser development UI captures**, not mockups, solver
+results, native desktop acceptance captures, or packaged application evidence.
+They use the public ESP32 board recorded in the
+[capture manifest](app/public/help/ui-current/manifest.json). Graphite/Light
+workspace appearance and Graphite/Light/AMOLED viewport appearance are separate
+preferences.
 
-### UI map: where to go and how deep
+The main field viewport can display supplied cells, points, velocity arrows,
+temperature and other scalar fields, connected supplied curves, and saved frame
+playback. Sparse samples are not joined across unknown gaps. CFD previews without
+cell dimensions remain point samples. Renderer-generated frozen-field paths are
+approximate presentation, not transient particle paths. See
+[field visualization](docs/FIELD_VISUALIZATION.md); the planned Blender adapter
+is not implemented.
 
-![SPIKE navigation: two command rows, contextual panels and the study loop](app/public/help/ui-current/navigation-map.svg)
+## Analysis gallery
 
-**Clean has two persistent command rows:** the global header, then shared
-document/assembly tabs and tiny viewport controls. Extra tools open contextually.
-Use **Ctrl+K** for a task, the **workspace icon** for a domain, or select an object
-to inspect its properties. Restore hidden panels with **Show hidden tools**.
+The eight images below are **computed documentation plots from executed named
+examples and postprocessors**. They are not UI screenshots, measurements, or
+evidence that every model runs in every workspace. Follow the
+[gallery audit and reproduction guide](docs/ANALYSIS_GALLERY.md) for inputs,
+units, hashes, model status, and limitations.
 
-Menu has six sections: **Project**, **Design & view**, **Analyze**, **Results &
-reports**, **Tools** and **Help**. Paths usually follow section → group → action;
-some workspace routes are deeper. For example, **Project → New project** takes
-two choices after Menu, **Analyze → Power integrity → DC PI setup** takes three,
-and **Design & view → Viewport tools → Navigate → Orientation grid** takes four.
-Use Menu search, **All actions**, or Ctrl+K to skip browsing those groups.
-
-Read the [visual UI map and navigation guide](docs/UI_NAVIGATION.md) for section
-ownership, menu-depth examples, tabs versus panels, keyboard/back navigation and
-the import → setup → mesh → solve → results → save flow. It ships in Help as
-**UI map and navigation**, together with this explanatory diagram.
-
-### Current interface and analysis examples
-
-The [volume and airflow visualizer](docs/FIELD_VISUALIZATION.md) displays supplied
-voxel cells, velocity arrows, temperature and other scalar fields in the main
-Three viewport, sharing the board scene and camera. The compact **Fields**
-control expands on hover or keyboard focus; click it for settings, while saved
-frame play/pause and scrubbing remain inline. Connected **streamlines and
-streamtubes** use supplied curves; declared complete 3D fluid grids also support
-bounded, bidirectional frozen-field paths seeded on the selected center plane.
-Sparse samples are never joined across unknown gaps.
-CFD previews without cell dimensions remain
-point samples. Try the clearly labeled [synthetic visualization fixture](examples/field_visualization/README.md).
-Photoreal static/transient export is covered by the [Blender integration plan](docs/BLENDER_RENDER_PLAN.md);
-the Blender adapter is not yet implemented.
-
-The current development UI offers **Clean** contextual access and **Classic**
-workspace/ribbon access, with shared projects and solver inputs. Compact camera,
-view and selection tools stay beside the viewport; the large legacy ribbon belongs to Classic mode, while the separate floating
-quick-tools bar remains optional in Clean mode. Use **Workspaces**, **Menu > All
-actions**, or **Ctrl+K** to find setup, editors, solver blocks and results.
-
-![Current Clean UI with the public ESP32 board in a light viewport](app/public/help/ui-current/clean-viewport.jpg)
-
-*Current local browser preview, 19 October 2026: imported geometry and component
-stand-ins, not a solver result or native desktop acceptance capture. Workspace
-Graphite/Light and viewport Graphite/Light/AMOLED preferences are independent.*
-
-Start with the [current UI quick start](docs/UI_QUICKSTART.md), then the
-[analysis gallery](docs/ANALYSIS_GALLERY.md) and
-[runnable examples index](examples/README.md). The gallery covers **PI, SI, EM,
-Thermal, hybrid multi-solve, CFD, CHT and multiboard analysis**, with computed
-plots, units, source provenance and model limits. These describe current source;
-the published Gamma download above may expose an older UI and capability set.
-
-The in-app **Help and user guide** includes these guides and their visuals
-offline. Search the analysis name or a command; supported sentence requests use
-the loaded board and open setup for missing inputs rather than assuming supply,
-load or return values. See [command access and search limits](docs/COMMAND_ACCESS.md).
-
-## ESP32 PCB and antenna simulation examples
-
-Start with the [five-minute walkthrough](docs/ESP32_QUICKSTART.md) to import
-the board, open saved thermal and antenna results, and probe the viewport.
-
-![ESP32 board imported into SPIKE's 3D viewport](examples/esp32/evidence/viewport_3d.png)
-
-*An open ESP32 board in SPIKE's 3D view. This capture shows the imported board
-before an analysis is run.*
-
-![Solved relative ESP32 antenna radiation pattern](examples/esp32/evidence/rf_surrogate_pattern_3d.png)
-
-*An [EMerge](https://github.com/FennisRobert/EMerge) antenna solve displayed as a relative 3D pattern. SPIKE exported a
-two-conductor model of the board; the [ESP32 example](examples/esp32/README.md)
-records its inputs, assumptions, and plots.*
-
-![ESP32 board and EMerge radiation pattern in the SPIKE viewport](examples/esp32/evidence/emerge_pattern_in_spike_viewport.png)
-
-*The ESP32 board and its [EMerge](https://github.com/FennisRobert/EMerge)-powered radiation pattern together in SPIKE's
-3D viewport at 2.45 GHz. This saved run uses a simplified two-conductor
-antenna model; the surface shows relative far-field shape, not absolute gain.*
-
-For more examples, see the [thermal walkthrough](docs/THERMAL_USER_GUIDE.md),
-[SI walkthrough](docs/SI_USER_GUIDE.md), and
-[simulation studies guide](docs/SIMULATION_STUDIES.md).
-
-For coupled assemblies, see the [curated multi-board walkthroughs](examples/multiboard/README.md):
-Arduino UNO R4 Minima with a relay shield, and Raspberry Pi CM4 IO with Sailor Hat.
-Each includes PI, SI and Thermal inputs, completed reduced-model results,
-recorded steps, and saved-project verification.
+| Area | Computed plot | Demonstrated boundary |
+| --- | --- | --- |
+| PI | ![PI dielectric admittance](examples/analysis_gallery/figures/pi-dielectric-admittance.png) | Retained dielectric electroquasistatic admittance and power accounting; not a full-board DC map or full-wave solve. |
+| SI | ![SI RLGC line fields](examples/analysis_gallery/figures/si-rlgc-line-fields.png) | Supplied RLGC line response and coherent longitudinal quantities; no new geometry extraction or measured channel claim. |
+| EM | ![EM Huygens far field](examples/analysis_gallery/figures/em-huygens-far-field.png) | Huygens postprocessing of synthetic boundary samples; not a newly executed Maxwell solve or absolute gain. |
+| Thermal | ![Two-solid conduction](examples/analysis_gallery/figures/thermal-two-solid-conduction.png) | Steady two-solid conduction with a matched contact; not package-calibrated board prediction. |
+| Hybrid | ![Electrothermal convergence](examples/analysis_gallery/figures/hybrid-electrothermal-convergence.png) | Iterated DC loss and temperature feedback with explicit material law; not general simultaneous multiphysics. |
+| CFD | ![Native cavity flow](examples/analysis_gallery/figures/cfd-native-cavity.png) | Two-dimensional laminar lid-driven cavity reference; not enclosure airflow, turbulence, or CHT. |
+| CHT | ![Laminar channel CHT](examples/analysis_gallery/figures/cht-laminar-channel.png) | Bounded conjugate solid/fluid laminar channel; not a general enclosure solve. |
+| Multiboard | ![Multiboard coupled networks](examples/analysis_gallery/figures/multiboard-coupled-networks.png) | Explicit reduced harness and thermal networks; not full spatial fields across all boards. |
 
 ## PCB analysis capabilities
 
-Use SPIKE to investigate DC voltage drop and power distribution, inspect
-S-parameters and NEXT/FEXT crosstalk, compare board cooling conditions, and view
-2D antenna cuts and 3D radiation patterns. Each workflow has its own model
-requirements and limits, summarized below.
-
 | Area | Available workflow | Current limit |
-|---|---|---|
-| Board and project | Import KiCad PCB data into `SpiDeR` with ordered stackup, copper, tracks, vias, pads, filled zones, components, rigid-flex regions, and import diagnostics. Inspect 2D layers and the assembled 3D scene; select nets and objects, place probes, and save versioned `.spike` projects with multiple study cases. | Some KiCad features or 3D models may be omitted or substituted; review the import report for the specific board. |
-| Power integrity and circuits | Set sources, loads, returns, mesh and limits; run supported DC voltage-drop, harness, PEEC, PDN, power-tree, and circuit workflows. Converter models can include voltage, efficiency, and loss settings. | DC and PEEC paths use simplified conductor and return models. Converter behavior and pin mapping must be supplied; a footprint alone does not provide them. |
-| Signal integrity | Analyze loaded RLGC or Touchstone channels with explicit ports and terminations; inspect S-parameters, reflection/VSWR, TDR/TDT, waveforms, eyes, and NEXT/FEXT. | Port-network results do not contain spatial E/H fields. Nonlinear IBIS-AMI models and protocol checks are not implemented in this workflow. |
-| Thermal | Solve object-node, 2D board-plate, and layered steady/transient board models with explicit powers, heat paths and boundaries. Compare still-air, sealed-box, and forced-air presets; inspect layer maps, temperature history, case/junction estimates and board-aligned result overlays. | Cooling presets use specified heat-transfer coefficients instead of solving airflow. Board grids omit detailed package geometry and conjugate heat transfer. |
-| Electromagnetics | Run EMerge on the exported antenna model and view its solved S-parameters, 2D cuts, and sampled 3D radiation pattern in SPIKE. The EM workspace also offers separate openEMS and internal screening workflows. | The SPIKE-to-EMerge adapter exports selected antenna and reference copper as a two-layer model with one dielectric; other layers and components are omitted. The 3D display interpolates and normalizes EMerge's solved angular samples, so its radius and color show relative pattern shape rather than absolute gain. |
-| CFD and CHT | Experimental native laminar cavity/channel examples, retained-solid thermal workflows, and separately admitted external CHT adapters. Inspect velocity, pressure, temperature, heat balance and residuals where returned. | Isothermal airflow is not CHT. Bounded reference cases do not qualify arbitrary enclosures, turbulence or fan assemblies. See the [gallery](docs/ANALYSIS_GALLERY.md) and [solver status](docs/SOLVER_STATUS.md). |
-| Hybrid and multiboard | Coordinate supported reduced electrothermal or scalar co-simulation models; assign board instances, connector pins and explicit interconnect models for supported PI/SI/Thermal/EM studies. | Coupling is workflow-specific. Reduced networks are not full spatial fields across every board or a general all-domain simultaneous solve. |
-| Visualization and reports | Orbit or inspect the board in 2D/3D, toggle geometry and result layers, probe returned values, compare studies, and preview/export reports with units, run settings, warnings, and result status. | Only quantities returned by the selected analysis can be plotted or probed. |
-| Automation | Use the local worker and CLI, extension manager, solver manager, and optional MCP bridge. LM Studio and Ollama can use SPIKE tools to inspect projects, set up studies, and run supported analyses. | Local models need a separately installed runtime and tool-capable model. MCP access is limited to SPIKE's available tools. |
+| --- | --- | --- |
+| Board and project | Import KiCad PCB data into `SpiDeR`; inspect 2D layers and assembled 3D; save versioned projects with study cases. | Some KiCad features or 3D models may be omitted or substituted. Review each import report. |
+| Power integrity and circuits | Supported DC voltage-drop, harness, PEEC, PDN, power-tree, and circuit workflows with explicit sources, loads, returns, mesh, and limits. | Simplified conductor/return models apply. Converter behavior and pin mapping must be supplied. |
+| Signal integrity | Loaded RLGC or Touchstone channels with explicit ports and terminations; S-parameters, reflection, TDR/TDT, eyes, and NEXT/FEXT where returned. | Port networks contain no spatial E/H fields. Nonlinear IBIS-AMI and protocol checks are not implemented in this route. |
+| Thermal | Object-node, 2D board-plate, and layered steady/transient models; explicit powers, heat paths, and boundaries. | Cooling presets prescribe heat-transfer coefficients rather than solving airflow; board grids omit detailed package geometry and CHT. |
+| Electromagnetics | EMerge antenna adapter plus separate openEMS and internal screening routes; display returned S-parameters, cuts, and sampled relative patterns. | The EMerge board export is a simplified two-layer, one-dielectric model. Normalized display radius/color is not absolute gain. |
+| CFD and CHT | Experimental bounded native laminar references, retained-solid thermal routes, and separately admitted external adapters. | Isothermal airflow is not CHT. Reference cases do not qualify arbitrary enclosures, turbulence, or fan assemblies. |
+| Hybrid and multiboard | Supported reduced electrothermal/scalar coupling and explicit board, connector, interconnect, and contact models. | Coupling is workflow-specific, not a general all-domain simultaneous solve. |
+| Visualization and reports | 2D/3D result layers, returned-value probes, study comparison, and reports with units, settings, warnings, and status. | Only quantities returned by the selected analysis can be plotted or probed. |
+| Automation | Local worker and CLI, extension/solver managers, and optional MCP bridge for supported project and study tools. | Local models need a separate runtime and a tool-capable model; MCP is limited to exposed SPIKE tools. |
+
+### Part limits and operating headroom
+
+[Part limits and stress](docs/PART_LIMITS.md) compares captured observations
+against occurrence-specific declared voltage, current, temperature, power,
+mechanical stress, and frequency allowances. It reports stress/headroom,
+coverage, provenance, and pass/fail/incomplete states in JSON/CSV. Missing
+evidence never becomes a pass. Temperature percentages require an explicit
+reference such as ambient. These checks are declared-limit comparisons, not
+automatic datasheet qualification, reliability, lifetime, fatigue, or combined
+stress predictions.
 
 ### Circuit simulation choices
 
-SPIKE's circuit workspace offers a built-in linear solver and two separate
-circuit-engine paths: [ngspice](docs/SOLVER_STATUS.md) and the SPIKES backend.
-Select the engine that matches the circuit model and check its availability in
-the app. **SPIKES Studio is a separate program and is not part of the SPIKE
-desktop release.** SPIKE uses only its backend engine for supported structured
-circuit runs. The [circuit workflow](docs/USER_TASK_SEQUENCES.md) explains the
-model and pin setup.
-
-SPIKE reads KiCad boards directly. The bundled ODB++ extension can also import
-board jobs; keep the original archive because the saved SPIKE project stores a
-normalized copy. See [Importer Architecture](docs/IMPORTER_ARCHITECTURE.md),
-[task sequences](docs/USER_TASK_SEQUENCES.md), and
-[Solver Status](docs/SOLVER_STATUS.md) for details.
+The circuit workspace has a built-in linear solver and separate
+[ngspice](docs/SOLVER_STATUS.md) and SPIKES backend routes. Select an engine for
+the supplied circuit model and check runtime availability. **SPIKES Studio is a
+separate program and is not included in the SPIKE desktop release.** SPIKE uses
+only its backend for supported structured runs. See the
+[circuit workflow](docs/USER_TASK_SEQUENCES.md).
 
 ## Solver modules and the solver suite
 
-Open **Solver manager** from **Ctrl+K** to browse named solver modules, inspect
-scope and dependencies, and open the appropriate setup workflow. Modules are
-organized into PCB, Harness, MCAD collaboration, Circuits, PI, SI, CFD, CHT,
-Thermal, Electromagnetics, Structural mechanics, and Execution/shared services.
-A module can belong to more than one section.
+Open **Solver manager** from **Ctrl+K** to inspect named modules, scope,
+dependencies, runtime readiness, and the appropriate setup workflow.
 
-| Module family | Named solvers and workflows | Scope |
+| Module family | Named workflows | Scope |
 | --- | --- | --- |
-| PI | SPIKE DC PI, SPIKE 2.5D PI, SPIKE PI Transient, SPIKE 3D PI - DC conduction, PDN and Filters | Reduced conductor networks, quasi-static PEEC, supported transients, bounded solid DC and explicit PDN circuits; separate model assumptions apply. |
-| SI | SPIKE SI Networks, SI Channels, SI Eye and Protocol Screens | Sampled networks, supported line/channel models and deterministic screens. |
-| Thermal and coupling | SPIKE Board Thermal, 3D Solid Thermal, Assembly Electrothermal, PWM Electrothermal | Board/solid heat transfer and explicitly mapped loss/temperature feedback. |
-| CFD and CHT | SPIKE 2D CFD, Channel Airflow, admitted external cooling/CHT adapters | Bounded native reference models and separately installed engines; isothermal CFD and CHT are distinct. |
-| EM and RF | SPIKE 2D Magnetic FEM, Lumped EM Machines, openEMS and EMerge adapters | Bounded magnetic models and supported external field workflows. |
-| Circuits | SPIKES Circuit MNA, Adaptive Transient, I/Q Device Models, SMPS Stability | Supported circuit/model workflows; some authoring and execution routes live in separate Studio/CLI tools. |
-| Mechanics and MCAD | SPIKE 3D Structural, Thermoelastic, geometry/FreeCAD adapters | Bounded static mechanics, same-mesh thermal coupling and geometry exchange. |
-| Assemblies and execution | Harness and board adapters, Scalar Co-simulation, Parallel workers | Explicit interconnects and coupling contracts; independent parallel jobs do not automatically couple physics. |
+| PI | DC PI, 2.5D PI, PI Transient, 3D DC conduction, PDN and filters | Reduced networks, quasi-static PEEC, supported transients, bounded solid DC, and explicit circuits. |
+| SI | Networks, channels, eye and protocol screens | Sampled networks, supported line/channel models, and deterministic screens. |
+| Thermal and coupling | Board/solid thermal, assembly electrothermal, PWM electrothermal | Explicit heat models and mapped loss/temperature feedback. |
+| CFD and CHT | 2D CFD, channel airflow, admitted external cooling/CHT adapters | Bounded native references and separately installed engines; isothermal CFD and CHT remain distinct. |
+| EM and RF | 2D magnetic FEM, lumped EM machines, openEMS and EMerge adapters | Bounded magnetic models and supported external field workflows. |
+| Circuits | Circuit MNA, adaptive transient, I/Q device models, SMPS stability | Supported structured routes; some authoring/execution lives in separate Studio or CLI tools. |
+| Mechanics and MCAD | 3D structural, thermoelastic, geometry/FreeCAD adapters | Bounded static mechanics, same-mesh coupling, and geometry exchange. |
+| Assemblies and execution | Harness/board adapters, scalar co-simulation, parallel workers | Explicit interconnect and coupling contracts; parallel jobs do not automatically couple physics. |
 
-**Current delivery:** implemented first-party code and adapters are bundled by
-default. Solver blocks are logical dependency groups, not separately installable
-packages. Bulk selection previews required dependencies and unresolved external
-engines; it does not install, remove or run anything. Optional engines need their
-own compatible installation and admission. A future base-plus-downloadable-module
-installer is planned, with independent versions, compatibility checks and verified
-activation before it can be enabled.
+Implemented first-party code and adapters are bundled by default. Solver blocks
+are logical dependency groups, not separately installable packages. Bulk
+selection previews dependencies; it does not install, remove, or execute them.
+Optional engines need their own compatible installation and admission. Bundled
+code, runtime readiness, and numerical qualification remain separate states.
 
-Read the [solver suite and module guide](docs/SOLVER_SUITE.md),
-[block dependency catalog](docs/SOLVER_BLOCKS.md), and
-[engine selection and registration guide](docs/SOLVER_MANAGER.md).
-Bundled code, runtime readiness and numerical qualification are separate states;
-[Solver Status](docs/SOLVER_STATUS.md) remains authoritative. Planned MoM and
-owned arbitrary-PCB full-wave entries are not executable solvers.
+| Module guide | Purpose |
+| --- | --- |
+| [Solver suite](docs/SOLVER_SUITE.md) | Module families and workflow entry points |
+| [Solver blocks](docs/SOLVER_BLOCKS.md) | Dependency groups and unresolved external engines |
+| [Solver manager](docs/SOLVER_MANAGER.md) | Engine selection, registration, and readiness |
+| [Solver status](docs/SOLVER_STATUS.md) | Authoritative implementation and validation status |
+| [Extension SDK](extension_sdk/README.md) | Process isolation, permissions, result contracts, and examples |
 
-## Extensions: EMerge, openEMS, and board workflows
+## Extensions
 
-These are the seven packages under [`extensions/`](extensions/). Their Python
-entry points run in separate processes. A bundled package supplies an adapter
-or utility; optional third-party engines are installed separately. The
-[Extension Manager and SDK](extension_sdk/README.md)
-describe installation, permissions, and session trust for other local packages.
+<details>
+<summary><strong>Extension catalog and boundaries</strong></summary>
 
 | Extension | Capability | Dependency and limitation |
-|---|---|---|
-| [OpenEMS Suite](extensions/openems_suite/README.md) | Preflight, prepare, and run explicit-port high-frequency PI and SI interconnect sweeps; import S-parameters and supported near-to-far-field outputs. | Requires separately installed openEMS/CSXCAD. Exactly one excited port per run; no DC PI or thermal coupling. Unsupported PCB topology blocks a solve. |
-| [EMerge Suite](extensions/emerge_suite/README.md) | Build a selected-net two-layer PCB model for one/two-port S-parameters, 2D far-field cuts, and sampled 3D radiation patterns, including a simple dielectric cover. The pattern samples come from EMerge's field solve. | Requires a compatible separate EMerge Python runtime. The SPIKE adapter limits the model to selected copper, aligned pad ports, rectangular bounds, one dielectric and surface PEC; additional copper layers, components, many cutouts and complex surroundings are omitted. The display normalizes the pattern to a relative peak. |
-| [ODB++ Import](docs/ODB_AND_HARNESS_EXTENSIONS.md) | Import a job archive/folder, choose a board step, inspect import quality, and open the normalized board in SPIKE. | Experimental; unsupported symbols, compositing, and panel step repeats are reported. Keep the original ODB++ export because a `.spike` snapshot is not the source archive. |
-| [Harness Engineering](docs/ODB_AND_HARNESS_EXTENSIONS.md) | Import JSON/CSV/TSV connections, edit wire nets and lengths, validate connectivity, compile an electrical fragment, bind an assembly, and export JSON. | Reads the listed connection-list formats; it does not import other harness database formats. |
-| [MCAD Collaboration](docs/MCAD_EXPORT.md) | Preview a mechanical assembly and export named STEP, FreeCAD, BREP, and metadata artifacts. | Requires installed FreeCAD. Geometry exchange only; inspect listed omissions before export. |
-| [PWM Converter Analysis](extensions/converter-analysis/spike-extension.json) | Check converter-study readiness and create a versioned setup envelope. | Assistant and validator only: the extension does not contribute a converter solver run or calculate efficiency and losses. |
-| [Net Inventory](extensions/net-inventory/spike-extension.json) | Example SDK utility that counts normalized nets and conductors and emits report data. | Inventory only; it performs no numerical analysis. |
+| --- | --- | --- |
+| [openEMS Suite](extensions/openems_suite/README.md) | Explicit-port HF PI/SI preparation and execution; supported result import. | Separate openEMS/CSXCAD installation; one excited port per run; no DC PI or thermal coupling. |
+| [EMerge Suite](extensions/emerge_suite/README.md) | Simplified selected-net S-parameters and relative radiation patterns. | Separate compatible runtime; selected copper, aligned ports, rectangular bounds, one dielectric, and surface PEC. |
+| [ODB++ Import](docs/ODB_AND_HARNESS_EXTENSIONS.md) | Experimental board-job import with quality diagnostics. | Unsupported symbols, compositing, and panel repeats are reported; retain the source archive. |
+| [Harness Engineering](docs/ODB_AND_HARNESS_EXTENSIONS.md) | JSON/CSV/TSV connection editing and assembly binding. | Does not import other harness database formats. |
+| [MCAD Collaboration](docs/MCAD_EXPORT.md) | Preview and named STEP, FreeCAD, BREP, and metadata export. | Requires FreeCAD; geometry exchange only. |
+| [PWM Converter Analysis](extensions/converter-analysis/spike-extension.json) | Readiness checks and versioned setup envelope. | No converter solve or efficiency/loss calculation. |
+| [Net Inventory](extensions/net-inventory/spike-extension.json) | Example SDK net/conductor inventory. | No numerical analysis. |
 
-The [extension analysis contract](docs/EXTENSION_ANALYSIS_API.md) binds external
-results to the current design and checks their format, source, units, and bounds;
-these checks do not repeat an external engine's calculation. The SDK's
-[field-data and mesh-field examples](extension_sdk/README.md) demonstrate
-handoff and display, not supported solver integrations.
+External result format, source, unit, and bounds checks do not repeat an external
+engine calculation. See the [extension analysis contract](docs/EXTENSION_ANALYSIS_API.md).
 
-## Try the CLI
+</details>
+
+## CLI and documentation
 
 ```powershell
 .\spike.cmd --help
@@ -295,54 +215,88 @@ handoff and display, not supported solver integrations.
   --load 50,20,F.Cu,1
 ```
 
-The CLI can also run saved requests and batches, inspect available solvers, and
-generate reports. See the [CLI reference](docs/CLI.md).
+| Need | Guide |
+| --- | --- |
+| Commands, saved requests, batches, and reports | [CLI reference](docs/CLI.md) |
+| User workflows and tutorials | [Documentation index](docs/README.md) |
+| Numerical implementation status and limits | [Solver status](docs/SOLVER_STATUS.md) |
+| Mathematics, methods, and references | [Mathematics](docs/SOLVER_MATHEMATICS.md) · [handbook](docs/SOLVER_HANDBOOK.md) · [references](docs/SOLVER_REFERENCES.md) |
+| LM Studio, Ollama, and MCP | [Local LLM and MCP](docs/LOCAL_LLM_MCP.md) |
+| Build, architecture, and contribution | [Developer guide](docs/DEVELOPER_GUIDE.md) · [architecture](ARCHITECTURE.md) · [contributing](CONTRIBUTING.md) |
 
-## More information
-
-- [Guides and tutorials](docs/README.md), including [thermal](docs/THERMAL_USER_GUIDE.md), [signal integrity](docs/SI_USER_GUIDE.md), and the [ESP32 example](examples/esp32/README.md)
-- [Solver status and numerical limits](docs/SOLVER_STATUS.md)
-- [Solver mathematics and numerical methods](docs/SOLVER_MATHEMATICS.md), [handbook](docs/SOLVER_HANDBOOK.md), and [research references](docs/SOLVER_REFERENCES.md)
-- [Local LLM and MCP setup](docs/LOCAL_LLM_MCP.md) for LM Studio or Ollama
-- [Contributing](CONTRIBUTING.md), [developer setup](docs/DEVELOPER_GUIDE.md), and [architecture](ARCHITECTURE.md)
-- [Report a bug](https://github.com/wayri/SPIKE/issues/new?template=bug_report.yml) with a small reproducible example; review your report before sharing board data
+The product direction includes larger assemblies and coordinated cross-domain
+studies. Coverage and execution scale depend on the selected workflow;
+large-scale arbitrary-assembly simulation remains a development target, not a
+blanket validated capability. See [product scope](docs/PRODUCT_SCOPE.md).
 
 ## Help improve SPIKE
 
-Tried the same board or circuit in another tool? We'd love to hear how the
-results and workflow compare, including where SPIKE falls short. If you can,
-share a small example you have permission to publish, the tool versions and
-settings, and what differed. Comparisons with measurements are welcome too.
-Matching geometry, materials, ports, and boundary conditions makes differences
-easier to investigate. [Open an issue](https://github.com/wayri/SPIKE/issues)
-with your observations; a brief usability note is just as welcome as a detailed
-numerical comparison.
+Share reproducible comparisons, especially where SPIKE falls short. Include a
+small publishable example, tool versions, settings, geometry, materials, ports,
+boundary conditions, and the observed difference. Review reports before sharing
+board data. [Open an issue](https://github.com/wayri/SPIKE/issues) or join the
+[Discord community](https://discord.gg/UCmeR9ypzQ); the invite opens in the
+read-only welcome channel.
+
+<details>
+<summary><strong>Disclaimer and development disclosure</strong></summary>
+
+SPIKE is a work in progress and is provided **AS IS**, without warranty or
+guarantee of any kind, including accuracy, reliability, or fitness for a
+particular purpose. Use it at your own risk. To the extent permitted by
+applicable law, and unless otherwise agreed in writing, Yawar B (wayri) and the
+contributors are not liable for any damage, loss, or other consequences arising
+from using or being unable to use SPIKE, including incorrect results, design
+errors, equipment damage, data loss, or financial loss. You are responsible for
+checking inputs, assumptions, and results before relying on them. This summarizes
+the warranty and liability provisions in the [Apache License 2.0](LICENSE); the
+license terms govern.
+
+SPIKE's development effort is largely LLM-driven under human review. Human
+direction and responsibility remain distinct from LLM-generated proposals,
+code, tests, and documentation. Passing tests and generated reports are
+engineering evidence, not independent physical validation. Read the
+[LLM-driven development disclosure](docs/LLM_DEVELOPMENT.md). This early
+community preview may contain instabilities, bugs, and incomplete behavior.
+
+</details>
 
 ## License
 
-Copyright 2026 Yawar B (wayri) and SPIKE contributors.
-SPIKE-owned code and documentation are licensed under [Apache 2.0](LICENSE),
-except where a file or directory specifies different terms.
-Dependencies, external engines, and example boards retain their own licenses;
-see [third-party notices](THIRD_PARTY_NOTICES.md).
+Copyright 2026 Yawar B (wayri) and SPIKE contributors. SPIKE-owned code and
+documentation are licensed under [Apache 2.0](LICENSE), except where a file or
+directory specifies different terms. Dependencies, external engines, and
+example boards retain their own licenses; see
+[third-party notices](THIRD_PARTY_NOTICES.md).
 
-## Acknowledgements
+<details>
+<summary><strong>Acknowledgements</strong></summary>
 
 - Large language models have produced substantial proposals, code, tests, and
-  documentation during SPIKE's development under human direction and review.
-  The [LLM-driven development disclosure](docs/LLM_DEVELOPMENT.md) explains
-  this contribution and its limits.
+  documentation under human direction and review. The
+  [development disclosure](docs/LLM_DEVELOPMENT.md) records this contribution
+  and its limits.
 - The KiCad project and its contributors for the PCB ecosystem SPIKE works with.
-- The Tauri, React, Three.js, Plotly.js, and Lucide projects behind the desktop interface and plots.
-- The NumPy, SciPy, Shapely/GEOS, PyVista, wxPython, nanobind, Matplotlib, mplcursors, ReportLab, Apache Arrow, jsonschema, and Eigen projects used by the Python and native tooling.
-- [ngspice](https://ngspice.sourceforge.io/) and its contributors for the optional circuit engine.
-- [openEMS](https://openems.de/) and [CSXCAD](https://github.com/thliebig/CSXCAD) contributors for the optional electromagnetic solver and geometry tools.
-- Robert Fennis and the [EMerge](https://github.com/FennisRobert/EMerge) contributors for the optional electromagnetic solver used in the ESP32 antenna example.
-- The [OpenFOAM](https://www.openfoam.com/) community for the optional airflow solver.
-- The [FreeCAD](https://www.freecad.org/) community for the optional mechanical CAD integration.
-- Berkeley Lab and the Regents of the University of California for the Marble reference board, and uysan for the open `iot-esp-eth` ESP32 board used in the worked example.
-- Contributors, testers, issue reporters, and documentation authors who help improve SPIKE.
+- The Tauri, React, Three.js, Plotly.js, and Lucide projects behind the desktop
+  interface and plots.
+- NumPy, SciPy, Shapely/GEOS, PyVista, wxPython, nanobind, Matplotlib,
+  mplcursors, ReportLab, Apache Arrow, jsonschema, and Eigen contributors.
+- [ngspice](https://ngspice.sourceforge.io/) contributors for the optional
+  circuit engine.
+- [openEMS](https://openems.de/) and
+  [CSXCAD](https://github.com/thliebig/CSXCAD) contributors for the optional EM
+  solver and geometry tools.
+- Robert Fennis and [EMerge](https://github.com/FennisRobert/EMerge)
+  contributors for the optional EM solver used in the ESP32 antenna example.
+- The [OpenFOAM](https://www.openfoam.com/) community for the optional airflow
+  solver, and the [FreeCAD](https://www.freecad.org/) community for the optional
+  mechanical CAD integration.
+- Berkeley Lab and the Regents of the University of California for the Marble
+  reference board, and uysan for the open `iot-esp-eth` ESP32 example board.
+- Contributors, testers, issue reporters, and documentation authors.
 
-If we have missed a credit, please open an issue or pull request. License and
-source details for included examples and integrations are in the
+If a credit is missing, open an issue or pull request. Source and license details
+for included examples and integrations are in
 [third-party notices](THIRD_PARTY_NOTICES.md).
+
+</details>
