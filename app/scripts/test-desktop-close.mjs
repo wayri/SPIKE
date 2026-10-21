@@ -47,6 +47,9 @@ assert.ok(bridge.includes('"spike://desktop-close-requested"') && bridge.include
 assert.ok(app.includes("if (accepted && !disposed) handleClose(preventDefault)"), "stale acknowledgements cannot reopen a save guard");
 assert.ok(app.includes("void acknowledgeDesktopClose(generation)"), "a live renderer must acknowledge close even when a dirty draft keeps it open");
 assert.ok(app.includes("<DesktopCloseDraftDialog"), "draft-blocked close must have a visible recovery dialog");
+const qualification = read("../src/PanelPopupQualification.tsx");
+assert.ok(qualification.includes("acknowledgeDesktopClose(generation)"), "the installed frontend proof must acknowledge the native close generation");
+assert.ok(qualification.includes("if(accepted&&!disposed)return desktopBridge.closeDesktopWindow()"), "the installed frontend proof must admit whole-app shutdown only after the exact generation is accepted");
 // Exercise the actual bridge functions with only the native transport substituted.
 let nativeListener, invoked = [], delivered = [], desktop = true;
 const transportSource = bridge.slice(bridge.indexOf("export async function subscribeDesktopCloseRequested"), bridge.indexOf("export async function closeDesktopWindow"))

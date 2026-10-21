@@ -47,7 +47,11 @@ export default function PanelPopupQualification() {
   const [phase,setPhase]=useState("scale"),[error,setError]=useState("");
   const mounts=useRef(0),baseline=useRef(0),cycle=useRef(0),latest=useRef(phase);latest.current=phase;
   const fail=(message:string)=>{setError(message);document.title=`SPIKE PANEL QUALIFICATION FAIL - ${message}`;};
-  useEffect(()=>{let disposed=false,unlisten:(()=>void)|undefined;void desktopBridge.subscribeDesktopCloseRequested(()=>undefined).then(listener=>{if(disposed)listener();else unlisten=listener;}).catch(error=>{if(!disposed)fail(`Close protocol: ${String(error)}`);});return()=>{disposed=true;unlisten?.();};},[]);
+  useEffect(()=>{let disposed=false,unlisten:(()=>void)|undefined;void desktopBridge.subscribeDesktopCloseRequested((_preventDefault,generation)=>{
+    void desktopBridge.acknowledgeDesktopClose(generation).then(accepted=>{
+      if(accepted&&!disposed)return desktopBridge.closeDesktopWindow();
+    }).catch(error=>{if(!disposed)fail(`Close protocol: ${String(error)}`);});
+  }).then(listener=>{if(disposed)listener();else unlisten=listener;}).catch(error=>{if(!disposed)fail(`Close protocol: ${String(error)}`);});return()=>{disposed=true;unlisten?.();};},[]);
   useEffect(()=>{document.title="SPIKE PANEL QUALIFICATION RUNNING";void setPanelUiScale(1.25).then(()=>setPhase("edit")).catch(error=>fail(String(error)));const deadline=window.setTimeout(()=>{if(latest.current!=="pass")fail(`Timed out in ${latest.current}`);},20000);return()=>window.clearTimeout(deadline);},[]);
   useEffect(()=>{if(phase==="closed-returned")setTimeout(()=>setPhase("pass"),1000);},[phase]);
   return <div className="app-shell focus-shell" style={{height:"100vh"}}><p role="status">{error||phase}</p><FloatingPanel id="native-qualification" title="Native qualification" active={true} onDetached={()=>setPhase(++cycle.current===1?"detached":"close-detached")} onDocked={()=>setPhase(cycle.current===2?"closed-returned":"returned")} onError={fail}><Proof phase={phase} setPhase={setPhase} mounts={mounts} baseline={baseline} fail={fail}/></FloatingPanel></div>;

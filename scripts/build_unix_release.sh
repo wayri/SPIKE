@@ -30,7 +30,7 @@ cd ..
 python scripts/prepare_release_resources.py --config-output build/tauri.release.json
 cd app
 if [[ "$(uname)" == Darwin ]]; then
-  npm run tauri build -- --bundles app --config ../build/tauri.release.json
+  npm run tauri build -- --bundles app --features custom-protocol --config ../build/tauri.release.json
 else
-  npm run tauri build -- --bundles deb --config ../build/tauri.release.json
+  npm run tauri build -- --bundles deb --features custom-protocol --config ../build/tauri.release.json
 fi

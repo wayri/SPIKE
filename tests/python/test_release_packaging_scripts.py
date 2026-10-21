@@ -1,5 +1,6 @@
 """Source-contract checks for cross-platform release packaging order."""
 from pathlib import Path
+import shlex
 import unittest
 
 
@@ -7,6 +8,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ReleasePackagingScriptTests(unittest.TestCase):
+    def test_all_unix_bundles_embed_frontend_without_development_server(self):
+        script = (ROOT / "scripts/build_unix_release.sh").read_text(encoding="utf-8")
+        builds = [shlex.split(line.strip()) for line in script.splitlines()
+                  if line.strip().startswith("npm run tauri build ")]
+        self.assertEqual(len(builds), 2)
+        for command in builds:
+            with self.subTest(bundle=command[command.index("--bundles") + 1]):
+                self.assertIn("--features", command)
+                self.assertIn("custom-protocol", command[command.index("--features") + 1].split(","))
+
     def test_unix_builds_required_native_helpers_before_frozen_worker(self):
         script = (ROOT / "scripts/build_unix_release.sh").read_text(encoding="utf-8")
         airflow = script.index("python scripts/build_native_airflow.py --build-dir build-native-airflow --generator Ninja")

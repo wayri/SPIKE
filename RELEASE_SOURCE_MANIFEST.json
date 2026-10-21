@@ -1,7 +1,7 @@
 {
   "contract": "spike/release-source-manifest/v1",
   "version": "0.4.0-alpha.1",
-  "parent_commit": "c41f1837aa1da5b3e677cad348b6ef76818ce6ec",
+  "parent_commit": "4fb63366f7999aeec6dc0d92f2a83f6932dd5a2e",
   "selection": "Current development overlay on the existing 0.4 release branch; retained published fixes; generated/private/download caches and unresolved third-party export assets excluded.",
   "self_excluded": true,
   "review_status": {
@@ -1549,10 +1549,10 @@
     },
     {
       "path": "app/scripts/test-desktop-close.mjs",
-      "git_blob": "6fa3bcdcd7652bc5e817ce358ebdbe1384cdd65b",
+      "git_blob": "7623870c4c6c19b4e49d8470aa65baf14fbe366b",
       "mode": "100644",
-      "bytes": 6116,
-      "sha256": "3bac4bf70ac71f9818ce888613d408893c94bdd921dec74de056e65cdfaefd4f"
+      "bytes": 6542,
+      "sha256": "a308a4aaaf1c3845737f60ff533ef44f900afc534b4d703f13e41f69ae6f2e1a"
     },
     {
       "path": "app/scripts/test-detached-table-theme.mjs",
@@ -4545,10 +4545,10 @@
     },
     {
       "path": "app/src/PanelPopupQualification.tsx",
-      "git_blob": "cb2f5b84125432962c52b31eabfb98ef8e95f6c0",
+      "git_blob": "b36b88ad8407bfd43b9b99189e64826cfb9ea618",
       "mode": "100644",
-      "bytes": 5575,
-      "sha256": "d6d9236f9ddd47f344807aeb35f2a4c48bc11bccffc3a653f85cbeaf545d04b2"
+      "bytes": 5824,
+      "sha256": "c712b34770f68d85ab67237c5c032dfd6e02754b19aa813ef43c477500a4bda2"
     },
     {
       "path": "app/src/PanelResponsive.css",
@@ -8973,6 +8973,13 @@
       "mode": "100644",
       "bytes": 3764,
       "sha256": "80bec0bd5bd32b8541577216ec6328e05acd1ec16a10c48982ad073f009a363a"
+    },
+    {
+      "path": "docs/DEMO_BOARD_PROVENANCE.md",
+      "git_blob": "05fdc9261f13af08154d7ffe7b4b9681654ac19d",
+      "mode": "100644",
+      "bytes": 960,
+      "sha256": "285b103a46c060a4a478afb9807790d85e0f7b89ff531d4bbe301c38a93f1428"
     },
     {
       "path": "docs/DESIGN_PRINCIPLES.md",
@@ -40112,10 +40119,10 @@
     },
     {
       "path": "scripts/build_unix_release.sh",
-      "git_blob": "8c9c5e5855a5efe1bded1e4f7f7362eb24b514d0",
+      "git_blob": "ed2ca1582408bf20764e2609ae61fefd39f59746",
       "mode": "100644",
-      "bytes": 1938,
-      "sha256": "d057dd549d96dba64ec5cddd87ba283386286a2d9ae92a92874e1261e0011e13"
+      "bytes": 1992,
+      "sha256": "67ab77cde6249ac174001d735705ccba840221e1433cd7417b6961c9fb35edf7"
     },
     {
       "path": "scripts/build_wave1_assembly_acceptance_fixture.py",
@@ -50262,10 +50269,10 @@
     },
     {
       "path": "tests/python/test_release_packaging_scripts.py",
-      "git_blob": "8ebe97556e1d2f216d817e2b9b615a059bf57b70",
+      "git_blob": "da189a2d51713c5cc154168ab456952f89f1d093",
       "mode": "100644",
-      "bytes": 1335,
-      "sha256": "954b1cf3b8a45e8f707cf33b1fce314f674c5fc7a4361b3c66c041ee1d6d54f6"
+      "bytes": 1966,
+      "sha256": "0ec050e9520c7f6bf0bb1497aaf0a31d25789bab3b1f405ef7f2edb49c6a2762"
     },
     {
       "path": "tests/python/test_result_face_projection_index.py",
