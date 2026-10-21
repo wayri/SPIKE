@@ -1,77 +1,125 @@
 # Platform installation and command line
 
-## Windows Gamma preview
+## 0.4.0-alpha.1 experimental release
 
-The current Windows x64 Gamma prerelease is
-[0.3.12-gamma.1](https://github.com/wayri/SPIKE/releases/tag/v0.3.12-gamma.1).
-Use the attached EXE or MSI and verify its SHA-256 checksum. It is unsigned;
-numerical human review and clean-machine qualification remain pending. Save and
-close your work before installing. This release does not refresh Linux or macOS.
+SPIKE 0.4.0-alpha.1 is an experimental four-platform preview built from source
+candidate `4f550c0f`. The earlier all-platform candidate run
+[`39572252308`](https://github.com/wayri/SPIKE/actions/runs/39572252308)
+passed. The [publication workflow](https://github.com/wayri/SPIKE/actions/runs/39584567090)
+records the final package checks and publication outcome. The
+[release page](https://github.com/wayri/SPIKE/releases/tag/v0.4.0-alpha.1)
+is authoritative for the available attachments.
 
-## Earlier experimental Linux and macOS packages
+> [!WARNING]
+> Knowledgeable human numerical and firmware review remains pending. Package
+> availability, checksums, and passing automation do not qualify a solver,
+> method, model, result, or platform for production engineering use.
 
-The experimental platform packages include the desktop app, Python runtime,
-native kernels, and command-line interface. A separate Python installation is
-not needed.
+The packages include the desktop app, Python runtime, native kernels, and
+command-line interface. A separate Python installation is not needed.
 
-## Linux: Flatpak
+| Platform | Release package | SHA-256 |
+| --- | --- | --- |
+| Windows x64 | [`SPIKE_0.4.0-alpha.1_x64-setup.exe`](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_x64-setup.exe) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_x64-setup.exe.sha256) |
+| Linux x86-64 | [`SPIKE_0.4.0-alpha.1_linux-x86_64_EXPERIMENTAL.flatpak`](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_linux-x86_64_EXPERIMENTAL.flatpak) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_linux-x86_64_EXPERIMENTAL.flatpak.sha256) |
+| macOS Apple silicon | [`SPIKE_0.4.0-alpha.1_macos-arm64_EXPERIMENTAL.dmg`](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-arm64_EXPERIMENTAL.dmg) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-arm64_EXPERIMENTAL.dmg.sha256) |
+| macOS Intel | [`SPIKE_0.4.0-alpha.1_macos-x86_64_EXPERIMENTAL.dmg`](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-x86_64_EXPERIMENTAL.dmg) | [checksum](https://github.com/wayri/SPIKE/releases/download/v0.4.0-alpha.1/SPIKE_0.4.0-alpha.1_macos-x86_64_EXPERIMENTAL.dmg.sha256) |
 
-Download the `.flatpak` file from the [0.3.5 release](https://github.com/wayri/SPIKE/releases/tag/v0.3.5).
-With Flatpak installed, run:
+Verify the adjacent SHA-256 file before installing. Save and close open work
+before an install or update.
+
+## Windows x64
+
+Run `SPIKE_0.4.0-alpha.1_x64-setup.exe` and choose the installer scope. The
+standard per-user installation places the command launcher at:
+
+```text
+%LOCALAPPDATA%\Programs\SPIKE\spike.cmd
+```
+
+From PowerShell:
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\SPIKE\spike.cmd" --help
+& "$env:LOCALAPPDATA\Programs\SPIKE\spike.cmd" import C:\boards\example.kicad_pcb
+```
+
+If you select another install scope or directory, run `spike.cmd` from that
+installation root. The Windows installer is **unsigned**; Windows may show an
+unrecognized-app warning. Verify the checksum and publisher context before
+continuing.
+
+## Linux x86-64: Flatpak
+
+With Flatpak installed, download the 0.4.0-alpha.1 package and run:
 
 ```sh
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-flatpak install --user ./SPIKE_0.3.5_linux-x86_64_EXPERIMENTAL.flatpak
+flatpak install --user ./SPIKE_0.4.0-alpha.1_linux-x86_64_EXPERIMENTAL.flatpak
 flatpak run org.spike.integrity
 ```
 
-The package is for x86-64 Linux. Flatpak downloads
-the runtime on first installation. SPIKE can then run locally without a network
-connection. The app can read and write your home directory and uses the network
-for configured local model services and extensions.
+Flatpak downloads the runtime during the first installation. SPIKE can then run
+locally without a network connection. The app can read and write your home
+directory and uses the network for configured local model services and
+extensions.
 
-## macOS: DMG
-
-Use the earlier 0.3.5 `macos-arm64` package for Apple Silicon. Intel macOS
-packaging is held; no verified Intel package is claimed. Open the DMG and drag
-SPIKE into Applications. The recorded build baseline is macOS 15; earlier
-versions have not been tested.
-
-These experimental builds are ad-hoc signed, without Apple notarization.
-macOS may block the first launch. If you trust the downloaded file, use
-**System Settings → Privacy & Security → Open Anyway** after attempting to open it.
-
-## Command line
-
-Linux:
+Run the packaged CLI with:
 
 ```sh
 flatpak run --command=spike org.spike.integrity --help
 flatpak run --command=spike org.spike.integrity import ~/boards/example.kicad_pcb
 ```
 
-macOS:
+Optional external solvers remain separate installations. Flatpak isolates SPIKE
+from host executables, so openEMS, EMerge, FreeCAD, OpenFOAM, SU2, ngspice, and
+other engines installed on the host are not automatically available inside the
+sandbox. Their availability depends on their own operating-system dependencies
+and an admitted integration path. The same restriction applies to CLI extension
+commands.
+
+## macOS: Apple silicon or Intel
+
+Choose the package that matches **About This Mac**:
+
+| Mac hardware | Package |
+| --- | --- |
+| Apple M-series | `SPIKE_0.4.0-alpha.1_macos-arm64_EXPERIMENTAL.dmg` |
+| Intel processor | `SPIKE_0.4.0-alpha.1_macos-x86_64_EXPERIMENTAL.dmg` |
+
+Open the DMG and drag SPIKE into Applications. Both experimental packages are
+built with a macOS 15 baseline; earlier macOS versions have not been tested.
+They are ad-hoc signed and **not Apple-notarized**, so macOS may block the first
+launch. After verifying the checksum, if you trust the package, attempt to open
+it and then use **System Settings -> Privacy & Security -> Open Anyway**.
+
+Run the packaged CLI with:
 
 ```sh
 /Applications/SPIKE.app/Contents/MacOS/spike --help
 /Applications/SPIKE.app/Contents/MacOS/spike import ~/boards/example.kicad_pcb
 ```
 
-Both launchers use the same command parser and analysis backend as the source
-CLI. See the [CLI guide](CLI.md) for analysis, reports, studies, and automation.
-Build checks compare every command's help, version, board inspection, and error
-output with the source CLI.
+## Command-line behavior
 
-Optional external solvers are separate installations. Their availability depends
-on the operating system and their own dependencies. Flatpak isolates SPIKE from
-host executables: a solver installed on the host is not automatically available
-inside the sandbox. This restriction also applies to CLI extension commands.
+The installed launchers use the same command parser and analysis backend as the
+source CLI. See the [CLI guide](CLI.md) for analysis, reports, studies, and
+automation. Package checks compare command help, version, board inspection, and
+error behavior with the source CLI.
+
+## Historical packages
+
+Windows Gamma releases and 0.3.5 Linux/macOS packages are older artifacts from
+different source identities. They do not contain the 0.4.0-alpha.1 candidate and
+must not be relabeled as current four-platform packages. Use an older artifact
+only when deliberately reproducing its recorded behavior and retain its original
+version, checksum, and limitations.
 
 ## Building
 
 The [automated build and release chain](BUILD_AND_RELEASE.md) generates the
-Windows installer and experimental Unix packages. Gamma tags are excluded from
-the automatic multi-platform publication chain; their platform-specific build
-evidence must be recorded separately. The general chain runs on other version tags or from
-**Actions - Build and release SPIKE - Run workflow**. The resulting packages
-and SHA-256 files are stored in `dist-release`.
+Windows x64 installer, Linux x86-64 Flatpak, and macOS Apple silicon and Intel
+DMGs. It runs from a matching version tag or from
+**Actions -> Build and release SPIKE -> Run workflow**. All four packages and
+their SHA-256 files must pass verification before publication; outputs are
+stored in `dist-release`.
