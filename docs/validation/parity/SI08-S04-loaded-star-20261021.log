@@ -1,0 +1,16 @@
+test_active_nonreciprocal_zero_source_and_numeric_scales (tests.python.test_sparameter_rational.SParameterRationalTests.test_active_nonreciprocal_zero_source_and_numeric_scales) ... ok
+test_cancellation_after_solve_discards_model (tests.python.test_sparameter_rational.SParameterRationalTests.test_cancellation_after_solve_discards_model) ... ok
+test_known_real_rc_coefficients_source_identity_and_sample_reconstruction (tests.python.test_sparameter_rational.SParameterRationalTests.test_known_real_rc_coefficients_source_identity_and_sample_reconstruction) ... ok
+test_missing_pole_and_anti_causal_source_fail_sample_error (tests.python.test_sparameter_rational.SParameterRationalTests.test_missing_pole_and_anti_causal_source_fail_sample_error) ... ok
+test_rad_per_second_pole_order_and_common_frequency_scaling (tests.python.test_sparameter_rational.SParameterRationalTests.test_rad_per_second_pole_order_and_common_frequency_scaling) ... ok
+test_rank_condition_and_corrupted_least_squares_failures (tests.python.test_sparameter_rational.SParameterRationalTests.test_rank_condition_and_corrupted_least_squares_failures) ... ok
+test_state_step_and_independent_numerical_impulse_transform (tests.python.test_sparameter_rational.SParameterRationalTests.test_state_step_and_independent_numerical_impulse_transform) ... ok
+test_strict_dc_physical_scalars_shapes_and_resources (tests.python.test_sparameter_rational.SParameterRationalTests.test_strict_dc_physical_scalars_shapes_and_resources) ... ok
+test_active_nonreciprocal_model_is_retained (tests.python.test_sparameter_rational_contract.RationalContractTests.test_active_nonreciprocal_model_is_retained) ... ok
+test_actual_worker_schema_coefficients_source_and_error_limit (tests.python.test_sparameter_rational_contract.RationalContractTests.test_actual_worker_schema_coefficients_source_and_error_limit) ... ok
+test_worker_rejects_bad_pole_dc_unknown_and_inaccurate_fit (tests.python.test_sparameter_rational_contract.RationalContractTests.test_worker_rejects_bad_pole_dc_unknown_and_inaccurate_fit) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.041s
+
+OK

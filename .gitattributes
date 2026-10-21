@@ -403,3 +403,23 @@ scripts/parity_si_candidate_gate.py -text -eol
 tests/python/test_rlgc_loaded_cascade.py -text -eol
 tests/python/test_rlgc_reactive_pair.py -text -eol
 tests/python/test_si_candidate_stage_evidence.py -text -eol
+
+# Verified active PI/SI and native STEP receipt source bytes.
+docs/RLGC_LINE_JUNCTION.md -text -eol
+examples/rlgc_line_junction/run_line.py -text -eol
+examples/rlgc_line_junction/three-legs.request.json -text -eol
+python/spike_core/mcad_importer.py -text -eol
+python/spike_core/rlgc_line_junction.py -text -eol
+python/spike_core/spider_v2_schema.py -text -eol
+schemas/pdn-network-request-v1.schema.json -text -eol
+schemas/rlgc-line-junction-request-v1.schema.json -text -eol
+schemas/rlgc-line-junction-result-v1.schema.json -text -eol
+tests/python/test_scaled_component_review.py -text -eol
+
+# Verified active import and component-admission receipt source bytes.
+python/spike_core/assembly_frames.py -text -eol
+python/spike_core/gmsh_occ_mesher.py -text -eol
+python/spike_core/project_package.py -text -eol
+schemas/assembly-thermal-mesh-assignments-v1.schema.json -text -eol
+schemas/mcad-assembly-v1.schema.json -text -eol
+tests/python/test_assembly_thermal_meshing.py -text -eol

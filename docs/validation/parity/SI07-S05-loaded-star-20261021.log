@@ -1,0 +1,15 @@
+test_coupled_two_port_signed_pwl_physical_reference_and_refined_outputs (tests.python.test_sparameter_rlc_terminated.RlcTests.test_coupled_two_port_signed_pwl_physical_reference_and_refined_outputs) ... ok
+test_invalid_and_total_state_preflight_resources_cancel (tests.python.test_sparameter_rlc_terminated.RlcTests.test_invalid_and_total_state_preflight_resources_cancel) ... ok
+test_loaded_rlc_damping_and_source_work_storage_dissipation (tests.python.test_sparameter_rlc_terminated.RlcTests.test_loaded_rlc_damping_and_source_work_storage_dissipation) ... ok
+test_mixed_rl_rc_and_pure_r_reductions_against_previous_apis (tests.python.test_sparameter_rlc_terminated.RlcTests.test_mixed_rl_rc_and_pure_r_reductions_against_previous_apis) ... ok
+test_reference_impedance_and_time_unit_invariance (tests.python.test_sparameter_rlc_terminated.RlcTests.test_reference_impedance_and_time_unit_invariance) ... ok
+test_singular_unstable_marginal_and_precision_rejections (tests.python.test_sparameter_rlc_terminated.RlcTests.test_singular_unstable_marginal_and_precision_rejections) ... ok
+test_true_fitted_memory_parallel_conductance_inductor_network (tests.python.test_sparameter_rlc_terminated.RlcTests.test_true_fitted_memory_parallel_conductance_inductor_network) ... ok
+test_example_runs_and_public_contracts_are_registered (tests.python.test_sparameter_rlc_contract.RlcContractTests.test_example_runs_and_public_contracts_are_registered) ... ok
+test_worker_and_schema_fail_closed_on_unsupported_boundaries (tests.python.test_sparameter_rlc_contract.RlcContractTests.test_worker_and_schema_fail_closed_on_unsupported_boundaries) ... ok
+test_worker_loaded_rlc_state_power_and_original_provenance (tests.python.test_sparameter_rlc_contract.RlcContractTests.test_worker_loaded_rlc_state_power_and_original_provenance) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.023s
+
+OK

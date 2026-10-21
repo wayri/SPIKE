@@ -162,15 +162,19 @@ Invoke-Checked $python @(
     "scripts/verify_packaged_cli.py", "--", "cmd.exe", "/d", "/c", $installedLauncher
 ) $root
 
-$desktopCandidates = @(Get-ChildItem -LiteralPath $installRoot -Recurse -Filter "*.exe" -File |
-    Where-Object { $_.Name -notin @("spike-worker.exe", "uninstall.exe") })
-if ($desktopCandidates.Count -ne 1) {
-    throw "Expected exactly one installed desktop executable; found $($desktopCandidates.Count)."
+$cargoManifest = Get-Content -LiteralPath (Join-Path $app "src-tauri\Cargo.toml") -Raw
+$defaultRunMatch = [regex]::Match($cargoManifest, '(?m)^default-run\s*=\s*"([^"]+)"\s*$')
+if (-not $defaultRunMatch.Success) {
+    throw "app/src-tauri/Cargo.toml does not define the canonical desktop default-run binary."
+}
+$desktopExecutable = Join-Path $installRoot ($defaultRunMatch.Groups[1].Value + ".exe")
+if (-not (Test-Path -LiteralPath $desktopExecutable -PathType Leaf)) {
+    throw "The canonical installed desktop executable is missing: $desktopExecutable"
 }
 # A live process can still be displaying the missing-frontend error dialog.
 # Require the embedded JavaScript/native panel proof and a normal close instead.
 Invoke-Checked $python @(
-    "scripts/verify_windows_desktop.py", $desktopCandidates[0].FullName,
+    "scripts/verify_windows_desktop.py", $desktopExecutable,
     "--output", (Join-Path $root "build/desktop-frontend-qualification.json")
 ) $root
 

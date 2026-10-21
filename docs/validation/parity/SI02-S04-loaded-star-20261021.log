@@ -1,0 +1,20 @@
+test_excitation_scaling_and_probe_refinement_do_not_change_integrals (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_excitation_scaling_and_probe_refinement_do_not_change_integrals) ... ok
+test_fields_storage_loss_and_boundaries_against_spatial_exponential (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_fields_storage_loss_and_boundaries_against_spatial_exponential) ... ok
+test_integrated_ledger_against_independent_spatial_quadrature (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_integrated_ledger_against_independent_spatial_quadrature) ... ok
+test_lossless_two_sided_standing_wave_and_exact_zero_heat (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_lossless_two_sided_standing_wave_and_exact_zero_heat) ... ok
+test_matched_single_wave_rms_power_and_equal_heat_split (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_matched_single_wave_rms_power_and_equal_heat_split) ... ok
+test_numerical_failure_and_invariant_failure_are_not_repaired (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_numerical_failure_and_invariant_failure_are_not_repaired) ... ok
+test_relative_excitation_phase_changes_interference_loss (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_relative_excitation_phase_changes_interference_loss) ... ok
+test_resource_preflight_and_cancellation (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_resource_preflight_and_cancellation) ... ok
+test_short_antiphase_line_retains_small_positive_dielectric_loss (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_short_antiphase_line_retains_small_positive_dielectric_loss) ... ok
+test_spatial_loss_quadrature_refines_to_analytic_ledger (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_spatial_loss_quadrature_refines_to_analytic_ledger) ... ok
+test_strict_grid_type_and_probe_admission (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_strict_grid_type_and_probe_admission) ... ok
+test_zero_drive_and_provenance_snapshot (tests.python.test_rlgc_line_fields.RLGCLineFieldsTests.test_zero_drive_and_provenance_snapshot) ... ok
+test_example_executes_and_schemas_registered (tests.python.test_rlgc_line_fields_contract.RLGCFieldsContractTests.test_example_executes_and_schemas_registered) ... ok
+test_schema_worker_rejects_dc_unknown_or_malformed_drives (tests.python.test_rlgc_line_fields_contract.RLGCFieldsContractTests.test_schema_worker_rejects_dc_unknown_or_malformed_drives) ... ok
+test_worker_independent_spatial_fields_quadrature_and_identity (tests.python.test_rlgc_line_fields_contract.RLGCFieldsContractTests.test_worker_independent_spatial_fields_quadrature_and_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.977s
+
+OK

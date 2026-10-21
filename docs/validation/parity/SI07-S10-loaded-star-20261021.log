@@ -1,0 +1,14 @@
+test_actual_fitted_inductor_memory_against_physical_ode (tests.python.test_sparameter_reflectometry.ReflectometryTests.test_actual_fitted_inductor_memory_against_physical_ode) ... ok
+test_analytic_resistor_port_uses_network_current_one_fit_and_identity (tests.python.test_sparameter_reflectometry.ReflectometryTests.test_analytic_resistor_port_uses_network_current_one_fit_and_identity) ... ok
+test_coupled_driven_ports_and_common_state_physical_reference (tests.python.test_sparameter_reflectometry.ReflectometryTests.test_coupled_driven_ports_and_common_state_physical_reference) ... ok
+test_floor_equality_nulls_open_current_and_signed_active_response (tests.python.test_sparameter_reflectometry.ReflectometryTests.test_floor_equality_nulls_open_current_and_signed_active_response) ... ok
+test_invalid_resource_precision_corrupted_wave_and_cancellation_fail_closed (tests.python.test_sparameter_reflectometry.ReflectometryTests.test_invalid_resource_precision_corrupted_wave_and_cancellation_fail_closed) ... ok
+test_reference_time_units_and_shared_observation_refinement (tests.python.test_sparameter_reflectometry.ReflectometryTests.test_reference_time_units_and_shared_observation_refinement) ... ok
+test_example_executes_and_contracts_are_registered (tests.python.test_sparameter_reflectometry_contract.ReflectometryContractTests.test_example_executes_and_contracts_are_registered) ... ok
+test_worker_against_analytic_reflection_impedance_and_network_power (tests.python.test_sparameter_reflectometry_contract.ReflectometryContractTests.test_worker_against_analytic_reflection_impedance_and_network_power) ... ok
+test_worker_and_schema_fail_closed_on_invalid_requests (tests.python.test_sparameter_reflectometry_contract.ReflectometryContractTests.test_worker_and_schema_fail_closed_on_invalid_requests) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.004s
+
+OK

@@ -1,0 +1,19 @@
+test_analytic_quarter_wave_impedance_step_and_lossless_power (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_analytic_quarter_wave_impedance_step_and_lossless_power) ... ok
+test_cancellation_and_numerical_failure_are_atomic (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_cancellation_and_numerical_failure_are_atomic) ... ok
+test_coherent_local_waves_and_heat_match_independent_section_quadrature (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_coherent_local_waves_and_heat_match_independent_section_quadrature) ... ok
+test_coherent_scaling_and_reversal_preserve_physical_ownership (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_coherent_scaling_and_reversal_preserve_physical_ownership) ... ok
+test_combined_output_and_work_preflight_precede_leaf_solvers (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_combined_output_and_work_preflight_precede_leaf_solvers) ... ok
+test_contract_digest_and_child_input_snapshots (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_contract_digest_and_child_input_snapshots) ... ok
+test_corrupt_child_junction_and_loss_are_rejected_without_repair (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_corrupt_child_junction_and_loss_are_rejected_without_repair) ... ok
+test_exact_grid_reference_ids_and_nested_admission (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_exact_grid_reference_ids_and_nested_admission) ... ok
+test_identical_segmentation_preserves_network_fields_and_total_heat (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_identical_segmentation_preserves_network_fields_and_total_heat) ... ok
+test_one_section_is_actual_s04_and_zero_drive_has_exact_zero_ledger (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_one_section_is_actual_s04_and_zero_drive_has_exact_zero_ledger) ... ok
+test_two_and_three_sections_match_independent_spatial_network_and_fields (tests.python.test_rlgc_line_cascade.RLGCLineCascadeTests.test_two_and_three_sections_match_independent_spatial_network_and_fields) ... ok
+test_actual_cli_and_example_emit_registered_result (tests.python.test_rlgc_line_cascade_contract.CascadeContractTests.test_actual_cli_and_example_emit_registered_result) ... ok
+test_strict_schema_and_worker_fail_closed_on_invalid_section (tests.python.test_rlgc_line_cascade_contract.CascadeContractTests.test_strict_schema_and_worker_fail_closed_on_invalid_section) ... ok
+test_worker_independent_spatial_chain_fields_loss_and_identity (tests.python.test_rlgc_line_cascade_contract.CascadeContractTests.test_worker_independent_spatial_chain_fields_loss_and_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.829s
+
+OK

@@ -1,0 +1,15 @@
+test_cancellation_before_and_during_bounces_and_final_return (tests.python.test_lossless_line_transient.LosslessLineTests.test_cancellation_before_and_during_bounces_and_final_return) ... ok
+test_ideal_zero_resistance_full_reflections_remain_finite (tests.python.test_lossless_line_transient.LosslessLineTests.test_ideal_zero_resistance_full_reflections_remain_finite) ... ok
+test_invalid_fields_times_initial_history_precision_resources (tests.python.test_lossless_line_transient.LosslessLineTests.test_invalid_fields_times_initial_history_precision_resources) ... ok
+test_matched_finite_pulse_spatial_energy_equals_injected_network_work (tests.python.test_lossless_line_transient.LosslessLineTests.test_matched_finite_pulse_spatial_energy_equals_injected_network_work) ... ok
+test_matched_finite_ramp_exact_delays_and_prearrival_zeros (tests.python.test_lossless_line_transient.LosslessLineTests.test_matched_finite_ramp_exact_delays_and_prearrival_zeros) ... ok
+test_observation_refinement_and_distributed_parameter_length_time_scaling (tests.python.test_lossless_line_transient.LosslessLineTests.test_observation_refinement_and_distributed_parameter_length_time_scaling) ... ok
+test_resistive_first_echo_multiple_bounces_and_both_ends_driven (tests.python.test_lossless_line_transient.LosslessLineTests.test_resistive_first_echo_multiple_bounces_and_both_ends_driven) ... ok
+test_example_executes_and_contracts_are_registered (tests.python.test_lossless_line_transient_contract.LosslessLineContractTests.test_example_executes_and_contracts_are_registered) ... ok
+test_worker_against_independent_geometric_reflection_series (tests.python.test_lossless_line_transient_contract.LosslessLineContractTests.test_worker_against_independent_geometric_reflection_series) ... ok
+test_worker_and_schema_reject_invalid_physics_contracts (tests.python.test_lossless_line_transient_contract.LosslessLineContractTests.test_worker_and_schema_reject_invalid_physics_contracts) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.807s
+
+OK

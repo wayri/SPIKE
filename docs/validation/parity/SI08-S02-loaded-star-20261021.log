@@ -1,0 +1,15 @@
+test_analytic_matched_delay_attenuation_dc_and_nonuniform_grid (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_analytic_matched_delay_attenuation_dc_and_nonuniform_grid) ... ok
+test_reconstruction_detects_corrupt_solve_and_extreme_norms_fail (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_reconstruction_detects_corrupt_solve_and_extreme_norms_fail) ... ok
+test_reflective_nonreciprocal_active_dut_from_independent_connections (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_reflective_nonreciprocal_active_dut_from_independent_connections) ... ok
+test_representation_singular_and_product_condition_failures (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_representation_singular_and_product_condition_failures) ... ok
+test_resources_and_cancellation_after_partial_sweep (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_resources_and_cancellation_after_partial_sweep) ... ok
+test_strict_shapes_names_grids_reference_and_finite_values (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_strict_shapes_names_grids_reference_and_finite_values) ... ok
+test_unilateral_dut_and_forward_polarity_are_preserved (tests.python.test_sparameter_deembedding.TwoPortDeembeddingTests.test_unilateral_dut_and_forward_polarity_are_preserved) ... ok
+test_actual_worker_rejects_orientation_grid_reference_and_unknown_fields (tests.python.test_sparameter_deembedding_contract.DeembeddingContractTests.test_actual_worker_rejects_orientation_grid_reference_and_unknown_fields) ... ok
+test_actual_worker_schema_active_nonreciprocal_dut_and_source_preservation (tests.python.test_sparameter_deembedding_contract.DeembeddingContractTests.test_actual_worker_schema_active_nonreciprocal_dut_and_source_preservation) ... ok
+test_ideal_through_fixtures_need_no_impedance_conversion (tests.python.test_sparameter_deembedding_contract.DeembeddingContractTests.test_ideal_through_fixtures_need_no_impedance_conversion) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.035s
+
+OK

@@ -1,0 +1,16 @@
+test_analytic_under_critical_overdamped_rlc_and_termination_energy (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_analytic_under_critical_overdamped_rlc_and_termination_energy) ... ok
+test_invalid_preflight_limits_and_cancel (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_invalid_preflight_limits_and_cancel) ... ok
+test_mixed_coupled_through_ports_and_source_order (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_mixed_coupled_through_ports_and_source_order) ... ok
+test_physical_rlc_invariant_under_reference_impedance_encoding (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_physical_rlc_invariant_under_reference_impedance_encoding) ... ok
+test_pwl_signed_source_physical_state_reference_and_grid_invariance (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_pwl_signed_source_physical_state_reference_and_grid_invariance) ... ok
+test_rlc_time_units_scaling_and_stable_active_network (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_rlc_time_units_scaling_and_stable_active_network) ... ok
+test_singular_unstable_marginal_and_precision_refusals (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_singular_unstable_marginal_and_precision_refusals) ... ok
+test_two_simultaneous_inductors_coupled_capacitance_physical_reference (tests.python.test_sparameter_inductive_terminated.InductiveTests.test_two_simultaneous_inductors_coupled_capacitance_physical_reference) ... ok
+test_actual_worker_rlc_voltage_current_derivative_energy_and_lineage (tests.python.test_sparameter_inductive_contract.InductiveContractTests.test_actual_worker_rlc_voltage_current_derivative_energy_and_lineage) ... ok
+test_example_executes_and_schema_catalog_registers_both_contracts (tests.python.test_sparameter_inductive_contract.InductiveContractTests.test_example_executes_and_schema_catalog_registers_both_contracts) ... ok
+test_worker_rejects_invalid_boundary_and_does_not_return_partial_result (tests.python.test_sparameter_inductive_contract.InductiveContractTests.test_worker_rejects_invalid_boundary_and_does_not_return_partial_result) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 1.130s
+
+OK

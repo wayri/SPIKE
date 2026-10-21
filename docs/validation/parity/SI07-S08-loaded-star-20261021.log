@@ -1,0 +1,14 @@
+test_coupled_physical_all_patterns_memory_common_initial_and_witnesses (tests.python.test_sparameter_multi_aggressor.MultiAggressorTests.test_coupled_physical_all_patterns_memory_common_initial_and_witnesses) ... ok
+test_failed_direct_witness_has_no_successful_partial_result (tests.python.test_sparameter_multi_aggressor.MultiAggressorTests.test_failed_direct_witness_has_no_successful_partial_result) ... ok
+test_invalid_family_resources_arithmetic_before_fit_and_cancel (tests.python.test_sparameter_multi_aggressor.MultiAggressorTests.test_invalid_family_resources_arithmetic_before_fit_and_cancel) ... ok
+test_one_aggressor_independent_analytic_modal_step (tests.python.test_sparameter_multi_aggressor.MultiAggressorTests.test_one_aggressor_independent_analytic_modal_step) ... ok
+test_reference_and_physical_time_scale_invariance (tests.python.test_sparameter_multi_aggressor.MultiAggressorTests.test_reference_and_physical_time_scale_invariance) ... ok
+test_zero_deviations_exact_ties_source_order_and_observation_only (tests.python.test_sparameter_multi_aggressor.MultiAggressorTests.test_zero_deviations_exact_ties_source_order_and_observation_only) ... ok
+test_example_and_registered_contracts (tests.python.test_sparameter_multi_aggressor_contract.MultiAggressorContractTests.test_example_and_registered_contracts) ... ok
+test_worker_and_schema_reject_invalid_requests_without_partial_result (tests.python.test_sparameter_multi_aggressor_contract.MultiAggressorContractTests.test_worker_and_schema_reject_invalid_requests_without_partial_result) ... ok
+test_worker_schema_identity_and_independent_physical_enumeration (tests.python.test_sparameter_multi_aggressor_contract.MultiAggressorContractTests.test_worker_schema_identity_and_independent_physical_enumeration) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.744s
+
+OK
