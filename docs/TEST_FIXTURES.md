@@ -68,6 +68,32 @@ land-transition receipt checks remain required.
 
 ## E-brake fixture
 
+`test_parity_backlog` runs the unchanged `check_ebrake_owned_dc.py` and
+`parity_owned_pad_gate.py` generators once per test module, using the existing
+`app/public/demo/ebrake1.kicad_pcb` as a local input. Install the normal Python
+worker dependencies first. The replay executes the real CLI solve, all four
+mesh levels (2, 1, 0.5 and 0.25 mm), and the owned-pad numerical tests. Its
+subprocess timeouts are 300 seconds for the board study and 180 seconds for
+acceptance. The existing diagnostic's nonconverged result remains
+nonconverged; acceptance does not promote it to production qualification.
+
+The test creates fresh evidence below `.local/test-temp/owned-pad-backlog-*`,
+validates it with the unchanged gate, and selects that receipt for PI01-S01
+in the test's in-memory backlog only. All other stage selections, the static
+backlog, historical receipt, source hashes and qualification flags remain
+unchanged. Temporary outputs are removed after the module completes.
+Corruption checks reject altered source bindings, qualification, test coverage,
+skips and board artifacts.
+
+This local replay does not bundle the historical board-derived request/results
+under `build/si02-s13-development-20261020/ebrake-owned-replay`. The archived
+PI01-S01 receipt still requires those exact original local artifacts if it is
+validated directly; passing the fresh replay does not claim that the archive
+ships them. EBrake redistribution provenance remains unconfirmed as recorded
+in [the multiboard acceptance record](validation/MULTIBOARD_ACCEPTANCE_20261001.md).
+No license or redistribution permission for the board or derived geometry is
+inferred from its existing presence in this checkout.
+
 The e-brake driver board is a useful real-world KiCad regression fixture. It contains routed copper, internal layers, vias, zones, stackup data, components, manufacturing outputs, STEP models, and schematics.
 
 Board under test:

@@ -423,3 +423,11 @@ python/spike_core/project_package.py -text -eol
 schemas/assembly-thermal-mesh-assignments-v1.schema.json -text -eol
 schemas/mcad-assembly-v1.schema.json -text -eol
 tests/python/test_assembly_thermal_meshing.py -text -eol
+
+# Verified original owned-pad receipt source bytes.
+docs/OWNED_DRILLED_PAD_DC.md -text -eol
+python/spike_core/hybrid_drilled_roundrect.py -text -eol
+python/spike_core/hybrid_owned_copper.py -text -eol
+scripts/check_ebrake_owned_dc.py -text -eol
+scripts/parity_owned_pad_gate.py -text -eol
+tests/python/test_hybrid_drilled_roundrect.py -text -eol

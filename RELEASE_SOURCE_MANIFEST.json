@@ -1,7 +1,7 @@
 {
   "contract": "spike/release-source-manifest/v1",
   "version": "0.4.0-alpha.1",
-  "parent_commit": "f738a4e8522ba6a167b6f85a275b78328b609e77",
+  "parent_commit": "f77e17907393c32258566b205b3d26fb43f0b57c",
   "selection": "Current development overlay on the existing 0.4 release branch; retained published fixes; generated/private/download caches and unresolved third-party export assets excluded.",
   "self_excluded": true,
   "review_status": {
@@ -86,10 +86,10 @@
   "files": [
     {
       "path": ".gitattributes",
-      "git_blob": "7f7f2df1d56941dcd5f0fed31f27c6a52b6a5958",
+      "git_blob": "8de94e12dd7662a1e50ea5595ae2399b9608b67c",
       "mode": "100644",
-      "bytes": 21529,
-      "sha256": "e7a16991e96635387770a042d1054096c6f224d8bf677115011ce3f31e323e5b"
+      "bytes": 21876,
+      "sha256": "544ca6088c09196efd93c9f204fe2028666a65a304f8041408ab6c1c3392e369"
     },
     {
       "path": ".githooks/pre-push",
@@ -10712,10 +10712,10 @@
     },
     {
       "path": "docs/TEST_FIXTURES.md",
-      "git_blob": "bf9923c994fc918b42e6466a2aba47bc244dd62f",
+      "git_blob": "845efe34d881d0947151959f964f998deb3b35a2",
       "mode": "100644",
-      "bytes": 7802,
-      "sha256": "ec6505960b97dc7a2e3466736b82f5563d7122de1583815dbb549bd6c33f3e97"
+      "bytes": 9490,
+      "sha256": "57e4f7ab6faf83b4a6dee4f12842c104ce91ec37e06bb9483baa5f058f8551db"
     },
     {
       "path": "docs/TETRAHEDRAL_MESH_WORKSPACE.md",
@@ -13551,6 +13551,13 @@
       "mode": "100644",
       "bytes": 8959,
       "sha256": "5069e802d1eb6a9fa0ea528f7011e14a191cd14a6ce33743d0585a108f84daf6"
+    },
+    {
+      "path": "docs/validation/parity/PI01-S01-loaded-star-20261021.log",
+      "git_blob": "4607ef452fd6ba53aa0e1541bf443e2de0bf8988",
+      "mode": "100644",
+      "bytes": 5121,
+      "sha256": "127a17f34e75078ce713d04e6671a5f2a675dac0d05d56fca749f4423be0c7c8"
     },
     {
       "path": "docs/validation/parity/PI01-S01-reactive-pair-20261020.json",
@@ -49534,10 +49541,10 @@
     },
     {
       "path": "tests/python/test_parity_backlog.py",
-      "git_blob": "d6edea0b031005cbdf3692818ae7305a5b9ed52b",
+      "git_blob": "d04d45d90204632e1e3b2839016ee629f7c50b35",
       "mode": "100644",
-      "bytes": 13271,
-      "sha256": "0e396dee05aef70901867444282444ace6f43dd07cb05f16cfbba15bbf126563"
+      "bytes": 16528,
+      "sha256": "d194c8d89f49dbc9933f7cd8f697815bce6244f54c9be3f75a858a628dd28163"
     },
     {
       "path": "tests/python/test_parity_component_admission_gate.py",
