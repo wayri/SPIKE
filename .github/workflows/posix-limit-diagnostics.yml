@@ -32,7 +32,8 @@ jobs:
           uv venv --seed --managed-python --python 3.12 .build-venv
           echo "$PWD/.build-venv/bin" >> "$GITHUB_PATH"
       - name: Install diagnostic wheels
-        run: python -m pip install --only-binary=:all: numpy scipy shapely
+        run: |
+          python -m pip install --only-binary=:all: numpy scipy shapely
       - name: Probe isolated child limits
         run: python scripts/diagnose_posix_limits.py
       - name: Retain bounded diagnostic evidence
