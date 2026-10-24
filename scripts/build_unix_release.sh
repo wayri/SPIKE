@@ -21,7 +21,7 @@ fi
 cmake -S . -B build-spikes-hybrid -G Ninja "${cmake_args[@]}"
 cmake --build build-spikes-hybrid --target spike_peec_native spikes_c_api --parallel 2
 python scripts/build_native_airflow.py --build-dir build-native-airflow --generator Ninja
-python scripts/build_packaged_circuit_worker.py
+python scripts/build_packaged_circuit_worker.py --dependency-report build/qualification/python-install.json
 python scripts/build_packaged_worker.py
 python scripts/verify_packaged_cli.py -- app/src-tauri/resources/worker/spike-worker/spike-worker --cli
 cd app

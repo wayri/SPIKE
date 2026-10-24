@@ -9,6 +9,7 @@ import importlib.metadata
 import json
 import os
 from pathlib import Path
+import platform
 import shutil
 import subprocess
 import sys
@@ -53,6 +54,53 @@ def _require_builder() -> str:
             f"PyInstaller {EXPECTED_PYINSTALLER_VERSION} is required, found {version}"
         )
     return version
+
+
+def _dependency_provenance(report: Path | None) -> dict[str, Any]:
+    """Bind the actual platform's build evidence without treating pip reports as locks."""
+    if sys.platform == "win32":
+        if report is not None:
+            raise ValueError("Windows circuit builds use the existing Windows build lock")
+        return {"build_lock": BUILD_LOCK.name, "build_lock_sha256": _sha256(BUILD_LOCK)}
+    if report is None:
+        raise ValueError("Unix circuit builds require --dependency-report from pip install --report")
+    if not report.is_file() or not 0 < report.stat().st_size <= 16 * 1024**2:
+        raise ValueError("Dependency report is missing, empty, or exceeds 16 MiB")
+    payload = report.read_bytes()
+    def unique(pairs):
+        value = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError("Duplicate dependency report key")
+            value[key] = item
+        return value
+    def reject_constant(value):
+        raise ValueError("Non-finite dependency report number")
+    raw = json.loads(payload, object_pairs_hook=unique, parse_constant=reject_constant)
+    expected_environment = {
+        "sys_platform": sys.platform, "platform_system": platform.system(),
+        "platform_machine": platform.machine(), "python_full_version": platform.python_version(),
+    }
+    if (not isinstance(raw, dict) or raw.get("version") != "1"
+            or not isinstance(raw.get("pip_version"), str) or not raw["pip_version"]
+            or not isinstance(raw.get("environment"), dict)
+            or any(raw["environment"].get(key) != value for key, value in expected_environment.items())
+            or not isinstance(raw.get("install"), list)):
+        raise ValueError("Expected pip report v1 matching the current platform and Python runtime")
+    for record in raw["install"]:
+        metadata = record.get("metadata", {}) if isinstance(record, dict) else {}
+        download = record.get("download_info", {}) if isinstance(record, dict) else {}
+        if (not isinstance(metadata, dict) or not isinstance(download, dict)
+                or any(not isinstance(metadata.get(key), str) or not metadata[key] for key in ("name", "version"))
+                or not isinstance(download.get("url"), str) or not download["url"]):
+            raise ValueError("Pip install records require package/version and download evidence")
+    return {"dependency_provenance": {
+        "kind": "pip-install-report", "report": report.name,
+        "sha256": hashlib.sha256(payload).hexdigest(), "report_version": raw["version"],
+        "pip_version": raw["pip_version"], "environment": expected_environment,
+        "install_records": len(raw["install"]),
+        "scope": "pip installation transaction; not a complete environment lock",
+    }}
 
 
 def _remove_managed(path: Path, parent: Path) -> None:
@@ -166,8 +214,9 @@ def _smoke(executable: Path) -> dict[str, Any]:
     return manifest
 
 
-def build(*, keep_work: bool = False) -> tuple[Path, Path]:
+def build(*, keep_work: bool = False, dependency_report: Path | None = None) -> tuple[Path, Path]:
     pyinstaller_version = _require_builder()
+    dependency_provenance = _dependency_provenance(dependency_report)
     library = _library()
     RESOURCE_ROOT.mkdir(parents=True, exist_ok=True)
     BUILD_ROOT.mkdir(parents=True, exist_ok=True)
@@ -191,13 +240,14 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         for item in sorted(artifact.rglob("*")) if item.is_file()
     ]
     manifest = RESOURCE_ROOT / "spike-circuit-worker.manifest.json"
+    if _dependency_provenance(dependency_report) != dependency_provenance:
+        raise RuntimeError("Circuit build dependency evidence changed during the build")
     manifest.write_text(json.dumps({
         "contract": "spike/owned-spice-process-package/v1",
         "validation_state": "experimental",
         "product_qualified": False,
         "pyinstaller": pyinstaller_version,
-        "build_lock": BUILD_LOCK.name,
-        "build_lock_sha256": _sha256(BUILD_LOCK),
+        **dependency_provenance,
         "source_library_sha256": _sha256(library),
         "capability": capability,
         "files": files,
@@ -211,8 +261,10 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep-work", action="store_true")
+    parser.add_argument("--dependency-report", type=Path,
+                        help="Unix only: actual pip install --report JSON from this build runtime")
     args = parser.parse_args()
-    executable, manifest = build(keep_work=args.keep_work)
+    executable, manifest = build(keep_work=args.keep_work, dependency_report=args.dependency_report)
     print(f"Verified packaged circuit worker: {executable}")
     print(f"Integrity manifest: {manifest}")
     return 0
