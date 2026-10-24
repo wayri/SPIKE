@@ -123,3 +123,19 @@ DMGs. It runs from a matching version tag or from
 **Actions -> Build and release SPIKE -> Run workflow**. All four packages and
 their SHA-256 files must pass verification before publication; outputs are
 stored in `dist-release`.
+
+
+## 0.4.1 macOS testing candidates
+
+Native-verified Apple Silicon and Intel DMGs are available as temporary CI
+artifacts in the [0.4.1 candidate table](releases/v0.4.1.md#native-platform-candidate-status---24-october-2026).
+Use the package matching your hardware, verify its adjacent SHA-256, open the
+DMG and copy SPIKE to Applications. Save existing work first. Both target
+macOS15 and are ad-hoc signed without notarization; the first-launch procedure
+above applies.
+
+The dedicated circuit-worker profile explicitly uses sampled process-group RAM
+monitoring. It can overshoot and is not a hard allocation cap or an app-wide
+memory limit. [ADR0143](adr/0143-explicit-macos-sampled-memory-policy.md) records
+policy selection and failure behavior. Strict API defaults are unchanged.
+The full 0.4.1 release remains unpublished pending its Windows and review gates.

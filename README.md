@@ -54,6 +54,17 @@ See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md). Older
 Windows Gamma and 0.3.5 Linux/macOS packages are historical artifacts and do
 not contain this candidate source.
 
+### 0.4.1 Mac testing candidates
+
+| Hardware | Native-verified experimental candidate |
+| --- | --- |
+| Apple Silicon | [DMG + SHA-256](https://github.com/wayri/SPIKE/actions/runs/40097197077/artifacts/12561711770) |
+| Intel Mac | [DMG + SHA-256](https://github.com/wayri/SPIKE/actions/runs/40097197077/artifacts/12561874533) |
+
+macOS15; ad-hoc signed and unnotarized. Dedicated circuit-worker RAM monitoring
+is sampled, **not a hard cap**. These CI artifacts expire after14days and are
+separate from the published release above. See [checks, limits and release gates](docs/releases/v0.4.1.md#native-platform-candidate-status---24-october-2026).
+
 ## Start a study
 
 | Step | In SPIKE | Check before continuing |
