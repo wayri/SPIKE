@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Process-group lifecycle checks; native fixtures execute no solver workload."""
 import json
+import errno
 import os
 from pathlib import Path
 import signal
@@ -13,6 +14,7 @@ import unittest
 from unittest.mock import Mock, patch
 
 from python.spike_core import circuit_worker_supervisor as supervisor
+from python.spike_core import circuit_worker_resources as resources
 
 
 class PosixCleanupControlTests(unittest.TestCase):
@@ -84,6 +86,89 @@ class PosixCleanupControlTests(unittest.TestCase):
                         cleanup.assert_called_once_with(process)
                 self.assertEqual(resource.setrlimit.call_args_list,
                                  [((1, (268435456, 268435456)),), ((2, (0, 0)),)])
+
+
+class DarwinZombieGroupTests(unittest.TestCase):
+    def test_eperm_requires_positive_zombie_evidence_before_reaping_at_each_signal(self):
+        for failed_call in range(3):
+            with self.subTest(failed_call=failed_call):
+                original = PermissionError(errno.EPERM, "denied")
+                process = Mock(pid=4321, returncode=None)
+                process.poll.side_effect = AssertionError("must retain the leader")
+                events = []
+                def signal_group(pid, sig):
+                    self.assertIsNone(process.returncode)
+                    events.append("signal")
+                    if len(events) == failed_call + 1:
+                        raise original
+                def observe(*args):
+                    self.assertIsNone(process.returncode)
+                    events.append("observe")
+                    return b"4321 4321 Zs\n4322 4321 Z\n"
+                def reap():
+                    self.assertEqual(events[-1], "observe")
+                    events.append("reap")
+                    process.returncode = 0
+                process.wait.side_effect = reap
+                with patch.object(resources.sys, "platform", "darwin"), \
+                        patch.object(resources.os, "killpg", create=True, side_effect=signal_group) as killpg, \
+                        patch.object(resources, "_read_ps_group", side_effect=observe) as observation, \
+                        patch.object(supervisor.signal, "SIGKILL", 9, create=True), \
+                        patch.object(supervisor.time, "monotonic", side_effect=[0, .6]):
+                    supervisor._terminate_posix_group(process)
+                self.assertEqual(killpg.call_count, failed_call + 1)
+                observation.assert_called_once_with(4321, "pid=,pgid=,stat=", .5)
+                process.poll.assert_not_called()
+                process.wait.assert_called_once_with()
+
+    def test_live_missing_or_invalid_observation_never_suppresses_eperm(self):
+        for output in (b"4321 4321 S\n", b"4321 4321 Z\n4322 4321 R\n", b"", b"garbage",
+                       b"4322 4321 Z\n", b"4321 9999 Z\n", b"4321 4321 Z\n4321 4321 Z\n",
+                       b"4321 4321 Zmalformed\n", b"4321 4321 Z\n\n",
+                       resources.ResourceObservationError("observer timeout/nonzero/failure")):
+            with self.subTest(output=output):
+                original = PermissionError(errno.EPERM, "denied")
+                process = Mock(pid=4321)
+                with patch.object(resources.sys, "platform", "darwin"), \
+                        patch.object(resources.os, "killpg", create=True, side_effect=original), \
+                        patch.object(resources, "_read_ps_group",
+                            return_value=output if isinstance(output, bytes) else None,
+                            side_effect=output if isinstance(output, Exception) else None):
+                    with self.assertRaises(PermissionError) as caught:
+                        supervisor._terminate_posix_group(process)
+                self.assertIs(caught.exception, original)
+                process.wait.assert_not_called()
+                process.poll.assert_not_called()
+
+    def test_other_platforms_and_other_permission_errors_are_not_suppressed(self):
+        for platform, error_number in (("linux", errno.EPERM), ("darwin", errno.EACCES)):
+            original = PermissionError(error_number, "denied")
+            with self.subTest(platform=platform, errno=error_number), \
+                    patch.object(resources.sys, "platform", platform), \
+                    patch.object(resources.os, "killpg", create=True, side_effect=original), \
+                    patch.object(resources, "_read_ps_group") as observe:
+                with self.assertRaises(PermissionError) as caught:
+                    resources._signal_owned_group(4321, signal.SIGTERM)
+                self.assertIs(caught.exception, original)
+                observe.assert_not_called()
+
+    @unittest.skipUnless(sys.platform == "darwin", "requires native Darwin zombie-group semantics")
+    def test_native_zombie_leader_is_observed_before_cleanup_reaps_it(self):
+        process = subprocess.Popen([sys.executable, "-c", "pass"], start_new_session=True,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            deadline = time.monotonic() + 3
+            while not resources._group_has_only_zombies(process.pid):
+                self.assertLess(time.monotonic(), deadline, "leader must become a visible zombie")
+                time.sleep(.01)
+            self.assertIsNone(process.returncode, "native fixture must remain unreaped")
+            with patch.object(process, "poll", side_effect=AssertionError("poll would reap the leader")):
+                supervisor._terminate_posix_group(process)
+            self.assertEqual(process.returncode, 0)
+        finally:
+            if process.returncode is None:
+                process.kill()
+            process.wait(timeout=3)
 
 
 _TREE = r'''

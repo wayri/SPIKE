@@ -39,6 +39,11 @@ jobs:
         run: |
           mkdir -p build/qualification
           python -m unittest tests.python.test_posix_supervisor_cleanup tests.python.test_circuit_worker_resource_admission tests.python.test_darwin_sampled_rss tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload -v 2>&1 | tee build/qualification/supervisor-tests.log
+      - name: Verify macOS offline test boundary
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          /usr/bin/sandbox-exec -p '(version 1)(allow default)(deny network*)' python -c 'import socket,unittest; unittest.TestCase().assertRaises(PermissionError, socket.socket().bind, ("127.0.0.1", 0))'
       - name: Probe isolated child limits
         run: python scripts/diagnose_posix_limits.py
       - name: Retain bounded diagnostic evidence

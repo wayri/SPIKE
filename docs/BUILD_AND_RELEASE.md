@@ -159,3 +159,8 @@ python scripts/verify_unix_release_payload.py \
 The DMG includes `EXPERIMENTAL-RESOURCE-POLICY.json` beside the app. Both Mac
 architectures still require native mounted/copied-app verification, CLI checks,
 startup and reinstall/removal evidence. Ad-hoc signing is not notarization.
+
+The native Mac lifecycle also runs the installed CLI with network operations
+explicitly denied by `sandbox-exec`. A loopback-bind denial first checks that
+the offline test boundary is active. This is a test wrapper only; it does not
+change the distributed app's permissions or imply a security sandbox for jobs.

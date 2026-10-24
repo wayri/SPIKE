@@ -34,7 +34,7 @@ from .spikes_runtime import _library_name
 from .circuit_worker_resources import (
     DARWIN_RSS_ENFORCEMENT, RSS_SAMPLE_INTERVAL_SECONDS, RSS_OBSERVER_TIMEOUT_SECONDS,
     RSS_OBSERVER_MAX_BYTES, ResourceObservationError, _parse_group_rss,
-    _sample_group_rss_bytes, _rss_provenance, _attach_rss_provenance,
+    _sample_group_rss_bytes, _rss_provenance, _attach_rss_provenance, _signal_owned_group,
 )
 
 
@@ -135,24 +135,17 @@ def _validate_budget(timeout_seconds: float, memory_limit_mib: int) -> None:
 
 def _terminate_posix_group(process: subprocess.Popen) -> None:
     """Terminate a group whose leader is still owned and unreaped, then reap it."""
-    try:
-        os.killpg(process.pid, signal.SIGTERM)
-    except ProcessLookupError:
+    if not _signal_owned_group(process.pid, signal.SIGTERM):
         process.wait()
         return
     deadline = time.monotonic() + 0.5
     while True:
         # Keep the leader unreaped until the last group signal. Its reserved
         # PID prevents this numeric process-group ID from being reused.
-        try:
-            os.killpg(process.pid, 0)
-        except ProcessLookupError:
+        if not _signal_owned_group(process.pid, 0):
             break
         if time.monotonic() >= deadline:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
+            _signal_owned_group(process.pid, signal.SIGKILL)
             break
         time.sleep(0.02)
     process.wait()

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+import errno
 import os
 from pathlib import Path
 import subprocess
+import sys
 import time
 
 from .owned_spice_process import (
@@ -42,7 +44,7 @@ def _parse_group_rss(output: bytes, group: int) -> int:
     return total_kib * 1024
 
 
-def _sample_group_rss_bytes(group: int, timeout_seconds: float) -> int:
+def _read_ps_group(group: int, columns: str, timeout_seconds: float) -> bytes:
     """Read a bounded /bin/ps snapshot; the caller retains its unreaped leader."""
     import select
 
@@ -50,7 +52,7 @@ def _sample_group_rss_bytes(group: int, timeout_seconds: float) -> int:
     observer = None
     try:
         observer = subprocess.Popen(
-            ["/bin/ps", "-x", "-g", str(group), "-o", "pid=,pgid=,rss="],
+            ["/bin/ps", "-x", "-g", str(group), "-o", columns],
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
             shell=False, close_fds=True, env={"LC_ALL": "C", "COMMAND_MODE": "unix2003"},
         )
@@ -66,7 +68,7 @@ def _sample_group_rss_bytes(group: int, timeout_seconds: float) -> int:
             if not chunk:
                 if observer.wait(timeout=max(0.001, deadline - time.monotonic())) != 0:
                     raise ResourceObservationError("RSS observer returned a nonzero exit status")
-                return _parse_group_rss(bytes(output), group)
+                return bytes(output)
             output.extend(chunk)
             if len(output) > RSS_OBSERVER_MAX_BYTES:
                 raise ResourceObservationError("RSS observer exceeded its output budget")
@@ -82,6 +84,53 @@ def _sample_group_rss_bytes(group: int, timeout_seconds: float) -> int:
                 raise ResourceObservationError("RSS observer cleanup failed") from error
             finally:
                 observer.stdout.close()
+
+
+def _sample_group_rss_bytes(group: int, timeout_seconds: float) -> int:
+    return _parse_group_rss(_read_ps_group(group, "pid=,pgid=,rss=", timeout_seconds), group)
+
+
+def _group_has_only_zombies(group: int) -> bool:
+    """Prove the retained leader is present and every listed group member is dead."""
+    output = _read_ps_group(group, "pid=,pgid=,stat=", RSS_OBSERVER_TIMEOUT_SECONDS)
+    if not output or len(output) > RSS_OBSERVER_MAX_BYTES:
+        raise ResourceObservationError("process-state observer returned empty or excessive output")
+    seen = set()
+    all_zombies = True
+    for line in output.splitlines():
+        fields = line.split()
+        if len(fields) != 3 or any(len(field) > 20 or not field.isdigit() for field in fields[:2]):
+            raise ResourceObservationError("process-state observer returned a malformed row")
+        pid, pgid = map(int, fields[:2])
+        state = fields[2]
+        if (pid <= 0 or pgid != group or pid in seen or not state
+                or state[0] not in b"IRSTUZ" or any(flag not in b"+<>AELNSsVWX" for flag in state[1:])):
+            raise ResourceObservationError("process-state observer returned an invalid identity or state")
+        seen.add(pid)
+        all_zombies = all_zombies and state.startswith(b"Z")
+    if group not in seen:
+        raise ResourceObservationError("process-state observer did not identify the retained leader")
+    return all_zombies
+
+
+def _signal_owned_group(group: int, signum: int) -> bool:
+    """Signal a group with an unreaped owned leader; return False only if gone/dead."""
+    try:
+        os.killpg(group, signum)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError as error:
+        # Darwin may reject signalling groups containing only zombies. A
+        # permission denial alone never establishes that cleanup succeeded.
+        if sys.platform == "darwin" and error.errno == errno.EPERM:
+            try:
+                dead = _group_has_only_zombies(group)
+            except ResourceObservationError as observation_error:
+                raise error from observation_error
+            if dead:
+                return False
+        raise
 
 
 def _rss_provenance(timeout_seconds: float, memory_limit_mib: int, *, termination_requested: bool = True) -> dict:
