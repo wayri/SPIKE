@@ -33,7 +33,11 @@ jobs:
           echo "$PWD/.build-venv/bin" >> "$GITHUB_PATH"
       - name: Install diagnostic wheels
         run: |
-          python -m pip install --only-binary=:all: numpy scipy shapely
+          python -m pip install --only-binary=:all: numpy scipy shapely jsonschema==4.25.1
+      - name: Verify process-group cleanup and admission reporting
+        run: |
+          mkdir -p build/qualification
+          python -m unittest tests.python.test_posix_supervisor_cleanup tests.python.test_circuit_worker_resource_admission tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload -v 2>&1 | tee build/qualification/supervisor-tests.log
       - name: Probe isolated child limits
         run: python scripts/diagnose_posix_limits.py
       - name: Retain bounded diagnostic evidence
@@ -41,6 +45,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: posix-limits-${{ matrix.os }}
-          path: build/qualification/posix-limits.json
+          path: build/qualification/*
           if-no-files-found: error
           retention-days: 14

@@ -191,6 +191,7 @@ issued entry.
 | `SPIKE-BE-SPICE-E-0052` | Owned SPICE workspace composition failed | Correct the reviewed visual workspace; raw netlist text is not accepted. |
 | `SPIKE-BE-SPICE-E-0053` | Owned SPICE engine unavailable | Restore the release-owned circuit engine installation. |
 | `SPIKE-BE-SPICE-E-0054` | Owned SPICE bridge execution failed | Inspect owned-engine status, workspace validation, and bounded execution diagnostics. |
+| `SPIKE-BE-SPICE-E-0057` | Circuit supervisor initialization failed | Inspect resource-admission diagnostics and use a supported platform/runtime; never retry without the requested OS protection. |
 | `SPIKE-BE-SPICE-E-0055` | Owned circuit worker cancelled | Inspect the caller cancellation request; the supervisor terminated the complete admitted OS container. |
 | `SPIKE-BE-SPICE-E-0056` | Owned circuit worker wall-time limit exceeded | Reduce the workload or request a larger admitted timeout; the supervisor terminated the complete admitted OS container. |
 | `SPIKE-BE-EXT-E-0001` | External engine launch failed | Review discovery and process diagnostics before retrying. |
