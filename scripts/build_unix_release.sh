@@ -8,6 +8,7 @@ export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
 export CXXFLAGS="${CXXFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
 mkdir -p build/qualification
 python -m pip install --report build/qualification/python-install.json numpy scipy shapely matplotlib mplcursors reportlab nanobind jsonschema==4.25.1 pyarrow==25.0.1 pyinstaller==6.21.0
+python -m unittest tests.python.test_circuit_worker_dependency_provenance tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload -q
 cmake_args=(-DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_BINDINGS=ON -DSPIKE_PORTABLE_BUILD=ON
   "-DPython_EXECUTABLE=$(command -v python)" "-Dnanobind_DIR=$(python -m nanobind --cmake_dir)")
 if [[ "$(uname)" == Darwin ]]; then

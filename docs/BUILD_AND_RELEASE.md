@@ -78,6 +78,38 @@ The current Windows installer is unsigned. macOS packages are ad-hoc signed
 without Apple notarization. Linux and macOS outputs remain experimental.
 Optional external engines are installed separately.
 
+## Linux and macOS candidate verification
+
+Run the native Unix workflow on the intended release branch:
+
+```sh
+gh workflow run unix-release.yml --repo wayri/SPIKE --ref codex/release-v0.4.1 -f platform=all
+```
+
+| Target | Native runner | Package |
+| --- | --- | --- |
+| Linux x86-64 | Ubuntu 24.04 | Flatpak with GNOME 50 runtime |
+| macOS Apple silicon | macOS 15 ARM64 | Experimental DMG |
+| macOS Intel | macOS 15 x86-64 | Experimental DMG |
+
+The Unix circuit worker records the actual pip installation transaction and its
+SHA-256 instead of naming the Windows dependency lock. This report identifies
+what that transaction installed; it is not a complete environment lock.
+
+Before packaging, verify every main-worker and circuit-worker member against
+its manifest, execute the supervised circuit smoke case, and verify the bytes
+again after execution. macOS also checks the final signed app and the copy
+installed from the mounted DMG. Signing must not silently invalidate worker
+manifests. The installed CLI, reinstall/removal and desktop process survival
+checks run on each native target. Process survival does not establish rendered
+frontend readiness or visual acceptance.
+
+Package artifacts and SHA-256 sidecars are retained for 14 days. Separate
+`qualification-<runner>` artifacts retain dependency installation, platform,
+source-commit and payload-verification evidence for 30 days. Download and retain
+both when reviewing a candidate. A successful workflow does not replace the
+required knowledgeable human numerical review or desktop visual acceptance.
+
 ## Local builds
 
 The GitHub workflows call the same checked-in scripts used for local builds:
