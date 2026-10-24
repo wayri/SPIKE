@@ -7,8 +7,11 @@ from pathlib import Path
 import platform
 import shutil
 import subprocess
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 VERSION = json.loads((ROOT / 'app/package.json').read_text())['version']
 OUT = ROOT / 'dist-release'
 OUT.mkdir(exist_ok=True)
@@ -33,11 +36,15 @@ if platform.system() == 'Darwin':
     run('python', 'scripts/verify_packaged_cli.py', '--', app / 'Contents/MacOS/spike')
     run('codesign', '--force', '--deep', '--sign', '-', app)
     run('codesign', '--verify', '--deep', '--strict', app)
-    run('python', 'scripts/verify_unix_release_payload.py', '--resources', app / 'Contents/Resources')
+    run('python', 'scripts/verify_unix_release_payload.py', '--resources', app / 'Contents/Resources',
+        '--resource-policy', 'darwin_sampled_rss')
     staging = ROOT / 'build/dmg-root'
     staging.mkdir(exist_ok=True)
     shutil.copytree(app, staging / 'SPIKE.app', symlinks=True)
     (staging / 'Applications').symlink_to('/Applications')
+    from python.spike_core.release_resource_policy import release_supervision_profile
+    (staging / 'EXPERIMENTAL-RESOURCE-POLICY.json').write_text(
+        json.dumps(release_supervision_profile('darwin'), indent=2) + '\n', encoding='utf-8')
     artifact = OUT / f'SPIKE_{VERSION}_macos-{platform.machine()}_EXPERIMENTAL.dmg'
     run('hdiutil', 'create', '-volname', 'SPIKE', '-srcfolder', staging, '-ov', '-format', 'UDZO', artifact)
 else:

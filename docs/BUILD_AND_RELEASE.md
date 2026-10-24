@@ -138,3 +138,24 @@ Windows CI now explicitly builds with `custom-protocol` and requires the fixed
 inert native panel qualification to finish, with the development server absent.
 Process survival alone is not frontend readiness. This check does not run the
 normal workspace, a solver, or a clean-machine installer acceptance campaign.
+
+
+### macOS 0.4.1 experimental circuit supervision
+
+The 0.4.1 macOS recipe explicitly selects `darwin_sampled_rss` for its dedicated
+circuit-worker qualification probe. This observes process-group resident memory;
+it is **not a hard memory cap**. API callers retain `strict_address_space` by
+default. See [ADR 0143](adr/0143-explicit-macos-sampled-memory-policy.md) for
+selection, limits and recovery. The signed package manifest and installed
+qualification report must agree on `release_supervision`; an omitted policy,
+false hard-cap claim or failed observation cannot pass qualification.
+
+```sh
+python scripts/verify_unix_release_payload.py \
+  --resources /Applications/SPIKE.app/Contents/Resources \
+  --resource-policy darwin_sampled_rss --output macos-payload.json
+```
+
+The DMG includes `EXPERIMENTAL-RESOURCE-POLICY.json` beside the app. Both Mac
+architectures still require native mounted/copied-app verification, CLI checks,
+startup and reinstall/removal evidence. Ad-hoc signing is not notarization.

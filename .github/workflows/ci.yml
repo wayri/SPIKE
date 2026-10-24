@@ -32,6 +32,7 @@ jobs:
         run: |
           python scripts/check_architecture.py
           python scripts/release_automation.py check
+          python -m unittest tests.python.test_circuit_worker_dependency_provenance tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload tests.python.test_posix_supervisor_cleanup tests.python.test_circuit_worker_resource_admission tests.python.test_darwin_sampled_rss -v
           python -m unittest discover -s tests/python -p test_worker_cli_entry.py -v
           python -m unittest tests.python.test_headless tests.python.test_mcp_server tests.python.test_automation -v
           python -m unittest discover -s tests/python -p test_release_automation.py -v

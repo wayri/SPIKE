@@ -479,6 +479,8 @@ _CATALOG_ENTRIES = (
         user_action="Re-extract the PEEC network and review its explicit circuit endpoint mapping before rerunning co-simulation.",
     ),
     _metadata("SPIKE-BE-SPICE-E-0054", "SPIKES backend execution failed", "The structured workspace passed admission but the SPIKES backend bridge failed.", recoverable=True, retryable=True, user_action="Inspect the SPIKES backend status, workspace validation, and bounded execution diagnostics."),
+    _metadata("SPIKE-BE-SPICE-E-0058", "Sampled circuit memory budget exceeded", "Experimental macOS process-group resident-memory observation exceeded the requested budget.", recoverable=True, retryable=False, user_action="Reduce workload or explicitly request a larger budget. Sampled monitoring is not a hard memory cap."),
+    _metadata("SPIKE-BE-SPICE-E-0059", "Circuit memory observation failed", "Experimental macOS resident-memory monitoring could not obtain an admitted observation; the worker group was terminated.", recoverable=True, retryable=False, user_action="Inspect operating-system process observation availability before retrying; do not run unmonitored."),
     _metadata("SPIKE-BE-SPICE-E-0057", "Circuit supervisor initialization failed", "The requested operating-system resource protections could not be established before circuit worker execution.", recoverable=True, retryable=False, user_action="Inspect the resource-admission diagnostics and use a supported platform/runtime. Execution must not retry without the requested protection."),
     _metadata(
         "SPIKE-BE-EXT-E-0001",

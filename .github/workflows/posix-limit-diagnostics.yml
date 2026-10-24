@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p build/qualification
-          python -m unittest tests.python.test_posix_supervisor_cleanup tests.python.test_circuit_worker_resource_admission tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload -v 2>&1 | tee build/qualification/supervisor-tests.log
+          python -m unittest tests.python.test_posix_supervisor_cleanup tests.python.test_circuit_worker_resource_admission tests.python.test_darwin_sampled_rss tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload -v 2>&1 | tee build/qualification/supervisor-tests.log
       - name: Probe isolated child limits
         run: python scripts/diagnose_posix_limits.py
       - name: Retain bounded diagnostic evidence

@@ -233,6 +233,8 @@ def build(*, keep_work: bool = False, dependency_report: Path | None = None) -> 
     executable = artifact / ("spike-circuit-worker.exe" if os.name == "nt" else "spike-circuit-worker")
     if not executable.is_file():
         raise RuntimeError(f"PyInstaller did not produce {executable}")
+    from python.spike_core.release_resource_policy import release_supervision_profile
+
     capability = _smoke(executable)
     files = [
         {"path": item.relative_to(artifact).as_posix(), "bytes": item.stat().st_size,
@@ -250,6 +252,7 @@ def build(*, keep_work: bool = False, dependency_report: Path | None = None) -> 
         **dependency_provenance,
         "source_library_sha256": _sha256(library),
         "capability": capability,
+        "release_supervision": release_supervision_profile(sys.platform),
         "files": files,
     }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if not keep_work:

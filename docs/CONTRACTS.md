@@ -528,3 +528,21 @@ Every port has an explicit finite nonnegative Thevenin resistance and PWL
 source voltage. Connected loop/stability admission precedes exact PWL
 state propagation; full fit, termination and boundary evidence is retained.
 See [terminated workflow](TERMINATED_NETWORK_TRANSIENT.md).
+
+
+## Explicit circuit-worker resource policies
+
+`supervise_process` and `run_circuit_worker` retain
+`resource_policy="strict_address_space"` by default. An explicit
+`resource_policy="darwin_sampled_rss"` is admitted only on Darwin. It reports
+`darwin_process_group_sampled_rss_experimental`, observes summed process-group
+RSS, and does not establish a hard memory cap. Budget overage returns
+`memory_exceeded`; circuit terminal results use E-0058. Observation failure
+terminates the group, publishes E-0059 and raises `ResourceObservationError`.
+Strict initialization failure still publishes E-0057 and raises without retry.
+See [ADR 0143](adr/0143-explicit-macos-sampled-memory-policy.md).
+
+Circuit package manifests add `release_supervision`; the final Unix payload
+verifier requires exact agreement with the native package profile and an
+explicit matching command-line policy. Existing process-result v1 fields and
+raw-netlist/library admission boundaries are unchanged.

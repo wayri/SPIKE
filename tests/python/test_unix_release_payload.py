@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -39,6 +40,7 @@ def fixture(root):
                 "table_contract": "spike/copper-geometry-arrow/v4", "rows": 4,
                 "retained_unresolved_occurrences": 1, "artifact_sha256": "a"*64, "design_id": "fixture"}}
     auxiliary = {"contract": "spike/owned-spice-process-package/v1", "product_qualified": False,
+                 "release_supervision": verifier.release_supervision_profile(sys.platform),
                  "files": inventory(circuit, "bytes"), "capability": {
                      "engine": "spike-circuit-worker", "validation_state": "experimental",
                      "structured_workspace_only": True, "raw_netlist_accepted": False,
@@ -53,7 +55,7 @@ def smoke(**kwargs):
     write_json(kwargs["job_root"] / kwargs["result"], {
         "contract": "spike/owned-spice-process-result/v1", "status": "completed",
         "validation_state": "experimental", "circuit": {"status": "completed"}})
-    return SupervisionResult("completed", 0, .01, "mock-test-only")
+    return SupervisionResult("completed", 0, .01, verifier.release_supervision_profile(sys.platform)["enforcement"])
 
 
 class UnixReleasePayloadTests(unittest.TestCase):
@@ -63,7 +65,7 @@ class UnixReleasePayloadTests(unittest.TestCase):
             bundled, _, _ = fixture(root)
             before = {path.relative_to(root): path.read_bytes() for path in root.rglob("*") if path.is_file()}
             with patch.object(verifier, "run_circuit_worker", side_effect=smoke) as run:
-                result = verifier.verify(root)
+                result = verifier.verify(root, resource_policy=verifier.release_supervision_profile(sys.platform)["resource_policy"])
             run.assert_called_once()
             self.assertEqual(run.call_args.kwargs["worker_executable"].parent, (bundled / "spike-circuit-worker").resolve(strict=True))
             self.assertEqual(run.call_args.kwargs["library_sha256"], result["circuit_library_sha256"])
@@ -86,7 +88,7 @@ class UnixReleasePayloadTests(unittest.TestCase):
                 else:
                     (bundled / "spike-circuit-worker/unrecorded.txt").write_text("extra")
                 with patch.object(verifier, "run_circuit_worker") as run, self.assertRaises(ValueError):
-                    verifier.verify(root)
+                    verifier.verify(root, resource_policy=verifier.release_supervision_profile(sys.platform)["resource_policy"])
                 run.assert_not_called()
 
     def test_failed_authoritative_worker_check_is_not_ignored(self):
@@ -96,7 +98,7 @@ class UnixReleasePayloadTests(unittest.TestCase):
             main["benchmark_summary"]["failed"] = 1
             write_json(bundled / "spike-worker.manifest.json", main)
             with patch.object(verifier, "run_circuit_worker") as run, self.assertRaisesRegex(ValueError, "acceptance"):
-                verifier.verify(root)
+                verifier.verify(root, resource_policy=verifier.release_supervision_profile(sys.platform)["resource_policy"])
             run.assert_not_called()
 
     def test_supervisor_failure_and_post_probe_mutation_fail_closed(self):
@@ -111,7 +113,29 @@ class UnixReleasePayloadTests(unittest.TestCase):
                     (bundled / "spike-worker" / main["files"][0]["path"]).write_bytes(b"changed during probe")
                     return outcome
                 with patch.object(verifier, "run_circuit_worker", side_effect=failure), self.assertRaises(ValueError):
+                    verifier.verify(root, resource_policy=verifier.release_supervision_profile(sys.platform)["resource_policy"])
+
+    def test_policy_and_manifest_must_agree_before_execution(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            bundled, _, auxiliary = fixture(root)
+            auxiliary["release_supervision"]["hard_memory_cap"] = "untrue"
+            write_json(bundled / "spike-circuit-worker.manifest.json", auxiliary)
+            with patch.object(verifier, "run_circuit_worker") as run, self.assertRaisesRegex(ValueError, "profile differs"):
+                verifier.verify(root, resource_policy=verifier.release_supervision_profile(sys.platform)["resource_policy"])
+            run.assert_not_called()
+
+    def test_mac_policy_is_explicit_and_reported_as_sampled(self):
+        with tempfile.TemporaryDirectory() as temporary, patch.object(verifier.sys, "platform", "darwin"):
+            root = Path(temporary)
+            fixture(root)
+            with patch.object(verifier, "run_circuit_worker", side_effect=smoke) as run:
+                with self.assertRaisesRegex(ValueError, "Explicit verification policy"):
                     verifier.verify(root)
+                run.assert_not_called()
+                report = verifier.verify(root, resource_policy="darwin_sampled_rss")
+                self.assertFalse(report["release_supervision"]["hard_memory_cap"])
+                self.assertEqual(run.call_args.kwargs["resource_policy"], "darwin_sampled_rss")
 
     def test_packaging_checks_final_signed_and_assembled_payload(self):
         source = (verifier.ROOT / "scripts/package_unix_release.py").read_text(encoding="utf-8")

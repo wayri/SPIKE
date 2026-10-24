@@ -93,7 +93,7 @@ jobs:
           hdiutil attach dist-release/*.dmg -nobrowse -mountpoint "$RUNNER_TEMP/spike-dmg"
           ditto "$RUNNER_TEMP/spike-dmg/SPIKE.app" "$RUNNER_TEMP/spike-install/SPIKE.app"
           python scripts/verify_packaged_cli.py -- "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/MacOS/spike"
-          python scripts/verify_unix_release_payload.py --resources "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/Resources" --output build/qualification/macos-installed-payload.json
+          python scripts/verify_unix_release_payload.py --resources "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/Resources" --output build/qualification/macos-installed-payload.json --resource-policy darwin_sampled_rss
           python scripts/smoke_desktop_package.py "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/MacOS/spike-desktop"
           ditto "$RUNNER_TEMP/spike-dmg/SPIKE.app" "$RUNNER_TEMP/spike-install/SPIKE.app"
           python scripts/verify_packaged_cli.py -- "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/MacOS/spike"

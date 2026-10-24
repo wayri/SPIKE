@@ -1,10 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
-"""OS-enforced supervisor for the dedicated owned-circuit worker.
+"""Supervisor for the dedicated owned-circuit worker.
 
 This module is the trusted host-side boundary.  It admits exact worker/library
 bytes before launch, uses a Windows Job Object or a POSIX process group with
 resource limits, and publishes a bounded terminal result when the worker is
 cancelled or exceeds its wall-time budget.  It never invokes a shell.
+The explicit experimental Darwin RSS policy samples resident memory; it is not
+a hard memory cap and may overshoot between observations. Group RSS counts
+shared pages in each member and does not cover descendants escaping the group.
 """
 
 from __future__ import annotations
@@ -28,6 +31,11 @@ from .owned_spice_process import (
     _reject_reparse_components,
 )
 from .spikes_runtime import _library_name
+from .circuit_worker_resources import (
+    DARWIN_RSS_ENFORCEMENT, RSS_SAMPLE_INTERVAL_SECONDS, RSS_OBSERVER_TIMEOUT_SECONDS,
+    RSS_OBSERVER_MAX_BYTES, ResourceObservationError, _parse_group_rss,
+    _sample_group_rss_bytes, _rss_provenance, _attach_rss_provenance,
+)
 
 
 MAX_TIMEOUT_SECONDS = 86_400
@@ -55,6 +63,13 @@ class SupervisorInitializationError(RuntimeError):
             f"was not established for the requested {memory_limit_mib} MiB and "
             f"{timeout_seconds} second budgets."
         )
+
+
+def _validate_resource_policy(resource_policy: str) -> None:
+    if resource_policy not in ("strict_address_space", "darwin_sampled_rss"):
+        raise ValueError("unknown supervisor resource_policy")
+    if resource_policy == "darwin_sampled_rss" and (sys.platform != "darwin" or os.name != "posix"):
+        raise ValueError("darwin_sampled_rss requires native Darwin")
 
 
 def sha256_file(path: Path) -> str:
@@ -85,7 +100,7 @@ def _regular_identity(path: Path, expected_name: str, expected_sha256: str) -> P
     return path
 
 
-def _terminal_result(path: Path, status: str, code: str, message: str) -> None:
+def _terminal_result(path: Path, status: str, code: str, message: str, *, provenance: dict | None = None) -> None:
     _atomic_publish(path, {
         "contract": PROCESS_RESULT_CONTRACT,
         "status": status,
@@ -95,6 +110,7 @@ def _terminal_result(path: Path, status: str, code: str, message: str) -> None:
         "provenance": {
             "supervisor": "python.spike_core.circuit_worker_supervisor",
             "complete_process_tree_termination_requested": True,
+            **(provenance or {}),
         },
     })
 
@@ -149,14 +165,16 @@ def _supervise_posix(
     timeout_seconds: float,
     memory_limit_mib: int,
     cancelled: Callable[[], bool],
+    resource_policy: str = "strict_address_space",
 ) -> tuple[str, int]:
     import resource
 
     memory_bytes = memory_limit_mib * 1024 * 1024
 
     def limits() -> None:
-        resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
-        if hasattr(resource, "RLIMIT_CORE"):
+        if resource_policy == "strict_address_space":
+            resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
+        if resource_policy == "darwin_sampled_rss" or hasattr(resource, "RLIMIT_CORE"):
             resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
 
     try:
@@ -171,7 +189,10 @@ def _supervise_posix(
         ) from error
     deadline = time.monotonic() + timeout_seconds
     status = "completed"
-    while process.poll() is None:
+    # The experimental policy requires an observation even for a fast child.
+    first_sample = resource_policy == "darwin_sampled_rss"
+    while first_sample or process.poll() is None:
+        first_sample = False
         try:
             if cancelled():
                 status = "cancelled"
@@ -179,7 +200,18 @@ def _supervise_posix(
             if time.monotonic() >= deadline:
                 status = "timeout"
                 break
-            time.sleep(0.02)
+            if resource_policy == "darwin_sampled_rss":
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    status = "timeout"
+                    break
+                if _sample_group_rss_bytes(process.pid, remaining) > memory_bytes:
+                    status = "memory_exceeded"
+                    break
+                if time.monotonic() >= deadline:
+                    status = "timeout"
+                    break
+            time.sleep(RSS_SAMPLE_INTERVAL_SECONDS if resource_policy == "darwin_sampled_rss" else 0.02)
         except BaseException:
             # The last poll returned None, so this leader has not been reaped.
             _terminate_posix_group(process)
@@ -343,10 +375,12 @@ def supervise_process(
     timeout_seconds: float,
     memory_limit_mib: int,
     cancelled: Callable[[], bool] = lambda: False,
+    resource_policy: str = "strict_address_space",
 ) -> SupervisionResult:
-    """Run an already-admitted executable without a shell under OS limits."""
+    """Run with strict limits, or explicitly selected experimental Darwin RSS sampling."""
 
     _validate_budget(timeout_seconds, memory_limit_mib)
+    _validate_resource_policy(resource_policy)
     if not program.is_absolute() or not program.is_file():
         raise ValueError("supervised program must be an absolute regular file")
     if not cwd.is_absolute() or not cwd.is_dir():
@@ -360,8 +394,10 @@ def supervise_process(
     else:
         status, returncode = _supervise_posix(
             program, arguments, cwd, timeout_seconds, memory_limit_mib, cancelled,
+            resource_policy=resource_policy,
         )
-        enforcement = "posix_process_group_rlimit"
+        enforcement = (DARWIN_RSS_ENFORCEMENT if resource_policy == "darwin_sampled_rss"
+                       else "posix_process_group_rlimit")
     return SupervisionResult(status, returncode, time.monotonic() - started, enforcement)
 
 
@@ -377,9 +413,11 @@ def run_circuit_worker(
     timeout_seconds: float = 300,
     memory_limit_mib: int = 4096,
     cancelled: Callable[[], bool] = lambda: False,
+    resource_policy: str = "strict_address_space",
 ) -> SupervisionResult:
     """Admit identities and supervise the worker's fixed four-argument ABI."""
 
+    _validate_resource_policy(resource_policy)
     worker_name = "spike-circuit-worker.exe" if os.name == "nt" else "spike-circuit-worker"
     library_name = _library_name()
     worker = _regular_identity(worker_executable, worker_name, worker_sha256)
@@ -400,6 +438,7 @@ def run_circuit_worker(
             worker, ["--request", request, "--result", result], cwd=root,
             timeout_seconds=timeout_seconds, memory_limit_mib=memory_limit_mib,
             cancelled=cancelled,
+            resource_policy=resource_policy,
         )
     except SupervisorInitializationError as error:
         _atomic_publish(result_path, {
@@ -410,6 +449,8 @@ def run_circuit_worker(
             "issues": [{"code": "SPIKE-BE-SPICE-E-0057", "severity": "error",
                         "message": str(error)}],
             "provenance": {
+                **(_rss_provenance(timeout_seconds, memory_limit_mib, termination_requested=False)
+                   if resource_policy == "darwin_sampled_rss" else {}),
                 "supervisor": "python.spike_core.circuit_worker_supervisor",
                 "supervisor_initialization_failed": True,
                 "enforcement_established": False,
@@ -420,8 +461,32 @@ def run_circuit_worker(
             },
         })
         raise
+    except ResourceObservationError:
+        _atomic_publish(result_path, {
+            "contract": PROCESS_RESULT_CONTRACT, "status": "failed",
+            "validation_state": "experimental", "circuit": None,
+            "issues": [{"code": "SPIKE-BE-SPICE-E-0059", "severity": "error",
+                        "message": "Required experimental RSS observation failed; circuit job stopped"}],
+            "provenance": {**_rss_provenance(timeout_seconds, memory_limit_mib),
+                           "resource_observation_failed": True},
+        })
+        raise
+    sampled_provenance = (_rss_provenance(timeout_seconds, memory_limit_mib)
+                          if resource_policy == "darwin_sampled_rss" else None)
     if outcome.status == "cancelled":
-        _terminal_result(result_path, "cancelled", "SPIKE-BE-SPICE-E-0055", "circuit job cancelled")
+        _terminal_result(result_path, "cancelled", "SPIKE-BE-SPICE-E-0055", "circuit job cancelled",
+                         provenance=sampled_provenance)
     elif outcome.status == "timeout":
-        _terminal_result(result_path, "failed", "SPIKE-BE-SPICE-E-0056", "circuit job exceeded wall-time budget")
+        _terminal_result(result_path, "failed", "SPIKE-BE-SPICE-E-0056", "circuit job exceeded wall-time budget",
+                         provenance=sampled_provenance)
+    elif outcome.status == "memory_exceeded":
+        _atomic_publish(result_path, {
+            "contract": PROCESS_RESULT_CONTRACT, "status": "failed",
+            "validation_state": "experimental", "circuit": None,
+            "issues": [{"code": "SPIKE-BE-SPICE-E-0058", "severity": "error",
+                        "message": "Sampled process-group RSS exceeded the requested memory budget"}],
+            "provenance": _rss_provenance(timeout_seconds, memory_limit_mib),
+        })
+    elif resource_policy == "darwin_sampled_rss":
+        _attach_rss_provenance(root, result_relative, timeout_seconds, memory_limit_mib)
     return outcome

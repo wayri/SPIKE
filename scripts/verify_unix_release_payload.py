@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
 from python.spike_core.beta_runtime_readiness import _read_object
 from python.spike_core.circuit_worker_supervisor import run_circuit_worker, sha256_file
 from python.spike_core.spikes_runtime import _library_name
+from python.spike_core.release_resource_policy import release_supervision_profile
 from python.spike_core.wave1_packaged_acceptance import verify_packaged_worker_manifest
 from scripts.build_packaged_circuit_worker import _smoke_job
 
@@ -72,9 +73,14 @@ def _admit(resources: Path) -> tuple[dict, dict, list[dict]]:
     return worker, circuit, checks
 
 
-def verify(resources: Path) -> dict:
+def verify(resources: Path, *, resource_policy: str = "strict_address_space") -> dict:
     resources = resources.resolve(strict=True)
     worker, circuit, checks = _admit(resources)
+    profile = release_supervision_profile(sys.platform)
+    if resource_policy != profile["resource_policy"]:
+        raise ValueError("Explicit verification policy differs from the platform release profile")
+    if circuit.get("release_supervision") != profile:
+        raise ValueError("Circuit package release supervision profile differs")
     bundled = resources / "bundled"
     circuit_root = bundled / "spike-circuit-worker"
     executable = circuit_root / ("spike-circuit-worker.exe" if os.name == "nt" else "spike-circuit-worker")
@@ -90,8 +96,9 @@ def verify(resources: Path) -> dict:
             worker_executable=executable, worker_sha256=executable_digest,
             library_path=library, library_sha256=library_digest, job_root=job_root,
             request="job/request.json", result="job/result.json", timeout_seconds=30,
-            memory_limit_mib=4096)
-        if outcome.status != "completed" or outcome.returncode != 0:
+            memory_limit_mib=profile["memory_limit_mib"], resource_policy=resource_policy)
+        if (outcome.status != "completed" or outcome.returncode != 0
+                or outcome.os_enforcement != profile["enforcement"]):
             raise ValueError("Supervised packaged circuit smoke did not complete")
         result = _read_object(job_root / "job/result.json", "circuit smoke result")
         if (result.get("contract") != "spike/owned-spice-process-result/v1"
@@ -107,6 +114,7 @@ def verify(resources: Path) -> dict:
         raise ValueError("Payload version identities are missing or invalid")
     return {"contract": "spike/unix-release-payload-verification/v1", "status": "passed",
             "production_qualified": False, "versions": versions,
+            "release_supervision": profile,
             "worker_checks": [{"id": check["id"], "status": check["status"]} for check in checks],
             "worker_members": len(worker["files"]), "circuit_members": len(circuit["files"]),
             "manifest_sha256": manifest_digests,
@@ -119,9 +127,11 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--resources", required=True, type=Path,
                         help="Installed resource root containing bundled/")
+    parser.add_argument("--resource-policy", default="strict_address_space",
+                        choices=["strict_address_space", "darwin_sampled_rss"])
     parser.add_argument("--output", type=Path, default=ROOT / "build/qualification/unix-payload.json")
     args = parser.parse_args(argv)
-    report = verify(args.resources)
+    report = verify(args.resources, resource_policy=args.resource_policy)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x", encoding="utf-8") as stream:
         json.dump(report, stream, indent=2)
