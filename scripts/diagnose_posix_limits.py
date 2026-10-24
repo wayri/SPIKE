@@ -110,26 +110,31 @@ def diagnose() -> dict:
                            "machine": platform.machine(), "python": platform.python_version(),
                            "macos": platform.mac_ver()[0]},
               "probes": [], "production_configuration_changed": False}
-    for mode in ("light", "loaded"):
-        for memory_mib in (256, 2048, 4096):
-            stage = subprocess.Popen(
-                [sys.executable, str(Path(__file__).resolve()), "--parent", mode,
-                 "--memory-mib", str(memory_mib)],
-                start_new_session=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            )
-            timed_out = False
-            try:
-                stdout, stderr = stage.communicate(timeout=20)
-            except subprocess.TimeoutExpired:
-                timed_out = True
-                os.killpg(stage.pid, signal.SIGKILL)
-                stdout, stderr = stage.communicate(timeout=3)
-            report["probes"].append({
-                "mode": mode, "memory_mib": memory_mib, "returncode": stage.returncode,
-                "timed_out": timed_out, "stderr_bytes": len(stderr),
-                "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
-                "events": [json.loads(line) for line in stdout.splitlines()],
-            })
+    layouts = ("default", "avoid_shared_region") if sys.platform == "darwin" else ("default",)
+    for layout in layouts:
+        environment = os.environ.copy()
+        if layout == "avoid_shared_region":
+            environment["DYLD_SHARED_REGION"] = "avoid"
+        for mode in ("light", "loaded"):
+            for memory_mib in (256, 2048, 4096):
+                stage = subprocess.Popen(
+                    [sys.executable, str(Path(__file__).resolve()), "--parent", mode,
+                     "--memory-mib", str(memory_mib)],
+                    start_new_session=True, env=environment, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                )
+                timed_out = False
+                try:
+                    stdout, stderr = stage.communicate(timeout=20)
+                except subprocess.TimeoutExpired:
+                    timed_out = True
+                    os.killpg(stage.pid, signal.SIGKILL)
+                    stdout, stderr = stage.communicate(timeout=3)
+                report["probes"].append({
+                    "layout": layout, "mode": mode, "memory_mib": memory_mib, "returncode": stage.returncode,
+                    "timed_out": timed_out, "stderr_bytes": len(stderr),
+                    "stderr_sha256": hashlib.sha256(stderr).hexdigest(),
+                    "events": [json.loads(line) for line in stdout.splitlines()],
+                })
     return report
 
 
