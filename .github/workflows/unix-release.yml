@@ -12,10 +12,18 @@ on:
         type: choice
         default: all
         options: [all, linux, macos]
+      diagnostics:
+        description: Run bounded resource-limit diagnostics only
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
+  diagnose:
+    if: inputs.diagnostics == true
+    uses: ./.github/workflows/posix-limit-diagnostics.yml
   build:
+    if: inputs.diagnostics != true
     strategy:
       fail-fast: false
       matrix:
