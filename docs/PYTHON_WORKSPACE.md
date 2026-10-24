@@ -119,7 +119,10 @@ expression evaluation are not available. You can edit another tab during a
 run; the executing script stays locked until it stops.
 
 A saved script runs with its parent folder as the working directory. An unsaved
-tab runs from the selected workspace folder. Resolve important input and output
+tab runs from its explicitly retained work folder when staged by the Assistant
+task harness, otherwise the selected workspace folder. Harness staging opens a
+new unsaved tab and never runs its source; review and Run remain user actions.
+Resolve important input and output
 paths explicitly. The child has the user's ordinary local file and
 installed-package access. The process boundary supports cancellation and fault
 containment; it is not a security sandbox.

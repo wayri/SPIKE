@@ -36,7 +36,7 @@ def _filtered_determinants(edge1, edge2, differences):
     return np.where(determinant > error, 1, np.where(determinant < -error, -1, 0))
 
 
-def _separated(vertices, left, right, exact_points, exact_axes, diagnostics):
+def _separated(vertices, left, right, exact_points, exact_axes, diagnostics, *, resource_scale=1):
     left_points, right_points = vertices[left], vertices[right]
     differences = right_points[None, :, :]-left_points[:, None, :]
     edge_pairs = []
@@ -58,7 +58,7 @@ def _separated(vertices, left, right, exact_points, exact_axes, diagnostics):
     face_signs = _filtered_determinants(edges[:, 0, None, None, :],
                                        edges[:, 1, None, None, :], differences[None, ...])
     diagnostics["axis_tests"] += 8
-    if diagnostics["axis_tests"] > MAX_AXIS_TESTS:
+    if diagnostics["axis_tests"] > MAX_AXIS_TESTS*resource_scale:
         raise TetraIntersectionError("Intersection axis-test budget exceeded")
     for axis_number, ((a, b), (c, d)) in enumerate(edge_pairs):
         signs = face_signs[axis_number]
@@ -86,7 +86,7 @@ def _separated(vertices, left, right, exact_points, exact_axes, diagnostics):
                 if vertex in projections:
                     continue
                 diagnostics["exact_predicates"] += 1
-                if diagnostics["exact_predicates"] > MAX_EXACT_PREDICATES:
+                if diagnostics["exact_predicates"] > MAX_EXACT_PREDICATES*resource_scale:
                     raise TetraIntersectionError("Exact intersection predicate budget exceeded")
                 point = exact_point(vertex)
                 projections[vertex] = sum(axis[j]*point[j] for j in range(3))
@@ -103,7 +103,7 @@ def _separated(vertices, left, right, exact_points, exact_axes, diagnostics):
     pairs = itertools.product(itertools.combinations(left, 2), itertools.combinations(right, 2))
     for number, ((a, b), (c, d)) in enumerate(pairs, start=8):
         diagnostics["axis_tests"] += 1
-        if diagnostics["axis_tests"] > MAX_AXIS_TESTS:
+        if diagnostics["axis_tests"] > MAX_AXIS_TESTS*resource_scale:
             raise TetraIntersectionError("Intersection axis-test budget exceeded")
         signs = _filtered_determinants(vertices[b]-vertices[a], vertices[d]-vertices[c], differences)
         positive, negative = bool(np.any(signs > 0)), bool(np.any(signs < 0))
@@ -115,13 +115,49 @@ def _separated(vertices, left, right, exact_points, exact_axes, diagnostics):
     return exact_separation(deferred)
 
 
-def screen_positive_volume_intersections(vertices, cells, face_owners, *, cancel_check=None):
+def _strict_aabb_pairs(minima,maxima,*,cancel_check=None):
+    """All strictly overlapping AABB pairs, same lexicographic order as brute force.
+
+    A node encloses every descendant box. Disjoint enclosing bounds safely
+    discard a complete subtree; leaves still use the original strict tests.
+    This broadphase never decides tetra intersection or skips the SAT owner.
+    """
+    minima=np.asarray(minima);maxima=np.asarray(maxima)
+    if len(minima)<=4096:
+        for i in range(len(minima)):
+            if cancel_check and cancel_check():raise InterruptedError("Tetra intersection screening cancelled")
+            possible=np.flatnonzero(np.all(maxima[i]>minima[i+1:],axis=1)&np.all(maxima[i+1:]>minima[i],axis=1))+i+1
+            for j in possible:yield i,int(j)
+        return
+    centres=minima/2+maxima/2
+    def build(ids):
+        lo=minima[ids].min(axis=0);hi=maxima[ids].max(axis=0)
+        if len(ids)<=16:return lo,hi,ids,None,None
+        axis=int(np.argmax(np.ptp(centres[ids],axis=0)));order=np.lexsort((ids,centres[ids,axis]));ids=ids[order];middle=len(ids)//2
+        return lo,hi,None,build(ids[:middle]),build(ids[middle:])
+    root=build(np.arange(len(minima)))
+    for i in range(len(minima)):
+        if cancel_check and cancel_check():raise InterruptedError("Tetra intersection screening cancelled")
+        stack=[root];found=[]
+        while stack:
+            lo,hi,ids,left,right=stack.pop()
+            if np.any(hi<=minima[i]) or np.any(maxima[i]<=lo):continue
+            if ids is None:stack.append(right);stack.append(left);continue
+            candidates=ids[ids>i]
+            selected=candidates[np.all(maxima[i]>minima[candidates],axis=1)&np.all(maxima[candidates]>minima[i],axis=1)]
+            found.extend(map(int,selected))
+        for j in sorted(found):yield i,j
+
+
+def screen_positive_volume_intersections(vertices, cells, face_owners, *, cancel_check=None, resource_scale=1):
     """Check all pairs through AABBs; return diagnostics or raise, never repair.
 
     Requires positive-volume, manifold tetra topology already admitted. Only
     pairs sharing a verified opposite-sided facet can skip the convex test.
     No assertion about nonshared zero-measure tangencies is made.
     """
+    if type(resource_scale) is not int or not 1<=resource_scale<=16:
+        raise TetraIntersectionError("Invalid explicit intersection resource scale")
     diagnostics = {"candidate_pairs": 0, "axis_tests": 0, "exact_predicates": 0,
                    "positive_volume_overlap_checked": True,
                    "nonshared_zero_measure_contacts_qualified": False}
@@ -129,20 +165,13 @@ def screen_positive_volume_intersections(vertices, cells, face_owners, *, cancel
     minima, maxima = vertices[cells].min(axis=1), vertices[cells].max(axis=1)
     exact_points, exact_axes = {}, {}
     with np.errstate(all="raise"):
-        for i in range(len(cells)):
+        for i,j in _strict_aabb_pairs(minima,maxima,cancel_check=cancel_check):
             if cancel_check and cancel_check():
                 raise InterruptedError("Tetra intersection screening cancelled")
-            # Strict inequalities exclude exact axis-aligned touching safely.
-            possible = np.flatnonzero(np.all(maxima[i] > minima[i+1:], axis=1)
-                                      & np.all(maxima[i+1:] > minima[i], axis=1))+i+1
-            for j in possible:
-                if cancel_check and cancel_check():
-                    raise InterruptedError("Tetra intersection screening cancelled")
-                if (i, int(j)) in adjacent:
-                    continue
-                diagnostics["candidate_pairs"] += 1
-                if diagnostics["candidate_pairs"] > MAX_CANDIDATES:
-                    raise TetraIntersectionError("Intersection candidate budget exceeded")
-                if not _separated(vertices, cells[i], cells[j], exact_points, exact_axes, diagnostics):
-                    raise TetraIntersectionError(f"Positive-volume tetrahedron overlap: cells {i} and {j}")
+            if (i,j) in adjacent:continue
+            diagnostics["candidate_pairs"] += 1
+            if diagnostics["candidate_pairs"] > MAX_CANDIDATES*resource_scale:
+                raise TetraIntersectionError("Intersection candidate budget exceeded")
+            if not _separated(vertices,cells[i],cells[j],exact_points,exact_axes,diagnostics,resource_scale=resource_scale):
+                raise TetraIntersectionError(f"Positive-volume tetrahedron overlap: cells {i} and {j}")
     return diagnostics

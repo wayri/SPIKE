@@ -1,0 +1,169 @@
+{
+  "license": "Apache-2.0, original demonstration geometry and code; no official vendor CAD model bundled",
+  "files": [
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/build_carrier.py",
+      "sha256": "e194cdcb3f34c35f584fb61ab73279e967cfe1450854eea3158243b334711205",
+      "bytes": 12171
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/carrier.kicad_pcb",
+      "sha256": "f2369ed58ea78340df839230c06bf9f68c39b60ac0bad7a1336e96b7ff8313b5",
+      "bytes": 476511
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/carrier.kicad_prl",
+      "sha256": "405cafbacb54803b3f73763dc74689efbd89dc27687e7baff0108179d2fca4fe",
+      "bytes": 2294
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/carrier.kicad_pro",
+      "sha256": "b0cc45862d01a23f2f5c8e90711fc2d1da115b47785fb7aebf4cf261fa63efb4",
+      "bytes": 9745
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/carrier.kicad_sch",
+      "sha256": "6e23d6a5de19084d684d6c107268a05cd47b9be2310e695435332dc9d687ac14",
+      "bytes": 44552
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.kicad_sym",
+      "sha256": "76d135bb6a4fcb9afaba0647cac0d3f54913ea0cf622a22f0250899021da629d",
+      "bytes": 11204
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/converter-base.cir",
+      "sha256": "e24a6ec372ceab08f3e0005b8e07f3c47ac15c5ca0f670b77bf1343b98adc62c",
+      "bytes": 27017
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/converter-refined.cir",
+      "sha256": "cc085431533fa04f2a94f83d50d0e90155244c19050e9edb6a557d8cc11c0381",
+      "bytes": 27017
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/converter.spksch",
+      "sha256": "9ad7f9bbd1bbdda1fd001511959e7ad73261621ea5addf9880bc4a5f0d607b2f",
+      "bytes": 44311
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/fp-lib-table",
+      "sha256": "236a822ab7be7e11a5dc5ad057f9320c73797bf1790f64280d92bf0c6530d50f",
+      "bytes": 182
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/LICENSE",
+      "sha256": "1dbace2c4de7ffdf533d0a4cb55bd93177201ead936d0f349cd14a05a84d2266",
+      "bytes": 11560
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/NOTICE",
+      "sha256": "4a31b20101273580d461261b9dd212d6e941b4db73e820f96847cf5d5b9b9286",
+      "bytes": 768
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/README.md",
+      "sha256": "42f09320871a42d95c30afd57333518dfa8b5e27f212c24226c7dcc9c6951ed6",
+      "bytes": 8262
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/route_carrier.py",
+      "sha256": "1df60140ec2ee67a906c1a60e8212d5ced9049b3153019459f973acf455f4e6f",
+      "bytes": 5025
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/run_converter.py",
+      "sha256": "13146948c99e7ed48b74670363003f72f985afa2cd29a746b2b61f61784a4d27",
+      "bytes": 6534
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/sym-lib-table",
+      "sha256": "ba74d155fa409764d448b0b4e36a28222c9f2735285ae661c929d48e6d0807fe",
+      "bytes": 169
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/write_evidence.py",
+      "sha256": "03a1fc2706168799e763e7b58f817cc7af3330708712b6d1137e3ced4c7203e0",
+      "bytes": 2696
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/GatePads2x4_P5.kicad_mod",
+      "sha256": "ae2638f3268f017c7a357f4b191cd7da98b73260c885036810a9e685c5cded6a",
+      "bytes": 1226
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/Header1x2.kicad_mod",
+      "sha256": "a1c247eb05d1814d071fb8c83b2a4de37be65ad80d2fb2a723c0314fb315c9a9",
+      "bytes": 685
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/Header2x4.kicad_mod",
+      "sha256": "7409c7a03c049237758946b0ee9d697c4ee0b9ed2f15fb72477d6b11b634eb2e",
+      "bytes": 1249
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/Header2x8.kicad_mod",
+      "sha256": "97eb7b653ec81867f7449c6f0ed988ec713ae278d7b8a5b785677c18e2d5a1b0",
+      "bytes": 2014
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/Inductor_GeometryOnly.kicad_mod",
+      "sha256": "0442429c8f68b2c772da97fa9c364125559a606037a4460a804b20b939de09f6",
+      "bytes": 680
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/MOS_GDS_GeometryOnly.kicad_mod",
+      "sha256": "7977514e7ef5f008f84fc17066fa194e0f855e8ff4c78cc46c186573d1403ab9",
+      "bytes": 769
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/Passive2_GeometryOnly.kicad_mod",
+      "sha256": "ee79deebf3935647ec178a9db8a6e04ef0674e693be4159508b95c568a269d5d",
+      "bytes": 686
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/Carrier.pretty/PlanarTransformer_Module.kicad_mod",
+      "sha256": "75831ccab408018c7e7aace847f65a05fa90744c1af0a75c8a3acbebcd460668",
+      "bytes": 3810
+    },
+    {
+      "path": "examples/promo_showcase/planar_magnetics/converter/models/planar_transformer_assembly.step",
+      "sha256": "a814e49e924ed78b5a12a95e1540744612ff77e381023fd2c99b7d93ab90ccdf",
+      "bytes": 5439208
+    }
+  ],
+  "solver_sources": [
+    {
+      "path": "python/spikes/native_runner.py",
+      "sha256": "42a7a1a7e7eb36eba9cb618f259a5bd745e2f69aa158b80cd1e9873b51a2cebb",
+      "bytes": 32622
+    },
+    {
+      "path": "python/spikes/native_abi.py",
+      "sha256": "f30dc8e4763358e90eb4ce2cd7e4091858cf56977b06b7ae046cca92e38457d7",
+      "bytes": 90799
+    },
+    {
+      "path": "standalone/spikes_project/studio/python/spikes_studio/document.py",
+      "sha256": "7305b73a307e41b8c9cc543ad3bf3494a03b03e6f10a0c1e2a81e1a2a0246235",
+      "bytes": 40230
+    },
+    {
+      "path": "standalone/spikes_project/studio/python/spikes_studio/run_control.py",
+      "sha256": "c7600c70b95c854ee1044b0d1a86317485c421e1d82f6da595888336c018295f",
+      "bytes": 18431
+    }
+  ],
+  "model_source": {
+    "path": "output/promo-planar-magnetics-20261023/core/original-planar-module-full.step",
+    "sha256": "a814e49e924ed78b5a12a95e1540744612ff77e381023fd2c99b7d93ab90ccdf",
+    "bytes": 5439208
+  },
+  "model_copy": {
+    "path": "examples/promo_showcase/planar_magnetics/converter/models/planar_transformer_assembly.step",
+    "sha256": "a814e49e924ed78b5a12a95e1540744612ff77e381023fd2c99b7d93ab90ccdf",
+    "bytes": 5439208
+  },
+  "unchanged_model_geometry": true,
+  "no_new_numerical_solver": true
+}

@@ -116,7 +116,8 @@ class PlanarMagneticOperator:
                  "One nonempty string region ID per triangle is required")
         _require(isinstance(materials, dict) and set(region_ids) == set(materials),
                  "Materials must match mesh region IDs exactly")
-        self.groups = {key: np.flatnonzero(np.asarray(region_ids) == key) for key in materials}
+        region_array = np.asarray(region_ids)
+        self.groups = {key: np.flatnonzero(region_array == key) for key in materials}
         self.materials = {key: MagneticMaterial(value) for key, value in materials.items()}
         self.region_ids = list(region_ids)
         p = self.nodes[self.triangles]
@@ -191,7 +192,7 @@ def solve_magnetostatic(*, nodes_m, triangles, region_ids, materials, stack_dept
     _require(set(labels[fixed]) == set(range(count)), "Each connected component requires a Dirichlet gauge")
     # A harmonic linear start avoids artificial boundary-layer B-H overshoot
     # caused by zero interior values with nonzero prescribed boundary values.
-    if len(free):
+    if len(free) and np.any(a[fixed] != 0.):
         local = op.areas[:, None, None] * np.einsum("eik,ejk->eij", op.curl, op.curl)
         laplace = coo_matrix((local.ravel(), (op.rows, op.cols)), shape=(n, n)).tocsr()
         with warnings.catch_warnings():

@@ -20,6 +20,15 @@ class AssemblyDesignError(ValueError):
 def _same_json_value(left: Any, right: Any) -> bool:
     """Compare JSON values before and after typed tuple hydration."""
 
+    # JSON leaves dominate large board records. They cannot be mappings or
+    # sequences, so avoid two runtime protocol checks for every coordinate.
+    # Keep ordinary equality (including NaN behavior) and the generic fallback.
+    if type(left) in (str, int, float, bool, type(None)):
+        return left == right
+    if type(left) is dict and type(right) is dict:
+        return left.keys() == right.keys() and all(
+            _same_json_value(left[key], right[key]) for key in left
+        )
     if isinstance(left, Mapping) and isinstance(right, Mapping):
         return set(left) == set(right) and all(_same_json_value(left[key], right[key]) for key in left)
     if isinstance(left, (list, tuple)) and isinstance(right, (list, tuple)):

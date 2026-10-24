@@ -1,0 +1,22 @@
+{
+  "purpose": "Explicit future radiated-immunity coupling example; not an executable SPIKE request",
+  "execution_status": "blocked_unsupported_incident_field_workflow",
+  "board": "antenna_example.kicad_pcb",
+  "board_sha256": "f8fd038633c5b49a3867c8f09dc4fb3341b9be5a4a3cd961a088dbde6a77a2f0",
+  "proposed_linear_scenario": {
+    "frequencies_hz": [3000000000, 3200000000, 3400000000, 3600000000, 3800000000, 4000000000, 4200000000],
+    "incident_electric_field_rms_v_per_m": 1.0,
+    "direction_xyz": [1, 0, 0],
+    "electric_polarization_xyz": [0, 1, 0],
+    "magnetic_direction_xyz": [0, 0, 1],
+    "plane_wave_convention": "E cross H parallel propagation; RMS phasors; phase origin must be admitted by future adapter",
+    "receive_terminal": {"signal_net": "RF", "return_net": "GND", "load_ohm": 50},
+    "requested_response": ["complex loaded voltage V(RF)-V(GND)", "load current", "absorbed load power", "total/scattered E/H probes"]
+  },
+  "not_a_standard_test_profile": true,
+  "missing_solver_contracts": ["incident wave and phase reference", "loaded receiving port", "room/absorber/antenna coupling if a physical chamber is requested", "field-to-circuit susceptibility and time/modulation models"],
+  "validation_required": ["independent receiving-antenna/coupling reference", "field amplitude and power normalization", "mesh and absorbing-boundary refinement", "conservation checks and measured fixture correlation"],
+  "induced_voltage_result": null,
+  "immunity_threshold_result": null,
+  "compliance_result": null
+}

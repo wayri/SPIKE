@@ -43,4 +43,6 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    from python.spike_core.numerical_runtime import bootstrap_worker_numerics
+    bootstrap_worker_numerics()
     raise SystemExit(main())

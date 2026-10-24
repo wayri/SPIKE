@@ -122,6 +122,25 @@ def _network_links(scenario: Any, node_ids: set[str]) -> Tuple[List[Tuple[str, s
     return links, issues
 
 
+def nodes_without_thermal_sink(node_ids: Sequence[Any], edges: Iterable[Tuple[Any, Any]]) -> List[Any]:
+    """Return floating nodes in input order; topology only, no temperatures solved."""
+    adjacency = {node: set() for node in node_ids}
+    reachable = set()
+    for left, right in edges:
+        if right is None:
+            reachable.add(left)
+        else:
+            adjacency[left].add(right)
+            adjacency[right].add(left)
+    frontier = list(reachable)
+    while frontier:
+        for neighbor in adjacency[frontier.pop()]:
+            if neighbor not in reachable:
+                reachable.add(neighbor)
+                frontier.append(neighbor)
+    return [node for node in node_ids if node not in reachable]
+
+
 def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable[Mapping[str, Any]] = ()) -> Dict[str, Any]:
     """Solve an explicit resistive/RC thermal network.
 
@@ -188,23 +207,7 @@ def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable
         powers[element_id] += power
 
     if not any(item.get("severity") == "error" for item in issues):
-        connected = {node for node, other, _, _ in links if other is None}
-        # A component attached to an ambient-connected node is constrained.  A
-        # straightforward graph traversal catches isolated floating subgraphs.
-        adjacency = {node: set() for node in node_ids}
-        for left, right, _, _ in links:
-            if right is not None:
-                adjacency[left].add(right)
-                adjacency[right].add(left)
-        reachable = set(connected)
-        frontier = list(connected)
-        while frontier:
-            node = frontier.pop()
-            for neighbor in adjacency[node]:
-                if neighbor not in reachable:
-                    reachable.add(neighbor)
-                    frontier.append(neighbor)
-        for node in sorted(node_ids - reachable):
+        for node in nodes_without_thermal_sink(sorted(node_ids), [(left, right) for left, right, _, _ in links]):
             issues.append(_issue("THERMAL_NETWORK_AMBIENT_PATH_REQUIRED", f"{node} has no explicit thermal path to ambient."))
 
     if any(item.get("severity") == "error" for item in issues):
@@ -277,18 +280,12 @@ def estimate_lumped_thermal_network(scenario: Any, *, inherited_issues: Iterable
     }
 
 
-def estimate_surface_thermal_network(scenario: Any, surfaces: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    """Solve admitted object boundaries, retaining a single temperature per object.
-
-    The component adapter owns admission and SI-unit conversion is explicit here.
-    Radiation is diffuse gray exchange with fixed, large isothermal surroundings
-    (view factor one). It is not interobject radiation or a spatial field solver.
-    """
+def prepare_surface_thermal_branches(scenario: Any, surfaces: Sequence[Mapping[str, Any]]):
+    """Construct admitted boundary branches without solving the thermal network."""
     sigma = 5.670374419e-8  # W/(m² K⁴), SI Stefan-Boltzmann constant.
     ids = [str(element["id"]) for element in scenario.thermal_elements]
     index = {identifier: offset for offset, identifier in enumerate(ids)}
     ambient = float(scenario.ambient_temperature_c)
-    powers = [float(element["power_w"]) for element in scenario.thermal_elements]
     legacy, issues = _network_links(scenario, set(ids))
     if issues:
         raise ValueError(issues[0]["message"])
@@ -310,23 +307,13 @@ def estimate_surface_thermal_network(scenario: Any, surfaces: Sequence[Mapping[s
         sink = item.get("surroundings_temperature_c", item.get("ambient_temperature_c", ambient))
         branches.append((index[item["object_ref"]], other, coefficient, sink, kind == "radiation"))
 
-    reachable = {left for left, right, _, _, _ in branches if right is None}
-    adjacency = {i: set() for i in range(len(ids))}
-    for left, right, _, _, _ in branches:
-        if right is not None:
-            adjacency[left].add(right)
-            adjacency[right].add(left)
-    frontier = list(reachable)
-    while frontier:
-        for neighbor in adjacency[frontier.pop()]:
-            if neighbor not in reachable:
-                reachable.add(neighbor)
-                frontier.append(neighbor)
-    if len(reachable) != len(ids):
-        missing = ", ".join(ids[i] for i in range(len(ids)) if i not in reachable)
-        raise ValueError(f"Objects without an explicit path to a fixed thermal sink: {missing}.")
+    return branches, legacy, sigma
 
+
+def admit_surface_thermal_work(scenario: Any, node_count: int, branches):
+    """Check the existing surface-network output/work budget without solving."""
     steps = 0
+    end = 0.0
     if scenario.mode == "transient":
         end = float(scenario.run["end_time_s"])
         steps = max(1, math.ceil(end / float(scenario.run["write_interval_s"])))
@@ -335,14 +322,37 @@ def estimate_surface_thermal_network(scenario: Any, surfaces: Sequence[Mapping[s
     # A single interobject branch selects dense elimination for this matrix.
     # Bound both the minimum expected work and actual Newton factorizations;
     # the latter prevents nonlinear iterations multiplying the admitted budget.
-    dense_solve_work = len(ids) ** 3 if any(right is not None for _, right, _, _, _ in branches) else 0
-    dense_work_used = 0
+    dense_solve_work = node_count ** 3 if any(right is not None for _, right, _, _, _ in branches) else 0
     work_limit_message = (
         f"Coupled surface solve exceeds the {MAX_SURFACE_DENSE_WORK:,} dense work-unit limit. "
         "Reduce the number of objects, increase the time step, or shorten the duration."
     )
     if dense_solve_work * (steps + 1) > MAX_SURFACE_DENSE_WORK:
         raise ValueError(work_limit_message)
+
+    return end, steps, dense_solve_work, work_limit_message
+
+
+def estimate_surface_thermal_network(scenario: Any, surfaces: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    """Solve admitted object boundaries, retaining a single temperature per object.
+
+    The component adapter owns admission and SI-unit conversion is explicit here.
+    Radiation is diffuse gray exchange with fixed, large isothermal surroundings
+    (view factor one). It is not interobject radiation or a spatial field solver.
+    """
+    ids = [str(element["id"]) for element in scenario.thermal_elements]
+    index = {identifier: offset for offset, identifier in enumerate(ids)}
+    ambient = float(scenario.ambient_temperature_c)
+    powers = [float(element["power_w"]) for element in scenario.thermal_elements]
+    branches, legacy, sigma = prepare_surface_thermal_branches(scenario, surfaces)
+
+    missing_nodes = nodes_without_thermal_sink(list(range(len(ids))), [(left, right) for left, right, _, _, _ in branches])
+    if missing_nodes:
+        missing = ", ".join(ids[i] for i in missing_nodes)
+        raise ValueError(f"Objects without an explicit path to a fixed thermal sink: {missing}.")
+
+    end, steps, dense_solve_work, work_limit_message = admit_surface_thermal_work(scenario, len(ids), branches)
+    dense_work_used = 0
 
     matrix = [[0.0] * len(ids) for _ in ids]
     for left, right, coefficient, _, radiation in branches:

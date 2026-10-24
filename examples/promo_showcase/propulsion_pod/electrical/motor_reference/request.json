@@ -1,0 +1,19 @@
+{
+  "contract": "spike/magnetic-machine-study/v1",
+  "model": "pm_rotor",
+  "geometry": {},
+  "mesh_edge_m": 0.002,
+  "stack_depth_m": 0.02,
+  "relative_permeability": 1000,
+  "remanence_t": 1,
+  "current_density_a_m2": 1000000,
+  "position": 0.2,
+  "motion": {
+    "duration_s": 0.002,
+    "time_step_s": 0.001,
+    "mass_or_inertia": 0.001,
+    "damping": 0.001,
+    "external_load": 0,
+    "initial_velocity": 0
+  }
+}

@@ -39,29 +39,43 @@ function tokenScore(token: string, fields: IndexedField[]) {
   return best;
 }
 
+type SearchIndex = { label: string; fields: IndexedField[]; source: string[] };
+const itemIndexes = new WeakMap<UniversalSearchableItem, SearchIndex>();
+let previousQuery: { raw: string; request: string; term: string; tokens: string[] } | undefined;
+
+function prepareQuery(raw: string) {
+  if (previousQuery?.raw === raw) return previousQuery;
+  const request = raw.trim().replace(/^(?:please\s+|(?:can|could|would) you\s+|i want to\s+)/i, "");
+  const term = normalizeSearchText(request.replace(/^(?:open|show|go to|take me to)\s+(?:the\s+)?/i, ""));
+  return previousQuery = { raw, request, term, tokens: term.split(" ").filter(Boolean) };
+}
+
+/** Cache only presentation text; every score still reads the current enabled state. */
+function indexItem(item: UniversalSearchableItem): SearchIndex {
+  const source = [item.label, item.keywords ?? "", item.category, item.description ?? ""];
+  const cached = itemIndexes.get(item);
+  if (cached && cached.source.every((value, index) => value === source[index])) return cached;
+  const weights = [120, 95, 65, 45];
+  const fields = source.map((value, index) => {
+    const text = normalizeSearchText(value);
+    return { text, words: text.split(" ").filter(Boolean), weight: weights[index] };
+  });
+  const indexed = { source, label: fields[0].text, fields };
+  itemIndexes.set(item, indexed);
+  return indexed;
+}
+
 export function scoreUniversalSearchItem(item: UniversalSearchableItem, query: string) {
-  const request = query.trim().replace(/^(?:please\s+|(?:can|could|would) you\s+|i want to\s+)/i, "");
+  const { request, term, tokens } = prepareQuery(query);
   if (/^show\s+/i.test(request) && /^hide\s+/i.test(item.label)) return 0;
   if (/^hide\s+/i.test(request) && /^show\s+/i.test(item.label)) return 0;
-  const conversationalQuery = request.replace(/^(?:open|show|go to|take me to)\s+(?:the\s+)?/i, "");
-  const term = normalizeSearchText(conversationalQuery);
   if (!term) return item.disabled ? -1 : 1;
 
-  const label = normalizeSearchText(item.label);
-  const category = normalizeSearchText(item.category);
-  const description = normalizeSearchText(item.description ?? "");
-  const keywords = normalizeSearchText(item.keywords ?? "");
+  const { label, fields } = indexItem(item);
   if (label === term) return 1000;
   if (label.startsWith(term)) return 850;
   if (label.includes(term)) return 700;
 
-  const fields: IndexedField[] = [
-    { text: label, words: label.split(" ").filter(Boolean), weight: 120 },
-    { text: keywords, words: keywords.split(" ").filter(Boolean), weight: 95 },
-    { text: category, words: category.split(" ").filter(Boolean), weight: 65 },
-    { text: description, words: description.split(" ").filter(Boolean), weight: 45 },
-  ];
-  const tokens = term.split(" ").filter(Boolean);
   const scores = tokens.map(token => tokenScore(token, fields));
   if (scores.some(value => value === 0)) return 0;
   return scores.reduce((sum, value) => sum + value, 0) / scores.length + Math.min(tokens.length, 4) * 8;

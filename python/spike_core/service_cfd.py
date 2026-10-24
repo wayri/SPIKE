@@ -5,7 +5,7 @@ from .service_helpers import error_response
 
 METHODS = frozenset({'cfd_capabilities', 'run_native_cfd', 'run_su2_cfd', 'run_su2_cht',
                      'run_native_cht', 'run_coupled_surface_exchange', 'run_enclosure_cht',
-                     'run_enclosure_cht_v2'})
+                     'run_enclosure_cht_v2', 'run_cfd_tetra_cht'})
 
 
 def handle_cfd_request(method, params):
@@ -21,9 +21,11 @@ def handle_cfd_request(method, params):
             from .su2_airflow import su2_airflow_capabilities
             from .su2_cht import su2_cht_capabilities
             from .native_cht import native_cht_capabilities
+            from .cfd_tetra_cht import cfd_tetra_cht_capabilities
             result = {'contract': 'spike/cfd-catalog/v1', 'engines': {
                 'spike.native_cavity': native_airflow_capabilities(),
                 'spike.native_cht': native_cht_capabilities(),
+                'spike.tetra_cht': cfd_tetra_cht_capabilities(),
                 'spike.enclosure_cht': {'available': True, 'model_status': 'experimental',
                     'geometry': 'supplied_voxel_regions_nested_thermal_tensor_grid',
                     'creeping_obstacles': True, 'inertial_rectangular_fluid_region': True,
@@ -59,6 +61,9 @@ def handle_cfd_request(method, params):
             elif method == 'run_enclosure_cht_v2':
                 from .enclosure_cht_v2 import solve_enclosure_cht_v2
                 result = solve_enclosure_cht_v2(params['request'])
+            elif method == 'run_cfd_tetra_cht':
+                from .cfd_tetra_cht import solve_cfd_tetra_cht
+                result = solve_cfd_tetra_cht(params['request'])
             elif method == 'run_coupled_surface_exchange':
                 from .coupled_surface_exchange import transfer_coupled_surface_exchange
                 result = transfer_coupled_surface_exchange(params['request'])

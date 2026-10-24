@@ -1,0 +1,11 @@
+{
+  "model": "electromagnet",
+  "turns": 200,
+  "current_a": 1.2,
+  "resistance_ohm": 3.0,
+  "core_length_m": 0.1,
+  "core_area_m2": 0.0001,
+  "core_relative_permeability": 2000.0,
+  "gap_length_m": 0.002,
+  "gap_area_m2": 0.00012
+}

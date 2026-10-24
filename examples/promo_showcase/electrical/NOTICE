@@ -1,0 +1,9 @@
+SPIKE electrical showcase
+Original SPIKE-owned example decks, native schematic/dashboard, controller source,
+machine requests and packaging/verification glue are distributed under Apache-2.0.
+See the accompanying LICENSE, copied unchanged from the SPIKE repository.
+
+Sources are identified and hashed in source-provenance.json. All copied files
+remain unmodified except the explicitly identified permeability comparison request.
+No third-party board, proprietary model, native solver DLL or compiler is bundled.
+The original authors' notices in copied material remain applicable.

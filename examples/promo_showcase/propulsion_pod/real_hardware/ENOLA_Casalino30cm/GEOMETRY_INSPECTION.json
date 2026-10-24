@@ -1,0 +1,46 @@
+[
+  {
+    "file": "CASALINO_D30cm_pitch+5deg.stl",
+    "sha256": "4659b1f740d6e2ea30819b7a2ce3cdddd54703600ff0d0919d0529ff1db62afd",
+    "triangles": 35744,
+    "unique_vertices": 17868,
+    "bbox_native": [
+      [
+        -15.54857063293457,
+        -1.3029414415359497,
+        -150.0
+      ],
+      [
+        15.54857063293457,
+        21.433568954467773,
+        150.0
+      ]
+    ],
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "units": "STL has no embedded units; native tip-to-tip span300 matches source GeneralInfo diameter0.3m, therefore coordinate interpretation is millimetres; multiply by.001 for solver metres.",
+    "axis": "Tip span is Z; rotation-axis direction and origin must be confirmed from hub/section geometry before CFD, not inferred solely from span."
+  },
+  {
+    "file": "CASALINO_D30cm_pitch-5deg.stl",
+    "sha256": "dc765e0e38e113fd5a48a8b689cae1017d7173eeecde9f1fba654f8a35bfa7b3",
+    "triangles": 35848,
+    "unique_vertices": 17920,
+    "bbox_native": [
+      [
+        -17.276874542236328,
+        -0.0240811575204134,
+        -150.0
+      ],
+      [
+        17.276874542236328,
+        19.104406356811523,
+        150.0
+      ]
+    ],
+    "boundary_edges": 0,
+    "nonmanifold_edges": 0,
+    "units": "STL has no embedded units; native tip-to-tip span300 matches source GeneralInfo diameter0.3m, therefore coordinate interpretation is millimetres; multiply by.001 for solver metres.",
+    "axis": "Tip span is Z; rotation-axis direction and origin must be confirmed from hub/section geometry before CFD, not inferred solely from span."
+  }
+]

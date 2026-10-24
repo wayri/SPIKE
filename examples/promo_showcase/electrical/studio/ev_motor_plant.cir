@@ -1,0 +1,14 @@
+.title Two-wheeler averaged armature; mechanical state and back-EMF in C controller
+Vdrive motor_in 0 0
+Rarm motor_in arm 0.08
+Larm arm emf 500u
+Vback emf sense 0
+Rsense sense 0 1m
+Vspeed omega 0 0
+Vcurrent current 0 0
+Vthrottle throttle 0 0
+Vbrake brake 0 0
+Vtemperature controller_temp 0 25
+Vbus bus 0 72
+.tran 1m 10 uic
+.end

@@ -1,3 +1,5 @@
+import { useGuidedRunAdapter } from "./useGuidedRunAdapter";
+import SolverSetupSteps, { SolverSetupPanel } from "./SolverSetupSteps";
 import "./sparameterResponsive.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2, Download, Play, Upload, X } from "./icons";
@@ -7,6 +9,7 @@ import type { AssemblyDesigns } from "./mcadAssembly";
 import { cancelLocalWorker, isDesktopShell, runSiProtocolTestSuite, runSiUniformChannel } from "./workerBridge";
 import SiChannelResultPanel from "./SiChannelResultPanel";
 import SiWorkflowWorkbench from "./SiWorkflowWorkbench";
+import MultiportFixturePanel from "./MultiportFixturePanel";
 import PlotlyChart from "./PlotlyChart";
 import type { SiProtocolSuite } from "./siProtocolSuites";
 import { usePanelPresentation } from "./panelPresentation";
@@ -21,7 +24,7 @@ type Props = {
   suite?: SiProtocolSuite | null;
   selectedProfile?: SiChannelProfile | null;
   initialResult?: Record<string, unknown> | null;
-  initialView?: "workflow" | "geometry";
+  initialView?: "workflow" | "geometry" | "multiport";
   initialFocus?: "channel" | "crosstalk" | "eye" | "pam4" | "impedance" | "ports";
   intentToken?: number;
   searchDraft?: SiSearchDraft;
@@ -150,9 +153,11 @@ const downloadJson = (ownerDocument: Document | undefined, name: string, value: 
 
 export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, onClose, onStatus, suite, selectedProfile, initialResult, initialView, initialFocus = "channel", intentToken, searchDraft, onResult }: Props) {
   const { ownerDocument } = usePanelPresentation();
+  const [setupStep, setSetupStep] = useState("domain");
   const [workflowView, setWorkflowView] = useState(() => initialView ? initialView === "workflow" : !suite && !selectedProfile && initialResult?.contract !== "spike/si-channel-result/v1");
   useEffect(() => { if ((suite || selectedProfile) && !initialView) setWorkflowView(false); }, [suite?.id, selectedProfile?.id, initialView]);
-  useEffect(() => { if (initialView && intentToken) setWorkflowView(initialView === "workflow"); }, [initialView, intentToken]);
+  const [multiportView, setMultiportView] = useState(initialView === "multiport");
+  useEffect(() => { if (initialView && intentToken) {setWorkflowView(initialView === "workflow");setMultiportView(initialView === "multiport");} }, [initialView, intentToken]);
   const desktop = isDesktopShell();
   const input = useRef<HTMLInputElement>(null);
   const [data, setData] = useState<TouchstoneData | null>(null);
@@ -255,30 +260,36 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     setSearchReview(`Reviewed search inputs applied. Select the reference copper layer and review signal, return, differential mate or victim, and frequency settings before running.${searchDraft.componentRefs?.length ? ` Component references ${searchDraft.componentRefs.join(", ")} do not define source/receiver pin endpoints; review explicit endpoints in the source-to-receiver workflow.` : " Source/receiver pin endpoints require separate review in the source-to-receiver workflow."}${searchDraft.riseTimeS !== undefined ? ` Requested rise time ${searchDraft.riseTimeS} s remains pending review: geometry channel setup has no source rise-time input. No waveform is inferred from this value; configure the source rise time in the source-to-receiver workflow.` : ""}`);
   }, [searchDraft, activeDesign, designNets, siBusy]);
 
-  const runGeometryChannel = async () => {
-    if (!activeDesign) return;
+  // Build and validate the exact request without executing a worker. Both guide and Run use this path.
+  const prepareGeometryChannel = () => {
+    let route = "domain";
+    try {
+    if (!activeDesign) throw new Error("Select a retained design before running geometry SI.");
+    route = "conditions";
     const start = Number(frequencyStartHz);
     const stop = Number(frequencyStopHz);
     const count = Number(frequencyPoints);
     const bitRate = Number(bitRateHz);
     let eyeMask: EyeMask | null = null;
-    try { eyeMask = parseEyeMask(eyeMaskJson); } catch (error) { setSiError(error instanceof Error ? error.message : String(error)); return; }
-    if (eyeMaskProfileId && eyeMask) { setSiError("Choose either a built-in eye mask profile or supplied mask JSON."); return; }
-    if (start !== 0) { setSiError("TDR/TDT and eye reconstruction require the frequency range to start at exactly 0 Hz (DC)."); return; }
-    if (!Number.isFinite(stop) || stop <= 0) { setSiError("Frequency stop must be positive and finite."); return; }
-    if (!Number.isInteger(count) || count < 3 || count > 32769) { setSiError("Frequency points must be an integer from 3 through 32769."); return; }
-    if (loadedCrosstalk && count > 8193) { setSiError("Loaded NEXT/FEXT transient analysis admits at most 8,193 frequency points."); return; }
-    if (!signalNet || !referenceNet || !referenceLayer) { setSiError("Select a signal net, reference net, and reference copper layer."); return; }
-    if (initialFocus === "crosstalk" && !victimNet) { setSiError("Choose a separate victim net to calculate NEXT and FEXT."); return; }
-    if (signalNet === referenceNet || (victimNet && [signalNet, referenceNet].includes(victimNet)) || (differentialMateNet && [signalNet, referenceNet, victimNet].includes(differentialMateNet))) { setSiError("Aggressor, differential mate, optional victim, and reference nets must be distinct."); return; }
-    if (signaling === "differential" && !differentialMateNet) { setSiError("Differential signaling requires an explicitly selected P/N mate."); return; }
+    eyeMask = parseEyeMask(eyeMaskJson);
+    if (eyeMaskProfileId && eyeMask) { throw new Error("Choose either a built-in eye mask profile or supplied mask JSON."); }
+    if (start !== 0) { throw new Error("TDR/TDT and eye reconstruction require the frequency range to start at exactly 0 Hz (DC)."); }
+    if (!Number.isFinite(stop) || stop <= 0) { throw new Error("Frequency stop must be positive and finite."); }
+    if (!Number.isInteger(count) || count < 3 || count > 32769) { throw new Error("Frequency points must be an integer from 3 through 32769."); }
+    if (loadedCrosstalk && count > 8193) { throw new Error("Loaded NEXT/FEXT transient analysis admits at most 8,193 frequency points."); }
+    route = "ports";
+    if (!signalNet || !referenceNet || !referenceLayer) { throw new Error("Select a signal net, reference net, and reference copper layer."); }
+    if (initialFocus === "crosstalk" && !victimNet) { throw new Error("Choose a separate victim net to calculate NEXT and FEXT."); }
+    if (signalNet === referenceNet || (victimNet && [signalNet, referenceNet].includes(victimNet)) || (differentialMateNet && [signalNet, referenceNet, victimNet].includes(differentialMateNet))) { throw new Error("Aggressor, differential mate, optional victim, and reference nets must be distinct."); }
+    if (signaling === "differential" && !differentialMateNet) { throw new Error("Differential signaling requires an explicitly selected P/N mate."); }
     const coupledMate = signaling === "differential" ? differentialMateNet : victimNet;
     const separationTolerance = Number(separationToleranceMm);
     const skewTolerance = Number(skewToleranceMm);
-    if (coupledMate && (!Number.isFinite(separationTolerance) || separationTolerance < 0 || !Number.isFinite(skewTolerance) || skewTolerance < 0)) { setSiError("Coupled separation and skew tolerances must be finite, non-negative millimetre values."); return; }
-    if (!Number.isFinite(bitRate) || bitRate <= 0) { setSiError(`${modulation === "PAM4" ? "Symbol" : "Bit"} rate must be positive and finite.`); return; }
+    if (coupledMate && (!Number.isFinite(separationTolerance) || separationTolerance < 0 || !Number.isFinite(skewTolerance) || skewTolerance < 0)) { throw new Error("Coupled separation and skew tolerances must be finite, non-negative millimetre values."); }
+    route = "conditions";
+    if (!Number.isFinite(bitRate) || bitRate <= 0) { throw new Error(`${modulation === "PAM4" ? "Symbol" : "Bit"} rate must be positive and finite.`); }
     const referenceImpedance = Number(referenceImpedanceOhm);
-    if (!Number.isFinite(referenceImpedance) || referenceImpedance <= 0) { setSiError("Reference impedance must be positive and finite."); return; }
+    if (!Number.isFinite(referenceImpedance) || referenceImpedance <= 0) { throw new Error("Reference impedance must be positive and finite."); }
     const step = (stop - start) / (count - 1);
     const frequencies = Array.from({ length: count }, (_, index) => start + step * index);
     const request: Record<string, unknown> = {
@@ -300,8 +311,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
       const zero = Number(ctleZeroHz);
       const pole = Number(ctlePoleHz);
       const noise = Number(voltageNoise);
-      if (!ffe.length || ffe.some(value => !Number.isFinite(value)) || !dfe.length || dfe.some(value => !Number.isFinite(value))) { setSiError("FFE and DFE taps must be comma-separated finite values."); return; }
-      if (![zero, pole, noise].every(Number.isFinite)) { setSiError("CTLE and noise controls must be finite."); return; }
+      if (!ffe.length || ffe.some(value => !Number.isFinite(value)) || !dfe.length || dfe.some(value => !Number.isFinite(value))) { throw new Error("FFE and DFE taps must be comma-separated finite values."); }
+      if (![zero, pole, noise].every(Number.isFinite)) { throw new Error("CTLE and noise controls must be finite."); }
       request.symbol_rate_hz = bitRate;
       request.symbol_count = 512;
       request.pam4_model = {
@@ -328,8 +339,8 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
     if (victimNet && loadedCrosstalk) {
       const sourceVoltage = Number(crosstalkSourceV);
       const terminations = crosstalkTerminations.map(Number);
-      if (!Number.isFinite(sourceVoltage) || Math.abs(sourceVoltage) > 1e6) { setSiError("The NEXT/FEXT Thevenin source must be finite and within +/-1e6 V."); return; }
-      if (terminations.some(value => !Number.isFinite(value) || value < 1e-6 || value > 1e12)) { setSiError("Each NEXT/FEXT termination must be within 1e-6 through 1e12 ohm."); return; }
+      if (!Number.isFinite(sourceVoltage) || Math.abs(sourceVoltage) > 1e6) { throw new Error("The NEXT/FEXT Thevenin source must be finite and within +/-1e6 V."); }
+      if (terminations.some(value => !Number.isFinite(value) || value < 1e-6 || value > 1e12)) { throw new Error("Each NEXT/FEXT termination must be within 1e-6 through 1e12 ohm."); }
       const waveform = Array.from({ length: 512 }, (_, index) => index < 16 || index >= 272 ? 0 : sourceVoltage);
       request.crosstalk_model = {
         port_map: { aggressor_near: 0, victim_near: 1, aggressor_far: 2, victim_far: 3 },
@@ -338,22 +349,30 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
         trace_limit: 512,
       };
     }
-    setSiBusy(true);
-    setSiError("");
-    onStatus(`Running bounded experimental ${signaling === "differential" ? "differential" : "single-ended"} aggressor ${signalNet}${differentialMateNet ? ` / mate ${differentialMateNet}` : ""}${victimNet ? ` with separate victim ${victimNet}` : ""}`);
-    try {
       const lane: Record<string, unknown> = { lane_id: String(request.channel_id), channel_request: request };
       if (eyeMask || eyeMaskProfileId) {
         if (eyeMask) lane.eye_mask = eyeMask;
         if (eyeMaskProfileId) lane.eye_mask_id = eyeMaskProfileId;
         if (eyeMaskProfileId || eyeMask?.voltage_unit === "V") {
-          if (!eyeVoltageScale.trim() || !eyeVoltageOffset.trim()) { setSiError("A volts mask requires explicit scale and offset values for normalized eye samples."); setSiBusy(false); return; }
+          if (!eyeVoltageScale.trim() || !eyeVoltageOffset.trim()) { throw new Error("A volts mask requires explicit scale and offset values for normalized eye samples."); }
           const scaleV = Number(eyeVoltageScale);
           const offsetV = Number(eyeVoltageOffset);
-          if (!Number.isFinite(scaleV) || scaleV <= 0 || !Number.isFinite(offsetV)) { setSiError("A volts mask requires a finite positive scale and finite offset for normalized eye samples."); setSiBusy(false); return; }
+          if (!Number.isFinite(scaleV) || scaleV <= 0 || !Number.isFinite(offsetV)) { throw new Error("A volts mask requires a finite positive scale and finite offset for normalized eye samples."); }
           lane.eye_voltage_mapping = { scale_v: scaleV, offset_v: offsetV, bit_rate_hz: bitRate };
         }
       }
+    return { request, lane };
+    } catch (error) { throw Object.assign(error instanceof Error ? error : new Error(String(error)), { route }); }
+  };
+  const runGeometryChannel = async () => {
+    if (!activeDesign) { setSiError("Select a retained design before running geometry SI."); setSetupStep("domain"); return; }
+    let prepared: ReturnType<typeof prepareGeometryChannel>;
+    try { prepared = prepareGeometryChannel(); } catch (error) { setSiError(error instanceof Error ? error.message : String(error)); setSetupStep((error as {route?: string}).route ?? "review"); return; }
+    const { request, lane } = prepared;
+    setSiBusy(true);
+    setSiError("");
+    onStatus(`Running bounded experimental ${signaling === "differential" ? "differential" : "single-ended"} aggressor ${signalNet}${differentialMateNet ? ` / mate ${differentialMateNet}` : ""}${victimNet ? ` with separate victim ${victimNet}` : ""}`);
+    try {
       const response = suite
         ? await runSiProtocolTestSuite(activeDesign, {
           contract: "spike/si-protocol-test-suite-request/v1",
@@ -413,22 +432,52 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
   const suiteLane = records(suiteResult?.lanes)[0];
   const eyeMaskResult = record(suiteLane?.eye_mask_result);
 
+  // Equal reconstructed design objects must not notify the guide registry again.
+  const designRevision = useMemo(() => JSON.stringify(activeDesign), [activeDesign]);
+  const requestGeometryRun = useGuidedRunAdapter({
+    id: "si-geometry", context: { key: `si-geometry:${String(activeDesign?.design_id ?? "none")}`, workspace: "HF / SI", title: "Geometry SI channel",
+      revision: JSON.stringify({ design: designRevision, desktop, signalNet, victimNet, differentialMateNet, signaling, referenceNet, referenceLayer, frequencyStartHz, frequencyStopHz, frequencyPoints, bitRateHz, referenceImpedanceOhm, modulation, txFfeTaps, rxDfeTaps, ctleZeroHz, ctlePoleHz, voltageNoise, separationToleranceMm, skewToleranceMm, loadedCrosstalk, crosstalkSourceV, crosstalkTerminations, eyeMaskJson, eyeMaskProfileId, eyeVoltageScale, eyeVoltageOffset, suite, initialFocus }) },
+    check: async () => {
+      if (!desktop || siBusy) return { requirements: [{ id: "si-geometry-runtime", title: siBusy ? "Wait for the active SI operation" : "Open SPIKE desktop", detail: siBusy ? "Stop or finish the active operation before starting another run." : "The local desktop worker is required to execute SI.", severity: "blocker", route: "review" }] };
+      try { prepareGeometryChannel(); return { requirements: [], summary: "Local SI inputs are ready for the existing bounded channel solver; worker validation still applies." }; }
+      catch (error) { return { requirements: [{ id: "si-geometry-input", title: "Review SI setup", detail: error instanceof Error ? error.message : String(error), severity: "blocker", route: (error as {route?: string}).route ?? "review" }] }; }
+    },
+    fix: requirement => { setWorkflowView(false); setSetupStep(requirement.route ?? "review"); setSiError(requirement.detail); },
+    run: async (_context, signal) => { if (!signal.aborted) await runGeometryChannel(); },
+    tutorSteps: [
+      { id: "domain", title: "Choose geometry", detail: "Select the retained design and channel signaling assumptions.", route: "domain" },
+      { id: "ports", title: "Define signal and return", detail: "Choose distinct signal and reference nets, reference copper, and optional mate or victim.", route: "ports" },
+      { id: "conditions", title: "Review sweep and stimulus", detail: "Set frequency samples, rate, impedance and requested modulation or eye assumptions.", route: "conditions" },
+      { id: "review", title: "Check and run", detail: "Check the current draft, then launch the experimental bounded SI solver and inspect its diagnostics.", route: "review" },
+    ],
+  });
   return <div className="modal-backdrop"><section className="modal sparam-workbench" role="dialog" aria-modal="true" aria-label="S-parameter workbench">
     <header><div><span className="eyebrow">HF / SI NETWORK ANALYSIS</span><h2>S-parameter workbench</h2></div><button className="icon-btn" onClick={onClose} title="Close"><X size={17} /></button></header>
-    <div className="sparam-commandbar"><button className={workflowView ? "primary-btn" : "secondary-btn"} onClick={() => setWorkflowView(true)}>Source-to-receiver workflow</button><button className={!workflowView ? "primary-btn" : "secondary-btn"} onClick={() => setWorkflowView(false)}>Geometry / protocol / network inspection</button></div>
+    <div className="sparam-commandbar"><button className={workflowView && !multiportView ? "primary-btn" : "secondary-btn"} onClick={() => { setWorkflowView(true); setMultiportView(false); }}>Source-to-receiver workflow</button><button className={!workflowView && !multiportView ? "primary-btn" : "secondary-btn"} onClick={() => { setWorkflowView(false); setMultiportView(false); }}>Geometry / protocol / network inspection</button><button className={multiportView ? "primary-btn" : "secondary-btn"} onClick={() => setMultiportView(true)}>Multiport fixture removal</button></div>
     {searchReview && <div className="sparam-error" role="status"><AlertTriangle size={16} /> {searchReview}</div>}
-    <div hidden={!workflowView}><SiWorkflowWorkbench key={searchDraft?.id ?? "saved-workflow"} design={activeDesign} initialResult={searchDraft ? null : initialResult} initialStep={initialFocus === "ports" ? "endpoints" : "channel"} intentToken={intentToken} onResult={onResult} onStatus={onStatus} /></div>
-    {!workflowView && <>
+    <div hidden={!multiportView}><MultiportFixturePanel active={multiportView} onReveal={()=>setMultiportView(true)} /></div>
+    <div hidden={!workflowView || multiportView}><SiWorkflowWorkbench onReveal={() => setWorkflowView(true)} key={searchDraft?.id ?? "saved-workflow"} design={activeDesign} initialResult={searchDraft ? null : initialResult} initialStep={initialFocus === "ports" ? "endpoints" : "channel"} intentToken={intentToken} onResult={onResult} onStatus={onStatus} /></div>
+    <div hidden={workflowView || multiportView}>
     {!desktop && <p className="si-note">Geometry and protocol execution requires the SPIKE desktop app. Browser preview supports configuration and network inspection.</p>}
     <div className="sparam-commandbar"><b>{initialFocus === "crosstalk" ? "NEXT / FEXT · select an aggressor and separate victim net" : initialFocus === "pam4" ? "PAM4 channel and eye" : initialFocus === "eye" ? "NRZ channel and eye" : initialFocus === "impedance" ? "Channel impedance and TDR" : suite ? `${suite.name} preset · geometry channel` : "Geometry-derived channel"} · experimental, not signoff/compliance qualified</b></div>
     {!activeDesign ? <div className="sparam-error"><AlertTriangle size={16} /> Blocked: this project has no canonical active SpiDeR v2 record. Save or reopen a canonical project design before running geometry-derived SI.</div> : <>
-      <div className="sparam-body">
+      <SolverSetupSteps label="Geometry SI setup steps" current={setupStep} onChange={setSetupStep} steps={[
+        { id: "domain", label: "Geometry and channel", description: "Select exact signal and coupled routes from the canonical board geometry." },
+        { id: "ports", label: "Reference and ports", description: "Review the reference conductor, layer and optional explicit NEXT/FEXT source and terminations." },
+        { id: "conditions", label: "Sweep and conditions", description: "Set frequency sampling, reference impedance and reviewed modulation assumptions. This route uses bounded extraction without an independent full-wave mesh." },
+        { id: "review", label: "Review and run", description: "Run the existing experimental channel request; inspect returned errors, traces and validity limits." },
+      ]} />
+      <div className="sparam-body" data-setup-step={setupStep}>
+
         <aside>
+          <SolverSetupPanel active={setupStep === "domain"} label="SI geometry and channel">
           <h3>Canonical geometry</h3>
           <label className="setup-sublabel">Signal net<select className="select-control" value={signalNet} onChange={event => { const next = event.target.value; setSignalNet(next); setDifferentialMateNet(suggestedDifferentialMate(designNets.find(net => net.id === next), designNets)); }}><option value="">Select signal</option>{designNets.map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>{suite ? `${suite.name} candidates are prioritized; review the exact board net before running.` : "Select the exact board route to analyze."}</small></label>
           <label className="setup-sublabel">Signaling<select className="select-control" value={signaling} disabled={initialFocus === "crosstalk" || Boolean(eyeMaskProfileId)} onChange={event => setSignaling(event.target.value as "single_ended" | "differential")}><option value="single_ended">Single-ended aggressor</option><option value="differential">Differential aggressor pair</option></select></label>
           {signaling === "differential" ? <label className="setup-sublabel">Differential mate<select className="select-control" value={differentialMateNet} onChange={event => setDifferentialMateNet(event.target.value)}><option value="">Select mate (P/N)</option>{designNets.filter(net => net.id !== signalNet).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Explicit P/N mate for the bounded four-port and mixed-mode transform.</small></label> : <label className="setup-sublabel">{initialFocus === "crosstalk" ? "Victim net (required)" : "Victim net (optional)"}<select className="select-control" value={victimNet} onChange={event => setVictimNet(event.target.value)}><option value="">No separate victim</option>{designNets.filter(net => ![signalNet, referenceNet].includes(net.id)).map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select><small>Select the separate coupled-line victim for NEXT/FEXT.</small></label>}
           {(signaling === "differential" || victimNet) && <><label className="setup-sublabel">Separation variation tolerance (mm)<input value={separationToleranceMm} onChange={event => setSeparationToleranceMm(event.target.value)} inputMode="decimal" /></label><label className="setup-sublabel">Path skew tolerance (mm)<input value={skewToleranceMm} onChange={event => setSkewToleranceMm(event.target.value)} inputMode="decimal" /><small>Fail-closed bounds for the piecewise paired-route approximation.</small></label></>}
+          </SolverSetupPanel>
+          <SolverSetupPanel active={setupStep === "ports"} label="SI reference and ports">
           {signaling === "single_ended" && victimNet && <fieldset className="setup-subgroup"><legend>Loaded NEXT / FEXT voltage</legend>
             <label className="setup-sublabel"><span><input type="checkbox" checked={loadedCrosstalk} onChange={event => setLoadedCrosstalk(event.target.checked)} /> Apply explicit source and terminations</span><small>Computes victim volts from a 512-sample Thevenin pulse. Other sources are suppressed.</small></label>
             {loadedCrosstalk && <><label className="setup-sublabel">Thevenin pulse amplitude (V)<input value={crosstalkSourceV} onChange={event => setCrosstalkSourceV(event.target.value)} inputMode="decimal" /></label>
@@ -437,9 +486,11 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
           </fieldset>}
           <label className="setup-sublabel">Reference net<select className="select-control" value={referenceNet} onChange={event => setReferenceNet(event.target.value)}><option value="">Select reference</option>{designNets.map(net => <option key={net.id} value={net.id}>{net.name}</option>)}</select></label>
           <label className="setup-sublabel">Reference layer<select className="select-control" value={referenceLayer} onChange={event => setReferenceLayer(event.target.value)}><option value="">Select copper layer</option>{copperLayers.map(layer => <option key={layer.id} value={layer.id}>{layer.name}</option>)}</select></label>
+          </SolverSetupPanel>
         </aside>
         <main>
           <div className="sparam-plot-heading"><div><span className="eyebrow">BOUNDED REQUEST</span><h3>{String(activeDesign.name ?? activeDesign.design_id)}</h3></div><div><b>Qualification: false</b><span>Compliance: not evaluated</span></div></div>
+          <SolverSetupPanel active={setupStep === "conditions"} label="SI sweep and conditions">
           <div className="sparam-readout">
             <label><span>Start frequency (Hz)</span><input value={frequencyStartHz} onChange={event => setFrequencyStartHz(event.target.value)} inputMode="decimal" /></label>
             <label><span>Stop frequency (Hz)</span><input value={frequencyStopHz} onChange={event => setFrequencyStopHz(event.target.value)} inputMode="decimal" /></label>
@@ -461,10 +512,14 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
             <small>Forbidden polygons use [time_ui, voltage] vertices with implicit closure. Source locator and clause are required. A mask pass applies only to the returned sampled polylines; overall protocol compliance remains not evaluated.</small>
             {(eyeMaskProfileId || eyeMaskJson.trim()) && (() => { try { const mask = parseEyeMask(eyeMaskJson); return eyeMaskProfileId || mask?.voltage_unit === "V" ? <div className="si-eye-voltage-mapping"><label>Normalized-to-volts scale (V)<input value={eyeVoltageScale} onChange={event => setEyeVoltageScale(event.target.value)} inputMode="decimal" /></label><label>Normalized zero offset (V)<input value={eyeVoltageOffset} onChange={event => setEyeVoltageOffset(event.target.value)} inputMode="decimal" /></label><small>Required evidence mapping: V = normalized × scale + offset at 480 Mbit/s for the built-in profiles. Values are never guessed.</small></div> : <span className="si-eye-mask-ready">Normalized mask assigned</span>; } catch { return <span className="si-eye-mask-invalid">Mask JSON is not ready to run.</span>; } })()}
           </fieldset>}
+          </SolverSetupPanel>
+          <SolverSetupPanel active={setupStep === "review" || siBusy} label="SI review and run">
+          <p className="si-note">Signal {designNets.find(net => net.id === signalNet)?.name || "unassigned"}; reference {designNets.find(net => net.id === referenceNet)?.name || "unassigned"}; {frequencyPoints} requested sweep points. Execution revalidates this request.</p>
           {siBusy
             ? <button className="primary-btn" onClick={() => { void cancelLocalWorker().catch(error => setSiError(error instanceof Error ? error.message : String(error))); }}><X size={15} />Stop SI channel</button>
-            : <button className="primary-btn" disabled={!desktop} onClick={() => void runGeometryChannel()}><Play size={15} />{initialFocus === "crosstalk" ? "Run NEXT / FEXT" : initialFocus === "pam4" ? "Run PAM4 channel" : "Run experimental SI channel"}</button>}
-          {siError && <div className="sparam-error"><AlertTriangle size={16} /> {siError}</div>}
+            : <button className="primary-btn" disabled={!desktop} onClick={requestGeometryRun}><Play size={15} />{initialFocus === "crosstalk" ? "Run NEXT / FEXT" : initialFocus === "pam4" ? "Run PAM4 channel" : "Run experimental SI channel"}</button>}
+          </SolverSetupPanel>
+          {siError && <div className="sparam-error" role="alert"><AlertTriangle size={16} /> {siError}</div>}
           {suiteResult && <div className="sparam-summary"><div><span>SUITE</span><b>{String(record(suiteResult.suite).family ?? suite?.family ?? "SI")}</b></div><div><span>COMPLETED TESTS</span><b>{String(record(suiteResult.summary).completed_tests ?? 0)}</b></div><div><span>BLOCKED TESTS</span><b>{String(record(suiteResult.summary).blocked_tests ?? 0)}</b></div><div><span>COMPLIANCE</span><b>{String(suiteResult.compliance_status ?? "not_evaluated")}</b></div></div>}
           {summary && <>
             <div className="sparam-summary">
@@ -530,6 +585,6 @@ export default function SParameterWorkbench({ assemblyDesigns, canonicalDesign, 
         </main>
       </div>
     </>}
-    </>}
+    </div>
   </section></div>;
 }

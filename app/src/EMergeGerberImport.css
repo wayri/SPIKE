@@ -1,11 +1,19 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-.emerge-gerber-manager { width: min(1060px, calc(100vw - 40px)); max-height: calc(100vh - 48px); overflow: auto; min-width: 0; padding: 20px; border: 1px solid var(--spike-control-border); border-radius: 8px; background: var(--spike-table-toolbar); color: var(--spike-table-text); }
+.emerge-gerber-manager { container: emerge-gerber / inline-size; width: min(780px, calc(100vw - 40px)); max-height: calc(100vh - 48px); overflow: auto; min-width: 0; padding: 18px; border: 1px solid var(--spike-control-border); border-radius: 8px; background: var(--spike-table-toolbar); color: var(--spike-table-text); }
 .emerge-gerber-manager header, .emerge-gerber-manager header > div, .emerge-gerber-actions, .emerge-gerber-layer-title, .emerge-gerber-manager footer { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .emerge-gerber-manager header, .emerge-gerber-manager footer { justify-content: space-between; }
 .emerge-gerber-manager h2 { margin: 0; font-size: 19px; }
+.emerge-gerber-manager > header > button { margin-left: auto; flex: 0 0 auto; }
 .emerge-gerber-manager p, .emerge-gerber-manager small { font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.emerge-gerber-intro { max-width: 78ch; margin-bottom: 6px; }
 .emerge-gerber-manager small { display: block; margin: 8px 0; }
 .emerge-gerber-actions, .emerge-gerber-layer-title { flex-wrap: wrap; }
+.emerge-gerber-content { min-width: 0; }
+.emerge-gerber-manager .solver-setup-steps { margin-block: 8px 12px; padding-bottom: 10px; }
+.emerge-gerber-manager .solver-setup-steps ol { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.emerge-gerber-manager .solver-setup-steps nav button { min-height: 34px; padding: 5px 7px; }
+.emerge-gerber-manager .solver-step-description { margin-block: 7px 8px; }
+.emerge-gerber-manager .solver-step-navigation { display: none; }
 .emerge-gerber-fields { margin: 14px 0; padding: 12px; border: 1px solid var(--spike-control-border); min-width: 0; }
 .emerge-gerber-fields legend { padding: 0 6px; font-size: 13px; }
 .emerge-gerber-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; min-width: 0; }
@@ -20,9 +28,65 @@
 .emerge-gerber-file:has(input:disabled) { opacity: .5; pointer-events: none; }
 .emerge-gerber-manager footer { flex-wrap: wrap; margin-top: 16px; }
 .emerge-gerber-manager footer span { flex: 1 1 240px; font-size: 12px; }
-.emerge-gerber-error { border-left: 3px solid var(--spike-control-focus); padding: 8px; }
+.emerge-gerber-error { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-left: 3px solid var(--spike-control-focus); padding: 8px; }
+.emerge-gerber-error > button { margin-left: auto; }
+.emerge-gerber-navigation { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.emerge-gerber-navigation b { min-width: 68px; text-align: center; font-size: 10px; color: var(--spike-control-muted); }
+.emerge-gerber-manager :is(.emerge-gerber-actions,.emerge-gerber-navigation,.emerge-gerber-layer-title) :is(button,.secondary-btn),
+.emerge-gerber-manager button.emerge-gerber-import { width: auto; max-width: 100%; min-height: 32px; padding-inline: 10px; white-space: normal; text-align: center; }
+.emerge-gerber-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 2px 0 12px; }
+.emerge-gerber-summary > div { display: grid; gap: 3px; min-width: 0; padding: 9px 10px; border: 1px solid var(--spike-control-border); border-radius: 6px; background: var(--spike-control-field); }
+.emerge-gerber-summary span { color: var(--spike-control-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.emerge-gerber-summary b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+.emerge-gerber-provenance { padding: 8px 10px; border-left: 2px solid var(--spike-control-border); color: var(--spike-control-muted); }
+.emerge-gerber-import { margin-top: 4px; }
 .emerge-native-source { border: 1px solid var(--spike-control-border); padding: 10px; margin: 10px 0; min-width: 0; }
 .emerge-native-source ul { padding-left: 18px; overflow-wrap: anywhere; }
 .emerge-board-terminals { border: 0; margin: 0; padding: 0; min-width: 0; }
 .wizard-section [hidden] { display: none; }
 @media (max-width: 680px) { .emerge-gerber-manager { width: calc(100vw - 20px); padding: 12px; max-height: calc(100vh - 20px); } .emerge-gerber-grid { grid-template-columns: minmax(0, 1fr); } .emerge-gerber-manager header h2 { font-size: 16px; } }
+@container emerge-gerber (max-width: 560px) {
+  .emerge-gerber-manager .solver-setup-steps ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .emerge-gerber-summary { grid-template-columns: minmax(0, 1fr); }
+  .emerge-gerber-manager footer { align-items: stretch; }
+  .emerge-gerber-navigation { width: 100%; justify-content: space-between; }
+}
+
+/* Keep the task location and navigation in view; only the current step scrolls. */
+.emerge-gerber-manager { display:flex;flex-direction:column;box-sizing:border-box;height:min(780px,calc(100vh - 48px));overflow:hidden; }
+.focus-tool-content .emerge-gerber-manager { height:100%!important;max-height:100%!important; }
+.emerge-gerber-manager > :is(header,p,.solver-setup-steps,footer) { flex:none; }
+.emerge-gerber-content { flex:1;min-height:0;overflow:auto;overscroll-behavior:contain; }
+.emerge-gerber-manager > footer { border-top:1px solid var(--spike-table-border);padding-top:10px;margin-top:10px; }
+/* A wide editor slot is not a reason to stretch its setup form or actions. */
+.focus-tool-content > .modal-shade > .emerge-gerber-manager.emerge-gerber-manager {width:min(100%,960px)!important;max-width:960px!important;}
+.emerge-gerber-manager .emerge-gerber-content {width:100%;max-width:920px;align-self:flex-start;}
+.emerge-gerber-manager > :is(header,.solver-setup-steps,footer),.emerge-gerber-manager > p {width:100%;max-width:920px;box-sizing:border-box;}
+.emerge-gerber-manager header h2 {font-size:17px;line-height:1.35;}
+.emerge-gerber-manager .emerge-gerber-grid {grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),220px));justify-content:start;gap:12px 16px;}
+.emerge-gerber-manager .emerge-gerber-grid label {align-content:start;gap:5px;font-weight:500;line-height:1.4;}
+.emerge-gerber-manager .emerge-gerber-grid :is(input,select) {height:32px;font-size:12px;}
+.emerge-gerber-manager .emerge-gerber-section-title {display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:100%;margin:0 0 12px;padding:0 4px;font-size:13px;font-weight:650;line-height:1.4;}
+.emerge-gerber-manager legend.emerge-gerber-section-title {width:auto;max-width:100%;padding-inline:6px;margin-bottom:0;}
+.emerge-gerber-manager .emerge-gerber-package {padding:12px;margin-bottom:14px;border:1px solid var(--spike-control-border);border-radius:5px;}
+.emerge-gerber-manager .emerge-gerber-fields {padding:14px;margin:0 0 16px;border-radius:5px;}
+.emerge-gerber-manager .emerge-gerber-layer,.emerge-gerber-manager .emerge-gerber-port {padding:12px;margin:10px 0;border:1px solid var(--spike-table-border);border-radius:4px;background:var(--spike-table-surface);}
+.emerge-gerber-manager :is(button,.emerge-gerber-file) {width:auto;min-height:30px;max-width:100%;flex:0 0 auto;align-self:start;justify-self:start;margin:0;padding:5px 9px;font:12px/1.35 "Segoe UI Variable Text",system-ui,sans-serif;box-sizing:border-box;}
+.emerge-gerber-manager .emerge-gerber-file {width:fit-content;display:inline-flex;white-space:normal;}
+.emerge-gerber-manager .emerge-gerber-layer-title {display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:8px;}
+.emerge-gerber-manager .emerge-gerber-layer-title span {min-width:0;font-size:11px;}
+.emerge-gerber-manager .emerge-gerber-actions {gap:8px;}
+.emerge-gerber-manager .emerge-gerber-navigation {justify-content:flex-end;}
+.emerge-gerber-manager .section-help-button {align-self:center;justify-self:end;flex:none;}
+@container emerge-gerber (max-width:540px) {
+ .emerge-gerber-manager .emerge-gerber-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+ .emerge-gerber-manager .emerge-gerber-layer-title {grid-template-columns:auto minmax(0,1fr);}
+ .emerge-gerber-manager .emerge-gerber-layer-title .emerge-gerber-file {grid-column:1/-1;}
+ .emerge-gerber-manager header > div {flex-wrap:wrap;gap:6px;}
+}
+@container emerge-gerber (max-width:340px) {.emerge-gerber-manager .emerge-gerber-grid {grid-template-columns:minmax(0,1fr);}}
+.emerge-gerber-manager .emerge-gerber-bounds-heading {margin-top:16px;max-width:460px;}
+.emerge-gerber-manager .emerge-gerber-bounds {grid-template-columns:repeat(2,minmax(0,220px));}
+.emerge-gerber-manager .solver-setup-steps ol {grid-template-columns:repeat(4,minmax(0,140px));gap:8px;}
+@container emerge-gerber (max-width:540px) {.emerge-gerber-manager .solver-setup-steps ol {grid-template-columns:repeat(2,minmax(0,1fr));}}
+@container emerge-gerber (max-width:340px) {.emerge-gerber-manager .emerge-gerber-bounds {grid-template-columns:minmax(0,1fr);}}

@@ -10,6 +10,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import uuid
 import zipfile
 from dataclasses import asdict, dataclass, field
@@ -546,6 +547,25 @@ def _extract_zip(package: Path, destination: Path) -> None:
                 raise ValueError(f"Extension archive member size is inconsistent: {name}")
 
 
+def _rename_extension_directory(source: Path, destination: Path) -> None:
+    """Atomically move to an absent destination; bound transient Windows denials.
+
+    Windows rename refuses an existing destination (unlike replace), including
+    one created during a retry delay. Never retry unrelated errors or conceal
+    an exhausted denial. This does not infer what caused a sharing/access error.
+    """
+    for attempt in range(3):
+        if os.path.lexists(destination):
+            raise FileExistsError(f"Extension move destination already exists: {destination}")
+        try:
+            os.rename(source, destination)
+            return
+        except OSError as exc:
+            if sys.platform != "win32" or getattr(exc, "winerror", None) not in (5, 32, 33) or attempt == 2:
+                raise
+            time.sleep(.05 * (attempt + 1))
+
+
 class ExtensionPackageManager:
     """Install and remove only bounded local extension packages owned by SPIKE."""
 
@@ -612,8 +632,8 @@ class ExtensionPackageManager:
                 ProcessExtension(manifest, stage, False)
                 if destination.exists():
                     backup = self.install_root / f".replace-{manifest.id}-{uuid.uuid4().hex}"
-                    os.replace(destination, backup)
-                os.replace(stage, destination)
+                    _rename_extension_directory(destination, backup)
+                _rename_extension_directory(stage, destination)
                 stage = None
                 if backup is not None:
                     shutil.rmtree(backup, ignore_errors=True)
@@ -628,7 +648,7 @@ class ExtensionPackageManager:
                 }
             except Exception:
                 if backup is not None and backup.exists() and not destination.exists():
-                    os.replace(backup, destination)
+                    _rename_extension_directory(backup, destination)
                 raise
             finally:
                 if stage is not None and stage.exists():
@@ -644,7 +664,7 @@ class ExtensionPackageManager:
         if receipt is None:
             raise PermissionError("Only extensions installed by SPIKE's extension manager can be removed.")
         tombstone = self.install_root / f".remove-{extension_id}-{uuid.uuid4().hex}"
-        os.replace(destination, tombstone)
+        _rename_extension_directory(destination, tombstone)
         # The rename removes the extension from discovery atomically. A locked
         # file may leave an inert tombstone for a later cleanup, but must not
         # restore a partially deleted executable package.

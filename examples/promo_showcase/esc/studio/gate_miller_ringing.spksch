@@ -1,0 +1,510 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "eeae73a8c66c46b09ea97fcb9d7fbe84",
+  "title": "Linear gate-loop resonance and drain-to-gate capacitive injection",
+  "source": ".title Linear gate-loop resonance and drain-to-gate capacitive injection\nVgate command 0 PULSE(0 12 100n 10n 10n 400n 1u)\nRdriver command gate_lead 2\nLpackage gate_lead gate 20n\nCgs gate 0 2n\nCgd gate drain 100p\nVdrain drain 0 PULSE(72 0 200n 5n 5n 400n 1u)\nRleak gate 0 1G\n.tran 1n 3u uic\n.end\n",
+  "components": [
+    {
+      "id": "27e91bd5f3f54550ab02f8e966a7fd4b",
+      "ref": "VGATE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "command",
+        "0"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "254fcf1bde1c422f804e860c29033d67",
+      "ref": "RDRIVER",
+      "kind": "resistor",
+      "value": "2",
+      "nodes": [
+        "command",
+        "gate_lead"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "50f3d1f3c6e448fd98b8799e723a51a8",
+      "ref": "LPACKAGE",
+      "kind": "inductor",
+      "value": "2e-08",
+      "nodes": [
+        "gate_lead",
+        "gate"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "615279ea2545465990c781391ba0b33b",
+      "ref": "CGS",
+      "kind": "capacitor",
+      "value": "2e-09",
+      "nodes": [
+        "gate",
+        "0"
+      ],
+      "x": 740,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "866491822e18492194fb64401d59af2c",
+      "ref": "CGD",
+      "kind": "capacitor",
+      "value": "1e-10",
+      "nodes": [
+        "gate",
+        "drain"
+      ],
+      "x": 140,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "26c04b5bdcd845a488a584c9e79c68d6",
+      "ref": "VDRAIN",
+      "kind": "voltage_source",
+      "value": "72",
+      "nodes": [
+        "drain",
+        "0"
+      ],
+      "x": 340,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "59366c1c8b5648d4b9a27818540bb4cf",
+      "ref": "RLEAK",
+      "kind": "resistor",
+      "value": "1000000000",
+      "nodes": [
+        "gate",
+        "0"
+      ],
+      "x": 540,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    }
+  ],
+  "probes": [
+    {
+      "id": "26839b758ae7405888a2717bb8b010fc",
+      "expression": "V(gate)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(gate)",
+        "quantity": "node_voltage",
+        "targets": [
+          "gate"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "38da9c521dfd416eb9e68093f6c9c161",
+      "expression": "V(drain)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(drain)",
+        "quantity": "node_voltage",
+        "targets": [
+          "drain"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "b494a5b2ce514bcd93893225ca5b2487",
+      "expression": "I(Lpackage)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "I(Lpackage)",
+        "quantity": "element_current",
+        "targets": [
+          "LPACKAGE"
+        ],
+        "unit": "A"
+      }
+    }
+  ],
+  "expressions": [],
+  "metadata": {
+    "example_limitations": "Explicit ideal supplied excitation, linear sensing or gate RLC; no vendor transistor, ADC, commutation, switching-loss, field or thermal coupling."
+  },
+  "revision": 12,
+  "wires": [
+    {
+      "id": "ac1b0ff492324905aa94805a2eafedc1",
+      "a": [
+        "27e91bd5f3f54550ab02f8e966a7fd4b",
+        0
+      ],
+      "b": [
+        "254fcf1bde1c422f804e860c29033d67",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 1
+    },
+    {
+      "id": "3b9d6c2790064275ab1641324dbdf9ac",
+      "a": [
+        "27e91bd5f3f54550ab02f8e966a7fd4b",
+        1
+      ],
+      "b": [
+        "615279ea2545465990c781391ba0b33b",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 2
+    },
+    {
+      "id": "8f015b9e987744dca6971312c5c764a8",
+      "a": [
+        "27e91bd5f3f54550ab02f8e966a7fd4b",
+        1
+      ],
+      "b": [
+        "26c04b5bdcd845a488a584c9e79c68d6",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 3
+    },
+    {
+      "id": "87ae15041c3c4dfa9e382d443425c36f",
+      "a": [
+        "27e91bd5f3f54550ab02f8e966a7fd4b",
+        1
+      ],
+      "b": [
+        "59366c1c8b5648d4b9a27818540bb4cf",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 4
+    },
+    {
+      "id": "1265b096fd8c4627851e58a7b2973803",
+      "a": [
+        "254fcf1bde1c422f804e860c29033d67",
+        1
+      ],
+      "b": [
+        "50f3d1f3c6e448fd98b8799e723a51a8",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 5
+    },
+    {
+      "id": "4f1dec593219453eb738ebab6ae9961d",
+      "a": [
+        "50f3d1f3c6e448fd98b8799e723a51a8",
+        1
+      ],
+      "b": [
+        "615279ea2545465990c781391ba0b33b",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 6
+    },
+    {
+      "id": "ac32bada7c6f445c9e5322a0232b0ec8",
+      "a": [
+        "50f3d1f3c6e448fd98b8799e723a51a8",
+        1
+      ],
+      "b": [
+        "866491822e18492194fb64401d59af2c",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 7
+    },
+    {
+      "id": "3859f41439194410b4b52e7ee23cc3ae",
+      "a": [
+        "50f3d1f3c6e448fd98b8799e723a51a8",
+        1
+      ],
+      "b": [
+        "59366c1c8b5648d4b9a27818540bb4cf",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 8
+    },
+    {
+      "id": "5821a781edae48f0ba59394ea3e9e9b9",
+      "a": [
+        "866491822e18492194fb64401d59af2c",
+        1
+      ],
+      "b": [
+        "26c04b5bdcd845a488a584c9e79c68d6",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 9
+    }
+  ],
+  "junctions": [],
+  "labels": [],
+  "power_symbols": [],
+  "model_policy": {
+    "schematic": {
+      "tier": "source",
+      "enforce": false
+    },
+    "subsheets": {},
+    "components": {}
+  },
+  "simulation_sequences": [],
+  "annotations": [],
+  "dashboard": {
+    "version": 1,
+    "widgets": [
+      {
+        "id": "6d5b1554bc5f4845bc0174ebbfef7322",
+        "kind": "Scope",
+        "title": "V(gate)",
+        "expression": "V(gate)",
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "8e41c783a1644bd6a734045f4267bb8c",
+        "kind": "Scope",
+        "title": "V(drain)",
+        "expression": "V(drain)",
+        "x": 500,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "42d50a079655423abd051a26c94491c0",
+        "kind": "Scope",
+        "title": "I(Lpackage)",
+        "expression": "I(Lpackage)",
+        "x": 1000,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "285a7c8f62504ec2a3422e675d084665",
+        "kind": "Note",
+        "title": "Model scope",
+        "expression": "Original illustrative sensing/linear transient, not VESC firmware or a qualified three-phase motor controller.",
+        "x": 0,
+        "y": 300,
+        "width": 900,
+        "height": 160,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      }
+    ]
+  },
+  "thermal_setup": {
+    "contract": "spikes/thermal-setup/v1",
+    "solver_binding": "not_coupled",
+    "board": {
+      "length_mm": 100.0,
+      "width_mm": 80.0,
+      "thickness_mm": 1.6,
+      "material": "FR4 (assumption)",
+      "orientation": "horizontal",
+      "layers": [
+        {
+          "name": "L1",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L2",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L3",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L4",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        }
+      ]
+    },
+    "enclosure": {
+      "type": "open_air",
+      "material": "Unspecified",
+      "length_mm": 150.0,
+      "width_mm": 120.0,
+      "height_mm": 50.0,
+      "wall_mm": 2.0,
+      "vent_area_mm2": 0.0
+    },
+    "environment": {
+      "ambient_c": 25.0,
+      "airflow": "natural",
+      "air_speed_m_s": 0.0,
+      "direction": "parallel_to_board",
+      "convection_w_m2k": null,
+      "altitude_m": 0.0
+    },
+    "notes": "Initial authoring assumptions; replace with actual board/environment data."
+  },
+  "run_profile": {
+    "contract": "spikes/run-profile/v1",
+    "name": "Default",
+    "backend": "native",
+    "execution": "batch",
+    "analysis": "from_netlist",
+    "time_step": "10u",
+    "stop_time": "5m",
+    "uic": true,
+    "method": "hybrid_trapezoidal",
+    "capture_samples": 20000,
+    "speed_ratio": 1.0,
+    "electrical_temperature_c": null
+  },
+  "plot_layout": {
+    "mode": "units",
+    "panes": {},
+    "heights": {}
+  },
+  "instruments": [],
+  "controller_setup": null,
+  "controller_boards": [],
+  "power_tree": {
+    "contract": "spikes/power-tree/v1",
+    "stages": []
+  },
+  "analytics_extensions": [],
+  "directives": [
+    {
+      "id": "11e4a1d701bd44448ad03d99ee0ebea8",
+      "group": "Simulation",
+      "title": "",
+      "visible": true,
+      "x": 100.0,
+      "y": 420.0,
+      "text": ".tran 1n 3u uic",
+      "enabled": true,
+      "line": 9,
+      "end_line": 9
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "purpose": "Requested future full-drone integration case; NOT an executable SPIKE solver request",
+  "execution_status": "blocked",
+  "vehicle": "IRIS PCB flight-controller and four integrated ESCs",
+  "source_revision": "999dd2eb725d550889c1ffe2c09f8de0390d081b",
+  "geometry": {
+    "coordinate_unit": "mm",
+    "flight_volume_min": [-1000, -1000, 0],
+    "flight_volume_max": [1000, 1000, 1500],
+    "flight_volume_stl": "flight_volume_mm.stl",
+    "meaning": "2 x 2 x 1.5 metre geometric envelope only; neither meshed flow nor a flight constraint",
+    "requested_boundary_kind": "closed stationary room, no-slip walls; not yet admitted or solved"
+  },
+  "source_BOM_facts": {
+    "battery": "1000 mAh 2S LiPo",
+    "motors": "4 x 8000 kV 1103 BLDC",
+    "propellers": "Gemfan 2512, 2.5 inch, three blades, 2CW + 2CCW"
+  },
+  "required_missing_inputs": {
+    "mass_kg": null,
+    "centre_of_mass_m": null,
+    "inertia_tensor_kg_m2": null,
+    "motor_phase_resistance_ohm": null,
+    "motor_phase_inductance_h": null,
+    "back_emf_torque_constant_and_convention": null,
+    "propeller_thrust_torque_maps_and_validity": null,
+    "blade_geometry_and_redistribution_rights": null,
+    "battery_impedance_discharge_model": null,
+    "sensor_timing_noise_and_flight_controller_interface": null
+  },
+  "required_missing_implemented_coupling": [
+    "Four ESC/BLDC shaft states and aerodynamic load feedback",
+    "Moving rotating propeller flow and conservative force/torque transfer",
+    "6-DOF flight dynamics, room-boundary handling and controller sensor feedback",
+    "Clocked firmware execution and synchronized electrical/aero/thermal histories"
+  ],
+  "initial_flight_state": null,
+  "trajectory": null,
+  "rotor_airflow_result": null
+}

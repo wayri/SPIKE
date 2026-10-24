@@ -32,6 +32,7 @@ from .si_channel import (
     _ordered_open_path,
     _validate_channel_request,
     _reference_zone_covers_path,
+    _reference_zones_for_request,
     _selector,
     normalized_nrz_eye,
     time_domain_report,
@@ -336,12 +337,7 @@ def extract_coupled_path_rlgc(
     signal_layer = _selector(signal_tracks[0].layer_id, design.layers, "Signal layer")
     if signal_layer.id == reference_layer.id or reference_layer.layer_type != "copper":
         raise SiChannelError("The reference layer must be a distinct copper layer.")
-    reference_zones = [
-        zone for zone in design.zones
-        if zone.net_id == reference.id and reference_layer.id in zone.layer_ids
-    ]
-    if len(reference_zones) != 1:
-        raise SiChannelError("The bounded coupled channel requires exactly one reference zone.")
+    reference_zones, omitted_reference_zones = _reference_zones_for_request(design, reference, reference_layer, request)
     for tracks in (signal_tracks, victim_tracks):
         if not _reference_zone_covers_path(reference_zones[0], tracks):
             raise SiChannelError("Both projected trace footprints must be fully covered by the reference zone.")
@@ -369,7 +365,7 @@ def extract_coupled_path_rlgc(
     conductivity = float(conductor.conductivity_s_per_m or 0.0) if conductor else 0.0
     thickness_m = float(signal_layer.thickness_mm or 0.0) * 1e-3
     height_m = abs(float(reference_layer.z_mm) - float(signal_layer.z_mm)) * 1e-3
-    if conductivity <= 0 or thickness_m <= 0 or height_m <= 0:
+    if not all(isfinite(value) and value > 0 for value in (conductivity, thickness_m, height_m)):
         raise SiChannelError("Conductor conductivity/thickness and reference spacing must be positive.")
 
     requested_cells = int(request.get("cross_section_vertical_cells", 24))
@@ -415,6 +411,17 @@ def extract_coupled_path_rlgc(
         "signal_track_ids": [track.id for track in signal_tracks],
         "victim_track_ids": [track.id for track in victim_tracks],
         "reference_zone_id": reference_zones[0].id,
+        "material_parameters_digest": _canonical_digest({
+            "signal_material_id": signal_layer.material_id,
+            "conductivity_s_per_m": conductivity,
+            "dielectric_material_ids": [layer.material_id for layer in dielectric_layers],
+            "relative_permittivity": epsilon_r, "loss_tangent": loss_tangent,
+            "loss_tangent_known": loss_known,
+            "loss_model": validate_loss_model(request.get("loss_model")),
+        }),
+        "declared_material_scenario_context_digest": _canonical_digest(design.metadata.get("spike.si_material_scenario")),
+        "reference_zone_selection": "explicit" if "reference_zone_id" in request else "unique_retained_zone",
+        "omitted_reference_zone_ids": omitted_reference_zones,
         "length_m": line_geometry["length_mm"] * 1e-3,
         "signal_width_m": widths_m[0],
         "victim_width_m": widths_m[1],
@@ -467,6 +474,7 @@ def extract_coupled_path_rlgc(
             "compliance_ready": False,
         },
         "limitations": [
+            *(["Other retained reference zones are omitted from this selected-plane approximation; no multi-zone return-current extraction is claimed."] if omitted_reference_zones else []),
             "two straight parallel coextensive planar traces only" if path_mode == "strict_uniform" else "piecewise planar paired traces with bounded separation/skew variation only",
             "single homogeneous dielectric and simple continuous reference polygon",
             "finite cross-section truncation with natural outer boundaries",

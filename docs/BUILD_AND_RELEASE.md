@@ -1,5 +1,22 @@
 # Building SPIKE
 
+The 0.4.0-alpha.1 EMerge/AC/thermal integration is described in
+[its source/frozen-worker evidence record](validation/EMERGE_RELEASE_INTEGRATION_20261023.md).
+For an isolated verified worker build that preserves the current bundled worker:
+`python scripts/build_packaged_worker.py --candidate-root build/<new-candidate>`.
+The candidate directory must be fresh and inside build/. Normal release builds
+also execute the new co-simulation probe and retain it in the worker manifest.
+Building this candidate does not update published installers or qualify a release.
+
+To stage a separately verified worker without replacing the current bundled
+copy, `scripts/prepare_release_resources.py` accepts `--worker-root`,
+`--stage-root build/<fresh-stage>` and `--config-output build/<config>.json`.
+Custom stages must be fresh. Member integrity is checked before and after copy;
+safe nested qualification-report paths are preserved. The existing installer
+can consume that config with `-SkipWorker` because the worker has already been
+built and verified; retain its tests (do not add `-SkipTests`). This is a preview
+build workflow, not permission to bypass production signing or qualification.
+
 GitHub Actions builds the Windows x64 installer, Linux x86-64 Flatpak, and macOS
 DMGs for Apple Silicon and Intel. Each platform builds on a runner with the
 matching operating system and architecture. Linux builds use the GNOME 50
@@ -61,6 +78,38 @@ The current Windows installer is unsigned. macOS packages are ad-hoc signed
 without Apple notarization. Linux and macOS outputs remain experimental.
 Optional external engines are installed separately.
 
+## Linux and macOS candidate verification
+
+Run the native Unix workflow on the intended release branch:
+
+```sh
+gh workflow run unix-release.yml --repo wayri/SPIKE --ref codex/release-v0.4.1 -f platform=all
+```
+
+| Target | Native runner | Package |
+| --- | --- | --- |
+| Linux x86-64 | Ubuntu 24.04 | Flatpak with GNOME 50 runtime |
+| macOS Apple silicon | macOS 15 ARM64 | Experimental DMG |
+| macOS Intel | macOS 15 x86-64 | Experimental DMG |
+
+The Unix circuit worker records the actual pip installation transaction and its
+SHA-256 instead of naming the Windows dependency lock. This report identifies
+what that transaction installed; it is not a complete environment lock.
+
+Before packaging, verify every main-worker and circuit-worker member against
+its manifest, execute the supervised circuit smoke case, and verify the bytes
+again after execution. macOS also checks the final signed app and the copy
+installed from the mounted DMG. Signing must not silently invalidate worker
+manifests. The installed CLI, reinstall/removal and desktop process survival
+checks run on each native target. Process survival does not establish rendered
+frontend readiness or visual acceptance.
+
+Package artifacts and SHA-256 sidecars are retained for 14 days. Separate
+`qualification-<runner>` artifacts retain dependency installation, platform,
+source-commit and payload-verification evidence for 30 days. Download and retain
+both when reviewing a candidate. A successful workflow does not replace the
+required knowledgeable human numerical review or desktop visual acceptance.
+
 ## Local builds
 
 The GitHub workflows call the same checked-in scripts used for local builds:
@@ -89,3 +138,29 @@ Windows CI now explicitly builds with `custom-protocol` and requires the fixed
 inert native panel qualification to finish, with the development server absent.
 Process survival alone is not frontend readiness. This check does not run the
 normal workspace, a solver, or a clean-machine installer acceptance campaign.
+
+
+### macOS 0.4.1 experimental circuit supervision
+
+The 0.4.1 macOS recipe explicitly selects `darwin_sampled_rss` for its dedicated
+circuit-worker qualification probe. This observes process-group resident memory;
+it is **not a hard memory cap**. API callers retain `strict_address_space` by
+default. See [ADR 0143](adr/0143-explicit-macos-sampled-memory-policy.md) for
+selection, limits and recovery. The signed package manifest and installed
+qualification report must agree on `release_supervision`; an omitted policy,
+false hard-cap claim or failed observation cannot pass qualification.
+
+```sh
+python scripts/verify_unix_release_payload.py \
+  --resources /Applications/SPIKE.app/Contents/Resources \
+  --resource-policy darwin_sampled_rss --output macos-payload.json
+```
+
+The DMG includes `EXPERIMENTAL-RESOURCE-POLICY.json` beside the app. Both Mac
+architectures still require native mounted/copied-app verification, CLI checks,
+startup and reinstall/removal evidence. Ad-hoc signing is not notarization.
+
+The native Mac lifecycle also runs the installed CLI with network operations
+explicitly denied by `sandbox-exec`. A loopback-bind denial first checks that
+the offline test boundary is active. This is a test wrapper only; it does not
+change the distributed app's permissions or imply a security sandbox for jobs.

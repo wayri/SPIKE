@@ -257,3 +257,12 @@ a seven-frequency KiCad antenna fixture completed with EMerge 3.0.0a19;
 those runs establish execution, not physical accuracy. A knowledgeable human
 must review numerical behavior before release. EMerge's license and runtime
 dependencies require separate review before redistribution.
+
+An experimental internal [sampled circuit and resistor-thermal bridge](../../docs/EMERGE_COSIMULATION.md)
+now preserves bound EMerge networks for owned AC/rational consumers. It requires
+explicit RMS power-wave and terminal/reference-plane declarations. Only known
+external series-resistor heat maps to retained thermal cells; radiation or
+unclassified EM power is not heat. Fresh field calibration, EM-body heating,
+live SPICE execution and general feedback remain pending. The current release
+source adds explicit worker/CLI routes and a draft export plus guarded Python
+Workspace runners; it does not advertise general qualified EM/thermal coupling.

@@ -36,7 +36,7 @@ export type SiProtocolSuite = {
   revision: string;
   description: string;
   signaling: "single_ended" | "differential" | "parallel_bus" | "mixed";
-  encoding: "NRZ" | "PAM4" | "mixed" | "user_defined";
+  encoding: "NRZ" | "PAM3" | "PAM4" | "mixed" | "user_defined";
   topology: string[];
   requiredInputs: string[];
   analyses: SiProtocolAnalysis[];
@@ -115,6 +115,10 @@ const suite = (
 });
 
 export const builtinSiProtocolSuites: SiProtocolSuite[] = [
+  suite("spike.si.lpddr", "LPDDR", "DDR", "Dedicated low-power memory setup; exact generation, I/O models, read/write topology and strobe timing must be supplied. No generation-specific limits are inferred.", "parallel_bus", "user_defined", ["controller", "package", "DQ and DQS", "CA and CK", "memory devices", "terminations"], ["LPDDR generation/revision", "pin/byte/strobe mapping", "read/write direction", "stackup", "I/O and package models", "authorized timing limits"], MEMORY, source("JEDEC low-power memory specifications", "https://www.jedec.org/standards-documents")),
+  suite("spike.si.dpi", "Parallel DPI", "MIPI", "Parallel display-pixel interface, distinct from DisplayPort and DSI. Per-lane screening is not clock-relative setup/hold verification.", "parallel_bus", "user_defined", ["display controller", "RGB data bus", "pixel clock", "sync and enable", "display receiver"], ["interface revision", "voltage and pin mapping", "edge rates", "I/O and package models", "pixel-clock relationship", "receiver timing limits"], CHANNEL.filter(item => item.id !== "mode_conversion"), source("MIPI display interface catalog", "https://www.mipi.org/current-specifications")),
+  suite("spike.si.usb3", "USB 3.x", "USB", "Explicit NRZ USB 3.x channel setup, not USB4 v2 PAM3 or a compliance claim.", "differential", "NRZ", ["host", "package", "board", "connector and cable", "device"], ["exact USB revision/rate", "lane/port map", "Tx/Rx models", "cable and package models", "authorized electrical limits"], CHANNEL, source("USB-IF specifications", "https://www.usb.org/documents")),
+  suite("spike.si.usb4-v2-pam3", "USB4 v2 PAM3", "USB", "PAM3 vocabulary and topology only. Numerical execution is explicitly unsupported until a verified three-level engine exists; NRZ/PAM4 is not substituted.", "differential", "PAM3", ["host", "package", "board", "connector and cable", "device"], ["exact USB4 revision/mode", "lane mapping", "PAM3 Tx/Rx models", "clock recovery and training", "authorized limits"], CHANNEL.map(item => item.id === "topology" ? item : blocked(item.id, item.name, ...item.requiredCapabilities, "pam3_execution")), source("USB-IF USB4 v2 specification access", "https://www.usb.org/document-library/usb4r-specification-v20")),
   suite("spike.si.ddr", "DDR / LPDDR", "DDR", "Parallel memory-channel setup for DQ, DQS, CK, command/address, package, termination and timing review.", "parallel_bus", "NRZ", ["controller", "package", "fly-by or point-to-point bus", "memory devices", "terminations"], ["stackup", "pin/lane map", "IBIS or measured models", "package models", "licensed limits"], MEMORY, source("JEDEC DDR and LPDDR family", "https://www.jedec.org/standards-documents")),
   suite("spike.si.gddr", "GDDR", "GDDR", "Graphics-memory channel setup with per-lane package/board topology and simultaneous-switching review.", "parallel_bus", "NRZ", ["graphics controller", "package escapes", "point-to-point memory lanes", "memory devices"], ["stackup", "lane map", "package models", "I/O models", "licensed limits"], MEMORY, source("JEDEC GDDR family", "https://www.jedec.org/standards-documents")),
   suite("spike.si.hbm", "HBM", "HBM", "Interposer/package-aware wide-memory interface setup; 2.5D/3D package extraction remains solver-gated.", "parallel_bus", "NRZ", ["logic die", "interposer", "stacked memory", "micro-bump ports"], ["interposer geometry", "package stack", "port map", "I/O models", "licensed limits"], MEMORY, source("JEDEC HBM family", "https://www.jedec.org/standards-documents")),
@@ -146,6 +150,7 @@ export function validateSiProtocolSuite(value: unknown): string[] {
   if (!suite.name?.trim()) errors.push("name is required.");
   if (!suite.revision?.trim()) errors.push("revision is required.");
   if (!suite.description?.trim()) errors.push("description is required.");
+  if (!["NRZ", "PAM3", "PAM4", "mixed", "user_defined"].includes(suite.encoding ?? "")) errors.push("encoding is unsupported.");
   if (!Array.isArray(suite.topology) || !suite.topology.length || suite.topology.length > 64) errors.push("topology must contain 1-64 entries.");
   if (!Array.isArray(suite.requiredInputs) || !suite.requiredInputs.length || suite.requiredInputs.length > 64) errors.push("requiredInputs must contain 1-64 entries.");
   if (!Array.isArray(suite.analyses) || !suite.analyses.length || suite.analyses.length > 32) errors.push("analyses must contain 1-32 entries.");

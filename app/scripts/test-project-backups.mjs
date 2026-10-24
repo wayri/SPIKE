@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import ts from 'typescript';
+import vm from 'node:vm';
+import {importTestTypescript} from './import-test-typescript.mjs';
+const {ProjectBackupScheduler}=await importTestTypescript('projectBackupScheduler');
+const {loadAppSettings,DEFAULT_SETTINGS,saveAppSettings}=await importTestTypescript('appSettings');
+let stored=null;globalThis.localStorage={getItem:()=>stored,setItem:(_,v)=>stored=v};
+assert.equal(loadAppSettings().autoBackupEnabled,true);
+for(const [input,enabled,minutes] of [[{autosaveMinutes:0},false,5],[{autosaveMinutes:10},true,10],[{autoBackupEnabled:false,autoBackupMinutes:15},false,15],[{autoBackupMinutes:-5},true,5]]){stored=JSON.stringify(input);assert.equal(loadAppSettings().autoBackupEnabled,enabled);assert.equal(loadAppSettings().autoBackupMinutes,minutes);}
+saveAppSettings({...DEFAULT_SETTINGS,autoBackupMinutes:60});assert.equal(loadAppSettings().autoBackupMinutes,60);
+let current={key:'A',revision:1,dirty:true,hasWork:true},writes=0,events=[],fail=false,wait=null;
+const record={id:'one',path:'recovery.spike',created_at:new Date().toISOString(),bytes:1,session_id:'A',project_name:'test'};
+const scheduler=new ProjectBackupScheduler(()=>current,async()=>{writes++;if(fail)throw Error('disk full');if(wait)await wait;return record;},e=>events.push(e));
+assert.equal(await scheduler.tick(),true);assert.equal(current.dirty,true);assert.equal(await scheduler.tick(),false);assert.equal(writes,1);
+current={...current,revision:2,pausedReason:'busy'};assert.equal(await scheduler.tick(),false);assert.equal(writes,1);
+current={...current,pausedReason:undefined};fail=true;assert.equal(await scheduler.tick(),false);assert.equal(events.at(-1).phase,'error');fail=false;assert.equal(await scheduler.tick(),true);
+current={...current,dirty:false};assert.equal(await scheduler.tick(),false);assert.equal(await scheduler.tick(true),true);
+let resolve;wait=new Promise(r=>resolve=r);current={...current,revision:3,dirty:true};const pending=scheduler.tick();assert.equal(await scheduler.tick(true),false);current={...current,revision:4};resolve();await pending;wait=null;assert.equal(await scheduler.tick(),true);
+wait=new Promise(r=>resolve=r);current={...current,revision:5};const old=scheduler.tick();current={...current,key:'B',revision:1};const count=events.length;resolve();await old;assert.equal(events.length,count);wait=null;assert.equal(await scheduler.tick(),true);
+current={...current,hasWork:false};assert.equal(await scheduler.tick(true),false);
+let refs=[],states=[],effects=[],ri=0,si=0,ei=0,timers=new Map(),next=0;
+const react={useRef(v){const i=ri++;return refs[i]??(refs[i]={current:v});},useState(v){const i=si++;if(!(i in states))states[i]=typeof v==='function'?v():v;return[states[i],v=>states[i]=v];},useEffect(fn,deps){const i=ei++,old=effects[i];if(!old||deps.some((v,j)=>v!==old.deps[j])){old?.cleanup?.();effects[i]={deps,cleanup:fn()};}}};
+const sandbox={exports:{},require:n=>n==='react'?react:{ProjectBackupScheduler},window:{setInterval(fn,delay){timers.set(++next,{fn,delay});return next;},clearInterval(id){timers.delete(id);}}};
+vm.runInNewContext(ts.transpileModule(readFileSync(new URL('../src/useAutomaticProjectBackup.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,sandbox);
+const render=o=>{ri=si=ei=0;return sandbox.exports.default(o);};let timerWrites=0;
+const options={enabled:true,minutes:5,context:()=>({key:'timer',revision:1,dirty:true,hasWork:true}),save:async()=>{timerWrites++;return record;}};
+render(options);assert.equal([...timers.values()][0].delay,300000);render({...options,minutes:15});assert.equal(timers.size,1);assert.equal([...timers.values()][0].delay,900000);
+[...timers.values()][0].fn();await new Promise(r=>setImmediate(r));assert.equal(timerWrites,1);
+render({...options,enabled:false});assert.equal(timers.size,0);render({...options,minutes:NaN});assert.equal(timers.size,0);for(const e of effects)e.cleanup?.();assert.equal(timers.size,0);
+console.log('PASS backup preference migration/persistence, revision scheduling, overlap/failure/context safety, timer enable/interval/cleanup');
+// Execute the actual App save callback against a restored recovery base.
+const app=readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8');
+const callback=app.slice(app.indexOf('  const saveProject = async'),app.indexOf('  const projectBackup=useAutomaticProjectBackup'));
+let chosen='C:/recovery/backup.spike',savedParams,clean=0,adopted=0,status='';
+const saveScope={exports:{},projectFileName:n=>n,projectName:'recovered.spike',assemblyToolDraftOwnerRef:{current:null},projectBackup:{status:{phase:'idle'}},setStatus:v=>status=v,projectSaveCount:{current:0},projectGeneration:{current:1},projectEditRevision:{current:2},projectData:()=>({design:{source_format:'kicad'}}),boardImport:{progress:null,whenReady:async()=>null},boardData:null,serializeBoardVisuals:async()=>({}),desktopShell:true,projectPath:'C:/recovery/backup.spike',recoveryCopy:true,selectNativeProjectSavePath:async()=>chosen,runNativeProjectWorker:async request=>{savedParams=request.params;return{ok:true,result:{manifest:{manifest_payload_sha256:'a'.repeat(64)},design_id:'design',design_ir:null}};},setCanonicalSpiDeR(){},setProjectPath(){adopted++;},setProjectManifestDigest(){},setActiveDesignId(){},rememberProject(){},setProjectUpgradeOffer(){},setRecoveryCopy(){},retainedProjectSnapshot:{current:null},setProjectClean(){clean++;}};
+vm.runInNewContext(ts.transpileModule(callback+'\nexports.save=saveProject;',{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText,saveScope);
+assert.equal(await saveScope.exports.save(),false);assert.match(status,/recovery backups must remain unchanged/);assert.equal(savedParams,undefined);assert.equal(saveScope.projectSaveCount.current,0);
+chosen='C:/work/recovered.spike';assert.equal(await saveScope.exports.save(),true);assert.equal(savedParams.path,chosen);assert.equal(savedParams.base_package_path,'C:/recovery/backup.spike');assert.equal(adopted,1);assert.equal(clean,1);
+saveScope.projectData=()=>{throw Error('snapshot failed');};assert.equal(await saveScope.exports.save(),false);assert.equal(saveScope.projectSaveCount.current,0,'snapshot exceptions cannot leave saving locked');
+console.log('PASS actual recovery SaveAs protection and portable base reuse');

@@ -23,3 +23,8 @@
 .spike-action-context-menu .action-menu-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:none;padding:2px 2px 5px 8px}
 .action-menu-heading>strong{min-width:0;overflow-wrap:anywhere;font-size:12px}
 .action-menu-heading>.spike-control--icon{flex:none;width:26px;height:26px;min-height:26px;padding:4px}
+
+.spike-action-context-menu .action-menu-search { width:100%;margin:4px 0 7px; }
+.analysis-net-search { display:flex;align-items:center;gap:6px;padding:7px 0; }
+.analysis-net-search input { flex:1;min-width:0; }
+.analysis-net-browser > small { display:block;color:var(--spike-table-muted);margin-bottom:5px; }

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { CircuitBoard, FilePenLine } from "./icons";
+import type { ReactNode } from "react";
 import type { FocusToolPanel } from "./FocusToolDeck";
 import "./buttonStandard.css";
 import "./WorkspaceEditorTabs.css";
@@ -10,15 +11,16 @@ export function workspaceEditorPanels(panels: readonly FocusToolPanel[]): FocusT
   return panels.map(panel => ({...panel, presentation: inspectors.has(panel.id) ? "panel" : "document"}));
 }
 
-export default function WorkspaceEditorTabs({panels, activeId, onActivate}: {
+export default function WorkspaceEditorTabs({panels, activeId, onActivate, navigation}: {
+  navigation?: ReactNode;
   panels: readonly FocusToolPanel[];
   activeId: string | null;
   onActivate: (id: string | null) => void;
 }) {
   const documents = panels.filter(panel => panel.open && panel.presentation === "document");
-  if (!documents.length) return null;
+  if (!documents.length && !navigation) return null;
   const active = documents.find(panel => panel.id === activeId || panel.aliases?.includes(activeId ?? ""));
-  return <nav className="workspace-editor-tabs" aria-label="Workspace editors">
+  return <nav className="workspace-editor-tabs" aria-label="Workspace editors">{navigation}
     <div role="tablist" aria-label="Board and editors" onKeyDown={event => {
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
       const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));

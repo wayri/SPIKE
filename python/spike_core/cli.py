@@ -1094,6 +1094,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--quiet", action="store_true", help="Do not write the result to stdout")
     parser.add_argument("--fail-on-warning", action="store_true", help=f"Return exit code {EXIT_WARNING} when warnings exist")
     sub = parser.add_subparsers(dest="command", required=True)
+    from .cli_em_cosimulation import register_em_cosimulation_commands
+    register_em_cosimulation_commands(sub)
     from .cluster_cli import register_commands
     register_commands(sub)
 
@@ -1491,6 +1493,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
+    if args.command == "em-cosim":
+        from .cli_em_cosimulation import dispatch_em_cosimulation
+        result = dispatch_em_cosimulation(args, read_json=_read_json, response=_response)
+        return result, _result_exit(result, args.fail_on_warning)
     from .cluster_cli import COMMANDS, dispatch_cluster
     if args.command in COMMANDS:
         result = dispatch_cluster(args)

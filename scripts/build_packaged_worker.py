@@ -379,6 +379,8 @@ C1 out 0 1u
 
 
 def _verify(executable: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+    from scripts.verify_packaged_schema_catalog import verify_packaged_schema_catalog
+    schema_coherence = verify_packaged_schema_catalog(executable)
     runtime_environment = {"SPIKE_HOME": str(ROOT)}
     source = collect_runtime_snapshot(
         [sys.executable, "-m", "python.spike_core.service"],
@@ -420,6 +422,19 @@ def _verify(executable: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str,
     spikes_engine_probe = _verify_spikes_engine(executable)
     from scripts.verify_extension_runtime import verify_extension_runtime
     extension_probe = verify_extension_runtime(executable, _request)
+    extension_probe["schema_source_coherence"] = schema_coherence
+    from scripts.verify_em_cosimulation_runtime import verify_em_cosimulation_runtime
+    extension_probe["em_cosimulation"] = verify_em_cosimulation_runtime(executable, _request)
+    from scripts.verify_tetra_cht_runtime import verify_tetra_cht_runtime
+    extension_probe["tetra_cht"] = verify_tetra_cht_runtime(executable, _request)
+    from scripts.verify_si_execution_runtime import verify_si_execution_runtime
+    extension_probe["si_pam3"] = verify_si_execution_runtime(executable, _request)
+    # A successful numerical snapshot alone can miss concurrent source edits.
+    # Compare actual frozen code after all probes, before writing any success manifest.
+    from scripts.verify_packaged_source_modules import verify_packaged_source_modules
+    extension_probe["python_source_coherence"] = verify_packaged_source_modules(
+        executable, require_em_cosimulation=True)
+    extension_probe["schema_source_coherence"] = verify_packaged_schema_catalog(executable)
     return packaged, qualification, geometry_arrow_probe, spikes_engine_probe, extension_probe
 
 
@@ -547,6 +562,10 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         "--collect-submodules",
         "extensions.openems_suite",
         "--hidden-import",
+        "extensions.emerge_suite.cosimulation",
+        "--hidden-import",
+        "extensions.emerge_suite.volume_capture",
+        "--hidden-import",
         "python.spike_core.sparselizard_process",
         "--hidden-import",
         "python.spike_core.circuit_worker_supervisor",
@@ -590,9 +609,18 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
 
 
 def main() -> int:
+    global RESOURCE_ROOT, BUILD_ROOT, RUNTIME_QUALIFICATION_PATH
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep-work", action="store_true", help="Retain PyInstaller work/spec directories")
+    parser.add_argument("--candidate-root", type=Path, help="Fresh directory below build/; preserve the current bundled worker")
     args = parser.parse_args()
+    if args.candidate_root is not None:
+        candidate = args.candidate_root.resolve()
+        if candidate.exists() or not candidate.is_relative_to((ROOT / "build").resolve()):
+            parser.error("Candidate root must be a fresh directory strictly below repository build/")
+        RESOURCE_ROOT = candidate / "resources"
+        BUILD_ROOT = candidate / "work"
+        RUNTIME_QUALIFICATION_PATH = candidate / "release-runtime-qualification.json"
     executable, manifest = build(keep_work=args.keep_work)
     print(f"Verified packaged worker: {executable}")
     print(f"Integrity manifest: {manifest}")

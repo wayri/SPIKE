@@ -15,6 +15,7 @@ from python.spike_core.circuit_worker_supervisor import (
     supervise_process,
     run_circuit_worker,
 )
+from python.spike_core.spikes_runtime import _library_name
 
 
 # A venv's ``sys.executable`` is a launcher which starts the base interpreter.
@@ -94,9 +95,7 @@ class CircuitWorkerSupervisorTests(unittest.TestCase):
         executable = artifact / (
             "spike-circuit-worker.exe" if os.name == "nt" else "spike-circuit-worker"
         )
-        library = artifact / "_internal" / "spikes" / (
-            "spikes_c_api.dll" if os.name == "nt" else "libspikes_c_api.so"
-        )
+        library = artifact / "_internal" / "spikes" / _library_name()
         if not executable.is_file() or not library.is_file():
             self.skipTest("packaged circuit worker is not present")
         from scripts.build_packaged_circuit_worker import _smoke_job

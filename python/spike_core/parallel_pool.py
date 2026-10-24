@@ -17,6 +17,7 @@ from typing import Any, Callable, Sequence
 
 from .acceleration import acceleration_catalog
 from .compute_policy import cpu_thread_budget
+from .numerical_runtime import numerical_child_environment
 from .parallel_child import ALLOWED_METHODS
 from . import __version__
 
@@ -335,15 +336,9 @@ def _error_outcome(job: dict[str, Any], code: str, message: str, *,
 
 
 def _child_environment(threads: int) -> dict[str, str]:
-    environment = dict(os.environ)
-    value = str(threads)
-    for name in (
-        "SPIKE_CPU_THREADS", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS",
-        "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS",
-        "BLIS_NUM_THREADS",
-    ):
-        environment[name] = value
-    return environment
+    # A batch's explicit per-job allocation remains authoritative even when
+    # its parent interactive worker uses the low-memory one-thread default.
+    return numerical_child_environment(cpu_threads=threads, blas_threads=threads)
 
 
 def _run_job(job: dict[str, Any], timeout_s: float, threads: int,

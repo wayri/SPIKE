@@ -7,6 +7,7 @@ Newtonian stress. Natural data are (mu grad(u)-p I)n, called pseudo-traction.
 See docs/validation/CFD_TETRA_STOKES_20261021.md for derivation and limits.
 """
 from collections.abc import Mapping
+from inspect import signature
 import math
 import numbers
 import time
@@ -15,7 +16,7 @@ import numpy as np
 from scipy.sparse import bmat, coo_matrix, diags
 from scipy.sparse.linalg import LinearOperator, minres, onenormest, splu
 
-from .cfd_tetra_mesh import admit_cfd_tetra_mesh
+from .cfd_tetra_mesh import _resolve_admission
 
 
 CONTRACT = "spike/cfd-tetra-stokes/v1"
@@ -31,6 +32,19 @@ _KEYS = {"contract", "mesh", "dynamic_viscosity_pa_s", "density_kg_m3",
 
 class CfdTetraStokesError(ValueError):
     """Unsupported, inconsistent, unresolved, or unrepresentable input."""
+
+
+def _minres_correction(operator, rhs, *, M, maxiter, callback):
+    """Same relative tolerance across SciPy's tol -> rtol API rename.
+
+    No TypeError retry or solver fallback: errors inside MINRES still propagate,
+    and the independently recomputed residual remains the acceptance criterion.
+    """
+    parameters = signature(minres).parameters
+    key = "rtol" if "rtol" in parameters else "tol" if "tol" in parameters else None
+    if key is None:
+        raise CfdTetraStokesError("Unsupported MINRES relative-tolerance API")
+    return minres(operator, rhs, M=M, maxiter=maxiter, callback=callback, **{key: 1e-14})
 
 
 def _number(value, name):
@@ -222,8 +236,8 @@ def _inverse_solver(matrix, check, *, velocity_block, pressure_diagonal, gauge_c
                 if used > MAX_ITERATIONS_PER_INVERSE:
                     raise CfdTetraStokesError("MINRES iteration budget exceeded")
 
-            correction, info = minres(operator, residual, M=preconditioner,
-                                      rtol=1e-14, maxiter=5000, callback=callback)
+            correction, info = _minres_correction(operator, residual, M=preconditioner,
+                                                  maxiter=5000, callback=callback)
             if info < 0 or not np.isfinite(correction).all():
                 raise CfdTetraStokesError("MINRES breakdown or nonfinite correction")
             solution += correction
@@ -344,11 +358,19 @@ def _diagnostics(mesh, k, b, body, traction_load, gradients, mu, rho,
     momentum = _relative(_norm(equation_defect[free]), scale)
     if momentum > 1e-10 or not math.isfinite(momentum):
         raise CfdTetraStokesError("unscaled momentum residual exceeds 1e-10")
-    reaction = np.where(np.repeat(prescribed, 3), equation_defect, 0.)
     # Subtracting a reference face makes constant velocity gradients exactly
     # zero without cancelling large equal face values in a dot product.
     differences = local_u - local_u[:, :1, :]
     grad_u = np.sum(differences[:, :, :, None] * gradients[:, :, None, :], axis=1)
+    # Apply the transpose of the same difference-based gradient. This is
+    # K*u algebraically, but preserves the constant-velocity nullspace.
+    local_force = mu * mesh["cell_volumes"][:, None, None] * np.einsum(
+        "cab,cib->cia", grad_u, gradients)
+    local_force[:, 0] = -np.sum(local_force[:, 1:], axis=1)
+    viscous_force = np.zeros_like(face_u)
+    np.add.at(viscous_force, mesh["cell_faces"], local_force)
+    reaction = np.where(np.repeat(prescribed, 3),
+                        viscous_force.ravel()-pressure_force-load, 0.)
     dissipation = float(np.sum(np.multiply(mu * mesh["cell_volumes"],
                                           np.sum(np.multiply(grad_u, grad_u), axis=(1, 2)))))
     body_work, traction_work = _power(body, u), _power(traction_load, u)
@@ -378,7 +400,7 @@ def _diagnostics(mesh, k, b, body, traction_load, gradients, mu, rho,
     }, np.mean(local_u, axis=1), grad_u
 
 
-def solve_cfd_tetra_stokes(request, *, cancel_check=None):
+def solve_cfd_tetra_stokes(request, *, cancel_check=None, _mesh_reuse=None):
     """Solve only admitted creeping CR/P0 flow; failures never publish fields."""
     result = {
         "contract": RESULT_CONTRACT, "model_status": "experimental", "production_qualified": False,
@@ -414,7 +436,7 @@ def solve_cfd_tetra_stokes(request, *, cancel_check=None):
 
         check()
         with np.errstate(over="raise", under="raise", invalid="raise", divide="raise"):
-            mesh = admit_cfd_tetra_mesh(request["mesh"], cancel_check=admission_cancel)
+            mesh = _resolve_admission(request["mesh"], _mesh_reuse, admission_cancel)
             check()
             mu = _number(request["dynamic_viscosity_pa_s"], "dynamic_viscosity_pa_s")
             rho = _number(request["density_kg_m3"], "density_kg_m3")
@@ -422,9 +444,21 @@ def solve_cfd_tetra_stokes(request, *, cancel_check=None):
             prescribed, boundary_u, traction, outlets, gauges = _boundary(mesh, request["boundary_conditions"])
             k, b, body, gradients = _assemble(mesh, force, mu, check)
             traction_load = np.multiply(mesh["face_areas"][:, None], traction).ravel()
+            # A constant vector per connected component is in both K and B's
+            # exact nullspaces. Solve for the velocity relative to one supplied
+            # anchor, then restore it; loads and natural data are unchanged.
+            lift = np.zeros_like(boundary_u)
+            relative_boundary = boundary_u.copy()
+            for component in mesh["components"]:
+                faces = np.unique(mesh["cell_faces"][component])
+                anchors = faces[prescribed[faces]]
+                lift[faces] = boundary_u[anchors[0]]
+                relative_boundary[anchors] -= lift[anchors]
             u, p, free, condition, residual, solver_stats = _linear_solve(
-                k, b, body+traction_load, prescribed, boundary_u, gauges, check,
+                k, b, body+traction_load, prescribed, relative_boundary, gauges, check,
                 volumes=mesh["cell_volumes"], components=mesh["components"], mu=mu)
+            u += lift.ravel()
+            u.reshape((-1, 3))[prescribed] = boundary_u[prescribed]
             diagnostics, cell_u, grad_u = _diagnostics(
                 mesh, k, b, body, traction_load, gradients, mu, rho, u, p, free, prescribed, outlets)
             diagnostics.update(scaled_linear_relative_residual=residual, scaled_condition_estimate=condition,

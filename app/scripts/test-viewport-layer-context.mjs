@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+import { viewportLayerTarget } from "../src/viewportLayerContext.ts";
+const base={assembly:true,availableBoardIds:["A","B"],selectedBoardIds:[],selectedObject:null,activeBoardAvailable:true,harnessSelected:false};
+assert.equal(viewportLayerTarget(base),null);
+assert.equal(viewportLayerTarget({...base,selectedBoardIds:["A"]}),"A");
+assert.equal(viewportLayerTarget({...base,selectedBoardIds:["A"],selectedObject:{occurrenceId:"B"}}),"B","part/net ownership overrides stale focus");
+assert.equal(viewportLayerTarget({...base,selectedObject:{occurrenceId:"missing"},selectedBoardIds:["A"]}),null,"deleted source never falls back to another occurrence");
+assert.equal(viewportLayerTarget({...base,selectedObject:{},selectedBoardIds:["A"]}),null,"same named but unbound object is not proof of ownership");
+assert.equal(viewportLayerTarget({...base,selectedBoardIds:["A","B"],selectedObject:{occurrenceId:"A"}}),null);
+assert.equal(viewportLayerTarget({...base,selectedBoardIds:["A"],harnessSelected:true}),null);
+assert.equal(viewportLayerTarget({...base,selectedObject:{assemblyPartId:"case"},selectedBoardIds:["A"]}),null);
+assert.equal(viewportLayerTarget({...base,assembly:false,selectedObject:{}}),"active-board");
+assert.equal(viewportLayerTarget({...base,assembly:false,activeBoardAvailable:false}),null);
+assert.equal(viewportLayerTarget({...base,assembly:false,selectedObject:{assemblyPartId:"enclosure"}}),null);
+console.log("Viewport layer context: board, part/net ownership, stale/missing identities, multiselection, harness and MCAD exclusion passed.");
+
+// Exercise the actual App callback: a selected part on B must not edit old focus A.
+const app=ts.createSourceFile("App.tsx",readFileSync(new URL("../src/App.tsx",import.meta.url),"utf8"),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+let callback;
+const visit=node=>{if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(app)==="ViewportLayerSelector")callback=node.attributes.properties.find(prop=>ts.isJsxAttribute(prop)&&prop.name.text==="onToggle")?.initializer?.expression;ts.forEachChild(node,visit);};visit(app);assert.ok(callback);
+const code=ts.transpileModule(`const run = ${callback.getText(app)};`,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
+const original={A:{"F.Cu":true,"B.Cu":false},B:{"F.Cu":false,"B.Cu":true}};
+let visibility=structuredClone(original),focus={},changes=0;
+const run=new Function("multipleBoardViewport","virtualBoardProjection","resolvedAssemblyLayerVisibility","recordChange","setAssemblyLayerVisibility","setAssemblyLayerFocus","toggleLayer",`${code};return run;`)(true,{visuals:[{id:"A"},{id:"B"}]},original,()=>{changes++;},fn=>{visibility=fn(visibility);},fn=>{focus=fn(focus);},()=>assert.fail("must not use stale main focus toggle"));
+run("B","F.Cu");assert.deepEqual(visibility.A,original.A);assert.equal(visibility.B["F.Cu"],true);assert.deepEqual(focus,{B:"All"});assert.equal(changes,1);
+run("deleted","F.Cu");assert.equal(changes,1,"deleted occurrence callback cannot mutate state");
+console.log("Actual App layer callback preserves unrelated board A when selected-object context edits B.");
+
+let netCallback;
+const findNetCallback=node=>{if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(app)==="ViewportLayerSelector")netCallback=node.attributes.properties.find(prop=>ts.isJsxAttribute(prop)&&prop.name.text==="onShowNetNames")?.initializer?.expression;ts.forEachChild(node,findNetCallback);};findNetCallback(app);assert.ok(netCallback);
+const netCode=ts.transpileModule(`const run = ${netCallback.getText(app)};`,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText;
+let netVisibility={A:false,B:false},netChanges=0;
+const netRun=new Function("viewportLayerBoard","multipleBoardViewport","virtualBoardProjection","recordChange","setShowNetNames","setAssemblyNetNameVisibility",`${netCode};return run;`)({id:"B"},true,{visuals:[{id:"A"},{id:"B"}]},()=>netChanges++,()=>assert.fail("board scope must not change global default"),fn=>{netVisibility=fn(netVisibility);});
+netRun("B",true);assert.deepEqual(netVisibility,{A:false,B:true});assert.equal(netChanges,1);
+netRun("A",true);assert.deepEqual(netVisibility,{A:false,B:true});assert.equal(netChanges,1,"stale target cannot change another board's labels");
+netRun("B",false);assert.deepEqual(netVisibility,{A:false,B:false});
+console.log("Actual App net-name callback scopes show/hide to B and preserves A.");
+const opacityCallbacks={};
+const findOpacityCallbacks=node=>{if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(app)==="ViewportLayerSelector")for(const attr of node.attributes.properties)if(ts.isJsxAttribute(attr)&&["onOpacity","onAllOpacity"].includes(attr.name.text))opacityCallbacks[attr.name.text]=attr.initializer.expression;ts.forEachChild(node,findOpacityCallbacks);};findOpacityCallbacks(app);
+let scopedOpacity={A:{"F.Cu":.8,"B.Cu":.6},B:{"F.Cu":1,"B.Cu":.3,retained:.2}},opacityChanges=0;
+const compileOpacity=(name,multiple=true)=>new Function("viewportLayerBoard","multipleBoardViewport","virtualBoardProjection","recordChange","setLayerOpacity","setAssemblyLayerOpacity","resolvedAssemblyLayerOpacity",ts.transpileModule(`const run=${opacityCallbacks[name].getText(app)};return run;`,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText)({id:"B",layers:["F.Cu","B.Cu"]},multiple,{visuals:[{id:"A"},{id:"B"}]},()=>opacityChanges++,()=>assert.fail("assembly opacity cannot change global preferences"),fn=>{scopedOpacity=fn(scopedOpacity);},scopedOpacity);
+const oneOpacity=compileOpacity("onOpacity"),allOpacity=compileOpacity("onAllOpacity");
+oneOpacity("B","F.Cu",.45);assert.deepEqual(scopedOpacity.A,{"F.Cu":.8,"B.Cu":.6});assert.equal(scopedOpacity.B["F.Cu"],.45);
+const beforeOpacity=structuredClone(scopedOpacity),countOpacity=opacityChanges;
+oneOpacity("A","F.Cu",.2);oneOpacity("B","missing",.2);oneOpacity("B","F.Cu",NaN);allOpacity("A",.2);allOpacity("B",Infinity);allOpacity("B",-.1);assert.deepEqual(scopedOpacity,beforeOpacity);assert.equal(opacityChanges,countOpacity);
+allOpacity("B",.7);assert.deepEqual(scopedOpacity,{A:{"F.Cu":.8,"B.Cu":.6},B:{"F.Cu":.7,"B.Cu":.7,retained:.2}},"All resets every listed layer of B and preserves A and unrelated preferences");
+console.log("Actual App wheel opacity callbacks preserve other boards, reject stale/invalid inputs and reset all selected-board layer opacities.");
+let resetCallback;const findReset=node=>{if(ts.isVariableDeclaration(node)&&node.name.getText(app)==="resetLayerView")resetCallback=node.initializer;ts.forEachChild(node,findReset);};findReset(app);assert.ok(resetCallback);
+let resetOpacity={A:{"F.Cu":.4},B:{"F.Cu":.2}},resetVisibility={A:{"F.Cu":false},B:{"F.Cu":false}},resetFocus={A:"F.Cu",B:"B.Cu"},resetZones={A:"outline",B:"transparent"},resetChanges=0;
+const runReset=new Function("virtualBoardProjection","assemblyBoardVisuals","recordChange","setAssemblyLayerVisibility","setAssemblyLayerOpacity","setAssemblyLayerFocus","setAssemblyZoneDisplay","visibilityForBoard","boardData","restoreLayerDefaults","setZoneDisplay",ts.transpileModule(`const run=${resetCallback.getText(app)};return run;`,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText)({visuals:[{id:"A",designId:"da"},{id:"B",designId:"db"}]},{boards:{da:{},db:{}}},()=>resetChanges++,fn=>resetVisibility=fn(resetVisibility),fn=>resetOpacity=fn(resetOpacity),fn=>resetFocus=fn(resetFocus),fn=>resetZones=fn(resetZones),()=>({"F.Cu":true,"B.Cu":false}),{},()=>{},()=>{});
+runReset("B");assert.deepEqual(resetOpacity,{A:{"F.Cu":.4},B:{}});assert.deepEqual(resetVisibility,{A:{"F.Cu":false},B:{"F.Cu":true,"B.Cu":false}});assert.deepEqual(resetZones,{A:"outline",B:"filled"});assert.equal(resetFocus.B,"All");runReset("missing");assert.equal(resetChanges,1);
+console.log("Reset display defaults affect the requested occurrence only and preserve sibling view settings.");

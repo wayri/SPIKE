@@ -45,7 +45,7 @@ const interfaceActions = [];
 const mockReact = { ...React,
   useState(initial) { const index = cell++; if (!(index in cells)) cells[index] = typeof initial === "function" ? initial() : initial; return [cells[index], value => { cells[index] = typeof value === "function" ? value(cells[index]) : value; }]; },
   useRef(initial) { const index = cell++; return cells[index] ??= { current: initial }; },
-  useEffect() {}, useMemo: factory => factory(),
+  useEffect(effect, dependencies) { if (workspaceProps.initialScript && dependencies?.length === 1 && dependencies[0] === workspaceProps.initialScript) effect(); }, useMemo: factory => factory(),
 };
 const stubs = Object.fromEntries(["PythonCodeEditor", "PythonDebugPanel", "PythonFileExplorer", "PythonTemplateLibrary", "PythonWorkspaceHelp", "PythonRecoveryPanel", "PythonNetBrowser", "PythonRunStatus"].map(name => [name, function Stub() { return null; }]));
 const bridge = {
@@ -222,3 +222,13 @@ button("Close Python workspace").props.onClick(); render(); assert.equal(closed,
 assert.ok(elements(tree).some(node => node.props.role === "alertdialog"), "closing offers to save the new template");
 await button("Discard edits").props.onClick(); render(); assert.equal(closed, 1);
 console.log("Python workspace tabs, dirty-close protection, Save/Save as, external conflicts, debug controls, breakpoints and template creation passed");
+// A harness draft remains unsaved/unexecuted and retains its explicitly selected
+// work folder even when the editor's previously selected folder differs.
+desktop = true; cells = []; requests.length = 0;
+workspaceProps = { initialScript: { id: "harness-draft", name: "summary.py", code: "print('fixture')", workingDirectory: "C:/harness-data" } };
+render(); render();
+assert.equal(editor().props.code, "print('fixture')");
+assert.equal(requests.length, 0, "opening a harness draft never launches Python");
+assert.ok(content(tree).includes("C:/harness-data"));
+button("Run").props.onClick(); await flush();
+assert.equal(requests.find(request => request.method === "run_python_script").params.working_directory, "C:/harness-data");

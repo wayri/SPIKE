@@ -1,0 +1,112 @@
+{
+  "license": "Apache-2.0",
+  "original_copied_examples": [
+    {
+      "copy": "gate_miller_ringing.cir",
+      "source": "examples/spikes/advanced_systems/gate_miller_ringing.cir",
+      "sha256": "bf4649de3c2c83ec1d359b1d4678a83a078c57ed585e6b875cfeab7ca549a641",
+      "unchanged": true
+    },
+    {
+      "copy": "two_wheeler_dashboard.spksch",
+      "source": "examples/spikes/advanced_systems/two_wheeler_dashboard.spksch",
+      "sha256": "2743aaf17f406272ed3de62ac64a589d279abb938be0cfda8eeb8f8f04b8868a",
+      "unchanged": true
+    },
+    {
+      "copy": "ev_current_controller.c",
+      "source": "examples/spikes/advanced_systems/ev_current_controller.c",
+      "sha256": "890c1ce8e6bbb63436a1be788bd26c8c24acf1d13db61cdd71d9aaae00c7e092",
+      "unchanged": true
+    },
+    {
+      "copy": "ev_motor_plant.cir",
+      "source": "examples/spikes/advanced_systems/ev_motor_plant.cir",
+      "sha256": "022453b3bd7c7b332f19735c349ff243c14657d908410b3c2353b41528ddf7cf",
+      "unchanged": true
+    }
+  ],
+  "pack_files": [
+    {
+      "file": "backemf_sensing.cir",
+      "sha256": "edc477f401e3cb4ad390f28d5a657cfafa18a478bb00ab1440e594afd515db7f",
+      "bytes": 8793
+    },
+    {
+      "file": "backemf_sensing.spksch",
+      "sha256": "2c50905140be93d05de64030d171e9cef5f76b9b912d90446069848899b2fb90",
+      "bytes": 20875
+    },
+    {
+      "file": "current_sensing.cir",
+      "sha256": "bb50c6393b65fb98ea0823bd4fd71bfd29a400385c3b96d2bb545f4a671b578c",
+      "bytes": 297
+    },
+    {
+      "file": "current_sensing.spksch",
+      "sha256": "93a2553ceb429077088310d6ecc69b0bcdb8cd3bfdf24d616100826653c22ec0",
+      "bytes": 10747
+    },
+    {
+      "file": "ev_current_controller.c",
+      "sha256": "890c1ce8e6bbb63436a1be788bd26c8c24acf1d13db61cdd71d9aaae00c7e092",
+      "bytes": 1542
+    },
+    {
+      "file": "ev_motor_plant.cir",
+      "sha256": "022453b3bd7c7b332f19735c349ff243c14657d908410b3c2353b41528ddf7cf",
+      "bytes": 328
+    },
+    {
+      "file": "gate_miller_ringing.cir",
+      "sha256": "bf4649de3c2c83ec1d359b1d4678a83a078c57ed585e6b875cfeab7ca549a641",
+      "bytes": 295
+    },
+    {
+      "file": "gate_miller_ringing.spksch",
+      "sha256": "1aea9da6a87435b777f45ba5ffb09b01af435ce0f6b7335e2020a7a26c075516",
+      "bytes": 12049
+    },
+    {
+      "file": "LICENSE",
+      "sha256": "1dbace2c4de7ffdf533d0a4cb55bd93177201ead936d0f349cd14a05a84d2266",
+      "bytes": 11560
+    },
+    {
+      "file": "NOTICE",
+      "sha256": "547ceb7deee11bc8768c4439beda4a9f1314b1d0afaee0d4177352b89f4c9a6f",
+      "bytes": 770
+    },
+    {
+      "file": "prepare_verify.py",
+      "sha256": "45e5766ff00e255002fbaf89c077bf495285718e47f064e25b83da6a039bc4f2",
+      "bytes": 5745
+    },
+    {
+      "file": "README.md",
+      "sha256": "edbb514cbd829218ebd3b33f7bdee4786b5a24b5da33f3bfed2fa328bb70c0c1",
+      "bytes": 4235
+    },
+    {
+      "file": "two_wheeler_dashboard.spksch",
+      "sha256": "2743aaf17f406272ed3de62ac64a589d279abb938be0cfda8eeb8f8f04b8868a",
+      "bytes": 14685
+    }
+  ],
+  "solver_sources": [
+    {
+      "path": "python/spikes/native_runner.py",
+      "sha256": "42a7a1a7e7eb36eba9cb618f259a5bd745e2f69aa158b80cd1e9873b51a2cebb"
+    },
+    {
+      "path": "standalone/spikes_project/studio/python/spikes_studio/document.py",
+      "sha256": "7305b73a307e41b8c9cc543ad3bf3494a03b03e6f10a0c1e2a81e1a2a0246235"
+    },
+    {
+      "path": "standalone/spikes_project/studio/python/spikes_studio/run_control.py",
+      "sha256": "c7600c70b95c854ee1044b0d1a86317485c421e1d82f6da595888336c018295f"
+    }
+  ],
+  "no_new_solvers": true,
+  "no_ui_execution_claimed": true
+}

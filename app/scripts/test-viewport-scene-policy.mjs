@@ -289,6 +289,14 @@ try {
     cameraCommand: "", selectionFilter: "all", onSelect() {}, showAxes: false,
   };
   const render = overrides => renderToStaticMarkup(React.createElement(LayoutViewport, { ...props, ...overrides }));
+  const nativeLayerMarkup = (markup, layer) => {
+    const marker = `aria-label="${layer} native vector geometry"`;
+    const markerIndex = markup.indexOf(marker);
+    assert.notEqual(markerIndex, -1, `${layer} native group must be present`);
+    const start = markup.lastIndexOf("<g", markerIndex);
+    const next = markup.indexOf('<g pointer-events="none" aria-label="', markerIndex + marker.length);
+    return markup.slice(start, next < 0 ? markup.length : next);
+  };
   const allLayers = render({});
   const independentlyToggleableLayers = ["F.Cu", "In1.Cu", "B.Cu", "F.Mask", "B.Mask", "F.Paste", "B.Paste", "F.SilkS", "B.SilkS", "F.Fab", "B.Fab"];
   for (const layer of [...independentlyToggleableLayers, "Edge.Cuts"]) {
@@ -303,9 +311,9 @@ try {
   }
   for (const transparent of independentlyToggleableLayers) {
     const markup = render({ layerOpacity: { [transparent]: 0 } });
-    assert.match(markup, new RegExp(`opacity="0"[^>]*aria-label="${transparent} native vector geometry"`), `${transparent} zero opacity must apply only to its native group`);
+    assert.match(nativeLayerMarkup(markup, transparent), /(?:opacity|fill-opacity|stroke-opacity)="0"/, `${transparent} zero opacity must apply within its native group`);
     for (const preserved of independentlyToggleableLayers.filter(layer => layer !== transparent)) {
-      assert.doesNotMatch(markup, new RegExp(`opacity="0"[^>]*aria-label="${preserved} native vector geometry"`), `${transparent} zero opacity must preserve unrelated native ${preserved} geometry`);
+      assert.doesNotMatch(nativeLayerMarkup(markup, preserved), /(?:opacity|fill-opacity|stroke-opacity)="0"/, `${transparent} zero opacity must preserve unrelated native ${preserved} geometry`);
     }
   }
   assert.match(allLayers, /M4\.6,5a0\.4,0\.4/, "visible vias must contribute their annulus geometry");
@@ -360,7 +368,7 @@ try {
   assert.doesNotMatch(render({ visibleLayers: allOff, showVias: false }), /aria-label="Vias only"/);
   const innerOnly = render({ visibleLayers: { ...allOff, 'In1.Cu': true } });
   assert.match(innerOnly, /aria-label="In1.Cu native vector geometry"/);
-  assert.match(innerOnly, /opacity="0\.9"[^>]*aria-label="In1.Cu native vector geometry"/, "isolated copper must remain legible without the multi-layer opacity reduction");
+  assert.match(nativeLayerMarkup(innerOnly, "In1.Cu"), /opacity="0\.9"/, "isolated copper must remain legible without the multi-layer opacity reduction");
   assert.doesNotMatch(innerOnly, /aria-label="F.Cu native vector geometry"/);
   assert.doesNotMatch(innerOnly, /aria-label="B.Cu native vector geometry"/);
   const hiddenSelectedNet = render({ visibleLayers: allOff, showVias: false, selectedNet: "VCC" });
@@ -371,6 +379,10 @@ try {
     pads: [...board.pads, { ...board.pads[0], id: "alt-pad", at: [17, 8], net: "ALT", ref: "U2" }],
   };
   const oneNetHighlight = render({ board: secondNetBoard, selectedNet: "VCC" });
+  const translucentNetHighlight = render({ board: secondNetBoard, selectedNet: "VCC", translucentScene: true,
+    resultVisualization: { visible: false, sceneMode: "translucent", boardOpacity: .18, mode: "geometry", visibleResultLayers: [] } });
+  assert.match(nativeLayerMarkup(translucentNetHighlight, "F.Cu"), /<g opacity="0\.021168"/, "scene translucency composes with multi-layer and net-focus opacity without an active solver result");
+  assert.match(translucentNetHighlight, /stroke="#55e5d5"/, "selected copper remains in the opaque foreground overlay");
   const multipleNetHighlight = render({ board: secondNetBoard, selectedNet: "VCC", highlightedNets: ["ALT"] });
   assert.match(multipleNetHighlight, /data-highlighted-net="VCC ALT"/, "all requested source net names are retained by the overlay");
   assert.ok((multipleNetHighlight.match(/stroke="#55e5d5"|fill="#55e5d5"/g) ?? []).length > (oneNetHighlight.match(/stroke="#55e5d5"|fill="#55e5d5"/g) ?? []).length,

@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from 'node:assert/strict';
+import { importTestTypescript } from './import-test-typescript.mjs';
+const {captureOccurrence,pasteOccurrence,removeOccurrence,reconcileOccurrenceShapes,seedActiveBoard}=await importTestTypescript('occurrenceClipboard');
+const matrix=[1,0,0,0,0,1,0,0,0,0,1,12,0,0,0,1];
+const board={id:'A',name:'Controller',design_id:'source',frame:{frame_id:'A-frame',parent_frame_id:'assembly',transform:matrix},extensions:{solver_results:{pass:true}}};
+const part={id:'housing',name:'Housing',source_id:'cad',model_id:'housing-model',material_id:'aluminium',part_type:'enclosure',frame:{frame_id:'housing-frame',parent_frame_id:'assembly',units:'mm',handedness:'right',transform:matrix},extensions:{result:{temperature:42}}};
+const assembly={contract:'spike/assembly-ir/v1',assembly_id:'demo',name:'Assembly',frame:{frame_id:'assembly'},boards:[board],parts:[part],harnesses:[],connector_mappings:[]};
+const designs={contract:'spike/assembly-designs/v1',active_design_id:'source',designs:[{contract:'spike/design-ir/v2',design_id:'source',name:'Controller',metadata:{board_size_mm:[68,52]},tracks:[{id:'track'}]}]};
+const before=JSON.stringify({assembly,designs});
+const clip=captureOccurrence(assembly,{boardId:'A'});
+assert(Object.isFrozen(clip)&&Object.isFrozen(clip.row.frame.transform));
+const second=pasteOccurrence(assembly,designs,clip,'B');
+assert.equal(second.assembly.boards.length,2);assert.equal(second.designs.designs.length,1);
+assert.equal(second.assembly.boards[1].design_id,'source');assert.equal(second.assembly.boards[1].frame.transform[3],98);
+assert.equal(second.assembly.boards[1].frame.transform[11],12);assert.deepEqual(second.assembly.boards[1].extensions,{},'derived state cannot bind to the new occurrence');
+second.assembly.boards[1].frame.transform[3]=888;assert.equal(board.frame.transform[3],0);
+const independent=pasteOccurrence(assembly,designs,clip,'C','copy');
+assert.equal(independent.designs.designs.length,2);assert.notEqual(independent.assembly.boards[1].design_id,'source');
+independent.designs.designs[1].tracks[0].id='changed';assert.equal(designs.designs[0].tracks[0].id,'track');
+assert.throws(()=>pasteOccurrence({...assembly,assembly_id:'other'},designs,clip,'X'),/this project/);
+assert.throws(()=>pasteOccurrence(assembly,null,clip,'X'),/source design/);
+assert.throws(()=>pasteOccurrence(assembly,designs,clip,'A'),/unique/);
+assert.throws(()=>removeOccurrence(assembly,{boardId:'A'}),/at least one/);
+const linked={...second.assembly,harnesses:[{id:'link',endpoint_a:'A::J1',endpoint_b:'B::J2'}],connector_mappings:[{id:'mate',data:{board_id:'A'}}]};
+const cut=removeOccurrence(linked,{boardId:'A'});assert.equal(cut.removedLinks,2);assert.equal(cut.assembly.boards.length,1);
+const restored=pasteOccurrence(cut.assembly,designs,clip,'D');assert.equal(restored.assembly.boards.length,2,'cut payload survives source-occurrence removal');assert.equal(restored.assembly.harnesses.length,0,'paste does not clone removed connections');
+assert.throws(()=>removeOccurrence({...second.assembly,thermal_contacts:[{id:'contact'}]},{boardId:'A'}),/contacts/);
+assert.throws(()=>removeOccurrence({...assembly,parts:[part,{...part,id:'child',frame:{...part.frame,frame_id:'child-frame',parent_frame_id:'housing-frame'}}]},{partId:'housing'}),/child/);
+const pc=captureOccurrence(assembly,{partId:'housing'}),pasted=pasteOccurrence(assembly,designs,pc,'housing-2');
+assert.equal(pasted.assembly.parts[1].model_id,'housing-model');assert.notEqual(pasted.assembly.parts[1].frame.frame_id,part.frame.frame_id);assert.deepEqual(pasted.assembly.parts[1].extensions,{});assert.notEqual(pasted.assembly.parts[1].frame.transform[3],part.frame.transform[3]);
+const afterCut=removeOccurrence(assembly,{partId:'housing'});assert.equal(pasteOccurrence(afterCut.assembly,designs,pc,'housing-3').assembly.parts.length,1);
+const parentGone={...assembly,parts:[]};const childClip={...pc,row:{...part,frame:{...part.frame,parent_frame_id:'missing'}}};assert.throws(()=>pasteOccurrence(parentGone,designs,childClip,'missing-parent'),/parent frame/);
+const seeded=seedActiveBoard(designs.designs[0],'Controller');assert.equal(seeded.assembly.boards.length,1);for(const key of ['frame','harnesses','connector_mappings','rigid_flex_links','extensions','metadata']) assert.ok(key in seeded.assembly, `Required saved AssemblyIR field ${key}`);assert.ok('source_id' in seeded.assembly.boards[0]);assert.equal(seeded.designs.designs[0].design_id,'source');assert.throws(()=>seedActiveBoard({contract:'spike/v1'},'legacy'),/canonical/);
+assert.equal(JSON.stringify({assembly,designs}),before,'all edits preserve the original undo snapshot');
+// Saved package round trip retains unique placements and source sharing.
+const reopened=JSON.parse(JSON.stringify(restored));assert.equal(reopened.assembly.boards.length,2);assert.equal(reopened.assembly.boards[1].design_id,'source');
+console.log('Occurrence clipboard: immutable capture, instances, independent copies, placement, source retention, dependency-safe delete/cut and round-trip passed');
+
+const refs={part_id:'housing'};
+const shapes={assembly_id:'demo',shapes:[{shape_id:'shape',part_id:'housing'}],constraints:[{references:[refs]}],thermal_contact_bindings:[{endpoint_a:refs,endpoint_b:{part_id:'other'}}],electrical_bond_bindings:[]};
+assert.equal(reconcileOccurrenceShapes(shapes,assembly),shapes,'unchanged geometry keeps the exact shape index');
+const pruned=reconcileOccurrenceShapes(shapes,{...assembly,parts:[]});
+assert.deepEqual(pruned.shapes,[]);assert.deepEqual(pruned.constraints,[]);assert.deepEqual(pruned.thermal_contact_bindings,[]);assert.equal(shapes.shapes.length,1,'undo snapshot keeps old exact shape data');
+const visualPart={...part,extensions:{'spike.mcad.tessellation':{source_model_id:'step-source',visual_only:true,solver_ready:false}}};
+assert.deepEqual(pasteOccurrence({...assembly,parts:[visualPart]},designs,captureOccurrence({...assembly,parts:[visualPart]},{partId:'housing'}),'visual-copy').assembly.parts[1].extensions,visualPart.extensions,'copies retain visual-source provenance, not contacts or result state');
+console.log('Occurrence topology: deletion prunes owned shape setup, snapshots survive, and tessellation provenance is retained');

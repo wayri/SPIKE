@@ -60,6 +60,29 @@ This scope also excludes 10GBASE-T. BASE-T requires a twisted-pair PHY with
 PAM16 signaling, DSP, echo/crosstalk cancellation and protocol-specific link
 behavior that this linear NRZ workflow does not implement.
 
+## Frozen worker replay
+
+The same `qualification_report` accepts an explicit workflow adapter; no
+criterion, stimulus, frequency grid or tolerance changes between source and
+worker execution. Run the eleven requests through fresh worker processes:
+
+```powershell
+.venv/Scripts/python.exe scripts/verify_serdes_worker_reference.py build/si-qualification-worker-r3-20261023/resources/spike-worker/spike-worker.exe --output build/serdes-worker-reference-new.json
+```
+
+The output filename must be fresh. The verifier binds the executable SHA-256
+before/after execution and records the reference-runner and workflow source
+identities. Worker errors, any failed numerical gate, a missing request or
+executable replacement reject the run. It does not certify all dependency
+files by itself; the worker integrity manifest and source/schema guards remain
+separate requirements. Its runtime metadata describes the orchestration
+interpreter; bundled interpreter details are in the worker manifest.
+The test in `test_serdes_worker_reference` uses the actual source workflow
+through an explicit adapter, plus original boundary-failure fixtures. Only an
+executed external-worker report establishes frozen-process numerical evidence.
+Neither mode converts the synthetic fixtures into Marble/WREN measurements,
+vendor-model interoperability, protocol compliance or hardware qualification.
+
 ## Reference sources
 
 The 10.3125 GBd reference rate is motivated by the IEEE 802.3 public presentation

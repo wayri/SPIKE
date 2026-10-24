@@ -1,0 +1,15 @@
+{
+  "model": "pm_dc_motor",
+  "resistance_ohm": 2.0,
+  "inductance_h": 0.02,
+  "coupling_constant": 0.1,
+  "inertia_kg_m2": 0.002,
+  "damping_n_m_s_per_rad": 0.003,
+  "shaft_torque_n_m": -0.01,
+  "initial_current_a": 0.2,
+  "initial_speed_rad_s": 2.0,
+  "initial_angle_rad": 0.3,
+  "duration_s": 0.2,
+  "time_step_s": 0.001,
+  "voltage_v": 12.0
+}

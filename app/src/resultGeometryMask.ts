@@ -350,3 +350,38 @@ export function resultFaceTriangleIndices(vertices: [number, number, number][]):
   triangles.push(remaining[0].index, remaining[1].index, remaining[2].index);
   return triangles;
 }
+
+type CachedFaceTriangles = {
+  coordinates: Float64Array;
+  triangles: readonly number[];
+};
+
+const faceTriangleCache = new WeakMap<[number, number, number][], CachedFaceTriangles>();
+
+function faceCoordinatesMatch(vertices: [number, number, number][], coordinates: Float64Array): boolean {
+  if (coordinates.length !== vertices.length * 3) return false;
+  for (let index = 0; index < vertices.length; index += 1) {
+    const vertex = vertices[index];
+    const offset = index * 3;
+    if (coordinates[offset] !== vertex[0]
+      || coordinates[offset + 1] !== vertex[1]
+      || coordinates[offset + 2] !== vertex[2]) return false;
+  }
+  return true;
+}
+
+/**
+ * Reuses triangulation while a saved result face keeps the same topology.
+ * Coordinates are compared before reuse so an in-place geometry update cannot
+ * return stale indices. Treat the returned indices as immutable.
+ */
+export function cachedResultFaceTriangleIndices(vertices: [number, number, number][]): readonly number[] {
+  const cached = faceTriangleCache.get(vertices);
+  if (cached && faceCoordinatesMatch(vertices, cached.coordinates)) return cached.triangles;
+  const triangles = Object.freeze(resultFaceTriangleIndices(vertices));
+  const coordinates = new Float64Array(vertices.length * 3);
+  vertices.forEach((vertex, index) => coordinates.set(vertex, index * 3));
+  const entry = { coordinates, triangles };
+  faceTriangleCache.set(vertices, entry);
+  return entry.triangles;
+}

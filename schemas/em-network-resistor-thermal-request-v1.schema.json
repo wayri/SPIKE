@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/em-network-resistor-thermal-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; named-port equality, cell existence, weight conservation, mesh validity and heat conservation are enforced by the implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "ac_request", "thermal_request", "sample_index", "resistor_cell_weights"],
+  "properties": {
+    "contract": {"const": "spike/em-network-resistor-thermal-request/v1"},
+    "ac_request": {
+      "type": "object",
+      "required": ["contract", "source", "wave_convention", "boundaries"],
+      "properties": {"contract": {"const": "spike/em-network-ac-request/v1"}}
+    },
+    "thermal_request": {
+      "type": "object",
+      "required": ["contract", "mesh", "materials", "boundaries"],
+      "properties": {
+        "contract": {"const": "spike/assembly-tetra-thermal-request/v1"},
+        "heat_sources_w_m3": {"type": "object", "maxProperties": 0}
+      }
+    },
+    "sample_index": {"type": "integer", "minimum": 0, "maximum": 511},
+    "resistor_cell_weights": {
+      "type": "object", "minProperties": 1, "maxProperties": 16,
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "null"},
+          {"type": "object", "minProperties": 1, "maxProperties": 2000,
+            "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}}
+        ]
+      }
+    }
+  }
+}

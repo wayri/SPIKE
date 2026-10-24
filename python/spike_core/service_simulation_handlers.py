@@ -10,7 +10,7 @@ from typing import Any, Dict
 
 from .assembly_analysis_scope import attach_scope_provenance, write_case_scope
 from .contracts import AnalysisResult, AnalysisSpec, SpiDeR, ValidationIssue
-from .component_thermal import run_component_thermal
+from .component_thermal import run_component_thermal, validate_component_thermal
 from .board_thermal import run_board_thermal
 from .external_engines import prepare_openems_case, run_openems_case
 from .models import (
@@ -38,10 +38,22 @@ def handle_simulation_request(
     thermal_adapter_registry: Dict[str, Any] | None = None,
 ) -> Dict[str, Any] | None:
     """Handle model and simulation requests, or return ``None``."""
+    from .service_propulsion_pod import handle_propulsion_pod_request
+    propulsion_response = handle_propulsion_pod_request(method, params)
+    if propulsion_response is not None:
+        return propulsion_response
+    from .service_si_models import handle_si_model_request
+    si_model_response = handle_si_model_request(method, params)
+    if si_model_response is not None:
+        return si_model_response
     from .service_sparameter_processing import handle_sparameter_processing_request
     network_response = handle_sparameter_processing_request(method, params)
     if network_response is not None:
         return network_response
+    from .service_em_cosimulation import handle_em_cosimulation_request
+    em_cosimulation_response = handle_em_cosimulation_request(method, params)
+    if em_cosimulation_response is not None:
+        return em_cosimulation_response
     from .service_pdn_network import handle_pdn_network_request
     pdn_response = handle_pdn_network_request(method, params)
     if pdn_response is not None:
@@ -139,6 +151,8 @@ def handle_simulation_request(
         return {"ok": True, "result": validate_scenario(ThermalScenario(**params["scenario"]))}
     if method == "estimate_thermal":
         return {"ok": True, "result": estimate_compact_thermal(ThermalScenario(**params["scenario"]))}
+    if method == "validate_component_thermal":
+        return {"ok": True, "result": validate_component_thermal(params)}
     if method == "run_component_thermal":
         return {"ok": True, "result": attach_scope_provenance(run_component_thermal(params), assembly_scope)}
     if method == "run_board_thermal":

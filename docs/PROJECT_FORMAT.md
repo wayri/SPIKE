@@ -98,3 +98,21 @@ This prevents untrusted project content from turning Save into an arbitrary file
   screening-only validity boundary.
 - Unsupported solver data must not be promoted to a validated result during migration.
 - EDA source paths are metadata only; the embedded source is authoritative for portable recall.
+
+
+### Occurrence net-name display preferences
+
+`analysis.assembly_net_name_visibility` is an optional map from board occurrence
+ID to a boolean. An explicit entry overrides `analysis.show_net_names` for that
+occurrence. An absent map or entry uses the existing global preference, preserving
+older projects. These are display preferences and do not change electrical net
+identity, geometry or solver inputs. The viewport layer selector updates only
+its selected occurrence; global net-name commands clear occurrence overrides.
+
+## Copper-zone display preferences
+
+The optional analysis fields `zone_display` (`filled`, `transparent`, `outline`)
+and `assembly_zone_display` (board-occurrence ID to mode) retain presentation
+preferences. Missing or unrecognized values use `filled`. They accompany existing
+`layer_opacity` / `assembly_layer_opacity` values (0–1), survive copies without
+results, and never change imported geometry, materials or analysis inputs.

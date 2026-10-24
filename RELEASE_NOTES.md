@@ -1,5 +1,12 @@
 # SPIKE Release Notes
 
+## Planned: SPIKE 0.4.1
+
+The accumulated desktop and solver-integration changes target **0.4.1**.
+See the [planned release scope and acceptance work](docs/releases/v0.4.1.md).
+This target is not a publication or installed-build claim.
+
+
 ## SPIKE desktop 0.3.0 — community engineering preview
 
 **Channel:** community engineering preview for testing. The current-source

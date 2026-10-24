@@ -6,9 +6,10 @@ import hashlib
 import tempfile
 import unittest
 import zipfile
+from collections import UserDict
 from pathlib import Path
 
-from python.spike_core.assembly_designs import AssemblyDesignError, canonicalize_assembly_designs
+from python.spike_core.assembly_designs import AssemblyDesignError, canonicalize_assembly_designs, _same_json_value
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import AssemblyIRV1, SpiDeRV2
 from python.spike_core.project_package import PackageLimits, ProjectPackageError, read_project, read_spike_package, write_spike_package
@@ -24,6 +25,15 @@ def _design(identity: str, digest: str) -> dict:
 
 
 class AssemblyDesignTests(unittest.TestCase):
+    def test_duplicate_comparison_retains_json_tuple_and_mapping_semantics(self):
+        left = {"points": [(1., 2.), (3., 4.)], "metadata": {"enabled": True, "value": None}}
+        right = UserDict({"points": [[1, 2], [3, 4]], "metadata": {"enabled": 1, "value": None}})
+        self.assertTrue(_same_json_value(left, right))
+        right["points"][1][0] = 5
+        self.assertFalse(_same_json_value(left, right))
+        self.assertFalse(_same_json_value(float("nan"), float("nan")))
+        self.assertFalse(_same_json_value({"a": 1}, {"a": 1, "b": 2}))
+
     def fixture(self):
         first, second = _design("controller", "1" * 64), _design("load", "2" * 64)
         assembly = AssemblyIRV1.from_dict({

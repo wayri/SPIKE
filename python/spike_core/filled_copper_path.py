@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from fractions import Fraction
 import heapq
-from math import isfinite
+from math import inf, isfinite
 from typing import Iterable, Sequence
 
 from .planar_polygon_topology import (
@@ -197,7 +197,7 @@ class FilledCopperDomain(SourceFilledBoundary):
 
         relevant = [
             (index, edge)
-            for index, edge in enumerate(self.edges)
+            for index, edge in self.query_indexed_edges((x0, -inf, x1, inf))
             if edge[0][0] != edge[1][0]
             and max(edge[0][0], edge[1][0]) > x0
             and min(edge[0][0], edge[1][0]) < x1
@@ -234,6 +234,17 @@ class FilledCopperDomain(SourceFilledBoundary):
                 "cell slab count exceeds the bounded source-vertex budget"
             )
 
+        starts = sorted(
+            (min(edge[0][0], edge[1][0]), edge_index, edge)
+            for edge_index, edge in relevant
+        )
+        stops = sorted(
+            (max(edge[0][0], edge[1][0]), edge_index)
+            for edge_index, edge in relevant
+        )
+        start_cursor = 0
+        stop_cursor = 0
+        active: dict[int, Edge] = {}
         records: list[dict[str, object]] = []
         work = 0
         for left_x, right_x in zip(xs, xs[1:]):
@@ -244,17 +255,23 @@ class FilledCopperDomain(SourceFilledBoundary):
                 raise FilledPathError(
                     "cell slab has no representable interior coordinate"
                 )
+            while start_cursor < len(starts) and starts[start_cursor][0] < middle_x:
+                _, edge_index, edge = starts[start_cursor]
+                active[edge_index] = edge
+                start_cursor += 1
+            while stop_cursor < len(stops) and stops[stop_cursor][0] <= middle_x:
+                _, edge_index = stops[stop_cursor]
+                active.pop(edge_index, None)
+                stop_cursor += 1
+            work += len(relevant)
+            if work > MAX_CELL_FRAGMENT_WORK:
+                raise FilledPathBudgetError(
+                    "cell fragment work exceeds the bounded work budget"
+                )
             crossings = []
-            for edge_index, edge in relevant:
-                work += 1
-                if work > MAX_CELL_FRAGMENT_WORK:
-                    raise FilledPathBudgetError(
-                        "cell fragment work exceeds the bounded work budget"
-                    )
-                low_x = min(edge[0][0], edge[1][0])
-                high_x = max(edge[0][0], edge[1][0])
-                if low_x < middle_x < high_x:
-                    crossings.append((_edge_y(edge, middle_x), edge_index, edge))
+            for edge_index in sorted(active):
+                edge = active[edge_index]
+                crossings.append((_edge_y(edge, middle_x), edge_index, edge))
             crossings.sort(key=lambda item: (item[0], item[1]))
             if len(crossings) % 2:
                 raise FilledPathError("physical edges produce unmatched slab crossings")

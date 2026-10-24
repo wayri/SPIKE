@@ -1,5 +1,153 @@
 # SPIKE Solver Status
 
+The current [solver integration map](SOLVER_INTEGRATION.md) distinguishes dedicated
+setup panels, guarded request runners, source/API references and unavailable
+workflows. UI discovery and worker transport do not promote physical or release
+qualification. Existing evidence below retains its dated scope.
+
+
+The [SI08 full-family campaign](SI08_FAMILY_CLOSURE.md) starts with
+[supplied coupled multiport fixture removal](MULTIPORT_DEEMBEDDING.md).
+Independent simultaneous-wave checks cover 1, 2, 3, 4 and 8 DUT ports, dense
+fixture coupling/reflections, active and reflecting DUTs, DC, arbitrary named
+storage order and numerical rejection. Nine source-bound numerical/workflow
+checks pass. Calibration/uncertainty, general passive causal fitting,
+measurement/transient correlation and release qualification
+remain open; SI08 remains in progress. The source worker and dedicated desktop
+fixture panel have completed bounded software integration in
+[SI08-S05](validation/SI08_MULTIPORT_INTEGRATION_20261024.md), including actual
+native import/run/export, editing invalidation, singular-sample rejection,
+recovery and wide/narrow visual inspection. Installed-package and physical
+qualification remain separate. This adds no physical extraction claim.
+
+[PI01-S02 scalable increment](validation/PI01_SCALABLE_20261024.md) verifies an
+explicit isolated 50k-cell profile, localized conforming source-volume partition,
+stable scalar RT0 Gram assembly, one-factor sparse solves and batched unchanged
+solid-geometry audits. Eighty focused tests and 60 affected solid-physics tests
+pass. The reviewed Marble U37.18/R195.1 transfer solves 29,448--39,675 tetrahedra,
+but fails the frozen heat/p99 refinement-stability limits. EBrake24V and full
+Marble+1V0 remain resource-blocked under the current projected-extrusion strategy.
+Full PI01-S02 remains in progress; no production route or board qualification
+is enabled by this supplement.
+
+The [24 October numerical runtime policy](WORKER_NUMERICAL_RUNTIME.md) defaults
+owned workers to a pre-import one-thread inner BLAS/OpenMP budget, separately
+from explicit outer/job CPU budgets. Fresh AC/CHT benchmarks preserved numerical
+checks with approximately 89% lower Windows peak private commit; resident-RAM
+and solve-time changes were much smaller. See [measured scope](validation/SOLVER_RUNTIME_MEMORY_20261024.md).
+The [alpha.2 packaging record](validation/AC_CHT_ALPHA2_PACKAGING_20261024.md)
+now records a rebuilt and verified Windows worker with the AC resistor/CHT
+worker/CLI route and retained matching source baseline. Linux focused source
+qualification passes 62/62 tests in an isolated dependency environment.
+Windows MSI/NSIS engineering-preview artifacts are built. Windows and Linux
+frozen workers pass six AC/CHT refinement field replays; the Linux worker
+matches all 775 inspected Windows Python/schema files (510 modules and 265
+schemas in the corrected R3 Windows/R4 Linux candidate). Installed lifecycle,
+clean-machine and full-suite acceptance remain distinct gates; no MPI
+capability or new CFD/SI/PI physical qualification is inferred.
+
+[PI01-S02 board-volume reference](validation/PI01_BOARD_VOLUME_20261023.md):
+47 source-bound focused tests verify offline conservative tetrahedral DC,
+explicit full-pad contacts, native pad/via authentication, retraced source fills,
+barrel/land volume coverage and retained physical fields/heat/density. Current
+native EBrake24V and Marble runs authenticate sources but exceed the reference
+mesh/barrel budgets; no full-board result or convergence is claimed. Full
+PI01-S02 stays in progress. Production dispatch, AC/SI closure, physical stack
+validation and human numerical release review remain open.
+
+The [SI worker qualification attempt](validation/SI_WORKER_QUALIFICATION_20261023.md)
+now has a final R3 worker with a retained matching 499-module/262-schema
+baseline, mandatory packaged/runtime gates and the unchanged 10.3125 GBd
+analytical gates executed through frozen processes. Earlier drift failures
+remain recorded; later working-tree edits are not part of that candidate. This is
+not board compliance: all 18 actual Marble/WREN high-speed pairs reject the
+current geometry extractor in both declared modes. External vendor AMI models
+remain blocked at package/rights/admission, not silently replaced by synthetic
+fixtures. The record separates executed checks from these open gaps.
+
+The [SI material/reference increment](validation/SI_BOARD_SCENARIOS_20261023.md)
+adds immutable, source-bound conductivity scenarios and exact retained-plane
+selection without bypassing geometry checks. Marble's selected diagnostic
+piecewise path now produces a checked experimental network under an explicit
+nominal material assumption. The legacy converted White Rabbit case still
+rejects missing reference geometry. A fresh Windows worker passes its bounded
+probes; this is not physical board, protocol or installer qualification.
+
+The experimental [coupled propulsion benchmark](validation/PROPULSION_POD_COUPLING_DERIVATION_20261023.md)
+now executes a real sampled SPIKES C controller, reciprocal two-phase linear
+P1 motor ports, shaft dynamics and geometry-derived hover BEM reaction in one
+accepted-step loop. The source Python Workspace path completed 2,500 steps,
+500 controller ticks and 26 field frames with native result/view persistence.
+This synthetic benchmark does not establish VESC firmware/three-phase product
+motor identity, blade-resolved CFD, enclosure/thermal feedback or full flight.
+The optional Studio source runtime/compiler is required; frozen/installable
+qualification and interactive desktop visual acceptance remain open.
+
+The separate [geometry-port integration](adr/0136-explicit-geometry-propulsion-ports.md)
+now has a shared headless/worker application boundary and saved-result GUI
+admission/replay. A fixed compiled-controller regression crosses that actual UI
+parser with explicitly synthetic fixture ports. Actual source-derived motor
+refinement has passed the declared sampled1mNm functional-change screen;
+angular interpolation is still being checked. Repaired actual blade meshes
+resolve only the constant pressure kernel, but full-speed actual-air load,
+traction/grid/domain convergence and the completed real-source loop remain
+pending. Transport tests and display availability do not establish those facts.
+
+The subsequent [SI execution increment](validation/SI_EXECUTION_20261023.md)
+adds a C++ AMI Init/GetWave/Close host for explicitly trusted Windows x64
+development models, plus a generic sampled-FIR PAM3 worker route with two eyes
+and SER. AMI inventory remains non-executing; the host is not a security
+sandbox or a vendor-qualified loader. Generic PAM3 is not USB4 encoding,
+training, receiver or compliance qualification. The generation-specific suite
+still rejects unsupported PAM3 execution instead of substituting NRZ/PAM4.
+Separate LPDDR, parallel-DPI, USB3 and USB4-v2 setup entries remain declarative.
+A bounded native C++ transition-PI CDR reference has
+strict-FP CMake/CTest targets and benchmarks; it is not the active Python/worker
+backend. These later source changes are not contained in the earlier preview
+installers. Full release qualification remains open.
+
+The [local AC repair](validation/LOCAL_AC_REPAIR_20261023.md) checks every
+independent terminal basis at unchanged tolerances. Dated PI02-S01–S04 receipts
+replay current source. The [EMerge sampled circuit bridge](EMERGE_COSIMULATION.md)
+adds experimental explicit AC boundaries and conservative external-resistor
+heat mapping to retained thermal cells. It preserves source status/diagnostics;
+it does not itself establish field calibration. Additional experimental
+[live linear SPICE](validation/EM_SPICE_COUPLING_20261023.md) and
+[supplied-field body heating](validation/EM_BODY_HEATING_20261023.md) routes now
+execute through the worker/CLI. The latter requires raw Poynting closure and
+state-bound samples; actual EMerge field/board accuracy remains unqualified.
+The current
+0.4.0-alpha.1 source candidate now exposes worker/CLI methods, EMerge draft
+export and guarded Python Workspace templates, not a general graphical
+coupled-study editor. [Integration evidence](validation/EMERGE_RELEASE_INTEGRATION_20261023.md)
+distinguishes the built candidate from published installers.
+
+The [retained tetrahedral CHT composition](validation/CFD_CHT_RELEASE_20261023.md)
+now exposes `run_cfd_tetra_cht` and a truthful experimental capability record.
+It derives conservative face mass flux from an executed creeping-flow solve;
+it does not accept fabricated caller flux or enable turbulence.
+
+The experimental [AC resistor/solid/creeping-CHT bridge](validation/AC_NETWORK_CHT_20261023.md)
+now deposits explicit named-port external resistor watts conservatively on
+retained solid cells, preserving outside and unclassified network powers.
+Layered conduction and tangent-flow analytical refinement passed; this does not
+add live SPICE, R(T) feedback, general EM-body heating or production cooling.
+Thermal assembly has a measured [11.4% lower local stage median](validation/CFD_ENERGY_PERFORMANCE_20261023.md)
+with exact matrix equivalence; no end-to-end speedup or HPC claim is made.
+
+The experimental [AC-loss to heat to elasticity chain](validation/AC_THERMAL_ELASTIC_20261023.md)
+now executes actual existing field/thermal/structural owners on an identical
+retained mesh, with context and temperature provenance, slab refinement and
+clamped/free-expansion checks. The current source registers
+`run_pdn_dielectric_thermomechanical` and a guarded Workspace request runner.
+This remains one-way same-mesh coupling, not a general PCB/SI/transient
+workflow; numerical and release limitations remain.
+
+The [tetrahedral CFD zero-work defect](validation/CFD_TETRA_ZERO_WORK_20261023.md)
+is repaired through constant lifting and consistent gradient-adjoint reactions.
+This supersedes the older unresolved uniform-translation limitation only;
+inertia, symmetric-stress open boundaries, turbulence and production CFD remain open.
+
 Internal [charged-particle/kinetic references](validation/NATIVE_PARTICLE_REFERENCE_20261021.md)
 pass 209 active checks in Windows GNU Release and Debug: relativistic
 kinematics, signed electrostatic energy, dilute hard-sphere gas diagnostics and
@@ -1470,6 +1618,15 @@ electrostatics, vias/antipads, bends, launches, connectors, arbitrary coupled
 lines, IBIS/source/receiver models, statistical eyes, rare-event BER, isolated
 packaged-SPIKES parity, independent correlation, and measured two/four-port
 VNA/TDR evidence remain required. See `GEOMETRY_DERIVED_SI_CHANNEL.md`.
+
+The separate in-process `si_pair_geometry.prepare_pair_geometry` prerequisite
+retains independently segmented P/N tracks, vias, arcs, pads and source context,
+with exact rational straight-track coverage and explicit unextracted transitions.
+It does not relax those extractor requirements or produce a channel. See the
+[retention derivation and verification](validation/SI_GENERAL_PAIR_GEOMETRY_20261023.md).
+Vendor AMI terms inspection remains blocked by the absence of a verified isolated
+Windows VM; no installer or vendor model was executed. See the
+[environment preflight](validation/AMI_VM_PREFLIGHT_20261023.md).
 
 Causality checking for arbitrary imported networks remains unavailable until
 DC extrapolation, resampling, window, and delay-removal policies are explicit.

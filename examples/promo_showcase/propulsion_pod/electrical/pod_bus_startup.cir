@@ -1,0 +1,10 @@
+.title Original restrained propulsion-pod electrical bus starter
+* Supplied 48V ramp and 0.2A/5A load, not an ESC or propeller model.
+Vsource supply 0 PWL(0 0 200u 48 4m 48)
+Rsource supply lead 0.1
+Llead lead bus 1u
+Resr bus capacitor 0.02
+Cbus capacitor 0 470u
+Iload bus 0 PWL(0 0 400u 0 410u .2 1m .2 1010u 5 2m 5 2010u .2 4m .2)
+.tran 1u 4m uic
+.end

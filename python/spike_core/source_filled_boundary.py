@@ -153,6 +153,11 @@ class SourceFilledBoundary:
     def query_edges(self, bounds: Sequence[float]) -> tuple[Edge, ...]:
         return self._spatial_index.query_edges(bounds)
 
+    def query_indexed_edges(
+        self, bounds: Sequence[float],
+    ) -> tuple[tuple[int, Edge], ...]:
+        return self._spatial_index.query_indexed_edges(bounds)
+
     def query_points(self, bounds: Sequence[float]) -> tuple[Point, ...]:
         return self._spatial_index.query_points(bounds)
 

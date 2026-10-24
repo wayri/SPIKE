@@ -27,6 +27,13 @@ def _digest(path: Path) -> str:
 
 def validate_done_import_stage(stage: dict, root: Path) -> None:
     receipt = json.loads(_path(root, stage.get('evidence')).read_text(encoding='utf-8'))
+    if stage['id'] == 'SI08-S05':
+        if __package__:
+            from .parity_multiport_native_gate import validate_evidence
+        else:
+            from parity_multiport_native_gate import validate_evidence
+        validate_evidence(receipt, root)
+        return
     if stage['id'] == 'PI01-S02A':
         if __package__:
             from .parity_finite_contact_gate import validate_receipt

@@ -1,0 +1,14 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.mechanical-section-controls { min-width: 0; font: 12px/1.4 system-ui, sans-serif; color: var(--spike-table-text); border-top: 1px solid var(--spike-table-border); }
+.mechanical-section-controls > summary { cursor: pointer; padding: 7px 0; font-weight: 600; }
+.mechanical-section-controls > summary span { margin-left: 8px; color: var(--spike-table-muted); font-weight: 400; }
+.mechanical-section-body { display: grid; gap: 8px; padding: 0 0 8px; min-width: 0; }
+.mechanical-section-controls p { margin: 0; color: var(--spike-table-muted); overflow-wrap: anywhere; }
+.mechanical-section-actions, .mechanical-section-presets { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 0; }
+.mechanical-section-actions label { display: inline-flex; align-items: center; gap: 4px; }
+.mechanical-section-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 105px), 1fr)); gap: 6px; min-width: 0; }
+.mechanical-section-fields label { display: grid; gap: 3px; min-width: 0; }
+.mechanical-section-fields input { box-sizing: border-box; width: 100%; min-width: 0; min-height: 26px; padding: 3px 5px; font: 12px/1.4 system-ui, sans-serif; }
+.mechanical-section-controls input:focus-visible { outline: 2px solid var(--spike-table-focus); outline-offset: 1px; }
+.mechanical-section-controls [role="alert"] { color: var(--spike-table-danger-text); }
+.mechanical-section-controls > summary[hidden] {display:none;}

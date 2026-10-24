@@ -1,0 +1,71 @@
+{
+  "request": {
+    "contract": "spike/propulsion-pod-request/v1",
+    "field_motor": {},
+    "propeller": {
+      "contract": "spike/hover-bem-propeller/v1",
+      "blade_count": 2,
+      "radial_stations_m": [
+        0.03,
+        0.15
+      ],
+      "chord_m": [
+        0.018,
+        0.012
+      ],
+      "twist_rad": [
+        0.18,
+        0.12
+      ],
+      "density_kg_m3": 1.225,
+      "dynamic_viscosity_pa_s": 1.81e-05,
+      "speed_of_sound_m_s": 343.0,
+      "polar": {
+        "lift_slope_per_rad": 6.0,
+        "drag_coefficient": 0.012,
+        "alpha_valid_rad": [
+          0.0,
+          0.2
+        ],
+        "reynolds_valid": [
+          0.0,
+          2000000.0
+        ],
+        "source": "Illustrative attached linear polar; not measured"
+      },
+      "radial_cells": 32,
+      "relative_tolerance": 1e-10,
+      "max_iterations": 80
+    },
+    "drive": {
+      "resistance_ohm": [
+        0.5,
+        0.5
+      ],
+      "end_turn_inductance_h": [
+        0.0002,
+        0.0002
+      ],
+      "dc_bus_v": 12.0,
+      "current_limit_a": 4.0,
+      "speed_kp_a_s_per_rad": 0.06,
+      "speed_ki_a_per_rad": 0.5,
+      "current_gain_ohm": 0.25
+    },
+    "shaft": {
+      "inertia_kg_m2": 5e-06,
+      "damping_n_m_s": 1e-06,
+      "initial_speed_rad_s": 0.0,
+      "initial_angle_rad": 0.2
+    },
+    "transient": {
+      "duration_s": 0.25,
+      "time_step_s": 0.0001,
+      "controller_period_s": 0.0005,
+      "field_output_interval_s": 0.01,
+      "target_speed_rad_s": 100.0,
+      "maximum_speed_rad_s": 500.0,
+      "wall_budget_s": 120.0
+    }
+  }
+}

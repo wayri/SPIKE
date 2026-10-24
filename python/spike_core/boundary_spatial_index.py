@@ -243,6 +243,14 @@ class BoundarySpatialIndex:
         indices = self._query_edge_indices(bounds)
         return tuple(self.original_edges[index] for index in indices)
 
+    def query_indexed_edges(
+        self, bounds: Sequence[float],
+    ) -> tuple[tuple[int, Edge], ...]:
+        """Return candidates with their stable original physical-edge indices."""
+
+        indices = self._query_edge_indices(bounds)
+        return tuple((index, self.original_edges[index]) for index in indices)
+
     def query_canonical_edges(self, bounds: Sequence[float]) -> tuple[Edge, ...]:
         """Return the same candidates with stable endpoint order for containment."""
 

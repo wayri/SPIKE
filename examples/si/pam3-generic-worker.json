@@ -1,0 +1,16 @@
+{
+  "id": "pam3-generic-reference",
+  "method": "simulate_si_pam3",
+  "params": {
+    "request": {
+      "contract": "spike/si-pam3-request/v1",
+      "symbols": [0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0,1,2],
+      "levels_v": [-0.4,0.0,0.4],
+      "channel_impulse": [1.0],
+      "symbol_rate_hz": 20000000000,
+      "samples_per_ui": 8,
+      "voltage_noise_rms_v": 0.01,
+      "noise_seed": 11
+    }
+  }
+}

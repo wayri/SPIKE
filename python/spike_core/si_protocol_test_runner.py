@@ -60,6 +60,10 @@ def _validate_request(request: Mapping[str, Any]) -> tuple[dict[str, Any], list[
     if request.get("contract") != REQUEST_CONTRACT:
         raise SiProtocolTestRunnerError(f"contract must be {REQUEST_CONTRACT}.")
     suite = canonical_si_protocol_suite(request.get("suite"))
+    if suite["encoding"] == "PAM3":
+        raise SiProtocolTestRunnerError(
+            "PAM3 execution is not implemented; an NRZ/PAM4 eye cannot substitute for this interface."
+        )
 
     raw_limits = request.get("resource_limits") or {}
     if not isinstance(raw_limits, Mapping) or set(raw_limits) - _RESOURCE_KEYS:

@@ -12,6 +12,18 @@ import types
 from PyInstaller.archive.readers import CArchiveReader
 
 ROOT = Path(__file__).resolve().parents[1]
+EM_COSIM_MODULES = {
+    "python.spike_core.service_em_cosimulation", "python.spike_core.cli_em_cosimulation",
+    "python.spike_core.em_network_ac", "python.spike_core.em_network_resistor_thermal",
+    "python.spike_core.pdn_dielectric_ac", "python.spike_core.pdn_dielectric_thermomechanical",
+    "extensions.emerge_suite.cosimulation",
+    "extensions.emerge_suite.volume_capture",
+    "python.spike_core.em_spice_coupling", "python.spike_core.em_spice_coupling_circuit",
+    "python.spike_core.em_body_heating", "python.spike_core.cfd_tetra_cht",
+    "python.spike_core.em_network_resistor_cht", "python.spike_core.cfd_tetra_energy",
+    "python.spike_core.cfd_tetra_stokes", "python.spike_core.cfd_tetra_mesh",
+    "python.spike_core.numerical_runtime",
+}
 
 
 def normalized(code):
@@ -20,17 +32,16 @@ def normalized(code):
         for value in code.co_consts))
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("executable", type=Path)
-    parser.add_argument("--output", type=Path)
-    args = parser.parse_args()
-    archive = CArchiveReader(str(args.executable)).open_embedded_archive("PYZ.pyz")
+def inspect_packaged_source_modules(executable, *, source_root=None, require_em_cosimulation=False):
+    """Return a strict comparison report; never import the packaged application."""
+    root = Path(source_root) if source_root is not None else ROOT
+    archive = CArchiveReader(str(executable)).open_embedded_archive("PYZ.pyz")
     checked, changed, missing = [], [], []
     for name in sorted(archive.toc):
-        if name != "python" and not name.startswith("python."):
+        if name != "python" and not name.startswith("python.") and not (
+                require_em_cosimulation and name in EM_COSIM_MODULES):
             continue
-        base = ROOT.joinpath(*name.split("."))
+        base = root.joinpath(*name.split("."))
         source = base.with_suffix(".py")
         if not source.is_file():
             source = base / "__init__.py"
@@ -44,8 +55,30 @@ def main():
         # can differ only in frozenset ordering under different hash seeds.
         if normalized(frozen) != normalized(current):
             changed.append(name)
-    report = {"status": "passed" if checked and not changed and not missing else "failed",
-              "checked_modules": len(checked), "changed": changed, "missing": missing}
+    required_missing = sorted(EM_COSIM_MODULES - set(checked)) if require_em_cosimulation else []
+    report = {"status": "passed" if checked and not changed and not missing and not required_missing else "failed",
+              "checked_modules": len(checked), "changed": changed, "missing": missing,
+              "required_missing": required_missing, "source_root": str(root.resolve())}
+    return report
+
+
+def verify_packaged_source_modules(executable, *, source_root=None, require_em_cosimulation=False):
+    report = inspect_packaged_source_modules(
+        executable, source_root=source_root, require_em_cosimulation=require_em_cosimulation)
+    if report["status"] != "passed":
+        raise RuntimeError("Packaged Python source coherence failed: " + json.dumps(report, sort_keys=True))
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("executable", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--source-root", type=Path, help="Explicit retained baseline; default is the active repository")
+    parser.add_argument("--require-em-cosimulation", action="store_true", help="Reject a worker missing the integrated EM/AC/heat owners")
+    args = parser.parse_args()
+    report = inspect_packaged_source_modules(args.executable, source_root=args.source_root,
+                                             require_em_cosimulation=args.require_em_cosimulation)
     if args.output:
         args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report))

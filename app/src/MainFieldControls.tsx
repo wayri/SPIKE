@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Controls only; BoardViewport owns the shared scene and camera.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Box, Eye, EyeOff, Upload, Download, Play, Pause, X, ArrowLeft, ArrowRight, SkipForward, RotateCcw } from "./icons";
 import { admitFieldVolume, type FieldViewOptions } from "./fieldVolumeModel";
@@ -9,11 +9,18 @@ import { createPlaybackTimeline } from "./transientPlayback";
 import type { MainFieldView } from "./mainFieldViewport";
 import "./buttonStandard.css";
 import "./MainFieldControls.css";
-type Props = { view: MainFieldView | null; open: boolean; onOpen: (open: boolean) => void; onPresent: (data: unknown) => void; onOptions: (patch: Partial<FieldViewOptions>) => void; onVisible: (value: boolean) => void; onClear: () => void };
-export default function MainFieldControls({ view, open, onOpen, onPresent, onOptions, onVisible, onClear }: Props) {
+export type ViewportResultLayer = {id:string;label:string;available:boolean;visible:boolean;onVisible:(value:boolean)=>void;opacity?:number;onOpacity?:(value:number)=>void;onManage?:()=>void};
+type Props = {layers?:ViewportResultLayer[];resultPicker?:ReactNode;onManageAll?:()=>void; view: MainFieldView | null; open: boolean; onOpen: (open: boolean) => void; onPresent: (data: unknown) => void; onOptions: (patch: Partial<FieldViewOptions>) => void; onVisible: (value: boolean) => void; onClear: () => void };
+export default function MainFieldControls({ view, open, onOpen, onPresent, onOptions, onVisible, onClear, layers=[], resultPicker, onManageAll }: Props) {
   const trigger = useRef<HTMLButtonElement>(null), panel = useRef<HTMLElement>(null), input = useRef<HTMLInputElement>(null);
   const [position, setPosition] = useState({ top: 70, left: 12 }), [error, setError] = useState("");
   const [playing, setPlaying] = useState(false), [speed, setSpeed] = useState(1), [loop, setLoop] = useState(false);
+  const [preview,setPreview]=useState(false);
+  const previewRef=useRef(preview),leaveTimer=useRef<ReturnType<typeof setTimeout>|null>(null);previewRef.current=preview;
+  const cancelLeave=()=>{if(leaveTimer.current!==null)clearTimeout(leaveTimer.current);leaveTimer.current=null;};
+  const leave=()=>{cancelLeave();if(previewRef.current)leaveTimer.current=setTimeout(()=>{if(previewRef.current)onOpen(false);},120);};
+  useEffect(()=>()=>cancelLeave(),[]);
+  useEffect(()=>{if(!open)setPreview(false);},[open]);
   const source = view?.data, settings = view?.options;
   const frame = Math.min(settings?.frame ?? 0, Math.max(0, (source?.frames.length ?? 1) - 1));
   const times = useMemo(() => source?.frames.map(f => f.timeS) ?? [], [source]);
@@ -34,7 +41,7 @@ export default function MainFieldControls({ view, open, onOpen, onPresent, onOpt
     if (!open) return;
     const place = () => { const rect = trigger.current?.getBoundingClientRect(); if (rect) setPosition({ top: Math.min(rect.bottom + 6, window.innerHeight - 140), left: Math.max(8, Math.min(rect.right - 340, window.innerWidth - 348)) }); }; place();
     const key = (e: KeyboardEvent) => { if (e.key === "Escape") { onOpen(false); trigger.current?.focus(); } };
-    const outside = (e: PointerEvent) => { if (!panel.current?.contains(e.target as Node) && !trigger.current?.contains(e.target as Node)) onOpen(false); };
+    const outside = (e: PointerEvent) => { if (!(e.target instanceof Element && e.target.closest(".select-search")) && !panel.current?.contains(e.target as Node) && !trigger.current?.contains(e.target as Node)) onOpen(false); };
     window.addEventListener("resize", place); document.addEventListener("keydown", key); document.addEventListener("pointerdown", outside);
     return () => { window.removeEventListener("resize", place); document.removeEventListener("keydown", key); document.removeEventListener("pointerdown", outside); };
   }, [open, onOpen]);
@@ -43,11 +50,12 @@ export default function MainFieldControls({ view, open, onOpen, onPresent, onOpt
   const select = (label: string, value: string | number, values: [string | number, string, boolean?][], change: (value: string) => void, disabled = false) => <label>{label}<select aria-label={label} value={value} disabled={disabled} onChange={e => change(e.target.value)}>{values.map(([id, text, off]) => <option key={id} value={id} disabled={off}>{text}</option>)}</select></label>;
   const range = (label: string, value: number, min: number, max: number, step: number, change: (value: number) => void, disabled = false) => <label>{label}<input type="range" aria-label={label} min={min} max={max} step={step} value={value} disabled={disabled} onChange={e => change(Number(e.target.value))} /></label>;
   return <div className="main-field-tools" role="group" aria-label="Main viewport field tools" onPointerDown={e => e.stopPropagation()}>
-    <button ref={trigger} type="button" className="main-field-trigger" aria-label="Volume and airflow controls" title="Volume and airflow controls" aria-expanded={open} onClick={() => onOpen(!open)}><Box size={15} /><span>Fields</span></button>
+    <button ref={trigger} type="button" className="main-field-trigger" aria-label="Result layers and fields" title="Result layers and fields" aria-expanded={open} onMouseEnter={()=>{cancelLeave();if(!open){setPreview(true);onOpen(true);}}} onMouseLeave={leave} onClick={()=>{cancelLeave();setPreview(false);onOpen(preview||!open);}}><Box size={15} /><span>Fields</span></button>
     {source && <>{timeline && <><button type="button" aria-label={playing ? "Pause field playback" : "Play field playback"} onClick={() => { if (!playing && frame === times.length - 1) onOptions({ frame: 0 }); onVisible(true); setPlaying(!playing); }}>{playing ? <Pause size={14} /> : <Play size={14} />}</button><input className="main-field-scrubber" type="range" aria-label="Field playback frame" min="0" max={times.length - 1} value={frame} onChange={e => step(Number(e.target.value))} /><small>{times[frame].toPrecision(4)} s</small></>}<button type="button" aria-label={view!.visible ? "Hide field layer" : "Show field layer"} title={view!.visible ? "Hide field layer" : "Show field layer"} onClick={() => onVisible(!view!.visible)}>{view!.visible ? <EyeOff size={14} /> : <Eye size={14} />}</button></>}
     <input ref={input} hidden type="file" accept=".json" aria-label="Field visualization JSON file" onChange={async e => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; try { if (file.size > 64 * 1024 * 1024) throw new Error("Field import is limited to 64 MiB."); onPresent(admitFieldVolume(JSON.parse(await file.text()))); setError(""); } catch (reason) { setError(`Import rejected; previous field retained: ${reason instanceof Error ? reason.message : String(reason)}`); } }} />
-    {open && createPortal(<section ref={panel} className="main-field-popover" style={position} role="dialog" aria-label="Field display settings" onPointerDown={e => e.stopPropagation()}>
-      <header><strong>Field display</strong><div><button type="button" title="Import field JSON" aria-label="Import field" onClick={() => input.current?.click()}><Upload size={14} /></button><button type="button" title="Export field JSON" aria-label="Export field" disabled={!source} onClick={download}><Download size={14} /></button><button type="button" aria-label="Close field controls" onClick={() => { onOpen(false); trigger.current?.focus(); }}><X size={14} /></button></div></header>
+    {open && createPortal(<section ref={panel} className="main-field-popover" style={position} role="dialog" aria-label="Field display settings" onPointerEnter={cancelLeave} onPointerLeave={leave} onPointerDown={e => {setPreview(false);cancelLeave();e.stopPropagation();}}>
+      <header><strong>Result layers and fields</strong><div><button type="button" title="Import field JSON" aria-label="Import field" onClick={() => input.current?.click()}><Upload size={14} /></button><button type="button" title="Export field JSON" aria-label="Export field" disabled={!source} onClick={download}><Download size={14} /></button><button type="button" aria-label="Close field controls" onClick={() => { onOpen(false); trigger.current?.focus(); }}><X size={14} /></button></div></header>
+      <section className="main-field-layers" aria-label="Result layer visibility">{resultPicker}{layers.map(layer=><div className="main-field-layer" key={layer.id}><label><input type="checkbox" aria-label={`Show ${layer.label}`} disabled={!layer.available} checked={layer.available&&layer.visible} onChange={event=>layer.onVisible(event.target.checked)}/><span>{layer.label}</span>{!layer.available&&<small>No data</small>}</label>{layer.onManage&&<button type="button" disabled={!layer.available} aria-label={`Manage ${layer.label}`} onClick={layer.onManage}>Manage</button>}{layer.onOpacity&&<label className="main-field-layer-opacity">Opacity<input type="range" aria-label={`${layer.label} opacity`} min="0" max="1" step="0.01" disabled={!layer.available} value={layer.opacity??1} onChange={event=>layer.onOpacity?.(Number(event.target.value))}/><output>{Math.round((layer.opacity??1)*100)}%</output></label>}</div>)}{onManageAll&&<button type="button" className="main-field-manager" onClick={onManageAll}>Manage analysis results</button>}</section>
       {error && <p role="alert">{error}</p>}{!source && <p>Import a field dataset, or choose Show fields in main viewport in a CFD result. Fields share the board scene and camera.</p>}
       {source && settings && <><p className="main-field-name" title={source.label}>{source.label}</p><div className="main-field-grid">
         {select("Volume quantity", quantity!.id, source.quantities.map(q => [q.id, `${q.label} (${q.unit})`]), value => onOptions({ quantity: value }), generated)}

@@ -31,6 +31,17 @@ const api = module.exports;
 
 const boardScope = { kind: "board-occurrence", occurrenceId: "occ-A", designId: "design-A" };
 const partScope = { kind: "assembly-part", partId: "case-lid" };
+for (const value of [0, .35, 1]) {
+  const action = { type: "layer-opacity-all", occurrenceId: "occ-A", value };
+  assert(model.validWorkspaceViewAction(action));
+  assert(model.actionMatchesWorkspaceView(action, boardScope));
+  assert(!model.actionMatchesWorkspaceView(action, { ...boardScope, occurrenceId: "occ-B" }));
+  assert(!model.actionMatchesWorkspaceView(action, partScope));
+}
+for (const value of [NaN, Infinity, -Infinity, -.01, 1.01, "0.5", null, undefined]) {
+  assert(!model.validWorkspaceViewAction({ type: "layer-opacity-all", occurrenceId: "occ-A", value }));
+}
+assert(!model.validWorkspaceViewAction({ type: "layer-opacity-all", value: .5 }));
 const target = { id: "occ-A", designId: "design-A", name: "Power board", active: false, widthMm: 20, heightMm: 10, localCenterMm: [10, 5, 0], transform: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] };
 const snapshot = (id, scope, projectSession = "project-1", revision = "state-1") => ({
   viewId: id, projectSession, revision, viewportRevision: "viewport-1",
@@ -42,6 +53,18 @@ const snapshot = (id, scope, projectSession = "project-1", revision = "state-1")
 const viewport = { revision: "viewport-1", boards: { "design-A": { tracks: [], pads: [], vias: [], zones: [], components: [] } }, assemblyModels: [] };
 assert.equal(model.validWorkspaceViewSnapshot(snapshot("board-view", boardScope)), true);
 assert.equal(model.validWorkspaceViewViewportData(viewport), true);
+assert(model.validWorkspaceViewAction({ type: "net-names", occurrenceId: "occ-A", value: true }));
+assert(!model.validWorkspaceViewAction({ type: "net-names", occurrenceId: "occ-A", value: "true" }));
+assert(!model.validWorkspaceViewAction({ type: "net-names", value: true }));
+assert(!model.actionMatchesWorkspaceView({ type: "net-names", occurrenceId: "occ-B", value: true }, boardScope));
+assert(model.validWorkspaceViewSnapshot({ ...snapshot("board-view", boardScope), showNetNames: false, assemblyNetNameVisibility: { "occ-A": true } }));
+assert(!model.validWorkspaceViewSnapshot({ ...snapshot("board-view", boardScope), assemblyNetNameVisibility: { "occ-A": "true" } }));
+assert(model.validWorkspaceViewSnapshot({ ...snapshot("board-view", boardScope), zoneDisplay: "transparent", assemblyZoneDisplay: { "occ-A": "outline" } }));
+for (const mode of [true, null, "unsupported", {}]) {
+  assert(!model.validWorkspaceViewSnapshot({ ...snapshot("board-view", boardScope), zoneDisplay: mode }));
+  assert(!model.validWorkspaceViewSnapshot({ ...snapshot("board-view", boardScope), assemblyZoneDisplay: { "occ-A": mode } }));
+}
+
 
 const actionsA = [], actionsB = []; let hangA = false, hangLeaseB = false;
 await api.openWorkspaceViewWindow("board-view", snapshot("board-view", boardScope), action => { actionsA.push(action); return hangA ? new Promise(() => {}) : "A"; }, viewport);
@@ -65,6 +88,10 @@ assert.equal(await childA.act({ type: "focus-owner" }), true);
 assert.equal(ownerFocuses, 1, "show-owner is fulfilled by the transport owner window");
 assert.equal(actionsA.some(action => action.type === "focus-owner"), false, "focus-owner is not delegated as a project mutation");
 await assert.rejects(childA.act({ type: "select-object", partId: "case-lid", sourceObjectId: "face-4" }), /fixed view scope/);
+assert.equal(await childA.act({ type: "layer-opacity-all", occurrenceId: "occ-A", value: .4 }), "A");
+assert.equal(actionsA.at(-1).value, .4);
+await assert.rejects(childA.act({ type: "layer-opacity-all", occurrenceId: "occ-B", value: .4 }), /fixed view scope/);
+await assert.rejects(childB.act({ type: "layer-opacity-all", occurrenceId: "occ-A", value: .4 }), /fixed view scope/);
 
 // A dropped refresh must not authorize a stale revision or project session.
 const channelA = groups.get([...groups.keys()].find(key => key.includes(new URL(popups[0].url, window.location.href).searchParams.get("workspaceViewToken"))))[0];
@@ -94,6 +121,7 @@ new Function("require", "module", "exports", hookJs)(name => name === "./workspa
       : nativeRequire(name), hookModule, hookModule.exports);
 const scopeOptions = {
   projectSession: "project-1", revision: "state-1", viewportRevision: "viewport-1",
+  showNetNames: true, assemblyNetNameVisibility: { "occ-A": false, "occ-B": true },
   boards: { "design-A": viewport.boards["design-A"], "design-B": { tracks: [{ id: "secret-sibling" }] } },
   occurrences: [target, { ...target, id: "occ-B", designId: "design-B", name: "Sibling" }],
   assemblyModels: [{ partId: "case-lid", modelId: "lid", name: "Lid", modelType: "glb", url: "lid.glb", partTransform: target.transform, modelTransform: target.transform, visible: true, opacity: 1 },
@@ -105,6 +133,8 @@ const scopeOptions = {
 const boardDescriptor = snapshot("board-view", boardScope).descriptor;
 const scopedBoard = hookModule.exports.deriveWorkspaceViewScope(scopeOptions, boardDescriptor);
 assert.deepEqual(Object.keys(scopedBoard.viewport.boards), ["design-A"]); assert.deepEqual(scopedBoard.targetBoards.map(item => item.id), ["occ-A"]);
+assert.equal(scopedBoard.showNetNames, true);
+assert.deepEqual(scopedBoard.assemblyNetNameVisibility, { "occ-A": false }, "scope snapshots contain only the fixed occurrence label setting");
 assert.equal(scopedBoard.targetBoards[0].active, true, "a fixed board view uses the primary scene instead of rendering a duplicate assembly occurrence");
 assert.equal(target.active, false, "scope projection does not mutate the assembly occurrence");
 assert.deepEqual(Object.keys(scopedBoard.layerVisibility), ["occ-A"]); assert.deepEqual(Object.keys(scopedBoard.linkedNets), ["occ-A::GND"]);
@@ -188,3 +218,12 @@ await assert.rejects(nativeApi.connectWorkspaceViewChild("strict-view", { onSnap
 failEmit = false;
 assert.equal(activeNativeListeners.size, listenersBeforeFailedConnect, "failed child setup removes all partially registered listeners");
 console.log("Workspace scoped views passed: isolated sessions/tokens, fixed source scope, stale project rejection, RPC teardown, sibling survival and owner-loss lease");
+for (const value of ["filled","transparent","outline"]) {
+  assert.equal(model.validWorkspaceViewAction({type:"zone-display",occurrenceId:"A",value}),true);
+  assert.equal(model.actionMatchesWorkspaceView({type:"zone-display",occurrenceId:"A",value},{kind:"board-occurrence",occurrenceId:"B",designId:"d"}),false);
+}
+for (const value of ["wireframe",null,1,["filled"],{},false])assert.equal(model.validWorkspaceViewAction({type:"zone-display",occurrenceId:"A",value}),false);
+assert.equal(model.validWorkspaceViewAction({type:"reset-view",occurrenceId:"A"}),true);
+assert.equal(model.validWorkspaceViewAction({type:"reset-view"}),false);
+assert.equal(model.actionMatchesWorkspaceView({type:"reset-view",occurrenceId:"A"},{kind:"assembly-part",partId:"A"}),false);
+console.log("Zone/reset view messages validate exact modes and remain bound to one board occurrence.");

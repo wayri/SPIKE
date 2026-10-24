@@ -1,6 +1,17 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 @import "./tableTheme.css";
 
+/* Keep overflow operable without visible native scrollbar chrome in SPIKE.
+ * This shared sheet also covers detached tools and interactive previews.
+ * Do not replace overflow with hidden: wheel, touch, focus and keyboard still scroll.
+ */
+:root, :root * { scrollbar-width: none !important; }
+:root::-webkit-scrollbar, :root *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /*
  * Shared SPIKE control baseline. Keep these selectors at zero specificity so
  * scoped tool styles can define deliberate compact, icon, ribbon and grid

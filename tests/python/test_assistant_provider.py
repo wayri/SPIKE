@@ -92,6 +92,24 @@ class ProviderTests(unittest.TestCase):
             self.assertFalse(result["ok"])
             self.assertNotIn("PRIVATE", json.dumps(result))
 
+    def test_local_errors_explain_recovery_without_remote_text(self):
+        for status, hint in ((400, "supports tools"), (404, "Probe models"), (503, "memory")):
+            self.status = status
+            self.reply = b'PRIVATE_KEY_AND_PROJECT'
+            result = handle("assistant_turn", self.params())
+            self.assertFalse(result["ok"])
+            self.assertIn(hint, result["error"])
+            self.assertNotIn("PRIVATE", result["error"])
+        with patch.object(p.http.client.HTTPConnection, "request", side_effect=ConnectionRefusedError):
+            for selected, hint in (("ollama", "ollama serve"), ("lmstudio", "start its local API server")):
+                with self.assertRaisesRegex(p.ProviderError, hint):
+                    p.assistant_models({"provider": selected})
+
+    def test_model_discovery_has_short_deadline(self):
+        with patch.object(p, "_request", return_value={"models": []}) as request:
+            p.assistant_models({"provider": "ollama"})
+        self.assertEqual(request.call_args.kwargs["timeout"], 10)
+
     def test_deadline(self):
         self.delay = .2
         with patch.object(p, "TIMEOUT", .05):
@@ -109,13 +127,24 @@ class ProviderTests(unittest.TestCase):
         self.assertEqual(p._destination("lmstudio", "http://[::1]:1234")[1], "::1")
 
     def test_models_and_status_do_not_probe_implicitly(self):
-        self.reply = {"data": [{"id": "b"}, {"id": "a"}, {"id": "a"}]}
-        self.assertEqual(p.assistant_models({"provider": "lmstudio", "endpoint": self.endpoint})["models"], ["a", "b"])
-        self.assertEqual(self.requests[-1][0], "/v1/models")
+        self.reply = {"data": [{"id": "b", "state": "not-loaded"},
+                               {"id": "a", "state": "loaded"},
+                               {"id": "a", "state": "not-loaded"}]}
+        models = p.assistant_models({"provider": "lmstudio", "endpoint": self.endpoint})
+        self.assertEqual(models["models"], ["a", "b"])
+        self.assertEqual(models["preferred_model"], "a")
+        self.assertEqual(self.requests[-1][0], "/api/v0/models")
         with patch.object(p, "_request", side_effect=AssertionError("no status network probe")), patch.object(c, "get_credential", return_value="private-key"):
             status = p.assistant_provider_status({"provider": "openai"})
             self.assertFalse(status["network_probed"])
             self.assertNotIn("private-key", json.dumps(status))
+
+    def test_lmstudio_model_discovery_falls_back_for_older_servers(self):
+        with patch.object(p, "_request", side_effect=[p.ProviderError("unsupported"),
+                                                       {"data": [{"id": "legacy-b"}, {"id": "legacy-a"}]}]) as request:
+            result = p.assistant_models({"provider": "lmstudio", "endpoint": self.endpoint})
+        self.assertEqual(result, {"provider": "lmstudio", "models": ["legacy-a", "legacy-b"]})
+        self.assertEqual([call.args[2] for call in request.call_args_list], ["/api/v0/models", "/v1/models"])
 
     def test_cloud_headers_tls_and_fixed_host(self):
         for selected in ("openai", "anthropic"):

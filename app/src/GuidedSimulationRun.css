@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.guided-simulation-run { display: flex; flex-direction: column; min-width: 0; width: min(380px, 100%); max-height: 100%; color: var(--spike-table-text); background: var(--spike-popup-surface, var(--spike-control-surface)); border: 1px solid var(--spike-control-border); border-radius: 6px; font: var(--spike-control-font); box-sizing: border-box; }
+.guided-simulation-run__header { display: flex; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid var(--spike-control-border); }
+.guided-simulation-run__header > div { min-width: 0; flex: 1; }
+.guided-simulation-run h2 { font-size: 15px; margin: 3px 0 0; }
+.guided-simulation-run h3 { font-size: 13px; margin: 5px 0 9px; }
+.guided-simulation-run p { line-height: 1.55; margin: 8px 0; overflow-wrap: anywhere; }
+.guided-simulation-run__body { min-height: 0; overflow: auto; padding: 8px 12px; }
+.guided-simulation-run__context { font-weight: 600; }
+.guided-simulation-run__status { border-left: 3px solid var(--spike-control-primary-border); padding-left: 9px; }
+.guided-simulation-run__section { padding: 12px; margin: 12px 0; border: 1px solid var(--spike-control-border); border-radius: 4px; background: var(--spike-control-field); }
+.guided-simulation-run__eyebrow { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--spike-control-muted); }
+.guided-simulation-run__hint { color: var(--spike-control-muted); font-size: 11px; }
+.guided-simulation-run__actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 12px; }
+.guided-simulation-run footer { border-top: 1px solid var(--spike-control-border); }
+.guided-simulation-run__section .guided-simulation-run__actions { padding: 10px 0 0; }
+.guided-simulation-run button { flex-shrink: 0; }
+/* The guide reserves a layout track so editors and viewport remain usable. */
+#simulation-workspace.guided-run-open { --guided-editor-track:0px; grid-template-columns:minmax(0,1fr) var(--guided-editor-track) minmax(260px,320px)!important;grid-template-areas:"commands commands guide" "viewport focus-tool guide"!important; }
+#simulation-workspace.guided-run-open.focus-panel-open { --guided-editor-track:clamp(280px,30vw,480px); }
+.guided-run-dock { grid-area:guide;min-width:0;min-height:0;display:flex;flex-direction:column;gap:8px;padding:8px;border-left:1px solid var(--spike-table-border);overflow:auto;background:var(--spike-table-toolbar); }
+.guided-run-dock>.guided-simulation-run { width:100%;min-height:0;flex:1; }
+.guided-run-targets { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px; }
+.guided-run-targets button { min-width:0; }
+.workspace-simulation-actions { display:flex;align-items:center;gap:5px;flex:0 0 auto; }
+@media(max-width:1100px) { #simulation-workspace.guided-run-open { grid-template-columns:minmax(0,1fr) var(--guided-editor-track)!important;grid-template-rows:36px minmax(0,1fr) minmax(180px,32vh)!important;grid-template-areas:"commands commands" "viewport focus-tool" "guide guide"!important; }.guided-run-dock { border-left:0;border-top:1px solid var(--spike-table-border);display:grid;grid-template-columns:minmax(120px,.35fr) minmax(0,1fr); }.guided-run-targets { align-content:start; } }
+
+/* Classic retains its existing document tab area rather than creating an implicit track. */
+.interface-classic #simulation-workspace.guided-run-open { grid-template-rows:auto minmax(0,1fr)!important;grid-template-areas:"documents documents guide" "viewport focus-tool guide"!important; }
+@media(max-width:1100px) { .interface-classic #simulation-workspace.guided-run-open {grid-template-rows:auto minmax(0,1fr) minmax(180px,32vh)!important;grid-template-areas:"documents documents" "viewport focus-tool" "guide guide"!important;} }

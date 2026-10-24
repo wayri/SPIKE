@@ -24,3 +24,14 @@
 .main-field-popover .main-field-remove { justify-self:start;font-size:11px; }
 @media(prefers-reduced-motion:reduce) { .main-field-trigger span,.main-field-scrubber { transition:none; } }
 @media(pointer:coarse) { .main-field-trigger span { max-width:48px;opacity:1; }.main-field-tools button { min-width:32px;min-height:32px; } }
+
+.main-field-tools { margin-inline-start:7px;padding-inline-start:9px;border-inline-start:1px solid var(--spike-table-border-strong);gap:5px; }
+.main-field-layers { display:grid;gap:8px;border-bottom:1px solid var(--spike-table-border);padding-bottom:10px; }
+.main-field-layer { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;padding-block:5px;border-bottom:1px solid var(--spike-table-border); }
+.main-field-layer > label:first-child { display:flex;align-items:center;gap:6px;min-width:0; }
+.main-field-layer small { color:var(--spike-table-muted);font-size:10px; }
+.main-field-layer button,.main-field-manager { width:auto;min-height:26px;font-size:11px; }
+.main-field-layer-opacity { grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) 32px;align-items:center;gap:8px;font-size:10px; }
+.main-field-layer-opacity input { min-width:0;width:100%; }
+.main-field-layer-opacity output { text-align:end;font-variant-numeric:tabular-nums; }
+.main-field-layers select { max-width:100%;width:100%; }

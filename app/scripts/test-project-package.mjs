@@ -1,10 +1,23 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { importTestTypescript } from "./import-test-typescript.mjs";
+import ts from "typescript";
 
+const projectPackageSource = readFileSync(new URL("../src/projectPackage.ts", import.meta.url), "utf8");
+const versionSource = readFileSync(new URL("../src/appVersion.ts", import.meta.url), "utf8");
+const version = versionSource.match(/APP_VERSION\s*=\s*"([^"]+)"/)?.[1];
+assert.ok(version, "the application version must be declared");
+const source = projectPackageSource.replace(
+  /import \{ APP_VERSION \} from "\.\/appVersion";\s*/,
+  `const APP_VERSION = ${JSON.stringify(version)};\n`,
+);
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const bridgeSource = readFileSync(new URL("../src/workerBridge.ts", import.meta.url), "utf8");
-const projectPackage = await importTestTypescript("projectPackage");
+const transpiled = ts.transpileModule(source, {
+  compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
+}).outputText;
+const projectPackage = await import(
+  `data:text/javascript;base64,${Buffer.from(transpiled).toString("base64")}`
+);
 
 const payload = {
   emi: { setup: { contract: "spike/emi-setup/v1", chamber: { distance_m: 3, table_height_m: .8, antenna_height_m: 2, orientation: "upright", azimuth_deg: 45, polarization: "vertical", floor: "absorber", cutaway: true } } },
@@ -20,6 +33,7 @@ const payload = {
   },
   analysis: {
     show_net_names: true,
+    assembly_net_name_visibility: { "occ-A": false, "occ-B": true },
     mode: "DC IR Drop",
     result_display: "dc-result-1",
     latest_result: { analysis_id: "dc-1" },
@@ -75,6 +89,7 @@ assert.deepEqual(reopened.project.studies, payload.studies);
 assert.equal(reopened.project.analysis.result_display, "dc-result-1");
 assert.deepEqual(reopened.project.analysis.pdn_review, payload.analysis.pdn_review);
 assert.equal(reopened.project.analysis.show_net_names, true, "net-name visibility survives save/reopen");
+assert.deepEqual(reopened.project.analysis.assembly_net_name_visibility, payload.analysis.assembly_net_name_visibility, "each occurrence retains its own net-name display preference");
 assert.deepEqual(reopened.project.spice.workspace, payload.spice.workspace);
 assert.deepEqual(reopened.project.emi.setup.chamber, payload.emi.setup.chamber);
 assert.deepEqual(reopened.project.workspace, payload.workspace);

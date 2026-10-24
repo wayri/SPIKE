@@ -54,6 +54,17 @@ See [platform installation and CLI commands](docs/PLATFORM_PACKAGES.md). Older
 Windows Gamma and 0.3.5 Linux/macOS packages are historical artifacts and do
 not contain this candidate source.
 
+### 0.4.1 Mac testing candidates
+
+| Hardware | Native-verified experimental candidate |
+| --- | --- |
+| Apple Silicon | [DMG + SHA-256](https://github.com/wayri/SPIKE/actions/runs/40097197077/artifacts/12561711770) |
+| Intel Mac | [DMG + SHA-256](https://github.com/wayri/SPIKE/actions/runs/40097197077/artifacts/12561874533) |
+
+macOS15; ad-hoc signed and unnotarized. Dedicated circuit-worker RAM monitoring
+is sampled, **not a hard cap**. These CI artifacts expire after14days and are
+separate from the published release above. See [checks, limits and release gates](docs/releases/v0.4.1.md#native-platform-candidate-status---24-october-2026).
+
 ## Start a study
 
 | Step | In SPIKE | Check before continuing |
@@ -71,6 +82,21 @@ Fast entry points: [five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md) ·
 
 ## Current UI and navigation
 
+### Learn with pictures
+
+Open **Help → Home** for task cards and numbered steps. Each step explains what to do, what to expect and how to recover, with an actual UI picture and a highlighted control. Select a picture to enlarge it.
+
+| Guided task | What you will learn |
+| --- | --- |
+| [Picture walkthroughs](docs/PICTURE_WALKTHROUGHS.md) | Gerber import, layers, mechanical tools, PI/SI/EM/Thermal setup and results |
+| [Navigation map](docs/UI_NAVIGATION.md) | Command rows, hover previews, pinned controls and panel history |
+| [Integrated solver capabilities](docs/SOLVER_INTEGRATION.md) | Find every indexed capability, its exact setup or reviewed runner, and its evidence limits |
+| [Solder connections](docs/SOLDER_CONNECTIONS.md) | Model pin/pad fillets and terminal collars in the main viewport (development source) |
+| [Project backups](docs/PROJECT_BACKUPS.md) | Enable local automatic recovery, choose an interval, and restore a copy (development source) |
+| [Run readiness and Tutor](docs/GUIDED_SIMULATION_RUN.md) | Resolve missing setup inputs one at a time, recheck and submit a supported simulation (development source) |
+| [Solver setup flows](docs/SOLVER_SETUP_FLOWS.md) | Inputs → setup → review → run → evidence |
+
+
 ![SPIKE navigation map showing the two command rows, contextual panels, and study loop](app/public/help/ui-current/navigation-map.svg)
 
 Clean mode keeps a global header plus document and assembly tabs. Open a domain
@@ -81,17 +107,17 @@ The six menu sections are **Project**, **Design & view**, **Analyze**, **Results
 maps section ownership, menu depth, keyboard navigation, and the import -> setup
 -> mesh -> solve -> results -> save loop.
 
-| Actual development UI, 19 October 2026 | Actual command search, 19 October 2026 |
+| Actual workbench, 23 October 2026 | Expanded layer controls, 23 October 2026 |
 | --- | --- |
-| ![Clean UI showing the public ESP32 board in the light viewport](app/public/help/ui-current/clean-viewport.jpg) | ![Universal command search showing PI suggestions](app/public/help/ui-current/universal-search.jpg) |
-| Imported geometry and component stand-ins; no analysis was executed. | Search suggestions only; no command or analysis was executed. |
+| ![Current SPIKE workbench with the retained EBrake board](app/public/help/guides-current/workbench-overview.jpg) | ![Layer selector expanded with named layers and Net names controls](app/public/help/guides-current/layers-expanded.jpg) |
+| Two compact command rows around the retained board. | Board-specific layers, opacity controls and downward net-label expansion. |
 
-These are actual local **browser development UI captures**, not mockups, solver
-results, native desktop acceptance captures, or packaged application evidence.
-They use the public ESP32 board recorded in the
-[capture manifest](app/public/help/ui-current/manifest.json). Graphite/Light
-workspace appearance and Graphite/Light/AMOLED viewport appearance are separate
-preferences.
+These are actual local **browser development UI captures**. They show the
+owner-provided EBrake board and current controls; no numerical solve or installed
+native desktop acceptance is demonstrated. The [capture manifest](app/public/help/guides-current/manifest.json)
+records the original image hashes and limitations. The guided Help adds numbered
+highlights without modifying these screenshot pixels. Graphite/Light workspace
+appearance and Graphite/Light/AMOLED viewport appearance are separate preferences.
 
 The main field viewport can display supplied cells, points, velocity arrows,
 temperature and other scalar fields, connected supplied curves, and saved frame
@@ -100,6 +126,8 @@ cell dimensions remain point samples. Renderer-generated frozen-field paths are
 approximate presentation, not transient particle paths. See
 [field visualization](docs/FIELD_VISUALIZATION.md); the planned Blender adapter
 is not implemented.
+
+The development source also adds [guided solver setup and searchable choices](docs/SOLVER_SETUP_FLOWS.md): numbered steps for basic PI, SI, thermal, EM, CFD and assembly airflow workflows, with wildcard search in ordinary dropdowns. These changes are not yet included in the published installer.
 
 ## Analysis gallery
 
@@ -195,6 +223,7 @@ code, runtime readiness, and numerical qualification remain separate states.
 | [EMerge Suite](extensions/emerge_suite/README.md) | Simplified selected-net S-parameters and relative radiation patterns. | Separate compatible runtime; selected copper, aligned ports, rectangular bounds, one dielectric, and surface PEC. |
 | [ODB++ Import](docs/ODB_AND_HARNESS_EXTENSIONS.md) | Experimental board-job import with quality diagnostics. | Unsupported symbols, compositing, and panel repeats are reported; retain the source archive. |
 | [Harness Engineering](docs/ODB_AND_HARNESS_EXTENSIONS.md) | JSON/CSV/TSV connection editing and assembly binding. | Does not import other harness database formats. |
+| [Mechanical viewport tools](docs/MECHANICAL_VIEWPORT_TOOLS.md) | Object visibility, opacity, isolation, angled sections and point dimensions in the main viewport. | Development UI; uncapped cuts and explicit coordinate/anchor measurements. |
 | [MCAD Collaboration](docs/MCAD_EXPORT.md) | Preview and named STEP, FreeCAD, BREP, and metadata export. | Requires FreeCAD; geometry exchange only. |
 | [PWM Converter Analysis](extensions/converter-analysis/spike-extension.json) | Readiness checks and versioned setup envelope. | No converter solve or efficiency/loss calculation. |
 | [Net Inventory](extensions/net-inventory/spike-extension.json) | Example SDK net/conductor inventory. | No numerical analysis. |
@@ -221,7 +250,9 @@ engine calculation. See the [extension analysis contract](docs/EXTENSION_ANALYSI
 | User workflows and tutorials | [Documentation index](docs/README.md) |
 | Numerical implementation status and limits | [Solver status](docs/SOLVER_STATUS.md) |
 | Mathematics, methods, and references | [Mathematics](docs/SOLVER_MATHEMATICS.md) · [handbook](docs/SOLVER_HANDBOOK.md) · [references](docs/SOLVER_REFERENCES.md) |
-| LM Studio, Ollama, and MCP | [Local LLM and MCP](docs/LOCAL_LLM_MCP.md) |
+| Set up and use the Assistant: files, analysis, data and scripts | [Assistant user guide](docs/ASSISTANT_USER_GUIDE.md) |
+| Local work-folder inspection, CSV summaries and reviewed Python drafts | [Task harness](docs/ASSISTANT_TASK_HARNESS.md) |
+| LM Studio, Ollama, and external MCP configuration | [Local LLM and MCP](docs/LOCAL_LLM_MCP.md) |
 | Build, architecture, and contribution | [Developer guide](docs/DEVELOPER_GUIDE.md) · [architecture](ARCHITECTURE.md) · [contributing](CONTRIBUTING.md) |
 
 The product direction includes larger assemblies and coordinated cross-domain

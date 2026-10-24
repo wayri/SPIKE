@@ -137,6 +137,39 @@ assert.equal(boardProjection.visuals[0].widthMm, 1000);
 assert.equal(boardProjection.visuals[1].heightMm, 80);
 assert.deepEqual(boardProjection.unresolvedBoardIds, []);
 
+let retainedNetReads = 0;
+const repeatedNets = Array.from({ length: 10_000 }, (_, index) => ({
+  get id() { retainedNetReads++; return `net-${index}`; },
+  get name() { retainedNetReads++; return `NET_${index}`; },
+}));
+const repeatedBoards = Array.from({ length: 30 }, (_, index) => ({
+  id: `repeat-${index}`, design_id: "repeated-design",
+  frame: { frame_id: `repeat-${index}-frame`, parent_frame_id: "assembly", units: "mm", handedness: "right",
+    transform: [...identity.slice(0, 3), index * 2, ...identity.slice(4)] },
+}));
+const repeatedProjection = harness.buildVirtualBoardVisualization({
+  contract: "spike/assembly-ir/v1", assembly_id: "repeated", name: "Repeated source", parts: [],
+  boards: repeatedBoards, connector_mappings: [], harnesses: [],
+}, {
+  contract: "spike/assembly-designs/v1", active_design_id: "repeated-design",
+  designs: [{ contract: "spike/design-ir/v2", design_id: "repeated-design", metadata: { board_size_mm: [80, 50] }, nets: repeatedNets }],
+});
+assert.equal(repeatedProjection.visuals.length, 30);
+assert.equal(retainedNetReads, repeatedNets.length * 2,
+  "repeated occurrences prepare retained net identity once per design rather than once per board");
+assert.equal(new Set(repeatedProjection.visuals.map(item => item.netNamesById)).size, 1,
+  "repeated occurrences share immutable retained net presentation");
+assert.throws(() => { repeatedProjection.visuals[0].netNamesById["net-0"] = "WRONG"; }, TypeError,
+  "derived canonical-name maps reject cross-occurrence mutation");
+assert.throws(() => { delete repeatedProjection.visuals[0].netIdsByName.NET_0; }, TypeError,
+  "derived canonical-ID maps reject cross-occurrence deletion");
+assert.equal(repeatedProjection.visuals[1].netNamesById["net-0"], "NET_0",
+  "a rejected mutation leaves sibling identity exact");
+assert.equal(repeatedNets[0].id, "net-0");
+assert.equal(repeatedNets[0].name, "NET_0", "projection never mutates retained source nets");
+assert.equal(repeatedProjection.visuals.filter(item => item.active).length, 1,
+  "the first active-design occurrence remains the sole active board");
+
 const marblePlacement = (xMm, yMm, zMm, rxDeg, ryDeg, rzDeg) => {
   const rx = rxDeg * Math.PI / 180, ry = ryDeg * Math.PI / 180, rz = rzDeg * Math.PI / 180;
   const sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);

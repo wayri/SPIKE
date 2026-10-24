@@ -1,0 +1,1052 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spike.local/schemas/multiport-deembedding-result-v1.schema.json",
+  "title": "Supplied multiport fixture removal result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract",
+    "model_status",
+    "production_qualified",
+    "input_digest",
+    "source_request",
+    "derived_network",
+    "diagnostics",
+    "limitations"
+  ],
+  "properties": {
+    "contract": {
+      "const": "spike/multiport-deembedding-result/v1"
+    },
+    "model_status": {
+      "const": "experimental"
+    },
+    "production_qualified": {
+      "const": false
+    },
+    "input_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "measured",
+        "fixture",
+        "external_ports",
+        "dut_ports"
+      ],
+      "properties": {
+        "contract": {
+          "const": "spike/multiport-deembedding-request/v1"
+        },
+        "measured": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "port_names",
+            "reference_impedance_ohm",
+            "frequencies_hz",
+            "s_parameters"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "\\S"
+            },
+            "port_names": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "pattern": "\\S"
+              },
+              "uniqueItems": true
+            },
+            "reference_impedance_ohm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frequencies_hz": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4096,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "s_parameters": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4096,
+              "items": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 8,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "real",
+                      "imag"
+                    ],
+                    "properties": {
+                      "real": {
+                        "type": "number"
+                      },
+                      "imag": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "oneOf": [
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 1,
+                      "maxItems": 1
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 1,
+                        "maxItems": 1,
+                        "items": {
+                          "minItems": 1,
+                          "maxItems": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": {
+                          "minItems": 2,
+                          "maxItems": 2
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 3,
+                      "maxItems": 3
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                          "minItems": 3,
+                          "maxItems": 3
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 4,
+                      "maxItems": 4
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 4,
+                        "maxItems": 4,
+                        "items": {
+                          "minItems": 4,
+                          "maxItems": 4
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 5,
+                      "maxItems": 5
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 5,
+                        "maxItems": 5,
+                        "items": {
+                          "minItems": 5,
+                          "maxItems": 5
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 6,
+                      "maxItems": 6
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 6,
+                        "maxItems": 6,
+                        "items": {
+                          "minItems": 6,
+                          "maxItems": 6
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 7,
+                      "maxItems": 7
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 7,
+                        "maxItems": 7,
+                        "items": {
+                          "minItems": 7,
+                          "maxItems": 7
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 8,
+                      "maxItems": 8
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 8,
+                        "maxItems": 8,
+                        "items": {
+                          "minItems": 8,
+                          "maxItems": 8
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "fixture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "port_names",
+            "reference_impedance_ohm",
+            "frequencies_hz",
+            "s_parameters"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80,
+              "pattern": "\\S"
+            },
+            "port_names": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 16,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80,
+                "pattern": "\\S"
+              },
+              "uniqueItems": true
+            },
+            "reference_impedance_ohm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frequencies_hz": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4096,
+              "items": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "s_parameters": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4096,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 16,
+                "items": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "real",
+                      "imag"
+                    ],
+                    "properties": {
+                      "real": {
+                        "type": "number"
+                      },
+                      "imag": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "oneOf": [
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 2,
+                      "maxItems": 2
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": {
+                          "minItems": 2,
+                          "maxItems": 2
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 4,
+                      "maxItems": 4
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 4,
+                        "maxItems": 4,
+                        "items": {
+                          "minItems": 4,
+                          "maxItems": 4
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 6,
+                      "maxItems": 6
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 6,
+                        "maxItems": 6,
+                        "items": {
+                          "minItems": 6,
+                          "maxItems": 6
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 8,
+                      "maxItems": 8
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 8,
+                        "maxItems": 8,
+                        "items": {
+                          "minItems": 8,
+                          "maxItems": 8
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 10,
+                      "maxItems": 10
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 10,
+                        "maxItems": 10,
+                        "items": {
+                          "minItems": 10,
+                          "maxItems": 10
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 12,
+                      "maxItems": 12
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 12,
+                        "maxItems": 12,
+                        "items": {
+                          "minItems": 12,
+                          "maxItems": 12
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 14,
+                      "maxItems": 14
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 14,
+                        "maxItems": 14,
+                        "items": {
+                          "minItems": 14,
+                          "maxItems": 14
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 16,
+                      "maxItems": 16
+                    },
+                    "s_parameters": {
+                      "items": {
+                        "minItems": 16,
+                        "maxItems": 16,
+                        "items": {
+                          "minItems": 16,
+                          "maxItems": 16
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "external_ports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "dut_ports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 1,
+                      "maxItems": 1
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 1,
+                  "maxItems": 1
+                },
+                "dut_ports": {
+                  "minItems": 1,
+                  "maxItems": 1
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 4,
+                      "maxItems": 4
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "dut_ports": {
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 6,
+                      "maxItems": 6
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "dut_ports": {
+                  "minItems": 3,
+                  "maxItems": 3
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 4,
+                      "maxItems": 4
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 8,
+                      "maxItems": 8
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "dut_ports": {
+                  "minItems": 4,
+                  "maxItems": 4
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 5,
+                      "maxItems": 5
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 10,
+                      "maxItems": 10
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 5,
+                  "maxItems": 5
+                },
+                "dut_ports": {
+                  "minItems": 5,
+                  "maxItems": 5
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 6,
+                      "maxItems": 6
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 12,
+                      "maxItems": 12
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 6,
+                  "maxItems": 6
+                },
+                "dut_ports": {
+                  "minItems": 6,
+                  "maxItems": 6
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 7,
+                      "maxItems": 7
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 14,
+                      "maxItems": 14
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 7,
+                  "maxItems": 7
+                },
+                "dut_ports": {
+                  "minItems": 7,
+                  "maxItems": 7
+                }
+              }
+            },
+            {
+              "properties": {
+                "measured": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 8,
+                      "maxItems": 8
+                    }
+                  }
+                },
+                "fixture": {
+                  "properties": {
+                    "port_names": {
+                      "minItems": 16,
+                      "maxItems": 16
+                    }
+                  }
+                },
+                "external_ports": {
+                  "minItems": 8,
+                  "maxItems": 8
+                },
+                "dut_ports": {
+                  "minItems": 8,
+                  "maxItems": 8
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "derived_network": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "port_names",
+        "reference_impedance_ohm",
+        "frequencies_hz",
+        "s_parameters"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "\\S"
+        },
+        "port_names": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "reference_impedance_ohm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frequencies_hz": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "s_parameters": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4096,
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 8,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "real",
+                  "imag"
+                ],
+                "properties": {
+                  "real": {
+                    "type": "number"
+                  },
+                  "imag": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 1,
+                  "maxItems": 1
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 1,
+                    "maxItems": 1,
+                    "items": {
+                      "minItems": 1,
+                      "maxItems": 1
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 2,
+                    "maxItems": 2,
+                    "items": {
+                      "minItems": 2,
+                      "maxItems": 2
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 4,
+                  "maxItems": 4
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "items": {
+                      "minItems": 4,
+                      "maxItems": 4
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 5,
+                  "maxItems": 5
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 5,
+                    "maxItems": 5,
+                    "items": {
+                      "minItems": 5,
+                      "maxItems": 5
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 6,
+                  "maxItems": 6
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 6,
+                    "maxItems": 6,
+                    "items": {
+                      "minItems": 6,
+                      "maxItems": 6
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 7,
+                  "maxItems": 7
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 7,
+                    "maxItems": 7,
+                    "items": {
+                      "minItems": 7,
+                      "maxItems": 7
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "properties": {
+                "port_names": {
+                  "minItems": 8,
+                  "maxItems": 8
+                },
+                "s_parameters": {
+                  "items": {
+                    "minItems": 8,
+                    "maxItems": 8,
+                    "items": {
+                      "minItems": 8,
+                      "maxItems": 8
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "diagnostics": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "frequency_hz",
+          "transmission_condition_product",
+          "outward_condition",
+          "inward_condition",
+          "recovery_condition",
+          "feedback_condition",
+          "max_solve_backward_residual",
+          "reconstruction_residual",
+          "sampled_smax"
+        ],
+        "properties": {
+          "frequency_hz": {
+            "type": "number",
+            "minimum": 0
+          },
+          "transmission_condition_product": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000.0
+          },
+          "outward_condition": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000.0
+          },
+          "inward_condition": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000.0
+          },
+          "recovery_condition": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000.0
+          },
+          "feedback_condition": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100000000.0
+          },
+          "max_solve_backward_residual": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1e-10
+          },
+          "reconstruction_residual": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1e-10
+          },
+          "sampled_smax": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    }
+  }
+}

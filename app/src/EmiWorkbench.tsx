@@ -1,3 +1,4 @@
+import SolverSetupSteps, { SolverSetupPanel } from "./SolverSetupSteps";
 import type { EmMachineStudy } from "./EmMachineWorkbench";
 import { validEmiFarField } from "./emiFieldData";
 import { EmiFieldPlots } from "./EmiFieldPlots";
@@ -184,7 +185,7 @@ export function normalizeEmiFieldResult(raw: unknown): EmiFieldResult | null {
   };
 }
 
-export type EmiSetupSection = "domain" | "prepass" | "excitation" | "solver" | "machines";
+export type EmiSetupSection = "domain" | "prepass" | "excitation" | "solver" | "review" | "machines";
 
 const metricFor = (net: string): EmiNetMetric => ({
   net,
@@ -344,13 +345,7 @@ export function EmiSetupPanel({
     const standard = current.radiated_emissions_standard;
     return standard ? { ...current, radiated_emissions_standard: { ...standard, ...patch } } : current;
   });
-  const stages = preflight?.stages ?? [
-    { id: "setup", name: "Design and domain", state: board ? "pending" : "blocked", detail: "Choose candidate and return nets." },
-    { id: "screen", name: "Electrical pre-pass", state: "pending", detail: "Supply PI, transient, SPICE, or measured metrics." },
-    { id: "excitation", name: "Excitation and ports", state: "pending", detail: "Define field-solver excitation." },
-    { id: "fields", name: "Full-wave fields", state: "capability_gated", detail: "Requires an eligible external solver." },
-    { id: "far_field", name: "Far field and compliance", state: "capability_gated", detail: "A reference-validated openEMS adapter and an explicit NF2FF request are required." },
-  ];
+
 
   if (section === "machines") return <div className="emi-setup-panel"><button type="button" onClick={() => setSection("domain")}>Back to PCB EM</button><p>Machine geometry, field results and motion plots are in the main workspace.</p><p>Studies retain experimental status. Review mesh and time-step convergence before relying on forces or torque.</p></div>;
 
@@ -362,13 +357,15 @@ export function EmiSetupPanel({
       <b>{setup.selected_nets.length} candidate{setup.selected_nets.length === 1 ? "" : "s"}</b>
       <small>{preflight ? `${preflight.counts.errors} errors · ${preflight.counts.warnings} warnings` : "Run preflight before case preparation"}</small>
     </div>
-    <div className="emi-process" aria-label="EM workflow stages">
-      {stages.map((stage, index) => <button key={stage.id} className={`${stageTone(stage.state)} ${section === (["domain", "prepass", "excitation", "solver", "solver"] as const)[index] ? "selected" : ""}`} onClick={() => setSection((["domain", "prepass", "excitation", "solver", "solver"] as const)[index])} title={stage.detail}>
-        <span>{index + 1}</span><b>{stage.name}</b><small>{stage.state.replace(/_/g, " ")}</small>
-      </button>)}
-    </div>
+    <SolverSetupSteps label="PCB EM setup steps" current={section} onChange={id => setSection(id as EmiSetupSection)} steps={[
+      { id: "domain", label: "Geometry and domain", description: "Choose candidate and return nets, analysis scope and frequency range." },
+      { id: "prepass", label: "Electrical pre-pass", description: "Enter measured or exported electrical metrics and run bounded screening." },
+      { id: "excitation", label: "Sources and ports", description: "Review explicit excitation ports. Closed-loop SPICE remains unavailable." },
+      { id: "solver", label: "Mesh and solver", description: "Set mesh resolution and solver limits; register an eligible engine in Solver Manager." },
+      { id: "review", label: "Review and run", description: "Validate, correct diagnostics, prepare the case, then run when all existing execution gates allow it." },
+    ]} />
 
-    {section === "domain" && <>
+    <SolverSetupPanel active={section === "domain"} label="EM geometry and domain">
       <section className="emi-section">
         <label>NET DOMAIN</label>
         <div className="emi-inline-actions"><button onClick={useSelectedNet} disabled={!selected?.net}><Network size={13} /> Use selected net</button><span>{setup.return_nets.length} returns</span></div>
@@ -410,9 +407,9 @@ export function EmiSetupPanel({
         })()}
         <div className="emi-field-grid"><label>Start (Hz)<input type="number" min="1" value={setup.frequency.start_hz} onChange={event => replace({ frequency: { ...setup.frequency, start_hz: Number(event.target.value) } })} /></label><label>Stop (Hz)<input type="number" min="2" value={setup.frequency.stop_hz} onChange={event => replace({ frequency: { ...setup.frequency, stop_hz: Number(event.target.value) } })} /></label><label>Points<input type="number" min="2" max="100000" value={setup.frequency.points} onChange={event => replace({ frequency: { ...setup.frequency, points: Number(event.target.value) } })} /></label></div>
       </section>
-    </>}
+    </SolverSetupPanel>
 
-    {section === "prepass" && <section className="emi-section">
+    <SolverSetupPanel active={section === "prepass"} label="EM electrical pre-pass"><section className="emi-section">
       <label>ELECTRICAL PRE-PASS METRICS</label>
       <p className="emi-note">Enter measured values or values exported from PI, transient, or SPICE analyses. Geometry alone is not treated as an emission prediction.</p>
       <div className="emi-metric-list">
@@ -424,9 +421,9 @@ export function EmiSetupPanel({
         {!setup.net_metrics.length && <p>Select candidate nets in the Domain stage.</p>}
       </div>
       <button className="emi-primary" disabled={busy || !board} onClick={onScreen}><Gauge size={14} /> {busy ? "Working" : "Run screening"}</button>
-    </section>}
+    </section></SolverSetupPanel>
 
-    {section === "excitation" && <section className="emi-section">
+    <SolverSetupPanel active={section === "excitation"} label="EM sources and ports"><section className="emi-section">
       <label>FULL-WAVE EXCITATION</label>
       <select value={setup.excitation.mode} onChange={event => replace({ excitation: { ...setup.excitation, mode: event.target.value as EmiSetup["excitation"]["mode"] } })}>
         <option value="prepass_results">PI/transient result metrics (screening only)</option><option value="explicit_ports">Explicit lumped ports</option><option value="spice">Closed-loop SPICE (unavailable)</option>
@@ -441,9 +438,9 @@ export function EmiSetupPanel({
         </article>)}</div>
       </>}
       <div className="emi-gate"><ShieldAlert size={14} /><span><b>Execution gate</b>Port coordinates are validated again against exported conductors. Closed-loop SPICE excitation remains unavailable.</span></div>
-    </section>}
+    </section></SolverSetupPanel>
 
-    {section === "solver" && <section className="emi-section">
+    <SolverSetupPanel active={section === "solver"} label="EM mesh and solver"><section className="emi-section">
       <label>FIELD SOLVER</label>
       <div className="emi-field-grid"><label>Resolution (mm)<input type="number" min="0.0001" step="0.05" value={setup.mesh.resolution_mm} onChange={event => replace({ mesh: { ...setup.mesh, resolution_mm: Number(event.target.value) } })} /></label><label>Boundary cells<input type="number" min="2" max="40" value={setup.mesh.padding_cells} onChange={event => replace({ mesh: { ...setup.mesh, padding_cells: Number(event.target.value) } })} /></label><label>Time limit (s)<input type="number" min="1" max="604800" value={setup.max_solver_time_s} onChange={event => replace({ max_solver_time_s: Number(event.target.value) })} /></label></div>
       <div className="emi-solver-card">
@@ -452,16 +449,20 @@ export function EmiSetupPanel({
       </div>
       <button className="secondary-btn" onClick={onSolverManager}><SlidersHorizontal size={14} /> Solver Manager</button>
       <div className="emi-viewport-options"><label><input type="checkbox" checked={setup.viewport.translucent_board} onChange={event => replace({ viewport: { ...setup.viewport, translucent_board: event.target.checked } })} /> Translucent board</label><label><input type="checkbox" checked={setup.viewport.analysis_nets_only} onChange={event => replace({ viewport: { ...setup.viewport, analysis_nets_only: event.target.checked } })} /> Analysis nets only</label></div>
-    </section>}
+    </section></SolverSetupPanel>
 
     {preflight?.issues.length ? <div className="emi-issues">{preflight.issues.slice(0, 6).map(issue => <div key={`${issue.code}:${issue.message}`} className={issue.severity}><span>{issue.severity === "error" ? <AlertTriangle size={13} /> : <ShieldAlert size={13} />}</span><p><b>{issue.code.replace(/^EMI_/, "").replace(/_/g, " ")}</b>{issue.message}</p></div>)}</div> : null}
     {screening?.screening && <button className="emi-screen-summary" onClick={onDashboard}><RadioTower size={14} /><span><b>Screening complete</b>{screening.screening.recommended_nets[0]?.net ?? "No ranked net"} is first for full-wave review</span></button>}
+    <SolverSetupPanel active={section === "review" || busy} label="EM review and run">
+    <p className="emi-note">{setup.selected_nets.length} candidate net(s), {setup.excitation.ports.length} port(s), {setup.mesh.resolution_mm} mm mesh. Preparation and execution remain separate actions; navigation does not validate a case.</p>
+    {!board && <p role="status">Import board geometry before validation or preparation.</p>}
     <footer className="emi-actions">
       <button onClick={onValidate} disabled={busy || !board}><ShieldAlert size={13} /> Validate</button>
       <button onClick={onPrepare} disabled={busy || !board || preflight?.can_prepare === false}><Layers3 size={13} /> Prepare</button>
       <button onClick={onRun} disabled={busy || !preflight?.can_run || !canExecutePreparedCase}><Play size={13} /> Run</button>
       <button onClick={onDashboard} disabled={!preflight && !screening}><Waves size={13} /> Review</button>
     </footer>
+    </SolverSetupPanel>
   </div>;
 }
 

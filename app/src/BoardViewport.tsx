@@ -1,7 +1,13 @@
+import { buildSolderJointScene, type SolderJointPlacement } from "./solderJointScene";
+import { resolveSolderJoints, MAX_SOLDER_JOINTS } from "./solderJointModel";
+import type { BondRecord } from "./BondManager";
+import { createInfiniteViewportGrid } from "./infiniteViewportGrid";
+import { applyZoneDisplayScene, restoreZoneDisplayScene, zoneSceneKind, type ZoneDisplayMode } from "./zoneDisplay";
 import { resultVectorGlyphs, type ResultVectorGlyph } from "./resultVectorGlyphs";
 import { appendProceduralDrillHoles, proceduralPadDrillPath } from "./proceduralDrillGeometry";
 import { viewportBackgroundColor, worldGridSize, type ViewportBackground } from "./viewportEnvironment";
 import { assemblyNetLabels } from "./assemblyNetLabels";
+import { assemblyLayerIsRendered } from "./assemblyLayout2d";
 import { applyNetFocusColor } from "./netFocusMaterial";
 import { viewportMouseButtons } from "./viewportMouseNavigation";
 import { updateCopperSelectionBoundary, copperSelectionOpacity } from "./copperSelectionOverlay";
@@ -9,6 +15,8 @@ import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { ViewportOccurrenceCuller } from "./viewportOccurrenceCulling";
 import { viewportDampingFactor, ViewportFrameClock } from "./viewportFrameCadence";
 import { sectionHitVisible } from "./viewportSection";
+import { applyAssemblyMaterialClipping, applyAssemblyMaterialOpacity, mechanicalPartPresentation, type MechanicalVisual } from "./assemblyMechanicalPresentation";
+import { buildMechanicalMeasurementScene, type MechanicalMeasurement } from "./mechanicalMeasurementScene";
 import ViewportNetViewer from "./ViewportNetViewer";
 import { netViewerBoard, viewportNetRows } from "./viewportNetViewerModel";
 import { applyAssemblySceneVisibility, updateAssemblySceneSelection } from "./assemblySceneVisibility";
@@ -53,7 +61,7 @@ import type { EMergeAngularPattern } from "./emergePatternInterpolation";
 import { admitSiCrosstalkViewport, type AdmittedSiCrosstalkViewport, type SiCrosstalkViewportResult } from "./siCrosstalkViewport";
 import { numericExtent, numericMaximum } from "./numericRange";
 import { meshCellEdgeIndexes, meshCellFaceVertices } from "./meshTopology";
-import { pointOnResultConductor, resultDatumFitsConductor, resultFaceTriangleIndices } from "./resultGeometryMask";
+import { cachedResultFaceTriangleIndices, pointOnResultConductor, resultDatumFitsConductor } from "./resultGeometryMask";
 import { resultDatumLayers, resultLayerIsVisible, selectedDatumLayers } from "./resultLayerSelection";
 import { thermalScenePointMm } from "./thermalCoordinates";
 import { boardThermalCellGeometry } from "./boardThermalViewport";
@@ -98,7 +106,7 @@ import {
   type ViewportSceneKind,
   boardSceneVisibility,
 } from "./viewportScenePolicy";
-import { KeyedResourcePool, partitionComponentProxies, takeWithinCostBudget, throughHoleComponentRefs } from "./viewportPerformance";
+import { copperNetLabels, KeyedResourcePool, partitionComponentProxies, takeWithinCostBudget, throughHoleComponentRefs } from "./viewportPerformance";
 import { buildProceduralComponentInstances, updateProceduralComponentInstances, type PlaceholderInstance } from "./proceduralComponentInstances";
 import { deriveComponentPlaceholder } from "./componentPlaceholder";
 import {
@@ -212,13 +220,18 @@ type Props = {
   viewMode: ViewMode;
   visibleLayers: Record<string, boolean>;
   layerOpacity: Record<string, number>;
+  zoneDisplay?: ZoneDisplayMode;
+  assemblyZoneDisplay?: Record<string, ZoneDisplayMode>;
   layerSeparation: number;
   showVias: boolean;
   showNetNames?: boolean;
+  assemblyNetNameVisibility?: Record<string, boolean>;
   showModels: boolean;
   showSmdModels: boolean;
   showThtModels: boolean;
   assemblyModels?: AssemblySceneModel[];
+  mechanicalVisuals?: Record<string, MechanicalVisual>;
+  mechanicalMeasurement?: MechanicalMeasurement | null;
   assemblySelectorPreviews?: AssemblySelectorPreviewModel[];
   virtualBoards?: VirtualBoardVisual[];
   assemblyBoardDesigns?: Record<string, ParsedBoard>;
@@ -252,6 +265,7 @@ type Props = {
   showWorldGrid?: boolean;
   viewportBackground?: ViewportBackground;
   showAxes?: boolean;
+  showOriginAxes?: boolean;
   selectionBlink?: boolean;
   renderingQuality?: "balanced" | "quality" | "performance";
   antialiasing?: boolean;
@@ -275,6 +289,7 @@ type Props = {
   tracePopupHistoryLimit?: number;
   tracePopupResultBoardInstanceId?: string | null;
   terminalMarkers?: AnalysisTerminalMarker[];
+  solderBonds?: readonly BondRecord[];
   thermalScenario?: ThermalScenarioView | null;
   thermalVisibility?: ThermalSceneVisibility;
   emRadiation?: EmRadiationViewportResult | null;
@@ -596,6 +611,11 @@ function batchProceduralGeometry(root: THREE.Group, copperLayers: readonly strin
       return;
     }
     const mesh = new THREE.Mesh(merged, batch.material);
+    if (batch.kind === "copper-zone") {
+      // Retain polygon boundaries across batching, including coincident pours.
+      let end = 0;
+      merged.userData.zoneTriangleEnds = batch.geometries.map(geometry => end += geometry.index?.count ?? geometry.getAttribute("position").count);
+    }
     mesh.userData = batch.data;
     identifySceneObject(mesh, batch.kind, batch.layer, `procedural-batch-${batchIndex + 1}`, copperLayers);
     root.add(mesh);
@@ -917,6 +937,16 @@ function copperZ(layer: string, layers: string[], boardThickness = 1.82, stackup
   return internal.length === 1 ? 0 : upper + (lower - upper) * index / Math.max(internal.length - 1, 1);
 }
 
+function primaryNetLabelPosition(board: ParsedBoard, transform: { centerX: number; centerY: number; scale: number }, label: { x: number; y: number; layer: string }, separationMm: number): [number, number, number] {
+  const { centerX, centerY, scale } = transform;
+  const index = board.layers.indexOf(label.layer);
+  const midpoint = Math.max((board.layers.length - 1) / 2, .5);
+  const offset = index >= 0 ? (midpoint - index) * separationMm * scale : 0;
+  const side = label.layer.startsWith("B.") ? -1 : 1;
+  return [(label.x - centerX) * scale, (centerY - label.y) * scale,
+    copperZ(label.layer, board.layers, boardThicknessMm(board) * scale, board.stackup) + offset + side * .08 * scale];
+}
+
 function thermalPoint(
   point: [number, number, number],
   volume: { x: number; y: number; z: number },
@@ -987,7 +1017,7 @@ function resultAxisTicks(minimumMm: number, maximumMm: number, desiredCount = 5)
 const EMPTY_VIEWPORT_LIST: never[] = [];
 const EMPTY_VIEWPORT_MAP: Record<string, never> = {};
 
-function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLayers, layerOpacity, layerSeparation, showVias, showNetNames = false, showModels, showSmdModels, showThtModels, assemblyModels = EMPTY_VIEWPORT_LIST, assemblySelectorPreviews = EMPTY_VIEWPORT_LIST, virtualBoards = EMPTY_VIEWPORT_LIST, assemblyBoardDesigns = EMPTY_VIEWPORT_MAP, assemblyLayerVisibility = EMPTY_VIEWPORT_MAP, assemblyLayerOpacity = EMPTY_VIEWPORT_MAP, assemblyLayerFocus = EMPTY_VIEWPORT_MAP, onAssemblyLayerFocus, assemblyBoardVisibility = EMPTY_VIEWPORT_MAP, assemblyExplodeOffsets = EMPTY_VIEWPORT_MAP, assemblySnapTargets = EMPTY_VIEWPORT_LIST, selectedAssemblySnapTargetId = null, onAssemblySnapTarget, assemblyResultOverlays = EMPTY_VIEWPORT_LIST, selectedBoardInstanceId = null, onBoardInstanceSelect, onAssemblyNetSelect, onAssemblyComponentSelect, onShowAllAssemblyBoards, linkedAssemblyNets = EMPTY_VIEWPORT_MAP, virtualHarnesses = EMPTY_VIEWPORT_LIST, selectedHarnessId = null, selectedHarnessConductorId = null, onHarnessSelect, topologySelectorActive = false, selectedTopologyId = null, onTopologySelect, isolatedAssemblyPartId = null, assemblySection = DEFAULT_ASSEMBLY_SECTION, navigationMode, navigationInertia, showWorldGrid = true, viewportBackground = "dark", showAxes = true, selectionBlink = true, renderingQuality = "balanced", antialiasing = true, maximumFps = 120, cameraCommand, viewportRestore = null, selectionFilter, selectedId, selectedPosition, selectedNet = null, highlightedNets = EMPTY_VIEWPORT_LIST, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = EMPTY_VIEWPORT_LIST, probes = EMPTY_VIEWPORT_LIST, showProbes = true, hoverProbeEnabled = false, hoverProbeKind = "universal", traceValuePopupsEnabled = false, tracePopupHistoryLimit = 48, tracePopupResultBoardInstanceId = null, terminalMarkers = EMPTY_VIEWPORT_LIST, thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true, field: true }, emRadiation = null, emOverlay = null, extensionMesh = null, fieldVolume = null, onFieldError, onEmSample, siCrosstalk = null, board, onSelect, onHoverProbe, onNetTune, onContextMenu, onOrbitCenter, onCamera, onLayoutView, onTelemetry, onModelStatus, sceneLoadToken = null, onSceneReady, onAssemblyPartViewportStatus }: Props) {
+function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLayers, layerOpacity, zoneDisplay = "filled", assemblyZoneDisplay = EMPTY_VIEWPORT_MAP, layerSeparation, showVias, showNetNames = false, assemblyNetNameVisibility = EMPTY_VIEWPORT_MAP, showModels, showSmdModels, showThtModels, assemblyModels = EMPTY_VIEWPORT_LIST, mechanicalVisuals = EMPTY_VIEWPORT_MAP, mechanicalMeasurement = null, assemblySelectorPreviews = EMPTY_VIEWPORT_LIST, virtualBoards = EMPTY_VIEWPORT_LIST, assemblyBoardDesigns = EMPTY_VIEWPORT_MAP, assemblyLayerVisibility = EMPTY_VIEWPORT_MAP, assemblyLayerOpacity = EMPTY_VIEWPORT_MAP, assemblyLayerFocus = EMPTY_VIEWPORT_MAP, onAssemblyLayerFocus, assemblyBoardVisibility = EMPTY_VIEWPORT_MAP, assemblyExplodeOffsets = EMPTY_VIEWPORT_MAP, assemblySnapTargets = EMPTY_VIEWPORT_LIST, selectedAssemblySnapTargetId = null, onAssemblySnapTarget, assemblyResultOverlays = EMPTY_VIEWPORT_LIST, selectedBoardInstanceId = null, onBoardInstanceSelect, onAssemblyNetSelect, onAssemblyComponentSelect, onShowAllAssemblyBoards, linkedAssemblyNets = EMPTY_VIEWPORT_MAP, virtualHarnesses = EMPTY_VIEWPORT_LIST, selectedHarnessId = null, selectedHarnessConductorId = null, onHarnessSelect, topologySelectorActive = false, selectedTopologyId = null, onTopologySelect, isolatedAssemblyPartId = null, assemblySection = DEFAULT_ASSEMBLY_SECTION, navigationMode, navigationInertia, showWorldGrid = true, viewportBackground = "dark", showAxes = true, showOriginAxes = true, selectionBlink = true, renderingQuality = "balanced", antialiasing = true, maximumFps = 120, cameraCommand, viewportRestore = null, selectionFilter, selectedId, selectedPosition, selectedNet = null, highlightedNets = EMPTY_VIEWPORT_LIST, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = EMPTY_VIEWPORT_LIST, probes = EMPTY_VIEWPORT_LIST, showProbes = true, hoverProbeEnabled = false, hoverProbeKind = "universal", traceValuePopupsEnabled = false, tracePopupHistoryLimit = 48, tracePopupResultBoardInstanceId = null, terminalMarkers = EMPTY_VIEWPORT_LIST, solderBonds = EMPTY_VIEWPORT_LIST, thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true, field: true }, emRadiation = null, emOverlay = null, extensionMesh = null, fieldVolume = null, onFieldError, onEmSample, siCrosstalk = null, board, onSelect, onHoverProbe, onNetTune, onContextMenu, onOrbitCenter, onCamera, onLayoutView, onTelemetry, onModelStatus, sceneLoadToken = null, onSceneReady, onAssemblyPartViewportStatus }: Props) {
   const renderQuality = (badge: ReactNode) => qualityTarget ? createPortal(badge, qualityTarget) : badge;
   const [incomingBoard, setIncomingBoard] = useState<ParsedBoard | null>(null);
   const [fullModelState, setFullModelState] = useState<"none" | "loading" | "ready" | "failed">("none");
@@ -1052,6 +1082,8 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   ].join("\u0000") : "";
   const netViewerScope = useMemo(() => netViewerBoard(activeBoard, virtualBoards, assemblyBoardDesigns, selectedBoardInstanceId),
     [activeBoard, virtualBoards, assemblyBoardDesigns, selectedBoardInstanceId]);
+  const singleBoardNetNames = (virtualBoards.length === 1 ? assemblyNetNameVisibility[virtualBoards[0].id] : undefined) ?? showNetNames;
+  const netViewerNetNames = netViewerScope.occurrence ? assemblyNetNameVisibility[netViewerScope.occurrence.id] ?? showNetNames : singleBoardNetNames;
   const netViewerRows = useMemo(() => viewportNetRows(netViewerScope.board), [netViewerScope.board]);
   const splitSceneAvailable = Boolean(activeBoard?.componentModelUrl);
   const layerFilterActive = activeBoard?.boardModelIncludesCopper === false
@@ -1109,8 +1141,8 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   assemblySceneInputsRef.current = geometryBoards;
   const assemblyVisualsRef = useRef(new Map(virtualBoards.map(board => [board.id, board])));
   assemblyVisualsRef.current = new Map(virtualBoards.map(board => [board.id, board]));
-  const assemblyDisplayRef = useRef({ selectedBoardInstanceId, linkedAssemblyNets, assemblyLayerVisibility, assemblyLayerOpacity, assemblyBoardVisibility, assemblyExplodeOffsets, visibleLayers, layerOpacity, showVias });
-  assemblyDisplayRef.current = { selectedBoardInstanceId, linkedAssemblyNets, assemblyLayerVisibility, assemblyLayerOpacity, assemblyBoardVisibility, assemblyExplodeOffsets, visibleLayers, layerOpacity, showVias };
+  const assemblyDisplayRef = useRef({ selectedBoardInstanceId, linkedAssemblyNets, assemblyLayerVisibility, assemblyLayerOpacity, assemblyBoardVisibility, assemblyExplodeOffsets, visibleLayers, layerOpacity, zoneDisplay, assemblyZoneDisplay, showVias });
+  assemblyDisplayRef.current = { selectedBoardInstanceId, linkedAssemblyNets, assemblyLayerVisibility, assemblyLayerOpacity, assemblyBoardVisibility, assemblyExplodeOffsets, visibleLayers, layerOpacity, zoneDisplay, assemblyZoneDisplay, showVias };
   const displayAssemblyOccurrence = (scene: THREE.Object3D, source: ParsedBoard, boardId: string) => {
     const display = assemblyDisplayRef.current;
     scene.visible = display.assemblyBoardVisibility[boardId] !== false;
@@ -1122,9 +1154,12 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       scene.userData.displayExplodeOffsetMm = display.assemblyExplodeOffsets[boardId] ?? 0;
       scene.matrixAutoUpdate = false;
     }
+    restoreZoneDisplayScene(scene);
     updateAssemblySceneSelection(scene, display.selectedBoardInstanceId === boardId, display.linkedAssemblyNets[boardId] ?? [], Object.values(display.linkedAssemblyNets).some(nets => nets.length > 0));
     applyAssemblySceneVisibility(scene, source, display.assemblyLayerVisibility[boardId] ?? display.visibleLayers,
       display.assemblyLayerOpacity[boardId] ?? display.layerOpacity, display.showVias);
+    applyZoneDisplayScene(scene, display.assemblyZoneDisplay[boardId] ?? display.zoneDisplay,
+      display.assemblyLayerOpacity[boardId] ?? display.layerOpacity, true);
   };
 
   const virtualBoardPickablesRef = useRef<THREE.Object3D[]>([]);
@@ -1135,6 +1170,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   const harnessPickablesRef = useRef<THREE.Object3D[]>([]);
   const selectorPreviewGroupRef = useRef<THREE.Group>();
   const selectorPreviewPickablesRef = useRef<THREE.Object3D[]>([]);
+  const refreshSelectorPreviewDisplayRef = useRef<() => void>(() => {});
   const topologySelectorActiveRef = useRef(topologySelectorActive);
   const onTopologySelectRef = useRef(onTopologySelect);
   const onHarnessSelectRef = useRef(onHarnessSelect);
@@ -2033,9 +2069,13 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(pointer, activeCameraRef.current!);
+      const sourceHit = hitAt(event, false)?.hit;
+      const occurrenceHit = virtualBoardHitAt(event, false);
       const surfaceHit = raycaster.intersectObject(boardGroup, true)
         .find(hit => sectionVisible(hit) && visibleInScene(hit.object) && !hit.object.userData.pickingProxy);
-      if (surfaceHit) return surfaceHit.point.clone();
+      const nearest = [sourceHit, occurrenceHit, surfaceHit].filter((hit): hit is NonNullable<typeof hit> => hit != null)
+        .sort((a, b) => a.distance - b.distance)[0];
+      if (nearest) return nearest.point.clone();
       const target = viewModeRef.current === "3D" ? controls3d.target : controls2d.target;
       const fallback = raycaster.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -target.z), new THREE.Vector3());
       return fallback && (viewModeRef.current !== "3D" || sectionHitVisible({ point: fallback }, sectionPlanesRef.current)) ? fallback : undefined;
@@ -2820,7 +2860,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       for (const hole of zone.holes ?? []) shape.holes.push(pathFromPoints(hole.map(world)));
       const mesh = new THREE.Mesh(
         new THREE.ShapeGeometry(shape, 4),
-        displayMaterial(layerThreeColor(zone.layer, activeBoard.layers.indexOf(zone.layer)), { metalness: 0.38, roughness: 0.52, opacity: 0.86 }),
+        displayMaterial(layerThreeColor(zone.layer, activeBoard.layers.indexOf(zone.layer)), { metalness: 0.38, roughness: 0.52, opacity: 1 }),
       );
       mesh.position.z = copperZ(zone.layer, activeBoard.layers, boardThickness, activeBoard.stackup);
       mesh.receiveShadow = true;
@@ -3351,12 +3391,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
             const material = entry;
             if (preparedMaterials.has(material)) return material;
             preparedMaterials.add(material);
-            material.userData.spikeAssemblyBaseOpacity = entry.opacity;
-            material.userData.spikeAssemblyBaseTransparent = entry.transparent;
-            material.userData.spikeAssemblyBaseDepthWrite = entry.depthWrite;
-            material.opacity = entry.opacity * instance.opacity;
-            material.transparent = entry.transparent || instance.opacity < 0.999;
-            material.depthWrite = entry.depthWrite && instance.opacity >= 0.999;
+            applyAssemblyMaterialOpacity(material, instance.opacity);
             return material;
           });
           object.material = Array.isArray(object.material) ? cloned : cloned[0];
@@ -3376,6 +3411,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         modelId: instance.modelId,
         modelType: instance.modelType,
         assemblyVisible: instance.visible,
+        assemblyOpacity: instance.opacity,
       };
       partFrame.matrix.copy(rowMajorMatrix(instance.partTransform));
       partFrame.matrixAutoUpdate = false;
@@ -3517,7 +3553,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       requestInteractiveFrameRef.current();
     }, 150);
     return () => window.clearTimeout(shadowRefresh);
-  }, [viewMode, virtualBoards, assemblyBoardDesigns, selectedBoardInstanceId, linkedAssemblyNets, assemblyLayerVisibility, assemblyLayerOpacity, assemblyBoardVisibility, assemblyExplodeOffsets, visibleLayers, layerOpacity, showVias]);
+  }, [viewMode, virtualBoards, assemblyBoardDesigns, selectedBoardInstanceId, linkedAssemblyNets, assemblyLayerVisibility, assemblyLayerOpacity, assemblyBoardVisibility, assemblyExplodeOffsets, visibleLayers, layerOpacity, zoneDisplay, assemblyZoneDisplay, showVias]);
 
   useEffect(() => {
     const group = virtualBoardGroupRef.current;
@@ -3680,6 +3716,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       results.forEach(result => assemblyFrame.add(result.partFrame));
       selectorPreviewPickablesRef.current = results.flatMap(result => result.pickables);
       assemblyFrame.updateMatrixWorld(true);
+      refreshSelectorPreviewDisplayRef.current();
       if (hostRef.current) hostRef.current.dataset.selectorPreviewLoad = `ready=${results.length};selectors=${selectorPreviewPickablesRef.current.length}`;
     }).catch(error => {
       if (!cancelled) {
@@ -3703,47 +3740,68 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   }, [assemblySection, activeBoard]);
 
   useEffect(() => {
-    const group = selectorPreviewGroupRef.current;
-    if (!group) return;
-    group.visible = viewMode === "3D" && showModels && topologySelectorActive;
-    const clippingPlanes: THREE.Plane[] = [];
-    group.traverse(object => {
-      const reference = object.userData?.topologyReference as TopologyReference | undefined;
-      const partId = typeof object.userData?.assemblyPartId === "string" ? object.userData.assemblyPartId : "";
-      if (partId) object.visible = !isolatedAssemblyPartId || isolatedAssemblyPartId === partId;
-      if (!reference) return;
-      const selected = reference.topology_id === selectedTopologyId;
-      if (object instanceof THREE.Mesh && object.material instanceof THREE.MeshBasicMaterial) {
-        object.material.color.setHex(selected ? 0xff5f57 : 0x45d4b5);
-        object.material.opacity = selected ? 0.58 : 0.12;
-        object.material.clippingPlanes = clippingPlanes;
-        object.material.needsUpdate = true;
-      } else if (object instanceof THREE.Line && object.material instanceof THREE.LineBasicMaterial) {
-        object.material.color.setHex(selected ? 0xff5f57 : reference.topology_kind === "axis" ? 0xffc857 : 0x70d7ff);
-        object.material.opacity = selected ? 1 : 0.72;
-        object.material.clippingPlanes = clippingPlanes;
-        object.material.needsUpdate = true;
-      }
-    });
-  }, [assemblySection, assemblySelectorPreviews, isolatedAssemblyPartId, selectedTopologyId, showModels, topologySelectorActive, viewMode]);
+    const apply = () => {
+      const group = selectorPreviewGroupRef.current;
+      if (!group) return;
+      group.visible = viewMode === "3D" && showModels && topologySelectorActive;
+      const clippingPlanes = assemblySectionClippingPlanes(assemblySection, boardTransformRef.current);
+      group.traverse(object => {
+        const reference = object.userData?.topologyReference as TopologyReference | undefined;
+        const partId = typeof object.userData?.assemblyPartId === "string" ? object.userData.assemblyPartId : "";
+        if (partId && Object.prototype.hasOwnProperty.call(object.userData, "assemblyVisible")) {
+          const presentation = mechanicalPartPresentation(
+            object.userData.assemblyVisible !== false,
+            1,
+            mechanicalVisuals[partId],
+            !isolatedAssemblyPartId || isolatedAssemblyPartId === partId,
+          );
+          object.visible = presentation.visible;
+          object.userData.assemblyPresentationOpacity = presentation.opacity;
+        }
+        if (!reference) return;
+        let partFrame: THREE.Object3D | null = object;
+        while (partFrame && !Object.prototype.hasOwnProperty.call(partFrame.userData, "assemblyPresentationOpacity")) partFrame = partFrame.parent;
+        const partOpacity = Number(partFrame?.userData.assemblyPresentationOpacity ?? 1);
+        const selected = reference.topology_id === selectedTopologyId;
+        if (object instanceof THREE.Mesh && object.material instanceof THREE.MeshBasicMaterial) {
+          object.material.color.setHex(selected ? 0xff5f57 : 0x45d4b5);
+          object.material.opacity = (selected ? 0.58 : 0.12) * partOpacity;
+          applyAssemblyMaterialClipping(object.material, clippingPlanes, false);
+        } else if (object instanceof THREE.Line && object.material instanceof THREE.LineBasicMaterial) {
+          object.material.color.setHex(selected ? 0xff5f57 : reference.topology_kind === "axis" ? 0xffc857 : 0x70d7ff);
+          object.material.opacity = (selected ? 1 : 0.72) * partOpacity;
+          applyAssemblyMaterialClipping(object.material, clippingPlanes, false);
+        }
+      });
+    };
+    refreshSelectorPreviewDisplayRef.current = apply;
+    apply();
+  }, [assemblySection, assemblySelectorPreviews, mechanicalVisuals, isolatedAssemblyPartId, selectedTopologyId, showModels, topologySelectorActive, viewMode]);
 
   useEffect(() => {
     const apply = () => {
       const group = assemblyGroupRef.current;
       if (!group) return;
-      const clippingPlanes: THREE.Plane[] = [];
+      const clippingPlanes = assemblySectionClippingPlanes(assemblySection, boardTransformRef.current);
       group.traverse(object => {
         const partId = typeof object.userData?.assemblyPartId === "string" ? object.userData.assemblyPartId : "";
         if (partId) {
-          object.visible = object.userData.assemblyVisible !== false
-            && (!isolatedAssemblyPartId || isolatedAssemblyPartId === partId);
+          const presentation = mechanicalPartPresentation(
+            object.userData.assemblyVisible !== false,
+            Number(object.userData.assemblyOpacity ?? 1),
+            mechanicalVisuals[partId],
+            !isolatedAssemblyPartId || isolatedAssemblyPartId === partId,
+          );
+          object.visible = presentation.visible;
+          object.userData.assemblyPresentationOpacity = presentation.opacity;
         }
         if (object instanceof THREE.Mesh) {
           const materials = Array.isArray(object.material) ? object.material : [object.material];
           materials.forEach(material => {
-            material.clippingPlanes = clippingPlanes;
-            material.clipShadows = clippingPlanes.length > 0;
-            material.needsUpdate = true;
+            let parent: THREE.Object3D | null = object;
+            while (parent && typeof parent.userData?.assemblyPartId !== "string") parent = parent.parent;
+            applyAssemblyMaterialOpacity(material, Number(parent?.userData.assemblyPresentationOpacity ?? 1));
+            applyAssemblyMaterialClipping(material, clippingPlanes, clippingPlanes.length > 0);
           });
         }
       });
@@ -3751,13 +3809,26 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
     };
     refreshAssemblyDisplayRef.current = apply;
     apply();
-  }, [assemblyModels, assemblySection, isolatedAssemblyPartId]);
+  }, [assemblyModels, mechanicalVisuals, assemblySection, isolatedAssemblyPartId]);
 
   useEffect(() => {
     if (assemblyGroupRef.current) assemblyGroupRef.current.visible = viewMode === "3D" && showModels;
     syncAssemblyGizmoRef.current();
     refreshVisibleBoundsRef.current();
   }, [showModels, viewMode]);
+
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene || viewMode !== "3D" || !mechanicalMeasurement) return;
+    const measurementScene = buildMechanicalMeasurementScene(mechanicalMeasurement, boardTransformRef.current);
+    scene.add(measurementScene);
+    requestInteractiveFrameRef.current();
+    return () => {
+      scene.remove(measurementScene);
+      clearGroup(measurementScene);
+      requestInteractiveFrameRef.current();
+    };
+  }, [mechanicalMeasurement, viewMode, activeBoard]);
 
   useEffect(() => {
     const group = emRadiationGroupRef.current;
@@ -4224,26 +4295,18 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
     clearGroup(group);
     const resultsActive = Boolean(analysisResult && resultVisualization?.visible && resultVisualization.mode !== "geometry");
     group.visible = (showAxes || showWorldGrid) && viewMode === "3D";
+    requestInteractiveFrameRef.current();
     if (!group.visible) return;
     const { scale, centerX, centerY } = boardTransformRef.current;
     const worldBounds = visibleBoundsRef.current;
     const size = worldGridSize(Math.max(activeBoard ? activeBoard.width * scale : 0, worldBounds.size.x), Math.max(activeBoard ? activeBoard.height * scale : 0, worldBounds.size.y));
-    const divisions = 40;
-    const grid = new THREE.GridHelper(size, divisions, viewportBackground === "light" ? 0x607783 : 0x66808b, viewportBackground === "light" ? 0x7e929b : 0x30434b);
-    grid.rotation.x = Math.PI / 2;
-    grid.position.set(worldBounds.center.x, worldBounds.center.y, Math.min(activeBoard ? -boardThicknessMm(activeBoard) * scale / 2 : 0, worldBounds.center.z - worldBounds.size.z / 2) - 0.65);
+    const floorZ = Math.min(activeBoard ? -boardThicknessMm(activeBoard) * scale / 2 : 0, worldBounds.center.z - worldBounds.size.z / 2) - 0.65;
+    const grid = createInfiniteViewportGrid(floorZ, viewportBackground);
     grid.visible = showWorldGrid;
-    const materials = Array.isArray(grid.material) ? grid.material : [grid.material];
-    materials.forEach(material => {
-      material.transparent = true;
-      material.opacity = 0.22;
-      material.depthWrite = false;
-    });
-    grid.renderOrder = -10;
     group.add(grid);
     const axes = new THREE.AxesHelper(Math.max(size * 0.16, 8));
     axes.position.set(-size / 2, -size / 2, grid.position.z + 0.04);
-    axes.visible = showAxes;
+    axes.visible = showAxes && showOriginAxes;
     axes.renderOrder = 140;
     group.add(axes);
     if (!resultsActive || !showAxes || !activeBoard) return;
@@ -4321,7 +4384,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         group.add(zUnit);
       }
     }
-  }, [viewportBackground, activeBoard, analysisResult, resultVisualization, showAxes, showWorldGrid, viewMode, virtualBoards, assemblyBoardDesigns, assemblyBoardVisibility, assemblyExplodeOffsets]);
+  }, [viewportBackground, activeBoard, analysisResult, resultVisualization, showAxes, showOriginAxes, showWorldGrid, viewMode, virtualBoards, assemblyBoardDesigns, assemblyBoardVisibility, assemblyExplodeOffsets]);
 
   useEffect(() => {
     const perspective = perspectiveRef.current;
@@ -4352,7 +4415,10 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   useEffect(() => {
     const group = proceduralGroupRef.current;
     if (!group) return;
+    restoreZoneDisplayScene(group);
+    if (accurateBoardRef.current) restoreZoneDisplayScene(accurateBoardRef.current);
     const copperLayers = activeBoard?.layers ?? [];
+    const effectiveZoneDisplay = (selectedBoardInstanceId && assemblyZoneDisplay[selectedBoardInstanceId]) || zoneDisplay;
     const stackMidpoint = Math.max((copperLayers.length - 1) / 2, 0.5);
     const worldSpacing = layerSeparation * (210 / Math.max(activeBoard?.width ?? 210, activeBoard?.height ?? 210, 1));
     const offsetForLayer = (layer?: string) => {
@@ -4384,7 +4450,6 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       showModels, categoryFiltered: categoryFilterActive, resultModelsVisible,
       missingModels: missingModelRefs.length > 0,
     });
-    const authoritativeAnalysisView = analysisView && presentation.importedBoard;
     const authoritativeView = !analysisView && presentation.importedBoard;
     // Keep retained geometry available for layers the imported scene could not
     // identify (for example inner copper), while tagged imported surfaces own
@@ -4396,7 +4461,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
     if (accurateComponentsRef.current) accurateComponentsRef.current.visible = presentation.importedComponents;
     if (hostRef.current) hostRef.current.dataset.groupVisibility = JSON.stringify(presentation);
     const netFocusActive = virtualBoards.length === 0 && Boolean(selectedNet || highlightedNets.length);
-    const authoritativeOpacity = authoritativeAnalysisView && resultVisualization?.sceneMode === "translucent"
+    const authoritativeOpacity = resultVisualization?.sceneMode === "translucent"
       ? resultVisualization.boardOpacity
       : 1;
     accurateGroupRef.current?.traverse(object => {
@@ -4481,6 +4546,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       const retainedLayer = data.substrate ? "Board body" : data.viaBarrel || data.via ? "through" : data.viaFaceLayer ?? data.layer;
       const importedLayerCovered = Boolean(retainedLayer && importedBoardLayers.has(retainedLayer));
       const authoritativeFallbackVisible = !authoritativeView || !importedLayerCovered
+        || effectiveZoneDisplay !== "filled" && (zoneSceneKind(object).startsWith("copper-") || zoneSceneKind(object).startsWith("via-"))
         || Boolean(data.model && presentation.proceduralComponents);
       const viaVisible = !data.via || showVias;
       // The substrate is independent of copper visibility. Inspection uses the
@@ -4641,9 +4707,11 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       });
       hostRef.current.dataset.sceneVisibility = JSON.stringify(counts);
     }
+    applyZoneDisplayScene(group, effectiveZoneDisplay);
+    if (accurateBoardRef.current) applyZoneDisplayScene(accurateBoardRef.current, effectiveZoneDisplay);
     hoverMaterialsRef.current = hoverMaterials;
     selectionMaterialsRef.current = selectionMaterials;
-  }, [activeBoard, virtualBoards.length, visibleLayers, layerOpacity, layerSeparation, showVias, selectedId, selectedNet, highlightedNets, isolatedNet, hoverPreview, showModels, showSmdModels, showThtModels, viewMode, fullModelState, componentModelState, layerFilterActive, splitSceneAvailable, resultSceneKey, analysisResult, analysisNets, missingModelRefs]);
+  }, [activeBoard, virtualBoards.length, visibleLayers, layerOpacity, zoneDisplay, assemblyZoneDisplay, selectedBoardInstanceId, layerSeparation, showVias, selectedId, selectedNet, highlightedNets, isolatedNet, hoverPreview, showModels, showSmdModels, showThtModels, viewMode, fullModelState, componentModelState, layerFilterActive, splitSceneAvailable, resultSceneKey, analysisResult, analysisNets, missingModelRefs]);
 
   // Selection, hover, opacity, and visibility changes do not alter proxy
   // bounds. Invalidating the spatial index for those high-frequency updates
@@ -4969,11 +5037,11 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         ].join(";");
       }
       const geometryScalarSamples = mode === "via_stress" ? [] : scalarSamples;
-      const triangleIndices = new Map<ScalarSample, number[]>();
+      const triangleIndices = new Map<ScalarSample, readonly number[]>();
       const trianglesFor = (sample: ScalarSample) => {
         const cached = triangleIndices.get(sample);
         if (cached) return cached;
-        const triangles = resultFaceTriangleIndices(sample.vertices_mm!);
+        const triangles = cachedResultFaceTriangleIndices(sample.vertices_mm!);
         triangleIndices.set(sample, triangles);
         return triangles;
       };
@@ -5395,6 +5463,15 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       if (!anchor) setNavigationStatus("Pointer unavailable; zoomed around the view center.");
       zoomCameraAt(camera, controls.target, anchor ?? controls.target.clone(), cameraCommand.startsWith("zoom-in") ? 0.8 : 1.25);
       viewHelperRef.current?.center.copy(controls.target);
+    } else if (cameraCommand.startsWith("reset-view-")) {
+      // Flush orbit damping before fitting from the renderer's default pose.
+      const damping = controls.enableDamping;
+      controls.enableDamping = false;
+      controls.reset();
+      fitRef.current(mode);
+      controls.enableDamping = damping;
+      viewHelperRef.current?.center.copy(controls.target);
+      requestInteractiveFrameRef.current();
     } else if (cameraCommand.startsWith("fit")) {
       fitRef.current(mode);
     } else if (cameraCommand.startsWith("focus-selection")) {
@@ -5669,29 +5746,92 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   }, [activeBoard, analysisResult, hoverProbeEnabled, hoverProbeOverlayText, hoverProbeTarget, resultVisualization, viewMode]);
 
   useEffect(() => {
+    const scene=sceneRef.current;
+    if(!scene||viewMode!=="3D"||!activeBoard||!solderBonds.length)return;
+    const {centerX,centerY,scale}=boardTransformRef.current;
+    const placements:SolderJointPlacement[]=[];
+    const issues:string[]=[];
+    const multi=virtualBoards.length>1;
+    const targets=multi?virtualBoards:[virtualBoards[0]];
+    for(const occurrence of targets){
+      if(placements.length>=MAX_SOLDER_JOINTS)break;
+      if(occurrence&&assemblyBoardVisibility[occurrence.id]===false)continue;
+      const source=multi&&occurrence?assemblyBoardDesigns[occurrence.designId]:activeBoard;
+      if(!source)continue;
+      const resolved=resolveSolderJoints(source,solderBonds,occurrence?.id,multi);issues.push(...resolved.issues);
+      const visibility=occurrence?assemblyLayerVisibility[occurrence.id]??visibleLayers:visibleLayers;
+      const opacity=occurrence?assemblyLayerOpacity[occurrence.id]??layerOpacity:layerOpacity;
+      for(const joint of resolved.joints){
+        if(placements.length>=MAX_SOLDER_JOINTS){issues.push("Solder display budget reached; remaining joints omitted");break;}
+        if(!assemblyLayerIsRendered(joint.layer,visibility,opacity)||isolatedNet&&joint.pad.net!==isolatedNet)continue;
+        const matrix=new THREE.Matrix4();
+        const thickness=boardThicknessMm(source);
+        const stackIndex=source.layers.indexOf(joint.layer);
+        const explode=stackIndex>=0?(Math.max((source.layers.length-1)/2,.5)-stackIndex)*layerSeparation:0;
+        const z=multi?kiCadLaminateMidplaneMm(source)+joint.side*((occurrence?.thicknessMm??thickness)/2+.025):joint.side*(thickness/2+.025)+explode;
+        matrix.makeTranslation(joint.pad.at[0],joint.pad.at[1],z);
+        matrix.multiply(new THREE.Matrix4().makeRotationZ(joint.pad.rotation*Math.PI/180));
+        if(multi&&occurrence){matrix.premultiply(rowMajorMatrix(occurrence.transform));matrix.elements[14]+=assemblyExplodeOffsets[occurrence.id]??0;}
+        const boardOpacity=resultVisualization?.translucentScene||resultVisualization?.sceneMode==="translucent"?resultVisualization.boardOpacity??.2:1;
+        placements.push({joint,matrix,opacity:joint.visual.opacity*(opacity[joint.layer]??1)*boardOpacity});
+      }
+    }
+    if(multi&&solderBonds.some(bond=>bond.solderVisual&&!bond.boardInstanceId))issues.push("Unscoped solder records require a board occurrence before assembly display");
+    const group=buildSolderJointScene(placements);
+    group.scale.set(scale,-scale,scale);group.position.set(-centerX*scale,centerY*scale,0);
+    const clipping=assemblySectionClippingPlanes(assemblySection,boardTransformRef.current);
+    group.traverse(object=>{if(object instanceof THREE.Mesh)for(const material of Array.isArray(object.material)?object.material:[object.material])applyAssemblyMaterialClipping(material,clipping,clipping.length>0);});
+    if(hostRef.current)hostRef.current.dataset.solderConnections=JSON.stringify({shown:placements.length,issues});
+    scene.add(group);requestInteractiveFrameRef.current();
+    return()=>{scene.remove(group);clearGroup(group);if(hostRef.current)delete hostRef.current.dataset.solderConnections;requestInteractiveFrameRef.current();};
+  },[activeBoard,solderBonds,viewMode,virtualBoards,assemblyBoardDesigns,assemblyBoardVisibility,assemblyLayerVisibility,assemblyLayerOpacity,assemblyExplodeOffsets,visibleLayers,layerOpacity,layerSeparation,isolatedNet,assemblySection,resultSceneKey]);
+
+  useEffect(() => {
     const scene = sceneRef.current;
-    if (!scene || !showNetNames || viewMode !== "3D" || virtualBoards.length < 2) return;
+    if (!scene || viewMode !== "3D") return;
     const labels = new THREE.Group(); labels.name = "assembly-net-labels";
+    if (virtualBoards.length <= 1 && activeBoard && singleBoardNetNames && assemblyBoardVisibility[virtualBoards[0]?.id] !== false) {
+      const visual = virtualBoards[0];
+      const visible = visual ? assemblyLayerVisibility[visual.id] ?? visibleLayers : visibleLayers;
+      const opacity = visual ? assemblyLayerOpacity[visual.id] ?? layerOpacity : layerOpacity;
+      const unitsPerPixel = activeBoard.width / 600;
+      const named = (net?: string) => net ? activeBoard.nets[net] ?? visual?.netNamesById?.[net] ?? net : undefined;
+      const tracks = activeBoard.tracks.filter(row => assemblyLayerIsRendered(row.layer, visible, opacity) && (!isolatedNet || named(row.net) === isolatedNet))
+        .map(row => ({ ...row, net: named(row.net), width: Math.max(row.width, unitsPerPixel * 14) }));
+      const zones = activeBoard.zones.filter(row => assemblyLayerIsRendered(row.layer, visible, opacity) && (!isolatedNet || named(row.net) === isolatedNet))
+        .map(row => ({ ...row, net: named(row.net) }));
+      for (const label of copperNetLabels(tracks, zones, { ...activeBoard.bounds, unitsPerPixel }, 80)) {
+        const sprite = overlayLabel(label.net, "#eaf5fa", Math.max(.6, label.fontSize * boardTransformRef.current.scale));
+        if (!sprite) continue;
+        sprite.position.fromArray(primaryNetLabelPosition(activeBoard, boardTransformRef.current, label, layerSeparation));
+        sprite.userData = { occurrenceId: visual?.id, layer: label.layer };
+        labels.add(sprite);
+      }
+    }
     const budget = Math.max(1,Math.floor(300 / virtualBoards.length));
-    for (const visual of virtualBoards) {
+    for (const visual of virtualBoards.length > 1 ? virtualBoards : []) {
       const source = assemblyBoardDesigns[visual.designId];
-      if (!source || assemblyBoardVisibility[visual.id] === false) continue;
+      if (!source || assemblyBoardVisibility[visual.id] === false || !(assemblyNetNameVisibility[visual.id] ?? showNetNames)) continue;
       const visible = assemblyLayerVisibility[visual.id] ?? visibleLayers;
       const opacity = assemblyLayerOpacity[visual.id] ?? layerOpacity;
       const matrix = rowMajorMatrix(visual.transform);
+      const { centerX, centerY, scale } = boardTransformRef.current;
       for (const label of assemblyNetLabels(source,visual,visible,opacity,source.width / 600,budget)) {
-        const sprite = overlayLabel(label.net,"#eaf5fa",Math.max(.6,label.fontSize));
+        const sprite = overlayLabel(label.net,"#eaf5fa",Math.max(.6,label.fontSize * scale));
         if (!sprite) continue;
         const side = label.layer.startsWith("B.") ? -1 : 1;
-        sprite.position.set(label.x,label.y,side * ((visual.thicknessMm ?? 1.6) / 2 + .08)).applyMatrix4(matrix);
-        sprite.position.z += assemblyExplodeOffsets[visual.id] ?? 0;
+        // Occurrence transforms consume native board coordinates. The scene
+        // occurrence's local-center translation cancels its centered geometry.
+        sprite.position.set(label.x,label.y,kiCadLaminateMidplaneMm(source) + side * ((visual.thicknessMm ?? boardThicknessMm(source)) / 2 + .08)).applyMatrix4(matrix);
+        sprite.position.set((sprite.position.x - centerX) * scale, (centerY - sprite.position.y) * scale,
+          (sprite.position.z + (assemblyExplodeOffsets[visual.id] ?? 0)) * scale);
         sprite.userData = {occurrenceId:visual.id,canonicalNetId:label.canonicalNetId,layer:label.layer};
         labels.add(sprite);
       }
     }
     scene.add(labels); requestInteractiveFrameRef.current();
     return () => { scene.remove(labels); labels.traverse(object => { if (object instanceof THREE.Sprite) { object.material.map?.dispose(); object.material.dispose(); } }); requestInteractiveFrameRef.current(); };
-  }, [showNetNames,viewMode,virtualBoards,assemblyBoardDesigns,assemblyBoardVisibility,assemblyLayerVisibility,assemblyLayerOpacity,assemblyExplodeOffsets,visibleLayers,layerOpacity,settledBoardScene]);
+  }, [activeBoard,singleBoardNetNames,isolatedNet,layerSeparation,showNetNames,assemblyNetNameVisibility,viewMode,virtualBoards,assemblyBoardDesigns,assemblyBoardVisibility,assemblyLayerVisibility,assemblyLayerOpacity,assemblyExplodeOffsets,visibleLayers,layerOpacity,settledBoardScene]);
 
   return (
     <div className="viewport-result-shell">
@@ -5699,10 +5839,13 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       <div ref={hostRef} className={`three-host ${viewMode === "2D" && activeBoard ? "layout-active" : ""}`} data-model-metrics={modelMetrics} data-hover-preview={hoverPreview?.label ?? ""}>
       {viewMode === "2D" && virtualBoards.length > 1 && <AssemblyLayoutViewport
         viewportBackground={viewportBackground} showWorldGrid={showWorldGrid}
+        zoneDisplay={zoneDisplay} assemblyZoneDisplay={assemblyZoneDisplay}
         designs={assemblyBoardDesigns} boards={assemblyDisplayBoards(virtualBoards, assemblyBoardVisibility, assemblyExplodeOffsets)} harnesses={assemblyDisplayHarnesses(virtualHarnesses, assemblyBoardVisibility, assemblyExplodeOffsets)}
         assemblyLayerVisibility={assemblyLayerVisibility} assemblyLayerOpacity={assemblyLayerOpacity} focusedLayerByBoard={assemblyLayerFocus} onLayerFocus={onAssemblyLayerFocus}
         selectedBoardId={selectedBoardInstanceId} linkedNets={linkedAssemblyNets}
-        visibleLayers={visibleLayers} layerOpacity={layerOpacity} showVias={showVias} showNetNames={showNetNames}
+        translucentScene={Boolean(resultVisualization?.translucentScene || resultVisualization?.sceneMode === "translucent")}
+        boardOpacity={resultVisualization?.boardOpacity}
+        visibleLayers={visibleLayers} layerOpacity={layerOpacity} showVias={showVias} showNetNames={showNetNames} assemblyNetNameVisibility={assemblyNetNameVisibility}
         selectionFilter={selectionFilter}
         cameraCommand={cameraCommand}
         snapTargets={assemblySnapTargets} selectedSnapTargetId={selectedAssemblySnapTargetId} onSnapTarget={onAssemblySnapTarget}
@@ -5711,10 +5854,11 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
       />}
       {viewMode === "2D" && virtualBoards.length <= 1 && activeBoard && <LayoutViewport
         board={activeBoard}
+        zoneDisplay={(selectedBoardInstanceId && assemblyZoneDisplay[selectedBoardInstanceId]) || zoneDisplay}
         visibleLayers={visibleLayers}
         layerOpacity={layerOpacity}
         showVias={showVias}
-        showNetNames={showNetNames}
+        showNetNames={singleBoardNetNames}
         selectedId={selectedId}
         selectedPosition={selectedPosition}
         selectedNet={selectedNet}
@@ -5744,7 +5888,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         onSelect={onSelect}
         onContextMenu={onContextMenu}
       />}
-      {showNetNames && (viewMode === "3D" || virtualBoards.length > 1) && <ViewportNetViewer
+      {netViewerNetNames && (viewMode === "3D" || virtualBoards.length > 1) && <ViewportNetViewer
         boardKey={netViewerScope.key} boardName={netViewerScope.label} rows={netViewerRows}
         assembly={virtualBoards.length > 1} available={Boolean(netViewerScope.board)}
         selectedIds={netViewerScope.occurrence ? linkedAssemblyNets[netViewerScope.occurrence.id] ?? [] : []}

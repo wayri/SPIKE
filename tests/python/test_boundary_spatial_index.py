@@ -107,6 +107,10 @@ class BoundarySpatialIndexTests(unittest.TestCase):
         self.assertEqual(
             domain.query_edges((-inf, -inf, inf, inf)), domain.edges,
         )
+        self.assertEqual(
+            domain.query_indexed_edges((-inf, -inf, inf, inf)),
+            tuple(enumerate(domain.edges)),
+        )
         generator = random.Random(99173)
         for _ in range(300):
             point = (generator.uniform(-4, 4), generator.uniform(-4, 4))

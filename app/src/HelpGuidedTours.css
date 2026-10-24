@@ -1,0 +1,53 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.help-guided-tours { min-width: 0; max-width: 1100px; margin: 0 auto; }
+.help-guided-tours * { box-sizing: border-box; }
+.help-guide-kicker { color: var(--spike-accent-text); font-size: 11px; text-transform: uppercase; letter-spacing: 1.3px; }
+.help-guide-intro { margin: 16px 0 24px; max-width: 740px; }
+.help-browser article .help-guide-intro h2, .help-browser article .help-guide-title { margin: 8px 0; }
+.help-guide-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 285px), 1fr)); gap: 12px; }
+.help-guided-tours .help-guide-task { display: flex; align-items: flex-start; gap: 12px; width: 100%; min-width: 0; min-height: 140px; padding: 20px; text-align: left; border: 1px solid var(--spike-border-default); border-radius: 10px; background: var(--spike-surface-raised); }
+.help-guide-task-number { color: var(--spike-accent-text); font-size: 12px; padding-top: 3px; }
+.help-guide-task-copy { display: grid; gap: 10px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.help-guide-task-copy strong { font-size: 16px; line-height: 1.35; }
+.help-guide-task-copy > span { color: var(--spike-text-muted); font-size: 12px; line-height: 1.65; }
+.help-guide-task-copy small { color: var(--spike-accent-text); font-size: 11px; }
+.help-guide-header, .help-guide-navigation { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+.help-guide-header > span, .help-guide-navigation > span { flex: 1; min-width: 0; font-size: 12px; color: var(--spike-text-muted); }
+.help-guide-prerequisites { padding: 14px 18px; border: 1px solid var(--spike-border-subtle); border-radius: 8px; margin: 18px 0; }
+.help-guide-prerequisites summary { color: var(--spike-text-strong); cursor: pointer; font-size: 13px; }
+.help-guide-prerequisites ul { margin-bottom: 0; padding-left: 20px; }
+.help-guide-step-list { max-width: 100%; margin: 20px 0; }
+.help-guide-step-list ol { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.help-guide-step-list li { min-width: 0; flex: 1 1 145px; }
+.help-guided-tours .help-guide-step-list button { display: flex; gap: 8px; align-items: center; width: 100%; height: 100%; text-align: left; padding: 10px; font-size: 12px; }
+.help-guide-step-list button > span:first-child { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border: 1px solid var(--spike-border-default); border-radius: 50%; }
+.help-guide-step-list button[aria-current="step"] { border-color: var(--spike-accent); background: var(--spike-surface-raised); }
+.help-guide-step-list button[aria-current="step"] > span:first-child { color: var(--spike-accent-text); border-color: var(--spike-accent); }
+.help-browser article .help-guide-current-title { font-size: 19px; margin: 24px 0 12px; }
+.help-guide-instructions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.help-browser article .help-guide-instructions h3, .help-browser article .help-guide-recovery h3 { margin: 0 0 6px; font-size: 13px; }
+.help-guide-instructions p, .help-guide-recovery p { margin: 0; }
+.help-guide-figure { margin: 22px 0; min-width: 0; }
+.help-guided-tours .help-guide-image { position: relative; display: block; width: 100%; min-width: 0; padding: 0; border: 1px solid var(--spike-border-default); border-radius: 8px; overflow: hidden; line-height: 0; cursor: zoom-in; }
+.help-guide-image img { display: block; width: 100%; height: auto; margin: 0; }
+.help-guide-highlight { position: absolute; display: block; border: 3px solid var(--spike-accent); border-radius: 4px; pointer-events: none; box-shadow: 0 0 0 1px var(--spike-text-strong); }
+.help-guide-highlight > span { position: absolute; top: 0; left: 0; display: grid; place-items: center; min-width: 25px; height: 25px; background: var(--spike-surface-panel); border: 1px solid var(--spike-accent); color: var(--spike-text-strong); border-radius: 0 0 5px 0; font: 700 13px/1 sans-serif; }
+.help-guide-figure figcaption { margin-top: 10px; color: var(--spike-text-muted); font-size: 11px; line-height: 1.65; }
+.help-guide-recovery { padding: 15px 18px; border-left: 3px solid var(--spike-border-default); background: var(--spike-surface-raised); }
+.help-guide-references { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 16px 0; font-size: 12px; overflow-wrap: anywhere; }
+.help-guide-references > span { color: var(--spike-text-muted); }
+.help-guide-navigation { border-top: 1px solid var(--spike-border-subtle); padding-top: 16px; }
+@media (max-width: 720px) {
+  .help-guide-instructions { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .help-guided-tours .help-guide-task { padding: 16px; min-height: 120px; }
+  .help-guide-step-list li { flex-basis: 135px; }
+  .help-guide-navigation { gap: 8px; }
+}
+
+.help-guided-tours .help-guide-task { display: grid; grid-template-columns: 24px minmax(0, 1fr) 16px; align-content: start; }
+.help-guide-task-thumbnail { grid-column: 1 / -1; display: block; width: 100%; height: 132px; object-fit: cover; border-radius: 5px; border: 1px solid var(--spike-border-subtle); }
+
+@container (max-width: 650px) {
+  .help-guide-instructions { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .help-guide-step-list li { flex-basis: 135px; }
+}

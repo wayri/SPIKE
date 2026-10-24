@@ -7,6 +7,12 @@ const authoritativeStudyOmission = (path: readonly string[], key: string): boole
 /** Preserve future fields while replacing the fields the current UI edits. */
 export function mergeProjectSnapshot(retained: unknown, updated: unknown, path: readonly string[] = []): any {
   if (updated === undefined) return retained;
+  // A new geometry capture is authoritative. Merging an older field_snapshots
+  // key into a rerun that returned no spatial fields would forge its provenance.
+  if (path.join(".") === "analysis.propulsion_pod_three_phase.result" && updated && typeof updated === "object"
+      && !Array.isArray(updated) && (updated as Record<string, unknown>).contract === "spike/geometry-propulsion-loop-result/v1") {
+    return structuredClone(updated);
+  }
   if (Array.isArray(updated)) {
     const old = Array.isArray(retained) ? retained : [];
     const identity = (item: any) => item && typeof item === 'object' && !Array.isArray(item)
@@ -50,6 +56,7 @@ export function withoutSavedResults(snapshot: Record<string, any>): Record<strin
     }
   }
   if (copy.analysis) {
+    if (copy.analysis.propulsion_pod_three_phase) copy.analysis.propulsion_pod_three_phase.result = null;
     if (copy.analysis.retained_assembly_em) copy.analysis.retained_assembly_em.result = null;
     if (copy.analysis.engineering_review) {
       copy.analysis.engineering_review.result = null;

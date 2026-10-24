@@ -19,6 +19,20 @@ class WindowsInstallerScriptTests(unittest.TestCase):
         self.assertIn('frontendDist = $snapshotRelativePath', self.script)
         self.assertNotIn('frontendDist = $frontendSnapshot }', self.script)
 
+    def test_retained_frontend_is_bounded_preview_only_and_does_not_skip_tests(self):
+        self.assertIn('[string]$FrontendSnapshot', self.script)
+        self.assertIn('Retained frontend snapshots are preview-only', self.script)
+        self.assertIn('strictly below this checkout', self.script)
+        self.assertIn('Frontend snapshot reparse points are not allowed', self.script)
+        self.assertIn('Copy-Item -LiteralPath $frontendSource', self.script)
+        self.assertNotIn('$SkipTests = $true', self.script)
+
+    def test_preview_frontend_build_is_isolated_before_vite_can_empty_output(self):
+        self.assertIn('build\\frontend-builds\\', self.script)
+        self.assertIn('[Guid]::NewGuid().ToString("N")', self.script)
+        self.assertIn('"--outDir", $frontendBuildOutput', self.script)
+        self.assertIn('$frontendSource = $frontendBuildOutput', self.script)
+
     def test_packaged_builds_explicitly_embed_frontend(self):
         production = self.script[self.script.index('"run", "tauri", "build", "--", "--bundles"'):]
         production = production[:production.index(') $app')]

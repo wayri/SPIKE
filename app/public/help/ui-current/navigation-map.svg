@@ -16,10 +16,10 @@
   <text x="32" y="118" class="heading">1  Where things live</text>
   <rect x="32" y="135" width="1056" height="57" rx="7" class="box"/>
   <text x="48" y="159" class="teal small bold">ROW 1 · GLOBAL</text>
-  <text x="48" y="182" class="small">Menu   |   Project files   |   Search · Ctrl+K   |   Workspaces   |   Hidden tools   |   Layout   |   Help</text>
+  <text x="48" y="182" class="small">Menu   |   Project files   |   Search · Ctrl+K   |   Hidden tools   |   Layout   |   Help</text>
   <rect x="32" y="201" width="1056" height="57" rx="7" class="box"/>
   <text x="48" y="225" class="teal small bold">ROW 2 · CURRENT DOCUMENT / VIEW</text>
-  <text x="48" y="248" class="small">Editor / assembly tabs   |   Add view   |   2D / 3D   ·   Orbit   ·   Pan   ·   Fit   ·   Camera   ·   Filter   ·   Tools</text>
+  <text x="48" y="248" class="small">Workspaces   |   Editor / assembly tabs   |   2D / 3D · Orbit · Pan · Fit · Camera · Filter   |   Board layers</text>
   <rect x="32" y="269" width="730" height="174" rx="7" class="soft"/>
   <text x="54" y="304" class="heading">Viewport or active editor</text>
   <text x="54" y="335" class="muted">Board / assembly / results, power tree or another document</text>

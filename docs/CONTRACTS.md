@@ -1,5 +1,60 @@
 # Versioned Data Contracts
 
+The separate offline `spike/multiport-deembedding-request/v1` and
+`spike/multiport-deembedding-result/v1` contracts retain supplied measured and
+coupled-fixture networks, exact real-reference grids, complete named port maps
+and a separately derived DUT. See [strict local fields and numerical scope](MULTIPORT_DEEMBEDDING.md).
+They are registered in the worker/schema catalog with strict nested records
+and unique canonical IDs; dynamic numerical/map invariants remain worker checks. The
+source-bound evidence contract is `spike/multiport-deembedding-evidence/v1`;
+its scope explicitly keeps full-family and production qualification false.
+
+The `spike/multiport-native-observation/v1` manifest records explicitly trusted
+native agent/human observations, hash-bound artifacts and stable runtime source
+snapshots. `spike/multiport-native-stage-evidence/v1` binds that manifest,
+executed headless evidence and current validator identities. It permits only
+SI08-S05 software-stage completion; family and production remain false. See
+[native acceptance scope](validation/SI08_MULTIPORT_INTEGRATION_20261024.md).
+
+Separate offline `spike/tetra-dc-rt0-scalable-request/v1`,
+`spike/dc-board-volume-scalable-model/v1` and
+`spike/source-board-volume-scalable-study/v1` explicitly select the bounded 50k
+development profile. Original request/model admission remains unchanged.
+`spike/selected-board-volume-refinement/v1` binds the same physical source model,
+three factor-two mesh levels, supervision and retained field replay; inspection
+cannot become acceptance, and failed stability retains stage/production false.
+See [numerics, resources and frozen criteria](DC_TETRA_SCALABLE.md). No public
+worker route, registered production schema or installed qualification is added.
+
+Offline experimental `spike/tetra-dc-rt0-request/v1` uses the retained solid mesh,
+exact per-cell scalar conductivity and whole exterior-face current patches.
+`spike/dc-board-volume-model/v1` declares copper slabs, barrel gaps and full finite
+electrodes; `spike/source-board-volume-study/v1` additionally pins native board
+identity and explicit pad/layer/side electrodes. Result wrappers retain actual
+fields, source/fill/coverage evidence, per-volume watts and separate experimental
+scope flags. Strict Python admission/replay owns these internal contracts;
+no registered production worker route or public schema is introduced. See
+[interfaces and physical limits](DC_TETRA_RT0.md) and [executed evidence](validation/PI01_BOARD_VOLUME_20261023.md).
+
+`spike/si-material-scenario-request/v1` admits explicit conductivity and
+provenance for exact material IDs on a bound design/source revision. Its
+registered schema is structural; finite values, ownership, stale revisions,
+resource bounds and immutability remain decoder checks. Inline worker
+preparation and retained in-process designs have different explicit size
+limits. `spike/si-uniform-channel-request/v1` adds optional exact
+`reference_zone_id` without relaxing reference coverage or geometry gates.
+
+`spike/em-spice-coupling-request/v1` and
+`spike/em-body-heating-request/v1` now have strict self-contained schemas in the
+catalog. Exact wrappers, finite JSON, 8 MiB admission, digest association,
+passivity, conditioning and physical conservation remain runtime gates;
+schema conformance alone does not establish a valid simulation.
+
+The EMerge co-simulation boundary exposes exactly `{request: ...}` worker
+parameters and registered preparation, sampled AC and resistor-thermal request
+schemas. Source errors block admission; source warnings/status are preserved.
+See [contracts, ports, RMS units and limits](EMERGE_COSIMULATION.md).
+
 Experimental offline annular DC uses `spike/dc-annular-land-request/v1` and
 `spike/dc-annular-stack-request/v1`; corresponding results preserve unit/final
 fields and explicit port incidence. `spike/source-annular-pad/v1` authenticates
@@ -473,3 +528,21 @@ Every port has an explicit finite nonnegative Thevenin resistance and PWL
 source voltage. Connected loop/stability admission precedes exact PWL
 state propagation; full fit, termination and boundary evidence is retained.
 See [terminated workflow](TERMINATED_NETWORK_TRANSIENT.md).
+
+
+## Explicit circuit-worker resource policies
+
+`supervise_process` and `run_circuit_worker` retain
+`resource_policy="strict_address_space"` by default. An explicit
+`resource_policy="darwin_sampled_rss"` is admitted only on Darwin. It reports
+`darwin_process_group_sampled_rss_experimental`, observes summed process-group
+RSS, and does not establish a hard memory cap. Budget overage returns
+`memory_exceeded`; circuit terminal results use E-0058. Observation failure
+terminates the group, publishes E-0059 and raises `ResourceObservationError`.
+Strict initialization failure still publishes E-0057 and raises without retry.
+See [ADR 0143](adr/0143-explicit-macos-sampled-memory-policy.md).
+
+Circuit package manifests add `release_supervision`; the final Unix payload
+verifier requires exact agreement with the native package profile and an
+explicit matching command-line policy. Existing process-result v1 fields and
+raw-netlist/library admission boundaries are unchanged.

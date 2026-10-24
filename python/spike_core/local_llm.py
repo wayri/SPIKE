@@ -52,7 +52,7 @@ def _request(origin: str, path: str, body: dict[str, Any] | None = None) -> dict
         if not isinstance(result, dict):
             raise LocalModelError("Local model returned invalid JSON")
         return result
-    except (OSError, json.JSONDecodeError) as exc:
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise LocalModelError(f"Local model request failed: {exc}") from exc
     finally:
         connection.close()
@@ -102,25 +102,44 @@ def chat(provider: str, model: str, prompt: str, *, endpoint: str | None = None,
         {"role": "user", "content": prompt},
     ]
     calls_used = 0
-    for _ in range(MAX_TOOL_ROUNDS + 1):
+    for round_index in range(MAX_TOOL_ROUNDS + 1):
         body = {"model": model, "messages": messages, "tools": tools, "stream": False}
         response = _request(origin, "/v1/chat/completions" if provider == "lmstudio" else "/api/chat", body)
         if provider == "lmstudio":
             choices = response.get("choices")
-            message = choices[0].get("message") if isinstance(choices, list) and choices and isinstance(choices[0], dict) else None
+            choice = choices[0] if isinstance(choices, list) and choices and isinstance(choices[0], dict) else None
+            if not isinstance(choice, dict) or choice.get("finish_reason") not in {"stop", "tool_calls"}:
+                raise LocalModelError("LM Studio returned an incomplete assistant message")
+            message = choice.get("message")
         else:
             message = response.get("message")
         if not isinstance(message, dict):
             raise LocalModelError("Local model returned no assistant message")
+        if provider == "ollama" and response.get("done") is not True:
+            raise LocalModelError("Ollama returned an incomplete assistant message")
         tool_calls = message.get("tool_calls") or []
         if not isinstance(tool_calls, list):
             raise LocalModelError("Local model returned invalid tool calls")
+        content = message.get("content", "")
+        if content is None and tool_calls:
+            content = ""
+        if not isinstance(content, str):
+            raise LocalModelError("Local model returned invalid assistant content")
         if not tool_calls:
-            content = message.get("content")
-            return content if isinstance(content, str) else ""
+            if not content:
+                raise LocalModelError("Local model returned no text or tool calls")
+            return content
+        if round_index >= MAX_TOOL_ROUNDS:
+            raise LocalModelError("Local model exceeded the tool-round limit")
         if calls_used + len(tool_calls) > MAX_TOOL_CALLS:
             raise LocalModelError("Local model exceeded the tool-call limit")
-        messages.append({"role": "assistant", "content": message.get("content") or "", "tool_calls": tool_calls})
+        if provider == "lmstudio":
+            identifiers = [call.get("id") for call in tool_calls if isinstance(call, dict)]
+            if len(identifiers) != len(tool_calls) or any(not isinstance(identity, str) or not identity for identity in identifiers):
+                raise LocalModelError("LM Studio tool call lacks an ID")
+            if len(set(identifiers)) != len(identifiers):
+                raise LocalModelError("LM Studio returned duplicate tool-call IDs")
+        messages.append({"role": "assistant", "content": content, "tool_calls": tool_calls})
         for call in tool_calls:
             if not isinstance(call, dict):
                 raise LocalModelError("Local model returned an invalid tool call")
@@ -131,13 +150,11 @@ def chat(provider: str, model: str, prompt: str, *, endpoint: str | None = None,
                 result = {"content": [{"type": "text", "text": str(exc)}], "isError": True}
             content = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
             if provider == "lmstudio":
-                if not isinstance(call.get("id"), str):
-                    raise LocalModelError("LM Studio tool call lacks an ID")
                 messages.append({"role": "tool", "tool_call_id": call["id"], "content": content})
             else:
                 messages.append({"role": "tool", "tool_name": name, "content": content})
             calls_used += 1
-    raise LocalModelError("Local model exceeded the tool-round limit")
+    raise AssertionError("unreachable")
 
 
 def main(argv: list[str] | None = None) -> int:

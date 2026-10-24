@@ -1,0 +1,9 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.multiport-fixture { display: grid; gap: 12px; min-width: 0; padding: 16px; }
+.multiport-fixture p, .multiport-fixture li { overflow-wrap: anywhere; margin: 0; }
+.multiport-fixture label { display: grid; gap: 6px; min-width: 0; }
+.multiport-fixture textarea { box-sizing: border-box; width: 100%; min-height: 180px; resize: vertical; font: 12px/1.5 monospace; }
+.multiport-fixture-actions { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.multiport-fixture-actions input { max-width: 100%; min-width: 0; }
+.multiport-fixture-summary { display: grid; gap: 8px; min-width: 0; }
+.multiport-fixture pre { max-width: 100%; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }

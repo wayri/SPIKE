@@ -97,7 +97,10 @@ function assertSelfContainedArtifact(artifact: VisualArtifact) {
     }
     return;
   }
-  const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+  // Match the visual decoder's exact byte conversion without a string-iterator
+  // callback/allocation for every byte of a large portable GLB.
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
   const view = new DataView(bytes.buffer);
   if (bytes.length < 20 || view.getUint32(0, true) !== 0x46546c67 || view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== bytes.length) {
     throw new Error('Saved model is not a valid GLB.');

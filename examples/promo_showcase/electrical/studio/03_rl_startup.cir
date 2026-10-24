@@ -1,0 +1,7 @@
+.title Tutorial 03 - Inductor current startup
+* tau = L/R = 1 ms; final current approaches 1 A.
+V1 in 0 10
+R1 in out 10
+L1 out 0 10m
+.tran 10u 5m uic
+.end

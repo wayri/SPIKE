@@ -11,6 +11,7 @@ import numpy as np
 from scipy.sparse import csr_matrix, eye, kron
 
 from python.spike_core.cfd_tetra_mesh import admit_cfd_tetra_mesh
+from python.spike_core import cfd_tetra_stokes as stokes
 from python.spike_core.cfd_tetra_stokes import (
     CONTRACT, CfdTetraStokesError, _block_preconditioner, solve_cfd_tetra_stokes)
 
@@ -221,15 +222,86 @@ class TetraStokesTests(unittest.TestCase):
         self.assertLess(result["diagnostics"]["momentum_relative_residual"], 1e-10)
         self.assertLess(result["diagnostics"]["relative_energy_defect"], 1e-9)
 
-    def test_unresolved_zero_work_translation_fails_closed(self):
+    def test_zero_work_stationary_translation_geometry_and_scale(self):
+        angle = .37
+        rotation = np.array([[math.cos(angle), -math.sin(angle), 0.],
+                             [math.sin(angle), math.cos(angle), 0.], [0., 0., 1.]])
+        for length, mu in ((1e-3, 1e-3), (1., 1.), (1e3, 1e3)):
+            for speed in (0., 1e-9, .001):
+                for translated in (False, True):
+                    with self.subTest(length=length, mu=mu, speed=speed, translated=translated):
+                        request = quadratic_mms(2)
+                        xyz = length*np.asarray(request["mesh"]["vertices"]) @ rotation.T
+                        if translated:
+                            xyz += length*np.array([3., -2., 5.])
+                        request["mesh"]["vertices"] = xyz.tolist()
+                        request["dynamic_viscosity_pa_s"] = mu
+                        request["body_force_n_m3"][:] = 0.
+                        velocity = speed*np.array([1., -.2, .3])
+                        for boundary in request["boundary_conditions"].values():
+                            boundary["face_average_velocity_m_s"][:] = velocity
+                        result = self.completed(request)
+                        actual = np.asarray(result["fields"]["face_average_velocity_m_s"])
+                        np.testing.assert_array_equal(actual, np.tile(velocity, (len(actual), 1)))
+                        np.testing.assert_array_equal(result["fields"]["cell_velocity_gradient_s_inv"], 0.)
+                        np.testing.assert_array_equal(result["fields"]["cell_pressure_pa"], 0.)
+                        for key in ("viscous_broken_gradient_dissipation_w", "body_force_work_w",
+                                    "pseudo_traction_work_w", "dirichlet_reaction_work_w",
+                                    "pressure_work_w", "relative_energy_defect",
+                                    "scaled_linear_relative_residual"):
+                            self.assertEqual(result["diagnostics"][key], 0., key)
+                        self.assertLessEqual(result["diagnostics"]["momentum_relative_residual"], 1e-10)
+                        self.assertLessEqual(result["diagnostics"]["maximum_local_mass_scaled_residual"], 1e-10)
+
+    def test_translation_does_not_erase_nonzero_body_load(self):
+        request = quadratic_mms(2)
+        request["body_force_n_m3"][:] = [1e-5, -2e-5, 3e-5]
+        for boundary in request["boundary_conditions"].values():
+            boundary["face_average_velocity_m_s"][:] = [.001, 0., 0.]
+        result = self.completed(request)
+        self.assertGreater(np.max(np.abs(result["fields"]["cell_pressure_pa"])), 1e-6)
+        self.assertGreater(result["diagnostics"]["viscous_broken_gradient_dissipation_w"], 0.)
+        self.assertGreater(abs(result["diagnostics"]["body_force_work_w"]), 1e-9)
+        self.assertLessEqual(result["diagnostics"]["relative_energy_defect"], 1e-9)
+
+    def test_zero_work_translation_with_natural_outlet(self):
         request = quadratic_mms(2)
         request["body_force_n_m3"][:] = 0.
         for boundary in request["boundary_conditions"].values():
             boundary["face_average_velocity_m_s"][:] = [.001, 0., 0.]
-        # Physical work and dissipation both vanish. The retained physical
-        # relative-power gate cannot resolve roundoff reactions in this case;
-        # do not silently waive it or publish a qualified field.
-        self.blocked(request, "power balance")
+        count = len(request["mesh"]["boundary_patches"]["outlet"])
+        request["boundary_conditions"]["outlet"] = {
+            "kind": "pseudo_traction", "face_average_pseudo_traction_pa": np.zeros((count, 3)),
+            "reject_backflow": True}
+        result = self.completed(request)
+        actual = np.asarray(result["fields"]["face_average_velocity_m_s"])
+        np.testing.assert_array_equal(actual, np.tile([.001, 0., 0.], (len(actual), 1)))
+        np.testing.assert_array_equal(result["fields"]["cell_pressure_pa"], 0.)
+        self.assertEqual(result["diagnostics"]["relative_energy_defect"], 0.)
+        self.assertGreater(result["diagnostics"]["boundary_patch_outward_flux_m3_s"]["outlet"], 0.)
+        self.assertEqual(result["diagnostics"]["pressure_gauge_cells"], [])
+
+    def test_forged_solver_load_and_gradient_still_fail_fixed_gates(self):
+        original_inverse = stokes._inverse_solver
+        def wrong_inverse(*args, **kwargs):
+            solve, transpose, stats = original_inverse(*args, **kwargs)
+            return lambda rhs: 1.01*solve(rhs), transpose, stats
+        with patch.object(stokes, "_inverse_solver", side_effect=wrong_inverse):
+            self.blocked(poiseuille(2), "scaled linear residual")
+        original_diagnostics = stokes._diagnostics
+        def wrong_load(*args):
+            changed = list(args)
+            changed[3] = args[3].copy()
+            changed[3][args[10][0]] += 1e-5
+            return original_diagnostics(*changed)
+        with patch.object(stokes, "_diagnostics", side_effect=wrong_load):
+            self.blocked(poiseuille(2), "momentum residual")
+        original_assemble = stokes._assemble
+        def wrong_gradient(*args):
+            k, b, body, gradients = original_assemble(*args)
+            return k, b, body, 1.01*gradients
+        with patch.object(stokes, "_assemble", side_effect=wrong_gradient):
+            self.blocked(poiseuille(2), "power balance")
 
     def test_natural_pressure_sign_and_boundary_flux(self):
         base = self.completed(poiseuille(3))
@@ -273,6 +345,15 @@ class TetraStokesTests(unittest.TestCase):
         self.assertEqual(result["diagnostics"]["pressure_gauge_cells"], [0, 6])
         np.testing.assert_array_equal(result["fields"]["cell_pressure_pa"], 0.)
         np.testing.assert_array_equal(result["fields"]["face_average_velocity_m_s"], 0.)
+        for name, condition in request["boundary_conditions"].items():
+            condition["face_average_velocity_m_s"][:] = ([0., -.002, 0.] if name.startswith("second_")
+                                                         else [.001, 0., 0.])
+        translated = self.completed(request)
+        faces = np.asarray(translated["fields"]["face_vertices"])
+        expected = np.tile([.001, 0., 0.], (len(faces), 1))
+        expected[np.all(faces >= offset, axis=1)] = [0., -.002, 0.]
+        np.testing.assert_array_equal(translated["fields"]["face_average_velocity_m_s"], expected)
+        self.assertEqual(translated["diagnostics"]["relative_energy_defect"], 0.)
 
     def test_incompatible_closed_flux_and_backflow_rejected(self):
         request = quadratic_mms(2)

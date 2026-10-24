@@ -4,7 +4,7 @@ from .service_helpers import error_response
 
 
 def handle_sparameter_processing_request(method, params):
-    if method not in ('run_rlgc_loaded_star', 'run_rlgc_coupled_star', 'run_rlgc_loaded_cascade', 'run_rlgc_coupled_cascade', 'run_rlgc_reactive_pair', 'run_rlgc_terminated_pair', 'run_rlgc_coupled_pair', 'run_si_candidate_study', 'deembed_two_port', 'resample_sparameter_network', 'fit_sparameter_rational',
+    if method not in ('run_rlgc_loaded_star', 'run_rlgc_coupled_star', 'run_rlgc_loaded_cascade', 'run_rlgc_coupled_cascade', 'run_rlgc_reactive_pair', 'run_rlgc_terminated_pair', 'run_rlgc_coupled_pair', 'run_si_candidate_study', 'deembed_two_port', 'deembed_multiport', 'resample_sparameter_network', 'fit_sparameter_rational',
                       'run_rational_network_transient', 'run_terminated_network_transient',
                       'run_inductive_network_transient', 'run_capacitive_network_transient',
                       'run_rlc_network_transient', 'run_initialized_rlc_network_transient',
@@ -90,6 +90,9 @@ def handle_sparameter_processing_request(method, params):
         elif method == 'fit_sparameter_rational':
             from .sparameter_rational import fit_sparameter_rational
             result = fit_sparameter_rational(params['request'])
+        elif method == 'deembed_multiport':
+            from .sparameter_multiport_deembedding import deembed_multiport
+            result = deembed_multiport(params['request'])
         elif method == 'resample_sparameter_network':
             from .sparameter_sampling import resample_sparameter_network
             result = resample_sparameter_network(params['request'])
