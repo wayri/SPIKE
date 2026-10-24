@@ -65,7 +65,7 @@ class UnixReleasePayloadTests(unittest.TestCase):
             with patch.object(verifier, "run_circuit_worker", side_effect=smoke) as run:
                 result = verifier.verify(root)
             run.assert_called_once()
-            self.assertEqual(run.call_args.kwargs["worker_executable"].parent, bundled / "spike-circuit-worker")
+            self.assertEqual(run.call_args.kwargs["worker_executable"].parent, (bundled / "spike-circuit-worker").resolve(strict=True))
             self.assertEqual(run.call_args.kwargs["library_sha256"], result["circuit_library_sha256"])
             self.assertEqual(result["status"], "passed")
             self.assertEqual(result["versions"]["worker_version"], "0.4.1")
