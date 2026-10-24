@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # UI and solver-boundary performance — 23 October 2026
 
+Local evidence paths are not shipped in this source snapshot. Their historical references below are retained as unlinked paths, not public artifact downloads.
+
 This pass removes redundant presentation, initialization, orchestration, and
 transport work. It does not change governing equations, mesh-density settings,
 communication points, convergence tolerances, or solver admission gates. It does
@@ -28,7 +30,7 @@ Detailed evidence and scope:
 - [Exact PCB preparation optimization and retained-fixture evidence](PCB_PREPARATION_OPTIMIZATION_20261023.md).
 - [Independent edge-index and slab-sweep equivalence review](PCB_PREPARATION_INDEX_REVIEW_20261023.md).
 - Raw initialization, encoding and bounded solve measurements:
-  [`output/performance-20261023`](../../output/performance-20261023).
+  `output/performance-20261023` (`../../output/performance-20261023`; local evidence, not included).
 
 The Results panel additionally memoizes the selected board geometry/layer
 inventory, engineering analytics, DC review, and source/load review using their

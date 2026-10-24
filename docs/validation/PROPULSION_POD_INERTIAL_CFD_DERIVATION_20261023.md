@@ -1,5 +1,5 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-# Experimental rotating-blade inertial CFD â€” 23 October 2026
+# Experimental rotating-blade inertial CFD - 23 October 2026
 
 This owner implements actual incompressible laminar inertial flow with moving
 no-slip blade boundaries in a constant-speed rotating frame. It is neither BEM
@@ -219,7 +219,7 @@ CC-BY-SA4.0. The selected `CASALINO_D30cm_pitch+5deg.stl` SHA256 is
 It has35744triangles,17868vertices, no zero-area facets, coherently oriented
 2-owner edges, Euler characteristic-4 and signed solid volume24.507802cm3.
 Edge closure does not establish absence of global self-intersections.
-The bounding box is xÂ±15.548571mm,yâˆ’1.302941..21.433569mm,zÂ±150mm.
+The bounding box is x+/-15.548571mm,y-1.302941..21.433569mm,z+/-150mm.
 Shaft+y is the explicit meshing interpretation; source mounting/flow context
 must still match any experiment used for comparison.
 
@@ -252,11 +252,11 @@ are distinct checks. Coarsening itself never promotes a load to qualification.
 
 ## Primary method references and clean-room statement
 
-* NASA Glenn, [Navierâ€“Stokes equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/navier-strokes-equation/), governing conservation context.
+* NASA Glenn, [Navier-Stokes equation](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/navier-strokes-equation/), governing conservation context.
 * NASA Wind-US [ROTATE keyword](https://www.grc.nasa.gov/www/winddocs/user/keywords/rotate.html), rotating-frame modelling context and warning that merely imparting rotating grid velocity is not a high-speed rotating-frame model.
 * Ansys Fluent2025R2, [moving-reference-frame equations](https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/flu_th/flu_th_sec_rotate_equations.html), absolute/relative formulation context. The explicit transformation above is independently derived; no implementation was examined or adapted.
-* Tezduyar, Mittal, Ray and Shih1992, CMAME95:221â€“242, [primary author-hosted paper](https://www.tafsm.org/PUB_PRE/jALL/j28-CMAME-PSPG.pdf), DOI10.1016/0045-7825(92)90141-6, equations11â€“20 for residual-consistent stabilization. Its P1 equal-order validation is not adopted as evidence for this P2 rotating-blade case.
-* FEniCS Project [Taylorâ€“Hood Stokes method documentation](https://docs.fenicsproject.org/dolfinx/v0.9.0/python/demos/demo_stokes.html), conforming mixed-space context.
+* Tezduyar, Mittal, Ray and Shih1992, CMAME95:221-242, [primary author-hosted paper](https://www.tafsm.org/PUB_PRE/jALL/j28-CMAME-PSPG.pdf), DOI10.1016/0045-7825(92)90141-6, equations11-20 for residual-consistent stabilization. Its P1 equal-order validation is not adopted as evidence for this P2 rotating-blade case.
+* FEniCS Project [Taylor-Hood Stokes method documentation](https://docs.fenicsproject.org/dolfinx/v0.9.0/python/demos/demo_stokes.html), conforming mixed-space context.
 * VTK [DecimatePro API](https://vtk.org/doc/nightly/html/classvtkDecimatePro.html) and [implicit closest-surface distance API](https://vtk.org/doc/nightly/html/classvtkImplicitPolyDataDistance.html), native tool operation only; no vendor source was copied.
 
 All new numerical assembly, derivations, manufactured forcing, broadphase,
@@ -326,8 +326,8 @@ Taylor expansion gives `F(x+delta)=e+O(||delta||^2)`. A forcing bound eta<1
 therefore gives a local residual contraction when the quadratic remainder
 is sufficiently small. Actual line search and final residual checks remain
 necessary; no global guarantee follows for this blade case. This is a
-constant forcing choice, not the adaptive Eisenstatâ€“Walker rule. Primary
-reference: Eisenstat and Walker1996, SIAM J Sci Comput17:16â€“32,
+constant forcing choice, not the adaptive Eisenstat-Walker rule. Primary
+reference: Eisenstat and Walker1996, SIAM J Sci Comput17:16-32,
 [DOI10.1137/0917003](https://epubs.siam.org/doi/10.1137/0917003), whose inexact
 Newton condition is used; no implementation was copied.
 
@@ -337,7 +337,7 @@ Original ENOLA +5deg STL SHA256
 `4659b1f740d6e2ea30819b7a2ce3cdddd54703600ff0d0919d0529ff1db62afd`.
 The coarser5362-facet simulation surface includes explicit local hub geometry
 regularization. Its10733-cell mesh passes the unchanged positive/condition
-and full topology/intersection admission; this supplies the v3â€“v5 cases.
+and full topology/intersection admission; this supplies the v3-v5 cases.
 Global0.3mm bidirectional triangle-cover checks pass. At12 blade sections
 the maximum thickness-proxy change is12.57%, so this coarsening is not
 independently established aerodynamically adequate.
@@ -398,7 +398,7 @@ For nonsingular A, forward error obeys `||x-x*||<=||A^-1||||r||`; conditioning
 still limits the forward information obtainable from a small backward
 residual. No higher-precision residual or mixed-precision theorem is claimed.
 Primary method reference: Carson and Higham2018,
-[SIAM J Sci Comput40:A817â€“A847](https://epubs.siam.org/doi/10.1137/17M1140819),
+[SIAM J Sci Comput40:A817-A847](https://epubs.siam.org/doi/10.1137/17M1140819),
 describes residual/correction/update refinement and GMRES correction solves.
 Its three-precision guarantees are not assumed here. No source implementation
 was copied. Three dedicated checks passed: an ill-conditioned small direct
@@ -539,8 +539,8 @@ the quadratic term and conditioning prevent a global guarantee. Actual
 backtracking and final full nonlinear1e-9, energy1e-7, weak continuity,
 Mach and blade-load convergence requirements remain unchanged. This is an
 explicit absolute-budget inexact Newton choice, not an implementation of
-the adaptive Eisenstatâ€“Walker rule. Primary reference: Eisenstat and Walker,
-SIAM J Sci Comput17(1996):16â€“32,
+the adaptive Eisenstat-Walker rule. Primary reference: Eisenstat and Walker,
+SIAM J Sci Comput17(1996):16-32,
 [DOI10.1137/0917003](https://epubs.siam.org/doi/10.1137/0917003), inexact Newton
 forcing inequality. No implementation was copied.
 

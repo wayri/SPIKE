@@ -1,6 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # PI01-S02: conservative board-volume reference, 23 October 2026
 
+Local evidence paths are not shipped in this source snapshot. Their historical references below are retained as unlinked paths, not public artifact downloads.
+
 Full stage: **in progress**. Production qualification: **false**. The bounded
 offline reference and its reproducible verification are supplementary evidence;
 the original EBrake/Marble studies have not passed whole-board acceptance.
@@ -34,7 +36,7 @@ and heat/work checks. Human numerical release review remains required.
 
 The supplemental [source-bound receipt](parity/PI01-S02-board-volume-20261023.json)
 binds the exact executed source, tests, fixtures, method documents,
-[execution log](parity/PI01-S02-board-volume-20261023.log) and
+execution log (`parity/PI01-S02-board-volume-20261023.log`; local evidence, not included) and
 [raw retained fields](parity/PI01-S02-board-volume-fields-20261023.json).
 Its 47 focused tests include independently authored analytical and harmonic
 continuum oracles, rotation/translation/units, material layers, multiple driven

@@ -1463,7 +1463,7 @@ roundoff allowance; other integrity and physical power gates remain unchanged.
 [Method](RLGC_LOADED_STAR.md),
 [ADR 0124](adr/0124-physical-rlc-loaded-coupled-stars.md),
 [verification](validation/SI02_LOADED_STAR_20261021.md).
-The new schemas enforce source/termination counts for every 2â€“8-leg topology.
+The new schemas enforce source/termination counts for every 2–8-leg topology.
 
 ## Part operating limits
 

@@ -118,7 +118,7 @@ consistency. See [reference plane and math](NETWORK_REFLECTOMETRY.md).
 
 
 `spike/crosstalk-timing-corners-request/v1` wraps a multi-aggressor request
-with 1â€“8 named supplied signed-delay maps covering every aggressor. Result/v1
+with 1–8 named supplied signed-delay maps covering every aggressor. Result/v1
 retains original source, complete shifted corner results and their identities,
 requested-sample finite-family envelopes with attaining corner ids and directly
 verified global witnesses. Endpoint holds and unchanged supplied initial state
@@ -126,7 +126,7 @@ are explicit. See [timing semantics and limits](CROSSTALK_TIMING_CORNERS.md).
 
 
 `spike/multi-aggressor-crosstalk-request/v1` wraps initialized RLC v2 with
-explicit victim, 1â€“6 aggressor reference voltages and voltage limits. Result/v1
+explicit victim, 1–6 aggressor reference voltages and voltage limits. Result/v1
 retains original source, actual baseline, zero-state contributions, requested-time
 signed-family envelopes and two directly verified fixed-pattern traces with
 request digests. See [derivation and API](MULTI_AGGRESSOR_CROSSTALK.md). Cross-field

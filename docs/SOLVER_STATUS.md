@@ -107,7 +107,7 @@ backend. These later source changes are not contained in the earlier preview
 installers. Full release qualification remains open.
 
 The [local AC repair](validation/LOCAL_AC_REPAIR_20261023.md) checks every
-independent terminal basis at unchanged tolerances. Dated PI02-S01â€“S04 receipts
+independent terminal basis at unchanged tolerances. Dated PI02-S01–S04 receipts
 replay current source. The [EMerge sampled circuit bridge](EMERGE_COSIMULATION.md)
 adds experimental explicit AC boundaries and conservative external-resistor
 heat mapping to retained thermal cells. It preserves source status/diagnostics;
@@ -771,7 +771,7 @@ EMI compliance qualification. Adapter contract tests use API doubles. The
 [four-layer ESP32 board surrogate](../examples/esp32/README.md) reduces the
 source to F.Cu antenna copper, an ideal B.Cu reference plane, equivalent
 dielectric and one explicit PEC short. EMerge 3.0.0a19 completed a three-point
-2.30â€“2.60 GHz radiation run and a 1.0/1.5 mm mesh comparison; its generated
+2.30–2.60 GHz radiation run and a 1.0/1.5 mm mesh comparison; its generated
 3D pattern and cuts are unvalidated and do not represent full-board RF
 performance. A two-frequency, two-port fixture completed SI and radiation solves with EMerge
 2.8.9 on Windows. A seven-frequency KiCad antenna fixture completed with the
@@ -779,7 +779,7 @@ EMerge 3.0.0a19 prerelease, including SPIKE result admission and sample probes.
 Paired seven-frequency bare and ideal dielectric-cover cases also completed
 on the same KiCad board; the [radome fixture](../examples/emerge/radome/README.md)
 records their differing S11 and peak-normalized pattern samples. The cover is
-one bounded dielectric box in the FEM geometry; the 5Â° surface and EM chamber
+one bounded dielectric box in the FEM geometry; the 5° surface and EM chamber
 overlay are display interpolation. Curved radomes and imported complex
 surroundings remain unsupported.
 These are execution evidence, not mesh convergence or physical validation.
@@ -805,7 +805,7 @@ marks non-integrated EMerge studies and boundaries as pending adapters.
 The [Marble/White Rabbit SI experiments](../examples/emerge/board_si/README.md)
 completed source-derived four-port coupled-route sweeps with EMerge 3.0.0a19 and
 EMCAD 0.1.0: 64 frequencies from 100 MHz to 6.4 GHz and 7,744 valid E/H samples
-per model. The adapter now accepts explicitly mapped 2â€“8 ports across up to four
+per model. The adapter now accepts explicitly mapped 2–8 ports across up to four
 signal nets. These examples idealize the reference planes and terminals and omit
 the rest of the boards. Marble passed sampled passivity; an independent two-point
 SuperLU/automatic-backend comparison agreed within 1.20e-11 in complex S.
@@ -957,7 +957,7 @@ surrogate instead; its direct Marble sparse-DC audit reports about 3.82 pF,
 but source/via coverage is incomplete and the AC request still fails the
 zone-support gate before native integration. Neither value is a measured or
 field-derived capacitance. The conforming geometry prototype is not wired
-into production: its 32kâ€“38k branches exceed the 8,192-pair dense field cap,
+into production: its 32k–38k branches exceed the 8,192-pair dense field cap,
 its current two-point DC refinement does not converge monotonically, and the
 native pair kernel does not handle spatially separate annular via barrels.
 An isolated hybridized RT0 sparse-DC experiment passes finite-contact,
@@ -1721,7 +1721,7 @@ electromagnetic solver and the extension does not advertise thermal analysis.
   enabled only when the runtime is runnable and geometry, stackup, NF2FF request,
   resource limits, and ports pass preflight
 - RE reference metadata: the EMI setup can retain CISPR 32 A/B, CISPR 25
-  classes 1â€“5, and MIL-STD-461H/G RE102 platform selections with exact edition
+  classes 1–5, and MIL-STD-461H/G RE102 platform selections with exact edition
   and source; unknown/mismatched selections fail preflight. Numeric limits,
   qualified receiver/fixture evidence, and pass/fail comparison are absent.
   Selecting a profile does not promote solver readiness or compliance status;
@@ -2131,9 +2131,9 @@ qualification remain open. SI02 and full PI/SI parity remain in progress.
 
 ## SI02-S12: ideal branched coupled lines (20 October 2026)
 
-The experimental [coupled star](RLGC_COUPLED_STAR.md) connects 2â€“8 uniform
+The experimental [coupled star](RLGC_COUPLED_STAR.md) connects 2–8 uniform
 supplied symmetric coupled legs at two distinct ideal conductor nodes. It returns
-4â€“16 exterior ports, coherent leg fields, per-node voltage/KCL/power residuals
+4–16 exterior ports, coherent leg fields, per-node voltage/KCL/power residuals
 and separately owned conductor/dielectric heat. Child energy densities remain
 separate from heat; mutual terms have no inferred conductor or thermal-cell share.
 [Evidence](validation/SI02_COUPLED_STAR_20261020.md) covers the bounded stage.
@@ -2144,7 +2144,7 @@ qualification remain open. SI02 and full PI/SI parity remain in progress.
 ## SI02-S13: physically loaded coupled branches (21 October 2026)
 
 The experimental [loaded coupled star](RLGC_LOADED_STAR.md) assigns physical
-RLC sources/loads on 4â€“16 exterior ports, retaining actual branch fields and
+RLC sources/loads on 4–16 exterior ports, retaining actual branch fields and
 separate terminal/branch heat W, mean stored J and reactive var. Internal and
 endpoint feedback keep separate conditioning gates and full child provenance.
 A valid standing-wave cancellation case also repaired a boundary-integrity false
