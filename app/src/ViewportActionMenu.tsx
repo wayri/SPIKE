@@ -1,16 +1,32 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Activity, ArrowLeft, Box, ChevronRight, CircuitBoard, ClipboardCheck, Eye, Focus, FolderOpen, Layers3, Magnet, Network, Play, Search, SlidersHorizontal, Target, Thermometer, X, type LucideIcon } from "./icons";
+import { Activity, Orbit, Hand, ZoomIn, ZoomOut, RotateCcw, ArrowLeft, Copy, ClipboardPaste, Scissors, Trash2, Move3D, Box, ChevronRight, CircuitBoard, ClipboardCheck, Eye, Focus, FolderOpen, Layers3, Magnet, Network, Play, Search, SlidersHorizontal, Target, Thermometer, X, type LucideIcon } from "./icons";
 import { usePanelPresentation } from "./panelPresentation";
+import { CameraTopIcon, CameraBottomIcon, CameraFrontIcon, CameraBackIcon, CameraLeftIcon, CameraRightIcon, CameraIsometricIcon } from "./CameraViewIcons";
+import { optionMatchesQuery } from "./optionSearch";
 import "./buttonStandard.css";
 import "./ViewportActionMenu.css";
 
-export type ContextMenuAction = { id: string; label: string; description?: string; disabledReason?: string; run: () => void };
+export type ContextMenuAction = { id: string; label: string; description?: string; disabledReason?: string; checked?: boolean; run: () => void };
 export type ContextMenuGroup = { id: string; label: string; actions: ContextMenuAction[] };
 export type ViewportActionMenuProps = { x: number; y: number; title: string; summary: string[]; groups: ContextMenuGroup[]; onClose: () => void; essentialTools?: ReactNode };
 
 function actionIcon(id:string):LucideIcon {
+  if(id==="orbit-center")return Target;
+  if(id==="navigation-orbit")return Orbit;
+  if(id==="navigation-pan")return Hand;
+  if(id==="navigation-zoom-in")return ZoomIn;
+  if(id==="navigation-zoom-out")return ZoomOut;
+  if(id==="navigation-reset")return RotateCcw;
+  const cameraIcons: Record<string, LucideIcon> = {"camera-view-top":CameraTopIcon,"camera-view-bottom":CameraBottomIcon,"camera-view-front":CameraFrontIcon,"camera-view-back":CameraBackIcon,"camera-view-left":CameraLeftIcon,"camera-view-right":CameraRightIcon,"camera-view-iso":CameraIsometricIcon};
+  if(cameraIcons[id])return cameraIcons[id];
+  if(id.startsWith("camera-"))return Box;
+  if(id==="cut")return Scissors;
+  if(id==="copy" || id==="duplicate")return Copy;
+  if(id.startsWith("paste"))return ClipboardPaste;
+  if(id==="delete")return Trash2;
+  if(id==="move-occurrence")return Move3D;
   if(id.startsWith("pi-") || id.includes("power"))return Activity;
   if(id.startsWith("si-") || id.includes("trace"))return Network;
   if(id.startsWith("thermal"))return Thermometer;
@@ -41,9 +57,9 @@ export default function ViewportActionMenu({ x, y, title, summary, groups, onClo
   const activeGroup = availableGroups.find(group => group.id === groupId);
   const term = query.trim().toLocaleLowerCase();
   const matches = availableGroups.flatMap(group => group.actions.filter(action =>
-    `${group.label} ${action.label} ${action.description ?? ""} ${action.disabledReason ?? ""}`.toLocaleLowerCase().includes(term)
+    optionMatchesQuery(`${group.label} ${action.label} ${action.description ?? ""} ${action.disabledReason ?? ""}`, term)
   ).map(action => ({ group, action })));
-  const items = () => Array.from(menu.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+  const items = () => Array.from(menu.current?.querySelectorAll<HTMLElement>('[role="menuitem"], [role="menuitemradio"]') ?? []);
   const focusAt = (index: number) => {
     const entries = items(); if (!entries.length) return;
     const selected = ((index % entries.length) + entries.length) % entries.length;
@@ -107,13 +123,13 @@ export default function ViewportActionMenu({ x, y, title, summary, groups, onClo
       search.current?.focus(); setQuery(value => value + event.key); event.preventDefault();
     }
   };
-  const actionButton = (action: ContextMenuAction, group?: ContextMenuGroup) => <button key={`${group?.id ?? groupId}:${action.id}`} type="button" role="menuitem" tabIndex={-1}
-    className="viewport-action-menu__item spike-control--bare" aria-disabled={Boolean(action.disabledReason) || undefined}
+  const actionButton = (action: ContextMenuAction, group?: ContextMenuGroup, compact = false) => <button key={`${group?.id ?? groupId}:${action.id}`} type="button" role={action.checked === undefined ? "menuitem" : "menuitemradio"} aria-checked={action.checked} tabIndex={-1}
+    className={`viewport-action-menu__item spike-control--bare${compact?" viewport-action-menu__item--compact":""}`} aria-disabled={Boolean(action.disabledReason) || undefined}
     title={action.disabledReason ?? action.description ?? action.label}
     onClick={() => { if (action.disabledReason) return; close(); action.run(); }}>
     <ContextActionIcon id={action.id}/><span className="viewport-action-menu__copy"><span>{action.label}</span>
-      {group && <small className="viewport-action-menu__context">{group.label}</small>}
-      {(action.disabledReason || action.description) && <small>{action.disabledReason || action.description}</small>}
+      {group && !compact && <small className="viewport-action-menu__context">{group.label}</small>}
+      {!compact && (action.disabledReason || action.description) && <small>{action.disabledReason || action.description}</small>}
     </span>
   </button>;
   const content = <div ref={panel} className="viewport-context-menu viewport-action-menu" style={{ left: x, top: y }} onKeyDown={onKeyDown}
@@ -123,10 +139,10 @@ export default function ViewportActionMenu({ x, y, title, summary, groups, onClo
       <button type="button" className="spike-control--icon spike-control--bare" aria-label="Close viewport actions" onClick={() => close()}><X size={14} aria-hidden="true" /></button></div>
     {essentialTools}
     {summary.length > 0 && <div className="viewport-action-menu__summary">{summary.map((line, index) => <span key={index}>{line}</span>)}</div>}
-    <label className="viewport-action-menu__search"><Search size={14} aria-hidden="true" /><input ref={search} type="search" aria-label="Search viewport actions" placeholder="Find an action…" value={query} onChange={event => { setQuery(event.target.value); setGroupId(null); }} /></label>
+    <label className="viewport-action-menu__search"><Search size={14} aria-hidden="true" /><input ref={search} type="search" aria-label="Search viewport actions" placeholder="Find an action · * or ?" value={query} onChange={event => { setQuery(event.target.value); setGroupId(null); }} /></label>
     {activeGroup && !term && <button type="button" className="viewport-action-menu__back spike-control--bare" onClick={back}><ArrowLeft size={14} aria-hidden="true" />{activeGroup.label}</button>}
     <div ref={menu} id={`${identity}-menu`} className="viewport-action-menu__list" role="menu" aria-label={term ? "Matching viewport actions" : activeGroup ? activeGroup.label : title}>
-      {term ? matches.map(({ group, action }) => actionButton(action, group)) : activeGroup ? activeGroup.actions.map(action => actionButton(action)) : availableGroups.map(group =>
+      {term ? matches.map(({ group, action }) => actionButton(action, group)) : activeGroup ? activeGroup.actions.map(action => actionButton(action)) : availableGroups.map(group => group.id === "edit" || group.id === "suggested" ? <div key={group.id} className={`viewport-action-menu__direct viewport-action-menu__direct--${group.id}`}><div className="viewport-action-menu__section">{group.label}</div><div className={group.id === "edit" ? "viewport-action-menu__edit-grid" : undefined}>{group.actions.map(action=>actionButton(action,undefined,group.id === "edit"))}</div></div> :
         <button key={group.id} type="button" role="menuitem" tabIndex={-1} className="viewport-action-menu__item spike-control--bare" data-group={group.id}
           aria-haspopup="menu" aria-expanded={false} aria-controls={`${identity}-menu`} onClick={() => setGroupId(group.id)}>
           <ContextActionIcon id={group.actions[0]?.id ?? group.id}/><span className="viewport-action-menu__copy"><span>{group.label}</span><small>{group.actions.length} {group.actions.length === 1 ? "action" : "actions"}</small></span><ChevronRight size={14} aria-hidden="true" />

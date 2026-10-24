@@ -3,6 +3,9 @@
 
 This is an experimental, in-process development workflow. It is not a new
 public worker engine or qualified engineering turbulence/CHT capability.
+The [23 October zero-work repair](validation/CFD_TETRA_ZERO_WORK_20261023.md)
+now admits verified uniform translation without relaxing existing gates;
+historical rejected probes remain in the older records.
 The [execution record](validation/CFD_CAD_OPEN_BOUNDARY_20261021.md) distinguishes
 actual native CAD runs from mathematical unit tests and retained failed probes.
 

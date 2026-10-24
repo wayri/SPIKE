@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """A retained source cutout must survive meshing and graph construction."""
+from dataclasses import asdict
 import unittest
 from unittest.mock import patch
 
@@ -63,6 +64,24 @@ class HybridFilledPathTests(unittest.TestCase):
                 reached.add(index)
                 stack.extend(adjacent[index]-reached)
         self.assertTrue(set(owners) <= reached)
+
+    def test_indexed_cell_candidates_preserve_complete_mesh_identity(self):
+        design = SpiDeR(layers=[{'name': 'F.Cu'}], zones=[{
+            'id': 'source-with-hole', 'layer': 'F.Cu', 'net_name': 'VCC',
+            'points': source_path(),
+        }])
+        spec = AnalysisSpec(mode='dc', net_names=['VCC'], mesh={
+            'zone_cell_mm': 0.5, 'node_tolerance_mm': 1e-6,
+            'max_zone_cells': 1000,
+        })
+        with patch(
+            'python.spike_core.boundary_spatial_index.'
+            'BoundarySpatialIndex.query_indexed_edges',
+            lambda index, _bounds: tuple(enumerate(index.original_edges)),
+        ):
+            full_scan = build_hybrid_mesh(design, spec)
+        indexed = build_hybrid_mesh(design, spec)
+        self.assertEqual(asdict(indexed), asdict(full_scan))
 
     def test_narrow_hole_is_not_bridged_by_node_or_face_tolerance(self):
         source = [(0., 0.), (8., 0.), (8., 6.), (0., 6.), (0., 0.),

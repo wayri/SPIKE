@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-.viewport-essential-tools { display:flex;align-items:center;gap:3px;flex:none;min-width:0; }
+.viewport-essential-tools { display:flex;align-items:center;gap:4px;flex:none;min-width:0; }
 .viewport-essential-tools .spike-control--icon { min-width:26px;width:26px;min-height:26px;height:26px;padding:4px;flex:none; }
+.viewport-essential-section { display:flex;align-items:center;gap:3px; }
+.viewport-essential-tools .viewport-essential-mode { width:auto;min-width:40px;padding-inline:6px;gap:4px;font-size:11px;font-weight:650; }
 .viewport-essential-tools [aria-pressed="true"] { color:var(--spike-accent-text);border-color:var(--spike-control-focus); }
 .viewport-essential-divider { height:18px;border-left:1px solid var(--spike-table-border);margin-inline:2px; }
 .viewport-essential-popover-trigger { position:relative; }
@@ -9,3 +11,7 @@
 .viewport-action-menu > .viewport-essential-tools { flex-wrap:wrap;flex-shrink:0;padding-bottom:6px;border-bottom:1px solid var(--spike-table-border); }
 
 .viewport-essential-tools .viewport-essential-divider { margin-inline:5px;height:16px; }
+
+.canvas-toolbar .viewport-translucency-toggle { margin-inline:5px; }
+.canvas-toolbar .viewport-translucency-toggle[aria-pressed="true"] { color:var(--spike-control-focus);border-color:var(--spike-control-focus); }
+.viewport-essential-tools .viewport-essential-mode > span { display:inline!important; }

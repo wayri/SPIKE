@@ -1,0 +1,445 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "07dd59c5c9634637b60991907a92a2e3",
+  "title": "Original restrained propulsion-pod electrical bus starter",
+  "source": ".title Original restrained propulsion-pod electrical bus starter\n* Supplied 48V ramp and 0.2A/5A load, not an ESC or propeller model.\nVsource supply 0 PWL(0 0 200u 48 4m 48)\nRsource supply lead 0.1\nLlead lead bus 1u\nResr bus capacitor 0.02\nCbus capacitor 0 470u\nIload bus 0 PWL(0 0 400u 0 410u .2 1m .2 1010u 5 2m 5 2010u .2 4m .2)\n.tran 1u 4m uic\n.end\n",
+  "components": [
+    {
+      "id": "3025c2c057ea464ab72d703d742a4329",
+      "ref": "VSOURCE",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "supply",
+        "0"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "72401a2941084683b1cbec24bbc8191a",
+      "ref": "RSOURCE",
+      "kind": "resistor",
+      "value": "0.1",
+      "nodes": [
+        "supply",
+        "lead"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "9b537394fae443588d8d782f09d58d44",
+      "ref": "LLEAD",
+      "kind": "inductor",
+      "value": "1e-06",
+      "nodes": [
+        "lead",
+        "bus"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "0182ba8312344120824e28eaeb267b6b",
+      "ref": "RESR",
+      "kind": "resistor",
+      "value": "0.02",
+      "nodes": [
+        "bus",
+        "capacitor"
+      ],
+      "x": 740,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "eba8376033a04da98f74d8480c5c78df",
+      "ref": "CBUS",
+      "kind": "capacitor",
+      "value": "0.00047",
+      "nodes": [
+        "capacitor",
+        "0"
+      ],
+      "x": 140,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "dc40ca0816de4bcbb61d9e16401afebb",
+      "ref": "ILOAD",
+      "kind": "current_source",
+      "value": "0",
+      "nodes": [
+        "bus",
+        "0"
+      ],
+      "x": 340,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    }
+  ],
+  "probes": [
+    {
+      "id": "159e35b86177462494f9a72317a017b6",
+      "expression": "V(supply)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(supply)",
+        "quantity": "node_voltage",
+        "targets": [
+          "supply"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "56e3680393a9499a8e4ee0759e59446f",
+      "expression": "V(bus)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(bus)",
+        "quantity": "node_voltage",
+        "targets": [
+          "bus"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "7b7aaddd6cd6496789f395c896d4162b",
+      "expression": "I(Iload)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "I(Iload)",
+        "quantity": "element_current",
+        "targets": [
+          "ILOAD"
+        ],
+        "unit": "A"
+      }
+    }
+  ],
+  "expressions": [],
+  "metadata": {
+    "example_limitations": "Supplied 48V bus ramp and ideal current load. Assumed source R/L and capacitor C/ESR. No motor, inverter, propeller, battery chemistry, thermal or field coupling."
+  },
+  "revision": 10,
+  "wires": [
+    {
+      "id": "1de00dbd52ad46aab7dc9e927e32f79b",
+      "a": [
+        "3025c2c057ea464ab72d703d742a4329",
+        0
+      ],
+      "b": [
+        "72401a2941084683b1cbec24bbc8191a",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 1
+    },
+    {
+      "id": "2ec7fb6a8d0f47968135b1f7fecd7f48",
+      "a": [
+        "3025c2c057ea464ab72d703d742a4329",
+        1
+      ],
+      "b": [
+        "eba8376033a04da98f74d8480c5c78df",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 2
+    },
+    {
+      "id": "fb0d32df78a44cfeaec823f1a1e41b3c",
+      "a": [
+        "3025c2c057ea464ab72d703d742a4329",
+        1
+      ],
+      "b": [
+        "dc40ca0816de4bcbb61d9e16401afebb",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 3
+    },
+    {
+      "id": "a140be658e8b4c47a64fc2de4fd927c0",
+      "a": [
+        "72401a2941084683b1cbec24bbc8191a",
+        1
+      ],
+      "b": [
+        "9b537394fae443588d8d782f09d58d44",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 4
+    },
+    {
+      "id": "417a8be7ff234b6e8658d1a736a10fec",
+      "a": [
+        "9b537394fae443588d8d782f09d58d44",
+        1
+      ],
+      "b": [
+        "0182ba8312344120824e28eaeb267b6b",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 5
+    },
+    {
+      "id": "40902d95ad554ef1be5d3ecde7619e30",
+      "a": [
+        "9b537394fae443588d8d782f09d58d44",
+        1
+      ],
+      "b": [
+        "dc40ca0816de4bcbb61d9e16401afebb",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 6
+    },
+    {
+      "id": "4ebdd16c40d84d578c5f667a55d809f5",
+      "a": [
+        "0182ba8312344120824e28eaeb267b6b",
+        1
+      ],
+      "b": [
+        "eba8376033a04da98f74d8480c5c78df",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 7
+    }
+  ],
+  "junctions": [],
+  "labels": [],
+  "power_symbols": [],
+  "model_policy": {
+    "schematic": {
+      "tier": "source",
+      "enforce": false
+    },
+    "subsheets": {},
+    "components": {}
+  },
+  "simulation_sequences": [],
+  "annotations": [],
+  "dashboard": {
+    "version": 1,
+    "widgets": [
+      {
+        "id": "9db09385b50147aa9b201fe33f835d8a",
+        "kind": "Scope",
+        "title": "V(supply)",
+        "expression": "V(supply)",
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "8df0e0deb6e14105aa306395380446c4",
+        "kind": "Scope",
+        "title": "V(bus)",
+        "expression": "V(bus)",
+        "x": 500,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "9ce380ae3e6e4f16b8d49036f7a76efa",
+        "kind": "Scope",
+        "title": "I(Iload)",
+        "expression": "I(Iload)",
+        "x": 1000,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      }
+    ]
+  },
+  "thermal_setup": {
+    "contract": "spikes/thermal-setup/v1",
+    "solver_binding": "not_coupled",
+    "board": {
+      "length_mm": 100.0,
+      "width_mm": 80.0,
+      "thickness_mm": 1.6,
+      "material": "FR4 (assumption)",
+      "orientation": "horizontal",
+      "layers": [
+        {
+          "name": "L1",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L2",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L3",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L4",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        }
+      ]
+    },
+    "enclosure": {
+      "type": "open_air",
+      "material": "Unspecified",
+      "length_mm": 150.0,
+      "width_mm": 120.0,
+      "height_mm": 50.0,
+      "wall_mm": 2.0,
+      "vent_area_mm2": 0.0
+    },
+    "environment": {
+      "ambient_c": 25.0,
+      "airflow": "natural",
+      "air_speed_m_s": 0.0,
+      "direction": "parallel_to_board",
+      "convection_w_m2k": null,
+      "altitude_m": 0.0
+    },
+    "notes": "Initial authoring assumptions; replace with actual board/environment data."
+  },
+  "run_profile": {
+    "contract": "spikes/run-profile/v1",
+    "name": "Default",
+    "backend": "native",
+    "execution": "batch",
+    "analysis": "from_netlist",
+    "time_step": "1u",
+    "stop_time": "4m",
+    "uic": true,
+    "method": "backward_euler",
+    "capture_samples": 20000,
+    "speed_ratio": 1.0,
+    "electrical_temperature_c": null
+  },
+  "plot_layout": {
+    "mode": "units",
+    "panes": {},
+    "heights": {}
+  },
+  "instruments": [],
+  "controller_setup": null,
+  "controller_boards": [],
+  "power_tree": {
+    "contract": "spikes/power-tree/v1",
+    "stages": []
+  },
+  "analytics_extensions": [],
+  "directives": [
+    {
+      "id": "ea7cd16f609847d6afc481dda7eafe86",
+      "group": "Simulation",
+      "title": "",
+      "visible": true,
+      "x": 100.0,
+      "y": 420.0,
+      "text": ".tran 1u 4m uic",
+      "enabled": true,
+      "line": 9,
+      "end_line": 9
+    }
+  ]
+}

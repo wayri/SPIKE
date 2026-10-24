@@ -21,6 +21,11 @@ function compile(path, jsx = false) {
   } }).outputText;
 }
 
+function loadUIHelper(name) {
+  const loaded = { exports: {} };
+  new Function("require", "module", "exports", compile(`src/${name.slice(2)}.${name.includes("Content") || name.includes("Markdown") ? "tsx" : "ts"}`, true))(dependency => dependency.startsWith("./") ? loadUIHelper(dependency) : nodeRequire(dependency), loaded, loaded.exports);
+  return loaded.exports;
+}
 function loadConversation() {
   const loaded = { exports: {} };
   new Function("require", "module", "exports", compile("src/assistantConversation.ts"))(name => {
@@ -96,6 +101,25 @@ const failed = await toolScenario({ effectName: "simulate", commandError: true }
 assert.equal(failed.evidence[0].state, "failed");
 assert.match(failed.workerRequests[1].params.messages.at(-1).content, /solver fixture failed/);
 
+for (const externalDrift of [false, true]) {
+  let revision = "r1", round = 0;
+  const completed = [], evidence = [];
+  await api.runAssistantConversation({
+    provider: "lmstudio", model: "local", allowCloud: false, shareProjectContext: true, messages: [user],
+    getContext: () => ({}), getRevision: () => revision, review: async () => true,
+    runWorker: async () => round++ === 0 ? turn([
+      { id: "create", name: "apply", arguments: {} },
+      { id: "verify", name: "inspect", arguments: {} },
+      { id: "stale-edit", name: "apply", arguments: {} },
+    ]) : answer("Done"),
+    onCommand: async command => { completed.push(command); if (command === "prepare_patch") revision = "r2"; return { ok: true }; },
+    onEvidence: item => { evidence.push(item); if (externalDrift && item.toolCall.id === "create") revision = "external"; },
+  });
+  assert.deepEqual(completed, externalDrift ? ["prepare_patch"] : ["prepare_patch", "analysis_context"]);
+  assert.equal(evidence[1].state, externalDrift ? "blocked" : "completed", "reads may verify only the revision produced by our own approved action");
+  assert.equal(evidence[2].state, "blocked", "further edits require a fresh plan after revision changes");
+}
+
 let unknownRound = 0;
 const unknownEvidence = [];
 await api.runAssistantConversation({
@@ -135,6 +159,7 @@ new Function("require", "module", "exports", compile("src/AssistantChatPanel.tsx
   if (name === "./assistantSkills") return { assistantToolCatalog: catalog, toolCapabilityStates: { inspect: "available" } };
   if (name === "./assistantConversation") return api;
   if (name === "./AssistantChatPanel.css") return {};
+  if (["./assistantAttachments", "./AssistantMessageContent"].includes(name)) return loadUIHelper(name);
   return nodeRequire(name);
 }, panelModule, panelModule.exports);
 const markup = renderToStaticMarkup(React.createElement(panelModule.exports.default, { onClose() {}, onCommand: async () => ({}), getContext: () => ({ boards: [1], nets: [1, 2] }), getRevision: () => "rev-1" }));
@@ -149,7 +174,7 @@ assert.doesNotMatch(markup, /SECRET/);
 const panelSource = readFileSync(resolve(appRoot, "src", "AssistantChatPanel.tsx"), "utf8");
 assert.match(panelSource, /setAllowCloud\(false\)/, "provider changes reset cloud consent");
 assert.match(panelSource, /setMessages\(\[\]\)/, "provider and consent changes clear prior conversation evidence");
-assert.match(panelSource, />Clear conversation<\/button>/, "the user can clear transient conversation state");
+assert.match(panelSource, /aria-label="Clear conversation"/, "the user can clear transient conversation state");
 assert.match(panelSource, /setCredential\(""\)/, "credentials are cleared from component state");
 assert.match(panelSource, /cancelWorker\(operation\.current\)/, "unmount cancels the owned request");
 assert.doesNotMatch(panelSource, /localStorage|sessionStorage/, "chat and credentials are not persisted by the panel");
@@ -174,6 +199,7 @@ new Function("require", "module", "exports", compile("src/AssistantChatPanel.tsx
   if (name === "./assistantSkills") return { assistantToolCatalog: catalog, toolCapabilityStates: {} };
   if (name === "./assistantConversation") return api;
   if (name === "./AssistantChatPanel.css") return {};
+  if (["./assistantAttachments", "./AssistantMessageContent"].includes(name)) return loadUIHelper(name);
   return nodeRequire(name);
 }, interactivePanel, interactivePanel.exports);
 const mount = () => { stateCursor = 0; refCursor = 0; effectCursor = 0; return interactivePanel.exports.default({ onClose() {}, onCommand: async () => ({}), getContext: () => ({}), getRevision: () => "r1" }); };
@@ -218,6 +244,34 @@ await flush(); tree = mount();
 assert.equal(find(tree, node => node.type === "textarea").props.disabled, false, "failed remote cancellation still releases the composer");
 assert.ok(states.some(value => typeof value === "string" && value.includes("cancellation was not confirmed")), "failed cancellation is visible");
 cancelUnmount(); cancelReject = false;
+// Selecting a local provider discovers models instead of claiming an unprobed
+// endpoint is configured. Endpoint edits invalidate model and chat selection.
+states.length = 0; refs.length = 0; effects.length = 0;
+tree = mount(); const localUnmount = effects[2]();
+find(tree, node => node.type === "select").props.onChange({ target: { value: "ollama" } });
+tree = mount();
+const previousProbes = pendingSetups.length;
+effects[3]();
+assert.equal(pendingSetups.length, previousProbes + 1);
+assert.equal(pendingSetups.at(-1).request.method, "assistant_models");
+assert.equal(pendingSetups.at(-1).request.params.provider, "ollama");
+pendingSetups.at(-1).resolve({ ok: true, result: { models: ["a-large-cached-model", "cached-local"], preferred_model: "cached-local" } });
+await flush(); tree = mount();
+assert.equal(find(tree, node => node.type === "input" && node.props.placeholder === "Enter or probe a model").props.value, "cached-local");
+find(tree, node => node.type === "input" && node.props.value === "http://127.0.0.1:11434").props.onChange({ target: { value: "http://127.0.0.1:11435" } });
+await flush(); tree = mount();
+assert.equal(find(tree, node => node.type === "input" && node.props.placeholder === "Enter or probe a model").props.value, "");
+const beforeShortcut = pendingSetups.length;
+find(tree, node => node.type === "button" && node.props.children === "Inspect files").props.onClick();
+tree = mount();
+assert.match(find(tree, node => node.type === "textarea").props.value, /spike_work_files/);
+assert.equal(pendingSetups.length, beforeShortcut, "task shortcuts prefill without sending a provider request");
+assert.equal(find(tree, node => node.type === "button" && node.props.children === "Inspect files"), null, "shortcuts cannot replace an existing typed message");
+const queuedTask = find(tree, node => node.type === "textarea").props.value;
+find(tree, node => node.type === "button" && node.props.children === "Choose work folder").props.onClick();
+await flush(); tree = mount();
+assert.equal(find(tree, node => node.type === "textarea").props.value, queuedTask, "choosing a work folder preserves the pending task text");
+localUnmount();
 console.log("assistant chat tests passed");
 
 // Model-authored extension code cannot be admitted through otherwise valid tools.

@@ -81,6 +81,22 @@ def _finite_norm(array, label, *, positive=False):
     return value
 
 
+def _basis_relative_error(error, reference, label):
+    """Check each unit-voltage experiment at its own physical response scale.
+
+    A Frobenius norm over all columns can conceal a failed weak terminal
+    behind another terminal with a much larger admittance. Keep the aggregate
+    gate as well; neither the tolerance nor its representability limit changes.
+    """
+    tiny = np.finfo(float).tiny
+    relative = _finite_norm(error, label) / max(_finite_norm(reference, label + " scale"), tiny)
+    for column in range(reference.shape[1]):
+        relative = max(relative, _finite_norm(error[:, column], label) /
+                       max(_finite_norm(reference[:, column], label + " basis scale"), tiny))
+    _require(math.isfinite(relative), f"Unrepresentable {label} ratio", "numerical_failure")
+    return relative
+
+
 def _prepare(request):
     fields = {"contract", "mesh", "materials", "electrodes", "reference_electrode",
               "outer_boundary", "context_digest", "frequencies_hz"}
@@ -197,11 +213,10 @@ def _extract(request, poll):
         if len(free):
             operator = matrix[free][:, free].toarray()
             rhs = -(matrix[free][:, fixed] @ potentials[fixed])
-            rhs_norm = _finite_norm(rhs, "free-node excitation")
             poll()
             solution, backward_error, condition = _solve_linear(operator, rhs, f"dielectric AC {frequency} Hz")
             potentials[free] = solution
-            residual = _finite_norm(operator @ solution - rhs, "free-node residual") / max(rhs_norm, np.finfo(float).tiny)
+            residual = _basis_relative_error(operator @ solution - rhs, rhs, "free-node residual")
             _require(math.isfinite(residual) and residual <= 1e-9,
                      "Dielectric free-node residual exceeds tolerance", "numerical_failure")
         currents, reactions = _electrode_reactions(matrix, potentials, electrodes)
@@ -217,10 +232,10 @@ def _extract(request, poll):
             fields[index] = field
             power_matrix += volume * field.conj().T @ gamma[cell["material_id"]] @ field
         scale = _finite_norm(admittance, "admittance", positive=True)
-        power_error = _finite_norm(admittance - power_matrix, "power identity") / scale
-        reciprocity = _finite_norm(admittance - admittance.T, "reciprocity") / scale
-        balance = float(np.max(np.abs(np.sum(currents, axis=0))) /
-                        max(float(np.max(np.sum(np.abs(currents), axis=0))), np.finfo(float).tiny))
+        power_error = _basis_relative_error(admittance - power_matrix, admittance, "power identity")
+        reciprocity = _basis_relative_error(admittance - admittance.T, admittance, "reciprocity")
+        balance = float(np.max(np.abs(np.sum(currents, axis=0)) /
+                               np.maximum(np.sum(np.abs(currents), axis=0), np.finfo(float).tiny)))
         _require(power_error <= 1e-9, "Electrode and integrated field complex power disagree", "numerical_failure")
         _require(reciprocity <= 1e-9, "Dielectric reciprocity check failed", "numerical_failure")
         _require(balance <= 1e-9, "Electrode current conservation failed", "numerical_failure")

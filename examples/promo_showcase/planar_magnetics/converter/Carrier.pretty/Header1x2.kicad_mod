@@ -1,0 +1,8 @@
+(footprint "Header1x2"(version 20241229)(generator "SPIKE")(layer "F.Cu")
+(property "Reference" "REF**"(at 0 -3.1 0)(layer "F.SilkS")(effects(font(size 1 1)(thickness .15))))
+(property "Value" "Header1x2"(at 0 3.1 0)(layer "F.Fab")(effects(font(size 1 1)(thickness .15))))
+(fp_rect(start -1.6 -1.6)(end 4.140000000000001 1.6)(stroke(width .15)(type default))(fill none)(layer "F.SilkS"))
+(fp_rect(start -1.85 -1.85)(end 4.390000000000001 1.85)(stroke(width .05)(type default))(fill none)(layer "F.CrtYd"))
+(pad "1" thru_hole circle(at 0 0)(size 2.0 2.0)(drill 1.0)(layers "*.Cu" "*.Mask"))
+(pad "2" thru_hole circle(at 2.54 0)(size 2.0 2.0)(drill 1.0)(layers "*.Cu" "*.Mask"))
+)

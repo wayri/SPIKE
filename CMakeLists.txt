@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(SPIKE VERSION 0.4.0 LANGUAGES CXX)
+project(SPIKE VERSION 0.4.1 LANGUAGES CXX)
 
 set(SPIKES_ENGINE_PRERELEASE "beta.1" CACHE STRING
     "SPIKES engine prerelease identifier")
@@ -313,9 +313,36 @@ install(FILES
 # Testing (Optional - will be expanded)
 # ============================================================================
 
+# Bounded SI source references remain separate from legacy fast-math kernels.
+add_library(spike_si_reference STATIC src/si/transition_pi_cdr.cpp)
+target_include_directories(spike_si_reference PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(spike_si_reference PUBLIC cxx_std_20)
+if(MSVC)
+    target_compile_options(spike_si_reference PRIVATE /W4 /WX /permissive- /fp:strict)
+else()
+    target_compile_options(spike_si_reference PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+endif()
+
 option(BUILD_TESTING "Build tests" ON)
+option(SPIKE_BUILD_AMI_HOST "Build isolated trusted-development AMI ABI host" OFF)
+if(SPIKE_BUILD_AMI_HOST)
+    if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR NOT MSVC)
+        message(FATAL_ERROR "AMI development admission currently requires MSVC Windows x64")
+    endif()
+    add_executable(spike-ami-host src/si/ami_host_main.cpp)
+    set_property(TARGET spike-ami-host PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    target_compile_options(spike-ami-host PRIVATE /W4 /WX /permissive- /fp:strict)
+endif()
 if(BUILD_TESTING)
     enable_testing()
+    add_executable(test_si_transition_pi_cdr tests/test_si_transition_pi_cdr.cpp)
+    target_link_libraries(test_si_transition_pi_cdr PRIVATE spike_si_reference)
+    if(MSVC)
+        target_compile_options(test_si_transition_pi_cdr PRIVATE /W4 /WX /permissive- /fp:strict)
+    else()
+        target_compile_options(test_si_transition_pi_cdr PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+    endif()
+    add_test(NAME test_si_transition_pi_cdr COMMAND test_si_transition_pi_cdr)
     add_executable(test_spikes_digital_kernel tests/native/spikes_digital_kernel_test.cpp)
     target_include_directories(test_spikes_digital_kernel PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     if(MSVC)

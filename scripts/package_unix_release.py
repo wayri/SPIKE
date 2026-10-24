@@ -33,6 +33,7 @@ if platform.system() == 'Darwin':
     run('python', 'scripts/verify_packaged_cli.py', '--', app / 'Contents/MacOS/spike')
     run('codesign', '--force', '--deep', '--sign', '-', app)
     run('codesign', '--verify', '--deep', '--strict', app)
+    run('python', 'scripts/verify_unix_release_payload.py', '--resources', app / 'Contents/Resources')
     staging = ROOT / 'build/dmg-root'
     staging.mkdir(exist_ok=True)
     shutil.copytree(app, staging / 'SPIKE.app', symlinks=True)
@@ -77,6 +78,7 @@ else:
                     '  </mime-type>\n</mime-info>\n')
     run('flatpak', 'build-finish', bundle, '--command=spike-gui', '--socket=wayland',
         '--socket=fallback-x11', '--share=ipc', '--device=dri', '--share=network', '--filesystem=home')
+    run('python', 'scripts/verify_unix_release_payload.py', '--resources', files / 'lib/spike')
     repo = ROOT / 'build/flatpak-repo'
     run('flatpak', 'build-export', repo, bundle)
     artifact = OUT / f'SPIKE_{VERSION}_linux-x86_64_EXPERIMENTAL.flatpak'

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useEffect, useRef, useState } from "react";
+import { Plus, ExternalLink, Minus } from "lucide-react";
 import AssistantChatPanel from "./AssistantChatPanel";
 import { connectAssistantWindow, minimizeAssistantWindow, destroyAssistantWindow, onAssistantCloseRequested } from "./assistantWindow";
 import type { AssistantMessage } from "./assistantConversation";
@@ -60,11 +61,11 @@ export default function AssistantWindowRoot() {
       <label>Chat<select value={current.id} disabled={busy} onChange={event => { setSelected(event.target.value); setBusy(false); }}>
         {chats.map((chat, index) => <option key={chat.id} value={chat.id}>{index + 1}. {chat.title}</option>)}
       </select></label>
-      <button type="button" disabled={busy || chats.length >= 32} onClick={() => { const chat = newChat(); setChats(rows => [...rows, chat]); setSelected(chat.id); }}>New chat</button>
-      <button type="button" disabled={busy} onClick={() => void exportHandoff()}>External LLM handoff</button>
-      <button type="button" title="Minimize to the Windows taskbar; retain chats and active request" onClick={() => void minimizeAssistantWindow()}>Minimize</button>
+      <button type="button" className="spike-control--icon" aria-label="New chat" title="New chat" disabled={busy || chats.length >= 32} onClick={() => { const chat = newChat(); setChats(rows => [...rows, chat]); setSelected(chat.id); }}><Plus size={18} /></button>
+      <button type="button" className="spike-control--icon" aria-label="External LLM handoff" title="External LLM handoff" disabled={busy} onClick={() => void exportHandoff()}><ExternalLink size={18} /></button>
+      <button type="button" className="spike-control--icon" aria-label="Minimize assistant" title="Minimize to the Windows taskbar; retain chats and active request" onClick={() => void minimizeAssistantWindow()}><Minus size={18} /></button>
     </nav>
-    <p className="assistant-window__notice">Chats stay in this window's memory. Closing discards them. Provider or sharing changes clear the selected chat. Copy a handoff before closing; review its contents before sharing.</p>
+    <details className="assistant-window__notice"><summary>Session & privacy</summary><p>Chats stay in this window's memory. Closing discards them. Provider or sharing changes clear the selected chat. Copy a handoff before closing; review its contents before sharing. Attachments are included in the handoff and may contain private information.</p></details>
     {error && <p role="alert">{error}</p>}
     {!connection && !error && <p role="status">Connecting to the SPIKE workspace...</p>}
     {connection && chats.map(chat => <div key={chat.id} className="assistant-window__chat" hidden={chat.id !== current.id}>

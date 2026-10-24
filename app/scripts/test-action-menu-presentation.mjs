@@ -2,6 +2,9 @@
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 import ts from "typescript";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const { optionMatchesQuery } = await importTestTypescript("optionSearch");
+let searchQuery = "";
 const module={exports:{}};
 globalThis.document={activeElement:null,body:{id:"main-body"},addEventListener(){},removeEventListener(){}};
 globalThis.window={innerWidth:800,innerHeight:600,addEventListener(){},removeEventListener(){}};
@@ -11,7 +14,7 @@ let portalTarget;
 const jsx={jsx:(type,props)=>({type,props}),jsxs:(type,props)=>({type,props})};
 const source=readFileSync(new URL("../src/ActionContextMenu.tsx",import.meta.url),"utf8");
 new Function("require","module","exports",ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText)(
- name=>name==="react"?{useRef:x=>({current:x}),useEffect(){}}:name==="react-dom"?{createPortal:(x,target)=>{portalTarget=target;return x;}}:name==="./panelPresentation"?{usePanelPresentation:()=>({ownerDocument:detachedDocument,ownerWindow:detachedWindow,detached:true})}:name==="react/jsx-runtime"?jsx:{Check:"Check",MousePointer2:"Pointer"},module,module.exports);
+ name=>name==="react"?{useRef:x=>({current:x}),useEffect(){},useState:()=>[searchQuery,value=>{searchQuery=value;}] }:name==="./optionSearch"?{optionMatchesQuery}:name==="react-dom"?{createPortal:(x,target)=>{portalTarget=target;return x;}}:name==="./panelPresentation"?{usePanelPresentation:()=>({ownerDocument:detachedDocument,ownerWindow:detachedWindow,detached:true})}:name==="react/jsx-runtime"?jsx:{Check:"Check",MousePointer2:"Pointer"},module,module.exports);
 let chosen=0,closed=0;
 const tree=module.exports.default({x:1,y:1,title:"Navigate",actions:[
  {label:"Orbit",icon:"OrbitIcon",description:"Left drag · Shift + left drag to pan",section:"Drag mode",checked:true,radio:true,run:()=>chosen++},
@@ -28,3 +31,8 @@ assert.equal(nodes(tree).filter(x=>x.props?.className==="action-menu-section").l
 assert(nodes(tree).some(x=>x.type==="small"&&x.props.children.includes("Shift")));
 buttons[0].props.onClick();assert.equal(chosen,1);assert.equal(closed,1);
 console.log("Navigation menu icons, radio/checkbox states, grouped actions, gesture hints and callbacks passed.");
+
+searchQuery="p?n";
+const filteredTree=module.exports.default({x:1,y:1,title:"Navigate",actions:[{label:"Orbit",run(){}},{label:"Pan",disabled:true,run(){}},{label:"Zoom",run(){}}],onClose(){}});
+const filteredButtons=nodes(filteredTree).filter(node=>node.type==="button"&&node.props.role?.startsWith("menuitem"));
+assert.equal(filteredButtons.length,1);assert.equal(filteredButtons[0].props.disabled,true,"wildcard filtering preserves unavailable action state");

@@ -80,8 +80,8 @@ release under `CONTRIBUTING.md`.
 
 ## Stage verification
 
-PI02-S01 is **Done** for its bounded acceptance: twelve stage tests passed
-with zero skips in the [source-bound receipt](validation/parity/PI02-S01.json).
+PI02-S01 is **Done** for its bounded acceptance: sixteen stage tests passed
+with zero skips in the [current source-bound receipt](validation/parity/PI02-S01-20261023.json).
 Independent aligned layered meshes with 9 and 75 free nodes have relative Y
 errors below 2e-14 and conjugate field-power errors below 2e-14. Homogeneous
 scalar/tensor plates, three tensor directions, lossless limits, multielectrode
@@ -99,3 +99,11 @@ Combined PI/SI numerical, worker, electrostatic and evidence regressions passed
 89 tests with zero skips in 23.239 s (`build/parity-pi02s01-focused.log`).
 Retained execution logs preserve their exact bytes across Git line-ending
 conversion so their source-bound hashes remain reproducible.
+
+On 23 October 2026, [per-basis admission was strengthened](validation/LOCAL_AC_REPAIR_20261023.md)
+at unchanged 1e-9 tolerances. Four new tests expose weak-terminal errors hidden
+by pooled norms; PI02-S01 now has 16 stage tests. New dated PI02-S01 through
+PI02-S04 receipts replay the changed source; earlier receipts remain historical.
+Scalar residual/power/reciprocity diagnostics now include the worst basis;
+current balance is normalized per basis. This is not general PCB AC extraction,
+a capacity increase or independent measured qualification.

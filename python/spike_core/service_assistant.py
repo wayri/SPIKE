@@ -2,8 +2,10 @@
 """Worker entry points for opt-in assistant providers and OS credentials."""
 from . import assistant_credentials as credentials
 from . import assistant_provider as provider
+from .assistant_harness import HarnessError
 
 _METHOD_FIELDS = {
+    "assistant_work_files": {"root", "action", "relativeName", "column", "units", "offset", "limit"},
     "assistant_schema": {"name"},
     "assistant_validate_schema": {"name", "document"},
     "assistant_provider_status": {"provider"},
@@ -21,6 +23,9 @@ def handle_assistant_request(method, params, request_id=None):
         if not isinstance(params, dict) or set(params) - _METHOD_FIELDS[method]:
             raise provider.ProviderError("Invalid assistant request parameters.")
         provider._encode(params)
+        if method == "assistant_work_files":
+            from .assistant_harness import handle_work_request
+            return {"ok": True, "result": handle_work_request(params.get("root"), {key: value for key, value in params.items() if key != "root"})}
         if method in {"assistant_schema", "assistant_validate_schema"}:
             from .contract_catalog import schema_operation
             return {"ok": True, "result": schema_operation("read" if method == "assistant_schema" else "validate", params)}
@@ -34,7 +39,7 @@ def handle_assistant_request(method, params, request_id=None):
         else:
             result = getattr(provider, method)(params)
         return {"ok": True, "result": result}
-    except provider.ProviderError as exc:
+    except (provider.ProviderError, HarnessError) as exc:
         return {"ok": False, "error": str(exc), "type": "AssistantProviderError"}
     except Exception:
         # Credentials and remote bodies must never escape via exception messages.

@@ -39,12 +39,24 @@ await api.openAssistantWindow(owner, () => {});
 assert.equal(nativeCreated, 1); assert.equal(focused, 1, "reuse the live chat window");
 assert.equal(windows.get("spike-assistant").options.skipTaskbar, false, "native assistant retains an independent Windows taskbar entry");
 const bridge = await api.connectAssistantWindow();
+// Native pickers wait for a human; keep ordinary provider requests bounded.
+const nativeSetTimeout = globalThis.setTimeout;
+const requestTimeouts = [];
+globalThis.setTimeout = (callback, delay, ...args) => { requestTimeouts.push(delay); return nativeSetTimeout(callback, delay, ...args); };
+try {
+  await bridge.onCommand("assistant_choose_work_folder", {});
+  assert.equal(requestTimeouts.at(-1), 30 * 60 * 1000, "folder picker has its own human interaction budget");
+  await bridge.prepareContext();
+  assert.equal(requestTimeouts.at(-1), 150000, "ordinary requests retain their bounded timeout");
+} finally { globalThis.setTimeout = nativeSetTimeout; }
+commands.length = 0;
 assert.equal(bridge.getRevision(), "r1");
 assert.equal(bridge.getContext().projectName, "p1");
 assert.deepEqual(await bridge.onCommand("analysis_context", {}), { boardCount: 2 });
 await assert.rejects(() => bridge.onCommand("arbitrary_shell", {}), /Unsupported/);
 await assert.rejects(() => bridge.onCommand("analysis_context", { extra: true }), /Unexpected/);
 await assert.rejects(() => bridge.runWorker({ id: "assistant-bad", method: "run_python", params: {} }), /Unsupported/);
+await assert.rejects(() => bridge.runWorker({ id: "assistant-files", method: "assistant_work_files", params: { root: "C:/private", action: "list" } }), /Unsupported/, "child cannot inject a work-folder root through the worker channel");
 await assert.rejects(() => bridge.cancelWorker("unowned"), /Unknown/);
 assert.equal(cancellations.length, 0);
 assert.equal(await bridge.cancelWorker(), false);
@@ -67,6 +79,11 @@ await api.closeOwnedAssistantWindow();
 assert.equal(listeners.has("main:spike-assistant-request"), false);
 await api.openAssistantWindow(owner, () => {});
 const closingBridge = await api.connectAssistantWindow();
+const large = "x".repeat(3 * 1024 * 1024);
+await closingBridge.runWorker({ id: "assistant-media-budget", method: "assistant_turn", params: { mediaFixture: large } });
+await assert.rejects(() => closingBridge.runWorker({ id: "assistant-setup-budget", method: "assistant_models", params: { fixture: large } }), /transport budget/);
+await assert.rejects(() => closingBridge.runWorker({ id: "assistant-oversize-budget", method: "assistant_turn", params: { fixture: "x".repeat(30 * 1024 * 1024) } }), /transport budget/);
+
 const pending = closingBridge.runWorker({ id: "assistant-slow", method: "assistant_turn", params: {} }).then(() => "resolved", error => error.message);
 await new Promise(resolve => setImmediate(resolve));
 await api.closeOwnedAssistantWindow();

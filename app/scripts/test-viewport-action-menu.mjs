@@ -2,6 +2,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const optionSearch = await importTestTypescript("optionSearch");
 const states = [], refs = [], effects = [], layouts = []; let index = 0, pending = [], pendingLayout = [];
 const same = (a, b) => a && b && a.length === b.length && a.every((v, i) => Object.is(v, b[i]));
 const hook = (collection, queue, fn, deps) => { const at = index++; if (!same(collection[at]?.deps, deps)) queue.push(() => { collection[at]?.cleanup?.(); collection[at] = { deps, fn, cleanup: fn() }; }); };
@@ -16,7 +18,7 @@ const jsx = (type, props) => ({ type, props: props ?? {} });
 const compiled = ts.transpileModule(readFileSync(new URL("../src/ViewportActionMenu.tsx", import.meta.url), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
 const module = { exports: {} };
 let presentationDocument, presentationWindow, portalTarget;
-new Function("require", "module", "exports", compiled)(name => name === "react" ? react : name === "react-dom" ? {createPortal:(content,target)=>{portalTarget=target;return content;}} : name === "./panelPresentation" ? { usePanelPresentation: () => ({ ownerDocument: presentationDocument, ownerWindow: presentationWindow, detached: true }) } : name === "react/jsx-runtime" ? { jsx, jsxs: jsx } : {}, module, module.exports);
+new Function("require", "module", "exports", compiled)(name => name === "react" ? react : name === "react-dom" ? {createPortal:(content,target)=>{portalTarget=target;return content;}} : name === "./panelPresentation" ? { usePanelPresentation: () => ({ ownerDocument: presentationDocument, ownerWindow: presentationWindow, detached: true }) } : name === "./optionSearch" ? optionSearch : name === "react/jsx-runtime" ? { jsx, jsxs: jsx } : {}, module, module.exports);
 const listeners = new Map(), windowListeners = new Map();
 const origin = { isConnected: true, focused: 0, focus() { this.focused++; presentationDocument.activeElement = this; } };
 presentationDocument = { body:{}, activeElement: origin, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name) };
@@ -31,7 +33,7 @@ const props = { x: 470, y: 310, title: "Board actions", summary: ["Workspace: PI
 const nodes = node => !node || typeof node !== "object" ? [] : [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
 function render() {
   index = 0; pending = []; pendingLayout = []; tree = module.exports.default(props);
-  const all = nodes(tree); menuItems = all.filter(node => node.props.role === "menuitem");
+  const all = nodes(tree); menuItems = all.filter(node => ["menuitem", "menuitemradio"].includes(node.props.role));
   menuElements = menuItems.map(node => ({ dataset: { group: node.props["data-group"] }, tabIndex: node.props.tabIndex, focus() { presentationDocument.activeElement = this; }, scrollIntoView() {} }));
   searchElement = { focus() { presentationDocument.activeElement = this; } };
   for (const node of all) if (node.props.ref) node.props.ref.current = node === tree ? panel : node.props.role === "menu" ? menu : node.type === "input" ? searchElement : null;
@@ -78,6 +80,12 @@ presentationWindow.innerWidth = 400; windowListeners.get("resize")(); assert.equ
 props.essentialTools = jsx("div", { "aria-label": "Viewport camera and selection" }); render();
 assert.ok(nodes(tree).some(node => node === props.essentialTools), "context camera controls are rendered");
 key("Tab", searchElement); assert.equal(closed, 4, "Tab reaches context camera controls without dismissal");
+searchNode().props.onChange({ target: { value: "" } }); render();
+props.groups = [{ id: "navigation", label: "Navigate viewport", actions: [{ id: "navigation-orbit", label: "Orbit", checked: true, run: () => runs++ }, { id: "navigation-pan", label: "Pan", checked: false, run: () => runs++ }] }];
+render(); menuItems[0].props.onClick(); render();
+assert.equal(menuItems[0].props.role, "menuitemradio"); assert.equal(menuItems[0].props["aria-checked"], true);
+assert.equal(menuItems[1].props["aria-checked"], false);
+key("ArrowDown"); assert.equal(presentationDocument.activeElement, menuElements[1], "mode radio actions join keyboard navigation");
 effects.forEach(effect => effect?.cleanup?.()); layouts.forEach(effect => effect?.cleanup?.());
 assert.equal(listeners.size, 0); assert.equal(windowListeners.size, 0);
 console.log("Viewport action menu: keyboard submenus, focus return, disabled actions, grouped search, stable updates and bounded positioning passed.");

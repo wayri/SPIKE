@@ -6,6 +6,7 @@ import { comparisonCompatibility, exportStudyDataset, MAX_STUDY_DOCUMENT_BYTES, 
 import { isDesktopShell, saveNativeTextFile } from "./workerBridge";
 import { usePanelPresentation } from "./panelPresentation";
 import "./studyManager.css";
+import { usePanelHeaderMenu } from "./PanelHeaderMenu";
 
 export type StudyCaseType = { value: string; label: string; disabled?: boolean; description?: string };
 const DEFAULT_TYPES: StudyCaseType[] = [
@@ -154,10 +155,17 @@ export default function StudyManager(props: Props) {
   };
   const selectedType = types.find(type => type.value === newType);
   const compatibility = comparisonCompatibility(compared);
+  const headerMenu = usePanelHeaderMenu("Simulation studies", [
+    { label: "New study", icon: FolderPlus, run: () => { const id = props.onCreateStudy(); setSelectedId(id); } },
+    { label: "Import studies", icon: Upload, run: () => importRef.current?.click() },
+    { label: "Export study", icon: Download, disabled: !study, run: () => void exportStudy() },
+    { label: "Close", icon: X, run: props.onClose },
+  ]);
 
   return <div className="modal-shade study-manager-shade" role="dialog" aria-modal="true" aria-label="Simulation studies" onKeyDown={event => { if (event.key === "Escape" && pendingDelete) { event.stopPropagation(); setPendingDelete(null); } }}>
     <section className="study-manager">
-      <header className="study-manager-header"><div><b>Simulation studies</b><small>Saved setups, recorded results, and supplied data. This manager does not start a solver.</small></div><div className="study-header-actions"><button onClick={() => importRef.current?.click()}><Upload size={15}/> Import</button><button disabled={!study} onClick={() => void exportStudy()}><Download size={15}/> Export</button><button className="canvas-icon" aria-label="Close studies" onClick={props.onClose}><X size={17}/></button></div></header>
+      <header className="study-manager-header" {...headerMenu.headerProps}><div><b>Simulation studies</b><small>Saved setups, recorded results, and supplied data. This manager does not start a solver.</small></div><div className="study-header-actions"><button onClick={() => importRef.current?.click()}><Upload size={15}/> Import</button><button disabled={!study} onClick={() => void exportStudy()}><Download size={15}/> Export</button><button className="canvas-icon" aria-label="Close Simulation studies" title="Close Simulation studies" onClick={props.onClose}><X size={17}/></button></div></header>
+      {headerMenu.menu}
       <input ref={importRef} className="study-file-input" type="file" accept="application/json,.json" aria-label="Import study JSON" onChange={event => void importFile(event.target.files?.[0])}/>
       <input ref={datasetRef} className="study-file-input" type="file" accept="application/json,text/csv,.json,.csv" aria-label="Attach dataset file" onChange={event => void attachDataset(event.target.files?.[0])}/>
       {message && <div className="study-message" role="status"><span>{message}</span><button aria-label="Dismiss status" onClick={() => setMessage("")}><X size={14}/></button></div>}

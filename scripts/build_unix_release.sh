@@ -6,7 +6,8 @@ export PYTHONDONTWRITEBYTECODE=1
 export RUSTFLAGS="--remap-path-prefix=$PWD=/build/spike --remap-path-prefix=$HOME=/build/user"
 export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
 export CXXFLAGS="${CXXFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
-python -m pip install numpy scipy shapely matplotlib mplcursors reportlab nanobind jsonschema==4.25.1 pyarrow==25.0.1 pyinstaller==6.21.0
+mkdir -p build/qualification
+python -m pip install --report build/qualification/python-install.json numpy scipy shapely matplotlib mplcursors reportlab nanobind jsonschema==4.25.1 pyarrow==25.0.1 pyinstaller==6.21.0
 cmake_args=(-DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_BINDINGS=ON -DSPIKE_PORTABLE_BUILD=ON
   "-DPython_EXECUTABLE=$(command -v python)" "-Dnanobind_DIR=$(python -m nanobind --cmake_dir)")
 if [[ "$(uname)" == Darwin ]]; then

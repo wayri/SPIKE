@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { numericExtent, numericMaximum } from "./numericRange";
 import { runLocalWorker } from "./workerBridge";
+import SolverSetupSteps, { SolverSetupPanel, type SolverSetupStep } from "./SolverSetupSteps";
 import "./InternalAirflowPanel.css";
 
 export type InternalAirflowRequest = {
@@ -294,6 +295,7 @@ export default function InternalAirflowPanel({ workerAvailable, initialRequest, 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"temperature" | "velocity">("temperature");
+  const [setupStep, setSetupStep] = useState("geometry");
   const runSequence = useRef(0);
   useEffect(() => () => { runSequence.current += 1; }, []);
   const patch = (key: keyof Draft, value: string) => setDraft(current => ({ ...current, [key]: value }));
@@ -338,16 +340,38 @@ export default function InternalAirflowPanel({ workerAvailable, initialRequest, 
   let currentRequest: InternalAirflowRequest | null = null;
   try { currentRequest = buildInternalAirflowRequest(draft); } catch { /* validation is reported when Run is selected */ }
   const stale = Boolean(result && resultRequest && JSON.stringify(resultRequest) !== JSON.stringify(currentRequest));
+  const setupSteps: readonly SolverSetupStep[] = [
+    { id: "geometry", label: "Geometry", description: "Define the rectangular channel length, gap and width." },
+    { id: "fluid-heat", label: "Fluid & heat", description: "Set the prescribed flow, inlet state, constant fluid properties and signed wall heat fluxes." },
+    { id: "mesh", label: "Mesh", description: "Choose the bounded axial and transverse finite-volume cell counts." },
+    { id: "review", label: "Review & run", description: "Review the model limits, run the admitted request and inspect returned solver evidence." },
+  ];
+  const geometryKeys = new Set<keyof Draft>(["length_m", "gap_m", "width_m"]);
+  const meshKeys = new Set<keyof Draft>(["axial_cells", "transverse_cells"]);
+  const renderControls = (selected: (key: keyof Draft) => boolean) => <div className="internal-airflow-controls">
+    {controls.filter(control => selected(control.key)).map(control => <label key={control.key}><span>{control.label}<small>{control.unit}</small></span><input aria-label={`${control.label} (${control.unit})`} type="number" step={control.step ?? "any"} min={control.min} value={draft[control.key]} disabled={busy} onChange={event => patch(control.key, event.target.value)} /></label>)}
+  </div>;
   return <section className="internal-airflow-panel" aria-labelledby="internal-airflow-heading">
     <header><div><p className="internal-airflow-eyebrow">Thermal environment</p><h4 id="internal-airflow-heading">Internal channel airflow</h4></div><span className="internal-airflow-badge">Experimental</span></header>
     <p className="internal-airflow-intro">Prescribed laminar flow and wall-heated fluid energy transport for a rectangular channel. This screen does not solve a solid domain, turbulence, flow separation, fans, or enclosure-scale CFD.</p>
-    <div className="internal-airflow-controls">
-      {controls.map(control => <label key={control.key}><span>{control.label}<small>{control.unit}</small></span><input aria-label={`${control.label} (${control.unit})`} type="number" step={control.step ?? "any"} min={control.min} value={draft[control.key]} disabled={busy} onChange={event => patch(control.key, event.target.value)} /></label>)}
-    </div>
-    <p className="internal-airflow-boundary-note">Both wall heat fluxes are signed: positive values heat the fluid and zero is adiabatic. Mesh admission is bounded to 2..1000 axial cells, 3..200 transverse cells, and 100,000 field values.</p>
-    <div className="internal-airflow-actions"><button type="button" className="spike-control--primary" disabled={!workerAvailable || busy} onClick={() => void run()}>{busy ? "Running channel screen…" : "Run channel screen"}</button><span aria-live="polite">{!workerAvailable ? "Local solver worker unavailable." : busy ? "Solver request in progress." : "Ready for a local experimental run."}</span></div>
+    <SolverSetupSteps label="Internal airflow setup steps" steps={setupSteps} current={setupStep} onChange={setSetupStep} />
+    <SolverSetupPanel active={setupStep === "geometry"} label="Channel geometry">
+      {renderControls(key => geometryKeys.has(key))}
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "fluid-heat"} label="Fluid and heat inputs">
+      {renderControls(key => !geometryKeys.has(key) && !meshKeys.has(key))}
+      <p className="internal-airflow-boundary-note">Both wall heat fluxes are signed: positive values heat the fluid and zero is adiabatic.</p>
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "mesh"} label="Mesh inputs">
+      {renderControls(key => meshKeys.has(key))}
+      <p className="internal-airflow-boundary-note">Mesh admission is bounded to 2..1000 axial cells, 3..200 transverse cells, and 100,000 field values.</p>
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "review"} label="Review and run">
+      <div className="internal-airflow-actions"><button type="button" className="spike-control--primary" disabled={!workerAvailable || busy} onClick={() => void run()}>{busy ? "Running channel screen…" : "Run channel screen"}</button></div>
+      {stale && <p className="internal-airflow-stale" role="status">Inputs differ from the solved setup. Results below show the previous solver request.</p>}
+      {result ? <ResultView result={result} mode={mode} onMode={setMode} /> : <div className="internal-airflow-empty">Run the solver to view returned temperature stations or velocity arrows. No field is estimated in the browser.</div>}
+    </SolverSetupPanel>
+    <div className="internal-airflow-actions"><span aria-live="polite">{!workerAvailable ? "Local solver worker unavailable." : busy ? "Solver request in progress." : "Ready for a local experimental run."}</span></div>
     {error && <p className="internal-airflow-error" role="alert">{error} {result ? "The last valid result remains visible." : "Review the inputs and run again."}</p>}
-    {stale && <p className="internal-airflow-stale" role="status">Inputs differ from the solved setup. Results below show the previous solver request.</p>}
-    {result ? <ResultView result={result} mode={mode} onMode={setMode} /> : <div className="internal-airflow-empty">Run the solver to view returned temperature stations or velocity arrows. No field is estimated in the browser.</div>}
   </section>;
 }

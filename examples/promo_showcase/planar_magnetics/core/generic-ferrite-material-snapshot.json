@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "material_id": "tdk-n97-with-generic-ferrite-estimates-showcase",
+  "revision": "2026-10-23.1",
+  "digest": "a098109a2fd3a2921bc7261b50813dc6244d0ff863a7c6193b6947a8e696ca25",
+  "record": {
+    "schema_version": 1,
+    "id": "tdk-n97-with-generic-ferrite-estimates-showcase",
+    "revision": "2026-10-23.1",
+    "name": "N97 facts plus selected generic ferrite estimates (inert showcase)",
+    "family": "ferrite",
+    "manufacturer": "TDK Electronics",
+    "grade": "N97 factual subset; generic thermal/mechanical estimates separate",
+    "description": "Inert project evidence snapshot. Generic approximate ferrite thermal/mechanical values are not N97-specific characterization or an automatic constitutive model.",
+    "notes": "N97-specific unknowns remain null in n97-core-material.json. This separate illustrative record selects generic approximate ferrite values explicitly. Poisson ratio remains unavailable; isotropic structural admission must remain blocked until supplied. No temperature/frequency extrapolation or physical qualification.",
+    "tags": [
+      "estimate",
+      "generic-ferrite",
+      "n97-factual-subset",
+      "inert-evidence",
+      "not-production-qualified"
+    ],
+    "properties": {
+      "density": {
+        "unit": "kg/m^3",
+        "status": "manufacturer",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/inf/80/db/fer/n97.pdf; June2025,p2",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "N97 typical density; not a measured lot"
+        },
+        "shape": "scalar",
+        "value": 4850
+      },
+      "relative_permeability": {
+        "unit": "1",
+        "status": "manufacturer",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/inf/80/db/fer/n97.pdf; June2025,p2",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "N97 initial small-signal permeability2300\u00b125%@25C; not amplitude/complex/nonlinear permeability or shape effective mu",
+          "temperature_k": [
+            298.15,
+            298.15
+          ]
+        },
+        "shape": "scalar",
+        "value": 2300
+      },
+      "electrical_conductivity": {
+        "unit": "S/m",
+        "status": "manufacturer",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/inf/80/db/fer/n97.pdf; June2025,p2",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "Reciprocal conversion1/(8ohm*m)=0.125S/m from N97 resistivity; not a high-frequency/temperature law"
+        },
+        "shape": "scalar",
+        "value": 0.125
+      },
+      "youngs_modulus": {
+        "unit": "Pa",
+        "status": "estimate",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/download/540066/fb53a2e55d6690c04d227a78a5be58f0/pdf-generaldefinitions.pdf; October2022,section8.1,p17",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "Generic ferrite approximate modulus150000N/mm2 converted to150GPa; not N97-specific or structural qualification"
+        },
+        "shape": "scalar",
+        "value": 150000000000.0
+      },
+      "thermal_conductivity": {
+        "unit": "W/(m*K)",
+        "status": "estimate",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/download/540066/fb53a2e55d6690c04d227a78a5be58f0/pdf-generaldefinitions.pdf; October2022,section8.1,p17",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "User-selected midpoint5.5W/(mK) of generic ferrite approximate4..7W/(mK) range; source4..7e-3J/(mm*s*K); not N97-specific"
+        },
+        "shape": "scalar",
+        "value": 5.5
+      },
+      "specific_heat": {
+        "unit": "J/(kg*K)",
+        "status": "estimate",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/download/540066/fb53a2e55d6690c04d227a78a5be58f0/pdf-generaldefinitions.pdf; October2022,section8.1,p17",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "Generic ferrite approximate0.7J/(g*K) converted to700J/(kg*K); not N97-specific"
+        },
+        "shape": "scalar",
+        "value": 700
+      },
+      "thermal_expansion": {
+        "unit": "1/K",
+        "status": "estimate",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/download/540066/fb53a2e55d6690c04d227a78a5be58f0/pdf-generaldefinitions.pdf; October2022,section8.1,p17",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "User-selected midpoint8.5e-6/K of generic ferrite approximate7..10e-6/K range; not N97-specific"
+        },
+        "shape": "scalar",
+        "value": 8.5e-06
+      },
+      "poissons_ratio": {
+        "unit": "1",
+        "status": "unavailable",
+        "provenance": {
+          "source": "https://www.tdk-electronics.tdk.com/download/540066/fb53a2e55d6690c04d227a78a5be58f0/pdf-generaldefinitions.pdf; October2022,section8.1,p17",
+          "reviewed": "2026-10-23",
+          "license": "Factual property transcription only; supplier publication copyright retained, PDF not redistributed"
+        },
+        "applicability": {
+          "notes": "Not supplied by reviewed source; no value invented"
+        },
+        "shape": "unavailable"
+      }
+    }
+  }
+}

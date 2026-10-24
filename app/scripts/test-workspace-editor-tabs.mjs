@@ -21,7 +21,7 @@ try {
   assert.match(markup,/role="tab"[^>]*aria-selected="true"[^>]*>.*Power &amp; signal paths/);
   assert.ok(markup.includes("Circuit workspace"));assert.ok(!markup.includes("Thermal setup"));assert.ok(!markup.includes("Spatial selection"));
   const activated=[];const tree=Tabs({panels,activeId:"netManagerOpen",onActivate:id=>activated.push(id)});
-  const list=tree.props.children,buttons=[list.props.children[0],...list.props.children[1]];
+  const list=tree.props.children[1],buttons=[list.props.children[0],...list.props.children[1]];
   assert.equal(buttons.at(-1).props["aria-selected"],true,"aliases select the existing document");
   buttons[0].props.onClick();buttons[2].props.onClick();assert.deepEqual(activated,[null,"spiceOpen"]);
   let focused=-1;const targets=buttons.map((button,index)=>({focus:()=>focused=index,click:button.props.onClick}));

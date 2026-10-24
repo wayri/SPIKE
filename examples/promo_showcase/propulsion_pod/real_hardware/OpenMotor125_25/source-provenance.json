@@ -1,0 +1,20 @@
+{
+  "source_base_url": "https://github.com/eMotres/OpenMotor-Hardware/tree/1e1e56d7cf64ea393793ca5c06189251f87b6e98",
+  "revision": "1e1e56d7cf64ea393793ca5c06189251f87b6e98",
+  "license": "CERN-OHL-W-2.0",
+  "retained_files_unmodified": [
+    "CIAG_2_28 125_25.step",
+    "CIAG_2_28 125_25_datasheet.pdf",
+    "CIAG_2_28 125_25_test_propeller_30x14.csv",
+    "LICENSE.txt",
+    "UPSTREAM_README.md"
+  ],
+  "notices": "Verbatim source: retain upstream notices and license per3.1. Any modifiedCoveredSource requires modificationdate/description and sameWlicense/sourceavailability under3.3; products/sourceavailability obligations under4.1. This original source snapshot is not relicensed as SPIKE software.",
+  "reviewed": "2026-10-23",
+  "derived_review_artifacts": [
+    "inspect_step.py",
+    "STEP_NATIVE_INSPECTION.json",
+    "source-provenance.json",
+    "SHA256SUMS.json"
+  ]
+}

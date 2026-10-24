@@ -5,6 +5,8 @@ import type { LucideIcon } from "./icons";
 import { normalizeSearchText, scoreUniversalSearchItem } from "./universalSearchModel";
 import { searchableFocusCommands, type FocusCommand } from "./focusCommands";
 import { emptySearchPreferences, frequentSearchActionIds, loadSearchPreferences, recentSearchActionIds, recordSearchAction, searchPreferenceRank, toggleSearchPin } from "./searchPreferences";
+import { searchCategory } from "./searchCategory";
+import "./searchCategory.css";
 import "./UniversalSearch.css";
 
 export type UniversalSearchItem = {
@@ -46,9 +48,10 @@ export default function UniversalSearch({ open, items, suggestCommands, commands
   }, [open]);
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const commandItems = useMemo<UniversalSearchItem[]>(() => searchableFocusCommands(commands).map(command => ({ ...command, icon: command.icon as LucideIcon | undefined })), [commands]);
+  const commandItems = useMemo<UniversalSearchItem[]>(() => open ? searchableFocusCommands(commands).map(command => ({ ...command, icon: command.icon as LucideIcon | undefined })) : [], [open, commands]);
   const storage = () => { try { return typeof localStorage === "undefined" ? null : localStorage; } catch { return null; } };
   const results = useMemo(() => {
+    if (!open) return [];
     const seen = new Set<string>();
     const term = normalizeSearchText(query);
     return [...(suggestCommands?.(query) ?? []), ...items, ...commandItems, ...liveItems]
@@ -61,9 +64,9 @@ export default function UniversalSearch({ open, items, suggestCommands, commands
     .map(entry => entry.item)
     .filter(item => { const identity = `${item.category}\u0000${item.label}`.toLocaleLowerCase(); if (seen.has(identity)) return false; seen.add(identity); return true; })
     .slice(0, query.trim() ? 60 : 18);
-  }, [items, commandItems, liveItems, query, suggestCommands, preferences]);
+  }, [open, items, commandItems, liveItems, query, suggestCommands, preferences]);
 
-  const availableById = useMemo(() => new Map([...(suggestCommands?.("") ?? []), ...items, ...commandItems, ...liveItems].map(item => [item.id, item])), [items, commandItems, liveItems, suggestCommands]);
+  const availableById = useMemo(() => new Map((open ? [...(suggestCommands?.("") ?? []), ...items, ...commandItems, ...liveItems] : []).map(item => [item.id, item])), [open, items, commandItems, liveItems, suggestCommands]);
   const recent = useMemo(() => recentSearchActionIds(preferences).flatMap(id => availableById.get(id) ?? []), [preferences, availableById]);
   const frequent = useMemo(() => frequentSearchActionIds(preferences).flatMap(id => availableById.get(id) ?? []), [preferences, availableById]);
   const summaryItems = summaryMode === "recent" ? recent : frequent;
@@ -127,17 +130,17 @@ export default function UniversalSearch({ open, items, suggestCommands, commands
       <div className="universal-search-body">
         <div className="universal-search-summary" aria-label="Recent and most used search actions">
           {!query.trim() && (recent.length > 0 || frequent.length > 0) && <><span className="universal-search-summary-modes"><button aria-pressed={summaryMode === "recent"} onClick={() => setSummaryMode("recent")}>Recent</button><button aria-pressed={summaryMode === "frequent"} onClick={() => setSummaryMode("frequent")}>Most used</button></span>
-          {summaryItems.map(item => <button key={`${summaryMode}:${item.id}`} disabled={busyIds.has(item.id)} onClick={() => execute(item)} title={item.label}>{item.label}</button>)}</>}
+          {summaryItems.map(item => <button key={`${summaryMode}:${item.id}`} type="button" data-search-category={searchCategory(item.category)} disabled={item.disabled || busyIds.has(item.id)} onClick={() => execute(item)} title={`${item.category}: ${item.label}${item.disabled ? " · Unavailable" : ""}`}><span className="search-category-dot" aria-hidden="true"/>{item.label}</button>)}</>}
         </div>
         <div id="universal-search-results" className="universal-search-list" role="listbox">
           {results.map((item, index) => {
             const Icon = item.icon ?? Search;
             const pinned = preferences.pins.includes(item.id);
-            return <div key={item.id} className={`universal-search-row${index === activeIndex ? " active" : ""}`} role="presentation" onMouseEnter={() => setActiveIndex(index)}>
+            return <div key={item.id} className={`universal-search-row${index === activeIndex ? " active" : ""}`} data-search-category={searchCategory(item.category)} role="presentation" onMouseEnter={() => setActiveIndex(index)}>
               <button disabled={item.disabled || busyIds.has(item.id)} role="option" aria-selected={index === activeIndex} onClick={() => execute(item)}>
                 <Icon size={15} />
-                <span><b>{item.label}</b><small>{item.description ?? item.category}</small></span>
-                <em>{item.category}</em>
+                <span><b title={item.label}>{item.label}</b><small title={item.description ?? item.category}>{item.description ?? item.category}</small></span>
+                <em className="search-category-badge" title={item.category}>{item.category}</em>
                 {item.shortcut ? <kbd>{item.shortcut}</kbd> : <ArrowRight size={13} />}
               </button>
               <button className="universal-search-pin" aria-label={`${pinned ? "Unpin" : "Pin"} ${item.label}`} aria-pressed={pinned} onClick={() => setPreferences(current => toggleSearchPin(current, item.id, storage()))}>{pinned ? "Pinned" : "Pin"}</button>
@@ -145,7 +148,7 @@ export default function UniversalSearch({ open, items, suggestCommands, commands
           })}
           {!results.length && <div className="universal-search-empty"><Search size={20} /><b>No matching command or design object</b><span>Try “run PI on net …”, “focus part …”, “show layer …”, or a tool name.</span></div>}
         </div>
-        {active && <footer><span>{active.category}</span><b>{active.label}</b><small>{active.description ?? "Press Enter to open"}</small></footer>}
+        {active && <footer data-search-category={searchCategory(active.category)}><span>{active.category}</span><b>{active.label}</b><small>{active.description ?? "Press Enter to open"}</small></footer>}
       </div>
       <div className="universal-search-hints"><span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span><span><kbd>Tab</kbd> Complete</span><span><kbd>Enter</kbd> Execute</span><span><kbd>Ctrl</kbd><kbd>K</kbd> Search</span></div>
     </section>

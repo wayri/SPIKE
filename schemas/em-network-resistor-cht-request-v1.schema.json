@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/em-network-resistor-cht-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; retained mesh, phase, mapping, conservation, cancellation and child-solver gates are enforced by the implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "ac_request", "cht_request", "sample_index", "resistor_cell_weights"],
+  "properties": {
+    "contract": {"const": "spike/em-network-resistor-cht-request/v1"},
+    "ac_request": {"$ref": "em-network-ac-request-v1.schema.json"},
+    "cht_request": {
+      "type": "object",
+      "required": ["contract", "mesh", "flow", "energy"],
+      "properties": {"contract": {"const": "spike/cfd-tetra-cht/v1"}}
+    },
+    "sample_index": {"type": "integer", "minimum": 0, "maximum": 511},
+    "resistor_cell_weights": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 16,
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "null"},
+          {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1000000,
+            "propertyNames": {"pattern": "^(0|[1-9][0-9]{0,3})$"},
+            "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        ]
+      }
+    }
+  }
+}

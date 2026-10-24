@@ -48,7 +48,9 @@ class AnnularContactGateTests(unittest.TestCase):
         stage = next(s for s in backlog["stages"] if s["id"] == "PI01-S02")
         self.assertEqual(stage["status"], "in_progress")
         supplement = stage["supplementary_evidence"][0]
-        self.assertEqual(supplement["evidence"], "docs/validation/parity/PI01-S02-annular-contact-20261021.json")
+        receipt = json.loads((ROOT / supplement["evidence"]).read_text(encoding="utf-8"))
+        validate_receipt(receipt)
+        self.assertEqual(receipt["contract"], "spike/pi01-annular-contact-evidence/v1")
         self.assertFalse(supplement["stage_complete"])
         self.assertEqual(supplement["status"], "verified_bounded_increment")
 

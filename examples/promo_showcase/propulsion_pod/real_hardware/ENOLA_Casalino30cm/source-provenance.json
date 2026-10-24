@@ -1,0 +1,12 @@
+{
+  "source_url": "https://zenodo.org/records/20111572",
+  "doi": "10.5281/zenodo.20111572",
+  "version": "v1",
+  "creator": "Universitat Polit\u00e8cnica de Val\u00e8ncia",
+  "funding": "ENOLA PID2022-142018OA-I00",
+  "license": "CC-BY-SA-4.0",
+  "retained_unmodified_geometry_and_data": true,
+  "notice": "Attribute creator,datasetDOI/version and originalgeometrylineage inREADME. Retainlicenseanddisclaimer; mark latergeometrytransformations/modifications and keepapplicableadaptedmaterialunderCC-BY-SA4.0. No endorsement or operational/safetyqualification.",
+  "selection": "Original baselineParasolidCAD + exact\u00b15STLvariants and selectedexperimentalCSV; selected+5geometry must use+5measureddata, notbaseline.",
+  "reviewed": "2026-10-23"
+}

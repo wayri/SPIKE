@@ -4,13 +4,16 @@ while a future cloud worker can expose the same request/response shapes over HTT
 """
 
 from __future__ import annotations
-import json
 import os
 import subprocess
 import sys
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict
+
+if __name__ == "__main__":
+    from .numerical_runtime import bootstrap_worker_numerics
+    bootstrap_worker_numerics()
 
 from .kicad_schematic_importer import handle_kicad_schematic_request, KicadSchematicViewError
 from .connectivity_view_importer import handle_connectivity_view_request, ConnectivityViewError
@@ -33,7 +36,6 @@ from .environment_profiles import (
 from .contracts import AnalysisSpec, SpiDeR, ValidationIssue
 from .spider_v2 import SpiDeRV2
 from .converter_study import converter_capabilities, run_converter_study, validate_converter_study
-from .errors import error_envelope
 from .convergence import run_mesh_convergence
 from .geometry import extract_net_geometry
 from .extensions import ExtensionPackageManager, ExtensionRegistry, default_extension_roots
@@ -125,7 +127,6 @@ from .kicad_importer import import_kicad_design as _design_from_kicad
 from .external_pi_result_validation import validate_external_pi_multiport
 from . import __version__
 
-
 _solver_registry = default_solver_registry()
 _extension_registry = ExtensionRegistry()
 _extension_packages = ExtensionPackageManager()
@@ -149,14 +150,13 @@ _operation_id = operation_id
 _error_response = error_response
 _export_step = export_step
 
-
 def handle(request: Dict[str, Any]) -> Dict[str, Any]:
     return dispatch_spider_request(request, _dispatch)
 
-
 def _dispatch(request: Dict[str, Any]) -> Dict[str, Any]:
-    method = request.get("method")
-    params = request.get("params", {})
+    method, params = request.get("method"), request.get("params", {})
+    if not isinstance(params, dict):
+        return {"ok": False, "error": "Request params must be an object", "type": "TypeError"}
     spider_result = handle_spider_request(method, params)
     if spider_result is not None:
         return {"ok": True, "result": spider_result}

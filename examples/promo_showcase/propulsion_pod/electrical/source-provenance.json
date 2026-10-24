@@ -1,0 +1,109 @@
+{
+  "license": "Apache-2.0",
+  "copied_firstparty_files": [
+    {
+      "source": {
+        "path": "examples/promo_showcase/esc/studio/current_sensing.cir",
+        "sha256": "bb50c6393b65fb98ea0823bd4fd71bfd29a400385c3b96d2bb545f4a671b578c",
+        "bytes": 297
+      },
+      "copy": {
+        "path": "examples/promo_showcase/propulsion_pod/electrical/current_sensing.cir",
+        "sha256": "bb50c6393b65fb98ea0823bd4fd71bfd29a400385c3b96d2bb545f4a671b578c",
+        "bytes": 297
+      },
+      "unchanged": true,
+      "license": "Apache-2.0"
+    },
+    {
+      "source": {
+        "path": "examples/promo_showcase/esc/studio/current_sensing.spksch",
+        "sha256": "93a2553ceb429077088310d6ecc69b0bcdb8cd3bfdf24d616100826653c22ec0",
+        "bytes": 10747
+      },
+      "copy": {
+        "path": "examples/promo_showcase/propulsion_pod/electrical/current_sensing.spksch",
+        "sha256": "93a2553ceb429077088310d6ecc69b0bcdb8cd3bfdf24d616100826653c22ec0",
+        "bytes": 10747
+      },
+      "unchanged": true,
+      "license": "Apache-2.0"
+    }
+  ],
+  "files": [
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/current_sensing.cir",
+      "sha256": "bb50c6393b65fb98ea0823bd4fd71bfd29a400385c3b96d2bb545f4a671b578c",
+      "bytes": 297
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/current_sensing.spksch",
+      "sha256": "93a2553ceb429077088310d6ecc69b0bcdb8cd3bfdf24d616100826653c22ec0",
+      "bytes": 10747
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/LICENSE",
+      "sha256": "1dbace2c4de7ffdf533d0a4cb55bd93177201ead936d0f349cd14a05a84d2266",
+      "bytes": 11560
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/NOTICE",
+      "sha256": "dc8fdbd0044b6ccd0e5d6d87ff79c7ad8e63a0f0600855fc91daa3881d37b9d2",
+      "bytes": 588
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/pod_bus_startup.cir",
+      "sha256": "4d12573eedbf89af711554b3f881024916abb5cd883ecc735c1dbc95c688cdb8",
+      "bytes": 353
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/pod_bus_startup.spksch",
+      "sha256": "f4e3f3bca65e46e7c4e7514835b852a21b37ebc2c51fb2456ca48fdb53399541",
+      "bytes": 10536
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/README.md",
+      "sha256": "5c614ebdc0a9698bdc3372f47028379f84965a65fe90465e0c064552f4a0888b",
+      "bytes": 4414
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/run_examples.py",
+      "sha256": "a310fc0405902ec72c13afb76d73fc6cdf9bb08f476336f61ae5feb99980de70",
+      "bytes": 3933
+    },
+    {
+      "path": "examples/promo_showcase/propulsion_pod/electrical/write_provenance.py",
+      "sha256": "5a7b457d639cf95392ab591eee87b2c7402d0491b7905c1df3c655968e74205f",
+      "bytes": 1163
+    }
+  ],
+  "runtime_and_capability_sources": [
+    {
+      "path": "python/spikes/native_runner.py",
+      "sha256": "42a7a1a7e7eb36eba9cb618f259a5bd745e2f69aa158b80cd1e9873b51a2cebb",
+      "bytes": 32622
+    },
+    {
+      "path": "standalone/spikes_project/studio/python/spikes_studio/document.py",
+      "sha256": "7305b73a307e41b8c9cc543ad3bf3494a03b03e6f10a0c1e2a81e1a2a0246235",
+      "bytes": 40230
+    },
+    {
+      "path": "standalone/spikes_project/studio/python/spikes_studio/run_control.py",
+      "sha256": "c7600c70b95c854ee1044b0d1a86317485c421e1d82f6da595888336c018295f",
+      "bytes": 18431
+    },
+    {
+      "path": "docs/EM_MACHINES.md",
+      "sha256": "6de96a9cf31018b3df792fa12afb1895b5ce592cdfd06b1eb297582be6b2b003",
+      "bytes": 4055
+    },
+    {
+      "path": "examples/spikes/advanced_systems/README.md",
+      "sha256": "7e848fb2c34e492ace858468454e3a8beaa914fa13e0795c7eb4f82bca0d8ecf",
+      "bytes": 4769
+    }
+  ],
+  "no_thirdparty_code": true,
+  "no_new_physics": true
+}

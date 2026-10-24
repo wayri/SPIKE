@@ -1,0 +1,9 @@
+Separate original SPIKE planar PM field reference — Apache-2.0
+
+request.json is copied byte-for-byte from examples/em_machines/planar_pm_fem.json.
+The runner and native package glue are original firstparty example work using
+the existing machine-study, magnetostatic and portable-project APIs.
+The accompanying electrical parent LICENSE applies.
+
+Synthetic prescribed-current planar reference only. No physical pod or controller
+linkage, manufacturer geometry, vendor model or external solver code is bundled.

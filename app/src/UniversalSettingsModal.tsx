@@ -1,11 +1,11 @@
-import { Gauge, Globe2, MonitorCog, Ruler, ShieldCheck, SlidersHorizontal, UserRound, X } from "./icons";
+import { Gauge, History, Globe2, MonitorCog, Ruler, ShieldCheck, SlidersHorizontal, UserRound, X } from "./icons";
 import { useEffect, useState } from "react";
 import { AppSettings, LANGUAGE_NAMES } from "./appSettings";
 import { usePanelPresentation } from "./panelPresentation";
 
-type SettingsTab = "General" | "Units" | "Interface" | "Language" | "Profile" | "Privacy";
+type SettingsTab = "General" | "Units" | "Interface" | "Language" | "Profile" | "Privacy" | "Backups";
 
-export default function UniversalSettingsModal({ settings, onSave, onClose, onOpenUpdates }: { onOpenUpdates?: () => void; settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void }) {
+export default function UniversalSettingsModal({ settings, onSave, onClose, onOpenUpdates, onOpenBackups, backupStatus }: { onOpenBackups?: () => void; backupStatus?: string; onOpenUpdates?: () => void; settings: AppSettings; onSave: (settings: AppSettings) => void; onClose: () => void }) {
   const { ownerDocument, ownerWindow } = usePanelPresentation();
   const [draft, setDraft] = useState<AppSettings>(() => structuredClone(settings));
   const [tab, setTab] = useState<SettingsTab>("General");
@@ -17,7 +17,7 @@ export default function UniversalSettingsModal({ settings, onSave, onClose, onOp
   }, [ownerDocument, ownerWindow, onClose]);
   const update = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => setDraft(current => ({ ...current, [key]: value }));
   const tabs: { id: SettingsTab; icon: typeof Gauge }[] = [
-    { id: "General", icon: SlidersHorizontal }, { id: "Units", icon: Ruler }, { id: "Interface", icon: MonitorCog },
+    { id: "General", icon: SlidersHorizontal }, { id:"Backups",icon:History }, { id: "Units", icon: Ruler }, { id: "Interface", icon: MonitorCog },
     { id: "Language", icon: Globe2 }, { id: "Profile", icon: UserRound }, { id: "Privacy", icon: ShieldCheck },
   ];
   return <div className="modal-shade settings-shade" role="dialog" aria-modal="true" aria-label="SPIKE settings">
@@ -29,11 +29,18 @@ export default function UniversalSettingsModal({ settings, onSave, onClose, onOp
           {tab === "General" && <SettingsSection title="Workspace">
             {onOpenUpdates && <button type="button" onClick={onOpenUpdates}>SPIKE updates · check GitHub releases</button>}
             <Setting label="Restore last workspace"><input type="checkbox" checked={draft.restoreWorkspace} onChange={event => update("restoreWorkspace", event.target.checked)} /></Setting>
-            <Setting label="Autosave interval"><select value={draft.autosaveMinutes} onChange={event => update("autosaveMinutes", Number(event.target.value) as AppSettings["autosaveMinutes"])}><option value={0}>Disabled</option><option value={1}>1 minute</option><option value={5}>5 minutes</option><option value={10}>10 minutes</option><option value={30}>30 minutes</option></select></Setting>
             <Setting label="Numerical precision"><input type="number" min={3} max={12} value={draft.significantDigits} onChange={event => update("significantDigits", Math.max(3, Math.min(12, Number(event.target.value))))} /></Setting>
             <Setting label="Solver memory fraction"><input type="number" min={10} max={90} step={5} value={Math.round(draft.solverMemoryFraction * 100)} onChange={event => update("solverMemoryFraction", Math.max(0.1, Math.min(0.9, Number(event.target.value) / 100)))} /><small>% of detected RAM</small></Setting>
             <Setting label="Solver memory limit"><input type="number" min={2} step={1} value={draft.solverMemoryLimitGb} onChange={event => update("solverMemoryLimitGb", Math.max(2, Number(event.target.value) || 2))} /><small>GB, minimum 2 GB</small></Setting>
             <p className="settings-note">The lower of the detected-RAM fraction and absolute GB limit is used for admission planning. Solver convergence, external-engine limits, and GPU capacity remain separate checks.</p>
+          </SettingsSection>}
+          {tab === "Backups" && <SettingsSection title="Automatic project backups">
+            <Setting label="Enable automatic backups"><input type="checkbox" checked={draft.autoBackupEnabled} onChange={event=>update("autoBackupEnabled",event.target.checked)}/></Setting>
+            <Setting label="Back up every"><select aria-label="Project backup interval" disabled={!draft.autoBackupEnabled} value={draft.autoBackupMinutes} onChange={event=>update("autoBackupMinutes",Number(event.target.value) as AppSettings["autoBackupMinutes"])}>{([1,5,10,15,30,60] as const).map(minutes=><option key={minutes} value={minutes}>{minutes} {minutes===1?"minute":"minutes"}</option>)}</select></Setting>
+            <p className="settings-note">Changed project work is backed up to separate local recovery packages. The original file stays unchanged and unsaved edits remain marked unsaved. Backups pause during active operations or unapplied assembly drafts. The ten latest packages per editing session are retained, subject to storage limits.</p>
+            <p className="settings-note">Use Apply settings to start or stop the timer. Disabling does not delete existing backups. Python editor buffers and unapplied editor drafts have their own save/recovery flows.</p>
+            {backupStatus&&<p role="status" className="settings-note">{backupStatus}</p>}
+            {onOpenBackups&&<button type="button" onClick={onOpenBackups}>Open project recovery backups</button>}
           </SettingsSection>}
           {tab === "Units" && <SettingsSection title="Engineering units">
             <Setting label="Unit system"><select value={draft.unitSystem} onChange={event => update("unitSystem", event.target.value as AppSettings["unitSystem"])}><option value="engineering">Engineering SI</option><option value="si">Strict SI</option><option value="imperial">Imperial</option></select></Setting>
@@ -47,6 +54,7 @@ export default function UniversalSettingsModal({ settings, onSave, onClose, onOp
             <Setting label="Theme"><select value={draft.theme} onChange={event => update("theme", event.target.value as AppSettings["theme"])}><option value="professional-dark">Graphite + Teal</option><option value="light">Light + Teal</option><option value="high-contrast">High contrast</option><option value="system">Follow system</option></select></Setting>
             <Setting label="UI scale"><select value={draft.uiScale} onChange={event => update("uiScale", Number(event.target.value))}>{[.65, .75, .9, 1, 1.1, 1.25, 1.5].map(value => <option key={value} value={value}>{Math.round(value * 100)}%</option>)}</select></Setting>
             <Setting label="Viewport background"><select value={draft.viewportBackground} onChange={event => update("viewportBackground", event.target.value as AppSettings["viewportBackground"])}><option value="dark">Graphite</option><option value="light">Light</option><option value="amoled">AMOLED · true black</option></select></Setting>
+            <Setting label="Origin axis markers"><input type="checkbox" checked={draft.viewportOriginAxes} onChange={event => update("viewportOriginAxes", event.target.checked)} /></Setting>
             <Setting label="Orientation grid"><input type="checkbox" checked={draft.viewportGrid} onChange={event => update("viewportGrid", event.target.checked)} /></Setting>
             <Setting label="Rendering profile"><select value={draft.renderQuality} onChange={event => update("renderQuality", event.target.value as AppSettings["renderQuality"])}><option value="quality">Quality</option><option value="balanced">Balanced</option><option value="performance">Performance</option></select></Setting>
             <Setting label="Maximum frame rate"><select value={draft.maximumFps} onChange={event => update("maximumFps", Number(event.target.value) as AppSettings["maximumFps"])}><option value={30}>30 FPS</option><option value={60}>60 FPS</option><option value={120}>120 FPS</option></select></Setting>

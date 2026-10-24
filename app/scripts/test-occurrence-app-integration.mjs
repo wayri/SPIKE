@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import ts from 'typescript';
+import {importTestTypescript} from './import-test-typescript.mjs';
+const model=await importTestTypescript('occurrenceClipboard');
+const source=fs.readFileSync(new URL('../src/App.tsx',import.meta.url),'utf8');
+const fragment=source.slice(source.indexOf('  const occurrenceEditContext ='),source.indexOf('  const generateReport ='));
+assert(fragment.includes('commitOccurrenceEdit'));
+const compiled=ts.transpileModule(fragment,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.None}}).outputText;
+const history=[];
+const env={...model,assemblyIr:null,assemblyDesigns:null,assemblyPackageShapes:null,selected:null,selectedBoardInstanceId:null,canonicalSpiDeR:{contract:'spike/design-ir/v2',design_id:'source',name:'Board',metadata:{board_size_mm:[20,10]}},boardData:{},boardFile:'owned-board.kicad_pcb',universalRunning:false,assemblyToolDraftOwnerRef:{current:null},projectGeneration:{current:1},occurrenceClipboard:null,modelIndex:{models:[]},status:'',setStatus(text){env.status=text;},recordChange(){history.push(structuredClone({assembly:env.assemblyIr,designs:env.assemblyDesigns}));},setAssemblyIr(next){env.assemblyIr=next;},setAssemblyDesigns(next){env.assemblyDesigns=next;},setOccurrenceClipboard(next){env.occurrenceClipboard=next;},setSelected(next){env.selected=next;},setSelectedBoardInstanceId(next){env.selectedBoardInstanceId=next;},setAssemblyModelAssignments(){},requestAnimationFrame(fn){fn();},commandCamera(){}};
+for(const setter of ['setAssemblyPackageShapes','setSelectedHarnessId','setAssemblyHighlightSeed','setLinkedAssemblyNets','setMcadFocusedPartId','setIsolatedAssemblyPartId','setMechanicalMeasurement','setResultDisplay','setResultVisualization','setViewMode'])env[setter]=()=>{};
+const bind=()=>new Function('env',`with(env){${compiled}; return {copyOccurrenceSelection,pasteSelection,duplicateOccurrenceSelection,deleteOccurrenceSelection};}`)(env);
+bind().copyOccurrenceSelection();assert(env.occurrenceClipboard);assert.equal(env.assemblyIr,null,'copy alone must not promote or dirty the project');assert.equal(history.length,0);
+await bind().pasteSelection();assert.equal(env.assemblyIr.boards.length,2);assert.equal(env.assemblyDesigns.designs.length,1);assert.equal(history.length,1);assert(env.selectedBoardInstanceId,'new occurrence is selected');
+const original=env.assemblyIr.boards[0],newId=env.selectedBoardInstanceId;
+bind().copyOccurrenceSelection(null,newId,true);assert.equal(env.assemblyIr.boards.length,1);assert.equal(history.length,2);assert.equal(env.occurrenceClipboard.payload.row.id,newId);
+const count=history.length;bind().deleteOccurrenceSelection(null,String(original.id));assert.equal(env.assemblyIr.boards.length,1);assert.equal(history.length,count,'failed delete is atomic');assert.match(env.status,/at least one/);
+await bind().pasteSelection();assert.equal(env.assemblyIr.boards.length,2);assert.equal(env.assemblyDesigns.designs.length,1,'cut preserves its retained source');
+await bind().pasteSelection('copy');assert.equal(env.assemblyIr.boards.length,3);assert.equal(env.assemblyDesigns.designs.length,2);
+const before=JSON.stringify(env.assemblyIr);env.projectGeneration.current++;await bind().pasteSelection();assert.equal(JSON.stringify(env.assemblyIr),before);assert.match(env.status,/this project first/);
+env.universalRunning=true;const n=history.length;bind().duplicateOccurrenceSelection();assert.equal(history.length,n);assert.match(env.status,/Stop the active simulation/);
+env.universalRunning=false;env.assemblyToolDraftOwnerRef.current='placement';bind().deleteOccurrenceSelection();assert.equal(history.length,n);assert.match(env.status,/draft/);
+assert(!fragment.includes('clipboard.readText'),'pasting arbitrary selection JSON is no longer admitted');
+console.log('App occurrence integration: nonmutating Copy, seed promotion, atomic Cut/Delete, independent copies, selection, project generations and run/draft locks passed');
+
+env.assemblyToolDraftOwnerRef.current=null;
+const part={id:'missing-model-part',name:'Housing',model_id:'missing-model',frame:{frame_id:'part-frame',parent_frame_id:'assembly',transform:[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]}};
+env.assemblyIr={...env.assemblyIr,parts:[part]};env.selected={id:part.id,type:'component',name:part.name,assemblyPartId:part.id};env.selectedBoardInstanceId=null;
+const prior=JSON.stringify(env.assemblyIr),priorClip=env.occurrenceClipboard,priorHistory=history.length;
+bind().copyOccurrenceSelection(env.selected,null,true);assert.equal(JSON.stringify(env.assemblyIr),prior);assert.equal(env.occurrenceClipboard,priorClip);assert.equal(history.length,priorHistory);assert.match(env.status,/glTF\/GLB/);
+bind().duplicateOccurrenceSelection();assert.equal(JSON.stringify(env.assemblyIr),prior);assert.equal(history.length,priorHistory);
+env.selected={...env.selected,assemblyPartId:'gone'};bind().duplicateOccurrenceSelection();assert.equal(history.length,priorHistory);assert.match(env.status,/no longer exists/);
+console.log('App occurrence failure gates: missing visual model and stale mechanical selections cannot cut, duplicate or dirty the project');

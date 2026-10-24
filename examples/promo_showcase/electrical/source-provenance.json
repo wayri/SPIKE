@@ -1,0 +1,325 @@
+{
+  "license": "Apache-2.0 for original firstparty contents; Arduino CAD output separately CC BY-SA 4.0",
+  "copied_examples": [
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/studio/02_rc_startup.cir",
+        "sha256": "8e800542be918c7f272d8b34b6bdd96c9e4e7b668a2c888fc871a6db3a21a97f",
+        "bytes": 168
+      },
+      "source": {
+        "path": "examples/spikes/studio_tutorials/02_rc_startup.cir",
+        "sha256": "8e800542be918c7f272d8b34b6bdd96c9e4e7b668a2c888fc871a6db3a21a97f",
+        "bytes": 168
+      },
+      "license": "Apache-2.0",
+      "modified": false
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/studio/03_rl_startup.cir",
+        "sha256": "b6f62dac29bb8b369cade1e2a66966fa61e4d3204b5490a9438e2c6739f68214",
+        "bytes": 155
+      },
+      "source": {
+        "path": "examples/spikes/studio_tutorials/03_rl_startup.cir",
+        "sha256": "b6f62dac29bb8b369cade1e2a66966fa61e4d3204b5490a9438e2c6739f68214",
+        "bytes": 155
+      },
+      "license": "Apache-2.0",
+      "modified": false
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/studio/ev_current_controller.c",
+        "sha256": "890c1ce8e6bbb63436a1be788bd26c8c24acf1d13db61cdd71d9aaae00c7e092",
+        "bytes": 1542
+      },
+      "source": {
+        "path": "examples/spikes/advanced_systems/ev_current_controller.c",
+        "sha256": "890c1ce8e6bbb63436a1be788bd26c8c24acf1d13db61cdd71d9aaae00c7e092",
+        "bytes": 1542
+      },
+      "license": "Apache-2.0",
+      "modified": false
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/studio/ev_motor_plant.cir",
+        "sha256": "022453b3bd7c7b332f19735c349ff243c14657d908410b3c2353b41528ddf7cf",
+        "bytes": 328
+      },
+      "source": {
+        "path": "examples/spikes/advanced_systems/ev_motor_plant.cir",
+        "sha256": "022453b3bd7c7b332f19735c349ff243c14657d908410b3c2353b41528ddf7cf",
+        "bytes": 328
+      },
+      "license": "Apache-2.0",
+      "modified": false
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/studio/gate_miller_ringing.cir",
+        "sha256": "bf4649de3c2c83ec1d359b1d4678a83a078c57ed585e6b875cfeab7ca549a641",
+        "bytes": 295
+      },
+      "source": {
+        "path": "examples/spikes/advanced_systems/gate_miller_ringing.cir",
+        "sha256": "bf4649de3c2c83ec1d359b1d4678a83a078c57ed585e6b875cfeab7ca549a641",
+        "bytes": 295
+      },
+      "license": "Apache-2.0",
+      "modified": false
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/studio/two_wheeler_dashboard.spksch",
+        "sha256": "2743aaf17f406272ed3de62ac64a589d279abb938be0cfda8eeb8f8f04b8868a",
+        "bytes": 14685
+      },
+      "source": {
+        "path": "examples/spikes/advanced_systems/two_wheeler_dashboard.spksch",
+        "sha256": "2743aaf17f406272ed3de62ac64a589d279abb938be0cfda8eeb8f8f04b8868a",
+        "bytes": 14685
+      },
+      "license": "Apache-2.0",
+      "modified": false
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/magnetics/electromagnet-air.json",
+        "sha256": "14e2a177977d208cfc02f25242376b282e92a44d231b1e2ecb668c581467bdb2",
+        "bytes": 241
+      },
+      "source": {
+        "path": "examples/em_machines/electromagnet.json",
+        "sha256": "d12af613d5f028bee9560031e0433aa7244ff90f3fa5a0cfa3e264946f10dffd",
+        "bytes": 242
+      },
+      "license": "Apache-2.0",
+      "modified": true,
+      "change": "relative permeability set to 1 for supplied linear reluctance comparison"
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/magnetics/electromagnet.json",
+        "sha256": "d12af613d5f028bee9560031e0433aa7244ff90f3fa5a0cfa3e264946f10dffd",
+        "bytes": 242
+      },
+      "source": {
+        "path": "examples/em_machines/electromagnet.json",
+        "sha256": "d12af613d5f028bee9560031e0433aa7244ff90f3fa5a0cfa3e264946f10dffd",
+        "bytes": 242
+      },
+      "license": "Apache-2.0",
+      "modified": false,
+      "change": ""
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/magnetics/motor.json",
+        "sha256": "03e59d24285f36f568d98a048124948007303da365526a5195db34ee49ac4969",
+        "bytes": 360
+      },
+      "source": {
+        "path": "examples/em_machines/motor.json",
+        "sha256": "03e59d24285f36f568d98a048124948007303da365526a5195db34ee49ac4969",
+        "bytes": 360
+      },
+      "license": "Apache-2.0",
+      "modified": false,
+      "change": ""
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/magnetics/planar_pm_fem.json",
+        "sha256": "e051a567185739af81b8917511f7251252869222b5fb008e27c03a55876bb86b",
+        "bytes": 421
+      },
+      "source": {
+        "path": "examples/em_machines/planar_pm_fem.json",
+        "sha256": "e051a567185739af81b8917511f7251252869222b5fb008e27c03a55876bb86b",
+        "bytes": 421
+      },
+      "license": "Apache-2.0",
+      "modified": false,
+      "change": ""
+    },
+    {
+      "copied": {
+        "path": "examples/promo_showcase/electrical/magnetics/planar_solenoid_fem.json",
+        "sha256": "056fad7c627599e55150571a53410de941fe07b7a8d8ec7f265ae9ad9ef7a490",
+        "bytes": 1256
+      },
+      "source": {
+        "path": "examples/em_machines/planar_solenoid_fem.json",
+        "sha256": "056fad7c627599e55150571a53410de941fe07b7a8d8ec7f265ae9ad9ef7a490",
+        "bytes": 1256
+      },
+      "license": "Apache-2.0",
+      "modified": false,
+      "change": ""
+    }
+  ],
+  "solver_sources": [
+    {
+      "path": "python/spike_core/em_machines.py",
+      "sha256": "853267b5eadd1f44e1ebd2d712987ad3827bb868d89d46b18959f7adc2487e69",
+      "bytes": 10792
+    },
+    {
+      "path": "python/spike_core/magnetic_machine_study.py",
+      "sha256": "f06616d1812c145a9154886c88489746920ca787bea45647f7418cc73c613f49",
+      "bytes": 22689
+    },
+    {
+      "path": "python/spike_core/magnetic_fem.py",
+      "sha256": "ae92fe4e55ea0e5a1fa37369daa219c6e110589bae93ea5e20faa1b85f2c18ff",
+      "bytes": 25310
+    },
+    {
+      "path": "python/spike_core/magnetic_thermal.py",
+      "sha256": "38e48c52ab3da438cd1125f53852adca0ae96a0c6186c3a02e342b251a5b894a",
+      "bytes": 18452
+    },
+    {
+      "path": "python/spike_core/machine_geometry.py",
+      "sha256": "26599f5dad5f5b83ebba06a6a3206c8c08965e67116a7a4f2fca2174ccf52b14",
+      "bytes": 38787
+    },
+    {
+      "path": "python/spike_core/multiboard_circuit.py",
+      "sha256": "eb4b3f76f4a53b712843a606a48ba00e2737954bd779840b15f73e0238ea5db9",
+      "bytes": 17649
+    },
+    {
+      "path": "python/spike_core/multiboard_study.py",
+      "sha256": "9cf7a6875ba08e1463f275dfa4dbba961af8536047b42dab81fa8a340dfeb73d",
+      "bytes": 14136
+    },
+    {
+      "path": "scripts/build_arduino_shield_acceptance.py",
+      "sha256": "d8b616493c811d3e423d8009f7ff1184e6dc9ef3bfd999b264591355552b8c85",
+      "bytes": 23902
+    }
+  ],
+  "pack_files": [
+    {
+      "path": "examples/promo_showcase/electrical/LICENSE",
+      "sha256": "1dbace2c4de7ffdf533d0a4cb55bd93177201ead936d0f349cd14a05a84d2266",
+      "bytes": 11560
+    },
+    {
+      "path": "examples/promo_showcase/electrical/NOTICE",
+      "sha256": "2d5a1de20ee635c79ec0fb6a05d9b8827d81158c906b0d233b95a165dc6dbf0a",
+      "bytes": 580
+    },
+    {
+      "path": "examples/promo_showcase/electrical/package_arduino.py",
+      "sha256": "f1eeb67c94bfae791a9d3d6dcbb961e36acf685ed286b85eff0623d6a3f1d7cd",
+      "bytes": 3214
+    },
+    {
+      "path": "examples/promo_showcase/electrical/package_studies.py",
+      "sha256": "11f85377b28acc21a6bf6559ed98429a1414be05d5d4ad74f6010d2e7301d292",
+      "bytes": 2402
+    },
+    {
+      "path": "examples/promo_showcase/electrical/README.md",
+      "sha256": "ae60ba608040e647a4a4002c66f607a7ef227ba8808645f01a72fbf298d3195c",
+      "bytes": 6179
+    },
+    {
+      "path": "examples/promo_showcase/electrical/verify.py",
+      "sha256": "ff1aeef0b057bb2438c5457d6a6a3308fc783b2b52ea58c2ae80a28d8ef6a9a4",
+      "bytes": 3773
+    },
+    {
+      "path": "examples/promo_showcase/electrical/write_provenance.py",
+      "sha256": "e803103b8ee638f513cfaf149743f312c2feafd569d50e875f0a4f01cd7ba180",
+      "bytes": 1768
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/electromagnet-air.json",
+      "sha256": "14e2a177977d208cfc02f25242376b282e92a44d231b1e2ecb668c581467bdb2",
+      "bytes": 241
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/electromagnet-air.spike",
+      "sha256": "cbf9339ab8ecea5502cddbc19670430b07432ec26557ad2b6e064aa0f6e4bbf5",
+      "bytes": 3981
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/electromagnet.json",
+      "sha256": "d12af613d5f028bee9560031e0433aa7244ff90f3fa5a0cfa3e264946f10dffd",
+      "bytes": 242
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/electromagnet.spike",
+      "sha256": "f19e8d49064b63ec9f7a924443d31e9e194e6c72e001b23a23867fd3cb441725",
+      "bytes": 3961
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/motor.json",
+      "sha256": "03e59d24285f36f568d98a048124948007303da365526a5195db34ee49ac4969",
+      "bytes": 360
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/motor.spike",
+      "sha256": "1ee640dc991533c25bcd1b7c413cd3b7583dfa50637dd41e4ed3084744442d52",
+      "bytes": 15345
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/planar_pm_fem.json",
+      "sha256": "e051a567185739af81b8917511f7251252869222b5fb008e27c03a55876bb86b",
+      "bytes": 421
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/planar_pm_fem.spike",
+      "sha256": "edf4c91a5c38eb3f53a8848e24996ebca58e908a37a26635e3329f7cbd9b9f33",
+      "bytes": 1018134
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/planar_solenoid_fem.json",
+      "sha256": "056fad7c627599e55150571a53410de941fe07b7a8d8ec7f265ae9ad9ef7a490",
+      "bytes": 1256
+    },
+    {
+      "path": "examples/promo_showcase/electrical/magnetics/planar_solenoid_fem.spike",
+      "sha256": "107ae8eca9eddbedb9024be41cfd32ab6295c811258ba912da2025776654eab3",
+      "bytes": 3720386
+    },
+    {
+      "path": "examples/promo_showcase/electrical/studio/02_rc_startup.cir",
+      "sha256": "8e800542be918c7f272d8b34b6bdd96c9e4e7b668a2c888fc871a6db3a21a97f",
+      "bytes": 168
+    },
+    {
+      "path": "examples/promo_showcase/electrical/studio/03_rl_startup.cir",
+      "sha256": "b6f62dac29bb8b369cade1e2a66966fa61e4d3204b5490a9438e2c6739f68214",
+      "bytes": 155
+    },
+    {
+      "path": "examples/promo_showcase/electrical/studio/ev_current_controller.c",
+      "sha256": "890c1ce8e6bbb63436a1be788bd26c8c24acf1d13db61cdd71d9aaae00c7e092",
+      "bytes": 1542
+    },
+    {
+      "path": "examples/promo_showcase/electrical/studio/ev_motor_plant.cir",
+      "sha256": "022453b3bd7c7b332f19735c349ff243c14657d908410b3c2353b41528ddf7cf",
+      "bytes": 328
+    },
+    {
+      "path": "examples/promo_showcase/electrical/studio/gate_miller_ringing.cir",
+      "sha256": "bf4649de3c2c83ec1d359b1d4678a83a078c57ed585e6b875cfeab7ca549a641",
+      "bytes": 295
+    },
+    {
+      "path": "examples/promo_showcase/electrical/studio/two_wheeler_dashboard.spksch",
+      "sha256": "2743aaf17f406272ed3de62ac64a589d279abb938be0cfda8eeb8f8f04b8868a",
+      "bytes": 14685
+    }
+  ],
+  "no_ui_execution_claimed": true,
+  "no_new_physics": true
+}

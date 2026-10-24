@@ -4,6 +4,21 @@ import { scoreUniversalSearchItem } from "../src/universalSearchModel.ts";
 
 const item = (label, category, description = "", keywords = "") => ({ label, category, description, keywords });
 
+// Text can change while an action keeps its object identity (for example a live net name).
+const changing = item("Inspect copper", "View", "Original description", "layers");
+assert.equal(scoreUniversalSearchItem(changing, "inspect copper"), 1000);
+changing.label = "Inspect temperature";
+changing.keywords = "cooling";
+changing.category = "Thermal";
+changing.description = "New airflow details";
+assert.equal(scoreUniversalSearchItem(changing, "inspect copper"), 0);
+assert.equal(scoreUniversalSearchItem(changing, "inspect temperature"), 1000);
+assert.ok(scoreUniversalSearchItem(changing, "airflow cooling") > 0);
+changing.disabled = true;
+assert.equal(scoreUniversalSearchItem(changing, ""), -1, "enabled state is never cached");
+changing.disabled = false;
+assert.equal(scoreUniversalSearchItem(changing, ""), 1);
+
 assert.ok(
   scoreUniversalSearchItem(item("Layered board thermal", "Saved thermal result", "Inspect board temperatures", "heat map pcb"), "thermal pcb") > 0,
   "multiword queries should match across labels and aliases",

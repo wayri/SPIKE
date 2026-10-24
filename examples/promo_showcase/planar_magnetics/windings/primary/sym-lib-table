@@ -1,0 +1,1 @@
+(sym_lib_table (lib (name "Winding") (type "KiCad") (uri "${KIPRJMOD}/Winding.kicad_sym") (options "") (descr "Original winding equivalent symbols")))

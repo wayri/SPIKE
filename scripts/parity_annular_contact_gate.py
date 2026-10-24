@@ -98,12 +98,20 @@ def validate_receipt(receipt, root=ROOT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("output", "log", "report"): parser.add_argument("--"+name, type=Path, required=True)
+    parser.add_argument("--previous-evidence", type=Path,
+                        help="Validated earlier PI01 partial receipt; defaults to the current ledger base evidence")
     args = parser.parse_args(); paths = (args.output, args.log, args.report)
     if len({p.resolve() for p in paths}) != 3: parser.error("Outputs must differ")
     for path in paths:
         if path.exists() or not path.resolve().is_relative_to(ROOT): parser.error("Choose fresh repository outputs")
         path.parent.mkdir(parents=True, exist_ok=True)
-    validate_previous(json.loads((ROOT/PREVIOUS).read_text(encoding="utf-8")))
+    previous = args.previous_evidence
+    if previous is None:
+        ledger = json.loads((ROOT/"docs/parity-capability-backlog-v1.json").read_text(encoding="utf-8"))
+        previous = ROOT/next(s for s in ledger["stages"] if s["id"] == "PI01-S02")["evidence"]
+    previous_path = previous.resolve()
+    if not previous_path.is_relative_to(ROOT): parser.error("Previous evidence must stay in this repository")
+    validate_previous(json.loads(previous_path.read_text(encoding="utf-8")))
     before = {n: digest(ROOT/n) for n in SOURCES}
     tests = suite(); expected = names(tests); stream = io.StringIO()
     run = unittest.TextTestRunner(stream=stream, verbosity=2).run(tests)
@@ -126,7 +134,7 @@ def main():
         "sources_before": before, "sources_after": after,
         "tests": {"names": expected, "run": run.testsRun, "failures": [], "errors": [], "skipped": [],
                   "expected_failures": [], "unexpected_successes": []},
-        "previous_evidence": PREVIOUS, "previous_sha256": digest(ROOT/PREVIOUS),
+        "previous_evidence": previous_path.relative_to(ROOT).as_posix(), "previous_sha256": digest(previous_path),
         "log": args.log.resolve().relative_to(ROOT).as_posix(), "log_sha256": digest(args.log),
         "report": args.report.resolve().relative_to(ROOT).as_posix(), "report_sha256": digest(args.report)}
     args.output.write_text(json.dumps(receipt, indent=2)+"\n", encoding="utf-8")

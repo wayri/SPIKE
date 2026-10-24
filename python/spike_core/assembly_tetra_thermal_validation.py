@@ -63,24 +63,43 @@ def indices(value, size, count):
 
 def _overlap_audit(xyz, cells):
     """SAT interior test with bounded spatial hierarchy and comparison budget."""
-    points = [xyz[cell["vertices"]] for cell in cells]
-    lows, highs = np.array([p.min(0) for p in points]), np.array([p.max(0) for p in points])
-    edges = [[p[j] - p[i] for i, j in itertools.combinations(range(4), 2)] for p in points]
-    normals = [[np.cross(p[j] - p[i], p[k] - p[i])
-                for i, j, k in itertools.combinations(range(4), 3)] for p in points]
+    vertex_ids = np.asarray([cell["vertices"] for cell in cells], dtype=np.int64)
+    points = xyz[vertex_ids]
+    lows, highs = points.min(axis=1), points.max(axis=1)
+    edge_i = np.array([0, 0, 0, 1, 1, 2]); edge_j = np.array([1, 2, 3, 2, 3, 3])
+    edges = points[:, edge_j] - points[:, edge_i]
+    face_i = np.array([0, 0, 0, 1]); face_j = np.array([1, 1, 2, 2]); face_k = np.array([2, 3, 3, 3])
+    normals = np.cross(points[:, face_j] - points[:, face_i],
+                       points[:, face_k] - points[:, face_i])
     comparisons = 0
+    first, second = [], []
+
+    def audit_batch():
+        if not first:
+            return
+        i, j = np.asarray(first, dtype=np.int64), np.asarray(second, dtype=np.int64)
+        axes = np.concatenate((normals[i], normals[j],
+            np.cross(edges[i, :, None, :], edges[j, None, :, :]).reshape(-1, 36, 3)), axis=1)
+        lengths = np.linalg.norm(axes, axis=2)
+        nonzero = lengths > 0
+        normalized = axes / np.where(nonzero, lengths, 1)[:, :, None]
+        origin = points[i, 0]
+        a = np.einsum("bpk,bak->bpa", points[i] - origin[:, None, :], normalized)
+        b = np.einsum("bpk,bak->bpa", points[j] - origin[:, None, :], normalized)
+        overlap = np.minimum(a.max(axis=1), b.max(axis=1)) - np.maximum(a.min(axis=1), b.min(axis=1))
+        tolerance = 1e-11 * np.maximum((highs[i] - lows[i]).max(axis=1),
+                                      (highs[j] - lows[j]).max(axis=1))
+        separated = np.any(nonzero & (overlap <= tolerance[:, None]), axis=1)
+        require(np.all(separated), "Overlapping tetrahedral solid interiors.")
+        first.clear(); second.clear()
+
     for i, j in overlapping_pairs(lows, highs, MAX_HIERARCHY_VISITS, require):
         comparisons += 1
         require(comparisons <= MAX_COMPARISONS, "Geometry comparison budget exceeded.")
-        axes = np.concatenate((normals[i], normals[j],
-                               np.cross(np.array(edges[i])[:, None], np.array(edges[j])).reshape(-1, 3)))
-        lengths = np.linalg.norm(axes, axis=1)
-        axes = axes[lengths > 0] / lengths[lengths > 0, None]
-        # Subtract local origin before projection to avoid translation loss.
-        a, b = (points[i] - points[i][0]) @ axes.T, (points[j] - points[i][0]) @ axes.T
-        overlap = np.minimum(a.max(0), b.max(0)) - np.maximum(a.min(0), b.min(0))
-        tolerance = 1e-11 * max(np.max(highs[i] - lows[i]), np.max(highs[j] - lows[j]))
-        require(np.any(overlap <= tolerance), "Overlapping tetrahedral solid interiors.")
+        first.append(i); second.append(j)
+        if len(first) == 4096:
+            audit_batch()
+    audit_batch()
     return comparisons
 
 

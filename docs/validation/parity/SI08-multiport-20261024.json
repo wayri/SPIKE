@@ -1,0 +1,47 @@
+{
+  "contract": "spike/multiport-deembedding-evidence/v1",
+  "status": "passed",
+  "family_complete": false,
+  "production_qualified": false,
+  "sources_before": {
+    "scripts/verify_multiport_deembedding.py": "6d6d1c8b75ffc48afc96eb40d6812540283f6cab4b6d995d9793c45cbe1a5f1f",
+    "python/spike_core/sparameter_multiport_deembedding.py": "3f11b146290c1b35d0e90633a986a9b5f4f7289cff275bd271c43cf50aa51249",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "tests/python/test_sparameter_multiport_deembedding.py": "516a0f7e06f49775fe159b85430513d83728158cbd4bc16af6ce8301141c45ee",
+    "tests/python/test_multiport_deembedding_workflow.py": "1a7af7d5c1e781e8bf16d026c87b4db7274bad6d24918c9d6b1728f9f2a01e24",
+    "examples/multiport_deembedding/run_fixture.py": "3d724e2e60969889dee785b625cf95835d16371e79aec2e636284e474f0d8a13",
+    "docs/MULTIPORT_DEEMBEDDING.md": "3add3e197da537e6d9d5fc427db8036bba48479269268515822ab22f7cb031d2",
+    "docs/validation/MULTIPORT_DEEMBEDDING_ORACLES_20261024.md": "d326a12ed2d337a1242b772ab92aec1ec1aa0122d3c4a44ccce24097229b8083"
+  },
+  "sources_after": {
+    "scripts/verify_multiport_deembedding.py": "6d6d1c8b75ffc48afc96eb40d6812540283f6cab4b6d995d9793c45cbe1a5f1f",
+    "python/spike_core/sparameter_multiport_deembedding.py": "3f11b146290c1b35d0e90633a986a9b5f4f7289cff275bd271c43cf50aa51249",
+    "python/spike_core/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "tests/python/test_sparameter_multiport_deembedding.py": "516a0f7e06f49775fe159b85430513d83728158cbd4bc16af6ce8301141c45ee",
+    "tests/python/test_multiport_deembedding_workflow.py": "1a7af7d5c1e781e8bf16d026c87b4db7274bad6d24918c9d6b1728f9f2a01e24",
+    "examples/multiport_deembedding/run_fixture.py": "3d724e2e60969889dee785b625cf95835d16371e79aec2e636284e474f0d8a13",
+    "docs/MULTIPORT_DEEMBEDDING.md": "3add3e197da537e6d9d5fc427db8036bba48479269268515822ab22f7cb031d2",
+    "docs/validation/MULTIPORT_DEEMBEDDING_ORACLES_20261024.md": "d326a12ed2d337a1242b772ab92aec1ec1aa0122d3c4a44ccce24097229b8083"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_multiport_deembedding_workflow.MultiportWorkflowTests.test_demo_recovery_and_overwrite_protection",
+      "tests.python.test_multiport_deembedding_workflow.MultiportWorkflowTests.test_invalid_supplied_request_creates_no_result",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_independent_dense_internal_wave_oracle_and_shuffled_names",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_invalid_identity_mapping_grid_reference_and_finite_data",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_nonuniform_frequency_sweep_and_map_covariance",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_resource_bounds_and_cancellation_are_atomic",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_singular_recovery_and_ill_conditioned_reconnection",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_singular_weak_and_condition_product_transmissions",
+      "tests.python.test_sparameter_multiport_deembedding.MultiportDeembeddingTests.test_zero_dut_transmission_reflection_and_matched_load"
+    ],
+    "run": 9,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI08-multiport-20261024.log",
+  "log_sha256": "511afb71eae3f827b9f55c31d39b7a9d29c53bf80565147480a98506d5e3f84b"
+}

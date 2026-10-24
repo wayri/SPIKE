@@ -194,14 +194,17 @@ const pendingVisual = {
 };
 const renderPending = (visibleLayers, options = {}) => renderToStaticMarkup(React.createElement(AssemblyLayoutViewport, {
   designs: { "pending-design": pendingBoard },
-  boards: [pendingVisual],
+  boards: options.boards ?? [pendingVisual],
   harnesses: [],
   selectedBoardId: "pending-occurrence",
   linkedNets: options.linkedNets ?? {},
   visibleLayers,
   showNetNames:options.showNetNames ?? false,
+  assemblyNetNameVisibility: options.assemblyNetNameVisibility,
   layerOpacity: options.layerOpacity ?? {},
   showVias: true,
+  translucentScene: options.translucentScene,
+  boardOpacity: options.boardOpacity,
   onBoardSelect() {},
   onNetSelect() {},
 }));
@@ -210,10 +213,19 @@ assert.match(labeledMarkup,/data-net-label="1" data-occurrence-id="pending-occur
 assert.match(labeledMarkup,/>VCC<\/text>/);
 assert.doesNotMatch(renderPending({}, {showNetNames:false}),/data-net-label=/);
 assert.doesNotMatch(renderPending({"F.Cu":false}, {showNetNames:true}),/data-net-label=/,"hidden layer nets are not labeled");
+const siblingVisual = { ...pendingVisual, id: "sibling-occurrence", active: false };
+const occurrenceLabels = renderPending({}, { boards: [pendingVisual, siblingVisual], assemblyNetNameVisibility: { "pending-occurrence": true, "sibling-occurrence": false } });
+assert.match(occurrenceLabels, /data-net-label="1" data-occurrence-id="pending-occurrence"/);
+assert.doesNotMatch(occurrenceLabels, /data-net-label="1" data-occurrence-id="sibling-occurrence"/, "equal designs retain independent occurrence label visibility");
+assert.doesNotMatch(renderPending({}, { showNetNames: true, assemblyNetNameVisibility: { "pending-occurrence": false } }), /data-net-label=/, "explicit occurrence false overrides legacy true");
+assert.match(renderPending({}, { assemblyNetNameVisibility: { "pending-occurrence": true } }), /data-net-label=/, "explicit occurrence true overrides legacy false");
 const pendingMarkup = renderPending({});
 assert.match(pendingMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "pending source alignment renders retained track geometry instead of a blank outline");
 assert.match(pendingMarkup, />U1<\/text>/, "pending source alignment renders retained component art");
 assert.doesNotMatch(pendingMarkup, /<image/, "pending source alignment does not render an unaligned source image");
+const translucentSelectedMarkup = renderPending({}, { translucentScene: true, boardOpacity: .18, linkedNets: { "pending-occurrence": ["1"] } });
+assert.match(translucentSelectedMarkup, /data-assembly-board-geometry="true" opacity="0\.0576"/, "assembly translucency composes with net-focus dimming without requiring solver results");
+assert.match(translucentSelectedMarkup, /stroke="#55e5d5"/, "the occurrence-scoped selected net remains an opaque foreground overlay");
 globalThis.__assemblyTestSourceAlignments = { "pending-design": { board: pendingBoard, offset: null } };
 const unavailableMarkup = renderPending({});
 assert.match(unavailableMarkup, /<line x1="1" y1="2" x2="9" y2="2" stroke="#[0-9a-f]+"/, "failed source alignment keeps retained track geometry visible");

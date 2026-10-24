@@ -2,6 +2,8 @@
 .app-shell .workspace-header { display:grid;grid-template-rows:52px minmax(0,1fr);align-items:stretch;height:var(--ui-title-height);min-width:0;padding:0 10px;gap:0; }
 .app-shell .workspace-header-main { display:grid;grid-template-columns:auto minmax(130px,230px) minmax(260px,1fr) auto;align-items:center;gap:12px;min-width:0; }
 .workspace-header-brand { display:flex;align-items:center;gap:8px;min-width:0; }
+.workspace-header-main:has(.workspace-studies-trigger) { grid-template-columns:auto minmax(120px,230px) auto minmax(160px,1fr) auto; }
+.workspace-studies-trigger { display:inline-flex;align-items:center;gap:5px;min-width:0;white-space:nowrap; }
 .app-shell .workspace-header .workspace-project-trigger { width:100%;max-width:none;min-width:0;height:34px;flex:none;border:1px solid var(--spike-table-border);border-radius:5px; }
 .app-shell .workspace-header .workspace-project-trigger b { flex:1;text-align:left; }
 .app-shell .workspace-header .workspace-header-search { display:flex;align-items:center;gap:10px;width:100%;height:36px;min-width:0;padding:0 12px;color:var(--spike-table-muted);background:var(--spike-table-surface);border:1px solid var(--spike-table-border-strong);border-radius:6px; }
@@ -25,6 +27,8 @@
   .workspace-header-utilities>.avatar { display:none; }
   .workspace-header-search>kbd { display:none; }
   .app-shell .workspace-header .workspace-header-search>span { display:block; }
+  .app-shell .workspace-header-main:has(.workspace-studies-trigger) { grid-template-columns:auto minmax(90px,140px) auto minmax(100px,1fr) auto; }
+  .workspace-studies-trigger>span, .workspace-studies-trigger>svg:last-child { display:none; }
 }
 
 .app-shell.focus-shell .workspace-header:not(.has-workspace-shortcuts) { grid-template-rows:minmax(0,1fr); }

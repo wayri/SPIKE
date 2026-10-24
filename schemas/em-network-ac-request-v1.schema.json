@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/em-network-ac-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; matrix dimensions, sample alignment, passivity, conditioning and residual gates are enforced by the implementation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "source", "wave_convention", "boundaries"],
+  "properties": {
+    "contract": {"const": "spike/em-network-ac-request/v1"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "port_names", "reference_impedance_ohm", "frequencies_hz", "s_parameters"],
+      "properties": {
+        "id": {"$ref": "#/$defs/name"},
+        "port_names": {"type": "array", "minItems": 1, "maxItems": 16, "uniqueItems": true, "items": {"$ref": "#/$defs/name"}},
+        "reference_impedance_ohm": {"type": "number", "minimum": 0.000001, "maximum": 1000000000},
+        "frequencies_hz": {"type": "array", "minItems": 1, "maxItems": 512, "items": {"type": "number", "minimum": 0}},
+        "s_parameters": {
+          "type": "array", "minItems": 1, "maxItems": 512,
+          "items": {"type": "array", "minItems": 1, "maxItems": 16,
+            "items": {"type": "array", "minItems": 1, "maxItems": 16, "items": {"$ref": "#/$defs/complex_object"}}}
+        }
+      }
+    },
+    "wave_convention": {"const": "rms_power_waves_common_positive_real_reference"},
+    "boundaries": {
+      "type": "array", "minItems": 1, "maxItems": 512,
+      "items": {
+        "type": "object", "minProperties": 1, "maxProperties": 16,
+        "propertyNames": {"$ref": "#/$defs/name"},
+        "additionalProperties": {
+          "type": "object", "additionalProperties": false,
+          "required": ["voltage_v", "impedance_ohm"],
+          "properties": {
+            "voltage_v": {"$ref": "#/$defs/complex_pair"},
+            "impedance_ohm": {"$ref": "#/$defs/complex_pair"}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "name": {"type": "string", "minLength": 1, "maxLength": 80, "pattern": "\\S"},
+    "complex_pair": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "minimum": -1e100, "maximum": 1e100}},
+    "complex_object": {
+      "type": "object", "additionalProperties": false, "required": ["real", "imag"],
+      "properties": {"real": {"type": "number"}, "imag": {"type": "number"}}
+    }
+  }
+}

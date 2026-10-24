@@ -209,7 +209,10 @@ def run_cosimulation(request, *, adapters=None, cancelled=None, timeout_s=60.0):
     outputs = {pid: _outputs(p["initial_outputs"], p["outputs"]) for pid, p in by_id.items()}
     states = {pid: None for pid in by_id}
     participant_views = {pid: _readonly(p) for pid, p in by_id.items()}
-    result["frames"] = [{"time_s": 0.0, "outputs": deepcopy(outputs)}]
+    # ``outputs`` is freshly normalized here and on every accepted tick.  A
+    # later tick replaces the complete tree instead of mutating it, so the
+    # retained frame can own this tree directly without another full copy.
+    result["frames"] = [{"time_s": 0.0, "outputs": outputs}]
     started = time.monotonic()
 
     def check_control():
@@ -227,11 +230,21 @@ def run_cosimulation(request, *, adapters=None, cancelled=None, timeout_s=60.0):
                     return result
                 p = by_id[pid]
                 inputs = {key: outputs[drivers[(pid, key)][0]][drivers[(pid, key)][1]] for key in p["inputs"]}
+                previous_state = states[pid]
                 values, state = adapters[p["adapter"]].step(
-                    participant_views[pid], inputs, deepcopy(states[pid]), tick, tick * step_s, step_s)
+                    participant_views[pid], inputs,
+                    None if previous_state is None else deepcopy(previous_state),
+                    tick, tick * step_s, step_s)
                 staged_outputs[pid] = _outputs(values, p["outputs"])
-                bounded_digest(state)
-                staged_states[pid] = deepcopy(state)
+                # None is the exact JSON state of the built-in stateless
+                # adapters.  Hashing and copying it at every communication
+                # point cannot add validation or isolation.  Stateful custom
+                # adapters retain the bounded JSON check and commit copy.
+                if state is None:
+                    staged_states[pid] = None
+                else:
+                    bounded_digest(state)
+                    staged_states[pid] = deepcopy(state)
             control = check_control()
             if control:
                 result["status"] = control
@@ -242,7 +255,7 @@ def run_cosimulation(request, *, adapters=None, cancelled=None, timeout_s=60.0):
                                  "participant_id": pid, "message": str(exc)}]
             return result
         outputs, states = staged_outputs, staged_states
-        result["frames"].append({"time_s": tick * step_s, "outputs": deepcopy(outputs)})
+        result["frames"].append({"time_s": tick * step_s, "outputs": outputs})
         result["completed_steps"] = tick
     result["status"] = "completed"
     return result

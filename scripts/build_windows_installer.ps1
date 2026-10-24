@@ -5,7 +5,8 @@ param(
     [switch]$SkipTests,
     [switch]$SkipWorker,
     [switch]$BuildOnly,
-    [string]$ResourceConfig
+    [string]$ResourceConfig,
+    [string]$FrontendSnapshot
 )
 
 $ErrorActionPreference = "Stop"
@@ -36,6 +37,30 @@ if ([string]::IsNullOrWhiteSpace($applicationVersion)) {
 }
 $projectPython = Join-Path $root ".venv\Scripts\python.exe"
 $python = if (Test-Path -LiteralPath $projectPython) { $projectPython } else { "python" }
+$frontendBuildOutput = if ($isProduction) { Join-Path $app "dist" } else {
+    Join-Path $root ("build\frontend-builds\" + [Guid]::NewGuid().ToString("N") + "\dist")
+}
+$frontendSource = $frontendBuildOutput
+if ($FrontendSnapshot) {
+    if ($isProduction) { throw "Retained frontend snapshots are preview-only; production must use its reviewed build inputs." }
+    $frontendSource = [System.IO.Path]::GetFullPath($FrontendSnapshot)
+    $buildPrefix = [System.IO.Path]::GetFullPath((Join-Path $root "build")) + [System.IO.Path]::DirectorySeparatorChar
+    if ((Get-Item -LiteralPath (Join-Path $root "build")).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+        throw "Frontend snapshot reparse points are not allowed."
+    }
+    if (-not $frontendSource.StartsWith($buildPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath (Join-Path $frontendSource "index.html") -PathType Leaf)) {
+        throw "Retained frontend must be an existing snapshot strictly below this checkout's build directory."
+    }
+    $scan = Get-Item -LiteralPath $frontendSource
+    while ($scan.FullName.StartsWith($buildPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        if ($scan.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { throw "Frontend snapshot reparse points are not allowed." }
+        $scan = $scan.Parent
+    }
+    if (Get-ChildItem -LiteralPath $frontendSource -Recurse -Force | Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint }) {
+        throw "Frontend snapshot reparse points are not allowed."
+    }
+}
 
 function Invoke-Checked {
     param([string]$Executable, [string[]]$Arguments, [string]$WorkingDirectory)
@@ -116,7 +141,11 @@ if (-not $SkipTests) {
     Invoke-Checked $python @("scripts/check_architecture.py") $root
     Invoke-Checked $python @("-m", "unittest", "discover", "-s", "tests/python", "-p", "test_errors.py", "-v") $root
     Invoke-Checked $python @("-m", "unittest", "discover", "-s", "tests/python", "-p", "test_schema_catalog.py", "-v") $root
-    Invoke-Checked "npm.cmd" @("run", "build") $app
+    if ($isProduction) {
+        Invoke-Checked "npm.cmd" @("run", "build") $app
+    } else {
+        Invoke-Checked "npm.cmd" @("run", "build", "--", "--outDir", $frontendBuildOutput) $app
+    }
     Invoke-Checked "cargo" @("test", "--lib") (Join-Path $app "src-tauri")
 }
 if ($ResourceConfig) {
@@ -140,7 +169,7 @@ if ($isProduction) {
     $frontendSnapshotRoot = Join-Path $root ("build\frontend-snapshots\" + [Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $frontendSnapshotRoot -Force | Out-Null
     $frontendSnapshot = Join-Path $frontendSnapshotRoot "dist"
-    Copy-Item -LiteralPath (Join-Path $app "dist") -Destination $frontendSnapshot -Recurse -ErrorAction Stop
+    Copy-Item -LiteralPath $frontendSource -Destination $frontendSnapshot -Recurse -ErrorAction Stop
     if (-not (Test-Path -LiteralPath (Join-Path $frontendSnapshot "index.html"))) {
         throw "Frontend snapshot is missing index.html. Build the frontend before packaging."
     }

@@ -1,0 +1,21 @@
+{
+  "contract": "spike/propulsion-loop-study-assumptions/v1",
+  "state": "declared_request_not_executed",
+  "request_file": "real_geometry_loop_request_5us.json",
+  "motor_property_receipt": "output/promo-propulsion-pod-20261023/real_motor/geometric-R-J-candidates.json",
+  "motor_property_receipt_sha256": "3645f8aeecb405d71280f9e287f70c5c517f0629e524afa7ac54df610deb5737",
+  "physical_qualified": false,
+  "assumptions": [
+    "48V averaged inverter and fixed sampled demonstration C controller; no VESC firmware or PWM qualification.",
+    "Initial190rad/s and target200rad/s describe an already spinning restrained shaft; no startup or free flight.",
+    "Total shaft inertia0.001kgm2 and damping1e-5Nms are declared scenario inputs, not measured motor/propeller assembly properties. Magnetic-parts-only geometric inertia is retained separately.",
+    "Winding R20 candidate comes from source copper-volume interpretation,2series coils/4parallel branches. Coil end-connection copper is already included; no duplicate end-turn resistance added. Bus/Connect/leads/contacts and literal connector-short qualification remain unresolved.",
+    "Additional end-turn inductance is explicitly0H;3D end-turn leakage flux is not characterized by the planar field model.",
+    "Eleven thermal-node capacities/conductances and MOSFET R20=0.002ohm/alpha0.004K-1 remain illustrative inputs. Thermal feedback is winding/MOSFET resistance only, not resolved CHT or temperature-dependent magnetic steel/PM characterization.",
+    "Controller current demand6A is below the10A field-table envelope; this is not a hardware protection clamp. Accepted currents must remain inside the table envelope.",
+    "Requires converged retained actual-air CFD anchors covering the whole accepted speed trajectory. No extrapolation or synthetic load substitution is allowed.",
+    "Fine-grid dt5us at unchanged controller20us; compare with the 10us result using compare_geometry_timesteps.py. This is a prepared request, not executed convergence evidence.",
+    "This request has not yet executed with the actual-source field/CFD tables."
+  ],
+  "request_file_sha256": "edc4776ba478c80b1a975c3df1b23cabb6559d9eab0778d0a8494acde2877668"
+}

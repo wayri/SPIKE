@@ -1,5 +1,22 @@
 # Building SPIKE
 
+The 0.4.0-alpha.1 EMerge/AC/thermal integration is described in
+[its source/frozen-worker evidence record](validation/EMERGE_RELEASE_INTEGRATION_20261023.md).
+For an isolated verified worker build that preserves the current bundled worker:
+`python scripts/build_packaged_worker.py --candidate-root build/<new-candidate>`.
+The candidate directory must be fresh and inside build/. Normal release builds
+also execute the new co-simulation probe and retain it in the worker manifest.
+Building this candidate does not update published installers or qualify a release.
+
+To stage a separately verified worker without replacing the current bundled
+copy, `scripts/prepare_release_resources.py` accepts `--worker-root`,
+`--stage-root build/<fresh-stage>` and `--config-output build/<config>.json`.
+Custom stages must be fresh. Member integrity is checked before and after copy;
+safe nested qualification-report paths are preserved. The existing installer
+can consume that config with `-SkipWorker` because the worker has already been
+built and verified; retain its tests (do not add `-SkipTests`). This is a preview
+build workflow, not permission to bypass production signing or qualification.
+
 GitHub Actions builds the Windows x64 installer, Linux x86-64 Flatpak, and macOS
 DMGs for Apple Silicon and Intel. Each platform builds on a runner with the
 matching operating system and architecture. Linux builds use the GNOME 50

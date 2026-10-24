@@ -14,7 +14,7 @@ import numpy as np
 from scipy.sparse import bmat, coo_matrix, diags
 from scipy.sparse.linalg import LinearOperator, onenormest, splu
 
-from .cfd_tetra_mesh import admit_cfd_tetra_mesh
+from .cfd_tetra_mesh import _resolve_admission
 from .enclosure_sa_transport import _matvec
 
 CONTRACT = "spike/cfd-tetra-energy/v1"
@@ -70,12 +70,12 @@ def _temperature_lift(mesh, boundaries, anchor):
     return float(reference+np.sum((areas/np.sum(areas))*(temperatures-reference)))
 
 
-def _inputs(request, cancel_check):
+def _inputs(request, cancel_check, mesh_reuse=None):
     if not isinstance(request, dict) or set(request) != {
             "contract", "mesh", "cell_material_ids", "materials", "face_mass_flow_kg_s",
             "source_w_m3", "reference_temperature_k", "boundaries"} or request["contract"] != CONTRACT:
         raise ValueError("Invalid tetra energy contract or fields")
-    mesh = admit_cfd_tetra_mesh(request["mesh"], cancel_check=cancel_check)
+    mesh = _resolve_admission(request["mesh"], mesh_reuse, cancel_check)
     count, faces = len(mesh["cells"]), len(mesh["face_areas"])
     ids, materials = request["cell_material_ids"], request["materials"]
     if (not isinstance(ids, list) or len(ids) != count
@@ -120,8 +120,15 @@ def _inputs(request, cancel_check):
 
 def _assemble(mesh, conductivity, cp, mass, source, anchor, boundaries, mass_balance, cancel_check):
     nc, nf = len(mesh["cells"]), len(mesh["face_areas"])
-    rows, cols, values = [], [], []
-    drow, dcol, dval = [], [], []
+    # Every tetra contributes one dense 4x4 RT0 block and four signed
+    # divergence entries.  Allocate those fixed-size COO buffers once while
+    # retaining the original cell-major/i-major/j-major insertion order.
+    rows = np.empty(16*nc, dtype=np.int64)
+    cols = np.empty(16*nc, dtype=np.int64)
+    values = np.empty(16*nc)
+    drow = np.repeat(np.arange(nc, dtype=np.int64), 4)
+    dcol = np.empty(4*nc, dtype=np.int64)
+    dval = np.empty(4*nc, dtype=np.int8)
     for cell, vertices in enumerate(mesh["cells"]):
         if cancel_check and cancel_check():
             raise InterruptedError()
@@ -135,10 +142,13 @@ def _assemble(mesh, conductivity, cp, mass, source, anchor, boundaries, mass_bal
         if not np.isfinite(local_mass).all() or np.linalg.eigvalsh(local_mass)[0] <= 0.:
             raise ValueError("Invalid or unrepresentable RT0 cell mass")
         f = mesh["cell_faces"][cell]
-        for i in range(4):
-            drow.append(cell); dcol.append(int(f[i])); dval.append(int(s[i]))
-            for j in range(4):
-                rows.append(int(f[i])); cols.append(int(f[j])); values.append(local_mass[i, j])
+        divergence_slice = slice(4*cell, 4*cell+4)
+        dcol[divergence_slice] = f
+        dval[divergence_slice] = s
+        block_slice = slice(16*cell, 16*cell+16)
+        rows[block_slice] = np.repeat(f, 4)
+        cols[block_slice] = np.tile(f, 4)
+        values[block_slice] = local_mass.ravel()
     mixed = coo_matrix((values, (rows, cols)), shape=(nf, nf)).tocsr()
     divergence = coo_matrix((dval, (drow, dcol)), shape=(nc, nf)).tocsr()
     rhs_flux, robin = np.zeros(nf), np.zeros(nf)
@@ -204,7 +214,7 @@ def _assemble(mesh, conductivity, cp, mass, source, anchor, boundaries, mass_bal
     return mixed, divergence, advection, rhs_flux, load, free, fixed, prescribed, incoming_heat
 
 
-def solve_cfd_tetra_energy(request, *, cancel_check=None):
+def solve_cfd_tetra_energy(request, *, cancel_check=None, _mesh_reuse=None):
     result = {"contract": RESULT_CONTRACT, "research_only": True, "production_qualified": False,
               "scope": "steady_prescribed_coefficient_tetra_conjugate_sensible_energy"}
     started = time.monotonic()
@@ -218,7 +228,8 @@ def solve_cfd_tetra_energy(request, *, cancel_check=None):
         if cancel_check and cancel_check():
             raise InterruptedError()
         with np.errstate(all="raise"):
-            mesh, k, cp, fluid, mass, source, anchor, boundaries, mass_balance, rel_mass = _inputs(request, cancel_check)
+            mesh, k, cp, fluid, mass, source, anchor, boundaries, mass_balance, rel_mass = _inputs(
+                request, cancel_check, _mesh_reuse)
             lift = _temperature_lift(mesh, boundaries, anchor)
             m, d, h, r1, r2, free, fixed, prescribed, incoming = _assemble(
                 mesh, k, cp, mass, source, lift, boundaries, mass_balance, cancel_check)

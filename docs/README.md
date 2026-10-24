@@ -69,7 +69,9 @@ with solved temperature cells and probing.
 | Explore antenna and EM results | [EM workflow](EMI_WORKFLOW.md) · [EMerge example](VIRTUAL_EMI_EMERGE_TUTORIAL.md) |
 | Mesh a complete planar PCB with local refinement | [Focused volume meshes](PCB_FOCUSED_VOLUME_MESHING.md) |
 | Work through examples | [Tutorial atlas](CAPABILITY_TUTORIAL_ATLAS.md) · [ESP32 example](../examples/esp32/README.md) |
-| Connect a local language model | [Local LLM and MCP](LOCAL_LLM_MCP.md) |
+| Set up the Assistant; work with files, analyses, data and scripts | [Assistant user guide](ASSISTANT_USER_GUIDE.md) |
+| Inspect a work folder, summarize CSV data and stage Python drafts | [Assistant task harness](ASSISTANT_TASK_HARNESS.md) |
+| Connect an external local model/MCP host | [Local LLM and MCP](LOCAL_LLM_MCP.md) |
 | Diagnose an error | [Troubleshooting](../TROUBLESHOOTING.md) · [Error codes](ERROR_CODE_CATALOG.md) |
 | Use the command line | [CLI workflow](CLI_WORKFLOW.md) · [CLI reference](CLI.md) |
 

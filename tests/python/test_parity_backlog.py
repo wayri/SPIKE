@@ -77,7 +77,7 @@ class ParityBacklogTests(unittest.TestCase):
         self.assertTrue({'GP01', 'GP04', 'OP01', 'OP02', 'OP03', 'OP04', 'OP05',
                          'VF01', 'VF02', 'AX01', 'AX02', 'LB01', 'LB02'}.issubset(
                              result['benchmark_definitions_pending']))
-        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04', 'SI07-S05', 'SI07-S06', 'SI07-S07', 'SI07-S08', 'SI07-S09', 'SI07-S10', 'SI02-S01', 'SI02-S02', 'SI02-S03', 'SI02-S04', 'SI02-S05', 'SI02-S06', 'PI01-S01', 'SI01-S01', 'SI02-S07', 'SI02-S08', 'SI02-S09', 'SI02-S10', 'SI02-S11', 'SI02-S12', 'SI02-S13', 'PI01-S02A'])
+        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04', 'SI07-S05', 'SI07-S06', 'SI07-S07', 'SI07-S08', 'SI07-S09', 'SI07-S10', 'SI02-S01', 'SI02-S02', 'SI02-S03', 'SI02-S04', 'SI02-S05', 'SI02-S06', 'PI01-S01', 'SI01-S01', 'SI02-S07', 'SI02-S08', 'SI02-S09', 'SI02-S10', 'SI02-S11', 'SI02-S12', 'SI02-S13', 'PI01-S02A', 'SI08-S05'])
 
     def test_duplicate_missing_and_unknown_capabilities_fail(self):
         for mutation in ('duplicate', 'missing', 'unknown'):
@@ -157,7 +157,8 @@ class ParityBacklogTests(unittest.TestCase):
             with self.assertRaises(ValueError): validate_backlog(other, self.roadmap)
 
     def test_structural_done_rejects_failed_skipped_stale_or_overclaimed_receipt(self):
-        stage = {'id': 'GP07-S01', 'evidence': 'docs/validation/parity/GP07-S01.json'}
+        current = next(s for s in self.payload['stages'] if s['id'] == 'GP07-S01')
+        stage = {'id': current['id'], 'evidence': current['evidence']}
         original = json.loads((ROOT/stage['evidence']).read_text(encoding='utf-8'))
         validate_done_import_stage(stage, ROOT)
         with tempfile.TemporaryDirectory(dir=ROOT/'build/parity-test-temp') as directory:

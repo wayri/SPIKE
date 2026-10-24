@@ -6,6 +6,9 @@ export type ViewportResultField = {
   unit: string;
 };
 
+/** Stable dependency key for the only ResultVisualization state read by the dense field filters. */
+export const resultFieldLayerSelectionKey = (layers: string[] | undefined): string => JSON.stringify(layers ?? []);
+
 export const viewportResultField = (mode: string): ViewportResultField => {
   switch (mode) {
     case "voltage": return { key: "voltage_v", label: "Absolute voltage", unit: "V" };

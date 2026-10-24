@@ -19,10 +19,115 @@ MAX_VERTICES = 4*MAX_CELLS
 MAX_FACES = 4*MAX_CELLS
 MAX_CONDITION = 1e6
 _LOCAL_FACES = ((1, 2, 3), (0, 3, 2), (0, 1, 3), (0, 2, 1))
+_MAX_REUSE_DIGEST_BYTES = 32 * 1024**2
 
 
 class CfdTetraMeshError(ValueError):
     """Mesh geometry, topology, provenance or resource admission failed."""
+
+
+_REUSE_KEY = object()
+
+
+class _AdmissionReuse:
+    """Private identity-bound ticket for one in-process composed solve."""
+    __slots__ = ("raw", "admitted", "raw_digest", "key")
+
+    def __init__(self, raw, admitted, raw_digest):
+        self.raw = raw
+        self.admitted = admitted
+        self.raw_digest = raw_digest
+        self.key = _REUSE_KEY
+
+
+def _raw_mesh_encoding(raw, *, retain):
+    """Return bounded order/type-sensitive digest and optional private snapshot."""
+    nodes = 0
+
+    def string_size(value):
+        size = 2
+        for char in value:
+            code = ord(char)
+            if char in ('"', "\\") or char in "\b\f\n\r\t":
+                size += 2
+            elif code < 0x20 or code <= 0xffff:
+                size += 6 if code >= 0x7f or code < 0x20 else 1
+            else:
+                size += 12
+        return size
+
+    def visit(value, depth):
+        nonlocal nodes
+        nodes += 1
+        if nodes > 500_000 or depth > 32:
+            raise CfdTetraMeshError("Tetra mesh reuse JSON structure exceeds node/depth budget")
+        kind = type(value)
+        if kind is dict:
+            size = 2 + max(0, len(value) - 1)
+            for key, item in value.items():
+                if type(key) is not str:
+                    raise CfdTetraMeshError("Tetra mesh reuse requires string JSON object keys")
+                size += string_size(key) + 1 + visit(item, depth + 1)
+            return size
+        if kind is list:
+            return 2 + max(0, len(value) - 1) + sum(
+                visit(item, depth + 1) for item in value)
+        if value is None:
+            return 4
+        if kind is bool:
+            return 4 if value else 5
+        if kind is int:
+            return len(str(value))
+        if kind is float:
+            if not math.isfinite(value):
+                raise CfdTetraMeshError("Tetra mesh reuse source is not finite JSON")
+            return len(repr(value))
+        if kind is str:
+            return string_size(value)
+        raise CfdTetraMeshError("Tetra mesh reuse requires plain JSON containers")
+
+    try:
+        measured = visit(raw, 0)
+        if measured > _MAX_REUSE_DIGEST_BYTES:
+            raise CfdTetraMeshError("Tetra mesh reuse digest exceeds 32 MiB")
+        encoded = json.dumps(raw, sort_keys=False, allow_nan=False, separators=(",", ":"))
+        payload = encoded.encode("utf-8")
+        if len(payload) != measured or len(payload) > _MAX_REUSE_DIGEST_BYTES:
+            raise CfdTetraMeshError("Tetra mesh changed during reuse snapshot")
+        snapshot = json.loads(encoded) if retain else None
+    except (RuntimeError, UnicodeError, OverflowError, ValueError) as exc:
+        if isinstance(exc, CfdTetraMeshError):
+            raise
+        raise CfdTetraMeshError("Tetra mesh reuse source changed or is not representable") from exc
+    return hashlib.sha256(payload).hexdigest(), snapshot
+
+
+def _raw_mesh_digest(raw):
+    """Bounded order-sensitive digest for detecting mutation after admission."""
+    return _raw_mesh_encoding(raw, retain=False)[0]
+
+
+def _admit_with_reuse(raw, cancel_check=None):
+    """Admit a private pre-callback snapshot and bind its unchanged source."""
+    before, snapshot = _raw_mesh_encoding(raw, retain=True)
+    admitted = admit_cfd_tetra_mesh(snapshot, cancel_check=cancel_check)
+    if _raw_mesh_digest(raw) != before:
+        raise CfdTetraMeshError("Tetra mesh changed during admission; reuse refused")
+    return admitted, _AdmissionReuse(raw, admitted, before)
+
+
+def _resolve_admission(raw, reuse, cancel_check):
+    """Admit normally, or consume a private same-object composition ticket."""
+    if reuse is None:
+        return admit_cfd_tetra_mesh(raw, cancel_check=cancel_check)
+    if (type(reuse) is not _AdmissionReuse or reuse.key is not _REUSE_KEY
+            or reuse.raw is not raw):
+        raise CfdTetraMeshError("Invalid or stale internal tetra admission reuse")
+    if cancel_check and cancel_check():
+        raise InterruptedError("Tetra mesh admission reuse cancelled")
+    if _raw_mesh_digest(raw) != reuse.raw_digest:
+        raise CfdTetraMeshError("Tetra mesh changed after admission; stale reuse rejected")
+    return reuse.admitted
 
 
 def _require(condition, message):
@@ -65,7 +170,9 @@ def _boundary_manifold(faces):
         _require(len(seen) == len(graph), "Disconnected exterior vertex link")
 
 
-def _admit(mesh, cancel_check):
+def _admit(mesh, cancel_check, max_cells=MAX_CELLS):
+    max_vertices=4*max_cells
+    max_faces=4*max_cells
     if cancel_check and cancel_check():
         raise InterruptedError("Tetra mesh admission cancelled")
     _require(isinstance(mesh, dict) and set(mesh) == {
@@ -73,8 +180,8 @@ def _admit(mesh, cancel_check):
         "Unexpected numerical mesh fields")
     _require(mesh["contract"] == CONTRACT and mesh["units"] == "m", "Invalid mesh contract or units")
     raw, cells = mesh["vertices"], mesh["cells"]
-    _require(isinstance(raw, list) and 4 <= len(raw) <= MAX_VERTICES
-             and isinstance(cells, list) and 1 <= len(cells) <= MAX_CELLS, "Mesh resource budget exceeded")
+    _require(isinstance(raw, list) and 4 <= len(raw) <= max_vertices
+             and isinstance(cells, list) and 1 <= len(cells) <= max_cells, "Mesh resource budget exceeded")
     for point in raw:
         _require(isinstance(point, list) and len(point) == 3 and all(
             type(v) in (int, float) and math.isfinite(v) for v in point), "Nonfinite or invalid vertex")
@@ -83,15 +190,15 @@ def _admit(mesh, cancel_check):
     _require(len({tuple(sorted(c)) for c in connectivity}) == len(cells), "Duplicate tetrahedra")
     _require(set(itertools.chain.from_iterable(connectivity)) == set(range(len(raw))), "Orphan vertices")
     patches = mesh["boundary_patches"]
-    _require(isinstance(patches, dict) and 1 <= len(patches) <= MAX_FACES
+    _require(isinstance(patches, dict) and 1 <= len(patches) <= max_faces
              and all(_label(k) for k in patches), "Invalid boundary patch IDs")
     supplied, patch_keys = set(), {}
     for label, rows in patches.items():
-        _require(isinstance(rows, list) and 1 <= len(rows) <= MAX_FACES, "Invalid boundary patch")
+        _require(isinstance(rows, list) and 1 <= len(rows) <= max_faces, "Invalid boundary patch")
         patch_keys[label] = []
         for row in rows:
             key = tuple(sorted(_indices(row, len(raw), 3)))
-            _require(key not in supplied and len(supplied) < MAX_FACES, "Duplicate or excessive boundary faces")
+            _require(key not in supplied and len(supplied) < max_faces, "Duplicate or excessive boundary faces")
             supplied.add(key)
             patch_keys[label].append(key)
     vertices = np.array(raw, dtype=float)
@@ -162,7 +269,7 @@ def _admit(mesh, cancel_check):
     _boundary_manifold(exterior)
     from .cfd_tetra_intersections import screen_positive_volume_intersections
     screening = screen_positive_volume_intersections(
-        vertices, tetra, owners, cancel_check=cancel_check)
+        vertices, tetra, owners, cancel_check=cancel_check,resource_scale=(max_cells+MAX_CELLS-1)//MAX_CELLS)
     components, visited = [], set()
     for t in range(len(cells)):
         if t in visited:
@@ -191,11 +298,12 @@ def _admit(mesh, cancel_check):
             "production_qualified": False}
 
 
-def admit_cfd_tetra_mesh(mesh, *, cancel_check=None):
+def admit_cfd_tetra_mesh(mesh, *, cancel_check=None, max_cells=MAX_CELLS):
     """Return copied SI topology/geometry or raise CfdTetraMeshError; no repairs."""
+    _require(type(max_cells) is int and 1 <= max_cells <= 65536, "Invalid explicit tetra cell resource budget")
     try:
         with np.errstate(all="raise"):
-            return _admit(mesh, cancel_check)
+            return _admit(mesh, cancel_check, max_cells)
     except (ArithmeticError, TypeError, np.linalg.LinAlgError) as exc:
         raise CfdTetraMeshError("Unrepresentable or malformed tetra geometry") from exc
     except ValueError as exc:

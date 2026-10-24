@@ -7,7 +7,12 @@ import math
 from typing import Any, Mapping
 
 from .thermal import ThermalScenario
-from .thermal_network import MAX_NETWORK_NODES, MAX_TRANSIENT_STEPS, estimate_lumped_thermal_network, estimate_surface_thermal_network
+from .thermal_network import (
+    MAX_NETWORK_NODES, MAX_TRANSIENT_STEPS, _network_links,
+    admit_surface_thermal_work, estimate_lumped_thermal_network,
+    estimate_surface_thermal_network, nodes_without_thermal_sink,
+    prepare_surface_thermal_branches,
+)
 
 MAX_COMPONENT_SAMPLES = 100_000
 MAX_SURFACE_BOUNDARIES = 2048
@@ -133,6 +138,39 @@ def _admit(request: Mapping[str, Any]) -> tuple[ThermalScenario, list[dict[str, 
         components.append(component)
     surfaces = _admit_surfaces(request, {component["component_ref"] for component in components}, ambient)
     return scenario, components, surfaces
+
+
+def validate_component_thermal(request: Mapping[str, Any]) -> dict[str, Any]:
+    """Check component inputs and explicit heat paths without executing a solver.
+
+    Readiness covers this adapter's admission and topology only. It does not
+    establish convergence, temperature accuracy or production qualification.
+    """
+    issues = []
+    try:
+        if not isinstance(request, Mapping):
+            raise ValueError("Component thermal request must be an object.")
+        scenario, components, surfaces = _admit(request)
+        ids = [component["component_ref"] for component in components]
+        if surfaces:
+            branches, _, _ = prepare_surface_thermal_branches(scenario, surfaces)
+            admit_surface_thermal_work(scenario, len(ids), branches)
+            missing = [ids[i] for i in nodes_without_thermal_sink(list(range(len(ids))),
+                       [(left, right) for left, right, _, _, _ in branches])]
+        else:
+            links, link_issues = _network_links(scenario, set(ids))
+            issues.extend(link_issues)
+            missing = nodes_without_thermal_sink(ids, [(left, right) for left, right, _, _ in links])
+        for ref in missing:
+            index = ids.index(ref)
+            issues.append({"code": "THERMAL_NETWORK_AMBIENT_PATH_REQUIRED", "severity": "error",
+                           "message": f"{ref} has no explicit thermal path to a fixed sink.",
+                           "path": f"components[{index}]",
+                           "suggestion": "Provide a complete effective top/bottom path to ambient or an explicit surface boundary connected to a fixed thermal sink. Missing sides remain adiabatic."})
+    except (ValueError, TypeError, OverflowError, ZeroDivisionError) as exc:
+        issues.append({"code": "COMPONENT_THERMAL_INPUT_INVALID", "severity": "error", "message": str(exc),
+                       "suggestion": "Review the named value and its units in component thermal setup, then check again."})
+    return {"can_solve": not any(issue["severity"] == "error" for issue in issues), "issues": issues}
 
 
 def run_component_thermal(request: Mapping[str, Any]) -> dict[str, Any]:

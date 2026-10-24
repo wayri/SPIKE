@@ -42,6 +42,33 @@ def _digest(value: Mapping[str, Any]) -> str:
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
+def _plain_json_source(value: Any, *, maximum_depth: int = 128, maximum_nodes: int = 2_000_000) -> bool:
+    """Whether canonical JSON hashing preserves every parser-visible type."""
+    stack = [(value, 0)]
+    containers: set[int] = set()
+    nodes = 0
+    while stack:
+        item, depth = stack.pop()
+        nodes += 1
+        if nodes > maximum_nodes or depth > maximum_depth:
+            return False
+        if type(item) is dict:
+            identity = id(item)
+            if identity in containers or any(type(key) is not str for key in item):
+                return False
+            containers.add(identity)
+            stack.extend((child, depth + 1) for child in item.values())
+        elif type(item) is list:
+            identity = id(item)
+            if identity in containers:
+                return False
+            containers.add(identity)
+            stack.extend((child, depth + 1) for child in item)
+        elif type(item) not in {str, int, float, bool, type(None)}:
+            return False
+    return True
+
+
 def _finite(value: Any, name: str, *, positive: bool = False, nonnegative: bool = False) -> float:
     if isinstance(value, bool):
         raise MultiboardExecutionError(f"{name} must be a finite numeric value.")
@@ -135,6 +162,13 @@ def run_independent_si_batch(
     if planned_lanes > limits["maximum_total_lanes"] or planned_points > limits["maximum_total_frequency_points"]:
         raise MultiboardExecutionError("Planned SI jobs exceed aggregate multi-board resource limits before execution.")
     seen: set[str] = set()
+    # Multiple physical occurrences may intentionally reference one retained
+    # design. Reuse is limited to callback-free plain-JSON payloads: caller
+    # callbacks can mutate the raw request between jobs, while Python-only
+    # containers can have parser-visible semantics that JSON normalization
+    # would erase. Those paths retain the original per-occurrence validation.
+    parsed_designs: dict[str, SpiDeRV2] = {}
+    design_cacheability: dict[str, bool] = {}
     completed: list[Dict[str, Any]] = []
     totals = {"board_jobs": 0, "lanes": 0, "frequency_points": 0, "estimated_numeric_bytes": 0}
     for index, job in enumerate(jobs):
@@ -153,7 +187,20 @@ def run_independent_si_batch(
         if not isinstance(design, Mapping):
             raise MultiboardExecutionError(f"Board {board_id} has no retained SpiDeR v2 payload.")
         try:
-            result = run_si_protocol_test_suite(SpiDeRV2.from_dict(design), suite_request, cancel_check=cancel_check)
+            cacheable_source = cancel_check is None
+            if cacheable_source:
+                design_id = board["design_id"]
+                if design_id not in design_cacheability:
+                    design_cacheability[design_id] = _plain_json_source(design)
+                cacheable_source = design_cacheability[design_id]
+            cached_design = parsed_designs.get(board["design_id"])
+            if not cacheable_source or cached_design is None:
+                parsed_design = SpiDeRV2.from_dict(design)
+                if cacheable_source:
+                    parsed_designs[board["design_id"]] = parsed_design
+            else:
+                parsed_design = cached_design
+            result = run_si_protocol_test_suite(parsed_design, suite_request, cancel_check=cancel_check)
         except (SiProtocolTestRunnerError, ValueError, TypeError) as exc:
             raise MultiboardExecutionError(f"SI job for board {board_id} could not run: {exc}") from exc
         admission = result["resource_admission"]

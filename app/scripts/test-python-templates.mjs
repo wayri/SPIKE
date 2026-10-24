@@ -70,6 +70,10 @@ for (const id of smokeIds) {
 }
 
 const executionMethods = new Map([
+  ["prepare-emerge-cosimulation", { method: "prepare_emerge_cosimulation_source", key: "request", value: {} }],
+  ["run-em-network-ac", { method: "solve_em_network_ac", key: "request", value: {} }],
+  ["run-em-resistor-thermal", { method: "run_em_network_resistor_thermal", key: "request", value: {} }],
+  ["run-dielectric-thermomechanical", { method: "run_pdn_dielectric_thermomechanical", key: "request", value: {} }],
   ["run-cosimulation-request", { method: "run_cosimulation", key: "request", value: {} }],
   ["compare-digital-twin-request", { method: "compare_digital_twin", key: "request", value: {} }],
   ["run-dc-request", { method: "run_analysis", key: "spec", value: { mode: "dc" } }],
@@ -126,6 +130,24 @@ spike = Spike()
   assert.match(dispatched.stdout, new RegExp(`CALLED ${fixture.method}`));
 }
 const dc = PYTHON_TEMPLATES.find(template => template.id === "run-dc-request").code;
+const coSource = PYTHON_TEMPLATES.find(template => template.id === "prepare-emerge-cosimulation").code;
+const coOutput = join(requestDirectory, "complete-cosimulation-result.json");
+const coRunner = coSource.replace("REQUEST_FILE = None", `REQUEST_FILE = ${JSON.stringify(join(requestDirectory, "prepare-emerge-cosimulation.json"))}`)
+  .replace("RESULT_FILE = None", `RESULT_FILE = ${JSON.stringify(coOutput)}`);
+const coContext = `
+class Spike:
+    def call(self, method, params=None):
+        return {"contract": "spike/emerge-cosimulation-source/v1", "model_status": "unvalidated", "production_qualified": False, "source_issues": [{"severity": "warning", "message": "retained"}]}
+    def publish_result(self, result):
+        raise RuntimeError("No automatic publication")
+spike = Spike()
+`;
+let coRun = spawnSync(python, ["-c", coContext + "\n" + coRunner], { encoding: "utf8" });
+assert.equal(coRun.status, 0, coRun.stderr);
+assert.equal(JSON.parse(readFileSync(coOutput, "utf8")).source_issues[0].message, "retained");
+coRun = spawnSync(python, ["-c", coContext + "\n" + coRunner], { encoding: "utf8" });
+assert.notEqual(coRun.status, 0, "Result export must refuse an existing file");
+assert.match(coRun.stderr, /FileExistsError/);
 const conflictPath = join(requestDirectory, "conflicting-design.json");
 writeFileSync(conflictPath, JSON.stringify({ spec: { mode: "dc" }, design: { design_id: "other" } }), "utf8");
 const conflict = dc.replace("REQUEST_FILE = None", `REQUEST_FILE = ${JSON.stringify(conflictPath)}`);

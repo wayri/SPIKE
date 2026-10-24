@@ -120,3 +120,52 @@ circular hole; the inch fixture has a flash and trace. The optional installed
 runtime test loads both through `FileBasedPCB`, checks metre-scale bounds and
 the clear-hole boundary, without reading or copying upstream implementation
 source.
+
+## Source and fabrication coordinates
+
+The Source step separates portable package actions from numeric setup. **Open
+source package** restores a retained source draft; **Export source package**
+validates and downloads its original files and setup. Neither runs a solver.
+Study name is a project label. Contour resolution (0.001–1 mm) controls native
+Gerber sampling and is separate from tetrahedral mesh size.
+
+Minimum/maximum X and Y are assembly/source millimetres. Keep the original
+Gerber origin and enter increasing bounds. This rectangle declares the substrate;
+it does not extract the board edge from artwork. Review these values against the
+fabrication source before importing.
+
+## Copper and dielectric stack
+
+Order copper from F.Cu through inner layers to B.Cu. Choose one original Gerber
+file for each copper layer. Each gap below a copper layer has explicit thickness
+(mm), relative permittivity and loss tangent. These are user-supplied material
+values, not values inferred from the Gerber file. Adding or removing inner copper
+requires reviewing all adjacent dielectric gaps and port layer references.
+
+## Drill sources
+
+The Stack step can retain optional Excellon files for source provenance.
+They currently block native drill/via execution before meshing or solving;
+retention is not a claim that drill holes or plated vias have been reconstructed.
+Remove unsupported drill sources only when that omission is appropriate for the
+intended study, and record the resulting geometry limitation.
+
+## Explicit port planes
+
+Ports are manual X/Z planes at an entered Y. Set centre X, Y and plane width in
+millimetres, and select the signal layer and adjacent lower return layer. One or
+two ports are supported. Coordinates and layer bounds can be checked, but Gerber
+artwork supplies no verified terminal, pad or net identity. Inspect actual
+conductor/port contact in the prepared native mesh before solving.
+
+## Review and load
+
+Review summarises source files, copper count, drills and ports while keeping the
+draft mounted. **Load Gerber study** is the explicit import action; switching
+steps, opening Help or exporting a package does not import it. Import failure
+keeps the draft for correction. Saving the project after import retains the
+source definitions. Native mesh preparation and solving are subsequent actions.
+
+The setup uses bounded form columns, compact action buttons and section headers.
+The **Help** button beside each header opens this matching offline help section. Closing
+Help and returning through panel navigation preserves the setup draft.

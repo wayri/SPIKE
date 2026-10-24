@@ -7,7 +7,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { solverSuiteCatalog as catalog, solverSuiteGroups, filterSolverSuite, solverSuiteStatusLabels } from "../src/solverSuiteCatalog.ts";
 const root = new URL("../../", import.meta.url);
-const actions = new Set(["spice", "pi", "si", "thermal", "em", "native-cfd", "machines", "extensions", "workers", "python"]);
+const actions = new Set(["spice", "pi", "si", "si-multiport", "thermal", "em", "native-cfd", "machines", "propulsion-pod", "extensions", "workers", "python"]);
 assert.equal(new Set(catalog.map(item => item.id)).size, catalog.length, "Stable unique capability identities");
 for (const item of catalog) {
   assert.ok(solverSuiteGroups.includes(item.group), item.id);
@@ -15,14 +15,20 @@ for (const item of catalog) {
   assert.ok(item.summary.length > 25 && item.limits.length > 25, `${item.id}: scope and limits required`);
   for (const path of [item.reference, item.source]) assert.ok(existsSync(new URL(path, root)), `${item.id}: missing evidence ${path}`);
   if (item.status === "planned") assert.equal(item.action, undefined, "Unavailable capability cannot be routed for execution");
+  else if (item.sourceOnly) assert.equal(item.action, undefined, `${item.id}: source-only capability cannot imply a UI run route`);
   else assert.ok(actions.has(item.action), `${item.id}: known workspace entry route required`);
+  if (item.templateId) assert.equal(item.action, "python", `${item.id}: templates are opened through the Python workspace`);
   if (item.extensionId) {
     const directory = item.extensionId.replace("spike.", "").replaceAll("-", "_");
     const manifest = JSON.parse(readFileSync(new URL(`extensions/${directory}/spike-extension.json`, root), "utf8"));
     assert.equal(manifest.id, item.extensionId, `${item.id}: actual extension identity`);
   }
 }
-for (const id of ["circuit-adaptive", "circuit-equations", "circuit-smps", "circuit-pdk", "circuit-tcad", "pi-dielectric-ac", "pi-reduction", "thermal-pwm", "cfd-native", "cfd-su2", "si-eye", "em-magnetic"]) assert.ok(catalog.some(item => item.id === id), `Recent capability missing: ${id}`);
+for (const id of ["circuit-adaptive", "circuit-equations", "circuit-smps", "circuit-pdk", "circuit-tcad", "pi-dielectric-ac", "pi-reduction", "thermal-pwm", "cfd-native", "cfd-su2", "si-eye", "em-magnetic", "execution-propulsion-pod", "execution-propulsion-geometry", "si-multiport-deembedding", "si-pam3", "em-network-cosimulation", "em-resistor-thermal", "em-resistor-cht", "em-spice-coupling", "em-body-heating", "cfd-tetra-cht", "pi-ac-thermal-elastic", "pi-board-volume-dc"]) assert.ok(catalog.some(item => item.id === id), `Recent capability missing: ${id}`);
+assert.equal(catalog.find(item => item.id === "pi-solid-dc").sourceOnly, true);
+assert.equal(catalog.find(item => item.id === "si-multiport-deembedding").action, "si-multiport");
+assert.equal(catalog.find(item => item.id === "execution-propulsion-pod").action, "propulsion-pod");
+assert.equal(catalog.find(item => item.id === "thermal-external").action, "workers");
 assert.equal(catalog.find(item => item.id === "cfd-native").status, "experimental");
 assert.match(catalog.find(item => item.id === "cfd-native").limits, /Isothermal.*no thermal\/CAD/);
 assert.match(catalog.find(item => item.id === "circuit-tcad").limits, /no biased carrier transport/);
@@ -36,9 +42,10 @@ const bundle = await build({ entryPoints: [fileURLToPath(new URL("../src/SolverS
 const code = bundle.outputFiles[0].text.replaceAll('from "react"', `from ${JSON.stringify(new URL("../node_modules/react/index.js", import.meta.url).href)}`).replaceAll('from "react/jsx-runtime"', `from ${JSON.stringify(new URL("../node_modules/react/jsx-runtime.js", import.meta.url).href)}`);
 const { default: SolverSuitePanel } = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`);
 const html = renderToStaticMarkup(React.createElement(SolverSuitePanel, { onClose() {}, onOpenWorkflow() {}, initialView: "capabilities" }));
-for (const label of ["Runtime availability has not been probed here", "Search solver capabilities", "Filter solver domain", "Filter solver status", "Evidence reference", "Scope limit:", "Open circuit / Studio handoff", "Open Python workspace", "Unavailable"]) assert.ok(html.includes(label), `Missing user state: ${label}`);
+for (const label of ["Runtime availability has not been probed here", "Search solver capabilities", "Filter solver domain", "Filter solver status", "Evidence reference", "Scope limit:", "Open circuit / Studio handoff", "Open reviewed runner", "Source/API evidence only", "Unavailable"]) assert.ok(html.includes(label), `Missing user state: ${label}`);
 assert.equal((html.match(/class="solver-suite-card"/g) ?? []).length, catalog.length);
 assert.equal((html.match(/disabled="">Unavailable/g) ?? []).length, catalog.filter(item => item.status === "planned").length);
+assert.equal((html.match(/Source\/API evidence only/g) ?? []).length, catalog.filter(item => item.sourceOnly).length);
 assert.ok(!html.includes('href="docs/'), "References must not navigate to raw filesystem paths");
 const modelBundle = await build({ entryPoints: [fileURLToPath(new URL("../src/solverManagerModel.ts", import.meta.url))], bundle: true, write: false, format: "esm", platform: "node" });
 const manager = await import(`data:text/javascript;base64,${Buffer.from(modelBundle.outputFiles[0].text).toString("base64")}`);

@@ -68,7 +68,7 @@ def canonical_si_protocol_suite(value: Mapping[str, Any]) -> Dict[str, Any]:
     if signaling not in {"single_ended", "differential", "parallel_bus", "mixed"}:
         raise SiProtocolSuiteError("signaling is not supported.")
     encoding = value.get("encoding")
-    if encoding not in {"NRZ", "PAM4", "mixed", "user_defined"}:
+    if encoding not in {"NRZ", "PAM3", "PAM4", "mixed", "user_defined"}:
         raise SiProtocolSuiteError("encoding is not supported.")
     qualification = value.get("qualification")
     if qualification not in {"setup_only", "experimental", "validated"}:
@@ -193,6 +193,9 @@ def plan_si_protocol_analysis(suite: Mapping[str, Any], available_capabilities: 
     for analysis in canonical["analyses"]:
         missing = sorted(set(analysis["requiredCapabilities"]) - available)
         configurable = analysis["id"] == "topology"
+        if canonical["encoding"] == "PAM3" and not configurable:
+            # Declared vocabulary is not an implementation of a modulation.
+            missing = sorted(set(missing) | {"pam3_execution"})
         stages.append({
             "analysis_id": analysis["id"],
             "name": analysis["name"],

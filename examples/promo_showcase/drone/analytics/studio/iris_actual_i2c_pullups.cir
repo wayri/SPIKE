@@ -1,0 +1,12 @@
+.title IRIS actual I2C1 pullups - supplied charging scenario
+* Board-derived topology/nominal R values: Eugene109/IRIS, GPL-3.0-only.
+* https://github.com/Eugene109/IRIS/tree/999dd2eb725d550889c1ffe2c09f8de0390d081b
+* Adaptation: actual R11/R12 nets + supplied100pF busC and ideal step source.
+* Not a full IO/firmware/digital SI model; upstream EasyEDA conversion warnings remain.
+VPULLUP rail 0 PWL(0 0 1u 0 1.001u 3.3 4u 3.3)
+R11 rail I2C1_SDA 2.2k
+R12 rail I2C1_SCLK 2.2k
+CASSUMED_SDA I2C1_SDA 0 100p
+CASSUMED_SCLK I2C1_SCLK 0 100p
+.tran 1n 4u
+.end

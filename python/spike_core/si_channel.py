@@ -42,7 +42,7 @@ class SiChannelError(ValueError):
 
 _REQUEST_KEYS = {
     "contract", "channel_id", "signal_net", "victim_net", "reference_net",
-    "reference_layer", "path_id", "victim_path_id", "path_mode",
+    "reference_layer", "reference_zone_id", "path_id", "victim_path_id", "path_mode",
     "cross_section_vertical_cells", "coupled_separation_tolerance_mm",
     "coupled_skew_tolerance_mm", "reference_impedance_ohm", "frequencies_hz",
     "bit_rate_hz", "bit_count", "statistical_eye_model", "trace_limit",
@@ -60,6 +60,10 @@ def _validate_channel_request(request: Mapping[str, Any]) -> None:
     unknown = set(request) - _REQUEST_KEYS
     if unknown:
         raise SiChannelError(f"SI channel request has unknown fields: {sorted(unknown)}.")
+    if "reference_zone_id" in request:
+        zone_id = request["reference_zone_id"]
+        if not isinstance(zone_id, str) or not zone_id or zone_id != zone_id.strip() or len(zone_id) > 256:
+            raise SiChannelError("reference_zone_id must be an exact nonempty canonical ID of at most 256 characters.")
     try:
         validate_loss_model(request.get("loss_model"))
     except ValueError as exc:
@@ -191,6 +195,19 @@ def _frequency_grid(value: Any) -> np.ndarray:
     return frequencies
 
 
+def _reference_zones_for_request(design, reference_net, reference_layer, request):
+    """Select declared retained identity, never union or infer a return plane."""
+    candidates = [zone for zone in design.zones
+                  if zone.net_id == reference_net.id and reference_layer.id in zone.layer_ids]
+    if not candidates:
+        raise SiChannelError("The explicit reference net has no retained zone on the selected reference layer.")
+    zone_id = request.get("reference_zone_id")
+    selected = candidates if zone_id is None else [zone for zone in candidates if zone.id == zone_id]
+    if len(selected) != 1:
+        raise SiChannelError("The bounded SI channel requires exactly one unambiguous reference zone; select an exact matching reference_zone_id.")
+    return selected, sorted(zone.id for zone in candidates if zone.id != selected[0].id)
+
+
 def _reference_zone_covers_path(zone: Any, tracks: Sequence[Any]) -> bool:
     """Prove the projected trace footprint stays inside one simple zone.
 
@@ -249,14 +266,7 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
     if signal_layer.id == reference_layer.id or reference_layer.layer_type != "copper":
         raise SiChannelError("The reference layer must be a distinct canonical copper layer.")
 
-    reference_zones = [
-        zone for zone in design.zones
-        if zone.net_id == reference_net.id and reference_layer.id in zone.layer_ids
-    ]
-    if not reference_zones:
-        raise SiChannelError("The explicit reference net has no retained zone on the selected reference layer.")
-    if len(reference_zones) != 1:
-        raise SiChannelError("The bounded SI channel requires exactly one unambiguous reference zone.")
+    reference_zones, omitted_reference_zones = _reference_zones_for_request(design, reference_net, reference_layer, request)
     if not _reference_zone_covers_path(reference_zones[0], ordered):
         raise SiChannelError("The projected signal-trace footprint is not fully covered by the reference zone.")
 
@@ -287,7 +297,7 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
     thickness_m = float(signal_layer.thickness_mm or 0.0) * 1e-3
     signal_material = material_by_id.get(signal_layer.material_id)
     conductivity = float(signal_material.conductivity_s_per_m or 0.0) if signal_material else 0.0
-    if height_m <= 0 or width_m <= 0 or thickness_m <= 0 or conductivity <= 0:
+    if not all(isfinite(value) and value > 0 for value in (height_m, width_m, thickness_m, conductivity)):
         raise SiChannelError("Signal/reference spacing, trace width/thickness, and conductor conductivity must be positive.")
 
     length_m = sum(
@@ -310,6 +320,8 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
         "reference_layer_id": reference_layer.id,
         "track_ids": [track.id for track in ordered],
         "reference_zone_ids": [zone.id for zone in reference_zones],
+        "reference_zone_selection": "explicit" if "reference_zone_id" in request else "unique_retained_zone",
+        "omitted_reference_zone_ids": omitted_reference_zones,
         "path_id": path_id,
         "length_m": length_m,
         "width_m": width_m,
@@ -322,6 +334,15 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
         "bend_evidence": bends,
         "reference_zone_declared": True,
         "reference_zone_full_path_coverage_verified": True,
+        "material_parameters_digest": _canonical_digest({
+            "signal_material_id": signal_layer.material_id,
+            "conductivity_s_per_m": conductivity,
+            "dielectric_material_ids": [layer.material_id for layer in dielectric_layers],
+            "relative_permittivity": epsilon_r, "loss_tangent": loss_tangent,
+            "loss_tangent_known": loss_known,
+            "loss_model": validate_loss_model(request.get("loss_model")),
+        }),
+        "declared_material_scenario_context_digest": _canonical_digest(design.metadata.get("spike.si_material_scenario")),
     }
     return {
         "contract": EXTRACTION_CONTRACT,
@@ -353,6 +374,7 @@ def extract_uniform_path_rlgc(design: SpiDeRV2, request: Mapping[str, Any]) -> d
             "compliance_ready": False,
         },
         "limitations": [
+            *(["Other retained reference zones are omitted from this selected-plane approximation; no multi-zone return-current extraction is claimed."] if omitted_reference_zones else []),
             "single straight constant-width planar path only" if path_mode == "strict_uniform" else "piecewise planar constant-width path; each segment uses one shared quasi-TEM cross-section",
             "single homogeneous dielectric and one simple polygonal reference zone without holes",
             "reference-zone coverage proves only the projected trace footprint, not return-current density",

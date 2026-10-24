@@ -5,7 +5,20 @@
 .workspace-editor-tabs [role="tab"] span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .workspace-editor-tabs [aria-selected="true"] { border-color:var(--spike-control-focus);color:var(--spike-accent-text); }
 .app-shell.focus-shell .workspace.focus-workspace.has-editor-tabs { grid-template-rows:auto minmax(0,1fr);grid-template-areas:"documents documents" "viewport focus-tool"; }
-.app-shell.focus-shell .workspace.focus-workspace.has-editor-tabs.workspace-document-open { grid-template-columns:0px minmax(0,1fr); }
-.workspace-document-open > .canvas-area { visibility:hidden;pointer-events:none; }
-.workspace-document-open .focus-panel-resizer { display:none; }
+.app-shell.focus-shell .workspace.focus-workspace.has-editor-tabs.workspace-document-open:not(.focus-panel-expanded) { grid-template-columns:minmax(240px,1fr) clamp(420px,var(--focus-editor-width,640px),62vw); }
+
 .focus-tool-deck-host[data-presentation="document"] { border-left:0; }
+
+/* Setup stays beside the same live canvas; only explicit Expand replaces it. */
+.workspace-editor-tabs { display:flex;align-items:center;gap:6px; }
+.workspace-editor-tabs > [role="tablist"] { min-width:0;flex:1; }
+.workspace-editor-tabs > .panel-navigation { flex:0 0 auto; }
+@media(max-width:850px) {
+  .app-shell.focus-shell .workspace.focus-workspace.workspace-document-open:not(.focus-panel-expanded) {
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto minmax(160px,.45fr) minmax(280px,1.55fr)!important;
+    grid-template-areas:"documents" "viewport" "focus-tool"!important;
+  }
+  .app-shell.interface-clean .workspace.focus-workspace.workspace-document-open:not(.focus-panel-expanded) { grid-template-areas:"commands" "viewport" "focus-tool"!important; }
+  .workspace-document-open:not(.focus-panel-expanded) .focus-panel-resizer { display:none; }
+}

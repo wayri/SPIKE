@@ -34,7 +34,7 @@ const module = { exports: {} };
 new Function("require", "module", "exports", compiled)(name => {
   if (name === "react") return react;
   if (name === "react/jsx-runtime") return jsx;
-  if (name === "./icons") return { ChevronDown: Icon, FolderOpen: Icon, PanelLeft: Icon, Search: Icon };
+  if (name === "./icons") return { ChevronDown: Icon, FolderOpen: Icon, ListTree: Icon, PanelLeft: Icon, Search: Icon };
   if (name === "./ActionContextMenu") return { __esModule: true, default: ActionContextMenu };
   if (name === "./CommandStrip") return { __esModule: true, default: CommandStrip };
   throw new Error(`Unexpected dependency: ${name}`);
@@ -159,3 +159,22 @@ assert.match(css, /@media\(max-width:900px\)[\s\S]*workspace-header-search>kbd\s
 assert.match(css, /@media\(max-width:900px\)[\s\S]*workspace-header-search>span\s*\{\s*display:block/);
 
 console.log("Workspace header actions, menus, quick navigation, search wiring, and responsive contracts passed.");
+
+const studyCalls = [];
+const studyActions = [{ label: "Study manager", run: () => studyCalls.push("manage") }, { label: "Stop active analysis", disabled: true, run: () => studyCalls.push("stop") }];
+tree = render({ studyActions });
+let studyTrigger = find(tree, node => node.props?.className?.includes("workspace-studies-trigger"));
+assert.ok(studyTrigger, "dedicated studies control is in the top header");
+studyTrigger.props.onClick({ currentTarget: anchor });
+tree = render({ studyActions });
+let studyPopup = find(tree, node => node.type === ActionContextMenu && node.props.title === "Studies and simulations");
+assert.equal(studyPopup.props.actions, studyActions, "study actions retain owner callbacks and disabled state");
+assert.equal(find(tree, node => node.type === ActionContextMenu && node.props.title === "Project files"), null, "study and file popups are mutually exclusive");
+studyPopup.props.actions[0].run();
+assert.deepEqual(studyCalls, ["manage"]);
+studyPopup.props.onClose();
+tree = render({ studyActions });
+find(tree, node => node.props?.className?.includes("workspace-studies-trigger")).props.onKeyDown({ key: "ArrowDown", currentTarget: anchor, preventDefault() {} });
+tree = render({ studyActions });
+assert.ok(find(tree, node => node.type === ActionContextMenu && node.props.title === "Studies and simulations"), "keyboard opens studies");
+console.log("Studies toolbar entry, popup isolation, keyboard and owner actions passed.");

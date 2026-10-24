@@ -143,7 +143,62 @@ and transformation-heat effects. Neither reference establishes an implemented
 SPIKE material law. Future numerical changes still require the precise primary
 method review, independent derivation, executed evidence and human review.
 
-## Shared materials, libraries and evidence
+## Expanded magnetics requirements - 23 October 2026
+
+The owner requested silicon-scale through grid-scale magnetic devices and
+confirmed that "flasks" includes **both magnetic bottles/plasma confinement
+and physical vessels with shielding or induction heating**. SI/AMI remains the
+first delivery priority. This is authorized scope, not an enabled capability
+or a claim that one discretization covers all scales.
+
+The existing bounded starting points are [planar magnetic FEM](MAGNETIC_FEM.md),
+[machine studies](MAGNETIC_MACHINE_STUDIES.md) and
+[magnetic/thermal coupling](MAGNETIC_THERMAL.md). Planar Az results do not supply
+general 3D electric fields, end-turn leakage, hysteresis or plasma dynamics.
+
+| Workstream | Required physics and outputs | Evidence required before promotion |
+|---|---|---|
+| Winding and circuit analytics | Explicit signed turns, current return and terminal orientation; flux linkage, self/mutual and incremental inductance, coupling and termination-specific leakage; resistance and impedance matrices | Independent analytical winding cases, reciprocity and passive energy for applicable linear materials, mesh/exterior convergence and terminal power balance; distinguish biased incremental, secant and frequency-dependent quantities |
+| General coil/core fields | Conforming 3D copper, vias, contacts, gaps, shields and open exterior; planar/foil/sheet/stacked PCB windings, clamps, open/closed cores and permanent magnets | Current continuity, flux balance, gauge/topology checks, air-box or exterior-method convergence, gap/fringing and end-turn references; arbitrary contact geometry is not inferred |
+| Losses and broadband magnetics | Skin/proximity and eddy losses, lamination/foil/litz models with declared homogenization limits; temperature dependence, anisotropy, saturation, hysteresis and excess losses as separate laws | Skin-depth resolution, mesh/time/frequency convergence, positive cycle dissipation and no double-counting of empirical core loss and resolved eddy loss; calibrated material data and waveform/bias/temperature ranges |
+| Transformers and inductors | PCB/planar, shielded, open core, distribution and grid devices; voltage-driven circuits, inrush, saturation, short-circuit forces, winding capacitance and dielectric electric fields | Analytical and independently solved terminal/field cases, supplied excitation/load histories, energy and thermal balance, insulation-field references and matched measurements. Rated power alone never selects a valid model |
+| Motors, generators and actuators | Rotating/sliding interfaces, inverter/control coupling, motion/back-EMF, torque/force, losses, cooling and stress | Reciprocal electrical/mechanical work, torque-method agreement, accepted-state rollback, mesh/time/coupling convergence, applicable measured operating maps; prescribed currents are not closed-loop drive qualification |
+| Vessel shielding and induction heating | Conductive/permeable vessels and clamps, shell thickness/gaps, shielding factors, induced currents, deposited heat and thermomechanical loads | Penetration-depth and thin-shell limits, benchmark shielding/heat deposition, conservative volume mapping, temperature feedback and independent or measured correlation |
+| Magnetic bottles and plasma | Coil/vessel field topology first; charged-particle orbits and mirror diagnostics only with explicit assumptions; separate kinetic, collisional fluid or MHD closures for plasma response | Orbit invariants and time convergence before particle claims; closure/range admission, charge/energy/momentum conservation, wall/sheath and collision data, independent plasma benchmarks before confinement/stability claims |
+| Silicon and microstructures | Continuum validity, anisotropy and thin layers; micromagnetics/domain dynamics only through separately justified exchange, anisotropy and magnetization evolution models | Size/time-scale applicability, independent material and standard-problem evidence. A bulk permeability law cannot establish spin dynamics, domain switching or quantum transport |
+
+Delivery order within the magnetics track: (1) explicit winding/terminal
+analytics over verified fields; (2) conforming 3D geometry and exterior fields;
+(3) voltage-driven eddy/loss/thermal coupling; (4) motion/control coupling and
+device-scale correlation; (5) separately qualified microstructure and plasma
+models. No new numerical implementation or benchmark execution is claimed by
+this requirements clarification.
+
+Visualization must consume returned, unit-tagged E (V/m), B (T), H (A/m),
+J (A/m2), loss density (W/m3), potentials and material frames. Vector glyphs,
+seeded field lines, slices, probes and leakage maps need original mesh/time/
+frequency binding, declared interpolation and decimation, and integration
+error/termination reporting. Field lines are visualization trajectories, not
+particle trajectories or proof of confinement. Electric fields require the
+appropriate potential/continuity or Maxwell solve; they cannot be invented
+from a magnetostatic B plot.
+
+Every coupled result must retain source/mesh/material and circuit identities,
+signed power/work and storage terms, conservative transfers, converged
+temperature/motion feedback, cancellation and rollback. Native C++20 sparse
+kernels and eventual distributed ownership follow [the HPC roadmap](NATIVE_HPC_MIGRATION.md);
+cluster execution and speed are qualified separately from physical accuracy.
+
+Planning sources reviewed on 23 October 2026, not adopted implementations:
+[PPPL M3D-C1 overview, Physical Model](https://m3dc1.pppl.gov/m3dc1_overview.html)
+describes fluid/extended-MHD plasma response and constitutive closures;
+[Stanford PDML overview](https://pdml.stanford.edu/) distinguishes collisional
+fluid, rarefied kinetic and hybrid regimes. These primary overviews inform
+scope separation only. Neither is a reviewed discretization, an imported code
+dependency, nor evidence that SPIKE implements plasma dynamics. New numerical
+work still requires exact method-source review and the evidence record above.
+
+## Shared material and library integration
 
 LB01 must bind mechanical elasticity/expansion/yield/damage, temperature laws,
 conductivity, permeability/remanence/loss and semiconductor mobility/carrier

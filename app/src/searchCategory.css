@@ -1,0 +1,21 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Shared category palette. Text labels remain authoritative, including without color. */
+[data-search-category] { --search-category-color:var(--spike-table-choice); }
+[data-search-category="pi"] { --search-category-color:#f4c45b; }
+[data-search-category="si"], [data-search-category="flow"] { --search-category-color:#53d9dc; }
+[data-search-category="em"] { --search-category-color:#c995ff; }
+[data-search-category="thermal"] { --search-category-color:#ff9970; }
+[data-search-category="solver"], [data-search-category="design"] { --search-category-color:#6cdd9b; }
+[data-search-category="mesh"], [data-search-category="project"] { --search-category-color:#88baff; }
+[data-search-category="results"] { --search-category-color:#e9a6dd; }
+[data-search-category="help"], [data-search-category="settings"] { --search-category-color:#bac7d8; }
+:root[data-theme="light"] [data-search-category="pi"] { --search-category-color:#805600; }
+:root[data-theme="light"] :is([data-search-category="si"],[data-search-category="flow"]) { --search-category-color:#006b73; }
+:root[data-theme="light"] [data-search-category="em"] { --search-category-color:#7436a3; }
+:root[data-theme="light"] [data-search-category="thermal"] { --search-category-color:#a3421b; }
+:root[data-theme="light"] :is([data-search-category="solver"],[data-search-category="design"]) { --search-category-color:#246d3e; }
+:root[data-theme="light"] :is([data-search-category="mesh"],[data-search-category="project"]) { --search-category-color:#285f9d; }
+:root[data-theme="light"] [data-search-category="results"] { --search-category-color:#87396f; }
+:root[data-theme="light"] :is([data-search-category="help"],[data-search-category="settings"]) { --search-category-color:#4b5c73; }
+:root[data-theme="high-contrast"] [data-search-category] { --search-category-color:var(--spike-table-text-strong); }
+@media(forced-colors:active) { [data-search-category] { --search-category-color:CanvasText; } }

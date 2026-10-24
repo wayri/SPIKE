@@ -1,6 +1,7 @@
 import { prepareLinkedPanelClose } from "./panelWindowBridge";
 // SPDX-License-Identifier: Apache-2.0
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
+import SelectSearchLayer from "./SelectSearchLayer";
 import { createPortal } from "react-dom";
 import { ExternalLink, PanelRightClose } from "./icons";
 import { PanelPresentationContext } from "./panelPresentation";
@@ -85,6 +86,6 @@ export default function FloatingPanel({id,title,active,children,onDetached,onDoc
   };
   useEffect(()=>{if(active && child && !child.closed)child.focus();},[active,child]);
   useEffect(()=>()=>{dragCleanup.current?.();cleanup.current?.();floatingWindows.delete(id);const close=closeChild.current;closeChild.current=null;if(close)void close().catch(error=>callbacks.current.onError?.(`Could not retire floating window: ${String(error)}`));else popup.current?.close();popup.current=null;},[]);
-  const contents=<FloatingContext.Provider value={{detached:Boolean(child),detach,dock,onHeaderPointerDown,scale,setScale}}><PanelPresentationContext.Provider value={{ownerDocument:child?.document ?? (typeof document!=="undefined"?document:undefined),ownerWindow:child ?? (typeof window!=="undefined"?window:undefined),detached:Boolean(child)}}><div className="floating-panel-frame" hidden={!active && !child} style={{height:"100%"}}>{notice&&<p className="floating-panel-notice" role="alert">{notice}</p>}{children}</div></PanelPresentationContext.Provider></FloatingContext.Provider>;
+  const contents=<FloatingContext.Provider value={{detached:Boolean(child),detach,dock,onHeaderPointerDown,scale,setScale}}><PanelPresentationContext.Provider value={{ownerDocument:child?.document ?? (typeof document!=="undefined"?document:undefined),ownerWindow:child ?? (typeof window!=="undefined"?window:undefined),detached:Boolean(child)}}><div className="floating-panel-frame" hidden={!active && !child} style={{height:"100%"}}>{child && <SelectSearchLayer ownerDocument={child.document}/>} {notice&&<p className="floating-panel-notice" role="alert">{notice}</p>}{children}</div></PanelPresentationContext.Provider></FloatingContext.Provider>;
   return <div ref={slot} className="focus-floating-slot" hidden={!active || Boolean(child)} data-panel-id={id} aria-label={title}>{host?createPortal(contents,host,id):contents}</div>;
 }

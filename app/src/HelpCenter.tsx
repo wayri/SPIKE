@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowRight, BookOpen, Bookmark, Copy, Search, X } from "./ic
 import { Children, isValidElement, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { APP_VERSION } from "./appVersion";
 import { helpTopics } from "./HelpTopics";
+import HelpGuidedTours from "./HelpGuidedTours";
+import { helpGuidedFlows } from "./helpGuidedFlows";
 import HelpMarkdown, { CopyCode } from "./HelpMarkdown";
 import { helpSlug, searchHelp, type HelpTopic } from "./helpModel";
 import { usePanelPresentation } from "./panelPresentation";
@@ -11,20 +13,67 @@ import controls from "./helpControls.generated.json";
 import "./helpCenter.css";
 
 const documents = import.meta.glob([
-  "../../docs/WORKBENCH_HANDBOOK.md", "../../docs/USER_TASK_SEQUENCES.md",
+  "../../docs/SOLVER_INTEGRATION.md",
+  "../../docs/ASSEMBLY_ELECTROTHERMAL.md",
+  "../../docs/ASSEMBLY_THERMAL_TRANSIENT.md",
+  "../../docs/COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md",
+  "../../docs/EMERGE_ANTENNA_WALKTHROUGH.md",
+  "../../docs/EMERGE_COSIMULATION.md",
+  "../../docs/EM_MACHINES.md",
+  "../../docs/EXTENSION_WORKSPACE_ENGINES.md",
+  "../../docs/GEOMETRY_DERIVED_SI_CHANNEL.md",
+  "../../docs/INTERNAL_AIRFLOW.md",
+  "../../docs/MAGNETIC_MACHINE_STUDIES.md",
+  "../../docs/MULTIBOARD_VOLUME_ELECTROTHERMAL.md",
+  "../../docs/MULTIPORT_DEEMBEDDING.md",
+  "../../docs/PALACE_XYCE_WORKBENCHES.md",
+  "../../docs/PARALLEL_WORKER_MANAGER.md",
+  "../../docs/PDN_ADMITTANCE_REDUCTION.md",
+  "../../docs/PDN_DIELECTRIC_AC.md",
+  "../../docs/PDN_SCREENING.md",
+  "../../docs/PDN_SIMULTANEOUS_LOADS.md",
+  "../../docs/PI_ENGINEERING_TOOLS.md",
+  "../../docs/PI_SI_PARITY_EXECUTION.md",
+  "../../docs/PWM_VOLUME_ELECTROTHERMAL.md",
+  "../../docs/RETAINED_ASSEMBLY_EM.md",
+  "../../docs/SI_EYE_MASK_TESTING.md",
+  "../../docs/SOURCE_CURRENT_LIMITS.md",
+  "../../docs/SPIKES_ACTIVE_LIBRARY_COVERAGE.md",
+  "../../docs/SPIKES_ADAPTIVE_SWITCHING_FOUNDATION.md",
+  "../../docs/SPIKES_ASIC_TWO_APPLICATION_FLOW.md",
+  "../../docs/SPIKES_BATTERY_MODEL.md",
+  "../../docs/SPIKES_BOARD_STUDIO.md",
+  "../../docs/SPIKES_EQUATION_DEVICES.md",
+  "../../docs/SPIKES_LUMPED_PHYSICS_PARTS.md",
+  "../../docs/SPIKES_OPEN_PDK_WORKFLOW.md",
+  "../../docs/SPIKES_SMPS_STABILITY.md",
+  "../../docs/SPIKES_TCAD_EQUILIBRIUM.md",
+  "../../docs/adr/0136-explicit-geometry-propulsion-ports.md",
+  "../../docs/validation/AC_NETWORK_CHT_20261023.md",
+  "../../docs/validation/AC_THERMAL_ELASTIC_20261023.md",
+  "../../docs/validation/CFD_CHT_RELEASE_20261023.md",
+  "../../docs/validation/EM_BODY_HEATING_20261023.md",
+  "../../docs/validation/EM_SPICE_COUPLING_20261023.md",
+  "../../docs/validation/NATIVE_SU2_CFD_20261011.md",
+  "../../docs/validation/PI01_BOARD_VOLUME_20261023.md",
+  "../../docs/validation/PROPULSION_POD_COUPLING_DERIVATION_20261023.md",
+  "../../docs/validation/SI_EXECUTION_20261023.md",
+  "../../docs/validation/THERMAL_COOLING_ENVIRONMENTS_20261009.md",
+
+  "../../docs/PICTURE_WALKTHROUGHS.md", "../../docs/WORKBENCH_HANDBOOK.md", "../../docs/USER_TASK_SEQUENCES.md",
   "../../docs/HELP_FAQ.md", "../../docs/CLI.md", "../../docs/CLI_WORKFLOW.md",
   "../../docs/ERROR_CODE_CATALOG.md", "../../docs/THERMAL_USER_GUIDE.md",
   "../../docs/SI_USER_GUIDE.md", "../../docs/PI_SI_OPENEMS_TUTORIAL.md",
-  "../../docs/SIMULATION_STUDIES.md", "../../docs/LOCAL_LLM_MCP.md",
-  "../../docs/ODB_AND_HARNESS_EXTENSIONS.md", "../../docs/MCAD_EXPORT.md",
+  "../../docs/SIMULATION_STUDIES.md", "../../docs/LOCAL_LLM_MCP.md", "../../docs/INTEGRATED_ASSISTANT.md",
+  "../../docs/ODB_AND_HARNESS_EXTENSIONS.md", "../../docs/MCAD_EXPORT.md", "../../docs/MECHANICAL_VIEWPORT_TOOLS.md",
   "../../docs/RESULT_VISUALIZATION_AND_LIMITS.md", "../../docs/SOLVER_STATUS.md",
   "../../docs/EMI_WORKFLOW.md", "../../docs/THERMAL_WORKFLOW.md",
   "../../docs/SI_WORKFLOW.md", "../../docs/PI_PATH_ANALYSIS.md",
   "../../docs/EXTERNAL_ENGINE_INTEROPERABILITY.md", "../../docs/PROJECT_FORMAT.md",
-  "../../docs/PYTHON_WORKSPACE.md",
+  "../../docs/PYTHON_WORKSPACE.md", "../../docs/EMERGE_GERBER.md",
   "../../docs/SOLVER_MATHEMATICS.md", "../../docs/SOLVER_HANDBOOK.md",
   "../../docs/SOLVER_REFERENCES.md", "../../docs/MESHING_ENGINE.md",
-  "../../docs/UI_QUICKSTART.md", "../../docs/UI_NAVIGATION.md", "../../docs/ANALYSIS_GALLERY.md",
+  "../../docs/SOLVER_SETUP_FLOWS.md", "../../docs/UI_QUICKSTART.md", "../../docs/UI_NAVIGATION.md", "../../docs/LINKED_CAD_SOURCES.md", "../../docs/GUIDED_SIMULATION_RUN.md", "../../docs/PROJECT_BACKUPS.md", "../../docs/SOLDER_CONNECTIONS.md", "../../docs/ANALYSIS_GALLERY.md",
   "../../docs/FIELD_VISUALIZATION.md", "../../docs/BLENDER_RENDER_PLAN.md", "../../docs/PART_LIMITS.md",
   "../../docs/SOLVER_SUITE.md", "../../docs/SOLVER_BLOCKS.md", "../../docs/SOLVER_MANAGER.md",
   "../../docs/COMMAND_ACCESS.md", "../../docs/INTERFACE_LAYOUTS.md",
@@ -40,7 +89,7 @@ const categoryFor = (path: string) => /WORKBENCH_HANDBOOK|USER_TASK|HELP_FAQ/.te
 const controlGroups = Array.from(new Set(controls.map(control => control.file)));
 const humanName = (file: string) => file.replace(/\.tsx$/, "").replace(/([a-z])([A-Z])/g, "$1 $2");
 const errorTopic = (code: string) => `diagnostic:${code}`;
-const categories = ["All", "Start here", "Workflows & FAQ", "Controls", "CLI", "Diagnostics", "Reference library", "Evidence", "Bookmarks"];
+const categories = ["All", "Start here", "Guided walkthroughs", "Workflows & FAQ", "Controls", "CLI", "Diagnostics", "Reference library", "Evidence", "Bookmarks"];
 const screenshots = [
   { file: "marble-workspace-3d.png", title: "Marble workspace in 3D", caption: "SPIKE 0.2.12 local browser capture after source-importing the pinned Marble v1.4.4 board. The visible component bodies are procedural models; this capture did not use the native desktop worker.", source: "Local browser capture; Marble source details in THIRD_PARTY_NOTICES.md" },
   { file: "marble-layout-layers.png", title: "Marble layer inspection", caption: "SPIKE 0.2.12 local browser capture with All copper selected and the layer manager open. It documents the imported 2D board and controls, not an analysis result.", source: "Local browser capture; Marble source details in THIRD_PARTY_NOTICES.md" },
@@ -66,8 +115,10 @@ function Checklist() {
 }
 function makeTopics(): HelpTopic[] {
   return [
-    { id: "home", title: "Welcome to SPIKE Help", category: "Start here", keywords: "guide getting started workflow handbook FAQ checklist", body: <><p className="help-lead">Find a workflow. Understand a control. Resolve a failure.</p><p>This offline guide combines illustrated walkthroughs, a workbench handbook, the SPIKE CLI reference, and the diagnostic catalog. Search article text, button labels, flags or complete codes.</p><div className="help-stats"><span><b>{controlGroups.length}</b> interface components</span><span><b>{controls.length}</b> control locations</span><span><b>{reference.commands.length}</b> command pages</span><span><b>{reference.errors.length}</b> diagnostics</span></div><p>Start with the <a href="#help/picture-guide" data-help-topic="picture-guide">picture walkthrough</a>, <a href="#help/feature-coverage" data-help-topic="feature-coverage">feature coverage map</a>, Workbench handbook or Quick start. Workflows & FAQ explains the sequence; Controls lists the interface reference; Reference library includes engineering and capability boundaries.</p><Checklist /><h2>Evidence and coverage</h2><p>Historical screenshots retain their original scope. Some show setup before an analysis was run. The Current UI quick start and Analysis gallery include current browser captures and reproducible computed example plots across eight analysis areas. These are distinct from native desktop result captures and physical validation. Dynamic control labels are identified in the inventory; the catalog does not claim every runtime state has been exercised.</p></> },
-    ...helpTopics().filter(topic => topic.id !== "error-codes").map(topic => ({ ...topic, category: topic.id === "feature-coverage" || topic.id === "recorded-pic-dc" ? "Evidence" : "Start here" })),
+    { id: "home", title: "Learn SPIKE by doing", category: "Start here", keywords: "guide getting started workflow pictures numbered walkthroughs help", body: <><HelpGuidedTours /><p>For PI, SI, Thermal and EM, follow the <a href="#help/doc:docs/PICTURE_WALKTHROUGHS.md" data-help-topic="doc:docs/PICTURE_WALKTHROUGHS.md">illustrated solver sequences</a>. Use the reference library for formats, assumptions and execution limits.</p></> },
+    { id: "analysis-checklist", title: "Analysis readiness checklist", category: "Start here", keywords: "preflight mesh inputs convergence evidence save review", body: <Checklist /> },
+    ...helpGuidedFlows.map(flow => ({ id: `guide:${flow.id}`, title: flow.title, category: "Guided walkthroughs", keywords: [flow.summary, flow.outcome, ...flow.prerequisites, ...flow.steps.flatMap(step => [step.title, step.action, step.expected, step.recovery])].join(" "), body: <HelpGuidedTours initialFlow={flow.id} /> })),
+    ...helpTopics().filter(topic => topic.id !== "error-codes").map(topic => ({ ...topic, category: topic.id === "feature-coverage" || topic.id === "recorded-pic-dc" || topic.id === "picture-guide" ? "Evidence" : "Start here" })),
     ...Object.entries({ ...documents, ...rootDocuments }).map(([path, markdown]) => ({ id: `doc:${path.replace(/^\.\.\/\.\.\//, "")}`, source: path.replace(/^\.\.\/\.\.\//, ""), title: markdown.match(/^#\s+(.+)$/m)?.[1] ?? path.split("/").pop()!, keywords: path, markdown, category: categoryFor(path) })),
     ...controlGroups.map(file => ({ id: `controls:${file}`, title: `${humanName(file)} controls`, keywords: controls.filter(item => item.file === file).map(item => `${item.label} ${item.description} ${item.section} ${item.options.join(" ")}`).join(" "), category: "Controls", body: <ControlReference key={file} file={file} /> })),
     ...reference.commands.map(command => ({ id: `cli:${command.command}`, title: command.command, keywords: `${command.summary} ${command.usage}`, category: "CLI", body: <><p>{command.summary}</p><p>Generated from the SPIKE command parser. Use <code>.\spike.cmd</code> in a Windows checkout in place of the executable name. This page does not execute commands.</p><CopyCode text={command.usage} /><h2>Interpreting completion</h2><p>SPIKE: 0 = success; 1 = usage/input error; 2 = analysis failure; 3 = validation failure; 4 = warning gate. Check output status and command-specific gate policy as well.</p></> })),
@@ -76,13 +127,14 @@ function makeTopics(): HelpTopic[] {
   ];
 }
 
-export default function HelpCenter({ onClose, diagnosticCode, context }: { onClose: () => void; diagnosticCode?: string; context?: string }) {
+export default function HelpCenter({ onClose, diagnosticCode, context, initialTopic, initialAnchor, navigationRequest }: { onClose: () => void; diagnosticCode?: string; context?: string; initialTopic?: string; initialAnchor?: string; navigationRequest?: number }) {
   const { ownerDocument, ownerWindow } = usePanelPresentation();
   const topics = useMemo(makeTopics, []);
   const initial = diagnosticCode && topics.some(topic => topic.id === errorTopic(diagnosticCode)) ? errorTopic(diagnosticCode) : "home";
   const [history, setHistory] = useState([initial]), [position, setPosition] = useState(0);
   const [query, setQuery] = useState(diagnosticCode && initial === "home" ? diagnosticCode : ""), [category, setCategory] = useState("All");
   const [bookmarks, setBookmarks] = useState(() => readSaved("spike.help.bookmarks"));
+  const [browseOpen, setBrowseOpen] = useState(false);
   const [limit, setLimit] = useState(80), [notice, setNotice] = useState("");
   const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
   const [toc, setToc] = useState<{ id: string; label: string }[]>([]);
@@ -93,6 +145,7 @@ export default function HelpCenter({ onClose, diagnosticCode, context }: { onClo
   function scrollToAnchor(anchor: string) { const heading = Array.from(article.current?.querySelectorAll<HTMLElement>("[id]") ?? []).find(element => element.id === anchor); if (heading) heading.scrollIntoView({ block: "start" }); else article.current?.scrollTo({ top: 0 }); }
   function navigate(id: string, anchor = "") {
     if (!topics.some(topic => topic.id === id)) { setNotice("That help article is not included in this build."); return; }
+    setBrowseOpen(false);
     pendingAnchor.current = anchor; if (id === active) { scrollToAnchor(anchor); return; }
     setHistory(previous => [...previous.slice(0, position + 1), id]); setPosition(position + 1); setNotice("");
   }
@@ -104,12 +157,20 @@ export default function HelpCenter({ onClose, diagnosticCode, context }: { onClo
   }, [diagnosticCode, topics]);
   useEffect(() => { setLimit(80); }, [query, category]);
   useEffect(() => {
-    const headings = Array.from(article.current?.querySelectorAll<HTMLElement>("h2, h3") ?? []);
+    const headings = Array.from(article.current?.querySelectorAll<HTMLElement>("h2, h3") ?? []).filter(heading => !heading.closest(".help-guided-tours"));
     headings.forEach((heading, index) => { if (!heading.id) heading.id = `${helpSlug(heading.textContent ?? "section")}-${index}`; });
     setToc(headings.map(heading => ({ id: heading.id, label: heading.textContent ?? "" })));
     scrollToAnchor(pendingAnchor.current); pendingAnchor.current = "";
     article.current?.focus({ preventScroll: true });
   }, [active]);
+  useEffect(() => {
+    if (!initialTopic || diagnosticCode) return;
+    setQuery(""); setCategory("All");
+    navigate(initialTopic, initialAnchor ?? "");
+    // Only explicit requests navigate; browsing help must preserve its history.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTopic, initialAnchor, navigationRequest, diagnosticCode]);
+
   useEffect(() => { const previous = ownerDocument?.activeElement as HTMLElement | null; search.current?.focus(); return () => { if (previous?.isConnected) previous.focus(); }; }, [ownerDocument]);
   useEffect(() => {
     const doc = ownerDocument, view = ownerWindow; if (!doc || !view) return;
@@ -135,14 +196,15 @@ export default function HelpCenter({ onClose, diagnosticCode, context }: { onClo
     view.addEventListener("keydown", key, true); return () => view.removeEventListener("keydown", key, true);
   }, [ownerDocument, ownerWindow, onClose, lightbox]);
   const hasTopic = (id: string) => topics.some(topic => topic.id === id);
-  const setSearch = (value: string) => { if (value.startsWith("help:")) { const [id, anchor = ""] = value.slice(5).split("#"); if (hasTopic(id)) { navigate(id, anchor); setQuery(""); return; } } setQuery(value); };
-  return <div className="modal-shade help-shade" role="dialog" aria-modal="true" aria-label="SPIKE help and user guide"><section ref={modal} className="help-center help-browser">
+  const setSearch = (value: string) => { if (value.startsWith("help:")) { const [id, anchor = ""] = value.slice(5).split("#"); if (hasTopic(id)) { navigate(id, anchor); setQuery(""); return; } } setQuery(value); setBrowseOpen(true); };
+  return <div className="modal-shade help-shade" role="dialog" aria-modal="true" aria-label="SPIKE help and user guide"><section ref={modal} className={`help-center help-browser${browseOpen ? " help-browse-open" : ""}`}>
     <header><div><BookOpen size={22} /><span><b>SPIKE Help</b><small>Offline guide · v{APP_VERSION}{context ? ` · ${context} workspace` : ""}</small></span></div><div className="help-header-actions"><button onClick={() => navigate("doc:docs/WORKBENCH_HANDBOOK.md")}>Workbench handbook</button><button className="canvas-icon" aria-label="Close help" onClick={onClose}><X size={18} /></button></div></header>
-    <div className="help-layout"><aside className="help-sidebar"><label className="help-search"><Search size={17} /><input ref={search} aria-label="Search all help" value={query} onChange={event => setSearch(event.target.value)} placeholder="Search topics, buttons, errors…" /></label><select aria-label="Help category" value={category} onChange={event => setCategory(event.target.value)}>{categories.map(name => <option key={name}>{name}</option>)}</select><div className="help-result-count" role="status">{filtered.length} articles{query ? ` matching “${query}”` : ""}</div><nav aria-label="Help articles">{filtered.slice(0, limit).map(topic => <button key={topic.id} aria-current={active === topic.id ? "page" : undefined} className={active === topic.id ? "active" : ""} onClick={() => navigate(topic.id)}><small>{topic.category}</small><span>{topic.title}</span>{query && <em>{topic.text.slice(Math.max(0, topic.text.toLowerCase().indexOf(query.toLowerCase()) - 35), Math.max(0, topic.text.toLowerCase().indexOf(query.toLowerCase()) - 35) + 145)}</em>}</button>)}{!filtered.length && <p className="help-empty">No matching articles. Try fewer words or select All. Unknown codes require their original diagnostic record.</p>}{filtered.length > limit && <button onClick={() => setLimit(limit + 80)}>Show more articles ({filtered.length - limit} remaining)</button>}</nav></aside>
+    <div className="help-layout"><aside className="help-sidebar"><label className="help-search"><Search size={17} /><input ref={search} aria-label="Search all help" value={query} onChange={event => setSearch(event.target.value)} placeholder="Search topics, buttons, errors…" /></label><select aria-label="Help category" value={category} onChange={event => { setCategory(event.target.value); setBrowseOpen(true); }}>{categories.map(name => <option key={name}>{name}</option>)}</select><div className="help-result-count" role="status"><button type="button" className="help-browse-toggle" aria-expanded={browseOpen} onClick={() => setBrowseOpen(!browseOpen)}>{browseOpen ? "Hide articles" : "Browse articles"}</button>{filtered.length} articles{query ? ` matching “${query}”` : ""}</div><nav aria-label="Help articles">{filtered.slice(0, limit).map(topic => <button key={topic.id} aria-current={active === topic.id ? "page" : undefined} className={active === topic.id ? "active" : ""} onClick={() => navigate(topic.id)}><small>{topic.category}</small><span>{topic.title}</span>{query && <em>{topic.text.slice(Math.max(0, topic.text.toLowerCase().indexOf(query.toLowerCase()) - 35), Math.max(0, topic.text.toLowerCase().indexOf(query.toLowerCase()) - 35) + 145)}</em>}</button>)}{!filtered.length && <p className="help-empty">No matching articles. Try fewer words or select All. Unknown codes require their original diagnostic record.</p>}{filtered.length > limit && <button onClick={() => setLimit(limit + 80)}>Show more articles ({filtered.length - limit} remaining)</button>}</nav></aside>
     <div className="help-reading"><div className="help-toolbar"><button aria-label="Back in help" disabled={position === 0} onClick={() => setPosition(position - 1)}><ArrowLeft size={16} /></button><button aria-label="Forward in help" disabled={position === history.length - 1} onClick={() => setPosition(position + 1)}><ArrowRight size={16} /></button><button onClick={() => navigate("home")}>Home</button><span>{current.category}</span><button aria-label={bookmarks.includes(active) ? "Remove bookmark" : "Bookmark article"} aria-pressed={bookmarks.includes(active)} onClick={() => { const next = bookmarks.includes(active) ? bookmarks.filter(id => id !== active) : [...bookmarks, active]; setBookmarks(next); saveLocal("spike.help.bookmarks", next); }}><Bookmark size={16} fill={bookmarks.includes(active) ? "currentColor" : "none"} /></button><button onClick={() => void navigator.clipboard.writeText(`help:${active}`).then(() => setNotice("Help link copied. Paste it into help search to open this article."), () => setNotice(`Copy this help address: help:${active}`))}><Copy size={14} /> Link</button><button onClick={() => ownerWindow?.print()}>Print</button></div>
     {notice && <div className="help-notice" role="status">{notice}</div>}
-    <article key={active} ref={article} tabIndex={-1} onClick={event => { const target = event.target as Element | null; const element = target?.nodeType === 1 ? target : null; const link = element?.closest<HTMLAnchorElement>("a[data-help-topic]"); if (link?.dataset.helpTopic) { event.preventDefault(); navigate(link.dataset.helpTopic); return; } const image = element?.tagName === "IMG" ? element as HTMLImageElement : element?.closest("[data-help-image]")?.querySelector<HTMLImageElement>("img"); if (image) { event.preventDefault(); setLightbox({ src: image.src, alt: image.alt }); } }}><div className="help-eyebrow">SPIKE / {current.category}</div><h1>{current.title}</h1>{toc.length > 2 && <details className="help-toc"><summary>On this page · {toc.length} sections</summary>{toc.map(item => <button key={item.id} onClick={() => scrollToAnchor(item.id)}>{item.label}</button>)}</details>}{current.markdown ? <HelpMarkdown text={current.markdown} source={current.source ?? ""} navigate={navigate} hasTopic={hasTopic} /> : current.body}<div className="help-related"><h2>Continue learning</h2><button onClick={() => navigate("doc:docs/WORKBENCH_HANDBOOK.md")}>Workbench handbook</button><button onClick={() => navigate("doc:docs/HELP_FAQ.md")}>FAQ & recovery</button><button onClick={() => { setCategory("Controls"); setQuery(""); }}>Browse controls</button><button onClick={() => navigate("picture-guide")}>Picture walkthrough</button><button onClick={() => navigate("feature-coverage")}>Feature coverage & gaps</button><button onClick={() => navigate("evidence")}>Screenshots & results</button></div></article></div></div>
+    <article key={active} ref={article} tabIndex={-1} onClick={event => { const target = event.target as Element | null; const element = target?.nodeType === 1 ? target : null; const task = element?.closest<HTMLButtonElement>(".help-guide-task"); if (task?.dataset.helpTopic) { navigate(task.dataset.helpTopic); return; } const link = element?.closest<HTMLAnchorElement>("a[data-help-topic]"); if (link?.dataset.helpTopic) { event.preventDefault(); navigate(link.dataset.helpTopic, link.dataset.helpAnchor); return; } const image = element?.tagName === "IMG" ? element as HTMLImageElement : element?.closest("[data-help-image]")?.querySelector<HTMLImageElement>("img"); if (image) { event.preventDefault(); setLightbox({ src: image.src, alt: image.alt }); } }}><div className="help-eyebrow">SPIKE / {current.category}</div><h1>{current.title}</h1>{toc.length > 2 && <details className="help-toc"><summary>On this page · {toc.length} sections</summary>{toc.map(item => <button key={item.id} onClick={() => scrollToAnchor(item.id)}>{item.label}</button>)}</details>}{current.markdown ? <HelpMarkdown text={current.markdown} source={current.source ?? ""} navigate={navigate} hasTopic={hasTopic} /> : current.body}<div className="help-related"><h2>Continue learning</h2><button onClick={() => navigate("doc:docs/WORKBENCH_HANDBOOK.md")}>Workbench handbook</button><button onClick={() => navigate("doc:docs/HELP_FAQ.md")}>FAQ & recovery</button><button onClick={() => { setCategory("Controls"); setQuery(""); }}>Browse controls</button><button onClick={() => navigate("home")}>Guided tasks</button><button onClick={() => navigate("feature-coverage")}>Feature coverage & gaps</button><button onClick={() => navigate("evidence")}>Screenshots & results</button></div></article></div></div>
     <footer><span>Offline reference · Result validity and runtime diagnostics take precedence.</span><small>Ctrl+F search · Esc close</small></footer>
     {lightbox && <div className="help-lightbox" role="dialog" aria-label="Enlarged screenshot" aria-modal="true"><button autoFocus onClick={() => setLightbox(null)}><X size={18} /> Close image</button><img src={lightbox.src} alt={lightbox.alt} /><p>{lightbox.alt}</p></div>}
   </section></div>;
 }
+

@@ -1,5 +1,153 @@
 # Subsystem Index
 
+`sparameter_multiport_deembedding.py` owns experimental offline removal of an
+explicit coupled 2N-port fixture with named exterior/DUT partitions. It reuses
+strict sampled-network admission from `sparameter_sampling.py`.
+`scripts/verify_multiport_deembedding.py` retains original offline independent
+wave-system and example-persistence evidence. See [method and workflow](MULTIPORT_DEEMBEDDING.md)
+and [full SI08 closure campaign](SI08_FAMILY_CLOSURE.md).
+
+Subsequent worker/schema ownership is `service_sparameter_processing.py` and
+the two `multiport-deembedding-*` schemas. `MultiportFixturePanel.tsx` owns the
+desktop capture workflow, `multiportFixtureModel.ts` presentation-only admission,
+and `scripts/verify_multiport_integration.py` bounded headless evidence.
+`scripts/parity_multiport_native_gate.py` validates trusted native observations,
+artifact identity and the independent matched-path oracle for completed
+[SI08-S05](validation/SI08_MULTIPORT_INTEGRATION_20261024.md). Full SI08 remains open.
+
+Guided simulation presentation is owned by `app/src/GuidedSimulationRun.tsx`
+and `guidedSimulationModel.ts`; `useGuidedRunAdapter.ts` connects live editor
+adapters to the common Run/Tutor entry points. `App.tsx` composes native target
+adapters and the reserved dock; individual panels retain setup and run authority.
+`ExtensionWorkspacePanel.tsx` checks declared route/scalar prerequisites while
+retaining the extension's final runtime/numerical admission. See
+[guided run flow and boundaries](GUIDED_SIMULATION_RUN.md).
+
+Scalable DC reference: `dc_board_partition.py` owns component/interface-local
+arrangements and retained contact identities; `dc_tetra_sparse.py` owns Gram
+assembly and factor-reused trace execution under the explicitly named profile.
+`scripts/benchmark_board_volume_scaling.py` owns isolated supervised attempts;
+`scripts/verify_board_volume_refinement.py` owns source-bound saved-field and
+refinement-stability replay; `scripts/parity_board_scaling_gate.py` owns the
+supplemental receipt. The shared solid validator batches the existing SAT
+predicate without changing admission limits. See [executed scope and remaining
+board gates](validation/PI01_SCALABLE_20261024.md).
+
+`numerical_runtime.py` owns pre-import numerical child budgets; source/frozen
+entrypoints and the thin desktop launcher apply them before numerical imports.
+The local parallel pool preserves explicit per-job budgets.
+`process_memory_observation.py` observes OS memory without solver control;
+`scripts/benchmark_solver_runtime_memory.py` records fresh-child AC/CHT
+accuracy, speed and memory. See [policy](WORKER_NUMERICAL_RUNTIME.md),
+[ADR 0137](adr/0137-separate-worker-numerical-thread-budget.md) and
+[executed observations](validation/SOLVER_RUNTIME_MEMORY_20261024.md).
+
+Experimental board-volume DC ownership: `dc_board_filled.py` preserves native
+retraced filled copper; `dc_board_source.py` authenticates pad/via geometry and
+maps explicit full-pad electrodes/barrel gaps; `dc_board_volume.py` owns conforming
+declared-volume compilation. `dc_tetra_rt0_input.py`, `dc_tetra_rt0.py`,
+`dc_tetra_density.py` and `dc_tetra_rt0_evidence.py` own admission, conservative
+fields, physical-volume ranks and independent retained validation respectively.
+`dc_board_study.py` composes offline model/source runs; the supplemental gate is
+`scripts/parity_board_volume_gate.py`, the CLI example is
+`examples/dc_board_volume/`, and current board attempts use
+`scripts/benchmark_board_volume_dc.py`. See [verified scope and blockers](validation/PI01_BOARD_VOLUME_20261023.md).
+
+Assistant task harness: `app/src/assistantTaskHarness.ts` owns main-window folder
+authority and unsaved script staging; `python/spike_core/assistant_harness.py`
+owns bounded read-only file/CSV evidence, reached through `service_assistant.py`.
+See [workflow](ASSISTANT_TASK_HARNESS.md) and
+[boundary decision](adr/0132-assistant-work-folder-task-harness.md).
+
+The source-only experimental controller/FEM/hover-propeller benchmark belongs
+to `propulsion_pod.py`, `propulsion_pod_field.py`, `propulsion_pod_propeller.py`
+and `propulsion_pod_controller.py`; `service_propulsion_pod.py` owns its separate
+worker contracts. See [ADR 0131](adr/0131-reciprocal-field-controller-hover-pod.md)
+and the [independent exchange derivation](validation/PROPULSION_POD_COUPLING_DERIVATION_20261023.md).
+It does not expand the legacy prescribed-current machine or rotor-CFD claims.
+
+The three-phase extension uses `propulsion_pod_three_phase_run.py` (public
+orchestration), `propulsion_pod_three_phase.py` (floating-neutral electrothermal
+step), `propulsion_pod_three_phase_field.py`, `propulsion_pod_three_phase_controller.py`
+and `propulsion_pod_thermal.py`. The same service owns its separate three-phase
+routes. `propulsion_pod_vesc_binding.py` proves source-board topology only.
+`propulsion_pod_rotor_cfd.py` and its geometry helper are a separate low-Re
+blade-resolved prerequisite with unresolved load convergence; they are not an
+admitted full-speed air-propeller load. See the linked numerical evidence policy.
+
+`propulsion_pod_transport_contractions.py` owns bounded algebraic volume
+contractions used by the experimental inertial CFD snapshot;
+`propulsion_pod_jacobian_schur.py` owns an optional current-Jacobian block
+preconditioner candidate, not a default solver.
+`propulsion_pod_inertial_cfd_current.py` adapts its explicit stronger option
+to field-restarted research cases without constructing unused seed factors.
+`propulsion_pod_cfd_refinement.py` owns centroid subdivision, guarded exact
+boundary-edge-star refinement and P2/P1 initial-guess transfer, not a converged
+refinement study. `propulsion_pod_modal_gap.py` owns the O(N) exact annular
+energy/action used by `propulsion_pod_nonlinear_motor.py`'s explicit bounded
+high-mode option; its dense reference factor and real material/performance
+admission remain separate. See their method
+records and admission limits in [numerical evidence](NUMERICAL_METHOD_EVIDENCE.md).
+
+The separate real-source geometry-port workstream uses
+`propulsion_pod_geometry_run.py` and `service_propulsion_pod_geometry.py` for
+bounded inline table execution with fixed compiled C;
+`propulsion_pod_geometry_loop.py` composes conservative magnetic/load ports and
+thermal resistance feedback. `geometryPodStudy.ts`, `GeometryPodCapture.tsx`
+and `GeometryPodFields.tsx` admit/replay saved states separately from the
+synthetic benchmark. See [ADR0136](adr/0136-explicit-geometry-propulsion-ports.md)
+and the [headless workflow](../examples/promo_showcase/propulsion_pod/coupled/REAL_GEOMETRY_LOOP.md).
+Source-specific motor/CFD convergence and GUI visual verification remain separate.
+
+SI interface expansion: [workflow/native roadmap](SI_INTERFACE_EXPANSION.md).
+`si_material_scenario.py` owns immutable, revision-bound conductivity preparation;
+`service_si_materials.py` owns the bounded inline worker route. Reference-plane
+selection remains in `si_channel.py`/`si_coupled_channel.py`. See
+[real-board scenario evidence](validation/SI_BOARD_SCENARIOS_20261023.md).
+`si_pair_geometry.py` owns in-process lossless selected-pair preparation;
+`scripts/verify_si_pair_geometry.py` checks pinned Marble/WREN source retention
+and complete exact straight-track intervals. This is not the coupled extractor
+or an IPC solve route. See [derivation and limits](validation/SI_GENERAL_PAIR_GEOMETRY_20261023.md).
+`si_ami_inventory.py` owns non-executing AMI model inventory.
+`si_ami_execution.py` supervises the separate `src/si/ami_host_main.cpp` trusted
+development executable, not a generic worker DLL loader. `si_pam3.py` owns
+sampled-FIR PAM3 math; `service_si_pam3.py` and `service_si_models.py` expose its
+strict worker route. See [execution evidence](validation/SI_EXECUTION_20261023.md).
+`si_protocol_suites.py`
+admits declared PAM3 vocabulary while the numerical runner explicitly rejects
+it instead of substituting NRZ/PAM4.
+
+Live linear sampled-network/SPICE lowering belongs to `em_spice_coupling.py`
+and `em_spice_coupling_circuit.py`. Supplied-field calibration and volume loss
+belong to `em_body_heating.py`, with public dataset capture in
+`extensions/emerge_suite/volume_capture.py`. Conservative retained tetrahedral
+flow-to-thermal composition belongs to `cfd_tetra_cht.py`, exposed by
+`service_cfd.py`. Their dated validation records distinguish source execution
+from physical and installer qualification.
+
+`em_network_resistor_cht.py` composes explicit named-port resistor losses with
+retained solid-volume heating and that creeping CHT owner, in-process only.
+See [AC/CHT evidence](validation/AC_NETWORK_CHT_20261023.md) and
+[ADR 0135](adr/0135-explicit-network-resistor-to-creeping-cht.md).
+Fixed-size RT0 thermal assembly buffers and exact-equivalence tests are recorded
+in [stage-only performance evidence](validation/CFD_ENERGY_PERFORMANCE_20261023.md).
+
+EMerge's explicit sampled circuit handoff belongs to
+`extensions/emerge_suite/cosimulation.py`; bounded AC wave connections and
+external-resistor heat composition belong to `em_network_ac.py` and
+`em_network_resistor_thermal.py`. See [interfaces and math](EMERGE_COSIMULATION.md).
+`service_em_cosimulation.py` and `cli_em_cosimulation.py` own process exposure;
+`emergeCosimulationDraft.ts` owns draft-only transport and the Python Workspace
+catalog supplies guarded runners. They do not infer EM-body heat or qualify
+general co-simulation. See [release evidence](validation/EMERGE_RELEASE_INTEGRATION_20261023.md).
+
+Experimental AC-loss/heat/stress chaining belongs to
+`pdn_dielectric_thermomechanical.py`; it composes existing solver owners without
+new numerical laws. See [method/example](validation/AC_THERMAL_ELASTIC_20261023.md)
+and [ADR0128](adr/0128-same-mesh-ac-thermal-elastic-chain.md).
+The [tetrahedral CFD zero-work repair](validation/CFD_TETRA_ZERO_WORK_20261023.md)
+preserves the constant-velocity nullspace and all existing flow gates.
+
 Electron/ion optics and vacuum/pressure environments:
 [scope and stages](CHARGED_PARTICLE_VACUUM_PLAN.md). Internal native reference
 ownership is `src/particles/kinetic_reference.*` with
@@ -1315,7 +1463,7 @@ roundoff allowance; other integrity and physical power gates remain unchanged.
 [Method](RLGC_LOADED_STAR.md),
 [ADR 0124](adr/0124-physical-rlc-loaded-coupled-stars.md),
 [verification](validation/SI02_LOADED_STAR_20261021.md).
-The new schemas enforce source/termination counts for every 2–8-leg topology.
+The new schemas enforce source/termination counts for every 2â€“8-leg topology.
 
 ## Part operating limits
 
@@ -1325,3 +1473,41 @@ and `partLimitsModel.ts` own editing, storage admission and report export;
 `engineeringReviewWorkspace.ts` retains rules and captured evidence, while
 `projectSnapshotState.ts` strips observations from result-free exports.
 See [workflow, equations and validation](PART_LIMITS.md).
+
+
+### Searchable dropdowns and basic solver steps
+
+`SelectSearchLayer.tsx` and `optionSearch.ts` adapt native single-choice fields,
+including detached panel documents; `SolverSetupSteps.tsx` owns retained step
+navigation. See [setup flows](SOLVER_SETUP_FLOWS.md) for domain integrations
+and presentation-only boundaries.
+
+Viewport context relevance is owned by `app/src/viewportContextPolicy.ts`;
+`occurrenceClipboard.ts` owns immutable same-project board/mechanical occurrence
+capture, duplication and dependency-checked removal. `App.tsx` binds these to
+selection, project generation, saved state and Undo/Redo. See [context and occurrence navigation](UI_NAVIGATION.md#context-actions-and-reusable-occurrences).
+
+Linked CAD source refresh: `python/spike_core/service_linked_sources.py` owns
+bounded source fingerprints and manifest-bound link/refresh transactions;
+`app/src/LinkedSourcesPanel.tsx` owns target search, optional status checks and
+explicit revision review in Project manager. Native host path grants and project
+trust binding guard the worker transport. See [linked CAD sources](LINKED_CAD_SOURCES.md).
+
+Viewport context camera actions are composed by `app/src/viewportNavigationActions.ts`;
+`BoardViewport.tsx` supplies original-click scene/assembly hit coordinates. The
+context policy keeps camera navigation and standard views available across
+workspaces without expanding the analysis action inventory.
+
+## Project recovery backups
+
+[Backup settings and recovery](PROJECT_BACKUPS.md): `app/src/useAutomaticProjectBackup.ts`, `projectBackupScheduler.ts`, `ProjectBackupsPanel.tsx`; native boundary `app/src-tauri/src/project_backups.rs`; portable storage `python/spike_core/service_project_backup.py`.
+
+`app/src/infiniteViewportGrid.ts` owns the constant-geometry 3D floor/horizon shader; `BoardViewport.tsx` owns placement and disposal. `appSettings.ts` owns the independently persisted origin-axis preference. See [viewport appearance](UI_NAVIGATION.md#floor-grid-horizon-and-origin-markers).
+
+## Solder presentation
+
+`app/src/solderJointModel.ts` admits identity-bound display settings; `solderJointScene.ts` owns bounded instanced profiles; `SolderJointEditor.tsx` extends `BondManager.tsx`. App retains these optional fields in existing component-bond snapshots; BoardViewport composes their scene. Solver contacts continue through unchanged `componentBonding.ts` mapping. See [solder connections](SOLDER_CONNECTIONS.md).
+
+## Integrated solver discovery and exact setup
+
+`app/src/solverSuiteCatalog.ts` owns presentation routes and template IDs; `python/spike_core/solver_blocks.py` owns the preview-only dependency graph and generates its bundled JSON snapshot. App stages exact reviewed runners from `pythonWorkspaceTemplates.ts` or opens owning panels. `generate-solver-integration.mjs` generates the [complete capability destination map](SOLVER_INTEGRATION.md). Source-only and planned references never become runtime-qualified by discovery.

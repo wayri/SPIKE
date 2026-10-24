@@ -10,7 +10,7 @@ globalThis.CustomEvent = class CustomEvent {
 };
 
 const bridge = await import("../src/workerBridge.ts");
-for (const method of ['review_engineering', 'quick_engineering_tool', 'run_em_machine', 'run_magnetic_machine', 'prepare_assembly_em', 'run_assembly_em', 'run_assembly_field_transient', 'run_assembly_electrothermal', 'evaluate_electrical_heat_source', 'prepare_pcb_electrothermal_geometry', 'solve_fan_system_operating_point']) {
+for (const method of ['run_em_network_resistor_cht','run_em_spice_coupling','run_em_body_heating','simulate_si_pam3','run_cfd_tetra_cht','extract_pdn_dielectric_ac','reduce_pdn_admittance','run_assembly_tetra_structural','run_assembly_thermomechanical','run_pdn_dielectric_thermomechanical','run_propulsion_pod','run_propulsion_pod_three_phase','run_propulsion_pod_geometry', 'review_engineering', 'quick_engineering_tool', 'run_em_machine', 'run_magnetic_machine', 'prepare_assembly_em', 'run_assembly_em', 'run_assembly_field_transient', 'run_assembly_electrothermal', 'evaluate_electrical_heat_source', 'prepare_pcb_electrothermal_geometry', 'solve_fan_system_operating_point']) {
   assert.equal(bridge.isHeavyWorkerMethod(method), true, `${method} must receive heavy-worker supervision`);
 }
 const deferred = () => {
@@ -47,7 +47,7 @@ const deferred = () => {
     if (command === "cancel_worker") return true;
     throw new Error(command);
   };
-  const pending = bridge.runLocalWorker({ id: "late-success", method: "run_analysis" });
+  const pending = bridge.runLocalWorker({ id: "late-success", method: "run_propulsion_pod_geometry" });
   const duplicate = await bridge.runLocalWorker({ id: "duplicate", method: "run_analysis" });
   assert.equal(duplicate.type, "WorkerBusyError");
   assert.equal(runCalls, 1);

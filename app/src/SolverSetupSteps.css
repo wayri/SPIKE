@@ -1,0 +1,35 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.solver-setup-steps { min-width: 0; width: 100%; margin-block: 12px 16px; padding-block: 4px 12px; border-bottom: 1px solid var(--spike-table-border); font: var(--spike-control-font); color: var(--spike-control-text); }
+.solver-setup-steps ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 6px; padding: 0; margin: 0; list-style: none; }
+.solver-setup-steps li { min-width: 0; }
+.solver-setup-steps nav button { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 38px; height: auto; padding: 7px 9px; border-color: transparent; background: transparent; color: var(--spike-control-muted); border-radius: 7px; text-align: left; white-space: normal; overflow-wrap: anywhere; font: var(--spike-control-font); line-height: 1.45; }
+.solver-setup-steps nav button:hover:not(:disabled) { background: var(--spike-control-surface-hover); color: var(--spike-control-text); }
+.solver-setup-steps nav button.selected { background: var(--spike-control-surface-active); border-color: var(--spike-table-border); color: var(--spike-control-text); font-weight: 600; }
+.solver-step-number { display: grid; place-items: center; flex: 0 0 23px; height: 23px; border: 1px solid var(--spike-table-border-strong); border-radius: 50%; font-size: 10px; font-weight: 600; color: var(--spike-control-muted); }
+.selected .solver-step-number { border-color: var(--spike-control-border-hover); color: var(--spike-control-focus); }
+.solver-step-description { white-space: normal; overflow-wrap: anywhere; color: var(--spike-control-muted); margin: 10px 3px 12px; line-height: 1.6; max-width: 84ch; }
+.solver-step-navigation { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-inline: 3px; }
+.solver-step-navigation span { flex: 1; min-width: 75px; text-align: center; color: var(--spike-control-muted); font-size: 10px; }
+.solver-step-navigation button { min-width: 64px; border-radius: 6px; }
+.solver-setup-panel { min-width: 0; }
+.solver-setup-panel > .wizard-section + .wizard-section { margin-top: 14px; }
+.solver-setup-panel[hidden] { display: none !important; }
+.pi-dialog-actions[hidden], .si-toolbar button[hidden] { display: none !important; }
+/* Review needs both validation actions and diagnostics despite the legacy Mesh/Solve workspace filter. */
+.pi-run-dialog[data-setup-step="review"] .mesh-only { display: block; }
+.pi-run-dialog[data-setup-step="review"] .pi-dialog-actions button[title^="Validate setup"],
+.pi-run-dialog[data-setup-step="review"] .pi-dialog-actions button[title^="Run the configured mesh"] { display: inline-flex; }
+.sparam-workbench .sparam-body[data-setup-step] { grid-template-columns: minmax(0, 1fr); }
+.sparam-body[data-setup-step="domain"] > main, .sparam-body[data-setup-step="ports"] > main,
+.sparam-body[data-setup-step="conditions"] > aside, .sparam-body[data-setup-step="review"] > aside { display: none; }
+.sparam-workbench .sparam-body[data-setup-step] > aside { border: 0; }
+
+/* Consistent form hierarchy inside the guided pages, independent of legacy panels. */
+.solver-setup-panel > :is(.wizard-section,.emi-section,fieldset,.setup-subgroup) { padding:12px;margin-block:0 12px;border:1px solid var(--spike-table-border);border-radius:8px; }
+.solver-setup-panel label { line-height:1.5; }
+.solver-setup-panel :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),select,textarea) { border-radius:5px;font:12px/1.4 Inter,ui-sans-serif,system-ui,sans-serif; }
+.solver-setup-panel > .wizard-section > label:first-child { margin-bottom:8px;color:var(--spike-table-muted);font-weight:600; }
+/* Guided forms keep readable bounds inside expanded editor slots. */
+.solver-setup-panel {width:100%;max-width:68rem;box-sizing:border-box;}
+.solver-setup-panel :is(button.secondary-btn,button.primary-btn,label.secondary-btn) {width:fit-content;max-width:100%;display:inline-flex;align-items:center;justify-content:center;min-height:30px;margin-top:0;padding:5px 10px;font-size:12px;line-height:1.4;}
+.solver-setup-panel > fieldset > legend {font-size:13px;font-weight:650;line-height:1.4;}

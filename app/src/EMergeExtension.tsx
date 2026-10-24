@@ -14,6 +14,7 @@ import { suggestEMergePadPairs } from "./emergeSetupSuggestions";
 import { reviewEMergeNetwork } from "./emergeNetworkReview";
 import { EMergeNearField } from "./EMergeNearField";
 import { downloadEMergeText, exportEMergeNetwork } from "./emergeSampleExport";
+import { exportEMergeCosimulationDraft } from "./emergeCosimulationDraft";
 
 export function EMergeCapabilityInventory({ rows }: { rows: unknown }) {
   if (!Array.isArray(rows)) return null;
@@ -329,6 +330,10 @@ export function EMergeResultPlot({ result, frequencyIndex, onFrequencyIndexChang
     try { const output = exportEMergeNetwork(result, format); downloadEMergeText(output.name, output.text); setExportError(""); }
     catch (error) { setExportError(error instanceof Error ? error.message : "Network export failed."); }
   };
+  const exportCosimulation = () => {
+    try { const output = exportEMergeCosimulationDraft(result); downloadEMergeText(output.name, output.text); setExportError(""); }
+    catch (error) { setExportError(error instanceof Error ? error.message : "Co-simulation draft export failed."); }
+  };
   const cutIndex = frequencyIndex ?? localCutIndex;
   const setCutIndex = onFrequencyIndexChange ?? setLocalCutIndex;
   const radiationPoints = useMemo(() => {
@@ -371,6 +376,7 @@ export function EMergeResultPlot({ result, frequencyIndex, onFrequencyIndexChang
   return <div className="extension-output emerge-result-output">
     <label>EMERGE RESULT</label>
     <small>Model status: {status}. Curves and the 3D surface use solved EMerge samples. The 3D radius is relative field amplitude.</small>
+    {networkReview.ports.length > 0 && <section aria-label="EMerge co-solver handoff"><button type="button" className="secondary-btn" onClick={exportCosimulation}>Export co-simulation draft</button><small>Experimental: review terminal pairs, reference planes, expected source hashes and RMS wave convention in the exported draft. Run the EMerge preparation template in Python Workspace, then the sampled AC / resistor-thermal templates. This does not run SPICE or convert radiation into heat.</small></section>}
     {networkReview.ports.length > 0 && <section><div className="extension-actions"><button className="secondary-btn" onClick={() => exportNetwork("csv")}>Export complex CSV</button><button className="secondary-btn" onClick={() => exportNetwork("touchstone")}>Export Touchstone</button></div><label>Probe solved network sample<select aria-label="Probe solved network frequency" value={Math.min(networkSample, frequencies.length - 1)} onChange={event => setNetworkSample(Number(event.target.value))}>{frequencies.map((frequency, index) => <option key={frequency} value={index}>{frequency} Hz</option>)}</select></label><DataTable label="EMerge network samples"><thead><tr><th>Term</th><th>Real</th><th>Imaginary</th><th>Magnitude</th><th>Phase (deg)</th></tr></thead><tbody>{ports.flatMap((receive, row) => ports.map((excited, column) => { const pair = (sParameters.values as number[][][][])[Math.min(networkSample, frequencies.length - 1)][row][column]; return <tr key={`${row}-${column}`}><td>{receive} ← {excited}</td><td>{pair[0].toPrecision(6)}</td><td>{pair[1].toPrecision(6)}</td><td>{Math.hypot(...pair).toPrecision(6)}</td><td>{(Math.atan2(pair[1], pair[0]) * 180 / Math.PI).toPrecision(6)}</td></tr>; }))}</tbody></DataTable>{exportError && <p role="alert">{exportError}</p>}</section>}
     <section><div className="extension-output-title"><b>Analysis information</b></div><DataTable label="EMerge analysis information"><tbody>
       <tr><th>Solver</th><td>{String(summary.engine ?? "EMerge")} {String(summary.engine_version ?? "")}</td></tr>

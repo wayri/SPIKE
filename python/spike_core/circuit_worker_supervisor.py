@@ -26,6 +26,7 @@ from .owned_spice_process import (
     _normalized_job_relative,
     _reject_reparse_components,
 )
+from .spikes_runtime import _library_name
 
 
 MAX_TIMEOUT_SECONDS = 86_400
@@ -338,7 +339,7 @@ def run_circuit_worker(
     """Admit identities and supervise the worker's fixed four-argument ABI."""
 
     worker_name = "spike-circuit-worker.exe" if os.name == "nt" else "spike-circuit-worker"
-    library_name = "spikes_c_api.dll" if os.name == "nt" else "libspikes_c_api.so"
+    library_name = _library_name()
     worker = _regular_identity(worker_executable, worker_name, worker_sha256)
     _regular_identity(library_path, library_name, library_sha256)
     root = job_root.resolve(strict=True)
